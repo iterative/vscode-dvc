@@ -1,5 +1,6 @@
 import { VisualizationSpec } from 'react-vega'
 import { PlotsType } from '../../../plots/webview/contract'
+import { join } from '../../util/path'
 
 const basicVega = {
   'logs/loss.tsv': [
@@ -184,40 +185,46 @@ const basicVega = {
   ]
 }
 
-const getImageData = (baseUrl: string, sep: string) => ({
+const getImageData = (
+  baseUrl: string,
+  joinFunc: (...args: string[]) => string
+) => ({
   'plots/acc.png': [
     {
       type: PlotsType.IMAGE,
       revisions: ['workspace'],
-      url: [baseUrl, 'workspace_plots_acc.png'].join(sep)
+      url: joinFunc(baseUrl, 'workspace_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['HEAD'],
-      url: [baseUrl, 'HEAD_plots_acc.png'].join(sep)
+      url: joinFunc(baseUrl, 'HEAD_plots_acc.png')
     }
   ],
   'plots/loss.png': [
     {
       type: PlotsType.IMAGE,
       revisions: ['workspace'],
-      url: [baseUrl, 'workspace_plots_loss.png'].join(sep)
+      url: joinFunc(baseUrl, 'workspace_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['HEAD'],
-      url: [baseUrl, 'HEAD_plots_loss.png'].join(sep)
+      url: joinFunc(baseUrl, 'HEAD_plots_loss.png')
     }
   ]
 })
 
-export const getMinimalData = (baseUrl: string, sep = '/') => ({
-  ...getImageData(baseUrl, sep),
+export const getSmallMemoryFootprintFixture = (
+  baseUrl: string,
+  joinFunc = join
+) => ({
+  ...getImageData(baseUrl, joinFunc),
   ...basicVega
 })
 
-export const getData = (baseUrl: string, sep = '/') => ({
-  ...getImageData(baseUrl, sep),
+export const getFixture = (baseUrl: string, joinFunc = join) => ({
+  ...getImageData(baseUrl, joinFunc),
   ...basicVega,
   ...require('./confusionMatrix').default
 })

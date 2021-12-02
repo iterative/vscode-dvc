@@ -1,5 +1,5 @@
 import { basePlotsUrl } from '../../../util'
-import { getData, getMinimalData } from '..'
+import { getFixture } from '..'
 import { Uri, ViewColumn, window } from 'vscode'
 import { ViewKey } from '../../../../webview/constants'
 
@@ -18,5 +18,8 @@ const baseUrl = webviewPanel.webview
 
 webviewPanel.dispose()
 
-export const minimalStaticPlotsFixture = getMinimalData(baseUrl)
-export const staticPlotsFixture = getData(baseUrl)
+const uriJoin = (...segments: string[]) => segments.join('/')
+
+const data = getFixture(baseUrl, uriJoin)
+
+export default data

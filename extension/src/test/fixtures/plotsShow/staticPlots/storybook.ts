@@ -1,4 +1,5 @@
-import { getData, getMinimalData } from '..'
+import { getFixture } from '..'
 
-export const minimalStaticPlotsFixture = getMinimalData('.')
-export const staticPlotsFixture = getData('.')
+const data = getFixture('.')
+
+export default data

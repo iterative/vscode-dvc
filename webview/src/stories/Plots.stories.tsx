@@ -2,7 +2,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import { staticPlotsFixture } from 'dvc/src/test/fixtures/plotsShow/staticPlots/storybook'
+import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/storybook'
 import Plots from '../plots/components/Plots'
 import {
   useAppReducer,

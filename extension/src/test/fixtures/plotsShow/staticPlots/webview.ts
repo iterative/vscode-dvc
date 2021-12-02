@@ -1,3 +1,5 @@
-import { getMinimalData } from '..'
+import { getSmallMemoryFootprintFixture } from '..'
 
-export const minimalStaticPlotsFixture = getMinimalData('.')
+const data = getSmallMemoryFootprintFixture('.')
+
+export default data
