@@ -5,7 +5,7 @@ import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import { plotsShowFixture } from '../../fixtures/plotsShow/output'
-import { staticPlotsFixture } from '../../fixtures/plotsShow/staticPlots/integration'
+import { staticPlotsFixture } from '../../fixtures/plotsShow/staticPlots/vscode'
 import { closeAllEditors } from '../util'
 import { PlotsData } from '../../../plots/webview/contract'
 
