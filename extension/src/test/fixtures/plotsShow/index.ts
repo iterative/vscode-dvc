@@ -1,6 +1,5 @@
 import { VisualizationSpec } from 'react-vega'
 import { PlotsType } from '../../../plots/webview/contract'
-import { join } from '../../util/path'
 
 const basicVega = {
   'logs/loss.tsv': [
@@ -185,40 +184,40 @@ const basicVega = {
   ]
 }
 
-const getImageData = (baseUrl: string) => ({
+const getImageData = (baseUrl: string, sep: string) => ({
   'plots/acc.png': [
     {
       type: PlotsType.IMAGE,
       revisions: ['workspace'],
-      url: join(baseUrl, 'workspace_plots_acc.png')
+      url: [baseUrl, 'workspace_plots_acc.png'].join(sep)
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['HEAD'],
-      url: join(baseUrl, 'HEAD_plots_acc.png')
+      url: [baseUrl, 'HEAD_plots_acc.png'].join(sep)
     }
   ],
   'plots/loss.png': [
     {
       type: PlotsType.IMAGE,
       revisions: ['workspace'],
-      url: join(baseUrl, 'workspace_plots_loss.png')
+      url: [baseUrl, 'workspace_plots_loss.png'].join(sep)
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['HEAD'],
-      url: join(baseUrl, 'HEAD_plots_loss.png')
+      url: [baseUrl, 'HEAD_plots_loss.png'].join(sep)
     }
   ]
 })
 
-export const getMinimalData = (baseUrl: string) => ({
-  ...getImageData(baseUrl),
+export const getMinimalData = (baseUrl: string, sep = '/') => ({
+  ...getImageData(baseUrl, sep),
   ...basicVega
 })
 
-export const getData = (baseUrl: string) => ({
-  ...getImageData(baseUrl),
+export const getData = (baseUrl: string, sep = '/') => ({
+  ...getImageData(baseUrl, sep),
   ...basicVega,
   ...require('./confusionMatrix').default
 })

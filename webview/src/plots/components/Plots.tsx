@@ -128,18 +128,16 @@ const LivePlots = ({
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
     {Object.entries(plots).map(([path, plots]) =>
-      plots.map(plot =>
+      plots.map((plot, i) =>
         isVegaPlot(plot) ? (
           <VegaLite
             actions={false}
             config={config}
             spec={plot.content}
             renderer="svg"
-            key={`plot-${path}`}
+            key={`plot-${path}-${i}`}
           />
-        ) : (
-          <></>
-        )
+        ) : undefined
       )
     )}
   </>
