@@ -23,11 +23,12 @@ export enum Status {
   UNSELECTED = 0
 }
 
-const enum MementoPrefixes {
+export const enum MementoPrefixes {
   COLORS = 'colors:',
   FILTER_BY = 'filterBy:',
   SORT_BY = 'sortBy:',
-  STATUS = 'status:'
+  STATUS = 'status:',
+  SELECTED_METRICS = 'selectedMetrics:'
 }
 
 export class ExperimentsModel {
@@ -46,6 +47,7 @@ export class ExperimentsModel {
   private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
+  private selectedMetrics?: string[] = undefined
 
   private readonly dvcRoot: string
   private readonly workspaceState: Memento
@@ -63,6 +65,11 @@ export class ExperimentsModel {
     this.dvcRoot = dvcRoot
 
     this.workspaceState = workspaceState
+
+    this.selectedMetrics = workspaceState.get(
+      MementoPrefixes.SELECTED_METRICS + dvcRoot,
+      undefined
+    )
   }
 
   public getLivePlots() {
@@ -96,7 +103,8 @@ export class ExperimentsModel {
             selectedExperiments.includes(value.group)
           )
         }
-      })
+      }),
+      selectedMetrics: this.selectedMetrics
     }
   }
 
@@ -231,6 +239,22 @@ export class ExperimentsModel {
         }
       })
     ]
+  }
+
+  public setSelectedMetrics(selectedMetrics: string[]) {
+    this.selectedMetrics = selectedMetrics
+    this.persistSelectedMetrics()
+  }
+
+  public getSelectedMetrics() {
+    return this.selectedMetrics
+  }
+
+  private persistSelectedMetrics() {
+    this.workspaceState.update(
+      MementoPrefixes.SELECTED_METRICS + this.dvcRoot,
+      this.getSelectedMetrics()
+    )
   }
 
   private getSubRows(experiments: Experiment[]) {

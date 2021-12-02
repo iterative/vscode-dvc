@@ -17,10 +17,6 @@ import { definedAndNonEmpty } from '../../util/array'
 import * as Time from '../../util/time'
 import { OutputChannel } from '../../vscode/outputChannel'
 
-export const dvcDemoPath = Uri.file(
-  resolve(__dirname, '..', '..', '..', '..', 'demo')
-).fsPath
-
 export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
 export const configurationChangeEvent = (

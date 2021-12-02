@@ -11,7 +11,8 @@ import {
   getFilterId,
   Operator
 } from '../../../../../experiments/model/filterBy'
-import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
+import { dvcDemoPath } from '../../../../util'
+import { experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'

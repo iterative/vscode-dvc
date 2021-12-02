@@ -1,6 +1,7 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
-import { buildInternalCommands, dvcDemoPath } from '../util'
+import { dvcDemoPath } from '../../util'
+import { buildInternalCommands } from '../util'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'

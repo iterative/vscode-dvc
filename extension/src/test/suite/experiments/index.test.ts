@@ -16,11 +16,10 @@ import { ParamOrMetric, TableData } from '../../../experiments/webview/contract'
 import {
   buildInternalCommands,
   closeAllEditors,
-  dvcDemoPath,
   experimentsUpdatedEvent,
   extensionUri
 } from '../util'
-import { buildMockMemento } from '../../util'
+import { buildMockMemento, dvcDemoPath } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'

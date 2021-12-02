@@ -220,6 +220,10 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
+  public setSelectedMetrics(metrics: string[]) {
+    this.experiments.setSelectedMetrics(metrics)
+  }
+
   private notifyChanged() {
     this.livePlotsChanged.fire()
     this.experimentsChanged.fire()

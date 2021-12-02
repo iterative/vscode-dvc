@@ -6,7 +6,7 @@ import { Plots } from '../../../plots'
 import { BaseWebview } from '../../../webview'
 import { buildExperiments } from '../experiments/util'
 import { CliReader } from '../../../cli/reader'
-import { dvcDemoPath } from '../util'
+import { dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 
@@ -45,7 +45,8 @@ export const getExpectedData = (domain: string[], range: string[]) => {
       plots: plots.map(plot => ({
         title: plot.title,
         values: plot.values.filter(values => domain.includes(values.group))
-      }))
+      })),
+      selectedMetrics: undefined
     },
     static: undefined
   }

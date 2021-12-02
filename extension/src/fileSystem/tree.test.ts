@@ -9,6 +9,7 @@ import { RegisteredCommands } from '../commands/external'
 import { OutputChannel } from '../vscode/outputChannel'
 import { WorkspaceRepositories } from '../repository/workspace'
 import { Repository } from '../repository'
+import { dvcDemoPath } from '../test/util'
 
 const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
 const mockedWorkspaceChangedFire = jest.fn()
@@ -63,8 +64,6 @@ beforeEach(() => {
 })
 
 describe('TrackedTreeView', () => {
-  const dvcDemoPath = join(__dirname, '..', '..', '..', 'demo')
-
   describe('initialize', () => {
     it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(

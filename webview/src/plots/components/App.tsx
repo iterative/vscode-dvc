@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
 import {
+  MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview
 } from 'dvc/src/webview/contract'
@@ -10,6 +11,9 @@ import { PlotsWebviewState, useAppReducer } from '../hooks/useAppReducer'
 
 const signalInitialized = () =>
   vsCodeApi.postMessage({ type: MessageFromWebviewType.INITIALIZED })
+
+const sendMessage = (message: MessageFromWebview) =>
+  vsCodeApi.postMessage(message)
 
 export const App = () => {
   const [state, dispatch] = useAppReducer(
@@ -32,5 +36,5 @@ export const App = () => {
     vsCodeApi.setState<PlotsWebviewState>(state)
   }, [state])
 
-  return <Plots state={state} dispatch={dispatch} />
+  return <Plots state={state} dispatch={dispatch} sendMessage={sendMessage} />
 }
