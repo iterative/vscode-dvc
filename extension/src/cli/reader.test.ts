@@ -8,7 +8,7 @@ import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
 import { getProcessEnv } from '../env'
 import expShowFixture from '../test/fixtures/expShow/output'
-import plotsShowFixture from '../test/fixtures/plotsShow/output'
+import { plotsShowFixture } from '../test/fixtures/plotsShow/output'
 import { Config } from '../config'
 
 jest.mock('vscode')

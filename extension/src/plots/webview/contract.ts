@@ -24,12 +24,12 @@ export const isVegaPlot = (plot: StaticPlot): plot is VegaPlot =>
 
 export type VegaPlot = {
   content: VisualizationSpec
-  revs?: string[]
+  revisions?: string[]
   type: PlotsType
 }
 
 export type ImagePlot = {
-  rev?: string
+  revisions?: string[]
   type: PlotsType
   url: string
 }

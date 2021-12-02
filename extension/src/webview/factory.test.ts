@@ -1,14 +1,14 @@
 import { ViewKey } from './constants'
 import { isValidState } from './factory'
 import livePlotsFixture from '../test/fixtures/expShow/livePlots'
-import plotsShowFixture from '../test/fixtures/plotsShow/minimalOutput'
+import { minimalPlotsShowFixture } from '../test/fixtures/plotsShow/output'
 
 describe('isValidState', () => {
   const dvcRoot = 'test'
   it('should successfully validate example plots data', () => {
     expect(
       isValidState(ViewKey.PLOTS, {
-        data: { live: livePlotsFixture, static: plotsShowFixture },
+        data: { live: livePlotsFixture, static: minimalPlotsShowFixture },
         dvcRoot
       })
     ).toBe(true)
@@ -26,7 +26,7 @@ describe('isValidState', () => {
   it('should successfully validate data containing only static plots', () => {
     expect(
       isValidState(ViewKey.PLOTS, {
-        data: { static: plotsShowFixture },
+        data: { static: minimalPlotsShowFixture },
         dvcRoot
       })
     ).toBe(true)
