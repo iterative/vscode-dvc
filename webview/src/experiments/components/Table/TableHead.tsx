@@ -1,6 +1,6 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { DragDropContext, DragUpdate } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
@@ -18,6 +18,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   instance: {
     headerGroups,
     setColumnOrder,
+    allColumns,
     state: { columnOrder }
   },
   sorts,
@@ -27,7 +28,9 @@ export const TableHead: React.FC<TableHeadProps> = ({
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
 
-  const memoizedSetColumnOrder = useCallback(setColumnOrder, [setColumnOrder])
+  const onDragStart = () => {
+    setColumnOrder(allColumns.map(column => column.id))
+  }
 
   const onDragUpdate = (column: DragUpdate) => {
     if (!column.destination) {
@@ -40,7 +43,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
 
       colOrder.splice(oldIndex, 1)
       colOrder.splice(destination.index, 0, draggableId)
-      memoizedSetColumnOrder(colOrder)
+      setColumnOrder(colOrder)
     }
   }
 
@@ -53,7 +56,11 @@ export const TableHead: React.FC<TableHeadProps> = ({
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
         <span {...headerGroup.getHeaderGroupProps()}>
-          <DragDropContext onDragUpdate={onDragUpdate} onDragEnd={onDragEnd}>
+          <DragDropContext
+            onDragUpdate={onDragUpdate}
+            onDragEnd={onDragEnd}
+            onDragStart={onDragStart}
+          >
             <MergedHeaderGroup
               orderedColumns={orderedColumns}
               headerGroup={headerGroup}
