@@ -12,6 +12,7 @@ export type LivePlotData = {
 export type LivePlotsData = {
   plots: LivePlotData[]
   colors: LivePlotsColors
+  selectedMetrics?: string[]
 }
 
 export enum PlotsType {

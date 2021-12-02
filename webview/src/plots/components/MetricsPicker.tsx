@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { SelectMenu } from '../../shared/components/selectMenu/SelectMenu'
 import { SelectMenuOptionProps } from '../../shared/components/selectMenu/SelectMenuOption'
 
@@ -15,18 +15,15 @@ export const MetricsPicker: React.FC<{
     }))
   )
   const onClick = (id: string) => {
-    setOptions(
-      options.map(option =>
-        option.id === id
-          ? { ...option, isSelected: !option.isSelected }
-          : option
-      )
+    const rebuiltOptions = options.map(option =>
+      option.id === id ? { ...option, isSelected: !option.isSelected } : option
+    )
+    setOptions(rebuiltOptions)
+    setSelectedMetrics(
+      rebuiltOptions
+        .filter(option => option.isSelected)
+        .map(option => option.id)
     )
   }
-  useEffect(() => {
-    setSelectedMetrics(
-      options.filter(option => option.isSelected).map(option => option.id)
-    )
-  }, [options, setSelectedMetrics])
   return <SelectMenu options={options} onClick={onClick} />
 }

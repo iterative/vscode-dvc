@@ -191,6 +191,7 @@ describe('App', () => {
           }
         }}
         dispatch={jest.fn}
+        sendMessage={jest.fn}
       />
     )
 
@@ -228,5 +229,42 @@ describe('App', () => {
     expect(() =>
       screen.getByTestId('plot-metrics:summary.json:loss')
     ).not.toThrow()
+  })
+
+  it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
+    const initialState = {
+      collapsedSections: defaultCollapsibleSectionsState,
+      data: {
+        live: livePlotsFixture
+      }
+    }
+    mockGetState.mockReturnValue(initialState)
+    render(<App />)
+
+    const pickerButton = screen.getByTestId('icon-menu-item')
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    const lossItem = await screen.findByText('loss')
+
+    fireEvent.click(lossItem, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: ['accuracy', 'val_loss', 'val_accuracy'],
+      type: MessageFromWebviewType.METRIC_TOGGLED
+    })
+
+    fireEvent.click(lossItem, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: ['loss', 'accuracy', 'val_loss', 'val_accuracy'],
+      type: MessageFromWebviewType.METRIC_TOGGLED
+    })
   })
 })

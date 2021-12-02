@@ -12,6 +12,11 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
+import {
+  MessageFromWebviewType,
+  MetricToggledPayload
+} from '../webview/contract'
+import { Logger } from '../common/logger'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -33,6 +38,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.data = this.dispose.track(new PlotsData(dvcRoot, internalCommands))
 
     this.dispose.track(this.data.onDidUpdate(data => this.setStaticPlots(data)))
+
+    this.handleMessageFromWebview()
   }
 
   public async setExperiments(experiments: Experiments) {
@@ -80,5 +87,22 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
 
     this.staticPlots = data
+  }
+
+  private handleMessageFromWebview() {
+    this.dispose.track(
+      this.onDidReceivedWebviewMessage(message => {
+        if (message.type === MessageFromWebviewType.METRIC_TOGGLED) {
+          return (
+            message.payload &&
+            this.experiments?.setSelectedMetrics(
+              message.payload as MetricToggledPayload
+            )
+          )
+        }
+
+        Logger.error(`Unexpected message: ${message}`)
+      })
+    )
   }
 }

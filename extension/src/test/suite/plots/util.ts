@@ -45,7 +45,8 @@ export const getExpectedData = (domain: string[], range: string[]) => {
       plots: plots.map(plot => ({
         title: plot.title,
         values: plot.values.filter(values => domain.includes(values.group))
-      }))
+      })),
+      selectedMetrics: undefined
     },
     static: undefined
   }
