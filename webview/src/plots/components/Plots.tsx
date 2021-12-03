@@ -8,100 +8,29 @@ import {
   VegaPlot
 } from 'dvc/src/plots/webview/contract'
 import { VegaLite } from 'react-vega'
-import styles from './styles.module.scss'
-import { config, createSpec } from './constants'
+import { config, createSpec, PlotDimensions } from './constants'
 import { EmptyState } from './EmptyState'
-import { MetricsPicker } from './MetricsPicker'
-import { PlotSize, SizePicker } from './SizePicker'
+import { PlotSize } from './SizePicker'
+import { PlotsContainer } from './PlotsContainer'
 import {
-  CollapsibleSectionsActions,
   PlotsSectionKeys,
-  CollapsibleSectionsState,
   PlotsReducerAction,
   PlotsWebviewState
 } from '../hooks/useAppReducer'
-import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
-import { AllIcons } from '../../shared/components/icon/Icon'
 import { getDisplayNameFromPath } from '../../util/paths'
-
-const PlotsContainer: React.FC<{
-  collapsedSections: CollapsibleSectionsState
-  sectionKey: PlotsSectionKeys
-  dispatch: Dispatch<PlotsReducerAction>
-  title: string
-  metrics?: string[]
-  selectedMetrics?: string[]
-  setSelectedPlots?: (selectedPlots: string[]) => void
-}> = ({
-  collapsedSections,
-  sectionKey,
-  dispatch,
-  title,
-  children,
-  metrics,
-  selectedMetrics,
-  setSelectedPlots
-}) => {
-  const open = !collapsedSections[sectionKey]
-  return (
-    <div className={styles.plotsContainerWrapper}>
-      <details open={open} className={styles.plotsContainer}>
-        <summary
-          onClick={e => {
-            e.preventDefault()
-            dispatch({
-              sectionKey,
-              type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
-            })
-          }}
-        >
-          {title}
-        </summary>
-        <div className={styles.centered}>{open && children}</div>
-      </details>
-      {metrics && setSelectedPlots && selectedMetrics && (
-        <div className={styles.iconMenu}>
-          <IconMenu
-            items={[
-              {
-                icon: AllIcons.LINES,
-                onClickNode: (
-                  <MetricsPicker
-                    metrics={metrics}
-                    setSelectedMetrics={setSelectedPlots}
-                    selectedMetrics={selectedMetrics}
-                  />
-                ),
-                tooltip: 'Choose metrics'
-              },
-              {
-                icon: AllIcons.DOTS,
-                onClickNode: (
-                  <SizePicker
-                    currentSize={PlotSize.REGULAR}
-                    setSelectedSize={() => {}}
-                  />
-                ),
-                tooltip: 'Resize'
-              }
-            ]}
-          />
-        </div>
-      )}
-    </div>
-  )
-}
 
 const Plot = ({
   values,
   title,
+  size,
   scale
 }: {
   values: { x: number; y: number; group: string }[]
   title: string
+  size: keyof typeof PlotDimensions
   scale?: LivePlotsColors
 }) => {
-  const spec = createSpec(title, scale)
+  const spec = createSpec(title, size, scale)
 
   return (
     <div data-testid={`plot-${title}`}>
@@ -118,10 +47,12 @@ const Plot = ({
 
 const LivePlots = ({
   plots,
-  colors
+  colors,
+  size
 }: {
   plots: LivePlotData[]
   colors: LivePlotsColors
+  size: keyof typeof PlotDimensions
 }) =>
   plots.length ? (
     <>
@@ -130,6 +61,7 @@ const LivePlots = ({
           values={plotData.values}
           title={plotData.title}
           scale={colors}
+          size={size}
           key={`plot-${plotData.title}`}
         />
       ))}
@@ -174,6 +106,9 @@ const Plots = ({
   const { data, collapsedSections } = state
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
+  const [size, setSize] = useState<keyof typeof PlotDimensions>(
+    PlotSize.REGULAR
+  )
 
   useEffect(() => {
     const newMetrics = getMetricsFromPlots(data?.live?.plots)
@@ -199,15 +134,19 @@ const Plots = ({
           sectionKey={PlotsSectionKeys.LIVE_PLOTS}
           collapsedSections={collapsedSections}
           dispatch={dispatch}
-          metrics={metrics}
-          selectedMetrics={selectedPlots}
-          setSelectedPlots={setSelectedPlots}
+          menu={{
+            metrics,
+            selectedMetrics: selectedPlots,
+            setSelectedPlots,
+            setSize
+          }}
         >
           <LivePlots
             plots={livePlots.plots.filter(plot =>
               selectedPlots?.includes(getDisplayNameFromPath(plot.title))
             )}
             colors={livePlots.colors}
+            size={size}
           />
         </PlotsContainer>
       )}
