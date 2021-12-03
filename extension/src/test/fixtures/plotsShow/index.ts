@@ -1,7 +1,8 @@
 import { VisualizationSpec } from 'react-vega'
 import { PlotsType } from '../../../plots/webview/contract'
+import { join } from '../../util/path'
 
-const data = {
+const basicVega = {
   'logs/loss.tsv': [
     {
       content: {
@@ -184,4 +185,46 @@ const data = {
   ]
 }
 
-export default data
+const getImageData = (
+  baseUrl: string,
+  joinFunc: (...args: string[]) => string
+) => ({
+  'plots/acc.png': [
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['workspace'],
+      url: joinFunc(baseUrl, 'workspace_plots_acc.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['HEAD'],
+      url: joinFunc(baseUrl, 'HEAD_plots_acc.png')
+    }
+  ],
+  'plots/loss.png': [
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['workspace'],
+      url: joinFunc(baseUrl, 'workspace_plots_loss.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['HEAD'],
+      url: joinFunc(baseUrl, 'HEAD_plots_loss.png')
+    }
+  ]
+})
+
+export const getSmallMemoryFootprintFixture = (
+  baseUrl: string,
+  joinFunc = join
+) => ({
+  ...getImageData(baseUrl, joinFunc),
+  ...basicVega
+})
+
+export const getFixture = (baseUrl: string, joinFunc = join) => ({
+  ...getImageData(baseUrl, joinFunc),
+  ...basicVega,
+  ...require('./confusionMatrix').default
+})

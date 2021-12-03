@@ -124,6 +124,10 @@ export class BaseWebview<T extends WebviewData> {
     return this
   }
 
+  public getWebviewUri(url: string) {
+    return this.webviewPanel.webview.asWebviewUri(Uri.file(url)).toString()
+  }
+
   protected sendMessage(message: MessageToWebview<T>) {
     if (this.deferred.state !== 'resolved') {
       throw new Error(
