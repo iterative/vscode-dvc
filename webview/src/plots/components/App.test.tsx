@@ -11,7 +11,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import minimalPlotsShowFixture from 'dvc/src/test/fixtures/plotsShow/minimalOutput'
+import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/webview'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -137,7 +137,7 @@ describe('App', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
-        data: { live: livePlotsFixture, static: minimalPlotsShowFixture },
+        data: { live: livePlotsFixture, static: staticPlotsFixture },
         type: MessageToWebviewType.SET_DATA
       }
     })
