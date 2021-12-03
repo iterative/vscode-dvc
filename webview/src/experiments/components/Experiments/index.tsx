@@ -97,21 +97,15 @@ export const ExperimentsTable: React.FC<{
       expandSubRows: false,
       initialState
     },
-    useFlexLayout,
     hooks => {
       hooks.stateReducers.push((state, action) => {
-        if (action.type === 'set-ungrouped') {
-          return {
-            ...state,
-            ungrouped: action.setting || !state.ungrouped
-          }
-        }
         if (action.type === 'columnDoneResizing') {
           reportResizedColumn(state, model)
         }
         return state
       })
     },
+    useFlexLayout,
     useColumnOrder,
     useGroupBy,
     useExpanded,

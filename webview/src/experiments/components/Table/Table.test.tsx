@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom/extend-expect'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
@@ -15,13 +15,19 @@ import {
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
+import { mocked } from 'ts-jest/utils'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnOrder'
 import { Model } from '../../model'
 
+import { vsCodeApi } from '../../../shared/api'
+
 jest.mock('../../../shared/api')
+const { postMessage, setState } = vsCodeApi
+const mockedPostMessage = mocked(postMessage)
+const mockedSetState = mocked(setState)
 
 describe('Table', () => {
   const getParentElement = async (text: string) =>
@@ -393,6 +399,38 @@ describe('Table', () => {
       )
 
       expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
+    })
+
+    it('should resize columns and persist new state when a separator is clicked and dragged', async () => {
+      const model = new Model({ data: tableData })
+      render(<ExperimentsTable tableData={tableData} model={model} />)
+      const experimentColumnResizeHandle = (
+        await screen.findAllByRole('separator')
+      )[0]
+
+      fireEvent.mouseDown(experimentColumnResizeHandle, {
+        bubbles: true,
+        clientX: 0
+      })
+      fireEvent.mouseMove(document, {
+        bubbles: true,
+        clientX: 25
+      })
+      fireEvent.mouseUp(experimentColumnResizeHandle)
+
+      expect(mockedSetState).toBeCalledWith({
+        data: {
+          ...tableData,
+          columnWidths: {
+            id: 175
+          }
+        },
+        dvcRoot: undefined
+      })
+      expect(mockedPostMessage).toBeCalledWith({
+        payload: { id: 'id', width: 175 },
+        type: 'column-resized'
+      })
     })
   })
 })

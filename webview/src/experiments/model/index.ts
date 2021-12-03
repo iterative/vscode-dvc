@@ -58,16 +58,14 @@ export class Model {
 
   public persistColumnWidth(id: string, width: number) {
     const originalState = this.getState()
-    const { data } = originalState
-    if (!data) {
-      return
-    }
+    const data = originalState.data as TableData
+    const { columnWidths = {} } = data
     vsCodeApi.setState({
       ...originalState,
       data: {
         ...data,
         columnWidths: {
-          ...data.columnWidths,
+          ...(columnWidths || {}),
           [id]: width
         }
       }
@@ -80,10 +78,7 @@ export class Model {
 
   public persistColumnsOrder(newOrder: string[]): void {
     const originalState = this.getState()
-    const { data } = originalState
-    if (!data) {
-      return
-    }
+    const data = originalState.data as TableData
     vsCodeApi.setState({
       ...originalState,
       data: {
