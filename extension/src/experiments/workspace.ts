@@ -1,5 +1,6 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
+import { readToQueueFromCsv, waitForLock } from './queue'
 import { pickExperimentName } from './quickPick'
 import { TableData } from './webview/contract'
 import {
@@ -12,6 +13,7 @@ import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { WorkspacePlots } from '../plots/workspace'
+import { pickCsv } from '../vscode/resourcePicker'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -98,6 +100,29 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     return this.getRepository(dvcRoot).autoApplyFilters(enable)
+  }
+
+  public async queueExperimentsFromCsv() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const csv = await pickCsv('Select a CSV to queue experiments from')
+    if (!csv) {
+      return
+    }
+
+    const toQueue = await readToQueueFromCsv(csv)
+
+    for (const arr of toQueue) {
+      await waitForLock(cwd)
+      await this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_QUEUE,
+        cwd,
+        ...arr
+      )
+    }
   }
 
   public async getCwdThenRun(commandId: CommandId) {

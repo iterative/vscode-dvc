@@ -9,11 +9,17 @@ import {
 const registerExperimentCwdCommands = (
   experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
-): void =>
+): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_EXPERIMENT,
     () => experiments.getCwdThenReport(AvailableCommands.EXPERIMENT_QUEUE)
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.QUEUE_EXPERIMENTS_FROM_CSV,
+    () => experiments.queueExperimentsFromCsv()
+  )
+}
 
 const registerExperimentNameCommands = (
   experiments: WorkspaceExperiments,
