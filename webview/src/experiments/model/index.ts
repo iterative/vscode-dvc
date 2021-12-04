@@ -76,7 +76,7 @@ export class Model {
     })
   }
 
-  public persistColumnsOrder(newOrder: string[]): void {
+  public persistColumnOrder(newOrder: string[]): void {
     const originalState = this.getState()
     const data = originalState.data as TableData
     vsCodeApi.setState({

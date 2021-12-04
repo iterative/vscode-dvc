@@ -169,7 +169,7 @@ suite('Experiments Test Suite', () => {
 
       const mockSetColumnReordered = stub(
         ParamsAndMetricsModel.prototype,
-        'setColumnsOrder'
+        'setColumnOrder'
       )
 
       const columnOrderSet = new Promise(resolve =>

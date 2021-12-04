@@ -212,7 +212,7 @@ export class Experiments extends BaseRepository<TableData> {
   public getWebviewData() {
     return {
       changes: this.paramsAndMetrics.getChanges(),
-      columnOrder: this.paramsAndMetrics.getColumnsOrder(),
+      columnOrder: this.paramsAndMetrics.getColumnOrder(),
       columnWidths: this.paramsAndMetrics.getColumnWidths(),
       columns: this.paramsAndMetrics.getSelected(),
       rows: this.experiments.getRowData(),
@@ -242,7 +242,7 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.COLUMN_REORDERED:
             return (
               message.payload &&
-              this.paramsAndMetrics.setColumnsOrder(
+              this.paramsAndMetrics.setColumnOrder(
                 message.payload as ColumnReorderPayload
               )
             )
