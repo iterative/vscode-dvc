@@ -1,15 +1,16 @@
+import { Flag } from '../cli/args'
 import { exists, readCsv } from '../fileSystem'
 import { join } from '../test/util/path'
 import { definedAndNonEmpty } from '../util/array'
 import { delay } from '../util/time'
 
-const reduceRow = (row: Record<string, unknown>) =>
-  Object.entries(row).reduce((acc, [k, v]) => {
+const collectParamsToVary = (csvRow: Record<string, unknown>): string[] =>
+  Object.entries(csvRow).reduce((acc, [k, v]) => {
     const key = k.trim()
     const value = (v as string).trim()
 
     if (key !== '' && value !== '') {
-      acc.push('-S')
+      acc.push(Flag.SET_PARAM)
       const str = [key, value].join('=')
       acc.push(str)
     }
@@ -22,9 +23,9 @@ export const readToQueueFromCsv = (path: string): Promise<string[][]> =>
     const toQueue: string[][] = []
     readCsv(path)
       .on('data', row => {
-        const arr = reduceRow(row)
-        if (definedAndNonEmpty(arr)) {
-          toQueue.push(arr)
+        const paramsToVary = collectParamsToVary(row)
+        if (definedAndNonEmpty(paramsToVary)) {
+          toQueue.push(paramsToVary)
         }
       })
       .on('end', () => {

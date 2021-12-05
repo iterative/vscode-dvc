@@ -115,12 +115,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
     const toQueue = await readToQueueFromCsv(csv)
 
-    for (const arr of toQueue) {
+    for (const params of toQueue) {
       await waitForLock(cwd)
       await this.internalCommands.executeCommand(
         AvailableCommands.EXPERIMENT_QUEUE,
         cwd,
-        ...arr
+        ...params
       )
     }
   }
