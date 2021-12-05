@@ -2,9 +2,9 @@ import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore } from 'sinon'
-import { buildRepositoryData } from './util'
-import { Disposable } from '../../../extension'
-import { dvcDemoPath } from '../../util'
+import { buildRepositoryData } from '../util'
+import { Disposable } from '../../../../extension'
+import { dvcDemoPath } from '../../../util'
 
 suite('Repository Data Test Suite', () => {
   const disposable = Disposable.fn()

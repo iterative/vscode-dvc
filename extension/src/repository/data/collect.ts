@@ -1,7 +1,7 @@
 import { join, sep } from 'path'
 import { Uri } from 'vscode'
-import { Resource } from './commands'
-import { addToMapSet } from '../util/map'
+import { Resource } from '../commands'
+import { addToMapSet } from '../../util/map'
 
 export type PathItem = Resource & {
   isDirectory: boolean
