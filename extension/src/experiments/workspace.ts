@@ -117,10 +117,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
     for (const params of toQueue) {
       await waitForLock(cwd)
-      await this.internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_QUEUE,
-        cwd,
-        ...params
+      await reportOutput(
+        this.internalCommands.executeCommand(
+          AvailableCommands.EXPERIMENT_QUEUE,
+          cwd,
+          ...params
+        )
       )
     }
   }
