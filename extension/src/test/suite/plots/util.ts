@@ -11,10 +11,8 @@ import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 
 export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
-  const { experiments, internalCommands, resourceLocator } = buildExperiments(
-    disposer,
-    expShowFixture
-  )
+  const { experiments, internalCommands, updatesPaused, resourceLocator } =
+    buildExperiments(disposer, expShowFixture)
 
   const messageSpy = spy(BaseWebview.prototype, 'show')
   const mockPlotsShow = stub(CliReader.prototype, 'plotsShow').resolves(
@@ -22,7 +20,12 @@ export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
   )
 
   const plots = disposer.track(
-    new Plots(dvcDemoPath, internalCommands, resourceLocator.scatterGraph)
+    new Plots(
+      dvcDemoPath,
+      internalCommands,
+      updatesPaused,
+      resourceLocator.scatterGraph
+    )
   )
   plots.setExperiments(experiments)
   await plots.isReady()

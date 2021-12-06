@@ -30,11 +30,15 @@ export class RepositoryData {
     new EventEmitter()
   )
 
-  constructor(dvcRoot: string, internalCommands: InternalCommands) {
+  constructor(
+    dvcRoot: string,
+    internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>
+  ) {
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
       new ProcessManager(
-        new EventEmitter<boolean>(),
+        updatesPaused,
         { name: 'partialUpdate', process: () => this.partialUpdate() },
         { name: 'fullUpdate', process: () => this.fullUpdate() }
       )

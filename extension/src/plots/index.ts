@@ -1,3 +1,4 @@
+import { EventEmitter } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ImagePlot,
@@ -31,11 +32,14 @@ export class Plots extends BaseRepository<TPlotsData> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>,
     webviewIcon: Resource
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.data = this.dispose.track(new PlotsData(dvcRoot, internalCommands))
+    this.data = this.dispose.track(
+      new PlotsData(dvcRoot, internalCommands, updatesPaused)
+    )
 
     this.dispose.track(this.data.onDidUpdate(data => this.setStaticPlots(data)))
 

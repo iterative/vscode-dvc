@@ -1,3 +1,4 @@
+import { EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { InternalCommands } from '../commands/internal'
@@ -25,9 +26,13 @@ export abstract class BaseWorkspace<
     return this.initialized
   }
 
-  public create(dvcRoots: string[], optional?: U): T[] {
+  public create(
+    dvcRoots: string[],
+    updatesPaused: EventEmitter<boolean>,
+    optional?: U
+  ): T[] {
     const repositories = dvcRoots.map(dvcRoot =>
-      this.createRepository(dvcRoot, optional)
+      this.createRepository(dvcRoot, updatesPaused, optional)
     )
 
     Promise.all(repositories.map(repository => repository.isReady())).then(() =>
@@ -66,5 +71,9 @@ export abstract class BaseWorkspace<
     this.repositories[dvcRoot] = repository
   }
 
-  abstract createRepository(dvcRoot: string, arg?: U): T
+  abstract createRepository(
+    dvcRoot: string,
+    updatesPaused: EventEmitter<boolean>,
+    arg?: U
+  ): T
 }

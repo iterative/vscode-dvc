@@ -43,11 +43,12 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     dvcRoot: string,
     internalCommands: InternalCommands,
     updateCommandId: CommandId,
+    updatesPaused: EventEmitter<boolean>,
     staticFiles: string[] = []
   ) {
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager(new EventEmitter(), {
+      new ProcessManager(updatesPaused, {
         name: 'update',
         process: () => this.update()
       })

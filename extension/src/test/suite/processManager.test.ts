@@ -88,7 +88,7 @@ suite('Process Manager Test Suite', () => {
 
     it('should send all calls to the queue when processes are paused', async () => {
       const mockUpdate = stub()
-      const processesPaused = new EventEmitter<boolean>()
+      const processesPaused = disposable.track(new EventEmitter<boolean>())
       const processManager = disposable.track(
         new ProcessManager(processesPaused, {
           name: 'update',

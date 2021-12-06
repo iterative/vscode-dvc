@@ -1,4 +1,5 @@
 import { stub } from 'sinon'
+import { EventEmitter } from 'vscode'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
@@ -25,12 +26,15 @@ const buildDependencies = (
     experimentShowData
   )
 
+  const updatesPaused = disposer.track(new EventEmitter<boolean>())
+
   const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
 
   return {
     internalCommands,
     mockExperimentShow,
-    resourceLocator
+    resourceLocator,
+    updatesPaused
   }
 }
 
@@ -39,13 +43,18 @@ export const buildExperiments = (
   experimentShowData = expShowFixture,
   dvcRoot = dvcDemoPath
 ) => {
-  const { internalCommands, mockExperimentShow, resourceLocator } =
-    buildDependencies(disposer, experimentShowData)
+  const {
+    internalCommands,
+    mockExperimentShow,
+    updatesPaused,
+    resourceLocator
+  } = buildDependencies(disposer, experimentShowData)
 
   const experiments = disposer.track(
     new Experiments(
       dvcRoot,
       internalCommands,
+      updatesPaused,
       resourceLocator,
       buildMockMemento(),
       buildMockData()
@@ -58,7 +67,8 @@ export const buildExperiments = (
     experiments,
     internalCommands,
     mockExperimentShow,
-    resourceLocator
+    resourceLocator,
+    updatesPaused
   }
 }
 
@@ -66,6 +76,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
   const {
     internalCommands,
     experiments: mockExperiments,
+    updatesPaused,
     resourceLocator
   } = buildExperiments(disposer, expShowFixture, 'other/dvc/root')
 
@@ -77,6 +88,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
   )
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
+    updatesPaused,
     resourceLocator
   )
   experiments.setState(expShowFixture)
@@ -84,7 +96,8 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {
-  const { internalCommands, resourceLocator } = buildDependencies(disposer)
+  const { internalCommands, updatesPaused, resourceLocator } =
+    buildDependencies(disposer)
 
   stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
@@ -92,6 +105,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   )
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
+    updatesPaused,
     resourceLocator
   )
 

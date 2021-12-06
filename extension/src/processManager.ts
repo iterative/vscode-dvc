@@ -35,10 +35,6 @@ export class ProcessManager {
   }
 
   public async run(name: string): Promise<void> {
-    if (this.paused) {
-      return this.queue(name)
-    }
-
     this.checkCanRun(name)
     const { process, lastStarted } = this.processes[name]
 
@@ -46,7 +42,7 @@ export class ProcessManager {
       return
     }
 
-    if (this.anyOngoing()) {
+    if (this.anyOngoing() || this.paused) {
       return this.queue(name)
     }
 
