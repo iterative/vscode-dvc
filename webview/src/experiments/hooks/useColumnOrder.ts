@@ -1,9 +1,5 @@
-import {
-  ColumnDetail,
-  ParamOrMetric
-} from 'dvc/src/experiments/webview/contract'
+import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { useMemo } from 'react'
-import { Model } from '../model'
 
 function getColumnsByPath(
   columns: ParamOrMetric[]
@@ -15,20 +11,11 @@ function getColumnsByPath(
   return columnsByPath
 }
 
-function getOrderedPaths(columnsOrder: ColumnDetail[]): string[] {
-  return (
-    columnsOrder
-      ?.map(column => column.path)
-      .filter(column => !['experiment', 'timestamp'].includes(column)) || []
-  )
-}
-
 function getOrderedData(
   columnsByPath: Record<string, ParamOrMetric>,
-  columnsOrder: ColumnDetail[]
+  columnOrder: string[]
 ): ParamOrMetric[] {
-  const orderedPaths = getOrderedPaths(columnsOrder)
-  return orderedPaths
+  return columnOrder
     .map(path => ({
       ...columnsByPath[path]
     }))
@@ -37,10 +24,10 @@ function getOrderedData(
 
 function getOrderedDataWithGroups(
   columns: ParamOrMetric[],
-  columnsOrder: ColumnDetail[]
+  columnOrder: string[]
 ) {
   const columnsByPath = getColumnsByPath(columns)
-  const orderedData = [...getOrderedData(columnsByPath, columnsOrder)]
+  const orderedData = [...getOrderedData(columnsByPath, columnOrder)]
   const previousGroups: string[] = []
 
   let previousGroup = (orderedData?.length && orderedData[0].parentPath) || ''
@@ -71,18 +58,12 @@ function getOrderedDataWithGroups(
 }
 
 export const useColumnOrder = (
-  modelInstance: Model
-): [ParamOrMetric[], (newOrder: string[]) => void] => {
-  const { data } = modelInstance
-  const { columns, columnsOrder } = data || {}
-  const columnOrderRepresentation = useMemo(() => {
-    if (columns && columnsOrder) {
-      return getOrderedDataWithGroups(columns, columnsOrder)
+  params: ParamOrMetric[],
+  columnOrder: string[]
+): ParamOrMetric[] =>
+  useMemo(() => {
+    if (params && columnOrder) {
+      return getOrderedDataWithGroups(params, columnOrder)
     }
     return []
-  }, [columns, columnsOrder])
-
-  const setColumnOrderRepresentation = (newOrder: string[]) =>
-    modelInstance.sendColumnsOrder(newOrder)
-  return [columnOrderRepresentation, setColumnOrderRepresentation]
-}
+  }, [params, columnOrder])

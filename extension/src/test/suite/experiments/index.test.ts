@@ -96,8 +96,9 @@ suite('Experiments Test Suite', () => {
 
       const expectedTableData: TableData = {
         changes: workspaceChangesFixture,
+        columnOrder: [],
+        columnWidths: {},
         columns: columnsFixture,
-        columnsOrder: [],
         rows: rowsFixture,
         sorts: []
       }
@@ -168,7 +169,7 @@ suite('Experiments Test Suite', () => {
 
       const mockSetColumnReordered = stub(
         ParamsAndMetricsModel.prototype,
-        'setColumnsOrder'
+        'setColumnOrder'
       )
 
       const columnOrderSet = new Promise(resolve =>

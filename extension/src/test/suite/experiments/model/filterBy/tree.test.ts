@@ -105,8 +105,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith({
         changes: workspaceChangesFixture,
+        columnOrder: [],
+        columnWidths: {},
         columns: columnsFixture,
-        columnsOrder: [],
         rows: filteredRows,
         sorts: []
       })
@@ -128,8 +129,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const expectedTableData: TableData = {
         changes: workspaceChangesFixture,
+        columnOrder: [],
+        columnWidths: {},
         columns: columnsFixture,
-        columnsOrder: [],
         rows: [workspace, master],
         sorts: []
       }
