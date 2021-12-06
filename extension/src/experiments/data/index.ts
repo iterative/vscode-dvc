@@ -29,6 +29,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return collectFiles(data)
   }
 
+  public forceUpdate() {
+    return this.processManager.forceRunQueued()
+  }
+
   private async watchExpGitRefs(): Promise<void> {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
     const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')

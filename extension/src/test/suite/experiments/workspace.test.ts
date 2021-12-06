@@ -97,6 +97,12 @@ suite('Workspace Experiments Test Suite', () => {
         'getOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
+      const mockForceUpdate = stub()
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns({
+        forceUpdate: mockForceUpdate
+      } as unknown as Experiments)
+
       const mockUri = Uri.file(join(dvcDemoPath, 'queue.csv'))
 
       stub(window, 'showOpenDialog').resolves([mockUri])
@@ -105,6 +111,7 @@ suite('Workspace Experiments Test Suite', () => {
         RegisteredCommands.QUEUE_EXPERIMENTS_FROM_CSV
       )
 
+      expect(mockForceUpdate).to.be.calledThrice
       expect(mockExperimentRunQueue).to.be.calledThrice
       expect(mockExperimentRunQueue).to.be.calledWith(
         dvcDemoPath,

@@ -88,6 +88,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.managedUpdate()
   }
 
+  public forceUpdate() {
+    return this.data.forceUpdate()
+  }
+
   public async setState(data: ExperimentsOutput) {
     await Promise.all([
       this.paramsAndMetrics.transformAndSet(data),
