@@ -1,4 +1,4 @@
-import { Event, EventEmitter } from 'vscode'
+import { EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { DecorationProvider } from './decorationProvider'
@@ -9,7 +9,6 @@ import { InternalCommands } from '../commands/internal'
 
 export class Repository {
   public readonly dispose = Disposable.fn()
-  public readonly onDidChangeTreeData: Event<void>
 
   private readonly model: RepositoryModel
   private readonly deferred = new Deferred()
@@ -24,10 +23,9 @@ export class Repository {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    decorationProvider = new DecorationProvider(),
-    treeDataChanged = new EventEmitter<void>()
+    treeDataChanged: EventEmitter<void>
   ) {
-    this.decorationProvider = this.dispose.track(decorationProvider)
+    this.decorationProvider = this.dispose.track(new DecorationProvider())
     this.dvcRoot = dvcRoot
     this.model = this.dispose.track(new RepositoryModel(dvcRoot))
     this.data = this.dispose.track(
@@ -38,8 +36,7 @@ export class Repository {
       new SourceControlManagement(this.dvcRoot, this.getState())
     )
 
-    this.treeDataChanged = this.dispose.track(treeDataChanged)
-    this.onDidChangeTreeData = this.treeDataChanged.event
+    this.treeDataChanged = treeDataChanged
 
     this.initialize()
   }
