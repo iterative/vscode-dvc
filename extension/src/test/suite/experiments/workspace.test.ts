@@ -16,7 +16,6 @@ import {
   RegisteredCommands
 } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
-import * as Time from '../../../util/time'
 import { CliRunner } from '../../../cli/runner'
 import { join } from '../../util/path'
 
@@ -101,7 +100,6 @@ suite('Workspace Experiments Test Suite', () => {
       const mockUri = Uri.file(join(dvcDemoPath, 'queue.csv'))
 
       stub(window, 'showOpenDialog').resolves([mockUri])
-      stub(Time, 'delay').resolves(undefined)
 
       await commands.executeCommand(
         RegisteredCommands.QUEUE_EXPERIMENTS_FROM_CSV

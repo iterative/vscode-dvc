@@ -1,8 +1,6 @@
 import { Flag } from '../cli/args'
-import { exists, readCsv } from '../fileSystem'
-import { join } from '../test/util/path'
+import { readCsv } from '../fileSystem'
 import { definedAndNonEmpty } from '../util/array'
-import { delay } from '../util/time'
 
 const collectParamsToVary = (csvRow: Record<string, unknown>): string[] =>
   Object.entries(csvRow).reduce((acc, [k, v]) => {
@@ -32,12 +30,3 @@ export const readToQueueFromCsv = (path: string): Promise<string[][]> =>
         resolve(toQueue)
       })
   })
-
-export const waitForLock = async (cwd: string): Promise<void> => {
-  const lock = join(cwd, '.dvc', 'rwlock')
-
-  if (exists(lock)) {
-    await delay(2000)
-    return waitForLock(cwd)
-  }
-}

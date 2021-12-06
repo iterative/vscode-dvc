@@ -1,6 +1,6 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
-import { readToQueueFromCsv, waitForLock } from './queue'
+import { readToQueueFromCsv } from './queue'
 import { pickExperimentName } from './quickPick'
 import { TableData } from './webview/contract'
 import {
@@ -120,7 +120,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     const toQueue = await readToQueueFromCsv(csv)
 
     for (const params of toQueue) {
-      await waitForLock(cwd)
       await reportOutput(
         this.internalCommands.executeCommand(
           AvailableCommands.EXPERIMENT_QUEUE,
