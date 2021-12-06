@@ -12,7 +12,10 @@ const registerExperimentCwdCommands = (
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_EXPERIMENT,
-    () => experiments.getCwdThenReport(AvailableCommands.EXPERIMENT_QUEUE)
+    () =>
+      experiments.pauseUpdatesThenRun(() =>
+        experiments.getCwdThenReport(AvailableCommands.EXPERIMENT_QUEUE)
+      )
   )
 
   internalCommands.registerExternalCommand(

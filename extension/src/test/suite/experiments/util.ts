@@ -82,9 +82,14 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
 
   stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
-    new WorkspaceExperiments(internalCommands, buildMockMemento(), {
-      'other/dvc/root': mockExperiments
-    })
+    new WorkspaceExperiments(
+      internalCommands,
+      updatesPaused,
+      buildMockMemento(),
+      {
+        'other/dvc/root': mockExperiments
+      }
+    )
   )
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
@@ -101,7 +106,11 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
 
   stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
-    new WorkspaceExperiments(internalCommands, buildMockMemento())
+    new WorkspaceExperiments(
+      internalCommands,
+      updatesPaused,
+      buildMockMemento()
+    )
   )
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],

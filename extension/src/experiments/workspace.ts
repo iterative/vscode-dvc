@@ -27,16 +27,20 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
+  public readonly updatesPaused: EventEmitter<boolean>
+
   private readonly workspaceState: Memento
   private focusedWebviewDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>,
     workspaceState: Memento,
     experiments?: Record<string, Experiments>
   ) {
     super(internalCommands, experiments)
 
+    this.updatesPaused = updatesPaused
     this.workspaceState = workspaceState
   }
 
@@ -134,6 +138,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
+  }
+
+  public async pauseUpdatesThenRun(func: () => Promise<void> | undefined) {
+    this.updatesPaused.fire(true)
+    await func()
+    this.updatesPaused.fire(false)
   }
 
   public getCwdThenReport(commandId: CommandId) {
