@@ -3,12 +3,10 @@ import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { DragUpdate } from 'react-beautiful-dnd'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { MergedHeaderGroup } from './MergeHeaderGroups'
 import { Model } from '../../model'
 import { useColumnOrder } from '../../hooks/useColumnOrder'
-import { vsCodeApi } from '../../../shared/api'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -50,10 +48,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   }
 
   const onDragEnd = () => {
-    vsCodeApi.postMessage({
-      payload: columnOrder,
-      type: MessageFromWebviewType.COLUMN_REORDERED
-    })
+    model.persistColumnOrder(columnOrder)
   }
 
   return (

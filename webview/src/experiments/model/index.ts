@@ -55,6 +55,20 @@ export class Model {
     vsCodeApi.postMessage(message)
   }
 
+  public persistColumnWidth(id: string, width: number) {
+    this.sendMessage({
+      payload: { id, width },
+      type: MessageFromWebviewType.COLUMN_RESIZED
+    })
+  }
+
+  public persistColumnOrder(newOrder: string[]): void {
+    this.sendMessage({
+      payload: newOrder,
+      type: MessageFromWebviewType.COLUMN_REORDERED
+    })
+  }
+
   private getState(): PersistedModelState {
     return {
       dvcRoot: this.dvcRoot

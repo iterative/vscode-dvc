@@ -15,13 +15,11 @@ import {
   useResizeColumns,
   TableState
 } from 'react-table'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
 import { Model } from '../../model'
-import { vsCodeApi } from '../../../shared/api'
 
 const DEFAULT_COLUMN_WIDTH = 120
 
@@ -62,14 +60,11 @@ const getColumns = (columns: ParamOrMetric[]): Column<Experiment>[] =>
     ...buildDynamicColumns(columns, 'metrics')
   ] as Column<Experiment>[]
 
-const reportResizedColumn = (state: TableState<Experiment>) => {
-  const id = state.columnResizing.isResizingColumn
-  if (id) {
-    const width = state.columnResizing.columnWidths[id]
-    vsCodeApi.postMessage({
-      payload: { id, width },
-      type: MessageFromWebviewType.COLUMN_RESIZED
-    })
+const reportResizedColumn = (state: TableState<Experiment>, model: Model) => {
+  const columnId = state.columnResizing.isResizingColumn
+  if (columnId) {
+    const columnWidth = state.columnResizing.columnWidths[columnId]
+    model.persistColumnWidth(columnId, columnWidth)
   }
 }
 
@@ -105,7 +100,7 @@ export const ExperimentsTable: React.FC<{
     hooks => {
       hooks.stateReducers.push((state, action) => {
         if (action.type === 'columnDoneResizing') {
-          reportResizedColumn(state)
+          reportResizedColumn(state, model)
         }
         return state
       })
