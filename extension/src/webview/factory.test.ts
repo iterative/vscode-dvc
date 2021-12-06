@@ -1,7 +1,7 @@
 import { ViewKey } from './constants'
 import { isValidState } from './factory'
 import livePlotsFixture from '../test/fixtures/expShow/livePlots'
-import plotsShowFixture from '../test/fixtures/plotsShow/minimalOutput'
+import plotsShowFixture from '../test/fixtures/plotsShow/output'
 
 describe('isValidState', () => {
   const dvcRoot = 'test'

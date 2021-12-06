@@ -1,5 +1,10 @@
 import isEmpty from 'lodash.isempty'
-import { PlotsData as TPlotsData, PlotsOutput } from './webview/contract'
+import {
+  ImagePlot,
+  isImagePlot,
+  PlotsData as TPlotsData,
+  PlotsOutput
+} from './webview/contract'
 import { PlotsData } from './data'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -7,6 +12,11 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
+import {
+  MessageFromWebviewType,
+  MetricToggledPayload
+} from '../webview/contract'
+import { Logger } from '../common/logger'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -28,6 +38,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.data = this.dispose.track(new PlotsData(dvcRoot, internalCommands))
 
     this.dispose.track(this.data.onDidUpdate(data => this.setStaticPlots(data)))
+
+    this.handleMessageFromWebview()
   }
 
   public async setExperiments(experiments: Experiments) {
@@ -49,6 +61,18 @@ export class Plots extends BaseRepository<TPlotsData> {
     return {
       live: this.experiments?.getLivePlots(),
       static: this.staticPlots
+        ? Object.entries(this.staticPlots).reduce((acc, [path, plots]) => {
+            acc[path] = plots.map(plot =>
+              isImagePlot(plot)
+                ? ({
+                    ...plot,
+                    url: this.webview?.getWebviewUri(plot.url)
+                  } as ImagePlot)
+                : plot
+            )
+            return acc
+          }, {} as PlotsOutput)
+        : undefined
     }
   }
 
@@ -63,5 +87,22 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
 
     this.staticPlots = data
+  }
+
+  private handleMessageFromWebview() {
+    this.dispose.track(
+      this.onDidReceivedWebviewMessage(message => {
+        if (message.type === MessageFromWebviewType.METRIC_TOGGLED) {
+          return (
+            message.payload &&
+            this.experiments?.setSelectedMetrics(
+              message.payload as MetricToggledPayload
+            )
+          )
+        }
+
+        Logger.error(`Unexpected message: ${message}`)
+      })
+    )
   }
 }

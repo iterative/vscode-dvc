@@ -8,16 +8,18 @@ export type ColumnResizePayload = {
   id: string
   width: number
 }
+export type MetricToggledPayload = string[]
 
 export type MessageFromWebview = {
   type: MessageFromWebviewType
-  payload?: ColumnReorderPayload | ColumnResizePayload
+  payload?: ColumnReorderPayload | ColumnResizePayload | MetricToggledPayload
 }
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   COLUMN_REORDERED = 'column-reordered',
-  COLUMN_RESIZED = 'column-resized'
+  COLUMN_RESIZED = 'column-resized',
+  METRIC_TOGGLED = 'metric-toggled'
 }
 
 export interface setData<T extends WebviewData> {

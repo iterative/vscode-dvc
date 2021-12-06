@@ -12,6 +12,7 @@ export type LivePlotData = {
 export type LivePlotsData = {
   plots: LivePlotData[]
   colors: LivePlotsColors
+  selectedMetrics?: string[]
 }
 
 export enum PlotsType {
@@ -19,17 +20,23 @@ export enum PlotsType {
   IMAGE = 'image'
 }
 
+export const isVegaPlot = (plot: StaticPlot): plot is VegaPlot =>
+  plot.type === PlotsType.VEGA
+
 export type VegaPlot = {
   content: VisualizationSpec
-  revs?: string[]
+  revisions?: string[]
   type: PlotsType
 }
 
 export type ImagePlot = {
-  rev?: string
+  revisions?: string[]
   type: PlotsType
   url: string
 }
+
+export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
+  plot.type === PlotsType.IMAGE
 
 export type StaticPlot = VegaPlot | ImagePlot
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import plotsShowFixture from 'dvc/src/test/fixtures/plotsShow/output'
+import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/storybook'
 import Plots from '../plots/components/Plots'
 import {
   useAppReducer,
@@ -19,7 +19,7 @@ export default {
     collapsedSections: defaultCollapsibleSectionsState,
     data: {
       live: livePlotsFixture,
-      static: plotsShowFixture
+      static: staticPlotsFixture
     }
   },
   component: Plots,
@@ -31,7 +31,7 @@ const Template: Story<{
   data?: PlotsData
 }> = ({ collapsedSections, data }) => {
   const [state, dispatch] = useAppReducer({ collapsedSections, data })
-  return <Plots state={state} dispatch={dispatch} />
+  return <Plots state={state} dispatch={dispatch} sendMessage={() => {}} />
 }
 
 export const WithData = Template.bind({})
@@ -48,7 +48,7 @@ export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
   data: {
     live: undefined,
-    static: plotsShowFixture
+    static: staticPlotsFixture
   }
 }
 

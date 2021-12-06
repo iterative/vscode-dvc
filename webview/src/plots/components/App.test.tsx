@@ -11,7 +11,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import minimalPlotsShowFixture from 'dvc/src/test/fixtures/plotsShow/minimalOutput'
+import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/webview'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -33,6 +33,15 @@ const { postMessage, getState, setState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
 const mockSetState = mocked(setState)
+
+const toStringSize = (size: number, addedSize = 44) =>
+  (size + addedSize).toString()
+
+const getPlotSvg = async () => {
+  const [plot] = await screen.findAllByRole('graphics-document')
+  // eslint-disable-next-line testing-library/no-node-access
+  return plot.getElementsByTagName('svg')[0]
+}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -137,7 +146,7 @@ describe('App', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
-        data: { live: livePlotsFixture, static: minimalPlotsShowFixture },
+        data: { live: livePlotsFixture, static: staticPlotsFixture },
         type: MessageToWebviewType.SET_DATA
       }
     })
@@ -191,6 +200,7 @@ describe('App', () => {
           }
         }}
         dispatch={jest.fn}
+        sendMessage={jest.fn}
       />
     )
 
@@ -228,5 +238,84 @@ describe('App', () => {
     expect(() =>
       screen.getByTestId('plot-metrics:summary.json:loss')
     ).not.toThrow()
+  })
+
+  it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
+    const initialState = {
+      collapsedSections: defaultCollapsibleSectionsState,
+      data: {
+        live: livePlotsFixture
+      }
+    }
+    mockGetState.mockReturnValue(initialState)
+    render(<App />)
+
+    const [pickerButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    const lossItem = await screen.findByText('loss')
+
+    fireEvent.click(lossItem, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: ['accuracy', 'val_loss', 'val_accuracy'],
+      type: MessageFromWebviewType.METRIC_TOGGLED
+    })
+
+    fireEvent.click(lossItem, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: ['loss', 'accuracy', 'val_loss', 'val_accuracy'],
+      type: MessageFromWebviewType.METRIC_TOGGLED
+    })
+  })
+
+  it('should change the size of the plots according to the size picker', async () => {
+    render(
+      <Plots
+        state={{
+          collapsedSections: defaultCollapsibleSectionsState,
+          data: {
+            live: livePlotsFixture,
+            static: undefined
+          }
+        }}
+        dispatch={jest.fn}
+        sendMessage={jest.fn}
+      />
+    )
+
+    const summaryElement = await screen.findByText('Live Experiments Plots')
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const [, sizePickerButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(sizePickerButton)
+    fireEvent.click(sizePickerButton)
+
+    const smallButton = screen.getByText('Small')
+    const regularButton = screen.getByText('Regular')
+    const largeButton = screen.getByText('Large')
+
+    fireEvent.click(smallButton)
+    let svg = await getPlotSvg()
+    expect(svg.getAttribute('height')).toBe(toStringSize(200))
+
+    fireEvent.click(regularButton)
+    svg = await getPlotSvg()
+    expect(svg.getAttribute('height')).toBe(toStringSize(300))
+
+    fireEvent.click(largeButton)
+    svg = await getPlotSvg()
+    expect(svg.getAttribute('height')).toBe(toStringSize(750, 48))
   })
 })

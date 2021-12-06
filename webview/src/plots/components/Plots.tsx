@@ -1,12 +1,14 @@
 import React, { Dispatch, useState, useEffect } from 'react'
 import {
+  isVegaPlot,
   LivePlotsColors,
   LivePlotData,
-  PlotsOutput,
-  PlotsType,
-  StaticPlot,
-  VegaPlot
+  PlotsOutput
 } from 'dvc/src/plots/webview/contract'
+import {
+  MessageFromWebview,
+  MessageFromWebviewType
+} from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
 import { config, createSpec, PlotDimensions } from './constants'
 import { EmptyState } from './EmptyState'
@@ -70,24 +72,19 @@ const LivePlots = ({
     EmptyState('No metrics selected')
   )
 
-const isVega = (plot: StaticPlot): plot is VegaPlot =>
-  plot.type === PlotsType.VEGA
-
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
     {Object.entries(plots).map(([path, plots]) =>
-      plots.map(plot =>
-        isVega(plot) ? (
+      plots.map((plot, i) =>
+        isVegaPlot(plot) ? (
           <VegaLite
             actions={false}
             config={config}
             spec={plot.content}
             renderer="svg"
-            key={`plot-${path}`}
+            key={`plot-${path}-${i}`}
           />
-        ) : (
-          <></>
-        )
+        ) : undefined
       )
     )}
   </>
@@ -98,10 +95,12 @@ const getMetricsFromPlots = (plots?: LivePlotData[]): string[] =>
 
 const Plots = ({
   state,
-  dispatch
+  dispatch,
+  sendMessage
 }: {
   state: PlotsWebviewState
   dispatch: Dispatch<PlotsReducerAction>
+  sendMessage: (message: MessageFromWebview) => void
 }) => {
   const { data, collapsedSections } = state
   const [metrics, setMetrics] = useState<string[]>([])
@@ -113,7 +112,7 @@ const Plots = ({
   useEffect(() => {
     const newMetrics = getMetricsFromPlots(data?.live?.plots)
     setMetrics(newMetrics)
-    setSelectedPlots(newMetrics)
+    setSelectedPlots(data?.live?.selectedMetrics || newMetrics)
   }, [data, setSelectedPlots, setMetrics])
 
   if (!data) {
@@ -124,6 +123,14 @@ const Plots = ({
 
   if (!livePlots && !staticPlots) {
     return EmptyState('No Plots to Display')
+  }
+
+  const setSelectedMetrics = (metrics: string[]) => {
+    setSelectedPlots(metrics)
+    sendMessage({
+      payload: metrics,
+      type: MessageFromWebviewType.METRIC_TOGGLED
+    })
   }
 
   return (
@@ -137,7 +144,7 @@ const Plots = ({
           menu={{
             metrics,
             selectedMetrics: selectedPlots,
-            setSelectedPlots,
+            setSelectedPlots: setSelectedMetrics,
             setSize
           }}
         >

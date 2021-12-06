@@ -24,7 +24,7 @@ export const createSpec = (
       {
         encoding: {
           color: { field: 'group', legend: null, scale, type: 'nominal' },
-          y: { field: 'y', title, type: 'quantitative' }
+          y: { field: 'y', scale: { zero: false }, title, type: 'quantitative' }
         },
         layer: [
           { mark: 'line' },
