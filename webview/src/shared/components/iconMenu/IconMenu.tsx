@@ -25,7 +25,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({
           {...item}
           canShowOnClickNode={item.tooltip === hoverKey}
           onMouseOver={setHoverKey}
-          last={i === items.length - 1 && direction === IconMenuDirection.RIGHT}
+          last={i >= items.length - 2 && direction === IconMenuDirection.RIGHT}
           index={i}
         />
       ))}
