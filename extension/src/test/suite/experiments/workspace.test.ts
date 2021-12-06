@@ -16,7 +16,6 @@ import {
   RegisteredCommands
 } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
-import * as Time from '../../../util/time'
 import { CliRunner } from '../../../cli/runner'
 import { join } from '../../util/path'
 
@@ -98,15 +97,21 @@ suite('Workspace Experiments Test Suite', () => {
         'getOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
+      const mockForceUpdate = stub()
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns({
+        forceUpdate: mockForceUpdate
+      } as unknown as Experiments)
+
       const mockUri = Uri.file(join(dvcDemoPath, 'queue.csv'))
 
       stub(window, 'showOpenDialog').resolves([mockUri])
-      stub(Time, 'delay').resolves(undefined)
 
       await commands.executeCommand(
         RegisteredCommands.QUEUE_EXPERIMENTS_FROM_CSV
       )
 
+      expect(mockForceUpdate).to.be.calledThrice
       expect(mockExperimentRunQueue).to.be.calledThrice
       expect(mockExperimentRunQueue).to.be.calledWith(
         dvcDemoPath,

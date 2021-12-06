@@ -1,6 +1,6 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
-import { readToQueueFromCsv, waitForLock } from './queue'
+import { readToQueueFromCsv } from './queue'
 import { pickExperimentName } from './quickPick'
 import { TableData } from './webview/contract'
 import {
@@ -27,16 +27,20 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
+  public readonly updatesPaused: EventEmitter<boolean>
+
   private readonly workspaceState: Memento
   private focusedWebviewDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>,
     workspaceState: Memento,
     experiments?: Record<string, Experiments>
   ) {
     super(internalCommands, experiments)
 
+    this.updatesPaused = updatesPaused
     this.workspaceState = workspaceState
   }
 
@@ -107,6 +111,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!cwd) {
       return
     }
+    const experiments = this.getRepository(cwd)
 
     const csv = await pickCsv('Select a CSV to queue experiments from')
     if (!csv) {
@@ -116,7 +121,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     const toQueue = await readToQueueFromCsv(csv)
 
     for (const params of toQueue) {
-      await waitForLock(cwd)
+      await experiments.forceUpdate()
       await reportOutput(
         this.internalCommands.executeCommand(
           AvailableCommands.EXPERIMENT_QUEUE,
@@ -134,6 +139,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
+  }
+
+  public async pauseUpdatesThenRun(func: () => Promise<void> | undefined) {
+    this.updatesPaused.fire(true)
+    await func()
+    this.updatesPaused.fire(false)
   }
 
   public getCwdThenReport(commandId: CommandId) {

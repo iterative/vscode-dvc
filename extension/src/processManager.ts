@@ -53,6 +53,17 @@ export class ProcessManager {
     return this.runQueued()
   }
 
+  public async forceRunQueued(): Promise<void> {
+    const next = this.getNextFromQueue()
+    if (!next) {
+      return
+    }
+
+    const { process } = this.processes[next]
+    await Promise.all([process(), this.setLastStarted(next)])
+    return this.forceRunQueued()
+  }
+
   public isOngoingOrQueued(name: string) {
     return this.isOngoing(name) || this.isQueued(name)
   }
@@ -75,16 +86,21 @@ export class ProcessManager {
   }
 
   private runQueued(): Promise<void> {
-    const next = this.nextInQueue()
+    const next = this.getNextFromQueue()
     if (!next) {
       return Promise.resolve()
     }
-    this.dequeue(next)
+
     return this.run(next)
   }
 
-  private nextInQueue(): string | undefined {
-    return this.queued.values().next().value
+  private getNextFromQueue(): string | undefined {
+    const next = this.queued.values().next().value
+    if (!next) {
+      return
+    }
+    this.queued.delete(next)
+    return next
   }
 
   private isOngoing(name: string) {
@@ -101,10 +117,6 @@ export class ProcessManager {
 
   private unlock(name: string) {
     return this.locked.delete(name)
-  }
-
-  private dequeue(name: string): boolean {
-    return this.queued.delete(name)
   }
 
   private checkCanRun(name: string) {

@@ -14,6 +14,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
   public readonly onDidUpdate: Event<T>
 
   protected readonly dvcRoot: string
+  protected readonly processManager: ProcessManager
 
   private collectedFiles: string[] = []
   private readonly staticFiles: string[]
@@ -21,7 +22,6 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private readonly processManager: ProcessManager
   private readonly internalCommands: InternalCommands
 
   private readonly updated: EventEmitter<T> = this.dispose.track(
