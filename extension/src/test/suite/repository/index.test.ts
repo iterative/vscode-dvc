@@ -14,6 +14,7 @@ import {
   StatusOutput
 } from '../../../cli/reader'
 import { SourceControlManagement } from '../../../repository/sourceControlManagement'
+import { DecorationProvider } from '../../../repository/decorationProvider'
 
 suite('Repository Test Suite', () => {
   const disposable = Disposable.fn()
@@ -47,7 +48,8 @@ suite('Repository Test Suite', () => {
         mockDiff,
         mockGetAllUntracked,
         mockListDvcOnlyRecursive,
-        mockStatus
+        mockStatus,
+        treeDataChanged
       } = buildDependencies(disposable)
 
       mockListDvcOnlyRecursive.resolves([
@@ -86,7 +88,7 @@ suite('Repository Test Suite', () => {
       mockGetAllUntracked.resolves(untracked)
 
       const repository = disposable.track(
-        new Repository(dvcDemoPath, internalCommands)
+        new Repository(dvcDemoPath, internalCommands, treeDataChanged)
       )
       await repository.isReady()
 
@@ -126,7 +128,6 @@ suite('Repository Test Suite', () => {
   describe('update', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
       const {
-        decorationProvider,
         internalCommands,
         mockDiff,
         mockGetAllUntracked,
@@ -179,12 +180,7 @@ suite('Repository Test Suite', () => {
       mockGetAllUntracked.resolves(emptySet)
 
       const repository = disposable.track(
-        new Repository(
-          dvcDemoPath,
-          internalCommands,
-          decorationProvider,
-          treeDataChanged
-        )
+        new Repository(dvcDemoPath, internalCommands, treeDataChanged)
       )
       await repository.isReady()
 
@@ -246,7 +242,6 @@ suite('Repository Test Suite', () => {
       ])
 
       const {
-        decorationProvider,
         internalCommands,
         mockDiff,
         mockGetAllUntracked,
@@ -317,12 +312,7 @@ suite('Repository Test Suite', () => {
         .resolves(untracked)
 
       const repository = disposable.track(
-        new Repository(
-          dvcDemoPath,
-          internalCommands,
-          decorationProvider,
-          treeDataChanged
-        )
+        new Repository(dvcDemoPath, internalCommands, treeDataChanged)
       )
       await repository.isReady()
       mockNow.resetBehavior()
@@ -330,7 +320,10 @@ suite('Repository Test Suite', () => {
       const dataUpdateEvent = new Promise(resolve =>
         disposable.track(onDidChangeTreeData(() => resolve(undefined)))
       )
-      const setDecorationStateSpy = spy(decorationProvider, 'setState')
+      const setDecorationStateSpy = spy(
+        DecorationProvider.prototype,
+        'setState'
+      )
       const setScmStateSpy = spy(SourceControlManagement.prototype, 'setState')
 
       expect(repository.getState()).to.deep.equal(emptyState)

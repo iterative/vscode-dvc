@@ -31,7 +31,7 @@ export class WorkspaceRepositories extends BaseWorkspace<Repository> {
 
   public createRepository(dvcRoot: string): Repository {
     const repository = this.dispose.track(
-      new Repository(dvcRoot, this.internalCommands)
+      new Repository(dvcRoot, this.internalCommands, this.treeDataChanged)
     )
     getGitRepositoryRoot(dvcRoot).then(gitRoot =>
       repository.dispose.track(
@@ -40,9 +40,6 @@ export class WorkspaceRepositories extends BaseWorkspace<Repository> {
           getRepositoryListener(repository, dvcRoot)
         )
       )
-    )
-    repository.dispose.track(
-      repository.onDidChangeTreeData(() => this.treeDataChanged.fire())
     )
 
     this.setRepository(dvcRoot, repository)

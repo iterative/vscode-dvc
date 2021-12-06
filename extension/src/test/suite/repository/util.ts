@@ -5,7 +5,6 @@ import { buildInternalCommands } from '../util'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
-import { DecorationProvider } from '../../../repository/decorationProvider'
 import * as Time from '../../../util/time'
 
 export const buildDependencies = (disposer: Disposer) => {
@@ -17,12 +16,10 @@ export const buildDependencies = (disposer: Disposer) => {
   const mockGetAllUntracked = stub(Git, 'getAllUntracked')
   const mockNow = stub(Time, 'getCurrentEpoch')
 
-  const decorationProvider = disposer.track(new DecorationProvider())
   const treeDataChanged = disposer.track(new EventEmitter<void>())
   const onDidChangeTreeData = treeDataChanged.event
 
   return {
-    decorationProvider,
     internalCommands,
     mockDiff,
     mockGetAllUntracked,
