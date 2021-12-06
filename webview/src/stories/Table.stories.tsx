@@ -43,9 +43,7 @@ export default {
 } as Meta
 
 const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
-  return (
-    <Experiments tableData={tableData} model={new Model({ data: tableData })} />
-  )
+  return <Experiments tableData={tableData} model={new Model()} />
 }
 
 export const WithData = Template.bind({})

@@ -407,7 +407,7 @@ describe('Table', () => {
           id: 333
         }
       }
-      const model = new Model({ data: tableDataWithColumnSetting })
+      const model = new Model()
       render(
         <ExperimentsTable
           tableData={tableDataWithColumnSetting}

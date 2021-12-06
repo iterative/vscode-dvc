@@ -15,7 +15,6 @@ import { vsCodeApi } from '../../shared/api'
 type MessageToWebview = GenericMessageToWebview<TableData>
 
 interface PersistedModelState {
-  data?: TableData | null
   dvcRoot?: string
 }
 
