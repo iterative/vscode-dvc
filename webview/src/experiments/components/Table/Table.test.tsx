@@ -415,9 +415,9 @@ describe('Table', () => {
           model={model}
         />
       )
-      const experimentColumnResizeHandle = (
-        await screen.findAllByRole('separator')
-      )[0]
+      const [experimentColumnResizeHandle] = await screen.findAllByRole(
+        'separator'
+      )
 
       fireEvent.mouseDown(experimentColumnResizeHandle, {
         bubbles: true,
