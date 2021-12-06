@@ -34,6 +34,7 @@ export class RepositoryData {
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
       new ProcessManager(
+        new EventEmitter<boolean>(),
         { name: 'partialUpdate', process: () => this.partialUpdate() },
         { name: 'fullUpdate', process: () => this.fullUpdate() }
       )
