@@ -29,9 +29,17 @@ export class WorkspaceRepositories extends BaseWorkspace<Repository> {
     return cwd
   }
 
-  public createRepository(dvcRoot: string): Repository {
+  public createRepository(
+    dvcRoot: string,
+    updatesPaused: EventEmitter<boolean>
+  ): Repository {
     const repository = this.dispose.track(
-      new Repository(dvcRoot, this.internalCommands, this.treeDataChanged)
+      new Repository(
+        dvcRoot,
+        this.internalCommands,
+        updatesPaused,
+        this.treeDataChanged
+      )
     )
     getGitRepositoryRoot(dvcRoot).then(gitRoot =>
       repository.dispose.track(
