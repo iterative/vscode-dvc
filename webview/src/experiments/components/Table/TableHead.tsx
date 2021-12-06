@@ -48,7 +48,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   }
 
   const onDragEnd = () => {
-    model.persistColumnsOrder(columnOrder)
+    model.persistColumnOrder(columnOrder)
   }
 
   return (

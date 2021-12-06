@@ -61,12 +61,12 @@ describe('Model', () => {
     })
   })
 
-  describe('createColumnsOrderRepresentation', () => {
+  describe('createColumnOrderRepresentation', () => {
     it('should send a message to notify of the changes if there is a new order set', () => {
       const sendMessageSpy = jest.spyOn(Model.prototype, 'sendMessage')
       sendMessageSpy.mockReset()
 
-      model.persistColumnsOrder(columnOrder)
+      model.persistColumnOrder(columnOrder)
 
       expect(sendMessageSpy).toHaveBeenCalledTimes(1)
       expect(sendMessageSpy).toHaveBeenCalledWith({

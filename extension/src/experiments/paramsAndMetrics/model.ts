@@ -13,7 +13,7 @@ export enum Status {
 
 export const enum MementoPrefixes {
   STATUS = 'paramsAndMetricsStatus:',
-  COLUMNS_ORDER = 'paramsAndMetricsColumnsOrder:',
+  COLUMN_ORDER = 'paramsAndMetricsColumnOrder:',
   COLUMN_WIDTHS = 'paramsAndMetricsColumnWidths:'
 }
 
@@ -27,7 +27,7 @@ export class ParamsAndMetricsModel {
   private readonly dvcRoot: string
   private readonly workspaceState: Memento
 
-  private columnsOrderState: string[] = []
+  private columnOrderState: string[] = []
   private columnWidthsState: Record<string, number> = {}
   private paramsAndMetricsChanges: string[] = []
 
@@ -35,8 +35,8 @@ export class ParamsAndMetricsModel {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
     this.status = workspaceState.get(MementoPrefixes.STATUS + dvcRoot, {})
-    this.columnsOrderState = workspaceState.get(
-      MementoPrefixes.COLUMNS_ORDER + dvcRoot,
+    this.columnOrderState = workspaceState.get(
+      MementoPrefixes.COLUMN_ORDER + dvcRoot,
       []
     )
     this.columnWidthsState = workspaceState.get(
@@ -45,8 +45,8 @@ export class ParamsAndMetricsModel {
     )
   }
 
-  public getColumnsOrder(): string[] {
-    return this.columnsOrderState
+  public getColumnOrder(): string[] {
+    return this.columnOrderState
   }
 
   public getColumnWidths(): Record<string, number> {
@@ -119,8 +119,8 @@ export class ParamsAndMetricsModel {
     return flatten<Status>(nestedStatuses)
   }
 
-  public setColumnsOrder(columnOrder: string[]) {
-    this.columnsOrderState = columnOrder
+  public setColumnOrder(columnOrder: string[]) {
+    this.columnOrderState = columnOrder
     this.persistColumnOrder()
   }
 
@@ -131,8 +131,8 @@ export class ParamsAndMetricsModel {
 
   private persistColumnOrder() {
     this.workspaceState.update(
-      MementoPrefixes.COLUMNS_ORDER + this.dvcRoot,
-      this.getColumnsOrder()
+      MementoPrefixes.COLUMN_ORDER + this.dvcRoot,
+      this.getColumnOrder()
     )
   }
 
