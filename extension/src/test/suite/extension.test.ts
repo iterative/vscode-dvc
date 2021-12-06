@@ -261,7 +261,7 @@ suite('Extension Test Suite', () => {
       expect(mockDiff, 'should have updated the repository data').to.have.been
         .called
       expect(mockStatus).to.have.been.called
-      expect(mockExperimentShow, 'should have update the experiments data').to
+      expect(mockExperimentShow, 'should have updated the experiments data').to
         .have.been.called
 
       expect(

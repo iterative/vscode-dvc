@@ -48,9 +48,10 @@ export class Experiments extends BaseRepository<TableData> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
-    data = new ExperimentsData(dvcRoot, internalCommands)
+    data?: ExperimentsData
   ) {
     super(dvcRoot, resourceLocator.beaker)
 
@@ -66,7 +67,9 @@ export class Experiments extends BaseRepository<TableData> {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
-    this.data = this.dispose.track(data)
+    this.data = this.dispose.track(
+      data || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
+    )
 
     this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
 

@@ -23,15 +23,16 @@ export class Repository {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>,
     treeDataChanged: EventEmitter<void>
   ) {
-    this.decorationProvider = this.dispose.track(new DecorationProvider())
     this.dvcRoot = dvcRoot
     this.model = this.dispose.track(new RepositoryModel(dvcRoot))
     this.data = this.dispose.track(
-      new RepositoryData(dvcRoot, internalCommands)
+      new RepositoryData(dvcRoot, internalCommands, updatesPaused)
     )
 
+    this.decorationProvider = this.dispose.track(new DecorationProvider())
     this.sourceControlManagement = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, this.getState())
     )

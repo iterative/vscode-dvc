@@ -49,6 +49,7 @@ suite('Repository Test Suite', () => {
         mockGetAllUntracked,
         mockListDvcOnlyRecursive,
         mockStatus,
+        updatesPaused,
         treeDataChanged
       } = buildDependencies(disposable)
 
@@ -88,7 +89,12 @@ suite('Repository Test Suite', () => {
       mockGetAllUntracked.resolves(untracked)
 
       const repository = disposable.track(
-        new Repository(dvcDemoPath, internalCommands, treeDataChanged)
+        new Repository(
+          dvcDemoPath,
+          internalCommands,
+          updatesPaused,
+          treeDataChanged
+        )
       )
       await repository.isReady()
 
@@ -135,7 +141,8 @@ suite('Repository Test Suite', () => {
         mockNow,
         mockStatus,
         onDidChangeTreeData,
-        treeDataChanged
+        treeDataChanged,
+        updatesPaused
       } = buildDependencies(disposable)
       mockNow.returns(100)
 
@@ -180,7 +187,12 @@ suite('Repository Test Suite', () => {
       mockGetAllUntracked.resolves(emptySet)
 
       const repository = disposable.track(
-        new Repository(dvcDemoPath, internalCommands, treeDataChanged)
+        new Repository(
+          dvcDemoPath,
+          internalCommands,
+          updatesPaused,
+          treeDataChanged
+        )
       )
       await repository.isReady()
 
@@ -249,6 +261,7 @@ suite('Repository Test Suite', () => {
         mockNow,
         mockStatus,
         onDidChangeTreeData,
+        updatesPaused,
         treeDataChanged
       } = buildDependencies(disposable)
 
@@ -312,7 +325,12 @@ suite('Repository Test Suite', () => {
         .resolves(untracked)
 
       const repository = disposable.track(
-        new Repository(dvcDemoPath, internalCommands, treeDataChanged)
+        new Repository(
+          dvcDemoPath,
+          internalCommands,
+          updatesPaused,
+          treeDataChanged
+        )
       )
       await repository.isReady()
       mockNow.resetBehavior()

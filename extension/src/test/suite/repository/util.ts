@@ -18,6 +18,7 @@ export const buildDependencies = (disposer: Disposer) => {
 
   const treeDataChanged = disposer.track(new EventEmitter<void>())
   const onDidChangeTreeData = treeDataChanged.event
+  const updatesPaused = disposer.track(new EventEmitter<boolean>())
 
   return {
     internalCommands,
@@ -27,7 +28,8 @@ export const buildDependencies = (disposer: Disposer) => {
     mockNow,
     mockStatus,
     onDidChangeTreeData,
-    treeDataChanged
+    treeDataChanged,
+    updatesPaused
   }
 }
 
@@ -38,7 +40,8 @@ export const buildRepositoryData = async (disposer: Disposer) => {
     mockGetAllUntracked,
     mockListDvcOnlyRecursive,
     mockNow,
-    mockStatus
+    mockStatus,
+    updatesPaused
   } = buildDependencies(disposer)
 
   mockDiff.resolves({})
@@ -47,7 +50,9 @@ export const buildRepositoryData = async (disposer: Disposer) => {
   mockNow.returns(150)
   mockStatus.resolves({})
 
-  const data = disposer.track(new RepositoryData(dvcDemoPath, internalCommands))
+  const data = disposer.track(
+    new RepositoryData(dvcDemoPath, internalCommands, updatesPaused)
+  )
   await data.isReady()
 
   mockDiff.resetHistory()

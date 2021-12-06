@@ -204,11 +204,16 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
   }
 
-  public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
+  public createRepository(
+    dvcRoot: string,
+    updatesPaused: EventEmitter<boolean>,
+    resourceLocator: ResourceLocator
+  ) {
     const experiments = this.dispose.track(
       new Experiments(
         dvcRoot,
         this.internalCommands,
+        updatesPaused,
         resourceLocator,
         this.workspaceState
       )
