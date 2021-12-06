@@ -57,19 +57,6 @@ export class Model {
   }
 
   public persistColumnWidth(id: string, width: number) {
-    const originalState = this.getState()
-    const data = originalState.data as TableData
-    const { columnWidths = {} } = data
-    vsCodeApi.setState({
-      ...originalState,
-      data: {
-        ...data,
-        columnWidths: {
-          ...(columnWidths || {}),
-          [id]: width
-        }
-      }
-    })
     this.sendMessage({
       payload: { id, width },
       type: MessageFromWebviewType.COLUMN_RESIZED
@@ -77,15 +64,6 @@ export class Model {
   }
 
   public persistColumnOrder(newOrder: string[]): void {
-    const originalState = this.getState()
-    const data = originalState.data as TableData
-    vsCodeApi.setState({
-      ...originalState,
-      data: {
-        ...data,
-        columnOrder: newOrder
-      }
-    })
     this.sendMessage({
       payload: newOrder,
       type: MessageFromWebviewType.COLUMN_REORDERED
@@ -94,14 +72,12 @@ export class Model {
 
   private getState(): PersistedModelState {
     return {
-      data: this.data,
       dvcRoot: this.dvcRoot
     }
   }
 
   private setState(state: PersistedModelState) {
     this.dvcRoot = state.dvcRoot
-    this.data = state.data
   }
 
   private handleMessage(message: MessageToWebview): void {

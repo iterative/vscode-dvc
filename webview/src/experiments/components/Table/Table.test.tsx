@@ -25,9 +25,8 @@ import { Model } from '../../model'
 import { vsCodeApi } from '../../../shared/api'
 
 jest.mock('../../../shared/api')
-const { postMessage, setState } = vsCodeApi
+const { postMessage } = vsCodeApi
 const mockedPostMessage = mocked(postMessage)
-const mockedSetState = mocked(setState)
 
 describe('Table', () => {
   const getParentElement = async (text: string) =>
@@ -429,15 +428,6 @@ describe('Table', () => {
       })
       fireEvent.mouseUp(experimentColumnResizeHandle)
 
-      expect(mockedSetState).toBeCalledWith({
-        data: {
-          ...tableDataWithColumnSetting,
-          columnWidths: {
-            id: 353
-          }
-        },
-        dvcRoot: undefined
-      })
       expect(mockedPostMessage).toBeCalledWith({
         payload: { id: 'id', width: 353 },
         type: 'column-resized'
