@@ -20,7 +20,6 @@ import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
-import { Model } from '../../model'
 import { vsCodeApi } from '../../../shared/api'
 
 const DEFAULT_COLUMN_WIDTH = 120
@@ -75,8 +74,7 @@ const reportResizedColumn = (state: TableState<Experiment>) => {
 
 export const ExperimentsTable: React.FC<{
   tableData: TableData
-  model: Model
-}> = ({ tableData, model }) => {
+}> = ({ tableData }) => {
   const [columns, data, defaultColumn, initialState] = React.useMemo(() => {
     const { columnOrder } = tableData
     const initialState: Partial<TableState<Experiment>> = {
@@ -151,22 +149,28 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <Table
-      model={model}
       instance={instance}
       sorts={tableData.sorts}
       changes={tableData.changes}
+      tableData={{
+        changes: [],
+        columnOrder: [],
+        columnWidths: {},
+        columns: [],
+        rows: [],
+        sorts: []
+      }}
     />
   )
 }
 
 const Experiments: React.FC<{
   tableData?: TableData | null
-  model: Model
-}> = ({ tableData, model }) => {
+}> = ({ tableData }) => {
   return (
     <div className={styles.experiments}>
       {tableData ? (
-        <ExperimentsTable tableData={tableData} model={model} />
+        <ExperimentsTable tableData={tableData} />
       ) : (
         <p>Loading experiments...</p>
       )}

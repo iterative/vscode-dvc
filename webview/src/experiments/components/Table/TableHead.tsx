@@ -1,19 +1,18 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { DragUpdate } from 'react-beautiful-dnd'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { MergedHeaderGroup } from './MergeHeaderGroups'
-import { Model } from '../../model'
 import { useColumnOrder } from '../../hooks/useColumnOrder'
 import { vsCodeApi } from '../../../shared/api'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
+  columns: ParamOrMetric[]
   sorts: SortDefinition[]
-  model: Model
 }
 
 export const TableHead: React.FC<TableHeadProps> = ({
@@ -23,10 +22,10 @@ export const TableHead: React.FC<TableHeadProps> = ({
     allColumns,
     state: { columnOrder }
   },
-  sorts,
-  model
+  columns,
+  sorts
 }) => {
-  const orderedColumns = useColumnOrder(model.data?.columns || [], columnOrder)
+  const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
 
