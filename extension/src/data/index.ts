@@ -47,7 +47,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
   ) {
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager({
+      new ProcessManager(new EventEmitter(), {
         name: 'update',
         process: () => this.update()
       })
