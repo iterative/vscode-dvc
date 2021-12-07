@@ -80,13 +80,11 @@ describe('App', () => {
       window,
       new MessageEvent('message', {
         data: {
-          data: {
-            dvcRoot
-          },
+          dvcRoot,
           type: MessageToWebviewType.SET_DVC_ROOT
         }
       })
     )
-    expect(mockSetState).toBeCalledWith({})
+    expect(mockSetState).toBeCalledWith({ dvcRoot })
   })
 })
