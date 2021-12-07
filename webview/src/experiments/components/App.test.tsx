@@ -16,8 +16,9 @@ import { vsCodeApi } from '../../shared/api'
 
 jest.mock('../../shared/api')
 
-const { postMessage } = vsCodeApi
+const { postMessage, setState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
+const mockSetState = mocked(setState)
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -70,5 +71,20 @@ describe('App', () => {
         expect(emptyState).not.toBeInTheDocument()
       })
     })
+  })
+
+  it('Should persist dvcRoot when the message to update it is given', () => {
+    render(<App />)
+    const dvcRoot = 'testDvcRoot'
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          dvcRoot,
+          type: MessageToWebviewType.SET_DVC_ROOT
+        }
+      })
+    )
+    expect(mockSetState).toBeCalledWith({ dvcRoot })
   })
 })
