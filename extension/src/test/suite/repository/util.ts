@@ -5,7 +5,6 @@ import { buildInternalCommands } from '../util'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
-import { DecorationProvider } from '../../../repository/decorationProvider'
 import * as Time from '../../../util/time'
 
 export const buildDependencies = (disposer: Disposer) => {
@@ -17,12 +16,11 @@ export const buildDependencies = (disposer: Disposer) => {
   const mockGetAllUntracked = stub(Git, 'getAllUntracked')
   const mockNow = stub(Time, 'getCurrentEpoch')
 
-  const decorationProvider = disposer.track(new DecorationProvider())
   const treeDataChanged = disposer.track(new EventEmitter<void>())
   const onDidChangeTreeData = treeDataChanged.event
+  const updatesPaused = disposer.track(new EventEmitter<boolean>())
 
   return {
-    decorationProvider,
     internalCommands,
     mockDiff,
     mockGetAllUntracked,
@@ -30,7 +28,8 @@ export const buildDependencies = (disposer: Disposer) => {
     mockNow,
     mockStatus,
     onDidChangeTreeData,
-    treeDataChanged
+    treeDataChanged,
+    updatesPaused
   }
 }
 
@@ -41,7 +40,8 @@ export const buildRepositoryData = async (disposer: Disposer) => {
     mockGetAllUntracked,
     mockListDvcOnlyRecursive,
     mockNow,
-    mockStatus
+    mockStatus,
+    updatesPaused
   } = buildDependencies(disposer)
 
   mockDiff.resolves({})
@@ -50,7 +50,9 @@ export const buildRepositoryData = async (disposer: Disposer) => {
   mockNow.returns(150)
   mockStatus.resolves({})
 
-  const data = disposer.track(new RepositoryData(dvcDemoPath, internalCommands))
+  const data = disposer.track(
+    new RepositoryData(dvcDemoPath, internalCommands, updatesPaused)
+  )
   await data.isReady()
 
   mockDiff.resetHistory()

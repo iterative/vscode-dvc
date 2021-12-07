@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { Uri } from 'vscode'
 import { collectTree } from './collect'
-import { dvcDemoPath } from '../test/util'
+import { dvcDemoPath } from '../../test/util'
 
 describe('collectTree', () => {
   const makeUri = (...paths: string[]): Uri =>

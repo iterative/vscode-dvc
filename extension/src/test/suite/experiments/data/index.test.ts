@@ -1,6 +1,6 @@
 import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { FileSystemWatcher } from 'vscode'
+import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { Disposable } from '../../../../extension'
@@ -36,7 +36,11 @@ suite('Experiments Data Test Suite', () => {
       )
 
       const data = disposable.track(
-        new ExperimentsData(dvcDemoPath, internalCommands)
+        new ExperimentsData(
+          dvcDemoPath,
+          internalCommands,
+          disposable.track(new EventEmitter<boolean>())
+        )
       )
 
       await Promise.all([
@@ -65,7 +69,11 @@ suite('Experiments Data Test Suite', () => {
       ).returns(mockWatcher)
 
       const data = disposable.track(
-        new ExperimentsData(dvcDemoPath, internalCommands)
+        new ExperimentsData(
+          dvcDemoPath,
+          internalCommands,
+          disposable.track(new EventEmitter<boolean>())
+        )
       )
 
       await data.isReady()
@@ -104,7 +112,11 @@ suite('Experiments Data Test Suite', () => {
       })
 
       const data = disposable.track(
-        new ExperimentsData(dvcDemoPath, internalCommands)
+        new ExperimentsData(
+          dvcDemoPath,
+          internalCommands,
+          disposable.track(new EventEmitter<boolean>())
+        )
       )
 
       await data.isReady()

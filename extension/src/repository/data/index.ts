@@ -1,11 +1,11 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { DiffOutput, ListOutput, StatusOutput } from '../cli/reader'
-import { isAnyDvcYaml } from '../fileSystem'
-import { getAllUntracked } from '../git'
-import { ProcessManager } from '../processManager'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
+import { isAnyDvcYaml } from '../../fileSystem'
+import { getAllUntracked } from '../../git'
+import { ProcessManager } from '../../processManager'
 
 export type Data = {
   diffFromHead: DiffOutput
@@ -30,10 +30,15 @@ export class RepositoryData {
     new EventEmitter()
   )
 
-  constructor(dvcRoot: string, internalCommands: InternalCommands) {
+  constructor(
+    dvcRoot: string,
+    internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>
+  ) {
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
       new ProcessManager(
+        updatesPaused,
         { name: 'partialUpdate', process: () => this.partialUpdate() },
         { name: 'fullUpdate', process: () => this.fullUpdate() }
       )
