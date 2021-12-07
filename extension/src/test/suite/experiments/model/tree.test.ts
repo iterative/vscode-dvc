@@ -7,7 +7,7 @@ import { ExperimentsModel, Status } from '../../../../experiments/model'
 import { experimentsUpdatedEvent } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
-import { buildPlots, getExpectedData } from '../../plots/util'
+import { buildPlots, getExpectedLivePlotsData } from '../../plots/util'
 import livePlotsFixture from '../../../fixtures/expShow/livePlots'
 import expShowFixture from '../../../fixtures/expShow/output'
 import columnsFixture from '../../../fixtures/expShow/columns'
@@ -54,10 +54,22 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       while (expectedDomain.length) {
+        const expectedData = getExpectedLivePlotsData(
+          expectedDomain,
+          expectedRange
+        )
+
         expect(
           messageSpy,
           'a message is sent with colors for the currently selected experiments'
-        ).to.be.calledWith(getExpectedData(expectedDomain, expectedRange))
+        ).to.be.calledWith(
+          expectedDomain.length === 3
+            ? {
+                ...expectedData,
+                static: undefined
+              }
+            : expectedData
+        )
         messageSpy.resetHistory()
 
         const id = expectedIds.pop()
@@ -84,8 +96,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'when there are no experiments selected we send undefined (show empty state)'
       ).to.be.calledWith({
-        live: undefined,
-        static: undefined
+        live: undefined
       })
       messageSpy.resetHistory()
 
@@ -105,7 +116,7 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       expect(messageSpy, 'we no longer send undefined').to.be.calledWith(
-        getExpectedData(expectedDomain, expectedRange)
+        getExpectedLivePlotsData(expectedDomain, expectedRange)
       )
       expect(
         setSelectionModeSpy,
@@ -169,7 +180,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'a message is sent with colors for the currently selected experiments'
       ).to.be.calledWith(
-        getExpectedData([selectedDisplayName], [selectedColor])
+        getExpectedLivePlotsData([selectedDisplayName], [selectedColor])
       )
       expect(
         setSelectionModeSpy,
@@ -211,7 +222,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'the filter is applied and one experiment remains because of a single checkpoint'
       ).to.be.calledWith(
-        getExpectedData([selectedDisplayName], [selectedColor])
+        getExpectedLivePlotsData([selectedDisplayName], [selectedColor])
       )
       expect(
         setSelectionModeSpy,
@@ -264,8 +275,7 @@ suite('Experiments Tree Test Suite', () => {
       await tableFilterAdded
 
       const expectedMessage = {
-        live: undefined,
-        static: undefined
+        live: undefined
       }
 
       expect(
