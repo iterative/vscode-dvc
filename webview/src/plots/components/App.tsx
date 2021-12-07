@@ -1,16 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
-import {
-  MessageFromWebview,
-  MessageFromWebviewType,
-  MessageToWebview
-} from 'dvc/src/webview/contract'
+import { MessageFromWebview, MessageToWebview } from 'dvc/src/webview/contract'
 import Plots from './Plots'
 import { vsCodeApi } from '../../shared/api'
 import { PlotsWebviewState, useAppReducer } from '../hooks/useAppReducer'
-
-const signalInitialized = () =>
-  vsCodeApi.postMessage({ type: MessageFromWebviewType.INITIALIZED })
+import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
 const sendMessage = (message: MessageFromWebview) =>
   vsCodeApi.postMessage(message)
@@ -20,18 +14,15 @@ export const App = () => {
     vsCodeApi.getState<PlotsWebviewState>()
   )
 
-  useEffect(() => {
-    const messageListener = ({
-      data
-    }: {
-      data: MessageToWebview<PlotsData>
-    }) => {
-      dispatch(data)
-    }
-    window.addEventListener('message', messageListener)
-    signalInitialized()
-    return () => window.removeEventListener('message', messageListener)
-  }, [dispatch])
+  useVsCodeMessaging(
+    useCallback(
+      ({ data }: { data: MessageToWebview<PlotsData> }) => {
+        dispatch(data)
+      },
+      [dispatch]
+    )
+  )
+
   useEffect(() => {
     vsCodeApi.setState<PlotsWebviewState>(state)
   }, [state])
