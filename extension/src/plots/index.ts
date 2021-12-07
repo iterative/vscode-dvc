@@ -41,7 +41,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      this.data.onDidUpdate(data => this.setOrSendStaticPlots(data))
+      this.data.onDidUpdate(data => this.sendStaticPlots(data))
     )
 
     this.handleMessageFromWebview()
@@ -54,11 +54,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.dispose.track(
       experiments.onDidChangeLivePlots(() => {
-        if (this.webview) {
-          this.webview.show({
-            live: this.getLivePlots()
-          })
-        }
+        this.sendLivePlotsData()
       })
     )
 
@@ -70,20 +66,14 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public sendInitialWebviewData() {
-    this.webview?.show({
-      live: this.getLivePlots()
-    })
+    this.sendLivePlotsData()
     this.data.managedUpdate()
   }
 
-  private getLivePlots() {
-    return this.experiments?.getLivePlots() || null
-  }
-
-  private setOrSendStaticPlots(data: PlotsOutput) {
-    if (this.webview) {
-      return this.sendStaticPlots(data)
-    }
+  private sendLivePlotsData() {
+    this.webview?.show({
+      live: this.experiments?.getLivePlots() || null
+    })
   }
 
   private sendStaticPlots(data: PlotsOutput) {
