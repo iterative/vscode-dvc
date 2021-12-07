@@ -20,7 +20,7 @@ import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
-import { vsCodeApi } from '../../../shared/api'
+import { sendMessage } from '../../../shared/vscode'
 
 const DEFAULT_COLUMN_WIDTH = 120
 
@@ -65,7 +65,7 @@ const reportResizedColumn = (state: TableState<Experiment>) => {
   const id = state.columnResizing.isResizingColumn
   if (id) {
     const width = state.columnResizing.columnWidths[id]
-    vsCodeApi.postMessage({
+    sendMessage({
       payload: { id, width },
       type: MessageFromWebviewType.COLUMN_RESIZED
     })

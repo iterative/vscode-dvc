@@ -5,10 +5,7 @@ import {
   LivePlotData,
   PlotsOutput
 } from 'dvc/src/plots/webview/contract'
-import {
-  MessageFromWebview,
-  MessageFromWebviewType
-} from 'dvc/src/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
 import { config, createSpec, PlotDimensions } from './constants'
 import { EmptyState } from './EmptyState'
@@ -20,6 +17,7 @@ import {
   PlotsWebviewState
 } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
+import { sendMessage } from '../../shared/vscode'
 
 const Plot = ({
   values,
@@ -95,12 +93,10 @@ const getMetricsFromPlots = (plots?: LivePlotData[]): string[] =>
 
 const Plots = ({
   state,
-  dispatch,
-  sendMessage
+  dispatch
 }: {
   state: PlotsWebviewState
   dispatch: Dispatch<PlotsReducerAction>
-  sendMessage: (message: MessageFromWebview) => void
 }) => {
   const { data, collapsedSections } = state
   const [metrics, setMetrics] = useState<string[]>([])
