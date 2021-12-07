@@ -9,7 +9,7 @@ import { vsCodeApi } from '../api'
 const signalInitialized = () =>
   vsCodeApi.postMessage({ type: MessageFromWebviewType.INITIALIZED })
 
-export function useVsCodeMessages<T extends WebviewData>(
+export function useVsCodeMessaging<T extends WebviewData>(
   handler: (event: { data: MessageToWebview<T> }) => void
 ) {
   useEffect(() => {

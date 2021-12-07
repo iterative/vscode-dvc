@@ -4,7 +4,7 @@ import { MessageFromWebview, MessageToWebview } from 'dvc/src/webview/contract'
 import Plots from './Plots'
 import { vsCodeApi } from '../../shared/api'
 import { PlotsWebviewState, useAppReducer } from '../hooks/useAppReducer'
-import { useVsCodeMessages } from '../../shared/hooks/useVsCodeMessages'
+import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
 const sendMessage = (message: MessageFromWebview) =>
   vsCodeApi.postMessage(message)
@@ -14,7 +14,7 @@ export const App = () => {
     vsCodeApi.getState<PlotsWebviewState>()
   )
 
-  useVsCodeMessages(
+  useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<PlotsData> }) => {
         dispatch(data)

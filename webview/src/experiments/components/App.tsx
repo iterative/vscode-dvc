@@ -6,11 +6,11 @@ import {
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import Experiments from './Experiments'
 import { vsCodeApi } from '../../shared/api'
-import { useVsCodeMessages } from '../../shared/hooks/useVsCodeMessages'
+import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
 export const App: React.FC<Record<string, unknown>> = () => {
   const [tableData, setTableData] = useState<TableData>()
-  useVsCodeMessages(
+  useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<TableData> }) => {
         switch (data.type) {
