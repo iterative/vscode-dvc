@@ -12,6 +12,7 @@ export type LivePlotData = {
 export type LivePlotsData = {
   plots: LivePlotData[]
   colors: LivePlotsColors
+  size: PlotSize
   selectedMetrics?: string[]
 }
 
@@ -46,3 +47,12 @@ export type PlotsData = {
   live: LivePlotsData | undefined
   static: PlotsOutput | undefined
 }
+
+export const PlotSize = {
+  LARGE: 'LARGE',
+  REGULAR: 'REGULAR',
+  SMALL: 'SMALL'
+}
+
+type PlotSizeKeys = keyof typeof PlotSize
+export type PlotSize = typeof PlotSize[PlotSizeKeys]

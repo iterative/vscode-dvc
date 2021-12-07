@@ -1,7 +1,7 @@
 import React, { Dispatch } from 'react'
-import { PlotDimensions } from './constants'
+import { PlotSize } from 'dvc/src/plots/webview/contract'
 import { MetricsPicker } from './MetricsPicker'
-import { PlotSize, SizePicker } from './SizePicker'
+import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { AllIcons } from '../../shared/components/icon/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
@@ -16,7 +16,8 @@ interface MenuProps {
   metrics: string[]
   selectedMetrics: string[]
   setSelectedPlots: (selectedPlots: string[]) => void
-  setSize: (size: keyof typeof PlotDimensions) => void
+  setSize: (size: PlotSize) => void
+  size: PlotSize
 }
 
 interface PlotsContainerProps {

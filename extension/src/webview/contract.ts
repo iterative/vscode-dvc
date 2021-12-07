@@ -1,5 +1,5 @@
 import { TableData } from '../experiments/webview/contract'
-import { PlotsData } from '../plots/webview/contract'
+import { PlotsData, PlotSize } from '../plots/webview/contract'
 
 export type WebviewData = TableData | PlotsData
 
@@ -9,17 +9,23 @@ export type ColumnResizePayload = {
   width: number
 }
 export type MetricToggledPayload = string[]
+export type PlotsResizedPayload = PlotSize
 
 export type MessageFromWebview = {
   type: MessageFromWebviewType
-  payload?: ColumnReorderPayload | ColumnResizePayload | MetricToggledPayload
+  payload?:
+    | ColumnReorderPayload
+    | ColumnResizePayload
+    | MetricToggledPayload
+    | PlotsResizedPayload
 }
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   COLUMN_REORDERED = 'column-reordered',
   COLUMN_RESIZED = 'column-resized',
-  METRIC_TOGGLED = 'metric-toggled'
+  METRIC_TOGGLED = 'metric-toggled',
+  PLOTS_RESIZED = 'plots-resized'
 }
 
 export interface setData<T extends WebviewData> {

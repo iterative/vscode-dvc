@@ -3,16 +3,16 @@ import {
   isVegaPlot,
   LivePlotsColors,
   LivePlotData,
-  PlotsOutput
+  PlotsOutput,
+  PlotSize
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebview,
   MessageFromWebviewType
 } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
-import { config, createSpec, PlotDimensions } from './constants'
+import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
-import { PlotSize } from './SizePicker'
 import { PlotsContainer } from './PlotsContainer'
 import {
   PlotsSectionKeys,
@@ -29,7 +29,7 @@ const Plot = ({
 }: {
   values: { x: number; y: number; group: string }[]
   title: string
-  size: keyof typeof PlotDimensions
+  size: PlotSize
   scale?: LivePlotsColors
 }) => {
   const spec = createSpec(title, size, scale)
@@ -54,7 +54,7 @@ const LivePlots = ({
 }: {
   plots: LivePlotData[]
   colors: LivePlotsColors
-  size: keyof typeof PlotDimensions
+  size: PlotSize
 }) =>
   plots.length ? (
     <>
@@ -105,15 +105,21 @@ const Plots = ({
   const { data, collapsedSections } = state
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
-  const [size, setSize] = useState<keyof typeof PlotDimensions>(
-    PlotSize.REGULAR
-  )
+  const [size, setSize] = useState<PlotSize>(PlotSize.REGULAR)
 
   useEffect(() => {
     const newMetrics = getMetricsFromPlots(data?.live?.plots)
     setMetrics(newMetrics)
     setSelectedPlots(data?.live?.selectedMetrics || newMetrics)
   }, [data, setSelectedPlots, setMetrics])
+
+  useEffect(() => {
+    setSize(data?.live?.size || PlotSize.REGULAR)
+  }, [data, setSize])
+
+  useEffect(() => {
+    window.dispatchEvent(new Event('resize'))
+  }, [size])
 
   if (!data) {
     return EmptyState('Loading Plots...')
@@ -133,6 +139,11 @@ const Plots = ({
     })
   }
 
+  const changeSize = (size: PlotSize) => {
+    setSize(size)
+    sendMessage({ payload: size, type: MessageFromWebviewType.PLOTS_RESIZED })
+  }
+
   return (
     <>
       {livePlots && (
@@ -145,7 +156,8 @@ const Plots = ({
             metrics,
             selectedMetrics: selectedPlots,
             setSelectedPlots: setSelectedMetrics,
-            setSize
+            setSize: changeSize,
+            size
           }}
         >
           <LivePlots
