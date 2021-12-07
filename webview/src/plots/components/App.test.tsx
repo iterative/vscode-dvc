@@ -34,6 +34,15 @@ const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
 const mockSetState = mocked(setState)
 
+const toStringSize = (size: number, addedSize = 44) =>
+  (size + addedSize).toString()
+
+const getPlotSvg = async () => {
+  const [plot] = await screen.findAllByRole('graphics-document')
+  // eslint-disable-next-line testing-library/no-node-access
+  return plot.getElementsByTagName('svg')[0]
+}
+
 beforeEach(() => {
   jest.clearAllMocks()
 })
@@ -205,7 +214,7 @@ describe('App', () => {
       screen.getByTestId('plot-metrics:summary.json:loss')
     ).not.toThrow()
 
-    const pickerButton = screen.getByTestId('icon-menu-item')
+    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -241,7 +250,7 @@ describe('App', () => {
     mockGetState.mockReturnValue(initialState)
     render(<App />)
 
-    const pickerButton = screen.getByTestId('icon-menu-item')
+    const [pickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -266,5 +275,47 @@ describe('App', () => {
       payload: ['loss', 'accuracy', 'val_loss', 'val_accuracy'],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
+  })
+
+  it('should change the size of the plots according to the size picker', async () => {
+    render(
+      <Plots
+        state={{
+          collapsedSections: defaultCollapsibleSectionsState,
+          data: {
+            live: livePlotsFixture,
+            static: undefined
+          }
+        }}
+        dispatch={jest.fn}
+        sendMessage={jest.fn}
+      />
+    )
+
+    const summaryElement = await screen.findByText('Live Experiments Plots')
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const [, sizePickerButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(sizePickerButton)
+    fireEvent.click(sizePickerButton)
+
+    const smallButton = screen.getByText('Small')
+    const regularButton = screen.getByText('Regular')
+    const largeButton = screen.getByText('Large')
+
+    fireEvent.click(smallButton)
+    let svg = await getPlotSvg()
+    expect(svg.getAttribute('height')).toBe(toStringSize(200))
+
+    fireEvent.click(regularButton)
+    svg = await getPlotSvg()
+    expect(svg.getAttribute('height')).toBe(toStringSize(300))
+
+    fireEvent.click(largeButton)
+    svg = await getPlotSvg()
+    expect(svg.getAttribute('height')).toBe(toStringSize(750, 48))
   })
 })

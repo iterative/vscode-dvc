@@ -20,21 +20,18 @@ import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnOrder'
-import { Model } from '../../model'
 
 import { vsCodeApi } from '../../../shared/api'
 
 jest.mock('../../../shared/api')
-const { postMessage, setState } = vsCodeApi
+const { postMessage } = vsCodeApi
 const mockedPostMessage = mocked(postMessage)
-const mockedSetState = mocked(setState)
 
 describe('Table', () => {
   const getParentElement = async (text: string) =>
     // eslint-disable-next-line testing-library/no-node-access
     (await screen.findByText(text))?.parentElement
 
-  const model = new Model()
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
   const getHeaderGroupProps = (key: string) => () => ({ key })
   const headerBasicProps = {
@@ -107,6 +104,14 @@ describe('Table', () => {
       columnOrder: []
     }
   } as unknown as TableInstance<Experiment>
+  const dummyTableData: TableData = {
+    changes: [],
+    columnOrder: [],
+    columnWidths: {},
+    columns: [],
+    rows: [],
+    sorts: []
+  }
   const renderTable = (
     sorts: SortDefinition[] = [],
     tableInstance = instance,
@@ -114,10 +119,10 @@ describe('Table', () => {
   ) =>
     render(
       <Table
-        model={model}
         instance={tableInstance}
         sorts={sorts}
         changes={changes}
+        tableData={dummyTableData}
       />
     )
 
@@ -310,7 +315,7 @@ describe('Table', () => {
     }
 
     const renderExperimentsTable = (data: TableData = tableData) => {
-      const view = render(<ExperimentsTable tableData={data} model={model} />)
+      const view = render(<ExperimentsTable tableData={data} />)
 
       mockDndElSpacing(view)
 
@@ -408,13 +413,7 @@ describe('Table', () => {
           id: 333
         }
       }
-      const model = new Model({ data: tableDataWithColumnSetting })
-      render(
-        <ExperimentsTable
-          tableData={tableDataWithColumnSetting}
-          model={model}
-        />
-      )
+      render(<ExperimentsTable tableData={tableDataWithColumnSetting} />)
       const [experimentColumnResizeHandle] = await screen.findAllByRole(
         'separator'
       )
@@ -429,15 +428,6 @@ describe('Table', () => {
       })
       fireEvent.mouseUp(experimentColumnResizeHandle)
 
-      expect(mockedSetState).toBeCalledWith({
-        data: {
-          ...tableDataWithColumnSetting,
-          columnWidths: {
-            id: 353
-          }
-        },
-        dvcRoot: undefined
-      })
       expect(mockedPostMessage).toBeCalledWith({
         payload: { id: 'id', width: 353 },
         type: 'column-resized'
