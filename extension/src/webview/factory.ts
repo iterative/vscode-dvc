@@ -4,15 +4,9 @@ import { BaseWebview } from '.'
 import { ViewKey, WebviewDetails } from './constants'
 import { WebviewState, UnknownWebviewState, WebviewData } from './contract'
 import { Resource } from '../resourceLocator'
-import { TableData } from '../experiments/webview/contract'
 import { PlotsData } from '../plots/webview/contract'
 import { hasKey } from '../util/object'
 import { getWorkspaceRootUris } from '../vscode/workspaceFolders'
-
-const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
-  const data = state.data as TableData
-  return !!(data?.rows && data?.columns)
-}
 
 const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as PlotsData
@@ -23,7 +17,7 @@ export const isValidState = (
   viewKey: ViewKey,
   state: UnknownWebviewState
 ): state is WebviewState<WebviewData> =>
-  (viewKey === ViewKey.EXPERIMENTS && isExperimentsWebviewState(state)) ||
+  viewKey === ViewKey.EXPERIMENTS ||
   (viewKey === ViewKey.PLOTS && isPlotsWebviewState(state))
 
 const create = (
