@@ -66,7 +66,7 @@ suite('Experiments Tree Test Suite', () => {
           expectedDomain.length === 3
             ? {
                 ...expectedData,
-                static: undefined
+                static: null
               }
             : expectedData
         )
@@ -96,7 +96,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'when there are no experiments selected we send undefined (show empty state)'
       ).to.be.calledWith({
-        live: undefined
+        live: null
       })
       messageSpy.resetHistory()
 
@@ -275,7 +275,7 @@ suite('Experiments Tree Test Suite', () => {
       await tableFilterAdded
 
       const expectedMessage = {
-        live: undefined
+        live: null
       }
 
       expect(

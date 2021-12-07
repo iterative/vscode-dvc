@@ -57,7 +57,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       experiments.onDidChangeLivePlots(() => {
         if (this.webview) {
           this.webview.show({
-            live: this.experiments?.getLivePlots()
+            live: this.getLivePlots()
           })
         }
       })
@@ -69,9 +69,13 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public getWebviewData() {
     return {
-      live: this.experiments?.getLivePlots(),
+      live: this.getLivePlots(),
       static: this.getStaticPlots(this.staticPlots)
     }
+  }
+
+  private getLivePlots() {
+    return this.experiments?.getLivePlots() || null
   }
 
   private setOrSendStaticPlots(data: PlotsOutput) {
@@ -91,7 +95,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private getStaticPlots(data: PlotsOutput | undefined) {
     if (isEmpty(data)) {
-      return
+      return null
     }
 
     return Object.entries(data as PlotsOutput).reduce((acc, [path, plots]) => {
