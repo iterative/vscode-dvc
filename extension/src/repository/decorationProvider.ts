@@ -114,7 +114,7 @@ export class DecorationProvider implements FileDecorationProvider {
     }
   }
 
-  public setState = (state: DecorationState) => {
+  public setState(state: DecorationState) {
     const urisToUpdate = this.getUnion(this.state, state)
     this.state = state
     this.decorationsChanged.fire(urisToUpdate)

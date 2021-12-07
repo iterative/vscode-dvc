@@ -1,9 +1,9 @@
 import { dirname, resolve } from 'path'
 import isEqual from 'lodash.isequal'
 import { Disposable } from '@hediet/std/disposable'
-import { collectTree, PathItem } from './collect'
-import { SourceControlManagementModel } from './sourceControlManagement'
-import { DecorationModel } from './decorationProvider'
+import { collectTree, PathItem } from '../data/collect'
+import { SourceControlManagementModel } from '../sourceControlManagement'
+import { DecorationModel } from '../decorationProvider'
 import {
   ChangedType,
   DiffOutput,
@@ -14,8 +14,8 @@ import {
   Status,
   StatusesOrAlwaysChanged,
   StatusOutput
-} from '../cli/reader'
-import { isDirectory } from '../fileSystem'
+} from '../../cli/reader'
+import { isDirectory } from '../../fileSystem'
 
 type OutputData = {
   diffFromCache: StatusOutput
