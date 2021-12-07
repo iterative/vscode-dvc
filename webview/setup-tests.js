@@ -1,4 +1,5 @@
 /* eslint-disable */
 window = {
-  addEventListener: jest.fn()
+  addEventListener: jest.fn(),
+  dispatchEvent: jest.fn()
 }
