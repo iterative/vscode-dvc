@@ -62,14 +62,7 @@ suite('Experiments Tree Test Suite', () => {
         expect(
           messageSpy,
           'a message is sent with colors for the currently selected experiments'
-        ).to.be.calledWith(
-          expectedDomain.length === 3
-            ? {
-                ...expectedData,
-                static: null
-              }
-            : expectedData
-        )
+        ).to.be.calledWith(expectedData)
         messageSpy.resetHistory()
 
         const id = expectedIds.pop()

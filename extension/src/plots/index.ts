@@ -27,7 +27,6 @@ export class Plots extends BaseRepository<TPlotsData> {
   private experiments?: Experiments
 
   private readonly data: PlotsData
-  private staticPlots?: PlotsOutput
 
   constructor(
     dvcRoot: string,
@@ -64,14 +63,17 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.deferred.resolve()
-    return this.sendWebviewData()
+
+    if (this.webview) {
+      this.sendInitialWebviewData()
+    }
   }
 
-  public getWebviewData() {
-    return {
-      live: this.getLivePlots(),
-      static: this.getStaticPlots(this.staticPlots)
-    }
+  public sendInitialWebviewData() {
+    this.webview?.show({
+      live: this.getLivePlots()
+    })
+    this.data.managedUpdate()
   }
 
   private getLivePlots() {
@@ -82,12 +84,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     if (this.webview) {
       return this.sendStaticPlots(data)
     }
-
-    this.staticPlots = isEmpty(data) ? undefined : data
   }
 
   private sendStaticPlots(data: PlotsOutput) {
-    this.staticPlots = undefined
     this.webview?.show({
       static: this.getStaticPlots(data)
     })
