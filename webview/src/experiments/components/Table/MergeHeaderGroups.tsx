@@ -3,7 +3,14 @@ import cx from 'classnames'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
-import { Droppable } from 'react-beautiful-dnd'
+import {
+  DragDropContext,
+  DragStart,
+  DragUpdate,
+  Droppable,
+  DropResult,
+  ResponderProvided
+} from 'react-beautiful-dnd'
 import { TableHeader } from './TableHeader'
 import styles from './styles.module.scss'
 
@@ -12,29 +19,46 @@ export const MergedHeaderGroup: React.FC<{
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
   orderedColumns: ParamOrMetric[]
-}> = ({ headerGroup, sorts, columns, orderedColumns }) => {
+  onDragStart: (initial: DragStart, provided: ResponderProvided) => void
+  onDragUpdate: (initial: DragUpdate, provided: ResponderProvided) => void
+  onDragEnd: (initial: DropResult, provided: ResponderProvided) => void
+}> = ({
+  headerGroup,
+  sorts,
+  columns,
+  orderedColumns,
+  onDragStart,
+  onDragUpdate,
+  onDragEnd
+}) => {
   return (
-    <Droppable droppableId="droppable" direction="horizontal">
-      {provided => (
-        <div
-          ref={provided.innerRef}
-          {...headerGroup.getHeaderGroupProps({
-            className: cx(styles.tr, styles.headerRow)
-          })}
-        >
-          {headerGroup.headers.map((column: HeaderGroup<Experiment>, i) => (
-            <TableHeader
-              orderedColumns={orderedColumns}
-              key={column.id}
-              column={column}
-              columns={columns}
-              sorts={sorts}
-              index={i}
-            />
-          ))}
-          <div className={styles.dndPlaceholder}>{provided.placeholder}</div>
-        </div>
-      )}
-    </Droppable>
+    <DragDropContext
+      onDragStart={onDragStart}
+      onDragUpdate={onDragUpdate}
+      onDragEnd={onDragEnd}
+    >
+      <Droppable droppableId="droppable" direction="horizontal">
+        {provided => (
+          <div
+            ref={provided.innerRef}
+            {...headerGroup.getHeaderGroupProps({
+              className: cx(styles.tr, styles.headerRow)
+            })}
+          >
+            {headerGroup.headers.map((column: HeaderGroup<Experiment>, i) => (
+              <TableHeader
+                orderedColumns={orderedColumns}
+                key={column.id}
+                column={column}
+                columns={columns}
+                sorts={sorts}
+                index={i}
+              />
+            ))}
+            <div className={styles.dndPlaceholder}>{provided.placeholder}</div>
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
   )
 }

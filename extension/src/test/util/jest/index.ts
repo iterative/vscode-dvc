@@ -17,8 +17,8 @@ export const getFailingMockedProcess = (stderr: string): Process =>
     stdout: new Promise((_, reject) => reject(new Error(stderr)))
   } as unknown as Process)
 
-export const buildMockedEventEmitter = () => {
-  const mockedEmitter = mocked(new EventEmitter<void>())
+export const buildMockedEventEmitter = <T = void>() => {
+  const mockedEmitter = mocked(new EventEmitter<T>())
   const mockedEmitterChangedFire = jest.fn()
   const mockedEmitterChangedEvent = jest.fn()
   mockedEmitter.fire = mockedEmitterChangedFire

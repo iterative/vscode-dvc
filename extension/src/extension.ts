@@ -69,6 +69,10 @@ export class Extension implements IExtension {
     new EventEmitter()
   )
 
+  private updatesPaused: EventEmitter<boolean> = this.dispose.track(
+    new EventEmitter<boolean>()
+  )
+
   private readonly onDidChangeWorkspace: Event<void> =
     this.workspaceChanged.event
 
@@ -111,7 +115,11 @@ export class Extension implements IExtension {
     )
 
     this.experiments = this.dispose.track(
-      new WorkspaceExperiments(this.internalCommands, context.workspaceState)
+      new WorkspaceExperiments(
+        this.internalCommands,
+        this.updatesPaused,
+        context.workspaceState
+      )
     )
 
     this.plots = this.dispose.track(new WorkspacePlots(this.internalCommands))
@@ -301,10 +309,14 @@ export class Extension implements IExtension {
     this.resetMembers()
 
     await Promise.all([
-      this.repositories.create(this.dvcRoots),
+      this.repositories.create(this.dvcRoots, this.updatesPaused),
       this.trackedExplorerTree.initialize(this.dvcRoots),
-      this.experiments.create(this.dvcRoots, this.resourceLocator),
-      this.plots.create(this.dvcRoots, this.resourceLocator)
+      this.experiments.create(
+        this.dvcRoots,
+        this.updatesPaused,
+        this.resourceLocator
+      ),
+      this.plots.create(this.dvcRoots, this.updatesPaused, this.resourceLocator)
     ])
 
     this.experiments.linkRepositories(this.plots)

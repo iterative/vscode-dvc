@@ -26,7 +26,8 @@ export enum Flag {
   HELP = '-h',
   RECURSIVE = '-R',
   SHOW_JSON = '--show-json',
-  SUBDIRECTORY = '--subdir'
+  SUBDIRECTORY = '--subdir',
+  SET_PARAM = '-S'
 }
 
 export enum ExperimentSubCommand {

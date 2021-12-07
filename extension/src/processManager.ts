@@ -1,3 +1,4 @@
+import { EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { getCurrentEpoch } from './util/time'
 
@@ -9,15 +10,28 @@ export class ProcessManager {
     { process: () => Promise<unknown>; lastStarted?: number }
   > = {}
 
+  private paused = false
   private queued = new Set<string>()
   private locked = new Set<string>()
 
   constructor(
+    processesPaused: EventEmitter<boolean>,
     ...processes: { name: string; process: () => Promise<unknown> }[]
   ) {
     processes.map(({ name, process }) => {
       this.processes[name] = { process }
     })
+
+    const onDidPauseProcesses = processesPaused.event
+
+    this.dispose.track(
+      onDidPauseProcesses(paused => {
+        this.paused = paused
+        if (!this.paused) {
+          return this.runQueued()
+        }
+      })
+    )
   }
 
   public async run(name: string): Promise<void> {
@@ -28,7 +42,7 @@ export class ProcessManager {
       return
     }
 
-    if (this.anyOngoing()) {
+    if (this.anyOngoing() || this.paused) {
       return this.queue(name)
     }
 
@@ -37,6 +51,17 @@ export class ProcessManager {
     this.unlock(name)
 
     return this.runQueued()
+  }
+
+  public async forceRunQueued(): Promise<void> {
+    const next = this.getNextFromQueue()
+    if (!next) {
+      return
+    }
+
+    const { process } = this.processes[next]
+    await Promise.all([process(), this.setLastStarted(next)])
+    return this.forceRunQueued()
   }
 
   public isOngoingOrQueued(name: string) {
@@ -61,16 +86,21 @@ export class ProcessManager {
   }
 
   private runQueued(): Promise<void> {
-    const next = this.nextInQueue()
+    const next = this.getNextFromQueue()
     if (!next) {
       return Promise.resolve()
     }
-    this.dequeue(next)
+
     return this.run(next)
   }
 
-  private nextInQueue(): string | undefined {
-    return this.queued.values().next().value
+  private getNextFromQueue(): string | undefined {
+    const next = this.queued.values().next().value
+    if (!next) {
+      return
+    }
+    this.queued.delete(next)
+    return next
   }
 
   private isOngoing(name: string) {
@@ -87,10 +117,6 @@ export class ProcessManager {
 
   private unlock(name: string) {
     return this.locked.delete(name)
-  }
-
-  private dequeue(name: string): boolean {
-    return this.queued.delete(name)
   }
 
   private checkCanRun(name: string) {

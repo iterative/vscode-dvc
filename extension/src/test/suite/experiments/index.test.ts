@@ -96,8 +96,9 @@ suite('Experiments Test Suite', () => {
 
       const expectedTableData: TableData = {
         changes: workspaceChangesFixture,
+        columnOrder: [],
+        columnWidths: {},
         columns: columnsFixture,
-        columnsOrder: [],
         rows: rowsFixture,
         sorts: []
       }
@@ -168,7 +169,7 @@ suite('Experiments Test Suite', () => {
 
       const mockSetColumnReordered = stub(
         ParamsAndMetricsModel.prototype,
-        'setColumnsOrder'
+        'setColumnOrder'
       )
 
       const columnOrderSet = new Promise(resolve =>
@@ -203,6 +204,8 @@ suite('Experiments Test Suite', () => {
         new Map()
       )
 
+      const updatesPaused = disposable.track(new EventEmitter<boolean>())
+
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)
       )
@@ -211,6 +214,7 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           dvcDemoPath,
           internalCommands,
+          updatesPaused,
           resourceLocator,
           buildMockMemento(),
           buildMockData()
@@ -385,6 +389,7 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           {} as InternalCommands,
+          {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
           buildMockData()
@@ -544,6 +549,7 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           {} as InternalCommands,
+          {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
           buildMockData()
