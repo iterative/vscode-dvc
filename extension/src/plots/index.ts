@@ -70,6 +70,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.data.managedUpdate()
   }
 
+  public getWebviewData() {
+    return {}
+  }
+
   private sendLivePlotsData() {
     this.webview?.show({
       live: this.experiments?.getLivePlots() || null
