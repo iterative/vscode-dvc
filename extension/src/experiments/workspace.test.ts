@@ -11,6 +11,7 @@ import {
 } from '../commands/internal'
 import { getInput } from '../vscode/inputBox'
 import { buildMockMemento } from '../test/util'
+import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 
 const mockedShowWebview = jest.fn()
@@ -58,8 +59,11 @@ describe('Experiments', () => {
     (...args) => mockedRun(...args)
   )
 
+  const mockedUpdatesPaused = buildMockedEventEmitter<boolean>()
+
   const workspaceExperiments = new WorkspaceExperiments(
     mockedInternalCommands,
+    mockedUpdatesPaused,
     buildMockMemento(),
     {
       '/my/dvc/root': {
@@ -91,6 +95,19 @@ describe('Experiments', () => {
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedExpFunc).not.toBeCalled()
+    })
+  })
+
+  describe('pauseUpdatesThenRun', () => {
+    it('should pause updates, run the function and then flush the queue', async () => {
+      const mockedFunc = jest.fn()
+
+      await workspaceExperiments.pauseUpdatesThenRun(mockedFunc)
+
+      expect(mockedUpdatesPaused.fire).toBeCalledTimes(2)
+      expect(mockedUpdatesPaused.fire).toBeCalledWith(true)
+      expect(mockedUpdatesPaused.fire).toHaveBeenLastCalledWith(false)
+      expect(mockedFunc).toBeCalledTimes(1)
     })
   })
 

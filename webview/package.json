@@ -19,11 +19,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@hediet/std": "^0.6.0",
     "classnames": "^2.2.6",
     "dayjs": "^1.9.6",
-    "mobx": "^6.3.8",
-    "mobx-react": "^7.2.1",
     "react": "^17.0.1",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^17.0.1",
