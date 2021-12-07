@@ -152,14 +152,7 @@ export const ExperimentsTable: React.FC<{
       instance={instance}
       sorts={tableData.sorts}
       changes={tableData.changes}
-      tableData={{
-        changes: [],
-        columnOrder: [],
-        columnWidths: {},
-        columns: [],
-        rows: [],
-        sorts: []
-      }}
+      tableData={tableData}
     />
   )
 }
