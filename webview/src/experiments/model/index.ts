@@ -89,6 +89,7 @@ export class Model {
       case MessageToWebviewType.SET_DVC_ROOT:
         runInAction(() => {
           this.dvcRoot = message.dvcRoot
+          vsCodeApi.setState({ dvcRoot: this.dvcRoot })
         })
         return
       default:
