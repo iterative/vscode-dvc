@@ -24,7 +24,7 @@ import { getWarningResponse } from '../vscode/modal'
 import { Response } from '../vscode/response'
 import { Resource } from '../repository/commands'
 import { WorkspaceRepositories } from '../repository/workspace'
-import { PathItem } from '../repository/collect'
+import { PathItem } from '../repository/data/collect'
 
 export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   public readonly dispose = Disposable.fn()

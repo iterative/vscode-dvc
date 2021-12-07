@@ -48,9 +48,10 @@ export class Experiments extends BaseRepository<TableData> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
-    data = new ExperimentsData(dvcRoot, internalCommands)
+    data?: ExperimentsData
   ) {
     super(dvcRoot, resourceLocator.beaker)
 
@@ -66,7 +67,9 @@ export class Experiments extends BaseRepository<TableData> {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
-    this.data = this.dispose.track(data)
+    this.data = this.dispose.track(
+      data || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
+    )
 
     this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
 
@@ -83,6 +86,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public update() {
     return this.data.managedUpdate()
+  }
+
+  public forceUpdate() {
+    return this.data.forceUpdate()
   }
 
   public async setState(data: ExperimentsOutput) {
@@ -212,8 +219,9 @@ export class Experiments extends BaseRepository<TableData> {
   public getWebviewData() {
     return {
       changes: this.paramsAndMetrics.getChanges(),
+      columnOrder: this.paramsAndMetrics.getColumnOrder(),
+      columnWidths: this.paramsAndMetrics.getColumnWidths(),
       columns: this.paramsAndMetrics.getSelected(),
-      columnsOrder: this.paramsAndMetrics.getColumnsOrder(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
@@ -241,7 +249,7 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.COLUMN_REORDERED:
             return (
               message.payload &&
-              this.paramsAndMetrics.setColumnsOrder(
+              this.paramsAndMetrics.setColumnOrder(
                 message.payload as ColumnReorderPayload
               )
             )

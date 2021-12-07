@@ -10,10 +10,13 @@ import './test-vscode-styles.scss'
 import '../shared/style.scss'
 import { Model } from '../experiments/model'
 
-const tableData = {
+const tableData: TableData = {
   changes: workspaceChangesFixture,
+  columnOrder: [],
+  columnWidths: {
+    'params:params.yaml:dvc_logs_dir': 300
+  },
   columns: columnsFixture,
-  columnsOrder: [],
   rows: rowsFixture.map(row => ({
     ...row,
     subRows: row.subRows?.map(experiment => ({
@@ -40,7 +43,9 @@ export default {
 } as Meta
 
 const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
-  return <Experiments tableData={tableData} model={new Model()} />
+  return (
+    <Experiments tableData={tableData} model={new Model({ data: tableData })} />
+  )
 }
 
 export const WithData = Template.bind({})

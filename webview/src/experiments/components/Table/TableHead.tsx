@@ -1,34 +1,36 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import React, { useCallback, useEffect } from 'react'
+import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
-import { DragDropContext, DragUpdate } from 'react-beautiful-dnd'
+import { DragUpdate } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
 import { MergedHeaderGroup } from './MergeHeaderGroups'
 import { Model } from '../../model'
-import { useColumnOrder } from '../../hooks/useColumnsOrder'
+import { useColumnOrder } from '../../hooks/useColumnOrder'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
   sorts: SortDefinition[]
-  columnsOrder: string[]
   model: Model
 }
 
 export const TableHead: React.FC<TableHeadProps> = ({
-  instance: { headerGroups, setColumnOrder, allColumns },
+  instance: {
+    headerGroups,
+    setColumnOrder,
+    allColumns,
+    state: { columnOrder }
+  },
   sorts,
-  columnsOrder,
   model
 }) => {
-  const [orderedColumns, setColumnOrderRepresentation] = useColumnOrder(model)
+  const orderedColumns = useColumnOrder(model.data?.columns || [], columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
-  const currentColOrder = React.useRef<string[]>(columnsOrder)
-  const memoizedSetColumnOrder = useCallback(
-    (colsOrder: string[]) => setColumnOrder(colsOrder),
-    [setColumnOrder]
-  )
+
+  const onDragStart = () => {
+    setColumnOrder(allColumns.map(column => column.id))
+  }
 
   const onDragUpdate = (column: DragUpdate) => {
     if (!column.destination) {
@@ -36,43 +38,33 @@ export const TableHead: React.FC<TableHeadProps> = ({
     }
     const { draggableId, destination } = column
     if (destination.index > 1) {
-      const colOrder = [...currentColOrder.current]
+      const colOrder = [...columnOrder]
       const oldIndex = colOrder.indexOf(draggableId)
 
       colOrder.splice(oldIndex, 1)
       colOrder.splice(destination.index, 0, draggableId)
-      memoizedSetColumnOrder(colOrder)
+      setColumnOrder(colOrder)
     }
   }
 
   const onDragEnd = () => {
-    if (currentColOrder.current !== columnsOrder) {
-      setColumnOrderRepresentation(currentColOrder.current)
-    }
+    model.persistColumnOrder(columnOrder)
   }
-
-  useEffect(() => {
-    memoizedSetColumnOrder(columnsOrder)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [memoizedSetColumnOrder])
-
-  currentColOrder.current = allColumns?.map(o => o.id)
 
   return (
     <div className={styles.thead}>
-      {headerGroups.map((headerGroup, i) => (
-        <DragDropContext
+      {headerGroups.map(headerGroup => (
+        // eslint-disable-next-line react/jsx-key
+        <MergedHeaderGroup
+          {...headerGroup.getHeaderGroupProps()}
+          orderedColumns={orderedColumns}
+          headerGroup={headerGroup}
+          columns={allHeaders}
+          sorts={sorts}
+          onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
-          key={`header-group-${headerGroup.id}-${i}`}
-        >
-          <MergedHeaderGroup
-            orderedColumns={orderedColumns}
-            headerGroup={headerGroup}
-            columns={allHeaders}
-            sorts={sorts}
-          />
-        </DragDropContext>
+        />
       ))}
     </div>
   )

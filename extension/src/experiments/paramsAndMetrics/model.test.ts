@@ -82,17 +82,17 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
         })
       )
-      expect(model.getColumnsOrder()).toEqual(persistedState)
+      expect(model.getColumnOrder()).toEqual(persistedState)
     })
 
     it('should re-order the columns if a new columnOrder is set', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: [
+          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: [
             { path: 'A', width: 0 },
             { path: 'B', width: 0 },
             { path: 'C', width: 0 }
@@ -100,10 +100,8 @@ describe('ParamsAndMetricsModel', () => {
         })
       )
       const newState = ['C', 'B', 'A']
-      model.setColumnsOrder(newState)
-      expect(model.getColumnsOrder().map(column => column.path)).toEqual(
-        newState
-      )
+      model.setColumnOrder(newState)
+      expect(model.getColumnOrder()).toEqual(newState)
     })
   })
 
@@ -117,10 +115,10 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
         })
       )
-      expect(model.getColumnsOrder()).toEqual(persistedState)
+      expect(model.getColumnOrder()).toEqual(persistedState)
     })
 
     it('should set the width to a column when calling setColumnWidth', () => {
@@ -132,13 +130,15 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
         })
       )
+      const changedColumnId = 'C'
       const expectedWidth = 77
-      model.setColumnWidth('C', expectedWidth)
 
-      expect(model.getColumnsOrder()[1].width).toBe(expectedWidth)
+      model.setColumnWidth(changedColumnId, expectedWidth)
+
+      expect(model.getColumnWidths()[changedColumnId]).toBe(expectedWidth)
     })
   })
 })

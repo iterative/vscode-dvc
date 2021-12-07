@@ -4,7 +4,7 @@ import {
   MessageToWebviewType,
   MessageToWebview as GenericMessageToWebview
 } from 'dvc/src/webview/contract'
-import { ColumnDetail, TableData } from 'dvc/src/experiments/webview/contract'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
@@ -56,22 +56,36 @@ export class Model {
     vsCodeApi.postMessage(message)
   }
 
-  public getColumnsWithWidth(): ColumnDetail[] {
-    return this.data?.columnsOrder || []
+  public persistColumnWidth(id: string, width: number) {
+    const originalState = this.getState()
+    const data = originalState.data as TableData
+    const { columnWidths = {} } = data
+    vsCodeApi.setState({
+      ...originalState,
+      data: {
+        ...data,
+        columnWidths: {
+          ...(columnWidths || {}),
+          [id]: width
+        }
+      }
+    })
+    this.sendMessage({
+      payload: { id, width },
+      type: MessageFromWebviewType.COLUMN_RESIZED
+    })
   }
 
-  public setColumnWidth(id: string, width: number) {
-    const column = this.data?.columnsOrder.find(column => column.path === id)
-    if (column) {
-      column.width = width
-      this.sendMessage({
-        payload: { id, width },
-        type: MessageFromWebviewType.COLUMN_RESIZED
-      })
-    }
-  }
-
-  public sendColumnsOrder(newOrder: string[]): void {
+  public persistColumnOrder(newOrder: string[]): void {
+    const originalState = this.getState()
+    const data = originalState.data as TableData
+    vsCodeApi.setState({
+      ...originalState,
+      data: {
+        ...data,
+        columnOrder: newOrder
+      }
+    })
     this.sendMessage({
       payload: newOrder,
       type: MessageFromWebviewType.COLUMN_REORDERED
