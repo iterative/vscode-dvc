@@ -83,11 +83,12 @@ export class CliExecutor extends Cli {
     )
   }
 
-  public experimentRunQueue(cwd: string) {
+  public experimentRunQueue(cwd: string, ...args: Args) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.RUN,
-      ExperimentFlag.QUEUE
+      ExperimentFlag.QUEUE,
+      ...args
     )
   }
 

@@ -2,8 +2,15 @@ import { LivePlotsColors } from 'dvc/src/plots/webview/contract'
 import { Config } from 'vega'
 import { VisualizationSpec } from 'react-vega'
 
+export const PlotDimensions = {
+  LARGE: { height: 750, width: 1000 },
+  REGULAR: { height: 300, width: 400 },
+  SMALL: { height: 200, width: 267 }
+}
+
 export const createSpec = (
   title: string,
+  size: keyof typeof PlotDimensions,
   scale?: LivePlotsColors
 ): VisualizationSpec => {
   return {
@@ -12,7 +19,7 @@ export const createSpec = (
     encoding: {
       x: { field: 'x', title: 'iteration', type: 'nominal' }
     },
-    height: 300,
+    height: PlotDimensions[size].height,
     layer: [
       {
         encoding: {
@@ -50,7 +57,7 @@ export const createSpec = (
         transform: [{ groupby: ['x'], pivot: 'group', value: 'y' }]
       }
     ],
-    width: 400
+    width: PlotDimensions[size].width
   }
 }
 

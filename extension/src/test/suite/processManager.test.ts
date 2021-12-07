@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, stub } from 'sinon'
+import { EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ProcessManager } from '../../processManager'
 import { delay } from '../../util/time'
@@ -20,7 +21,10 @@ suite('Process Manager Test Suite', () => {
     it('should manage calls to a process', async () => {
       const mockRefresh = stub()
       const processManager = disposable.track(
-        new ProcessManager({ name: 'refresh', process: mockRefresh })
+        new ProcessManager(new EventEmitter(), {
+          name: 'refresh',
+          process: mockRefresh
+        })
       )
 
       mockRefresh.onFirstCall().callsFake(async () => {
@@ -81,5 +85,80 @@ suite('Process Manager Test Suite', () => {
       expect(mockRefresh, 'should queue the next call made after 200ms').to.be
         .calledTwice
     })
+
+    it('should send all calls to the queue when processes are paused', async () => {
+      const mockUpdate = stub()
+      const processesPaused = disposable.track(new EventEmitter<boolean>())
+      const processManager = disposable.track(
+        new ProcessManager(processesPaused, {
+          name: 'update',
+          process: mockUpdate
+        })
+      )
+      processesPaused.fire(true)
+
+      await Promise.all([
+        processManager.run('update'),
+        processManager.run('update'),
+        processManager.run('update'),
+        processManager.run('update')
+      ])
+
+      expect(
+        mockUpdate,
+        'should send all calls to the queue when processes are paused'
+      ).not.to.be.called
+
+      const onDidUnpauseProcesses = processesPaused.event
+
+      const updatesRestartedEvent = new Promise(resolve =>
+        disposable.track(onDidUnpauseProcesses(paused => resolve(paused)))
+      )
+      processesPaused.fire(false)
+
+      expect(await updatesRestartedEvent).to.be.false
+      expect(mockUpdate, 'the queue is flushed on restart').to.be.calledOnce
+    })
+  })
+
+  it('should empty the queue with forceRunQueued even if all processes are paused', async () => {
+    const mockPartialUpdate = stub()
+    const mockFullUpdate = stub()
+    const processesPaused = disposable.track(new EventEmitter<boolean>())
+    const processManager = disposable.track(
+      new ProcessManager(
+        processesPaused,
+        {
+          name: 'partialUpdate',
+          process: mockPartialUpdate
+        },
+        {
+          name: 'fullUpdate',
+          process: mockFullUpdate
+        }
+      )
+    )
+    processesPaused.fire(true)
+
+    await Promise.all([
+      processManager.run('partialUpdate'),
+      processManager.run('fullUpdate'),
+      processManager.run('partialUpdate'),
+      processManager.run('fullUpdate'),
+      processManager.run('partialUpdate'),
+      processManager.run('fullUpdate')
+    ])
+
+    expect(mockPartialUpdate, 'all calls are sent to the queue').not.to.be
+      .called
+    expect(mockFullUpdate).not.to.be.called
+
+    await processManager.forceRunQueued()
+
+    expect(
+      mockPartialUpdate,
+      'the queue is flushed when forceRunQueued is called'
+    ).to.be.calledOnce
+    expect(mockFullUpdate).to.be.calledOnce
   })
 })
