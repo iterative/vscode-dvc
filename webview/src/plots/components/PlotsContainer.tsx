@@ -72,7 +72,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
                 icon: AllIcons.DOTS,
                 onClickNode: (
                   <SizePicker
-                    currentSize={PlotSize.REGULAR}
+                    currentSize={menu.size}
                     setSelectedSize={menu.setSize as (size: string) => void}
                   />
                 ),

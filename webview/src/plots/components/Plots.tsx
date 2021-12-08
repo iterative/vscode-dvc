@@ -11,9 +11,11 @@ import {
   MessageFromWebviewType
 } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
+import cx from 'classnames'
 import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
+import styles from './styles.module.scss'
 import {
   PlotsSectionKeys,
   PlotsReducerAction,
@@ -24,7 +26,6 @@ import { getDisplayNameFromPath } from '../../util/paths'
 const Plot = ({
   values,
   title,
-  size,
   scale
 }: {
   values: { x: number; y: number; group: string }[]
@@ -32,10 +33,10 @@ const Plot = ({
   size: PlotSize
   scale?: LivePlotsColors
 }) => {
-  const spec = createSpec(title, size, scale)
+  const spec = createSpec(title, scale)
 
   return (
-    <div data-testid={`plot-${title}`}>
+    <div className={styles.plot} data-testid={`plot-${title}`}>
       <VegaLite
         actions={false}
         config={config}
@@ -55,22 +56,28 @@ const LivePlots = ({
   plots: LivePlotData[]
   colors: LivePlotsColors
   size: PlotSize
-}) =>
-  plots.length ? (
-    <>
+}) => {
+  const sizeClass = cx(styles.plotsWrapper, {
+    [styles.smallPlots]: size === PlotSize.SMALL,
+    [styles.regularPlots]: size === PlotSize.REGULAR,
+    [styles.largePlots]: size === PlotSize.LARGE
+  })
+
+  return plots.length ? (
+    <div className={sizeClass} data-testid="plots-wrapper">
       {plots.map(plotData => (
         <Plot
           values={plotData.values}
           title={plotData.title}
           scale={colors}
-          size={size}
           key={`plot-${plotData.title}`}
         />
       ))}
-    </>
+    </div>
   ) : (
     EmptyState('No metrics selected')
   )
+}
 
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
