@@ -37,15 +37,15 @@ export const WithData = Template.bind({})
 export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   data: {
-    live: livePlotsFixture,
-    static: null
+    collapsedSections: defaultCollapsedSections,
+    live: livePlotsFixture
   }
 }
 
 export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
   data: {
-    live: null,
+    collapsedSections: defaultCollapsedSections,
     static: staticPlotsFixture
   }
 }
@@ -53,8 +53,7 @@ WithStaticOnly.args = {
 export const WithoutPlots = Template.bind({})
 WithoutPlots.args = {
   data: {
-    live: null,
-    static: null
+    collapsedSections: defaultCollapsedSections
   }
 }
 
