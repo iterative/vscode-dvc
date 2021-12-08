@@ -27,7 +27,7 @@ export class WebviewSerializer {
       window.registerWebviewPanelSerializer(viewKey, {
         deserializeWebviewPanel: async (
           panel: WebviewPanel,
-          state: WebviewState<T>
+          state: WebviewState
         ) => {
           const dvcRoot = state?.dvcRoot
           const webview = await restoreWebview(viewKey, panel, state)

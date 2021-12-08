@@ -246,7 +246,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
         <TableHead
           instance={instance}
           sorts={sorts}
-          columns={tableData.columns}
+          columns={tableData?.columns || []}
         />
         {rows.map(row => (
           <TableBody

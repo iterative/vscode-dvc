@@ -76,9 +76,9 @@ export const ExperimentsTable: React.FC<{
   tableData: TableData
 }> = ({ tableData }) => {
   const [columns, data, defaultColumn, initialState] = React.useMemo(() => {
-    const { columnOrder } = tableData
+    const columnOrder = tableData?.columnOrder || []
     const initialState: Partial<TableState<Experiment>> = {
-      columnOrder: tableData.columnOrder
+      columnOrder: columnOrder
     }
     if (columnOrder) {
       initialState.columnOrder = columnOrder
@@ -86,8 +86,9 @@ export const ExperimentsTable: React.FC<{
     const defaultColumn: Partial<Column<Experiment>> = {
       minWidth: DEFAULT_COLUMN_WIDTH
     }
-    const data = tableData.rows
-    const columns = getColumns(tableData.columns)
+    const data = tableData?.rows || []
+    const tableColumns = tableData?.columns
+    const columns = tableColumns ? getColumns(tableColumns) : []
     return [columns, data, defaultColumn, initialState]
   }, [tableData])
 
@@ -122,7 +123,7 @@ export const ExperimentsTable: React.FC<{
         })
       })
       hooks.allColumns.push(allColumns => {
-        const { columnWidths } = tableData
+        const columnWidths = tableData?.columnWidths
         if (columnWidths === undefined) {
           return allColumns
         }
@@ -150,8 +151,8 @@ export const ExperimentsTable: React.FC<{
   return (
     <Table
       instance={instance}
-      sorts={tableData.sorts}
-      changes={tableData.changes}
+      sorts={tableData?.sorts || []}
+      changes={tableData?.changes}
       tableData={tableData}
     />
   )
