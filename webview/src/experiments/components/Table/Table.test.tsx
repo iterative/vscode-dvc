@@ -104,14 +104,6 @@ describe('Table', () => {
       columnOrder: []
     }
   } as unknown as TableInstance<Experiment>
-  const dummyTableData: TableData = {
-    changes: [],
-    columnOrder: [],
-    columnWidths: {},
-    columns: [],
-    rows: [],
-    sorts: []
-  }
   const renderTable = (
     sorts: SortDefinition[] = [],
     tableInstance = instance,
@@ -122,7 +114,7 @@ describe('Table', () => {
         instance={tableInstance}
         sorts={sorts}
         changes={changes}
-        tableData={dummyTableData}
+        columns={[]}
       />
     )
 

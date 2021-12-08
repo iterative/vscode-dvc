@@ -2,8 +2,8 @@ import React from 'react'
 import { Cell, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import {
-  RowData as Experiment,
-  TableData
+  ParamOrMetric,
+  RowData as Experiment
 } from 'dvc/src/experiments/webview/contract'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import styles from './styles.module.scss'
@@ -16,7 +16,7 @@ export interface InstanceProp {
 
 export interface TableProps extends InstanceProp {
   sorts: SortDefinition[]
-  tableData: TableData
+  columns: ParamOrMetric[]
 }
 
 export interface WithChanges {
@@ -237,17 +237,13 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   instance,
   sorts,
   changes,
-  tableData
+  columns
 }) => {
   const { getTableProps, rows } = instance
   return (
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
-        <TableHead
-          instance={instance}
-          sorts={sorts}
-          columns={tableData?.columns || []}
-        />
+        <TableHead instance={instance} sorts={sorts} columns={columns} />
         {rows.map(row => (
           <TableBody
             row={row}
