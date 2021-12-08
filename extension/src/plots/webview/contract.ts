@@ -45,4 +45,4 @@ export type PlotsOutput = Record<string, StaticPlot[]>
 export type PlotsData = {
   live?: LivePlotsData | null
   static?: PlotsOutput | null
-}
+} | null

@@ -51,10 +51,7 @@ export abstract class BaseRepository<T extends WebviewData> {
 
     const webview = await createWebview(
       this.viewKey,
-      {
-        data: this.getWebviewData(), // needed to load experiments table
-        dvcRoot: this.dvcRoot
-      },
+      this.dvcRoot,
       this.webviewIcon
     )
 
