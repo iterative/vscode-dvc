@@ -1,11 +1,13 @@
 import React from 'react'
 import { Cell, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
-import { RowData as Experiment } from 'dvc/src/experiments/webview/contract'
+import {
+  RowData as Experiment,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
-import { Model } from '../../model'
 import ClockIcon from '../../../shared/components/icons/Clock'
 import { getDisplayNameFromPath } from '../../../util/paths'
 export interface InstanceProp {
@@ -14,7 +16,7 @@ export interface InstanceProp {
 
 export interface TableProps extends InstanceProp {
   sorts: SortDefinition[]
-  model: Model
+  tableData: TableData
 }
 
 export interface WithChanges {
@@ -232,16 +234,20 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
 }
 
 export const Table: React.FC<TableProps & WithChanges> = ({
-  model,
   instance,
   sorts,
-  changes
+  changes,
+  tableData
 }) => {
   const { getTableProps, rows } = instance
   return (
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
-        <TableHead instance={instance} sorts={sorts} model={model} />
+        <TableHead
+          instance={instance}
+          sorts={sorts}
+          columns={tableData.columns}
+        />
         {rows.map(row => (
           <TableBody
             row={row}

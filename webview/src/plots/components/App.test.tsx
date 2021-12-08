@@ -116,7 +116,7 @@ describe('App', () => {
   it('should render the empty state when given data with no experiments', async () => {
     const dataMessageWithoutPlots = new MessageEvent('message', {
       data: {
-        data: { live: undefined, static: undefined },
+        data: { live: null, static: null },
         type: MessageToWebviewType.SET_DATA
       }
     })
@@ -197,7 +197,7 @@ describe('App', () => {
           collapsedSections: defaultCollapsibleSectionsState,
           data: {
             live: livePlotsFixture,
-            static: undefined
+            static: null
           }
         }}
         dispatch={jest.fn}
