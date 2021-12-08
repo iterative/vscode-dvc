@@ -3,7 +3,8 @@ import {
   isVegaPlot,
   LivePlotsColors,
   LivePlotData,
-  PlotsOutput
+  PlotsOutput,
+  Section
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebview,
@@ -14,11 +15,7 @@ import { config, createSpec, PlotDimensions } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotSize } from './SizePicker'
 import { PlotsContainer } from './PlotsContainer'
-import {
-  PlotsSectionKeys,
-  PlotsReducerAction,
-  PlotsWebviewState
-} from '../hooks/useAppReducer'
+import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 
 const Plot = ({
@@ -101,8 +98,10 @@ const Plots = ({
   state: PlotsWebviewState
   dispatch: Dispatch<PlotsReducerAction>
   sendMessage: (message: MessageFromWebview) => void
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
-  const { data, collapsedSections } = state
+  const { data } = state
+
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
   const [size, setSize] = useState<keyof typeof PlotDimensions>(
@@ -115,11 +114,11 @@ const Plots = ({
     setSelectedPlots(data?.live?.selectedMetrics || newMetrics)
   }, [data, setSelectedPlots, setMetrics])
 
-  if (!data) {
+  if (!data || !data.collapsedSections) {
     return EmptyState('Loading Plots...')
   }
 
-  const { live: livePlots, static: staticPlots } = data
+  const { collapsedSections, live: livePlots, static: staticPlots } = data
 
   if (!livePlots && !staticPlots) {
     return EmptyState('No Plots to Display')
@@ -138,7 +137,7 @@ const Plots = ({
       {livePlots && (
         <PlotsContainer
           title="Live Experiments Plots"
-          sectionKey={PlotsSectionKeys.LIVE_PLOTS}
+          sectionKey={Section.LIVE_PLOTS}
           collapsedSections={collapsedSections}
           dispatch={dispatch}
           menu={{
@@ -160,7 +159,7 @@ const Plots = ({
       {staticPlots && (
         <PlotsContainer
           title="Static Plots"
-          sectionKey={PlotsSectionKeys.STATIC_PLOTS}
+          sectionKey={Section.STATIC_PLOTS}
           collapsedSections={collapsedSections}
           dispatch={dispatch}
         >

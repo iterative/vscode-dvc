@@ -1,4 +1,5 @@
 import React, { Dispatch } from 'react'
+import { Section, CollapsedSections } from 'dvc/src/plots/webview/contract'
 import { PlotDimensions } from './constants'
 import { MetricsPicker } from './MetricsPicker'
 import { PlotSize, SizePicker } from './SizePicker'
@@ -7,9 +8,7 @@ import { AllIcons } from '../../shared/components/icon/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import {
   CollapsibleSectionsActions,
-  CollapsibleSectionsState,
-  PlotsReducerAction,
-  PlotsSectionKeys
+  PlotsReducerAction
 } from '../hooks/useAppReducer'
 
 interface MenuProps {
@@ -20,8 +19,8 @@ interface MenuProps {
 }
 
 interface PlotsContainerProps {
-  collapsedSections: CollapsibleSectionsState
-  sectionKey: PlotsSectionKeys
+  collapsedSections: CollapsedSections
+  sectionKey: Section
   dispatch: Dispatch<PlotsReducerAction>
   title: string
   menu?: MenuProps

@@ -29,7 +29,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public readonly updatesPaused: EventEmitter<boolean>
 
-  private readonly workspaceState: Memento
   private focusedWebviewDvcRoot: string | undefined
 
   constructor(
@@ -38,10 +37,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     workspaceState: Memento,
     experiments?: Record<string, Experiments>
   ) {
-    super(internalCommands, experiments)
+    super(internalCommands, workspaceState, experiments)
 
     this.updatesPaused = updatesPaused
-    this.workspaceState = workspaceState
   }
 
   public linkRepositories(workspacePlots: WorkspacePlots) {

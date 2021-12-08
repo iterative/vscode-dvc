@@ -1,26 +1,42 @@
 import { TableData } from '../experiments/webview/contract'
-import { PlotsData } from '../plots/webview/contract'
+import { PlotsData, CollapsedSections } from '../plots/webview/contract'
 
 export type WebviewData = TableData | PlotsData
 
+export enum MessageFromWebviewType {
+  INITIALIZED = 'initialized',
+  COLUMN_REORDERED = 'column-reordered',
+  COLUMN_RESIZED = 'column-resized',
+  METRIC_TOGGLED = 'metric-toggled',
+  PLOTS_SECTION_TOGGLED = 'plots-section-toggled'
+}
+
 export type ColumnReorderPayload = string[]
+
 export type ColumnResizePayload = {
   id: string
   width: number
 }
 export type MetricToggledPayload = string[]
 
-export type MessageFromWebview = {
-  type: MessageFromWebviewType
-  payload?: ColumnReorderPayload | ColumnResizePayload | MetricToggledPayload
-}
-
-export enum MessageFromWebviewType {
-  INITIALIZED = 'initialized',
-  COLUMN_REORDERED = 'column-reordered',
-  COLUMN_RESIZED = 'column-resized',
-  METRIC_TOGGLED = 'metric-toggled'
-}
+export type MessageFromWebview =
+  | {
+      type: MessageFromWebviewType.COLUMN_REORDERED
+      payload: ColumnReorderPayload
+    }
+  | {
+      type: MessageFromWebviewType.COLUMN_RESIZED
+      payload: ColumnResizePayload
+    }
+  | {
+      type: MessageFromWebviewType.METRIC_TOGGLED
+      payload: MetricToggledPayload
+    }
+  | {
+      type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
+      payload: CollapsedSections
+    }
+  | { type: MessageFromWebviewType.INITIALIZED }
 
 export interface setData<T extends WebviewData> {
   type: MessageToWebviewType.SET_DATA

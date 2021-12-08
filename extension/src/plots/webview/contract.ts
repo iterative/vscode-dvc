@@ -42,7 +42,20 @@ export type StaticPlot = VegaPlot | ImagePlot
 
 export type PlotsOutput = Record<string, StaticPlot[]>
 
+export enum Section {
+  LIVE_PLOTS = 'live-plots',
+  STATIC_PLOTS = 'static-plots'
+}
+
+export const defaultCollapsedSections = {
+  [Section.LIVE_PLOTS]: false,
+  [Section.STATIC_PLOTS]: false
+}
+
+export type CollapsedSections = typeof defaultCollapsedSections
+
 export type PlotsData = {
   live?: LivePlotsData | null
   static?: PlotsOutput | null
+  collapsedSections?: CollapsedSections
 } | null

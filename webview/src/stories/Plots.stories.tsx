@@ -1,14 +1,13 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
-import { PlotsData } from 'dvc/src/plots/webview/contract'
+import {
+  PlotsData,
+  defaultCollapsedSections
+} from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/storybook'
 import Plots from '../plots/components/Plots'
-import {
-  useAppReducer,
-  defaultCollapsibleSectionsState,
-  CollapsibleSectionsState
-} from '../plots/hooks/useAppReducer'
+import { useAppReducer } from '../plots/hooks/useAppReducer'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
@@ -16,8 +15,8 @@ import '../plots/components/styles.module.scss'
 
 export default {
   args: {
-    collapsedSections: defaultCollapsibleSectionsState,
     data: {
+      collapsedSections: defaultCollapsedSections,
       live: livePlotsFixture,
       static: staticPlotsFixture
     }
@@ -27,10 +26,9 @@ export default {
 } as Meta
 
 const Template: Story<{
-  collapsedSections: CollapsibleSectionsState
   data?: PlotsData
-}> = ({ collapsedSections, data }) => {
-  const [state, dispatch] = useAppReducer({ collapsedSections, data })
+}> = ({ data }) => {
+  const [state, dispatch] = useAppReducer({ data })
   return <Plots state={state} dispatch={dispatch} sendMessage={() => {}} />
 }
 
