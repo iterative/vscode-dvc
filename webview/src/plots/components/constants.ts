@@ -1,4 +1,4 @@
-import { LivePlotsColors, PlotSize } from 'dvc/src/plots/webview/contract'
+import { LivePlotsColors } from 'dvc/src/plots/webview/contract'
 import { Config } from 'vega'
 import { VisualizationSpec } from 'react-vega'
 

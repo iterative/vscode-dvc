@@ -30,7 +30,6 @@ const Plot = ({
 }: {
   values: { x: number; y: number; group: string }[]
   title: string
-  size: PlotSize
   scale?: LivePlotsColors
 }) => {
   const spec = createSpec(title, scale)
