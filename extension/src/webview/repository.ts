@@ -92,7 +92,5 @@ export abstract class BaseRepository<T extends WebviewData> {
     this.webview = undefined
   }
 
-  abstract getWebviewData(): T
-
   abstract sendInitialWebviewData(): void
 }

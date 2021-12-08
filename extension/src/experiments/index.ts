@@ -220,17 +220,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.sendWebviewData()
   }
 
-  public getWebviewData() {
-    return {
-      changes: this.paramsAndMetrics.getChanges(),
-      columnOrder: this.paramsAndMetrics.getColumnOrder(),
-      columnWidths: this.paramsAndMetrics.getColumnWidths(),
-      columns: this.paramsAndMetrics.getSelected(),
-      rows: this.experiments.getRowData(),
-      sorts: this.experiments.getSorts()
-    }
-  }
-
   public setSelectedMetrics(metrics: string[]) {
     this.experiments.setSelectedMetrics(metrics)
   }
@@ -248,6 +237,17 @@ export class Experiments extends BaseRepository<TableData> {
 
   private sendWebviewData() {
     this.webview?.show(this.getWebviewData())
+  }
+
+  private getWebviewData() {
+    return {
+      changes: this.paramsAndMetrics.getChanges(),
+      columnOrder: this.paramsAndMetrics.getColumnOrder(),
+      columnWidths: this.paramsAndMetrics.getColumnWidths(),
+      columns: this.paramsAndMetrics.getSelected(),
+      rows: this.experiments.getRowData(),
+      sorts: this.experiments.getSorts()
+    }
   }
 
   private handleMessageFromWebview() {
