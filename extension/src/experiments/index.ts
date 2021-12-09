@@ -20,6 +20,7 @@ import {
   MessageFromWebviewType
 } from '../webview/contract'
 import { Logger } from '../common/logger'
+import { PlotSize } from '../plots/webview/contract'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
@@ -222,6 +223,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public setSelectedMetrics(metrics: string[]) {
     this.experiments.setSelectedMetrics(metrics)
+  }
+
+  public setPlotSize(size: PlotSize) {
+    this.experiments.setPlotSize(size)
   }
 
   private notifyChanged() {

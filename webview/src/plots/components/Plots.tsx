@@ -3,14 +3,14 @@ import {
   isVegaPlot,
   LivePlotsColors,
   LivePlotData,
-  PlotsOutput
+  PlotsOutput,
+  PlotSize
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
 import cx from 'classnames'
 import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
-import { PlotSize } from './SizePicker'
 import { PlotsContainer } from './PlotsContainer'
 import styles from './styles.module.scss'
 import {
@@ -116,6 +116,10 @@ const Plots = ({
   }, [data, setSelectedPlots, setMetrics])
 
   useEffect(() => {
+    setSize(data?.live?.size || PlotSize.REGULAR)
+  }, [data, setSize])
+
+  useEffect(() => {
     window.dispatchEvent(new Event('resize'))
   }, [size])
 
@@ -137,6 +141,11 @@ const Plots = ({
     })
   }
 
+  const changeSize = (size: PlotSize) => {
+    setSize(size)
+    sendMessage({ payload: size, type: MessageFromWebviewType.PLOTS_RESIZED })
+  }
+
   return (
     <>
       {livePlots && (
@@ -149,7 +158,7 @@ const Plots = ({
             metrics,
             selectedMetrics: selectedPlots,
             setSelectedPlots: setSelectedMetrics,
-            setSize,
+            setSize: changeSize,
             size
           }}
         >

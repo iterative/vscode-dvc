@@ -16,11 +16,10 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
+import { PlotSize, LivePlotsColors } from 'dvc/src/plots/webview/contract'
 import { mocked } from 'ts-jest/utils'
-import { LivePlotsColors } from 'dvc/src/plots/webview/contract'
 import { App } from './App'
 import Plots from './Plots'
-
 import { vsCodeApi } from '../../shared/api'
 
 import {
@@ -306,5 +305,36 @@ describe('App', () => {
     fireEvent.click(largeButton)
     wrapper = await screen.findByTestId('plots-wrapper')
     expect(wrapper).toHaveClass('largePlots')
+  })
+
+  it('should send a message to the extension with the selected size when changing the size of plots', () => {
+    const initialState = {
+      collapsedSections: defaultCollapsibleSectionsState,
+      data: {
+        live: livePlotsFixture
+      }
+    }
+    mockGetState.mockReturnValue(initialState)
+    render(<App />)
+
+    const [, sizeButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(sizeButton)
+    fireEvent.click(sizeButton)
+
+    const largeButton = screen.getByText('Large')
+    fireEvent.click(largeButton)
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: PlotSize.LARGE,
+      type: MessageFromWebviewType.PLOTS_RESIZED
+    })
+
+    const smallButton = screen.getByText('Small')
+    fireEvent.click(smallButton)
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: PlotSize.SMALL,
+      type: MessageFromWebviewType.PLOTS_RESIZED
+    })
   })
 })

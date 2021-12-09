@@ -15,7 +15,8 @@ import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import {
   MessageFromWebviewType,
-  MetricToggledPayload
+  MetricToggledPayload,
+  PlotsResizedPayload
 } from '../webview/contract'
 import { Logger } from '../common/logger'
 
@@ -103,16 +104,24 @@ export class Plots extends BaseRepository<TPlotsData> {
   private handleMessageFromWebview() {
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message => {
-        if (message.type === MessageFromWebviewType.METRIC_TOGGLED) {
-          return (
-            message.payload &&
-            this.experiments?.setSelectedMetrics(
-              message.payload as MetricToggledPayload
+        switch (message.type) {
+          case MessageFromWebviewType.METRIC_TOGGLED:
+            return (
+              message.payload &&
+              this.experiments?.setSelectedMetrics(
+                message.payload as MetricToggledPayload
+              )
             )
-          )
+          case MessageFromWebviewType.PLOTS_RESIZED:
+            return (
+              message.payload &&
+              this.experiments?.setPlotSize(
+                message.payload as PlotsResizedPayload
+              )
+            )
+          default:
+            Logger.error(`Unexpected message: ${message}`)
         }
-
-        Logger.error(`Unexpected message: ${message}`)
       })
     )
   }

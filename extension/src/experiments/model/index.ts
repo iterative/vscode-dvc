@@ -14,7 +14,7 @@ import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
-import { LivePlotData } from '../../plots/webview/contract'
+import { LivePlotData, PlotSize } from '../../plots/webview/contract'
 import { hasKey } from '../../util/object'
 import { setContextValue } from '../../vscode/context'
 
@@ -28,7 +28,8 @@ export const enum MementoPrefixes {
   FILTER_BY = 'filterBy:',
   SORT_BY = 'sortBy:',
   STATUS = 'status:',
-  SELECTED_METRICS = 'selectedMetrics:'
+  SELECTED_METRICS = 'selectedMetrics:',
+  PLOT_SIZE = 'plotSize:'
 }
 
 export class ExperimentsModel {
@@ -48,6 +49,7 @@ export class ExperimentsModel {
 
   private currentSorts: SortDefinition[]
   private selectedMetrics?: string[] = undefined
+  private plotSize: PlotSize = PlotSize.REGULAR
 
   private readonly dvcRoot: string
   private readonly workspaceState: Memento
@@ -69,6 +71,11 @@ export class ExperimentsModel {
     this.selectedMetrics = workspaceState.get(
       MementoPrefixes.SELECTED_METRICS + dvcRoot,
       undefined
+    )
+
+    this.plotSize = workspaceState.get(
+      MementoPrefixes.PLOT_SIZE + dvcRoot,
+      PlotSize.REGULAR
     )
   }
 
@@ -104,7 +111,8 @@ export class ExperimentsModel {
           )
         }
       }),
-      selectedMetrics: this.selectedMetrics
+      selectedMetrics: this.getSelectedMetrics(),
+      size: this.getPlotSize()
     }
   }
 
@@ -250,11 +258,13 @@ export class ExperimentsModel {
     return this.selectedMetrics
   }
 
-  private persistSelectedMetrics() {
-    this.workspaceState.update(
-      MementoPrefixes.SELECTED_METRICS + this.dvcRoot,
-      this.getSelectedMetrics()
-    )
+  public setPlotSize(size: PlotSize) {
+    this.plotSize = size
+    this.persistPlotSize()
+  }
+
+  public getPlotSize() {
+    return this.plotSize
   }
 
   private getSubRows(experiments: Experiment[]) {
@@ -366,6 +376,20 @@ export class ExperimentsModel {
     return this.workspaceState.update(
       MementoPrefixes.STATUS + this.dvcRoot,
       this.status
+    )
+  }
+
+  private persistSelectedMetrics() {
+    return this.workspaceState.update(
+      MementoPrefixes.SELECTED_METRICS + this.dvcRoot,
+      this.getSelectedMetrics()
+    )
+  }
+
+  private persistPlotSize() {
+    this.workspaceState.update(
+      MementoPrefixes.PLOT_SIZE + this.dvcRoot,
+      this.getPlotSize()
     )
   }
 

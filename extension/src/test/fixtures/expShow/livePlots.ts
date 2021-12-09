@@ -1,4 +1,4 @@
-import { LivePlotsData } from '../../../plots/webview/contract'
+import { LivePlotsData, PlotSize } from '../../../plots/webview/contract'
 
 const data: LivePlotsData = {
   colors: {
@@ -207,7 +207,8 @@ const data: LivePlotsData = {
       ]
     }
   ],
-  selectedMetrics: undefined
+  selectedMetrics: undefined,
+  size: PlotSize.REGULAR
 }
 
 export default data
