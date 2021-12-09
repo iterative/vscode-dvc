@@ -1062,7 +1062,6 @@
     "lodash.isempty": "^4.4.0",
     "lodash.isequal": "^4.5.0",
     "lodash.omit": "^4.5.0",
-    "mobx": "^6.3.8",
     "vscode-extension-telemetry": "^0.4.3"
   },
   "devDependencies": {
