@@ -16,9 +16,8 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { PlotSize } from 'dvc/src/plots/webview/contract'
+import { PlotSize, LivePlotsColors } from 'dvc/src/plots/webview/contract'
 import { mocked } from 'ts-jest/utils'
-import { LivePlotsColors } from 'dvc/src/plots/webview/contract'
 import { App } from './App'
 import Plots from './Plots'
 import { vsCodeApi } from '../../shared/api'

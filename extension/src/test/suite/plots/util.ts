@@ -52,7 +52,6 @@ export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
       })),
       selectedMetrics: undefined,
       size: PlotSize.REGULAR
-    },
-    static: undefined
+    }
   }
 }
