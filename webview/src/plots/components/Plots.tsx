@@ -6,10 +6,7 @@ import {
   PlotsOutput,
   Section
 } from 'dvc/src/plots/webview/contract'
-import {
-  MessageFromWebview,
-  MessageFromWebviewType
-} from 'dvc/src/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
 import cx from 'classnames'
 import { config, createSpec } from './constants'
@@ -19,6 +16,7 @@ import { PlotsContainer } from './PlotsContainer'
 import styles from './styles.module.scss'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
+import { sendMessage } from '../../shared/vscode'
 
 const Plot = ({
   values,
@@ -98,12 +96,10 @@ const getMetricsFromPlots = (plots?: LivePlotData[]): string[] =>
 
 const Plots = ({
   state,
-  dispatch,
-  sendMessage
+  dispatch
 }: {
   state: PlotsWebviewState
   dispatch: Dispatch<PlotsReducerAction>
-  sendMessage: (message: MessageFromWebview) => void
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const { data } = state
