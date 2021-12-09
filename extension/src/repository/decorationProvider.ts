@@ -1,5 +1,4 @@
 import { Disposable } from '@hediet/std/disposable'
-import { makeObservable, observable } from 'mobx'
 import {
   window,
   Event,
@@ -68,13 +67,12 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC tracked'
   }
 
-  @observable
-  private state: DecorationState
-
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeFileDecorations: Event<Uri[]>
   private readonly decorationsChanged: EventEmitter<Uri[]>
+
+  private state: DecorationState
 
   private readonly decorationMapping: Partial<Record<Status, FileDecoration>> =
     {
@@ -87,8 +85,6 @@ export class DecorationProvider implements FileDecorationProvider {
     }
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
-    makeObservable(this)
-
     this.state = {} as DecorationState
 
     this.decorationsChanged = this.dispose.track(
