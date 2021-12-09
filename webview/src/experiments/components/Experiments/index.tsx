@@ -2,7 +2,8 @@ import React from 'react'
 import {
   ParamOrMetric,
   RowData as Experiment,
-  TableData
+  TableData,
+  InitiallyUndefinedTableData
 } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
@@ -73,23 +74,33 @@ const reportResizedColumn = (state: TableState<Experiment>) => {
 }
 
 export const ExperimentsTable: React.FC<{
-  tableData: TableData
-}> = ({ tableData }) => {
-  const [columns, data, defaultColumn, initialState] = React.useMemo(() => {
-    const { columnOrder } = tableData
-    const initialState: Partial<TableState<Experiment>> = {
-      columnOrder: tableData.columnOrder
-    }
-    if (columnOrder) {
-      initialState.columnOrder = columnOrder
-    }
-    const defaultColumn: Partial<Column<Experiment>> = {
-      minWidth: DEFAULT_COLUMN_WIDTH
-    }
-    const data = tableData.rows
-    const columns = getColumns(tableData.columns)
-    return [columns, data, defaultColumn, initialState]
-  }, [tableData])
+  tableData: InitiallyUndefinedTableData
+}> = ({ tableData: initiallyUndefinedTableData }) => {
+  const [tableData, columns, defaultColumn, initialState] =
+    React.useMemo(() => {
+      const tableData: TableData = {
+        changes: [],
+        columnOrder: [],
+        columnWidths: {},
+        columns: [],
+        rows: [],
+        sorts: [],
+        ...initiallyUndefinedTableData
+      }
+
+      const initialState: Partial<TableState<Experiment>> = {
+        columnOrder: tableData.columnOrder
+      }
+
+      const defaultColumn: Partial<Column<Experiment>> = {
+        minWidth: DEFAULT_COLUMN_WIDTH
+      }
+
+      const columns = getColumns(tableData.columns)
+      return [tableData, columns, defaultColumn, initialState]
+    }, [initiallyUndefinedTableData])
+
+  const { rows: data, columnWidths } = tableData
 
   const instance = useTable<Experiment>(
     {
@@ -122,7 +133,6 @@ export const ExperimentsTable: React.FC<{
         })
       })
       hooks.allColumns.push(allColumns => {
-        const { columnWidths } = tableData
         if (columnWidths === undefined) {
           return allColumns
         }
@@ -147,14 +157,7 @@ export const ExperimentsTable: React.FC<{
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
 
-  return (
-    <Table
-      instance={instance}
-      sorts={tableData.sorts}
-      changes={tableData.changes}
-      tableData={tableData}
-    />
-  )
+  return <Table instance={instance} tableData={tableData} />
 }
 
 const Experiments: React.FC<{

@@ -51,10 +51,7 @@ export abstract class BaseRepository<T extends WebviewData> {
 
     const webview = await createWebview(
       this.viewKey,
-      {
-        data: this.getWebviewData(),
-        dvcRoot: this.dvcRoot
-      },
+      this.dvcRoot,
       this.webviewIcon
     )
 
@@ -67,7 +64,7 @@ export abstract class BaseRepository<T extends WebviewData> {
 
   public setWebview(view: BaseWebview<T>) {
     this.webview = this.dispose.track(view)
-    view.isReady().then(() => this.sendWebviewData())
+    view.isReady().then(() => this.sendInitialWebviewData())
 
     const listener = this.dispose.track(
       view.onDidReceiveMessage(message =>
@@ -89,15 +86,11 @@ export abstract class BaseRepository<T extends WebviewData> {
     )
   }
 
-  protected sendWebviewData() {
-    this.webview?.show(this.getWebviewData())
-  }
-
   private resetWebview() {
     this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
   }
 
-  abstract getWebviewData(): T
+  abstract sendInitialWebviewData(): void
 }
