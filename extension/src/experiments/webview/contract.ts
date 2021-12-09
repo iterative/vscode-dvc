@@ -40,4 +40,6 @@ export type TableData = {
   changes: string[]
   columnOrder: string[]
   columnWidths: Record<string, number>
-} | null
+}
+
+export type InitiallyUndefinedTableData = TableData | undefined
