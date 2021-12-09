@@ -7,7 +7,7 @@ $header-fg-color: $fg-color;
 $border-color: grey;
 
 $edge-padding: 0.5rem;
-$workspace-edge-padding: $edge-padding - $edge-padding;
+$nested-row-padding: 1.35rem;
 
 // Dark Theme
 
@@ -163,7 +163,7 @@ $spinner-color-light: #000;
   .experimentGroup {
     .nestedRow {
       .firstCell {
-        padding-left: 2rem;
+        padding-left: $nested-row-padding;
       }
     }
     &.expandedGroup .nestedRow {
