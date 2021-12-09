@@ -119,7 +119,7 @@ export class BaseWebview<T extends WebviewData> {
     return this.webviewPanel.webview.asWebviewUri(Uri.file(url)).toString()
   }
 
-  public sendMessage(message: MessageToWebview<T>) {
+  protected sendMessage(message: MessageToWebview<T>) {
     if (this.deferred.state !== 'resolved') {
       throw new Error(
         'Cannot send message when webview is not initialized yet!'
