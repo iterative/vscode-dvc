@@ -76,7 +76,10 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
             {tooltip}
           </HoverMenu>
           {onClickNode && (
-            <HoverMenu show={showOnClickNode} hideWithDelay>
+            <HoverMenu
+              show={showOnClickNode}
+              hideWithDelay={canShowOnClickNode}
+            >
               {onClickNode}
             </HoverMenu>
           )}
