@@ -311,24 +311,18 @@ describe('App', () => {
   })
 
   it('should change the size of the plots according to the size picker', async () => {
-    render(
-      <Plots
-        state={{
-          data: {
-            live: livePlotsFixture,
-            sectionCollapsed: defaultSectionCollapsed,
-            static: undefined
-          }
-        }}
-        dispatch={jest.fn}
-      />
-    )
-
-    const summaryElement = await screen.findByText('Live Experiments Plots')
-    fireEvent.click(summaryElement, {
-      bubbles: true,
-      cancelable: true
+    const setInitialData = new MessageEvent('message', {
+      data: {
+        data: {
+          live: livePlotsFixture,
+          sectionCollapsed: defaultSectionCollapsed
+        },
+        type: MessageToWebviewType.SET_DATA
+      }
     })
+
+    render(<App />)
+    fireEvent(window, setInitialData)
 
     const [, sizePickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizePickerButton)
