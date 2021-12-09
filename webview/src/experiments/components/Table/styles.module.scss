@@ -6,6 +6,9 @@ $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $border-color: grey;
 
+$edge-padding: 0.5rem;
+$nested-row-padding: 1.35rem;
+
 // Dark Theme
 
 $row-bg-alt-color: rgba(60, 60, 60, 0.7);
@@ -160,7 +163,7 @@ $spinner-color-light: #000;
   .experimentGroup {
     .nestedRow {
       .firstCell {
-        padding-left: 2rem;
+        padding-left: $nested-row-padding;
       }
     }
     &.expandedGroup .nestedRow {
@@ -276,42 +279,30 @@ $spinner-color-light: #000;
   .workspaceRowGroup {
     border: none;
 
-    .tr .td {
-      background-color: none;
-      border-top: 1px solid $border-color;
-      border-bottom: 1px solid $border-color;
-
-      &.firstCell {
-        border-left: 1px solid $border-color;
-        margin-left: 0;
-        position: relative;
-
-        &::before {
-          content: '';
-          background-color: $bg-color;
-          height: calc(100% + 2px);
-          position: absolute;
-          top: -1px;
-          left: -1px;
-          width: calc(0.7rem + 1px);
-          border-right: 1px solid $border-color;
+    .td {
+      &:first-child {
+        padding-left: $edge-padding;
+        .innerCell {
+          padding-left: 0;
+          border-left: 1px solid $border-color;
         }
       }
 
       &:last-child {
-        border-right: 1px solid $border-color;
-
-        &::after {
-          content: '';
-          background-color: $bg-color;
-          height: 100%;
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: calc(0.7rem + 1px);
-          border-left: 1px solid $border-color;
+        padding-right: $edge-padding;
+        .innerCell {
+          padding-right: 0;
+          border-right: 1px solid $border-color;
         }
       }
+    }
+
+    .innerCell {
+      height: 100%;
+      width: 100%;
+      background-color: none;
+      border-top: 1px solid $border-color;
+      border-bottom: 1px solid $border-color;
     }
   }
 
@@ -341,14 +332,23 @@ $spinner-color-light: #000;
     position: relative;
   }
   .td {
-    padding: 0 0.25rem;
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
+    &:first-child {
+      .innerCell {
+        padding-left: $edge-padding;
+      }
+    }
+
+    &:last-child {
+      .innerCell {
+        padding-right: $edge-padding;
+      }
+    }
   }
   .experimentCell {
     text-align: left;
-    padding-left: 0.7rem;
   }
   .groupedCell {
     border-top: 1px solid rgba(255, 255, 255, 0.5);
@@ -463,9 +463,10 @@ $spinner-color-light: #000;
   padding: 0;
 }
 
-.td {
+.innerCell {
   display: flex;
   flex-flow: row nowrap;
+  padding: 0 0.25rem;
   align-items: center;
   .cellContents {
     flex: 1;
