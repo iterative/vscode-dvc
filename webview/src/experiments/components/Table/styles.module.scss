@@ -335,9 +335,6 @@ $spinner-color-light: #000;
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
-    .innerCell {
-      padding: 0 0.25rem;
-    }
     &:first-child {
       .innerCell {
         padding-left: $edge-padding;
@@ -349,9 +346,6 @@ $spinner-color-light: #000;
         padding-right: $edge-padding;
       }
     }
-  }
-  .innerCell {
-    padding: 0 0.25rem;
   }
   .experimentCell {
     text-align: left;
@@ -471,6 +465,7 @@ $spinner-color-light: #000;
 
 .innerCell {
   display: flex;
+  padding: 0 0.25rem;
   flex-flow: row nowrap;
   align-items: center;
   .cellContents {
