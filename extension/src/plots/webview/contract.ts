@@ -12,6 +12,7 @@ export type LivePlotData = {
 export type LivePlotsData = {
   plots: LivePlotData[]
   colors: LivePlotsColors
+  size: PlotSize
   selectedMetrics?: string[]
 }
 
@@ -41,6 +42,15 @@ export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
 export type StaticPlot = VegaPlot | ImagePlot
 
 export type PlotsOutput = Record<string, StaticPlot[]>
+
+export const PlotSize = {
+  LARGE: 'LARGE',
+  REGULAR: 'REGULAR',
+  SMALL: 'SMALL'
+}
+
+type PlotSizeKeys = keyof typeof PlotSize
+export type PlotSize = typeof PlotSize[PlotSizeKeys]
 
 export type PlotsData =
   | {
