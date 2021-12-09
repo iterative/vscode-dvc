@@ -79,7 +79,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             {...provided.dragHandleProps}
             data-testid="rendered-header"
             style={provided.draggableProps.style}
-            className={cx({
+            className={cx(styles.cellContents, {
               [styles.draggingColumn]: snapshot.isDragging,
               [styles.staticColumn]: !snapshot.isDragging,
               [styles.isDroppedColumn]: snapshot.isDropAnimating
