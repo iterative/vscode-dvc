@@ -2,30 +2,25 @@
  * @jest-environment jsdom
  */
 import React from 'react'
-import {
-  render,
-  cleanup,
-  waitFor,
-  screen,
-  fireEvent
-} from '@testing-library/react'
+import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/webview'
 import {
+  defaultSectionCollapsed,
+  LivePlotsColors,
+  PlotsData,
+  PlotSize,
+  Section
+} from 'dvc/src/plots/webview/contract'
+import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { PlotSize, LivePlotsColors } from 'dvc/src/plots/webview/contract'
 import { mocked } from 'ts-jest/utils'
 import { App } from './App'
 import Plots from './Plots'
 import { vsCodeApi } from '../../shared/api'
-
-import {
-  PlotsSectionKeys,
-  defaultCollapsibleSectionsState
-} from '../hooks/useAppReducer'
 
 jest.mock('../../shared/api')
 
@@ -38,9 +33,8 @@ jest.mock('./constants', () => ({
   })
 }))
 
-const { postMessage, getState, setState } = vsCodeApi
+const { postMessage, setState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
-const mockGetState = mocked(getState)
 const mockSetState = mocked(setState)
 
 beforeEach(() => {
@@ -52,25 +46,27 @@ afterEach(() => {
 })
 
 describe('App', () => {
+  const sendSetDataMessage = (data: PlotsData) => {
+    const message = new MessageEvent('message', {
+      data: {
+        data,
+        type: MessageToWebviewType.SET_DATA
+      }
+    })
+    fireEvent(window, message)
+  }
+
+  const renderAppWithData = (data: PlotsData) => {
+    render(<App />)
+    sendSetDataMessage(data)
+  }
+
   it('should send the initialized message on first render', () => {
     render(<App />)
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.INITIALIZED
     })
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
-  })
-
-  it('should recall state from VSCode on first render', () => {
-    const mockState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: { live: { plots: [] }, static: {} },
-      dvcRoot: 'root'
-    }
-    mockGetState.mockReturnValueOnce(mockState)
-    render(<App />)
-    expect(mockGetState).toBeCalledTimes(1)
-    expect(mockSetState).toBeCalledTimes(1)
-    expect(mockSetState).toBeCalledWith(mockState)
   })
 
   it('should set dvcRoot when the setDvcRoot message comes in', () => {
@@ -85,23 +81,8 @@ describe('App', () => {
       })
     )
     expect(mockSetState).toBeCalledWith({
-      collapsedSections: defaultCollapsibleSectionsState,
       dvcRoot: 'root'
     })
-    expect(mockSetState).toBeCalledTimes(2)
-  })
-
-  it('should not update state when given an invalid message type', () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          dvcRoot: 'root',
-          type: 'this is a bad message'
-        }
-      })
-    )
     expect(mockSetState).toBeCalledTimes(1)
   })
 
@@ -112,15 +93,21 @@ describe('App', () => {
     expect(loadingState).toBeInTheDocument()
   })
 
-  it('should render the empty state when given data with no experiments', async () => {
-    const dataMessageWithoutPlots = new MessageEvent('message', {
-      data: {
-        data: { live: null, static: null },
-        type: MessageToWebviewType.SET_DATA
-      }
+  it('should render the loading state when not initially provided with collapsed sections', async () => {
+    renderAppWithData({
+      live: null
     })
-    render(<App />)
-    fireEvent(window, dataMessageWithoutPlots)
+
+    const loadingState = await screen.findByText('Loading Plots...')
+
+    expect(loadingState).toBeInTheDocument()
+  })
+
+  it('should render the empty state when given data with no plots', async () => {
+    renderAppWithData({
+      live: null,
+      sectionCollapsed: defaultSectionCollapsed
+    })
     const emptyState = await screen.findByText('No Plots to Display')
 
     expect(emptyState).toBeInTheDocument()
@@ -128,45 +115,51 @@ describe('App', () => {
 
   it('should render only live plots when given a message with only live plots data', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
-    const dataMessageWithPlots = new MessageEvent('message', {
-      data: {
-        data: { live: livePlotsFixture },
-        type: MessageToWebviewType.SET_DATA
-      }
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
     })
-    render(<App />)
-    fireEvent(window, dataMessageWithPlots)
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
     expect(screen.queryByText('Static Plots')).not.toBeInTheDocument()
   })
 
-  it('should render live and static plots when given a message with both types of plots data', () => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {})
-    const dataMessageWithPlots = new MessageEvent('message', {
-      data: {
-        data: { live: livePlotsFixture, static: staticPlotsFixture },
-        type: MessageToWebviewType.SET_DATA
-      }
+  it('should render live and static plots when given messages with both types of plots data', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
     })
-    render(<App />)
-    fireEvent(window, dataMessageWithPlots)
+
+    sendSetDataMessage({
+      static: staticPlotsFixture
+    })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
     expect(screen.getByText('Static Plots')).toBeInTheDocument()
   })
 
+  it('should remove live plots given a message showing live plots as null', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
+
+    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
+
+    sendSetDataMessage({
+      live: null
+    })
+    expect(screen.queryByText('Live Experiments Plots')).not.toBeInTheDocument()
+  })
+
   it('should toggle the live plots section in state when its header is clicked', async () => {
-    const initialState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: {
-        live: livePlotsFixture
-      }
-    }
-    mockGetState.mockReturnValue(initialState)
-    render(<App />)
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
+
     const summaryElement = await screen.findByText('Live Experiments Plots')
     const [plot] = await screen.findAllByLabelText('Vega visualization')
     expect(plot).toBeInTheDocument()
@@ -175,17 +168,13 @@ describe('App', () => {
       bubbles: true,
       cancelable: true
     })
-    await waitFor(() => expect(mockSetState).toBeCalledTimes(2))
 
     expect(
       screen.queryByLabelText('Vega visualization')
     ).not.toBeInTheDocument()
-    expect(mockSetState).toBeCalledWith({
-      ...initialState,
-      collapsedSections: {
-        ...defaultCollapsibleSectionsState,
-        [PlotsSectionKeys.LIVE_PLOTS]: true
-      }
+    expect(mockPostMessage).toBeCalledWith({
+      payload: { [Section.LIVE_PLOTS]: true },
+      type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
     })
   })
 
@@ -193,9 +182,9 @@ describe('App', () => {
     render(
       <Plots
         state={{
-          collapsedSections: defaultCollapsibleSectionsState,
           data: {
             live: livePlotsFixture,
+            sectionCollapsed: defaultSectionCollapsed,
             static: null
           }
         }}
@@ -240,14 +229,10 @@ describe('App', () => {
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
-    const initialState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: {
-        live: livePlotsFixture
-      }
-    }
-    mockGetState.mockReturnValue(initialState)
-    render(<App />)
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
 
     const [pickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
@@ -277,14 +262,10 @@ describe('App', () => {
   })
 
   it('should change the size of the plots according to the size picker', async () => {
-    const initialState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: {
-        live: livePlotsFixture
-      }
-    }
-    mockGetState.mockReturnValue(initialState)
-    render(<App />)
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
 
     const [, sizePickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizePickerButton)
@@ -308,14 +289,10 @@ describe('App', () => {
   })
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
-    const initialState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: {
-        live: livePlotsFixture
-      }
-    }
-    mockGetState.mockReturnValue(initialState)
-    render(<App />)
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
 
     const [, sizeButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizeButton)

@@ -6,7 +6,7 @@ import { Plots } from '../../../plots'
 import { BaseWebview } from '../../../webview'
 import { buildExperiments } from '../experiments/util'
 import { CliReader } from '../../../cli/reader'
-import { dvcDemoPath } from '../../util'
+import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { PlotSize } from '../../../plots/webview/contract'
@@ -25,7 +25,8 @@ export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
       dvcDemoPath,
       internalCommands,
       updatesPaused,
-      resourceLocator.scatterGraph
+      resourceLocator.scatterGraph,
+      buildMockMemento()
     )
   )
   plots.setExperiments(experiments)

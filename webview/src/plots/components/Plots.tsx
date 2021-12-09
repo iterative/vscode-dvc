@@ -4,7 +4,8 @@ import {
   LivePlotsColors,
   LivePlotData,
   PlotsOutput,
-  PlotSize
+  PlotSize,
+  Section
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
@@ -13,11 +14,7 @@ import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
 import styles from './styles.module.scss'
-import {
-  PlotsSectionKeys,
-  PlotsReducerAction,
-  PlotsWebviewState
-} from '../hooks/useAppReducer'
+import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
 
@@ -103,8 +100,10 @@ const Plots = ({
 }: {
   state: PlotsWebviewState
   dispatch: Dispatch<PlotsReducerAction>
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
-  const { data, collapsedSections } = state
+  const { data } = state
+
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
   const [size, setSize] = useState<PlotSize>(PlotSize.REGULAR)
@@ -123,11 +122,11 @@ const Plots = ({
     window.dispatchEvent(new Event('resize'))
   }, [size])
 
-  if (!data) {
+  if (!data || !data.sectionCollapsed) {
     return EmptyState('Loading Plots...')
   }
 
-  const { live: livePlots, static: staticPlots } = data
+  const { sectionCollapsed, live: livePlots, static: staticPlots } = data
 
   if (!livePlots && !staticPlots) {
     return EmptyState('No Plots to Display')
@@ -151,8 +150,8 @@ const Plots = ({
       {livePlots && (
         <PlotsContainer
           title="Live Experiments Plots"
-          sectionKey={PlotsSectionKeys.LIVE_PLOTS}
-          collapsedSections={collapsedSections}
+          sectionKey={Section.LIVE_PLOTS}
+          sectionCollapsed={sectionCollapsed}
           dispatch={dispatch}
           menu={{
             metrics,
@@ -174,8 +173,8 @@ const Plots = ({
       {staticPlots && (
         <PlotsContainer
           title="Static Plots"
-          sectionKey={PlotsSectionKeys.STATIC_PLOTS}
-          collapsedSections={collapsedSections}
+          sectionKey={Section.STATIC_PLOTS}
+          sectionCollapsed={sectionCollapsed}
           dispatch={dispatch}
         >
           <StaticPlots plots={staticPlots} />

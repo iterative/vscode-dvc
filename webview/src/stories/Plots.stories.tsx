@@ -1,14 +1,13 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
-import { PlotsData } from 'dvc/src/plots/webview/contract'
+import {
+  PlotsData,
+  defaultSectionCollapsed
+} from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/storybook'
 import Plots from '../plots/components/Plots'
-import {
-  useAppReducer,
-  defaultCollapsibleSectionsState,
-  CollapsibleSectionsState
-} from '../plots/hooks/useAppReducer'
+import { useAppReducer } from '../plots/hooks/useAppReducer'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
@@ -16,9 +15,9 @@ import '../plots/components/styles.module.scss'
 
 export default {
   args: {
-    collapsedSections: defaultCollapsibleSectionsState,
     data: {
       live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed,
       static: staticPlotsFixture
     }
   },
@@ -27,10 +26,9 @@ export default {
 } as Meta
 
 const Template: Story<{
-  collapsedSections: CollapsibleSectionsState
   data?: PlotsData
-}> = ({ collapsedSections, data }) => {
-  const [state, dispatch] = useAppReducer({ collapsedSections, data })
+}> = ({ data }) => {
+  const [state, dispatch] = useAppReducer({ data })
   return <Plots state={state} dispatch={dispatch} />
 }
 
@@ -40,14 +38,14 @@ export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   data: {
     live: livePlotsFixture,
-    static: null
+    sectionCollapsed: defaultSectionCollapsed
   }
 }
 
 export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
   data: {
-    live: null,
+    sectionCollapsed: defaultSectionCollapsed,
     static: staticPlotsFixture
   }
 }
@@ -55,8 +53,7 @@ WithStaticOnly.args = {
 export const WithoutPlots = Template.bind({})
 WithoutPlots.args = {
   data: {
-    live: null,
-    static: null
+    sectionCollapsed: defaultSectionCollapsed
   }
 }
 

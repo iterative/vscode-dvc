@@ -1,10 +1,12 @@
-import { EventEmitter } from 'vscode'
+import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
+  defaultSectionCollapsed,
   ImagePlot,
   isImagePlot,
   PlotsData as TPlotsData,
-  PlotsOutput
+  PlotsOutput,
+  SectionCollapsed
 } from './webview/contract'
 import { PlotsData } from './data'
 import { BaseWebview } from '../webview'
@@ -22,18 +24,26 @@ import { Logger } from '../common/logger'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
+export const enum MementoPrefixes {
+  SECTION_COLLAPSED = 'sectionCollapsed:'
+}
+
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
   private experiments?: Experiments
 
   private readonly data: PlotsData
+  private readonly workspaceState: Memento
+
+  private sectionCollapsed: SectionCollapsed
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
-    webviewIcon: Resource
+    webviewIcon: Resource,
+    workspaceState: Memento
   ) {
     super(dvcRoot, webviewIcon)
 
@@ -46,6 +56,13 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.handleMessageFromWebview()
+
+    this.sectionCollapsed = workspaceState.get(
+      MementoPrefixes.SECTION_COLLAPSED + dvcRoot,
+      defaultSectionCollapsed
+    )
+
+    this.workspaceState = workspaceState
   }
 
   public async setExperiments(experiments: Experiments) {
@@ -67,14 +84,21 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public sendInitialWebviewData() {
-    this.sendLivePlotsData()
+    this.webview?.show({
+      live: this.getLivePlots(),
+      sectionCollapsed: this.sectionCollapsed
+    })
     this.data.managedUpdate()
   }
 
   private sendLivePlotsData() {
     this.webview?.show({
-      live: this.experiments?.getLivePlots() || null
+      live: this.getLivePlots()
     })
+  }
+
+  private getLivePlots() {
+    return this.experiments?.getLivePlots() || null
   }
 
   private sendStaticPlots(data: PlotsOutput) {
@@ -119,10 +143,26 @@ export class Plots extends BaseRepository<TPlotsData> {
                 message.payload as PlotsResizedPayload
               )
             )
+          case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
+            return (
+              message.payload && this.persistCollapsibleState(message.payload)
+            )
           default:
             Logger.error(`Unexpected message: ${message}`)
         }
       })
+    )
+  }
+
+  private persistCollapsibleState(newState: SectionCollapsed) {
+    this.sectionCollapsed = {
+      ...this.sectionCollapsed,
+      ...newState
+    }
+
+    this.workspaceState.update(
+      MementoPrefixes.SECTION_COLLAPSED + this.dvcRoot,
+      this.sectionCollapsed
     )
   }
 }

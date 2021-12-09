@@ -4,6 +4,15 @@ export type LivePlotValues = { group: string; x: number; y: number }[]
 
 export type LivePlotsColors = { domain: string[]; range: string[] }
 
+export const PlotSize = {
+  LARGE: 'LARGE',
+  REGULAR: 'REGULAR',
+  SMALL: 'SMALL'
+}
+
+type PlotSizeKeys = keyof typeof PlotSize
+export type PlotSize = typeof PlotSize[PlotSizeKeys]
+
 export type LivePlotData = {
   title: string
   values: LivePlotValues
@@ -43,18 +52,22 @@ export type StaticPlot = VegaPlot | ImagePlot
 
 export type PlotsOutput = Record<string, StaticPlot[]>
 
-export const PlotSize = {
-  LARGE: 'LARGE',
-  REGULAR: 'REGULAR',
-  SMALL: 'SMALL'
+export enum Section {
+  LIVE_PLOTS = 'live-plots',
+  STATIC_PLOTS = 'static-plots'
 }
 
-type PlotSizeKeys = keyof typeof PlotSize
-export type PlotSize = typeof PlotSize[PlotSizeKeys]
+export const defaultSectionCollapsed = {
+  [Section.LIVE_PLOTS]: false,
+  [Section.STATIC_PLOTS]: false
+}
+
+export type SectionCollapsed = typeof defaultSectionCollapsed
 
 export type PlotsData =
   | {
       live?: LivePlotsData | null
       static?: PlotsOutput | null
+      sectionCollapsed?: SectionCollapsed
     }
   | undefined

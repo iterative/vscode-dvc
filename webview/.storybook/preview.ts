@@ -11,7 +11,6 @@ declare global {
 window.webviewData = { theme: 'dark' }
 window.acquireVsCodeApi = () =>
   ({
-    getState: action('getState'),
     postMessage: action('postMessage'),
     setState: action('setState')
   } as unknown as InternalVsCodeApi)
