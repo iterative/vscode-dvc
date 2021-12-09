@@ -10,6 +10,7 @@ import {
   defaultSectionCollapsed,
   LivePlotsColors,
   PlotsData,
+  PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
 import {
@@ -285,5 +286,32 @@ describe('App', () => {
     fireEvent.click(largeButton)
     wrapper = await screen.findByTestId('plots-wrapper')
     expect(wrapper).toHaveClass('largePlots')
+  })
+
+  it('should send a message to the extension with the selected size when changing the size of plots', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
+
+    const [, sizeButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(sizeButton)
+    fireEvent.click(sizeButton)
+
+    const largeButton = screen.getByText('Large')
+    fireEvent.click(largeButton)
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: PlotSize.LARGE,
+      type: MessageFromWebviewType.PLOTS_RESIZED
+    })
+
+    const smallButton = screen.getByText('Small')
+    fireEvent.click(smallButton)
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: PlotSize.SMALL,
+      type: MessageFromWebviewType.PLOTS_RESIZED
+    })
   })
 })

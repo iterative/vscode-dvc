@@ -1,6 +1,13 @@
 /* global module */
 
 module.exports = {
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!**/*.test.*',
+    '!src/stories/*',
+    '!src/test/*',
+    '!src/shared/components/icons/*'
+  ],
   globals: {
     __webpack_public_path__: true
   },

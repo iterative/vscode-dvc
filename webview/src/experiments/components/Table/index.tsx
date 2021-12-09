@@ -66,21 +66,23 @@ const FirstCell: React.FC<{
 
   return (
     <div {...firstCellProps}>
-      <span className={styles.rowArrowPlaceholder}>
-        {row.canExpand && (
-          <span
-            className={
-              row.isExpanded
-                ? styles.expandedRowArrow
-                : styles.contractedRowArrow
-            }
-          />
-        )}
-      </span>
-      <span className={styles.bullet} style={{ color: bulletColor }}>
-        {cell.row.original.queued && <ClockIcon />}
-      </span>
-      {cell.isPlaceholder ? null : cell.render('Cell')}
+      <div className={styles.innerCell}>
+        <span className={styles.rowArrowPlaceholder}>
+          {row.canExpand && (
+            <span
+              className={
+                row.isExpanded
+                  ? styles.expandedRowArrow
+                  : styles.contractedRowArrow
+              }
+            />
+          )}
+        </span>
+        <span className={styles.bullet} style={{ color: bulletColor }}>
+          {cell.row.original.queued && <ClockIcon />}
+        </span>
+        {cell.isPlaceholder ? null : cell.render('Cell')}
+      </div>
     </div>
   )
 }
@@ -107,7 +109,9 @@ const CellWrapper: React.FC<{
     })}
     data-testid={cellId}
   >
-    {cell.isPlaceholder ? null : cell.render('Cell')}
+    <div className={styles.innerCell}>
+      {cell.isPlaceholder ? null : cell.render('Cell')}
+    </div>
   </div>
 )
 

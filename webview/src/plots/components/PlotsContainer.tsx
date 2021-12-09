@@ -1,7 +1,11 @@
 import React, { Dispatch } from 'react'
-import { Section, SectionCollapsed } from 'dvc/src/plots/webview/contract'
+import {
+  PlotSize,
+  Section,
+  SectionCollapsed
+} from 'dvc/src/plots/webview/contract'
 import { MetricsPicker } from './MetricsPicker'
-import { PlotSize, SizePicker } from './SizePicker'
+import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { AllIcons } from '../../shared/components/icon/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
