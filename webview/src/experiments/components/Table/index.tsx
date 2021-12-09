@@ -68,21 +68,23 @@ const FirstCell: React.FC<{
 
   return (
     <div {...firstCellProps}>
-      <span className={styles.rowArrowPlaceholder}>
-        {row.canExpand && (
-          <span
-            className={
-              row.isExpanded
-                ? styles.expandedRowArrow
-                : styles.contractedRowArrow
-            }
-          />
-        )}
-      </span>
-      <span className={styles.bullet} style={{ color: bulletColor }}>
-        {cell.row.original.queued && <ClockIcon />}
-      </span>
-      {cell.isPlaceholder ? null : cell.render('Cell')}
+      <div className={styles.innerCell}>
+        <span className={styles.rowArrowPlaceholder}>
+          {row.canExpand && (
+            <span
+              className={
+                row.isExpanded
+                  ? styles.expandedRowArrow
+                  : styles.contractedRowArrow
+              }
+            />
+          )}
+        </span>
+        <span className={styles.bullet} style={{ color: bulletColor }}>
+          {cell.row.original.queued && <ClockIcon />}
+        </span>
+        {cell.isPlaceholder ? null : cell.render('Cell')}
+      </div>
     </div>
   )
 }
@@ -92,10 +94,11 @@ const CellWrapper: React.FC<{
   changes?: string[]
   cellId: string
 }> = ({ cell, cellId, changes }) => (
-  <div
-    {...cell.getCellProps({
-      className: cx(
-        styles.td,
+  <div {...cell.getCellProps({ className: styles.td })}>
+    <div
+      data-testid={cellId}
+      className={cx(
+        styles.innerCell,
         cell.isPlaceholder && styles.groupPlaceholder,
         cell.column.isGrouped && styles.groupedColumnCell,
         cell.isGrouped && styles.groupedCell,
@@ -105,11 +108,10 @@ const CellWrapper: React.FC<{
           ),
           [styles.workspaceChange]: changes?.includes(cell.column.id)
         }
-      )
-    })}
-    data-testid={cellId}
-  >
-    {cell.isPlaceholder ? null : cell.render('Cell')}
+      )}
+    >
+      {cell.isPlaceholder ? null : cell.render('Cell')}
+    </div>
   </div>
 )
 
