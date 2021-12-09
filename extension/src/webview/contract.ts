@@ -45,9 +45,6 @@ export enum MessageToWebviewType {
   SET_DATA = 'setData'
 }
 
-export interface WebviewState<T extends WebviewData | unknown> {
+export interface WebviewState {
   dvcRoot: string
-  data: T
 }
-
-export type UnknownWebviewState = WebviewState<unknown>

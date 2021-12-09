@@ -43,11 +43,6 @@ export type StaticPlot = VegaPlot | ImagePlot
 
 export type PlotsOutput = Record<string, StaticPlot[]>
 
-export type PlotsData = {
-  live?: LivePlotsData | null
-  static?: PlotsOutput | null
-}
-
 export const PlotSize = {
   LARGE: 'LARGE',
   REGULAR: 'REGULAR',
@@ -56,3 +51,10 @@ export const PlotSize = {
 
 type PlotSizeKeys = keyof typeof PlotSize
 export type PlotSize = typeof PlotSize[PlotSizeKeys]
+
+export type PlotsData =
+  | {
+      live?: LivePlotsData | null
+      static?: PlotsOutput | null
+    }
+  | undefined

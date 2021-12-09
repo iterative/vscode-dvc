@@ -3,7 +3,6 @@
  */
 import '@testing-library/jest-dom/extend-expect'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
@@ -112,19 +111,10 @@ describe('Table', () => {
     rows: [],
     sorts: []
   }
-  const renderTable = (
-    sorts: SortDefinition[] = [],
-    tableInstance = instance,
-    changes: string[] = []
-  ) =>
-    render(
-      <Table
-        instance={tableInstance}
-        sorts={sorts}
-        changes={changes}
-        tableData={dummyTableData}
-      />
-    )
+  const renderTable = (testData = {}, tableInstance = instance) => {
+    const tableData = { ...dummyTableData, ...testData }
+    return render(<Table instance={tableInstance} tableData={tableData} />)
+  }
 
   beforeAll(() => {
     jest.spyOn(ColumnOrder, 'useColumnOrder').mockImplementation(() => [])
@@ -159,7 +149,7 @@ describe('Table', () => {
         ...newInstance.headerGroups
       ]
 
-      renderTable([{ descending, path: 'timestamp' }], newInstance)
+      renderTable({ sorts: [{ descending, path: 'timestamp' }] }, newInstance)
     }
 
     it('should not have any sorting classes if the sorts property is empty', async () => {
@@ -175,7 +165,9 @@ describe('Table', () => {
     })
 
     it('should apply the sortingHeaderCellAsc on the timestamp column if it is not descending in the sorts property', async () => {
-      renderTable([{ descending: false, path: 'timestamp' }])
+      renderTable({
+        sorts: [{ descending: false, path: 'timestamp' }]
+      })
 
       const column = await getParentElement('Timestamp')
 
@@ -186,7 +178,9 @@ describe('Table', () => {
     })
 
     it('should apply the sortingHeaderCellDesc on the timestamp column if it is descending in the sorts property', async () => {
-      renderTable([{ descending: true, path: 'timestamp' }])
+      renderTable({
+        sorts: [{ descending: true, path: 'timestamp' }]
+      })
 
       const column = await getParentElement('Timestamp')
 
@@ -247,7 +241,7 @@ describe('Table', () => {
     })
 
     it('should have the workspaceWithChanges class on a row if there are workspace changes', async () => {
-      renderTable(undefined, undefined, ['something_changed'])
+      renderTable({ changes: ['something_changed'] })
 
       const row = await screen.findByTestId('workspace-row')
 
@@ -263,7 +257,7 @@ describe('Table', () => {
     })
 
     it('should not have the workspaceChange class on a cell if there are changes to other columns but not this one', async () => {
-      renderTable(undefined, undefined, ['a_change'])
+      renderTable({ changes: ['a_change'] })
 
       const row = await screen.findByTestId('timestamp___workspace')
 
@@ -271,7 +265,7 @@ describe('Table', () => {
     })
 
     it('should have the workspaceChange class on a cell if there are changes matching the column id', async () => {
-      renderTable(undefined, undefined, ['timestamp'])
+      renderTable({ changes: ['timestamp'] })
 
       const row = await screen.findByTestId('timestamp___workspace')
 

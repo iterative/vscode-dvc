@@ -5,7 +5,6 @@ import {
   RowData as Experiment,
   TableData
 } from 'dvc/src/experiments/webview/contract'
-import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import ClockIcon from '../../../shared/components/icons/Clock'
@@ -15,7 +14,6 @@ export interface InstanceProp {
 }
 
 export interface TableProps extends InstanceProp {
-  sorts: SortDefinition[]
   tableData: TableData
 }
 
@@ -235,19 +233,14 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
 
 export const Table: React.FC<TableProps & WithChanges> = ({
   instance,
-  sorts,
-  changes,
   tableData
 }) => {
   const { getTableProps, rows } = instance
+  const { sorts, columns, changes } = tableData
   return (
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
-        <TableHead
-          instance={instance}
-          sorts={sorts}
-          columns={tableData.columns}
-        />
+        <TableHead instance={instance} sorts={sorts} columns={columns} />
         {rows.map(row => (
           <TableBody
             row={row}

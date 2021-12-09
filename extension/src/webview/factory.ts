@@ -1,42 +1,29 @@
 import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
-import isEqual from 'lodash.isequal'
 import { BaseWebview } from '.'
 import { ViewKey, WebviewDetails } from './constants'
-import { WebviewState, UnknownWebviewState, WebviewData } from './contract'
+import { WebviewState, WebviewData } from './contract'
 import { Resource } from '../resourceLocator'
-import { PlotsData } from '../plots/webview/contract'
-import { hasKey } from '../util/object'
 import { getWorkspaceRootUris } from '../vscode/workspaceFolders'
 
-const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
-  const data = state.data as PlotsData
-  return !!(isEqual(data, {}) || hasKey(data, 'live') || hasKey(data, 'static'))
-}
-
-export const isValidState = (
-  viewKey: ViewKey,
-  state: UnknownWebviewState
-): state is WebviewState<WebviewData> =>
-  viewKey === ViewKey.EXPERIMENTS ||
-  (viewKey === ViewKey.PLOTS && isPlotsWebviewState(state))
+export const isValidDvcRoot = (dvcRoot?: string): dvcRoot is string => !!dvcRoot
 
 const create = (
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
-  state: UnknownWebviewState
+  dvcRoot: string
 ) => {
-  if (!isValidState(viewKey, state)) {
+  if (!isValidDvcRoot(dvcRoot)) {
     throw new Error(`trying to set invalid state into ${viewKey}`)
   }
 
   const { contextKey, eventNames, scripts } = WebviewDetails[viewKey]
 
-  return new BaseWebview(webviewPanel, state, contextKey, eventNames, scripts)
+  return new BaseWebview(webviewPanel, dvcRoot, contextKey, eventNames, scripts)
 }
 
 export const createWebview = async (
   viewKey: ViewKey,
-  state: UnknownWebviewState,
+  dvcRoot: string,
   iconPath: Resource
 ) => {
   const { title, distPath } = WebviewDetails[viewKey]
@@ -54,7 +41,7 @@ export const createWebview = async (
 
   webviewPanel.iconPath = iconPath
 
-  const view = create(viewKey, webviewPanel, state)
+  const view = create(viewKey, webviewPanel, dvcRoot)
   await view.isReady()
   return view
 }
@@ -62,11 +49,11 @@ export const createWebview = async (
 export const restoreWebview = <T extends WebviewData>(
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
-  state: UnknownWebviewState
+  state: WebviewState
 ): Promise<BaseWebview<T>> => {
   return new Promise((resolve, reject) => {
     try {
-      resolve(create(viewKey, webviewPanel, state))
+      resolve(create(viewKey, webviewPanel, state.dvcRoot))
     } catch (e: unknown) {
       reject(e)
     }

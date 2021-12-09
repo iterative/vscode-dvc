@@ -6,8 +6,7 @@ import {
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
-  WebviewData,
-  WebviewState
+  WebviewData
 } from './contract'
 import { EventNames } from './constants'
 import { setContextValue } from '../vscode/context'
@@ -37,7 +36,7 @@ export class BaseWebview<T extends WebviewData> {
 
   constructor(
     webviewPanel: WebviewPanel,
-    state: WebviewState<T>,
+    dvcRoot: string,
     contextKey: string,
     eventsNames: EventNames,
     scripts: readonly string[]
@@ -52,7 +51,7 @@ export class BaseWebview<T extends WebviewData> {
 
     this.onDidReceiveMessage = this.messageReceived.event
 
-    this.dvcRoot = state.dvcRoot
+    this.dvcRoot = dvcRoot
 
     this.disposer.track(
       webviewPanel.onDidDispose(() => {
@@ -82,14 +81,6 @@ export class BaseWebview<T extends WebviewData> {
         dvcRoot: this.dvcRoot,
         type: MessageToWebviewType.SET_DVC_ROOT
       })
-
-      const data = state.data
-      if (data) {
-        this.sendMessage({
-          data,
-          type: MessageToWebviewType.SET_DATA
-        })
-      }
     })
 
     this.setupTelemetryEvents(webviewPanel, eventsNames)
