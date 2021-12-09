@@ -33,7 +33,7 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
   types?: string[]
 }
 
-export interface TableData {
+export type TableData = {
   rows: RowData[]
   columns: ParamOrMetric[]
   sorts: SortDefinition[]
@@ -41,3 +41,5 @@ export interface TableData {
   columnOrder: string[]
   columnWidths: Record<string, number>
 }
+
+export type InitiallyUndefinedTableData = TableData | undefined
