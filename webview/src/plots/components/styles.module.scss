@@ -35,7 +35,7 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
 }
 
 .plotsContainer {
-  width: 100vw;
+  width: 100%;
 
   summary {
     cursor: pointer;
@@ -54,4 +54,42 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
   position: absolute;
   right: 5%;
   top: -10px;
+}
+
+$gap: 20px;
+.plotsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $gap;
+  width: 100%;
+  justify-content: center;
+
+  :global(.vega-embed) {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.largePlots .plot {
+  width: calc(100% - $gap);
+  height: 60vw;
+  max-width: 1000px;
+  max-height: 600px;
+}
+
+.regularPlots .plot {
+  width: calc(50% - $gap);
+  height: 35vw;
+  max-width: 500px;
+  max-height: 400px;
+}
+
+.smallPlots .plot {
+  width: calc(33% - $gap);
+  height: 20vw;
+  max-width: 300px;
+  max-height: 200px;
 }

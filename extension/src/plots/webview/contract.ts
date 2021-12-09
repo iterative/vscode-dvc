@@ -54,8 +54,10 @@ export const defaultCollapsedSections = {
 
 export type CollapsedSections = typeof defaultCollapsedSections
 
-export type PlotsData = {
-  live?: LivePlotsData | null
-  static?: PlotsOutput | null
-  collapsedSections?: CollapsedSections
-} | null
+export type PlotsData =
+  | {
+      live?: LivePlotsData | null
+      static?: PlotsOutput | null
+      collapsedSections?: CollapsedSections
+    }
+  | undefined

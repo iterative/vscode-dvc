@@ -8,6 +8,7 @@ import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/webview'
 import {
   defaultCollapsedSections,
+  LivePlotsColors,
   Section
 } from 'dvc/src/plots/webview/contract'
 import {
@@ -21,18 +22,18 @@ import { vsCodeApi } from '../../shared/api'
 
 jest.mock('../../shared/api')
 
+jest.mock('./constants', () => ({
+  ...jest.requireActual('./constants'),
+  createSpec: (title: string, scale?: LivePlotsColors) => ({
+    ...jest.requireActual('./constants').createSpec(title, scale),
+    height: 100,
+    width: 100
+  })
+}))
+
 const { postMessage, setState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
 const mockSetState = mocked(setState)
-
-const toStringSize = (size: number, addedSize = 44) =>
-  (size + addedSize).toString()
-
-const getPlotSvg = async () => {
-  const [plot] = await screen.findAllByRole('graphics-document')
-  // eslint-disable-next-line testing-library/no-node-access
-  return plot.getElementsByTagName('svg')[0]
-}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -340,15 +341,15 @@ describe('App', () => {
     const largeButton = screen.getByText('Large')
 
     fireEvent.click(smallButton)
-    let svg = await getPlotSvg()
-    expect(svg.getAttribute('height')).toBe(toStringSize(200))
+    let wrapper = await screen.findByTestId('plots-wrapper')
+    expect(wrapper).toHaveClass('smallPlots')
 
     fireEvent.click(regularButton)
-    svg = await getPlotSvg()
-    expect(svg.getAttribute('height')).toBe(toStringSize(300))
+    wrapper = await screen.findByTestId('plots-wrapper')
+    expect(wrapper).toHaveClass('regularPlots')
 
     fireEvent.click(largeButton)
-    svg = await getPlotSvg()
-    expect(svg.getAttribute('height')).toBe(toStringSize(750, 48))
+    wrapper = await screen.findByTestId('plots-wrapper')
+    expect(wrapper).toHaveClass('largePlots')
   })
 })

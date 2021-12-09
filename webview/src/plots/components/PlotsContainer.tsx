@@ -1,6 +1,5 @@
 import React, { Dispatch } from 'react'
 import { Section, CollapsedSections } from 'dvc/src/plots/webview/contract'
-import { PlotDimensions } from './constants'
 import { MetricsPicker } from './MetricsPicker'
 import { PlotSize, SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
@@ -15,7 +14,8 @@ interface MenuProps {
   metrics: string[]
   selectedMetrics: string[]
   setSelectedPlots: (selectedPlots: string[]) => void
-  setSize: (size: keyof typeof PlotDimensions) => void
+  setSize: (size: PlotSize) => void
+  size: PlotSize
 }
 
 interface PlotsContainerProps {
@@ -70,7 +70,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
                 icon: AllIcons.DOTS,
                 onClickNode: (
                   <SizePicker
-                    currentSize={PlotSize.REGULAR}
+                    currentSize={menu.size}
                     setSelectedSize={menu.setSize as (size: string) => void}
                   />
                 ),
