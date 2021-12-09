@@ -81,7 +81,9 @@ const FirstCell: React.FC<{
         <span className={styles.bullet} style={{ color: bulletColor }}>
           {cell.row.original.queued && <ClockIcon />}
         </span>
-        {cell.isPlaceholder ? null : cell.render('Cell')}
+        {cell.isPlaceholder ? null : (
+          <div className={styles.cellContents}>{cell.render('Cell')}</div>
+        )}
       </div>
     </div>
   )
