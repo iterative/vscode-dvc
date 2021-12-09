@@ -278,7 +278,6 @@ describe('App', () => {
   })
 
   it('should change the size of the plots according to the size picker', async () => {
-
     const initialState = {
       collapsedSections: defaultCollapsibleSectionsState,
       data: {
