@@ -465,8 +465,8 @@ $spinner-color-light: #000;
 
 .innerCell {
   display: flex;
-  padding: 0 0.25rem;
   flex-flow: row nowrap;
+  padding: 0 0.25rem;
   align-items: center;
   .cellContents {
     flex: 1;
