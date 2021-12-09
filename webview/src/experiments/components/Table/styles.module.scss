@@ -6,9 +6,8 @@ $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $border-color: grey;
 
-$edge-padding: 1rem;
-$workspace-edge-margin: 0.8rem;
-$workspace-edge-padding: $edge-padding - $workspace-edge-margin;
+$edge-padding: 0.5rem;
+$workspace-edge-padding: $edge-padding - $edge-padding;
 
 // Dark Theme
 
@@ -282,17 +281,17 @@ $spinner-color-light: #000;
 
     .td {
       &:first-child {
-        padding-left: $workspace-edge-margin;
+        padding-left: $edge-padding;
         .innerCell {
-          padding-left: $workspace-edge-padding;
+          padding-left: 0;
           border-left: 1px solid $border-color;
         }
       }
 
       &:last-child {
-        padding-right: $workspace-edge-margin;
+        padding-right: $edge-padding;
         .innerCell {
-          padding-right: $workspace-edge-padding;
+          padding-right: 0;
           border-right: 1px solid $border-color;
         }
       }
