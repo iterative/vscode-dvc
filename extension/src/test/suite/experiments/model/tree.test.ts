@@ -54,18 +54,16 @@ suite('Experiments Tree Test Suite', () => {
         'setSelectionMode'
       )
 
+      const initialData = {
+        sectionCollapsed: defaultSectionCollapsed,
+        ...getExpectedLivePlotsData(expectedDomain, expectedRange)
+      }
+
       while (expectedDomain.length) {
-        const expectedLivePlots = getExpectedLivePlotsData(
-          expectedDomain,
-          expectedRange
-        )
         const expectedData =
           expectedDomain.length === 3
-            ? {
-                sectionCollapsed: defaultSectionCollapsed,
-                ...expectedLivePlots
-              }
-            : expectedLivePlots
+            ? initialData
+            : getExpectedLivePlotsData(expectedDomain, expectedRange)
 
         expect(
           messageSpy,
