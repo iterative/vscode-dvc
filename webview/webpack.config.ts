@@ -57,7 +57,10 @@ export default {
           {
             loader: cssLoader,
             options: {
-              modules: { auto: true }
+              modules: {
+                auto: true,
+                localIdentName: '[local]--[hash:base64]'
+              }
             }
           },
           { loader: 'sass-loader' }

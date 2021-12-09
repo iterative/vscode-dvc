@@ -40,7 +40,7 @@ const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
     case MessageToWebviewType.SET_DATA:
       return {
         ...state,
-        data: action.data
+        data: { ...state.data, ...action.data }
       }
     case MessageToWebviewType.SET_DVC_ROOT:
       return {

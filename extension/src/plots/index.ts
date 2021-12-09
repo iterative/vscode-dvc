@@ -27,7 +27,6 @@ export class Plots extends BaseRepository<TPlotsData> {
   private experiments?: Experiments
 
   private readonly data: PlotsData
-  private staticPlots?: PlotsOutput
 
   constructor(
     dvcRoot: string,
@@ -41,7 +40,9 @@ export class Plots extends BaseRepository<TPlotsData> {
       new PlotsData(dvcRoot, internalCommands, updatesPaused)
     )
 
-    this.dispose.track(this.data.onDidUpdate(data => this.setStaticPlots(data)))
+    this.dispose.track(
+      this.data.onDidUpdate(data => this.sendStaticPlots(data))
+    )
 
     this.handleMessageFromWebview()
   }
@@ -53,44 +54,50 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.dispose.track(
       experiments.onDidChangeLivePlots(() => {
-        this.notifyChanged()
+        this.sendLivePlotsData()
       })
     )
 
     this.deferred.resolve()
-    return this.notifyChanged()
-  }
 
-  public getWebviewData() {
-    return {
-      live: this.experiments?.getLivePlots(),
-      static: this.staticPlots
-        ? Object.entries(this.staticPlots).reduce((acc, [path, plots]) => {
-            acc[path] = plots.map(plot =>
-              isImagePlot(plot)
-                ? ({
-                    ...plot,
-                    url: this.webview?.getWebviewUri(plot.url)
-                  } as ImagePlot)
-                : plot
-            )
-            return acc
-          }, {} as PlotsOutput)
-        : undefined
+    if (this.webview) {
+      this.sendInitialWebviewData()
     }
   }
 
-  private notifyChanged() {
-    return this.sendWebviewData()
+  public sendInitialWebviewData() {
+    this.sendLivePlotsData()
+    this.data.managedUpdate()
   }
 
-  private setStaticPlots(data: PlotsOutput) {
+  private sendLivePlotsData() {
+    this.webview?.show({
+      live: this.experiments?.getLivePlots() || null
+    })
+  }
+
+  private sendStaticPlots(data: PlotsOutput) {
+    this.webview?.show({
+      static: this.getStaticPlots(data)
+    })
+  }
+
+  private getStaticPlots(data: PlotsOutput | undefined) {
     if (isEmpty(data)) {
-      this.staticPlots = undefined
-      return
+      return null
     }
 
-    this.staticPlots = data
+    return Object.entries(data as PlotsOutput).reduce((acc, [path, plots]) => {
+      acc[path] = plots.map(plot =>
+        isImagePlot(plot)
+          ? ({
+              ...plot,
+              url: this.webview?.getWebviewUri(plot.url)
+            } as ImagePlot)
+          : plot
+      )
+      return acc
+    }, {} as PlotsOutput)
   }
 
   private handleMessageFromWebview() {

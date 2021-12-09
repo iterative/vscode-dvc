@@ -17,6 +17,7 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { mocked } from 'ts-jest/utils'
+import { LivePlotsColors } from 'dvc/src/plots/webview/contract'
 import { App } from './App'
 import Plots from './Plots'
 
@@ -29,19 +30,19 @@ import {
 
 jest.mock('../../shared/api')
 
+jest.mock('./constants', () => ({
+  ...jest.requireActual('./constants'),
+  createSpec: (title: string, scale?: LivePlotsColors) => ({
+    ...jest.requireActual('./constants').createSpec(title, scale),
+    height: 100,
+    width: 100
+  })
+}))
+
 const { postMessage, getState, setState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
 const mockSetState = mocked(setState)
-
-const toStringSize = (size: number, addedSize = 44) =>
-  (size + addedSize).toString()
-
-const getPlotSvg = async () => {
-  const [plot] = await screen.findAllByRole('graphics-document')
-  // eslint-disable-next-line testing-library/no-node-access
-  return plot.getElementsByTagName('svg')[0]
-}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -115,7 +116,7 @@ describe('App', () => {
   it('should render the empty state when given data with no experiments', async () => {
     const dataMessageWithoutPlots = new MessageEvent('message', {
       data: {
-        data: { live: undefined, static: undefined },
+        data: { live: null, static: null },
         type: MessageToWebviewType.SET_DATA
       }
     })
@@ -196,7 +197,7 @@ describe('App', () => {
           collapsedSections: defaultCollapsibleSectionsState,
           data: {
             live: livePlotsFixture,
-            static: undefined
+            static: null
           }
         }}
         dispatch={jest.fn}
@@ -277,24 +278,15 @@ describe('App', () => {
   })
 
   it('should change the size of the plots according to the size picker', async () => {
-    render(
-      <Plots
-        state={{
-          collapsedSections: defaultCollapsibleSectionsState,
-          data: {
-            live: livePlotsFixture,
-            static: undefined
-          }
-        }}
-        dispatch={jest.fn}
-      />
-    )
 
-    const summaryElement = await screen.findByText('Live Experiments Plots')
-    fireEvent.click(summaryElement, {
-      bubbles: true,
-      cancelable: true
-    })
+    const initialState = {
+      collapsedSections: defaultCollapsibleSectionsState,
+      data: {
+        live: livePlotsFixture
+      }
+    }
+    mockGetState.mockReturnValue(initialState)
+    render(<App />)
 
     const [, sizePickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizePickerButton)
@@ -305,15 +297,15 @@ describe('App', () => {
     const largeButton = screen.getByText('Large')
 
     fireEvent.click(smallButton)
-    let svg = await getPlotSvg()
-    expect(svg.getAttribute('height')).toBe(toStringSize(200))
+    let wrapper = await screen.findByTestId('plots-wrapper')
+    expect(wrapper).toHaveClass('smallPlots')
 
     fireEvent.click(regularButton)
-    svg = await getPlotSvg()
-    expect(svg.getAttribute('height')).toBe(toStringSize(300))
+    wrapper = await screen.findByTestId('plots-wrapper')
+    expect(wrapper).toHaveClass('regularPlots')
 
     fireEvent.click(largeButton)
-    svg = await getPlotSvg()
-    expect(svg.getAttribute('height')).toBe(toStringSize(750, 48))
+    wrapper = await screen.findByTestId('plots-wrapper')
+    expect(wrapper).toHaveClass('largePlots')
   })
 })
