@@ -7,7 +7,7 @@ import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsShowFixture from '../../fixtures/plotsShow/output'
 import { closeAllEditors } from '../util'
 import {
-  defaultCollapsedSections,
+  defaultSectionCollapsed,
   PlotsData as TPlotsData
 } from '../../../plots/webview/contract'
 import { PlotsData } from '../../../plots/data'
@@ -36,8 +36,8 @@ suite('Plots Test Suite', () => {
       const webview = await plots.showWebview()
 
       const expectedPlotsData: TPlotsData = {
-        collapsedSections: defaultCollapsedSections,
-        live: livePlotsFixture
+        live: livePlotsFixture,
+        sectionCollapsed: defaultSectionCollapsed
       }
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)

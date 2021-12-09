@@ -2,7 +2,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import {
   PlotsData,
-  defaultCollapsedSections
+  defaultSectionCollapsed
 } from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/storybook'
@@ -16,8 +16,8 @@ import '../plots/components/styles.module.scss'
 export default {
   args: {
     data: {
-      collapsedSections: defaultCollapsedSections,
       live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed,
       static: staticPlotsFixture
     }
   },
@@ -37,15 +37,15 @@ export const WithData = Template.bind({})
 export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   data: {
-    collapsedSections: defaultCollapsedSections,
-    live: livePlotsFixture
+    live: livePlotsFixture,
+    sectionCollapsed: defaultSectionCollapsed
   }
 }
 
 export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
   data: {
-    collapsedSections: defaultCollapsedSections,
+    sectionCollapsed: defaultSectionCollapsed,
     static: staticPlotsFixture
   }
 }
@@ -53,7 +53,7 @@ WithStaticOnly.args = {
 export const WithoutPlots = Template.bind({})
 WithoutPlots.args = {
   data: {
-    collapsedSections: defaultCollapsedSections
+    sectionCollapsed: defaultSectionCollapsed
   }
 }
 

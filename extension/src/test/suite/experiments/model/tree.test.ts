@@ -13,7 +13,7 @@ import expShowFixture from '../../../fixtures/expShow/output'
 import columnsFixture from '../../../fixtures/expShow/columns'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/paths'
-import { defaultCollapsedSections } from '../../../../plots/webview/contract'
+import { defaultSectionCollapsed } from '../../../../plots/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -62,7 +62,7 @@ suite('Experiments Tree Test Suite', () => {
         const expectedData =
           expectedDomain.length === 3
             ? {
-                collapsedSections: defaultCollapsedSections,
+                sectionCollapsed: defaultSectionCollapsed,
                 ...expectedLivePlots
               }
             : expectedLivePlots

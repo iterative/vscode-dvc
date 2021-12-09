@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import staticPlotsFixture from 'dvc/src/test/fixtures/plotsShow/staticPlots/webview'
 import {
-  defaultCollapsedSections,
+  defaultSectionCollapsed,
   LivePlotsColors,
   Section
 } from 'dvc/src/plots/webview/contract'
@@ -97,8 +97,8 @@ describe('App', () => {
     const initialMessage = new MessageEvent('message', {
       data: {
         data: {
-          collapsedSections: defaultCollapsedSections,
-          live: null
+          live: null,
+          sectionCollapsed: defaultSectionCollapsed
         },
         type: MessageToWebviewType.SET_DATA
       }
@@ -115,8 +115,8 @@ describe('App', () => {
     const initialMessage = new MessageEvent('message', {
       data: {
         data: {
-          collapsedSections: defaultCollapsedSections,
-          live: livePlotsFixture
+          live: livePlotsFixture,
+          sectionCollapsed: defaultSectionCollapsed
         },
         type: MessageToWebviewType.SET_DATA
       }
@@ -134,8 +134,8 @@ describe('App', () => {
     const initialMessage = new MessageEvent('message', {
       data: {
         data: {
-          collapsedSections: defaultCollapsedSections,
-          live: livePlotsFixture
+          live: livePlotsFixture,
+          sectionCollapsed: defaultSectionCollapsed
         },
         type: MessageToWebviewType.SET_DATA
       }
@@ -164,8 +164,8 @@ describe('App', () => {
     const initialMessage = new MessageEvent('message', {
       data: {
         data: {
-          collapsedSections: defaultCollapsedSections,
-          live: livePlotsFixture
+          live: livePlotsFixture,
+          sectionCollapsed: defaultSectionCollapsed
         },
         type: MessageToWebviewType.SET_DATA
       }
@@ -193,8 +193,8 @@ describe('App', () => {
     const setInitialData = new MessageEvent('message', {
       data: {
         data: {
-          collapsedSections: defaultCollapsedSections,
-          live: livePlotsFixture
+          live: livePlotsFixture,
+          sectionCollapsed: defaultSectionCollapsed
         },
         type: MessageToWebviewType.SET_DATA
       }
@@ -225,8 +225,8 @@ describe('App', () => {
       <Plots
         state={{
           data: {
-            collapsedSections: defaultCollapsedSections,
             live: livePlotsFixture,
+            sectionCollapsed: defaultSectionCollapsed,
             static: null
           }
         }}
@@ -275,8 +275,8 @@ describe('App', () => {
     const setInitialData = new MessageEvent('message', {
       data: {
         data: {
-          collapsedSections: defaultCollapsedSections,
-          live: livePlotsFixture
+          live: livePlotsFixture,
+          sectionCollapsed: defaultSectionCollapsed
         },
         type: MessageToWebviewType.SET_DATA
       }
@@ -316,8 +316,8 @@ describe('App', () => {
       <Plots
         state={{
           data: {
-            collapsedSections: defaultCollapsedSections,
             live: livePlotsFixture,
+            sectionCollapsed: defaultSectionCollapsed,
             static: undefined
           }
         }}

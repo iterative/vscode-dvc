@@ -47,17 +47,17 @@ export enum Section {
   STATIC_PLOTS = 'static-plots'
 }
 
-export const defaultCollapsedSections = {
+export const defaultSectionCollapsed = {
   [Section.LIVE_PLOTS]: false,
   [Section.STATIC_PLOTS]: false
 }
 
-export type CollapsedSections = typeof defaultCollapsedSections
+export type SectionCollapsed = typeof defaultSectionCollapsed
 
 export type PlotsData =
   | {
       live?: LivePlotsData | null
       static?: PlotsOutput | null
-      collapsedSections?: CollapsedSections
+      sectionCollapsed?: SectionCollapsed
     }
   | undefined

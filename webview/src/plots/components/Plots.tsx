@@ -122,11 +122,11 @@ const Plots = ({
     window.dispatchEvent(new Event('resize'))
   }, [size])
 
-  if (!data || !data.collapsedSections) {
+  if (!data || !data.sectionCollapsed) {
     return EmptyState('Loading Plots...')
   }
 
-  const { collapsedSections, live: livePlots, static: staticPlots } = data
+  const { sectionCollapsed, live: livePlots, static: staticPlots } = data
 
   if (!livePlots && !staticPlots) {
     return EmptyState('No Plots to Display')
@@ -146,7 +146,7 @@ const Plots = ({
         <PlotsContainer
           title="Live Experiments Plots"
           sectionKey={Section.LIVE_PLOTS}
-          collapsedSections={collapsedSections}
+          sectionCollapsed={sectionCollapsed}
           dispatch={dispatch}
           menu={{
             metrics,
@@ -169,7 +169,7 @@ const Plots = ({
         <PlotsContainer
           title="Static Plots"
           sectionKey={Section.STATIC_PLOTS}
-          collapsedSections={collapsedSections}
+          sectionCollapsed={sectionCollapsed}
           dispatch={dispatch}
         >
           <StaticPlots plots={staticPlots} />

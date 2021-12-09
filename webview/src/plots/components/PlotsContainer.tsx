@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react'
-import { Section, CollapsedSections } from 'dvc/src/plots/webview/contract'
+import { Section, SectionCollapsed } from 'dvc/src/plots/webview/contract'
 import { MetricsPicker } from './MetricsPicker'
 import { PlotSize, SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
@@ -19,7 +19,7 @@ interface MenuProps {
 }
 
 interface PlotsContainerProps {
-  collapsedSections: CollapsedSections
+  sectionCollapsed: SectionCollapsed
   sectionKey: Section
   dispatch: Dispatch<PlotsReducerAction>
   title: string
@@ -27,14 +27,14 @@ interface PlotsContainerProps {
 }
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
-  collapsedSections,
+  sectionCollapsed,
   sectionKey,
   dispatch,
   title,
   children,
   menu
 }) => {
-  const open = !collapsedSections[sectionKey]
+  const open = !sectionCollapsed[sectionKey]
   return (
     <div className={styles.plotsContainerWrapper}>
       <details open={open} className={styles.plotsContainer}>

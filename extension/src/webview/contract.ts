@@ -1,5 +1,5 @@
 import { TableData } from '../experiments/webview/contract'
-import { PlotsData, CollapsedSections } from '../plots/webview/contract'
+import { PlotsData, SectionCollapsed } from '../plots/webview/contract'
 
 export type WebviewData = TableData | PlotsData
 
@@ -34,7 +34,7 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
-      payload: CollapsedSections
+      payload: SectionCollapsed
     }
   | { type: MessageFromWebviewType.INITIALIZED }
 

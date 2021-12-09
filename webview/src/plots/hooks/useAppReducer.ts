@@ -1,5 +1,5 @@
 import {
-  defaultCollapsedSections,
+  defaultSectionCollapsed,
   PlotsData,
   Section
 } from 'dvc/src/plots/webview/contract'
@@ -46,7 +46,7 @@ const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
       vsCodeApi.postMessage({
         payload: {
           [action.sectionKey]:
-            !state.data?.collapsedSections?.[action.sectionKey]
+            !state.data?.sectionCollapsed?.[action.sectionKey]
         },
         type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
       })
@@ -54,10 +54,10 @@ const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
         ...state,
         data: {
           ...state.data,
-          collapsedSections: {
-            ...(state.data?.collapsedSections || defaultCollapsedSections),
+          sectionCollapsed: {
+            ...(state.data?.sectionCollapsed || defaultSectionCollapsed),
             [action.sectionKey]:
-              !state.data?.collapsedSections?.[action.sectionKey]
+              !state.data?.sectionCollapsed?.[action.sectionKey]
           }
         }
       }

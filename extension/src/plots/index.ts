@@ -1,12 +1,12 @@
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
-  defaultCollapsedSections,
+  defaultSectionCollapsed,
   ImagePlot,
   isImagePlot,
   PlotsData as TPlotsData,
   PlotsOutput,
-  CollapsedSections
+  SectionCollapsed
 } from './webview/contract'
 import { PlotsData } from './data'
 import { BaseWebview } from '../webview'
@@ -24,7 +24,7 @@ import { Logger } from '../common/logger'
 export type PlotsWebview = BaseWebview<TPlotsData>
 
 export const enum MementoPrefixes {
-  COLLAPSED_SECTIONS = 'collapsedSections:'
+  SECTION_COLLAPSED = 'sectionCollapsed:'
 }
 
 export class Plots extends BaseRepository<TPlotsData> {
@@ -35,7 +35,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private readonly data: PlotsData
   private readonly workspaceState: Memento
 
-  private collapsedSections: CollapsedSections
+  private sectionCollapsed: SectionCollapsed
 
   constructor(
     dvcRoot: string,
@@ -56,9 +56,9 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.handleMessageFromWebview()
 
-    this.collapsedSections = workspaceState.get(
-      MementoPrefixes.COLLAPSED_SECTIONS + dvcRoot,
-      defaultCollapsedSections
+    this.sectionCollapsed = workspaceState.get(
+      MementoPrefixes.SECTION_COLLAPSED + dvcRoot,
+      defaultSectionCollapsed
     )
 
     this.workspaceState = workspaceState
@@ -84,8 +84,8 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public sendInitialWebviewData() {
     this.webview?.show({
-      collapsedSections: this.collapsedSections,
-      live: this.getLivePlots()
+      live: this.getLivePlots(),
+      sectionCollapsed: this.sectionCollapsed
     })
     this.data.managedUpdate()
   }
@@ -146,15 +146,15 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
   }
 
-  private persistCollapsibleState(newState: CollapsedSections) {
-    this.collapsedSections = {
-      ...this.collapsedSections,
+  private persistCollapsibleState(newState: SectionCollapsed) {
+    this.sectionCollapsed = {
+      ...this.sectionCollapsed,
       ...newState
     }
 
     this.workspaceState.update(
-      MementoPrefixes.COLLAPSED_SECTIONS + this.dvcRoot,
-      this.collapsedSections
+      MementoPrefixes.SECTION_COLLAPSED + this.dvcRoot,
+      this.sectionCollapsed
     )
   }
 }
