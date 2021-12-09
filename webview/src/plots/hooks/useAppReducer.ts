@@ -10,6 +10,7 @@ import {
 } from 'dvc/src/webview/contract'
 import { Reducer, useReducer } from 'react'
 import { vsCodeApi } from '../../shared/api'
+import { sendMessage } from '../../shared/vscode'
 
 export interface PlotsWebviewState {
   data?: PlotsData
@@ -43,7 +44,7 @@ const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
       return state
 
     case CollapsibleSectionsActions.TOGGLE_COLLAPSED:
-      vsCodeApi.postMessage({
+      sendMessage({
         payload: {
           [action.sectionKey]:
             !state.data?.sectionCollapsed?.[action.sectionKey]
