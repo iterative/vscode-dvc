@@ -94,11 +94,11 @@ const CellWrapper: React.FC<{
   changes?: string[]
   cellId: string
 }> = ({ cell, cellId, changes }) => (
-  <div {...cell.getCellProps({ className: styles.td })}>
-    <div
-      data-testid={cellId}
-      className={cx(
-        styles.innerCell,
+  <div
+    data-testid={cellId}
+    {...cell.getCellProps({
+      className: cx(
+        styles.td,
         cell.isPlaceholder && styles.groupPlaceholder,
         cell.column.isGrouped && styles.groupedColumnCell,
         cell.isGrouped && styles.groupedCell,
@@ -108,8 +108,10 @@ const CellWrapper: React.FC<{
           ),
           [styles.workspaceChange]: changes?.includes(cell.column.id)
         }
-      )}
-    >
+      )
+    })}
+  >
+    <div className={styles.innerCell}>
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
   </div>
