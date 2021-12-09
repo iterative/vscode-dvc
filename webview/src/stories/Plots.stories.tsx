@@ -31,7 +31,7 @@ const Template: Story<{
   data?: PlotsData
 }> = ({ collapsedSections, data }) => {
   const [state, dispatch] = useAppReducer({ collapsedSections, data })
-  return <Plots state={state} dispatch={dispatch} sendMessage={() => {}} />
+  return <Plots state={state} dispatch={dispatch} />
 }
 
 export const WithData = Template.bind({})
@@ -40,14 +40,14 @@ export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   data: {
     live: livePlotsFixture,
-    static: undefined
+    static: null
   }
 }
 
 export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
   data: {
-    live: undefined,
+    live: null,
     static: staticPlotsFixture
   }
 }
@@ -55,8 +55,8 @@ WithStaticOnly.args = {
 export const WithoutPlots = Template.bind({})
 WithoutPlots.args = {
   data: {
-    live: undefined,
-    static: undefined
+    live: null,
+    static: null
   }
 }
 

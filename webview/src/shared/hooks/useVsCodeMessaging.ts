@@ -4,10 +4,10 @@ import {
   WebviewData
 } from 'dvc/src/webview/contract'
 import { useEffect } from 'react'
-import { vsCodeApi } from '../api'
+import { sendMessage } from '../vscode'
 
 const signalInitialized = () =>
-  vsCodeApi.postMessage({ type: MessageFromWebviewType.INITIALIZED })
+  sendMessage({ type: MessageFromWebviewType.INITIALIZED })
 
 export function useVsCodeMessaging<T extends WebviewData>(
   handler: (event: { data: MessageToWebview<T> }) => void

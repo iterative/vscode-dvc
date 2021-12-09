@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore } from 'sinon'
+import { restore, spy } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsShowFixture from '../../fixtures/plotsShow/output'
-import staticPlotsFixture from '../../fixtures/plotsShow/staticPlots/vscode'
 import { closeAllEditors } from '../util'
-import { PlotsData } from '../../../plots/webview/contract'
+import { PlotsData as TPlotsData } from '../../../plots/webview/contract'
+import { PlotsData } from '../../../plots/data'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -28,16 +28,18 @@ suite('Plots Test Suite', () => {
         disposable,
         plotsShowFixture
       )
+      const managedUpdateSpy = spy(PlotsData.prototype, 'managedUpdate')
 
       const webview = await plots.showWebview()
 
-      const expectedPlotsData: PlotsData = {
-        live: livePlotsFixture,
-        static: staticPlotsFixture
+      const expectedPlotsData: TPlotsData = {
+        live: livePlotsFixture
       }
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)
       expect(mockPlotsShow).to.be.called
+      expect(managedUpdateSpy, 'should call the cli when the webview is loaded')
+        .to.be.calledOnce
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true

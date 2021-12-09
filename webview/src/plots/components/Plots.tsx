@@ -5,37 +5,35 @@ import {
   LivePlotData,
   PlotsOutput
 } from 'dvc/src/plots/webview/contract'
-import {
-  MessageFromWebview,
-  MessageFromWebviewType
-} from 'dvc/src/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
-import { config, createSpec, PlotDimensions } from './constants'
+import cx from 'classnames'
+import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotSize } from './SizePicker'
 import { PlotsContainer } from './PlotsContainer'
+import styles from './styles.module.scss'
 import {
   PlotsSectionKeys,
   PlotsReducerAction,
   PlotsWebviewState
 } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
+import { sendMessage } from '../../shared/vscode'
 
 const Plot = ({
   values,
   title,
-  size,
   scale
 }: {
   values: { x: number; y: number; group: string }[]
   title: string
-  size: keyof typeof PlotDimensions
   scale?: LivePlotsColors
 }) => {
-  const spec = createSpec(title, size, scale)
+  const spec = createSpec(title, scale)
 
   return (
-    <div data-testid={`plot-${title}`}>
+    <div className={styles.plot} data-testid={`plot-${title}`}>
       <VegaLite
         actions={false}
         config={config}
@@ -54,23 +52,29 @@ const LivePlots = ({
 }: {
   plots: LivePlotData[]
   colors: LivePlotsColors
-  size: keyof typeof PlotDimensions
-}) =>
-  plots.length ? (
-    <>
+  size: PlotSize
+}) => {
+  const sizeClass = cx(styles.plotsWrapper, {
+    [styles.smallPlots]: size === PlotSize.SMALL,
+    [styles.regularPlots]: size === PlotSize.REGULAR,
+    [styles.largePlots]: size === PlotSize.LARGE
+  })
+
+  return plots.length ? (
+    <div className={sizeClass} data-testid="plots-wrapper">
       {plots.map(plotData => (
         <Plot
           values={plotData.values}
           title={plotData.title}
           scale={colors}
-          size={size}
           key={`plot-${plotData.title}`}
         />
       ))}
-    </>
+    </div>
   ) : (
     EmptyState('No metrics selected')
   )
+}
 
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
@@ -95,25 +99,25 @@ const getMetricsFromPlots = (plots?: LivePlotData[]): string[] =>
 
 const Plots = ({
   state,
-  dispatch,
-  sendMessage
+  dispatch
 }: {
   state: PlotsWebviewState
   dispatch: Dispatch<PlotsReducerAction>
-  sendMessage: (message: MessageFromWebview) => void
 }) => {
   const { data, collapsedSections } = state
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
-  const [size, setSize] = useState<keyof typeof PlotDimensions>(
-    PlotSize.REGULAR
-  )
+  const [size, setSize] = useState<PlotSize>(PlotSize.REGULAR)
 
   useEffect(() => {
     const newMetrics = getMetricsFromPlots(data?.live?.plots)
     setMetrics(newMetrics)
     setSelectedPlots(data?.live?.selectedMetrics || newMetrics)
   }, [data, setSelectedPlots, setMetrics])
+
+  useEffect(() => {
+    window.dispatchEvent(new Event('resize'))
+  }, [size])
 
   if (!data) {
     return EmptyState('Loading Plots...')
@@ -145,7 +149,8 @@ const Plots = ({
             metrics,
             selectedMetrics: selectedPlots,
             setSelectedPlots: setSelectedMetrics,
-            setSize
+            setSize,
+            size
           }}
         >
           <LivePlots

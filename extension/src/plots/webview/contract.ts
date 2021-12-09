@@ -42,7 +42,9 @@ export type StaticPlot = VegaPlot | ImagePlot
 
 export type PlotsOutput = Record<string, StaticPlot[]>
 
-export type PlotsData = {
-  live: LivePlotsData | undefined
-  static: PlotsOutput | undefined
-}
+export type PlotsData =
+  | {
+      live?: LivePlotsData | null
+      static?: PlotsOutput | null
+    }
+  | undefined

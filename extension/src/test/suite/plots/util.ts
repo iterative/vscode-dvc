@@ -37,7 +37,7 @@ export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
   return { experiments, messageSpy, mockPlotsShow, plots }
 }
 
-export const getExpectedData = (domain: string[], range: string[]) => {
+export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
   const { plots } = livePlotsFixture
   return {
     live: {
@@ -50,7 +50,6 @@ export const getExpectedData = (domain: string[], range: string[]) => {
         values: plot.values.filter(values => domain.includes(values.group))
       })),
       selectedMetrics: undefined
-    },
-    static: undefined
+    }
   }
 }

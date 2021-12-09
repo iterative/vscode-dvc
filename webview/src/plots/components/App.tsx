@@ -1,13 +1,10 @@
 import React, { useCallback, useEffect } from 'react'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
-import { MessageFromWebview, MessageToWebview } from 'dvc/src/webview/contract'
+import { MessageToWebview } from 'dvc/src/webview/contract'
 import Plots from './Plots'
 import { vsCodeApi } from '../../shared/api'
 import { PlotsWebviewState, useAppReducer } from '../hooks/useAppReducer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
-
-const sendMessage = (message: MessageFromWebview) =>
-  vsCodeApi.postMessage(message)
 
 export const App = () => {
   const [state, dispatch] = useAppReducer(
@@ -27,5 +24,5 @@ export const App = () => {
     vsCodeApi.setState<PlotsWebviewState>(state)
   }, [state])
 
-  return <Plots state={state} dispatch={dispatch} sendMessage={sendMessage} />
+  return <Plots state={state} dispatch={dispatch} />
 }
