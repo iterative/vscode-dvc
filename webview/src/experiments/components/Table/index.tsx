@@ -93,7 +93,6 @@ const CellWrapper: React.FC<{
   cellId: string
 }> = ({ cell, cellId, changes }) => (
   <div
-    data-testid={cellId}
     {...cell.getCellProps({
       className: cx(
         styles.td,
@@ -108,6 +107,7 @@ const CellWrapper: React.FC<{
         }
       )
     })}
+    data-testid={cellId}
   >
     <div className={styles.innerCell}>
       {cell.isPlaceholder ? null : cell.render('Cell')}
