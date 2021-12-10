@@ -41,13 +41,6 @@ export class PlotsModel {
       MementoPrefixes.PLOT_SIZE + dvcRoot,
       PlotSize.REGULAR
     )
-
-    this.experiments.isReady().then(() => {
-      const data = this.experiments.getInitialPlotsData()
-      if (data) {
-        this.transformAndSet(data)
-      }
-    })
   }
 
   public transformAndSet(data: ExperimentsOutput) {

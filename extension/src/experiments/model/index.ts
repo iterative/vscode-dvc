@@ -47,9 +47,6 @@ export class ExperimentsModel {
   private readonly dvcRoot: string
   private readonly workspaceState: Memento
 
-  private initialPlotsDataFetched = false
-  private initialPlotsData?: ExperimentsOutput
-
   constructor(dvcRoot: string, workspaceState: Memento) {
     const { colors, currentSorts, filters, status } = this.revive(
       dvcRoot,
@@ -66,10 +63,6 @@ export class ExperimentsModel {
   }
 
   public transformAndSet(data: ExperimentsOutput) {
-    if (!this.initialPlotsDataFetched) {
-      this.initialPlotsData = data
-    }
-
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
       collectExperiments(data)
 
@@ -207,13 +200,6 @@ export class ExperimentsModel {
         }
       })
     ]
-  }
-
-  public getInitialPlotsData() {
-    const data = this.initialPlotsData
-    this.initialPlotsDataFetched = true
-    this.initialPlotsData = undefined
-    return data
   }
 
   private getSubRows(experiments: Experiment[]) {

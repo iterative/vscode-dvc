@@ -218,10 +218,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelected()
   }
 
-  public getInitialPlotsData() {
-    return this.experiments.getInitialPlotsData()
-  }
-
   private notifyChanged(data?: ExperimentsOutput) {
     this.experimentsChanged.fire(data)
     this.notifyParamsOrMetricsChanged()
