@@ -1,6 +1,7 @@
-import { MementoPrefixes, ParamsAndMetricsModel, Status } from './model'
+import { ParamsAndMetricsModel, Status } from './model'
 import { joinParamOrMetricPath } from './paths'
 import { buildMockMemento } from '../../test/util'
+import { MementoPrefix } from '../../vscode/memento'
 
 describe('ParamsAndMetricsModel', () => {
   const exampleDvcRoot = 'test'
@@ -53,7 +54,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.STATUS + exampleDvcRoot]: {
+          [MementoPrefix.PARAMS_AND_METRICS_STATUS + exampleDvcRoot]: {
             [paramsDotYamlPath]: Status.INDETERMINATE,
             [testParamPath]: Status.UNSELECTED
           }
@@ -82,7 +83,8 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + exampleDvcRoot]:
+            persistedState
         })
       )
       expect(model.getColumnOrder()).toEqual(persistedState)
@@ -92,7 +94,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: [
+          [MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + exampleDvcRoot]: [
             { path: 'A', width: 0 },
             { path: 'B', width: 0 },
             { path: 'C', width: 0 }
@@ -115,7 +117,8 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + exampleDvcRoot]:
+            persistedState
         })
       )
       expect(model.getColumnOrder()).toEqual(persistedState)
@@ -130,7 +133,8 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + exampleDvcRoot]:
+            persistedState
         })
       )
       const changedColumnId = 'C'

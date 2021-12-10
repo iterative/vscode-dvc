@@ -10,12 +10,7 @@ import {
 import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
-
-export const enum MementoPrefixes {
-  SECTION_COLLAPSED = 'sectionCollapsed:',
-  SELECTED_METRICS = 'selectedMetrics:',
-  PLOT_SIZE = 'plotSize:'
-}
+import { MementoPrefix } from '../../vscode/memento'
 
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
@@ -39,17 +34,17 @@ export class PlotsModel {
     this.workspaceState = workspaceState
 
     this.selectedMetrics = workspaceState.get(
-      MementoPrefixes.SELECTED_METRICS + dvcRoot,
+      MementoPrefix.PLOT_SELECTED_METRICS + dvcRoot,
       undefined
     )
 
     this.plotSize = workspaceState.get(
-      MementoPrefixes.PLOT_SIZE + dvcRoot,
+      MementoPrefix.PLOT_SIZE + dvcRoot,
       PlotSize.REGULAR
     )
 
     this.sectionCollapsed = workspaceState.get(
-      MementoPrefixes.SECTION_COLLAPSED + dvcRoot,
+      MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
       defaultSectionCollapsed
     )
   }
@@ -133,21 +128,21 @@ export class PlotsModel {
 
   private persistSelectedMetrics() {
     return this.workspaceState.update(
-      MementoPrefixes.SELECTED_METRICS + this.dvcRoot,
+      MementoPrefix.PLOT_SELECTED_METRICS + this.dvcRoot,
       this.getSelectedMetrics()
     )
   }
 
   private persistPlotSize() {
     this.workspaceState.update(
-      MementoPrefixes.PLOT_SIZE + this.dvcRoot,
+      MementoPrefix.PLOT_SIZE + this.dvcRoot,
       this.getPlotSize()
     )
   }
 
   private persistCollapsibleState() {
     this.workspaceState.update(
-      MementoPrefixes.SECTION_COLLAPSED + this.dvcRoot,
+      MementoPrefix.PLOT_SECTION_COLLAPSED + this.dvcRoot,
       this.sectionCollapsed
     )
   }
