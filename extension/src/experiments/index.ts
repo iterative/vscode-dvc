@@ -65,11 +65,7 @@ export class Experiments extends BaseRepository<TableData> {
       data || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
     )
 
-    this.dispose.track(
-      this.data.onDidUpdate(data => {
-        this.setState(data)
-      })
-    )
+    this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
 
     this.handleMessageFromWebview()
 
