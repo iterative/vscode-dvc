@@ -20,12 +20,11 @@ import {
   MessageFromWebviewType
 } from '../webview/contract'
 import { Logger } from '../common/logger'
-import { PlotSize } from '../plots/webview/contract'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
-  public readonly onDidChangeLivePlots: Event<void>
+  public readonly onDidChangeLivePlots: Event<ExperimentsOutput>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -43,7 +42,7 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly livePlotsChanged = this.dispose.track(
-    new EventEmitter<void>()
+    new EventEmitter<ExperimentsOutput>()
   )
 
   constructor(
@@ -72,7 +71,12 @@ export class Experiments extends BaseRepository<TableData> {
       data || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
     )
 
-    this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
+    this.dispose.track(
+      this.data.onDidUpdate(data => {
+        this.setState(data)
+        this.livePlotsChanged.fire(data)
+      })
+    )
 
     this.handleMessageFromWebview()
 
@@ -213,24 +217,23 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  public getLivePlots() {
-    return this.experiments.getLivePlots()
-  }
-
   public sendInitialWebviewData() {
     return this.sendWebviewData()
   }
 
-  public setSelectedMetrics(metrics: string[]) {
-    this.experiments.setSelectedMetrics(metrics)
+  public getExperimentDetails(id: string) {
+    return this.experiments.getExperimentDetails(id)
   }
 
-  public setPlotSize(size: PlotSize) {
-    this.experiments.setPlotSize(size)
+  public getAssignedColors() {
+    return this.experiments.getAssignedColors()
+  }
+
+  public getInitialPlotsData() {
+    return this.experiments.getInitialPlotsData()
   }
 
   private notifyChanged() {
-    this.livePlotsChanged.fire()
     this.experimentsChanged.fire()
     this.notifyParamsOrMetricsChanged()
   }

@@ -1,9 +1,10 @@
-import { ExperimentsModel, MementoPrefixes } from '.'
-import { PlotSize } from '../../plots/webview/contract'
+import { PlotsModel, MementoPrefixes } from '.'
+import { PlotSize } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
+import { Experiments } from '../../experiments'
 
 describe('experimentsModel', () => {
-  let model: ExperimentsModel
+  let model: PlotsModel
   const exampleDvcRoot = 'test'
   const persistedSelectedMetrics = ['loss', 'accuracy']
   const memento = buildMockMemento({
@@ -13,7 +14,13 @@ describe('experimentsModel', () => {
   })
 
   beforeEach(() => {
-    model = new ExperimentsModel(exampleDvcRoot, memento)
+    model = new PlotsModel(
+      exampleDvcRoot,
+      {
+        isReady: () => Promise.resolve(undefined)
+      } as unknown as Experiments,
+      memento
+    )
     jest.clearAllMocks()
   })
 
