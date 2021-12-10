@@ -42,6 +42,17 @@ const { postMessage, getState, setState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
 const mockSetState = mocked(setState)
+const initialState = {
+  collapsedSections: defaultCollapsibleSectionsState,
+  data: {
+    live: livePlotsFixture
+  }
+}
+
+const renderWithInitialState = () => {
+  mockGetState.mockReturnValue(initialState)
+  render(<App />)
+}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -159,14 +170,7 @@ describe('App', () => {
   })
 
   it('should toggle the live plots section in state when its header is clicked', async () => {
-    const initialState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: {
-        live: livePlotsFixture
-      }
-    }
-    mockGetState.mockReturnValue(initialState)
-    render(<App />)
+    renderWithInitialState()
     const summaryElement = await screen.findByText('Live Experiments Plots')
     const [plot] = await screen.findAllByLabelText('Vega visualization')
     expect(plot).toBeInTheDocument()
@@ -196,7 +200,7 @@ describe('App', () => {
           collapsedSections: defaultCollapsibleSectionsState,
           data: {
             live: livePlotsFixture,
-            static: null
+            static: undefined
           }
         }}
         dispatch={jest.fn}
@@ -240,14 +244,7 @@ describe('App', () => {
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
-    const initialState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: {
-        live: livePlotsFixture
-      }
-    }
-    mockGetState.mockReturnValue(initialState)
-    render(<App />)
+    renderWithInitialState()
 
     const [, pickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
@@ -277,14 +274,7 @@ describe('App', () => {
   })
 
   it('should change the size of the plots according to the size picker', async () => {
-    const initialState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: {
-        live: livePlotsFixture
-      }
-    }
-    mockGetState.mockReturnValue(initialState)
-    render(<App />)
+    renderWithInitialState()
 
     const [, , sizePickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizePickerButton)
@@ -308,14 +298,7 @@ describe('App', () => {
   })
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
-    const initialState = {
-      collapsedSections: defaultCollapsibleSectionsState,
-      data: {
-        live: livePlotsFixture
-      }
-    }
-    mockGetState.mockReturnValue(initialState)
-    render(<App />)
+    renderWithInitialState()
 
     const [, , sizeButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizeButton)
@@ -336,5 +319,35 @@ describe('App', () => {
       payload: PlotSize.SMALL,
       type: MessageFromWebviewType.PLOTS_RESIZED
     })
+  })
+
+  it('should show an input to rename the section when clicking the rename icon button', () => {
+    renderWithInitialState()
+
+    expect(screen.queryByRole('textbox')).toBeNull()
+
+    const [renameButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(renameButton)
+    fireEvent.click(renameButton)
+
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
+  })
+
+  it('should change the title of the section when hitting enter on the title input', () => {
+    renderWithInitialState()
+    const originalText = 'Live Experiments Plots'
+
+    expect(screen.getByText(originalText)).toBeInTheDocument()
+
+    const [renameButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(renameButton)
+    fireEvent.click(renameButton)
+
+    const titleInput = screen.getByRole('textbox')
+    const newTitle = 'Brand new section'
+    fireEvent.change(titleInput, { target: { value: newTitle } })
+    fireEvent.keyDown(titleInput, { key: 'Enter' })
+
+    expect(screen.getByText(newTitle)).toBeInTheDocument()
   })
 })
