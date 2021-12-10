@@ -6,7 +6,10 @@ import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsShowFixture from '../../fixtures/plotsShow/output'
 import { closeAllEditors } from '../util'
-import { PlotsData as TPlotsData } from '../../../plots/webview/contract'
+import {
+  defaultSectionCollapsed,
+  PlotsData as TPlotsData
+} from '../../../plots/webview/contract'
 import { PlotsData } from '../../../plots/data'
 
 suite('Plots Test Suite', () => {
@@ -33,7 +36,8 @@ suite('Plots Test Suite', () => {
       const webview = await plots.showWebview()
 
       const expectedPlotsData: TPlotsData = {
-        live: livePlotsFixture
+        live: livePlotsFixture,
+        sectionCollapsed: defaultSectionCollapsed
       }
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)

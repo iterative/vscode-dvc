@@ -13,6 +13,7 @@ import expShowFixture from '../../../fixtures/expShow/output'
 import columnsFixture from '../../../fixtures/expShow/columns'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/paths'
+import { defaultSectionCollapsed } from '../../../../plots/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -53,11 +54,16 @@ suite('Experiments Tree Test Suite', () => {
         'setSelectionMode'
       )
 
+      const initialData = {
+        sectionCollapsed: defaultSectionCollapsed,
+        ...getExpectedLivePlotsData(expectedDomain, expectedRange)
+      }
+
       while (expectedDomain.length) {
-        const expectedData = getExpectedLivePlotsData(
-          expectedDomain,
-          expectedRange
-        )
+        const expectedData =
+          expectedDomain.length === 3
+            ? initialData
+            : getExpectedLivePlotsData(expectedDomain, expectedRange)
 
         expect(
           messageSpy,

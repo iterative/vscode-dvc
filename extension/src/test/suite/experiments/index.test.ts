@@ -400,16 +400,16 @@ suite('Experiments Test Suite', () => {
       expect(
         mementoSpy,
         'workspaceContext is called for sort initialization'
-      ).to.be.calledWith('sortBy:test', [])
+      ).to.be.calledWith('experimentsSortBy:test', [])
       expect(
         mementoSpy,
         'workspaceContext is called for filter initialization'
-      ).to.be.calledWith('filterBy:test', [])
+      ).to.be.calledWith('experimentsFilterBy:test', [])
       expect(
         mementoSpy,
         'workspaceContext is called for color initialization'
-      ).to.be.calledWith('colors:test', match.has('assigned'))
-      expect(mementoSpy).to.be.calledWith('status:test', {})
+      ).to.be.calledWith('experimentsColors:test', match.has('assigned'))
+      expect(mementoSpy).to.be.calledWith('experimentsStatus:test', {})
 
       expect(
         testRepository.getSorts(),
@@ -418,13 +418,13 @@ suite('Experiments Test Suite', () => {
       expect(
         mockMemento.keys(),
         'Memento starts with the colors and status keys'
-      ).to.deep.equal(['status:test', 'colors:test'])
+      ).to.deep.equal(['experimentsStatus:test', 'experimentsColors:test'])
       expect(
-        mockMemento.get('colors:test'),
+        mockMemento.get('experimentsColors:test'),
         'the correct colors are persisted'
       ).to.deep.equal(expectedColors)
       expect(
-        mockMemento.get('status:test'),
+        mockMemento.get('experimentsStatus:test'),
         'the correct statuses are persisted'
       ).to.deep.equal({
         '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
@@ -438,7 +438,7 @@ suite('Experiments Test Suite', () => {
       await testRepository.addSort()
 
       expect(
-        mockMemento.get('sortBy:test'),
+        mockMemento.get('experimentsSortBy:test'),
         'first sort is added to memento'
       ).to.deep.equal([firstSortDefinition])
 
@@ -446,7 +446,7 @@ suite('Experiments Test Suite', () => {
       await testRepository.addSort()
 
       expect(
-        mockMemento.get('sortBy:test'),
+        mockMemento.get('experimentsSortBy:test'),
         'second sort is added to the memento'
       ).to.deep.equal(sortDefinitions)
 
@@ -455,26 +455,26 @@ suite('Experiments Test Suite', () => {
       mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
       await testRepository.addFilter()
       expect(
-        mockMemento.get('filterBy:test'),
+        mockMemento.get('experimentsFilterBy:test'),
         'first filter should be added to memento after addFilter'
       ).to.deep.equal([firstFilterMapEntry])
 
       mockPickFilter.onSecondCall().resolves(secondFilterDefinition)
       await testRepository.addFilter()
       expect(
-        mockMemento.get('filterBy:test'),
+        mockMemento.get('experimentsFilterBy:test'),
         'second filter should be added to memento after addFilter'
       ).to.deep.equal(filterMapEntries)
 
       testRepository.removeFilter(firstFilterId)
       expect(
-        mockMemento.get('filterBy:test'),
+        mockMemento.get('experimentsFilterBy:test'),
         'first filter should be removed from memento after removeFilter'
       ).to.deep.equal([secondFilterMapEntry])
 
       testRepository.removeSort(firstSortDefinition.path)
       expect(
-        mockMemento.get('sortBy:test'),
+        mockMemento.get('experimentsSortBy:test'),
         'first sort should be removed from memento after removeSortByPath'
       ).to.deep.equal([secondSortDefinition])
 
@@ -483,7 +483,7 @@ suite('Experiments Test Suite', () => {
       mockRemoveSorts.onFirstCall().resolves([secondSortDefinition])
       await testRepository.removeSorts()
       expect(
-        mockMemento.get('sortBy:test'),
+        mockMemento.get('experimentsSortBy:test'),
         'all sorts should be removed from memento after removeSorts'
       ).to.deep.equal([])
 
@@ -491,7 +491,7 @@ suite('Experiments Test Suite', () => {
       mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
       await testRepository.addFilter()
       expect(
-        mockMemento.get('filterBy:test'),
+        mockMemento.get('experimentsFilterBy:test'),
         'first filter should be re-added'
       ).to.deep.equal([secondFilterMapEntry, firstFilterMapEntry])
 
@@ -501,7 +501,7 @@ suite('Experiments Test Suite', () => {
         .resolves([firstFilterDefinition, secondFilterDefinition])
       await testRepository.removeFilters()
       expect(
-        mockMemento.get('filterBy:test'),
+        mockMemento.get('experimentsFilterBy:test'),
         'both filters should be removed from memento after removeFilters is run against them'
       ).to.deep.equal([])
 
@@ -509,7 +509,7 @@ suite('Experiments Test Suite', () => {
         '4fb124aebddb2adf1545030907687fa9a4c80e70'
       )
       expect(
-        mockMemento.get('status:test'),
+        mockMemento.get('experimentsStatus:test'),
         'the correct statuses have been recorded in the memento'
       ).to.deep.equal({
         '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
@@ -517,7 +517,7 @@ suite('Experiments Test Suite', () => {
         '4fb124aebddb2adf1545030907687fa9a4c80e70': 0
       })
       expect(
-        mockMemento.get('colors:test'),
+        mockMemento.get('experimentsColors:test'),
         'the correct colors are persisted'
       ).to.deep.equal(expectedColors)
     })
@@ -531,13 +531,13 @@ suite('Experiments Test Suite', () => {
       const available = ['#000000', '#FFFFFF', '#ABCDEF']
 
       const mockMemento = buildMockMemento({
-        'colors:test': {
+        'experimentsColors:test': {
           assigned,
           available
         },
-        'filterBy:test': filterMapEntries,
-        'sortBy:test': sortDefinitions,
-        'status:test': {
+        'experimentsFilterBy:test': filterMapEntries,
+        'experimentsSortBy:test': sortDefinitions,
+        'experimentsStatus:test': {
           '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
           '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
           '4fb124aebddb2adf1545030907687fa9a4c80e70': 0
@@ -557,18 +557,18 @@ suite('Experiments Test Suite', () => {
       )
       testRepository.setState(expShowFixture)
       await testRepository.isReady()
-      expect(mementoSpy).to.be.calledWith('sortBy:test', [])
-      expect(mementoSpy).to.be.calledWith('filterBy:test', [])
-      expect(mementoSpy).to.be.calledWith('status:test', {})
+      expect(mementoSpy).to.be.calledWith('experimentsSortBy:test', [])
+      expect(mementoSpy).to.be.calledWith('experimentsFilterBy:test', [])
+      expect(mementoSpy).to.be.calledWith('experimentsStatus:test', {})
       expect(testRepository.getSorts()).to.deep.equal(sortDefinitions)
       expect(testRepository.getFilters()).to.deep.equal([
         firstFilterDefinition,
         secondFilterDefinition
       ])
-      const livePlots = testRepository.getLivePlots()
-      expect(livePlots?.colors).to.deep.equal({
-        domain: ['test-branch', 'exp-83425'],
-        range: ['#96958f', '#5f5856']
+      const selected = testRepository.getSelectedExperiments()
+      expect(selected).to.deep.equal({
+        'exp-83425': '#5f5856',
+        'test-branch': '#96958f'
       })
     })
   })

@@ -1,3 +1,4 @@
+import { Memento } from 'vscode'
 import { BaseWebview } from '.'
 import { BaseRepository } from './repository'
 import { WebviewData } from './contract'
@@ -9,11 +10,16 @@ export abstract class BaseWorkspaceWebviews<
   T extends BaseRepository<U>,
   U extends WebviewData
 > extends BaseWorkspace<T, ResourceLocator> {
+  protected readonly workspaceState: Memento
+
   constructor(
     internalCommands: InternalCommands,
+    workspaceState: Memento,
     repositories?: Record<string, T>
   ) {
     super(internalCommands)
+
+    this.workspaceState = workspaceState
 
     if (repositories) {
       this.repositories = repositories

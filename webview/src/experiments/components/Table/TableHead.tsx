@@ -7,7 +7,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { MergedHeaderGroup } from './MergeHeaderGroups'
 import { useColumnOrder } from '../../hooks/useColumnOrder'
-import { vsCodeApi } from '../../../shared/api'
+import { sendMessage } from '../../../shared/vscode'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -49,7 +49,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   }
 
   const onDragEnd = () => {
-    vsCodeApi.postMessage({
+    sendMessage({
       payload: columnOrder,
       type: MessageFromWebviewType.COLUMN_REORDERED
     })

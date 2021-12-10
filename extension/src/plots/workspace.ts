@@ -15,7 +15,8 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
         dvcRoot,
         this.internalCommands,
         updatesPaused,
-        resourceLocator.scatterGraph
+        resourceLocator.scatterGraph,
+        this.workspaceState
       )
     )
 
