@@ -213,7 +213,7 @@ describe('App', () => {
       screen.getByTestId('plot-metrics:summary.json:loss')
     ).not.toThrow()
 
-    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -249,7 +249,7 @@ describe('App', () => {
     mockGetState.mockReturnValue(initialState)
     render(<App />)
 
-    const [pickerButton] = screen.getAllByTestId('icon-menu-item')
+    const [, pickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -286,7 +286,7 @@ describe('App', () => {
     mockGetState.mockReturnValue(initialState)
     render(<App />)
 
-    const [, sizePickerButton] = screen.getAllByTestId('icon-menu-item')
+    const [, , sizePickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizePickerButton)
     fireEvent.click(sizePickerButton)
 
@@ -317,7 +317,7 @@ describe('App', () => {
     mockGetState.mockReturnValue(initialState)
     render(<App />)
 
-    const [, sizeButton] = screen.getAllByTestId('icon-menu-item')
+    const [, , sizeButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 

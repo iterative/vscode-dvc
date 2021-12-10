@@ -1,8 +1,9 @@
-import React, { Dispatch } from 'react'
+import React, { Dispatch, useState } from 'react'
 import { PlotSize } from 'dvc/src/plots/webview/contract'
 import { MetricsPicker } from './MetricsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
+import { SectionRenamer } from './SectionRenamer'
 import { AllIcons } from '../../shared/components/icon/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import {
@@ -11,6 +12,7 @@ import {
   PlotsReducerAction,
   PlotsSectionKeys
 } from '../hooks/useAppReducer'
+import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 
 interface MenuProps {
   metrics: string[]
@@ -36,7 +38,48 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   children,
   menu
 }) => {
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [sectionTitle, setSectionTitle] = useState(title)
   const open = !collapsedSections[sectionKey]
+  const menuItems: IconMenuItemProps[] = [
+    {
+      icon: AllIcons.PENCIL,
+      onClick: () => setIsRenaming(true),
+      tooltip: 'Rename'
+    }
+  ]
+
+  if (menu) {
+    menuItems.push(
+      {
+        icon: AllIcons.LINES,
+        onClickNode: (
+          <MetricsPicker
+            metrics={menu.metrics}
+            setSelectedMetrics={menu.setSelectedPlots}
+            selectedMetrics={menu.selectedMetrics}
+          />
+        ),
+        tooltip: 'Choose metrics'
+      },
+      {
+        icon: AllIcons.DOTS,
+        onClickNode: (
+          <SizePicker
+            currentSize={menu.size}
+            setSelectedSize={menu.setSize as (size: string) => void}
+          />
+        ),
+        tooltip: 'Resize'
+      }
+    )
+  }
+
+  const onTitleChanged = (title: string) => {
+    setIsRenaming(false)
+    setSectionTitle(title)
+  }
+
   return (
     <div className={styles.plotsContainerWrapper}>
       <details open={open} className={styles.plotsContainer}>
@@ -49,39 +92,20 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             })
           }}
         >
-          {title}
+          {isRenaming ? (
+            <SectionRenamer
+              defaultTitle={sectionTitle}
+              onChangeTitle={onTitleChanged}
+            />
+          ) : (
+            sectionTitle
+          )}
         </summary>
         <div className={styles.centered}>{open && children}</div>
       </details>
-      {menu && (
-        <div className={styles.iconMenu}>
-          <IconMenu
-            items={[
-              {
-                icon: AllIcons.LINES,
-                onClickNode: (
-                  <MetricsPicker
-                    metrics={menu.metrics}
-                    setSelectedMetrics={menu.setSelectedPlots}
-                    selectedMetrics={menu.selectedMetrics}
-                  />
-                ),
-                tooltip: 'Choose metrics'
-              },
-              {
-                icon: AllIcons.DOTS,
-                onClickNode: (
-                  <SizePicker
-                    currentSize={menu.size}
-                    setSelectedSize={menu.setSize as (size: string) => void}
-                  />
-                ),
-                tooltip: 'Resize'
-              }
-            ]}
-          />
-        </div>
-      )}
+      <div className={styles.iconMenu}>
+        <IconMenu items={menuItems} />
+      </div>
     </div>
   )
 }
