@@ -64,13 +64,14 @@ export class PlotsModel {
     const selectedExperiments: string[] = []
     const range: string[] = []
 
-    const selected = this.experiments.getSelectedExperiments()
-    Object.entries(selected).forEach(([displayName, color]) => {
-      if (displayName && color) {
-        selectedExperiments.push(displayName)
-        range.push(color)
+    Object.entries(this.experiments.getSelectedExperiments()).forEach(
+      ([displayName, color]) => {
+        if (displayName && color) {
+          selectedExperiments.push(displayName)
+          range.push(color)
+        }
       }
-    })
+    )
 
     if (!definedAndNonEmpty(selectedExperiments)) {
       return
