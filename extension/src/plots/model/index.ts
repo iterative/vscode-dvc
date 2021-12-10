@@ -1,7 +1,12 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { collectLivePlotsData } from './collect'
-import { LivePlotData, PlotSize } from '../../plots/webview/contract'
+import {
+  defaultSectionCollapsed,
+  LivePlotData,
+  PlotSize,
+  SectionCollapsed
+} from '../../plots/webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
@@ -22,6 +27,7 @@ export class PlotsModel {
   private livePlots?: LivePlotData[]
   private selectedMetrics?: string[] = undefined
   private plotSize: PlotSize = PlotSize.REGULAR
+  private sectionCollapsed: SectionCollapsed
 
   constructor(
     dvcRoot: string,
@@ -40,6 +46,11 @@ export class PlotsModel {
     this.plotSize = workspaceState.get(
       MementoPrefixes.PLOT_SIZE + dvcRoot,
       PlotSize.REGULAR
+    )
+
+    this.sectionCollapsed = workspaceState.get(
+      MementoPrefixes.SECTION_COLLAPSED + dvcRoot,
+      defaultSectionCollapsed
     )
   }
 
@@ -96,6 +107,18 @@ export class PlotsModel {
     return this.plotSize
   }
 
+  public setSectionCollapsed(newState: SectionCollapsed) {
+    this.sectionCollapsed = {
+      ...this.sectionCollapsed,
+      ...newState
+    }
+    this.persistCollapsibleState()
+  }
+
+  public getSectionCollapsed() {
+    return this.sectionCollapsed
+  }
+
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
     return livePlots.map(plot => {
       const { title, values } = plot
@@ -119,6 +142,13 @@ export class PlotsModel {
     this.workspaceState.update(
       MementoPrefixes.PLOT_SIZE + this.dvcRoot,
       this.getPlotSize()
+    )
+  }
+
+  private persistCollapsibleState() {
+    this.workspaceState.update(
+      MementoPrefixes.SECTION_COLLAPSED + this.dvcRoot,
+      this.sectionCollapsed
     )
   }
 }
