@@ -1,16 +1,17 @@
-import { PlotsModel, MementoPrefixes } from '.'
+import { PlotsModel } from '.'
 import { PlotSize } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
+import { MementoPrefix } from '../../vscode/memento'
 
 describe('experimentsModel', () => {
   let model: PlotsModel
   const exampleDvcRoot = 'test'
   const persistedSelectedMetrics = ['loss', 'accuracy']
   const memento = buildMockMemento({
-    [MementoPrefixes.SELECTED_METRICS + exampleDvcRoot]:
+    [MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [MementoPrefixes.PLOT_SIZE + exampleDvcRoot]: PlotSize.REGULAR
+    [MementoPrefix.PLOT_SIZE + exampleDvcRoot]: PlotSize.REGULAR
   })
 
   beforeEach(() => {
@@ -41,7 +42,7 @@ describe('experimentsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefixes.SELECTED_METRICS + exampleDvcRoot,
+      MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot,
       newSelectedMetrics
     )
   })
@@ -61,7 +62,7 @@ describe('experimentsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefixes.PLOT_SIZE + exampleDvcRoot,
+      MementoPrefix.PLOT_SIZE + exampleDvcRoot,
       PlotSize.SMALL
     )
   })

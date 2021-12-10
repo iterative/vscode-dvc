@@ -15,17 +15,11 @@ import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { hasKey } from '../../util/object'
 import { setContextValue } from '../../vscode/context'
+import { MementoPrefix } from '../../vscode/memento'
 
 export enum Status {
   SELECTED = 1,
   UNSELECTED = 0
-}
-
-export const enum MementoPrefixes {
-  COLORS = 'colors:',
-  FILTER_BY = 'filterBy:',
-  SORT_BY = 'sortBy:',
-  STATUS = 'status:'
 }
 
 export class ExperimentsModel {
@@ -289,7 +283,7 @@ export class ExperimentsModel {
 
   private persistSorts() {
     return this.workspaceState.update(
-      MementoPrefixes.SORT_BY + this.dvcRoot,
+      MementoPrefix.EXPERIMENTS_SORT_BY + this.dvcRoot,
       this.currentSorts
     )
   }
@@ -299,21 +293,24 @@ export class ExperimentsModel {
       this.setSelectedToFilters()
     }
     return this.workspaceState.update(
-      MementoPrefixes.FILTER_BY + this.dvcRoot,
+      MementoPrefix.EXPERIMENTS_FILTER_BY + this.dvcRoot,
       [...this.filters]
     )
   }
 
   private persistColors() {
-    return this.workspaceState.update(MementoPrefixes.COLORS + this.dvcRoot, {
-      assigned: [...this.colors.assigned],
-      available: this.colors.available
-    })
+    return this.workspaceState.update(
+      MementoPrefix.EXPERIMENTS_COLORS + this.dvcRoot,
+      {
+        assigned: [...this.colors.assigned],
+        available: this.colors.available
+      }
+    )
   }
 
   private persistStatus() {
     return this.workspaceState.update(
-      MementoPrefixes.STATUS + this.dvcRoot,
+      MementoPrefix.EXPERIMENTS_STATUS + this.dvcRoot,
       this.status
     )
   }
@@ -330,7 +327,7 @@ export class ExperimentsModel {
     const { assigned, available } = workspaceState.get<{
       assigned: [string, string][]
       available: string[]
-    }>(MementoPrefixes.COLORS + dvcRoot, {
+    }>(MementoPrefix.EXPERIMENTS_COLORS + dvcRoot, {
       assigned: [],
       available: copyOriginalColors()
     })
@@ -341,17 +338,17 @@ export class ExperimentsModel {
         available: available
       },
       currentSorts: workspaceState.get<SortDefinition[]>(
-        MementoPrefixes.SORT_BY + dvcRoot,
+        MementoPrefix.EXPERIMENTS_SORT_BY + dvcRoot,
         []
       ),
       filters: new Map(
         workspaceState.get<[string, FilterDefinition][]>(
-          MementoPrefixes.FILTER_BY + dvcRoot,
+          MementoPrefix.EXPERIMENTS_FILTER_BY + dvcRoot,
           []
         )
       ),
       status: workspaceState.get<Record<string, Status>>(
-        MementoPrefixes.STATUS + dvcRoot,
+        MementoPrefix.EXPERIMENTS_STATUS + dvcRoot,
         {}
       )
     }

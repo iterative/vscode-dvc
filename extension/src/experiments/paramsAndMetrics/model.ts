@@ -4,17 +4,12 @@ import { collectChanges, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
+import { MementoPrefix } from '../../vscode/memento'
 
 export enum Status {
   SELECTED = 2,
   INDETERMINATE = 1,
   UNSELECTED = 0
-}
-
-export const enum MementoPrefixes {
-  STATUS = 'paramsAndMetricsStatus:',
-  COLUMN_ORDER = 'paramsAndMetricsColumnOrder:',
-  COLUMN_WIDTHS = 'paramsAndMetricsColumnWidths:'
 }
 
 export class ParamsAndMetricsModel {
@@ -34,13 +29,16 @@ export class ParamsAndMetricsModel {
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
-    this.status = workspaceState.get(MementoPrefixes.STATUS + dvcRoot, {})
+    this.status = workspaceState.get(
+      MementoPrefix.PARAMS_AND_METRICS_STATUS + dvcRoot,
+      {}
+    )
     this.columnOrderState = workspaceState.get(
-      MementoPrefixes.COLUMN_ORDER + dvcRoot,
+      MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + dvcRoot,
       []
     )
     this.columnWidthsState = workspaceState.get(
-      MementoPrefixes.COLUMN_WIDTHS + dvcRoot,
+      MementoPrefix.PARAMS_AND_METRICS_COLUMN_WIDTHS + dvcRoot,
       {}
     )
   }
@@ -131,14 +129,14 @@ export class ParamsAndMetricsModel {
 
   private persistColumnOrder() {
     this.workspaceState.update(
-      MementoPrefixes.COLUMN_ORDER + this.dvcRoot,
+      MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + this.dvcRoot,
       this.getColumnOrder()
     )
   }
 
   private persistColumnWidths() {
     this.workspaceState.update(
-      MementoPrefixes.COLUMN_WIDTHS + this.dvcRoot,
+      MementoPrefix.PARAMS_AND_METRICS_COLUMN_WIDTHS + this.dvcRoot,
       this.columnWidthsState
     )
   }
@@ -215,7 +213,7 @@ export class ParamsAndMetricsModel {
 
   private persistStatus() {
     return this.workspaceState.update(
-      MementoPrefixes.STATUS + this.dvcRoot,
+      MementoPrefix.PARAMS_AND_METRICS_STATUS + this.dvcRoot,
       this.status
     )
   }
