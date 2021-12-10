@@ -75,14 +75,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      experiments.onDidChangeLivePlots(data => {
-        this.model?.transformAndSet(data)
-        this.sendLivePlotsData()
-      })
-    )
-
-    this.dispose.track(
-      experiments.onDidChangeExperiments(() => {
+      experiments.onDidChangeExperiments(data => {
+        if (data) {
+          this.model?.transformAndSet(data)
+        }
         this.sendLivePlotsData()
       })
     )

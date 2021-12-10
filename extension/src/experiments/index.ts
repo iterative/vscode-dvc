@@ -22,9 +22,8 @@ import {
 import { Logger } from '../common/logger'
 
 export class Experiments extends BaseRepository<TableData> {
-  public readonly onDidChangeExperiments: Event<void>
+  public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
-  public readonly onDidChangeLivePlots: Event<ExperimentsOutput>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -34,15 +33,11 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly paramsAndMetrics: ParamsAndMetricsModel
 
   private readonly experimentsChanged = this.dispose.track(
-    new EventEmitter<void>()
+    new EventEmitter<ExperimentsOutput | void>()
   )
 
   private readonly paramsOrMetricsChanged = this.dispose.track(
     new EventEmitter<void>()
-  )
-
-  private readonly livePlotsChanged = this.dispose.track(
-    new EventEmitter<ExperimentsOutput>()
   )
 
   constructor(
@@ -57,7 +52,6 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
-    this.onDidChangeLivePlots = this.livePlotsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
@@ -74,7 +68,6 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       this.data.onDidUpdate(data => {
         this.setState(data)
-        this.livePlotsChanged.fire(data)
       })
     )
 
@@ -103,7 +96,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments.transformAndSet(data)
     ])
 
-    return this.notifyChanged()
+    return this.notifyChanged(data)
   }
 
   public getChildParamsOrMetrics(path?: string) {
@@ -229,8 +222,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getInitialPlotsData()
   }
 
-  private notifyChanged() {
-    this.experimentsChanged.fire()
+  private notifyChanged(data?: ExperimentsOutput) {
+    this.experimentsChanged.fire(data)
     this.notifyParamsOrMetricsChanged()
   }
 
