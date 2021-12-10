@@ -138,6 +138,19 @@ export class ExperimentsModel {
     return result
   }
 
+  public getSelected() {
+    const experiments = {} as Record<string, string>
+
+    this.getAssignedColors().forEach((color: string, id: string) => {
+      const { displayName, selected } = this.getExperimentDetails(id)
+      if (displayName && selected) {
+        experiments[displayName] = color
+      }
+    })
+
+    return experiments
+  }
+
   public setSelected(ids: string[]) {
     this.status = Object.keys(this.status).reduce((acc, id) => {
       const status = ids.includes(id) ? Status.SELECTED : Status.UNSELECTED

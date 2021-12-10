@@ -565,8 +565,11 @@ suite('Experiments Test Suite', () => {
         firstFilterDefinition,
         secondFilterDefinition
       ])
-      const assignedColors = testRepository.getAssignedColors()
-      expect([...assignedColors]).to.deep.equal(assigned)
+      const selected = testRepository.getSelectedExperiments()
+      expect(selected).to.deep.equal({
+        'exp-83425': '#5f5856',
+        'test-branch': '#96958f'
+      })
     })
   })
 })
