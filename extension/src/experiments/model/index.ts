@@ -139,16 +139,16 @@ export class ExperimentsModel {
   }
 
   public getSelected() {
-    const experiments = {} as Record<string, string>
+    const experimentColors = {} as Record<string, string>
 
     this.getAssignedColors().forEach((color: string, id: string) => {
       const { displayName, selected } = this.getExperimentDetails(id)
       if (displayName && selected) {
-        experiments[displayName] = color
+        experimentColors[displayName] = color
       }
     })
 
-    return experiments
+    return experimentColors
   }
 
   public setSelected(ids: string[]) {
