@@ -79,15 +79,7 @@ export class PlotsModel {
 
     return {
       colors: { domain: selectedExperiments, range },
-      plots: this.livePlots.map(plot => {
-        const { title, values } = plot
-        return {
-          title,
-          values: values.filter(value =>
-            selectedExperiments.includes(value.group)
-          )
-        }
-      }),
+      plots: this.getPlots(this.livePlots, selectedExperiments),
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize()
     }
@@ -109,6 +101,18 @@ export class PlotsModel {
 
   public getPlotSize() {
     return this.plotSize
+  }
+
+  private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
+    return livePlots.map(plot => {
+      const { title, values } = plot
+      return {
+        title,
+        values: values.filter(value =>
+          selectedExperiments.includes(value.group)
+        )
+      }
+    })
   }
 
   private persistSelectedMetrics() {

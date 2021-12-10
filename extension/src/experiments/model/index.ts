@@ -209,14 +209,6 @@ export class ExperimentsModel {
     ]
   }
 
-  public getExperimentDetails(id: string) {
-    return { displayName: this.displayName[id], selected: !!this.status[id] }
-  }
-
-  public getAssignedColors() {
-    return this.colors.assigned
-  }
-
   public getInitialPlotsData() {
     const data = this.initialPlotsData
     this.initialPlotsDataFetched = true
@@ -274,6 +266,10 @@ export class ExperimentsModel {
 
   private flattenExperiments() {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
+  }
+
+  private getExperimentDetails(id: string) {
+    return { displayName: this.displayName[id], selected: !!this.status[id] }
   }
 
   private setStatus() {
@@ -398,5 +394,9 @@ export class ExperimentsModel {
           selected
         }
       : experiment
+  }
+
+  private getAssignedColors() {
+    return this.colors.assigned
   }
 }
