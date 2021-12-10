@@ -10,11 +10,9 @@ import {
 import { collectExperiments } from './collect'
 import { copyOriginalColors } from './colors'
 import { collectColors, Colors } from './colors/collect'
-import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
-import { LivePlotData, PlotSize } from '../../plots/webview/contract'
 import { hasKey } from '../../util/object'
 import { setContextValue } from '../../vscode/context'
 
@@ -27,9 +25,7 @@ export const enum MementoPrefixes {
   COLORS = 'colors:',
   FILTER_BY = 'filterBy:',
   SORT_BY = 'sortBy:',
-  STATUS = 'status:',
-  SELECTED_METRICS = 'selectedMetrics:',
-  PLOT_SIZE = 'plotSize:'
+  STATUS = 'status:'
 }
 
 export class ExperimentsModel {
@@ -39,7 +35,6 @@ export class ExperimentsModel {
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
-  private livePlots?: LivePlotData[]
   private colors: Colors
   private status: Record<string, Status>
   private displayName: Record<string, string> = {}
@@ -48,8 +43,6 @@ export class ExperimentsModel {
   private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
-  private selectedMetrics?: string[] = undefined
-  private plotSize: PlotSize = PlotSize.REGULAR
 
   private readonly dvcRoot: string
   private readonly workspaceState: Memento
@@ -67,69 +60,16 @@ export class ExperimentsModel {
     this.dvcRoot = dvcRoot
 
     this.workspaceState = workspaceState
-
-    this.selectedMetrics = workspaceState.get(
-      MementoPrefixes.SELECTED_METRICS + dvcRoot,
-      undefined
-    )
-
-    this.plotSize = workspaceState.get(
-      MementoPrefixes.PLOT_SIZE + dvcRoot,
-      PlotSize.REGULAR
-    )
   }
 
-  public getLivePlots() {
-    if (!this.livePlots) {
-      return
-    }
-
-    const selectedExperiments: string[] = []
-    const range: string[] = []
-
-    this.getAssignedColors().forEach((color: string, id: string) => {
-      const displayName = this.displayName[id]
-      const selected = !!this.status[id]
-      if (displayName && selected) {
-        selectedExperiments.push(displayName)
-        range.push(color)
-      }
-    })
-
-    if (!definedAndNonEmpty(selectedExperiments)) {
-      return
-    }
-
-    return {
-      colors: { domain: selectedExperiments, range },
-      plots: this.livePlots.map(plot => {
-        const { title, values } = plot
-        return {
-          title,
-          values: values.filter(value =>
-            selectedExperiments.includes(value.group)
-          )
-        }
-      }),
-      selectedMetrics: this.getSelectedMetrics(),
-      size: this.getPlotSize()
-    }
-  }
-
-  public async transformAndSet(data: ExperimentsOutput) {
-    const [
-      { workspace, branches, experimentsByBranch, checkpointsByTip },
-      livePlots
-    ] = await Promise.all([
-      collectExperiments(data),
-      collectLivePlotsData(data)
-    ])
+  public transformAndSet(data: ExperimentsOutput) {
+    const { workspace, branches, experimentsByBranch, checkpointsByTip } =
+      collectExperiments(data)
 
     this.workspace = workspace
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
-    this.livePlots = livePlots
 
     Promise.all([this.setStatus(), this.setDisplayNames()])
     this.collectColors()
@@ -191,6 +131,19 @@ export class ExperimentsModel {
     return result
   }
 
+  public getSelected() {
+    const experimentColors = {} as Record<string, string>
+
+    this.getAssignedColors().forEach((color: string, id: string) => {
+      const { displayName, selected } = this.getExperimentDetails(id)
+      if (displayName && selected) {
+        experimentColors[displayName] = color
+      }
+    })
+
+    return experimentColors
+  }
+
   public setSelected(ids: string[]) {
     this.status = Object.keys(this.status).reduce((acc, id) => {
       const status = ids.includes(id) ? Status.SELECTED : Status.UNSELECTED
@@ -249,24 +202,6 @@ export class ExperimentsModel {
     ]
   }
 
-  public setSelectedMetrics(selectedMetrics: string[]) {
-    this.selectedMetrics = selectedMetrics
-    this.persistSelectedMetrics()
-  }
-
-  public getSelectedMetrics() {
-    return this.selectedMetrics
-  }
-
-  public setPlotSize(size: PlotSize) {
-    this.plotSize = size
-    this.persistPlotSize()
-  }
-
-  public getPlotSize() {
-    return this.plotSize
-  }
-
   private getSubRows(experiments: Experiment[]) {
     return experiments
       .map(experiment => {
@@ -317,6 +252,10 @@ export class ExperimentsModel {
 
   private flattenExperiments() {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
+  }
+
+  private getExperimentDetails(id: string) {
+    return { displayName: this.displayName[id], selected: !!this.status[id] }
   }
 
   private setStatus() {
@@ -376,20 +315,6 @@ export class ExperimentsModel {
     return this.workspaceState.update(
       MementoPrefixes.STATUS + this.dvcRoot,
       this.status
-    )
-  }
-
-  private persistSelectedMetrics() {
-    return this.workspaceState.update(
-      MementoPrefixes.SELECTED_METRICS + this.dvcRoot,
-      this.getSelectedMetrics()
-    )
-  }
-
-  private persistPlotSize() {
-    this.workspaceState.update(
-      MementoPrefixes.PLOT_SIZE + this.dvcRoot,
-      this.getPlotSize()
     )
   }
 

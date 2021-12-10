@@ -9,6 +9,7 @@ import {
   SectionCollapsed
 } from './webview/contract'
 import { PlotsData } from './data'
+import { PlotsModel } from './model'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -32,6 +33,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
   private experiments?: Experiments
+  private model?: PlotsModel
 
   private readonly data: PlotsData
   private readonly workspaceState: Memento
@@ -68,13 +70,20 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async setExperiments(experiments: Experiments) {
     this.experiments = experiments
 
-    await this.experiments.isReady()
+    this.model = this.dispose.track(
+      new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
+    )
 
     this.dispose.track(
-      experiments.onDidChangeLivePlots(() => {
+      experiments.onDidChangeExperiments(data => {
+        if (data) {
+          this.model?.transformAndSet(data)
+        }
         this.sendLivePlotsData()
       })
     )
+
+    await this.experiments.isReady()
 
     this.deferred.resolve()
 
@@ -98,7 +107,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getLivePlots() {
-    return this.experiments?.getLivePlots() || null
+    return this.model?.getLivePlots() || null
   }
 
   private sendStaticPlots(data: PlotsOutput) {
@@ -132,16 +141,14 @@ export class Plots extends BaseRepository<TPlotsData> {
           case MessageFromWebviewType.METRIC_TOGGLED:
             return (
               message.payload &&
-              this.experiments?.setSelectedMetrics(
+              this.model?.setSelectedMetrics(
                 message.payload as MetricToggledPayload
               )
             )
           case MessageFromWebviewType.PLOTS_RESIZED:
             return (
               message.payload &&
-              this.experiments?.setPlotSize(
-                message.payload as PlotsResizedPayload
-              )
+              this.model?.setPlotSize(message.payload as PlotsResizedPayload)
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return (

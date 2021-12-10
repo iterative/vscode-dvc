@@ -1,15 +1,15 @@
 import omit from 'lodash.omit'
-import { LivePlotValues, LivePlotData } from '../../../plots/webview/contract'
+import { LivePlotValues, LivePlotData } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentsOutput,
   Value,
   ValueTree
-} from '../../../cli/reader'
-import { reduceParamsAndMetrics } from '../../paramsAndMetrics/reduce'
-import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
-import { ParamsOrMetrics } from '../../webview/contract'
-import { addToMapArray, addToMapCount } from '../../../util/map'
+} from '../../cli/reader'
+import { reduceParamsAndMetrics } from '../../experiments/paramsAndMetrics/reduce'
+import { joinParamOrMetricPath } from '../../experiments/paramsAndMetrics/paths'
+import { ParamsOrMetrics } from '../../experiments/webview/contract'
+import { addToMapArray, addToMapCount } from '../../util/map'
 
 type LivePlotAccumulator = Map<string, LivePlotValues>
 
