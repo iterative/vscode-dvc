@@ -350,4 +350,25 @@ describe('App', () => {
 
     expect(screen.getByText(newTitle)).toBeInTheDocument()
   })
+
+  it('should send a message to the extension with the new section name after a section rename', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
+
+    const [renameButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(renameButton)
+    fireEvent.click(renameButton)
+
+    const titleInput = screen.getByRole('textbox')
+    const newTitle = 'Brand new section'
+    fireEvent.change(titleInput, { target: { value: newTitle } })
+    fireEvent.keyDown(titleInput, { key: 'Enter' })
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: { name: newTitle, section: Section.LIVE_PLOTS },
+      type: MessageFromWebviewType.SECTION_RENAMED
+    })
+  })
 })

@@ -1,10 +1,10 @@
-import { PlotsModel } from '.'
-import { PlotSize } from '../webview/contract'
+import { DefaultSectionNames, PlotsModel } from '.'
+import { PlotSize, Section } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 
-describe('experimentsModel', () => {
+describe('plotsModel', () => {
   let model: PlotsModel
   const exampleDvcRoot = 'test'
   const persistedSelectedMetrics = ['loss', 'accuracy']
@@ -64,6 +64,45 @@ describe('experimentsModel', () => {
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       MementoPrefix.PLOT_SIZE + exampleDvcRoot,
       PlotSize.SMALL
+    )
+  })
+
+  it('should change the the sectionName of a section when calling setSectionName', () => {
+    expect(model.getSectionName(Section.LIVE_PLOTS)).toEqual(
+      DefaultSectionNames[Section.LIVE_PLOTS]
+    )
+    expect(model.getSectionName(Section.STATIC_PLOTS)).toEqual(
+      DefaultSectionNames[Section.STATIC_PLOTS]
+    )
+
+    const newLivePlotsName = 'Live Section'
+    model.setSectionName(Section.LIVE_PLOTS, newLivePlotsName)
+
+    expect(model.getSectionName(Section.LIVE_PLOTS)).toEqual(newLivePlotsName)
+    expect(model.getSectionName(Section.STATIC_PLOTS)).toEqual(
+      DefaultSectionNames[Section.STATIC_PLOTS]
+    )
+
+    const newStaticPlotsName = 'Static'
+    model.setSectionName(Section.STATIC_PLOTS, newStaticPlotsName)
+    expect(model.getSectionName(Section.STATIC_PLOTS)).toEqual(
+      newStaticPlotsName
+    )
+  })
+
+  it('should update the persisted section names when calling setSectionName', () => {
+    const mementoUpdateSpy = jest.spyOn(memento, 'update')
+
+    const newName = 'Important Plots'
+    model.setSectionName(Section.LIVE_PLOTS, newName)
+
+    expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
+    expect(mementoUpdateSpy).toHaveBeenCalledWith(
+      MementoPrefix.PLOT_SECTION_NAMES + exampleDvcRoot,
+      {
+        [Section.LIVE_PLOTS]: newName,
+        [Section.STATIC_PLOTS]: DefaultSectionNames[Section.STATIC_PLOTS]
+      }
     )
   })
 })
