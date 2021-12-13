@@ -1,3 +1,5 @@
+$fg-color: var(--vscode-editor-foreground);
+
 // Dark
 
 $watermark-color: rgba(255, 255, 255, 0.6);
@@ -92,4 +94,13 @@ $gap: 20px;
   height: 20vw;
   max-width: 300px;
   max-height: 200px;
+}
+
+.sectionRenamer {
+  background-color: transparent;
+  font-size: 1.25rem;
+  font-family: inherit;
+  font-weight: inherit;
+  border: none;
+  color: $fg-color;
 }
