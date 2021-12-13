@@ -102,7 +102,7 @@ export class PlotsModel {
     return this.plotSize
   }
 
-  public setSectionCollapsed(newState: SectionCollapsed) {
+  public setSectionCollapsed(newState: Partial<SectionCollapsed>) {
     this.sectionCollapsed = {
       ...this.sectionCollapsed,
       ...newState

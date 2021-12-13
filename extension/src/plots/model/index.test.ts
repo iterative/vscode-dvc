@@ -1,5 +1,5 @@
 import { PlotsModel } from '.'
-import { PlotSize } from '../webview/contract'
+import { defaultSectionCollapsed, PlotSize, Section } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
@@ -65,5 +65,26 @@ describe('experimentsModel', () => {
       MementoPrefix.PLOT_SIZE + exampleDvcRoot,
       PlotSize.SMALL
     )
+  })
+
+  it('should update the persisted collapsible section state when calling setSectionCollapsed', () => {
+    const mementoUpdateSpy = jest.spyOn(memento, 'update')
+
+    expect(model.getSectionCollapsed()).toEqual(defaultSectionCollapsed)
+
+    model.setSectionCollapsed({ [Section.LIVE_PLOTS]: true })
+
+    const expectedSectionCollapsed = {
+      [Section.LIVE_PLOTS]: true,
+      [Section.STATIC_PLOTS]: false
+    }
+
+    expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
+    expect(mementoUpdateSpy).toHaveBeenCalledWith(
+      MementoPrefix.PLOT_SECTION_COLLAPSED + exampleDvcRoot,
+      expectedSectionCollapsed
+    )
+
+    expect(model.getSectionCollapsed()).toEqual(expectedSectionCollapsed)
   })
 })
