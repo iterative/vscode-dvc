@@ -1,7 +1,7 @@
 import isEqual from 'lodash.isequal'
 
 export const definedAndNonEmpty = (
-  maybeArray: unknown[] | undefined
+  maybeArray: readonly unknown[] | undefined
 ): maybeArray is unknown[] => {
   return !!maybeArray?.length
 }

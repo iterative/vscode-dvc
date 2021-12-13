@@ -33,7 +33,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.62.0-insiders",
+    "vscode": "^1.63.0",
     "node": ">=10.2.0"
   },
   "activationEvents": [
@@ -1062,7 +1062,6 @@
     "lodash.isempty": "^4.4.0",
     "lodash.isequal": "^4.5.0",
     "lodash.omit": "^4.5.0",
-    "mobx": "^6.3.8",
     "vscode-extension-telemetry": "^0.4.3"
   },
   "devDependencies": {
@@ -1080,7 +1079,7 @@
     "@types/node": "^14.14.22",
     "@types/react-vega": "^7.0.0",
     "@types/sinon-chai": "^3.2.6",
-    "@types/vscode": "^1.62.0",
+    "@types/vscode": "^1.63.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "clean-webpack-plugin": "^4.0.0",

@@ -1,14 +1,13 @@
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
-  defaultSectionCollapsed,
   ImagePlot,
   isImagePlot,
   PlotsData as TPlotsData,
-  PlotsOutput,
-  SectionCollapsed
+  PlotsOutput
 } from './webview/contract'
 import { PlotsData } from './data'
+import { PlotsModel } from './model'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -24,19 +23,14 @@ import { Logger } from '../common/logger'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
-export const enum MementoPrefixes {
-  SECTION_COLLAPSED = 'sectionCollapsed:'
-}
-
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
   private experiments?: Experiments
+  private model?: PlotsModel
 
   private readonly data: PlotsData
   private readonly workspaceState: Memento
-
-  private sectionCollapsed: SectionCollapsed
 
   constructor(
     dvcRoot: string,
@@ -57,24 +51,26 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.handleMessageFromWebview()
 
-    this.sectionCollapsed = workspaceState.get(
-      MementoPrefixes.SECTION_COLLAPSED + dvcRoot,
-      defaultSectionCollapsed
-    )
-
     this.workspaceState = workspaceState
   }
 
   public async setExperiments(experiments: Experiments) {
     this.experiments = experiments
 
-    await this.experiments.isReady()
+    this.model = this.dispose.track(
+      new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
+    )
 
     this.dispose.track(
-      experiments.onDidChangeLivePlots(() => {
+      experiments.onDidChangeExperiments(data => {
+        if (data) {
+          this.model?.transformAndSet(data)
+        }
         this.sendLivePlotsData()
       })
     )
+
+    await this.experiments.isReady()
 
     this.deferred.resolve()
 
@@ -86,7 +82,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public sendInitialWebviewData() {
     this.webview?.show({
       live: this.getLivePlots(),
-      sectionCollapsed: this.sectionCollapsed
+      sectionCollapsed: this.model?.getSectionCollapsed()
     })
     this.data.managedUpdate()
   }
@@ -98,7 +94,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getLivePlots() {
-    return this.experiments?.getLivePlots() || null
+    return this.model?.getLivePlots() || null
   }
 
   private sendStaticPlots(data: PlotsOutput) {
@@ -132,37 +128,24 @@ export class Plots extends BaseRepository<TPlotsData> {
           case MessageFromWebviewType.METRIC_TOGGLED:
             return (
               message.payload &&
-              this.experiments?.setSelectedMetrics(
+              this.model?.setSelectedMetrics(
                 message.payload as MetricToggledPayload
               )
             )
           case MessageFromWebviewType.PLOTS_RESIZED:
             return (
               message.payload &&
-              this.experiments?.setPlotSize(
-                message.payload as PlotsResizedPayload
-              )
+              this.model?.setPlotSize(message.payload as PlotsResizedPayload)
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return (
-              message.payload && this.persistCollapsibleState(message.payload)
+              message.payload &&
+              this.model?.setSectionCollapsed(message.payload)
             )
           default:
             Logger.error(`Unexpected message: ${message}`)
         }
       })
-    )
-  }
-
-  private persistCollapsibleState(newState: SectionCollapsed) {
-    this.sectionCollapsed = {
-      ...this.sectionCollapsed,
-      ...newState
-    }
-
-    this.workspaceState.update(
-      MementoPrefixes.SECTION_COLLAPSED + this.dvcRoot,
-      this.sectionCollapsed
     )
   }
 }

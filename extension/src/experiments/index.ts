@@ -20,12 +20,10 @@ import {
   MessageFromWebviewType
 } from '../webview/contract'
 import { Logger } from '../common/logger'
-import { PlotSize } from '../plots/webview/contract'
 
 export class Experiments extends BaseRepository<TableData> {
-  public readonly onDidChangeExperiments: Event<void>
+  public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
-  public readonly onDidChangeLivePlots: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -35,14 +33,10 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly paramsAndMetrics: ParamsAndMetricsModel
 
   private readonly experimentsChanged = this.dispose.track(
-    new EventEmitter<void>()
+    new EventEmitter<ExperimentsOutput | void>()
   )
 
   private readonly paramsOrMetricsChanged = this.dispose.track(
-    new EventEmitter<void>()
-  )
-
-  private readonly livePlotsChanged = this.dispose.track(
     new EventEmitter<void>()
   )
 
@@ -58,7 +52,6 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
-    this.onDidChangeLivePlots = this.livePlotsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
@@ -99,7 +92,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments.transformAndSet(data)
     ])
 
-    return this.notifyChanged()
+    return this.notifyChanged(data)
   }
 
   public getChildParamsOrMetrics(path?: string) {
@@ -213,25 +206,16 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  public getLivePlots() {
-    return this.experiments.getLivePlots()
-  }
-
   public sendInitialWebviewData() {
     return this.sendWebviewData()
   }
 
-  public setSelectedMetrics(metrics: string[]) {
-    this.experiments.setSelectedMetrics(metrics)
+  public getSelectedExperiments() {
+    return this.experiments.getSelected()
   }
 
-  public setPlotSize(size: PlotSize) {
-    this.experiments.setPlotSize(size)
-  }
-
-  private notifyChanged() {
-    this.livePlotsChanged.fire()
-    this.experimentsChanged.fire()
+  private notifyChanged(data?: ExperimentsOutput) {
+    this.experimentsChanged.fire(data)
     this.notifyParamsOrMetricsChanged()
   }
 

@@ -5,6 +5,10 @@ on:
       - master
   pull_request:
 
+concurrency:
+  group: cross-platform-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   suite:
     runs-on: ${{ matrix.os }}

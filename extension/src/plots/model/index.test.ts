@@ -1,19 +1,27 @@
-import { ExperimentsModel, MementoPrefixes } from '.'
-import { PlotSize } from '../../plots/webview/contract'
+import { PlotsModel } from '.'
+import { defaultSectionCollapsed, PlotSize, Section } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
+import { Experiments } from '../../experiments'
+import { MementoPrefix } from '../../vscode/memento'
 
 describe('experimentsModel', () => {
-  let model: ExperimentsModel
+  let model: PlotsModel
   const exampleDvcRoot = 'test'
   const persistedSelectedMetrics = ['loss', 'accuracy']
   const memento = buildMockMemento({
-    [MementoPrefixes.SELECTED_METRICS + exampleDvcRoot]:
+    [MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [MementoPrefixes.PLOT_SIZE + exampleDvcRoot]: PlotSize.REGULAR
+    [MementoPrefix.PLOT_SIZE + exampleDvcRoot]: PlotSize.REGULAR
   })
 
   beforeEach(() => {
-    model = new ExperimentsModel(exampleDvcRoot, memento)
+    model = new PlotsModel(
+      exampleDvcRoot,
+      {
+        isReady: () => Promise.resolve(undefined)
+      } as unknown as Experiments,
+      memento
+    )
     jest.clearAllMocks()
   })
 
@@ -34,7 +42,7 @@ describe('experimentsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefixes.SELECTED_METRICS + exampleDvcRoot,
+      MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot,
       newSelectedMetrics
     )
   })
@@ -54,8 +62,29 @@ describe('experimentsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefixes.PLOT_SIZE + exampleDvcRoot,
+      MementoPrefix.PLOT_SIZE + exampleDvcRoot,
       PlotSize.SMALL
     )
+  })
+
+  it('should update the persisted collapsible section state when calling setSectionCollapsed', () => {
+    const mementoUpdateSpy = jest.spyOn(memento, 'update')
+
+    expect(model.getSectionCollapsed()).toEqual(defaultSectionCollapsed)
+
+    model.setSectionCollapsed({ [Section.LIVE_PLOTS]: true })
+
+    const expectedSectionCollapsed = {
+      [Section.LIVE_PLOTS]: true,
+      [Section.STATIC_PLOTS]: false
+    }
+
+    expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
+    expect(mementoUpdateSpy).toHaveBeenCalledWith(
+      MementoPrefix.PLOT_SECTION_COLLAPSED + exampleDvcRoot,
+      expectedSectionCollapsed
+    )
+
+    expect(model.getSectionCollapsed()).toEqual(expectedSectionCollapsed)
   })
 })

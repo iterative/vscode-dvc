@@ -1,7 +1,6 @@
 import { EventEmitter, Event, workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { makeObservable, observable } from 'mobx'
 import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
@@ -9,15 +8,13 @@ import {
 import { getConfigValue } from './vscode/config'
 
 export class Config {
-  @observable
-  public pythonBinPath: string | undefined
-
-  @observable
-  private dvcPath = this.getCliPath()
-
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeExecutionDetails: Event<void>
+
+  public pythonBinPath: string | undefined
+
+  private dvcPath = this.getCliPath()
 
   private readonly executionDetailsChanged: EventEmitter<void>
 
@@ -28,8 +25,6 @@ export class Config {
   private readonly pythonPathOption = 'dvc.pythonPath'
 
   constructor() {
-    makeObservable(this)
-
     this.executionDetailsChanged = this.dispose.track(new EventEmitter())
     this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
 
