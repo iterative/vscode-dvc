@@ -105,7 +105,7 @@ describe('plotsModel', () => {
       }
     )
   })
- 
+
   it('should update the persisted collapsible section state when calling setSectionCollapsed', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
