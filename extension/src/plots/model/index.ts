@@ -5,6 +5,7 @@ import {
   defaultSectionCollapsed,
   LivePlotData,
   PlotSize,
+  Section,
   SectionCollapsed
 } from '../../plots/webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
@@ -12,6 +13,10 @@ import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 
+export const DefaultSectionNames = {
+  [Section.LIVE_PLOTS]: 'Live Experiments Plots',
+  [Section.STATIC_PLOTS]: 'Static Plots'
+}
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
 
@@ -23,6 +28,7 @@ export class PlotsModel {
   private selectedMetrics?: string[] = undefined
   private plotSize: PlotSize = PlotSize.REGULAR
   private sectionCollapsed: SectionCollapsed
+  private sectionNames: Record<Section, string> = DefaultSectionNames
 
   constructor(
     dvcRoot: string,
@@ -46,6 +52,11 @@ export class PlotsModel {
     this.sectionCollapsed = workspaceState.get(
       MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
       defaultSectionCollapsed
+    )
+
+    this.sectionNames = workspaceState.get(
+      MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
+      DefaultSectionNames
     )
   }
 
@@ -79,6 +90,7 @@ export class PlotsModel {
     return {
       colors: { domain: selectedExperiments, range },
       plots: this.getPlots(this.livePlots, selectedExperiments),
+      sectionName: this.getSectionName(Section.LIVE_PLOTS),
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize()
     }
@@ -114,6 +126,15 @@ export class PlotsModel {
     return this.sectionCollapsed
   }
 
+  public setSectionName(section: Section, name: string) {
+    this.sectionNames[section] = name
+    this.persistSectionNames()
+  }
+
+  public getSectionName(section: Section): string {
+    return this.sectionNames[section]
+  }
+
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
     return livePlots.map(plot => {
       const { title, values } = plot
@@ -144,6 +165,13 @@ export class PlotsModel {
     this.workspaceState.update(
       MementoPrefix.PLOT_SECTION_COLLAPSED + this.dvcRoot,
       this.sectionCollapsed
+    )
+  }
+
+  private persistSectionNames() {
+    this.workspaceState.update(
+      MementoPrefix.PLOT_SECTION_NAMES + this.dvcRoot,
+      this.sectionNames
     )
   }
 }

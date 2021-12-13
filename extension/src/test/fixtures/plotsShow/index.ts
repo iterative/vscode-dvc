@@ -1,5 +1,6 @@
 import { VisualizationSpec } from 'react-vega'
-import { PlotsType } from '../../../plots/webview/contract'
+import { DefaultSectionNames } from '../../../plots/model'
+import { PlotsType, Section } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 
 const basicVega = {
@@ -219,8 +220,11 @@ export const getSmallMemoryFootprintFixture = (
   baseUrl: string,
   joinFunc = join
 ) => ({
-  ...getImageData(baseUrl, joinFunc),
-  ...basicVega
+  plots: {
+    ...getImageData(baseUrl, joinFunc),
+    ...basicVega
+  },
+  sectionName: DefaultSectionNames[Section.STATIC_PLOTS]
 })
 
 export const getFixture = (baseUrl: string, joinFunc = join) => ({
