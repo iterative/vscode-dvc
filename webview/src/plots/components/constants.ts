@@ -10,20 +10,34 @@ export const createSpec = (
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
     encoding: {
-      x: { field: 'x', title: 'iteration', type: 'nominal' }
+      x: {
+        axis: { format: '0d', tickMinStep: 1 },
+        field: 'iteration',
+        title: 'iteration',
+        type: 'quantitative'
+      }
     },
     height: 'container',
     layer: [
       {
         encoding: {
           color: { field: 'group', legend: null, scale, type: 'nominal' },
-          y: { field: 'y', scale: { zero: false }, title, type: 'quantitative' }
+          y: {
+            field: 'y',
+            scale: { zero: false },
+            title,
+            type: 'quantitative'
+          }
         },
         layer: [
           { mark: 'line' },
           {
             mark: 'point',
-            transform: [{ filter: { empty: false, param: 'hover' } }]
+            transform: [
+              {
+                filter: { empty: false, param: 'hover' }
+              }
+            ]
           }
         ]
       },
@@ -40,14 +54,37 @@ export const createSpec = (
             name: 'hover',
             select: {
               clear: 'mouseout',
-              fields: ['x'],
+              fields: ['iteration'],
               nearest: true,
               on: 'mouseover',
               type: 'point'
             }
           }
         ],
-        transform: [{ groupby: ['x'], pivot: 'group', value: 'y' }]
+        transform: [
+          {
+            as: 'y',
+            calculate: "format(datum['y'],'.5f')"
+          },
+          {
+            groupby: ['iteration'],
+            op: 'mean',
+            pivot: 'group',
+            value: 'y'
+          }
+        ]
+      },
+      {
+        encoding: {
+          color: { field: 'group', scale },
+          x: { aggregate: 'max', field: 'iteration', type: 'quantitative' },
+          y: {
+            aggregate: { argmax: 'iteration' },
+            field: 'y',
+            type: 'quantitative'
+          }
+        },
+        layer: [{ mark: { stroke: null, type: 'circle' } }]
       }
     ],
     width: 'container'
@@ -60,6 +97,7 @@ export const config: Config = {
   axis: {
     domain: false,
     gridOpacity: 0.25,
+    labelAngle: 0,
     tickColor: foregroundColor,
     titleColor: foregroundColor
   },

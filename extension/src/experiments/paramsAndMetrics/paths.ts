@@ -4,6 +4,14 @@ const FILE_SPLIT_REGEX = new RegExp(
   `([^${FILE_SEPARATOR}]*)(?:${FILE_SEPARATOR}([^${FILE_SEPARATOR}]*))?(?:${FILE_SEPARATOR}(.*))?`
 )
 
+export const joinParamOrMetricFilePath = (...pathSegments: string[]) => {
+  const [fileSegment, ...rest] = pathSegments
+  if (rest.length === 0) {
+    return fileSegment
+  }
+  return fileSegment + FILE_SEPARATOR + rest.join(PARAM_METRIC_SEPARATOR)
+}
+
 export const joinParamOrMetricPath = (...pathSegments: string[]) => {
   const [baseSegment, fileSegment, ...rest] = pathSegments
   if (!fileSegment) {
@@ -15,9 +23,7 @@ export const joinParamOrMetricPath = (...pathSegments: string[]) => {
   return (
     baseSegment +
     FILE_SEPARATOR +
-    fileSegment +
-    FILE_SEPARATOR +
-    rest.join(PARAM_METRIC_SEPARATOR)
+    joinParamOrMetricFilePath(fileSegment, ...rest)
   )
 }
 

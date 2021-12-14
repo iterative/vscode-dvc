@@ -7,7 +7,7 @@ import {
   ValueTree
 } from '../../cli/reader'
 import { reduceParamsAndMetrics } from '../../experiments/paramsAndMetrics/reduce'
-import { joinParamOrMetricPath } from '../../experiments/paramsAndMetrics/paths'
+import { joinParamOrMetricFilePath } from '../../experiments/paramsAndMetrics/paths'
 import { ParamsOrMetrics } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
 
@@ -37,9 +37,9 @@ const collectFromMetricsFile = (
     return
   }
 
-  const path = joinParamOrMetricPath(...pathArray)
+  const path = joinParamOrMetricFilePath(...pathArray)
 
-  addToMapArray(acc, path, { group: displayName, x: iteration, y: value })
+  addToMapArray(acc, path, { group: displayName, iteration, y: value })
 }
 
 type MetricsAndTipOrUndefined =
@@ -84,7 +84,7 @@ const collectFromMetrics = (
       iteration,
       undefined,
       metrics[file],
-      ['metrics', file]
+      [file]
     )
   )
 }
