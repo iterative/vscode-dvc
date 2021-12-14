@@ -9,7 +9,8 @@ import { CliReader } from '../../../cli/reader'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
-import { PlotSize } from '../../../plots/webview/contract'
+import { PlotSize, Section } from '../../../plots/webview/contract'
+import { DefaultSectionNames } from '../../../plots/model'
 
 export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
   const { experiments, internalCommands, updatesPaused, resourceLocator } =
@@ -51,6 +52,7 @@ export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
         title: plot.title,
         values: plot.values.filter(values => domain.includes(values.group))
       })),
+      sectionName: DefaultSectionNames[Section.LIVE_PLOTS],
       selectedMetrics: undefined,
       size: PlotSize.REGULAR
     }

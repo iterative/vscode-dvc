@@ -4,7 +4,8 @@ import {
   ImagePlot,
   isImagePlot,
   PlotsData as TPlotsData,
-  PlotsOutput
+  PlotsOutput,
+  Section
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
@@ -14,11 +15,7 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import {
-  MessageFromWebviewType,
-  MetricToggledPayload,
-  PlotsResizedPayload
-} from '../webview/contract'
+import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
@@ -108,17 +105,25 @@ export class Plots extends BaseRepository<TPlotsData> {
       return null
     }
 
-    return Object.entries(data as PlotsOutput).reduce((acc, [path, plots]) => {
-      acc[path] = plots.map(plot =>
-        isImagePlot(plot)
-          ? ({
-              ...plot,
-              url: this.webview?.getWebviewUri(plot.url)
-            } as ImagePlot)
-          : plot
-      )
-      return acc
-    }, {} as PlotsOutput)
+    const plots = Object.entries(data as PlotsOutput).reduce(
+      (acc, [path, plots]) => {
+        acc[path] = plots.map(plot =>
+          isImagePlot(plot)
+            ? ({
+                ...plot,
+                url: this.webview?.getWebviewUri(plot.url)
+              } as ImagePlot)
+            : plot
+        )
+        return acc
+      },
+      {} as PlotsOutput
+    )
+
+    return {
+      plots,
+      sectionName: this.model?.getSectionName(Section.STATIC_PLOTS) || ''
+    }
   }
 
   private handleMessageFromWebview() {
@@ -127,20 +132,22 @@ export class Plots extends BaseRepository<TPlotsData> {
         switch (message.type) {
           case MessageFromWebviewType.METRIC_TOGGLED:
             return (
-              message.payload &&
-              this.model?.setSelectedMetrics(
-                message.payload as MetricToggledPayload
-              )
+              message.payload && this.model?.setSelectedMetrics(message.payload)
             )
           case MessageFromWebviewType.PLOTS_RESIZED:
-            return (
-              message.payload &&
-              this.model?.setPlotSize(message.payload as PlotsResizedPayload)
-            )
+            return message.payload && this.model?.setPlotSize(message.payload)
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return (
               message.payload &&
               this.model?.setSectionCollapsed(message.payload)
+            )
+          case MessageFromWebviewType.SECTION_RENAMED:
+            return (
+              message.payload &&
+              this.model?.setSectionName(
+                message.payload.section,
+                message.payload.name
+              )
             )
           default:
             Logger.error(`Unexpected message: ${message}`)

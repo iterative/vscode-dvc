@@ -17,7 +17,11 @@ async function main() {
     await runTests({
       extensionDevelopmentPath,
       extensionTestsPath,
-      launchArgs: ['--disable-extensions', workspacePath],
+      launchArgs: [
+        '--disable-extensions',
+        '--disable-workspace-trust',
+        workspacePath
+      ],
       vscodeExecutablePath
     })
   } catch {

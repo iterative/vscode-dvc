@@ -1,6 +1,6 @@
 import { VisualizationSpec } from 'react-vega'
 
-export type LivePlotValues = { group: string; x: number; y: number }[]
+export type LivePlotValues = { group: string; iteration: number; y: number }[]
 
 export type LivePlotsColors = { domain: string[]; range: string[] }
 
@@ -22,6 +22,7 @@ export type LivePlotsData = {
   plots: LivePlotData[]
   colors: LivePlotsColors
   size: PlotSize
+  sectionName: string
   selectedMetrics?: string[]
 }
 
@@ -52,6 +53,11 @@ export type StaticPlot = VegaPlot | ImagePlot
 
 export type PlotsOutput = Record<string, StaticPlot[]>
 
+export interface StaticPlotsData {
+  plots: PlotsOutput
+  sectionName: string
+}
+
 export enum Section {
   LIVE_PLOTS = 'live-plots',
   STATIC_PLOTS = 'static-plots'
@@ -67,7 +73,7 @@ export type SectionCollapsed = typeof defaultSectionCollapsed
 export type PlotsData =
   | {
       live?: LivePlotsData | null
-      static?: PlotsOutput | null
+      static?: StaticPlotsData | null
       sectionCollapsed?: SectionCollapsed
     }
   | undefined

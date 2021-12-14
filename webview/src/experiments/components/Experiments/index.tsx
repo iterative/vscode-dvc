@@ -9,7 +9,6 @@ import {
   Row,
   Column,
   useTable,
-  useGroupBy,
   useExpanded,
   useFlexLayout,
   useColumnOrder,
@@ -130,7 +129,6 @@ export const ExperimentsTable: React.FC<{
     },
     useFlexLayout,
     useColumnOrder,
-    useGroupBy,
     useExpanded,
     useResizeColumns,
     hooks => {

@@ -34,9 +34,7 @@ const getFirstCellProps = (
       styles.firstCell,
       styles.td,
       styles.experimentCell,
-      cell.isPlaceholder && styles.groupPlaceholder,
-      cell.column.isGrouped && styles.groupedColumnCell,
-      cell.isGrouped && styles.groupedCell
+      cell.isPlaceholder && styles.groupPlaceholder
     )
   })
 
@@ -96,18 +94,12 @@ const CellWrapper: React.FC<{
 }> = ({ cell, cellId, changes }) => (
   <div
     {...cell.getCellProps({
-      className: cx(
-        styles.td,
-        cell.isPlaceholder && styles.groupPlaceholder,
-        cell.column.isGrouped && styles.groupedColumnCell,
-        cell.isGrouped && styles.groupedCell,
-        {
-          [styles.metaCell]: ['timestamp', 'epochs'].includes(
-            getDisplayNameFromPath(cell.column.id)
-          ),
-          [styles.workspaceChange]: changes?.includes(cell.column.id)
-        }
-      )
+      className: cx(styles.td, cell.isPlaceholder && styles.groupPlaceholder, {
+        [styles.metaCell]: ['timestamp', 'epochs'].includes(
+          getDisplayNameFromPath(cell.column.id)
+        ),
+        [styles.workspaceChange]: changes?.includes(cell.column.id)
+      })
     })}
     data-testid={cellId}
   >
