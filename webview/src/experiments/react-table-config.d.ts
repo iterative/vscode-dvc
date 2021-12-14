@@ -42,10 +42,7 @@ declare module 'react-table' {
     D extends Record<string, unknown> = Record<string, unknown>
   > extends UseResizeColumnsColumnProps<D> {}
 
-  export interface Cell<
-    D extends Record<string, unknown> = Record<string, unknown>,
-    V = unknown
-  > {
+  export interface Cell {
     isPlaceholder: boolean
   }
 
