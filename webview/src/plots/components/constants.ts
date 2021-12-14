@@ -12,7 +12,7 @@ export const createSpec = (
     encoding: {
       x: {
         axis: { format: '0d', tickMinStep: 1 },
-        field: 'x',
+        field: 'iteration',
         title: 'iteration',
         type: 'quantitative'
       }
@@ -50,7 +50,7 @@ export const createSpec = (
             name: 'hover',
             select: {
               clear: 'mouseout',
-              fields: ['x'],
+              fields: ['iteration'],
               nearest: true,
               on: 'mouseover',
               type: 'point'
@@ -59,7 +59,7 @@ export const createSpec = (
         ],
         transform: [
           {
-            groupby: ['x'],
+            groupby: ['iteration'],
             op: 'mean',
             pivot: 'group',
             value: 'y'
@@ -68,9 +68,9 @@ export const createSpec = (
       },
       {
         encoding: {
-          x: { aggregate: 'max', field: 'x', type: 'quantitative' },
+          x: { aggregate: 'max', field: 'iteration', type: 'quantitative' },
           y: {
-            aggregate: { argmax: 'x' },
+            aggregate: { argmax: 'iteration' },
             field: 'y',
             type: 'quantitative'
           }

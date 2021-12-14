@@ -198,9 +198,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(() =>
-      screen.getByTestId('plot-metrics:summary.json:loss')
-    ).not.toThrow()
+    expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
 
     const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
@@ -213,7 +211,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(() => screen.getByTestId('plot-metrics:summary.json:loss')).toThrow()
+    expect(() => screen.getByTestId('plot-summary.json:loss')).toThrow()
 
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
@@ -223,9 +221,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(() =>
-      screen.getByTestId('plot-metrics:summary.json:loss')
-    ).not.toThrow()
+    expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
