@@ -10,14 +10,24 @@ export const createSpec = (
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
     encoding: {
-      x: { field: 'x', title: 'iteration', type: 'nominal' }
+      x: {
+        axis: { format: '0d', tickMinStep: 1 },
+        field: 'x',
+        title: 'iteration',
+        type: 'quantitative'
+      }
     },
     height: 'container',
     layer: [
       {
         encoding: {
           color: { field: 'group', legend: null, scale, type: 'nominal' },
-          y: { field: 'y', scale: { zero: false }, title, type: 'quantitative' }
+          y: {
+            field: 'y',
+            scale: { zero: false },
+            title,
+            type: 'quantitative'
+          }
         },
         layer: [
           { mark: 'line' },
@@ -47,7 +57,30 @@ export const createSpec = (
             }
           }
         ],
-        transform: [{ groupby: ['x'], pivot: 'group', value: 'y' }]
+        transform: [
+          {
+            groupby: ['x'],
+            op: 'mean',
+            pivot: 'group',
+            value: 'y'
+          }
+        ]
+      },
+      {
+        encoding: {
+          x: { aggregate: 'max', field: 'x', type: 'quantitative' },
+          y: {
+            aggregate: { argmax: 'x' },
+            field: 'y',
+            type: 'quantitative'
+          }
+        },
+        layer: [
+          {
+            encoding: { text: { field: 'group', type: 'nominal' } },
+            mark: { align: 'left', dx: 4, type: 'text' }
+          }
+        ]
       }
     ],
     width: 'container'
@@ -60,6 +93,7 @@ export const config: Config = {
   axis: {
     domain: false,
     gridOpacity: 0.25,
+    labelAngle: 0,
     tickColor: foregroundColor,
     titleColor: foregroundColor
   },
