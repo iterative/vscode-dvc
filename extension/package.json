@@ -44,7 +44,7 @@
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": false,
-      "description": "This extension depends on the Git extension, which is disabled in Restricted Mode"
+      "description": "This extension depends on the vscode.git extension, which is disabled in Restricted Mode."
     }
   },
   "contributes": {
