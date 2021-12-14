@@ -41,6 +41,12 @@
     "workspaceContains:**/*dvc*"
   ],
   "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "This extension depends on the Git extension, which is disabled in Restricted Mode"
+    }
+  },
   "contributes": {
     "commands": [
       {
