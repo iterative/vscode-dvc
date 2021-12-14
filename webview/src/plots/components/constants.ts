@@ -76,6 +76,7 @@ export const createSpec = (
       },
       {
         encoding: {
+          color: { field: 'group', scale },
           x: { aggregate: 'max', field: 'iteration', type: 'quantitative' },
           y: {
             aggregate: { argmax: 'iteration' },
@@ -83,12 +84,7 @@ export const createSpec = (
             type: 'quantitative'
           }
         },
-        layer: [
-          {
-            encoding: { text: { field: 'group', type: 'nominal' } },
-            mark: { align: 'left', dx: 4, type: 'text' }
-          }
-        ]
+        layer: [{ mark: { stroke: null, type: 'circle' } }]
       }
     ],
     width: 'container'
