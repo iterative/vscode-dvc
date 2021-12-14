@@ -29,6 +29,7 @@ interface PlotsContainerProps {
   sectionKey: Section
   dispatch: Dispatch<PlotsReducerAction>
   title: string
+  onRename: (section: Section, name: string) => void
   menu?: MenuProps
 }
 
@@ -38,6 +39,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   dispatch,
   title,
   children,
+  onRename,
   menu
 }) => {
   const [isRenaming, setIsRenaming] = useState(false)
@@ -81,6 +83,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   const onTitleChanged = (title: string) => {
     setIsRenaming(false)
     setSectionTitle(title)
+    onRename(sectionKey, title)
   }
 
   return (

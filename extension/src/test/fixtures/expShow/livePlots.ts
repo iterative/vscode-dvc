@@ -1,4 +1,9 @@
-import { LivePlotsData, PlotSize } from '../../../plots/webview/contract'
+import { DefaultSectionNames } from '../../../plots/model'
+import {
+  LivePlotsData,
+  PlotSize,
+  Section
+} from '../../../plots/webview/contract'
 
 const data: LivePlotsData = {
   colors: {
@@ -208,7 +213,8 @@ const data: LivePlotsData = {
     }
   ],
   selectedMetrics: undefined,
-  size: PlotSize.REGULAR
+  size: PlotSize.REGULAR,
+  sectionName: DefaultSectionNames[Section.LIVE_PLOTS]
 }
 
 export default data
