@@ -54,15 +54,7 @@ const buildDynamicColumns = (
         Header: data.name,
         accessor: buildAccessor(pathArray),
         columns: childColumns.length ? childColumns : undefined,
-        id: path,
-        type: data.types
-      }
-      switch (data.types) {
-        case ['integer']:
-        case ['number']:
-          column.sortType = 'basic'
-          break
-        default:
+        id: path
       }
       return column
     })

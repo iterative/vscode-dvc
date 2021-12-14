@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 import {
   UseColumnOrderInstanceProps,
@@ -8,122 +8,90 @@ import {
   UseExpandedOptions,
   UseExpandedRowProps,
   UseExpandedState,
-  UseFiltersColumnOptions,
-  UseFiltersColumnProps,
-  UseFiltersInstanceProps,
-  UseFiltersOptions,
-  UseFiltersState,
-  UseGlobalFiltersColumnOptions,
-  UseGlobalFiltersInstanceProps,
-  UseGlobalFiltersOptions,
-  UseGlobalFiltersState,
-  UseGroupByCellProps,
-  UseGroupByColumnOptions,
-  UseGroupByColumnProps,
-  UseGroupByHooks,
-  UseGroupByInstanceProps,
-  UseGroupByOptions,
-  UseGroupByRowProps,
-  UseGroupByState,
-  UsePaginationInstanceProps,
-  UsePaginationOptions,
-  UsePaginationState,
   UseResizeColumnsColumnOptions,
   UseResizeColumnsColumnProps,
   UseResizeColumnsOptions,
-  UseResizeColumnsState,
-  UseRowSelectHooks,
-  UseRowSelectInstanceProps,
-  UseRowSelectOptions,
-  UseRowSelectRowProps,
-  UseRowSelectState,
-  UseRowStateCellProps,
-  UseRowStateInstanceProps,
-  UseRowStateOptions,
-  UseRowStateRowProps,
-  UseRowStateState,
-  UseSortByColumnOptions,
-  UseSortByColumnProps,
-  UseSortByHooks,
-  UseSortByInstanceProps,
-  UseSortByOptions,
-  UseSortByState
+  UseResizeColumnsState
 } from 'react-table'
 
 declare module 'react-table' {
-  // take this file as-is, or comment out the sections that don't apply to your plugin configuration
-
   export interface TableOptions<D extends Record<string, unknown>>
+    // UseFiltersOptions<D>,
+    // UseGlobalFiltersOptions<D>,
+    // UseGroupByOptions<D>,
+    // UsePaginationOptions<D>,
+    // UseRowSelectOptions<D>,
+    // UseRowStateOptions<D>,
+    // UseSortByOptions<D>,
     extends UseExpandedOptions<D>,
-      UseFiltersOptions<D>,
-      UseGlobalFiltersOptions<D>,
-      UseGroupByOptions<D>,
-      UsePaginationOptions<D>,
-      UseResizeColumnsOptions<D>,
-      UseRowSelectOptions<D>,
-      UseRowStateOptions<D>,
-      UseSortByOptions<D> {}
+      UseResizeColumnsOptions<D> {}
 
   export interface Hooks<
-    D extends Record<string, unknown> = Record<string, unknown>
-  > extends UseExpandedHooks<D>,
-      UseGroupByHooks<D>,
-      UseRowSelectHooks<D>,
-      UseSortByHooks<D> {}
+      D extends Record<string, unknown> = Record<string, unknown>
+    >
+    // UseGroupByHooks<D>,
+    // UseRowSelectHooks<D>,
+    // UseSortByHooks<D>
+    extends UseExpandedHooks<D> {}
 
   export interface TableInstance<
-    D extends Record<string, unknown> = Record<string, unknown>
-  > extends UseColumnOrderInstanceProps<D>,
-      UseExpandedInstanceProps<D>,
-      UseFiltersInstanceProps<D>,
-      UseGlobalFiltersInstanceProps<D>,
-      UseGroupByInstanceProps<D>,
-      UsePaginationInstanceProps<D>,
-      UseRowSelectInstanceProps<D>,
-      UseRowStateInstanceProps<D>,
-      UseSortByInstanceProps<D> {}
+      D extends Record<string, unknown> = Record<string, unknown>
+    >
+    // UseFiltersInstanceProps<D>,
+    // UseGlobalFiltersInstanceProps<D>,
+    // UseGroupByInstanceProps<D>,
+    // UsePaginationInstanceProps<D>,
+    // UseRowSelectInstanceProps<D>,
+    // UseRowStateInstanceProps<D>,
+    // UseSortByInstanceProps<D>,
+    extends UseColumnOrderInstanceProps<D>,
+      UseExpandedInstanceProps<D> {}
 
   export interface TableState<
-    D extends Record<string, unknown> = Record<string, unknown>
-  > extends UseColumnOrderState<D>,
+      D extends Record<string, unknown> = Record<string, unknown>
+    >
+    // UseFiltersState<D>,
+    // UseGlobalFiltersState<D>,
+    // UseGroupByState<D>,
+    // UsePaginationState<D>,
+    // UseRowSelectState<D>,
+    // UseRowStateState<D>,
+    // UseSortByState<D>,
+    extends UseColumnOrderState<D>,
       UseExpandedState<D>,
-      UseFiltersState<D>,
-      UseGlobalFiltersState<D>,
-      UseGroupByState<D>,
-      UsePaginationState<D>,
-      UseResizeColumnsState<D>,
-      UseRowSelectState<D>,
-      UseRowStateState<D>,
-      UseSortByState<D> {}
+      UseResizeColumnsState<D> {}
 
   export interface ColumnInterface<
-    D extends Record<string, unknown> = Record<string, unknown>
-  > extends UseFiltersColumnOptions<D>,
-      UseGlobalFiltersColumnOptions<D>,
-      UseGroupByColumnOptions<D>,
-      UseResizeColumnsColumnOptions<D>,
-      UseSortByColumnOptions<D> {
-    type?: string[]
-  }
+      D extends Record<string, unknown> = Record<string, unknown>
+    >
+    // UseFiltersColumnOptions<D>,
+    // UseGlobalFiltersColumnOptions<D>,
+    // UseGroupByColumnOptions<D>,
+    // UseSortByColumnOptions<D>,
+    extends UseResizeColumnsColumnOptions<D> {}
 
+  // UseFiltersColumnProps<D>,
+  // UseGroupByColumnProps<D>,
+  // UseSortByColumnProps<D>
   export interface ColumnInstance<
     D extends Record<string, unknown> = Record<string, unknown>
-  > extends UseFiltersColumnProps<D>,
-      UseGroupByColumnProps<D>,
-      UseResizeColumnsColumnProps<D>,
-      UseSortByColumnProps<D> {}
+  > extends UseResizeColumnsColumnProps<D> {}
 
+  // UseGroupByCellProps<D>,
+  // UseRowStateCellProps<D>
   export interface Cell<
-    D extends Record<string, unknown> = Record<string, unknown>
-  > extends UseGroupByCellProps<D>,
-      UseRowStateCellProps<D> {}
+    D extends Record<string, unknown> = Record<string, unknown>,
+    V = unknown
+  > {
+    isPlaceholder: boolean
+  }
 
+  // UseGroupByRowProps<D>,
+  // UseRowSelectRowProps<D>,
+  // UseRowStateRowProps<D>
   export interface Row<
     D extends Record<string, unknown> = Record<string, unknown>
-  > extends UseExpandedRowProps<D>,
-      UseGroupByRowProps<D>,
-      UseRowSelectRowProps<D>,
-      UseRowStateRowProps<D> {
+  > extends UseExpandedRowProps<D> {
     flatIndex: number
   }
 }
