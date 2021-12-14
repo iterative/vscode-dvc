@@ -200,7 +200,7 @@ describe('App', () => {
 
     expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
 
-    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -230,7 +230,7 @@ describe('App', () => {
       sectionCollapsed: defaultSectionCollapsed
     })
 
-    const [pickerButton] = screen.getAllByTestId('icon-menu-item')
+    const [, pickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -263,7 +263,7 @@ describe('App', () => {
       sectionCollapsed: defaultSectionCollapsed
     })
 
-    const [, sizePickerButton] = screen.getAllByTestId('icon-menu-item')
+    const [, , sizePickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizePickerButton)
     fireEvent.click(sizePickerButton)
 
@@ -290,7 +290,7 @@ describe('App', () => {
       sectionCollapsed: defaultSectionCollapsed
     })
 
-    const [, sizeButton] = screen.getAllByTestId('icon-menu-item')
+    const [, , sizeButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 
@@ -309,5 +309,41 @@ describe('App', () => {
       payload: PlotSize.SMALL,
       type: MessageFromWebviewType.PLOTS_RESIZED
     })
+  })
+
+  it('should show an input to rename the section when clicking the rename icon button', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
+
+    expect(screen.queryByRole('textbox')).toBeNull()
+
+    const [renameButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(renameButton)
+    fireEvent.click(renameButton)
+
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
+  })
+
+  it('should change the title of the section when hitting enter on the title input', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
+    const originalText = 'Live Experiments Plots'
+
+    expect(screen.getByText(originalText)).toBeInTheDocument()
+
+    const [renameButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(renameButton)
+    fireEvent.click(renameButton)
+
+    const titleInput = screen.getByRole('textbox')
+    const newTitle = 'Brand new section'
+    fireEvent.change(titleInput, { target: { value: newTitle } })
+    fireEvent.keyDown(titleInput, { key: 'Enter' })
+
+    expect(screen.getByText(newTitle)).toBeInTheDocument()
   })
 })
