@@ -382,9 +382,11 @@ $spinner-color-light: #000;
 
   .metaCell {
     color: $meta-cell-color;
-    justify-content: center;
     text-align: center;
     font-size: 0.75rem;
+    .innerCell {
+      justify-content: center;
+    }
   }
 }
 
@@ -461,6 +463,7 @@ $spinner-color-light: #000;
   height: 0.8em;
   line-height: 0.8em;
   padding: 0;
+  margin: 0 0.25em;
 }
 
 .cellContents {
