@@ -2,6 +2,7 @@ import { TableData } from '../experiments/webview/contract'
 import {
   PlotsData,
   PlotSize,
+  Section,
   SectionCollapsed
 } from '../plots/webview/contract'
 
@@ -13,7 +14,8 @@ export enum MessageFromWebviewType {
   COLUMN_RESIZED = 'column-resized',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_SECTION_TOGGLED = 'plots-section-toggled',
-  PLOTS_RESIZED = 'plots-resized'
+  PLOTS_RESIZED = 'plots-resized',
+  SECTION_RENAMED = 'section-renamed'
 }
 
 export type ColumnReorderPayload = string[]
@@ -24,6 +26,10 @@ export type ColumnResizePayload = {
 }
 export type MetricToggledPayload = string[]
 export type PlotsResizedPayload = PlotSize
+export type PlotSectionRenamedPayload = {
+  section: Section
+  name: string
+}
 
 export type MessageFromWebview =
   | {
@@ -45,6 +51,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
       payload: SectionCollapsed
+    }
+  | {
+      type: MessageFromWebviewType.SECTION_RENAMED
+      payload: PlotSectionRenamedPayload
     }
   | { type: MessageFromWebviewType.INITIALIZED }
 

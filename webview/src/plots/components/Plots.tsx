@@ -146,14 +146,25 @@ const Plots = ({
     sendMessage({ payload: size, type: MessageFromWebviewType.PLOTS_RESIZED })
   }
 
+  const setSectionName = (section: Section, name: string) => {
+    sendMessage({
+      payload: { name, section },
+      type: MessageFromWebviewType.SECTION_RENAMED
+    })
+  }
+
+  const basicContainerProps = {
+    dispatch,
+    onRename: setSectionName,
+    sectionCollapsed
+  }
+
   return (
     <>
       {livePlots && (
         <PlotsContainer
-          title="Live Experiments Plots"
+          title={livePlots.sectionName}
           sectionKey={Section.LIVE_PLOTS}
-          sectionCollapsed={sectionCollapsed}
-          dispatch={dispatch}
           menu={{
             metrics,
             selectedMetrics: selectedPlots,
@@ -161,6 +172,7 @@ const Plots = ({
             setSize: changeSize,
             size
           }}
+          {...basicContainerProps}
         >
           <LivePlots
             plots={livePlots.plots.filter(plot =>
@@ -173,12 +185,11 @@ const Plots = ({
       )}
       {staticPlots && (
         <PlotsContainer
-          title="Static Plots"
+          title={staticPlots.sectionName}
           sectionKey={Section.STATIC_PLOTS}
-          sectionCollapsed={sectionCollapsed}
-          dispatch={dispatch}
+          {...basicContainerProps}
         >
-          <StaticPlots plots={staticPlots} />
+          <StaticPlots plots={staticPlots.plots} />
         </PlotsContainer>
       )}
     </>
