@@ -33,7 +33,11 @@ export const createSpec = (
           { mark: 'line' },
           {
             mark: 'point',
-            transform: [{ filter: { empty: false, param: 'hover' } }]
+            transform: [
+              {
+                filter: { empty: false, param: 'hover' }
+              }
+            ]
           }
         ]
       },
@@ -58,6 +62,10 @@ export const createSpec = (
           }
         ],
         transform: [
+          {
+            as: 'y',
+            calculate: "format(datum['y'],'.5f')"
+          },
           {
             groupby: ['iteration'],
             op: 'mean',
