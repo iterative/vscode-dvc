@@ -8,7 +8,6 @@ import {
   buildSingleRepoExperiments
 } from './util'
 import { Disposable } from '../../../extension'
-import { CliReader } from '../../../cli/reader'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
@@ -341,25 +340,38 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.applyExperiment', () => {
     it('should ask the user to pick an experiment and then apply that experiment to the workspace', async () => {
-      const mockExperiment = 'exp-to-apply'
+      const selectedExperiment = 'test-branch'
+
+      const { experiments } = buildExperiments(disposable)
 
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (WorkspaceExperiments as any).prototype,
         'getOnlyOrPickProject'
       ).returns(dvcDemoPath)
-      stub(CliReader.prototype, 'experimentListCurrent').resolves([
-        mockExperiment
-      ])
-
-      stub(window, 'showQuickPick').resolves(
-        mockExperiment as unknown as QuickPickItem
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getRepository'
+      ).returns(experiments)
+      const mockShowQuickPick = stub(window, 'showQuickPick').resolves(
+        selectedExperiment as unknown as QuickPickItem
       )
       const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
 
-      expect(mockExperimentApply).to.be.calledWith(dvcDemoPath, mockExperiment)
+      expect(mockExperimentApply).to.be.calledWith(
+        dvcDemoPath,
+        selectedExperiment
+      )
+      expect(mockShowQuickPick).to.be.calledWith(
+        ['exp-e7a67', 'test-branch', 'exp-83425'],
+        {
+          canPickMany: false,
+          placeHolder: 'Select an experiment'
+        }
+      )
     })
   })
 
@@ -367,17 +379,19 @@ suite('Workspace Experiments Test Suite', () => {
     it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
       const mockExperiment = 'exp-to-remove'
 
+      const { experiments } = buildExperiments(disposable)
+
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (WorkspaceExperiments as any).prototype,
         'getOnlyOrPickProject'
       ).returns(dvcDemoPath)
-      stub(CliReader.prototype, 'experimentListCurrent').resolves([
-        'exp-afc12',
-        mockExperiment,
-        'exp-bcde2',
-        'exp-ghi1k'
-      ])
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getRepository'
+      ).returns(experiments)
+
       stub(window, 'showQuickPick').resolves(
         mockExperiment as unknown as QuickPickItem
       )
