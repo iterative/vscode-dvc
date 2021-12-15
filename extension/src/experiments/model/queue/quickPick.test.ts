@@ -26,6 +26,7 @@ describe('pickParamsAndVary', () => {
   })
 
   it('should convert any selected params into the required format', async () => {
+    const unchanged = { path: 'params.yaml:learning_rate', value: 2e-12 }
     const initialUserResponse = [
       { path: 'params.yaml:dropout', value: 0.15 },
       { path: 'params.yaml:process.threshold', value: 0.86 }
@@ -37,7 +38,7 @@ describe('pickParamsAndVary', () => {
     mockedGetInput.mockResolvedValueOnce(secondInput)
 
     const paramsToQueue = await pickParamsAndVary([
-      { path: 'params.yaml:learning_rate', value: 2e-12 },
+      unchanged,
       ...initialUserResponse
     ])
 
@@ -45,7 +46,9 @@ describe('pickParamsAndVary', () => {
       '-S',
       `params.yaml:dropout=${firstInput}`,
       '-S',
-      `params.yaml:process.threshold=${secondInput}`
+      `params.yaml:process.threshold=${secondInput}`,
+      '-S',
+      [unchanged.path, unchanged.value].join('=')
     ])
     expect(mockedGetInput).toBeCalledTimes(2)
   })

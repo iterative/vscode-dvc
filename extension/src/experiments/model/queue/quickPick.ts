@@ -2,6 +2,7 @@ import { Param } from './collect'
 import { quickPickManyValues } from '../../../vscode/quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { Flag } from '../../../cli/args'
+import { definedAndNonEmpty } from '../../../util/array'
 
 export const pickParamsAndVary = async (params: Param[]) => {
   const paramsToVary = await quickPickManyValues<Param>(
@@ -14,19 +15,29 @@ export const pickParamsAndVary = async (params: Param[]) => {
     { title: 'Select a param to vary' }
   )
 
-  if (!paramsToVary) {
+  if (!definedAndNonEmpty(paramsToVary)) {
     return
   }
 
-  const acc: string[] = []
+  const paramPathsToVary = paramsToVary.map(param => param.path)
+  const unchanged = params.filter(
+    param => !paramPathsToVary.includes(param.path)
+  )
+
+  const args: string[] = []
   for (const { path, value } of paramsToVary) {
     const input = await getInput(`Enter a value for ${path}`, `${value}`)
     if (input === undefined) {
       return
     }
-    acc.push(Flag.SET_PARAM)
-    acc.push([path, input.trim()].join('='))
+    args.push(Flag.SET_PARAM)
+    args.push([path, input.trim()].join('='))
   }
 
-  return acc
+  unchanged.forEach(({ path, value }) => {
+    args.push(Flag.SET_PARAM)
+    args.push([path, value].join('='))
+  })
+
+  return args
 }
