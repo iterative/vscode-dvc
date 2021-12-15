@@ -109,7 +109,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!cwd) {
       return
     }
-    const experiments = this.getRepository(cwd)
+    const repository = this.getRepository(cwd)
 
     const csv = await pickCsv('Select a CSV to queue experiments from')
     if (!csv) {
@@ -119,7 +119,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     const toQueue = await readToQueueFromCsv(csv)
 
     for (const params of toQueue) {
-      await experiments.forceUpdate()
+      await repository.forceUpdate()
       await reportOutput(
         this.internalCommands.executeCommand(
           AvailableCommands.EXPERIMENT_QUEUE,
@@ -141,7 +141,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const paramsToQueue = await repository.pickQueueParams()
+    const paramsToQueue = await repository.pickParamsToQueue()
     if (!paramsToQueue) {
       return
     }
