@@ -10,6 +10,7 @@ import {
 import { collectExperiments } from './collect'
 import { copyOriginalColors } from './colors'
 import { collectColors, Colors } from './colors/collect'
+import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
@@ -165,6 +166,24 @@ export class ExperimentsModel {
       ...this.addDetails(experiment),
       hasChildren: !!this.checkpointsByTip.get(experiment.id)
     }))
+  }
+
+  public getExperimentNames() {
+    return [
+      'workspace',
+      ...this.flattenExperiments().map(experiment => experiment.displayName)
+    ].filter(Boolean) as string[]
+  }
+
+  public getExperimentParams(displayName: string) {
+    const params =
+      displayName === 'workspace'
+        ? this.workspace.params
+        : this.flattenExperiments().find(
+            experiment => experiment.displayName === displayName
+          )?.params
+
+    return collectFlatExperimentParams(params)
   }
 
   public getSelectable() {

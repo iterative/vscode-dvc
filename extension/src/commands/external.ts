@@ -38,6 +38,7 @@ export enum RegisteredCommands {
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
   EXPERIMENT_TOGGLE = 'dvc.views.experimentsTree.toggleStatus',
   QUEUE_EXPERIMENTS_FROM_CSV = 'dvc.queueExperimentsFromCsv',
+  QUEUE_EXPERIMENT_FROM_EXISTING = 'dvc.queueExperimentFromExisting',
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
   PLOTS_SHOW = 'dvc.showPlots',

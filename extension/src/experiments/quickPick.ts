@@ -3,7 +3,7 @@ import { quickPickManyValues, quickPickOne } from '../vscode/quickPick'
 import { reportError } from '../vscode/reporting'
 
 export const pickExperimentName = async (
-  experimentNamesPromise: Promise<string[]>
+  experimentNamesPromise: Promise<string[]> | string[]
 ): Promise<string | undefined> => {
   const experimentNames = await experimentNamesPromise
   if (experimentNames.length === 0) {

@@ -198,6 +198,15 @@
         }
       },
       {
+        "title": "%command.queueExperimentFromExisting%",
+        "command": "dvc.queueExperimentFromExisting",
+        "category": "DVC",
+        "icon": {
+          "dark": "resources/dark/queue-experiment.svg",
+          "light": "resources/light/queue-experiment.svg"
+        }
+      },
+      {
         "title": "%command.queueExperiment%",
         "command": "dvc.queueExperiment",
         "category": "DVC",
@@ -479,6 +488,10 @@
         },
         {
           "command": "dvc.queueExperimentsFromCsv",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.queueExperimentFromExisting",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
