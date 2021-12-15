@@ -60,25 +60,6 @@ describe('CliReader', () => {
     }
   )
 
-  describe('experimentListCurrent', () => {
-    it('should call the cli with the correct parameters to list all current experiments', async () => {
-      const cwd = __dirname
-      const experimentNames = ['exp-0180a', 'exp-c5444', 'exp-054c1']
-      mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(experimentNames.join('\n'))
-      )
-
-      const experimentList = await cliReader.experimentListCurrent(cwd)
-      expect(experimentList).toEqual(experimentNames)
-      expect(mockedCreateProcess).toBeCalledWith({
-        args: ['exp', 'list', '--names-only'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
   describe('experimentShow', () => {
     it('should match the expected output', async () => {
       const cwd = __dirname

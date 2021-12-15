@@ -1,7 +1,6 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
 import { readToQueueFromCsv } from './model/queue'
-import { pickExperimentName } from './quickPick'
 import { TableData } from './webview/contract'
 import {
   CommandId,
@@ -184,7 +183,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experimentName = await this.pickExperimentName(cwd)
+    const experimentName = await this.pickCurrentExperimentName(cwd)
 
     if (!experimentName) {
       return
@@ -220,7 +219,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experimentName = await this.pickExperimentName(cwd)
+    const experimentName = await this.pickCurrentExperimentName(cwd)
 
     if (!experimentName) {
       return
@@ -283,12 +282,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
 
-  private pickExperimentName(cwd: string) {
-    return pickExperimentName(
-      this.internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_LIST_CURRENT,
-        cwd
-      )
-    )
+  private pickCurrentExperimentName(cwd: string) {
+    return this.getRepository(cwd).pickCurrentExperimentName()
   }
 }
