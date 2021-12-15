@@ -34,13 +34,11 @@ export enum ExperimentSubCommand {
   APPLY = 'apply',
   BRANCH = 'branch',
   GARBAGE_COLLECT = 'gc',
-  LIST = 'list',
   REMOVE = 'remove',
   RUN = 'run'
 }
 
 export enum ExperimentFlag {
-  NAMES_ONLY = '--names-only',
   QUEUE = '--queue',
   RESET = '--reset',
   RUN_ALL = '--run-all'

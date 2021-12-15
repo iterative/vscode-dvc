@@ -2,7 +2,6 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { Experiments } from '.'
 import { WorkspaceExperiments } from './workspace'
-import { pickExperimentName } from './quickPick'
 import { quickPickOne } from '../vscode/quickPick'
 import {
   CommandId,
@@ -19,7 +18,7 @@ const mockedDisposable = mocked(Disposable)
 const mockedDvcRoot = '/my/dvc/root'
 const mockedOtherDvcRoot = '/my/fun/dvc/root'
 const mockedQuickPickOne = mocked(quickPickOne)
-const mockedPickExperimentName = mocked(pickExperimentName)
+const mockedPickCurrentExperimentName = jest.fn()
 const mockedGetInput = mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
@@ -27,7 +26,6 @@ const mockedExpFunc = jest.fn()
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
-jest.mock('./quickPick')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -50,11 +48,6 @@ describe('Experiments', () => {
   )
 
   mockedInternalCommands.registerCommand(
-    AvailableCommands.EXPERIMENT_LIST_CURRENT,
-    jest.fn()
-  )
-
-  mockedInternalCommands.registerCommand(
     AvailableCommands.EXPERIMENT_RUN,
     (...args) => mockedRun(...args)
   )
@@ -68,10 +61,12 @@ describe('Experiments', () => {
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
+        pickCurrentExperimentName: mockedPickCurrentExperimentName,
         showWebview: mockedShowWebview
       } as unknown as Experiments,
       '/my/fun/dvc/root': {
         getDvcRoot: () => mockedOtherDvcRoot,
+        pickCurrentExperimentName: jest.fn(),
         showWebview: jest.fn()
       } as unknown as Experiments
     }
@@ -114,12 +109,12 @@ describe('Experiments', () => {
   describe('getExpNameThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickExperimentName.mockResolvedValueOnce('exp-123')
+      mockedPickCurrentExperimentName.mockResolvedValueOnce('exp-123')
 
       await workspaceExperiments.getExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedPickExperimentName).toBeCalledTimes(1)
+      expect(mockedPickCurrentExperimentName).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123')
     })
@@ -188,7 +183,7 @@ describe('Experiments', () => {
   describe('getExpNameAndInputThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked and an input provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickExperimentName.mockResolvedValueOnce('exp-123')
+      mockedPickCurrentExperimentName.mockResolvedValueOnce('exp-123')
       mockedGetInput.mockResolvedValueOnce('abc123')
 
       await workspaceExperiments.getExpNameAndInputThenRun(
@@ -197,7 +192,7 @@ describe('Experiments', () => {
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedPickExperimentName).toBeCalledTimes(1)
+      expect(mockedPickCurrentExperimentName).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123', 'abc123')
     })
@@ -217,7 +212,7 @@ describe('Experiments', () => {
 
     it('should not call the function if user input is not provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickExperimentName.mockResolvedValueOnce('exp-456')
+      mockedPickCurrentExperimentName.mockResolvedValueOnce('exp-456')
       mockedGetInput.mockResolvedValueOnce(undefined)
 
       await workspaceExperiments.getExpNameAndInputThenRun(
