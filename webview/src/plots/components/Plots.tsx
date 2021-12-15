@@ -8,8 +8,7 @@ import {
   Section
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { VegaLite } from 'react-vega'
-import cx from 'classnames'
+import { VegaLite, VisualizationSpec } from 'react-vega'
 import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
@@ -44,21 +43,13 @@ const Plot = ({
 
 const LivePlots = ({
   plots,
-  colors,
-  size
+  colors
 }: {
   plots: LivePlotData[]
   colors: LivePlotsColors
-  size: PlotSize
-}) => {
-  const sizeClass = cx(styles.plotsWrapper, {
-    [styles.smallPlots]: size === PlotSize.SMALL,
-    [styles.regularPlots]: size === PlotSize.REGULAR,
-    [styles.largePlots]: size === PlotSize.LARGE
-  })
-
-  return plots.length ? (
-    <div className={sizeClass} data-testid="plots-wrapper">
+}) =>
+  plots.length ? (
+    <>
       {plots.map(plotData => (
         <Plot
           values={plotData.values}
@@ -67,24 +58,30 @@ const LivePlots = ({
           key={`plot-${plotData.title}`}
         />
       ))}
-    </div>
+    </>
   ) : (
     EmptyState('No metrics selected')
   )
-}
 
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
     {Object.entries(plots).map(([path, plots]) =>
       plots.map((plot, i) =>
         isVegaPlot(plot) ? (
-          <VegaLite
-            actions={false}
-            config={config}
-            spec={plot.content}
-            renderer="svg"
-            key={`plot-${path}-${i}`}
-          />
+          <div className={styles.plot} key={`plot-${path}-${i}`}>
+            <VegaLite
+              actions={false}
+              config={config}
+              spec={
+                {
+                  ...plot.content,
+                  height: 'container',
+                  width: 'container'
+                } as VisualizationSpec
+              }
+              renderer="svg"
+            />
+          </div>
         ) : undefined
       )
     )}
@@ -106,21 +103,12 @@ const Plots = ({
 
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
-  const [size, setSize] = useState<PlotSize>(PlotSize.REGULAR)
 
   useEffect(() => {
     const newMetrics = getMetricsFromPlots(data?.live?.plots)
     setMetrics(newMetrics)
     setSelectedPlots(data?.live?.selectedMetrics || newMetrics)
   }, [data, setSelectedPlots, setMetrics])
-
-  useEffect(() => {
-    setSize(data?.live?.size || PlotSize.REGULAR)
-  }, [data, setSize])
-
-  useEffect(() => {
-    window.dispatchEvent(new Event('resize'))
-  }, [size])
 
   if (!data || !data.sectionCollapsed) {
     return EmptyState('Loading Plots...')
@@ -140,9 +128,11 @@ const Plots = ({
     })
   }
 
-  const changeSize = (size: PlotSize) => {
-    setSize(size)
-    sendMessage({ payload: size, type: MessageFromWebviewType.PLOTS_RESIZED })
+  const changeSize = (size: PlotSize, section: Section) => {
+    sendMessage({
+      payload: { section, size },
+      type: MessageFromWebviewType.PLOTS_RESIZED
+    })
   }
 
   const setSectionName = (section: Section, name: string) => {
@@ -155,6 +145,7 @@ const Plots = ({
   const basicContainerProps = {
     dispatch,
     onRename: setSectionName,
+    onResize: changeSize,
     sectionCollapsed
   }
 
@@ -167,10 +158,9 @@ const Plots = ({
           menu={{
             metrics,
             selectedMetrics: selectedPlots,
-            setSelectedPlots: setSelectedMetrics,
-            setSize: changeSize,
-            size
+            setSelectedPlots: setSelectedMetrics
           }}
+          currentSize={livePlots.size}
           {...basicContainerProps}
         >
           <LivePlots
@@ -178,7 +168,6 @@ const Plots = ({
               selectedPlots?.includes(getDisplayNameFromPath(plot.title))
             )}
             colors={livePlots.colors}
-            size={size}
           />
         </PlotsContainer>
       )}
@@ -186,6 +175,7 @@ const Plots = ({
         <PlotsContainer
           title={staticPlots.sectionName}
           sectionKey={Section.STATIC_PLOTS}
+          currentSize={staticPlots.size}
           {...basicContainerProps}
         >
           <StaticPlots plots={staticPlots.plots} />

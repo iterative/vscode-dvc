@@ -56,6 +56,7 @@ export type PlotsOutput = Record<string, StaticPlot[]>
 export interface StaticPlotsData {
   plots: PlotsOutput
   sectionName: string
+  size: PlotSize
 }
 
 export enum Section {

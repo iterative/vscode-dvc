@@ -101,7 +101,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getStaticPlots(data: PlotsOutput | undefined) {
-    if (isEmpty(data)) {
+    if (isEmpty(data) || !this.model) {
       return null
     }
 
@@ -122,7 +122,8 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     return {
       plots,
-      sectionName: this.model?.getSectionName(Section.STATIC_PLOTS) || ''
+      sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
+      size: this.model.getPlotSize(Section.STATIC_PLOTS)
     }
   }
 
@@ -135,7 +136,13 @@ export class Plots extends BaseRepository<TPlotsData> {
               message.payload && this.model?.setSelectedMetrics(message.payload)
             )
           case MessageFromWebviewType.PLOTS_RESIZED:
-            return message.payload && this.model?.setPlotSize(message.payload)
+            return (
+              message.payload &&
+              this.model?.setPlotSize(
+                message.payload.section,
+                message.payload.size
+              )
+            )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return (
               message.payload &&

@@ -1,4 +1,4 @@
-import { DefaultSectionNames, PlotsModel } from '.'
+import { DefaultSectionNames, DefaultSectionSizes, PlotsModel } from '.'
 import { defaultSectionCollapsed, PlotSize, Section } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
@@ -11,7 +11,7 @@ describe('plotsModel', () => {
   const memento = buildMockMemento({
     [MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [MementoPrefix.PLOT_SIZE + exampleDvcRoot]: PlotSize.REGULAR
+    [MementoPrefix.PLOT_SIZE + exampleDvcRoot]: DefaultSectionSizes
   })
 
   beforeEach(() => {
@@ -48,22 +48,22 @@ describe('plotsModel', () => {
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
-    expect(model.getPlotSize()).toEqual(PlotSize.REGULAR)
+    expect(model.getPlotSize(Section.LIVE_PLOTS)).toEqual(PlotSize.REGULAR)
 
-    model.setPlotSize(PlotSize.LARGE)
+    model.setPlotSize(Section.LIVE_PLOTS, PlotSize.LARGE)
 
-    expect(model.getPlotSize()).toEqual(PlotSize.LARGE)
+    expect(model.getPlotSize(Section.LIVE_PLOTS)).toEqual(PlotSize.LARGE)
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setPlotSize(PlotSize.SMALL)
+    model.setPlotSize(Section.LIVE_PLOTS, PlotSize.SMALL)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       MementoPrefix.PLOT_SIZE + exampleDvcRoot,
-      PlotSize.SMALL
+      { ...DefaultSectionSizes, [Section.LIVE_PLOTS]: PlotSize.SMALL }
     )
   })
 
