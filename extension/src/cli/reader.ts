@@ -1,14 +1,6 @@
 import isEqual from 'lodash.isequal'
 import { Cli, typeCheckCommands } from '.'
-import {
-  Args,
-  Command,
-  ExperimentFlag,
-  ExperimentSubCommand,
-  Flag,
-  ListFlag,
-  SubCommand
-} from './args'
+import { Args, Command, Flag, ListFlag, SubCommand } from './args'
 import { retry } from './retry'
 import { trimAndSplit } from '../util/stdout'
 import { PlotsOutput } from '../plots/webview/contract'
@@ -101,7 +93,6 @@ export interface ExperimentsOutput {
 
 export const autoRegisteredCommands = {
   DIFF: 'diff',
-  EXPERIMENT_LIST_CURRENT: 'experimentListCurrent',
   EXPERIMENT_SHOW: 'experimentShow',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
   PLOTS_SHOW: 'plotsShow',
@@ -113,16 +104,6 @@ export class CliReader extends Cli {
     autoRegisteredCommands,
     this
   )
-
-  public experimentListCurrent(cwd: string): Promise<string[]> {
-    return this.readProcess<string[]>(
-      cwd,
-      trimAndSplit,
-      Command.EXPERIMENT,
-      ExperimentSubCommand.LIST,
-      ExperimentFlag.NAMES_ONLY
-    )
-  }
 
   public experimentShow(cwd: string): Promise<ExperimentsOutput> {
     return this.readShowProcessJson<ExperimentsOutput>(cwd, Command.EXPERIMENT)

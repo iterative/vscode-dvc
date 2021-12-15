@@ -200,6 +200,10 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
+  public pickCurrentExperimentName() {
+    return pickExperimentName(this.experiments.getCurrentExperimentNames())
+  }
+
   public async pickParamsToQueue() {
     const base = await pickExperimentName(this.experiments.getExperimentNames())
 
