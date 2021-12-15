@@ -1,7 +1,7 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
-import { pickParamsAndVary } from './model/queue/quickPick'
+import { pickParamsToQueue } from './model/queue/quickPick'
 import { pickExperimentName } from './quickPick'
 import {
   pickFilterToAdd,
@@ -213,7 +213,7 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    return pickParamsAndVary(params)
+    return pickParamsToQueue(params)
   }
 
   public getExperiments() {
