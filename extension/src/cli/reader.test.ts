@@ -290,14 +290,19 @@ describe('CliReader', () => {
         )
 
         const plots = await cliReader.plotsShow(cwd)
-        expect(plots).toEqual({})
-        expect(mockedCreateProcess).not.toBeCalled()
-        // expect(mockedCreateProcess).toBeCalledWith({
-        //   args: ['plots', 'show', SHOW_JSON],
-        //   cwd,
-        //   env: mockedEnv,
-        //   executable: 'dvc'
-        // })
+        expect(plots).toEqual(plotsShowFixture)
+        expect(mockedCreateProcess).toBeCalledWith({
+          args: [
+            'plots',
+            'show',
+            '-o',
+            join('.dvc', 'tmp', 'plots'),
+            SHOW_JSON
+          ],
+          cwd,
+          env: mockedEnv,
+          executable: 'dvc'
+        })
       })
     })
 
