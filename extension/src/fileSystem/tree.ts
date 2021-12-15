@@ -221,7 +221,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       async ({ dvcRoot, resourceUri }) => {
         const relPath = relativeWithUri(dvcRoot, resourceUri)
         const relDestination = await getInput(
-          'enter a destination relative to the root',
+          'Enter a destination relative to the root',
           relPath
         )
         if (!relDestination || relDestination === relPath) {

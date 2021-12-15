@@ -59,7 +59,7 @@ const registerExperimentInputCommands = (
     () =>
       experiments.getExpNameAndInputThenRun(
         AvailableCommands.EXPERIMENT_BRANCH,
-        'Name the new branch'
+        'Enter a name for the new branch'
       )
   )
 
