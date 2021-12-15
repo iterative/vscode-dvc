@@ -175,6 +175,14 @@ export class ExperimentsModel {
     ].filter(Boolean) as string[]
   }
 
+  public getCurrentExperimentNames() {
+    return [
+      ...this.flattenExperiments()
+        .filter(exp => !exp.queued)
+        .map(experiment => experiment.displayName)
+    ].filter(Boolean) as string[]
+  }
+
   public getExperimentParams(displayName: string) {
     const params =
       displayName === 'workspace'
