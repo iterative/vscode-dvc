@@ -1,8 +1,12 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
-import { window, commands, QuickPickItem, Uri } from 'vscode'
-import { buildMultiRepoExperiments, buildSingleRepoExperiments } from './util'
+import { stub, restore, SinonStub } from 'sinon'
+import { window, commands, QuickPickItem, Uri, QuickPickOptions } from 'vscode'
+import {
+  buildExperiments,
+  buildMultiRepoExperiments,
+  buildSingleRepoExperiments
+} from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
@@ -18,6 +22,8 @@ import {
 import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
 import { join } from '../../util/path'
+import { Param } from '../../../experiments/model/queue/collect'
+import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -131,6 +137,63 @@ suite('Workspace Experiments Test Suite', () => {
         dvcDemoPath,
         '-S',
         'lr=0.0005'
+      )
+    })
+  })
+
+  describe('dvc.queueExperimentsFromExisting', () => {
+    it('should be able to queue an experiment using an existing one as a base', async () => {
+      const { experiments } = buildExperiments(disposable)
+
+      const mockExperimentRunQueue = stub(
+        CliExecutor.prototype,
+        'experimentRunQueue'
+      ).resolves('true')
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptions],
+        Thenable<QuickPickItem[] | string | undefined>
+      >
+      mockShowQuickPick
+        .onFirstCall()
+        .resolves('workspace')
+        .onSecondCall()
+        .resolves([
+          {
+            label: 'params.yaml:dropout',
+            value: { path: 'params.yaml:dropout', value: 0.122 }
+          },
+          {
+            label: 'params.yaml:process.threshold',
+            value: { path: 'params.yaml:process.threshold', value: 0.86 }
+          }
+        ] as QuickPickItemWithValue<Param>[])
+
+      stub(window, 'showInputBox')
+        .onFirstCall()
+        .resolves('0.15')
+        .onSecondCall()
+        .resolves('0.16')
+
+      await commands.executeCommand(
+        RegisteredCommands.QUEUE_EXPERIMENT_FROM_EXISTING
+      )
+
+      expect(mockExperimentRunQueue).to.be.calledOnce
+      expect(mockExperimentRunQueue).to.be.calledWith(
+        dvcDemoPath,
+        '-S',
+        'params.yaml:dropout=0.15',
+        '-S',
+        'params.yaml:process.threshold=0.16'
       )
     })
   })

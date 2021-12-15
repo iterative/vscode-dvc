@@ -25,6 +25,14 @@ const registerExperimentCwdCommands = (
         experiments.queueExperimentsFromCsv()
       )
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.QUEUE_EXPERIMENT_FROM_EXISTING,
+    () =>
+      experiments.pauseUpdatesThenRun(() =>
+        experiments.queueExperimentFromExisting()
+      )
+  )
 }
 
 const registerExperimentNameCommands = (

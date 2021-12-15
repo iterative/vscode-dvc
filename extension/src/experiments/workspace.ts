@@ -1,6 +1,6 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
-import { readToQueueFromCsv } from './queue'
+import { readToQueueFromCsv } from './model/queue'
 import { pickExperimentName } from './quickPick'
 import { TableData } from './webview/contract'
 import {
@@ -109,7 +109,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!cwd) {
       return
     }
-    const experiments = this.getRepository(cwd)
+    const repository = this.getRepository(cwd)
 
     const csv = await pickCsv('Select a CSV to queue experiments from')
     if (!csv) {
@@ -119,7 +119,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     const toQueue = await readToQueueFromCsv(csv)
 
     for (const params of toQueue) {
-      await experiments.forceUpdate()
+      await repository.forceUpdate()
       await reportOutput(
         this.internalCommands.executeCommand(
           AvailableCommands.EXPERIMENT_QUEUE,
@@ -128,6 +128,31 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         )
       )
     }
+  }
+
+  public async queueExperimentFromExisting() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const repository = this.getRepository(cwd)
+    if (!repository) {
+      return
+    }
+
+    const paramsToQueue = await repository.pickParamsToQueue()
+    if (!paramsToQueue) {
+      return
+    }
+
+    return reportOutput(
+      this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_QUEUE,
+        cwd,
+        ...paramsToQueue
+      )
+    )
   }
 
   public async getCwdThenRun(commandId: CommandId) {
