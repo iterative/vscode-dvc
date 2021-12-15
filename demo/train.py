@@ -1,6 +1,6 @@
 """Model training and evaluation."""
 import json
-import yaml
+from ruamel.yaml import YAML
 import os
 import torch
 import torch.nn.functional as F
@@ -91,8 +91,9 @@ def main():
     if os.path.exists("model.pt"):
         model.load_state_dict(torch.load("model.pt"))
     # Load params.
+    yaml = YAML(typ="safe")
     with open("params.yaml") as f:
-        params = yaml.safe_load(f)
+        params = yaml.load(f)
     torch.manual_seed(params["seed"])
     # Load train and test data.
     mnist_train = torchvision.datasets.MNIST("data", download=True)

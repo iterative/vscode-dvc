@@ -2,3 +2,4 @@ dvc[s3]>=2.8.2
 dvclive
 torch
 torchvision
+ruamel.yaml
