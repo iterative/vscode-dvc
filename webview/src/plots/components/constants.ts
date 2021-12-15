@@ -31,7 +31,7 @@ export const createSpec = (
         },
 
         layer: [
-          { mark: 'line' },
+          { mark: { type: 'line' } },
           {
             mark: { type: 'point' },
             transform: [
