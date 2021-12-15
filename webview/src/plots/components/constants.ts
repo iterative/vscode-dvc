@@ -10,44 +10,81 @@ export const createSpec = (
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
     encoding: {
-      x: { field: 'x', title: 'iteration', type: 'nominal' }
+      x: {
+        axis: { format: '0d', tickMinStep: 1 },
+        field: 'iteration',
+        title: 'iteration',
+        type: 'quantitative'
+      },
+      y: {
+        field: 'y',
+        scale: { zero: false },
+        title,
+        type: 'quantitative'
+      }
     },
     height: 'container',
     layer: [
       {
         encoding: {
-          color: { field: 'group', legend: null, scale, type: 'nominal' },
-          y: { field: 'y', scale: { zero: false }, title, type: 'quantitative' }
+          color: { field: 'group', legend: null, scale, type: 'nominal' }
         },
+
         layer: [
-          { mark: 'line' },
+          { mark: { type: 'line' } },
           {
-            mark: 'point',
-            transform: [{ filter: { empty: false, param: 'hover' } }]
+            mark: { type: 'point' },
+            transform: [
+              {
+                filter: { empty: false, param: 'hover' }
+              }
+            ]
           }
         ]
       },
       {
         encoding: {
-          opacity: {
-            condition: { empty: false, param: 'hover', value: 0.8 },
-            value: 0
-          }
+          opacity: { value: 0 },
+          tooltip: [
+            { field: 'group', title: 'name' },
+            {
+              field: 'y',
+              title: title.substring(title.indexOf(':') + 1),
+              type: 'quantitative'
+            }
+          ]
         },
-        mark: { tooltip: { content: 'data' }, type: 'rule' },
+        mark: { type: 'rule' },
         params: [
           {
             name: 'hover',
             select: {
               clear: 'mouseout',
-              fields: ['x'],
+              fields: ['iteration', 'y'],
               nearest: true,
               on: 'mouseover',
               type: 'point'
             }
           }
-        ],
-        transform: [{ groupby: ['x'], pivot: 'group', value: 'y' }]
+        ]
+      },
+      {
+        encoding: {
+          color: { field: 'group', scale },
+          x: { aggregate: 'max', field: 'iteration', type: 'quantitative' },
+          y: {
+            aggregate: { argmax: 'iteration' },
+            field: 'y',
+            type: 'quantitative'
+          }
+        },
+        mark: { stroke: null, type: 'circle' }
+      }
+    ],
+    transform: [
+      {
+        as: 'y',
+        calculate: "format(datum['y'],'.5f')"
       }
     ],
     width: 'container'
@@ -60,6 +97,7 @@ export const config: Config = {
   axis: {
     domain: false,
     gridOpacity: 0.25,
+    labelAngle: 0,
     tickColor: foregroundColor,
     titleColor: foregroundColor
   },

@@ -5,7 +5,8 @@ import {
   LivePlotData,
   PlotsOutput,
   PlotSize,
-  Section
+  Section,
+  LivePlotValues
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
@@ -22,7 +23,7 @@ const Plot = ({
   title,
   scale
 }: {
-  values: { x: number; y: number; group: string }[]
+  values: LivePlotValues
   title: string
   scale?: LivePlotsColors
 }) => {

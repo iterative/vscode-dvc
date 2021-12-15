@@ -1,6 +1,6 @@
 import { VisualizationSpec } from 'react-vega'
 
-export type LivePlotValues = { group: string; x: number; y: number }[]
+export type LivePlotValues = { group: string; iteration: number; y: number }[]
 
 export type LivePlotsColors = { domain: string[]; range: string[] }
 
