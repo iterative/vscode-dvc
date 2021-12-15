@@ -1,6 +1,6 @@
-import { Flag } from '../cli/args'
-import { readCsv } from '../fileSystem'
-import { definedAndNonEmpty } from '../util/array'
+import { Flag } from '../../../cli/args'
+import { readCsv } from '../../../fileSystem'
+import { definedAndNonEmpty } from '../../../util/array'
 
 const collectParamsToVary = (csvRow: Record<string, unknown>): string[] =>
   Object.entries(csvRow).reduce((acc, [k, v]) => {
