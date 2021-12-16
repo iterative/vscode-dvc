@@ -131,6 +131,10 @@ describe('App', () => {
       sectionCollapsed: defaultSectionCollapsed
     })
 
+    const heightToSuppressVegaError = 1000
+    jest
+      .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+      .mockImplementation(() => heightToSuppressVegaError)
     sendSetDataMessage({
       static: staticPlotsFixture
     })

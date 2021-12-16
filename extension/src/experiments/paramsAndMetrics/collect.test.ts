@@ -365,6 +365,11 @@ describe('collectParamsAndMetrics', () => {
     expect(
       collectParamsAndMetrics(expShowFixture).map(({ path }) => path)
     ).toEqual([
+      joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
+      joinParamOrMetricPath('metrics', 'summary.json', 'accuracy'),
+      joinParamOrMetricPath('metrics', 'summary.json', 'val_loss'),
+      joinParamOrMetricPath('metrics', 'summary.json', 'val_accuracy'),
+      joinParamOrMetricPath('metrics', 'summary.json'),
       joinParamOrMetricPath('params', 'params.yaml', 'epochs'),
       joinParamOrMetricPath('params', 'params.yaml', 'learning_rate'),
       joinParamOrMetricPath('params', 'params.yaml', 'dvc_logs_dir'),
@@ -375,12 +380,7 @@ describe('collectParamsAndMetrics', () => {
       joinParamOrMetricPath('params', 'params.yaml', 'process'),
       joinParamOrMetricPath('params', 'params.yaml'),
       joinParamOrMetricPath('params', join('nested', 'params.yaml'), 'test'),
-      joinParamOrMetricPath('params', join('nested', 'params.yaml')),
-      joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
-      joinParamOrMetricPath('metrics', 'summary.json', 'accuracy'),
-      joinParamOrMetricPath('metrics', 'summary.json', 'val_loss'),
-      joinParamOrMetricPath('metrics', 'summary.json', 'val_accuracy'),
-      joinParamOrMetricPath('metrics', 'summary.json')
+      joinParamOrMetricPath('params', join('nested', 'params.yaml'))
     ])
   })
 })

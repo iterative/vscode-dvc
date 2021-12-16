@@ -34,12 +34,13 @@ export class Plots extends BaseRepository<TPlotsData> {
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
     webviewIcon: Resource,
-    workspaceState: Memento
+    workspaceState: Memento,
+    data?: PlotsData
   ) {
     super(dvcRoot, webviewIcon)
 
     this.data = this.dispose.track(
-      new PlotsData(dvcRoot, internalCommands, updatesPaused)
+      data || new PlotsData(dvcRoot, internalCommands, updatesPaused)
     )
 
     this.dispose.track(

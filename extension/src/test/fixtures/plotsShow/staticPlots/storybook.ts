@@ -1,5 +1,5 @@
-import { getFixture } from '..'
+import { getWebviewMessageFixture } from '..'
 
-const data = getFixture('.')
+const data = getWebviewMessageFixture('.')
 
 export default data

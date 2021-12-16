@@ -249,8 +249,8 @@ export const collectParamsAndMetrics = (
   collectFromBranchesObject(acc, branchesObject)
 
   return [
-    ...transformAndCollect(acc.paramsMap),
-    ...transformAndCollect(acc.metricsMap)
+    ...transformAndCollect(acc.metricsMap),
+    ...transformAndCollect(acc.paramsMap)
   ]
 }
 

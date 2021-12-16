@@ -1,4 +1,4 @@
-import isEqual from 'lodash.isequal'
+import { join } from 'path'
 import { Cli, typeCheckCommands } from '.'
 import { Args, Command, Flag, ListFlag, SubCommand } from './args'
 import { retry } from './retry'
@@ -128,7 +128,12 @@ export class CliReader extends Cli {
   }
 
   public plotsShow(cwd: string): Promise<PlotsOutput> {
-    return this.readShowProcessJson<PlotsOutput>(cwd, Command.PLOTS)
+    return this.readShowProcessJson<PlotsOutput>(
+      cwd,
+      Command.PLOTS,
+      '-o',
+      join('.dvc', 'tmp', 'plots')
+    )
   }
 
   public async root(cwd: string): Promise<string | undefined> {
@@ -146,11 +151,6 @@ export class CliReader extends Cli {
     formatter: typeof trimAndSplit | typeof JSON.parse,
     ...args: Args
   ): Promise<T> {
-    // Stubbed until DVC ready
-    if (isEqual(args, ['plots', 'show', '--show-json'])) {
-      return Promise.resolve({} as T)
-    }
-
     const output = await retry(
       () => this.executeProcess(cwd, ...args),
       args.join(' ')
@@ -171,7 +171,11 @@ export class CliReader extends Cli {
     )
   }
 
-  private readShowProcessJson<T>(cwd: string, command: Command): Promise<T> {
-    return this.readProcessJson<T>(cwd, command, SubCommand.SHOW)
+  private readShowProcessJson<T>(
+    cwd: string,
+    command: Command,
+    ...args: Args
+  ): Promise<T> {
+    return this.readProcessJson<T>(cwd, command, SubCommand.SHOW, ...args)
   }
 }

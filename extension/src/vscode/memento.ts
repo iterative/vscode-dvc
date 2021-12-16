@@ -8,6 +8,6 @@ export enum MementoPrefix {
   PARAMS_AND_METRICS_STATUS = 'paramsAndMetricsStatus:',
   PLOT_SECTION_COLLAPSED = 'plotSectionCollapsed:',
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
-  PLOT_SIZE = 'plotSize:',
+  PLOT_SIZES = 'plotSizes:',
   PLOT_SECTION_NAMES = 'plotSectionNames:'
 }
