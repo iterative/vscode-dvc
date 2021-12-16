@@ -295,7 +295,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(mockMove).to.be.calledOnce
       expect(mockInputBox).to.be.calledOnce
       expect(mockInputBox).to.be.calledWith({
-        prompt: 'enter a destination relative to the root',
+        title: 'Enter a destination relative to the root',
         value: relPath
       })
     })

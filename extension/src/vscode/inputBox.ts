@@ -1,7 +1,7 @@
 import { window } from 'vscode'
 
-export const getInput = (prompt: string, value?: string) =>
+export const getInput = (title: string, value?: string) =>
   window.showInputBox({
-    prompt,
+    title,
     value
   })

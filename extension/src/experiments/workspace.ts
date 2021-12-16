@@ -212,7 +212,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public getExpNameAndInputThenRun = async (
     commandId: CommandId,
-    prompt: string
+    title: string
   ) => {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
@@ -224,7 +224,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!experimentName) {
       return
     }
-    const input = await getInput(prompt)
+    const input = await getInput(title)
     if (input) {
       return reportOutput(
         this.internalCommands.executeCommand(
