@@ -50,7 +50,7 @@ export class PlotsModel {
     )
 
     this.plotSizes = workspaceState.get(
-      MementoPrefix.PLOT_SIZE + dvcRoot,
+      MementoPrefix.PLOT_SIZES + dvcRoot,
       DefaultSectionSizes
     )
 
@@ -161,7 +161,7 @@ export class PlotsModel {
 
   private persistPlotSize() {
     this.workspaceState.update(
-      MementoPrefix.PLOT_SIZE + this.dvcRoot,
+      MementoPrefix.PLOT_SIZES + this.dvcRoot,
       this.plotSizes
     )
   }
