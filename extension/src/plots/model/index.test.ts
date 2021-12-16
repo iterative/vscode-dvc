@@ -11,7 +11,7 @@ describe('plotsModel', () => {
   const memento = buildMockMemento({
     [MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [MementoPrefix.PLOT_SIZE + exampleDvcRoot]: DefaultSectionSizes
+    [MementoPrefix.PLOT_SIZES + exampleDvcRoot]: DefaultSectionSizes
   })
 
   beforeEach(() => {
@@ -62,7 +62,7 @@ describe('plotsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefix.PLOT_SIZE + exampleDvcRoot,
+      MementoPrefix.PLOT_SIZES + exampleDvcRoot,
       { ...DefaultSectionSizes, [Section.LIVE_PLOTS]: PlotSize.SMALL }
     )
   })
