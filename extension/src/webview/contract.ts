@@ -25,7 +25,7 @@ export type ColumnResizePayload = {
   width: number
 }
 export type MetricToggledPayload = string[]
-export type PlotsResizedPayload = PlotSize
+export type PlotsResizedPayload = { section: Section; size: PlotSize }
 export type PlotSectionRenamedPayload = {
   section: Section
   name: string

@@ -298,7 +298,7 @@ describe('App', () => {
     fireEvent.click(largeButton)
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: PlotSize.LARGE,
+      payload: { section: Section.LIVE_PLOTS, size: PlotSize.LARGE },
       type: MessageFromWebviewType.PLOTS_RESIZED
     })
 
@@ -306,7 +306,7 @@ describe('App', () => {
     fireEvent.click(smallButton)
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: PlotSize.SMALL,
+      payload: { section: Section.LIVE_PLOTS, size: PlotSize.SMALL },
       type: MessageFromWebviewType.PLOTS_RESIZED
     })
   })
