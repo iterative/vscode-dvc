@@ -128,13 +128,13 @@ describe('App', () => {
   it('should render live and static plots when given messages with both types of plots data', () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: {
-        [Section.LIVE_PLOTS]: false,
-        [Section.STATIC_PLOTS]: true
-        // if we render the static plots we get an error because the parent div has no height
-      }
+      sectionCollapsed: defaultSectionCollapsed
     })
 
+    const heightToSuppressVegaError = 1000
+    jest
+      .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+      .mockImplementation(() => heightToSuppressVegaError)
     sendSetDataMessage({
       static: staticPlotsFixture
     })
