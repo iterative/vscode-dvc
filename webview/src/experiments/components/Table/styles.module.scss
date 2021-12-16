@@ -109,6 +109,9 @@ $spinner-color-light: #000;
         }
       }
     }
+    .runningExperiment.oddRow & {
+      background-color: $row-bg-alt-color;
+    }
     .workspaceWithChanges.runningExperiment & {
       border-right-color: $metrics-color;
       border-top-color: $metrics-color;
