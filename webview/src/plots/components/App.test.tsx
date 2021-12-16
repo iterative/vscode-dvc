@@ -128,7 +128,11 @@ describe('App', () => {
   it('should render live and static plots when given messages with both types of plots data', () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: {
+        [Section.LIVE_PLOTS]: false,
+        [Section.STATIC_PLOTS]: true
+        // if we render the static plots we get an error because the parent div has no height
+      }
     })
 
     sendSetDataMessage({
