@@ -1,4 +1,5 @@
-import React, { Dispatch, useState } from 'react'
+import cx from 'classnames'
+import React, { Dispatch, useEffect, useState } from 'react'
 import {
   PlotSize,
   Section,
@@ -20,16 +21,16 @@ interface MenuProps {
   metrics: string[]
   selectedMetrics: string[]
   setSelectedPlots: (selectedPlots: string[]) => void
-  setSize: (size: PlotSize) => void
-  size: PlotSize
 }
 
-interface PlotsContainerProps {
+export interface PlotsContainerProps {
   sectionCollapsed: SectionCollapsed
   sectionKey: Section
   dispatch: Dispatch<PlotsReducerAction>
   title: string
   onRename: (section: Section, name: string) => void
+  onResize: (size: PlotSize, section: Section) => void
+  currentSize: PlotSize
   menu?: MenuProps
 }
 
@@ -40,11 +41,25 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   title,
   children,
   onRename,
+  onResize,
+  currentSize,
   menu
 }) => {
   const [isRenaming, setIsRenaming] = useState(false)
   const [sectionTitle, setSectionTitle] = useState(title)
+  const [size, setSize] = useState<PlotSize>(currentSize)
+
   const open = !sectionCollapsed[sectionKey]
+
+  useEffect(() => {
+    window.dispatchEvent(new Event('resize'))
+  }, [size])
+
+  const sizeClass = cx(styles.plotsWrapper, {
+    [styles.smallPlots]: size === PlotSize.SMALL,
+    [styles.regularPlots]: size === PlotSize.REGULAR,
+    [styles.largePlots]: size === PlotSize.LARGE
+  })
 
   const menuItems: IconMenuItemProps[] = [
     {
@@ -54,31 +69,30 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     }
   ]
 
-  if (menu) {
-    menuItems.push(
-      {
-        icon: AllIcons.LINES,
-        onClickNode: (
-          <MetricsPicker
-            metrics={menu.metrics}
-            setSelectedMetrics={menu.setSelectedPlots}
-            selectedMetrics={menu.selectedMetrics}
-          />
-        ),
-        tooltip: 'Choose metrics'
-      },
-      {
-        icon: AllIcons.DOTS,
-        onClickNode: (
-          <SizePicker
-            currentSize={menu.size}
-            setSelectedSize={menu.setSize as (size: string) => void}
-          />
-        ),
-        tooltip: 'Resize'
-      }
-    )
+  const changeSize = (size: PlotSize) => {
+    onResize(size, sectionKey)
+    setSize(size)
   }
+
+  if (menu) {
+    menuItems.push({
+      icon: AllIcons.LINES,
+      onClickNode: (
+        <MetricsPicker
+          metrics={menu.metrics}
+          setSelectedMetrics={menu.setSelectedPlots}
+          selectedMetrics={menu.selectedMetrics}
+        />
+      ),
+      tooltip: 'Choose metrics'
+    })
+  }
+
+  menuItems.push({
+    icon: AllIcons.DOTS,
+    onClickNode: <SizePicker currentSize={size} setSelectedSize={changeSize} />,
+    tooltip: 'Resize'
+  })
 
   const onTitleChanged = (title: string) => {
     setIsRenaming(false)
@@ -107,7 +121,13 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             sectionTitle
           )}
         </summary>
-        <div className={styles.centered}>{open && children}</div>
+        <div className={styles.centered}>
+          {open && (
+            <div className={sizeClass} data-testid="plots-wrapper">
+              {children}
+            </div>
+          )}
+        </div>
       </details>
       <div className={styles.iconMenu}>
         <IconMenu items={menuItems} />
