@@ -67,9 +67,9 @@ const LivePlots = ({
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
     {Object.entries(plots).map(([path, plots]) =>
-      plots.map((plot, i) =>
-        isVegaPlot(plot) ? (
-          <div className={styles.plot} key={`plot-${path}-${i}`}>
+      plots.map((plot, i) => (
+        <div className={styles.plot} key={`plot-${path}-${i}`}>
+          {isVegaPlot(plot) ? (
             <VegaLite
               actions={false}
               config={config}
@@ -82,9 +82,11 @@ const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
               }
               renderer="svg"
             />
-          </div>
-        ) : undefined
-      )
+          ) : (
+            <img src={plot.url} alt={`Plot of ${path}`} />
+          )}
+        </div>
+      ))
     )}
   </>
 )

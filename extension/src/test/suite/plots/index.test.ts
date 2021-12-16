@@ -5,12 +5,12 @@ import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsShowFixture from '../../fixtures/plotsShow/output'
+import staticPlotsFixture from '../../fixtures/plotsShow/staticPlots/vscode'
 import { closeAllEditors } from '../util'
 import {
   defaultSectionCollapsed,
   PlotsData as TPlotsData
 } from '../../../plots/webview/contract'
-import { PlotsData } from '../../../plots/data'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -27,13 +27,18 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { plots, mockPlotsShow, messageSpy } = await buildPlots(
+      const { data, plots, mockPlotsShow, messageSpy } = await buildPlots(
         disposable,
         plotsShowFixture
       )
-      const managedUpdateSpy = spy(PlotsData.prototype, 'managedUpdate')
+      const managedUpdateSpy = spy(data, 'managedUpdate')
+
+      const dataUpdatedEvent = new Promise(resolve =>
+        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      )
 
       const webview = await plots.showWebview()
+      await dataUpdatedEvent
 
       const expectedPlotsData: TPlotsData = {
         live: livePlotsFixture,
@@ -41,6 +46,7 @@ suite('Plots Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)
+      expect(messageSpy).to.be.calledWith({ static: staticPlotsFixture })
       expect(mockPlotsShow).to.be.called
       expect(managedUpdateSpy, 'should call the cli when the webview is loaded')
         .to.be.calledOnce
