@@ -12,10 +12,10 @@ beforeEach(() => {
 })
 
 describe('getInput', () => {
-  it('should call window.showInputBox with the provided prompt', async () => {
+  it('should call window.showInputBox with the provided title', async () => {
     const aggressiveText = 'TELL ME WHAT YOU WANT'
     await getInput(aggressiveText)
     expect(mockedInputBox).toBeCalledTimes(1)
-    expect(mockedInputBox).toBeCalledWith({ prompt: aggressiveText })
+    expect(mockedInputBox).toBeCalledWith({ title: aggressiveText })
   })
 })
