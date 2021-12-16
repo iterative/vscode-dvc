@@ -450,7 +450,7 @@ const data: RowData[] = [
               }
             },
             queued: false,
-            running: false,
+            running: true,
             executor: null,
             metrics: {
               'summary.json': {
