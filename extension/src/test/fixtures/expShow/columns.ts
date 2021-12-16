@@ -6,6 +6,57 @@ const nestedParamsFile = join('nested', 'params.yaml')
 
 const data: ParamOrMetric[] = [
   {
+    group: 'metrics',
+    hasChildren: false,
+    name: 'loss',
+    parentPath: 'metrics:summary.json',
+    path: 'metrics:summary.json:loss',
+    maxStringLength: 18,
+    minNumber: 1.775016188621521,
+    maxNumber: 2.048856019973755,
+    types: ['number']
+  },
+  {
+    group: 'metrics',
+    hasChildren: false,
+    name: 'accuracy',
+    parentPath: 'metrics:summary.json',
+    path: 'metrics:summary.json:accuracy',
+    maxStringLength: 19,
+    minNumber: 0.3484833240509033,
+    maxNumber: 0.5926499962806702,
+    types: ['number']
+  },
+  {
+    group: 'metrics',
+    hasChildren: false,
+    name: 'val_loss',
+    parentPath: 'metrics:summary.json',
+    path: 'metrics:summary.json:val_loss',
+    maxStringLength: 18,
+    minNumber: 1.7233840227127075,
+    maxNumber: 1.9979370832443237,
+    types: ['number']
+  },
+  {
+    group: 'metrics',
+    hasChildren: false,
+    name: 'val_accuracy',
+    parentPath: 'metrics:summary.json',
+    path: 'metrics:summary.json:val_accuracy',
+    maxStringLength: 19,
+    minNumber: 0.4277999997138977,
+    maxNumber: 0.6704000234603882,
+    types: ['number']
+  },
+  {
+    group: 'metrics',
+    hasChildren: true,
+    name: 'summary.json',
+    parentPath: 'metrics',
+    path: 'metrics:summary.json'
+  },
+  {
     group: 'params',
     hasChildren: false,
     name: 'epochs',
@@ -107,57 +158,6 @@ const data: ParamOrMetric[] = [
     name: nestedParamsFile,
     parentPath: 'params',
     path: joinParamOrMetricPath('params', nestedParamsFile)
-  },
-  {
-    group: 'metrics',
-    hasChildren: false,
-    name: 'loss',
-    parentPath: 'metrics:summary.json',
-    path: 'metrics:summary.json:loss',
-    maxStringLength: 18,
-    minNumber: 1.775016188621521,
-    maxNumber: 2.048856019973755,
-    types: ['number']
-  },
-  {
-    group: 'metrics',
-    hasChildren: false,
-    name: 'accuracy',
-    parentPath: 'metrics:summary.json',
-    path: 'metrics:summary.json:accuracy',
-    maxStringLength: 19,
-    minNumber: 0.3484833240509033,
-    maxNumber: 0.5926499962806702,
-    types: ['number']
-  },
-  {
-    group: 'metrics',
-    hasChildren: false,
-    name: 'val_loss',
-    parentPath: 'metrics:summary.json',
-    path: 'metrics:summary.json:val_loss',
-    maxStringLength: 18,
-    minNumber: 1.7233840227127075,
-    maxNumber: 1.9979370832443237,
-    types: ['number']
-  },
-  {
-    group: 'metrics',
-    hasChildren: false,
-    name: 'val_accuracy',
-    parentPath: 'metrics:summary.json',
-    path: 'metrics:summary.json:val_accuracy',
-    maxStringLength: 19,
-    minNumber: 0.4277999997138977,
-    maxNumber: 0.6704000234603882,
-    types: ['number']
-  },
-  {
-    group: 'metrics',
-    hasChildren: true,
-    name: 'summary.json',
-    parentPath: 'metrics',
-    path: 'metrics:summary.json'
   }
 ]
 

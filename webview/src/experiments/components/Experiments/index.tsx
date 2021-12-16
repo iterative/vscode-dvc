@@ -57,8 +57,8 @@ const getColumns = (columns: ParamOrMetric[]): Column<Experiment>[] =>
       Header: 'Timestamp',
       accessor: 'timestamp'
     },
-    ...buildDynamicColumns(columns, 'params'),
-    ...buildDynamicColumns(columns, 'metrics')
+    ...buildDynamicColumns(columns, 'metrics'),
+    ...buildDynamicColumns(columns, 'params')
   ] as Column<Experiment>[]
 
 const reportResizedColumn = (state: TableState<Experiment>) => {
