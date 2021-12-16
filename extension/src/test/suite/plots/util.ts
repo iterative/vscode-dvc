@@ -11,6 +11,7 @@ import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { PlotSize, Section } from '../../../plots/webview/contract'
 import { DefaultSectionNames } from '../../../plots/model'
+import { PlotsData } from '../../../plots/data'
 
 export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
   const { experiments, internalCommands, updatesPaused, resourceLocator } =
@@ -21,13 +22,16 @@ export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
     plotsShow
   )
 
+  const data = new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
+
   const plots = disposer.track(
     new Plots(
       dvcDemoPath,
       internalCommands,
       updatesPaused,
       resourceLocator.scatterGraph,
-      buildMockMemento()
+      buildMockMemento(),
+      data
     )
   )
   plots.setExperiments(experiments)
@@ -37,7 +41,7 @@ export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
   stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 
-  return { experiments, messageSpy, mockPlotsShow, plots }
+  return { data, experiments, messageSpy, mockPlotsShow, plots }
 }
 
 export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {

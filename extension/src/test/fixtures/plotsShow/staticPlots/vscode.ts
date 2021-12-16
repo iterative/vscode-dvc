@@ -1,5 +1,5 @@
 import { basePlotsUrl } from '../../../util'
-import { getFixture } from '..'
+import { getWebviewMessageFixture } from '..'
 import { Uri, ViewColumn, window } from 'vscode'
 import { ViewKey } from '../../../../webview/constants'
 
@@ -20,6 +20,6 @@ webviewPanel.dispose()
 
 const uriJoin = (...segments: string[]) => segments.join('/')
 
-const data = getFixture(baseUrl, uriJoin)
+const data = getWebviewMessageFixture(baseUrl, uriJoin)
 
 export default data

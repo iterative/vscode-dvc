@@ -229,11 +229,13 @@ export const getSmallMemoryFootprintFixture = (
 })
 
 export const getFixture = (baseUrl: string, joinFunc = join) => ({
-  plots: {
-    ...getImageData(baseUrl, joinFunc),
-    ...basicVega,
-    ...require('./confusionMatrix').default
-  },
+  ...getImageData(baseUrl, joinFunc),
+  ...basicVega,
+  ...require('./confusionMatrix').default
+})
+
+export const getWebviewMessageFixture = (baseUrl: string, joinFunc = join) => ({
+  plots: getFixture(baseUrl, joinFunc),
   sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
   size: PlotSize.REGULAR
 })
