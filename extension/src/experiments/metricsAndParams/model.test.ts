@@ -1,14 +1,14 @@
-import { ParamsAndMetricsModel, Status } from './model'
-import { joinParamOrMetricPath } from './paths'
+import { MetricsAndParamsModel, Status } from './model'
+import { joinMetricOrParamPath } from './paths'
 import { buildMockMemento } from '../../test/util'
 import { MementoPrefix } from '../../vscode/memento'
 
-describe('ParamsAndMetricsModel', () => {
+describe('MetricsAndParamsModel', () => {
   const exampleDvcRoot = 'test'
 
   describe('persistence', () => {
-    const paramsDotYamlPath = joinParamOrMetricPath('params', 'params.yaml')
-    const testParamPath = joinParamOrMetricPath(paramsDotYamlPath, 'testparam')
+    const paramsDotYamlPath = joinMetricOrParamPath('params', 'params.yaml')
+    const testParamPath = joinMetricOrParamPath(paramsDotYamlPath, 'testparam')
     const exampleData = {
       workspace: {
         baseline: {
@@ -25,7 +25,7 @@ describe('ParamsAndMetricsModel', () => {
       }
     }
     it('Shows all items when given no persisted status', async () => {
-      const model = new ParamsAndMetricsModel(
+      const model = new MetricsAndParamsModel(
         exampleDvcRoot,
         buildMockMemento()
       )
@@ -51,10 +51,10 @@ describe('ParamsAndMetricsModel', () => {
     })
 
     it('Maintains deselection from persisted status', async () => {
-      const model = new ParamsAndMetricsModel(
+      const model = new MetricsAndParamsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefix.PARAMS_AND_METRICS_STATUS + exampleDvcRoot]: {
+          [MementoPrefix.METRICS_AND_PARAMS_STATUS + exampleDvcRoot]: {
             [paramsDotYamlPath]: Status.INDETERMINATE,
             [testParamPath]: Status.UNSELECTED
           }
@@ -80,10 +80,10 @@ describe('ParamsAndMetricsModel', () => {
         { path: 'C', width: 0 },
         { path: 'B', width: 0 }
       ]
-      const model = new ParamsAndMetricsModel(
+      const model = new MetricsAndParamsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + exampleDvcRoot]:
+          [MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
         })
       )
@@ -91,10 +91,10 @@ describe('ParamsAndMetricsModel', () => {
     })
 
     it('should re-order the columns if a new columnOrder is set', () => {
-      const model = new ParamsAndMetricsModel(
+      const model = new MetricsAndParamsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + exampleDvcRoot]: [
+          [MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]: [
             { path: 'A', width: 0 },
             { path: 'B', width: 0 },
             { path: 'C', width: 0 }
@@ -114,10 +114,10 @@ describe('ParamsAndMetricsModel', () => {
         { path: 'C', width: 42 },
         { path: 'B', width: 150 }
       ]
-      const model = new ParamsAndMetricsModel(
+      const model = new MetricsAndParamsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + exampleDvcRoot]:
+          [MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
         })
       )
@@ -130,10 +130,10 @@ describe('ParamsAndMetricsModel', () => {
         { path: 'C', width: 42 },
         { path: 'B', width: 150 }
       ]
-      const model = new ParamsAndMetricsModel(
+      const model = new MetricsAndParamsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + exampleDvcRoot]:
+          [MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
         })
       )

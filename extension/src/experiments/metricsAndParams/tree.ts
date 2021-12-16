@@ -8,7 +8,7 @@ import {
   Uri
 } from 'vscode'
 import { Status } from './model'
-import { splitParamOrMetricPath } from './paths'
+import { splitMetricOrParamPath } from './paths'
 import { WorkspaceExperiments } from '../workspace'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -18,7 +18,7 @@ import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { InternalCommands } from '../../commands/internal'
 
-type ParamsAndMetricsItem = {
+type MetricsAndParamsItem = {
   description: string | undefined
   dvcRoot: string
   collapsibleState: TreeItemCollapsibleState
@@ -26,8 +26,8 @@ type ParamsAndMetricsItem = {
   iconPath: Resource
 }
 
-export class ExperimentsParamsAndMetricsTree
-  implements TreeDataProvider<string | ParamsAndMetricsItem>
+export class ExperimentsMetricsAndParamsTree
+  implements TreeDataProvider<string | MetricsAndParamsItem>
 {
   public readonly dispose = Disposable.fn()
 
@@ -36,7 +36,7 @@ export class ExperimentsParamsAndMetricsTree
   private readonly experiments: WorkspaceExperiments
   private readonly resourceLocator: ResourceLocator
 
-  private readonly view: TreeView<string | ParamsAndMetricsItem>
+  private readonly view: TreeView<string | MetricsAndParamsItem>
   private viewed = false
 
   constructor(
@@ -46,27 +46,27 @@ export class ExperimentsParamsAndMetricsTree
   ) {
     this.resourceLocator = resourceLocator
 
-    this.onDidChangeTreeData = experiments.paramsOrMetricsChanged.event
+    this.onDidChangeTreeData = experiments.metricsOrParamsChanged.event
 
     this.view = this.dispose.track(
-      createTreeView<ParamsAndMetricsItem>(
-        'dvc.views.experimentsParamsAndMetricsTree',
+      createTreeView<MetricsAndParamsItem>(
+        'dvc.views.experimentsMetricsAndParamsTree',
         this
       )
     )
 
     this.experiments = experiments
 
-    internalCommands.registerExternalCommand<ParamsAndMetricsItem>(
-      RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+    internalCommands.registerExternalCommand<MetricsAndParamsItem>(
+      RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
       ({ dvcRoot, path }) =>
-        this.experiments.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
+        this.experiments.getRepository(dvcRoot).toggleMetricOrParamStatus(path)
     )
 
     this.updateDescriptionOnChange()
   }
 
-  public getTreeItem(element: string | ParamsAndMetricsItem): TreeItem {
+  public getTreeItem(element: string | MetricsAndParamsItem): TreeItem {
     if (this.isRoot(element)) {
       const resourceUri = Uri.file(element)
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
@@ -74,13 +74,13 @@ export class ExperimentsParamsAndMetricsTree
 
     const { dvcRoot, path, collapsibleState, description, iconPath } = element
 
-    const splitPath = splitParamOrMetricPath(path)
+    const splitPath = splitMetricOrParamPath(path)
     const finalPathSegment = splitPath[splitPath.length - 1]
     const treeItem = new TreeItem(finalPathSegment, collapsibleState)
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],
-      command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+      command: RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
       title: 'toggle'
     }
 
@@ -93,10 +93,10 @@ export class ExperimentsParamsAndMetricsTree
   }
 
   public getChildren(
-    element?: string | ParamsAndMetricsItem
-  ): Promise<ParamsAndMetricsItem[] | string[]> {
+    element?: string | MetricsAndParamsItem
+  ): Promise<MetricsAndParamsItem[] | string[]> {
     if (element) {
-      return Promise.resolve(this.getParamsOrMetrics(element))
+      return Promise.resolve(this.getMetricsOrParams(element))
     }
 
     return this.getRootElements()
@@ -110,7 +110,7 @@ export class ExperimentsParamsAndMetricsTree
           dvcRoots.map(dvcRoot =>
             this.experiments
               .getRepository(dvcRoot)
-              .getParamsAndMetricsStatuses()
+              .getMetricsAndParamsStatuses()
           )
         )
         this.view.description = this.getDescription(statuses, ' of ')
@@ -124,7 +124,7 @@ export class ExperimentsParamsAndMetricsTree
 
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
-        EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED,
+        EventName.VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED,
         dvcRoots.length
       )
       this.viewed = true
@@ -138,9 +138,9 @@ export class ExperimentsParamsAndMetricsTree
     return dvcRoots.sort((a, b) => a.localeCompare(b))
   }
 
-  private getParamsOrMetrics(
-    element: string | ParamsAndMetricsItem
-  ): ParamsAndMetricsItem[] {
+  private getMetricsOrParams(
+    element: string | MetricsAndParamsItem
+  ): MetricsAndParamsItem[] {
     if (!element) {
       return []
     }
@@ -149,9 +149,9 @@ export class ExperimentsParamsAndMetricsTree
 
     return this.experiments
       .getRepository(dvcRoot)
-      .getChildParamsOrMetrics(path)
-      .map(paramOrMetric => {
-        const { descendantStatuses, hasChildren, path, status } = paramOrMetric
+      .getChildMetricsOrParams(path)
+      .map(metricOrParam => {
+        const { descendantStatuses, hasChildren, path, status } = metricOrParam
 
         const description = this.getDescription(descendantStatuses, '/')
         const iconPath = this.getIconPath(status)
@@ -163,7 +163,7 @@ export class ExperimentsParamsAndMetricsTree
       })
   }
 
-  private getDetails(element: string | ParamsAndMetricsItem) {
+  private getDetails(element: string | MetricsAndParamsItem) {
     if (this.isRoot(element)) {
       return [element, '']
     }
@@ -192,7 +192,7 @@ export class ExperimentsParamsAndMetricsTree
     }${separator}${statuses.length}`
   }
 
-  private isRoot(element: string | ParamsAndMetricsItem): element is string {
+  private isRoot(element: string | MetricsAndParamsItem): element is string {
     return typeof element === 'string'
   }
 }

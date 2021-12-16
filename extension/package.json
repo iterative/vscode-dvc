@@ -885,7 +885,7 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.experimentsParamsAndMetricsTree",
+          "id": "dvc.views.experimentsMetricsAndParamsTree",
           "name": "Metrics & Params",
           "when": "dvc.commands.available && dvc.project.available"
         },

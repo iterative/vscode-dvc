@@ -1,4 +1,4 @@
-import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
+import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 
 interface HeaderGroupWithOriginalId extends HeaderGroup<Experiment> {
@@ -22,7 +22,7 @@ export const getPlaceholders = (
 const cleanPath = (path: string): string => path.split('/').slice(1).join('/')
 
 export const getNodeSiblings = (
-  orderedColumns: ParamOrMetric[],
+  orderedColumns: MetricOrParam[],
   id: string
 ) => {
   const nodeRep = orderedColumns.find(node => cleanPath(node.path) === id)
@@ -30,7 +30,7 @@ export const getNodeSiblings = (
 }
 
 export const countUpperLevels = (
-  orderedColumns: ParamOrMetric[],
+  orderedColumns: MetricOrParam[],
   column: HeaderGroup<Experiment>,
   columns: HeaderGroup<Experiment>[],
   previousLevel = 0

@@ -1,7 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
+import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 import {
   DragDropContext,
@@ -18,7 +18,7 @@ export const MergedHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
-  orderedColumns: ParamOrMetric[]
+  orderedColumns: MetricOrParam[]
   onDragStart: (initial: DragStart, provided: ResponderProvided) => void
   onDragUpdate: (initial: DragUpdate, provided: ResponderProvided) => void
   onDragEnd: (initial: DropResult, provided: ResponderProvided) => void

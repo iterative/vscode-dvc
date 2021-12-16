@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  ParamOrMetric,
+  MetricOrParam,
   RowData as Experiment,
   TableData,
   InitiallyUndefinedTableData
@@ -38,7 +38,7 @@ const countRowsAndAddIndexes: (
   return index
 }
 
-const getColumns = (columns: ParamOrMetric[]): Column<Experiment>[] =>
+const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
   [
     {
       Header: 'Experiment',

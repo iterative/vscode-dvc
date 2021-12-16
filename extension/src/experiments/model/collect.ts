@@ -1,5 +1,5 @@
 import { ExperimentsAccumulator } from './accumulator'
-import { reduceParamsAndMetrics } from '../paramsAndMetrics/reduce'
+import { reduceMetricsAndParams } from '../metricsAndParams/reduce'
 import { Experiment } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -22,11 +22,11 @@ const collectExperimentOrCheckpoint = (
   }
 }
 
-const transformParamsAndMetrics = (
+const transformMetricsAndParams = (
   experiment: Experiment,
   experimentFields: ExperimentFields
 ) => {
-  const { metrics, params } = reduceParamsAndMetrics(experimentFields)
+  const { metrics, params } = reduceMetricsAndParams(experimentFields)
 
   if (metrics) {
     experiment.metrics = metrics
@@ -53,7 +53,7 @@ const transformExperimentData = (
       experimentFields?.name || sha.slice(0, fallbackDisplayNameLength)
   } as Experiment
 
-  transformParamsAndMetrics(experiment, experimentFields)
+  transformMetricsAndParams(experiment, experimentFields)
 
   return experiment
 }

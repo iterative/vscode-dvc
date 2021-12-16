@@ -1,5 +1,5 @@
 import { filterExperiments, Operator } from '.'
-import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
+import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { Experiment } from '../../webview/contract'
 
 describe('filterExperiments', () => {
@@ -48,7 +48,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.GREATER_THAN,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '2'
         }
       ],
@@ -62,7 +62,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.EQUAL,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '2'
         }
       ],
@@ -76,7 +76,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.NOT_EQUAL,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '2'
         }
       ],
@@ -90,12 +90,12 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.GREATER_THAN,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '0'
         },
         {
           operator: Operator.LESS_THAN_OR_EQUAL,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '2'
         }
       ],
@@ -109,17 +109,17 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.GREATER_THAN_OR_EQUAL,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '0'
         },
         {
           operator: Operator.LESS_THAN,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '10'
         },
         {
           operator: Operator.EQUAL,
-          path: joinParamOrMetricPath('params', paramsFile, 'sort'),
+          path: joinMetricOrParamPath('params', paramsFile, 'sort'),
           value: '10'
         }
       ],
@@ -133,7 +133,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.CONTAINS,
-          path: joinParamOrMetricPath('params', paramsFile, 'text'),
+          path: joinMetricOrParamPath('params', paramsFile, 'text'),
           value: 'def'
         }
       ],
@@ -147,7 +147,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.CONTAINS,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '1'
         }
       ],
@@ -161,7 +161,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.NOT_CONTAINS,
-          path: joinParamOrMetricPath('params', paramsFile, 'filter'),
+          path: joinMetricOrParamPath('params', paramsFile, 'filter'),
           value: '1'
         }
       ],
@@ -175,7 +175,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.NOT_CONTAINS,
-          path: joinParamOrMetricPath('params', paramsFile, 'text'),
+          path: joinMetricOrParamPath('params', paramsFile, 'text'),
           value: 'def'
         }
       ],
@@ -191,7 +191,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.IS_TRUE,
-          path: joinParamOrMetricPath('params', paramsFile, 'bool'),
+          path: joinMetricOrParamPath('params', paramsFile, 'bool'),
           value: undefined
         }
       ],
@@ -207,7 +207,7 @@ describe('filterExperiments', () => {
       [
         {
           operator: Operator.IS_FALSE,
-          path: joinParamOrMetricPath('params', paramsFile, 'bool'),
+          path: joinMetricOrParamPath('params', paramsFile, 'bool'),
           value: undefined
         }
       ],

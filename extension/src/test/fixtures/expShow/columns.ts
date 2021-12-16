@@ -1,10 +1,10 @@
 import { join } from '../../../test/util/path'
-import { ParamOrMetric } from '../../../experiments/webview/contract'
-import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
+import { MetricOrParam } from '../../../experiments/webview/contract'
+import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
 
 const nestedParamsFile = join('nested', 'params.yaml')
 
-const data: ParamOrMetric[] = [
+const data: MetricOrParam[] = [
   {
     group: 'metrics',
     hasChildren: false,
@@ -147,8 +147,8 @@ const data: ParamOrMetric[] = [
     group: 'params',
     hasChildren: false,
     name: 'test',
-    parentPath: joinParamOrMetricPath('params', nestedParamsFile),
-    path: joinParamOrMetricPath('params', nestedParamsFile, 'test'),
+    parentPath: joinMetricOrParamPath('params', nestedParamsFile),
+    path: joinMetricOrParamPath('params', nestedParamsFile, 'test'),
     maxStringLength: 4,
     types: ['boolean']
   },
@@ -157,7 +157,7 @@ const data: ParamOrMetric[] = [
     hasChildren: true,
     name: nestedParamsFile,
     parentPath: 'params',
-    path: joinParamOrMetricPath('params', nestedParamsFile)
+    path: joinMetricOrParamPath('params', nestedParamsFile)
   }
 ]
 
