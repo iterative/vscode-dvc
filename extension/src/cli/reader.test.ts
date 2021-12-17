@@ -23,6 +23,7 @@ const mockedDisposable = mocked(Disposable)
 const mockedCreateProcess = mocked(createProcess)
 const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
+  DVCLIVE_OPEN: 'false',
   DVC_NO_ANALYTICS: 'true',
   PATH: '/all/of/the/goodies:/in/my/path'
 }

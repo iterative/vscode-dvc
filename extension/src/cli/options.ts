@@ -22,6 +22,7 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   const PATH = getPATH(env?.PATH as string, pythonBinPath)
   return {
     ...env,
+    DVCLIVE_OPEN: 'false',
     DVC_NO_ANALYTICS: 'true',
     PATH
   }
