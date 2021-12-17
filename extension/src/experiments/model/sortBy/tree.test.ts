@@ -12,7 +12,7 @@ import {
 } from 'vscode'
 import { SortDefinition } from '.'
 import { ExperimentsSortByTree, SortItem } from './tree'
-import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
+import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { InternalCommands } from '../../../commands/internal'
 import { buildMockedExperiments } from '../../../test/util/jest'
 
@@ -59,7 +59,7 @@ beforeEach(() => {
 
 describe('ExperimentsSortByTree', () => {
   const dvcRoot = 'demo'
-  const examplePath = joinParamOrMetricPath('params', 'test')
+  const examplePath = joinMetricOrParamPath('params', 'test')
   const exampleSortDefinition: SortDefinition = {
     descending: true,
     path: examplePath

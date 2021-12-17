@@ -1,6 +1,6 @@
 import { Value, ValueTree } from '../../../cli/reader'
-import { joinParamOrMetricFilePath } from '../../paramsAndMetrics/paths'
-import { ParamsOrMetrics } from '../../webview/contract'
+import { joinMetricOrParamFilePath } from '../../metricsAndParams/paths'
+import { MetricsOrParams } from '../../webview/contract'
 
 export type Param = {
   path: string
@@ -22,12 +22,12 @@ const collectFromParamsFile = (
     return
   }
 
-  const path = joinParamOrMetricFilePath(...pathArray)
+  const path = joinMetricOrParamFilePath(...pathArray)
 
   acc.push({ path, value })
 }
 
-export const collectFlatExperimentParams = (params: ParamsOrMetrics = {}) => {
+export const collectFlatExperimentParams = (params: MetricsOrParams = {}) => {
   const acc: { path: string; value: string | number | boolean }[] = []
   Object.keys(params).forEach(file =>
     collectFromParamsFile(acc, undefined, params[file], [file])

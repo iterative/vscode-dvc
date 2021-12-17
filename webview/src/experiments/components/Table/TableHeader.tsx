@@ -1,5 +1,5 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
+import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
@@ -16,7 +16,7 @@ interface TableHeaderProps {
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
   index: number
-  orderedColumns: ParamOrMetric[]
+  orderedColumns: MetricOrParam[]
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
