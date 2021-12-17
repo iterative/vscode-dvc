@@ -1,15 +1,15 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
 import { SortDefinition } from '../model/sortBy'
 
-export interface ParamsOrMetrics {
+export interface MetricsOrParams {
   [filename: string]: ValueTree
 }
 
 export interface Experiment extends BaseExperimentFields {
   id: string
   displayName: string
-  params?: ParamsOrMetrics
-  metrics?: ParamsOrMetrics
+  params?: MetricsOrParams
+  metrics?: MetricsOrParams
   displayColor?: string
   selected?: boolean
 }
@@ -18,13 +18,13 @@ export interface RowData extends Experiment {
   subRows?: RowData[]
 }
 
-export interface ParamOrMetricAggregateData {
+export interface MetricOrParamAggregateData {
   maxStringLength?: number
   maxNumber?: number
   minNumber?: number
 }
 
-export interface ParamOrMetric extends ParamOrMetricAggregateData {
+export interface MetricOrParam extends MetricOrParamAggregateData {
   group: string
   hasChildren: boolean
   name: string
@@ -35,7 +35,7 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
 
 export type TableData = {
   rows: RowData[]
-  columns: ParamOrMetric[]
+  columns: MetricOrParam[]
   sorts: SortDefinition[]
   changes: string[]
   columnOrder: string[]

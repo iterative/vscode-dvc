@@ -2,11 +2,11 @@ import { SortDefinition } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { reportError } from '../../../vscode/reporting'
-import { pickFromParamsAndMetrics } from '../../paramsAndMetrics/quickPick'
-import { ParamOrMetric } from '../../webview/contract'
+import { pickFromMetricsAndParams } from '../../metricsAndParams/quickPick'
+import { MetricOrParam } from '../../webview/contract'
 
-export const pickSortToAdd = async (paramsAndMetrics: ParamOrMetric[]) => {
-  const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
+export const pickSortToAdd = async (metricsAndParams: MetricOrParam[]) => {
+  const picked = await pickFromMetricsAndParams(metricsAndParams, {
     title: 'Select a param or metric to sort by'
   })
   if (picked === undefined) {

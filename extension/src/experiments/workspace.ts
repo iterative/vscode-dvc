@@ -22,7 +22,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
-  public readonly paramsOrMetricsChanged = this.dispose.track(
+  public readonly metricsOrParamsChanged = this.dispose.track(
     new EventEmitter<void>()
   )
 
@@ -266,8 +266,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     experiments.dispose.track(
-      experiments.onDidChangeParamsOrMetrics(() => {
-        this.paramsOrMetricsChanged.fire()
+      experiments.onDidChangeMetricsOrParams(() => {
+        this.metricsOrParamsChanged.fire()
       })
     )
 

@@ -12,7 +12,7 @@ import livePlotsFixture from '../../../fixtures/expShow/livePlots'
 import expShowFixture from '../../../fixtures/expShow/output'
 import columnsFixture from '../../../fixtures/expShow/columns'
 import { Operator } from '../../../../experiments/model/filterBy'
-import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/paths'
+import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
 import { defaultSectionCollapsed } from '../../../../plots/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
@@ -204,7 +204,7 @@ suite('Experiments Tree Test Suite', () => {
       stub(ExperimentsModel.prototype, 'getFilters').returns([
         {
           operator: Operator.EQUAL,
-          path: joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
+          path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
           value: unfilteredCheckpointValue
         }
       ])
@@ -248,7 +248,7 @@ suite('Experiments Tree Test Suite', () => {
 
       messageSpy.resetHistory()
 
-      const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
+      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
 
       const lossFilter = {
         operator: Operator.EQUAL,
@@ -257,7 +257,7 @@ suite('Experiments Tree Test Suite', () => {
       }
 
       const loss = columnsFixture.find(
-        paramOrMetric => paramOrMetric.path === lossPath
+        metricOrParam => metricOrParam.path === lossPath
       )
       mockShowQuickPick
         .onFirstCall()

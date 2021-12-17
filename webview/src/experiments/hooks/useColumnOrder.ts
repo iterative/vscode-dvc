@@ -1,10 +1,10 @@
-import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
+import { MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { useMemo } from 'react'
 
 function getColumnsByPath(
-  columns: ParamOrMetric[]
-): Record<string, ParamOrMetric> {
-  const columnsByPath: Record<string, ParamOrMetric> = {}
+  columns: MetricOrParam[]
+): Record<string, MetricOrParam> {
+  const columnsByPath: Record<string, MetricOrParam> = {}
   for (const column of columns) {
     columnsByPath[column.path] = column
   }
@@ -12,18 +12,18 @@ function getColumnsByPath(
 }
 
 function getOrderedData(
-  columnsByPath: Record<string, ParamOrMetric>,
+  columnsByPath: Record<string, MetricOrParam>,
   columnOrder: string[]
-): ParamOrMetric[] {
+): MetricOrParam[] {
   return columnOrder
     .map(path => ({
       ...columnsByPath[path]
     }))
-    .filter(Boolean) as ParamOrMetric[]
+    .filter(Boolean) as MetricOrParam[]
 }
 
 function getOrderedDataWithGroups(
-  columns: ParamOrMetric[],
+  columns: MetricOrParam[],
   columnOrder: string[]
 ) {
   const columnsByPath = getColumnsByPath(columns)
@@ -51,16 +51,16 @@ function getOrderedDataWithGroups(
     parentNode.path = groupNumberPrefix + parentPath
 
     if (!orderedData.find(column => column.path === parentNode.path)) {
-      orderedData.push(parentNode as ParamOrMetric)
+      orderedData.push(parentNode as MetricOrParam)
     }
   })
   return orderedData
 }
 
 export const useColumnOrder = (
-  params: ParamOrMetric[],
+  params: MetricOrParam[],
   columnOrder: string[]
-): ParamOrMetric[] =>
+): MetricOrParam[] =>
   useMemo(() => {
     if (params && columnOrder) {
       return getOrderedDataWithGroups(params, columnOrder)

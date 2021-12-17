@@ -13,7 +13,7 @@ import {
 } from '../../../../../experiments/model/filterBy'
 import { dvcDemoPath } from '../../../../util'
 import { experimentsUpdatedEvent } from '../../../util'
-import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
+import { joinMetricOrParamPath } from '../../../../../experiments/metricsAndParams/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
 import { TableData } from '../../../../../experiments/webview/contract'
@@ -46,7 +46,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const experimentsWebview = await experiments.showWebview()
       const messageSpy = spy(experimentsWebview, 'show')
 
-      const accuracyPath = joinParamOrMetricPath(
+      const accuracyPath = joinMetricOrParamPath(
         'metrics',
         'summary.json',
         'accuracy'
@@ -59,7 +59,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       }
 
       const accuracy = columnsFixture.find(
-        paramOrMetric => paramOrMetric.path === accuracyPath
+        metricOrParam => metricOrParam.path === accuracyPath
       )
       mockShowQuickPick
         .onFirstCall()
@@ -147,10 +147,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
+      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
 
       const loss = columnsFixture.find(
-        paramOrMetric => paramOrMetric.path === lossPath
+        metricOrParam => metricOrParam.path === lossPath
       )
       mockShowQuickPick
         .onFirstCall()
