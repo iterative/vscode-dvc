@@ -152,7 +152,7 @@ export class RepositoryData {
       if (isExcluded(this.dvcRoot, path)) {
         return
       }
-      return this.managedUpdate()
+      return this.managedUpdate(path)
     }
 
     this.dispose.track(
