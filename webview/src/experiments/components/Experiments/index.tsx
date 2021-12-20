@@ -117,15 +117,6 @@ export const ExperimentsTable: React.FC<{
         }
         return state
       })
-      hooks.headerGroups.push(headerGroups => {
-        if (headerGroups.length > 5) {
-          return [
-            headerGroups[0],
-            ...headerGroups.slice(headerGroups.length - 5)
-          ]
-        }
-        return headerGroups
-      })
     },
     useFlexLayout,
     useColumnOrder,
