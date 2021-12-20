@@ -3,8 +3,10 @@ import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
 import { isDirectory } from '.'
+import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/data/constants'
+import { join } from '../test/util/path'
 
 export const fireWatcher = (path: string): Promise<void> => {
   const now = new Date().getTime() / 1000
@@ -60,4 +62,19 @@ export const createExpensiveWatcher = (
 
   fsWatcher.on('all', (_, path) => listener(path))
   return { dispose: () => fsWatcher.close() }
+}
+
+export const createNecessaryFileSystemWatcher = (
+  cwd: string,
+  paths: string[],
+  listener: (glob: string) => void
+): Disposable => {
+  const canUseNative = isInWorkspace(cwd)
+
+  const globForInexpensive = join(cwd, '**')
+  const explicitPaths = paths.map(path => join(cwd, path))
+
+  return canUseNative
+    ? createFileSystemWatcher(globForInexpensive, listener)
+    : createExpensiveWatcher(explicitPaths, listener)
 }
