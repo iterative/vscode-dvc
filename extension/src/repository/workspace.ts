@@ -3,11 +3,10 @@ import { EventEmitter, Uri } from 'vscode'
 import { Repository } from '.'
 import { DOT_GIT_HEAD, DOT_GIT_INDEX } from '../experiments/data/constants'
 import {
-  createExpensiveWatcher,
   createFileSystemWatcher,
+  createNecessaryFileSystemWatcher,
   getRepositoryListener
 } from '../fileSystem/watcher'
-import { isInWorkspace } from '../fileSystem/workspace'
 import { getGitRepositoryRoot } from '../git'
 import { BaseWorkspace } from '../workspace'
 
@@ -64,17 +63,13 @@ export class WorkspaceRepositories extends BaseWorkspace<Repository> {
     )
 
     getGitRepositoryRoot(dvcRoot).then(gitRoot => {
-      const canUseNative = isInWorkspace(gitRoot)
-      const fileSystemWatcher = canUseNative
-        ? createFileSystemWatcher(
-            join(gitRoot, '.git', '{index,HEAD}'),
-            getRepositoryListener(repository, dvcRoot)
-          )
-        : createExpensiveWatcher(
-            [join(gitRoot, DOT_GIT_INDEX), join(gitRoot, DOT_GIT_HEAD)],
-            getRepositoryListener(repository, dvcRoot)
-          )
-      repository.dispose.track(fileSystemWatcher)
+      repository.dispose.track(
+        createNecessaryFileSystemWatcher(
+          gitRoot,
+          [join(gitRoot, DOT_GIT_INDEX), join(gitRoot, DOT_GIT_HEAD)],
+          getRepositoryListener(repository, dvcRoot)
+        )
+      )
     })
   }
 }
