@@ -28,7 +28,7 @@ suite('Experiments Data Test Suite', () => {
   describe('ExperimentsData', () => {
     it('should debounce all calls to update that are made within 200ms', async () => {
       stub(Watcher, 'createFileSystemWatcher').resolves(mockWatcher)
-      stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
+      stub(Watcher, 'createExpensiveWatcher').returns(mockWatcher)
 
       const { cliReader, internalCommands } = buildInternalCommands(disposable)
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
@@ -56,7 +56,7 @@ suite('Experiments Data Test Suite', () => {
     })
 
     it('should call the updater function on setup', async () => {
-      stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
+      stub(Watcher, 'createExpensiveWatcher').returns(mockWatcher)
 
       const { cliReader, internalCommands } = buildInternalCommands(disposable)
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
@@ -91,7 +91,7 @@ suite('Experiments Data Test Suite', () => {
     })
 
     it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
-      stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
+      stub(Watcher, 'createExpensiveWatcher').returns(mockWatcher)
 
       const now = stub(Time, 'getCurrentEpoch').returns(100)
 

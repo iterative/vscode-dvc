@@ -3,7 +3,6 @@ import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
 import { isDirectory } from '.'
-import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/data/constants'
 
@@ -50,22 +49,15 @@ export const createFileSystemWatcher = (
   return fileSystemWatcher
 }
 
-const createExternalToWorkspaceWatcher = (
-  glob: string,
+export const createExpensiveWatcher = (
+  globOrArray: string | string[],
   listener: (path: string) => void
 ): Disposable => {
-  const fsWatcher = watch(glob, { ignoreInitial: true })
+  const fsWatcher = watch(globOrArray, {
+    ignoreInitial: true,
+    ignored: ignoredDotDirectories
+  })
+
   fsWatcher.on('all', (_, path) => listener(path))
   return { dispose: () => fsWatcher.close() }
-}
-
-export const createNecessaryFileSystemWatcher = (
-  glob: string,
-  listener: (glob: string) => void
-): Disposable => {
-  const canUseNative = isInWorkspace(glob)
-
-  return canUseNative
-    ? createFileSystemWatcher(glob, listener)
-    : createExternalToWorkspaceWatcher(glob, listener)
 }

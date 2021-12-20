@@ -1,12 +1,21 @@
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
-import { DOT_GIT, EXPERIMENTS_GIT_REFS, GIT_REFS } from './constants'
-import { createNecessaryFileSystemWatcher } from '../../fileSystem/watcher'
+import {
+  DOT_GIT,
+  DOT_GIT_HEAD,
+  EXPERIMENTS_GIT_REFS,
+  HEADS_GIT_REFS
+} from './constants'
+import {
+  createExpensiveWatcher,
+  createFileSystemWatcher
+} from '../../fileSystem/watcher'
 import { getGitRepositoryRoot } from '../../git'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/reader'
 import { BaseData } from '../../data'
+import { isInWorkspace } from '../../fileSystem/workspace'
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   constructor(
@@ -35,17 +44,26 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
   private async watchExpGitRefs(): Promise<void> {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
-    const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
-    this.dispose.track(
-      createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {
-        if (
-          path.includes('HEAD') ||
-          path.includes(EXPERIMENTS_GIT_REFS) ||
-          path.includes(join(GIT_REFS, 'heads'))
-        ) {
-          return this.managedUpdate()
-        }
-      })
-    )
+    const listener = (path: string) => {
+      if (
+        path.includes(DOT_GIT_HEAD) ||
+        path.includes(EXPERIMENTS_GIT_REFS) ||
+        path.includes(HEADS_GIT_REFS)
+      ) {
+        return this.managedUpdate()
+      }
+    }
+    const canUseNative = isInWorkspace(gitRoot)
+    const fileSystemWatcher = canUseNative
+      ? createFileSystemWatcher(join(gitRoot, DOT_GIT, '**'), listener)
+      : createExpensiveWatcher(
+          [
+            join(gitRoot, DOT_GIT_HEAD),
+            join(gitRoot, EXPERIMENTS_GIT_REFS),
+            join(gitRoot, HEADS_GIT_REFS)
+          ],
+          listener
+        )
+    this.dispose.track(fileSystemWatcher)
   }
 }

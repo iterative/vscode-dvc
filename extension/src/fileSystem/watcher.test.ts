@@ -1,15 +1,13 @@
 import { join, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { workspace } from 'vscode'
-import { FSWatcher, watch } from 'chokidar'
+import { FSWatcher } from 'chokidar'
 import {
   getRepositoryListener,
   ignoredDotDirectories,
-  createFileSystemWatcher,
-  createNecessaryFileSystemWatcher
+  createFileSystemWatcher
 } from './watcher'
 import { Repository } from '../repository'
-import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 jest.mock('vscode')
 jest.mock('chokidar')
@@ -19,9 +17,6 @@ const mockedWorkspace = mocked(workspace)
 const mockedCreateFileSystemWatcher = jest.fn()
 mockedWorkspace.createFileSystemWatcher = mockedCreateFileSystemWatcher
 
-const mockedGetWorkspaceFolders = mocked(getWorkspaceFolders)
-
-const mockedWatch = mocked(watch)
 const mockedWatcher = mocked(new FSWatcher())
 const mockedWatcherOn = jest.fn()
 const mockedWatcherClose = jest.fn()
@@ -210,109 +205,5 @@ describe('createFileSystemWatcher', () => {
     expect(() =>
       createFileSystemWatcher(join(__dirname, '**'), mockedListener)
     ).not.toThrow()
-  })
-})
-
-describe('createNecessaryFileSystemWatcher', () => {
-  const mockedExternalGitRefs = join(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '.git',
-    'refs',
-    '**'
-  )
-
-  it('should create a chokidar watcher with the correct options when the path to watch is outside the workspace', () => {
-    mockedGetWorkspaceFolders.mockReturnValueOnce([__dirname])
-
-    mockedWatch.mockReturnValue(mockedWatcher)
-
-    const mockedListener = jest.fn()
-
-    createNecessaryFileSystemWatcher(mockedExternalGitRefs, mockedListener)
-
-    expect(mockedWatch).toBeCalledTimes(1)
-    expect(mockedWatch).toBeCalledWith(mockedExternalGitRefs, {
-      ignoreInitial: true
-    })
-
-    expect(mockedWatcherOn).toBeCalledTimes(1)
-    expect(mockedCreateFileSystemWatcher).not.toBeCalled()
-  })
-
-  it('should return a dispose function that removes the listener when the path to watch is outside the workspace', () => {
-    mockedGetWorkspaceFolders.mockReturnValueOnce([__dirname])
-
-    mockedWatch.mockReturnValue(mockedWatcher)
-
-    const mockedListener = jest.fn()
-
-    const { dispose } = createNecessaryFileSystemWatcher(
-      mockedExternalGitRefs,
-      mockedListener
-    )
-
-    expect(mockedWatcherClose).not.toBeCalled()
-
-    dispose()
-
-    expect(mockedWatcherClose).toBeCalledTimes(1)
-    expect(mockedCreateFileSystemWatcher).not.toBeCalled()
-  })
-
-  it('should create an instance of the chokidar watcher only if the path is outside of all the available workspace folders', () => {
-    mockedGetWorkspaceFolders.mockReturnValueOnce([
-      join(__dirname, 'first'),
-      join(__dirname, 'second'),
-      join(__dirname, 'third'),
-      join(__dirname, 'fourth'),
-      join(__dirname, 'fifth')
-    ])
-
-    mockedWatch.mockReturnValue(mockedWatcher)
-
-    const mockedListener = jest.fn()
-
-    createNecessaryFileSystemWatcher(mockedExternalGitRefs, mockedListener)
-
-    expect(mockedWatch).toBeCalledTimes(1)
-    expect(mockedCreateFileSystemWatcher).not.toBeCalled()
-  })
-
-  it("should create an instance of VS Code's watcher whenever the path is inside any of the workspace folders", () => {
-    const mockedSecondDir = join(__dirname, 'second')
-    mockedGetWorkspaceFolders.mockReturnValueOnce([
-      join(__dirname, 'first'),
-      mockedSecondDir
-    ])
-
-    mockedWatch.mockReturnValue(mockedWatcher)
-
-    const mockedListener = jest.fn()
-
-    const mockedInternalGitRefs = join(mockedSecondDir, '.git', 'refs', '**')
-
-    createNecessaryFileSystemWatcher(mockedInternalGitRefs, mockedListener)
-
-    expect(mockedWatch).not.toBeCalled()
-    expect(mockedCreateFileSystemWatcher).toBeCalledTimes(1)
-  })
-
-  it("should create an instance of VS Code's watcher whenever the path is inside the only workspace folder", () => {
-    const mockedRoot = __dirname
-    mockedGetWorkspaceFolders.mockReturnValueOnce([mockedRoot])
-
-    mockedWatch.mockReturnValue(mockedWatcher)
-
-    const mockedListener = jest.fn()
-
-    const mockedInternalGitRefs = join(mockedRoot, '.git', 'refs', '**')
-
-    createNecessaryFileSystemWatcher(mockedInternalGitRefs, mockedListener)
-
-    expect(mockedWatch).not.toBeCalled()
-    expect(mockedCreateFileSystemWatcher).toBeCalledTimes(1)
   })
 })
