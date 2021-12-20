@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, relative } from 'path'
 import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
 import { EXPERIMENTS_GIT_REFS } from './constants'
@@ -40,15 +40,16 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
   private async watchExpGitRefs(): Promise<void> {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
+    const watchedRelPaths = [DOT_GIT_HEAD, EXPERIMENTS_GIT_REFS, HEADS_GIT_REFS]
     this.dispose.track(
       createNecessaryFileSystemWatcher(
         join(gitRoot, DOT_GIT),
-        ['HEAD', join('refs', 'exps'), join('refs', 'heads')],
+        watchedRelPaths.map(path => relative(DOT_GIT, path)),
         (path: string) => {
           if (
-            path.includes(DOT_GIT_HEAD) ||
-            path.includes(EXPERIMENTS_GIT_REFS) ||
-            path.includes(HEADS_GIT_REFS)
+            watchedRelPaths.some(watchedRelPath =>
+              path.includes(watchedRelPath)
+            )
           ) {
             return this.managedUpdate()
           }
