@@ -299,7 +299,7 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     const mockedListener = jest.fn()
 
-    const mockedInternalGitRefs = join('.git', 'refs', '**')
+    const mockedInternalGitRefs = join('.git', 'refs')
 
     createNecessaryFileSystemWatcher(
       mockedSecondDir,
@@ -319,7 +319,7 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     const mockedListener = jest.fn()
 
-    const mockedInternalGitRefs = join('.git', 'refs', '**')
+    const mockedInternalGitRefs = join('.git', 'refs')
 
     createNecessaryFileSystemWatcher(
       mockedRoot,
@@ -329,5 +329,6 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     expect(mockedWatch).not.toBeCalled()
     expect(mockedCreateFileSystemWatcher).toBeCalledTimes(1)
+    expect(mockedCreateFileSystemWatcher).toBeCalledWith(join(mockedRoot, '**'))
   })
 })
