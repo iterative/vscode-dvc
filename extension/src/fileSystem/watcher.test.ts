@@ -1,14 +1,12 @@
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { workspace } from 'vscode'
 import { FSWatcher, watch } from 'chokidar'
 import {
-  getRepositoryListener,
   ignoredDotDirectories,
   createFileSystemWatcher,
   createNecessaryFileSystemWatcher
 } from './watcher'
-import { Repository } from '../repository'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 jest.mock('vscode')
@@ -37,91 +35,6 @@ beforeEach(() => {
       onDidCreate: jest.fn(),
       onDidDelete: jest.fn()
     }
-  })
-})
-
-describe('getRepositoryListener', () => {
-  const mockedUpdate = jest.fn()
-  const repository = {
-    update: mockedUpdate
-  } as unknown as Repository
-
-  it('should return a function that does nothing if an empty path is provided', () => {
-    const mockedDvcRoot = resolve('some', 'dvc', 'root')
-    const listener = getRepositoryListener(repository, mockedDvcRoot)
-
-    listener('')
-
-    expect(mockedUpdate).not.toBeCalled()
-  })
-
-  it('should return a function that does nothing if an experiments git refs path is provided', () => {
-    const mockedDvcRoot = __dirname
-    const listener = getRepositoryListener(repository, mockedDvcRoot)
-
-    listener(join(mockedDvcRoot, '.git', 'refs', 'exps', '0F'))
-
-    expect(mockedUpdate).not.toBeCalled()
-  })
-
-  it('should return a function that calls update with the provided path if it is inside the repo', () => {
-    const mockedDvcRoot = resolve('some', 'dvc', 'repo')
-    const listener = getRepositoryListener(repository, mockedDvcRoot)
-
-    const path = join(mockedDvcRoot, 'data', 'placeholder.dvc')
-
-    listener(join(mockedDvcRoot, 'data', 'placeholder.dvc'))
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it('should return a function that calls update if it is called with .git/index (that is above the dvc root)', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    const path = resolve(__dirname, '..', '..', '.git', 'index')
-    listener(path)
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it('should return a function that calls update if it is called with .git/ORIG_HEAD (that is above the dvc root)', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    const path = resolve(__dirname, '..', '..', '.git', 'ORIG_HEAD')
-    listener(path)
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it('should return a function that does not call update if it is called with a file in the .git folder that does not contain index or HEAD', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    listener(
-      resolve(
-        __dirname,
-        '..',
-        '..',
-        '.git',
-        'any',
-        'other',
-        'file',
-        'or',
-        'ref'
-      )
-    )
-
-    expect(mockedUpdate).not.toBeCalled()
-  })
-
-  it('should return a function that returns early if called with a path that is above the dvc root that is not in the .git folder', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    listener(resolve(__dirname, '..', '..', 'other', 'refs'))
-
-    expect(mockedUpdate).not.toBeCalled()
   })
 })
 
