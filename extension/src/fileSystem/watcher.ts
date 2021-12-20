@@ -51,11 +51,11 @@ export const createFileSystemWatcher = (
   return fileSystemWatcher
 }
 
-export const createExpensiveWatcher = (
-  globOrArray: string | string[],
+const createExpensiveWatcher = (
+  paths: string[],
   listener: (path: string) => void
 ): Disposable => {
-  const fsWatcher = watch(globOrArray, {
+  const fsWatcher = watch(paths, {
     ignoreInitial: true,
     ignored: ignoredDotDirectories
   })
