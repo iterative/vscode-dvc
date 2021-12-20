@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
@@ -50,22 +51,30 @@ export const createFileSystemWatcher = (
   return fileSystemWatcher
 }
 
-const createExternalToWorkspaceWatcher = (
-  glob: string,
+const createExpensiveWatcher = (
+  paths: string[],
   listener: (path: string) => void
 ): Disposable => {
-  const fsWatcher = watch(glob, { ignoreInitial: true })
+  const fsWatcher = watch(paths, {
+    ignoreInitial: true,
+    ignored: ignoredDotDirectories
+  })
+
   fsWatcher.on('all', (_, path) => listener(path))
   return { dispose: () => fsWatcher.close() }
 }
 
 export const createNecessaryFileSystemWatcher = (
-  glob: string,
+  cwd: string,
+  paths: string[],
   listener: (glob: string) => void
 ): Disposable => {
-  const canUseNative = isInWorkspace(glob)
+  const canUseNative = isInWorkspace(cwd)
+
+  const globForInexpensive = join(cwd, '**')
+  const explicitPaths = paths.map(path => join(cwd, path))
 
   return canUseNative
-    ? createFileSystemWatcher(glob, listener)
-    : createExternalToWorkspaceWatcher(glob, listener)
+    ? createFileSystemWatcher(globForInexpensive, listener)
+    : createExpensiveWatcher(explicitPaths, listener)
 }
