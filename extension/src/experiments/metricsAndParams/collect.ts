@@ -1,10 +1,10 @@
 import get from 'lodash/get'
-import { reduceParamsAndMetrics } from './reduce'
-import { joinParamOrMetricPath } from './paths'
+import { reduceMetricsAndParams } from './reduce'
+import { joinMetricOrParamPath } from './paths'
 import {
-  ParamOrMetric,
-  ParamOrMetricAggregateData,
-  ParamsOrMetrics
+  MetricOrParam,
+  MetricOrParamAggregateData,
+  MetricsOrParams
 } from '../webview/contract'
 import {
   ExperimentFields,
@@ -15,7 +15,7 @@ import {
   ValueTree
 } from '../../cli/reader'
 
-interface PartialDescriptor extends ParamOrMetricAggregateData {
+interface PartialDescriptor extends MetricOrParamAggregateData {
   types: Set<string>
   hasChildren: boolean
   group: string
@@ -30,9 +30,9 @@ type Accumulator = {
   paramsMap: PartialMap
 }
 
-type ParamsAndMetrics = {
-  metrics: ParamsOrMetrics | undefined
-  params: ParamsOrMetrics | undefined
+type MetricsAndParams = {
+  metrics: MetricsOrParams | undefined
+  params: MetricsOrParams | undefined
 }
 
 const getValueType = (value: Value | ValueTree) => {
@@ -50,8 +50,8 @@ const getEntryOrDefault = (
   originalMap.get(propertyKey) || {
     group: ancestors[0],
     hasChildren: false,
-    parentPath: joinParamOrMetricPath(...ancestors),
-    path: joinParamOrMetricPath(...ancestors, propertyKey),
+    parentPath: joinMetricOrParamPath(...ancestors),
+    path: joinMetricOrParamPath(...ancestors, propertyKey),
     types: new Set<string>()
   }
 
@@ -128,12 +128,12 @@ const mergeOrCreateDescriptor = (
   }
 }
 
-const mergeParamsAndMetrics = (
+const mergeMetricsAndParams = (
   acc: Accumulator,
-  paramsAndMetrics: ParamsAndMetrics
+  metricsAndParams: MetricsAndParams
 ) => {
   const { paramsMap, metricsMap } = acc
-  const { params, metrics } = paramsAndMetrics
+  const { params, metrics } = metricsAndParams
   if (params) {
     mergeMap(paramsMap, params, 'params')
   }
@@ -144,12 +144,12 @@ const mergeParamsAndMetrics = (
 
 const extractExperimentFields = (
   experimentFieldsOrError: ExperimentFieldsOrError
-): ParamsAndMetrics | undefined => {
+): MetricsAndParams | undefined => {
   const experimentFields = experimentFieldsOrError.data
   if (!experimentFields) {
     return
   }
-  return reduceParamsAndMetrics(experimentFields)
+  return reduceMetricsAndParams(experimentFields)
 }
 
 const collectFromExperimentsObject = (
@@ -160,7 +160,7 @@ const collectFromExperimentsObject = (
     const experimentFields = extractExperimentFields(experiment)
 
     if (experimentFields) {
-      mergeParamsAndMetrics(acc, experimentFields)
+      mergeMetricsAndParams(acc, experimentFields)
     }
   }
 }
@@ -173,7 +173,7 @@ const collectFromBranchesObject = (
     const branch = extractExperimentFields(baseline)
 
     if (branch) {
-      mergeParamsAndMetrics(acc, branch)
+      mergeMetricsAndParams(acc, branch)
       collectFromExperimentsObject(acc, experiments)
     }
   }
@@ -182,7 +182,7 @@ const collectFromBranchesObject = (
 const createEntry = (
   name: string,
   descriptor: PartialDescriptor
-): ParamOrMetric => {
+): MetricOrParam => {
   const { group, path, hasChildren, parentPath } = descriptor
 
   return {
@@ -195,45 +195,45 @@ const createEntry = (
 }
 
 const addMetadata = (
-  paramOrMetric: ParamOrMetric,
+  metricOrParam: MetricOrParam,
   descriptor: PartialDescriptor
-): ParamOrMetric => {
+): MetricOrParam => {
   const { types, maxStringLength, minNumber, maxNumber } = descriptor
 
   if (maxStringLength) {
-    paramOrMetric.maxStringLength = maxStringLength
+    metricOrParam.maxStringLength = maxStringLength
   }
   if (minNumber) {
-    paramOrMetric.minNumber = minNumber
-    paramOrMetric.maxNumber = maxNumber
+    metricOrParam.minNumber = minNumber
+    metricOrParam.maxNumber = maxNumber
   }
   if (types.size) {
-    paramOrMetric.types = [...types]
+    metricOrParam.types = [...types]
   }
-  return paramOrMetric
+  return metricOrParam
 }
 
 const transformMap = ([name, descriptor]: [
   string,
   PartialDescriptor
-]): ParamOrMetric => {
-  const paramOrMetric = createEntry(name, descriptor)
-  return addMetadata(paramOrMetric, descriptor)
+]): MetricOrParam => {
+  const metricOrParam = createEntry(name, descriptor)
+  return addMetadata(metricOrParam, descriptor)
 }
 
 const transformAndCollect = (
-  paramsOrMetricsMap: PartialMap
-): ParamOrMetric[] => {
-  const paramsAndMetrics = []
-  for (const entry of paramsOrMetricsMap) {
-    paramsAndMetrics.push(transformMap(entry))
+  metricsOrParamsMap: PartialMap
+): MetricOrParam[] => {
+  const metricsAndParams = []
+  for (const entry of metricsOrParamsMap) {
+    metricsAndParams.push(transformMap(entry))
   }
-  return paramsAndMetrics
+  return metricsAndParams
 }
 
-export const collectParamsAndMetrics = (
+export const collectMetricsAndParams = (
   data: ExperimentsOutput
-): ParamOrMetric[] => {
+): MetricOrParam[] => {
   const { workspace, ...branchesObject } = data
   const workspaceBaseline = extractExperimentFields(workspace.baseline)
 
@@ -243,14 +243,14 @@ export const collectParamsAndMetrics = (
   }
 
   if (workspaceBaseline) {
-    mergeParamsAndMetrics(acc, workspaceBaseline)
+    mergeMetricsAndParams(acc, workspaceBaseline)
   }
 
   collectFromBranchesObject(acc, branchesObject)
 
   return [
-    ...transformAndCollect(acc.paramsMap),
-    ...transformAndCollect(acc.metricsMap)
+    ...transformAndCollect(acc.metricsMap),
+    ...transformAndCollect(acc.paramsMap)
   ]
 }
 
@@ -279,11 +279,11 @@ const collectChange = (
   }
 
   if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
-    changes.push(joinParamOrMetricPath(type, file, ...ancestors, key))
+    changes.push(joinMetricOrParamPath(type, file, ...ancestors, key))
   }
 }
 
-const collectParamsAndMetricsChanges = (
+const collectMetricsAndParamsChanges = (
   changes: string[],
   workspaceData: ExperimentFields,
   commitData: ExperimentFields
@@ -319,7 +319,7 @@ export const collectChanges = (data: ExperimentsOutput): string[] => {
     {} as Record<string, ExperimentFields>
   )
 
-  collectParamsAndMetricsChanges(changes, workspace, currentCommit)
+  collectMetricsAndParamsChanges(changes, workspace, currentCommit)
 
   return changes.sort()
 }

@@ -17,6 +17,11 @@ export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
   [Section.STATIC_PLOTS]: 'Static Plots'
 }
+
+export const DefaultSectionSizes = {
+  [Section.LIVE_PLOTS]: PlotSize.REGULAR,
+  [Section.STATIC_PLOTS]: PlotSize.REGULAR
+}
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
 
@@ -25,10 +30,10 @@ export class PlotsModel {
   private readonly workspaceState: Memento
 
   private livePlots?: LivePlotData[]
-  private selectedMetrics?: string[] = undefined
-  private plotSize: PlotSize = PlotSize.REGULAR
+  private selectedMetrics?: string[]
+  private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
-  private sectionNames: Record<Section, string> = DefaultSectionNames
+  private sectionNames: Record<Section, string>
 
   constructor(
     dvcRoot: string,
@@ -44,9 +49,9 @@ export class PlotsModel {
       undefined
     )
 
-    this.plotSize = workspaceState.get(
-      MementoPrefix.PLOT_SIZE + dvcRoot,
-      PlotSize.REGULAR
+    this.plotSizes = workspaceState.get(
+      MementoPrefix.PLOT_SIZES + dvcRoot,
+      DefaultSectionSizes
     )
 
     this.sectionCollapsed = workspaceState.get(
@@ -92,7 +97,7 @@ export class PlotsModel {
       plots: this.getPlots(this.livePlots, selectedExperiments),
       sectionName: this.getSectionName(Section.LIVE_PLOTS),
       selectedMetrics: this.getSelectedMetrics(),
-      size: this.getPlotSize()
+      size: this.getPlotSize(Section.LIVE_PLOTS)
     }
   }
 
@@ -105,13 +110,13 @@ export class PlotsModel {
     return this.selectedMetrics
   }
 
-  public setPlotSize(size: PlotSize) {
-    this.plotSize = size
+  public setPlotSize(section: Section, size: PlotSize) {
+    this.plotSizes[section] = size
     this.persistPlotSize()
   }
 
-  public getPlotSize() {
-    return this.plotSize
+  public getPlotSize(section: Section) {
+    return this.plotSizes[section]
   }
 
   public setSectionCollapsed(newState: Partial<SectionCollapsed>) {
@@ -156,8 +161,8 @@ export class PlotsModel {
 
   private persistPlotSize() {
     this.workspaceState.update(
-      MementoPrefix.PLOT_SIZE + this.dvcRoot,
-      this.getPlotSize()
+      MementoPrefix.PLOT_SIZES + this.dvcRoot,
+      this.plotSizes
     )
   }
 

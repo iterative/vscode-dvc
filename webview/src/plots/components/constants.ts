@@ -15,24 +15,25 @@ export const createSpec = (
         field: 'iteration',
         title: 'iteration',
         type: 'quantitative'
+      },
+      y: {
+        field: 'y',
+        scale: { zero: false },
+        title,
+        type: 'quantitative'
       }
     },
     height: 'container',
     layer: [
       {
         encoding: {
-          color: { field: 'group', legend: null, scale, type: 'nominal' },
-          y: {
-            field: 'y',
-            scale: { zero: false },
-            title,
-            type: 'quantitative'
-          }
+          color: { field: 'group', legend: null, scale, type: 'nominal' }
         },
+
         layer: [
-          { mark: 'line' },
+          { mark: { type: 'line' } },
           {
-            mark: 'point',
+            mark: { type: 'point' },
             transform: [
               {
                 filter: { empty: false, param: 'hover' }
@@ -43,34 +44,27 @@ export const createSpec = (
       },
       {
         encoding: {
-          opacity: {
-            condition: { empty: false, param: 'hover', value: 0.8 },
-            value: 0
-          }
+          opacity: { value: 0 },
+          tooltip: [
+            { field: 'group', title: 'name' },
+            {
+              field: 'y',
+              title: title.substring(title.indexOf(':') + 1),
+              type: 'quantitative'
+            }
+          ]
         },
-        mark: { tooltip: { content: 'data' }, type: 'rule' },
+        mark: { type: 'rule' },
         params: [
           {
             name: 'hover',
             select: {
               clear: 'mouseout',
-              fields: ['iteration'],
+              fields: ['iteration', 'y'],
               nearest: true,
               on: 'mouseover',
               type: 'point'
             }
-          }
-        ],
-        transform: [
-          {
-            as: 'y',
-            calculate: "format(datum['y'],'.5f')"
-          },
-          {
-            groupby: ['iteration'],
-            op: 'mean',
-            pivot: 'group',
-            value: 'y'
           }
         ]
       },
@@ -84,7 +78,13 @@ export const createSpec = (
             type: 'quantitative'
           }
         },
-        layer: [{ mark: { stroke: null, type: 'circle' } }]
+        mark: { stroke: null, type: 'circle' }
+      }
+    ],
+    transform: [
+      {
+        as: 'y',
+        calculate: "format(datum['y'],'.5f')"
       }
     ],
     width: 'container'

@@ -1,4 +1,4 @@
-import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
+import { MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { useColumnOrder } from './useColumnOrder'
 
 jest.mock('react', () => ({
@@ -8,7 +8,7 @@ jest.mock('../../shared/api')
 
 describe('useColumnOrder', () => {
   it('should return re-sorted columns with groups and generated parents', () => {
-    const params: ParamOrMetric[] = [
+    const params: MetricOrParam[] = [
       {
         group: 'group1',
         hasChildren: false,

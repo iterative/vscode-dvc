@@ -2,10 +2,11 @@ import { join } from 'path'
 import { EventEmitter, Uri } from 'vscode'
 import { Repository } from '.'
 import {
+  createFileSystemWatcher,
   createNecessaryFileSystemWatcher,
   getRepositoryListener
 } from '../fileSystem/watcher'
-import { getGitRepositoryRoot } from '../git'
+import { DOT_GIT_HEAD, DOT_GIT_INDEX, getGitRepositoryRoot } from '../git'
 import { BaseWorkspace } from '../workspace'
 
 export class WorkspaceRepositories extends BaseWorkspace<Repository> {
@@ -41,14 +42,8 @@ export class WorkspaceRepositories extends BaseWorkspace<Repository> {
         this.treeDataChanged
       )
     )
-    getGitRepositoryRoot(dvcRoot).then(gitRoot =>
-      repository.dispose.track(
-        createNecessaryFileSystemWatcher(
-          join(gitRoot, '**'),
-          getRepositoryListener(repository, dvcRoot)
-        )
-      )
-    )
+
+    this.setupWatchers(dvcRoot, repository)
 
     this.setRepository(dvcRoot, repository)
     return repository
@@ -56,5 +51,24 @@ export class WorkspaceRepositories extends BaseWorkspace<Repository> {
 
   private hasChanges(dvcRoot: string) {
     return this.getRepository(dvcRoot).hasChanges()
+  }
+
+  private setupWatchers(dvcRoot: string, repository: Repository) {
+    repository.dispose.track(
+      createFileSystemWatcher(
+        join(dvcRoot, '**'),
+        getRepositoryListener(repository, dvcRoot)
+      )
+    )
+
+    getGitRepositoryRoot(dvcRoot).then(gitRoot => {
+      repository.dispose.track(
+        createNecessaryFileSystemWatcher(
+          gitRoot,
+          [join(gitRoot, DOT_GIT_INDEX), join(gitRoot, DOT_GIT_HEAD)],
+          getRepositoryListener(repository, dvcRoot)
+        )
+      )
+    })
   }
 }

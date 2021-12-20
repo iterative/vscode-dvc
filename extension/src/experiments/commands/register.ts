@@ -25,6 +25,14 @@ const registerExperimentCwdCommands = (
         experiments.queueExperimentsFromCsv()
       )
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.QUEUE_EXPERIMENT_FROM_EXISTING,
+    () =>
+      experiments.pauseUpdatesThenRun(() =>
+        experiments.queueExperimentFromExisting()
+      )
+  )
 }
 
 const registerExperimentNameCommands = (
@@ -51,7 +59,7 @@ const registerExperimentInputCommands = (
     () =>
       experiments.getExpNameAndInputThenRun(
         AvailableCommands.EXPERIMENT_BRANCH,
-        'Name the new branch'
+        'Enter a name for the new branch'
       )
   )
 

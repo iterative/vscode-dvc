@@ -7,8 +7,8 @@ export const EXTENSION_ID = 'iterative.dvc'
 const ViewOpenedEvent = {
   VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
     'views.experimentsFilterByTree.opened',
-  VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED:
-    'views.experimentsParamsAndMetricsTree.opened',
+  VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED:
+    'views.experimentsMetricsAndParamsTree.opened',
   VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED: 'views.experimentsSortByTree.opened',
   VIEWS_EXPERIMENTS_TREE_OPENED: 'views.experimentsTree.opened',
   VIEWS_TRACKED_EXPLORER_TREE_OPENED: 'views.trackedExplorerTree.opened'
@@ -78,7 +78,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_FILTERS_REMOVE]: undefined
   [EventName.EXPERIMENT_FILTERS_REMOVE_ALL]: undefined
   [EventName.EXPERIMENT_GARBAGE_COLLECT]: undefined
-  [EventName.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE]: undefined
+  [EventName.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RUN_QUEUED]: undefined
@@ -92,6 +92,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_TOGGLE]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.QUEUE_EXPERIMENTS_FROM_CSV]: undefined
+  [EventName.QUEUE_EXPERIMENT_FROM_EXISTING]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PLOTS_SHOW]: undefined
@@ -130,7 +131,7 @@ export interface IEventNamePropertyMapping {
 
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount
-  [EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED]: DvcRootCount
+  [EventName.VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined

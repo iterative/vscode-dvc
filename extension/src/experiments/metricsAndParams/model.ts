@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectChanges, collectParamsAndMetrics } from './collect'
-import { ParamOrMetric } from '../webview/contract'
+import { collectChanges, collectMetricsAndParams } from './collect'
+import { MetricOrParam } from '../webview/contract'
 import { flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { MementoPrefix } from '../../vscode/memento'
@@ -12,33 +12,33 @@ export enum Status {
   UNSELECTED = 0
 }
 
-export class ParamsAndMetricsModel {
+export class MetricsAndParamsModel {
   public readonly dispose = Disposable.fn()
 
   private status: Record<string, Status>
 
-  private data: ParamOrMetric[] = []
+  private data: MetricOrParam[] = []
 
   private readonly dvcRoot: string
   private readonly workspaceState: Memento
 
   private columnOrderState: string[] = []
   private columnWidthsState: Record<string, number> = {}
-  private paramsAndMetricsChanges: string[] = []
+  private metricsAndParamsChanges: string[] = []
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
     this.status = workspaceState.get(
-      MementoPrefix.PARAMS_AND_METRICS_STATUS + dvcRoot,
+      MementoPrefix.METRICS_AND_PARAMS_STATUS + dvcRoot,
       {}
     )
     this.columnOrderState = workspaceState.get(
-      MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + dvcRoot,
+      MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + dvcRoot,
       []
     )
     this.columnWidthsState = workspaceState.get(
-      MementoPrefix.PARAMS_AND_METRICS_COLUMN_WIDTHS + dvcRoot,
+      MementoPrefix.METRICS_AND_PARAMS_COLUMN_WIDTHS + dvcRoot,
       {}
     )
   }
@@ -54,44 +54,44 @@ export class ParamsAndMetricsModel {
   public getSelected() {
     return (
       this.data.filter(
-        paramOrMetric => this.status[paramOrMetric.path] !== Status.UNSELECTED
+        metricOrParam => this.status[metricOrParam.path] !== Status.UNSELECTED
       ) || []
     )
   }
 
   public transformAndSet(data: ExperimentsOutput) {
     return Promise.all([
-      this.transformAndSetParamsAndMetrics(data),
+      this.transformAndSetMetricsAndParams(data),
       this.transformAndSetChanges(data)
     ])
   }
 
-  public getParamsAndMetrics() {
+  public getMetricsAndParams() {
     return this.data
   }
 
   public getTerminalNodes() {
-    return this.data.filter(paramOrMetric => !paramOrMetric.hasChildren)
+    return this.data.filter(metricOrParam => !metricOrParam.hasChildren)
   }
 
   public getChildren(path?: string) {
     return this.data
-      ?.filter(paramOrMetric =>
+      ?.filter(metricOrParam =>
         path
-          ? paramOrMetric.parentPath === path
-          : ['metrics', 'params'].includes(paramOrMetric.parentPath)
+          ? metricOrParam.parentPath === path
+          : ['metrics', 'params'].includes(metricOrParam.parentPath)
       )
-      .map(paramOrMetric => {
+      .map(metricOrParam => {
         return {
-          ...paramOrMetric,
-          descendantStatuses: this.getTerminalNodeStatuses(paramOrMetric.path),
-          status: this.status[paramOrMetric.path]
+          ...metricOrParam,
+          descendantStatuses: this.getTerminalNodeStatuses(metricOrParam.path),
+          status: this.status[metricOrParam.path]
         }
       })
   }
 
   public getChanges() {
-    return this.paramsAndMetricsChanges
+    return this.metricsAndParamsChanges
   }
 
   public toggleStatus(path: string) {
@@ -106,10 +106,10 @@ export class ParamsAndMetricsModel {
 
   public getTerminalNodeStatuses(parentPath?: string): Status[] {
     const nestedStatuses = (this.getChildren(parentPath) || []).map(
-      paramOrMetric => {
-        const terminalStatuses = paramOrMetric.hasChildren
-          ? this.getTerminalNodeStatuses(paramOrMetric.path)
-          : [this.status[paramOrMetric.path]]
+      metricOrParam => {
+        const terminalStatuses = metricOrParam.hasChildren
+          ? this.getTerminalNodeStatuses(metricOrParam.path)
+          : [this.status[metricOrParam.path]]
         return [...terminalStatuses]
       }
     )
@@ -129,52 +129,52 @@ export class ParamsAndMetricsModel {
 
   private persistColumnOrder() {
     this.workspaceState.update(
-      MementoPrefix.PARAMS_AND_METRICS_COLUMN_ORDER + this.dvcRoot,
+      MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + this.dvcRoot,
       this.getColumnOrder()
     )
   }
 
   private persistColumnWidths() {
     this.workspaceState.update(
-      MementoPrefix.PARAMS_AND_METRICS_COLUMN_WIDTHS + this.dvcRoot,
+      MementoPrefix.METRICS_AND_PARAMS_COLUMN_WIDTHS + this.dvcRoot,
       this.columnWidthsState
     )
   }
 
-  private transformAndSetParamsAndMetrics(data: ExperimentsOutput) {
-    const paramsAndMetrics = collectParamsAndMetrics(data)
+  private transformAndSetMetricsAndParams(data: ExperimentsOutput) {
+    const metricsAndParams = collectMetricsAndParams(data)
 
-    paramsAndMetrics.forEach(paramOrMetric => {
-      if (this.status[paramOrMetric.path] === undefined) {
-        this.status[paramOrMetric.path] = Status.SELECTED
+    metricsAndParams.forEach(metricOrParam => {
+      if (this.status[metricOrParam.path] === undefined) {
+        this.status[metricOrParam.path] = Status.SELECTED
       }
     })
 
-    this.data = paramsAndMetrics
+    this.data = metricsAndParams
   }
 
   private transformAndSetChanges(data: ExperimentsOutput) {
-    this.paramsAndMetricsChanges = collectChanges(data)
+    this.metricsAndParamsChanges = collectChanges(data)
   }
 
   private setAreChildrenSelected(path: string, status: Status) {
-    return this.getChildren(path)?.map(paramOrMetric => {
-      const path = paramOrMetric.path
+    return this.getChildren(path)?.map(metricOrParam => {
+      const path = metricOrParam.path
       this.status[path] = status
       this.setAreChildrenSelected(path, status)
     })
   }
 
-  private getParamOrMetric(path: string) {
-    return this.data?.find(paramOrMetric => paramOrMetric.path === path)
+  private getMetricOrParam(path: string) {
+    return this.data?.find(metricOrParam => metricOrParam.path === path)
   }
 
   private setAreParentsSelected(path: string) {
-    const changed = this.getParamOrMetric(path)
+    const changed = this.getMetricOrParam(path)
     if (!changed) {
       return
     }
-    const parent = this.getParamOrMetric(changed.parentPath)
+    const parent = this.getMetricOrParam(changed.parentPath)
     if (!parent) {
       return
     }
@@ -213,7 +213,7 @@ export class ParamsAndMetricsModel {
 
   private persistStatus() {
     return this.workspaceState.update(
-      MementoPrefix.PARAMS_AND_METRICS_STATUS + this.dvcRoot,
+      MementoPrefix.METRICS_AND_PARAMS_STATUS + this.dvcRoot,
       this.status
     )
   }

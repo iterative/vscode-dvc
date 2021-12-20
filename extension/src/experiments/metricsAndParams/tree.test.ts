@@ -2,11 +2,11 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
-import { ExperimentsParamsAndMetricsTree } from './tree'
-import { joinParamOrMetricPath } from './paths'
+import { ExperimentsMetricsAndParamsTree } from './tree'
+import { joinMetricOrParamPath } from './paths'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
-import { Status } from '../paramsAndMetrics/model'
+import { Status } from '../metricsAndParams/model'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 import { buildMockedExperiments } from '../../test/util/jest'
@@ -21,7 +21,7 @@ const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
 
-const { mockedExperiments, mockedGetChildParamsOrMetrics, mockedGetDvcRoots } =
+const { mockedExperiments, mockedGetChildMetricsOrParams, mockedGetDvcRoots } =
   buildMockedExperiments()
 
 const mockedInternalCommands = {
@@ -59,21 +59,21 @@ beforeEach(() => {
   } as unknown as (() => void) & Disposer)
 })
 
-describe('ExperimentsParamsAndMetricsTree', () => {
-  const rootParamsAndMetrics = columnsFixture
-    .filter(paramOrMetric =>
-      ['metrics', 'params'].includes(paramOrMetric.parentPath)
+describe('ExperimentsMetricsAndParamsTree', () => {
+  const rootMetricsAndParams = columnsFixture
+    .filter(metricOrParam =>
+      ['metrics', 'params'].includes(metricOrParam.parentPath)
     )
-    .map(paramOrMetric => ({
-      ...paramOrMetric,
+    .map(metricOrParam => ({
+      ...metricOrParam,
       descendantStatuses: [],
       status: Status.SELECTED
     }))
 
   describe('getChildren', () => {
     it('should return the experiments roots if there are multiple repositories and no path is provided', async () => {
-      const experimentsParamsAndMetricsTree =
-        new ExperimentsParamsAndMetricsTree(
+      const experimentsMetricsAndParamsTree =
+        new ExperimentsMetricsAndParamsTree(
           mockedExperiments,
           mockedInternalCommands,
           mockedResourceLocator
@@ -85,14 +85,14 @@ describe('ExperimentsParamsAndMetricsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce(mockedDvcRoots)
 
-      expect(await experimentsParamsAndMetricsTree.getChildren()).toEqual(
+      expect(await experimentsMetricsAndParamsTree.getChildren()).toEqual(
         mockedDvcRoots
       )
     })
 
     it('should return the params and metrics if there is only a single repository and no path is provided', async () => {
-      const experimentsParamsAndMetricsTree =
-        new ExperimentsParamsAndMetricsTree(
+      const experimentsMetricsAndParamsTree =
+        new ExperimentsMetricsAndParamsTree(
           mockedExperiments,
           mockedInternalCommands,
           mockedResourceLocator
@@ -100,9 +100,9 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const mockedDvcRoot = join('path', 'to', 'only', 'root')
 
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
-      mockedGetChildParamsOrMetrics.mockReturnValueOnce(rootParamsAndMetrics)
+      mockedGetChildMetricsOrParams.mockReturnValueOnce(rootMetricsAndParams)
 
-      const children = await experimentsParamsAndMetricsTree.getChildren()
+      const children = await experimentsMetricsAndParamsTree.getChildren()
 
       expect(children).toEqual([
         {
@@ -110,28 +110,28 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath('params', 'params.yaml')
+          path: joinMetricOrParamPath('metrics', 'summary.json')
         },
         {
           collapsibleState: 1,
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath('params', join('nested', 'params.yaml'))
+          path: joinMetricOrParamPath('params', 'params.yaml')
         },
         {
           collapsibleState: 1,
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath('metrics', 'summary.json')
+          path: joinMetricOrParamPath('params', join('nested', 'params.yaml'))
         }
       ])
     })
 
     it("should return the param's children if a path is provided", async () => {
-      const experimentsParamsAndMetricsTree =
-        new ExperimentsParamsAndMetricsTree(
+      const experimentsMetricsAndParamsTree =
+        new ExperimentsMetricsAndParamsTree(
           mockedExperiments,
           mockedInternalCommands,
           mockedResourceLocator
@@ -140,24 +140,31 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const mockedDvcRoot = join('path', 'to', 'dvc', 'repo')
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
 
-      mockedGetChildParamsOrMetrics.mockReturnValueOnce(rootParamsAndMetrics)
+      mockedGetChildMetricsOrParams.mockReturnValueOnce(rootMetricsAndParams)
 
-      await experimentsParamsAndMetricsTree.getChildren()
+      await experimentsMetricsAndParamsTree.getChildren()
 
-      mockedGetChildParamsOrMetrics.mockReturnValueOnce(rootParamsAndMetrics)
+      mockedGetChildMetricsOrParams.mockReturnValueOnce(rootMetricsAndParams)
 
-      const children = await experimentsParamsAndMetricsTree.getChildren(
+      const children = await experimentsMetricsAndParamsTree.getChildren(
         mockedDvcRoot
       )
 
-      const paramsPath = joinParamOrMetricPath('params', 'params.yaml')
-      const processPath = joinParamOrMetricPath(
+      const paramsPath = joinMetricOrParamPath('params', 'params.yaml')
+      const processPath = joinMetricOrParamPath(
         'params',
         'params.yaml',
         'process'
       )
 
       expect(children).toEqual([
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          path: joinMetricOrParamPath('metrics', 'summary.json')
+        },
         {
           collapsibleState: 1,
           description: undefined,
@@ -170,20 +177,13 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath('params', join('nested', 'params.yaml'))
-        },
-        {
-          collapsibleState: 1,
-          description: undefined,
-          dvcRoot: mockedDvcRoot,
-          iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath('metrics', 'summary.json')
+          path: joinMetricOrParamPath('params', join('nested', 'params.yaml'))
         }
       ])
 
-      mockedGetChildParamsOrMetrics.mockReturnValueOnce(
+      mockedGetChildMetricsOrParams.mockReturnValueOnce(
         columnsFixture
-          .filter(paramOrMetric => paramsPath === paramOrMetric.parentPath)
+          .filter(metricOrParam => paramsPath === metricOrParam.parentPath)
           .map(param => {
             if (param.path === processPath) {
               return {
@@ -202,7 +202,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           })
       )
 
-      const grandChildren = await experimentsParamsAndMetricsTree.getChildren({
+      const grandChildren = await experimentsMetricsAndParamsTree.getChildren({
         collapsibleState: TreeItemCollapsibleState.Collapsed,
         description: undefined,
         dvcRoot: mockedDvcRoot,
@@ -214,31 +214,31 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(paramsPath, 'epochs')
+          path: joinMetricOrParamPath(paramsPath, 'epochs')
         },
         {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(paramsPath, 'learning_rate')
+          path: joinMetricOrParamPath(paramsPath, 'learning_rate')
         },
         {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(paramsPath, 'dvc_logs_dir')
+          path: joinMetricOrParamPath(paramsPath, 'dvc_logs_dir')
         },
         {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(paramsPath, 'log_file')
+          path: joinMetricOrParamPath(paramsPath, 'log_file')
         },
         {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(paramsPath, 'dropout')
+          path: joinMetricOrParamPath(paramsPath, 'dropout')
         },
         {
           collapsibleState: 1,
@@ -249,9 +249,9 @@ describe('ExperimentsParamsAndMetricsTree', () => {
         }
       ])
 
-      mockedGetChildParamsOrMetrics.mockReturnValueOnce(
+      mockedGetChildMetricsOrParams.mockReturnValueOnce(
         columnsFixture
-          .filter(paramOrMetric => processPath === paramOrMetric.parentPath)
+          .filter(metricOrParam => processPath === metricOrParam.parentPath)
           .map(param => ({
             ...param,
             descendantStatuses: undefined,
@@ -260,7 +260,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           }))
       )
       const greatGrandChildren =
-        await experimentsParamsAndMetricsTree.getChildren({
+        await experimentsMetricsAndParamsTree.getChildren({
           collapsibleState: TreeItemCollapsibleState.Collapsed,
           description: '1/2',
           dvcRoot: mockedDvcRoot,
@@ -274,7 +274,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(
+          path: joinMetricOrParamPath(
             'params',
             'params.yaml',
             'process',
@@ -286,7 +286,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(
+          path: joinMetricOrParamPath(
             'params',
             'params.yaml',
             'process',
@@ -306,8 +306,8 @@ describe('ExperimentsParamsAndMetricsTree', () => {
         return mockedItem
       })
 
-      const experimentsParamsAndMetricsTree =
-        new ExperimentsParamsAndMetricsTree(
+      const experimentsMetricsAndParamsTree =
+        new ExperimentsMetricsAndParamsTree(
           mockedExperiments,
           mockedInternalCommands,
           mockedResourceLocator
@@ -316,7 +316,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const mockedDvcRoot = join('dvc', 'repo')
 
       const treeItem =
-        experimentsParamsAndMetricsTree.getTreeItem(mockedDvcRoot)
+        experimentsMetricsAndParamsTree.getTreeItem(mockedDvcRoot)
 
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
@@ -331,16 +331,16 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       return { collapsibleState, uri }
     })
 
-    const experimentsParamsAndMetricsTree = new ExperimentsParamsAndMetricsTree(
+    const experimentsMetricsAndParamsTree = new ExperimentsMetricsAndParamsTree(
       mockedExperiments,
       mockedInternalCommands,
       mockedResourceLocator
     )
 
     const filename = 'params.yml'
-    const relParamsPath = joinParamOrMetricPath('params', filename)
+    const relParamsPath = joinMetricOrParamPath('params', filename)
 
-    const paramsAndMetricsItem = {
+    const metricsAndParamsItem = {
       collapsibleState: TreeItemCollapsibleState.Collapsed,
       description: '3/4',
       dvcRoot: mockedDvcRoot,
@@ -349,14 +349,14 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     }
 
     const treeItem =
-      experimentsParamsAndMetricsTree.getTreeItem(paramsAndMetricsItem)
+      experimentsMetricsAndParamsTree.getTreeItem(metricsAndParamsItem)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
     expect(treeItem).toEqual({
       collapsibleState: 1,
       command: {
         arguments: [{ dvcRoot: mockedDvcRoot, path: relParamsPath }],
-        command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        command: RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
         title: 'toggle'
       },
       description: '3/4',
@@ -371,16 +371,16 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       return { collapsibleState, uri }
     })
 
-    const experimentsParamsAndMetricsTree = new ExperimentsParamsAndMetricsTree(
+    const experimentsMetricsAndParamsTree = new ExperimentsMetricsAndParamsTree(
       mockedExperiments,
       mockedInternalCommands,
       mockedResourceLocator
     )
 
     const filename = 'params.yml'
-    const relParamsPath = joinParamOrMetricPath('params', filename)
+    const relParamsPath = joinMetricOrParamPath('params', filename)
 
-    const paramsAndMetricsItem = {
+    const metricsAndParamsItem = {
       collapsibleState: TreeItemCollapsibleState.None,
       description: undefined,
       dvcRoot: mockedDvcRoot,
@@ -389,14 +389,14 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     }
 
     const treeItem =
-      experimentsParamsAndMetricsTree.getTreeItem(paramsAndMetricsItem)
+      experimentsMetricsAndParamsTree.getTreeItem(metricsAndParamsItem)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
     expect(treeItem).toEqual({
       collapsibleState: 0,
       command: {
         arguments: [{ dvcRoot: mockedDvcRoot, path: relParamsPath }],
-        command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        command: RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,

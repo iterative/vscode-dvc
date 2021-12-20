@@ -1,6 +1,6 @@
 import get from 'lodash.get'
 import { sortExperiments } from '.'
-import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
+import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { Experiment } from '../../webview/contract'
 
 describe('sortExperiments', () => {
@@ -16,7 +16,7 @@ describe('sortExperiments', () => {
     timestamp: testTimestamp
   }
   const testPathArray = ['params', 'params.yaml', 'test']
-  const testPath = joinParamOrMetricPath(...testPathArray)
+  const testPath = joinMetricOrParamPath(...testPathArray)
   const getTestParam = (experiment: Experiment) =>
     get(experiment, testPathArray)
 
@@ -58,7 +58,7 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = joinParamOrMetricPath('params', 'params.yaml', 'sort')
+    const testSortPath = joinMetricOrParamPath('params', 'params.yaml', 'sort')
     expect(
       (
         sortExperiments(
@@ -112,8 +112,8 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = joinParamOrMetricPath('params', 'params.yaml', 'sort')
-    const testSortPath2 = joinParamOrMetricPath(
+    const testSortPath = joinMetricOrParamPath('params', 'params.yaml', 'sort')
+    const testSortPath2 = joinMetricOrParamPath(
       'params',
       'params.yaml',
       'sort2'
@@ -193,7 +193,7 @@ describe('sortExperiments', () => {
 
   describe('Should use multiple sort definitions', () => {
     const otherTestPathArray = ['params', 'params.yaml', 'othertest']
-    const otherTestPath = joinParamOrMetricPath(...otherTestPathArray)
+    const otherTestPath = joinMetricOrParamPath(...otherTestPathArray)
     const testData = [
       {
         ...irrelevantExperimentData,

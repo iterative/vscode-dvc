@@ -1,6 +1,6 @@
 import { VisualizationSpec } from 'react-vega'
 import { DefaultSectionNames } from '../../../plots/model'
-import { PlotsType, Section } from '../../../plots/webview/contract'
+import { PlotSize, PlotsType, Section } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 
 const basicVega = {
@@ -224,14 +224,18 @@ export const getSmallMemoryFootprintFixture = (
     ...getImageData(baseUrl, joinFunc),
     ...basicVega
   },
-  sectionName: DefaultSectionNames[Section.STATIC_PLOTS]
+  sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
+  size: PlotSize.REGULAR
 })
 
 export const getFixture = (baseUrl: string, joinFunc = join) => ({
-  plots: {
-    ...getImageData(baseUrl, joinFunc),
-    ...basicVega,
-    ...require('./confusionMatrix').default
-  },
-  sectionName: DefaultSectionNames[Section.STATIC_PLOTS]
+  ...getImageData(baseUrl, joinFunc),
+  ...basicVega,
+  ...require('./confusionMatrix').default
+})
+
+export const getWebviewMessageFixture = (baseUrl: string, joinFunc = join) => ({
+  plots: getFixture(baseUrl, joinFunc),
+  sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
+  size: PlotSize.REGULAR
 })

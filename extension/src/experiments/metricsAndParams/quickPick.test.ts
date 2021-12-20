@@ -1,6 +1,6 @@
 import { mocked } from 'ts-jest/utils'
-import { pickFromParamsAndMetrics } from './quickPick'
-import { joinParamOrMetricPath } from './paths'
+import { pickFromMetricsAndParams } from './quickPick'
+import { joinMetricOrParamPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
 import { reportError } from '../../vscode/reporting'
 
@@ -14,11 +14,11 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('pickFromParamsAndMetrics', () => {
+describe('pickFromMetricsAndParams', () => {
   const params = 'params'
   const paramsYaml = 'params.yaml'
-  const paramsYamlPath = joinParamOrMetricPath(params, paramsYaml)
-  const epochsParamPath = joinParamOrMetricPath(paramsYamlPath, 'epochs')
+  const paramsYamlPath = joinMetricOrParamPath(params, paramsYaml)
+  const epochsParamPath = joinMetricOrParamPath(paramsYamlPath, 'epochs')
   const epochsParam = {
     group: params,
     hasChildren: false,
@@ -38,10 +38,10 @@ describe('pickFromParamsAndMetrics', () => {
     parentPath: params,
     path: paramsYamlPath
   }
-  const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
+  const exampleMetricsAndParams = [epochsParam, paramsYamlParam]
 
   it('should return early if no params or metrics are provided', async () => {
-    const picked = await pickFromParamsAndMetrics([], {
+    const picked = await pickFromMetricsAndParams([], {
       title: "can't pick from no params or metrics"
     })
     expect(picked).toBeUndefined()
@@ -51,7 +51,7 @@ describe('pickFromParamsAndMetrics', () => {
 
   it('should invoke a QuickPick with the correct options', async () => {
     const title = 'Test title'
-    await pickFromParamsAndMetrics(exampleParamsAndMetrics, { title })
+    await pickFromMetricsAndParams(exampleMetricsAndParams, { title })
     expect(mockedQuickPickValue).toBeCalledWith(
       [
         {

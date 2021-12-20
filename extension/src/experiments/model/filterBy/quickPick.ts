@@ -3,8 +3,8 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { getInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { reportError } from '../../../vscode/reporting'
-import { pickFromParamsAndMetrics } from '../../paramsAndMetrics/quickPick'
-import { ParamOrMetric } from '../../webview/contract'
+import { pickFromMetricsAndParams } from '../../metricsAndParams/quickPick'
+import { MetricOrParam } from '../../webview/contract'
 
 export const operators = [
   {
@@ -83,9 +83,9 @@ const addFilterValue = async (path: string, operator: Operator) => {
 }
 
 export const pickFilterToAdd = async (
-  paramsAndMetrics: ParamOrMetric[] | undefined
+  metricsAndParams: MetricOrParam[] | undefined
 ): Promise<FilterDefinition | undefined> => {
-  const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
+  const picked = await pickFromMetricsAndParams(metricsAndParams, {
     title: 'Select a param or metric to filter by'
   })
   if (!picked) {

@@ -1,7 +1,6 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
-import { readToQueueFromCsv } from './queue'
-import { pickExperimentName } from './quickPick'
+import { readToQueueFromCsv } from './model/queue'
 import { TableData } from './webview/contract'
 import {
   CommandId,
@@ -23,7 +22,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
-  public readonly paramsOrMetricsChanged = this.dispose.track(
+  public readonly metricsOrParamsChanged = this.dispose.track(
     new EventEmitter<void>()
   )
 
@@ -109,7 +108,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!cwd) {
       return
     }
-    const experiments = this.getRepository(cwd)
+    const repository = this.getRepository(cwd)
 
     const csv = await pickCsv('Select a CSV to queue experiments from')
     if (!csv) {
@@ -119,7 +118,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     const toQueue = await readToQueueFromCsv(csv)
 
     for (const params of toQueue) {
-      await experiments.forceUpdate()
+      await repository.forceUpdate()
       await reportOutput(
         this.internalCommands.executeCommand(
           AvailableCommands.EXPERIMENT_QUEUE,
@@ -128,6 +127,31 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         )
       )
     }
+  }
+
+  public async queueExperimentFromExisting() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const repository = this.getRepository(cwd)
+    if (!repository) {
+      return
+    }
+
+    const paramsToQueue = await repository.pickParamsToQueue()
+    if (!paramsToQueue) {
+      return
+    }
+
+    return reportOutput(
+      this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_QUEUE,
+        cwd,
+        ...paramsToQueue
+      )
+    )
   }
 
   public async getCwdThenRun(commandId: CommandId) {
@@ -159,7 +183,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experimentName = await this.pickExperimentName(cwd)
+    const experimentName = await this.pickCurrentExperimentName(cwd)
 
     if (!experimentName) {
       return
@@ -188,19 +212,19 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public getExpNameAndInputThenRun = async (
     commandId: CommandId,
-    prompt: string
+    title: string
   ) => {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
 
-    const experimentName = await this.pickExperimentName(cwd)
+    const experimentName = await this.pickCurrentExperimentName(cwd)
 
     if (!experimentName) {
       return
     }
-    const input = await getInput(prompt)
+    const input = await getInput(title)
     if (input) {
       return reportOutput(
         this.internalCommands.executeCommand(
@@ -242,8 +266,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     experiments.dispose.track(
-      experiments.onDidChangeParamsOrMetrics(() => {
-        this.paramsOrMetricsChanged.fire()
+      experiments.onDidChangeMetricsOrParams(() => {
+        this.metricsOrParamsChanged.fire()
       })
     )
 
@@ -258,12 +282,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
 
-  private pickExperimentName(cwd: string) {
-    return pickExperimentName(
-      this.internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_LIST_CURRENT,
-        cwd
-      )
-    )
+  private pickCurrentExperimentName(cwd: string) {
+    return this.getRepository(cwd).pickCurrentExperimentName()
   }
 }

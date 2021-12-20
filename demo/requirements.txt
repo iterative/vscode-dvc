@@ -1,4 +1,5 @@
-dvc[s3]>=2.8.2
+git+https://github.com/iterative/dvc
 dvclive
 torch
 torchvision
+ruamel.yaml

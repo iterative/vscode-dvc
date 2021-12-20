@@ -34,12 +34,13 @@ export class Plots extends BaseRepository<TPlotsData> {
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
     webviewIcon: Resource,
-    workspaceState: Memento
+    workspaceState: Memento,
+    data?: PlotsData
   ) {
     super(dvcRoot, webviewIcon)
 
     this.data = this.dispose.track(
-      new PlotsData(dvcRoot, internalCommands, updatesPaused)
+      data || new PlotsData(dvcRoot, internalCommands, updatesPaused)
     )
 
     this.dispose.track(
@@ -101,7 +102,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getStaticPlots(data: PlotsOutput | undefined) {
-    if (isEmpty(data)) {
+    if (isEmpty(data) || !this.model) {
       return null
     }
 
@@ -122,7 +123,8 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     return {
       plots,
-      sectionName: this.model?.getSectionName(Section.STATIC_PLOTS) || ''
+      sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
+      size: this.model.getPlotSize(Section.STATIC_PLOTS)
     }
   }
 
@@ -135,7 +137,13 @@ export class Plots extends BaseRepository<TPlotsData> {
               message.payload && this.model?.setSelectedMetrics(message.payload)
             )
           case MessageFromWebviewType.PLOTS_RESIZED:
-            return message.payload && this.model?.setPlotSize(message.payload)
+            return (
+              message.payload &&
+              this.model?.setPlotSize(
+                message.payload.section,
+                message.payload.size
+              )
+            )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return (
               message.payload &&

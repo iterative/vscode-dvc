@@ -1,8 +1,8 @@
 import React from 'react'
 import get from 'lodash/get'
 import { Column, Accessor, ColumnGroup } from 'react-table'
-import { splitParamOrMetricPath } from 'dvc/src/experiments/paramsAndMetrics/paths'
-import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
+import { splitMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
+import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
 import styles from '../components/Table/styles.module.scss'
 import { CopyButton } from '../components/CopyButton'
@@ -36,7 +36,7 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
     get(originalRow, pathArray)
 
 const buildDynamicColumns = (
-  properties: ParamOrMetric[],
+  properties: MetricOrParam[],
   parentPath: string
 ): Column<Experiment>[] =>
   properties
@@ -47,7 +47,7 @@ const buildDynamicColumns = (
       const Cell = getCellComponent()
       const childColumns = buildDynamicColumns(properties, path)
 
-      const pathArray = splitParamOrMetricPath(path)
+      const pathArray = splitMetricOrParamPath(path)
 
       const column: ColumnGroup<Experiment> | Column<Experiment> = {
         Cell,

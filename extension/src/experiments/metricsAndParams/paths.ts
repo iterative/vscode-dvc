@@ -1,18 +1,18 @@
 const FILE_SEPARATOR = ':'
-const PARAM_METRIC_SEPARATOR = '.'
+const METRIC_PARAM_SEPARATOR = '.'
 const FILE_SPLIT_REGEX = new RegExp(
   `([^${FILE_SEPARATOR}]*)(?:${FILE_SEPARATOR}([^${FILE_SEPARATOR}]*))?(?:${FILE_SEPARATOR}(.*))?`
 )
 
-export const joinParamOrMetricFilePath = (...pathSegments: string[]) => {
+export const joinMetricOrParamFilePath = (...pathSegments: string[]) => {
   const [fileSegment, ...rest] = pathSegments
   if (rest.length === 0) {
     return fileSegment
   }
-  return fileSegment + FILE_SEPARATOR + rest.join(PARAM_METRIC_SEPARATOR)
+  return fileSegment + FILE_SEPARATOR + rest.join(METRIC_PARAM_SEPARATOR)
 }
 
-export const joinParamOrMetricPath = (...pathSegments: string[]) => {
+export const joinMetricOrParamPath = (...pathSegments: string[]) => {
   const [baseSegment, fileSegment, ...rest] = pathSegments
   if (!fileSegment) {
     return baseSegment
@@ -23,11 +23,11 @@ export const joinParamOrMetricPath = (...pathSegments: string[]) => {
   return (
     baseSegment +
     FILE_SEPARATOR +
-    joinParamOrMetricFilePath(fileSegment, ...rest)
+    joinMetricOrParamFilePath(fileSegment, ...rest)
   )
 }
 
-export const splitParamOrMetricPath = (path: string) => {
+export const splitMetricOrParamPath = (path: string) => {
   const regexResult = FILE_SPLIT_REGEX.exec(path)
   if (!regexResult) {
     return []
@@ -39,5 +39,5 @@ export const splitParamOrMetricPath = (path: string) => {
   if (!paramPath) {
     return [baseSegment, fileSegment]
   }
-  return [baseSegment, fileSegment, ...paramPath.split(PARAM_METRIC_SEPARATOR)]
+  return [baseSegment, fileSegment, ...paramPath.split(METRIC_PARAM_SEPARATOR)]
 }

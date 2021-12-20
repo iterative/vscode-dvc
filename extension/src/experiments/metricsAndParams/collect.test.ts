@@ -1,13 +1,13 @@
 import { join } from 'path'
-import { collectChanges, collectParamsAndMetrics } from './collect'
-import { joinParamOrMetricPath } from './paths'
-import { ParamOrMetric } from '../webview/contract'
+import { collectChanges, collectMetricsAndParams } from './collect'
+import { joinMetricOrParamPath } from './paths'
+import { MetricOrParam } from '../webview/contract'
 import expShowFixture from '../../test/fixtures/expShow/output'
 import { ExperimentsOutput } from '../../cli/reader'
 
-describe('collectParamsAndMetrics', () => {
+describe('collectMetricsAndParams', () => {
   it('should output both params and metrics when both are present', () => {
-    const paramsAndMetrics = collectParamsAndMetrics({
+    const metricsAndParams = collectMetricsAndParams({
       workspace: {
         baseline: {
           data: {
@@ -27,18 +27,18 @@ describe('collectParamsAndMetrics', () => {
         }
       }
     })
-    const params = paramsAndMetrics.find(
-      paramOrMetric => paramOrMetric.group === 'params'
+    const params = metricsAndParams.find(
+      metricOrParam => metricOrParam.group === 'params'
     )
-    const metrics = paramsAndMetrics.find(
-      paramOrMetric => paramOrMetric.group === 'metrics'
+    const metrics = metricsAndParams.find(
+      metricOrParam => metricOrParam.group === 'metrics'
     )
     expect(params).toBeDefined()
     expect(metrics).toBeDefined()
   })
 
   it('should omit params when none exist in the source data', () => {
-    const paramsAndMetrics = collectParamsAndMetrics({
+    const metricsAndParams = collectMetricsAndParams({
       workspace: {
         baseline: {
           data: {
@@ -51,27 +51,27 @@ describe('collectParamsAndMetrics', () => {
         }
       }
     })
-    const params = paramsAndMetrics.find(
-      paramOrMetric => paramOrMetric.group === 'params'
+    const params = metricsAndParams.find(
+      metricOrParam => metricOrParam.group === 'params'
     )
-    const metrics = paramsAndMetrics.find(
-      paramOrMetric => paramOrMetric.group === 'metrics'
+    const metrics = metricsAndParams.find(
+      metricOrParam => metricOrParam.group === 'metrics'
     )
     expect(params).toBeUndefined()
     expect(metrics).toBeDefined()
   })
 
   it('should return an empty array if no params and metrics are provided', () => {
-    const paramsAndMetrics = collectParamsAndMetrics({
+    const metricsAndParams = collectMetricsAndParams({
       workspace: {
         baseline: {}
       }
     })
-    expect(paramsAndMetrics).toEqual([])
+    expect(metricsAndParams).toEqual([])
   })
 
   const exampleBigNumber = 3000000000
-  const paramsAndMetrics = collectParamsAndMetrics({
+  const metricsAndParams = collectMetricsAndParams({
     branchA: {
       baseline: {
         data: {
@@ -116,11 +116,11 @@ describe('collectParamsAndMetrics', () => {
     }
   })
 
-  const exampleMixedParam = paramsAndMetrics.find(
-    paramOrMetric =>
-      paramOrMetric.parentPath ===
-      joinParamOrMetricPath('params', 'params.yaml')
-  ) as ParamOrMetric
+  const exampleMixedParam = metricsAndParams.find(
+    metricOrParam =>
+      metricOrParam.parentPath ===
+      joinMetricOrParamPath('params', 'params.yaml')
+  ) as MetricOrParam
 
   it('should correctly identify mixed type params', () => {
     expect(exampleMixedParam.types).toEqual([
@@ -141,7 +141,7 @@ describe('collectParamsAndMetrics', () => {
   })
 
   it('should find a different minNumber and maxNumber on a mixed param', () => {
-    const paramsAndMetrics = collectParamsAndMetrics({
+    const metricsAndParams = collectMetricsAndParams({
       branch1: {
         baseline: {
           data: {
@@ -184,17 +184,17 @@ describe('collectParamsAndMetrics', () => {
         baseline: {}
       }
     })
-    const mixedParam = paramsAndMetrics.find(
-      paramOrMetric =>
-        paramOrMetric.path ===
-        joinParamOrMetricPath('params', 'params.yaml', 'mixedNumber')
-    ) as ParamOrMetric
+    const mixedParam = metricsAndParams.find(
+      metricOrParam =>
+        metricOrParam.path ===
+        joinMetricOrParamPath('params', 'params.yaml', 'mixedNumber')
+    ) as MetricOrParam
 
     expect(mixedParam.minNumber).toEqual(-1)
     expect(mixedParam.maxNumber).toEqual(1)
   })
 
-  const numericParamsAndMetrics = collectParamsAndMetrics({
+  const numericMetricsAndParams = collectMetricsAndParams({
     branch1: {
       baseline: {
         data: {
@@ -228,9 +228,9 @@ describe('collectParamsAndMetrics', () => {
       baseline: {}
     }
   })
-  const param = numericParamsAndMetrics.filter(
-    paramOrMetric => paramOrMetric.group === 'params'
-  ) as ParamOrMetric[]
+  const param = numericMetricsAndParams.filter(
+    metricOrParam => metricOrParam.group === 'params'
+  ) as MetricOrParam[]
   const [paramWithNumbers, paramWithoutNumbers] = param
 
   it('should not add a maxNumber or minNumber on a param with no numbers', () => {
@@ -251,7 +251,7 @@ describe('collectParamsAndMetrics', () => {
   })
 
   it('should aggregate multiple different field names', () => {
-    const paramsAndMetrics = collectParamsAndMetrics({
+    const metricsAndParams = collectMetricsAndParams({
       branchA: {
         baseline: {
           data: {
@@ -296,11 +296,11 @@ describe('collectParamsAndMetrics', () => {
       }
     })
 
-    const params = paramsAndMetrics.filter(
-      paramOrMetric =>
-        paramOrMetric.parentPath ===
-        joinParamOrMetricPath('params', 'params.yaml')
-    ) as ParamOrMetric[]
+    const params = metricsAndParams.filter(
+      metricOrParam =>
+        metricOrParam.parentPath ===
+        joinMetricOrParamPath('params', 'params.yaml')
+    ) as MetricOrParam[]
 
     expect(params?.map(({ name }) => name)).toEqual([
       'one',
@@ -311,7 +311,7 @@ describe('collectParamsAndMetrics', () => {
   })
 
   it('should not report types for params and metrics without primitives or children for params and metrics without objects', () => {
-    const paramsAndMetrics = collectParamsAndMetrics({
+    const metricsAndParams = collectMetricsAndParams({
       workspace: {
         baseline: {
           data: {
@@ -329,58 +329,58 @@ describe('collectParamsAndMetrics', () => {
       }
     })
 
-    const objectParam = paramsAndMetrics.find(
-      paramOrMetric =>
-        paramOrMetric.parentPath ===
-        joinParamOrMetricPath('params', 'params.yaml')
-    ) as ParamOrMetric
+    const objectParam = metricsAndParams.find(
+      metricOrParam =>
+        metricOrParam.parentPath ===
+        joinMetricOrParamPath('params', 'params.yaml')
+    ) as MetricOrParam
 
     expect(objectParam.name).toEqual('onlyHasChild')
     expect(objectParam.types).toBeUndefined()
 
-    const primitiveParam = paramsAndMetrics.find(
-      paramOrMetric =>
-        paramOrMetric.parentPath ===
-        joinParamOrMetricPath('params', 'params.yaml', 'onlyHasChild')
-    ) as ParamOrMetric
+    const primitiveParam = metricsAndParams.find(
+      metricOrParam =>
+        metricOrParam.parentPath ===
+        joinMetricOrParamPath('params', 'params.yaml', 'onlyHasChild')
+    ) as MetricOrParam
 
     expect(primitiveParam.name).toEqual('onlyHasPrimitive')
     expect(primitiveParam.types).toBeDefined()
 
-    const onlyHasPrimitiveChild = paramsAndMetrics.find(
-      paramOrMetric =>
-        paramOrMetric.parentPath ===
-        joinParamOrMetricPath(
+    const onlyHasPrimitiveChild = metricsAndParams.find(
+      metricOrParam =>
+        metricOrParam.parentPath ===
+        joinMetricOrParamPath(
           'params',
           'params.yaml',
           'onlyHasChild',
           'onlyHasPrimitive'
         )
-    ) as ParamOrMetric
+    ) as MetricOrParam
 
     expect(onlyHasPrimitiveChild).toBeUndefined()
   })
 
   it('should collect all params and metrics from the test fixture', () => {
     expect(
-      collectParamsAndMetrics(expShowFixture).map(({ path }) => path)
+      collectMetricsAndParams(expShowFixture).map(({ path }) => path)
     ).toEqual([
-      joinParamOrMetricPath('params', 'params.yaml', 'epochs'),
-      joinParamOrMetricPath('params', 'params.yaml', 'learning_rate'),
-      joinParamOrMetricPath('params', 'params.yaml', 'dvc_logs_dir'),
-      joinParamOrMetricPath('params', 'params.yaml', 'log_file'),
-      joinParamOrMetricPath('params', 'params.yaml', 'dropout'),
-      joinParamOrMetricPath('params', 'params.yaml', 'process', 'threshold'),
-      joinParamOrMetricPath('params', 'params.yaml', 'process', 'test_arg'),
-      joinParamOrMetricPath('params', 'params.yaml', 'process'),
-      joinParamOrMetricPath('params', 'params.yaml'),
-      joinParamOrMetricPath('params', join('nested', 'params.yaml'), 'test'),
-      joinParamOrMetricPath('params', join('nested', 'params.yaml')),
-      joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
-      joinParamOrMetricPath('metrics', 'summary.json', 'accuracy'),
-      joinParamOrMetricPath('metrics', 'summary.json', 'val_loss'),
-      joinParamOrMetricPath('metrics', 'summary.json', 'val_accuracy'),
-      joinParamOrMetricPath('metrics', 'summary.json')
+      joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
+      joinMetricOrParamPath('metrics', 'summary.json', 'accuracy'),
+      joinMetricOrParamPath('metrics', 'summary.json', 'val_loss'),
+      joinMetricOrParamPath('metrics', 'summary.json', 'val_accuracy'),
+      joinMetricOrParamPath('metrics', 'summary.json'),
+      joinMetricOrParamPath('params', 'params.yaml', 'epochs'),
+      joinMetricOrParamPath('params', 'params.yaml', 'learning_rate'),
+      joinMetricOrParamPath('params', 'params.yaml', 'dvc_logs_dir'),
+      joinMetricOrParamPath('params', 'params.yaml', 'log_file'),
+      joinMetricOrParamPath('params', 'params.yaml', 'dropout'),
+      joinMetricOrParamPath('params', 'params.yaml', 'process', 'threshold'),
+      joinMetricOrParamPath('params', 'params.yaml', 'process', 'test_arg'),
+      joinMetricOrParamPath('params', 'params.yaml', 'process'),
+      joinMetricOrParamPath('params', 'params.yaml'),
+      joinMetricOrParamPath('params', join('nested', 'params.yaml'), 'test'),
+      joinMetricOrParamPath('params', join('nested', 'params.yaml'))
     ])
   })
 })
