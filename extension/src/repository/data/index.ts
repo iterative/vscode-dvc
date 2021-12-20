@@ -4,8 +4,20 @@ import { Deferred } from '@hediet/std/synchronization'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
-import { getAllUntracked } from '../../git'
+import {
+  DOT_GIT_HEAD,
+  DOT_GIT_INDEX,
+  getAllUntracked,
+  getGitRepositoryRoot
+} from '../../git'
 import { ProcessManager } from '../../processManager'
+import {
+  createFileSystemWatcher,
+  createNecessaryFileSystemWatcher,
+  ignoredDotDirectories
+} from '../../fileSystem/watcher'
+import { join } from '../../test/util/path'
+import { EXPERIMENTS_GIT_REFS } from '../../experiments/data/constants'
 
 export type Data = {
   diffFromHead: DiffOutput
@@ -14,11 +26,20 @@ export type Data = {
   tracked?: ListOutput[]
 }
 
+export const isExcluded = (dvcRoot: string, path: string) =>
+  !path ||
+  !(
+    path.includes(dvcRoot) ||
+    (path.includes('.git') && (path.includes('HEAD') || path.includes('index')))
+  ) ||
+  path.includes(EXPERIMENTS_GIT_REFS) ||
+  ignoredDotDirectories.test(path)
+
 export class RepositoryData {
   public readonly dispose = Disposable.fn()
   public readonly onDidUpdate: Event<Data>
 
-  protected readonly dvcRoot: string
+  private readonly dvcRoot: string
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -46,6 +67,7 @@ export class RepositoryData {
 
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
+    this.watchWorkspace()
 
     this.initialize()
   }
@@ -121,5 +143,28 @@ export class RepositoryData {
 
   private notifyChanged(data: Data) {
     this.updated.fire(data)
+  }
+
+  private async watchWorkspace() {
+    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
+
+    const listener = (path: string) => {
+      if (isExcluded(this.dvcRoot, path)) {
+        return
+      }
+      return this.managedUpdate()
+    }
+
+    this.dispose.track(
+      createFileSystemWatcher(join(this.dvcRoot, '**'), listener)
+    )
+
+    this.dispose.track(
+      createNecessaryFileSystemWatcher(
+        gitRoot,
+        [join(gitRoot, DOT_GIT_INDEX), join(gitRoot, DOT_GIT_HEAD)],
+        listener
+      )
+    )
   }
 }
