@@ -1,13 +1,12 @@
 import { join } from 'path'
 import { EventEmitter, Uri } from 'vscode'
 import { Repository } from '.'
-import { DOT_GIT_HEAD, DOT_GIT_INDEX } from '../experiments/data/constants'
 import {
   createFileSystemWatcher,
   createNecessaryFileSystemWatcher,
   getRepositoryListener
 } from '../fileSystem/watcher'
-import { getGitRepositoryRoot } from '../git'
+import { DOT_GIT_HEAD, DOT_GIT_INDEX, getGitRepositoryRoot } from '../git'
 import { BaseWorkspace } from '../workspace'
 
 export class WorkspaceRepositories extends BaseWorkspace<Repository> {

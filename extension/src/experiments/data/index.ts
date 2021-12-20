@@ -1,14 +1,14 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
+import { EXPERIMENTS_GIT_REFS } from './constants'
+import { createNecessaryFileSystemWatcher } from '../../fileSystem/watcher'
 import {
   DOT_GIT,
   DOT_GIT_HEAD,
-  EXPERIMENTS_GIT_REFS,
-  HEADS_GIT_REFS
-} from './constants'
-import { createNecessaryFileSystemWatcher } from '../../fileSystem/watcher'
-import { getGitRepositoryRoot } from '../../git'
+  HEADS_GIT_REFS,
+  getGitRepositoryRoot
+} from '../../git'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/reader'
 import { BaseData } from '../../data'
