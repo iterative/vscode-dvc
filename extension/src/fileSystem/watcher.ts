@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
@@ -6,7 +7,6 @@ import { isDirectory } from '.'
 import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/data/constants'
-import { join } from '../test/util/path'
 
 export const fireWatcher = (path: string): Promise<void> => {
   const now = new Date().getTime() / 1000
