@@ -12,7 +12,7 @@ import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
 import { Experiments } from '../../../experiments'
 import { ResourceLocator } from '../../../resourceLocator'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
-import { ParamOrMetric, TableData } from '../../../experiments/webview/contract'
+import { MetricOrParam, TableData } from '../../../experiments/webview/contract'
 import {
   buildInternalCommands,
   closeAllEditors,
@@ -24,9 +24,9 @@ import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
-import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
+import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
 import { BaseWebview } from '../../../webview'
-import { ParamsAndMetricsModel } from '../../../experiments/paramsAndMetrics/model'
+import { MetricsAndParamsModel } from '../../../experiments/metricsAndParams/model'
 import * as Factory from '../../../webview/factory'
 import {
   MessageFromWebview,
@@ -168,7 +168,7 @@ suite('Experiments Test Suite', () => {
       ]
 
       const mockSetColumnReordered = stub(
-        ParamsAndMetricsModel.prototype,
+        MetricsAndParamsModel.prototype,
         'setColumnOrder'
       )
 
@@ -272,14 +272,14 @@ suite('Experiments Test Suite', () => {
       })
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
+      const sortPath = joinMetricOrParamPath('params', 'params.yaml', 'test')
 
       mockShowQuickPick.onFirstCall().resolves({
         label: 'test',
         value: {
           path: sortPath
         }
-      } as QuickPickItemWithValue<ParamOrMetric>)
+      } as QuickPickItemWithValue<MetricOrParam>)
 
       mockShowQuickPick.onSecondCall().resolves({
         label: 'Ascending',
@@ -332,35 +332,35 @@ suite('Experiments Test Suite', () => {
   describe('persisted state', () => {
     const firstSortDefinition = {
       descending: false,
-      path: joinParamOrMetricPath('params', 'params.yaml', 'test')
+      path: joinMetricOrParamPath('params', 'params.yaml', 'test')
     }
     const secondSortDefinition = {
       descending: true,
-      path: joinParamOrMetricPath('params', 'params.yaml', 'other')
+      path: joinMetricOrParamPath('params', 'params.yaml', 'other')
     }
     const sortDefinitions: SortDefinition[] = [
       firstSortDefinition,
       secondSortDefinition
     ]
 
-    const firstFilterId = joinParamOrMetricPath(
+    const firstFilterId = joinMetricOrParamPath(
       'params',
       'params.yaml',
       'test==1'
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: joinParamOrMetricPath('params', 'params.yaml', 'test'),
+      path: joinMetricOrParamPath('params', 'params.yaml', 'test'),
       value: 1
     }
-    const secondFilterId = joinParamOrMetricPath(
+    const secondFilterId = joinMetricOrParamPath(
       'params',
       'params.yaml',
       'other∈testcontains'
     )
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: joinParamOrMetricPath('params', 'params.yaml', 'other'),
+      path: joinMetricOrParamPath('params', 'params.yaml', 'other'),
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [

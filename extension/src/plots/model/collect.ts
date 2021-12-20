@@ -6,9 +6,9 @@ import {
   Value,
   ValueTree
 } from '../../cli/reader'
-import { reduceParamsAndMetrics } from '../../experiments/paramsAndMetrics/reduce'
-import { joinParamOrMetricFilePath } from '../../experiments/paramsAndMetrics/paths'
-import { ParamsOrMetrics } from '../../experiments/webview/contract'
+import { reduceMetricsAndParams } from '../../experiments/metricsAndParams/reduce'
+import { joinMetricOrParamFilePath } from '../../experiments/metricsAndParams/paths'
+import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
 
 type LivePlotAccumulator = Map<string, LivePlotValues>
@@ -37,7 +37,7 @@ const collectFromMetricsFile = (
     return
   }
 
-  const path = joinParamOrMetricFilePath(...pathArray)
+  const path = joinMetricOrParamFilePath(...pathArray)
 
   addToMapArray(acc, path, { group: displayName, iteration, y: value })
 }
@@ -45,7 +45,7 @@ const collectFromMetricsFile = (
 type MetricsAndTipOrUndefined =
   | {
       checkpoint_tip: string | undefined
-      metrics: ParamsOrMetrics | undefined
+      metrics: MetricsOrParams | undefined
     }
   | undefined
 
@@ -58,12 +58,12 @@ const transformExperimentData = (
   }
 
   const { checkpoint_tip } = experimentFields
-  const { metrics } = reduceParamsAndMetrics(experimentFields)
+  const { metrics } = reduceMetricsAndParams(experimentFields)
 
   return { checkpoint_tip, metrics }
 }
 
-type ValidCheckpointData = { checkpoint_tip: string; metrics: ParamsOrMetrics }
+type ValidCheckpointData = { checkpoint_tip: string; metrics: MetricsOrParams }
 
 const isValidCheckpoint = (
   data: MetricsAndTipOrUndefined,
@@ -75,7 +75,7 @@ const collectFromMetrics = (
   acc: LivePlotAccumulator,
   experimentName: string,
   iteration: number,
-  metrics: ParamsOrMetrics
+  metrics: MetricsOrParams
 ) => {
   Object.keys(metrics).forEach(file =>
     collectFromMetricsFile(

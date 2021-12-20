@@ -29,7 +29,7 @@ export enum RegisteredCommands {
   EXPERIMENT_FILTER_REMOVE = 'dvc.views.experimentsFilterByTree.removeFilter',
   EXPERIMENT_FILTERS_REMOVE = 'dvc.removeExperimentsTableFilters',
   EXPERIMENT_FILTERS_REMOVE_ALL = 'dvc.views.experimentsFilterByTree.removeAllFilters',
-  EXPERIMENT_PARAMS_AND_METRICS_TOGGLE = 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
+  EXPERIMENT_METRICS_AND_PARAMS_TOGGLE = 'dvc.views.experimentsMetricsAndParamsTree.toggleStatus',
   EXPERIMENT_SELECT = 'dvc.views.experimentsTree.selectExperiments',
   EXPERIMENT_SHOW = 'dvc.showExperiments',
   EXPERIMENT_SORT_ADD = 'dvc.addExperimentsTableSort',

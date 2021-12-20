@@ -7,13 +7,13 @@ import { Disposable } from '../../../../../extension'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   Experiment,
-  ParamOrMetric
+  MetricOrParam
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import { buildExperiments } from '../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
-import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
+import { joinMetricOrParamPath } from '../../../../../experiments/metricsAndParams/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { ExperimentsOutput } from '../../../../../cli/reader'
 
@@ -115,7 +115,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
           value: {
             path: paramPath
           }
-        } as QuickPickItemWithValue<ParamOrMetric>)
+        } as QuickPickItemWithValue<MetricOrParam>)
         mockShowQuickPick
           .onSecondCall()
           .resolves({ value: descending } as QuickPickItemWithValue<boolean>)
@@ -138,8 +138,8 @@ suite('Experiments Sort By Tree Test Suite', () => {
         ...testParamParentPathArray,
         'testparam2'
       ]
-      const testParamPath = joinParamOrMetricPath(...testParamPathArray)
-      const otherTestParamPath = joinParamOrMetricPath(
+      const testParamPath = joinMetricOrParamPath(...testParamPathArray)
+      const otherTestParamPath = joinMetricOrParamPath(
         ...otherTestParamPathArray
       )
 

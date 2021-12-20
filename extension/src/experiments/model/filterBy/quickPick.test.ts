@@ -2,7 +2,7 @@ import { mocked } from 'ts-jest/utils'
 import { FilterDefinition, Operator } from '.'
 import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
-import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
+import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 
 jest.mock('../../../vscode/inputBox')
@@ -18,8 +18,8 @@ beforeEach(() => {
 
 const params = 'params'
 const paramsYaml = 'params.yaml'
-const paramsYamlPath = joinParamOrMetricPath(params, paramsYaml)
-const epochsParamPath = joinParamOrMetricPath(paramsYamlPath, 'epochs')
+const paramsYamlPath = joinMetricOrParamPath(params, paramsYaml)
+const epochsParamPath = joinMetricOrParamPath(paramsYamlPath, 'epochs')
 const epochsParam = {
   group: params,
   hasChildren: false,
@@ -39,7 +39,7 @@ const boolParam = {
   minNumber: 0,
   name: 'bool',
   parentPath: paramsYamlPath,
-  path: joinParamOrMetricPath(paramsYamlPath, 'bool'),
+  path: joinMetricOrParamPath(paramsYamlPath, 'bool'),
   types: ['boolean']
 }
 const mixedParam = {
@@ -50,7 +50,7 @@ const mixedParam = {
   minNumber: 2,
   name: 'mixed',
   parentPath: paramsYamlPath,
-  path: joinParamOrMetricPath(paramsYamlPath, 'mixed'),
+  path: joinMetricOrParamPath(paramsYamlPath, 'mixed'),
   types: ['number', 'string', 'boolean']
 }
 

@@ -8,7 +8,7 @@ import {
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
-import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
+import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { ExperimentsData } from './data'
 import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
@@ -25,20 +25,20 @@ import { Logger } from '../common/logger'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
-  public readonly onDidChangeParamsOrMetrics: Event<void>
+  public readonly onDidChangeMetricsOrParams: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
   private readonly data: ExperimentsData
 
   private readonly experiments: ExperimentsModel
-  private readonly paramsAndMetrics: ParamsAndMetricsModel
+  private readonly metricsAndParams: MetricsAndParamsModel
 
   private readonly experimentsChanged = this.dispose.track(
     new EventEmitter<ExperimentsOutput | void>()
   )
 
-  private readonly paramsOrMetricsChanged = this.dispose.track(
+  private readonly metricsOrParamsChanged = this.dispose.track(
     new EventEmitter<void>()
   )
 
@@ -53,14 +53,14 @@ export class Experiments extends BaseRepository<TableData> {
     super(dvcRoot, resourceLocator.beaker)
 
     this.onDidChangeExperiments = this.experimentsChanged.event
-    this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
+    this.onDidChangeMetricsOrParams = this.metricsOrParamsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
     )
 
-    this.paramsAndMetrics = this.dispose.track(
-      new ParamsAndMetricsModel(dvcRoot, workspaceState)
+    this.metricsAndParams = this.dispose.track(
+      new MetricsAndParamsModel(dvcRoot, workspaceState)
     )
 
     this.data = this.dispose.track(
@@ -90,27 +90,27 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async setState(data: ExperimentsOutput) {
     await Promise.all([
-      this.paramsAndMetrics.transformAndSet(data),
+      this.metricsAndParams.transformAndSet(data),
       this.experiments.transformAndSet(data)
     ])
 
     return this.notifyChanged(data)
   }
 
-  public getChildParamsOrMetrics(path?: string) {
-    return this.paramsAndMetrics.getChildren(path)
+  public getChildMetricsOrParams(path?: string) {
+    return this.metricsAndParams.getChildren(path)
   }
 
-  public toggleParamOrMetricStatus(path: string) {
-    const status = this.paramsAndMetrics.toggleStatus(path)
+  public toggleMetricOrParamStatus(path: string) {
+    const status = this.metricsAndParams.toggleStatus(path)
 
-    this.notifyParamsOrMetricsChanged()
+    this.notifyMetricsOrParamsChanged()
 
     return status
   }
 
-  public getParamsAndMetricsStatuses() {
-    return this.paramsAndMetrics.getTerminalNodeStatuses()
+  public getMetricsAndParamsStatuses() {
+    return this.metricsAndParams.getTerminalNodeStatuses()
   }
 
   public toggleExperimentStatus(experimentId: string) {
@@ -124,8 +124,8 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async addSort() {
-    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
-    const sortToAdd = await pickSortToAdd(paramsAndMetrics)
+    const metricsAndParams = this.metricsAndParams.getTerminalNodes()
+    const sortToAdd = await pickSortToAdd(metricsAndParams)
     if (!sortToAdd) {
       return
     }
@@ -153,8 +153,8 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async addFilter() {
-    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
-    const filterToAdd = await pickFilterToAdd(paramsAndMetrics)
+    const metricsAndParams = this.metricsAndParams.getTerminalNodes()
+    const filterToAdd = await pickFilterToAdd(metricsAndParams)
     if (!filterToAdd) {
       return
     }
@@ -238,11 +238,11 @@ export class Experiments extends BaseRepository<TableData> {
 
   private notifyChanged(data?: ExperimentsOutput) {
     this.experimentsChanged.fire(data)
-    this.notifyParamsOrMetricsChanged()
+    this.notifyMetricsOrParamsChanged()
   }
 
-  private notifyParamsOrMetricsChanged() {
-    this.paramsOrMetricsChanged.fire()
+  private notifyMetricsOrParamsChanged() {
+    this.metricsOrParamsChanged.fire()
     return this.sendWebviewData()
   }
 
@@ -252,10 +252,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   private getWebviewData() {
     return {
-      changes: this.paramsAndMetrics.getChanges(),
-      columnOrder: this.paramsAndMetrics.getColumnOrder(),
-      columnWidths: this.paramsAndMetrics.getColumnWidths(),
-      columns: this.paramsAndMetrics.getSelected(),
+      changes: this.metricsAndParams.getChanges(),
+      columnOrder: this.metricsAndParams.getColumnOrder(),
+      columnWidths: this.metricsAndParams.getColumnWidths(),
+      columns: this.metricsAndParams.getSelected(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
@@ -268,14 +268,14 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.COLUMN_REORDERED:
             return (
               message.payload &&
-              this.paramsAndMetrics.setColumnOrder(
+              this.metricsAndParams.setColumnOrder(
                 message.payload as ColumnReorderPayload
               )
             )
           case MessageFromWebviewType.COLUMN_RESIZED: {
             const { id, width } = message.payload as ColumnResizePayload
             return (
-              message.payload && this.paramsAndMetrics.setColumnWidth(id, width)
+              message.payload && this.metricsAndParams.setColumnWidth(id, width)
             )
           }
           default:
