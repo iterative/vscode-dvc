@@ -93,7 +93,7 @@ const data: RowData[] = [
         },
         name: 'exp-e7a67',
         checkpoint_parent: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
-        displayName: 'exp-e7a67',
+        displayName: '4fb124a',
         displayColor: colorsList[0],
         id: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         subRows: [
@@ -196,7 +196,7 @@ const data: RowData[] = [
         name: 'test-branch',
         checkpoint_parent: '217312476f8854dda1865450b737eb6bc7a3ba1b',
         displayColor: colorsList[1],
-        displayName: 'test-branch',
+        displayName: '42b8736',
         id: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         subRows: [
           {
@@ -298,7 +298,7 @@ const data: RowData[] = [
         name: 'exp-83425',
         checkpoint_parent: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
         displayColor: colorsList[2],
-        displayName: 'exp-83425',
+        displayName: '1ba7bcd',
         id: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         subRows: [
           {
