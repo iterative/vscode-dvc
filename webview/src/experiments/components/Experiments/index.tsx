@@ -70,7 +70,9 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
               {getExperimentDisplayName(value, name, isBranchRow)}
             </span>
             {!isBranchRow && name && (
-              <span className={styles.experimentCellSecondaryName}>{name}</span>
+              <span className={styles.experimentCellSecondaryName}>
+                [{name}]
+              </span>
             )}
           </div>
         )
