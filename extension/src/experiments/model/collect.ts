@@ -36,9 +36,10 @@ const transformMetricsAndParams = (
   }
 }
 
-const transformExperimentLikeData = (
+const transformExperimentData = (
   sha: string,
-  experimentFieldsOrError: ExperimentFieldsOrError
+  experimentFieldsOrError: ExperimentFieldsOrError,
+  fallbackDisplayNameLength = 7
 ): Experiment | undefined => {
   const experimentFields = experimentFieldsOrError.data
   if (!experimentFields) {
@@ -47,41 +48,14 @@ const transformExperimentLikeData = (
 
   const experiment = {
     id: sha,
-    ...experimentFields
+    ...experimentFields,
+    displayName:
+      experimentFields?.name || sha.slice(0, fallbackDisplayNameLength)
   } as Experiment
 
   transformMetricsAndParams(experiment, experimentFields)
 
   return experiment
-}
-
-const transformExperimentData = (
-  sha: string,
-  experimentFieldsOrError: ExperimentFieldsOrError
-): Experiment | undefined => {
-  const transformedExperiment = transformExperimentLikeData(
-    sha,
-    experimentFieldsOrError
-  )
-  if (transformedExperiment) {
-    transformedExperiment.displayName = transformedExperiment.id.slice(0, 7)
-    return transformedExperiment
-  }
-}
-
-const transformBaselineData = (
-  sha: string,
-  experimentFieldsOrError: ExperimentFieldsOrError
-): Experiment | undefined => {
-  const transformedExperiment = transformExperimentLikeData(
-    sha,
-    experimentFieldsOrError
-  )
-  if (transformedExperiment) {
-    transformedExperiment.displayName =
-      transformedExperiment.name || transformedExperiment.id.slice(0, 7)
-    return transformedExperiment
-  }
 }
 
 const collectFromExperimentsObject = (
@@ -105,7 +79,7 @@ const collectFromBranchesObject = (
   for (const [branchSha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
   )) {
-    const branch = transformBaselineData(branchSha, baseline)
+    const branch = transformExperimentData(branchSha, baseline)
 
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
@@ -119,13 +93,11 @@ export const collectExperiments = (
   data: ExperimentsOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
-  const workspaceBaseline = transformExperimentLikeData(
+  const workspaceBaseline = transformExperimentData(
     'workspace',
-    workspace.baseline
-  ) as Experiment
-  if (workspaceBaseline) {
-    workspaceBaseline.displayName = workspaceBaseline.id
-  }
+    workspace.baseline,
+    9
+  )
 
   const acc = new ExperimentsAccumulator(workspaceBaseline)
 
