@@ -1,4 +1,4 @@
-git+https://github.com/iterative/dvc
+git+https://github.com/iterative/dvc#egg=dvc[s3]
 dvclive
 torch
 torchvision
