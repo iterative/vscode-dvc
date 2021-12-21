@@ -493,17 +493,14 @@ $spinner-color-light: #000;
   display: flex;
   flex-flow: row wrap;
   line-height: normal;
-  margin-right: 0.5em;
   text-overflow: ellipsis;
   align-items: center;
+  margin: 0 -0.25em;
   > * {
+    margin: 0 0.25em;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-}
-
-.experimentCellPrimaryName {
-  margin-right: 0.5em;
 }
 
 .experimentCellSecondaryName {
