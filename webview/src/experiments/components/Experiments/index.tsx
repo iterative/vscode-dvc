@@ -13,7 +13,8 @@ import {
   useFlexLayout,
   useColumnOrder,
   useResizeColumns,
-  TableState
+  TableState,
+  Cell
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import dayjs from '../../dayjs'
@@ -41,6 +42,16 @@ const countRowsAndAddIndexes: (
 const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
   [
     {
+      Cell: ({ value, row }: Cell<Experiment>) => (
+        <div className={styles.experimentCellContents}>
+          <span className={styles.experimentCellPrimaryName}>{value}</span>
+          {row.depth >= 1 && row.original.name && (
+            <span className={styles.experimentCellSecondaryName}>
+              {row.original.name}
+            </span>
+          )}
+        </div>
+      ),
       Header: 'Experiment',
       accessor: 'displayName',
       id: 'id',
