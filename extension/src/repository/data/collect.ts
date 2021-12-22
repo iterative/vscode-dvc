@@ -4,6 +4,7 @@ import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 
 export type PathItem = Resource & {
+  hasRemote: boolean
   isDirectory: boolean
 }
 
@@ -22,6 +23,7 @@ const transform = (
   acc.forEach((paths, path) => {
     const items = [...paths].map(path => ({
       dvcRoot,
+      hasRemote: ![...(acc.get(path) || [])].find(path => acc.get(path)),
       isDirectory: !!acc.get(path),
       resourceUri: Uri.file(join(dvcRoot, path))
     }))

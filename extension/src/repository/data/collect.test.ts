@@ -32,16 +32,19 @@ describe('collectTree', () => {
           [
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: false,
               isDirectory: true,
               resourceUri: makeUri('data')
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: true,
               resourceUri: makeUri('logs')
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri('model.pt')
             }
@@ -52,6 +55,7 @@ describe('collectTree', () => {
           [
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: false,
               isDirectory: true,
               resourceUri: makeUri('data', 'MNIST')
             }
@@ -62,6 +66,7 @@ describe('collectTree', () => {
           [
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: true,
               resourceUri: makeUri('data', 'MNIST', 'raw')
             }
@@ -72,6 +77,7 @@ describe('collectTree', () => {
           [
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri(
                 'data',
@@ -82,6 +88,7 @@ describe('collectTree', () => {
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri(
                 'data',
@@ -92,6 +99,7 @@ describe('collectTree', () => {
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri(
                 'data',
@@ -102,6 +110,7 @@ describe('collectTree', () => {
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri(
                 'data',
@@ -112,6 +121,7 @@ describe('collectTree', () => {
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri(
                 'data',
@@ -122,6 +132,7 @@ describe('collectTree', () => {
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri(
                 'data',
@@ -132,6 +143,7 @@ describe('collectTree', () => {
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri(
                 'data',
@@ -142,6 +154,7 @@ describe('collectTree', () => {
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri(
                 'data',
@@ -157,11 +170,13 @@ describe('collectTree', () => {
           [
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri('logs', 'acc.tsv')
             },
             {
               dvcRoot: dvcDemoPath,
+              hasRemote: true,
               isDirectory: false,
               resourceUri: makeUri('logs', 'loss.tsv')
             }
