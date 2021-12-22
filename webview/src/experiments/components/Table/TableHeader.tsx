@@ -43,9 +43,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       countUpperLevels(orderedColumns, column, columns, 0)) ||
     0
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
-  const isDescending = sorts.some(
-    sort => sort.path === column.id && sort.descending
-  )
+  const columnSort = sorts.find(sort => sort.path === column.id)
 
   const sortDescending = (descending: boolean) => {
     sendMessage({
@@ -62,14 +60,12 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       return
     }
 
-    const columnHasSorts =
-      sorts.filter(sort => sort.path === column.id).length > 0
-    if (!columnHasSorts) {
+    if (!columnSort) {
       return sortDescending(true)
     }
 
-    if (isDescending) {
-      sortDescending(!isDescending)
+    if (columnSort.descending) {
+      sortDescending(!columnSort.descending)
     } else {
       sendMessage({
         payload: { path: column.id },
