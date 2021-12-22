@@ -58,7 +58,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   }
 
   const sortTable = () => {
-    if (column.depth <= 0) {
+    if (column.columns !== undefined) {
       return
     }
 
