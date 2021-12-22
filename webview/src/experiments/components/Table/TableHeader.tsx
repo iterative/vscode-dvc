@@ -108,10 +108,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           })}
           key={column.id}
           data-testid={`header-${column.id}`}
-          role="button"
-          onClick={sortTable}
-          onKeyDown={sortTable}
-          tabIndex={index}
         >
           <div
             ref={provided.innerRef}
@@ -124,6 +120,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               [styles.staticColumn]: !snapshot.isDragging,
               [styles.isDroppedColumn]: snapshot.isDropAnimating
             })}
+            role="button"
+            onClick={sortTable}
+            onKeyDown={sortTable}
+            tabIndex={index}
           >
             {column.render('Header')}
           </div>
