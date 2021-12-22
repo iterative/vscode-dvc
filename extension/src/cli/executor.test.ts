@@ -409,7 +409,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['pull', '-R'],
+        args: ['pull'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -426,7 +426,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['pull', '-f', '-R'],
+        args: ['pull', '-f'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -444,7 +444,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['pull', relPath, '-R'],
+        args: ['pull', relPath],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -458,7 +458,12 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.pull(cwd, relPath, Flag.FORCE)
+      const output = await cliExecutor.pull(
+        cwd,
+        relPath,
+        Flag.FORCE,
+        Flag.RECURSIVE
+      )
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -481,7 +486,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push', '-R'],
+        args: ['push'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -497,7 +502,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push', '-f', '-R'],
+        args: ['push', '-f'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -511,7 +516,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.push(cwd, relPath)
+      const output = await cliExecutor.push(cwd, relPath, Flag.RECURSIVE)
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -533,7 +538,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push', relPath, '-f', '-R'],
+        args: ['push', relPath, '-f'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

@@ -33,16 +33,19 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: true,
+              isTracked: false,
               resourceUri: makeUri('data')
             },
             {
               dvcRoot: dvcDemoPath,
               isDirectory: true,
+              isTracked: true,
               resourceUri: makeUri('logs')
             },
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri('model.pt')
             }
           ]
@@ -53,6 +56,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: true,
+              isTracked: false,
               resourceUri: makeUri('data', 'MNIST')
             }
           ]
@@ -63,6 +67,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: true,
+              isTracked: true,
               resourceUri: makeUri('data', 'MNIST', 'raw')
             }
           ]
@@ -73,6 +78,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri(
                 'data',
                 'MNIST',
@@ -83,6 +89,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri(
                 'data',
                 'MNIST',
@@ -93,6 +100,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri(
                 'data',
                 'MNIST',
@@ -103,6 +111,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri(
                 'data',
                 'MNIST',
@@ -113,6 +122,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri(
                 'data',
                 'MNIST',
@@ -123,6 +133,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri(
                 'data',
                 'MNIST',
@@ -133,6 +144,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri(
                 'data',
                 'MNIST',
@@ -143,6 +155,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri(
                 'data',
                 'MNIST',
@@ -158,11 +171,13 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri('logs', 'acc.tsv')
             },
             {
               dvcRoot: dvcDemoPath,
               isDirectory: false,
+              isTracked: true,
               resourceUri: makeUri('logs', 'loss.tsv')
             }
           ]

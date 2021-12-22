@@ -13,7 +13,13 @@ import { exists, relativeWithUri } from '.'
 import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty, flatten } from '../util/array'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../commands/internal'
+import { tryThenMaybeForce } from '../cli/actions'
+import { Flag } from '../cli/args'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
@@ -236,5 +242,26 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
         )
       }
     )
+
+    this.internalCommands.registerExternalCliCommand<PathItem>(
+      RegisteredCliCommands.PULL_TARGET,
+      this.tryThenForce(AvailableCommands.PULL)
+    )
+
+    this.internalCommands.registerExternalCliCommand<PathItem>(
+      RegisteredCliCommands.PUSH_TARGET,
+      this.tryThenForce(AvailableCommands.PUSH)
+    )
+  }
+
+  private tryThenForce(commandId: CommandId) {
+    return ({ dvcRoot, resourceUri, isTracked }: PathItem) => {
+      const relPath = relativeWithUri(dvcRoot, resourceUri)
+      const args = [dvcRoot, relPath]
+      if (!isTracked) {
+        args.push(Flag.RECURSIVE)
+      }
+      return tryThenMaybeForce(this.internalCommands, commandId, ...args)
+    }
   }
 }
