@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useState, KeyboardEvent } from 'react'
+import React, { KeyboardEvent } from 'react'
 import styles from './styles.module.scss'
 import { Pin } from '../../../shared/components/icons'
 
