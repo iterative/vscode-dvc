@@ -488,3 +488,22 @@ $spinner-color-light: #000;
     }
   }
 }
+
+.experimentCellContents {
+  display: flex;
+  flex-flow: row wrap;
+  line-height: normal;
+  text-overflow: ellipsis;
+  align-items: center;
+  margin: 0 -0.25em;
+  > * {
+    margin: 0 0.25em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.experimentCellSecondaryName {
+  color: $meta-cell-color;
+  font-size: 0.8em;
+}
