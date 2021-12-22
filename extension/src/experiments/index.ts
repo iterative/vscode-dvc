@@ -125,7 +125,7 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSorts()
   }
 
-  public async addSort(sortToAdd: SortDefinition | undefined = undefined) {
+  public async addSort(sortToAdd?: SortDefinition) {
     const metricsAndParams = this.metricsAndParams.getTerminalNodes()
     if (!sortToAdd) {
       sortToAdd = await pickSortToAdd(metricsAndParams)
