@@ -255,10 +255,10 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   }
 
   private tryThenForce(commandId: CommandId) {
-    return ({ dvcRoot, resourceUri, hasRemote }: PathItem) => {
+    return ({ dvcRoot, resourceUri, isTracked }: PathItem) => {
       const relPath = relativeWithUri(dvcRoot, resourceUri)
       const args = [dvcRoot, relPath]
-      if (!hasRemote) {
+      if (!isTracked) {
         args.push(Flag.RECURSIVE)
       }
       return tryThenMaybeForce(this.internalCommands, commandId, ...args)

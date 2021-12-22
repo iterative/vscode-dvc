@@ -1,11 +1,11 @@
-import { join, sep } from 'path'
+import { dirname, join, sep } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 
 export type PathItem = Resource & {
-  hasRemote: boolean
   isDirectory: boolean
+  isTracked: boolean
 }
 
 const getPath = (pathArray: string[], idx: number) =>
@@ -16,15 +16,16 @@ const getDirectChild = (pathArray: string[], idx: number) =>
 
 const transform = (
   dvcRoot: string,
-  acc: Map<string, Set<string>>
+  acc: Map<string, Set<string>>,
+  isTracked: Set<string>
 ): Map<string, PathItem[]> => {
   const treeMap = new Map<string, PathItem[]>()
 
   acc.forEach((paths, path) => {
     const items = [...paths].map(path => ({
       dvcRoot,
-      hasRemote: ![...(acc.get(path) || [])].find(path => acc.get(path)),
       isDirectory: !!acc.get(path),
+      isTracked: isTracked.has(path),
       resourceUri: Uri.file(join(dvcRoot, path))
     }))
     const absPath = Uri.file(join(dvcRoot, path)).fsPath
@@ -39,9 +40,16 @@ export const collectTree = (
   paths: string[]
 ): Map<string, PathItem[]> => {
   const acc = new Map<string, Set<string>>()
+  const isTracked = new Set<string>()
 
   paths.forEach(path => {
     const pathArray = path.split(sep)
+
+    isTracked.add(path)
+    const dir = dirname(path)
+    if (dir !== '.') {
+      isTracked.add(dir)
+    }
 
     pathArray.reduce((acc, _, i) => {
       const path = getPath(pathArray, i)
@@ -50,5 +58,5 @@ export const collectTree = (
     }, acc)
   })
 
-  return transform(dvcRoot, acc)
+  return transform(dvcRoot, acc, isTracked)
 }
