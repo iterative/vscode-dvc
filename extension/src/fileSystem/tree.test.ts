@@ -159,6 +159,7 @@ describe('TrackedTreeView', () => {
       const child = await trackedTreeView.getChildren({
         dvcRoot: dvcDemoPath,
         isDirectory: true,
+        isTracked: false,
         resourceUri: data
       })
 
@@ -189,6 +190,7 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         isDirectory: true,
+        isTracked: false,
         resourceUri: Uri.file(join(dvcDemoPath, 'data'))
       })
 
@@ -217,6 +219,7 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         isDirectory: false,
+        isTracked: true,
         resourceUri: log
       })
 
@@ -246,6 +249,7 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         isDirectory: true,
+        isTracked: false,
         resourceUri: Uri.file(join(dvcDemoPath, 'data'))
       })
 
@@ -276,6 +280,7 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         isDirectory: false,
+        isTracked: true,
         resourceUri: log
       })
 

@@ -340,8 +340,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
-      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath)
-      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath, '-f')
+      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath, '-R')
+      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath, '-R', '-f')
     })
 
     it('should be able to run dvc.pushTarget without error', async () => {
@@ -387,8 +387,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'Force'
       )
       expect(mockPush).to.be.calledTwice
-      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath)
-      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath, '-f')
+      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath, '-R')
+      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath, '-R', '-f')
     })
   })
 })
