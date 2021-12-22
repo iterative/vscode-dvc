@@ -7,6 +7,7 @@ $header-fg-color: $fg-color;
 $border-color: grey;
 
 $edge-padding: 0.5rem;
+$cell-padding: 0.25rem;
 $nested-row-padding: 1.35rem;
 
 // Dark Theme
@@ -284,17 +285,17 @@ $spinner-color-light: #000;
 
     .td {
       &:first-child {
-        padding-left: $edge-padding;
+        padding-left: $edge-padding - $cell-padding;
         .innerCell {
-          padding-left: 0;
+          padding-left: $cell-padding;
           border-left: 1px solid $border-color;
         }
       }
 
       &:last-child {
-        padding-right: $edge-padding;
+        padding-right: $edge-padding - $cell-padding;
         .innerCell {
-          padding-right: 0;
+          padding-right: $cell-padding;
           border-right: 1px solid $border-color;
         }
       }
@@ -480,7 +481,7 @@ $spinner-color-light: #000;
 .innerCell {
   display: flex;
   flex-flow: row nowrap;
-  padding: 0 0.25rem;
+  padding: 0 $cell-padding;
   align-items: center;
   width: 100%;
   justify-content: flex-end;
