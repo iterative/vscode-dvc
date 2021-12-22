@@ -15,6 +15,7 @@ import {
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
 import { mocked } from 'ts-jest/utils'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
@@ -228,6 +229,51 @@ describe('Table', () => {
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         true
       )
+    })
+
+    it('should request descending sorting on click when it is not sorted', async () => {
+      renderTable()
+
+      const column = await getParentElement('Timestamp')
+      // eslint-disable-next-line testing-library/no-node-access
+      const renderedHeader = column?.firstElementChild
+
+      fireEvent.keyDown(renderedHeader!)
+
+      expect(mockedPostMessage).toBeCalledWith({
+        payload: { descending: true, path: 'timestamp' },
+        type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
+      })
+    })
+
+    it('should request ascending sorting on click when it is descending', async () => {
+      renderTable({ sorts: [{ descending: true, path: 'timestamp' }] })
+
+      const column = await getParentElement('Timestamp')
+      // eslint-disable-next-line testing-library/no-node-access
+      const renderedHeader = column?.firstElementChild
+
+      fireEvent.keyDown(renderedHeader!)
+
+      expect(mockedPostMessage).toBeCalledWith({
+        payload: { descending: false, path: 'timestamp' },
+        type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
+      })
+    })
+
+    it('should request to reset sorting on click when it is ascending', async () => {
+      renderTable({ sorts: [{ descending: false, path: 'timestamp' }] })
+
+      const column = await getParentElement('Timestamp')
+      // eslint-disable-next-line testing-library/no-node-access
+      const renderedHeader = column?.firstElementChild
+
+      fireEvent.keyDown(renderedHeader!)
+
+      expect(mockedPostMessage).toBeCalledWith({
+        payload: { path: 'timestamp' },
+        type: MessageFromWebviewType.COLUMN_REMOVE_SORT_REQUESTED
+      })
     })
   })
 
