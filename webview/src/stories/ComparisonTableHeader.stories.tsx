@@ -45,5 +45,5 @@ OtherColor.args = {
 export const Pinned = Template.bind({})
 Pinned.args = {
   ...basicArgs,
-  isPinned: true,
+  isPinned: true
 }
