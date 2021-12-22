@@ -17,10 +17,8 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
   index,
   isPinned
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
   const pinClasses = cx(styles.pin, {
-    [styles.pinned]: isPinned,
-    [styles.hoveredPin]: isHovered
+    [styles.pinned]: isPinned
   })
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -32,8 +30,6 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
       className={styles.header}
       onClick={onClicked}
       onKeyDown={onKeyDown}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       role="button"
       tabIndex={index}
     >

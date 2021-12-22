@@ -31,7 +31,7 @@ $bg-color: var(--vscode-editor-background);
   opacity: 0;
 }
 
-.hoveredPin {
+.header:hover .pin {
   opacity: 1;
 }
 
