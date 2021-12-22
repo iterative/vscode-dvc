@@ -353,7 +353,7 @@ $spinner-color-light: #000;
   .experimentCell {
     text-align: left;
     .innerCell {
-      justify-content: left;
+      justify-content: flex-start;
     }
   }
 
@@ -451,6 +451,7 @@ $spinner-color-light: #000;
 }
 
 .copyButton {
+  flex: 0 0 0.8em;
   font-size: 1.5em;
   display: none;
   border: none;
@@ -467,6 +468,7 @@ $spinner-color-light: #000;
 .cellContents {
   overflow: hidden;
   text-overflow: ellipsis;
+  direction: rtl;
 }
 
 .th {
@@ -481,7 +483,7 @@ $spinner-color-light: #000;
   padding: 0 0.25rem;
   align-items: center;
   width: 100%;
-  justify-content: right;
+  justify-content: flex-end;
   &:hover {
     & .copyButton {
       display: block;
@@ -494,6 +496,7 @@ $spinner-color-light: #000;
   flex-flow: row wrap;
   line-height: normal;
   text-overflow: ellipsis;
+  direction: ltr;
   align-items: center;
   margin: 0 -0.25em;
   > * {
