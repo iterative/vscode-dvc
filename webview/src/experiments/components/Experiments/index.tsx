@@ -13,7 +13,8 @@ import {
   useFlexLayout,
   useColumnOrder,
   useResizeColumns,
-  TableState
+  TableState,
+  Cell
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import dayjs from '../../dayjs'
@@ -38,11 +39,46 @@ const countRowsAndAddIndexes: (
   return index
 }
 
+const getExperimentDisplayName = (
+  id: string,
+  name: string | undefined,
+  isBranchRow: boolean
+) => {
+  if (id === 'workspace') {
+    return id
+  } else if (isBranchRow) {
+    return name
+  } else {
+    return id.slice(0, 7)
+  }
+}
+
 const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
   [
     {
+      Cell: ({
+        value,
+        row: {
+          depth,
+          original: { name }
+        }
+      }: Cell<Experiment>) => {
+        const isBranchRow = depth === 0
+        return (
+          <div className={styles.experimentCellContents}>
+            <span className={styles.experimentCellPrimaryName}>
+              {getExperimentDisplayName(value, name, isBranchRow)}
+            </span>
+            {!isBranchRow && name && (
+              <span className={styles.experimentCellSecondaryName}>
+                [{name}]
+              </span>
+            )}
+          </div>
+        )
+      },
       Header: 'Experiment',
-      accessor: 'displayName',
+      accessor: 'id',
       id: 'id',
       width: 150
     },

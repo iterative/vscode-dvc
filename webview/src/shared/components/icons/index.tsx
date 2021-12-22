@@ -1,4 +1,6 @@
 export { default as Check } from './Check'
+export { default as ChevronDown } from './ChevronDown'
+export { default as ChevronRight } from './ChevronRight'
 export { default as Clock } from './Clock'
 export { default as Copy } from './Copy'
 export { default as Dots } from './Dots'

@@ -1,7 +1,13 @@
-import { resolve } from 'path'
+import { join, resolve } from 'path'
 import { executeProcess } from './processExecution'
 import { trimAndSplit } from './util/stdout'
 import { isDirectory } from './fileSystem'
+
+export const DOT_GIT = '.git'
+export const DOT_GIT_HEAD = join(DOT_GIT, 'HEAD')
+export const DOT_GIT_INDEX = join(DOT_GIT, 'index')
+export const GIT_REFS = join(DOT_GIT, 'refs')
+export const HEADS_GIT_REFS = join(GIT_REFS, 'heads')
 
 const getUris = (repositoryRoot: string, relativePaths: string[]) =>
   relativePaths.map(path => resolve(repositoryRoot, path))

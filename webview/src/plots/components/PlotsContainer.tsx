@@ -9,7 +9,7 @@ import { MetricsPicker } from './MetricsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { SectionRenamer } from './SectionRenamer'
-import { AllIcons } from '../../shared/components/icon/Icon'
+import { AllIcons, Icon } from '../../shared/components/icon/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import {
   CollapsibleSectionsActions,
@@ -112,6 +112,14 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             })
           }}
         >
+          <Icon
+            icon={open ? AllIcons.CHEVRON_DOWN : AllIcons.CHEVRON_RIGHT}
+            data-testid="plots-container-details-chevron"
+            width={20}
+            height={20}
+            className={styles.detailsIcon}
+          />
+
           {isRenaming ? (
             <SectionRenamer
               defaultTitle={sectionTitle}

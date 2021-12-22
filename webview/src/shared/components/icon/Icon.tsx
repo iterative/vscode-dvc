@@ -1,8 +1,19 @@
 import React from 'react'
-import { Check, Dots, DownArrow, Lines, Pencil, UpArrow } from '../icons'
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Dots,
+  DownArrow,
+  Lines,
+  Pencil,
+  UpArrow
+} from '../icons'
 
 export const AllIcons = {
   CHECK: Check,
+  CHEVRON_DOWN: ChevronDown,
+  CHEVRON_RIGHT: ChevronRight,
   DOTS: Dots,
   DOWN_ARROW: DownArrow,
   LINES: Lines,
@@ -15,6 +26,7 @@ export type IconValues = typeof AllIcons[IconKeys]
 
 interface IconProps {
   icon: IconValues
+  className?: string
   color?: string
   width?: number
   height?: number
