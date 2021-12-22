@@ -12,6 +12,8 @@ export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   COLUMN_REORDERED = 'column-reordered',
   COLUMN_RESIZED = 'column-resized',
+  COLUMN_SORT_REQUESTED = 'column-sort-requested',
+  COLUMN_REMOVE_SORT_REQUESTED = 'column-remove-sort-requested',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_SECTION_TOGGLED = 'plots-section-toggled',
   PLOTS_RESIZED = 'plots-resized',
@@ -24,6 +26,16 @@ export type ColumnResizePayload = {
   id: string
   width: number
 }
+
+export type ColumnSortRequestPayload = {
+  descending: boolean
+  path: string
+}
+
+export type ColumnRemoveSortRequestPayload = {
+  path: string
+}
+
 export type MetricToggledPayload = string[]
 export type PlotsResizedPayload = { section: Section; size: PlotSize }
 export type PlotSectionRenamedPayload = {
@@ -39,6 +51,14 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.COLUMN_RESIZED
       payload: ColumnResizePayload
+    }
+  | {
+      type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
+      payload: ColumnSortRequestPayload
+    }
+  | {
+      type: MessageFromWebviewType.COLUMN_REMOVE_SORT_REQUESTED
+      payload: ColumnRemoveSortRequestPayload
     }
   | {
       type: MessageFromWebviewType.METRIC_TOGGLED

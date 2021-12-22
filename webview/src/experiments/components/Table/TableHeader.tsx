@@ -4,12 +4,14 @@ import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { Draggable } from 'react-beautiful-dnd'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import {
   countUpperLevels,
   getPlaceholders,
   isFirstLevelHeader
 } from '../../util/columns'
+import { sendMessage } from '../../../shared/vscode'
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
@@ -41,6 +43,40 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       countUpperLevels(orderedColumns, column, columns, 0)) ||
     0
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
+  const isDescending = sorts.some(
+    sort => sort.path === column.id && sort.descending
+  )
+
+  const sortDescending = (descending: boolean) => {
+    sendMessage({
+      payload: {
+        descending,
+        path: column.id
+      },
+      type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
+    })
+  }
+
+  const sortTable = () => {
+    if (column.depth <= 0) {
+      return
+    }
+
+    const columnHasSorts =
+      sorts.filter(sort => sort.path === column.id).length > 0
+    if (!columnHasSorts) {
+      return sortDescending(true)
+    }
+
+    if (isDescending) {
+      sortDescending(!isDescending)
+    } else {
+      sendMessage({
+        payload: { path: column.id },
+        type: MessageFromWebviewType.COLUMN_REMOVE_SORT_REQUESTED
+      })
+    }
+  }
 
   return (
     <Draggable
@@ -72,6 +108,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           })}
           key={column.id}
           data-testid={`header-${column.id}`}
+          role="button"
+          onClick={sortTable}
+          onKeyDown={sortTable}
+          tabIndex={index}
         >
           <div
             ref={provided.innerRef}

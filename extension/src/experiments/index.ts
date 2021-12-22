@@ -11,6 +11,7 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { ExperimentsData } from './data'
 import { TableData } from './webview/contract'
+import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
@@ -19,6 +20,7 @@ import { BaseRepository } from '../webview/repository'
 import {
   ColumnReorderPayload,
   ColumnResizePayload,
+  ColumnSortRequestPayload,
   MessageFromWebviewType
 } from '../webview/contract'
 import { Logger } from '../common/logger'
@@ -123,9 +125,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSorts()
   }
 
-  public async addSort() {
+  public async addSort(sortToAdd: SortDefinition | undefined = undefined) {
     const metricsAndParams = this.metricsAndParams.getTerminalNodes()
-    const sortToAdd = await pickSortToAdd(metricsAndParams)
+    if (!sortToAdd) {
+      sortToAdd = await pickSortToAdd(metricsAndParams)
+    }
+
     if (!sortToAdd) {
       return
     }
@@ -277,6 +282,15 @@ export class Experiments extends BaseRepository<TableData> {
             return (
               message.payload && this.metricsAndParams.setColumnWidth(id, width)
             )
+          }
+          case MessageFromWebviewType.COLUMN_SORT_REQUESTED: {
+            const { descending, path } =
+              message.payload as ColumnSortRequestPayload
+            return message.payload && this.addSort({ descending, path })
+          }
+          case MessageFromWebviewType.COLUMN_REMOVE_SORT_REQUESTED: {
+            const { path } = message.payload as ColumnSortRequestPayload
+            return message.payload && this.removeSort(path)
           }
           default:
             Logger.error(`Unexpected message: ${message}`)
