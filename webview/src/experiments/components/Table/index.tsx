@@ -8,7 +8,6 @@ import {
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import ClockIcon from '../../../shared/components/icons/Clock'
-import { getDisplayNameFromPath } from '../../../util/paths'
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -95,9 +94,7 @@ const CellWrapper: React.FC<{
   <div
     {...cell.getCellProps({
       className: cx(styles.td, cell.isPlaceholder && styles.groupPlaceholder, {
-        [styles.metaCell]: ['timestamp', 'epochs'].includes(
-          getDisplayNameFromPath(cell.column.id)
-        ),
+        [styles.metaCell]: !cell.column.group,
         [styles.workspaceChange]: changes?.includes(cell.column.id)
       })
     })}
