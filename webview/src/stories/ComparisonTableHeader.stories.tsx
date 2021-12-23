@@ -4,7 +4,6 @@ import { ComparisonTableHeader } from '../plots/components/ComparisonTable/Compa
 
 const basicArgs = {
   color: '#945DD6',
-  index: 1,
   name: 'exp-11caa2a'
 }
 
@@ -23,11 +22,10 @@ const Template: Story<{
   onClicked: () => void
   index: number
   isPinned: boolean
-}> = ({ name, color, onClicked, index, isPinned }) => (
+}> = ({ name, color, onClicked, isPinned }) => (
   <ComparisonTableHeader
     color={color}
     onClicked={onClicked}
-    index={index}
     isPinned={isPinned}
   >
     {name}
