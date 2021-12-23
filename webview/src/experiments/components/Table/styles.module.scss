@@ -6,9 +6,11 @@ $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $border-color: grey;
 
-$edge-padding: 0.5rem;
-$cell-padding: 0.25rem;
 $nested-row-padding: 1.35rem;
+
+$edge-padding: 0.8rem;
+$cell-padding: 0.5rem;
+$workspace-row-edge-margin: $edge-padding - $cell-padding;
 
 // Dark Theme
 
@@ -285,7 +287,7 @@ $spinner-color-light: #000;
 
     .td {
       &:first-child {
-        padding-left: $edge-padding - $cell-padding;
+        padding-left: $workspace-row-edge-margin;
         .innerCell {
           padding-left: $cell-padding;
           border-left: 1px solid $border-color;
@@ -293,7 +295,7 @@ $spinner-color-light: #000;
       }
 
       &:last-child {
-        padding-right: $edge-padding - $cell-padding;
+        padding-right: $workspace-row-edge-margin;
         .innerCell {
           padding-right: $cell-padding;
           border-right: 1px solid $border-color;
@@ -499,7 +501,6 @@ $spinner-color-light: #000;
   text-overflow: ellipsis;
   direction: ltr;
   align-items: center;
-  margin: 0 -0.25em;
   > * {
     margin: 0 0.25em;
     overflow: hidden;
