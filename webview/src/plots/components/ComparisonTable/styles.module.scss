@@ -1,0 +1,43 @@
+$bullet-size: 9px;
+$fg-color: var(--vscode-editor-foreground);
+$bg-color: var(--vscode-editor-background);
+
+.header {
+  padding: 10px 5px;
+  color: #fff;
+  background-color: #303031;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  gap: 4px;
+  border-radius: 4px 4px 0 0;
+  font-size: 0.8125rem;
+  position: relative;
+  width: 100%;
+  border: none;
+}
+
+.bullet {
+  display: block;
+  width: $bullet-size;
+  height: $bullet-size;
+  border-radius: $bullet-size;
+}
+
+.pin {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  transform: rotate(-90deg);
+  opacity: 0;
+}
+
+.header:hover .pin {
+  opacity: 1;
+}
+
+.pinned {
+  opacity: 1;
+  transform: rotate(0deg);
+}
