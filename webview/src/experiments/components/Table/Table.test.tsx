@@ -231,14 +231,11 @@ describe('Table', () => {
       )
     })
 
-    it('should request descending sorting on click when it is not sorted', async () => {
+    it('should request descending sorting on click when it is not sorted', () => {
       renderTable()
 
-      const column = await getParentElement('Timestamp')
-      // eslint-disable-next-line testing-library/no-node-access
-      const renderedHeader = column?.firstElementChild
-
-      fireEvent.keyDown(renderedHeader!)
+      const column = screen.getByText('Timestamp')
+      fireEvent.keyDown(column)
 
       expect(mockedPostMessage).toBeCalledWith({
         payload: { descending: true, path: 'timestamp' },
@@ -246,14 +243,11 @@ describe('Table', () => {
       })
     })
 
-    it('should request ascending sorting on click when it is descending', async () => {
+    it('should request ascending sorting on click when it is descending', () => {
       renderTable({ sorts: [{ descending: true, path: 'timestamp' }] })
 
-      const column = await getParentElement('Timestamp')
-      // eslint-disable-next-line testing-library/no-node-access
-      const renderedHeader = column?.firstElementChild
-
-      fireEvent.keyDown(renderedHeader!)
+      const column = screen.getByText('Timestamp')
+      fireEvent.keyDown(column)
 
       expect(mockedPostMessage).toBeCalledWith({
         payload: { descending: false, path: 'timestamp' },
@@ -261,14 +255,11 @@ describe('Table', () => {
       })
     })
 
-    it('should request to reset sorting on click when it is ascending', async () => {
+    it('should request to reset sorting on click when it is ascending', () => {
       renderTable({ sorts: [{ descending: false, path: 'timestamp' }] })
 
-      const column = await getParentElement('Timestamp')
-      // eslint-disable-next-line testing-library/no-node-access
-      const renderedHeader = column?.firstElementChild
-
-      fireEvent.keyDown(renderedHeader!)
+      const column = screen.getByText('Timestamp')
+      fireEvent.keyDown(column)
 
       expect(mockedPostMessage).toBeCalledWith({
         payload: { path: 'timestamp' },
