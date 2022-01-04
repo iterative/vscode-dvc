@@ -110,27 +110,6 @@ const initializeColumnOrder = (
   return allColumns
 }
 
-const initializeColumnWidths = (
-  allColumns: ColumnInstance<Experiment>[],
-  { instance }: MetaBase<Experiment>
-) => {
-  const columnWidths = instance.state.columnResizing?.columnWidths
-  if (columnWidths === undefined) {
-    return allColumns
-  }
-  return allColumns.map(column => {
-    const { id } = column
-    const width = columnWidths[id]
-    if (width !== undefined) {
-      return {
-        ...column,
-        width
-      }
-    }
-    return column
-  })
-}
-
 const reportResizedColumn = (state: TableState<Experiment>) => {
   const id = state.columnResizing.isResizingColumn
   if (id) {
@@ -203,7 +182,7 @@ export const ExperimentsTable: React.FC<{
           expandedRowCount
         })
       })
-      hooks.allColumns.push(initializeColumnWidths, initializeColumnOrder)
+      hooks.allColumns.push(initializeColumnOrder)
     }
   )
 
