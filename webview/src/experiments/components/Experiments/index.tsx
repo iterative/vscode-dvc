@@ -14,8 +14,7 @@ import {
   useColumnOrder,
   useResizeColumns,
   TableState,
-  Cell,
-  ColumnInstance
+  Cell
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import dayjs from '../../dayjs'
@@ -170,15 +169,13 @@ export const ExperimentsTable: React.FC<{
           expandedRowCount
         })
       })
-      hooks.allColumns.push(
-        (allColumns, { instance: { state } }): ColumnInstance<Experiment>[] => {
-          const { columnOrder } = state
-          if (!columnOrder || columnOrder.length === 0) {
-            state.columnOrder = allColumns.map(col => col.id)
-          }
-          return allColumns
+      hooks.allColumns.push((allColumns, { instance: { state } }) => {
+        const { columnOrder } = state
+        if (!columnOrder || columnOrder.length === 0) {
+          state.columnOrder = allColumns.map(col => col.id)
         }
-      )
+        return allColumns
+      })
     }
   )
 
