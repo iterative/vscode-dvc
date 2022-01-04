@@ -272,6 +272,9 @@ $spinner-color-light: #000;
       .experimentHeaderCell {
         padding-left: $cell-padding;
         text-align: left;
+        direction: ltr;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
