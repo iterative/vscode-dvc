@@ -19,7 +19,6 @@ export const TableHead: React.FC<TableHeadProps> = ({
   instance: {
     headerGroups,
     setColumnOrder,
-    allColumns,
     state: { columnOrder }
   },
   columns,
@@ -28,10 +27,6 @@ export const TableHead: React.FC<TableHeadProps> = ({
   const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
-
-  const onDragStart = () => {
-    setColumnOrder(allColumns.map(column => column.id))
-  }
 
   const onDragUpdate = (column: DragUpdate) => {
     if (!column.destination) {
@@ -65,7 +60,6 @@ export const TableHead: React.FC<TableHeadProps> = ({
           headerGroup={headerGroup}
           columns={allHeaders}
           sorts={sorts}
-          onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
         />
