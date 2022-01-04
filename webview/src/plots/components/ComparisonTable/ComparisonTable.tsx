@@ -1,11 +1,7 @@
-import {
-  LivePlotsColors,
-  PlotsOutput,
-  StaticPlot
-} from 'dvc/src/plots/webview/contract'
+import { LivePlotsColors, PlotsOutput } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
-import { StaticPlotComponent } from '../StaticPlot'
+import { ComparisonTableRow } from './ComparisonTableRow'
 
 export interface ComparisonTableProps {
   plots: PlotsOutput
@@ -49,20 +45,14 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
       <thead>
         <tr>{headers}</tr>
       </thead>
-      <tbody>
-        {entries.map(([path, plots]) => (
-          <tr key={path}>
-            {plots.map((plot: StaticPlot) => (
-              <td
-                key={path + plot.revisions?.[0]}
-                data-something={plot.revisions}
-              >
-                <StaticPlotComponent plot={plot} path={path} />
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
+      {entries.map(([path, plots]) => (
+        <ComparisonTableRow
+          key={path}
+          path={path}
+          plots={plots}
+          nbColumns={revisions.length}
+        />
+      ))}
     </table>
   )
 }
