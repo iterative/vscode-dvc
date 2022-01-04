@@ -15,8 +15,7 @@ import {
   useResizeColumns,
   TableState,
   Cell,
-  ColumnInstance,
-  MetaBase
+  ColumnInstance
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import dayjs from '../../dayjs'
@@ -99,17 +98,6 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
     ...buildDynamicColumns(columns, 'params')
   ] as Column<Experiment>[]
 
-const initializeColumnOrder = (
-  allColumns: ColumnInstance<Experiment>[],
-  { instance: { state } }: MetaBase<Experiment>
-): ColumnInstance<Experiment>[] => {
-  const { columnOrder } = state
-  if (!columnOrder || columnOrder.length === 0) {
-    state.columnOrder = allColumns.map(col => col.id)
-  }
-  return allColumns
-}
-
 const reportResizedColumn = (state: TableState<Experiment>) => {
   const id = state.columnResizing.isResizingColumn
   if (id) {
@@ -182,7 +170,15 @@ export const ExperimentsTable: React.FC<{
           expandedRowCount
         })
       })
-      hooks.allColumns.push(initializeColumnOrder)
+      hooks.allColumns.push(
+        (allColumns, { instance: { state } }): ColumnInstance<Experiment>[] => {
+          const { columnOrder } = state
+          if (!columnOrder || columnOrder.length === 0) {
+            state.columnOrder = allColumns.map(col => col.id)
+          }
+          return allColumns
+        }
+      )
     }
   )
 
