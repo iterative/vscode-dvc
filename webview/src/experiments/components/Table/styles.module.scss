@@ -262,8 +262,16 @@ $spinner-color-light: #000;
     &:last-child {
       font-size: 0.9rem;
 
-      .headerCell div {
-        opacity: 1;
+      .headerCell {
+        text-align: right;
+        div {
+          opacity: 1;
+        }
+      }
+
+      .experimentHeaderCell {
+        padding-left: $cell-padding;
+        text-align: left;
       }
     }
   }
@@ -374,7 +382,7 @@ $spinner-color-light: #000;
     color: $header-fg-color;
     text-align: center;
     border-bottom: 2px solid $bg-color;
-    padding: 0.31rem;
+    padding: 0.31rem $cell-padding;
   }
 
   .sortingHeaderCellAsc {
