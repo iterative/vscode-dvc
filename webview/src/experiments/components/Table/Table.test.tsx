@@ -153,6 +153,36 @@ describe('Table', () => {
       renderTable({ sorts: [{ descending, path: 'timestamp' }] }, newInstance)
     }
 
+    const renderTableWithSortableHeaders = (testData = {}) => {
+      const newInstance = {
+        ...instance,
+        headerGroups: [
+          {
+            getHeaderGroupProps: getHeaderGroupProps('headerGroup_1'),
+            headers: [
+              {
+                ...headerBasicProps,
+                id: 'experiment',
+                render: () => 'Experiment'
+              },
+              {
+                ...headerBasicProps,
+                id: 'timestamp',
+                render: () => 'Timestamp'
+              },
+              {
+                ...headerBasicProps,
+                id: 'metrics:logs.json:step',
+                render: () => 'step'
+              }
+            ]
+          }
+        ]
+      } as unknown as TableInstance<Experiment>
+
+      renderTable(testData, newInstance)
+    }
+
     it('should not have any sorting classes if the sorts property is empty', async () => {
       renderTable()
       const column = await getParentElement('Timestamp')
@@ -232,38 +262,62 @@ describe('Table', () => {
     })
 
     it('should request descending sorting on click when it is not sorted', () => {
-      renderTable()
+      renderTableWithSortableHeaders()
 
-      const column = screen.getByText('Timestamp')
+      const column = screen.getByText('step')
       fireEvent.keyDown(column)
 
       expect(mockedPostMessage).toBeCalledWith({
-        payload: { descending: true, path: 'timestamp' },
+        payload: { descending: true, path: 'metrics:logs.json:step' },
         type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
       })
     })
 
     it('should request ascending sorting on click when it is descending', () => {
-      renderTable({ sorts: [{ descending: true, path: 'timestamp' }] })
+      renderTableWithSortableHeaders({
+        sorts: [{ descending: true, path: 'metrics:logs.json:step' }]
+      })
 
-      const column = screen.getByText('Timestamp')
+      const column = screen.getByText('step')
       fireEvent.keyDown(column)
 
       expect(mockedPostMessage).toBeCalledWith({
-        payload: { descending: false, path: 'timestamp' },
+        payload: { descending: false, path: 'metrics:logs.json:step' },
         type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
       })
     })
 
     it('should request to reset sorting on click when it is ascending', () => {
-      renderTable({ sorts: [{ descending: false, path: 'timestamp' }] })
+      renderTableWithSortableHeaders({
+        sorts: [{ descending: false, path: 'metrics:logs.json:step' }]
+      })
 
-      const column = screen.getByText('Timestamp')
+      const column = screen.getByText('step')
       fireEvent.keyDown(column)
 
       expect(mockedPostMessage).toBeCalledWith({
-        payload: { path: 'timestamp' },
+        payload: { path: 'metrics:logs.json:step' },
         type: MessageFromWebviewType.COLUMN_REMOVE_SORT_REQUESTED
+      })
+    })
+
+    it('should not request to sort when clicking the Experiment / Timestamp columns', () => {
+      renderTable()
+
+      const experiment = screen.getByText('Experiment')
+      const timestamp = screen.getByText('Timestamp')
+
+      fireEvent.keyDown(experiment)
+      fireEvent.keyDown(timestamp)
+
+      expect(mockedPostMessage).not.toBeCalledWith({
+        payload: { descending: true, path: 'experiment' },
+        type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
+      })
+
+      expect(mockedPostMessage).not.toBeCalledWith({
+        payload: { descending: true, path: 'timestamp' },
+        type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
       })
     })
   })
