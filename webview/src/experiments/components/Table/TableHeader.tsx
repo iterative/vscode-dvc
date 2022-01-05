@@ -43,6 +43,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       countUpperLevels(orderedColumns, column, columns, 0)) ||
     0
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
+  const isParam = column.id.includes('params')
+  const isMetric = column.id.includes('metric')
+  const isParamOrMetric = isParam || isMetric
   const columnSort = sorts.find(sort => sort.path === column.id)
 
   const sortDescending = (descending: boolean) => {
@@ -56,7 +59,11 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   }
 
   const sortTable = () => {
-    if (column.columns !== undefined) {
+    if (!isParamOrMetric) {
+      return
+    }
+
+    if (column.columns) {
       return
     }
 
@@ -90,8 +97,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 ? styles.placeholderHeaderCell
                 : styles.headerCell,
               {
-                [styles.paramHeaderCell]: column.id.includes('params'),
-                [styles.metricHeaderCell]: column.id.includes('metric'),
+                [styles.paramHeaderCell]: isParam,
+                [styles.metricHeaderCell]: isMetric,
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
                 [styles.sortingHeaderCellAsc]: sorts.filter(
                   sort => !sort.descending && isSortedWithPlaceholder(sort)
