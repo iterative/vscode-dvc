@@ -186,6 +186,78 @@ suite('Experiments Test Suite', () => {
       expect(mockSetColumnReordered).to.be.calledWith(columnOrder)
     }).timeout(8000)
 
+    it('should handle sorting messages from the webview', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const mockMessageReceived = disposable.track(
+        new EventEmitter<MessageFromWebview>()
+      )
+
+      const onDidReceiveMessage = mockMessageReceived.event
+
+      stub(Factory, 'createWebview').resolves({
+        dispose: stub(),
+        isReady: () => Promise.resolve(),
+        onDidChangeIsFocused: stub(),
+        onDidDispose: stub(),
+        onDidReceiveMessage,
+        show: stub()
+      } as unknown as BaseWebview<TableData>)
+
+      await experiments.showWebview()
+
+      const payload = { descending: true, path: 'id' }
+
+      const mockAddSort = stub(Experiments.prototype, 'addSort')
+
+      const columnSortSet = mockAddSort.callsFake(async () => {})
+
+      mockMessageReceived.fire({
+        payload: payload,
+        type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
+      })
+
+      await columnSortSet
+
+      expect(mockAddSort).to.be.calledWith(payload)
+    })
+
+    it('should handle sorting removal messages from the webview', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const mockMessageReceived = disposable.track(
+        new EventEmitter<MessageFromWebview>()
+      )
+
+      const onDidReceiveMessage = mockMessageReceived.event
+
+      stub(Factory, 'createWebview').resolves({
+        dispose: stub(),
+        isReady: () => Promise.resolve(),
+        onDidChangeIsFocused: stub(),
+        onDidDispose: stub(),
+        onDidReceiveMessage,
+        show: stub()
+      } as unknown as BaseWebview<TableData>)
+
+      await experiments.showWebview()
+
+      const payload = { path: 'id' }
+
+      const mockRemoveSort = stub(Experiments.prototype, 'removeSort')
+
+      const columnSortResetSet = mockRemoveSort.callsFake(async () => {})
+
+      mockMessageReceived.fire({
+        payload: payload,
+        type: MessageFromWebviewType.COLUMN_REMOVE_SORT_REQUESTED
+      })
+
+      await columnSortResetSet
+
+      expect(mockRemoveSort).to.be.calledWith(payload.path)
+    })
+
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
 
