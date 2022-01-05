@@ -280,7 +280,7 @@ describe('Table', () => {
       })
 
       const column = screen.getByText('step')
-      fireEvent.keyDown(column)
+      fireEvent.click(column)
 
       expect(mockedPostMessage).toBeCalledWith({
         payload: { descending: false, path: 'metrics:logs.json:step' },
