@@ -40,7 +40,7 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
   width: 100%;
 
   summary {
-    cursor: pointer;
+    list-style-type: none;
     font-family: var(--vscode-font-family);
     margin: 14px 10px;
     font-weight: bold;
@@ -50,6 +50,11 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
 
 .plotsContainerWrapper {
   position: relative;
+}
+
+.detailsIcon {
+  fill: $fg-color;
+  margin-bottom: -4px;
 }
 
 .iconMenu {
@@ -94,6 +99,12 @@ $gap: 20px;
   height: 20vw;
   max-width: 300px;
   max-height: 200px;
+}
+
+.plot img,
+.plot svg {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .sectionRenamer {

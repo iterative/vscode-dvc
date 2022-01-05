@@ -1,14 +1,12 @@
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { workspace } from 'vscode'
 import { FSWatcher, watch } from 'chokidar'
 import {
-  getRepositoryListener,
   ignoredDotDirectories,
   createFileSystemWatcher,
   createNecessaryFileSystemWatcher
 } from './watcher'
-import { Repository } from '../repository'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 jest.mock('vscode')
@@ -37,91 +35,6 @@ beforeEach(() => {
       onDidCreate: jest.fn(),
       onDidDelete: jest.fn()
     }
-  })
-})
-
-describe('getRepositoryListener', () => {
-  const mockedUpdate = jest.fn()
-  const repository = {
-    update: mockedUpdate
-  } as unknown as Repository
-
-  it('should return a function that does nothing if an empty path is provided', () => {
-    const mockedDvcRoot = resolve('some', 'dvc', 'root')
-    const listener = getRepositoryListener(repository, mockedDvcRoot)
-
-    listener('')
-
-    expect(mockedUpdate).not.toBeCalled()
-  })
-
-  it('should return a function that does nothing if an experiments git refs path is provided', () => {
-    const mockedDvcRoot = __dirname
-    const listener = getRepositoryListener(repository, mockedDvcRoot)
-
-    listener(join(mockedDvcRoot, '.git', 'refs', 'exps', '0F'))
-
-    expect(mockedUpdate).not.toBeCalled()
-  })
-
-  it('should return a function that calls update with the provided path if it is inside the repo', () => {
-    const mockedDvcRoot = resolve('some', 'dvc', 'repo')
-    const listener = getRepositoryListener(repository, mockedDvcRoot)
-
-    const path = join(mockedDvcRoot, 'data', 'placeholder.dvc')
-
-    listener(join(mockedDvcRoot, 'data', 'placeholder.dvc'))
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it('should return a function that calls update if it is called with .git/index (that is above the dvc root)', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    const path = resolve(__dirname, '..', '..', '.git', 'index')
-    listener(path)
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it('should return a function that calls update if it is called with .git/ORIG_HEAD (that is above the dvc root)', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    const path = resolve(__dirname, '..', '..', '.git', 'ORIG_HEAD')
-    listener(path)
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it('should return a function that does not call update if it is called with a file in the .git folder that does not contain index or HEAD', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    listener(
-      resolve(
-        __dirname,
-        '..',
-        '..',
-        '.git',
-        'any',
-        'other',
-        'file',
-        'or',
-        'ref'
-      )
-    )
-
-    expect(mockedUpdate).not.toBeCalled()
-  })
-
-  it('should return a function that returns early if called with a path that is above the dvc root that is not in the .git folder', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    listener(resolve(__dirname, '..', '..', 'other', 'refs'))
-
-    expect(mockedUpdate).not.toBeCalled()
   })
 })
 
@@ -214,15 +127,9 @@ describe('createFileSystemWatcher', () => {
 })
 
 describe('createNecessaryFileSystemWatcher', () => {
-  const mockedExternalGitRefs = join(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '.git',
-    'refs',
-    '**'
-  )
+  const cwd = join(__dirname, '..', '..', '..')
+  const mockedExternalGitRefs = join('.git', 'refs')
+  const mockedExternalGitIndex = join('.git', 'index')
 
   it('should create a chokidar watcher with the correct options when the path to watch is outside the workspace', () => {
     mockedGetWorkspaceFolders.mockReturnValueOnce([__dirname])
@@ -231,12 +138,20 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     const mockedListener = jest.fn()
 
-    createNecessaryFileSystemWatcher(mockedExternalGitRefs, mockedListener)
+    createNecessaryFileSystemWatcher(
+      cwd,
+      [mockedExternalGitRefs, mockedExternalGitIndex],
+      mockedListener
+    )
 
     expect(mockedWatch).toBeCalledTimes(1)
-    expect(mockedWatch).toBeCalledWith(mockedExternalGitRefs, {
-      ignoreInitial: true
-    })
+    expect(mockedWatch).toBeCalledWith(
+      [join(cwd, mockedExternalGitRefs), join(cwd, mockedExternalGitIndex)],
+      {
+        ignoreInitial: true,
+        ignored: ignoredDotDirectories
+      }
+    )
 
     expect(mockedWatcherOn).toBeCalledTimes(1)
     expect(mockedCreateFileSystemWatcher).not.toBeCalled()
@@ -250,7 +165,8 @@ describe('createNecessaryFileSystemWatcher', () => {
     const mockedListener = jest.fn()
 
     const { dispose } = createNecessaryFileSystemWatcher(
-      mockedExternalGitRefs,
+      cwd,
+      [mockedExternalGitRefs],
       mockedListener
     )
 
@@ -275,7 +191,11 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     const mockedListener = jest.fn()
 
-    createNecessaryFileSystemWatcher(mockedExternalGitRefs, mockedListener)
+    createNecessaryFileSystemWatcher(
+      cwd,
+      [mockedExternalGitRefs],
+      mockedListener
+    )
 
     expect(mockedWatch).toBeCalledTimes(1)
     expect(mockedCreateFileSystemWatcher).not.toBeCalled()
@@ -292,9 +212,13 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     const mockedListener = jest.fn()
 
-    const mockedInternalGitRefs = join(mockedSecondDir, '.git', 'refs', '**')
+    const mockedInternalGitRefs = join('.git', 'refs')
 
-    createNecessaryFileSystemWatcher(mockedInternalGitRefs, mockedListener)
+    createNecessaryFileSystemWatcher(
+      mockedSecondDir,
+      [mockedInternalGitRefs],
+      mockedListener
+    )
 
     expect(mockedWatch).not.toBeCalled()
     expect(mockedCreateFileSystemWatcher).toBeCalledTimes(1)
@@ -308,11 +232,16 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     const mockedListener = jest.fn()
 
-    const mockedInternalGitRefs = join(mockedRoot, '.git', 'refs', '**')
+    const mockedInternalGitRefs = join('.git', 'refs')
 
-    createNecessaryFileSystemWatcher(mockedInternalGitRefs, mockedListener)
+    createNecessaryFileSystemWatcher(
+      mockedRoot,
+      [mockedInternalGitRefs],
+      mockedListener
+    )
 
     expect(mockedWatch).not.toBeCalled()
     expect(mockedCreateFileSystemWatcher).toBeCalledTimes(1)
+    expect(mockedCreateFileSystemWatcher).toBeCalledWith(join(mockedRoot, '**'))
   })
 })

@@ -101,11 +101,11 @@ export class CliExecutor extends Cli {
   }
 
   public pull(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.PULL, ...args, Flag.RECURSIVE)
+    return this.executeProcess(cwd, Command.PULL, ...args)
   }
 
   public push(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.PUSH, ...args, Flag.RECURSIVE)
+    return this.executeProcess(cwd, Command.PUSH, ...args)
   }
 
   public remove(cwd: string, ...args: Args) {

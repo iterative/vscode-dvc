@@ -1,11 +1,10 @@
+import { join } from 'path'
 import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
 import { isDirectory } from '.'
 import { isInWorkspace } from './workspace'
-import { Repository } from '../repository'
-import { EXPERIMENTS_GIT_REFS } from '../experiments/data/constants'
 
 export const fireWatcher = (path: string): Promise<void> => {
   const now = new Date().getTime() / 1000
@@ -13,25 +12,6 @@ export const fireWatcher = (path: string): Promise<void> => {
 }
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
-
-const isExcluded = (dvcRoot: string, path: string) =>
-  !path ||
-  !(
-    path.includes(dvcRoot) ||
-    (path.includes('.git') && (path.includes('HEAD') || path.includes('index')))
-  ) ||
-  path.includes(EXPERIMENTS_GIT_REFS) ||
-  ignoredDotDirectories.test(path)
-
-export const getRepositoryListener =
-  (repository: Repository, dvcRoot: string): ((path: string) => void) =>
-  (path: string) => {
-    if (isExcluded(dvcRoot, path)) {
-      return
-    }
-
-    repository.update(path)
-  }
 
 export const createFileSystemWatcher = (
   glob: string,
@@ -50,22 +30,30 @@ export const createFileSystemWatcher = (
   return fileSystemWatcher
 }
 
-const createExternalToWorkspaceWatcher = (
-  glob: string,
+const createExpensiveWatcher = (
+  paths: string[],
   listener: (path: string) => void
 ): Disposable => {
-  const fsWatcher = watch(glob, { ignoreInitial: true })
+  const fsWatcher = watch(paths, {
+    ignoreInitial: true,
+    ignored: ignoredDotDirectories
+  })
+
   fsWatcher.on('all', (_, path) => listener(path))
   return { dispose: () => fsWatcher.close() }
 }
 
 export const createNecessaryFileSystemWatcher = (
-  glob: string,
+  cwd: string,
+  paths: string[],
   listener: (glob: string) => void
 ): Disposable => {
-  const canUseNative = isInWorkspace(glob)
+  const canUseNative = isInWorkspace(cwd)
+
+  const globForInexpensive = join(cwd, '**')
+  const explicitPaths = paths.map(path => join(cwd, path))
 
   return canUseNative
-    ? createFileSystemWatcher(glob, listener)
-    : createExternalToWorkspaceWatcher(glob, listener)
+    ? createFileSystemWatcher(globForInexpensive, listener)
+    : createExpensiveWatcher(explicitPaths, listener)
 }

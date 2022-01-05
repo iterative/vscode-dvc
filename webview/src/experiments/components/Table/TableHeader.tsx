@@ -43,8 +43,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       countUpperLevels(orderedColumns, column, columns, 0)) ||
     0
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
-  const isParam = column.id.includes('params')
-  const isMetric = column.id.includes('metric')
+  const isParam = column.group === 'params'
+  const isMetric = column.group === 'metrics'
   const isParamOrMetric = isParam || isMetric
   const columnSort = sorts.find(sort => sort.path === column.id)
 

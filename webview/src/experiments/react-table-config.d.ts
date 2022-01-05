@@ -36,7 +36,9 @@ declare module 'react-table' {
 
   export interface ColumnInterface<
     D extends Record<string, unknown> = Record<string, unknown>
-  > extends UseResizeColumnsColumnOptions<D> {}
+  > extends UseResizeColumnsColumnOptions<D> {
+    group?: string
+  }
 
   export interface ColumnInstance<
     D extends Record<string, unknown> = Record<string, unknown>

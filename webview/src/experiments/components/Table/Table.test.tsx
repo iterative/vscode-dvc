@@ -172,6 +172,7 @@ describe('Table', () => {
               },
               {
                 ...headerBasicProps,
+                group: 'metrics',
                 id: 'metrics:logs.json:step',
                 render: () => 'step'
               }
