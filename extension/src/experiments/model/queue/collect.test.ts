@@ -1,39 +1,39 @@
 import { collectFlatExperimentParams } from './collect'
 import rowsFixture from '../../../test/fixtures/expShow/rows'
-import { joinMetricOrParamFilePath } from '../../metricsAndParams/paths'
+import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { join } from '../../../test/util/path'
 
 describe('collectFlatExperimentParams', () => {
   it('should flatten the params into an array', () => {
     const params = collectFlatExperimentParams(rowsFixture[0].params)
     expect(params).toEqual([
-      { path: joinMetricOrParamFilePath('params.yaml', 'epochs'), value: 2 },
+      { path: joinMetricOrParamPath('params.yaml', 'epochs'), value: 2 },
       {
-        path: joinMetricOrParamFilePath('params.yaml', 'learning_rate'),
+        path: joinMetricOrParamPath('params.yaml', 'learning_rate'),
         value: 2.2e-7
       },
       {
-        path: joinMetricOrParamFilePath('params.yaml', 'dvc_logs_dir'),
+        path: joinMetricOrParamPath('params.yaml', 'dvc_logs_dir'),
         value: 'dvc_logs'
       },
       {
-        path: joinMetricOrParamFilePath('params.yaml', 'log_file'),
+        path: joinMetricOrParamPath('params.yaml', 'log_file'),
         value: 'logs.csv'
       },
       {
-        path: joinMetricOrParamFilePath('params.yaml', 'dropout'),
+        path: joinMetricOrParamPath('params.yaml', 'dropout'),
         value: 0.122
       },
       {
-        path: joinMetricOrParamFilePath('params.yaml', 'process.threshold'),
+        path: joinMetricOrParamPath('params.yaml', 'process', 'threshold'),
         value: 0.86
       },
       {
-        path: joinMetricOrParamFilePath('params.yaml', 'process.test_arg'),
+        path: joinMetricOrParamPath('params.yaml', 'process', 'test_arg'),
         value: 'string'
       },
       {
-        path: joinMetricOrParamFilePath(join('nested', 'params.yaml'), 'test'),
+        path: joinMetricOrParamPath(join('nested', 'params.yaml'), 'test'),
         value: true
       }
     ])

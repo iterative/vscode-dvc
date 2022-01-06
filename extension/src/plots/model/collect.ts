@@ -7,7 +7,10 @@ import {
   ValueTree
 } from '../../cli/reader'
 import { reduceMetricsAndParams } from '../../experiments/metricsAndParams/reduce'
-import { joinMetricOrParamFilePath } from '../../experiments/metricsAndParams/paths'
+import {
+  decodeMetricOrParam,
+  joinMetricOrParamPath
+} from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
 
@@ -37,7 +40,7 @@ const collectFromMetricsFile = (
     return
   }
 
-  const path = joinMetricOrParamFilePath(...pathArray)
+  const path = joinMetricOrParamPath(...pathArray)
 
   addToMapArray(acc, path, { group: displayName, iteration, y: value })
 }
@@ -136,7 +139,7 @@ export const collectLivePlotsData = (
   const plotsData: LivePlotData[] = []
 
   acc.forEach((value, key) => {
-    plotsData.push({ title: key, values: value })
+    plotsData.push({ title: decodeMetricOrParam(key), values: value })
   })
 
   return plotsData
