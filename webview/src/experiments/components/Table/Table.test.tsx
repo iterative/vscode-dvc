@@ -266,7 +266,7 @@ describe('Table', () => {
       renderTableWithSortableHeaders()
 
       const column = screen.getByText('step')
-      fireEvent.keyDown(column)
+      fireEvent.keyDown(column, { key: 'Enter' })
 
       expect(mockedPostMessage).toBeCalledWith({
         payload: { descending: true, path: 'metrics:logs.json:step' },
@@ -294,7 +294,7 @@ describe('Table', () => {
       })
 
       const column = screen.getByText('step')
-      fireEvent.keyDown(column)
+      fireEvent.keyDown(column, { key: 'Enter' })
 
       expect(mockedPostMessage).toBeCalledWith({
         payload: { path: 'metrics:logs.json:step' },
@@ -308,8 +308,8 @@ describe('Table', () => {
       const experiment = screen.getByText('Experiment')
       const timestamp = screen.getByText('Timestamp')
 
-      fireEvent.keyDown(experiment)
-      fireEvent.keyDown(timestamp)
+      fireEvent.keyDown(experiment, { key: 'Enter' })
+      fireEvent.keyDown(timestamp, { key: 'Enter' })
 
       expect(mockedPostMessage).not.toBeCalledWith({
         payload: { descending: true, path: 'experiment' },

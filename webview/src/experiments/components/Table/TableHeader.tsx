@@ -121,8 +121,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             })}
             role="button"
             onClick={sortTable}
-            onKeyDown={sortTable}
-            tabIndex={index}
+            onKeyDown={event => event.key === 'Enter' && sortTable()}
+            tabIndex={0}
           >
             {column.render('Header')}
           </div>
