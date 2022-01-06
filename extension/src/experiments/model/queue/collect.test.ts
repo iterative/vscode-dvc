@@ -25,11 +25,11 @@ describe('collectFlatExperimentParams', () => {
         value: 0.122
       },
       {
-        path: joinMetricOrParamFilePath('params.yaml', 'process.threshold'),
+        path: joinMetricOrParamFilePath('params.yaml', 'process', 'threshold'),
         value: 0.86
       },
       {
-        path: joinMetricOrParamFilePath('params.yaml', 'process.test_arg'),
+        path: joinMetricOrParamFilePath('params.yaml', 'process', 'test_arg'),
         value: 'string'
       },
       {
