@@ -5,13 +5,13 @@ import styles from './styles.module.scss'
 import { AllIcons, Icon } from '../../../shared/components/icon/Icon'
 import { StaticPlotComponent } from '../StaticPlot'
 
-interface ComparisonTableProps {
+export interface ComparisonTableRowProps {
   path: string
   plots: StaticPlot[]
   nbColumns: number
 }
 
-export const ComparisonTableRow: React.FC<ComparisonTableProps> = ({
+export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   path,
   plots,
   nbColumns

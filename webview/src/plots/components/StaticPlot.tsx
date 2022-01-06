@@ -27,7 +27,7 @@ export const StaticPlotComponent: React.FC<StaticPlotProps> = ({
         renderer="svg"
       />
     ) : (
-      <img src={plot.url} alt={`Plot of ${path}`} />
+      <img src={plot.url} alt={`Plot of ${path} (${plot.revisions?.[0]})`} />
     )}
   </>
 )
