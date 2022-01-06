@@ -9,7 +9,7 @@ import {
 import { reduceMetricsAndParams } from '../../experiments/metricsAndParams/reduce'
 import {
   decodeMetricOrParam,
-  joinMetricOrParamPath
+  joinMetricOrParamFilePath
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
@@ -40,7 +40,7 @@ const collectFromMetricsFile = (
     return
   }
 
-  const path = joinMetricOrParamPath(...pathArray)
+  const path = joinMetricOrParamFilePath(...pathArray)
 
   addToMapArray(acc, path, { group: displayName, iteration, y: value })
 }

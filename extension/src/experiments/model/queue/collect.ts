@@ -1,5 +1,5 @@
 import { Value, ValueTree } from '../../../cli/reader'
-import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
+import { joinMetricOrParamFilePath } from '../../metricsAndParams/paths'
 import { MetricsOrParams } from '../../webview/contract'
 
 export type Param = {
@@ -22,7 +22,7 @@ const collectFromParamsFile = (
     return
   }
 
-  const path = joinMetricOrParamPath(...pathArray)
+  const path = joinMetricOrParamFilePath(...pathArray)
 
   acc.push({ path, value })
 }
