@@ -49,6 +49,10 @@ $bg-color: var(--vscode-editor-background);
   color: $fg-color;
   text-align: left;
   display: flex;
+
+  svg {
+    fill: $fg-color;
+  }
 }
 
 .cell {

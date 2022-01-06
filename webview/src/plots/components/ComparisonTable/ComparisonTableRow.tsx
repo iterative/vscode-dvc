@@ -27,7 +27,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           <button className={styles.rowToggler} onClick={toggleIsShownState}>
             <Icon
               icon={isShown ? AllIcons.CHEVRON_DOWN : AllIcons.CHEVRON_RIGHT}
-              color={'#fff'}
             />
             {path}
           </button>
