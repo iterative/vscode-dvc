@@ -59,11 +59,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   }
 
   const sortTable = () => {
-    if (!isParamOrMetric) {
-      return
-    }
-
-    if (column.columns) {
+    if (column.columns || !isParamOrMetric) {
       return
     }
 
