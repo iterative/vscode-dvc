@@ -5,7 +5,6 @@ import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 import {
   DragDropContext,
-  DragStart,
   DragUpdate,
   Droppable,
   DropResult,
@@ -19,24 +18,18 @@ export const MergedHeaderGroup: React.FC<{
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
   orderedColumns: MetricOrParam[]
-  onDragStart: (initial: DragStart, provided: ResponderProvided) => void
-  onDragUpdate: (initial: DragUpdate, provided: ResponderProvided) => void
+  onDragUpdate?: (initial: DragUpdate, provided: ResponderProvided) => void
   onDragEnd: (initial: DropResult, provided: ResponderProvided) => void
 }> = ({
   headerGroup,
   sorts,
   columns,
   orderedColumns,
-  onDragStart,
   onDragUpdate,
   onDragEnd
 }) => {
   return (
-    <DragDropContext
-      onDragStart={onDragStart}
-      onDragUpdate={onDragUpdate}
-      onDragEnd={onDragEnd}
-    >
+    <DragDropContext onDragUpdate={onDragUpdate} onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable" direction="horizontal">
         {provided => (
           <div

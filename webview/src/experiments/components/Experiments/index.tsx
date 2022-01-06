@@ -127,9 +127,12 @@ export const ExperimentsTable: React.FC<{
         ...initiallyUndefinedTableData
       }
 
-      const initialState: Partial<TableState<Experiment>> = {
-        columnOrder: tableData.columnOrder
-      }
+      const initialState = {
+        columnOrder: tableData.columnOrder,
+        columnResizing: {
+          columnWidths: tableData.columnWidths
+        }
+      } as Partial<TableState<Experiment>>
 
       const defaultColumn: Partial<Column<Experiment>> = {
         minWidth: DEFAULT_COLUMN_WIDTH
@@ -139,7 +142,7 @@ export const ExperimentsTable: React.FC<{
       return [tableData, columns, defaultColumn, initialState]
     }, [initiallyUndefinedTableData])
 
-  const { rows: data, columnWidths } = tableData
+  const { rows: data } = tableData
 
   const instance = useTable<Experiment>(
     {
@@ -170,21 +173,12 @@ export const ExperimentsTable: React.FC<{
           expandedRowCount
         })
       })
-      hooks.allColumns.push(allColumns => {
-        if (columnWidths === undefined) {
-          return allColumns
+      hooks.allColumns.push((allColumns, { instance: { state } }) => {
+        const { columnOrder } = state
+        if (!columnOrder || columnOrder.length === 0) {
+          state.columnOrder = allColumns.map(col => col.id)
         }
-        return allColumns.map(column => {
-          const { id } = column
-          const width = columnWidths[id]
-          if (width !== undefined) {
-            return {
-              ...column,
-              width
-            }
-          }
-          return column
-        })
+        return allColumns
       })
     }
   )

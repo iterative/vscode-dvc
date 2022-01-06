@@ -483,8 +483,22 @@ describe('collectChanges', () => {
     }
 
     expect(collectChanges(data)).toEqual([
-      'params:params.yaml:dropout.lower.p.0.05',
-      'params:params.yaml:dropout.upper.p.0.025'
+      joinMetricOrParamPath(
+        'params',
+        'params.yaml',
+        'dropout',
+        'lower',
+        'p',
+        '0.05'
+      ),
+      joinMetricOrParamPath(
+        'params',
+        'params.yaml',
+        'dropout',
+        'upper',
+        'p',
+        '0.025'
+      )
     ])
   })
 })
