@@ -172,6 +172,15 @@ describe('Table', () => {
               },
               {
                 ...headerBasicProps,
+                columns: [{}],
+                depth: 0,
+                group: 'metrics',
+                id: 'metrics:logs.json',
+                render: () => 'logs.json'
+              },
+              {
+                ...headerBasicProps,
+                depth: 1,
                 group: 'metrics',
                 id: 'metrics:logs.json:step',
                 render: () => 'step'
@@ -318,6 +327,20 @@ describe('Table', () => {
 
       expect(mockedPostMessage).not.toBeCalledWith({
         payload: { descending: true, path: 'timestamp' },
+        type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
+      })
+    })
+
+    it('should not request to sort when clicking a parent column', () => {
+      renderTableWithSortableHeaders({
+        sorts: []
+      })
+
+      const column = screen.getByText('logs.json')
+      fireEvent.keyDown(column, { key: 'Enter' })
+
+      expect(mockedPostMessage).not.toBeCalledWith({
+        payload: { descending: true, path: 'metrics:logs.json' },
         type: MessageFromWebviewType.COLUMN_SORT_REQUESTED
       })
     })
