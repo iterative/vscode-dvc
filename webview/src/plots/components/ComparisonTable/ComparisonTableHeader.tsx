@@ -3,7 +3,7 @@ import React from 'react'
 import styles from './styles.module.scss'
 import { Pin } from '../../../shared/components/icons'
 
-interface ComparisonTableHeaderProps {
+export interface ComparisonTableHeaderProps {
   color: string
   onClicked: () => void
   isPinned?: boolean

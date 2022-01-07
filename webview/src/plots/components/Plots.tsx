@@ -1,6 +1,5 @@
 import React, { Dispatch, useState, useEffect } from 'react'
 import {
-  isVegaPlot,
   LivePlotsColors,
   LivePlotData,
   PlotsOutput,
@@ -9,11 +8,12 @@ import {
   LivePlotValues
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { VegaLite, VisualizationSpec } from 'react-vega'
+import { VegaLite } from 'react-vega'
 import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
 import styles from './styles.module.scss'
+import { StaticPlotComponent } from './StaticPlot'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
@@ -69,22 +69,7 @@ const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
     {Object.entries(plots).map(([path, plots]) =>
       plots.map((plot, i) => (
         <div className={styles.plot} key={`plot-${path}-${i}`}>
-          {isVegaPlot(plot) ? (
-            <VegaLite
-              actions={false}
-              config={config}
-              spec={
-                {
-                  ...plot.content,
-                  height: 'container',
-                  width: 'container'
-                } as VisualizationSpec
-              }
-              renderer="svg"
-            />
-          ) : (
-            <img src={plot.url} alt={`Plot of ${path}`} />
-          )}
+          <StaticPlotComponent plot={plot} path={path} />
         </div>
       ))
     )}
