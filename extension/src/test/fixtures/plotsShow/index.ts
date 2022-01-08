@@ -186,10 +186,7 @@ const basicVega = {
   ]
 }
 
-const getImageData = (
-  baseUrl: string,
-  joinFunc: (...args: string[]) => string
-) => ({
+export const getImageData = (baseUrl: string, joinFunc = join) => ({
   'plots/acc.png': [
     {
       type: PlotsType.IMAGE,
@@ -218,7 +215,7 @@ const getImageData = (
 
 export const getSmallMemoryFootprintFixture = (
   baseUrl: string,
-  joinFunc = join
+  joinFunc?: (...args: string[]) => string
 ) => ({
   plots: {
     ...getImageData(baseUrl, joinFunc),
@@ -228,13 +225,19 @@ export const getSmallMemoryFootprintFixture = (
   size: PlotSize.REGULAR
 })
 
-export const getFixture = (baseUrl: string, joinFunc = join) => ({
+export const getFixture = (
+  baseUrl: string,
+  joinFunc?: (...args: string[]) => string
+) => ({
   ...getImageData(baseUrl, joinFunc),
   ...basicVega,
   ...require('./confusionMatrix').default
 })
 
-export const getWebviewMessageFixture = (baseUrl: string, joinFunc = join) => ({
+export const getWebviewMessageFixture = (
+  baseUrl: string,
+  joinFunc?: (...args: string[]) => string
+) => ({
   plots: getFixture(baseUrl, joinFunc),
   sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
   size: PlotSize.REGULAR
