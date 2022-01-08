@@ -33,19 +33,19 @@ describe('MetricsAndParamsModel', () => {
       expect(model.getSelected()).toEqual([
         {
           group: 'params',
+          hasChildren: true,
+          name: 'params.yaml',
+          parentPath: 'params',
+          path: paramsDotYamlPath
+        },
+        {
+          group: 'params',
           hasChildren: false,
           maxStringLength: 4,
           name: 'testparam',
           parentPath: paramsDotYamlPath,
           path: testParamPath,
           types: ['boolean']
-        },
-        {
-          group: 'params',
-          hasChildren: true,
-          name: 'params.yaml',
-          parentPath: 'params',
-          path: paramsDotYamlPath
         }
       ])
     })

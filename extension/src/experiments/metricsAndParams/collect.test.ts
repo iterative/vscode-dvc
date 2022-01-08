@@ -231,7 +231,12 @@ describe('collectMetricsAndParams', () => {
   const param = numericMetricsAndParams.filter(
     metricOrParam => metricOrParam.group === 'params'
   ) as MetricOrParam[]
-  const [paramWithNumbers, paramWithoutNumbers] = param
+  const paramWithNumbers = param.find(
+    p => p.name === 'withNumbers'
+  ) as MetricOrParam
+  const paramWithoutNumbers = param.find(
+    p => p.name === 'withoutNumbers'
+  ) as MetricOrParam
 
   it('should not add a maxNumber or minNumber on a param with no numbers', () => {
     expect(paramWithoutNumbers.minNumber).toBeUndefined()
@@ -310,6 +315,68 @@ describe('collectMetricsAndParams', () => {
     ])
   })
 
+  it('should create concatenated columns for nesting deeper than 5', () => {
+    const metricsAndParams = collectMetricsAndParams({
+      workspace: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: {
+                  one: {
+                    two: {
+                      three: { four: { five: { six: { seven: 'Lucky!' } } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    expect(metricsAndParams).toEqual([
+      {
+        group: 'params',
+        hasChildren: true,
+        name: 'params.yaml',
+        parentPath: 'params',
+        path: 'params:params.yaml'
+      },
+      {
+        group: 'params',
+        hasChildren: true,
+        name: 'one.two.three.four',
+        parentPath: 'params:params.yaml',
+        path: 'params:params.yaml:one%2Etwo%2Ethree%2Efour'
+      },
+      {
+        group: 'params',
+        hasChildren: true,
+        name: 'five',
+        parentPath: 'params:params.yaml:one%2Etwo%2Ethree%2Efour',
+        path: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five'
+      },
+      {
+        group: 'params',
+        hasChildren: true,
+        name: 'six',
+        parentPath: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five',
+        path: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five.six'
+      },
+      {
+        group: 'params',
+        hasChildren: false,
+        maxStringLength: 6,
+        name: 'seven',
+        parentPath: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five.six',
+        path: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five.six.seven',
+        types: ['string']
+      }
+    ])
+  })
+
   it('should not report types for params and metrics without primitives or children for params and metrics without objects', () => {
     const metricsAndParams = collectMetricsAndParams({
       workspace: {
@@ -365,22 +432,22 @@ describe('collectMetricsAndParams', () => {
     expect(
       collectMetricsAndParams(expShowFixture).map(({ path }) => path)
     ).toEqual([
+      joinMetricOrParamPath('metrics', 'summary.json'),
       joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
       joinMetricOrParamPath('metrics', 'summary.json', 'accuracy'),
       joinMetricOrParamPath('metrics', 'summary.json', 'val_loss'),
       joinMetricOrParamPath('metrics', 'summary.json', 'val_accuracy'),
-      joinMetricOrParamPath('metrics', 'summary.json'),
+      joinMetricOrParamPath('params', 'params.yaml'),
       joinMetricOrParamPath('params', 'params.yaml', 'epochs'),
       joinMetricOrParamPath('params', 'params.yaml', 'learning_rate'),
       joinMetricOrParamPath('params', 'params.yaml', 'dvc_logs_dir'),
       joinMetricOrParamPath('params', 'params.yaml', 'log_file'),
       joinMetricOrParamPath('params', 'params.yaml', 'dropout'),
+      joinMetricOrParamPath('params', 'params.yaml', 'process'),
       joinMetricOrParamPath('params', 'params.yaml', 'process', 'threshold'),
       joinMetricOrParamPath('params', 'params.yaml', 'process', 'test_arg'),
-      joinMetricOrParamPath('params', 'params.yaml', 'process'),
-      joinMetricOrParamPath('params', 'params.yaml'),
-      joinMetricOrParamPath('params', join('nested', 'params.yaml'), 'test'),
-      joinMetricOrParamPath('params', join('nested', 'params.yaml'))
+      joinMetricOrParamPath('params', join('nested', 'params.yaml')),
+      joinMetricOrParamPath('params', join('nested', 'params.yaml'), 'test')
     ])
   })
 })

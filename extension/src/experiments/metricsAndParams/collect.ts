@@ -1,257 +1,150 @@
 import get from 'lodash/get'
-import { reduceMetricsAndParams } from './reduce'
+import { ValueWalkMeta, walkRepo } from './walk'
 import { joinMetricOrParamPath } from './paths'
-import {
-  MetricOrParam,
-  MetricOrParamAggregateData,
-  MetricsOrParams
-} from '../webview/contract'
+import { MetricOrParam } from '../webview/contract'
 import {
   ExperimentFields,
   ExperimentFieldsOrError,
-  ExperimentsBranchOutput,
   ExperimentsOutput,
   Value,
   ValueTree
 } from '../../cli/reader'
 
-interface PartialDescriptor extends MetricOrParamAggregateData {
-  types: Set<string>
-  hasChildren: boolean
-  group: string
-  path: string
-  parentPath: string
-}
-
-type PartialMap = Map<string, PartialDescriptor>
-
-type Accumulator = {
-  metricsMap: PartialMap
-  paramsMap: PartialMap
-}
-
-type MetricsAndParams = {
-  metrics: MetricsOrParams | undefined
-  params: MetricsOrParams | undefined
-}
-
-const getValueType = (value: Value | ValueTree) => {
+const getValueType = (value: Value) => {
   if (value === null) {
     return 'null'
   }
   return typeof value
 }
 
-const getEntryOrDefault = (
-  originalMap: PartialMap,
-  propertyKey: string,
-  ancestors: string[]
-) =>
-  originalMap.get(propertyKey) || {
-    group: ancestors[0],
-    hasChildren: false,
-    parentPath: joinMetricOrParamPath(...ancestors),
-    path: joinMetricOrParamPath(...ancestors, propertyKey),
-    types: new Set<string>()
+const concatenatePathSegments = (path: string[], limit = 5) => {
+  const convertedLimit = limit - 3
+  if (path.length > convertedLimit) {
+    const cutoff = path.length - convertedLimit
+    const concatenatedPath = path.slice(0, cutoff).join('.')
+    return [concatenatedPath, ...path.slice(cutoff)]
   }
+  return path
+}
 
-const mergeNumber = (
-  descriptor: PartialDescriptor,
-  newNumber: number
-): void => {
-  const { maxNumber, minNumber } = descriptor
-  if (maxNumber === undefined || maxNumber < newNumber) {
-    descriptor.maxNumber = newNumber
-  }
-  if (minNumber === undefined || minNumber > newNumber) {
-    descriptor.minNumber = newNumber
+const setStringLength = (column: MetricOrParam, stringLength: number) => {
+  if (!column.maxStringLength || column.maxStringLength < stringLength) {
+    column.maxStringLength = stringLength
   }
 }
 
-const mergePrimitiveValue = (
-  descriptor: PartialDescriptor,
-  newValue: Value,
-  newValueType: string
-): PartialDescriptor => {
-  const { maxStringLength } = descriptor
-
-  const stringifiedAddition = String(newValue)
-  const additionStringLength = stringifiedAddition.length
-  if (maxStringLength === undefined || maxStringLength < additionStringLength) {
-    descriptor.maxStringLength = additionStringLength
+const mergeNumberIntoColumn = (column: MetricOrParam, value: number) => {
+  const { maxNumber, minNumber } = column
+  if (maxNumber === undefined || maxNumber < value) {
+    column.maxNumber = value
   }
-
-  if (newValueType === 'number') {
-    mergeNumber(descriptor, newValue as number)
-  }
-
-  return descriptor as PartialDescriptor
-}
-
-const mergeMap = (
-  originalMap: PartialMap,
-  valueTree: ValueTree,
-  ...ancestors: string[]
-): PartialMap => {
-  const sampleEntries = Object.entries(valueTree)
-  for (const [propertyKey, propertyValue] of sampleEntries) {
-    originalMap.set(
-      propertyKey,
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      mergeOrCreateDescriptor(
-        originalMap,
-        propertyKey,
-        propertyValue,
-        ...ancestors
-      )
-    )
-  }
-  return originalMap
-}
-const mergeOrCreateDescriptor = (
-  originalMap: PartialMap,
-  propertyKey: string,
-  newValue: Value | ValueTree,
-  ...ancestors: string[]
-): PartialDescriptor => {
-  const newValueType = getValueType(newValue)
-
-  const descriptor = getEntryOrDefault(originalMap, propertyKey, ancestors)
-
-  if (newValueType === 'object') {
-    mergeMap(originalMap, newValue as ValueTree, ...ancestors, propertyKey)
-    descriptor.hasChildren = true
-    return descriptor as PartialDescriptor
-  } else {
-    descriptor.types.add(newValueType)
-    return mergePrimitiveValue(descriptor, newValue as Value, newValueType)
+  if (minNumber === undefined || minNumber > value) {
+    column.minNumber = value
   }
 }
 
-const mergeMetricsAndParams = (
-  acc: Accumulator,
-  metricsAndParams: MetricsAndParams
+const mergeValueIntoColumn = (
+  column: MetricOrParam,
+  valueType: string,
+  value: Value
 ) => {
-  const { paramsMap, metricsMap } = acc
-  const { params, metrics } = metricsAndParams
-  if (params) {
-    mergeMap(paramsMap, params, 'params')
+  if (!column.types) {
+    column.types = [valueType]
+  } else if (column.types.findIndex(x => x === valueType) < 0) {
+    column.types.push(valueType)
   }
-  if (metrics) {
-    mergeMap(metricsMap, metrics, 'metrics')
+
+  setStringLength(column, String(value).length)
+
+  if (valueType === 'number') {
+    mergeNumberIntoColumn(column, value as number)
   }
-}
-
-const extractExperimentFields = (
-  experimentFieldsOrError: ExperimentFieldsOrError
-): MetricsAndParams | undefined => {
-  const experimentFields = experimentFieldsOrError.data
-  if (!experimentFields) {
-    return
-  }
-  return reduceMetricsAndParams(experimentFields)
-}
-
-const collectFromExperimentsObject = (
-  acc: Accumulator,
-  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
-) => {
-  for (const experiment of Object.values(experimentsObject)) {
-    const experimentFields = extractExperimentFields(experiment)
-
-    if (experimentFields) {
-      mergeMetricsAndParams(acc, experimentFields)
-    }
-  }
-}
-
-const collectFromBranchesObject = (
-  acc: Accumulator,
-  branchesObject: { [name: string]: ExperimentsBranchOutput }
-) => {
-  for (const { baseline, ...experiments } of Object.values(branchesObject)) {
-    const branch = extractExperimentFields(baseline)
-
-    if (branch) {
-      mergeMetricsAndParams(acc, branch)
-      collectFromExperimentsObject(acc, experiments)
-    }
-  }
-}
-
-const createEntry = (
-  name: string,
-  descriptor: PartialDescriptor
-): MetricOrParam => {
-  const { group, path, hasChildren, parentPath } = descriptor
-
-  return {
-    group,
-    hasChildren,
-    name,
-    parentPath,
-    path
-  }
-}
-
-const addMetadata = (
-  metricOrParam: MetricOrParam,
-  descriptor: PartialDescriptor
-): MetricOrParam => {
-  const { types, maxStringLength, minNumber, maxNumber } = descriptor
-
-  if (maxStringLength) {
-    metricOrParam.maxStringLength = maxStringLength
-  }
-  if (minNumber) {
-    metricOrParam.minNumber = minNumber
-    metricOrParam.maxNumber = maxNumber
-  }
-  if (types.size) {
-    metricOrParam.types = [...types]
-  }
-  return metricOrParam
-}
-
-const transformMap = ([name, descriptor]: [
-  string,
-  PartialDescriptor
-]): MetricOrParam => {
-  const metricOrParam = createEntry(name, descriptor)
-  return addMetadata(metricOrParam, descriptor)
-}
-
-const transformAndCollect = (
-  metricsOrParamsMap: PartialMap
-): MetricOrParam[] => {
-  const metricsAndParams = []
-  for (const entry of metricsOrParamsMap) {
-    metricsAndParams.push(transformMap(entry))
-  }
-  return metricsAndParams
 }
 
 export const collectMetricsAndParams = (
   data: ExperimentsOutput
 ): MetricOrParam[] => {
-  const { workspace, ...branchesObject } = data
-  const workspaceBaseline = extractExperimentFields(workspace.baseline)
+  const collectedColumns: Record<string, MetricOrParam> = {}
 
-  const acc = {
-    metricsMap: new Map(),
-    paramsMap: new Map()
+  const mergeParentColumnByPath = (path: string[], group: string) => {
+    const name = path[path.length - 1]
+    const columnPath = joinMetricOrParamPath(group, ...path)
+    const parentPath = joinMetricOrParamPath(
+      group,
+      ...path.slice(0, path.length - 1)
+    )
+    if (!collectedColumns[columnPath]) {
+      collectedColumns[columnPath] = {
+        group,
+        hasChildren: true,
+        name,
+        parentPath,
+        path: columnPath
+      }
+    } else {
+      collectedColumns[columnPath].hasChildren = true
+    }
   }
 
-  if (workspaceBaseline) {
-    mergeMetricsAndParams(acc, workspaceBaseline)
+  const buildValueColumn = (
+    name: string,
+    value: Value,
+    { group, file }: ValueWalkMeta,
+    ancestors: string[],
+    path: string,
+    valueType: string
+  ) => {
+    const parentPath = joinMetricOrParamPath(group, file, ...ancestors)
+    const newColumn: MetricOrParam = {
+      group,
+      hasChildren: false,
+      maxStringLength: String(value).length,
+      name,
+      parentPath,
+      path,
+      types: [valueType]
+    }
+
+    if (valueType === 'number') {
+      newColumn.maxNumber = value as number
+      newColumn.minNumber = value as number
+    }
+
+    return newColumn
   }
 
-  collectFromBranchesObject(acc, branchesObject)
+  const mergeValueColumn = (
+    name: string,
+    value: Value,
+    meta: ValueWalkMeta,
+    ancestors: string[]
+  ) => {
+    const { group, file } = meta
+    const path = joinMetricOrParamPath(group, file, ...ancestors, name)
+    const valueType = getValueType(value)
+    if (!collectedColumns[path]) {
+      collectedColumns[path] = buildValueColumn(
+        name,
+        value,
+        meta,
+        ancestors,
+        path,
+        valueType
+      )
+    } else {
+      mergeValueIntoColumn(collectedColumns[path], valueType, value)
+    }
+  }
 
-  return [
-    ...transformAndCollect(acc.metricsMap),
-    ...transformAndCollect(acc.paramsMap)
-  ]
+  walkRepo(data, (key, value, meta, ancestors) => {
+    const concatenatedAncestors = concatenatePathSegments(ancestors)
+    const fullParentPath = [meta.file, ...concatenatedAncestors]
+    for (let i = 1; i <= fullParentPath.length; i++) {
+      mergeParentColumnByPath(fullParentPath.slice(0, i), meta.group)
+    }
+    mergeValueColumn(key, value, meta, concatenatedAncestors)
+  })
+  return Object.values(collectedColumns)
 }
 
 const collectChange = (
