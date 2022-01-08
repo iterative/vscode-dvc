@@ -336,44 +336,30 @@ describe('collectMetricsAndParams', () => {
       }
     })
 
-    expect(metricsAndParams).toEqual([
-      {
-        group: 'params',
-        hasChildren: true,
-        name: 'params.yaml',
-        parentPath: 'params',
-        path: 'params:params.yaml'
-      },
-      {
-        group: 'params',
-        hasChildren: true,
-        name: 'one.two.three.four',
-        parentPath: 'params:params.yaml',
-        path: 'params:params.yaml:one%2Etwo%2Ethree%2Efour'
-      },
-      {
-        group: 'params',
-        hasChildren: true,
-        name: 'five',
-        parentPath: 'params:params.yaml:one%2Etwo%2Ethree%2Efour',
-        path: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five'
-      },
-      {
-        group: 'params',
-        hasChildren: true,
-        name: 'six',
-        parentPath: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five',
-        path: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five.six'
-      },
-      {
-        group: 'params',
-        hasChildren: false,
-        maxStringLength: 6,
-        name: 'seven',
-        parentPath: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five.six',
-        path: 'params:params.yaml:one%2Etwo%2Ethree%2Efour.five.six.seven',
-        types: ['string']
-      }
+    expect(metricsAndParams.map(({ path }) => path)).toEqual([
+      joinMetricOrParamPath('params', 'params.yaml'),
+      joinMetricOrParamPath('params', 'params.yaml', 'one.two.three.four'),
+      joinMetricOrParamPath(
+        'params',
+        'params.yaml',
+        'one.two.three.four',
+        'five'
+      ),
+      joinMetricOrParamPath(
+        'params',
+        'params.yaml',
+        'one.two.three.four',
+        'five',
+        'six'
+      ),
+      joinMetricOrParamPath(
+        'params',
+        'params.yaml',
+        'one.two.three.four',
+        'five',
+        'six',
+        'seven'
+      )
     ])
   })
 

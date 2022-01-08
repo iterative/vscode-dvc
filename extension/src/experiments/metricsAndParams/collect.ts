@@ -91,10 +91,15 @@ export const collectMetricsAndParams = (
     value: Value,
     { group, file }: ValueWalkMeta,
     ancestors: string[],
+    concatenatedAncestors: string[],
     path: string,
     valueType: string
   ) => {
-    const parentPath = joinMetricOrParamPath(group, file, ...ancestors)
+    const parentPath = joinMetricOrParamPath(
+      group,
+      file,
+      ...concatenatedAncestors
+    )
     const newColumn: MetricOrParam = {
       group,
       hasChildren: false,
@@ -102,6 +107,7 @@ export const collectMetricsAndParams = (
       name,
       parentPath,
       path,
+      pathArray: [group, file, ...ancestors, name],
       types: [valueType]
     }
 
@@ -117,10 +123,16 @@ export const collectMetricsAndParams = (
     name: string,
     value: Value,
     meta: ValueWalkMeta,
-    ancestors: string[]
+    ancestors: string[],
+    concatenatedAncestors: string[]
   ) => {
     const { group, file } = meta
-    const path = joinMetricOrParamPath(group, file, ...ancestors, name)
+    const path = joinMetricOrParamPath(
+      group,
+      file,
+      ...concatenatedAncestors,
+      name
+    )
     const valueType = getValueType(value)
     if (!collectedColumns[path]) {
       collectedColumns[path] = buildValueColumn(
@@ -128,6 +140,7 @@ export const collectMetricsAndParams = (
         value,
         meta,
         ancestors,
+        concatenatedAncestors,
         path,
         valueType
       )
@@ -138,11 +151,11 @@ export const collectMetricsAndParams = (
 
   walkRepo(data, (key, value, meta, ancestors) => {
     const concatenatedAncestors = concatenatePathSegments(ancestors)
-    const fullParentPath = [meta.file, ...concatenatedAncestors]
-    for (let i = 1; i <= fullParentPath.length; i++) {
-      mergeParentColumnByPath(fullParentPath.slice(0, i), meta.group)
+    const fullConcatenatedPath = [meta.file, ...concatenatedAncestors]
+    for (let i = 1; i <= fullConcatenatedPath.length; i++) {
+      mergeParentColumnByPath(fullConcatenatedPath.slice(0, i), meta.group)
     }
-    mergeValueColumn(key, value, meta, concatenatedAncestors)
+    mergeValueColumn(key, value, meta, ancestors, concatenatedAncestors)
   })
   return Object.values(collectedColumns)
 }

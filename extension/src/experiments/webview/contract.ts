@@ -31,6 +31,7 @@ export interface MetricOrParam extends MetricOrParamAggregateData {
   path: string
   parentPath: string
   types?: string[]
+  pathArray?: string[]
 }
 
 export type TableData = {

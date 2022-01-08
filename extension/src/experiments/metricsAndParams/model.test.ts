@@ -45,6 +45,7 @@ describe('MetricsAndParamsModel', () => {
           name: 'testparam',
           parentPath: paramsDotYamlPath,
           path: testParamPath,
+          pathArray: ['params', 'params.yaml', 'testparam'],
           types: ['boolean']
         }
       ])
