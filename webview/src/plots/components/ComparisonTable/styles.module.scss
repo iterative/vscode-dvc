@@ -41,3 +41,35 @@ $bg-color: var(--vscode-editor-background);
   opacity: 1;
   transform: rotate(0deg);
 }
+
+.rowToggler {
+  border: none;
+  width: 100%;
+  background: none;
+  color: $fg-color;
+  text-align: left;
+  display: flex;
+
+  svg {
+    fill: $fg-color;
+  }
+}
+
+.cell {
+  max-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  transform: scaleY(1);
+  transform-origin: top;
+  transition: max-height 0.3s;
+}
+
+.cellHidden {
+  max-height: 0;
+}
+
+.cell img {
+  width: 100%;
+  height: auto;
+}
+
