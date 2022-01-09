@@ -53,6 +53,10 @@ const getExperimentDisplayName = (
   }
 }
 
+const ExperimentHeaderCell = () => (
+  <div className={styles.experimentHeaderCell}>Experiment</div>
+)
+
 const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
   [
     {
@@ -77,7 +81,7 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
           </div>
         )
       },
-      Header: 'Experiment',
+      Header: ExperimentHeaderCell,
       accessor: 'id',
       id: 'id',
       width: 150

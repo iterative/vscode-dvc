@@ -330,7 +330,7 @@ describe('Table', () => {
       const { getByText, makeGetDragEl } = renderExperimentsTable()
 
       let headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.innerHTML
+        header => header.textContent
       )
 
       expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
@@ -343,7 +343,7 @@ describe('Table', () => {
       })
 
       headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.innerHTML
+        header => header.textContent
       )
 
       expect(headers).toEqual([...defaultCols, 'A', 'C', 'B'])
@@ -356,7 +356,7 @@ describe('Table', () => {
       })
 
       headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.innerHTML
+        header => header.textContent
       )
 
       expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
@@ -366,7 +366,7 @@ describe('Table', () => {
       const { getByText, makeGetDragEl } = renderExperimentsTable()
 
       const headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.innerHTML
+        header => header.textContent
       )
 
       await makeDnd({
@@ -394,7 +394,7 @@ describe('Table', () => {
       renderExperimentsTable(tableDataWithCustomColOrder)
 
       const headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.innerHTML
+        header => header.textContent
       )
 
       expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])

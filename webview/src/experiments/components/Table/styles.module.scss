@@ -6,8 +6,11 @@ $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $border-color: grey;
 
-$edge-padding: 0.5rem;
 $nested-row-padding: 1.35rem;
+
+$edge-padding: 0.8rem;
+$cell-padding: 0.5rem;
+$workspace-row-edge-margin: $edge-padding - $cell-padding;
 
 // Dark Theme
 
@@ -259,8 +262,19 @@ $spinner-color-light: #000;
     &:last-child {
       font-size: 0.9rem;
 
-      .headerCell div {
-        opacity: 1;
+      .headerCell {
+        text-align: right;
+        div {
+          opacity: 1;
+        }
+      }
+
+      .experimentHeaderCell {
+        padding-left: $cell-padding;
+        text-align: left;
+        direction: ltr;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
@@ -284,17 +298,17 @@ $spinner-color-light: #000;
 
     .td {
       &:first-child {
-        padding-left: $edge-padding;
+        padding-left: $workspace-row-edge-margin;
         .innerCell {
-          padding-left: 0;
+          padding-left: $cell-padding;
           border-left: 1px solid $border-color;
         }
       }
 
       &:last-child {
-        padding-right: $edge-padding;
+        padding-right: $workspace-row-edge-margin;
         .innerCell {
-          padding-right: 0;
+          padding-right: $cell-padding;
           border-right: 1px solid $border-color;
         }
       }
@@ -352,6 +366,9 @@ $spinner-color-light: #000;
   }
   .experimentCell {
     text-align: left;
+    .innerCell {
+      justify-content: flex-start;
+    }
   }
 
   .placeholderHeaderCell {
@@ -368,7 +385,7 @@ $spinner-color-light: #000;
     color: $header-fg-color;
     text-align: center;
     border-bottom: 2px solid $bg-color;
-    padding: 0.31rem;
+    padding: 0.31rem $cell-padding;
   }
 
   .sortingHeaderCellAsc {
@@ -381,11 +398,7 @@ $spinner-color-light: #000;
 
   .metaCell {
     color: $meta-cell-color;
-    text-align: center;
     font-size: 0.75rem;
-    .innerCell {
-      justify-content: center;
-    }
   }
 }
 
@@ -452,6 +465,7 @@ $spinner-color-light: #000;
 }
 
 .copyButton {
+  flex: 0 0 0.8em;
   font-size: 1.5em;
   display: none;
   border: none;
@@ -468,6 +482,7 @@ $spinner-color-light: #000;
 .cellContents {
   overflow: hidden;
   text-overflow: ellipsis;
+  direction: rtl;
 }
 
 .th {
@@ -479,9 +494,10 @@ $spinner-color-light: #000;
 .innerCell {
   display: flex;
   flex-flow: row nowrap;
-  padding: 0 0.25rem;
+  padding: 0 $cell-padding;
   align-items: center;
   width: 100%;
+  justify-content: flex-end;
   &:hover {
     & .copyButton {
       display: block;
@@ -494,8 +510,8 @@ $spinner-color-light: #000;
   flex-flow: row wrap;
   line-height: normal;
   text-overflow: ellipsis;
+  direction: ltr;
   align-items: center;
-  margin: 0 -0.25em;
   > * {
     margin: 0 0.25em;
     overflow: hidden;
