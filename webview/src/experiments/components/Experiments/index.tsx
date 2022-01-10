@@ -39,20 +39,6 @@ const countRowsAndAddIndexes: (
   return index
 }
 
-const getExperimentDisplayName = (
-  id: string,
-  name: string | undefined,
-  isBranchRow: boolean
-) => {
-  if (id === 'workspace') {
-    return id
-  } else if (isBranchRow) {
-    return name
-  } else {
-    return id.slice(0, 7)
-  }
-}
-
 const ExperimentHeaderCell = () => (
   <div className={styles.experimentHeaderCell}>Experiment</div>
 )
@@ -61,22 +47,16 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
   [
     {
       Cell: ({
-        value,
         row: {
-          depth,
-          original: { name }
+          original: { displayName }
         }
       }: Cell<Experiment>) => {
-        const isBranchRow = depth === 0
+        const [id, name] = displayName.split(' ')
         return (
           <div className={styles.experimentCellContents}>
-            <span className={styles.experimentCellPrimaryName}>
-              {getExperimentDisplayName(value, name, isBranchRow)}
-            </span>
-            {!isBranchRow && name && (
-              <span className={styles.experimentCellSecondaryName}>
-                [{name}]
-              </span>
+            <span className={styles.experimentCellPrimaryName}>{id}</span>
+            {name && (
+              <span className={styles.experimentCellSecondaryName}>{name}</span>
             )}
           </div>
         )

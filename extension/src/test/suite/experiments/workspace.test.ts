@@ -366,7 +366,7 @@ suite('Workspace Experiments Test Suite', () => {
         selectedExperiment
       )
       expect(mockShowQuickPick).to.be.calledWith(
-        ['exp-e7a67', 'test-branch', 'exp-83425'],
+        ['4fb124a [exp-e7a67]', '42b8736 [test-branch]', '1ba7bcd [exp-83425]'],
         {
           canPickMany: false,
           placeHolder: 'Select an experiment'

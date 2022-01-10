@@ -36,9 +36,25 @@ const transformMetricsAndParams = (
   }
 }
 
+export const getDisplayName = (
+  sha: string,
+  name: string | undefined,
+  isBranch: boolean,
+  fallbackDisplayNameLength = 7
+): string => {
+  if (isBranch && name) {
+    return name
+  }
+  if (name) {
+    return sha.slice(0, fallbackDisplayNameLength) + ` [${name}]`
+  }
+  return sha.slice(0, fallbackDisplayNameLength)
+}
+
 const transformExperimentData = (
   sha: string,
   experimentFieldsOrError: ExperimentFieldsOrError,
+  isBranch: boolean,
   fallbackDisplayNameLength = 7
 ): Experiment | undefined => {
   const experimentFields = experimentFieldsOrError.data
@@ -46,11 +62,12 @@ const transformExperimentData = (
     return
   }
 
+  const name = experimentFields?.name
+
   const experiment = {
     id: sha,
     ...experimentFields,
-    displayName:
-      experimentFields?.name || sha.slice(0, fallbackDisplayNameLength)
+    displayName: getDisplayName(sha, name, isBranch, fallbackDisplayNameLength)
   } as Experiment
 
   transformMetricsAndParams(experiment, experimentFields)
@@ -64,7 +81,7 @@ const collectFromExperimentsObject = (
   branchName: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experiment = transformExperimentData(sha, experimentData)
+    const experiment = transformExperimentData(sha, experimentData, false)
 
     if (experiment) {
       collectExperimentOrCheckpoint(acc, experiment, branchName)
@@ -79,7 +96,7 @@ const collectFromBranchesObject = (
   for (const [branchSha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
   )) {
-    const branch = transformExperimentData(branchSha, baseline)
+    const branch = transformExperimentData(branchSha, baseline, true)
 
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
@@ -96,6 +113,7 @@ export const collectExperiments = (
   const workspaceBaseline = transformExperimentData(
     'workspace',
     workspace.baseline,
+    true,
     9
   )
 

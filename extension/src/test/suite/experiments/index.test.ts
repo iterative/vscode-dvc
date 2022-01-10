@@ -58,9 +58,9 @@ suite('Experiments Test Suite', () => {
 
       expect(runs.map(experiment => experiment.displayName)).to.deep.equal([
         'workspace',
-        'exp-e7a67',
-        'test-branch',
-        'exp-83425',
+        '4fb124a [exp-e7a67]',
+        '42b8736 [test-branch]',
+        '1ba7bcd [exp-83425]',
         '90aea7f'
       ])
     })
@@ -567,8 +567,8 @@ suite('Experiments Test Suite', () => {
       ])
       const selected = testRepository.getSelectedExperiments()
       expect(selected).to.deep.equal({
-        'exp-83425': '#5f5856',
-        'test-branch': '#96958f'
+        '1ba7bcd [exp-83425]': '#5f5856',
+        '42b8736 [test-branch]': '#96958f'
       })
     })
   })
