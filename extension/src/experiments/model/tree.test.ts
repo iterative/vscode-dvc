@@ -221,6 +221,7 @@ describe('ExperimentsTree', () => {
 
       const children = await experimentsTree.getChildren({
         collapsibleState: 1,
+        description: undefined,
         dvcRoot: 'repo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'ebbd66f',
@@ -286,6 +287,7 @@ describe('ExperimentsTree', () => {
 
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
+        description: undefined,
         dvcRoot: 'demo',
         iconPath: mockedClockResource,
         id: 'f0778b3',
@@ -314,6 +316,7 @@ describe('ExperimentsTree', () => {
 
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
+        description: undefined,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'workspace',
@@ -345,6 +348,7 @@ describe('ExperimentsTree', () => {
 
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 1,
+        description: undefined,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'f0778b3',
@@ -376,6 +380,7 @@ describe('ExperimentsTree', () => {
 
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
+        description: undefined,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0778b3',
@@ -406,6 +411,7 @@ describe('ExperimentsTree', () => {
 
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 1,
+        description: undefined,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0998a3',

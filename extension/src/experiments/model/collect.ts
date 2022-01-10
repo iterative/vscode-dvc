@@ -38,12 +38,9 @@ const transformMetricsAndParams = (
 
 export const getDisplayName = (
   sha: string,
-  secondaryName: string | undefined,
-  fallbackDisplayNameLength = 7
+  secondaryName: string | undefined
 ): string => {
-  return [sha.slice(0, fallbackDisplayNameLength), secondaryName]
-    .filter(Boolean)
-    .join(' ')
+  return [sha.slice(0, 7), secondaryName].filter(Boolean).join(' ')
 }
 
 const transformExperimentData = (
