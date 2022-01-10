@@ -2,7 +2,7 @@ import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickParamsToQueue } from './model/queue/quickPick'
-import { pickExperimentName } from './quickPick'
+import { pickExperiment } from './quickPick'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
@@ -200,18 +200,20 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
-  public pickCurrentExperimentName() {
-    return pickExperimentName(this.experiments.getSelectable())
+  public pickCurrentExperiment() {
+    return pickExperiment(this.experiments.getSelectable())
   }
 
   public async pickParamsToQueue() {
-    const base = await pickExperimentName(this.experiments.getExperiments())
+    const base = await pickExperiment(
+      this.experiments.getExperimentsWithWorkspace()
+    )
 
     if (!base) {
       return
     }
 
-    const params = this.experiments.getExperimentParams(base)
+    const params = this.experiments.getExperimentParams(base.id)
 
     if (!params) {
       return

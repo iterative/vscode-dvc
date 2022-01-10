@@ -168,6 +168,10 @@ export class ExperimentsModel {
     }))
   }
 
+  public getExperimentsWithWorkspace() {
+    return [this.workspace, ...this.flattenExperiments()]
+  }
+
   public getExperimentParams(id: string) {
     const params =
       id === 'workspace'

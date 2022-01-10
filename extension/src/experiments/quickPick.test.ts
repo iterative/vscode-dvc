@@ -1,5 +1,5 @@
 import { mocked } from 'ts-jest/utils'
-import { pickGarbageCollectionFlags, pickExperimentName } from './quickPick'
+import { pickGarbageCollectionFlags, pickExperiment } from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { reportError } from '../vscode/reporting'
 
@@ -14,37 +14,96 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
+const mockedExp = {
+  displayId: 'abcdefb',
+  displayNameOrParent: '[exp-0580a]',
+  id: 'abcdefb',
+  name: 'exp-0580a'
+}
+
 const mockedExpList = [
-  { displayId: 'abcdefb', displayNameOrParent: '[exp-0580a]', id: 'abcdefb' },
-  { displayId: 'abcdefa', displayNameOrParent: '[exp-c54c4]', id: 'abcdefa' },
-  { displayId: 'abcdef1', displayNameOrParent: '[exp-054f1]', id: 'abcdef1' },
-  { displayId: 'abcdef2', displayNameOrParent: '[exp-ae4fa]', id: 'abcdef2' },
-  { displayId: 'abcdef3', displayNameOrParent: '[exp-1324e]', id: 'abcdef3' },
-  { displayId: 'abcdef4', displayNameOrParent: '[exp-3bd24]', id: 'abcdef4' },
-  { displayId: 'abcdef5', displayNameOrParent: '[exp-5d170]', id: 'abcdef5' },
-  { displayId: 'abcdef6', displayNameOrParent: '[exp-9fe22]', id: 'abcdef6' },
-  { displayId: 'abcdef7', displayNameOrParent: '[exp-b707b]', id: 'abcdef7' },
-  { displayId: 'abcdef8', displayNameOrParent: '[exp-47694]', id: 'abcdef8' },
-  { displayId: 'abcdef9', displayNameOrParent: '[exp-59807]', id: 'abcdef9' }
+  mockedExp,
+  {
+    displayId: 'abcdefa',
+    displayNameOrParent: '[exp-c54c4]',
+    id: 'abcdefa',
+    name: 'exp-c54c4'
+  },
+  {
+    displayId: 'abcdef1',
+    displayNameOrParent: '[exp-054f1]',
+    id: 'abcdef1',
+    name: 'exp-054f1'
+  },
+  {
+    displayId: 'abcdef2',
+    displayNameOrParent: '[exp-ae4fa]',
+    id: 'abcdef2',
+    name: 'exp-ae4fa'
+  },
+  {
+    displayId: 'abcdef3',
+    displayNameOrParent: '[exp-1324e]',
+    id: 'abcdef3',
+    name: 'exp-1324e'
+  },
+  {
+    displayId: 'abcdef4',
+    displayNameOrParent: '[exp-3bd24]',
+    id: 'abcdef4',
+    name: 'exp-3bd24'
+  },
+  {
+    displayId: 'abcdef5',
+    displayNameOrParent: '[exp-5d170]',
+    id: 'abcdef5',
+    name: 'exp-5d170'
+  },
+  {
+    displayId: 'abcdef6',
+    displayNameOrParent: '[exp-9fe22]',
+    id: 'abcdef6',
+    name: 'exp-9fe22'
+  },
+  {
+    displayId: 'abcdef7',
+    displayNameOrParent: '[exp-b707b]',
+    id: 'abcdef7',
+    name: 'exp-b707b'
+  },
+  {
+    displayId: 'abcdef8',
+    displayNameOrParent: '[exp-47694]',
+    id: 'abcdef8',
+    name: 'exp-47694'
+  },
+  {
+    displayId: 'abcdef9',
+    displayNameOrParent: '[exp-59807]',
+    id: 'abcdef9',
+    name: 'exp-59807'
+  }
 ]
 
-const mockedExpId = 'abcdefb'
-
-describe('pickExperimentName', () => {
-  it('should return the name of the chosen experiment if one is selected by the user', async () => {
-    mockedQuickPickValue.mockResolvedValueOnce(mockedExpId)
-    const name = await pickExperimentName(mockedExpList)
-    expect(name).toEqual(mockedExpId)
+describe('pickExperiment', () => {
+  it('should return the details of the chosen experiment if one is selected by the user', async () => {
+    const expectedDetails = {
+      id: mockedExp.id,
+      name: mockedExp.name
+    }
+    mockedQuickPickValue.mockResolvedValueOnce(expectedDetails)
+    const experiment = await pickExperiment(mockedExpList)
+    expect(experiment).toEqual(expectedDetails)
   })
 
   it('should return undefined if the user cancels the popup dialog', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
-    const undef = await pickExperimentName(mockedExpList)
+    const undef = await pickExperiment(mockedExpList)
     expect(undef).toBeUndefined()
   })
 
   it('should call showErrorMessage when no experiment names are provided', async () => {
-    await pickExperimentName([])
+    await pickExperiment([])
     expect(mockedReportError).toHaveBeenCalledTimes(1)
   })
 })

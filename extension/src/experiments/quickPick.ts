@@ -2,21 +2,22 @@ import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { reportError } from '../vscode/reporting'
 
-export const pickExperimentName = (
-  experimentDetails: {
+export const pickExperiment = (
+  experiments: {
     displayId: string
     displayNameOrParent?: string
     id: string
+    name?: string
   }[]
-): Thenable<string | undefined> | undefined => {
-  if (experimentDetails.length === 0) {
+): Thenable<{ id: string; name: string } | undefined> | undefined => {
+  if (experiments.length === 0) {
     reportError('There are no experiments to select.')
   } else {
-    return quickPickValue(
-      experimentDetails.map(({ displayId, id, displayNameOrParent }) => ({
+    return quickPickValue<{ id: string; name: string }>(
+      experiments.map(({ displayId, displayNameOrParent, id, name }) => ({
         description: displayNameOrParent,
         label: displayId,
-        value: id
+        value: { id, name: name || displayId }
       })),
       { title: 'Select an experiment' }
     )
