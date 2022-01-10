@@ -56,11 +56,11 @@ suite('Experiments Test Suite', () => {
 
       const runs = experiments.getExperiments()
 
-      expect(runs.map(experiment => experiment.displayName)).to.deep.equal([
+      expect(runs.map(experiment => experiment.displayId)).to.deep.equal([
         'workspace',
-        '4fb124a [exp-e7a67]',
-        '42b8736 [test-branch]',
-        '1ba7bcd [exp-83425]',
+        '4fb124a',
+        '42b8736',
+        '1ba7bcd',
         '90aea7f'
       ])
     })
@@ -81,7 +81,7 @@ suite('Experiments Test Suite', () => {
       )
 
       expect(
-        checkpoints?.map(checkpoint => checkpoint.displayName)
+        checkpoints?.map(checkpoint => checkpoint.displayId)
       ).to.deep.equal(['d1343a8', '1ee5f2e'])
     })
   })
@@ -243,28 +243,28 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
-            displayName: 'workspace',
+            displayId: 'workspace',
             id: 'workspace',
             params: { 'params.yaml': { test: 10 } }
           },
           {
-            displayName: 'testBranch',
+            displayId: 'testBranch',
             id: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
             subRows: [
               {
-                displayName: 'testExp',
+                displayId: 'testExp',
                 id: 'testExp1',
                 params: { 'params.yaml': { test: 2 } }
               },
               {
-                displayName: 'testExp',
+                displayId: 'testExp',
                 id: 'testExp2',
                 params: { 'params.yaml': { test: 1 } }
               },
               {
-                displayName: 'testExp',
+                displayId: 'testExp',
                 id: 'testExp3',
                 params: { 'params.yaml': { test: 3 } }
               }
@@ -300,28 +300,28 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
-            displayName: 'workspace',
+            displayId: 'workspace',
             id: 'workspace',
             params: { 'params.yaml': { test: 10 } }
           },
           {
-            displayName: 'testBranch',
+            displayId: 'testBranch',
             id: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
             subRows: [
               {
-                displayName: 'testExp',
+                displayId: 'testExp',
                 id: 'testExp2',
                 params: { 'params.yaml': { test: 1 } }
               },
               {
-                displayName: 'testExp',
+                displayId: 'testExp',
                 id: 'testExp1',
                 params: { 'params.yaml': { test: 2 } }
               },
               {
-                displayName: 'testExp',
+                displayId: 'testExp',
                 id: 'testExp3',
                 params: { 'params.yaml': { test: 3 } }
               }
@@ -571,8 +571,8 @@ suite('Experiments Test Suite', () => {
       ])
       const selected = testRepository.getSelectedExperiments()
       expect(selected).to.deep.equal({
-        '1ba7bcd [exp-83425]': '#5f5856',
-        '42b8736 [test-branch]': '#96958f'
+        'exp-83425': '#5f5856',
+        'test-branch': '#96958f'
       })
     })
   })

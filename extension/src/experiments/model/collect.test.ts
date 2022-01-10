@@ -98,15 +98,20 @@ describe('collectExperiments', () => {
 
     const modifiedExperiment = checkpointsByTip
       .get('55a07df59246a1a6280feb16dd022877178e80f6')
-      ?.filter(checkpoint => checkpoint.displayName.includes('('))
+      ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
 
     expect(modifiedExperiment).toHaveLength(1)
-    expect(modifiedExperiment?.[0].displayName).toEqual('7e3cb21 (3b0c6ac)')
+    expect(modifiedExperiment?.[0].displayNameOrParent).toEqual('(3b0c6ac)')
+    expect(modifiedExperiment?.[0].displayId).toEqual('7e3cb21')
 
     checkpointsByTip.forEach(checkpoints => {
       const continuationCheckpoints = checkpoints.filter(checkpoint => {
-        const { displayName } = checkpoint
-        return displayName.includes('(') && displayName !== '7e3cb21 (3b0c6ac)'
+        const { displayId, displayNameOrParent } = checkpoint
+        return (
+          displayNameOrParent?.includes('(') &&
+          displayId !== '7e3cb21' &&
+          displayNameOrParent !== '(3b0c6ac)'
+        )
       })
       expect(continuationCheckpoints).toHaveLength(0)
     })

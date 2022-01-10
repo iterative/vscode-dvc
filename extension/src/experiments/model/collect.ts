@@ -36,17 +36,13 @@ const transformMetricsAndParams = (
   }
 }
 
-export const getDisplayName = (
-  sha: string,
-  secondaryName: string | undefined
-): string => {
-  return [sha.slice(0, 7), secondaryName].filter(Boolean).join(' ')
-}
+const getDisplayId = (sha: string) => sha.slice(0, 7)
 
 const transformExperimentData = (
   sha: string,
   experimentFieldsOrError: ExperimentFieldsOrError,
-  displayName?: string
+  displayId: string | undefined,
+  displayNameOrParent?: string
 ): Experiment | undefined => {
   const experimentFields = experimentFieldsOrError.data
   if (!experimentFields) {
@@ -56,15 +52,19 @@ const transformExperimentData = (
   const experiment = {
     id: sha,
     ...experimentFields,
-    displayName
+    displayId
   } as Experiment
+
+  if (displayNameOrParent) {
+    experiment.displayNameOrParent = displayNameOrParent
+  }
 
   transformMetricsAndParams(experiment, experimentFields)
 
   return experiment
 }
 
-const getSecondaryName = (
+const getDisplayNameOrParent = (
   sha: string,
   experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ): string | undefined => {
@@ -78,7 +78,7 @@ const getSecondaryName = (
     parentTip &&
     experimentsObject[parentTip]?.data?.checkpoint_tip === parentTip
   ) {
-    return `(${parentTip.slice(0, 7)})`
+    return `(${getDisplayId(parentTip)})`
   }
   if (name) {
     return `[${name}]`
@@ -91,11 +91,12 @@ const collectFromExperimentsObject = (
   branchName: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const displayName = getDisplayName(
+    const experiment = transformExperimentData(
       sha,
-      getSecondaryName(sha, experimentsObject)
+      experimentData,
+      getDisplayId(sha),
+      getDisplayNameOrParent(sha, experimentsObject)
     )
-    const experiment = transformExperimentData(sha, experimentData, displayName)
 
     if (experiment) {
       collectExperimentOrCheckpoint(acc, experiment, branchName)
@@ -117,7 +118,7 @@ const collectFromBranchesObject = (
     )
 
     if (branch) {
-      collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
+      collectFromExperimentsObject(acc, experimentsObject, branch.displayId)
 
       acc.branches.push(branch)
     }

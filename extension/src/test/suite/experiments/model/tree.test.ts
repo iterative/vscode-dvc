@@ -131,7 +131,8 @@ suite('Experiments Tree Test Suite', () => {
       const selectedDisplayName = domain[0]
       const selectedColor = range[0]
       const selectedItem = {
-        label: selectedDisplayName,
+        description: selectedDisplayName,
+        label: '',
         picked: true,
         value: selectedId
       }
@@ -157,17 +158,20 @@ suite('Experiments Tree Test Suite', () => {
       expect(mockShowQuickPick).to.be.calledWith(
         [
           {
-            label: selectedDisplayName,
+            description: `[${selectedDisplayName}]`,
+            label: selectedId.slice(0, 7),
             picked: true,
             value: selectedId
           },
           {
-            label: domain[1],
+            description: `[${domain[1]}]`,
+            label: ids[1].slice(0, 7),
             picked: true,
             value: ids[1]
           },
           {
-            label: domain[2],
+            description: `[${domain[2]}]`,
+            label: ids[2].slice(0, 7),
             picked: true,
             value: ids[2]
           }

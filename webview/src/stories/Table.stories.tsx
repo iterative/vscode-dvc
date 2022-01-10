@@ -20,11 +20,11 @@ const tableData: TableData = {
     ...row,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      selected: experiment.displayName !== '42b8736 [test-branch]',
+      selected: experiment.displayId !== '42b8736',
       subRows: experiment.subRows?.map(checkpoint => ({
         ...checkpoint,
-        running: checkpoint.running || checkpoint.displayName === '23250b3',
-        selected: experiment.displayName !== '42b8736 [test-branch]'
+        running: checkpoint.running || checkpoint.displayId === '23250b3',
+        selected: experiment.displayId !== '42b8736'
       }))
     }))
   })),

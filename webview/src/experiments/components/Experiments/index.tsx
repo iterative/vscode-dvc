@@ -48,15 +48,18 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
     {
       Cell: ({
         row: {
-          original: { displayName }
+          original: { displayId, displayNameOrParent }
         }
       }: Cell<Experiment>) => {
-        const [id, name] = displayName.split(' ')
         return (
           <div className={styles.experimentCellContents}>
-            <span className={styles.experimentCellPrimaryName}>{id}</span>
-            {name && (
-              <span className={styles.experimentCellSecondaryName}>{name}</span>
+            <span className={styles.experimentCellPrimaryName}>
+              {displayId}
+            </span>
+            {displayNameOrParent && (
+              <span className={styles.experimentCellSecondaryName}>
+                {displayNameOrParent}
+              </span>
             )}
           </div>
         )

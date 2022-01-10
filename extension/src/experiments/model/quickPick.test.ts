@@ -21,9 +21,9 @@ describe('pickExperiments', () => {
   it('should return the selected experiment ids', async () => {
     const selectedId = '7c366f6'
     const mockedExperiments = [
-      { displayName: 'exp-123', id: '73de3fe', selected: false },
-      { displayName: 'exp-456', id: '0be657c', selected: true },
-      { displayName: 'exp-789', id: selectedId, selected: false }
+      { displayId: 'exp-123', id: '73de3fe', selected: false },
+      { displayId: 'exp-456', id: '0be657c', selected: true },
+      { displayId: 'exp-789', id: selectedId, selected: false }
     ] as Experiment[]
 
     mockedQuickPickManyValues.mockResolvedValueOnce([selectedId])

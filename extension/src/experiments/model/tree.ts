@@ -134,42 +134,39 @@ export class ExperimentsTree
     return this.experiments
       .getRepository(dvcRoot)
       .getExperiments()
-      .map(experiment => {
-        const [label, description] = experiment.displayName.split(' ')
-        return {
-          collapsibleState: experiment.hasChildren
-            ? TreeItemCollapsibleState.Collapsed
-            : TreeItemCollapsibleState.None,
-          command: experiment.queued
-            ? undefined
-            : {
-                arguments: [{ dvcRoot, id: experiment.id }],
-                command: RegisteredCommands.EXPERIMENT_TOGGLE,
-                title: 'toggle'
-              },
-          description,
-          dvcRoot,
-          iconPath: this.getExperimentIcon(experiment),
-          id: experiment.id,
-          label
-        }
-      })
+      .map(experiment => ({
+        collapsibleState: experiment.hasChildren
+          ? TreeItemCollapsibleState.Collapsed
+          : TreeItemCollapsibleState.None,
+        command: experiment.queued
+          ? undefined
+          : {
+              arguments: [{ dvcRoot, id: experiment.id }],
+              command: RegisteredCommands.EXPERIMENT_TOGGLE,
+              title: 'toggle'
+            },
+        description: experiment.displayNameOrParent,
+        dvcRoot,
+        iconPath: this.getExperimentIcon(experiment),
+        id: experiment.id,
+        label: experiment.displayId
+      }))
   }
 
   private getExperimentIcon({
     displayColor,
-    displayName,
+    displayId,
     running,
     queued,
     selected
   }: {
     displayColor?: string
-    displayName: string
+    displayId: string
     running?: boolean
     queued?: boolean
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
-    if (displayName === 'workspace' || running) {
+    if (displayId === 'workspace' || running) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
 
@@ -188,20 +185,17 @@ export class ExperimentsTree
   ): ExperimentItem[] {
     return (
       this.experiments.getRepository(dvcRoot).getCheckpoints(experimentId) || []
-    ).map(checkpoint => {
-      const [label, description] = checkpoint.displayName.split(' ')
-      return {
-        collapsibleState: TreeItemCollapsibleState.None,
-        description,
-        dvcRoot,
-        iconPath: this.getUriOrIcon(
-          checkpoint.displayColor,
-          this.getIconName(checkpoint.selected)
-        ),
-        id: checkpoint.id,
-        label
-      }
-    })
+    ).map(checkpoint => ({
+      collapsibleState: TreeItemCollapsibleState.None,
+      description: checkpoint.displayNameOrParent,
+      dvcRoot,
+      iconPath: this.getUriOrIcon(
+        checkpoint.displayColor,
+        this.getIconName(checkpoint.selected)
+      ),
+      id: checkpoint.id,
+      label: checkpoint.displayId
+    }))
   }
 
   private getUriOrIcon(displayColor: string | undefined, iconName: IconName) {
