@@ -116,7 +116,7 @@ const collectFromExperimentsObject = (
 
     collectFromMetrics(
       acc,
-      getDisplayName(checkpoint_tip, experimentName, false),
+      getDisplayName(checkpoint_tip, `[${experimentName}]`),
       iteration,
       metrics
     )

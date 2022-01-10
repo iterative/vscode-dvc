@@ -223,7 +223,9 @@ suite('Experiments Test Suite', () => {
 
       experiments.setState({
         testBranch: {
-          baseline: { data: buildTestExperiment(10) },
+          baseline: {
+            data: { name: 'testBranch', ...buildTestExperiment(10) }
+          },
           testExp1: { data: buildTestExperiment(2) },
           testExp2: { data: buildTestExperiment(1) },
           testExp3: { data: buildTestExperiment(3) }
@@ -246,8 +248,9 @@ suite('Experiments Test Suite', () => {
             params: { 'params.yaml': { test: 10 } }
           },
           {
-            displayName: 'testBra',
+            displayName: 'testBranch',
             id: 'testBranch',
+            name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
             subRows: [
               {
@@ -302,8 +305,9 @@ suite('Experiments Test Suite', () => {
             params: { 'params.yaml': { test: 10 } }
           },
           {
-            displayName: 'testBra',
+            displayName: 'testBranch',
             id: 'testBranch',
+            name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
             subRows: [
               {
