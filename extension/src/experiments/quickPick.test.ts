@@ -1,13 +1,13 @@
 import { mocked } from 'ts-jest/utils'
 import { pickGarbageCollectionFlags, pickExperimentName } from './quickPick'
-import { quickPickManyValues, quickPickOne } from '../vscode/quickPick'
+import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { reportError } from '../vscode/reporting'
 
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/reporting')
 
 const mockedReportError = mocked(reportError)
-const mockedQuickPickOne = mocked(quickPickOne)
+const mockedQuickPickValue = mocked(quickPickValue)
 const mockedQuickPickManyValues = mocked(quickPickManyValues)
 
 beforeEach(() => {
@@ -15,36 +15,36 @@ beforeEach(() => {
 })
 
 const mockedExpList = [
-  'exp-0580a',
-  'exp-c54c4',
-  'exp-054f1',
-  'exp-ae4fa',
-  'exp-1324e',
-  'exp-3bd24',
-  'exp-5d170',
-  'exp-9fe22',
-  'exp-b707b',
-  'exp-47694',
-  'exp-59807'
+  { displayId: 'abcdefb', displayNameOrParent: '[exp-0580a]', id: 'abcdefb' },
+  { displayId: 'abcdefa', displayNameOrParent: '[exp-c54c4]', id: 'abcdefa' },
+  { displayId: 'abcdef1', displayNameOrParent: '[exp-054f1]', id: 'abcdef1' },
+  { displayId: 'abcdef2', displayNameOrParent: '[exp-ae4fa]', id: 'abcdef2' },
+  { displayId: 'abcdef3', displayNameOrParent: '[exp-1324e]', id: 'abcdef3' },
+  { displayId: 'abcdef4', displayNameOrParent: '[exp-3bd24]', id: 'abcdef4' },
+  { displayId: 'abcdef5', displayNameOrParent: '[exp-5d170]', id: 'abcdef5' },
+  { displayId: 'abcdef6', displayNameOrParent: '[exp-9fe22]', id: 'abcdef6' },
+  { displayId: 'abcdef7', displayNameOrParent: '[exp-b707b]', id: 'abcdef7' },
+  { displayId: 'abcdef8', displayNameOrParent: '[exp-47694]', id: 'abcdef8' },
+  { displayId: 'abcdef9', displayNameOrParent: '[exp-59807]', id: 'abcdef9' }
 ]
 
-const mockedExpName = 'exp-2021'
+const mockedExpId = 'abcdefb'
 
 describe('pickExperimentName', () => {
   it('should return the name of the chosen experiment if one is selected by the user', async () => {
-    mockedQuickPickOne.mockResolvedValueOnce(mockedExpName)
-    const name = await pickExperimentName(Promise.resolve(mockedExpList))
-    expect(name).toEqual(mockedExpName)
+    mockedQuickPickValue.mockResolvedValueOnce(mockedExpId)
+    const name = await pickExperimentName(mockedExpList)
+    expect(name).toEqual(mockedExpId)
   })
 
   it('should return undefined if the user cancels the popup dialog', async () => {
-    mockedQuickPickOne.mockResolvedValueOnce(undefined)
-    const undef = await pickExperimentName(Promise.resolve(mockedExpList))
+    mockedQuickPickValue.mockResolvedValueOnce(undefined)
+    const undef = await pickExperimentName(mockedExpList)
     expect(undef).toBeUndefined()
   })
 
   it('should call showErrorMessage when no experiment names are provided', async () => {
-    await pickExperimentName(Promise.resolve([]))
+    await pickExperimentName([])
     expect(mockedReportError).toHaveBeenCalledTimes(1)
   })
 })

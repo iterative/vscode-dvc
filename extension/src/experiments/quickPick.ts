@@ -1,15 +1,25 @@
 import { GcPreserveFlag } from '../cli/args'
-import { quickPickManyValues, quickPickOne } from '../vscode/quickPick'
+import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { reportError } from '../vscode/reporting'
 
-export const pickExperimentName = async (
-  experimentNamesPromise: Promise<string[]> | string[]
-): Promise<string | undefined> => {
-  const experimentNames = await experimentNamesPromise
-  if (experimentNames.length === 0) {
+export const pickExperimentName = (
+  experimentDetails: {
+    displayId: string
+    displayNameOrParent?: string
+    id: string
+  }[]
+): Thenable<string | undefined> | undefined => {
+  if (experimentDetails.length === 0) {
     reportError('There are no experiments to select.')
   } else {
-    return quickPickOne(experimentNames, 'Select an experiment')
+    return quickPickValue(
+      experimentDetails.map(({ displayId, id, displayNameOrParent }) => ({
+        description: displayNameOrParent,
+        label: displayId,
+        value: id
+      })),
+      { title: 'Select an experiment' }
+    )
   }
 }
 

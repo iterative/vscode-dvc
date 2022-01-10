@@ -32,7 +32,7 @@ export class ExperimentsModel {
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private colors: Colors
   private status: Record<string, Status>
-  private displayName: Record<string, string> = {}
+  private names: Record<string, string> = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
   private useFiltersForSelection = false
@@ -66,7 +66,7 @@ export class ExperimentsModel {
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
 
-    Promise.all([this.setStatus(), this.setDisplayNames()])
+    Promise.all([this.setStatus(), this.setExperimentNames()])
     this.collectColors()
   }
 
@@ -130,9 +130,9 @@ export class ExperimentsModel {
     const experimentColors = {} as Record<string, string>
 
     this.getAssignedColors().forEach((color: string, id: string) => {
-      const { displayName, selected } = this.getExperimentDetails(id)
-      if (displayName && selected) {
-        experimentColors[displayName] = color
+      const { name, selected } = this.getExperimentDetails(id)
+      if (name && selected) {
+        experimentColors[name] = color
       }
     })
 
@@ -168,35 +168,19 @@ export class ExperimentsModel {
     }))
   }
 
-  public getExperimentNames() {
-    return [
-      'workspace',
-      ...this.flattenExperiments().map(experiment => experiment.displayName)
-    ].filter(Boolean) as string[]
-  }
-
-  public getCurrentExperimentNames() {
-    return [
-      ...this.flattenExperiments()
-        .filter(exp => !exp.queued)
-        .map(experiment => experiment.displayName)
-    ].filter(Boolean) as string[]
-  }
-
-  public getExperimentParams(displayName: string) {
+  public getExperimentParams(id: string) {
     const params =
-      displayName === 'workspace'
+      id === 'workspace'
         ? this.workspace.params
-        : this.flattenExperiments().find(
-            experiment => experiment.displayName === displayName
-          )?.params
+        : this.flattenExperiments().find(experiment => experiment.id === id)
+            ?.params
 
     return collectFlatExperimentParams(params)
   }
 
   public getSelectable() {
     return this.getExperiments().filter(
-      exp => exp.displayName !== 'workspace' && !exp.queued
+      exp => exp.displayId !== 'workspace' && !exp.queued
     )
   }
 
@@ -264,7 +248,7 @@ export class ExperimentsModel {
   }
 
   private getExperimentsByBranch(branch: Experiment) {
-    const experiments = this.experimentsByBranch.get(branch.displayName)
+    const experiments = this.experimentsByBranch.get(branch.displayId)
     if (!experiments) {
       return
     }
@@ -276,7 +260,7 @@ export class ExperimentsModel {
   }
 
   private getExperimentDetails(id: string) {
-    return { displayName: this.displayName[id], selected: !!this.status[id] }
+    return { name: this.names[id], selected: !!this.status[id] }
   }
 
   private setStatus() {
@@ -291,10 +275,12 @@ export class ExperimentsModel {
     this.persistStatus()
   }
 
-  private setDisplayNames() {
-    this.displayName = this.flattenExperiments().reduce((acc, exp) => {
-      const { id, displayName } = exp
-      acc[id] = displayName
+  private setExperimentNames() {
+    this.names = this.flattenExperiments().reduce((acc, exp) => {
+      const { id, name } = exp
+      if (name) {
+        acc[id] = name
+      }
       return acc
     }, {} as Record<string, string>)
   }
