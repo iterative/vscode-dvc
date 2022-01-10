@@ -13,6 +13,7 @@ import {
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
+import { getDisplayName } from '../../experiments/model/collect'
 
 type LivePlotAccumulator = Map<string, LivePlotValues>
 
@@ -113,7 +114,12 @@ const collectFromExperimentsObject = (
       continue
     }
 
-    collectFromMetrics(acc, experimentName, iteration, metrics)
+    collectFromMetrics(
+      acc,
+      getDisplayName(checkpoint_tip, experimentName, false),
+      iteration,
+      metrics
+    )
   }
 }
 
