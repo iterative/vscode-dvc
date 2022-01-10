@@ -80,9 +80,9 @@ export class PlotsModel {
     const range: string[] = []
 
     Object.entries(this.experiments.getSelectedExperiments()).forEach(
-      ([displayName, color]) => {
-        if (displayName && color) {
-          selectedExperiments.push(displayName)
+      ([name, color]) => {
+        if (name && color) {
+          selectedExperiments.push(name)
           range.push(color)
         }
       }

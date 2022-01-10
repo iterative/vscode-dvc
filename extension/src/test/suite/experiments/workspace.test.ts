@@ -159,11 +159,11 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptions],
-        Thenable<QuickPickItem[] | string | undefined>
+        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
       mockShowQuickPick
         .onFirstCall()
-        .resolves('workspace')
+        .resolves({ value: 'workspace' } as QuickPickItemWithValue)
         .onSecondCall()
         .resolves([
           {
@@ -354,9 +354,9 @@ suite('Workspace Experiments Test Suite', () => {
         (WorkspaceExperiments as any).prototype,
         'getRepository'
       ).returns(experiments)
-      const mockShowQuickPick = stub(window, 'showQuickPick').resolves(
-        selectedExperiment as unknown as QuickPickItem
-      )
+      const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
+        value: selectedExperiment
+      } as unknown as QuickPickItem)
       const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
@@ -366,10 +366,26 @@ suite('Workspace Experiments Test Suite', () => {
         selectedExperiment
       )
       expect(mockShowQuickPick).to.be.calledWith(
-        ['exp-e7a67', 'test-branch', 'exp-83425'],
+        [
+          {
+            description: '[exp-e7a67]',
+            label: '4fb124a',
+            value: '4fb124aebddb2adf1545030907687fa9a4c80e70'
+          },
+          {
+            description: '[test-branch]',
+            label: '42b8736',
+            value: '42b8736b08170529903cd203a1f40382a4b4a8cd'
+          },
+          {
+            description: '[exp-83425]',
+            label: '1ba7bcd',
+            value: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d'
+          }
+        ],
         {
           canPickMany: false,
-          placeHolder: 'Select an experiment'
+          title: 'Select an experiment'
         }
       )
     })
@@ -392,9 +408,9 @@ suite('Workspace Experiments Test Suite', () => {
         'getRepository'
       ).returns(experiments)
 
-      stub(window, 'showQuickPick').resolves(
-        mockExperiment as unknown as QuickPickItem
-      )
+      stub(window, 'showQuickPick').resolves({
+        value: mockExperiment
+      } as unknown as QuickPickItem)
       const mockExperimentRemove = stub(
         CliExecutor.prototype,
         'experimentRemove'

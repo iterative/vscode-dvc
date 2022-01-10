@@ -1,5 +1,6 @@
 import { collectExperiments } from './collect'
 import { Experiment } from '../webview/contract'
+import ModifiedFixture from '../../test/fixtures/expShow/modified'
 
 describe('collectExperiments', () => {
   it('should return an empty array if no branches are present', () => {
@@ -13,7 +14,7 @@ describe('collectExperiments', () => {
 
   const repoWithTwoBranches = {
     branchA: {
-      baseline: { data: {} },
+      baseline: { data: { name: 'branchA' } },
       otherExp1: { data: {} },
       otherExp2: {
         data: { checkpoint_tip: 'otherExp2' }
@@ -90,5 +91,29 @@ describe('collectExperiments', () => {
     expect(tip1cp1.id).toEqual('tip1cp1')
     expect(tip1cp2.id).toEqual('tip1cp2')
     expect(tip1cp3.id).toEqual('tip1cp3')
+  })
+
+  it('should handle the continuation of a modified checkpoint', () => {
+    const { checkpointsByTip } = collectExperiments(ModifiedFixture)
+
+    const modifiedExperiment = checkpointsByTip
+      .get('55a07df59246a1a6280feb16dd022877178e80f6')
+      ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
+
+    expect(modifiedExperiment).toHaveLength(1)
+    expect(modifiedExperiment?.[0].displayNameOrParent).toEqual('(3b0c6ac)')
+    expect(modifiedExperiment?.[0].displayId).toEqual('7e3cb21')
+
+    checkpointsByTip.forEach(checkpoints => {
+      const continuationCheckpoints = checkpoints.filter(checkpoint => {
+        const { displayId, displayNameOrParent } = checkpoint
+        return (
+          displayNameOrParent?.includes('(') &&
+          displayId !== '7e3cb21' &&
+          displayNameOrParent !== '(3b0c6ac)'
+        )
+      })
+      expect(continuationCheckpoints).toHaveLength(0)
+    })
   })
 })

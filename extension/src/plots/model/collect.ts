@@ -18,7 +18,7 @@ type LivePlotAccumulator = Map<string, LivePlotValues>
 
 const collectFromMetricsFile = (
   acc: LivePlotAccumulator,
-  displayName: string,
+  name: string,
   iteration: number,
   key: string | undefined,
   value: Value | ValueTree,
@@ -30,7 +30,7 @@ const collectFromMetricsFile = (
     Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
       return collectFromMetricsFile(
         acc,
-        displayName,
+        name,
         iteration,
         childKey,
         childValue,
@@ -42,7 +42,7 @@ const collectFromMetricsFile = (
 
   const path = joinMetricOrParamFilePath(...pathArray)
 
-  addToMapArray(acc, path, { group: displayName, iteration, y: value })
+  addToMapArray(acc, path, { group: name, iteration, y: value })
 }
 
 type MetricsAndTipOrUndefined =

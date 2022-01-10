@@ -29,6 +29,7 @@ type ExperimentItem = {
     title: string
   }
   dvcRoot: string
+  description: string | undefined
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
@@ -76,9 +77,10 @@ export class ExperimentsTree
       return getRootItem(element)
     }
 
-    const { label, collapsibleState, iconPath, command } = element
+    const { label, collapsibleState, iconPath, command, description } = element
     const item = new TreeItem(label, collapsibleState)
     item.iconPath = iconPath
+    item.description = description
     if (command) {
       item.command = command
     }
@@ -143,27 +145,28 @@ export class ExperimentsTree
               command: RegisteredCommands.EXPERIMENT_TOGGLE,
               title: 'toggle'
             },
+        description: experiment.displayNameOrParent,
         dvcRoot,
         iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
-        label: experiment.displayName
+        label: experiment.displayId
       }))
   }
 
   private getExperimentIcon({
     displayColor,
-    displayName,
+    displayId,
     running,
     queued,
     selected
   }: {
     displayColor?: string
-    displayName: string
+    displayId: string
     running?: boolean
     queued?: boolean
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
-    if (displayName === 'workspace' || running) {
+    if (displayId === 'workspace' || running) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
 
@@ -184,13 +187,14 @@ export class ExperimentsTree
       this.experiments.getRepository(dvcRoot).getCheckpoints(experimentId) || []
     ).map(checkpoint => ({
       collapsibleState: TreeItemCollapsibleState.None,
+      description: checkpoint.displayNameOrParent,
       dvcRoot,
       iconPath: this.getUriOrIcon(
         checkpoint.displayColor,
         this.getIconName(checkpoint.selected)
       ),
       id: checkpoint.id,
-      label: checkpoint.displayName
+      label: checkpoint.displayId
     }))
   }
 

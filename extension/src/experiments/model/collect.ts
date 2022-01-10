@@ -36,10 +36,13 @@ const transformMetricsAndParams = (
   }
 }
 
+const getDisplayId = (sha: string) => sha.slice(0, 7)
+
 const transformExperimentData = (
   sha: string,
   experimentFieldsOrError: ExperimentFieldsOrError,
-  fallbackDisplayNameLength = 7
+  displayId: string | undefined,
+  displayNameOrParent?: string
 ): Experiment | undefined => {
   const experimentFields = experimentFieldsOrError.data
   if (!experimentFields) {
@@ -49,13 +52,37 @@ const transformExperimentData = (
   const experiment = {
     id: sha,
     ...experimentFields,
-    displayName:
-      experimentFields?.name || sha.slice(0, fallbackDisplayNameLength)
+    displayId
   } as Experiment
+
+  if (displayNameOrParent) {
+    experiment.displayNameOrParent = displayNameOrParent
+  }
 
   transformMetricsAndParams(experiment, experimentFields)
 
   return experiment
+}
+
+const getDisplayNameOrParent = (
+  sha: string,
+  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
+): string | undefined => {
+  const experiment = experimentsObject[sha]?.data
+  if (!experiment) {
+    return
+  }
+
+  const { checkpoint_parent: parentTip, name } = experiment
+  if (
+    parentTip &&
+    experimentsObject[parentTip]?.data?.checkpoint_tip === parentTip
+  ) {
+    return `(${getDisplayId(parentTip)})`
+  }
+  if (name) {
+    return `[${name}]`
+  }
 }
 
 const collectFromExperimentsObject = (
@@ -64,7 +91,12 @@ const collectFromExperimentsObject = (
   branchName: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experiment = transformExperimentData(sha, experimentData)
+    const experiment = transformExperimentData(
+      sha,
+      experimentData,
+      getDisplayId(sha),
+      getDisplayNameOrParent(sha, experimentsObject)
+    )
 
     if (experiment) {
       collectExperimentOrCheckpoint(acc, experiment, branchName)
@@ -79,10 +111,14 @@ const collectFromBranchesObject = (
   for (const [branchSha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
   )) {
-    const branch = transformExperimentData(branchSha, baseline)
+    const branch = transformExperimentData(
+      branchSha,
+      baseline,
+      baseline?.data?.name
+    )
 
     if (branch) {
-      collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
+      collectFromExperimentsObject(acc, experimentsObject, branch.displayId)
 
       acc.branches.push(branch)
     }
@@ -93,10 +129,11 @@ export const collectExperiments = (
   data: ExperimentsOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
+  const workspaceId = 'workspace'
   const workspaceBaseline = transformExperimentData(
-    'workspace',
+    workspaceId,
     workspace.baseline,
-    9
+    workspaceId
   )
 
   const acc = new ExperimentsAccumulator(workspaceBaseline)

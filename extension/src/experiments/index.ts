@@ -201,11 +201,11 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public pickCurrentExperimentName() {
-    return pickExperimentName(this.experiments.getCurrentExperimentNames())
+    return pickExperimentName(this.experiments.getSelectable())
   }
 
   public async pickParamsToQueue() {
-    const base = await pickExperimentName(this.experiments.getExperimentNames())
+    const base = await pickExperimentName(this.experiments.getExperiments())
 
     if (!base) {
       return
