@@ -29,6 +29,7 @@ type ExperimentItem = {
     title: string
   }
   dvcRoot: string
+  description: string | undefined
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
@@ -76,9 +77,10 @@ export class ExperimentsTree
       return getRootItem(element)
     }
 
-    const { label, collapsibleState, iconPath, command } = element
+    const { label, collapsibleState, iconPath, command, description } = element
     const item = new TreeItem(label, collapsibleState)
     item.iconPath = iconPath
+    item.description = description
     if (command) {
       item.command = command
     }
@@ -132,22 +134,26 @@ export class ExperimentsTree
     return this.experiments
       .getRepository(dvcRoot)
       .getExperiments()
-      .map(experiment => ({
-        collapsibleState: experiment.hasChildren
-          ? TreeItemCollapsibleState.Collapsed
-          : TreeItemCollapsibleState.None,
-        command: experiment.queued
-          ? undefined
-          : {
-              arguments: [{ dvcRoot, id: experiment.id }],
-              command: RegisteredCommands.EXPERIMENT_TOGGLE,
-              title: 'toggle'
-            },
-        dvcRoot,
-        iconPath: this.getExperimentIcon(experiment),
-        id: experiment.id,
-        label: experiment.displayName
-      }))
+      .map(experiment => {
+        const [label, description] = experiment.displayName.split(' ')
+        return {
+          collapsibleState: experiment.hasChildren
+            ? TreeItemCollapsibleState.Collapsed
+            : TreeItemCollapsibleState.None,
+          command: experiment.queued
+            ? undefined
+            : {
+                arguments: [{ dvcRoot, id: experiment.id }],
+                command: RegisteredCommands.EXPERIMENT_TOGGLE,
+                title: 'toggle'
+              },
+          description,
+          dvcRoot,
+          iconPath: this.getExperimentIcon(experiment),
+          id: experiment.id,
+          label
+        }
+      })
   }
 
   private getExperimentIcon({
@@ -182,16 +188,20 @@ export class ExperimentsTree
   ): ExperimentItem[] {
     return (
       this.experiments.getRepository(dvcRoot).getCheckpoints(experimentId) || []
-    ).map(checkpoint => ({
-      collapsibleState: TreeItemCollapsibleState.None,
-      dvcRoot,
-      iconPath: this.getUriOrIcon(
-        checkpoint.displayColor,
-        this.getIconName(checkpoint.selected)
-      ),
-      id: checkpoint.id,
-      label: checkpoint.displayName
-    }))
+    ).map(checkpoint => {
+      const [label, description] = checkpoint.displayName.split(' ')
+      return {
+        collapsibleState: TreeItemCollapsibleState.None,
+        description,
+        dvcRoot,
+        iconPath: this.getUriOrIcon(
+          checkpoint.displayColor,
+          this.getIconName(checkpoint.selected)
+        ),
+        id: checkpoint.id,
+        label
+      }
+    })
   }
 
   private getUriOrIcon(displayColor: string | undefined, iconName: IconName) {
