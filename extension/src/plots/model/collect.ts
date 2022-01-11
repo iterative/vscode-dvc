@@ -45,8 +45,9 @@ const collectFromMetricsFile = (
   addToMapArray(acc, path, { group: name, iteration, y: value })
 }
 
-type MetricsAndTipOrUndefined =
+type MetricsAndDetailsOrUndefined =
   | {
+      checkpoint_parent: string | undefined
       checkpoint_tip: string | undefined
       metrics: MetricsOrParams | undefined
     }
@@ -54,22 +55,26 @@ type MetricsAndTipOrUndefined =
 
 const transformExperimentData = (
   experimentFieldsOrError: ExperimentFieldsOrError
-): MetricsAndTipOrUndefined => {
+): MetricsAndDetailsOrUndefined => {
   const experimentFields = experimentFieldsOrError.data
   if (!experimentFields) {
     return
   }
 
-  const { checkpoint_tip } = experimentFields
+  const { checkpoint_tip, checkpoint_parent } = experimentFields
   const { metrics } = reduceMetricsAndParams(experimentFields)
 
-  return { checkpoint_tip, metrics }
+  return { checkpoint_parent, checkpoint_tip, metrics }
 }
 
-type ValidCheckpointData = { checkpoint_tip: string; metrics: MetricsOrParams }
+type ValidCheckpointData = {
+  checkpoint_parent: string
+  checkpoint_tip: string
+  metrics: MetricsOrParams
+}
 
 const isValidCheckpoint = (
-  data: MetricsAndTipOrUndefined,
+  data: MetricsAndDetailsOrUndefined,
   sha: string
 ): data is ValidCheckpointData =>
   !!(data?.metrics && data?.checkpoint_tip && data?.checkpoint_tip !== sha)
@@ -92,10 +97,39 @@ const collectFromMetrics = (
   )
 }
 
+const linkModified = (
+  acc: LivePlotAccumulator,
+  checkpointCount: Map<string, number>,
+  currentCheckpoint: {
+    experimentName: string
+    checkpointParent: string
+    checkpointTip: string
+  },
+  lastCheckpoint: {
+    metrics: MetricsOrParams
+    iteration: number
+    checkpointTip: string
+  }
+) => {
+  const { experimentName, checkpointParent, checkpointTip } = currentCheckpoint
+
+  const {
+    metrics: lastMetrics,
+    checkpointTip: lastCheckpointTip,
+    iteration: lastIteration
+  } = lastCheckpoint
+
+  if (lastCheckpointTip && checkpointParent === lastCheckpointTip) {
+    checkpointCount.set(checkpointTip, lastIteration)
+    collectFromMetrics(acc, experimentName, lastIteration, lastMetrics)
+  }
+}
+
 const collectFromExperimentsObject = (
   acc: LivePlotAccumulator,
   experimentsObject: { [sha: string]: ExperimentFieldsOrError },
-  checkpointCount = new Map<string, number>()
+  checkpointCount = new Map<string, number>(),
+  lastCheckpoint = { checkpointTip: '', iteration: 0, metrics: {} }
 ) => {
   for (const [sha, experimentData] of Object.entries(
     experimentsObject
@@ -105,15 +139,28 @@ const collectFromExperimentsObject = (
     if (!isValidCheckpoint(data, sha)) {
       continue
     }
-    const { checkpoint_tip, metrics } = data
-    const iteration = addToMapCount(checkpoint_tip, checkpointCount)
+    const {
+      checkpoint_tip: checkpointTip,
+      checkpoint_parent: checkpointParent,
+      metrics
+    } = data
 
-    const experimentName = experimentsObject[checkpoint_tip].data?.name
+    const experimentName = experimentsObject[checkpointTip].data?.name
     if (!experimentName) {
       continue
     }
 
+    linkModified(
+      acc,
+      checkpointCount,
+      { checkpointParent, checkpointTip, experimentName },
+      lastCheckpoint
+    )
+
+    const iteration = addToMapCount(checkpointTip, checkpointCount)
     collectFromMetrics(acc, experimentName, iteration, metrics)
+
+    lastCheckpoint = { checkpointTip, iteration, metrics }
   }
 }
 
