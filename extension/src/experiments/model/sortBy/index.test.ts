@@ -5,12 +5,12 @@ import { Experiment } from '../../webview/contract'
 
 describe('sortExperiments', () => {
   const testId = 'f0778b3eb6a390d6f6731c735a2a4561d1792c3a'
-  const testDisplayName = 'f0778b3'
+  const testDisplayId = 'f0778b3'
   const testTimestamp = '2021-01-14T10:57:59'
   const irrelevantExperimentData = {
     checkpoint_parent: 'f81f1b5a1248b9d9f595fb53136298c69f908e66',
     checkpoint_tip: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
-    displayName: testDisplayName,
+    displayId: testDisplayId,
     id: testId,
     queued: false,
     timestamp: testTimestamp

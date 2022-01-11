@@ -7,7 +7,8 @@ export interface MetricsOrParams {
 
 export interface Experiment extends BaseExperimentFields {
   id: string
-  displayName: string
+  displayId: string
+  displayNameOrParent?: string
   params?: MetricsOrParams
   metrics?: MetricsOrParams
   displayColor?: string

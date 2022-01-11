@@ -183,13 +183,13 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experimentName = await this.pickCurrentExperimentName(cwd)
+    const experiment = await this.pickCurrentExperiment(cwd)
 
-    if (!experimentName) {
+    if (!experiment) {
       return
     }
     return reportOutput(
-      this.internalCommands.executeCommand(commandId, cwd, experimentName)
+      this.internalCommands.executeCommand(commandId, cwd, experiment.name)
     )
   }
 
@@ -219,9 +219,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experimentName = await this.pickCurrentExperimentName(cwd)
+    const experiment = await this.pickCurrentExperiment(cwd)
 
-    if (!experimentName) {
+    if (!experiment) {
       return
     }
     const input = await getInput(title)
@@ -230,7 +230,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         this.internalCommands.executeCommand(
           commandId,
           cwd,
-          experimentName,
+          experiment.name,
           input
         )
       )
@@ -282,7 +282,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
 
-  private pickCurrentExperimentName(cwd: string) {
-    return this.getRepository(cwd).pickCurrentExperimentName()
+  private pickCurrentExperiment(cwd: string) {
+    return this.getRepository(cwd).pickCurrentExperiment()
   }
 }

@@ -159,11 +159,11 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptions],
-        Thenable<QuickPickItem[] | string | undefined>
+        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
       mockShowQuickPick
         .onFirstCall()
-        .resolves('workspace')
+        .resolves({ value: 'workspace' } as QuickPickItemWithValue)
         .onSecondCall()
         .resolves([
           {
@@ -340,7 +340,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.applyExperiment', () => {
     it('should ask the user to pick an experiment and then apply that experiment to the workspace', async () => {
-      const selectedExperiment = 'test-branch'
+      const selectedExperimentName = 'test-branch'
 
       const { experiments } = buildExperiments(disposable)
 
@@ -354,22 +354,47 @@ suite('Workspace Experiments Test Suite', () => {
         (WorkspaceExperiments as any).prototype,
         'getRepository'
       ).returns(experiments)
-      const mockShowQuickPick = stub(window, 'showQuickPick').resolves(
-        selectedExperiment as unknown as QuickPickItem
-      )
+      const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
+        value: { id: 'a123456', name: selectedExperimentName }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
       const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
 
       expect(mockExperimentApply).to.be.calledWith(
         dvcDemoPath,
-        selectedExperiment
+        selectedExperimentName
       )
       expect(mockShowQuickPick).to.be.calledWith(
-        ['exp-e7a67', 'test-branch', 'exp-83425'],
+        [
+          {
+            description: '[exp-e7a67]',
+            label: '4fb124a',
+            value: {
+              id: '4fb124aebddb2adf1545030907687fa9a4c80e70',
+              name: 'exp-e7a67'
+            }
+          },
+          {
+            description: '[test-branch]',
+            label: '42b8736',
+            value: {
+              id: '42b8736b08170529903cd203a1f40382a4b4a8cd',
+              name: 'test-branch'
+            }
+          },
+          {
+            description: '[exp-83425]',
+            label: '1ba7bcd',
+            value: {
+              id: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
+              name: 'exp-83425'
+            }
+          }
+        ],
         {
           canPickMany: false,
-          placeHolder: 'Select an experiment'
+          title: 'Select an experiment'
         }
       )
     })
@@ -377,7 +402,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.removeExperiment', () => {
     it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
-      const mockExperiment = 'exp-to-remove'
+      const mockExperimentName = 'exp-to-remove'
 
       const { experiments } = buildExperiments(disposable)
 
@@ -392,9 +417,9 @@ suite('Workspace Experiments Test Suite', () => {
         'getRepository'
       ).returns(experiments)
 
-      stub(window, 'showQuickPick').resolves(
-        mockExperiment as unknown as QuickPickItem
-      )
+      stub(window, 'showQuickPick').resolves({
+        value: { id: 'f1245699', name: mockExperimentName }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
       const mockExperimentRemove = stub(
         CliExecutor.prototype,
         'experimentRemove'
@@ -402,7 +427,10 @@ suite('Workspace Experiments Test Suite', () => {
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
 
-      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
+      expect(mockExperimentRemove).to.be.calledWith(
+        dvcDemoPath,
+        mockExperimentName
+      )
     })
   })
 })
