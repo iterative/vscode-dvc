@@ -1,6 +1,6 @@
 import { collectExperiments } from './collect'
 import { Experiment } from '../webview/contract'
-import ModifiedFixture from '../../test/fixtures/expShow/modified'
+import modifiedFixture from '../../test/fixtures/expShow/modified'
 
 describe('collectExperiments', () => {
   it('should return an empty array if no branches are present', () => {
@@ -94,7 +94,7 @@ describe('collectExperiments', () => {
   })
 
   it('should handle the continuation of a modified checkpoint', () => {
-    const { checkpointsByTip } = collectExperiments(ModifiedFixture)
+    const { checkpointsByTip } = collectExperiments(modifiedFixture)
 
     const modifiedExperiment = checkpointsByTip
       .get('55a07df59246a1a6280feb16dd022877178e80f6')
