@@ -49,7 +49,7 @@ export class ExperimentsTree
   private readonly view: TreeView<string | ExperimentItem>
   private viewed = false
 
-  private expandedExperiments: Record<string, true | undefined> = {}
+  private expandedExperiments: Record<string, boolean | undefined> = {}
 
   constructor(
     experiments: WorkspaceExperiments,
@@ -64,17 +64,13 @@ export class ExperimentsTree
 
     this.dispose.track(
       this.view.onDidCollapseElement(({ element }) => {
-        if (!this.isRoot(element) && element.description) {
-          this.expandedExperiments[element.description] = undefined
-        }
+        this.setExperimentExpanded(element, false)
       })
     )
 
     this.dispose.track(
       this.view.onDidExpandElement(({ element }) => {
-        if (!this.isRoot(element) && element.description) {
-          this.expandedExperiments[element.description] = true
-        }
+        this.setExperimentExpanded(element, true)
       })
     )
 
@@ -169,6 +165,15 @@ export class ExperimentsTree
         id: experiment.id,
         label: experiment.displayId
       }))
+  }
+
+  private setExperimentExpanded(
+    element: string | ExperimentItem,
+    expanded: boolean
+  ) {
+    if (!this.isRoot(element) && element.description) {
+      this.expandedExperiments[element.description] = expanded
+    }
   }
 
   private getCollapsibleState(description?: string) {
