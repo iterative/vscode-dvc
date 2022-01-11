@@ -31,7 +31,7 @@ const data: RowData[] = [
         val_accuracy: 0.5608000159263611
       }
     },
-    displayName: 'workspace',
+    displayId: 'workspace',
     id: 'workspace'
   },
   {
@@ -62,7 +62,7 @@ const data: RowData[] = [
       }
     },
     name: 'master',
-    displayName: 'master',
+    displayId: 'master',
     subRows: [
       {
         checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
@@ -93,7 +93,8 @@ const data: RowData[] = [
         },
         name: 'exp-e7a67',
         checkpoint_parent: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
-        displayName: '4fb124a [exp-e7a67]',
+        displayId: '4fb124a',
+        displayNameOrParent: '[exp-e7a67]',
         displayColor: colorsList[0],
         id: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         subRows: [
@@ -125,7 +126,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
-            displayName: 'd1343a8',
+            displayId: 'd1343a8',
             displayColor: colorsList[0],
             id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
             selected: true
@@ -159,7 +160,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
             displayColor: colorsList[0],
-            displayName: '1ee5f2e',
+            displayId: '1ee5f2e',
             id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
             selected: true
           }
@@ -196,7 +197,8 @@ const data: RowData[] = [
         name: 'test-branch',
         checkpoint_parent: '217312476f8854dda1865450b737eb6bc7a3ba1b',
         displayColor: colorsList[1],
-        displayName: '42b8736 [test-branch]',
+        displayId: '42b8736',
+        displayNameOrParent: '[test-branch]',
         id: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         subRows: [
           {
@@ -228,7 +230,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: '9523bde67538cf31230efaff2dbc47d38a944ab5',
             displayColor: colorsList[1],
-            displayName: '2173124',
+            displayId: '2173124',
             id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
             selected: true
           },
@@ -261,7 +263,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
             displayColor: colorsList[1],
-            displayName: '9523bde',
+            displayId: '9523bde',
             id: '9523bde67538cf31230efaff2dbc47d38a944ab5',
             selected: true
           }
@@ -298,7 +300,8 @@ const data: RowData[] = [
         name: 'exp-83425',
         checkpoint_parent: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
         displayColor: colorsList[2],
-        displayName: '1ba7bcd [exp-83425]',
+        displayId: '1ba7bcd',
+        displayNameOrParent: '[exp-83425]',
         id: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         subRows: [
           {
@@ -330,7 +333,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
             displayColor: colorsList[2],
-            displayName: '22e40e1',
+            displayId: '22e40e1',
             id: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
             selected: true
           },
@@ -363,7 +366,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
             displayColor: colorsList[2],
-            displayName: '91116c1',
+            displayId: '91116c1',
             id: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
             selected: true
           },
@@ -396,7 +399,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
             displayColor: colorsList[2],
-            displayName: 'e821416',
+            displayId: 'e821416',
             id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
             selected: true
           },
@@ -429,7 +432,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: '23250b33e3d6dd0e136262d1d26a2face031cb03',
             displayColor: colorsList[2],
-            displayName: 'c658f8b',
+            displayId: 'c658f8b',
             id: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
             selected: true
           },
@@ -462,7 +465,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
             displayColor: colorsList[2],
-            displayName: '23250b3',
+            displayId: '23250b3',
             id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
             selected: true
           }
@@ -485,7 +488,7 @@ const data: RowData[] = [
           }
         },
         queued: true,
-        displayName: '90aea7f',
+        displayId: '90aea7f',
         id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
       }
     ]

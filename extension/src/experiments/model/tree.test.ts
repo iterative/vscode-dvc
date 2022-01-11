@@ -93,7 +93,7 @@ describe('ExperimentsTree', () => {
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
       mockedGetExperiments.mockReturnValueOnce([])
       mockedGetExperiments.mockReturnValueOnce([])
-      mockedGetExperiments.mockReturnValueOnce([{ displayName: '90aea7f' }])
+      mockedGetExperiments.mockReturnValueOnce([{ displayId: '90aea7f' }])
 
       const rootElements = await experimentsTree.getChildren()
 
@@ -113,14 +113,14 @@ describe('ExperimentsTree', () => {
       const experiments = [
         {
           displayColor: '#b180d7',
-          displayName: '90aea7f',
+          displayId: '90aea7f',
           hasChildren: true,
           id: '90aea7f',
           selected: true
         },
         {
           displayColor: '#1a1c19',
-          displayName: 'f0778b3',
+          displayId: 'f0778b3',
           hasChildren: false,
           id: 'f0778b3',
           running: true,
@@ -128,14 +128,14 @@ describe('ExperimentsTree', () => {
         },
         {
           displayColor: '#4063e2',
-          displayName: 'e350702',
+          displayId: 'e350702',
           hasChildren: false,
           id: 'e350702',
           running: false,
           selected: false
         },
         {
-          displayName: 'f81f1b5',
+          displayId: 'f81f1b5',
           hasChildren: false,
           id: 'f81f1b5',
           queued: true
@@ -214,8 +214,8 @@ describe('ExperimentsTree', () => {
       )
 
       const checkpoints = [
-        { displayName: 'aaaaaaa', id: 'aaaaaaaaaaaaaaaaa' },
-        { displayName: 'bbbbbbb', id: 'bbbbbbbbbbbbbbbbb' }
+        { displayId: 'aaaaaaa', id: 'aaaaaaaaaaaaaaaaa' },
+        { displayId: 'bbbbbbb', id: 'bbbbbbbbbbbbbbbbb' }
       ]
       mockedGetCheckpoints.mockReturnValueOnce(checkpoints)
 

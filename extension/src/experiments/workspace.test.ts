@@ -18,7 +18,7 @@ const mockedDisposable = mocked(Disposable)
 const mockedDvcRoot = '/my/dvc/root'
 const mockedOtherDvcRoot = '/my/fun/dvc/root'
 const mockedQuickPickOne = mocked(quickPickOne)
-const mockedPickCurrentExperimentName = jest.fn()
+const mockedPickCurrentExperiment = jest.fn()
 const mockedGetInput = mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
@@ -61,12 +61,12 @@ describe('Experiments', () => {
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
-        pickCurrentExperimentName: mockedPickCurrentExperimentName,
+        pickCurrentExperiment: mockedPickCurrentExperiment,
         showWebview: mockedShowWebview
       } as unknown as Experiments,
       '/my/fun/dvc/root': {
         getDvcRoot: () => mockedOtherDvcRoot,
-        pickCurrentExperimentName: jest.fn(),
+        pickCurrentExperiment: jest.fn(),
         showWebview: jest.fn()
       } as unknown as Experiments
     }
@@ -109,12 +109,15 @@ describe('Experiments', () => {
   describe('getExpNameThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickCurrentExperimentName.mockResolvedValueOnce('exp-123')
+      mockedPickCurrentExperiment.mockResolvedValueOnce({
+        id: 'a123456',
+        name: 'exp-123'
+      })
 
       await workspaceExperiments.getExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedPickCurrentExperimentName).toBeCalledTimes(1)
+      expect(mockedPickCurrentExperiment).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123')
     })
@@ -183,7 +186,10 @@ describe('Experiments', () => {
   describe('getExpNameAndInputThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked and an input provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickCurrentExperimentName.mockResolvedValueOnce('exp-123')
+      mockedPickCurrentExperiment.mockResolvedValueOnce({
+        id: 'a123456',
+        name: 'exp-123'
+      })
       mockedGetInput.mockResolvedValueOnce('abc123')
 
       await workspaceExperiments.getExpNameAndInputThenRun(
@@ -192,7 +198,7 @@ describe('Experiments', () => {
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedPickCurrentExperimentName).toBeCalledTimes(1)
+      expect(mockedPickCurrentExperiment).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123', 'abc123')
     })
@@ -212,7 +218,10 @@ describe('Experiments', () => {
 
     it('should not call the function if user input is not provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickCurrentExperimentName.mockResolvedValueOnce('exp-456')
+      mockedPickCurrentExperiment.mockResolvedValueOnce({
+        id: 'b456789',
+        name: 'exp-456'
+      })
       mockedGetInput.mockResolvedValueOnce(undefined)
 
       await workspaceExperiments.getExpNameAndInputThenRun(
