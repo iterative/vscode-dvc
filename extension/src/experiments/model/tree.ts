@@ -49,6 +49,8 @@ export class ExperimentsTree
   private readonly view: TreeView<string | ExperimentItem>
   private viewed = false
 
+  private expandedExperiments: Record<string, true | undefined> = {}
+
   constructor(
     experiments: WorkspaceExperiments,
     internalCommands: InternalCommands,
@@ -58,6 +60,22 @@ export class ExperimentsTree
 
     this.view = this.dispose.track(
       createTreeView<ExperimentItem>('dvc.views.experimentsTree', this)
+    )
+
+    this.dispose.track(
+      this.view.onDidCollapseElement(({ element }) => {
+        if (!this.isRoot(element) && element.description) {
+          this.expandedExperiments[element.description] = undefined
+        }
+      })
+    )
+
+    this.dispose.track(
+      this.view.onDidExpandElement(({ element }) => {
+        if (!this.isRoot(element) && element.description) {
+          this.expandedExperiments[element.description] = true
+        }
+      })
     )
 
     this.experiments = experiments
@@ -136,7 +154,7 @@ export class ExperimentsTree
       .getExperiments()
       .map(experiment => ({
         collapsibleState: experiment.hasChildren
-          ? TreeItemCollapsibleState.Collapsed
+          ? this.getCollapsibleState(experiment.displayNameOrParent)
           : TreeItemCollapsibleState.None,
         command: experiment.queued
           ? undefined
@@ -151,6 +169,13 @@ export class ExperimentsTree
         id: experiment.id,
         label: experiment.displayId
       }))
+  }
+
+  private getCollapsibleState(description?: string) {
+    if (description && this.expandedExperiments[description]) {
+      return TreeItemCollapsibleState.Expanded
+    }
+    return TreeItemCollapsibleState.Collapsed
   }
 
   private getExperimentIcon({

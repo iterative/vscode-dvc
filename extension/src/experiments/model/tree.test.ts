@@ -12,6 +12,8 @@ const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
+const mockedCreateTreeView = jest.fn()
+mockedWindow.createTreeView = mockedCreateTreeView
 const mockedTreeItem = mocked(TreeItem)
 const mockedThemeIcon = mocked(ThemeIcon)
 
@@ -44,7 +46,10 @@ jest.mock('@hediet/std/disposable')
 
 beforeEach(() => {
   jest.resetAllMocks()
-
+  mockedCreateTreeView.mockReturnValueOnce({
+    onDidCollapseElement: jest.fn(),
+    onDidExpandElement: jest.fn()
+  })
   mockedDisposable.fn.mockReturnValue({
     track: function <T>(disposable: T): T {
       return disposable
