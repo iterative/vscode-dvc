@@ -11,12 +11,17 @@ export const deeplyNestedOutput: ExperimentsOutput = {
         params: {
           'params.yaml': {
             data: {
-              '1': {
-                '2': {
-                  '3': {
-                    '4': {
-                      '5': { '6': { '7': 'Lucky!' } },
-                      '5b': { '6': 'Wow!!!!!!!!!!!!!!!!!!!!' }
+              outlier: 1,
+              nested1: {
+                doubled: 'first instance!',
+                nested2: {
+                  nested3: {
+                    nested4: {
+                      nested5: { nested6: { nested7: 'Lucky!' } },
+                      nested5b: {
+                        nested6: 'Wow!!!!!!!!!!!!!!!!!!!!',
+                        doubled: 'second instance!'
+                      }
                     }
                   }
                 }
