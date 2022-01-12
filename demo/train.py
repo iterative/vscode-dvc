@@ -6,12 +6,26 @@ import torch
 import torch.nn.functional as F
 import torchvision
 from dvclive import Live
+import matplotlib.pyplot as plt
+import numpy as np
+
+def write_results(actual,predicted, d):
+    os.makedirs(d,exist_ok=True)
+    heatmap, xedges, yedges = np.histogram2d(
+      actual, 
+      predicted, 
+      bins=20
+    )
+    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+
+    plt.clf()
+    plt.imshow(heatmap.T, extent=extent, origin='lower')
+    plt.savefig(os.path.join(d, 'heatmap.png'))
 
 live = Live()
 
 
-EPOCHS = 2
-
+EPOCHS = 9
 
 class ConvNet(torch.nn.Module):
     """Toy convolutional neural net."""
@@ -74,14 +88,16 @@ def evaluate(model, x, y):
     """Evaluate model and save metrics."""
     scores = predict(model, x)
     _, labels = torch.max(scores, 1)
+    actual = [int(v) for v in y]
+    predicted = [int(v) for v in labels]
     predictions = [{
                     "actual": int(actual),
                     "predicted": int(predicted)
-                   } for actual, predicted in zip(y, labels)]
+                   } for actual, predicted in zip(actual, predicted)]
     with open("predictions.json", "w") as f:
         json.dump(predictions, f)
     metrics = get_metrics(y, scores, labels)
-    return metrics
+    return metrics, actual, predicted
 
 
 def main():
@@ -105,10 +121,12 @@ def main():
         train(model, x_train, y_train, params["lr"], params["weight_decay"])
         torch.save(model.state_dict(), "model.pt")
         # Evaluate and checkpoint.
-        metrics = evaluate(model, x_test, y_test)
+        metrics, actual, predicted = evaluate(model, x_test, y_test)
+        # write_results(v,'plots')
         for k, v in metrics.items():
             live.log(k, v)
         live.next_step()
+    write_results(actual, predicted, 'plots')
 
 
 if __name__ == "__main__":
