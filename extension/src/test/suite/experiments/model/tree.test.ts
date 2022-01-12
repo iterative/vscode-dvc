@@ -321,7 +321,7 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.calledWith(expectedMessage)
     }).timeout(8000)
 
-    it('should retain the expanded status of experiments', () => {
+    it('should retain the expanded state of experiment tree items', () => {
       const { workspaceExperiments } = buildSingleRepoExperiments(disposable)
 
       const elementCollapsed = disposable.track(
