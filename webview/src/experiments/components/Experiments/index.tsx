@@ -130,6 +130,7 @@ export const ExperimentsTable: React.FC<{
   const instance = useTable<Experiment>(
     {
       autoResetExpanded: false,
+      autoResetResize: false,
       columns,
       data,
       defaultColumn,
