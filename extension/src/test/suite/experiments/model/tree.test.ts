@@ -1,7 +1,15 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, SinonStub, spy } from 'sinon'
-import { commands, QuickPickItem, QuickPickOptions, window } from 'vscode'
+import {
+  commands,
+  EventEmitter,
+  QuickPickItem,
+  QuickPickOptions,
+  TreeView,
+  TreeViewExpansionEvent,
+  window
+} from 'vscode'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel, Status } from '../../../../experiments/model'
 import { experimentsUpdatedEvent } from '../../util'
@@ -14,6 +22,13 @@ import columnsFixture from '../../../fixtures/expShow/columns'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
 import { defaultSectionCollapsed } from '../../../../plots/webview/contract'
+import {
+  ExperimentItem,
+  ExperimentsTree
+} from '../../../../experiments/model/tree'
+import { buildSingleRepoExperiments } from '../util'
+import { ResourceLocator } from '../../../../resourceLocator'
+import { InternalCommands } from '../../../../commands/internal'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -305,5 +320,54 @@ suite('Experiments Tree Test Suite', () => {
         'the old filters are still applied to the message'
       ).to.be.calledWith(expectedMessage)
     }).timeout(8000)
+
+    it('should retain the expanded status of experiments', () => {
+      const { workspaceExperiments } = buildSingleRepoExperiments(disposable)
+
+      const elementCollapsed = disposable.track(
+        new EventEmitter<TreeViewExpansionEvent<ExperimentItem>>()
+      )
+      const elementExpanded = disposable.track(
+        new EventEmitter<TreeViewExpansionEvent<ExperimentItem>>()
+      )
+
+      stub(window, 'createTreeView').returns({
+        dispose: stub(),
+        onDidCollapseElement: elementCollapsed.event,
+        onDidExpandElement: elementExpanded.event
+      } as unknown as TreeView<string | ExperimentItem>)
+
+      const experimentsTree = disposable.track(
+        new ExperimentsTree(
+          workspaceExperiments,
+          { registerExternalCommand: stub() } as unknown as InternalCommands,
+          {} as ResourceLocator
+        )
+      )
+
+      const description = '[exp-1234]'
+
+      const setExpandedSpy = spy(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        experimentsTree as any,
+        'setExperimentExpanded'
+      )
+
+      elementExpanded.fire({ element: { description } as ExperimentItem })
+
+      expect(
+        setExpandedSpy,
+        'the experiment should be set to expanded'
+      ).to.be.calledOnceWith(description, true)
+
+      setExpandedSpy.resetHistory()
+
+      elementCollapsed.fire({ element: { description } as ExperimentItem })
+
+      expect(
+        setExpandedSpy,
+        'the experiment should be set to collapsed'
+      ).to.be.calledOnceWith(description, false)
+    })
   })
 })

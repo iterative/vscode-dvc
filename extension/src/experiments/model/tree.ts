@@ -22,7 +22,7 @@ enum Status {
   QUEUED = 2
 }
 
-type ExperimentItem = {
+export type ExperimentItem = {
   command?: {
     arguments: [{ dvcRoot: string; id: string }]
     command: RegisteredCommands
@@ -64,13 +64,13 @@ export class ExperimentsTree
 
     this.dispose.track(
       this.view.onDidCollapseElement(({ element }) => {
-        this.setExperimentExpanded(element, false)
+        this.setExpanded(element, false)
       })
     )
 
     this.dispose.track(
       this.view.onDidExpandElement(({ element }) => {
-        this.setExperimentExpanded(element, true)
+        this.setExpanded(element, true)
       })
     )
 
@@ -167,13 +167,14 @@ export class ExperimentsTree
       }))
   }
 
-  private setExperimentExpanded(
-    element: string | ExperimentItem,
-    expanded: boolean
-  ) {
+  private setExpanded(element: string | ExperimentItem, expanded: boolean) {
     if (!this.isRoot(element) && element.description) {
-      this.expandedExperiments[element.description] = expanded
+      this.setExperimentExpanded(element.description, expanded)
     }
+  }
+
+  private setExperimentExpanded(description: string, expanded: boolean) {
+    this.expandedExperiments[description] = expanded
   }
 
   private getCollapsibleState(description?: string) {
