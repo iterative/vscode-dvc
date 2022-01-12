@@ -73,7 +73,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           key={column.id}
           data-testid={`header-${column.id}`}
         >
-          <div
+          <span
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -86,7 +86,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             })}
           >
             {column.render('Header')}
-          </div>
+          </span>
           {canResize && (
             <div
               {...column.getResizerProps()}

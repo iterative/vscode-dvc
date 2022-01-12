@@ -51,6 +51,17 @@ $spinner-color-light: #000;
   }
 }
 
+%truncateLeftParent {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+}
+
+%truncateLeftChild {
+  unicode-bidi: isolate;
+  direction: ltr;
+}
+
 // Concrete selectors
 
 @keyframes spin {
@@ -234,8 +245,12 @@ $spinner-color-light: #000;
   .headerRow {
     font-size: 0.7rem;
 
-    .headerCell div {
-      opacity: 0.6;
+    .headerCell {
+      @extend %truncateLeftParent;
+      .cellContents {
+        @extend %truncateLeftChild;
+        opacity: 0.6;
+      }
     }
 
     &:last-child,
@@ -482,7 +497,6 @@ $spinner-color-light: #000;
 .cellContents {
   overflow: hidden;
   text-overflow: ellipsis;
-  direction: rtl;
 }
 
 .th {
