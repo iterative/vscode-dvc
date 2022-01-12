@@ -9,21 +9,7 @@ from dvclive import Live
 import matplotlib.pyplot as plt
 import numpy as np
 
-def write_results(actual,predicted, d):
-    os.makedirs(d,exist_ok=True)
-    heatmap, xedges, yedges = np.histogram2d(
-      actual, 
-      predicted, 
-      bins=20
-    )
-    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-
-    plt.clf()
-    plt.imshow(heatmap.T, extent=extent, origin='lower')
-    plt.savefig(os.path.join(d, 'heatmap.png'))
-
 live = Live()
-
 
 EPOCHS = 9
 
@@ -75,6 +61,23 @@ def predict(model, x):
     return y_pred
 
 
+def write_heatmap(actual,predicted):
+    d = 'plots'
+    os.makedirs(d,exist_ok=True)
+    heatmap, xedges, yedges = np.histogram2d(
+      actual, 
+      predicted, 
+      bins=20
+    )
+    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+
+    plt.clf()
+    plt.imshow(heatmap.T, extent=extent, origin='lower')
+    plt.xlabel('actual')
+    plt.ylabel('predicted')
+    plt.savefig(os.path.join(d, 'heatmap.png'))
+
+
 def get_metrics(y, y_pred, y_pred_label):
     """Get loss and accuracy metrics."""
     metrics = {}
@@ -96,8 +99,11 @@ def evaluate(model, x, y):
                    } for actual, predicted in zip(actual, predicted)]
     with open("predictions.json", "w") as f:
         json.dump(predictions, f)
+
+    write_heatmap(actual,predicted)
     metrics = get_metrics(y, scores, labels)
-    return metrics, actual, predicted
+
+    return metrics
 
 
 def main():
@@ -121,12 +127,10 @@ def main():
         train(model, x_train, y_train, params["lr"], params["weight_decay"])
         torch.save(model.state_dict(), "model.pt")
         # Evaluate and checkpoint.
-        metrics, actual, predicted = evaluate(model, x_test, y_test)
-        # write_results(v,'plots')
+        metrics = evaluate(model, x_test, y_test)
         for k, v in metrics.items():
             live.log(k, v)
         live.next_step()
-    write_results(actual, predicted, 'plots')
 
 
 if __name__ == "__main__":
