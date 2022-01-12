@@ -245,12 +245,12 @@ $spinner-color-light: #000;
   .headerRow {
     font-size: 0.7rem;
 
-    .headerCell {
+    .headerCellContentsWrapper {
       @extend %truncateLeftParent;
-      .cellContents {
-        @extend %truncateLeftChild;
-        opacity: 0.6;
-      }
+      opacity: 0.6;
+    }
+    .cellContents {
+      @extend %truncateLeftChild;
     }
 
     &:last-child,
@@ -279,9 +279,10 @@ $spinner-color-light: #000;
 
       .headerCell {
         text-align: right;
-        div {
-          opacity: 1;
-        }
+      }
+
+      .headerCellContentsWrapper {
+        opacity: 1;
       }
 
       .experimentHeaderCell {
