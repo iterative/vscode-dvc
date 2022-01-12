@@ -5,5 +5,5 @@ module.exports = {
   coveragePathIgnorePatterns: ['<rootDir>/src/test/'],
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testPathIgnorePatterns: ['<rootDir>/src/test/suite', '<rootDir>/dist/']
+  testPathIgnorePatterns: ['<rootDir>/src/test/', '<rootDir>/dist/']
 }
