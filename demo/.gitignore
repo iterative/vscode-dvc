@@ -2,6 +2,6 @@
 /data/MNIST/processed
 /.vscode/settings.json
 /.env
-/plots
 /logs
 /logs_dvc_plots
+/plots
