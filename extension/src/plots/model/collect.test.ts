@@ -44,6 +44,6 @@ describe('collectLivePlotsData', () => {
 describe('collectRevisions', () => {
   it('should return the expected revisions from the test fixture', () => {
     const revisions = collectRevisions(expShowFixture)
-    expect(revisions).toEqual(['53c3851', '1ba7bcd', '42b8736', '4fb124a'])
+    expect(revisions).toEqual(['master', '1ba7bcd', '42b8736', '4fb124a'])
   })
 })

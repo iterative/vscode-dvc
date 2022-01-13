@@ -52,6 +52,7 @@ type MetricsAndDetailsOrUndefined =
       checkpoint_parent: string | undefined
       checkpoint_tip: string | undefined
       metrics: MetricsOrParams | undefined
+      queued: boolean | undefined
     }
   | undefined
 
@@ -63,16 +64,17 @@ const transformExperimentData = (
     return
   }
 
-  const { checkpoint_tip, checkpoint_parent } = experimentFields
+  const { checkpoint_tip, checkpoint_parent, queued } = experimentFields
   const { metrics } = reduceMetricsAndParams(experimentFields)
 
-  return { checkpoint_parent, checkpoint_tip, metrics }
+  return { checkpoint_parent, checkpoint_tip, metrics, queued }
 }
 
 type ValidCheckpointData = {
   checkpoint_parent: string
   checkpoint_tip: string
   metrics: MetricsOrParams
+  queued: boolean | undefined
 }
 
 const isValidCheckpoint = (
@@ -204,25 +206,27 @@ const collectBranchRevisions = (
       if (sha === 'baseline') {
         return
       }
-      const checkpoint_tip =
-        transformExperimentData(experimentData)?.checkpoint_tip
-      if (!checkpoint_tip) {
+      const data = transformExperimentData(experimentData)
+      if (!data || data.queued) {
         return
       }
 
-      acc.add(getDisplayId(checkpoint_tip))
+      const revSha = data.checkpoint_tip || sha
+
+      acc.add(getDisplayId(revSha))
     })
 }
 
 export const collectRevisions = (data: ExperimentsOutput): string[] => {
   const acc: Set<string> = new Set()
 
-  for (const [sha, experimentsObject] of Object.entries(
-    omit(data, 'workspace')
-  )) {
-    acc.add(getDisplayId(sha))
+  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
+    const branchName = experimentsObject.baseline.data?.name
 
-    // only works for checkpoint experiments!
+    if (branchName) {
+      acc.add(branchName)
+    }
+
     collectBranchRevisions(acc, experimentsObject)
   }
   return [...acc]
