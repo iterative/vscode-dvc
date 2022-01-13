@@ -72,7 +72,7 @@ export class PlotsData {
 
   private async update(): Promise<void> {
     const data = await this.internalCommands.executeCommand<PlotsOutput>(
-      AvailableCommands.PLOTS_SHOW,
+      AvailableCommands.PLOTS_DIFF,
       this.dvcRoot,
       ...(this.revisions || [])
     )

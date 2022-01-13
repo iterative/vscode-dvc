@@ -4,8 +4,8 @@ import { restore, spy } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
-import plotsShowFixture from '../../fixtures/plotsShow/output'
-import staticPlotsFixture from '../../fixtures/plotsShow/staticPlots/vscode'
+import plotsDiffFixture from '../../fixtures/plotsDiff/output'
+import staticPlotsFixture from '../../fixtures/plotsDiff/staticPlots/vscode'
 import { closeAllEditors } from '../util'
 import {
   defaultSectionCollapsed,
@@ -27,9 +27,9 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { data, plots, mockPlotsShow, messageSpy } = await buildPlots(
+      const { data, plots, mockplotsDiff, messageSpy } = await buildPlots(
         disposable,
-        plotsShowFixture
+        plotsDiffFixture
       )
       const managedUpdateSpy = spy(data, 'managedUpdate')
 
@@ -47,7 +47,7 @@ suite('Plots Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)
 
-      expect(mockPlotsShow).to.be.called
+      expect(mockplotsDiff).to.be.called
       expect(managedUpdateSpy, 'should call the cli when the webview is loaded')
         .to.be.calledOnce
 

@@ -8,7 +8,7 @@ import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
 import { getProcessEnv } from '../env'
 import expShowFixture from '../test/fixtures/expShow/output'
-import plotsShowFixture from '../test/fixtures/plotsShow/output'
+import plotsDiffFixture from '../test/fixtures/plotsDiff/output'
 import { Config } from '../config'
 
 jest.mock('vscode')
@@ -262,16 +262,16 @@ describe('CliReader', () => {
       })
     })
 
-    describe('plotsShow', () => {
+    describe('plotsDiff', () => {
       it('should match the expected output', async () => {
         const cwd = __dirname
 
         mockedCreateProcess.mockReturnValueOnce(
-          getMockedProcess(JSON.stringify(plotsShowFixture))
+          getMockedProcess(JSON.stringify(plotsDiffFixture))
         )
 
-        const plots = await cliReader.plotsShow(cwd, 'HEAD')
-        expect(plots).toEqual(plotsShowFixture)
+        const plots = await cliReader.plotsDiff(cwd, 'HEAD')
+        expect(plots).toEqual(plotsDiffFixture)
         expect(mockedCreateProcess).toBeCalledWith({
           args: [
             'plots',

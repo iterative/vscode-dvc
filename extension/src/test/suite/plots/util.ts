@@ -13,13 +13,13 @@ import { PlotSize, Section } from '../../../plots/webview/contract'
 import { DefaultSectionNames } from '../../../plots/model'
 import { PlotsData } from '../../../plots/data'
 
-export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
+export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
   const { experiments, internalCommands, updatesPaused, resourceLocator } =
     buildExperiments(disposer, expShowFixture)
 
   const messageSpy = spy(BaseWebview.prototype, 'show')
-  const mockPlotsShow = stub(CliReader.prototype, 'plotsShow').resolves(
-    plotsShow
+  const mockplotsDiff = stub(CliReader.prototype, 'plotsDiff').resolves(
+    plotsDiff
   )
 
   const data = new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
@@ -41,7 +41,7 @@ export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
   stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 
-  return { data, experiments, messageSpy, mockPlotsShow, plots }
+  return { data, experiments, messageSpy, mockplotsDiff, plots }
 }
 
 export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {

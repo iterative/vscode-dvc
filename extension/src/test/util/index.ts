@@ -4,7 +4,7 @@ import { Memento, Uri } from 'vscode'
 const dvcRoot = resolve(__dirname, '..', '..', '..', '..', 'demo')
 export const dvcDemoPath = Uri.file(dvcRoot).fsPath
 export const basePlotsUrl = Uri.file(
-  resolve(__dirname, '..', 'fixtures', 'plotsShow', 'staticImages')
+  resolve(__dirname, '..', 'fixtures', 'plotsDiff', 'staticImages')
 ).fsPath
 
 export const buildMockMemento = (

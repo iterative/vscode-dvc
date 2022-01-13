@@ -13,7 +13,7 @@ import {
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import expShowFixture from '../fixtures/expShow/output'
-import plotsShowFixture from '../fixtures/plotsShow/output'
+import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
 import { RegisteredCommands } from '../../commands/external'
 import * as Setup from '../../setup'
@@ -222,7 +222,7 @@ suite('Extension Test Suite', () => {
         ]
       })
 
-      stub(CliReader.prototype, 'plotsShow').resolves(plotsShowFixture)
+      stub(CliReader.prototype, 'plotsDiff').resolves(plotsDiffFixture)
 
       const mockStatus = stub(CliReader.prototype, 'status').resolves({
         'data/MNIST/raw.dvc': [
