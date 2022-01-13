@@ -2,6 +2,7 @@ import omit from 'lodash.omit'
 import { LivePlotValues, LivePlotData } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
+  ExperimentsBranchOutput,
   ExperimentsOutput,
   Value,
   ValueTree
@@ -13,6 +14,7 @@ import {
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
+import { getDisplayId } from '../../experiments/model/collect'
 
 type LivePlotAccumulator = Map<string, LivePlotValues>
 
@@ -190,4 +192,38 @@ export const collectLivePlotsData = (
   })
 
   return plotsData
+}
+
+const collectBranchRevisions = (
+  acc: Set<string>,
+  experimentsObject: ExperimentsBranchOutput
+): void => {
+  Object.entries(experimentsObject)
+    .reverse()
+    .map(([sha, experimentData]) => {
+      if (sha === 'baseline') {
+        return
+      }
+      const checkpoint_tip =
+        transformExperimentData(experimentData)?.checkpoint_tip
+      if (!checkpoint_tip) {
+        return
+      }
+
+      acc.add(getDisplayId(checkpoint_tip))
+    })
+}
+
+export const collectRevisions = (data: ExperimentsOutput): string[] => {
+  const acc: Set<string> = new Set()
+
+  for (const [sha, experimentsObject] of Object.entries(
+    omit(data, 'workspace')
+  )) {
+    acc.add(getDisplayId(sha))
+
+    // only works for checkpoint experiments!
+    collectBranchRevisions(acc, experimentsObject)
+  }
+  return [...acc]
 }

@@ -1,6 +1,6 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectLivePlotsData } from './collect'
+import { collectLivePlotsData, collectRevisions } from './collect'
 import {
   defaultSectionCollapsed,
   LivePlotData,
@@ -34,6 +34,7 @@ export class PlotsModel {
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
+  private revisions: string[] = []
 
   constructor(
     dvcRoot: string,
@@ -65,10 +66,14 @@ export class PlotsModel {
     )
   }
 
-  public transformAndSet(data: ExperimentsOutput) {
-    const livePlots = collectLivePlotsData(data)
+  public async transformAndSet(data: ExperimentsOutput) {
+    const [livePlots, revisions] = await Promise.all([
+      collectLivePlotsData(data),
+      collectRevisions(data)
+    ])
 
     this.livePlots = livePlots
+    this.revisions = revisions
   }
 
   public getLivePlots() {
@@ -99,6 +104,10 @@ export class PlotsModel {
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize(Section.LIVE_PLOTS)
     }
+  }
+
+  public getRevisions() {
+    return this.revisions
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {

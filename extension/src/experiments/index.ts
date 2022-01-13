@@ -222,6 +222,10 @@ export class Experiments extends BaseRepository<TableData> {
     return pickParamsToQueue(params)
   }
 
+  public getCurrentExperiments() {
+    return this.experiments.getSelectable()
+  }
+
   public getExperiments() {
     return this.experiments.getExperiments()
   }

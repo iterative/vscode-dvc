@@ -127,10 +127,15 @@ export class CliReader extends Cli {
     )
   }
 
-  public plotsShow(cwd: string): Promise<PlotsOutput> {
-    return this.readShowProcessJson<PlotsOutput>(
+  public plotsShow(
+    cwd: string,
+    ...experimentNames: string[]
+  ): Promise<PlotsOutput> {
+    return this.readProcessJson<PlotsOutput>(
       cwd,
       Command.PLOTS,
+      'diff',
+      ...experimentNames,
       '-o',
       join('.dvc', 'tmp', 'plots')
     )

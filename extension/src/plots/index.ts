@@ -60,11 +60,14 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      experiments.onDidChangeExperiments(data => {
+      experiments.onDidChangeExperiments(async data => {
         if (data) {
-          this.model?.transformAndSet(data)
+          await this.model?.transformAndSet(data)
         }
+
         this.sendLivePlotsData()
+        await this.data.isReady()
+        this.data.setRevisions(...(this.model?.getRevisions() || []))
       })
     )
 
@@ -82,7 +85,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       live: this.getLivePlots(),
       sectionCollapsed: this.model?.getSectionCollapsed()
     })
-    this.data.managedUpdate()
+    this.data.setRevisions(...(this.model?.getRevisions() || []))
   }
 
   private sendLivePlotsData() {

@@ -3,7 +3,7 @@ import webpackConfig from '../webpack.config'
 
 export default {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
-  staticDirs: ['../../demo/plots'],
+  staticDirs: ['../../extension/src/test/fixtures/plotsShow/staticImages'],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
