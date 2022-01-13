@@ -153,6 +153,13 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return this.getRepoChildren(dvcRoot, resourceUri.fsPath)
   }
 
+  private async getRepoChildren(dvcRoot: string, path?: string) {
+    await this.repositories.isReady()
+    return this.sortDirectory(
+      this.repositories.getRepository(dvcRoot).getChildren(path || dvcRoot)
+    )
+  }
+
   private sortDirectory(contents: PathItem[]) {
     return contents.sort((a, b) => {
       const aIsDirectory = a.isDirectory
@@ -161,11 +168,6 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       }
       return aIsDirectory ? -1 : 1
     })
-  }
-
-  private async getRepoChildren(dvcRoot: string, path?: string) {
-    await this.repositories.isReady()
-    return this.repositories.getRepository(dvcRoot).getChildren(path || dvcRoot)
   }
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
