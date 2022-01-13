@@ -2,10 +2,16 @@ import { join } from 'path'
 import { collectChanges, collectMetricsAndParams } from './collect'
 import { joinMetricOrParamPath } from './paths'
 import { MetricOrParam } from '../webview/contract'
-import expShowFixture from '../../test/fixtures/expShow/output'
+import outputFixture from '../../test/fixtures/expShow/output'
+import columnsFixture from '../../test/fixtures/expShow/columns'
 import { ExperimentsOutput } from '../../cli/reader'
 
 describe('collectMetricsAndParams', () => {
+  it('should return a value equal to the columns fixture when given the output fixture', () => {
+    const metricsAndParams = collectMetricsAndParams(outputFixture)
+    expect(metricsAndParams).toEqual(columnsFixture)
+  })
+
   it('should output both params and metrics when both are present', () => {
     const metricsAndParams = collectMetricsAndParams({
       workspace: {
@@ -363,7 +369,7 @@ describe('collectMetricsAndParams', () => {
 
   it('should collect all params and metrics from the test fixture', () => {
     expect(
-      collectMetricsAndParams(expShowFixture).map(({ path }) => path)
+      collectMetricsAndParams(outputFixture).map(({ path }) => path)
     ).toEqual([
       joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
       joinMetricOrParamPath('metrics', 'summary.json', 'accuracy'),

@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { basename, join } from 'path'
 import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
@@ -95,7 +95,9 @@ describe('TrackedTreeView', () => {
         resourceUri: Uri.file(dvcRoot)
       })
 
-      mockedGetChildren.mockImplementation(getRootPathItem)
+      mockedGetChildren.mockImplementation(dvcRoot => [
+        getRootPathItem(dvcRoot)
+      ])
 
       const rootElements = await trackedTreeView.getChildren()
 
@@ -104,6 +106,53 @@ describe('TrackedTreeView', () => {
       expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
       expect(mockedGetRepository).toBeCalledWith(mockedOtherRoot)
       expect(mockedGetChildren).toBeCalledTimes(2)
+    })
+
+    it('should return directories first in the list of root items', async () => {
+      const mockedDvcRoots = [dvcDemoPath]
+
+      const trackedTreeView = new TrackedExplorerTree(
+        mockedInternalCommands,
+        mockedWorkspaceChanged,
+        mockedRepositories
+      )
+      trackedTreeView.initialize(mockedDvcRoots)
+
+      mockedGetChildren.mockReturnValueOnce([
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: true,
+          isTracked: true,
+          resourceUri: Uri.file(join(dvcDemoPath, 'logs'))
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: true,
+          isTracked: true,
+          resourceUri: Uri.file(join(dvcDemoPath, 'data'))
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: false,
+          isTracked: true,
+          resourceUri: Uri.file(join(dvcDemoPath, 'model.pt'))
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: true,
+          isTracked: true,
+          resourceUri: Uri.file(join(dvcDemoPath, 'plots'))
+        }
+      ])
+
+      const rootElements = await trackedTreeView.getChildren()
+
+      expect(
+        rootElements.map(({ resourceUri }) => basename(resourceUri.fsPath))
+      ).toEqual(['data', 'logs', 'plots', 'model.pt'])
+      expect(mockedGetRepository).toBeCalledTimes(1)
+      expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
+      expect(mockedGetChildren).toBeCalledTimes(1)
     })
 
     it('should get the children for the provided element', async () => {

@@ -22,7 +22,7 @@ enum Status {
   QUEUED = 2
 }
 
-type ExperimentItem = {
+export type ExperimentItem = {
   command?: {
     arguments: [{ dvcRoot: string; id: string }]
     command: RegisteredCommands
@@ -49,6 +49,8 @@ export class ExperimentsTree
   private readonly view: TreeView<string | ExperimentItem>
   private viewed = false
 
+  private expandedExperiments: Record<string, boolean | undefined> = {}
+
   constructor(
     experiments: WorkspaceExperiments,
     internalCommands: InternalCommands,
@@ -58,6 +60,18 @@ export class ExperimentsTree
 
     this.view = this.dispose.track(
       createTreeView<ExperimentItem>('dvc.views.experimentsTree', this)
+    )
+
+    this.dispose.track(
+      this.view.onDidCollapseElement(({ element }) => {
+        this.setExpanded(element, false)
+      })
+    )
+
+    this.dispose.track(
+      this.view.onDidExpandElement(({ element }) => {
+        this.setExpanded(element, true)
+      })
     )
 
     this.experiments = experiments
@@ -136,7 +150,7 @@ export class ExperimentsTree
       .getExperiments()
       .map(experiment => ({
         collapsibleState: experiment.hasChildren
-          ? TreeItemCollapsibleState.Collapsed
+          ? this.getCollapsibleState(experiment.displayNameOrParent)
           : TreeItemCollapsibleState.None,
         command: experiment.queued
           ? undefined
@@ -151,6 +165,23 @@ export class ExperimentsTree
         id: experiment.id,
         label: experiment.displayId
       }))
+  }
+
+  private setExpanded(element: string | ExperimentItem, expanded: boolean) {
+    if (!this.isRoot(element) && element.description) {
+      this.setExperimentExpanded(element.description, expanded)
+    }
+  }
+
+  private setExperimentExpanded(description: string, expanded: boolean) {
+    this.expandedExperiments[description] = expanded
+  }
+
+  private getCollapsibleState(description?: string) {
+    if (description && this.expandedExperiments[description]) {
+      return TreeItemCollapsibleState.Expanded
+    }
+    return TreeItemCollapsibleState.Collapsed
   }
 
   private getExperimentIcon({
