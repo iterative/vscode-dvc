@@ -95,7 +95,7 @@ export const autoRegisteredCommands = {
   DIFF: 'diff',
   EXPERIMENT_SHOW: 'experimentShow',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
-  PLOTS_SHOW: 'plotsShow',
+  PLOTS_DIFF: 'plotsDiff',
   STATUS: 'status'
 } as const
 
@@ -127,10 +127,12 @@ export class CliReader extends Cli {
     )
   }
 
-  public plotsShow(cwd: string): Promise<PlotsOutput> {
-    return this.readShowProcessJson<PlotsOutput>(
+  public plotsDiff(cwd: string, ...revisions: string[]): Promise<PlotsOutput> {
+    return this.readProcessJson<PlotsOutput>(
       cwd,
       Command.PLOTS,
+      'diff',
+      ...revisions,
       '-o',
       join('.dvc', 'tmp', 'plots')
     )

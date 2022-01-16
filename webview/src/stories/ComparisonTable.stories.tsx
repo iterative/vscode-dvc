@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
-import { getImageData } from 'dvc/src/test/fixtures/plotsShow'
+import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
 import { LivePlotsColors, PlotsOutput } from 'dvc/src/plots/webview/contract'
 import { ComparisonTable } from '../plots/components/ComparisonTable/ComparisonTable'
 
