@@ -390,7 +390,7 @@ export const getFixture = (
 ) => ({
   ...getImageData(baseUrl, joinFunc),
   ...basicVega,
-  ...require('./confusionMatrix').default
+  ...require('./vega').default
 })
 
 export const getWebviewMessageFixture = (
