@@ -67,6 +67,7 @@ def write_heatmap(actual,predicted):
     heatmap, xedges, yedges = np.histogram2d(
       actual, 
       predicted, 
+      density=True,
       bins=20
     )
     extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
