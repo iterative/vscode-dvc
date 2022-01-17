@@ -1,5 +1,5 @@
 import omit from 'lodash.omit'
-import { collectLivePlotsData } from './collect'
+import { collectLivePlotsData, collectRevisions } from './collect'
 import expShowFixture from '../../test/fixtures/expShow/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 import livePlotsFixture from '../../test/fixtures/expShow/livePlots'
@@ -38,5 +38,12 @@ describe('collectLivePlotsData', () => {
   it('should return undefined given no input', () => {
     const data = collectLivePlotsData({} as ExperimentsOutput)
     expect(data).toBeUndefined()
+  })
+})
+
+describe('collectRevisions', () => {
+  it('should return the expected revisions from the test fixture', () => {
+    const revisions = collectRevisions(expShowFixture)
+    expect(revisions).toEqual(['master', '1ba7bcd', '42b8736', '4fb124a'])
   })
 })

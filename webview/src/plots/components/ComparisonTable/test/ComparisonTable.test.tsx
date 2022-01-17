@@ -4,7 +4,7 @@
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import { getImageData } from 'dvc/src/test/fixtures/plotsShow'
+import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
 import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
 
 describe('ComparisonTable', () => {
@@ -14,7 +14,7 @@ describe('ComparisonTable', () => {
 
   const basicProps: ComparisonTableProps = {
     colors: {
-      domain: ['workspace', 'HEAD'],
+      domain: ['6220556', 'a9eb4fd'],
       range: ['#f14c4c', '#3794ff']
     },
     plots: getImageData('.')
