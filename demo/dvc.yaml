@@ -12,7 +12,6 @@ stages:
     - model.pt:
         checkpoint: true
     plots:
-    - plots
     - predictions.json:
         cache: false
         template: confusion
