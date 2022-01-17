@@ -46,10 +46,14 @@ suite('Plots Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)
-      expect(messageSpy).to.be.calledWith({ static: staticPlotsFixture })
+
       expect(mockplotsDiff).to.be.called
       expect(managedUpdateSpy, 'should call the cli when the webview is loaded')
         .to.be.calledOnce
+
+      expect(messageSpy).to.be.calledWith({
+        static: staticPlotsFixture
+      })
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true

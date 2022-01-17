@@ -2,6 +2,7 @@ import omit from 'lodash.omit'
 import { LivePlotValues, LivePlotData } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
+  ExperimentsBranchOutput,
   ExperimentsOutput,
   Value,
   ValueTree
@@ -13,6 +14,7 @@ import {
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
+import { getDisplayId } from '../../experiments/model/collect'
 
 type LivePlotAccumulator = Map<string, LivePlotValues>
 
@@ -50,6 +52,7 @@ type MetricsAndDetailsOrUndefined =
       checkpoint_parent: string | undefined
       checkpoint_tip: string | undefined
       metrics: MetricsOrParams | undefined
+      queued: boolean | undefined
     }
   | undefined
 
@@ -61,16 +64,17 @@ const transformExperimentData = (
     return
   }
 
-  const { checkpoint_tip, checkpoint_parent } = experimentFields
+  const { checkpoint_tip, checkpoint_parent, queued } = experimentFields
   const { metrics } = reduceMetricsAndParams(experimentFields)
 
-  return { checkpoint_parent, checkpoint_tip, metrics }
+  return { checkpoint_parent, checkpoint_tip, metrics, queued }
 }
 
 type ValidCheckpointData = {
   checkpoint_parent: string
   checkpoint_tip: string
   metrics: MetricsOrParams
+  queued: boolean | undefined
 }
 
 const isValidCheckpoint = (
@@ -190,4 +194,40 @@ export const collectLivePlotsData = (
   })
 
   return plotsData
+}
+
+const collectBranchRevisions = (
+  acc: Set<string>,
+  experimentsObject: ExperimentsBranchOutput
+): void => {
+  Object.entries(experimentsObject)
+    .reverse()
+    .map(([sha, experimentData]) => {
+      if (sha === 'baseline') {
+        return
+      }
+      const data = transformExperimentData(experimentData)
+      if (!data || data.queued) {
+        return
+      }
+
+      const revSha = data.checkpoint_tip || sha
+
+      acc.add(getDisplayId(revSha))
+    })
+}
+
+export const collectRevisions = (data: ExperimentsOutput): string[] => {
+  const acc: Set<string> = new Set()
+
+  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
+    const branchName = experimentsObject.baseline.data?.name
+
+    if (branchName) {
+      acc.add(branchName)
+    }
+
+    collectBranchRevisions(acc, experimentsObject)
+  }
+  return [...acc]
 }
