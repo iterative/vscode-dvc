@@ -3,3 +3,5 @@ dvclive
 torch
 torchvision
 ruamel.yaml
+matplotlib
+numpy
