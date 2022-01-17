@@ -66,6 +66,7 @@ export class Plots extends BaseRepository<TPlotsData> {
         }
 
         this.sendLivePlotsData()
+
         await this.data.isReady()
         this.data.setRevisions(...(this.model?.getRevisions() || []))
       })
@@ -80,12 +81,26 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
   }
 
-  public sendInitialWebviewData() {
+  public async sendInitialWebviewData() {
+    this.data.clearRevisions()
+    this.data.setRevisions(...(this.model?.getRevisions() || []))
+
+    const initialStaticPlotMessage = new Promise(resolve => {
+      const listener = this.dispose.track(
+        this.data.onDidUpdate(() => {
+          this.dispose.untrack(listener)
+          listener.dispose()
+          resolve(undefined)
+        })
+      )
+    })
+
+    await initialStaticPlotMessage
+
     this.webview?.show({
       live: this.getLivePlots(),
       sectionCollapsed: this.model?.getSectionCollapsed()
     })
-    this.data.setRevisions(...(this.model?.getRevisions() || []))
   }
 
   private sendLivePlotsData() {

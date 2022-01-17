@@ -63,7 +63,22 @@ suite('Experiments Tree Test Suite', () => {
       const expectedRange = [...range]
       const expectedIds = [...ids]
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const plotsModel = (plots as any).model
+
+      const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
+      const getLivePlotsEvent = new Promise(resolve =>
+        mockGetLivePlots.callsFake(() => {
+          resolve(undefined)
+          return mockGetLivePlots.wrappedMethod.bind(plotsModel)()
+        })
+      )
+
       await plots.showWebview()
+      await getLivePlotsEvent
+
+      mockGetLivePlots.restore()
+
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,
         'setSelectionMode'

@@ -18,7 +18,7 @@ export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
     buildExperiments(disposer, expShowFixture)
 
   const messageSpy = spy(BaseWebview.prototype, 'show')
-  const mockplotsDiff = stub(CliReader.prototype, 'plotsDiff').resolves(
+  const mockPlotsDiff = stub(CliReader.prototype, 'plotsDiff').resolves(
     plotsDiff
   )
 
@@ -41,7 +41,7 @@ export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
   stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 
-  return { data, experiments, messageSpy, mockplotsDiff, plots }
+  return { data, experiments, messageSpy, mockPlotsDiff, plots }
 }
 
 export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
