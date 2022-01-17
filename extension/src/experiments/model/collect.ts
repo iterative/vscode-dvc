@@ -36,7 +36,7 @@ const transformMetricsAndParams = (
   }
 }
 
-const getDisplayId = (sha: string) => sha.slice(0, 7)
+export const getDisplayId = (sha: string) => sha.slice(0, 7)
 
 const transformExperimentData = (
   sha: string,
