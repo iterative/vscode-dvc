@@ -41,7 +41,10 @@ export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
   stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 
-  return { data, experiments, messageSpy, mockplotsDiff: mockPlotsDiff, plots }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const plotsModel = (plots as any).model
+
+  return { data, experiments, messageSpy, mockPlotsDiff, plots, plotsModel }
 }
 
 export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
