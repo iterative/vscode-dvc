@@ -17,6 +17,10 @@ export class PlotsData extends BaseData<PlotsOutput> {
     this.initialize()
   }
 
+  public clearRevisions() {
+    this.revisions = undefined
+  }
+
   public setRevisions(...revisions: string[]) {
     if (this.revisions && sameContents(revisions, this.revisions)) {
       return
