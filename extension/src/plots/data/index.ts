@@ -12,7 +12,7 @@ export class PlotsData extends BaseData<PlotsOutput> {
     super(
       dvcRoot,
       internalCommands,
-      AvailableCommands.PLOTS_SHOW,
+      AvailableCommands.PLOTS_DIFF,
       updatesPaused
     )
   }
