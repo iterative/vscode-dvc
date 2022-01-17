@@ -38,7 +38,7 @@
   "command.resetWorkspace": "Reset the Workspace",
   "command.runExperiment": "Run Experiment",
   "command.runQueuedExperiments": "Run All Queued Experiments",
-  "command.runResetExperiment": "Run and Reset Experiment",
+  "command.runResetExperiment": "Reset and Run Experiment",
   "command.selectForCompare": "Select for Compare",
   "command.setupWorkspace": "Setup The Workspace",
   "command.showCommands": "Show Commands",
