@@ -27,12 +27,8 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { data, plots, mockPlotsDiff, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const plotsModel = (plots as any).model
+      const { data, plots, plotsModel, mockPlotsDiff, messageSpy } =
+        await buildPlots(disposable, plotsDiffFixture)
 
       const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
       const getLivePlotsEvent = new Promise(resolve =>
