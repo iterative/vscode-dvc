@@ -1,4 +1,14 @@
-const colorsList = [
+export const branchColorsList = [
+  '#945dd6',
+  '#13adc7',
+  '#f46837',
+  '#48bb78',
+  '#4299e1',
+  '#ed8936',
+  '#f56565'
+]
+
+const expColorsList = [
   '#f14c4c',
   '#3794ff',
   '#cca700',
@@ -51,4 +61,6 @@ const colorsList = [
   '#5f5856'
 ]
 
-export const copyOriginalColors = (): string[] => [...colorsList]
+export const copyOriginalBranchColors = (): string[] => [...branchColorsList]
+
+export const copyOriginalExperimentColors = (): string[] => [...expColorsList]

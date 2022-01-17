@@ -1,8 +1,8 @@
 import { join } from '../../util/path'
 import { RowData } from '../../../experiments/webview/contract'
-import { copyOriginalColors } from '../../../experiments/model/colors'
+import { copyOriginalExperimentColors } from '../../../experiments/model/colors'
 
-const colorsList = copyOriginalColors()
+const colorsList = copyOriginalExperimentColors()
 
 const data: RowData[] = [
   {
