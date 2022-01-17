@@ -6,12 +6,12 @@ import torch
 import torch.nn.functional as F
 import torchvision
 from dvclive import Live
+import matplotlib.pyplot as plt
+import numpy as np
 
 live = Live()
 
-
-EPOCHS = 2
-
+EPOCHS = 9
 
 class ConvNet(torch.nn.Module):
     """Toy convolutional neural net."""
@@ -61,6 +61,23 @@ def predict(model, x):
     return y_pred
 
 
+def write_heatmap(actual,predicted):
+    d = 'plots'
+    os.makedirs(d,exist_ok=True)
+    heatmap, xedges, yedges = np.histogram2d(
+      actual, 
+      predicted, 
+      bins=20
+    )
+    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+
+    plt.clf()
+    plt.imshow(heatmap.T, extent=extent, origin='lower')
+    plt.xlabel('actual')
+    plt.ylabel('predicted')
+    plt.savefig(os.path.join(d, 'heatmap.png'))
+
+
 def get_metrics(y, y_pred, y_pred_label):
     """Get loss and accuracy metrics."""
     metrics = {}
@@ -74,13 +91,18 @@ def evaluate(model, x, y):
     """Evaluate model and save metrics."""
     scores = predict(model, x)
     _, labels = torch.max(scores, 1)
+    actual = [int(v) for v in y]
+    predicted = [int(v) for v in labels]
     predictions = [{
                     "actual": int(actual),
                     "predicted": int(predicted)
-                   } for actual, predicted in zip(y, labels)]
+                   } for actual, predicted in zip(actual, predicted)]
     with open("predictions.json", "w") as f:
         json.dump(predictions, f)
+
+    write_heatmap(actual,predicted)
     metrics = get_metrics(y, scores, labels)
+
     return metrics
 
 
