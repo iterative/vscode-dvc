@@ -51,6 +51,11 @@ export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
 
 export type StaticPlot = VegaPlot | ImagePlot
 
+export interface PlotsComparisonData {
+  plots: PlotsOutput
+  colors: Record<string, string>
+}
+
 export type PlotsOutput = Record<string, StaticPlot[]>
 
 export interface StaticPlotsData {
@@ -76,5 +81,6 @@ export type PlotsData =
       live?: LivePlotsData | null
       static?: StaticPlotsData | null
       sectionCollapsed?: SectionCollapsed
+      comparison?: PlotsComparisonData | null
     }
   | undefined

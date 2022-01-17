@@ -1,35 +1,24 @@
-import {
-  LivePlotsColors,
-  PlotsOutput,
-  StaticPlot
-} from 'dvc/src/plots/webview/contract'
+import { PlotsComparisonData, StaticPlot } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { ComparisonTableRow } from './ComparisonTableRow'
 
-export interface ComparisonTableProps {
-  plots: PlotsOutput
-  colors: LivePlotsColors
-}
-
-export const ComparisonTable: React.FC<ComparisonTableProps> = ({
+export const ComparisonTable: React.FC<PlotsComparisonData> = ({
   plots,
   colors
 }) => {
   const [pinnedColumn, setPinnedColumn] = useState('')
   const columns = [
     pinnedColumn,
-    ...colors.domain.filter(domain => domain !== pinnedColumn)
+    ...Object.keys(colors).filter(exp => exp !== pinnedColumn)
   ].filter(Boolean)
   const headers = columns.map(exp => {
-    const colorIndex = colors.domain.indexOf(exp)
-
     return (
       <th key={exp}>
         <ComparisonTableHeader
           isPinned={pinnedColumn === exp}
           onClicked={() => setPinnedColumn(exp)}
-          color={colors.range[colorIndex]}
+          color={colors[exp]}
         >
           {exp}
         </ComparisonTableHeader>
