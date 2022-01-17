@@ -14,7 +14,7 @@ describe('ComparisonTable', () => {
 
   const basicProps: ComparisonTableProps = {
     colors: {
-      domain: ['6220556', 'a9eb4fd'],
+      domain: ['workspace', 'HEAD'],
       range: ['#f14c4c', '#3794ff']
     },
     plots: getImageData('.')
