@@ -304,28 +304,70 @@ const basicVega = {
 }
 
 export const getImageData = (baseUrl: string, joinFunc = join) => ({
-  'plots/acc.png': [
+  'plots/heatmap.png': [
     {
       type: PlotsType.IMAGE,
-      revisions: ['workspace'],
-      url: joinFunc(baseUrl, 'workspace_plots_acc.png')
+      revisions: ['6220556'],
+      url: joinFunc(baseUrl, '6220556_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['HEAD'],
-      url: joinFunc(baseUrl, 'HEAD_plots_acc.png')
+      revisions: ['a9eb4fd'],
+      url: joinFunc(baseUrl, 'a9eb4fd_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['7ee8096'],
+      url: joinFunc(baseUrl, '7ee8096_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['e36f8a9'],
+      url: joinFunc(baseUrl, 'e36f8a9_plots_heatmap.png')
+    }
+  ],
+  'plots/acc.png': [
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['6220556'],
+      url: joinFunc(baseUrl, '6220556_plots_acc.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['a9eb4fd'],
+      url: joinFunc(baseUrl, 'a9eb4fd_plots_acc.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['7ee8096'],
+      url: joinFunc(baseUrl, '7ee8096_plots_acc.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['e36f8a9'],
+      url: joinFunc(baseUrl, 'e36f8a9_plots_acc.png')
     }
   ],
   'plots/loss.png': [
     {
       type: PlotsType.IMAGE,
-      revisions: ['workspace'],
-      url: joinFunc(baseUrl, 'workspace_plots_loss.png')
+      revisions: ['6220556'],
+      url: joinFunc(baseUrl, '6220556_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['HEAD'],
-      url: joinFunc(baseUrl, 'HEAD_plots_loss.png')
+      revisions: ['a9eb4fd'],
+      url: joinFunc(baseUrl, 'a9eb4fd_plots_loss.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['7ee8096'],
+      url: joinFunc(baseUrl, '7ee8096_plots_loss.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['e36f8a9'],
+      url: joinFunc(baseUrl, 'e36f8a9_plots_loss.png')
     }
   ]
 })
