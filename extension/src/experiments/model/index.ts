@@ -316,7 +316,13 @@ export class ExperimentsModel {
     this.branchColors = branchColors
     this.experimentColors = experimentColors
 
-    this.persistColors()
+    Promise.all([
+      this.persistColors(
+        MementoPrefix.EXPERIMENTS_COLORS,
+        this.experimentColors
+      ),
+      this.persistColors(MementoPrefix.BRANCH_COLORS, this.branchColors)
+    ])
   }
 
   private persistSorts() {
@@ -336,20 +342,11 @@ export class ExperimentsModel {
     )
   }
 
-  private persistColors() {
-    return Promise.all([
-      this.workspaceState.update(
-        MementoPrefix.EXPERIMENTS_COLORS + this.dvcRoot,
-        {
-          assigned: [...this.experimentColors.assigned],
-          available: this.experimentColors.available
-        }
-      ),
-      this.workspaceState.update(MementoPrefix.BRANCH_COLORS + this.dvcRoot, {
-        assigned: [...this.branchColors.assigned],
-        available: this.branchColors.available
-      })
-    ])
+  private persistColors(prefix: MementoPrefix, colors: Colors) {
+    this.workspaceState.update(prefix + this.dvcRoot, {
+      assigned: [...colors.assigned],
+      available: colors.available
+    })
   }
 
   private persistStatus() {
@@ -369,37 +366,21 @@ export class ExperimentsModel {
     filters: Map<string, FilterDefinition>
     status: Record<string, Status>
   } {
-    const { assigned: branchAssigned, available: branchAvailable } =
-      workspaceState.get<{
-        assigned: [string, string][]
-        available: string[]
-      }>(MementoPrefix.BRANCH_COLORS + dvcRoot, {
-        assigned: [],
-        available: copyOriginalBranchColors()
-      })
-
-    const { assigned: experimentAssigned, available: experimentAvailable } =
-      workspaceState.get<{
-        assigned: [string, string][]
-        available: string[]
-      }>(MementoPrefix.EXPERIMENTS_COLORS + dvcRoot, {
-        assigned: [],
-        available: copyOriginalExperimentColors()
-      })
-
     return {
-      branchColors: {
-        assigned: new Map(branchAssigned),
-        available: branchAvailable
-      },
+      branchColors: this.reviveColors(
+        workspaceState,
+        MementoPrefix.BRANCH_COLORS + dvcRoot,
+        copyOriginalBranchColors
+      ),
       currentSorts: workspaceState.get<SortDefinition[]>(
         MementoPrefix.EXPERIMENTS_SORT_BY + dvcRoot,
         []
       ),
-      experimentColors: {
-        assigned: new Map(experimentAssigned),
-        available: experimentAvailable
-      },
+      experimentColors: this.reviveColors(
+        workspaceState,
+        MementoPrefix.EXPERIMENTS_COLORS + dvcRoot,
+        copyOriginalExperimentColors
+      ),
       filters: new Map(
         workspaceState.get<[string, FilterDefinition][]>(
           MementoPrefix.EXPERIMENTS_FILTER_BY + dvcRoot,
@@ -410,6 +391,25 @@ export class ExperimentsModel {
         MementoPrefix.EXPERIMENTS_STATUS + dvcRoot,
         {}
       )
+    }
+  }
+
+  private reviveColors(
+    workspaceState: Memento,
+    key: string,
+    copyOriginalColors: () => string[]
+  ) {
+    const { assigned, available } = workspaceState.get<{
+      assigned: [string, string][]
+      available: string[]
+    }>(key, {
+      assigned: [],
+      available: copyOriginalColors()
+    })
+
+    return {
+      assigned: new Map(assigned),
+      available: available
     }
   }
 
