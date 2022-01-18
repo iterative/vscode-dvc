@@ -203,13 +203,17 @@ export class ExperimentsModel {
       { ...this.workspace, displayColor: getWorkspaceColor() },
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
+        const branchWithColor = {
+          ...branch,
+          displayColor: this.getBranchColor(branch.name as string)
+        }
 
         if (!definedAndNonEmpty(experiments)) {
-          return branch
+          return branchWithColor
         }
+
         return {
-          ...branch,
-          displayColor: this.branchColors.assigned.get(branch.name as string),
+          ...branchWithColor,
           subRows: this.getSubRows(experiments)
         }
       })
@@ -436,6 +440,10 @@ export class ExperimentsModel {
 
   private getAssignedBranchColors() {
     return this.branchColors.assigned
+  }
+
+  private getBranchColor(name: string) {
+    return this.getAssignedBranchColors().get(name)
   }
 
   private getAssignedExperimentColors() {
