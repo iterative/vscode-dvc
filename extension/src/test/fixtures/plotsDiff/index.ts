@@ -1,6 +1,14 @@
+import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { DefaultSectionNames } from '../../../plots/model'
-import { PlotSize, PlotsType, Section } from '../../../plots/webview/contract'
+import { extendVegaSpec } from '../../../plots/vega/util'
+import {
+  PlotSize,
+  PlotsOutput,
+  PlotsType,
+  Section,
+  VegaPlot
+} from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 
 const basicVega = {
@@ -393,11 +401,29 @@ export const getFixture = (
   ...require('./vega').default
 })
 
+const extendedSpecs = (plotsOutput: { [x: string]: VegaPlot[] }): PlotsOutput =>
+  Object.entries(plotsOutput).reduce((acc, [id, plots]) => {
+    acc[id] = plots.map(plot => ({
+      ...plot,
+      content: extendVegaSpec(plot.content as TopLevelSpec, [
+        { color: '#f14c4c', name: '6220556' },
+        { color: '#cca700', name: '7ee8096' },
+        { color: '#3794ff', name: 'a9eb4fd' },
+        { color: '#d18616', name: 'e36f8a9' }
+      ]) as VisualizationSpec
+    }))
+
+    return acc
+  }, {} as PlotsOutput)
+
 export const getWebviewMessageFixture = (
   baseUrl: string,
   joinFunc?: (...args: string[]) => string
 ) => ({
-  plots: getFixture(baseUrl, joinFunc),
+  plots: {
+    ...getImageData(baseUrl, joinFunc),
+    ...extendedSpecs({ ...basicVega, ...require('./vega').default })
+  },
   sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
   size: PlotSize.REGULAR
 })
