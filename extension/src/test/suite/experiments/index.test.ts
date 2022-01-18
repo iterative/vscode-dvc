@@ -35,7 +35,8 @@ import {
 import { ExperimentsModel } from '../../../experiments/model'
 import {
   copyOriginalBranchColors,
-  copyOriginalExperimentColors
+  copyOriginalExperimentColors,
+  getWorkspaceColor
 } from '../../../experiments/model/colors'
 import { InternalCommands } from '../../../commands/internal'
 
@@ -247,11 +248,13 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
+            displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
             params: { 'params.yaml': { test: 10 } }
           },
           {
+            displayColor: '#13adc7',
             displayId: 'testBranch',
             id: 'testBranch',
             name: 'testBranch',
@@ -304,11 +307,13 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
+            displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
             params: { 'params.yaml': { test: 10 } }
           },
           {
+            displayColor: '#13adc7',
             displayId: 'testBranch',
             id: 'testBranch',
             name: 'testBranch',
@@ -391,11 +396,8 @@ suite('Experiments Test Suite', () => {
         available: copyOriginalExperimentColors().slice(3)
       }
       const expectedBranchColors = {
-        assigned: [
-          ['workspace', '#945dd6'],
-          ['master', '#13adc7']
-        ],
-        available: copyOriginalBranchColors().slice(2)
+        assigned: [['master', '#13adc7']],
+        available: copyOriginalBranchColors().slice(1)
       }
 
       const mockMemento = buildMockMemento()

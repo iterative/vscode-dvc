@@ -1,5 +1,4 @@
 export const branchColorsList = [
-  '#945dd6',
   '#13adc7',
   '#f46837',
   '#48bb78',
@@ -60,6 +59,8 @@ const expColorsList = [
   '#96958f',
   '#5f5856'
 ]
+
+export const getWorkspaceColor = () => '#945dd6'
 
 export const copyOriginalBranchColors = (): string[] => [...branchColorsList]
 

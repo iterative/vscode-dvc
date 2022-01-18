@@ -10,7 +10,8 @@ import {
 import { collectExperiments } from './collect'
 import {
   copyOriginalBranchColors,
-  copyOriginalExperimentColors
+  copyOriginalExperimentColors,
+  getWorkspaceColor
 } from './colors'
 import { collectColors, Colors } from './colors/collect'
 import { collectFlatExperimentParams } from './queue/collect'
@@ -199,7 +200,7 @@ export class ExperimentsModel {
 
   public getRowData() {
     return [
-      this.workspace,
+      { ...this.workspace, displayColor: getWorkspaceColor() },
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
 
@@ -208,6 +209,7 @@ export class ExperimentsModel {
         }
         return {
           ...branch,
+          displayColor: this.branchColors.assigned.get(branch.name as string),
           subRows: this.getSubRows(experiments)
         }
       })
@@ -295,9 +297,7 @@ export class ExperimentsModel {
   private async collectColors() {
     const [branchColors, experimentColors] = await Promise.all([
       collectColors(
-        ['workspace', ...this.branches.map(branch => branch.name)].filter(
-          Boolean
-        ) as string[],
+        this.branches.map(branch => branch.name).filter(Boolean) as string[],
         this.getAssignedBranchColors(),
         this.branchColors.available,
         copyOriginalBranchColors
