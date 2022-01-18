@@ -1,8 +1,8 @@
 import { join } from '../../util/path'
 import { RowData } from '../../../experiments/webview/contract'
-import { copyOriginalColors } from '../../../experiments/model/colors'
+import { copyOriginalExperimentColors } from '../../../experiments/model/colors'
 
-const colorsList = copyOriginalColors()
+const colorsList = copyOriginalExperimentColors()
 
 const data: RowData[] = [
   {
@@ -32,7 +32,8 @@ const data: RowData[] = [
       }
     },
     displayId: 'workspace',
-    id: 'workspace'
+    id: 'workspace',
+    displayColor: '#945dd6'
   },
   {
     id: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
@@ -63,6 +64,7 @@ const data: RowData[] = [
     },
     name: 'master',
     displayId: 'master',
+    displayColor: '#13adc7',
     subRows: [
       {
         checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
