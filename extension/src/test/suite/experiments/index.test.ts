@@ -33,7 +33,11 @@ import {
   MessageFromWebviewType
 } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
-import { copyOriginalColors } from '../../../experiments/model/colors'
+import {
+  copyOriginalBranchColors,
+  copyOriginalExperimentColors,
+  getWorkspaceColor
+} from '../../../experiments/model/colors'
 import { InternalCommands } from '../../../commands/internal'
 
 suite('Experiments Test Suite', () => {
@@ -199,10 +203,11 @@ suite('Experiments Test Suite', () => {
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns(
-        new Map()
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ExperimentsModel.prototype as any,
+        'getAssignedExperimentColors'
+      ).returns(new Map())
 
       const updatesPaused = disposable.track(new EventEmitter<boolean>())
 
@@ -243,11 +248,13 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
+            displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
             params: { 'params.yaml': { test: 10 } }
           },
           {
+            displayColor: '#13adc7',
             displayId: 'testBranch',
             id: 'testBranch',
             name: 'testBranch',
@@ -300,11 +307,13 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
+            displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
             params: { 'params.yaml': { test: 10 } }
           },
           {
+            displayColor: '#13adc7',
             displayId: 'testBranch',
             id: 'testBranch',
             name: 'testBranch',
@@ -378,14 +387,19 @@ suite('Experiments Test Suite', () => {
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
     it('should initialize given no persisted state and update persistence given any change', async () => {
-      const expectedColors = {
+      const expectedExperimentColors = {
         assigned: [
           ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
           ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
           ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
         ],
-        available: copyOriginalColors().slice(3)
+        available: copyOriginalExperimentColors().slice(3)
       }
+      const expectedBranchColors = {
+        assigned: [['master', '#13adc7']],
+        available: copyOriginalBranchColors().slice(1)
+      }
+
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
 
@@ -411,8 +425,12 @@ suite('Experiments Test Suite', () => {
       ).to.be.calledWith('experimentsFilterBy:test', [])
       expect(
         mementoSpy,
-        'workspaceContext is called for color initialization'
+        'workspaceContext is called for experiment color initialization'
       ).to.be.calledWith('experimentsColors:test', match.has('assigned'))
+      expect(
+        mementoSpy,
+        'workspaceContext is called for branch color initialization'
+      ).to.be.calledWith('branchColors:test', match.has('assigned'))
       expect(mementoSpy).to.be.calledWith('experimentsStatus:test', {})
 
       expect(
@@ -422,11 +440,20 @@ suite('Experiments Test Suite', () => {
       expect(
         mockMemento.keys(),
         'Memento starts with the colors and status keys'
-      ).to.deep.equal(['experimentsStatus:test', 'experimentsColors:test'])
+      ).to.deep.equal([
+        'experimentsStatus:test',
+        'experimentsColors:test',
+        'branchColors:test'
+      ])
       expect(
         mockMemento.get('experimentsColors:test'),
-        'the correct colors are persisted'
-      ).to.deep.equal(expectedColors)
+        'the correct experiment colors are persisted'
+      ).to.deep.equal(expectedExperimentColors)
+      expect(
+        mockMemento.get('branchColors:test'),
+        'the correct branch colors are persisted'
+      ).to.deep.equal(expectedBranchColors)
+
       expect(
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses are persisted'
@@ -522,8 +549,12 @@ suite('Experiments Test Suite', () => {
       })
       expect(
         mockMemento.get('experimentsColors:test'),
-        'the correct colors are persisted'
-      ).to.deep.equal(expectedColors)
+        'the correct experiment colors are persisted'
+      ).to.deep.equal(expectedExperimentColors)
+      expect(
+        mockMemento.get('branchColors:test'),
+        'the correct branch colors are persisted'
+      ).to.deep.equal(expectedBranchColors)
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
