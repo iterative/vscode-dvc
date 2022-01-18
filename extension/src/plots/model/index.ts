@@ -15,12 +15,14 @@ import { MementoPrefix } from '../../vscode/memento'
 
 export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
-  [Section.STATIC_PLOTS]: 'Static Plots'
+  [Section.STATIC_PLOTS]: 'Static Plots',
+  [Section.COMPARISON_TABLE]: 'Comparison'
 }
 
 export const DefaultSectionSizes = {
   [Section.LIVE_PLOTS]: PlotSize.REGULAR,
-  [Section.STATIC_PLOTS]: PlotSize.REGULAR
+  [Section.STATIC_PLOTS]: PlotSize.REGULAR,
+  [Section.COMPARISON_TABLE]: PlotSize.REGULAR
 }
 export class PlotsModel {
   public readonly dispose = Disposable.fn()

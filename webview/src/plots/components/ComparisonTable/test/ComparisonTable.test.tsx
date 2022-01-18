@@ -1,19 +1,18 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react'
-import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
-import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
-import { ComparisonTable } from '../ComparisonTable'
+import React from 'react'
+import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
 
 describe('ComparisonTable', () => {
   afterEach(() => {
     cleanup()
   })
 
-  const basicProps: PlotsComparisonData = {
+  const basicProps: ComparisonTableProps = {
     colors: {
       '6220556': '#f14c4c',
       a9eb4fd: '#3794ff'

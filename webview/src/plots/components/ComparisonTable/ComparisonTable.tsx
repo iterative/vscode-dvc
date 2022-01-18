@@ -3,7 +3,12 @@ import React, { useState } from 'react'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { ComparisonTableRow } from './ComparisonTableRow'
 
-export const ComparisonTable: React.FC<PlotsComparisonData> = ({
+export type ComparisonTableProps = Omit<
+  PlotsComparisonData,
+  'sectionName' | 'size'
+>
+
+export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   plots,
   colors
 }) => {

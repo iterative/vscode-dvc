@@ -54,6 +54,8 @@ export type StaticPlot = VegaPlot | ImagePlot
 export interface PlotsComparisonData {
   plots: PlotsOutput
   colors: Record<string, string>
+  sectionName: string
+  size: PlotSize
 }
 
 export type PlotsOutput = Record<string, StaticPlot[]>
@@ -66,12 +68,14 @@ export interface StaticPlotsData {
 
 export enum Section {
   LIVE_PLOTS = 'live-plots',
-  STATIC_PLOTS = 'static-plots'
+  STATIC_PLOTS = 'static-plots',
+  COMPARISON_TABLE = 'comparison-table'
 }
 
 export const defaultSectionCollapsed = {
   [Section.LIVE_PLOTS]: false,
-  [Section.STATIC_PLOTS]: false
+  [Section.STATIC_PLOTS]: false,
+  [Section.COMPARISON_TABLE]: false
 }
 
 export type SectionCollapsed = typeof defaultSectionCollapsed
