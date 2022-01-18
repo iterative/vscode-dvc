@@ -1,3 +1,4 @@
+import { TopLevelSpec } from 'vega-lite'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
@@ -9,6 +10,7 @@ import {
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
+import { extendVegaSpec } from './vega/util'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -132,7 +134,13 @@ export class Plots extends BaseRepository<TPlotsData> {
                 ...plot,
                 url: this.webview?.getWebviewUri(plot.url)
               } as ImagePlot)
-            : plot
+            : {
+                ...plot,
+                content: extendVegaSpec(
+                  plot.content as TopLevelSpec,
+                  this.model?.getRevisionColors()
+                )
+              }
         )
         return acc
       },

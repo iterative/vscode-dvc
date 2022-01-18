@@ -110,6 +110,18 @@ export class PlotsModel {
     return this.revisions
   }
 
+  public getRevisionColors() {
+    return Object.entries(this.experiments?.getColors() || {}).reduce(
+      (acc, [revision, color]) => {
+        if (this.getRevisions().includes(revision)) {
+          acc.push({ color, name: revision })
+        }
+        return acc
+      },
+      [] as { name: string; color: string }[]
+    )
+  }
+
   public setSelectedMetrics(selectedMetrics: string[]) {
     this.selectedMetrics = selectedMetrics
     this.persistSelectedMetrics()

@@ -102,9 +102,11 @@ export const getSpecSizeUpdate = (
 
 const getUpdate = (
   spec: TopLevelSpec,
-  commits: { name: string; color: string }[]
+  commits?: { name: string; color: string }[]
 ) => ({
-  ...(isMultiViewByCommitPlot(spec) ? {} : getSpecColorUpdate(commits)),
+  ...(isMultiViewByCommitPlot(spec) || !commits
+    ? {}
+    : getSpecColorUpdate(commits)),
   ...getSpecSizeUpdate(
     !!spec.title,
     !isMultiViewPlot(spec) ? 'full' : undefined
@@ -113,7 +115,7 @@ const getUpdate = (
 
 export const extendVegaSpec = (
   spec: TopLevelSpec,
-  commits: { name: string; color: string }[]
+  commits?: { name: string; color: string }[]
 ) => {
   let newSpec = cloneDeep(spec) as any
 
