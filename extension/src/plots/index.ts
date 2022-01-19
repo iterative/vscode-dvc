@@ -1,3 +1,4 @@
+import { TopLevelSpec } from 'vega-lite'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
@@ -5,10 +6,12 @@ import {
   isImagePlot,
   PlotsData as TPlotsData,
   PlotsOutput,
-  Section
+  Section,
+  VegaPlot
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
+import { extendVegaSpec } from './vega/util'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -129,12 +132,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     return Object.entries(data as PlotsOutput).reduce((acc, [path, plots]) => {
       if (!onlyImages || plots.some(plot => isImagePlot(plot))) {
         acc[path] = plots.map(plot =>
-          isImagePlot(plot)
-            ? ({
-                ...plot,
-                url: this.webview?.getWebviewUri(plot.url)
-              } as ImagePlot)
-            : plot
+          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
         )
       }
       return acc
@@ -177,6 +175,23 @@ export class Plots extends BaseRepository<TPlotsData> {
           }) ||
         null
     })
+  }
+
+  private getImagePlot(plot: ImagePlot) {
+    return {
+      ...plot,
+      url: this.webview?.getWebviewUri(plot.url)
+    } as ImagePlot
+  }
+
+  private getVegaPlot(plot: VegaPlot) {
+    return {
+      ...plot,
+      content: extendVegaSpec(
+        plot.content as TopLevelSpec,
+        this.model?.getRevisionColors()
+      )
+    }
   }
 
   private handleMessageFromWebview() {

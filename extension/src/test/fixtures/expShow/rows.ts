@@ -62,8 +62,8 @@ const data: RowData[] = [
         val_accuracy: 0.4277999997138977
       }
     },
-    name: 'master',
-    displayId: 'master',
+    name: 'main',
+    displayId: 'main',
     displayColor: '#13adc7',
     subRows: [
       {
