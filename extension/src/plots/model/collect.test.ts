@@ -56,18 +56,32 @@ describe('collectRevisions', () => {
 
 describe('collectRevisionData', () => {
   it('should return the expected output from the test fixture', () => {
-    const data = collectRevisionData(plotsDiffFixture)
-    expect(Object.keys(data)).toEqual([
+    const { images, plots } = collectRevisionData(plotsDiffFixture)
+
+    expect(Object.keys(images)).toEqual([
+      'plots/heatmap.png',
+      'plots/acc.png',
+      'plots/loss.png'
+    ])
+
+    expect(Object.keys(images['plots/heatmap.png'])).toEqual([
+      'main',
+      '42b8736',
+      '1ba7bcd',
+      '4fb124a'
+    ])
+
+    expect(Object.keys(plots)).toEqual([
       'logs/loss.tsv',
       'logs/acc.tsv',
       'predictions.json'
     ])
 
-    expect(Object.keys(data['logs/loss.tsv'])).toEqual(
+    expect(Object.keys(plots['logs/loss.tsv'])).toEqual(
       plotsDiffFixture['logs/loss.tsv'][0].revisions
     )
 
-    Object.entries(data['logs/loss.tsv']).forEach(([revision, values]) => {
+    Object.entries(plots['logs/loss.tsv']).forEach(([revision, values]) => {
       expect(values.length).toBeTruthy()
       ;(values as { rev: string }[]).forEach(({ rev }) => {
         expect(rev).toEqual(revision)
@@ -89,7 +103,7 @@ describe('collectTemplates', () => {
       plotsDiffFixture['logs/loss.tsv'][0].content
     )
 
-    expect(omit(templates['logs/loss.tsv'], 'data')).toEqual(
+    expect(templates['logs/loss.tsv']).toEqual(
       omit(plotsDiffFixture['logs/loss.tsv'][0].content, 'data')
     )
   })

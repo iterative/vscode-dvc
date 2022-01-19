@@ -92,7 +92,7 @@ export class PlotsModel {
       collectTemplates(data)
     ])
 
-    this.revisionData = { ...this.revisionData, ...revisionData }
+    this.revisionData = { ...this.revisionData, ...revisionData.plots }
     this.templates = { ...this.templates, ...templates }
   }
 

@@ -4,7 +4,9 @@ import {
   LivePlotValues,
   LivePlotData,
   PlotsOutput,
-  isImagePlot
+  isImagePlot,
+  ImagePlot,
+  VegaPlot
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -238,25 +240,62 @@ export const collectRevisions = (data: ExperimentsOutput): string[] => {
   return [...acc]
 }
 
-export const collectRevisionData = (
-  data: PlotsOutput
-): Record<string, Record<string, unknown[]>> =>
-  Object.entries(data).reduce((acc, [path, plots]) => {
-    plots.forEach(plot => {
-      if (isImagePlot(plot)) {
-        return
-      }
-      if (!acc[path]) {
-        acc[path] = {}
-      }
+type ImageAccumulator = Record<string, Record<string, { url: string }>>
 
-      plot.revisions?.forEach(rev => (acc[path][rev] = []))
-      ;(plot.content.data as { values: { rev: string }[] }).values.forEach(
-        value => acc[path][value.rev].push(value)
-      )
-    })
-    return acc
-  }, {} as Record<string, Record<string, unknown[]>>)
+const collectImageData = (
+  acc: ImageAccumulator,
+  path: string,
+  plot: ImagePlot
+) => {
+  if (!acc[path]) {
+    acc[path] = {}
+  }
+  const rev = plot.revisions?.[0]
+  if (!rev) {
+    return
+  }
+  acc[path][rev] = { url: plot.url }
+}
+
+type PlotsAccumulator = Record<string, Record<string, unknown[]>>
+
+const collectPlotData = (
+  acc: PlotsAccumulator,
+  path: string,
+  plot: VegaPlot
+) => {
+  if (!acc[path]) {
+    acc[path] = {}
+  }
+
+  plot.revisions?.forEach(rev => (acc[path][rev] = []))
+  ;(plot.content.data as { values: { rev: string }[] }).values.forEach(value =>
+    acc[path][value.rev].push(value)
+  )
+}
+
+type Accumulator = {
+  plots: PlotsAccumulator
+  images: ImageAccumulator
+}
+
+export const collectRevisionData = (data: PlotsOutput): Accumulator =>
+  Object.entries(data).reduce(
+    (acc, [path, plots]) => {
+      plots.forEach(plot => {
+        if (isImagePlot(plot)) {
+          return collectImageData(acc.images, path, plot)
+        }
+
+        return collectPlotData(acc.plots, path, plot)
+      })
+      return acc
+    },
+    {
+      images: {} as ImageAccumulator,
+      plots: {} as PlotsAccumulator
+    }
+  )
 
 export const collectTemplates = (data: PlotsOutput) =>
   Object.entries(data).reduce((acc, [path, plots]) => {
@@ -264,12 +303,14 @@ export const collectTemplates = (data: PlotsOutput) =>
       if (isImagePlot(plot)) {
         return
       }
-      if (!acc[path]) {
-        acc[path] = {
-          ...plot.content,
-          data: { values: [] }
-        } as VisualizationSpec
+      if (acc[path]) {
+        return
       }
+      const template = {
+        ...plot.content
+      }
+      delete template.data
+      acc[path] = template
     })
     return acc
   }, {} as Record<string, VisualizationSpec>)
