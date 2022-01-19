@@ -148,7 +148,7 @@ export class PlotsModel {
   }
 
   public getSectionName(section: Section): string {
-    return this.sectionNames[section]
+    return this.sectionNames[section] || DefaultSectionNames[section]
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
