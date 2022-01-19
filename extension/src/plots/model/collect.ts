@@ -240,61 +240,50 @@ export const collectRevisions = (data: ExperimentsOutput): string[] => {
   return [...acc]
 }
 
-type ImageAccumulator = Record<string, Record<string, { url: string }>>
+export type RevisionData = Record<
+  string,
+  Record<string, { url: string } | unknown[]>
+>
 
-const collectImageData = (
-  acc: ImageAccumulator,
-  path: string,
-  plot: ImagePlot
-) => {
-  if (!acc[path]) {
-    acc[path] = {}
-  }
+const collectImageData = (acc: RevisionData, path: string, plot: ImagePlot) => {
   const rev = plot.revisions?.[0]
   if (!rev) {
     return
   }
-  acc[path][rev] = { url: plot.url }
-}
 
-type PlotsAccumulator = Record<string, Record<string, unknown[]>>
-
-const collectPlotData = (
-  acc: PlotsAccumulator,
-  path: string,
-  plot: VegaPlot
-) => {
-  if (!acc[path]) {
-    acc[path] = {}
+  if (!acc[rev]) {
+    acc[rev] = {}
   }
 
-  plot.revisions?.forEach(rev => (acc[path][rev] = []))
+  acc[rev][path] = { url: plot.url }
+}
+
+const collectPlotData = (acc: RevisionData, path: string, plot: VegaPlot) => {
+  plot.revisions?.forEach(rev => {
+    if (!acc[rev]) {
+      acc[rev] = {}
+    }
+    acc[rev][path] = []
+  })
   ;(plot.content.data as { values: { rev: string }[] }).values.forEach(value =>
-    acc[path][value.rev].push(value)
+    (acc[value.rev][path] as unknown[]).push(value)
   )
 }
 
-type Accumulator = {
-  plots: PlotsAccumulator
-  images: ImageAccumulator
-}
-
-export const collectRevisionData = (data: PlotsOutput): Accumulator =>
+export const collectRevisionData = (data: PlotsOutput): RevisionData =>
   Object.entries(data).reduce(
     (acc, [path, plots]) => {
       plots.forEach(plot => {
         if (isImagePlot(plot)) {
-          return collectImageData(acc.images, path, plot)
+          return collectImageData(acc, path, plot)
         }
 
-        return collectPlotData(acc.plots, path, plot)
+        return collectPlotData(acc, path, plot)
       })
       return acc
     },
-    {
-      images: {} as ImageAccumulator,
-      plots: {} as PlotsAccumulator
-    }
+
+    {} as RevisionData
   )
 
 export const collectTemplates = (data: PlotsOutput) =>

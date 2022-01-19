@@ -56,37 +56,33 @@ describe('collectRevisions', () => {
 
 describe('collectRevisionData', () => {
   it('should return the expected output from the test fixture', () => {
-    const { images, plots } = collectRevisionData(plotsDiffFixture)
+    const data = collectRevisionData(plotsDiffFixture)
+    const revisions = ['main', '42b8736', '1ba7bcd', '4fb124a']
 
-    expect(Object.keys(images)).toEqual([
+    expect(Object.keys(data)).toEqual(revisions)
+
+    expect(Object.keys(data.main)).toEqual([
       'plots/heatmap.png',
       'plots/acc.png',
-      'plots/loss.png'
-    ])
-
-    expect(Object.keys(images['plots/heatmap.png'])).toEqual([
-      'main',
-      '42b8736',
-      '1ba7bcd',
-      '4fb124a'
-    ])
-
-    expect(Object.keys(plots)).toEqual([
+      'plots/loss.png',
       'logs/loss.tsv',
       'logs/acc.tsv',
       'predictions.json'
     ])
 
-    expect(Object.keys(plots['logs/loss.tsv'])).toEqual(
-      plotsDiffFixture['logs/loss.tsv'][0].revisions
-    )
-
-    Object.entries(plots['logs/loss.tsv']).forEach(([revision, values]) => {
-      expect(values.length).toBeTruthy()
-      ;(values as { rev: string }[]).forEach(({ rev }) => {
-        expect(rev).toEqual(revision)
-      })
+    expect(data['1ba7bcd']['plots/heatmap.png']).toEqual({
+      url: plotsDiffFixture['plots/heatmap.png'][2].url
     })
+
+    revisions.forEach(revision =>
+      expect(data[revision]['logs/loss.tsv']).toEqual(
+        (
+          plotsDiffFixture['logs/loss.tsv'][0].content.data.values as {
+            rev: string
+          }[]
+        ).filter(value => value.rev === revision)
+      )
+    )
   })
 })
 

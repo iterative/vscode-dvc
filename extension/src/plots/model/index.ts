@@ -5,7 +5,8 @@ import {
   collectLivePlotsData,
   collectRevisionData,
   collectRevisions,
-  collectTemplates
+  collectTemplates,
+  RevisionData
 } from './collect'
 import {
   defaultSectionCollapsed,
@@ -43,7 +44,7 @@ export class PlotsModel {
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
 
-  private revisionData: Record<string, Record<string, unknown[]>> = {}
+  private revisionData: RevisionData = {}
   private templates: Record<string, VisualizationSpec> = {}
 
   constructor(
@@ -92,7 +93,7 @@ export class PlotsModel {
       collectTemplates(data)
     ])
 
-    this.revisionData = { ...this.revisionData, ...revisionData.plots }
+    this.revisionData = { ...this.revisionData, ...revisionData }
     this.templates = { ...this.templates, ...templates }
   }
 
