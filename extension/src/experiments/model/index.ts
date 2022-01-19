@@ -7,7 +7,7 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import { collectExperiments } from './collect'
+import { collectExperiments, getDisplayId } from './collect'
 import {
   copyOriginalBranchColors,
   copyOriginalExperimentColors,
@@ -128,6 +128,20 @@ export class ExperimentsModel {
     const result = this.filters.delete(id)
     this.applyAndPersistFilters()
     return result
+  }
+
+  public getColors() {
+    const colors = { workspace: getWorkspaceColor() } as Record<string, string>
+
+    this.getAssignedExperimentColors().forEach((color: string, id: string) => {
+      colors[getDisplayId(id)] = color
+    })
+
+    this.getAssignedBranchColors().forEach((color: string, name: string) => {
+      colors[name] = color
+    })
+
+    return colors
   }
 
   public getSelected() {
