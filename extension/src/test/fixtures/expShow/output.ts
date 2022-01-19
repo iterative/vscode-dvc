@@ -73,7 +73,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        name: 'master'
+        name: 'main'
       }
     },
     '4fb124aebddb2adf1545030907687fa9a4c80e70': {

@@ -396,7 +396,7 @@ suite('Experiments Test Suite', () => {
         available: copyOriginalExperimentColors().slice(3)
       }
       const expectedBranchColors = {
-        assigned: [['master', '#13adc7']],
+        assigned: [['main', '#13adc7']],
         available: copyOriginalBranchColors().slice(1)
       }
 

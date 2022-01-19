@@ -52,7 +52,7 @@ const data = {
             }
           }
         },
-        name: 'master'
+        name: 'main'
       }
     },
     f65419f2eec04e6a0376b6ee3939441fc5f50794: {
