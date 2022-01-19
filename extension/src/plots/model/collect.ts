@@ -289,10 +289,7 @@ export const collectRevisionData = (data: PlotsOutput): RevisionData =>
 export const collectTemplates = (data: PlotsOutput) =>
   Object.entries(data).reduce((acc, [path, plots]) => {
     plots.forEach(plot => {
-      if (isImagePlot(plot)) {
-        return
-      }
-      if (acc[path]) {
+      if (isImagePlot(plot) || acc[path]) {
         return
       }
       const template = {
