@@ -234,6 +234,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.sendWebviewData()
   }
 
+  public getColors() {
+    return this.experiments.getColors()
+  }
+
   public getSelectedExperiments() {
     return this.experiments.getSelected()
   }
