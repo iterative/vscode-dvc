@@ -72,16 +72,29 @@ export const isMultiViewPlot = (template?: TopLevelSpec): boolean =>
 export const isMultiViewByCommitPlot = (template?: TopLevelSpec): boolean =>
   !template || getFacetField(template) === COMMIT_FIELD
 
-export const getSpecColorUpdate = (
-  commits: { name: string; color: string }[]
-) => ({
+export type ColorScale = { domain: string[]; range: string[] }
+
+export const getColorScale = (
+  colors: Record<string, string>
+): ColorScale | undefined => {
+  const colorScale = Object.entries(colors).reduce(
+    (acc, [name, color]) => {
+      if (name && color) {
+        acc.domain.push(name)
+        acc.range.push(color)
+      }
+      return acc
+    },
+    { domain: [], range: [] } as ColorScale
+  )
+  return colorScale.domain.length ? colorScale : undefined
+}
+
+export const getSpecColorUpdate = (colorScale: ColorScale) => ({
   encoding: {
     color: {
       legend: { disable: true },
-      scale: {
-        domain: commits.map(({ name }) => name),
-        range: commits.map(({ color }) => color)
-      }
+      scale: colorScale
     }
   }
 })
@@ -100,26 +113,20 @@ export const getSpecSizeUpdate = (
   width: width === 'full' ? 'container' : width
 })
 
-const getUpdate = (
-  spec: TopLevelSpec,
-  commits?: { name: string; color: string }[]
-) => ({
-  ...(isMultiViewByCommitPlot(spec) || !commits
+const getUpdate = (spec: TopLevelSpec, colorScale?: ColorScale) => ({
+  ...(isMultiViewByCommitPlot(spec) || !colorScale
     ? {}
-    : getSpecColorUpdate(commits)),
+    : getSpecColorUpdate(colorScale)),
   ...getSpecSizeUpdate(
     !!spec.title,
     !isMultiViewPlot(spec) ? 'full' : undefined
   )
 })
 
-export const extendVegaSpec = (
-  spec: TopLevelSpec,
-  commits?: { name: string; color: string }[]
-) => {
+export const extendVegaSpec = (spec: TopLevelSpec, colorScale?: ColorScale) => {
   let newSpec = cloneDeep(spec) as any
 
-  const update = getUpdate(spec, commits)
+  const update = getUpdate(spec, colorScale)
 
   if (newSpec.concat?.length) {
     newSpec.concat = newSpec.concat.map((c: any) => merge(c, update))

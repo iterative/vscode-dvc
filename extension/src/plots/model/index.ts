@@ -8,10 +8,10 @@ import {
   Section,
   SectionCollapsed
 } from '../../plots/webview/contract'
-import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
+import { getColorScale } from '../vega/util'
 
 export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
@@ -81,24 +81,16 @@ export class PlotsModel {
       return
     }
 
-    const selectedExperiments: string[] = []
-    const range: string[] = []
+    const colors = getColorScale(this.experiments.getSelectedExperiments())
 
-    Object.entries(this.experiments.getSelectedExperiments()).forEach(
-      ([name, color]) => {
-        if (name && color) {
-          selectedExperiments.push(name)
-          range.push(color)
-        }
-      }
-    )
-
-    if (!definedAndNonEmpty(selectedExperiments)) {
+    if (!colors) {
       return
     }
 
+    const { domain: selectedExperiments } = colors
+
     return {
-      colors: { domain: selectedExperiments, range },
+      colors,
       plots: this.getPlots(this.livePlots, selectedExperiments),
       sectionName: this.getSectionName(Section.LIVE_PLOTS),
       selectedMetrics: this.getSelectedMetrics(),
@@ -111,15 +103,7 @@ export class PlotsModel {
   }
 
   public getRevisionColors() {
-    return Object.entries(this.experiments?.getColors() || {}).reduce(
-      (acc, [revision, color]) => {
-        if (this.getRevisions().includes(revision)) {
-          acc.push({ color, name: revision })
-        }
-        return acc
-      },
-      [] as { name: string; color: string }[]
-    )
+    return getColorScale(this.experiments?.getColors() || {})
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {

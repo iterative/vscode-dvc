@@ -49,12 +49,6 @@ suite('Plots Test Suite', () => {
         a9eb4fd: '#3794ff',
         e36f8a9: '#d18616'
       })
-      stub(plotsModel, 'getRevisions').returns([
-        'a9eb4fd',
-        '7ee8096',
-        'e36f8a9',
-        '6220556'
-      ])
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
 

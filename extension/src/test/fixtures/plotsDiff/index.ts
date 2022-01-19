@@ -405,12 +405,10 @@ const extendedSpecs = (plotsOutput: { [x: string]: VegaPlot[] }): PlotsOutput =>
   Object.entries(plotsOutput).reduce((acc, [id, plots]) => {
     acc[id] = plots.map(plot => ({
       ...plot,
-      content: extendVegaSpec(plot.content as TopLevelSpec, [
-        { color: '#f14c4c', name: '6220556' },
-        { color: '#cca700', name: '7ee8096' },
-        { color: '#3794ff', name: 'a9eb4fd' },
-        { color: '#d18616', name: 'e36f8a9' }
-      ]) as VisualizationSpec
+      content: extendVegaSpec(plot.content as TopLevelSpec, {
+        domain: ['6220556', '7ee8096', 'a9eb4fd', 'e36f8a9'],
+        range: ['#f14c4c', '#cca700', '#3794ff', '#d18616']
+      }) as VisualizationSpec
     }))
 
     return acc
