@@ -27,14 +27,8 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const {
-        data,
-        experiments,
-        plots,
-        plotsModel,
-        mockPlotsDiff,
-        messageSpy
-      } = await buildPlots(disposable, plotsDiffFixture)
+      const { data, plots, plotsModel, mockPlotsDiff, messageSpy } =
+        await buildPlots(disposable, plotsDiffFixture)
 
       const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
       const getLivePlotsEvent = new Promise(resolve =>
@@ -43,12 +37,6 @@ suite('Plots Test Suite', () => {
           return mockGetLivePlots.wrappedMethod.bind(plotsModel)()
         })
       )
-      stub(experiments, 'getColors').returns({
-        '6220556': '#f14c4c',
-        '7ee8096': '#cca700',
-        a9eb4fd: '#3794ff',
-        e36f8a9: '#d18616'
-      })
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
 

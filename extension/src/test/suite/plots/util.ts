@@ -10,7 +10,7 @@ import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { PlotSize, Section } from '../../../plots/webview/contract'
-import { DefaultSectionNames } from '../../../plots/model'
+import { DefaultSectionNames, PlotsModel } from '../../../plots/model'
 import { PlotsData } from '../../../plots/data'
 
 export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
@@ -42,7 +42,7 @@ export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const plotsModel = (plots as any).model
+  const plotsModel: PlotsModel = (plots as any).model
 
   return { data, experiments, messageSpy, mockPlotsDiff, plots, plotsModel }
 }
