@@ -240,10 +240,11 @@ export const collectRevisions = (data: ExperimentsOutput): string[] => {
   return [...acc]
 }
 
-export type RevisionData = Record<
-  string,
-  Record<string, { url: string } | unknown[]>
->
+export type RevisionData = {
+  [revision: string]: {
+    [path: string]: unknown[] | { url: string }
+  }
+}
 
 const collectImageData = (acc: RevisionData, path: string, plot: ImagePlot) => {
   const rev = plot.revisions?.[0]
