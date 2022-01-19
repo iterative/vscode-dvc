@@ -1,5 +1,11 @@
 import omit from 'lodash.omit'
-import { LivePlotValues, LivePlotData } from '../webview/contract'
+import { VisualizationSpec } from 'react-vega'
+import {
+  LivePlotValues,
+  LivePlotData,
+  PlotsOutput,
+  isImagePlot
+} from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
@@ -231,3 +237,39 @@ export const collectRevisions = (data: ExperimentsOutput): string[] => {
   }
   return [...acc]
 }
+
+export const collectRevisionData = (
+  data: PlotsOutput
+): Record<string, Record<string, unknown[]>> =>
+  Object.entries(data).reduce((acc, [path, plots]) => {
+    plots.forEach(plot => {
+      if (isImagePlot(plot)) {
+        return
+      }
+      if (!acc[path]) {
+        acc[path] = {}
+      }
+
+      plot.revisions?.forEach(rev => (acc[path][rev] = []))
+      ;(plot.content.data as { values: { rev: string }[] }).values.forEach(
+        value => acc[path][value.rev].push(value)
+      )
+    })
+    return acc
+  }, {} as Record<string, Record<string, unknown[]>>)
+
+export const collectTemplates = (data: PlotsOutput) =>
+  Object.entries(data).reduce((acc, [path, plots]) => {
+    plots.forEach(plot => {
+      if (isImagePlot(plot)) {
+        return
+      }
+      if (!acc[path]) {
+        acc[path] = {
+          ...plot.content,
+          data: { values: [] }
+        } as VisualizationSpec
+      }
+    })
+    return acc
+  }, {} as Record<string, VisualizationSpec>)

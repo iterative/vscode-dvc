@@ -1,10 +1,17 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectLivePlotsData, collectRevisions } from './collect'
+import { VisualizationSpec } from 'react-vega'
+import {
+  collectLivePlotsData,
+  collectRevisionData,
+  collectRevisions,
+  collectTemplates
+} from './collect'
 import {
   defaultSectionCollapsed,
   LivePlotData,
   PlotSize,
+  PlotsOutput,
   Section,
   SectionCollapsed
 } from '../../plots/webview/contract'
@@ -35,6 +42,9 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
+
+  private revisionData: Record<string, Record<string, unknown[]>> = {}
+  private templates: Record<string, VisualizationSpec> = {}
 
   constructor(
     dvcRoot: string,
@@ -74,6 +84,16 @@ export class PlotsModel {
 
     this.livePlots = livePlots
     this.revisions = revisions
+  }
+
+  public async transformAndSetStatic(data: PlotsOutput) {
+    const [revisionData, templates] = await Promise.all([
+      collectRevisionData(data),
+      collectTemplates(data)
+    ])
+
+    this.revisionData = { ...this.revisionData, ...revisionData }
+    this.templates = { ...this.templates, ...templates }
   }
 
   public getLivePlots() {
