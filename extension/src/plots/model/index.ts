@@ -1,6 +1,6 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectLivePlotsData } from './collect'
+import { collectLivePlotsData, collectRevisions } from './collect'
 import {
   defaultSectionCollapsed,
   LivePlotData,
@@ -8,10 +8,10 @@ import {
   Section,
   SectionCollapsed
 } from '../../plots/webview/contract'
-import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
+import { getColorScale } from '../vega/util'
 
 export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
@@ -34,6 +34,7 @@ export class PlotsModel {
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
+  private revisions: string[] = []
 
   constructor(
     dvcRoot: string,
@@ -65,10 +66,14 @@ export class PlotsModel {
     )
   }
 
-  public transformAndSet(data: ExperimentsOutput) {
-    const livePlots = collectLivePlotsData(data)
+  public async transformAndSet(data: ExperimentsOutput) {
+    const [livePlots, revisions] = await Promise.all([
+      collectLivePlotsData(data),
+      collectRevisions(data)
+    ])
 
     this.livePlots = livePlots
+    this.revisions = revisions
   }
 
   public getLivePlots() {
@@ -76,29 +81,29 @@ export class PlotsModel {
       return
     }
 
-    const selectedExperiments: string[] = []
-    const range: string[] = []
+    const colors = getColorScale(this.experiments.getSelectedExperiments())
 
-    Object.entries(this.experiments.getSelectedExperiments()).forEach(
-      ([name, color]) => {
-        if (name && color) {
-          selectedExperiments.push(name)
-          range.push(color)
-        }
-      }
-    )
-
-    if (!definedAndNonEmpty(selectedExperiments)) {
+    if (!colors) {
       return
     }
 
+    const { domain: selectedExperiments } = colors
+
     return {
-      colors: { domain: selectedExperiments, range },
+      colors,
       plots: this.getPlots(this.livePlots, selectedExperiments),
       sectionName: this.getSectionName(Section.LIVE_PLOTS),
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize(Section.LIVE_PLOTS)
     }
+  }
+
+  public getRevisions() {
+    return this.revisions
+  }
+
+  public getRevisionColors() {
+    return getColorScale(this.experiments?.getColors() || {})
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {

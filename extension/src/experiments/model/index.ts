@@ -7,8 +7,12 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import { collectExperiments } from './collect'
-import { copyOriginalColors } from './colors'
+import { collectExperiments, getDisplayId } from './collect'
+import {
+  copyOriginalBranchColors,
+  copyOriginalExperimentColors,
+  getWorkspaceColor
+} from './colors'
 import { collectColors, Colors } from './colors/collect'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
@@ -30,7 +34,8 @@ export class ExperimentsModel {
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
-  private colors: Colors
+  private branchColors: Colors
+  private experimentColors: Colors
   private status: Record<string, Status>
   private names: Record<string, string> = {}
 
@@ -43,12 +48,11 @@ export class ExperimentsModel {
   private readonly workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    const { colors, currentSorts, filters, status } = this.revive(
-      dvcRoot,
-      workspaceState
-    )
-    this.colors = colors
+    const { branchColors, currentSorts, experimentColors, filters, status } =
+      this.revive(dvcRoot, workspaceState)
+    this.branchColors = branchColors
     this.currentSorts = currentSorts
+    this.experimentColors = experimentColors
     this.status = status
     this.filters = filters
 
@@ -67,7 +71,7 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
 
     Promise.all([this.setStatus(), this.setExperimentNames()])
-    this.collectColors()
+    return this.collectColors()
   }
 
   public toggleStatus(experimentId: string) {
@@ -126,10 +130,24 @@ export class ExperimentsModel {
     return result
   }
 
+  public getColors() {
+    const colors = { workspace: getWorkspaceColor() } as Record<string, string>
+
+    this.getAssignedExperimentColors().forEach((color: string, id: string) => {
+      colors[getDisplayId(id)] = color
+    })
+
+    this.getAssignedBranchColors().forEach((color: string, name: string) => {
+      colors[name] = color
+    })
+
+    return colors
+  }
+
   public getSelected() {
     const experimentColors = {} as Record<string, string>
 
-    this.getAssignedColors().forEach((color: string, id: string) => {
+    this.getAssignedExperimentColors().forEach((color: string, id: string) => {
       const { name, selected } = this.getExperimentDetails(id)
       if (name && selected) {
         experimentColors[name] = color
@@ -196,15 +214,20 @@ export class ExperimentsModel {
 
   public getRowData() {
     return [
-      this.workspace,
+      { ...this.workspace, displayColor: getWorkspaceColor() },
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
+        const branchWithColor = {
+          ...branch,
+          displayColor: this.getBranchColor(branch.name as string)
+        }
 
         if (!definedAndNonEmpty(experiments)) {
-          return branch
+          return branchWithColor
         }
+
         return {
-          ...branch,
+          ...branchWithColor,
           subRows: this.getSubRows(experiments)
         }
       })
@@ -289,13 +312,31 @@ export class ExperimentsModel {
     }, {} as Record<string, string>)
   }
 
-  private collectColors() {
-    this.colors = collectColors(
-      this.getExperimentIds(),
-      this.getAssignedColors(),
-      this.colors.available
-    )
-    this.persistColors()
+  private async collectColors() {
+    const [branchColors, experimentColors] = await Promise.all([
+      collectColors(
+        this.branches.map(branch => branch.name).filter(Boolean) as string[],
+        this.getAssignedBranchColors(),
+        this.branchColors.available,
+        copyOriginalBranchColors
+      ),
+      collectColors(
+        this.getExperimentIds(),
+        this.getAssignedExperimentColors(),
+        this.experimentColors.available,
+        copyOriginalExperimentColors
+      )
+    ])
+    this.branchColors = branchColors
+    this.experimentColors = experimentColors
+
+    Promise.all([
+      this.persistColors(
+        MementoPrefix.EXPERIMENTS_COLORS,
+        this.experimentColors
+      ),
+      this.persistColors(MementoPrefix.BRANCH_COLORS, this.branchColors)
+    ])
   }
 
   private persistSorts() {
@@ -315,14 +356,11 @@ export class ExperimentsModel {
     )
   }
 
-  private persistColors() {
-    return this.workspaceState.update(
-      MementoPrefix.EXPERIMENTS_COLORS + this.dvcRoot,
-      {
-        assigned: [...this.colors.assigned],
-        available: this.colors.available
-      }
-    )
+  private persistColors(prefix: MementoPrefix, colors: Colors) {
+    this.workspaceState.update(prefix + this.dvcRoot, {
+      assigned: [...colors.assigned],
+      available: colors.available
+    })
   }
 
   private persistStatus() {
@@ -336,27 +374,26 @@ export class ExperimentsModel {
     dvcRoot: string,
     workspaceState: Memento
   ): {
-    colors: Colors
+    branchColors: Colors
+    experimentColors: Colors
     currentSorts: SortDefinition[]
     filters: Map<string, FilterDefinition>
     status: Record<string, Status>
   } {
-    const { assigned, available } = workspaceState.get<{
-      assigned: [string, string][]
-      available: string[]
-    }>(MementoPrefix.EXPERIMENTS_COLORS + dvcRoot, {
-      assigned: [],
-      available: copyOriginalColors()
-    })
-
     return {
-      colors: {
-        assigned: new Map(assigned),
-        available: available
-      },
+      branchColors: this.reviveColors(
+        workspaceState,
+        MementoPrefix.BRANCH_COLORS + dvcRoot,
+        copyOriginalBranchColors
+      ),
       currentSorts: workspaceState.get<SortDefinition[]>(
         MementoPrefix.EXPERIMENTS_SORT_BY + dvcRoot,
         []
+      ),
+      experimentColors: this.reviveColors(
+        workspaceState,
+        MementoPrefix.EXPERIMENTS_COLORS + dvcRoot,
+        copyOriginalExperimentColors
       ),
       filters: new Map(
         workspaceState.get<[string, FilterDefinition][]>(
@@ -371,6 +408,25 @@ export class ExperimentsModel {
     }
   }
 
+  private reviveColors(
+    workspaceState: Memento,
+    key: string,
+    copyOriginalColors: () => string[]
+  ) {
+    const { assigned, available } = workspaceState.get<{
+      assigned: [string, string][]
+      available: string[]
+    }>(key, {
+      assigned: [],
+      available: copyOriginalColors()
+    })
+
+    return {
+      assigned: new Map(assigned),
+      available: available
+    }
+  }
+
   private getExperimentIds() {
     return this.flattenExperiments().reduce((acc, { id, queued }) => {
       if (!queued) {
@@ -382,7 +438,7 @@ export class ExperimentsModel {
   }
 
   private addDetails(experiment: Experiment, id?: string) {
-    const assignedColors = this.getAssignedColors()
+    const assignedColors = this.getAssignedExperimentColors()
     const displayColor = assignedColors.get(id || experiment.id)
     const status = this.status[id || experiment.id]
     const selected = status !== undefined ? !!status : undefined
@@ -396,7 +452,15 @@ export class ExperimentsModel {
       : experiment
   }
 
-  private getAssignedColors() {
-    return this.colors.assigned
+  private getAssignedBranchColors() {
+    return this.branchColors.assigned
+  }
+
+  private getBranchColor(name: string) {
+    return this.getAssignedBranchColors().get(name)
+  }
+
+  private getAssignedExperimentColors() {
+    return this.experimentColors.assigned
   }
 }

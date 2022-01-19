@@ -1,3 +1,4 @@
+import { TopLevelSpec } from 'vega-lite'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
@@ -5,10 +6,12 @@ import {
   isImagePlot,
   PlotsData as TPlotsData,
   PlotsOutput,
-  Section
+  Section,
+  VegaPlot
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
+import { extendVegaSpec } from './vega/util'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -60,11 +63,15 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      experiments.onDidChangeExperiments(data => {
+      experiments.onDidChangeExperiments(async data => {
         if (data) {
-          this.model?.transformAndSet(data)
+          await this.model?.transformAndSet(data)
         }
+
         this.sendLivePlotsData()
+
+        await this.data.isReady()
+        this.data.setRevisions(...(this.model?.getRevisions() || []))
       })
     )
 
@@ -77,12 +84,26 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
   }
 
-  public sendInitialWebviewData() {
+  public async sendInitialWebviewData() {
+    this.data.clearRevisions()
+    this.data.setRevisions(...(this.model?.getRevisions() || []))
+
+    const initialStaticPlotMessage = new Promise(resolve => {
+      const listener = this.dispose.track(
+        this.data.onDidUpdate(() => {
+          this.dispose.untrack(listener)
+          listener.dispose()
+          resolve(undefined)
+        })
+      )
+    })
+
+    await initialStaticPlotMessage
+
     this.webview?.show({
       live: this.getLivePlots(),
       sectionCollapsed: this.model?.getSectionCollapsed()
     })
-    this.data.managedUpdate()
   }
 
   private sendLivePlotsData() {
@@ -109,12 +130,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     const plots = Object.entries(data as PlotsOutput).reduce(
       (acc, [path, plots]) => {
         acc[path] = plots.map(plot =>
-          isImagePlot(plot)
-            ? ({
-                ...plot,
-                url: this.webview?.getWebviewUri(plot.url)
-              } as ImagePlot)
-            : plot
+          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
         )
         return acc
       },
@@ -125,6 +141,23 @@ export class Plots extends BaseRepository<TPlotsData> {
       plots,
       sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
       size: this.model.getPlotSize(Section.STATIC_PLOTS)
+    }
+  }
+
+  private getImagePlot(plot: ImagePlot) {
+    return {
+      ...plot,
+      url: this.webview?.getWebviewUri(plot.url)
+    } as ImagePlot
+  }
+
+  private getVegaPlot(plot: VegaPlot) {
+    return {
+      ...plot,
+      content: extendVegaSpec(
+        plot.content as TopLevelSpec,
+        this.model?.getRevisionColors()
+      )
     }
   }
 
