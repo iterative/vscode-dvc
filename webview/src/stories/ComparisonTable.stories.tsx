@@ -7,8 +7,8 @@ import { ComparisonTable } from '../plots/components/ComparisonTable/ComparisonT
 export default {
   args: {
     colors: {
-      domain: ['6220556', 'a9eb4fd', '7ee8096', 'e36f8a9'],
-      range: ['#f14c4c', '#3794ff', '#cca700', '#d18616']
+      domain: ['main', '42b8736', '1ba7bcd', '4fb124a'],
+      range: ['#13adc7', '#f14c4c', '#3794ff', '#cca700']
     },
     plots: getImageData('.')
   },

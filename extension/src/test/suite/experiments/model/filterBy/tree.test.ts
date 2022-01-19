@@ -82,13 +82,13 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const [workspace, master] = rowsFixture
+      const [workspace, main] = rowsFixture
 
       const filteredRows = [
         workspace,
         {
-          ...master,
-          subRows: master.subRows
+          ...main,
+          subRows: main.subRows
             ?.filter(experiment => {
               const accuracy = experiment.metrics?.['summary.json']?.accuracy
               return accuracy && accuracy >= 0.45
@@ -132,7 +132,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: columnsFixture,
-        rows: [workspace, master],
+        rows: [workspace, main],
         sorts: []
       }
 
