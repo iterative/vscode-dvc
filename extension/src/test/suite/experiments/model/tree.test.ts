@@ -83,7 +83,8 @@ suite('Experiments Tree Test Suite', () => {
 
       const initialData = {
         sectionCollapsed: defaultSectionCollapsed,
-        ...getExpectedLivePlotsData(expectedDomain, expectedRange)
+        ...getExpectedLivePlotsData(expectedDomain, expectedRange),
+        static: null
       }
 
       while (expectedDomain.length) {
