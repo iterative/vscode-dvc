@@ -48,8 +48,9 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.dispose.track(
       this.data.onDidUpdate(data => {
-        this.sendStaticPlots(data)
-        this.sendComparisonPlots(data)
+        this.model?.transformAndSetPlots(data)
+        this.sendStaticPlots()
+        this.sendComparisonPlots()
       })
     )
 
@@ -65,20 +66,22 @@ export class Plots extends BaseRepository<TPlotsData> {
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
 
+    this.data.setModel(this.model)
+
     this.dispose.track(
       experiments.onDidChangeExperiments(async data => {
         if (data) {
-          await this.model?.transformAndSet(data)
+          await this.model?.transformAndSetExperiments(data)
         }
 
         this.sendLivePlotsData()
 
         await this.data.isReady()
-        this.data.setRevisions(...(this.model?.getRevisions() || []))
+        this.data.setRevisions()
       })
     )
 
-    await this.experiments.isReady()
+    await Promise.all([this.data.isReady(), this.experiments.isReady()])
 
     this.deferred.resolve()
 
@@ -88,24 +91,11 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public async sendInitialWebviewData() {
-    this.data.clearRevisions()
-    this.data.setRevisions(...(this.model?.getRevisions() || []))
-
-    const initialStaticPlotMessage = new Promise(resolve => {
-      const listener = this.dispose.track(
-        this.data.onDidUpdate(() => {
-          this.dispose.untrack(listener)
-          listener.dispose()
-          resolve(undefined)
-        })
-      )
-    })
-
-    await initialStaticPlotMessage
-
+    await this.isReady()
     this.webview?.show({
       live: this.getLivePlots(),
-      sectionCollapsed: this.model?.getSectionCollapsed()
+      sectionCollapsed: this.model?.getSectionCollapsed(),
+      static: this.getStaticPlots()
     })
   }
 
@@ -119,9 +109,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.model?.getLivePlots() || null
   }
 
-  private sendStaticPlots(data: PlotsOutput) {
+  private sendStaticPlots() {
     this.webview?.show({
-      static: this.getStaticPlots(data)
+      static: this.getStaticPlots()
     })
   }
 
@@ -139,7 +129,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     }, {} as PlotsOutput)
   }
 
-  private getStaticPlots(data: PlotsOutput | undefined) {
+  private getStaticPlots() {
+    const data = this.model?.getPlotsDiff()
     if (isEmpty(data) || !this.model) {
       return null
     }
@@ -151,7 +142,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
   }
 
-  private sendComparisonPlots(data: PlotsOutput) {
+  private sendComparisonPlots() {
+    const data = this.model?.getPlotsDiff()
+
     const plots = this.prepareStaticPlots(data, true)
     const colors: Record<string, string> = {}
 
