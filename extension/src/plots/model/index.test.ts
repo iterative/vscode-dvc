@@ -101,7 +101,9 @@ describe('plotsModel', () => {
       MementoPrefix.PLOT_SECTION_NAMES + exampleDvcRoot,
       {
         [Section.LIVE_PLOTS]: newName,
-        [Section.STATIC_PLOTS]: DefaultSectionNames[Section.STATIC_PLOTS]
+        [Section.STATIC_PLOTS]: DefaultSectionNames[Section.STATIC_PLOTS],
+        [Section.COMPARISON_TABLE]:
+          DefaultSectionNames[Section.COMPARISON_TABLE]
       }
     )
   })
@@ -115,7 +117,8 @@ describe('plotsModel', () => {
 
     const expectedSectionCollapsed = {
       [Section.LIVE_PLOTS]: true,
-      [Section.STATIC_PLOTS]: false
+      [Section.STATIC_PLOTS]: false,
+      [Section.COMPARISON_TABLE]: false
     }
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)

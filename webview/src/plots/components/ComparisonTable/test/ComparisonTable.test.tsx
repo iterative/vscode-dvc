@@ -1,10 +1,10 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react'
-import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
+import React from 'react'
 import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
 
 describe('ComparisonTable', () => {
@@ -14,8 +14,10 @@ describe('ComparisonTable', () => {
 
   const basicProps: ComparisonTableProps = {
     colors: {
-      domain: ['main', '42b8736'],
-      range: ['#f14c4c', '#3794ff']
+      '1ba7bcd': '#000000',
+      '42b8736': '#3794ff',
+      '4fb124a': '#ffffff',
+      main: '#f14c4c'
     },
     plots: getImageData('.')
   }
@@ -35,18 +37,20 @@ describe('ComparisonTable', () => {
 
     const columns = screen.getAllByRole('columnheader')
 
-    expect(columns.length).toBe(basicProps.colors.domain.length)
+    expect(columns.length).toBe(Object.keys(basicProps.colors).length)
   })
 
   it('should show the pinned column first', () => {
     renderTable()
 
     const [firstColumn, secondColumn] = screen.getAllByRole('columnheader')
-    const expectedFirstColumn = screen.getByText(basicProps.colors.domain[0])
+    const [firstExperiment, secondExperiment] = Object.keys(basicProps.colors)
+
+    const expectedFirstColumn = screen.getByText(firstExperiment)
 
     expect(firstColumn.textContent).toBe(expectedFirstColumn.textContent)
 
-    fireEvent.click(screen.getByText(basicProps.colors.domain[1]), {
+    fireEvent.click(screen.getByText(secondExperiment), {
       bubbles: true,
       cancelable: true
     })
@@ -68,18 +72,19 @@ describe('ComparisonTable', () => {
     renderTable()
 
     const firstPlotEntry = Object.entries(basicProps.plots)[0][0]
+    const [firstExperiment, secondExperiment] = Object.keys(basicProps.colors)
     const [firstPlot, secondPlot] = screen.getAllByRole('img')
     const expectedFirstPlot = screen.getByAltText(
-      `Plot of ${firstPlotEntry} (${basicProps.colors.domain[0]})`
+      `Plot of ${firstPlotEntry} (${firstExperiment})`
     )
     const expectedSecondPlot = screen.getByAltText(
-      `Plot of ${firstPlotEntry} (${basicProps.colors.domain[1]})`
+      `Plot of ${firstPlotEntry} (${secondExperiment})`
     )
 
     expect(firstPlot.isSameNode(expectedFirstPlot)).toBe(true)
     expect(secondPlot.isSameNode(expectedSecondPlot)).toBe(true)
 
-    fireEvent.click(screen.getByText(basicProps.colors.domain[1]), {
+    fireEvent.click(screen.getByText(secondExperiment), {
       bubbles: true,
       cancelable: true
     })

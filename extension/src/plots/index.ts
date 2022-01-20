@@ -47,7 +47,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      this.data.onDidUpdate(data => this.sendStaticPlots(data))
+      this.data.onDidUpdate(data => {
+        this.sendStaticPlots(data)
+        this.sendComparisonPlots(data)
+      })
     )
 
     this.handleMessageFromWebview()
@@ -122,26 +125,56 @@ export class Plots extends BaseRepository<TPlotsData> {
     })
   }
 
+  private prepareStaticPlots(
+    data: PlotsOutput | undefined,
+    onlyImages?: boolean
+  ) {
+    return Object.entries(data as PlotsOutput).reduce((acc, [path, plots]) => {
+      if (!onlyImages || plots.some(plot => isImagePlot(plot))) {
+        acc[path] = plots.map(plot =>
+          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
+        )
+      }
+      return acc
+    }, {} as PlotsOutput)
+  }
+
   private getStaticPlots(data: PlotsOutput | undefined) {
     if (isEmpty(data) || !this.model) {
       return null
     }
 
-    const plots = Object.entries(data as PlotsOutput).reduce(
-      (acc, [path, plots]) => {
-        acc[path] = plots.map(plot =>
-          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
-        )
-        return acc
-      },
-      {} as PlotsOutput
-    )
-
     return {
-      plots,
+      plots: this.prepareStaticPlots(data),
       sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
       size: this.model.getPlotSize(Section.STATIC_PLOTS)
     }
+  }
+
+  private sendComparisonPlots(data: PlotsOutput) {
+    const plots = this.prepareStaticPlots(data, true)
+    const colors: Record<string, string> = {}
+
+    Object.entries(plots).forEach(([, plots]) =>
+      plots.forEach(plot => {
+        const rev = plot.revisions?.[0]
+        if (rev) {
+          colors[rev] = '#ffffff'
+        }
+      })
+    )
+
+    this.webview?.show({
+      comparison:
+        (!isEmpty(data) &&
+          this.model && {
+            colors,
+            plots,
+            sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
+            size: this.model.getPlotSize(Section.COMPARISON_TABLE)
+          }) ||
+        null
+    })
   }
 
   private getImagePlot(plot: ImagePlot) {
