@@ -7,10 +7,10 @@ import { ComparisonTable } from '../plots/components/ComparisonTable/ComparisonT
 export default {
   args: {
     colors: {
-      '6220556': '#f14c4c',
-      '7ee8096': '#cca700',
-      a9eb4fd: '#3794ff',
-      e36f8a9: '#d18616'
+      '1ba7bcd': '#000000',
+      '42b8736': '#3794ff',
+      '4fb124a': '#ffffff',
+      main: '#f14c4c'
     },
     plots: getImageData('.')
   },
