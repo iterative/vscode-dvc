@@ -45,7 +45,7 @@ suite('Plots Test Suite', () => {
 
       expect(mockPlotsDiff).to.be.called
       expect(managedUpdateSpy, 'should call the cli when the webview is loaded')
-        .to.be.calledOnce
+        .to.be.called
 
       expect(messageSpy).to.be.calledWith({
         static: staticPlotsFixture
