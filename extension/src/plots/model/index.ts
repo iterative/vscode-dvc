@@ -1,18 +1,31 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectLivePlotsData, collectRevisions } from './collect'
+import { VisualizationSpec } from 'react-vega'
+import { TopLevelSpec } from 'vega-lite'
+import isEmpty from 'lodash.isempty'
+import {
+  collectLivePlotsData,
+  collectRevisionData,
+  collectRevisions,
+  collectTemplates,
+  RevisionData
+} from './collect'
 import {
   defaultSectionCollapsed,
+  ImagePlot,
   LivePlotData,
   PlotSize,
   PlotsOutput,
+  PlotsType,
   Section,
-  SectionCollapsed
+  SectionCollapsed,
+  StaticPlot
 } from '../../plots/webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
-import { getColorScale } from '../vega/util'
+import { extendVegaSpec, getColorScale } from '../vega/util'
+import { flatten } from '../../util/array'
 
 export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
@@ -36,7 +49,10 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
-  private plotsDiff?: PlotsOutput
+
+  private revisionData: RevisionData = {}
+  private templates: Record<string, VisualizationSpec> = {}
+  private paths: string[] = []
 
   constructor(
     dvcRoot: string,
@@ -78,12 +94,16 @@ export class PlotsModel {
     this.revisions = revisions
   }
 
-  public transformAndSetPlots(data: PlotsOutput) {
-    this.plotsDiff = data
-  }
+  public async transformAndSetPlots(data: PlotsOutput) {
+    const [revisionData, templates] = await Promise.all([
+      collectRevisionData(data),
+      collectTemplates(data)
+    ])
 
-  public getPlotsDiff() {
-    return this.plotsDiff
+    this.paths = Object.keys(data)
+
+    this.revisionData = { ...this.revisionData, ...revisionData }
+    this.templates = { ...this.templates, ...templates }
   }
 
   public getLivePlots() {
@@ -108,8 +128,62 @@ export class PlotsModel {
     }
   }
 
+  public getStaticPlots() {
+    if (isEmpty(this.paths)) {
+      return null
+    }
+
+    const revisions =
+      this.revisions.length === 1
+        ? ['workspace', ...this.revisions]
+        : this.revisions
+
+    const plots = this.paths.reduce((acc, path) => {
+      const template = { ...this.templates[path] }
+      if (isEmpty(template)) {
+        acc[path] = revisions.map(
+          rev =>
+            ({
+              ...this.revisionData[rev][path],
+              type: PlotsType.IMAGE
+            } as ImagePlot)
+        )
+        return acc
+      }
+      const data = {
+        values: flatten(
+          revisions.map(rev => this.revisionData[rev][path] as unknown[])
+        )
+      }
+
+      acc[path] = [
+        {
+          content: extendVegaSpec(
+            { ...template, data } as TopLevelSpec,
+            this.getRevisionColors()
+          ),
+          type: PlotsType.VEGA
+        } as StaticPlot
+      ]
+      return acc
+    }, {} as PlotsOutput)
+
+    return {
+      plots,
+      sectionName: this.getSectionName(Section.STATIC_PLOTS),
+      size: this.getPlotSize(Section.STATIC_PLOTS)
+    }
+  }
+
   public getRevisions() {
     return this.revisions
+  }
+
+  public getMissingRevisions() {
+    // need to check whether the branch(s) commit has changed
+    return this.revisions.filter(
+      rev => !Object.keys(this.revisionData).includes(rev)
+    )
   }
 
   public getRevisionColors() {

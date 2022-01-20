@@ -287,7 +287,9 @@ export const collectRevisionData = (data: PlotsOutput): RevisionData =>
     {} as RevisionData
   )
 
-export const collectTemplates = (data: PlotsOutput) =>
+export const collectTemplates = (
+  data: PlotsOutput
+): Record<string, VisualizationSpec> =>
   Object.entries(data).reduce((acc, [path, plots]) => {
     plots.forEach(plot => {
       if (isImagePlot(plot) || acc[path]) {

@@ -1,17 +1,12 @@
-import { TopLevelSpec } from 'vega-lite'
 import { EventEmitter, Memento } from 'vscode'
-import isEmpty from 'lodash.isempty'
 import {
   ImagePlot,
   isImagePlot,
   PlotsData as TPlotsData,
-  PlotsOutput,
-  Section,
-  VegaPlot
+  PlotsOutput
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
-import { extendVegaSpec } from './vega/util'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -47,8 +42,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      this.data.onDidUpdate(data => {
-        this.model?.transformAndSetPlots(data)
+      this.data.onDidUpdate(async data => {
+        await this.model?.transformAndSetPlots(data)
         this.sendStaticPlots()
       })
     )
@@ -77,6 +72,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
         await this.data.isReady()
         this.data.setRevisions()
+        this.sendStaticPlots()
       })
     )
 
@@ -115,27 +111,22 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getStaticPlots() {
-    const data = this.model?.getPlotsDiff()
-
-    if (isEmpty(data) || !this.model) {
+    const data = this.model?.getStaticPlots()
+    if (!data?.plots) {
       return null
     }
 
-    const plots = Object.entries(data as PlotsOutput).reduce(
+    const plots = Object.entries(data.plots as PlotsOutput).reduce(
       (acc, [path, plots]) => {
         acc[path] = plots.map(plot =>
-          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
+          isImagePlot(plot) ? this.getImagePlot(plot) : plot
         )
         return acc
       },
       {} as PlotsOutput
     )
 
-    return {
-      plots,
-      sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
-      size: this.model.getPlotSize(Section.STATIC_PLOTS)
-    }
+    return { ...data, plots }
   }
 
   private getImagePlot(plot: ImagePlot) {
@@ -143,16 +134,6 @@ export class Plots extends BaseRepository<TPlotsData> {
       ...plot,
       url: this.webview?.getWebviewUri(plot.url)
     } as ImagePlot
-  }
-
-  private getVegaPlot(plot: VegaPlot) {
-    return {
-      ...plot,
-      content: extendVegaSpec(
-        plot.content as TopLevelSpec,
-        this.model?.getRevisionColors()
-      )
-    }
   }
 
   private handleMessageFromWebview() {

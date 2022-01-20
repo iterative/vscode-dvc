@@ -30,7 +30,7 @@ export class PlotsData extends BaseData<PlotsOutput> {
   }
 
   public setRevisions() {
-    const args = this.model?.getRevisions() || []
+    const args = this.model?.getMissingRevisions() || []
     if (this.args && sameContents(args, this.args)) {
       return
     }
