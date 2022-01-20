@@ -1,17 +1,8 @@
-import { TopLevelSpec } from 'vega-lite'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
-import {
-  ImagePlot,
-  isImagePlot,
-  PlotsData as TPlotsData,
-  PlotsOutput,
-  Section,
-  VegaPlot
-} from './webview/contract'
+import { ImagePlot, PlotsData as TPlotsData, Section } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
-import { extendVegaSpec } from './vega/util'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -93,6 +84,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async sendInitialWebviewData() {
     await this.isReady()
     this.webview?.show({
+      // comparison: this.getComparisonData(),
       live: this.getLivePlots(),
       sectionCollapsed: this.model?.getSectionCollapsed(),
       static: this.getStaticPlots()
@@ -115,59 +107,42 @@ export class Plots extends BaseRepository<TPlotsData> {
     })
   }
 
-  private prepareStaticPlots(
-    data: PlotsOutput | undefined,
-    onlyImages?: boolean
-  ) {
-    return Object.entries(data as PlotsOutput).reduce((acc, [path, plots]) => {
-      if (!onlyImages || plots.some(plot => isImagePlot(plot))) {
-        acc[path] = plots.map(plot =>
-          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
-        )
-      }
-      return acc
-    }, {} as PlotsOutput)
-  }
-
   private getStaticPlots() {
-    const data = this.model?.getPlotsDiff()
-    if (isEmpty(data) || !this.model) {
+    const staticPlots = this.model?.getStaticPlots()
+
+    if (!this.model || !staticPlots || isEmpty(staticPlots)) {
       return null
     }
 
     return {
-      plots: this.prepareStaticPlots(data),
+      plots: staticPlots,
       sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
       size: this.model.getPlotSize(Section.STATIC_PLOTS)
     }
   }
 
   private sendComparisonPlots() {
-    const data = this.model?.getPlotsDiff()
+    this.webview?.show({ comparison: this.getComparisonData() })
+  }
 
-    const plots = this.prepareStaticPlots(data, true)
-    const colors: Record<string, string> = {}
+  private getComparisonData() {
+    const comparison = this.model?.getComparison()
+    if (!this.model || isEmpty(comparison)) {
+      return null
+    }
 
-    Object.entries(plots).forEach(([, plots]) =>
-      plots.forEach(plot => {
-        const rev = plot.revisions?.[0]
-        if (rev) {
-          colors[rev] = '#ffffff'
-        }
-      })
-    )
-
-    this.webview?.show({
-      comparison:
-        (!isEmpty(data) &&
-          this.model && {
-            colors,
-            plots,
-            sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
-            size: this.model.getPlotSize(Section.COMPARISON_TABLE)
-          }) ||
-        null
-    })
+    return {
+      colors: this.model.getColors(),
+      plots: Object.entries(comparison as Record<string, ImagePlot[]>).reduce(
+        (acc, [path, plots]) => {
+          acc[path] = plots.map(plot => this.getImagePlot(plot))
+          return acc
+        },
+        {} as Record<string, ImagePlot[]>
+      ),
+      sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
+      size: this.model.getPlotSize(Section.COMPARISON_TABLE)
+    }
   }
 
   private getImagePlot(plot: ImagePlot) {
@@ -175,16 +150,6 @@ export class Plots extends BaseRepository<TPlotsData> {
       ...plot,
       url: this.webview?.getWebviewUri(plot.url)
     } as ImagePlot
-  }
-
-  private getVegaPlot(plot: VegaPlot) {
-    return {
-      ...plot,
-      content: extendVegaSpec(
-        plot.content as TopLevelSpec,
-        this.model?.getRevisionColors()
-      )
-    }
   }
 
   private handleMessageFromWebview() {

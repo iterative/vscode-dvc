@@ -1,5 +1,5 @@
 import { getWebviewMessageFixture } from '..'
 
-const data = getWebviewMessageFixture('.')
+const data = getWebviewMessageFixture()
 
 export default data

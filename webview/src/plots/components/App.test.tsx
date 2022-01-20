@@ -5,7 +5,7 @@ import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/staticPlots/webview'
+import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/output/webview'
 import {
   defaultSectionCollapsed,
   LivePlotsColors,

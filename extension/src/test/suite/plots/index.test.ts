@@ -5,7 +5,7 @@ import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
-import staticPlotsFixture from '../../fixtures/plotsDiff/staticPlots/vscode'
+import staticPlotsFixture from '../../fixtures/plotsDiff/output/vscode'
 import { closeAllEditors } from '../util'
 import {
   defaultSectionCollapsed,

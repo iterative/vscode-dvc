@@ -5,7 +5,7 @@ import {
   defaultSectionCollapsed
 } from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/staticPlots/storybook'
+import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/output/storybook'
 import Plots from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'
 

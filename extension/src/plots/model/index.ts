@@ -1,18 +1,29 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectLivePlotsData, collectRevisions } from './collect'
+import { TopLevelSpec } from 'vega-lite'
+import {
+  collectLivePlotsData,
+  collectPaths,
+  collectRevisionData,
+  collectRevisions,
+  ComparisonData
+} from './collect'
 import {
   defaultSectionCollapsed,
+  ImagePlot,
+  isVegaPlot,
   LivePlotData,
   PlotSize,
   PlotsOutput,
   Section,
-  SectionCollapsed
+  SectionCollapsed,
+  VegaPlot
 } from '../../plots/webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
-import { getColorScale } from '../vega/util'
+import { extendVegaSpec, getColorScale } from '../vega/util'
+import { definedAndNonEmpty } from '../../util/array'
 
 export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
@@ -39,6 +50,10 @@ export class PlotsModel {
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
   private plotsDiff?: PlotsOutput
+
+  private plotPaths: string[] = []
+  private imagePaths: string[] = []
+  private comparisonData: ComparisonData = {}
 
   constructor(
     dvcRoot: string,
@@ -82,10 +97,27 @@ export class PlotsModel {
 
   public transformAndSetPlots(data: PlotsOutput) {
     this.plotsDiff = data
+
+    const { comparisonData } = collectRevisionData(data)
+
+    const { plots, images } = collectPaths(data)
+
+    this.comparisonData = comparisonData
+
+    this.plotPaths = plots
+    this.imagePaths = images
   }
 
   public getPlotsDiff() {
     return this.plotsDiff
+  }
+
+  public getImagePaths() {
+    return this.imagePaths
+  }
+
+  public getPlotPaths() {
+    return this.plotPaths
   }
 
   public getLivePlots() {
@@ -116,6 +148,51 @@ export class PlotsModel {
 
   public getRevisionColors() {
     return getColorScale(this.experiments?.getColors() || {})
+  }
+
+  public getColors() {
+    return this.experiments?.getColors() || {}
+  }
+
+  public getStaticPlots() {
+    const data = this.getPlotsDiff()
+    const paths = this.getPlotPaths()
+
+    const staticPlots = {} as Record<string, VegaPlot[]>
+    paths.forEach(path => {
+      const plots = data?.[path] || []
+      const allVega = plots
+        .map(plot => {
+          if (isVegaPlot(plot)) {
+            return {
+              ...plot,
+              content: extendVegaSpec(
+                plot.content as TopLevelSpec,
+                this.getRevisionColors()
+              )
+            }
+          }
+        })
+        .filter(Boolean) as VegaPlot[]
+      if (definedAndNonEmpty(allVega)) {
+        staticPlots[path] = allVega
+      }
+    })
+
+    return staticPlots
+  }
+
+  public getComparison() {
+    return this.imagePaths.reduce((acc, path) => {
+      acc[path] = []
+      ;['workspace', ...this.revisions].forEach(rev => {
+        const image = this.comparisonData?.[rev]?.[path]
+        if (image) {
+          acc[path].push(image)
+        }
+      })
+      return acc
+    }, {} as Record<string, ImagePlot[]>)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {

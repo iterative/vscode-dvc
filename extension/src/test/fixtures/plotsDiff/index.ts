@@ -4,9 +4,9 @@ import { DefaultSectionNames } from '../../../plots/model'
 import { extendVegaSpec } from '../../../plots/vega/util'
 import {
   PlotSize,
-  PlotsOutput,
   PlotsType,
   Section,
+  StaticPlotsData,
   VegaPlot
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
@@ -380,12 +380,8 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
   ]
 })
 
-export const getSmallMemoryFootprintFixture = (
-  baseUrl: string,
-  joinFunc?: (...args: string[]) => string
-) => ({
+export const getSmallMemoryFootprintFixture = () => ({
   plots: {
-    ...getImageData(baseUrl, joinFunc),
     ...basicVega
   },
   sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
@@ -401,7 +397,9 @@ export const getFixture = (
   ...require('./vega').default
 })
 
-const extendedSpecs = (plotsOutput: { [x: string]: VegaPlot[] }): PlotsOutput =>
+const extendedSpecs = (plotsOutput: {
+  [x: string]: VegaPlot[]
+}): Record<string, VegaPlot[]> =>
   Object.entries(plotsOutput).reduce((acc, [id, plots]) => {
     acc[id] = plots.map(plot => ({
       ...plot,
@@ -412,16 +410,24 @@ const extendedSpecs = (plotsOutput: { [x: string]: VegaPlot[] }): PlotsOutput =>
     }))
 
     return acc
-  }, {} as PlotsOutput)
+  }, {} as Record<string, VegaPlot[]>)
 
-export const getWebviewMessageFixture = (
-  baseUrl: string,
-  joinFunc?: (...args: string[]) => string
-) => ({
+export const getWebviewMessageFixture = (): StaticPlotsData => ({
   plots: {
-    ...getImageData(baseUrl, joinFunc),
     ...extendedSpecs({ ...basicVega, ...require('./vega').default })
   },
   sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
   size: PlotSize.REGULAR
 })
+
+// export const getWebviewMessageFixture = (
+//   baseUrl: string,
+//   joinFunc?: (...args: string[]) => string
+// ) => ({
+//   plots: {
+//     ...getImageData(baseUrl, joinFunc),
+//     ...extendedSpecs({ ...basicVega, ...require('./vega').default })
+//   },
+//   sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
+//   size: PlotSize.REGULAR
+// })

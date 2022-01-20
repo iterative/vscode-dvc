@@ -61,7 +61,7 @@ export interface PlotsComparisonData {
 export type PlotsOutput = Record<string, StaticPlot[]>
 
 export interface StaticPlotsData {
-  plots: PlotsOutput
+  plots: Record<string, VegaPlot[]>
   sectionName: string
   size: PlotSize
 }
