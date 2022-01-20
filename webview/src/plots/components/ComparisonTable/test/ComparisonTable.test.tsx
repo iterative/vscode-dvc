@@ -14,8 +14,10 @@ describe('ComparisonTable', () => {
 
   const basicProps: ComparisonTableProps = {
     colors: {
-      '6220556': '#f14c4c',
-      a9eb4fd: '#3794ff'
+      '1ba7bcd': '#000000',
+      '42b8736': '#3794ff',
+      '4fb124a': '#ffffff',
+      main: '#f14c4c'
     },
     plots: getImageData('.')
   }
