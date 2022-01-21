@@ -19,19 +19,30 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>
   ) {
-    super(
-      dvcRoot,
-      internalCommands,
-      AvailableCommands.EXPERIMENT_SHOW,
-      updatesPaused,
-      ['dvc.lock', 'dvc.yaml', 'params.yaml']
-    )
+    super(dvcRoot, internalCommands, updatesPaused, [
+      'dvc.lock',
+      'dvc.yaml',
+      'params.yaml'
+    ])
 
     this.watchExpGitRefs()
   }
 
   public collectFiles(data: ExperimentsOutput) {
     return collectFiles(data)
+  }
+
+  public async update(): Promise<void> {
+    const data = await this.internalCommands.executeCommand<ExperimentsOutput>(
+      AvailableCommands.EXPERIMENT_SHOW,
+      this.dvcRoot
+    )
+
+    const files = this.collectFiles(data)
+
+    this.compareFiles(files)
+
+    return this.notifyChanged(data)
   }
 
   public forceUpdate() {

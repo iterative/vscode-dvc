@@ -4,7 +4,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
-import { CommandId, InternalCommands } from '../commands/internal'
+import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { PlotsOutput } from '../plots/webview/contract'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
@@ -15,16 +15,13 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
 
   protected readonly dvcRoot: string
   protected readonly processManager: ProcessManager
-
-  protected args?: string[]
+  protected readonly internalCommands: InternalCommands
 
   private collectedFiles: string[] = []
   private readonly staticFiles: string[]
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
-
-  private readonly internalCommands: InternalCommands
 
   private readonly updated: EventEmitter<T> = this.dispose.track(
     new EventEmitter()
@@ -39,12 +36,9 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
 
   private watcher?: Disposable
 
-  private readonly updateCommandId: CommandId
-
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updateCommandId: CommandId,
     updatesPaused: EventEmitter<boolean>,
     staticFiles: string[] = []
   ) {
@@ -55,9 +49,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
         process: () => this.update()
       })
     )
-
     this.internalCommands = internalCommands
-    this.updateCommandId = updateCommandId
     this.onDidUpdate = this.updated.event
     this.staticFiles = staticFiles
 
@@ -70,6 +62,19 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
 
   public managedUpdate() {
     return this.processManager.run('update')
+  }
+
+  protected compareFiles(files: string[]) {
+    if (sameContents(this.collectedFiles, files)) {
+      return
+    }
+
+    this.collectedFiles = files
+    this.collectedFilesChanged.fire()
+  }
+
+  protected notifyChanged(data: T) {
+    this.updated.fire(data)
   }
 
   private initialize() {
@@ -93,33 +98,6 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     this.managedUpdate()
   }
 
-  private async update(): Promise<void> {
-    const data = await this.internalCommands.executeCommand<T>(
-      this.updateCommandId,
-      this.dvcRoot,
-      ...(this.args || [])
-    )
-
-    const files = this.collectFiles(data)
-
-    this.compareFiles(files)
-
-    return this.notifyChanged(data)
-  }
-
-  private compareFiles(files: string[]) {
-    if (sameContents(this.collectedFiles, files)) {
-      return
-    }
-
-    this.collectedFiles = files
-    this.collectedFilesChanged.fire()
-  }
-
-  private notifyChanged(data: T) {
-    this.updated.fire(data)
-  }
-
   private watchFiles() {
     const files = uniqueValues([...this.staticFiles, ...this.collectedFiles])
     if (!definedAndNonEmpty(files)) {
@@ -140,4 +118,6 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
   }
 
   abstract collectFiles(data: T): string[]
+
+  abstract update(): Promise<unknown>
 }

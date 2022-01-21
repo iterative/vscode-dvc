@@ -16,6 +16,7 @@ import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
+import { definedAndNonEmpty } from '../util/array'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -43,10 +44,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      this.data.onDidUpdate(data => {
-        this.model?.transformAndSetPlots(data)
+      this.data.onDidUpdate(async data => {
+        await this.model?.transformAndSetPlots(data)
         this.sendStaticPlots()
-        this.sendComparisonPlots()
       })
     )
 
@@ -73,7 +73,7 @@ export class Plots extends BaseRepository<TPlotsData> {
         this.sendLivePlotsData()
 
         await this.data.isReady()
-        this.data.setRevisions()
+        this.sendStaticPlots()
       })
     )
 
@@ -107,7 +107,12 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private sendStaticPlots() {
+    if (definedAndNonEmpty(this.model?.getMissingRevisions())) {
+      return this.data.managedUpdate()
+    }
+
     this.webview?.show({
+      comparison: this.getComparisonPlots(),
       static: this.getStaticPlots()
     })
   }
@@ -124,10 +129,6 @@ export class Plots extends BaseRepository<TPlotsData> {
       sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
       size: this.model.getPlotSize(Section.STATIC_PLOTS)
     }
-  }
-
-  private sendComparisonPlots() {
-    this.webview?.show({ comparison: this.getComparisonPlots() })
   }
 
   private getComparisonPlots() {

@@ -1,30 +1,32 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { TopLevelSpec } from 'vega-lite'
+import { VisualizationSpec } from 'react-vega'
 import {
   collectLivePlotsData,
   collectPaths,
   collectRevisionData,
   collectRevisions,
-  ComparisonData
+  collectTemplates,
+  ComparisonData,
+  RevisionData
 } from './collect'
 import {
   ComparisonPlots,
   defaultSectionCollapsed,
-  isVegaPlot,
   LivePlotData,
   PlotSize,
   PlotsOutput,
+  PlotsType,
   Section,
   SectionCollapsed,
-  VegaPlot,
   VegaPlots
 } from '../../plots/webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale } from '../vega/util'
-import { definedAndNonEmpty } from '../../util/array'
+import { flatten, uniqueValues } from '../../util/array'
 
 export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
@@ -50,11 +52,12 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
-  private plotsDiff?: PlotsOutput
 
   private plotPaths: string[] = []
   private imagePaths: string[] = []
   private comparisonData: ComparisonData = {}
+  private revisionData: RevisionData = {}
+  private templates: Record<string, VisualizationSpec> = {}
 
   constructor(
     dvcRoot: string,
@@ -96,21 +99,19 @@ export class PlotsModel {
     this.revisions = revisions
   }
 
-  public transformAndSetPlots(data: PlotsOutput) {
-    this.plotsDiff = data
+  public async transformAndSetPlots(data: PlotsOutput) {
+    const [{ comparisonData, revisionData }, templates, { plots, images }] =
+      await Promise.all([
+        collectRevisionData(data),
+        collectTemplates(data),
+        collectPaths(data)
+      ])
 
-    const { comparisonData } = collectRevisionData(data)
-
-    const { plots, images } = collectPaths(data)
-
-    this.comparisonData = comparisonData
-
+    this.comparisonData = { ...this.comparisonData, ...comparisonData }
+    this.revisionData = { ...this.revisionData, ...revisionData }
+    this.templates = { ...this.templates, ...templates }
     this.plotPaths = plots
     this.imagePaths = images
-  }
-
-  public getPlotsDiff() {
-    return this.plotsDiff
   }
 
   public getLivePlots() {
@@ -139,6 +140,17 @@ export class PlotsModel {
     return this.revisions
   }
 
+  public getMissingRevisions() {
+    return this.revisions.filter(
+      rev =>
+        !uniqueValues([
+          ...Object.keys(this.comparisonData),
+          ...Object.keys(this.revisionData),
+          'workspace'
+        ]).includes(rev)
+    )
+  }
+
   public getRevisionColors() {
     return getColorScale(this.experiments?.getColors() || {})
   }
@@ -154,27 +166,32 @@ export class PlotsModel {
   }
 
   public getStaticPlots() {
-    const data = this.getPlotsDiff()
-
     const staticPlots = {} as VegaPlots
     this.plotPaths.forEach(path => {
-      const plots = data?.[path] || []
-      const allVega = plots
-        .map(plot => {
-          if (isVegaPlot(plot)) {
-            return {
-              ...plot,
-              content: extendVegaSpec(
-                plot.content as TopLevelSpec,
-                this.getRevisionColors()
-              )
-            }
-          }
-        })
-        .filter(Boolean) as VegaPlot[]
-      if (definedAndNonEmpty(allVega)) {
-        staticPlots[path] = allVega
+      const template = this.templates[path]
+
+      if (!template) {
+        return
       }
+      staticPlots[path] = [
+        {
+          content: extendVegaSpec(
+            {
+              ...template,
+              data: {
+                values: flatten(
+                  this.revisions
+                    .map(rev => this.revisionData?.[rev]?.[path])
+                    .filter(Boolean)
+                )
+              }
+            } as TopLevelSpec,
+            this.getRevisionColors()
+          ),
+          revisions: this.revisions,
+          type: PlotsType.VEGA
+        }
+      ]
     })
 
     return staticPlots

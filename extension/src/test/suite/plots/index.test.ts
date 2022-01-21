@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore, spy, stub } from 'sinon'
+import { restore, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
@@ -28,8 +28,10 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { data, plots, plotsModel, mockPlotsDiff, messageSpy } =
-        await buildPlots(disposable, plotsDiffFixture)
+      const { plots, plotsModel, mockPlotsDiff, messageSpy } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
 
       const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
       const getLivePlotsEvent = new Promise(resolve =>
@@ -39,14 +41,10 @@ suite('Plots Test Suite', () => {
         })
       )
 
-      const managedUpdateSpy = spy(data, 'managedUpdate')
-
       const webview = await plots.showWebview()
       await getLivePlotsEvent
 
       expect(mockPlotsDiff).to.be.called
-      expect(managedUpdateSpy, 'should call the cli when the webview is loaded')
-        .to.be.called
 
       const expectedPlotsData: TPlotsData = {
         comparison: comparisonPlotsFixture,

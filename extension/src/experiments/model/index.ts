@@ -134,7 +134,11 @@ export class ExperimentsModel {
     const colors = { workspace: getWorkspaceColor() } as Record<string, string>
 
     this.getAssignedExperimentColors().forEach((color: string, id: string) => {
-      colors[getDisplayId(id)] = color
+      const displayId = getDisplayId(id)
+      colors[displayId] = color
+      this.checkpointsByTip.get(id)?.forEach(({ id }) => {
+        colors[getDisplayId(id)] = color
+      })
     })
 
     this.getAssignedBranchColors().forEach((color: string, name: string) => {
