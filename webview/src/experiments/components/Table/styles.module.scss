@@ -500,10 +500,8 @@ $spinner-color-light: #000;
   text-overflow: ellipsis;
 }
 
-.th {
-  .cellContents {
-    padding: 0.1em 0;
-  }
+.headerCellContentsWrapper {
+  padding: 0.1em 0;
 }
 
 .innerCell {
