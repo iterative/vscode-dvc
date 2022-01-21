@@ -320,13 +320,13 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['42b8736'],
-      url: joinFunc(baseUrl, '42b8736_plots_heatmap.png')
+      revisions: ['1ba7bcd'],
+      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
+      revisions: ['42b8736'],
+      url: joinFunc(baseUrl, '42b8736_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -342,13 +342,13 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['42b8736'],
-      url: joinFunc(baseUrl, '42b8736_plots_acc.png')
+      revisions: ['1ba7bcd'],
+      url: joinFunc(baseUrl, '1ba7bcd_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_acc.png')
+      revisions: ['42b8736'],
+      url: joinFunc(baseUrl, '42b8736_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -364,13 +364,13 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['42b8736'],
-      url: joinFunc(baseUrl, '42b8736_plots_loss.png')
+      revisions: ['1ba7bcd'],
+      url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
+      revisions: ['42b8736'],
+      url: joinFunc(baseUrl, '42b8736_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -412,7 +412,7 @@ const extendedSpecs = (plotsOutput: {
     return acc
   }, {} as Record<string, VegaPlot[]>)
 
-export const getWebviewMessageFixture = (): StaticPlotsData => ({
+export const getStaticWebviewMessage = (): StaticPlotsData => ({
   plots: {
     ...extendedSpecs({ ...basicVega, ...require('./vega').default })
   },
@@ -420,14 +420,19 @@ export const getWebviewMessageFixture = (): StaticPlotsData => ({
   size: PlotSize.REGULAR
 })
 
-// export const getWebviewMessageFixture = (
-//   baseUrl: string,
-//   joinFunc?: (...args: string[]) => string
-// ) => ({
-//   plots: {
-//     ...getImageData(baseUrl, joinFunc),
-//     ...extendedSpecs({ ...basicVega, ...require('./vega').default })
-//   },
-//   sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
-//   size: PlotSize.REGULAR
-// })
+export const getComparisonWebviewMessage = (
+  baseUrl: string,
+  joinFunc?: (...args: string[]) => string
+) => ({
+  plots: {
+    ...getImageData(baseUrl, joinFunc)
+  },
+  colors: {
+    '4fb124a': '#f14c4c',
+    '42b8736': '#3794ff',
+    '1ba7bcd': '#cca700',
+    main: '#13adc7'
+  },
+  sectionName: DefaultSectionNames[Section.COMPARISON_TABLE],
+  size: PlotSize.REGULAR
+})

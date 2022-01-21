@@ -85,7 +85,7 @@ describe('collectRevisionData', () => {
     ])
 
     expect(comparisonData['1ba7bcd']['plots/heatmap.png']).toEqual(
-      plotsDiffFixture['plots/heatmap.png'][2]
+      plotsDiffFixture['plots/heatmap.png'][1]
     )
   })
 })

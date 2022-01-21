@@ -84,7 +84,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async sendInitialWebviewData() {
     await this.isReady()
     this.webview?.show({
-      // comparison: this.getComparisonData(),
+      comparison: this.getComparisonData(),
       live: this.getLivePlots(),
       sectionCollapsed: this.model?.getSectionCollapsed(),
       static: this.getStaticPlots()

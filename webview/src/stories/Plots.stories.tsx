@@ -5,7 +5,8 @@ import {
   defaultSectionCollapsed
 } from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/output/storybook'
+import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/static'
+import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import Plots from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'
 
@@ -16,6 +17,7 @@ import '../plots/components/styles.module.scss'
 export default {
   args: {
     data: {
+      comparison: comparisonPlotsFixture,
       live: livePlotsFixture,
       sectionCollapsed: defaultSectionCollapsed,
       static: staticPlotsFixture
@@ -47,6 +49,14 @@ WithStaticOnly.args = {
   data: {
     sectionCollapsed: defaultSectionCollapsed,
     static: staticPlotsFixture
+  }
+}
+
+export const WithComparisonOnly = Template.bind({})
+WithComparisonOnly.args = {
+  data: {
+    comparison: comparisonPlotsFixture,
+    sectionCollapsed: defaultSectionCollapsed
   }
 }
 

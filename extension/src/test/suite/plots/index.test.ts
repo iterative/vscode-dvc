@@ -5,7 +5,8 @@ import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
-import staticPlotsFixture from '../../fixtures/plotsDiff/output/vscode'
+import staticPlotsFixture from '../../fixtures/plotsDiff/static'
+import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
 import { closeAllEditors } from '../util'
 import {
   defaultSectionCollapsed,
@@ -48,6 +49,7 @@ suite('Plots Test Suite', () => {
         .to.be.called
 
       const expectedPlotsData: TPlotsData = {
+        comparison: comparisonPlotsFixture,
         live: livePlotsFixture,
         sectionCollapsed: defaultSectionCollapsed,
         static: staticPlotsFixture
@@ -57,6 +59,6 @@ suite('Plots Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    }).timeout(8000)
+    }).timeout(80000)
   })
 })

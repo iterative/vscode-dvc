@@ -110,7 +110,7 @@ const Plots = ({
     comparison: comparisonTable
   } = data
 
-  if (!livePlots && !staticPlots) {
+  if (!livePlots && !staticPlots && !comparisonTable) {
     return EmptyState('No Plots to Display')
   }
 

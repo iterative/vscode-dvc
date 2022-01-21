@@ -151,7 +151,13 @@ export class PlotsModel {
   }
 
   public getColors() {
-    return this.experiments?.getColors() || {}
+    const colors = { ...(this.experiments?.getColors() || {}) }
+    Object.keys(colors).forEach(rev => {
+      if (!this.revisions.includes(rev)) {
+        delete colors[rev]
+      }
+    })
+    return colors
   }
 
   public getStaticPlots() {
@@ -185,7 +191,7 @@ export class PlotsModel {
   public getComparison() {
     return this.imagePaths.reduce((acc, path) => {
       acc[path] = []
-      ;['workspace', ...this.revisions].forEach(rev => {
+      this.revisions.forEach(rev => {
         const image = this.comparisonData?.[rev]?.[path]
         if (image) {
           acc[path].push(image)

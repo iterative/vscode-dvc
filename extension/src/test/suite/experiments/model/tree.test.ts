@@ -82,6 +82,7 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       const initialData = {
+        comparison: null,
         sectionCollapsed: defaultSectionCollapsed,
         ...getExpectedLivePlotsData(expectedDomain, expectedRange),
         static: null
