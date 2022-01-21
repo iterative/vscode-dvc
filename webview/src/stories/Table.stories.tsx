@@ -49,8 +49,8 @@ const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
 
 export const WithData = Template.bind({})
 
-export const WithDeeplyNestedData = Template.bind({})
-WithDeeplyNestedData.args = { tableData: deeplyNestedTableData }
+export const WithDeeplyNestedHeaders = Template.bind({})
+WithDeeplyNestedHeaders.args = { tableData: deeplyNestedTableData }
 
 export const WithoutData = Template.bind({})
 WithoutData.args = { tableData: undefined }
