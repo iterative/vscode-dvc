@@ -5,6 +5,7 @@ import {
   defaultSectionCollapsed,
   LivePlotData,
   PlotSize,
+  PlotsOutput,
   Section,
   SectionCollapsed
 } from '../../plots/webview/contract'
@@ -15,12 +16,14 @@ import { getColorScale } from '../vega/util'
 
 export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
-  [Section.STATIC_PLOTS]: 'Static Plots'
+  [Section.STATIC_PLOTS]: 'Static Plots',
+  [Section.COMPARISON_TABLE]: 'Comparison'
 }
 
 export const DefaultSectionSizes = {
   [Section.LIVE_PLOTS]: PlotSize.REGULAR,
-  [Section.STATIC_PLOTS]: PlotSize.REGULAR
+  [Section.STATIC_PLOTS]: PlotSize.REGULAR,
+  [Section.COMPARISON_TABLE]: PlotSize.REGULAR
 }
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
@@ -35,6 +38,7 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
+  private plotsDiff?: PlotsOutput
 
   constructor(
     dvcRoot: string,
@@ -66,7 +70,7 @@ export class PlotsModel {
     )
   }
 
-  public async transformAndSet(data: ExperimentsOutput) {
+  public async transformAndSetExperiments(data: ExperimentsOutput) {
     const [livePlots, revisions] = await Promise.all([
       collectLivePlotsData(data),
       collectRevisions(data)
@@ -74,6 +78,14 @@ export class PlotsModel {
 
     this.livePlots = livePlots
     this.revisions = revisions
+  }
+
+  public transformAndSetPlots(data: PlotsOutput) {
+    this.plotsDiff = data
+  }
+
+  public getPlotsDiff() {
+    return this.plotsDiff
   }
 
   public getLivePlots() {
@@ -142,7 +154,7 @@ export class PlotsModel {
   }
 
   public getSectionName(section: Section): string {
-    return this.sectionNames[section]
+    return this.sectionNames[section] || DefaultSectionNames[section]
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {

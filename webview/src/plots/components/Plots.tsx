@@ -21,6 +21,7 @@ import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
 import styles from './styles.module.scss'
 import { StaticPlotComponent } from './StaticPlot'
+import { ComparisonTable } from './ComparisonTable/ComparisonTable'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
@@ -121,7 +122,12 @@ const Plots = ({
     return EmptyState('Loading Plots...')
   }
 
-  const { sectionCollapsed, live: livePlots, static: staticPlots } = data
+  const {
+    sectionCollapsed,
+    live: livePlots,
+    static: staticPlots,
+    comparison: comparisonTable
+  } = data
 
   if (!livePlots && !staticPlots) {
     return EmptyState('No Plots to Display')
@@ -186,6 +192,19 @@ const Plots = ({
           {...basicContainerProps}
         >
           <StaticPlots plots={staticPlots.plots} />
+        </PlotsContainer>
+      )}
+      {comparisonTable && (
+        <PlotsContainer
+          title={comparisonTable.sectionName}
+          sectionKey={Section.COMPARISON_TABLE}
+          currentSize={comparisonTable.size}
+          {...basicContainerProps}
+        >
+          <ComparisonTable
+            plots={comparisonTable.plots}
+            colors={comparisonTable.colors}
+          />
         </PlotsContainer>
       )}
     </>

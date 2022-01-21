@@ -18,6 +18,7 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { mocked } from 'ts-jest/utils'
+import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
 import { App } from './App'
 import Plots from './Plots'
 import { vsCodeApi } from '../../shared/api'
@@ -123,6 +124,7 @@ describe('App', () => {
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
     expect(screen.queryByText('Static Plots')).not.toBeInTheDocument()
+    expect(screen.queryByText('Comparison')).not.toBeInTheDocument()
   })
 
   it('should render live and static plots when given messages with both types of plots data', () => {
@@ -142,6 +144,31 @@ describe('App', () => {
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
     expect(screen.getByText('Static Plots')).toBeInTheDocument()
+  })
+
+  it('should render the comparison table when given a message with comparison plots data', () => {
+    const expectedSectionName = 'Comparison'
+
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: defaultSectionCollapsed
+    })
+
+    sendSetDataMessage({
+      comparison: {
+        colors: {
+          '1ba7bcd': '#000000',
+          '42b8736': '#3794ff',
+          '4fb124a': '#ffffff',
+          main: '#f14c4c'
+        },
+        plots: getImageData('.'),
+        sectionName: expectedSectionName,
+        size: PlotSize.REGULAR
+      }
+    })
+
+    expect(screen.getByText(expectedSectionName)).toBeInTheDocument()
   })
 
   it('should remove live plots given a message showing live plots as null', () => {

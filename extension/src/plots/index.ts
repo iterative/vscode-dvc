@@ -47,7 +47,11 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      this.data.onDidUpdate(data => this.sendStaticPlots(data))
+      this.data.onDidUpdate(data => {
+        this.model?.transformAndSetPlots(data)
+        this.sendStaticPlots()
+        this.sendComparisonPlots()
+      })
     )
 
     this.handleMessageFromWebview()
@@ -62,20 +66,22 @@ export class Plots extends BaseRepository<TPlotsData> {
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
 
+    this.data.setModel(this.model)
+
     this.dispose.track(
       experiments.onDidChangeExperiments(async data => {
         if (data) {
-          await this.model?.transformAndSet(data)
+          await this.model?.transformAndSetExperiments(data)
         }
 
         this.sendLivePlotsData()
 
         await this.data.isReady()
-        this.data.setRevisions(...(this.model?.getRevisions() || []))
+        this.data.setRevisions()
       })
     )
 
-    await this.experiments.isReady()
+    await Promise.all([this.data.isReady(), this.experiments.isReady()])
 
     this.deferred.resolve()
 
@@ -85,24 +91,11 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public async sendInitialWebviewData() {
-    this.data.clearRevisions()
-    this.data.setRevisions(...(this.model?.getRevisions() || []))
-
-    const initialStaticPlotMessage = new Promise(resolve => {
-      const listener = this.dispose.track(
-        this.data.onDidUpdate(() => {
-          this.dispose.untrack(listener)
-          listener.dispose()
-          resolve(undefined)
-        })
-      )
-    })
-
-    await initialStaticPlotMessage
-
+    await this.isReady()
     this.webview?.show({
       live: this.getLivePlots(),
-      sectionCollapsed: this.model?.getSectionCollapsed()
+      sectionCollapsed: this.model?.getSectionCollapsed(),
+      static: this.getStaticPlots()
     })
   }
 
@@ -116,32 +109,65 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.model?.getLivePlots() || null
   }
 
-  private sendStaticPlots(data: PlotsOutput) {
+  private sendStaticPlots() {
     this.webview?.show({
-      static: this.getStaticPlots(data)
+      static: this.getStaticPlots()
     })
   }
 
-  private getStaticPlots(data: PlotsOutput | undefined) {
+  private prepareStaticPlots(
+    data: PlotsOutput | undefined,
+    onlyImages?: boolean
+  ) {
+    return Object.entries(data as PlotsOutput).reduce((acc, [path, plots]) => {
+      if (!onlyImages || plots.some(plot => isImagePlot(plot))) {
+        acc[path] = plots.map(plot =>
+          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
+        )
+      }
+      return acc
+    }, {} as PlotsOutput)
+  }
+
+  private getStaticPlots() {
+    const data = this.model?.getPlotsDiff()
     if (isEmpty(data) || !this.model) {
       return null
     }
 
-    const plots = Object.entries(data as PlotsOutput).reduce(
-      (acc, [path, plots]) => {
-        acc[path] = plots.map(plot =>
-          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
-        )
-        return acc
-      },
-      {} as PlotsOutput
-    )
-
     return {
-      plots,
+      plots: this.prepareStaticPlots(data),
       sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
       size: this.model.getPlotSize(Section.STATIC_PLOTS)
     }
+  }
+
+  private sendComparisonPlots() {
+    const data = this.model?.getPlotsDiff()
+
+    const plots = this.prepareStaticPlots(data, true)
+    const colors: Record<string, string> = {}
+
+    Object.entries(plots).forEach(([, plots]) =>
+      plots.forEach(plot => {
+        const rev = plot.revisions?.[0]
+        if (rev) {
+          colors[rev] = '#ffffff'
+        }
+      })
+    )
+
+    this.webview?.show({
+      comparison:
+        (!isEmpty(data) &&
+          this.model && {
+            colors,
+            plots,
+            sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
+            size: this.model.getPlotSize(Section.COMPARISON_TABLE)
+          }) ||
+        null
+    })
   }
 
   private getImagePlot(plot: ImagePlot) {

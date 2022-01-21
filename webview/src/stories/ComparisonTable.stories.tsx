@@ -1,14 +1,16 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
 import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
-import { LivePlotsColors, PlotsOutput } from 'dvc/src/plots/webview/contract'
+import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
 import { ComparisonTable } from '../plots/components/ComparisonTable/ComparisonTable'
 
 export default {
   args: {
     colors: {
-      domain: ['main', '42b8736', '1ba7bcd', '4fb124a'],
-      range: ['#13adc7', '#f14c4c', '#3794ff', '#cca700']
+      '1ba7bcd': '#000000',
+      '42b8736': '#3794ff',
+      '4fb124a': '#ffffff',
+      main: '#f14c4c'
     },
     plots: getImageData('.')
   },
@@ -16,9 +18,8 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: Story<{
-  plots: PlotsOutput
-  colors: LivePlotsColors
-}> = ({ plots, colors }) => <ComparisonTable plots={plots} colors={colors} />
+const Template: Story<PlotsComparisonData> = ({ plots, colors }) => (
+  <ComparisonTable plots={plots} colors={colors} />
+)
 
 export const Basic = Template.bind({})
