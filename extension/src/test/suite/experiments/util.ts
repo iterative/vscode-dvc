@@ -31,6 +31,7 @@ const buildDependencies = (
   const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
 
   return {
+    cliReader,
     internalCommands,
     mockExperimentShow,
     resourceLocator,
@@ -44,6 +45,7 @@ export const buildExperiments = (
   dvcRoot = dvcDemoPath
 ) => {
   const {
+    cliReader,
     internalCommands,
     mockExperimentShow,
     updatesPaused,
@@ -64,6 +66,7 @@ export const buildExperiments = (
   experiments.setState(experimentShowData)
 
   return {
+    cliReader,
     experiments,
     internalCommands,
     mockExperimentShow,

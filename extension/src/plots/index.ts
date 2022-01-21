@@ -71,8 +71,6 @@ export class Plots extends BaseRepository<TPlotsData> {
         }
 
         this.sendLivePlotsData()
-
-        await this.data.isReady()
         this.sendStaticPlots()
       })
     )

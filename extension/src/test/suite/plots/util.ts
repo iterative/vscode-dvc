@@ -5,7 +5,6 @@ import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import { Plots } from '../../../plots'
 import { BaseWebview } from '../../../webview'
 import { buildExperiments } from '../experiments/util'
-import { CliReader } from '../../../cli/reader'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
@@ -14,13 +13,16 @@ import { DefaultSectionNames, PlotsModel } from '../../../plots/model'
 import { PlotsData } from '../../../plots/data'
 
 export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
-  const { experiments, internalCommands, updatesPaused, resourceLocator } =
-    buildExperiments(disposer, expShowFixture)
+  const {
+    cliReader,
+    experiments,
+    internalCommands,
+    updatesPaused,
+    resourceLocator
+  } = buildExperiments(disposer, expShowFixture)
 
   const messageSpy = spy(BaseWebview.prototype, 'show')
-  const mockPlotsDiff = stub(CliReader.prototype, 'plotsDiff').resolves(
-    plotsDiff
-  )
+  const mockPlotsDiff = stub(cliReader, 'plotsDiff').resolves(plotsDiff)
 
   const data = new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
 
