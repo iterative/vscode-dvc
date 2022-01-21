@@ -83,22 +83,26 @@ $gap: 20px;
 .largePlots .plot {
   width: calc(100% - $gap);
   height: 60vw;
-  max-width: 1000px;
+  max-width: calc(1000px * var(--scale));
   max-height: 600px;
 }
 
 .regularPlots .plot {
-  width: calc(50% - $gap);
+  width: calc(50% * var(--scale) - $gap);
   height: 35vw;
-  max-width: 500px;
+  max-width: calc(500px * var(--scale));
   max-height: 400px;
 }
 
 .smallPlots .plot {
-  width: calc(33% - $gap);
+  width: calc(33% * var(--scale) - $gap);
   height: 20vw;
-  max-width: 300px;
+  max-width: calc(300px * var(--scale));
   max-height: 200px;
+}
+
+.plot {
+  width: calc(10% * var(--scale))
 }
 
 .plot img,

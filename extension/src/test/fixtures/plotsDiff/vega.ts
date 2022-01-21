@@ -298,6 +298,7 @@ const data = {
   ],
   'predictions.json': [
     {
+      multiview: true,
       type: 'vega',
       revisions: ['main', '42b8736', '1ba7bcd', '4fb124a'],
       content: {

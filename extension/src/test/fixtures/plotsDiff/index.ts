@@ -306,7 +306,8 @@ const basicVega = {
             ]
           }
         ]
-      } as VisualizationSpec
+      } as VisualizationSpec,
+      multiview: false
     }
   ]
 }
