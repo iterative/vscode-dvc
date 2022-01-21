@@ -9,8 +9,7 @@ import { CliReader } from '../../../cli/reader'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
-import { PlotSize, Section } from '../../../plots/webview/contract'
-import { DefaultSectionNames, PlotsModel } from '../../../plots/model'
+import { PlotsModel } from '../../../plots/model'
 import { PlotsData } from '../../../plots/data'
 
 export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
@@ -48,7 +47,7 @@ export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
 }
 
 export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
-  const { plots } = livePlotsFixture
+  const { plots, sectionName, selectedMetrics, size } = livePlotsFixture
   return {
     live: {
       colors: {
@@ -59,9 +58,9 @@ export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
         title: plot.title,
         values: plot.values.filter(values => domain.includes(values.group))
       })),
-      sectionName: DefaultSectionNames[Section.LIVE_PLOTS],
-      selectedMetrics: undefined,
-      size: PlotSize.REGULAR
+      sectionName,
+      selectedMetrics,
+      size
     }
   }
 }
