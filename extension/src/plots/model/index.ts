@@ -9,16 +9,16 @@ import {
   ComparisonData
 } from './collect'
 import {
+  ComparisonPlots,
   defaultSectionCollapsed,
-  ImagePlot,
   isVegaPlot,
   LivePlotData,
   PlotSize,
   PlotsOutput,
   Section,
   SectionCollapsed,
-  VegaPlots,
-  VegaPlot
+  VegaPlot,
+  VegaPlots
 } from '../../plots/webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
@@ -113,14 +113,6 @@ export class PlotsModel {
     return this.plotsDiff
   }
 
-  public getImagePaths() {
-    return this.imagePaths
-  }
-
-  public getPlotPaths() {
-    return this.plotPaths
-  }
-
   public getLivePlots() {
     if (!this.livePlots) {
       return
@@ -163,10 +155,9 @@ export class PlotsModel {
 
   public getStaticPlots() {
     const data = this.getPlotsDiff()
-    const paths = this.getPlotPaths()
 
     const staticPlots = {} as VegaPlots
-    paths.forEach(path => {
+    this.plotPaths.forEach(path => {
       const plots = data?.[path] || []
       const allVega = plots
         .map(plot => {
@@ -189,7 +180,7 @@ export class PlotsModel {
     return staticPlots
   }
 
-  public getComparison() {
+  public getComparisonPlots() {
     return this.imagePaths.reduce((acc, path) => {
       acc[path] = []
       this.revisions.forEach(rev => {
@@ -199,7 +190,7 @@ export class PlotsModel {
         }
       })
       return acc
-    }, {} as Record<string, ImagePlot[]>)
+    }, {} as ComparisonPlots)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {

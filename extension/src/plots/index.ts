@@ -1,6 +1,11 @@
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
-import { ImagePlot, PlotsData as TPlotsData, Section } from './webview/contract'
+import {
+  ComparisonPlots,
+  ImagePlot,
+  PlotsData as TPlotsData,
+  Section
+} from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
 import { BaseWebview } from '../webview'
@@ -84,7 +89,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async sendInitialWebviewData() {
     await this.isReady()
     this.webview?.show({
-      comparison: this.getComparisonData(),
+      comparison: this.getComparisonPlots(),
       live: this.getLivePlots(),
       sectionCollapsed: this.model?.getSectionCollapsed(),
       static: this.getStaticPlots()
@@ -122,24 +127,21 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private sendComparisonPlots() {
-    this.webview?.show({ comparison: this.getComparisonData() })
+    this.webview?.show({ comparison: this.getComparisonPlots() })
   }
 
-  private getComparisonData() {
-    const comparison = this.model?.getComparison()
-    if (!this.model || isEmpty(comparison)) {
+  private getComparisonPlots() {
+    const comparison = this.model?.getComparisonPlots()
+    if (!this.model || !comparison || isEmpty(comparison)) {
       return null
     }
 
     return {
       colors: this.model.getColors(),
-      plots: Object.entries(comparison as Record<string, ImagePlot[]>).reduce(
-        (acc, [path, plots]) => {
-          acc[path] = plots.map(plot => this.getImagePlot(plot))
-          return acc
-        },
-        {} as Record<string, ImagePlot[]>
-      ),
+      plots: Object.entries(comparison).reduce((acc, [path, plots]) => {
+        acc[path] = plots.map(plot => this.getImagePlot(plot))
+        return acc
+      }, {} as ComparisonPlots),
       sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
       size: this.model.getPlotSize(Section.COMPARISON_TABLE)
     }

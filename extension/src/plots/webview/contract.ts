@@ -61,6 +61,7 @@ export interface PlotsComparisonData {
 export type PlotsOutput = Record<string, StaticPlot[]>
 
 export type VegaPlots = { [path: string]: VegaPlot[] }
+export type ComparisonPlots = { [path: string]: ImagePlot[] }
 
 export interface StaticPlotsData {
   plots: VegaPlots
