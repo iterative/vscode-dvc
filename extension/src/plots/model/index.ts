@@ -17,6 +17,7 @@ import {
   PlotsOutput,
   Section,
   SectionCollapsed,
+  VegaPlots,
   VegaPlot
 } from '../../plots/webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
@@ -164,7 +165,7 @@ export class PlotsModel {
     const data = this.getPlotsDiff()
     const paths = this.getPlotPaths()
 
-    const staticPlots = {} as Record<string, VegaPlot[]>
+    const staticPlots = {} as VegaPlots
     paths.forEach(path => {
       const plots = data?.[path] || []
       const allVega = plots

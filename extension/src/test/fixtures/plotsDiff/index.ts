@@ -6,8 +6,8 @@ import {
   PlotSize,
   PlotsType,
   Section,
-  StaticPlotsData,
-  VegaPlot
+  VegaPlots,
+  StaticPlotsData
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 
@@ -397,9 +397,7 @@ export const getFixture = (
   ...require('./vega').default
 })
 
-const extendedSpecs = (plotsOutput: {
-  [x: string]: VegaPlot[]
-}): Record<string, VegaPlot[]> =>
+const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
   Object.entries(plotsOutput).reduce((acc, [id, plots]) => {
     acc[id] = plots.map(plot => ({
       ...plot,
@@ -410,7 +408,7 @@ const extendedSpecs = (plotsOutput: {
     }))
 
     return acc
-  }, {} as Record<string, VegaPlot[]>)
+  }, {} as VegaPlots)
 
 export const getStaticWebviewMessage = (): StaticPlotsData => ({
   plots: {
