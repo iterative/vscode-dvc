@@ -5,6 +5,7 @@ import {
   defaultSectionCollapsed,
   LivePlotData,
   PlotSize,
+  PlotsOutput,
   Section,
   SectionCollapsed
 } from '../../plots/webview/contract'
@@ -37,6 +38,7 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
+  private plotsDiff?: PlotsOutput
 
   constructor(
     dvcRoot: string,
@@ -68,7 +70,7 @@ export class PlotsModel {
     )
   }
 
-  public async transformAndSet(data: ExperimentsOutput) {
+  public async transformAndSetExperiments(data: ExperimentsOutput) {
     const [livePlots, revisions] = await Promise.all([
       collectLivePlotsData(data),
       collectRevisions(data)
@@ -76,6 +78,14 @@ export class PlotsModel {
 
     this.livePlots = livePlots
     this.revisions = revisions
+  }
+
+  public transformAndSetPlots(data: PlotsOutput) {
+    this.plotsDiff = data
+  }
+
+  public getPlotsDiff() {
+    return this.plotsDiff
   }
 
   public getLivePlots() {

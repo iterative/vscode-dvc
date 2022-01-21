@@ -1,5 +1,13 @@
 import omit from 'lodash.omit'
-import { LivePlotValues, LivePlotData } from '../webview/contract'
+import { VisualizationSpec } from 'react-vega'
+import {
+  LivePlotValues,
+  LivePlotData,
+  PlotsOutput,
+  isImagePlot,
+  ImagePlot,
+  VegaPlot
+} from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
@@ -231,3 +239,65 @@ export const collectRevisions = (data: ExperimentsOutput): string[] => {
   }
   return [...acc]
 }
+
+export type RevisionData = {
+  [revision: string]: {
+    [path: string]: unknown[] | { url: string }
+  }
+}
+
+const collectImageData = (acc: RevisionData, path: string, plot: ImagePlot) => {
+  const rev = plot.revisions?.[0]
+  if (!rev) {
+    return
+  }
+
+  if (!acc[rev]) {
+    acc[rev] = {}
+  }
+
+  acc[rev][path] = { url: plot.url }
+}
+
+const collectPlotData = (acc: RevisionData, path: string, plot: VegaPlot) => {
+  plot.revisions?.forEach(rev => {
+    if (!acc[rev]) {
+      acc[rev] = {}
+    }
+    acc[rev][path] = []
+  })
+  ;(plot.content.data as { values: { rev: string }[] }).values.forEach(value =>
+    (acc[value.rev][path] as unknown[]).push(value)
+  )
+}
+
+export const collectRevisionData = (data: PlotsOutput): RevisionData =>
+  Object.entries(data).reduce(
+    (acc, [path, plots]) => {
+      plots.forEach(plot => {
+        if (isImagePlot(plot)) {
+          return collectImageData(acc, path, plot)
+        }
+
+        return collectPlotData(acc, path, plot)
+      })
+      return acc
+    },
+
+    {} as RevisionData
+  )
+
+export const collectTemplates = (data: PlotsOutput) =>
+  Object.entries(data).reduce((acc, [path, plots]) => {
+    plots.forEach(plot => {
+      if (isImagePlot(plot) || acc[path]) {
+        return
+      }
+      const template = {
+        ...plot.content
+      }
+      delete template.data
+      acc[path] = template
+    })
+    return acc
+  }, {} as Record<string, VisualizationSpec>)
