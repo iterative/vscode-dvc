@@ -167,35 +167,32 @@ export class PlotsModel {
   }
 
   public getStaticPlots() {
-    const staticPlots = {} as VegaPlots
-    this.plotPaths.forEach(path => {
+    return this.plotPaths.reduce((acc, path) => {
       const template = this.templates[path]
 
-      if (!template) {
-        return
+      if (template) {
+        acc[path] = [
+          {
+            content: extendVegaSpec(
+              {
+                ...template,
+                data: {
+                  values: flatten(
+                    this.revisions
+                      .map(rev => this.revisionData?.[rev]?.[path])
+                      .filter(Boolean)
+                  )
+                }
+              } as TopLevelSpec,
+              this.getRevisionColors()
+            ),
+            revisions: this.revisions,
+            type: PlotsType.VEGA
+          }
+        ]
       }
-      staticPlots[path] = [
-        {
-          content: extendVegaSpec(
-            {
-              ...template,
-              data: {
-                values: flatten(
-                  this.revisions
-                    .map(rev => this.revisionData?.[rev]?.[path])
-                    .filter(Boolean)
-                )
-              }
-            } as TopLevelSpec,
-            this.getRevisionColors()
-          ),
-          revisions: this.revisions,
-          type: PlotsType.VEGA
-        }
-      ]
-    })
-
-    return staticPlots
+      return acc
+    }, {} as VegaPlots)
   }
 
   public getComparisonPlots() {
