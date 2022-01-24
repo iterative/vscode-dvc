@@ -417,38 +417,8 @@ const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
           }
         } as TopLevelSpec,
         {
-          domain: [
-            '2173124',
-            'workspace',
-            '4fb124a',
-            'd1343a8',
-            '1ee5f2e',
-            '42b8736',
-            '9523bde',
-            '1ba7bcd',
-            '22e40e1',
-            '91116c1',
-            'e821416',
-            'c658f8b',
-            '23250b3',
-            'main'
-          ],
-          range: [
-            '#3794ff',
-            '#945dd6',
-            '#f14c4c',
-            '#f14c4c',
-            '#f14c4c',
-            '#3794ff',
-            '#3794ff',
-            '#cca700',
-            '#cca700',
-            '#cca700',
-            '#cca700',
-            '#cca700',
-            '#cca700',
-            '#13adc7'
-          ]
+          domain: ['workspace', '4fb124a', '42b8736', '1ba7bcd', 'main'],
+          range: ['#945dd6', '#f14c4c', '#3794ff', '#cca700', '#13adc7']
         }
       ) as VisualizationSpec,
       revisions: expectedRevisions,

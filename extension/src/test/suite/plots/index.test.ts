@@ -44,7 +44,7 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { plots, plotsModel, mockPlotsDiff, messageSpy } = await buildPlots(
+      const { plots, plotsModel, messageSpy, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
