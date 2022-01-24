@@ -12,7 +12,7 @@ import {
 } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel, Status } from '../../../../experiments/model'
-import { experimentsUpdatedEvent } from '../../util'
+import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
 import { buildPlots, getExpectedLivePlotsData } from '../../plots/util'
@@ -21,7 +21,6 @@ import expShowFixture from '../../../fixtures/expShow/output'
 import columnsFixture from '../../../fixtures/expShow/columns'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
-import { defaultSectionCollapsed } from '../../../../plots/webview/contract'
 import {
   ExperimentItem,
   ExperimentsTree
@@ -81,23 +80,18 @@ suite('Experiments Tree Test Suite', () => {
         'setSelectionMode'
       )
 
-      const initialData = {
-        comparison: null,
-        sectionCollapsed: defaultSectionCollapsed,
-        ...getExpectedLivePlotsData(expectedDomain, expectedRange),
-        static: null
-      }
-
       while (expectedDomain.length) {
-        const expectedData =
-          expectedDomain.length === 3
-            ? initialData
-            : getExpectedLivePlotsData(expectedDomain, expectedRange)
+        const expectedData = getExpectedLivePlotsData(
+          expectedDomain,
+          expectedRange
+        )
+
+        const { live } = getFirstArgOfLastCall(messageSpy)
 
         expect(
-          messageSpy,
+          { live },
           'a message is sent with colors for the currently selected experiments'
-        ).to.be.calledWith(expectedData)
+        ).to.deep.equal(expectedData)
         messageSpy.resetHistory()
 
         const id = expectedIds.pop()

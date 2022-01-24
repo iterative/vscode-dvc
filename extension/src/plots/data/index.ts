@@ -6,12 +6,11 @@ import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<PlotsOutput> {
   private model?: PlotsModel
-  private filesCollected = false
 
   public async update(): Promise<void> {
     const args = this.model?.getMissingRevisions() || []
 
-    if (this.filesCollected && !definedAndNonEmpty(args)) {
+    if (!definedAndNonEmpty(args)) {
       return
     }
 
@@ -22,7 +21,6 @@ export class PlotsData extends BaseData<PlotsOutput> {
     )
 
     const files = this.collectFiles(data)
-    this.filesCollected = true
 
     this.compareFiles(files)
 

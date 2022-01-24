@@ -26,6 +26,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     ])
 
     this.watchExpGitRefs()
+    this.managedUpdate()
   }
 
   public collectFiles(data: ExperimentsOutput) {

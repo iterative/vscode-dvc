@@ -53,7 +53,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     this.onDidUpdate = this.updated.event
     this.staticFiles = staticFiles
 
-    this.initialize()
+    this.waitForInitialData()
   }
 
   public isReady() {
@@ -77,7 +77,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     this.updated.fire(data)
   }
 
-  private initialize() {
+  private waitForInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidUpdate(() => {
         this.watcher = this.watchFiles()
@@ -95,7 +95,6 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
         this.deferred.resolve()
       })
     )
-    this.managedUpdate()
   }
 
   private watchFiles() {

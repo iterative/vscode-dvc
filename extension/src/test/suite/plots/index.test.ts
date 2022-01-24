@@ -7,7 +7,8 @@ import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import staticPlotsFixture from '../../fixtures/plotsDiff/static'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
-import { closeAllEditors } from '../util'
+import { closeAllEditors, getFirstArgOfLastCall } from '../util'
+import { dvcDemoPath } from '../../util'
 import {
   defaultSectionCollapsed,
   PlotsData as TPlotsData
@@ -24,6 +25,21 @@ suite('Plots Test Suite', () => {
     this.timeout(5000)
     disposable.dispose()
     return closeAllEditors()
+  })
+
+  describe('Plots', () => {
+    it('should call plots diff on instantiation with missing revisions', async () => {
+      const { mockPlotsDiff } = await buildPlots(disposable)
+
+      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.calledWith(
+        dvcDemoPath,
+        'main',
+        '1ba7bcd',
+        '42b8736',
+        '4fb124a'
+      )
+    })
   })
 
   describe('showWebview', () => {
@@ -45,6 +61,18 @@ suite('Plots Test Suite', () => {
       await getLivePlotsEvent
 
       expect(mockPlotsDiff).to.be.called
+
+      const {
+        comparison: comparisonData,
+        live: liveData,
+        sectionCollapsed,
+        static: staticData
+      } = getFirstArgOfLastCall(messageSpy)
+
+      expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
+      expect(liveData).to.deep.equal(livePlotsFixture)
+      expect(sectionCollapsed).to.deep.equal(defaultSectionCollapsed)
+      expect(staticData).to.deep.equal(staticPlotsFixture)
 
       const expectedPlotsData: TPlotsData = {
         comparison: comparisonPlotsFixture,

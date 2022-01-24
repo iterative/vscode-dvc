@@ -23,7 +23,6 @@ export type PlotsWebview = BaseWebview<TPlotsData>
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
-  private experiments?: Experiments
   private model?: PlotsModel
 
   private readonly data: PlotsData
@@ -55,29 +54,14 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.workspaceState = workspaceState
   }
 
-  public async setExperiments(experiments: Experiments) {
-    this.experiments = experiments
-
+  public setExperiments(experiments: Experiments) {
     this.model = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
 
     this.data.setModel(this.model)
 
-    this.dispose.track(
-      experiments.onDidChangeExperiments(async data => {
-        if (data) {
-          await this.model?.transformAndSetExperiments(data)
-        }
-
-        this.sendLivePlotsData()
-        this.sendStaticPlots()
-      })
-    )
-
-    await Promise.all([this.data.isReady(), this.experiments.isReady()])
-
-    this.deferred.resolve()
+    this.waitForInitialData(experiments)
 
     if (this.webview) {
       this.sendInitialWebviewData()
@@ -104,10 +88,12 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.model?.getLivePlots() || null
   }
 
-  private sendStaticPlots() {
+  private async sendStaticPlots() {
     if (definedAndNonEmpty(this.model?.getMissingRevisions())) {
       return this.data.managedUpdate()
     }
+
+    await this.isReady()
 
     this.webview?.show({
       comparison: this.getComparisonPlots(),
@@ -185,6 +171,42 @@ export class Plots extends BaseRepository<TPlotsData> {
           default:
             Logger.error(`Unexpected message: ${message}`)
         }
+      })
+    )
+  }
+
+  private waitForInitialData(experiments: Experiments) {
+    const waitForInitialExpData = this.dispose.track(
+      experiments.onDidChangeExperiments(async data => {
+        this.dispose.untrack(waitForInitialExpData)
+        waitForInitialExpData.dispose()
+        this.dispose.track(
+          experiments.onDidChangeExperiments(async data => {
+            if (data) {
+              await this.model?.transformAndSetExperiments(data)
+            }
+
+            this.sendLivePlotsData()
+            this.sendStaticPlots()
+          })
+        )
+
+        if (data) {
+          await this.model?.transformAndSetExperiments(data)
+        }
+
+        if (definedAndNonEmpty(this.model?.getMissingRevisions())) {
+          const waitForMissingRevisions = this.dispose.track(
+            this.data.onDidUpdate(() => {
+              this.dispose.untrack(waitForMissingRevisions)
+              waitForMissingRevisions.dispose()
+              this.deferred.resolve()
+            })
+          )
+          return this.data.managedUpdate()
+        }
+
+        this.deferred.resolve()
       })
     )
   }
