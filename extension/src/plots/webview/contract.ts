@@ -38,12 +38,14 @@ export type VegaPlot = {
   content: VisualizationSpec
   revisions?: string[]
   type: PlotsType
+  multiView?: boolean
 }
 
 export type ImagePlot = {
   revisions?: string[]
   type: PlotsType
   url: string
+  multiView?: boolean
 }
 
 export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>

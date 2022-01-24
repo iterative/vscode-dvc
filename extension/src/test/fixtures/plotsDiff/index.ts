@@ -1,7 +1,7 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { DefaultSectionNames } from '../../../plots/model'
-import { extendVegaSpec } from '../../../plots/vega/util'
+import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import {
   PlotSize,
   PlotsType,
@@ -306,7 +306,8 @@ const basicVega = {
             ]
           }
         ]
-      } as VisualizationSpec
+      } as VisualizationSpec,
+      multiView: false
     }
   ]
 }
@@ -421,6 +422,7 @@ const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
           range: ['#945dd6', '#f14c4c', '#3794ff', '#cca700', '#13adc7']
         }
       ) as VisualizationSpec,
+      multiView: isMultiViewPlot(plot.content as TopLevelSpec),
       revisions: expectedRevisions,
       type: PlotsType.VEGA
     }))

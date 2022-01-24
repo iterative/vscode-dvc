@@ -25,7 +25,7 @@ import {
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
-import { extendVegaSpec, getColorScale } from '../vega/util'
+import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
 import { flatten, uniqueValues } from '../../util/array'
 
 export const DefaultSectionNames = {
@@ -53,8 +53,8 @@ export class PlotsModel {
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
 
-  private plotPaths: string[] = []
-  private imagePaths: string[] = []
+  private vegaPaths: string[] = []
+  private comparisonPaths: string[] = []
   private comparisonData: ComparisonData = {}
   private revisionData: RevisionData = {}
   private templates: Record<string, VisualizationSpec> = {}
@@ -110,8 +110,8 @@ export class PlotsModel {
     this.comparisonData = { ...this.comparisonData, ...comparisonData }
     this.revisionData = { ...this.revisionData, ...revisionData }
     this.templates = { ...this.templates, ...templates }
-    this.plotPaths = plots
-    this.imagePaths = images
+    this.vegaPaths = plots
+    this.comparisonPaths = images
   }
 
   public getLivePlots() {
@@ -167,7 +167,7 @@ export class PlotsModel {
   }
 
   public getStaticPlots() {
-    return this.plotPaths.reduce((acc, path) => {
+    return this.vegaPaths.reduce((acc, path) => {
       const template = this.templates[path]
 
       if (template) {
@@ -186,6 +186,7 @@ export class PlotsModel {
               } as TopLevelSpec,
               this.getRevisionColors()
             ),
+            multiView: isMultiViewPlot(template as TopLevelSpec),
             revisions: this.revisions,
             type: PlotsType.VEGA
           }
@@ -196,7 +197,7 @@ export class PlotsModel {
   }
 
   public getComparisonPlots() {
-    return this.imagePaths.reduce((acc, path) => {
+    return this.comparisonPaths.reduce((acc, path) => {
       acc[path] = []
       this.revisions.forEach(rev => {
         const image = this.comparisonData?.[rev]?.[path]

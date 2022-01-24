@@ -1,6 +1,7 @@
 const data = {
   'logs/acc.tsv': [
     {
+      multiView: false,
       type: 'vega',
       revisions: ['main', '42b8736', '1ba7bcd', '4fb124a'],
       content: {
@@ -298,6 +299,7 @@ const data = {
   ],
   'predictions.json': [
     {
+      multiView: true,
       type: 'vega',
       revisions: ['main', '42b8736', '1ba7bcd', '4fb124a'],
       content: {
