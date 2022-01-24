@@ -130,21 +130,24 @@ export class ExperimentsModel {
     return result
   }
 
-  public getColors() {
-    const colors = { workspace: getWorkspaceColor() } as Record<string, string>
-
-    this.getAssignedExperimentColors().forEach((color: string, id: string) => {
-      colors[getDisplayId(id)] = color
-    })
+  public getSelectedRevisions() {
+    const revisionColors = {} as Record<string, string>
 
     this.getAssignedBranchColors().forEach((color: string, name: string) => {
-      colors[name] = color
+      revisionColors[name] = color
     })
 
-    return colors
+    this.getAssignedExperimentColors().forEach((color: string, id: string) => {
+      const { selected } = this.getExperimentDetails(id)
+      if (selected) {
+        revisionColors[getDisplayId(id)] = color
+      }
+    })
+
+    return revisionColors
   }
 
-  public getSelected() {
+  public getSelectedExperiments() {
     const experimentColors = {} as Record<string, string>
 
     this.getAssignedExperimentColors().forEach((color: string, id: string) => {

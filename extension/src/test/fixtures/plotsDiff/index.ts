@@ -418,8 +418,8 @@ const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
           }
         } as TopLevelSpec,
         {
-          domain: ['workspace', '4fb124a', '42b8736', '1ba7bcd', 'main'],
-          range: ['#945dd6', '#f14c4c', '#3794ff', '#cca700', '#13adc7']
+          domain: ['main', '4fb124a', '42b8736', '1ba7bcd'],
+          range: ['#13adc7', '#f14c4c', '#3794ff', '#cca700']
         }
       ) as VisualizationSpec,
       multiView: isMultiViewPlot(plot.content as TopLevelSpec),

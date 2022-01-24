@@ -152,16 +152,15 @@ export class PlotsModel {
   }
 
   public getRevisionColors() {
-    return getColorScale(this.experiments?.getColors() || {})
+    return getColorScale(this.experiments?.getSelectedRevisions() || {})
   }
 
   public getColors() {
-    const colors = { ...(this.experiments?.getColors() || {}) }
+    const colors = { ...(this.experiments?.getSelectedRevisions() || {}) }
     Object.keys(colors).forEach(rev => {
       if (!Object.keys(this.comparisonData).includes(rev)) {
         delete colors[rev]
       }
-      delete colors.workspace
     })
     return colors
   }
