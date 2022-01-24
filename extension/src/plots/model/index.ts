@@ -5,7 +5,7 @@ import { VisualizationSpec } from 'react-vega'
 import {
   collectLivePlotsData,
   collectPaths,
-  collectRevisionData,
+  collectData,
   collectRevisions,
   collectTemplates,
   ComparisonData,
@@ -102,7 +102,7 @@ export class PlotsModel {
   public async transformAndSetPlots(data: PlotsOutput) {
     const [{ comparisonData, revisionData }, templates, { plots, images }] =
       await Promise.all([
-        collectRevisionData(data),
+        collectData(data),
         collectTemplates(data),
         collectPaths(data)
       ])

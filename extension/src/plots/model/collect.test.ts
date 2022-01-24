@@ -1,7 +1,7 @@
 import omit from 'lodash.omit'
 import {
   collectLivePlotsData,
-  collectRevisionData,
+  collectData,
   collectRevisions,
   collectTemplates
 } from './collect'
@@ -54,10 +54,9 @@ describe('collectRevisions', () => {
   })
 })
 
-describe('collectRevisionData', () => {
+describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
-    const { revisionData, comparisonData } =
-      collectRevisionData(plotsDiffFixture)
+    const { revisionData, comparisonData } = collectData(plotsDiffFixture)
     const revisions = ['main', '42b8736', '1ba7bcd', '4fb124a']
 
     revisions.forEach(revision =>

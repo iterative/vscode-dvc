@@ -281,7 +281,7 @@ const collectPlotData = (acc: RevisionData, path: string, plot: VegaPlot) => {
   )
 }
 
-export const collectRevisionData = (
+export const collectData = (
   data: PlotsOutput
 ): { revisionData: RevisionData; comparisonData: ComparisonData } =>
   Object.entries(data).reduce(
