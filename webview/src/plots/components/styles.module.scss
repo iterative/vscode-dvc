@@ -80,29 +80,33 @@ $gap: 20px;
   }
 }
 
+@function getSize($max, $scale) {
+  @if $scale > $max {
+    @return calc(100% - $gap)
+  } @else {
+    @return calc(100 / #{$max} * #{$scale} - $gap)
+  }
+}
+
 .largePlots .plot {
   width: calc(100% - $gap);
-  height: 60vw;
+  min-height: 60vw;
   max-width: calc(1000px * var(--scale));
-  max-height: 600px;
+  max-height: calc(600px * var(--scale));
 }
 
 .regularPlots .plot {
   width: calc(50% * var(--scale) - $gap);
-  height: 35vw;
+  min-height: 35vw;
   max-width: calc(500px * var(--scale));
-  max-height: 400px;
+  max-height: calc(400px * var(--scale));
 }
 
 .smallPlots .plot {
-  width: calc(33% * var(--scale) - $gap);
-  height: 20vw;
+  width: calc(33% * var(--scale));
+  min-height: 20vw;
   max-width: calc(300px * var(--scale));
-  max-height: 200px;
-}
-
-.plot {
-  width: calc(10% * var(--scale))
+  max-height: calc(200px * var(--scale));;
 }
 
 .plot img,

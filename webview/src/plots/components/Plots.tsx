@@ -38,7 +38,16 @@ const Plot = ({
   const spec = createSpec(title, scale)
 
   return (
-    <div className={styles.plot} data-testid={`plot-${title}`}>
+    <div
+      className={styles.plot}
+      style={
+        { '--scale': 1 } as DetailedHTMLProps<
+          HTMLAttributes<HTMLDivElement>,
+          HTMLDivElement
+        >
+      }
+      data-testid={`plot-${title}`}
+    >
       <VegaLite
         actions={false}
         config={config}
