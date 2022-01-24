@@ -1,17 +1,13 @@
-import { TopLevelSpec } from 'vega-lite'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
+  ComparisonPlots,
   ImagePlot,
-  isImagePlot,
   PlotsData as TPlotsData,
-  PlotsOutput,
-  Section,
-  VegaPlot
+  Section
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
-import { extendVegaSpec, isMultiViewPlot } from './vega/util'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -20,13 +16,14 @@ import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
+import { definedAndNonEmpty } from '../util/array'
+import { ExperimentsOutput } from '../cli/reader'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
-  private experiments?: Experiments
   private model?: PlotsModel
 
   private readonly data: PlotsData
@@ -47,10 +44,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      this.data.onDidUpdate(data => {
-        this.model?.transformAndSetPlots(data)
+      this.data.onDidUpdate(async data => {
+        await this.model?.transformAndSetPlots(data)
         this.sendStaticPlots()
-        this.sendComparisonPlots()
       })
     )
 
@@ -59,31 +55,14 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.workspaceState = workspaceState
   }
 
-  public async setExperiments(experiments: Experiments) {
-    this.experiments = experiments
-
+  public setExperiments(experiments: Experiments) {
     this.model = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
 
     this.data.setModel(this.model)
 
-    this.dispose.track(
-      experiments.onDidChangeExperiments(async data => {
-        if (data) {
-          await this.model?.transformAndSetExperiments(data)
-        }
-
-        this.sendLivePlotsData()
-
-        await this.data.isReady()
-        this.data.setRevisions()
-      })
-    )
-
-    await Promise.all([this.data.isReady(), this.experiments.isReady()])
-
-    this.deferred.resolve()
+    this.waitForInitialData(experiments)
 
     if (this.webview) {
       this.sendInitialWebviewData()
@@ -93,6 +72,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async sendInitialWebviewData() {
     await this.isReady()
     this.webview?.show({
+      comparison: this.getComparisonPlots(),
       live: this.getLivePlots(),
       sectionCollapsed: this.model?.getSectionCollapsed(),
       static: this.getStaticPlots()
@@ -109,65 +89,48 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.model?.getLivePlots() || null
   }
 
-  private sendStaticPlots() {
+  private async sendStaticPlots() {
+    if (definedAndNonEmpty(this.model?.getMissingRevisions())) {
+      return this.data.managedUpdate()
+    }
+
+    await this.isReady()
+
     this.webview?.show({
+      comparison: this.getComparisonPlots(),
       static: this.getStaticPlots()
     })
   }
 
-  private prepareStaticPlots(
-    data: PlotsOutput | undefined,
-    onlyImages?: boolean
-  ) {
-    return Object.entries(data as PlotsOutput).reduce((acc, [path, plots]) => {
-      if (!onlyImages || plots.some(plot => isImagePlot(plot))) {
-        acc[path] = plots.map(plot =>
-          isImagePlot(plot) ? this.getImagePlot(plot) : this.getVegaPlot(plot)
-        )
-      }
-      return acc
-    }, {} as PlotsOutput)
-  }
-
   private getStaticPlots() {
-    const data = this.model?.getPlotsDiff()
-    if (isEmpty(data) || !this.model) {
+    const staticPlots = this.model?.getStaticPlots()
+
+    if (!this.model || !staticPlots || isEmpty(staticPlots)) {
       return null
     }
 
     return {
-      plots: this.prepareStaticPlots(data),
+      plots: staticPlots,
       sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
       size: this.model.getPlotSize(Section.STATIC_PLOTS)
     }
   }
 
-  private sendComparisonPlots() {
-    const data = this.model?.getPlotsDiff()
+  private getComparisonPlots() {
+    const comparison = this.model?.getComparisonPlots()
+    if (!this.model || !comparison || isEmpty(comparison)) {
+      return null
+    }
 
-    const plots = this.prepareStaticPlots(data, true)
-    const colors: Record<string, string> = {}
-
-    Object.entries(plots).forEach(([, plots]) =>
-      plots.forEach(plot => {
-        const rev = plot.revisions?.[0]
-        if (rev) {
-          colors[rev] = '#ffffff'
-        }
-      })
-    )
-
-    this.webview?.show({
-      comparison:
-        (!isEmpty(data) &&
-          this.model && {
-            colors,
-            plots,
-            sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
-            size: this.model.getPlotSize(Section.COMPARISON_TABLE)
-          }) ||
-        null
-    })
+    return {
+      colors: this.model.getColors(),
+      plots: Object.entries(comparison).reduce((acc, [path, plots]) => {
+        acc[path] = plots.map(plot => this.getImagePlot(plot))
+        return acc
+      }, {} as ComparisonPlots),
+      sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
+      size: this.model.getPlotSize(Section.COMPARISON_TABLE)
+    }
   }
 
   private getImagePlot(plot: ImagePlot) {
@@ -175,17 +138,6 @@ export class Plots extends BaseRepository<TPlotsData> {
       ...plot,
       url: this.webview?.getWebviewUri(plot.url)
     } as ImagePlot
-  }
-
-  private getVegaPlot(plot: VegaPlot) {
-    return {
-      ...plot,
-      content: extendVegaSpec(
-        plot.content as TopLevelSpec,
-        this.model?.getRevisionColors()
-      ),
-      multiview: isMultiViewPlot(plot.content as TopLevelSpec)
-    }
   }
 
   private handleMessageFromWebview() {
@@ -222,5 +174,38 @@ export class Plots extends BaseRepository<TPlotsData> {
         }
       })
     )
+  }
+
+  private waitForInitialData(experiments: Experiments) {
+    const waitForInitialExpData = this.dispose.track(
+      experiments.onDidChangeExperiments(data => {
+        if (data) {
+          this.dispose.untrack(waitForInitialExpData)
+          waitForInitialExpData.dispose()
+          this.setupExperimentsListener(experiments)
+          this.initializeData(data)
+        }
+      })
+    )
+  }
+
+  private setupExperimentsListener(experiments: Experiments) {
+    this.dispose.track(
+      experiments.onDidChangeExperiments(async data => {
+        if (data) {
+          await this.model?.transformAndSetExperiments(data)
+        }
+
+        this.sendLivePlotsData()
+        this.sendStaticPlots()
+      })
+    )
+  }
+
+  private async initializeData(data: ExperimentsOutput) {
+    await this.model?.transformAndSetExperiments(data)
+    this.data.managedUpdate()
+    await this.data.isReady()
+    this.deferred.resolve()
   }
 }

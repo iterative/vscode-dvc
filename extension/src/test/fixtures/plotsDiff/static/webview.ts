@@ -1,5 +1,5 @@
 import { getSmallMemoryFootprintFixture } from '..'
 
-const data = getSmallMemoryFootprintFixture('.')
+const data = getSmallMemoryFootprintFixture()
 
 export default data

@@ -1,12 +1,14 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore, spy, stub } from 'sinon'
+import { restore, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
-import staticPlotsFixture from '../../fixtures/plotsDiff/staticPlots/vscode'
-import { closeAllEditors } from '../util'
+import staticPlotsFixture from '../../fixtures/plotsDiff/static'
+import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
+import { closeAllEditors, getFirstArgOfLastCall } from '../util'
+import { dvcDemoPath } from '../../util'
 import {
   defaultSectionCollapsed,
   PlotsData as TPlotsData
@@ -25,10 +27,27 @@ suite('Plots Test Suite', () => {
     return closeAllEditors()
   })
 
+  describe('Plots', () => {
+    it('should call plots diff on instantiation with missing revisions', async () => {
+      const { mockPlotsDiff } = await buildPlots(disposable)
+
+      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.calledWith(
+        dvcDemoPath,
+        'main',
+        '1ba7bcd',
+        '42b8736',
+        '4fb124a'
+      )
+    })
+  })
+
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { data, plots, plotsModel, mockPlotsDiff, messageSpy } =
-        await buildPlots(disposable, plotsDiffFixture)
+      const { plots, plotsModel, messageSpy, mockPlotsDiff } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
 
       const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
       const getLivePlotsEvent = new Promise(resolve =>
@@ -38,16 +57,25 @@ suite('Plots Test Suite', () => {
         })
       )
 
-      const managedUpdateSpy = spy(data, 'managedUpdate')
-
       const webview = await plots.showWebview()
       await getLivePlotsEvent
 
       expect(mockPlotsDiff).to.be.called
-      expect(managedUpdateSpy, 'should call the cli when the webview is loaded')
-        .to.be.called
+
+      const {
+        comparison: comparisonData,
+        live: liveData,
+        sectionCollapsed,
+        static: staticData
+      } = getFirstArgOfLastCall(messageSpy)
+
+      expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
+      expect(liveData).to.deep.equal(livePlotsFixture)
+      expect(sectionCollapsed).to.deep.equal(defaultSectionCollapsed)
+      expect(staticData).to.deep.equal(staticPlotsFixture)
 
       const expectedPlotsData: TPlotsData = {
+        comparison: comparisonPlotsFixture,
         live: livePlotsFixture,
         sectionCollapsed: defaultSectionCollapsed,
         static: staticPlotsFixture

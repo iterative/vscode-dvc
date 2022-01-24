@@ -85,7 +85,7 @@ const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
     {Object.entries(plots).map(([path, plots]) =>
       plots.map((plot: StaticPlot, i) => {
-        const nbRevisions = (plot.multiview && plot.revisions?.length) || 1
+        const nbRevisions = (plot.multiView && plot.revisions?.length) || 1
         return (
           <div
             className={styles.plot}
@@ -138,7 +138,7 @@ const Plots = ({
     comparison: comparisonTable
   } = data
 
-  if (!livePlots && !staticPlots) {
+  if (!livePlots && !staticPlots && !comparisonTable) {
     return EmptyState('No Plots to Display')
   }
 

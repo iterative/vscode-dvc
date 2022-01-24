@@ -242,11 +242,21 @@ export const collectRevisions = (data: ExperimentsOutput): string[] => {
 
 export type RevisionData = {
   [revision: string]: {
-    [path: string]: unknown[] | { url: string }
+    [path: string]: unknown[]
   }
 }
 
-const collectImageData = (acc: RevisionData, path: string, plot: ImagePlot) => {
+export type ComparisonData = {
+  [revision: string]: {
+    [path: string]: ImagePlot
+  }
+}
+
+const collectImageData = (
+  acc: ComparisonData,
+  path: string,
+  plot: ImagePlot
+) => {
   const rev = plot.revisions?.[0]
   if (!rev) {
     return
@@ -256,7 +266,7 @@ const collectImageData = (acc: RevisionData, path: string, plot: ImagePlot) => {
     acc[rev] = {}
   }
 
-  acc[rev][path] = { url: plot.url }
+  acc[rev][path] = plot
 }
 
 const collectPlotData = (acc: RevisionData, path: string, plot: VegaPlot) => {
@@ -271,20 +281,22 @@ const collectPlotData = (acc: RevisionData, path: string, plot: VegaPlot) => {
   )
 }
 
-export const collectRevisionData = (data: PlotsOutput): RevisionData =>
+export const collectData = (
+  data: PlotsOutput
+): { revisionData: RevisionData; comparisonData: ComparisonData } =>
   Object.entries(data).reduce(
     (acc, [path, plots]) => {
       plots.forEach(plot => {
         if (isImagePlot(plot)) {
-          return collectImageData(acc, path, plot)
+          return collectImageData(acc.comparisonData, path, plot)
         }
 
-        return collectPlotData(acc, path, plot)
+        return collectPlotData(acc.revisionData, path, plot)
       })
       return acc
     },
 
-    {} as RevisionData
+    { comparisonData: {} as ComparisonData, revisionData: {} as RevisionData }
   )
 
 export const collectTemplates = (data: PlotsOutput) =>
@@ -301,3 +313,21 @@ export const collectTemplates = (data: PlotsOutput) =>
     })
     return acc
   }, {} as Record<string, VisualizationSpec>)
+
+export const collectPaths = (
+  data: PlotsOutput
+): { plots: string[]; images: string[] } => {
+  const { images, plots } = Object.entries(data).reduce(
+    (acc, [path, plots]) => {
+      plots.forEach(plot => {
+        if (isImagePlot(plot)) {
+          acc.images.add(path)
+        }
+        acc.plots.add(path)
+      })
+      return acc
+    },
+    { images: new Set<string>(), plots: new Set<string>() }
+  )
+  return { images: [...images], plots: [...plots] }
+}

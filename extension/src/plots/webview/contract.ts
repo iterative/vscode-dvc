@@ -38,14 +38,14 @@ export type VegaPlot = {
   content: VisualizationSpec
   revisions?: string[]
   type: PlotsType
-  multiview?: boolean
+  multiView?: boolean
 }
 
 export type ImagePlot = {
   revisions?: string[]
   type: PlotsType
   url: string
-  multiview?: boolean
+  multiView?: boolean
 }
 
 export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
@@ -62,8 +62,11 @@ export interface PlotsComparisonData {
 
 export type PlotsOutput = Record<string, StaticPlot[]>
 
+export type VegaPlots = { [path: string]: VegaPlot[] }
+export type ComparisonPlots = { [path: string]: ImagePlot[] }
+
 export interface StaticPlotsData {
-  plots: PlotsOutput
+  plots: VegaPlots
   sectionName: string
   size: PlotSize
 }
