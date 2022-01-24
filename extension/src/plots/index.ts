@@ -17,6 +17,7 @@ import { InternalCommands } from '../commands/internal'
 import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
+import { ExperimentsOutput } from '../cli/reader'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -177,37 +178,34 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private waitForInitialData(experiments: Experiments) {
     const waitForInitialExpData = this.dispose.track(
+      experiments.onDidChangeExperiments(data => {
+        if (data) {
+          this.dispose.untrack(waitForInitialExpData)
+          waitForInitialExpData.dispose()
+          this.setupExperimentsListener(experiments)
+          this.initializeData(data)
+        }
+      })
+    )
+  }
+
+  private setupExperimentsListener(experiments: Experiments) {
+    this.dispose.track(
       experiments.onDidChangeExperiments(async data => {
-        this.dispose.untrack(waitForInitialExpData)
-        waitForInitialExpData.dispose()
-        this.dispose.track(
-          experiments.onDidChangeExperiments(async data => {
-            if (data) {
-              await this.model?.transformAndSetExperiments(data)
-            }
-
-            this.sendLivePlotsData()
-            this.sendStaticPlots()
-          })
-        )
-
         if (data) {
           await this.model?.transformAndSetExperiments(data)
         }
 
-        if (definedAndNonEmpty(this.model?.getMissingRevisions())) {
-          const waitForMissingRevisions = this.dispose.track(
-            this.data.onDidUpdate(() => {
-              this.dispose.untrack(waitForMissingRevisions)
-              waitForMissingRevisions.dispose()
-              this.deferred.resolve()
-            })
-          )
-          return this.data.managedUpdate()
-        }
-
-        this.deferred.resolve()
+        this.sendLivePlotsData()
+        this.sendStaticPlots()
       })
     )
+  }
+
+  private async initializeData(data: ExperimentsOutput) {
+    await this.model?.transformAndSetExperiments(data)
+    this.data.managedUpdate()
+    await this.data.isReady()
+    this.deferred.resolve()
   }
 }
