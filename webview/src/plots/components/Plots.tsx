@@ -1,11 +1,18 @@
-import React, { Dispatch, useState, useEffect } from 'react'
+import React, {
+  Dispatch,
+  useState,
+  useEffect,
+  DetailedHTMLProps,
+  HTMLAttributes
+} from 'react'
 import {
   LivePlotsColors,
   LivePlotData,
   PlotsOutput,
   PlotSize,
   Section,
-  LivePlotValues
+  LivePlotValues,
+  StaticPlot
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
@@ -31,7 +38,16 @@ const Plot = ({
   const spec = createSpec(title, scale)
 
   return (
-    <div className={styles.plot} data-testid={`plot-${title}`}>
+    <div
+      className={styles.plot}
+      style={
+        { '--scale': 1 } as DetailedHTMLProps<
+          HTMLAttributes<HTMLDivElement>,
+          HTMLDivElement
+        >
+      }
+      data-testid={`plot-${title}`}
+    >
       <VegaLite
         actions={false}
         config={config}
@@ -68,11 +84,23 @@ const LivePlots = ({
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
     {Object.entries(plots).map(([path, plots]) =>
-      plots.map((plot, i) => (
-        <div className={styles.plot} key={`plot-${path}-${i}`}>
-          <StaticPlotComponent plot={plot} path={path} />
-        </div>
-      ))
+      plots.map((plot: StaticPlot, i) => {
+        const nbRevisions = (plot.multiview && plot.revisions?.length) || 1
+        return (
+          <div
+            className={styles.plot}
+            style={
+              { '--scale': nbRevisions } as DetailedHTMLProps<
+                HTMLAttributes<HTMLDivElement>,
+                HTMLDivElement
+              >
+            }
+            key={`plot-${path}-${i}`}
+          >
+            <StaticPlotComponent plot={plot} path={path} />
+          </div>
+        )
+      })
     )}
   </>
 )

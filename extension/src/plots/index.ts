@@ -11,7 +11,7 @@ import {
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
-import { extendVegaSpec } from './vega/util'
+import { extendVegaSpec, isMultiViewPlot } from './vega/util'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -183,7 +183,8 @@ export class Plots extends BaseRepository<TPlotsData> {
       content: extendVegaSpec(
         plot.content as TopLevelSpec,
         this.model?.getRevisionColors()
-      )
+      ),
+      multiview: isMultiViewPlot(plot.content as TopLevelSpec)
     }
   }
 
