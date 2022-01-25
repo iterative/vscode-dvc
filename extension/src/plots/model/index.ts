@@ -3,9 +3,10 @@ import { Disposable } from '@hediet/std/disposable'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import {
+  collectBranchRevision,
+  collectData,
   collectLivePlotsData,
   collectPaths,
-  collectData,
   collectRevisions,
   collectTemplates,
   ComparisonData,
@@ -52,6 +53,7 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
+  private branchRevision = ''
 
   private vegaPaths: string[] = []
   private comparisonPaths: string[] = []
@@ -90,10 +92,13 @@ export class PlotsModel {
   }
 
   public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, revisions] = await Promise.all([
+    const [livePlots, revisions, branchRevision] = await Promise.all([
       collectLivePlotsData(data),
-      collectRevisions(data)
+      collectRevisions(data),
+      collectBranchRevision(data)
     ])
+
+    this.removeStaleBranchData(revisions[0], branchRevision)
 
     this.livePlots = livePlots
     this.revisions = revisions
@@ -245,6 +250,14 @@ export class PlotsModel {
 
   public getSectionName(section: Section): string {
     return this.sectionNames[section] || DefaultSectionNames[section]
+  }
+
+  private removeStaleBranchData(branchName: string, branchRevision: string) {
+    if (this.branchRevision !== branchRevision) {
+      delete this.revisionData[branchName]
+      delete this.comparisonData[branchName]
+      this.branchRevision = branchRevision
+    }
   }
 
   private getSelectedRevisions() {
