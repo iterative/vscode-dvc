@@ -266,7 +266,7 @@ suite('Repository Test Suite', () => {
         treeDataChanged
       } = buildDependencies(disposable)
 
-      mockNow.resolves(0)
+      mockNow.resolves(FIRST_TRUTHY_TIME)
       mockDiff
         .onFirstCall()
         .resolves({})
@@ -334,8 +334,9 @@ suite('Repository Test Suite', () => {
         )
       )
       await repository.isReady()
-      mockNow.resetBehavior()
-      mockNow.returns(201)
+
+      bypassProcessManagerDebounce(mockNow)
+
       const dataUpdateEvent = new Promise(resolve =>
         disposable.track(onDidChangeTreeData(() => resolve(undefined)))
       )
