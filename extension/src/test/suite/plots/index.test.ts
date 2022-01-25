@@ -18,7 +18,7 @@ import {
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
-  defaultSectionCollapsed,
+  DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData
 } from '../../../plots/webview/contract'
 
@@ -116,13 +116,13 @@ suite('Plots Test Suite', () => {
 
       expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
       expect(liveData).to.deep.equal(livePlotsFixture)
-      expect(sectionCollapsed).to.deep.equal(defaultSectionCollapsed)
+      expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
       expect(staticData).to.deep.equal(staticPlotsFixture)
 
       const expectedPlotsData: TPlotsData = {
         comparison: comparisonPlotsFixture,
         live: livePlotsFixture,
-        sectionCollapsed: defaultSectionCollapsed,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
         static: staticPlotsFixture
       }
 
