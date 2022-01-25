@@ -1,7 +1,8 @@
 import omit from 'lodash.omit'
 import {
-  collectLivePlotsData,
+  collectBranchRevision,
   collectData,
+  collectLivePlotsData,
   collectRevisions,
   collectTemplates
 } from './collect'
@@ -51,6 +52,13 @@ describe('collectRevisions', () => {
   it('should return the expected revisions from the test fixture', () => {
     const revisions = collectRevisions(expShowFixture)
     expect(revisions).toEqual(['main', '1ba7bcd', '42b8736', '4fb124a'])
+  })
+})
+
+describe('collectBranchRevision', () => {
+  it('should return the expected revision from the test fixture', () => {
+    const revision = collectBranchRevision(expShowFixture)
+    expect(revision).toEqual('53c3851')
   })
 })
 
