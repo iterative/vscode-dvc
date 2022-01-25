@@ -240,6 +240,11 @@ export const collectRevisions = (data: ExperimentsOutput): string[] => {
   return [...acc]
 }
 
+export const collectBranchRevision = (data: ExperimentsOutput): string => {
+  const branchSha = Object.keys(data).find(id => id !== 'workspace') as string
+  return getDisplayId(branchSha)
+}
+
 export type RevisionData = {
   [revision: string]: {
     [path: string]: unknown[]
