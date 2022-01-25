@@ -241,7 +241,7 @@ export const collectRevisions = (data: ExperimentsOutput): string[] => {
 }
 
 export const collectBranchRevision = (data: ExperimentsOutput): string => {
-  const [branchSha] = Object.keys(data).filter(id => id !== 'workspace')
+  const branchSha = Object.keys(data).find(id => id !== 'workspace') as string
   return getDisplayId(branchSha)
 }
 
