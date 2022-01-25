@@ -14,7 +14,9 @@ import {
 } from './collect'
 import {
   ComparisonPlots,
-  defaultSectionCollapsed,
+  DEFAULT_SECTION_COLLAPSED,
+  DEFAULT_SECTION_NAMES,
+  DEFAULT_SECTION_SIZES,
   LivePlotData,
   PlotSize,
   PlotsOutput,
@@ -30,17 +32,6 @@ import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
 import { flatten, uniqueValues } from '../../util/array'
 import { deleteTarget } from '../../fileSystem/workspace'
 
-export const DefaultSectionNames = {
-  [Section.LIVE_PLOTS]: 'Live Experiments Plots',
-  [Section.STATIC_PLOTS]: 'Static Plots',
-  [Section.COMPARISON_TABLE]: 'Comparison'
-}
-
-export const DefaultSectionSizes = {
-  [Section.LIVE_PLOTS]: PlotSize.REGULAR,
-  [Section.STATIC_PLOTS]: PlotSize.REGULAR,
-  [Section.COMPARISON_TABLE]: PlotSize.REGULAR
-}
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
 
@@ -78,17 +69,17 @@ export class PlotsModel {
 
     this.plotSizes = workspaceState.get(
       MementoPrefix.PLOT_SIZES + dvcRoot,
-      DefaultSectionSizes
+      DEFAULT_SECTION_SIZES
     )
 
     this.sectionCollapsed = workspaceState.get(
       MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
-      defaultSectionCollapsed
+      DEFAULT_SECTION_COLLAPSED
     )
 
     this.sectionNames = workspaceState.get(
       MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
-      DefaultSectionNames
+      DEFAULT_SECTION_NAMES
     )
   }
 
@@ -253,7 +244,7 @@ export class PlotsModel {
   }
 
   public getSectionName(section: Section): string {
-    return this.sectionNames[section] || DefaultSectionNames[section]
+    return this.sectionNames[section] || DEFAULT_SECTION_NAMES[section]
   }
 
   private removeStaleBranchData(branchName: string, branchRevision: string) {
