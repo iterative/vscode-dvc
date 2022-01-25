@@ -46,7 +46,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       this.data.onDidUpdate(async data => {
         await this.model?.transformAndSetPlots(data)
-        this.sendStaticPlots()
+        this.sendPlots()
       })
     )
 
@@ -89,8 +89,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.model?.getLivePlots() || null
   }
 
-  private async sendStaticPlots() {
+  private async sendPlots() {
     if (definedAndNonEmpty(this.model?.getMissingRevisions())) {
+      this.sendLivePlotsData()
       return this.data.managedUpdate()
     }
 
@@ -98,6 +99,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.webview?.show({
       comparison: this.getComparisonPlots(),
+      live: this.getLivePlots(),
       static: this.getStaticPlots()
     })
   }
@@ -196,8 +198,7 @@ export class Plots extends BaseRepository<TPlotsData> {
           await this.model?.transformAndSetExperiments(data)
         }
 
-        this.sendLivePlotsData()
-        this.sendStaticPlots()
+        this.sendPlots()
       })
     )
   }

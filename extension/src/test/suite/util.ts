@@ -22,6 +22,7 @@ import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import { BaseWebview } from '../../webview'
 import { ExperimentsData } from '../../experiments/data'
 import { ResourceLocator } from '../../resourceLocator'
+import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../processManager'
 
 export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
@@ -98,6 +99,18 @@ export const mockDuration = (duration: number) =>
     .returns(0)
     .onSecondCall()
     .returns(duration)
+
+export const FIRST_TRUTHY_TIME = 1
+
+export const getMockNow = () =>
+  stub(Time, 'getCurrentEpoch').returns(FIRST_TRUTHY_TIME)
+
+export const bypassProcessManagerDebounce = (
+  mockNow: SinonStub<[], number>
+) => {
+  mockNow.resetBehavior()
+  mockNow.returns(DEFAULT_DEBOUNCE_WINDOW_MS + FIRST_TRUTHY_TIME)
+}
 
 export const buildInternalCommands = (disposer: Disposer) => {
   const config = disposer.track(new Config())

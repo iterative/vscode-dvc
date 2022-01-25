@@ -3,9 +3,10 @@ import { Disposable } from '@hediet/std/disposable'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import {
+  collectBranchRevision,
+  collectData,
   collectLivePlotsData,
   collectPaths,
-  collectData,
   collectRevisions,
   collectTemplates,
   ComparisonData,
@@ -52,6 +53,7 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
+  private branchRevision = ''
 
   private vegaPaths: string[] = []
   private comparisonPaths: string[] = []
@@ -90,10 +92,13 @@ export class PlotsModel {
   }
 
   public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, revisions] = await Promise.all([
+    const [livePlots, revisions, branchRevision] = await Promise.all([
       collectLivePlotsData(data),
-      collectRevisions(data)
+      collectRevisions(data),
+      collectBranchRevision(data)
     ])
+
+    this.removeStaleBranchData(revisions[0], branchRevision)
 
     this.livePlots = livePlots
     this.revisions = revisions
@@ -152,16 +157,15 @@ export class PlotsModel {
   }
 
   public getRevisionColors() {
-    return getColorScale(this.experiments?.getColors() || {})
+    return getColorScale(this.experiments?.getSelectedRevisions() || {})
   }
 
   public getColors() {
-    const colors = { ...(this.experiments?.getColors() || {}) }
+    const colors = { ...(this.experiments?.getSelectedRevisions() || {}) }
     Object.keys(colors).forEach(rev => {
       if (!Object.keys(this.comparisonData).includes(rev)) {
         delete colors[rev]
       }
-      delete colors.workspace
     })
     return colors
   }
@@ -178,7 +182,7 @@ export class PlotsModel {
                 ...template,
                 data: {
                   values: flatten(
-                    this.revisions
+                    this.getSelectedRevisions()
                       .map(rev => this.revisionData?.[rev]?.[path])
                       .filter(Boolean)
                   )
@@ -187,7 +191,7 @@ export class PlotsModel {
               this.getRevisionColors()
             ),
             multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: this.revisions,
+            revisions: this.getSelectedRevisions(),
             type: PlotsType.VEGA
           }
         ]
@@ -199,7 +203,7 @@ export class PlotsModel {
   public getComparisonPlots() {
     return this.comparisonPaths.reduce((acc, path) => {
       acc[path] = []
-      this.revisions.forEach(rev => {
+      this.getSelectedRevisions().forEach(rev => {
         const image = this.comparisonData?.[rev]?.[path]
         if (image) {
           acc[path].push(image)
@@ -246,6 +250,21 @@ export class PlotsModel {
 
   public getSectionName(section: Section): string {
     return this.sectionNames[section] || DefaultSectionNames[section]
+  }
+
+  private removeStaleBranchData(branchName: string, branchRevision: string) {
+    if (this.branchRevision !== branchRevision) {
+      delete this.revisionData[branchName]
+      delete this.comparisonData[branchName]
+      this.branchRevision = branchRevision
+    }
+  }
+
+  private getSelectedRevisions() {
+    const selectedRevisions = Object.keys(
+      this.experiments.getSelectedRevisions()
+    )
+    return this.revisions.filter(rev => selectedRevisions.includes(rev))
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {

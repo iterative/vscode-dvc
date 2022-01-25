@@ -1,13 +1,21 @@
+import merge from 'lodash.merge'
+import cloneDeep from 'lodash.clonedeep'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
+import expShowFixture from '../../fixtures/expShow/output'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import staticPlotsFixture from '../../fixtures/plotsDiff/static'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
-import { closeAllEditors, getFirstArgOfLastCall } from '../util'
+import {
+  bypassProcessManagerDebounce,
+  closeAllEditors,
+  getFirstArgOfLastCall,
+  getMockNow
+} from '../util'
 import { dvcDemoPath } from '../../util'
 import {
   defaultSectionCollapsed,
@@ -39,6 +47,43 @@ suite('Plots Test Suite', () => {
         '42b8736',
         '4fb124a'
       )
+    })
+
+    it('should call plots diff with the branch name whenever the current branch commit changes', async () => {
+      const mockNow = getMockNow()
+      const { data, experiments, mockPlotsDiff } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+      mockPlotsDiff.resetHistory()
+
+      const committedExperiment = {
+        baseline: merge(
+          cloneDeep(
+            expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
+              '4fb124aebddb2adf1545030907687fa9a4c80e70'
+            ]
+          ),
+          { data: { name: 'main' } }
+        )
+      }
+
+      const updatedExpShowFixture = {
+        '9235a02880a0372545e5f7f4d79a5d9eee6331ac': committedExperiment,
+        workspace: committedExperiment
+      }
+
+      const dataUpdateEvent = new Promise(resolve =>
+        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      )
+
+      bypassProcessManagerDebounce(mockNow)
+      experiments.setState(updatedExpShowFixture)
+
+      await dataUpdateEvent
+
+      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'main')
     })
   })
 

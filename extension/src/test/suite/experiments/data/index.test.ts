@@ -5,11 +5,15 @@ import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { Disposable } from '../../../../extension'
 import expShowFixture from '../../../fixtures/expShow/output'
-import { buildInternalCommands, getFirstArgOfCall } from '../../util'
+import {
+  buildInternalCommands,
+  bypassProcessManagerDebounce,
+  getFirstArgOfCall,
+  getMockNow
+} from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
-import * as Time from '../../../../util/time'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -93,7 +97,7 @@ suite('Experiments Data Test Suite', () => {
     it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
       stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
 
-      const now = stub(Time, 'getCurrentEpoch').returns(100)
+      const mockNow = getMockNow()
 
       const { cliReader, internalCommands } = buildInternalCommands(disposable)
 
@@ -120,8 +124,8 @@ suite('Experiments Data Test Suite', () => {
       )
 
       await data.isReady()
-      now.resetBehavior()
-      now.returns(20000000000)
+
+      bypassProcessManagerDebounce(mockNow)
 
       mockExperimentShow.resolves(
         Object.assign(
