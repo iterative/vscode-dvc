@@ -152,16 +152,15 @@ export class PlotsModel {
   }
 
   public getRevisionColors() {
-    return getColorScale(this.experiments?.getColors() || {})
+    return getColorScale(this.experiments?.getSelectedRevisions() || {})
   }
 
   public getColors() {
-    const colors = { ...(this.experiments?.getColors() || {}) }
+    const colors = { ...(this.experiments?.getSelectedRevisions() || {}) }
     Object.keys(colors).forEach(rev => {
       if (!Object.keys(this.comparisonData).includes(rev)) {
         delete colors[rev]
       }
-      delete colors.workspace
     })
     return colors
   }
@@ -178,7 +177,7 @@ export class PlotsModel {
                 ...template,
                 data: {
                   values: flatten(
-                    this.revisions
+                    this.getSelectedRevisions()
                       .map(rev => this.revisionData?.[rev]?.[path])
                       .filter(Boolean)
                   )
@@ -187,7 +186,7 @@ export class PlotsModel {
               this.getRevisionColors()
             ),
             multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: this.revisions,
+            revisions: this.getSelectedRevisions(),
             type: PlotsType.VEGA
           }
         ]
@@ -199,7 +198,7 @@ export class PlotsModel {
   public getComparisonPlots() {
     return this.comparisonPaths.reduce((acc, path) => {
       acc[path] = []
-      this.revisions.forEach(rev => {
+      this.getSelectedRevisions().forEach(rev => {
         const image = this.comparisonData?.[rev]?.[path]
         if (image) {
           acc[path].push(image)
@@ -246,6 +245,13 @@ export class PlotsModel {
 
   public getSectionName(section: Section): string {
     return this.sectionNames[section] || DefaultSectionNames[section]
+  }
+
+  private getSelectedRevisions() {
+    const selectedRevisions = Object.keys(
+      this.experiments.getSelectedRevisions()
+    )
+    return this.revisions.filter(rev => selectedRevisions.includes(rev))
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
