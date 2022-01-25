@@ -10,6 +10,7 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
+import cx from 'classnames'
 import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
@@ -76,9 +77,12 @@ const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
     {Object.entries(plots).map(([path, plots]) =>
       plots.map((plot: StaticPlot, i) => {
         const nbRevisions = (plot.multiView && plot.revisions?.length) || 1
+        const className = cx(styles.plot, {
+          [styles.multiViewPlot]: plot.multiView
+        })
         return (
           <div
-            className={styles.plot}
+            className={className}
             style={withScale(nbRevisions)}
             key={`plot-${path}-${i}`}
           >
