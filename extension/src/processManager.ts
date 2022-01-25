@@ -2,6 +2,8 @@ import { EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { getCurrentEpoch } from './util/time'
 
+export const DEFAULT_DEBOUNCE_WINDOW_MS = 200
+
 export class ProcessManager {
   public readonly dispose = Disposable.fn()
 
@@ -74,7 +76,10 @@ export class ProcessManager {
   }
 
   private shouldDebounce(lastStarted: number | undefined) {
-    return lastStarted && getCurrentEpoch() - lastStarted <= 200
+    return (
+      lastStarted &&
+      getCurrentEpoch() - lastStarted < DEFAULT_DEBOUNCE_WINDOW_MS
+    )
   }
 
   private setLastStarted(name: string) {
