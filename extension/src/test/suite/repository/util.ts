@@ -1,7 +1,7 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
 import { dvcDemoPath } from '../../util'
-import { buildInternalCommands } from '../util'
+import { buildInternalCommands, FIRST_TRUTHY_TIME } from '../util'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
@@ -47,7 +47,7 @@ export const buildRepositoryData = async (disposer: Disposer) => {
   mockDiff.resolves({})
   mockGetAllUntracked.resolves(new Set())
   mockListDvcOnlyRecursive.resolves([])
-  mockNow.returns(150)
+  mockNow.returns(FIRST_TRUTHY_TIME)
   mockStatus.resolves({})
 
   const data = disposer.track(

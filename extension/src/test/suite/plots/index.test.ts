@@ -10,13 +10,17 @@ import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import staticPlotsFixture from '../../fixtures/plotsDiff/static'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
-import { closeAllEditors, getFirstArgOfLastCall } from '../util'
+import {
+  bypassProcessManagerDebounce,
+  closeAllEditors,
+  getFirstArgOfLastCall,
+  getMockNow
+} from '../util'
 import { dvcDemoPath } from '../../util'
 import {
   defaultSectionCollapsed,
   PlotsData as TPlotsData
 } from '../../../plots/webview/contract'
-import * as Time from '../../../util/time'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -46,8 +50,7 @@ suite('Plots Test Suite', () => {
     })
 
     it('should call plots diff with the branch name whenever the current branch commit changes', async () => {
-      const mockNow = stub(Time, 'getCurrentEpoch')
-      mockNow.returns(0)
+      const mockNow = getMockNow()
       const { data, experiments, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture
@@ -74,7 +77,7 @@ suite('Plots Test Suite', () => {
         disposable.track(data.onDidUpdate(() => resolve(undefined)))
       )
 
-      mockNow.returns(201)
+      bypassProcessManagerDebounce(mockNow)
       experiments.setState(updatedExpShowFixture)
 
       await dataUpdateEvent
