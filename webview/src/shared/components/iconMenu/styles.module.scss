@@ -25,13 +25,13 @@
 .hoverMenu {
   position: absolute;
   top: 25px;
-  left: 10px;
+  left: 5px;
   width: max-content;
   cursor: initial;
   z-index: 1;
 
   .last & {
     left: auto;
-    right: 10px;
+    right: 5px;
   }
 }
