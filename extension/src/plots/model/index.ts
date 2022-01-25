@@ -1,4 +1,4 @@
-import { Memento } from 'vscode'
+import { Memento, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
@@ -28,6 +28,7 @@ import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
 import { flatten, uniqueValues } from '../../util/array'
+import { deleteTarget } from '../../fileSystem/workspace'
 
 export const DefaultSectionNames = {
   [Section.LIVE_PLOTS]: 'Live Experiments Plots',
@@ -98,7 +99,10 @@ export class PlotsModel {
       collectBranchRevision(data)
     ])
 
-    this.removeStaleBranchData(revisions[0], branchRevision)
+    const [branch, ...experiments] = revisions
+
+    this.removeStaleBranchData(branch, branchRevision)
+    this.removeStaleData(experiments)
 
     this.livePlots = livePlots
     this.revisions = revisions
@@ -258,6 +262,26 @@ export class PlotsModel {
       delete this.comparisonData[branchName]
       this.branchRevision = branchRevision
     }
+  }
+
+  private removeStaleData(revisions: string[]) {
+    Object.keys(this.comparisonData).map(revision => {
+      if (!revisions.includes(revision)) {
+        this.comparisonPaths.map(path => {
+          const url = this.comparisonData[revision][path]?.url
+          if (url) {
+            deleteTarget(Uri.file(url))
+          }
+        })
+        delete this.comparisonData[revision]
+      }
+    })
+
+    Object.keys(this.revisionData).map(revision => {
+      if (!revisions.includes(revision)) {
+        delete this.revisionData[revision]
+      }
+    })
   }
 
   private getSelectedRevisions() {
