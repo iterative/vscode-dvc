@@ -80,14 +80,6 @@ $gap: 20px;
   }
 }
 
-@function getSize($max, $scale) {
-  @if $scale > $max {
-    @return calc(100% - $gap)
-  } @else {
-    @return calc(100 / #{$max} * #{$scale} - $gap)
-  }
-}
-
 .largePlots .plot {
   width: calc(100% - $gap);
   min-height: 60vw;
@@ -107,6 +99,11 @@ $gap: 20px;
   min-height: 20vw;
   max-width: calc(300px * var(--scale));
   max-height: calc(200px * var(--scale));;
+}
+
+
+.plot {
+  text-align: center;
 }
 
 .plot img,
