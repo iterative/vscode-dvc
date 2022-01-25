@@ -2,6 +2,8 @@ import { PlotsComparisonData, StaticPlot } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { ComparisonTableRow } from './ComparisonTableRow'
+import styles from '../styles.module.scss'
+import { withScale } from '../../../util/styles'
 
 export type ComparisonTableProps = Omit<
   PlotsComparisonData,
@@ -32,7 +34,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   })
 
   return (
-    <table>
+    <table className={styles.comparisonTable} style={withScale(columns.length)}>
       <thead>
         <tr>{headers}</tr>
       </thead>

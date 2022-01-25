@@ -1,10 +1,4 @@
-import React, {
-  Dispatch,
-  useState,
-  useEffect,
-  DetailedHTMLProps,
-  HTMLAttributes
-} from 'react'
+import React, { Dispatch, useState, useEffect } from 'react'
 import {
   LivePlotsColors,
   LivePlotData,
@@ -25,6 +19,7 @@ import { ComparisonTable } from './ComparisonTable/ComparisonTable'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
+import { withScale } from '../../util/styles'
 
 const Plot = ({
   values,
@@ -40,12 +35,7 @@ const Plot = ({
   return (
     <div
       className={styles.plot}
-      style={
-        { '--scale': 1 } as DetailedHTMLProps<
-          HTMLAttributes<HTMLDivElement>,
-          HTMLDivElement
-        >
-      }
+      style={withScale(1)}
       data-testid={`plot-${title}`}
     >
       <VegaLite
@@ -89,12 +79,7 @@ const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
         return (
           <div
             className={styles.plot}
-            style={
-              { '--scale': nbRevisions } as DetailedHTMLProps<
-                HTMLAttributes<HTMLDivElement>,
-                HTMLDivElement
-              >
-            }
+            style={withScale(nbRevisions)}
             key={`plot-${path}-${i}`}
           >
             <StaticPlotComponent plot={plot} path={path} />
