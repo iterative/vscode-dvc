@@ -7,139 +7,58 @@ const nestedParamsFile = join('nested', 'params.yaml')
 const data: MetricOrParam[] = [
   {
     group: 'metrics',
-    hasChildren: false,
-    name: 'loss',
-    parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
-    path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
-    maxStringLength: 18,
-    minNumber: 1.775016188621521,
-    maxNumber: 2.048856019973755,
-    types: ['number']
-  },
-  {
-    group: 'metrics',
-    hasChildren: false,
-    name: 'accuracy',
-    parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
-    path: joinMetricOrParamPath('metrics', 'summary.json', 'accuracy'),
-    maxStringLength: 19,
-    minNumber: 0.3484833240509033,
-    maxNumber: 0.5926499962806702,
-    types: ['number']
-  },
-  {
-    group: 'metrics',
-    hasChildren: false,
-    name: 'val_loss',
-    parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
-    path: joinMetricOrParamPath('metrics', 'summary.json', 'val_loss'),
-    maxStringLength: 18,
-    minNumber: 1.7233840227127075,
-    maxNumber: 1.9979370832443237,
-    types: ['number']
-  },
-  {
-    group: 'metrics',
-    hasChildren: false,
-    name: 'val_accuracy',
-    parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
-    path: joinMetricOrParamPath('metrics', 'summary.json', 'val_accuracy'),
-    maxStringLength: 19,
-    minNumber: 0.4277999997138977,
-    maxNumber: 0.6704000234603882,
-    types: ['number']
-  },
-  {
-    group: 'metrics',
     hasChildren: true,
     name: 'summary.json',
     parentPath: joinMetricOrParamPath('metrics'),
     path: joinMetricOrParamPath('metrics', 'summary.json')
   },
   {
-    group: 'params',
+    group: 'metrics',
     hasChildren: false,
-    name: 'epochs',
-    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
-    path: joinMetricOrParamPath('params', 'params.yaml', 'epochs'),
-    maxStringLength: 1,
-    minNumber: 2,
-    maxNumber: 5,
-    types: ['number']
+    maxStringLength: 18,
+    name: 'loss',
+    parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
+    path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
+    pathArray: ['metrics', 'summary.json', 'loss'],
+    types: ['number'],
+    maxNumber: 2.048856019973755,
+    minNumber: 1.775016188621521
   },
   {
-    group: 'params',
+    group: 'metrics',
     hasChildren: false,
-    name: 'learning_rate',
-    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
-    path: joinMetricOrParamPath('params', 'params.yaml', 'learning_rate'),
-    maxStringLength: 6,
-    minNumber: 2e-12,
-    maxNumber: 2.2e-7,
-    types: ['number']
+    maxStringLength: 19,
+    name: 'accuracy',
+    parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
+    path: joinMetricOrParamPath('metrics', 'summary.json', 'accuracy'),
+    pathArray: ['metrics', 'summary.json', 'accuracy'],
+    types: ['number'],
+    maxNumber: 0.5926499962806702,
+    minNumber: 0.3484833240509033
   },
   {
-    group: 'params',
+    group: 'metrics',
     hasChildren: false,
-    name: 'dvc_logs_dir',
-    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
-    path: joinMetricOrParamPath('params', 'params.yaml', 'dvc_logs_dir'),
-    maxStringLength: 8,
-    types: ['string']
+    maxStringLength: 18,
+    name: 'val_loss',
+    parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
+    path: joinMetricOrParamPath('metrics', 'summary.json', 'val_loss'),
+    pathArray: ['metrics', 'summary.json', 'val_loss'],
+    types: ['number'],
+    maxNumber: 1.9979370832443237,
+    minNumber: 1.7233840227127075
   },
   {
-    group: 'params',
+    group: 'metrics',
     hasChildren: false,
-    name: 'log_file',
-    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
-    path: joinMetricOrParamPath('params', 'params.yaml', 'log_file'),
-    maxStringLength: 8,
-    types: ['string']
-  },
-  {
-    group: 'params',
-    hasChildren: false,
-    name: 'dropout',
-    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
-    path: joinMetricOrParamPath('params', 'params.yaml', 'dropout'),
-    maxStringLength: 5,
-    minNumber: 0.122,
-    maxNumber: 0.15,
-    types: ['number']
-  },
-  {
-    group: 'params',
-    hasChildren: false,
-    name: 'threshold',
-    parentPath: joinMetricOrParamPath('params', 'params.yaml', 'process'),
-    path: joinMetricOrParamPath(
-      'params',
-      'params.yaml',
-      'process',
-      'threshold'
-    ),
-    maxStringLength: 4,
-    minNumber: 0.85,
-    maxNumber: 0.86,
-    types: ['number']
-  },
-  {
-    group: 'params',
-    hasChildren: false,
-    name: 'test_arg',
-    parentPath: joinMetricOrParamPath('params', 'params.yaml', 'process'),
-    path: joinMetricOrParamPath('params', 'params.yaml', 'process', 'test_arg'),
-    maxStringLength: 6,
-    minNumber: 3,
-    maxNumber: 3,
-    types: ['string', 'number']
-  },
-  {
-    group: 'params',
-    hasChildren: true,
-    name: 'process',
-    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
-    path: joinMetricOrParamPath('params', 'params.yaml', 'process')
+    maxStringLength: 19,
+    name: 'val_accuracy',
+    parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
+    path: joinMetricOrParamPath('metrics', 'summary.json', 'val_accuracy'),
+    pathArray: ['metrics', 'summary.json', 'val_accuracy'],
+    types: ['number'],
+    maxNumber: 0.6704000234603882,
+    minNumber: 0.4277999997138977
   },
   {
     group: 'params',
@@ -151,11 +70,94 @@ const data: MetricOrParam[] = [
   {
     group: 'params',
     hasChildren: false,
-    name: 'test',
-    parentPath: joinMetricOrParamPath('params', nestedParamsFile),
-    path: joinMetricOrParamPath('params', nestedParamsFile, 'test'),
+    maxStringLength: 1,
+    name: 'epochs',
+    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
+    path: joinMetricOrParamPath('params', 'params.yaml', 'epochs'),
+    pathArray: ['params', 'params.yaml', 'epochs'],
+    types: ['number'],
+    maxNumber: 5,
+    minNumber: 2
+  },
+  {
+    group: 'params',
+    hasChildren: false,
+    maxStringLength: 6,
+    name: 'learning_rate',
+    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
+    path: joinMetricOrParamPath('params', 'params.yaml', 'learning_rate'),
+    pathArray: ['params', 'params.yaml', 'learning_rate'],
+    types: ['number'],
+    maxNumber: 2.2e-7,
+    minNumber: 2e-12
+  },
+  {
+    group: 'params',
+    hasChildren: false,
+    maxStringLength: 8,
+    name: 'dvc_logs_dir',
+    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
+    path: joinMetricOrParamPath('params', 'params.yaml', 'dvc_logs_dir'),
+    pathArray: ['params', 'params.yaml', 'dvc_logs_dir'],
+    types: ['string']
+  },
+  {
+    group: 'params',
+    hasChildren: false,
+    maxStringLength: 8,
+    name: 'log_file',
+    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
+    path: joinMetricOrParamPath('params', 'params.yaml', 'log_file'),
+    pathArray: ['params', 'params.yaml', 'log_file'],
+    types: ['string']
+  },
+  {
+    group: 'params',
+    hasChildren: false,
+    maxStringLength: 5,
+    name: 'dropout',
+    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
+    path: joinMetricOrParamPath('params', 'params.yaml', 'dropout'),
+    pathArray: ['params', 'params.yaml', 'dropout'],
+    types: ['number'],
+    maxNumber: 0.15,
+    minNumber: 0.122
+  },
+  {
+    group: 'params',
+    hasChildren: true,
+    name: 'process',
+    parentPath: joinMetricOrParamPath('params', 'params.yaml'),
+    path: joinMetricOrParamPath('params', 'params.yaml', 'process')
+  },
+  {
+    group: 'params',
+    hasChildren: false,
     maxStringLength: 4,
-    types: ['boolean']
+    name: 'threshold',
+    parentPath: joinMetricOrParamPath('params', 'params.yaml', 'process'),
+    path: joinMetricOrParamPath(
+      'params',
+      'params.yaml',
+      'process',
+      'threshold'
+    ),
+    pathArray: ['params', 'params.yaml', 'process', 'threshold'],
+    types: ['number'],
+    maxNumber: 0.86,
+    minNumber: 0.85
+  },
+  {
+    group: 'params',
+    hasChildren: false,
+    maxStringLength: 6,
+    name: 'test_arg',
+    parentPath: joinMetricOrParamPath('params', 'params.yaml', 'process'),
+    path: joinMetricOrParamPath('params', 'params.yaml', 'process', 'test_arg'),
+    pathArray: ['params', 'params.yaml', 'process', 'test_arg'],
+    types: ['string', 'number'],
+    maxNumber: 3,
+    minNumber: 3
   },
   {
     group: 'params',
@@ -163,6 +165,16 @@ const data: MetricOrParam[] = [
     name: nestedParamsFile,
     parentPath: joinMetricOrParamPath('params'),
     path: joinMetricOrParamPath('params', nestedParamsFile)
+  },
+  {
+    group: 'params',
+    hasChildren: false,
+    maxStringLength: 4,
+    name: 'test',
+    parentPath: joinMetricOrParamPath('params', nestedParamsFile),
+    path: joinMetricOrParamPath('params', nestedParamsFile, 'test'),
+    pathArray: ['params', nestedParamsFile, 'test'],
+    types: ['boolean']
   }
 ]
 

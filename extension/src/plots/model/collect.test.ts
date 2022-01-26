@@ -1,7 +1,8 @@
 import omit from 'lodash.omit'
 import {
+  collectBranchRevision,
+  collectData,
   collectLivePlotsData,
-  collectRevisionData,
   collectRevisions,
   collectTemplates
 } from './collect'
@@ -54,34 +55,44 @@ describe('collectRevisions', () => {
   })
 })
 
-describe('collectRevisionData', () => {
+describe('collectBranchRevision', () => {
+  it('should return the expected revision from the test fixture', () => {
+    const revision = collectBranchRevision(expShowFixture)
+    expect(revision).toEqual('53c3851')
+  })
+})
+
+describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
-    const data = collectRevisionData(plotsDiffFixture)
+    const { revisionData, comparisonData } = collectData(plotsDiffFixture)
     const revisions = ['main', '42b8736', '1ba7bcd', '4fb124a']
 
-    expect(Object.keys(data)).toEqual(revisions)
-
-    expect(Object.keys(data.main)).toEqual([
-      'plots/heatmap.png',
-      'plots/acc.png',
-      'plots/loss.png',
-      'logs/loss.tsv',
-      'logs/acc.tsv',
-      'predictions.json'
-    ])
-
-    expect(data['1ba7bcd']['plots/heatmap.png']).toEqual({
-      url: plotsDiffFixture['plots/heatmap.png'][2].url
-    })
-
     revisions.forEach(revision =>
-      expect(data[revision]['logs/loss.tsv']).toEqual(
+      expect(revisionData[revision]['logs/loss.tsv']).toEqual(
         (
           plotsDiffFixture['logs/loss.tsv'][0].content.data.values as {
             rev: string
           }[]
         ).filter(value => value.rev === revision)
       )
+    )
+
+    expect(Object.keys(revisionData)).toEqual(revisions)
+
+    expect(Object.keys(revisionData.main)).toEqual([
+      'logs/loss.tsv',
+      'logs/acc.tsv',
+      'predictions.json'
+    ])
+
+    expect(Object.keys(comparisonData.main)).toEqual([
+      'plots/heatmap.png',
+      'plots/acc.png',
+      'plots/loss.png'
+    ])
+
+    expect(comparisonData['1ba7bcd']['plots/heatmap.png']).toEqual(
+      plotsDiffFixture['plots/heatmap.png'][1]
     )
   })
 })

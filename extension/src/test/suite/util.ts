@@ -1,8 +1,9 @@
 import { resolve } from 'path'
-import { SinonSpy, SinonStub, stub } from 'sinon'
+import { SinonSpy, SinonStub, spy, stub } from 'sinon'
 import {
   commands,
   ConfigurationChangeEvent,
+  EventEmitter,
   TextEditor,
   Uri,
   window,
@@ -16,6 +17,12 @@ import { Disposable, Disposer } from '../../extension'
 import { definedAndNonEmpty } from '../../util/array'
 import * as Time from '../../util/time'
 import { OutputChannel } from '../../vscode/outputChannel'
+import expShowFixture from '../fixtures/expShow/output'
+import plotsDiffFixture from '../fixtures/plotsDiff/output'
+import { BaseWebview } from '../../webview'
+import { ExperimentsData } from '../../experiments/data'
+import { ResourceLocator } from '../../resourceLocator'
+import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../processManager'
 
 export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
@@ -63,7 +70,10 @@ export const experimentsUpdatedEvent = (experiments: Experiments) =>
   })
 
 export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
-  spy.getCall(call).args[0]
+  spy.getCall(call).firstArg
+
+export const getFirstArgOfLastCall = (spy: SinonSpy) =>
+  getFirstArgOfCall(spy, -1)
 
 export const activeTextEditorChangedEvent = (
   disposable: Disposer
@@ -90,6 +100,18 @@ export const mockDuration = (duration: number) =>
     .onSecondCall()
     .returns(duration)
 
+export const FIRST_TRUTHY_TIME = 1
+
+export const getMockNow = () =>
+  stub(Time, 'getCurrentEpoch').returns(FIRST_TRUTHY_TIME)
+
+export const bypassProcessManagerDebounce = (
+  mockNow: SinonStub<[], number>
+) => {
+  mockNow.resetBehavior()
+  mockNow.returns(DEFAULT_DEBOUNCE_WINDOW_MS + FIRST_TRUTHY_TIME)
+}
+
 export const buildInternalCommands = (disposer: Disposer) => {
   const config = disposer.track(new Config())
   const cliReader = disposer.track(new CliReader(config))
@@ -103,4 +125,38 @@ export const buildInternalCommands = (disposer: Disposer) => {
   )
 
   return { cliReader, internalCommands }
+}
+
+export const buildMockData = <T = ExperimentsData>() =>
+  ({
+    dispose: stub(),
+    onDidUpdate: stub()
+  } as unknown as T)
+
+export const buildDependencies = (
+  disposer: Disposer,
+  expShow = expShowFixture,
+  plotsDiff = plotsDiffFixture
+) => {
+  const { cliReader, internalCommands } = buildInternalCommands(disposer)
+
+  const mockPlotsDiff = stub(cliReader, 'plotsDiff').resolves(plotsDiff)
+
+  const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(expShow)
+
+  const updatesPaused = disposer.track(new EventEmitter<boolean>())
+
+  const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
+
+  const messageSpy = spy(BaseWebview.prototype, 'show')
+
+  return {
+    cliReader,
+    internalCommands,
+    messageSpy,
+    mockExperimentShow,
+    mockPlotsDiff,
+    resourceLocator,
+    updatesPaused
+  }
 }

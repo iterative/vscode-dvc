@@ -5,9 +5,9 @@ import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/staticPlots/webview'
+import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/static/webview'
 import {
-  defaultSectionCollapsed,
+  DEFAULT_SECTION_COLLAPSED,
   LivePlotsColors,
   PlotsData,
   PlotSize,
@@ -107,7 +107,7 @@ describe('App', () => {
   it('should render the empty state when given data with no plots', async () => {
     renderAppWithData({
       live: null,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
     const emptyState = await screen.findByText('No Plots to Display')
 
@@ -118,7 +118,7 @@ describe('App', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
@@ -130,7 +130,7 @@ describe('App', () => {
   it('should render live and static plots when given messages with both types of plots data', () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     const heightToSuppressVegaError = 1000
@@ -151,7 +151,7 @@ describe('App', () => {
 
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     sendSetDataMessage({
@@ -174,7 +174,7 @@ describe('App', () => {
   it('should remove live plots given a message showing live plots as null', () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
@@ -188,7 +188,7 @@ describe('App', () => {
   it('should toggle the live plots section in state when its header is clicked', async () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     const summaryElement = await screen.findByText('Live Experiments Plots')
@@ -215,7 +215,7 @@ describe('App', () => {
         state={{
           data: {
             live: livePlotsFixture,
-            sectionCollapsed: defaultSectionCollapsed,
+            sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
             static: null
           }
         }}
@@ -258,7 +258,7 @@ describe('App', () => {
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     const [, pickerButton] = screen.getAllByTestId('icon-menu-item')
@@ -291,7 +291,7 @@ describe('App', () => {
   it('should change the size of the plots according to the size picker', async () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     const [, , sizePickerButton] = screen.getAllByTestId('icon-menu-item')
@@ -318,7 +318,7 @@ describe('App', () => {
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     const [, , sizeButton] = screen.getAllByTestId('icon-menu-item')
@@ -345,7 +345,7 @@ describe('App', () => {
   it('should show an input to rename the section when clicking the rename icon button', () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     expect(screen.queryByRole('textbox')).toBeNull()
@@ -360,7 +360,7 @@ describe('App', () => {
   it('should change the title of the section when hitting enter on the title input', () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
     const originalText = 'Live Experiments Plots'
 
@@ -381,7 +381,7 @@ describe('App', () => {
   it('should send a message to the extension with the new section name after a section rename', () => {
     renderAppWithData({
       live: livePlotsFixture,
-      sectionCollapsed: defaultSectionCollapsed
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     const [renameButton] = screen.getAllByTestId('icon-menu-item')

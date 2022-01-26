@@ -1,7 +1,6 @@
 import React from 'react'
 import get from 'lodash/get'
 import { Column, Accessor, ColumnGroup, ColumnInstance } from 'react-table'
-import { splitMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
 import styles from '../components/Table/styles.module.scss'
@@ -42,17 +41,15 @@ const buildDynamicColumns = (
   properties
     .filter(column => column.parentPath === parentPath)
     .map(data => {
-      const { path, group } = data
+      const { path, group, pathArray } = data
 
       const Cell = getCellComponent()
       const childColumns = buildDynamicColumns(properties, path)
 
-      const pathArray = splitMetricOrParamPath(path)
-
       const column: ColumnGroup<Experiment> | Column<Experiment> = {
         Cell,
         Header: data.name,
-        accessor: buildAccessor(pathArray),
+        accessor: pathArray && buildAccessor(pathArray),
         columns: childColumns.length ? childColumns : undefined,
         group,
         id: path

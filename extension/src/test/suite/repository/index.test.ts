@@ -15,6 +15,7 @@ import {
 } from '../../../cli/reader'
 import { SourceControlManagement } from '../../../repository/sourceControlManagement'
 import { DecorationProvider } from '../../../repository/decorationProvider'
+import { bypassProcessManagerDebounce, FIRST_TRUTHY_TIME } from '../util'
 
 suite('Repository Test Suite', () => {
   const disposable = Disposable.fn()
@@ -144,7 +145,7 @@ suite('Repository Test Suite', () => {
         treeDataChanged,
         updatesPaused
       } = buildDependencies(disposable)
-      mockNow.returns(100)
+      mockNow.returns(FIRST_TRUTHY_TIME)
 
       mockDiff
         .onFirstCall()
@@ -196,8 +197,8 @@ suite('Repository Test Suite', () => {
       )
       await repository.isReady()
 
-      mockNow.resetBehavior()
-      mockNow.returns(10000)
+      bypassProcessManagerDebounce(mockNow)
+
       const dataUpdateEvent = new Promise(resolve =>
         disposable.track(onDidChangeTreeData(() => resolve(undefined)))
       )
@@ -265,7 +266,7 @@ suite('Repository Test Suite', () => {
         treeDataChanged
       } = buildDependencies(disposable)
 
-      mockNow.resolves(1)
+      mockNow.resolves(FIRST_TRUTHY_TIME)
       mockDiff
         .onFirstCall()
         .resolves({})
@@ -333,8 +334,9 @@ suite('Repository Test Suite', () => {
         )
       )
       await repository.isReady()
-      mockNow.resetBehavior()
-      mockNow.returns(20000000)
+
+      bypassProcessManagerDebounce(mockNow)
+
       const dataUpdateEvent = new Promise(resolve =>
         disposable.track(onDidChangeTreeData(() => resolve(undefined)))
       )

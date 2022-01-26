@@ -1,30 +1,36 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectLivePlotsData, collectRevisions } from './collect'
+import { TopLevelSpec } from 'vega-lite'
+import { VisualizationSpec } from 'react-vega'
 import {
-  defaultSectionCollapsed,
+  collectBranchRevision,
+  collectData,
+  collectLivePlotsData,
+  collectPaths,
+  collectRevisions,
+  collectTemplates,
+  ComparisonData,
+  RevisionData
+} from './collect'
+import {
+  ComparisonPlots,
+  DEFAULT_SECTION_COLLAPSED,
+  DEFAULT_SECTION_NAMES,
+  DEFAULT_SECTION_SIZES,
   LivePlotData,
   PlotSize,
   PlotsOutput,
+  PlotsType,
   Section,
-  SectionCollapsed
+  SectionCollapsed,
+  VegaPlots
 } from '../../plots/webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
-import { getColorScale } from '../vega/util'
+import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
+import { flatten, uniqueValues } from '../../util/array'
 
-export const DefaultSectionNames = {
-  [Section.LIVE_PLOTS]: 'Live Experiments Plots',
-  [Section.STATIC_PLOTS]: 'Static Plots',
-  [Section.COMPARISON_TABLE]: 'Comparison'
-}
-
-export const DefaultSectionSizes = {
-  [Section.LIVE_PLOTS]: PlotSize.REGULAR,
-  [Section.STATIC_PLOTS]: PlotSize.REGULAR,
-  [Section.COMPARISON_TABLE]: PlotSize.REGULAR
-}
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
 
@@ -38,7 +44,13 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private revisions: string[] = []
-  private plotsDiff?: PlotsOutput
+  private branchRevision = ''
+
+  private vegaPaths: string[] = []
+  private comparisonPaths: string[] = []
+  private comparisonData: ComparisonData = {}
+  private revisionData: RevisionData = {}
+  private templates: Record<string, VisualizationSpec> = {}
 
   constructor(
     dvcRoot: string,
@@ -56,36 +68,46 @@ export class PlotsModel {
 
     this.plotSizes = workspaceState.get(
       MementoPrefix.PLOT_SIZES + dvcRoot,
-      DefaultSectionSizes
+      DEFAULT_SECTION_SIZES
     )
 
     this.sectionCollapsed = workspaceState.get(
       MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
-      defaultSectionCollapsed
+      DEFAULT_SECTION_COLLAPSED
     )
 
     this.sectionNames = workspaceState.get(
       MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
-      DefaultSectionNames
+      DEFAULT_SECTION_NAMES
     )
   }
 
   public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, revisions] = await Promise.all([
+    const [livePlots, revisions, branchRevision] = await Promise.all([
       collectLivePlotsData(data),
-      collectRevisions(data)
+      collectRevisions(data),
+      collectBranchRevision(data)
     ])
+
+    this.removeStaleBranchData(revisions[0], branchRevision)
 
     this.livePlots = livePlots
     this.revisions = revisions
   }
 
-  public transformAndSetPlots(data: PlotsOutput) {
-    this.plotsDiff = data
-  }
+  public async transformAndSetPlots(data: PlotsOutput) {
+    const [{ comparisonData, revisionData }, templates, { plots, images }] =
+      await Promise.all([
+        collectData(data),
+        collectTemplates(data),
+        collectPaths(data)
+      ])
 
-  public getPlotsDiff() {
-    return this.plotsDiff
+    this.comparisonData = { ...this.comparisonData, ...comparisonData }
+    this.revisionData = { ...this.revisionData, ...revisionData }
+    this.templates = { ...this.templates, ...templates }
+    this.vegaPaths = plots
+    this.comparisonPaths = images
   }
 
   public getLivePlots() {
@@ -114,8 +136,72 @@ export class PlotsModel {
     return this.revisions
   }
 
+  public getMissingRevisions() {
+    return this.revisions.filter(
+      rev =>
+        !uniqueValues([
+          ...Object.keys(this.comparisonData),
+          ...Object.keys(this.revisionData),
+          'workspace'
+        ]).includes(rev)
+    )
+  }
+
   public getRevisionColors() {
-    return getColorScale(this.experiments?.getColors() || {})
+    return getColorScale(this.experiments?.getSelectedRevisions() || {})
+  }
+
+  public getColors() {
+    const colors = { ...(this.experiments?.getSelectedRevisions() || {}) }
+    Object.keys(colors).forEach(rev => {
+      if (!Object.keys(this.comparisonData).includes(rev)) {
+        delete colors[rev]
+      }
+    })
+    return colors
+  }
+
+  public getStaticPlots() {
+    return this.vegaPaths.reduce((acc, path) => {
+      const template = this.templates[path]
+
+      if (template) {
+        acc[path] = [
+          {
+            content: extendVegaSpec(
+              {
+                ...template,
+                data: {
+                  values: flatten(
+                    this.getSelectedRevisions()
+                      .map(rev => this.revisionData?.[rev]?.[path])
+                      .filter(Boolean)
+                  )
+                }
+              } as TopLevelSpec,
+              this.getRevisionColors()
+            ),
+            multiView: isMultiViewPlot(template as TopLevelSpec),
+            revisions: this.getSelectedRevisions(),
+            type: PlotsType.VEGA
+          }
+        ]
+      }
+      return acc
+    }, {} as VegaPlots)
+  }
+
+  public getComparisonPlots() {
+    return this.comparisonPaths.reduce((acc, path) => {
+      acc[path] = []
+      this.getSelectedRevisions().forEach(rev => {
+        const image = this.comparisonData?.[rev]?.[path]
+        if (image) {
+          acc[path].push(image)
+        }
+      })
+      return acc
+    }, {} as ComparisonPlots)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {
@@ -154,7 +240,22 @@ export class PlotsModel {
   }
 
   public getSectionName(section: Section): string {
-    return this.sectionNames[section] || DefaultSectionNames[section]
+    return this.sectionNames[section] || DEFAULT_SECTION_NAMES[section]
+  }
+
+  private removeStaleBranchData(branchName: string, branchRevision: string) {
+    if (this.branchRevision !== branchRevision) {
+      delete this.revisionData[branchName]
+      delete this.comparisonData[branchName]
+      this.branchRevision = branchRevision
+    }
+  }
+
+  private getSelectedRevisions() {
+    const selectedRevisions = Object.keys(
+      this.experiments.getSelectedRevisions()
+    )
+    return this.revisions.filter(rev => selectedRevisions.includes(rev))
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {

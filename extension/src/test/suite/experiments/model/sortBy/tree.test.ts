@@ -104,11 +104,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const { experiments } = buildExperiments(disposable, testData)
+      const { experiments, messageSpy } = buildExperiments(disposable, testData)
 
       await experiments.isReady()
-      const experimentsWebview = await experiments.showWebview()
-      const messageSpy = spy(experimentsWebview, 'show')
+      await experiments.showWebview()
 
       const mockSortQuickPicks = (paramPath: string, descending: boolean) => {
         mockShowQuickPick.onFirstCall().resolves({

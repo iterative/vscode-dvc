@@ -38,12 +38,14 @@ export type VegaPlot = {
   content: VisualizationSpec
   revisions?: string[]
   type: PlotsType
+  multiView?: boolean
 }
 
 export type ImagePlot = {
   revisions?: string[]
   type: PlotsType
   url: string
+  multiView?: boolean
 }
 
 export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
@@ -60,8 +62,11 @@ export interface PlotsComparisonData {
 
 export type PlotsOutput = Record<string, StaticPlot[]>
 
+export type VegaPlots = { [path: string]: VegaPlot[] }
+export type ComparisonPlots = { [path: string]: ImagePlot[] }
+
 export interface StaticPlotsData {
-  plots: PlotsOutput
+  plots: VegaPlots
   sectionName: string
   size: PlotSize
 }
@@ -72,13 +77,25 @@ export enum Section {
   COMPARISON_TABLE = 'comparison-table'
 }
 
-export const defaultSectionCollapsed = {
+export const DEFAULT_SECTION_NAMES = {
+  [Section.LIVE_PLOTS]: 'Live Experiments Plots',
+  [Section.STATIC_PLOTS]: 'Static Plots',
+  [Section.COMPARISON_TABLE]: 'Comparison'
+}
+
+export const DEFAULT_SECTION_SIZES = {
+  [Section.LIVE_PLOTS]: PlotSize.REGULAR,
+  [Section.STATIC_PLOTS]: PlotSize.REGULAR,
+  [Section.COMPARISON_TABLE]: PlotSize.REGULAR
+}
+
+export const DEFAULT_SECTION_COLLAPSED = {
   [Section.LIVE_PLOTS]: false,
   [Section.STATIC_PLOTS]: false,
   [Section.COMPARISON_TABLE]: false
 }
 
-export type SectionCollapsed = typeof defaultSectionCollapsed
+export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
 
 export type PlotsData =
   | {

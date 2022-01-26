@@ -1,42 +1,12 @@
 import { stub } from 'sinon'
-import { EventEmitter } from 'vscode'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
-import { ResourceLocator } from '../../../resourceLocator'
 import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
-import { buildInternalCommands, extensionUri } from '../util'
+import { buildDependencies, buildMockData } from '../util'
 import { ExperimentsData } from '../../../experiments/data'
-
-export const buildMockData = () =>
-  ({
-    dispose: stub(),
-    onDidUpdate: stub()
-  } as unknown as ExperimentsData)
-
-const buildDependencies = (
-  disposer: Disposer,
-  experimentShowData = expShowFixture
-) => {
-  const { cliReader, internalCommands } = buildInternalCommands(disposer)
-
-  const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-    experimentShowData
-  )
-
-  const updatesPaused = disposer.track(new EventEmitter<boolean>())
-
-  const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
-
-  return {
-    internalCommands,
-    mockExperimentShow,
-    resourceLocator,
-    updatesPaused
-  }
-}
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -44,7 +14,9 @@ export const buildExperiments = (
   dvcRoot = dvcDemoPath
 ) => {
   const {
+    cliReader,
     internalCommands,
+    messageSpy,
     mockExperimentShow,
     updatesPaused,
     resourceLocator
@@ -57,15 +29,17 @@ export const buildExperiments = (
       updatesPaused,
       resourceLocator,
       buildMockMemento(),
-      buildMockData()
+      buildMockData<ExperimentsData>()
     )
   )
 
   experiments.setState(experimentShowData)
 
   return {
+    cliReader,
     experiments,
     internalCommands,
+    messageSpy,
     mockExperimentShow,
     resourceLocator,
     updatesPaused
@@ -76,6 +50,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
   const {
     internalCommands,
     experiments: mockExperiments,
+    messageSpy,
     updatesPaused,
     resourceLocator
   } = buildExperiments(disposer, expShowFixture, 'other/dvc/root')
@@ -97,11 +72,11 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     resourceLocator
   )
   experiments.setState(expShowFixture)
-  return { experiments, workspaceExperiments }
+  return { experiments, messageSpy, workspaceExperiments }
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {
-  const { internalCommands, updatesPaused, resourceLocator } =
+  const { internalCommands, messageSpy, updatesPaused, resourceLocator } =
     buildDependencies(disposer)
 
   stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
@@ -120,5 +95,5 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
 
   experiments.setState(expShowFixture)
 
-  return { workspaceExperiments }
+  return { messageSpy, workspaceExperiments }
 }

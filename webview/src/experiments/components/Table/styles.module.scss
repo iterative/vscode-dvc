@@ -51,6 +51,17 @@ $spinner-color-light: #000;
   }
 }
 
+%truncateLeftParent {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+}
+
+%truncateLeftChild {
+  unicode-bidi: isolate;
+  direction: ltr;
+}
+
 // Concrete selectors
 
 @keyframes spin {
@@ -234,8 +245,12 @@ $spinner-color-light: #000;
   .headerRow {
     font-size: 0.7rem;
 
-    .headerCell div {
+    .headerCellContentsWrapper {
+      @extend %truncateLeftParent;
       opacity: 0.6;
+    }
+    .cellContents {
+      @extend %truncateLeftChild;
     }
 
     &:last-child,
@@ -264,9 +279,10 @@ $spinner-color-light: #000;
 
       .headerCell {
         text-align: right;
-        div {
-          opacity: 1;
-        }
+      }
+
+      .headerCellContentsWrapper {
+        opacity: 1;
       }
 
       .experimentHeaderCell {
@@ -482,13 +498,10 @@ $spinner-color-light: #000;
 .cellContents {
   overflow: hidden;
   text-overflow: ellipsis;
-  direction: rtl;
 }
 
-.th {
-  .cellContents {
-    padding: 0.1em 0;
-  }
+.headerCellContentsWrapper {
+  padding: 0.1em 0;
 }
 
 .innerCell {
