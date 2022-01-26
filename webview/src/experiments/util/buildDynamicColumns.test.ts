@@ -54,7 +54,43 @@ describe('buildDynamicColumns', () => {
     ])
   })
 
-  it('Correctly parses a minimal input with a single-depth column at the end', () => {
+  it('Correctly parses a minimal input with a single-depth number-keyed column at the end', () => {
+    const input = collectMetricsAndParams({
+      workspace: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: {
+                  c: {
+                    d: 'e'
+                  },
+                  1: 'g'
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+    expect(simplifyColumns(buildDynamicColumns(input, 'params'))).toEqual([
+      {
+        columns: [
+          {
+            columns: [{ id: 'params:params.yaml:1' }],
+            id: 'params:params.yaml:1_previous_placeholder'
+          },
+          {
+            columns: [{ id: 'params:params.yaml:c.d' }],
+            id: 'params:params.yaml:c'
+          }
+        ],
+        id: 'params:params.yaml'
+      }
+    ])
+  })
+
+  it('Correctly parses a minimal input with a single-depth string-keyed column at the end', () => {
     const input = collectMetricsAndParams({
       workspace: {
         baseline: {
