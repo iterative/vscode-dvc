@@ -82,29 +82,28 @@ $gap: 20px;
 
 .largePlots .plot {
   width: calc(100% - $gap);
-  height: 60vw;
+  min-height: 60vw;
   max-width: calc(1000px * var(--scale));
-  max-height: 1000px;
+  max-height: calc(600px * var(--scale));
 }
 
 .regularPlots .plot {
-  width: calc(50% * var(--scale) - $gap);
-  height: 33vw;
+  min-width: calc(50% * var(--scale) - $gap);
+  min-height: 35vw;
   max-width: calc(500px * var(--scale));
-  max-height: 400px;
+  max-height: calc(400px * var(--scale));
 }
 
 .smallPlots .plot {
-  width: calc(33% * var(--scale) - $gap);
-  height: 20vw;
+  width: calc(33% * var(--scale));
+  min-height: 20vw;
   max-width: calc(300px * var(--scale));
-  max-height: 200px;
+  max-height: calc(200px * var(--scale));
 }
 
 
 .plot {
   text-align: center;
-  flex-grow: 5;
 }
 
 .plot img,
