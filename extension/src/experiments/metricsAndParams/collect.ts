@@ -18,6 +18,11 @@ const getValueType = (value: Value) => {
 }
 
 const concatenatePathSegments = (path: string[], limit = 5) => {
+  /*
+    This function doesn't receive the first and final layer, and the
+    concatenated layer itself counts as one; because of this, we must subtract 3
+    from what we want the final layer count to be.
+  */
   const convertedLimit = limit - 3
   if (path.length > convertedLimit) {
     const cutoff = path.length - convertedLimit
