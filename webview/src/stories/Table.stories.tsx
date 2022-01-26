@@ -4,6 +4,7 @@ import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
+import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
@@ -47,6 +48,9 @@ const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
 }
 
 export const WithData = Template.bind({})
+
+export const WithDeeplyNestedHeaders = Template.bind({})
+WithDeeplyNestedHeaders.args = { tableData: deeplyNestedTableData }
 
 export const WithoutData = Template.bind({})
 WithoutData.args = { tableData: undefined }

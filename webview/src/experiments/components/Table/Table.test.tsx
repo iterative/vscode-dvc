@@ -26,11 +26,11 @@ jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
 const mockedPostMessage = mocked(postMessage)
 
-describe('Table', () => {
-  const getParentElement = async (text: string) =>
-    // eslint-disable-next-line testing-library/no-node-access
-    (await screen.findByText(text))?.parentElement
+const queryClosest = (textElement: Element, matcher: string) =>
+  // eslint-disable-next-line testing-library/no-node-access
+  textElement.closest(`.${matcher}`)
 
+describe('Table', () => {
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
   const getHeaderGroupProps = (key: string) => () => ({ key })
   const headerBasicProps = {
@@ -154,14 +154,10 @@ describe('Table', () => {
 
     it('should not have any sorting classes if the sorts property is empty', async () => {
       renderTable()
-      const column = await getParentElement('Timestamp')
+      const column = await screen.findByText('Timestamp')
 
-      expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
-        false
-      )
-      expect(column?.className.includes(styles.sortingHeaderCellAsc)).toBe(
-        false
-      )
+      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeNull()
+      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
     })
 
     it('should apply the sortingHeaderCellAsc on the timestamp column if it is not descending in the sorts property', async () => {
@@ -169,12 +165,10 @@ describe('Table', () => {
         sorts: [{ descending: false, path: 'timestamp' }]
       })
 
-      const column = await getParentElement('Timestamp')
+      const column = await screen.findByText('Timestamp')
 
-      expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
-        false
-      )
-      expect(column?.className.includes(styles.sortingHeaderCellAsc)).toBe(true)
+      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeNull()
+      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeTruthy()
     })
 
     it('should apply the sortingHeaderCellDesc on the timestamp column if it is descending in the sorts property', async () => {
@@ -182,14 +176,10 @@ describe('Table', () => {
         sorts: [{ descending: true, path: 'timestamp' }]
       })
 
-      const column = await getParentElement('Timestamp')
+      const column = await screen.findByText('Timestamp')
 
-      expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
-        true
-      )
-      expect(column?.className.includes(styles.sortingHeaderCellAsc)).toBe(
-        false
-      )
+      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeTruthy()
+      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
     })
 
     it('should apply the sorting class if the cell is a placeholder above the column header when the sort is ascending', async () => {
@@ -203,11 +193,9 @@ describe('Table', () => {
     it('should not apply the sorting class if there is a placeholder above the column header when the sort is ascending', async () => {
       renderTableWithPlaceholder(false)
 
-      const column = await getParentElement('Timestamp')
+      const column = await screen.findByText('Timestamp')
 
-      expect(column?.className.includes(styles.sortingHeaderCellAsc)).toBe(
-        false
-      )
+      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
     })
 
     it('should not apply the sorting class if the cell is a placeholder above the column header when the sort is descending', async () => {
@@ -223,11 +211,9 @@ describe('Table', () => {
     it('should apply the sorting class if there is a placeholder above the column header when the sort is descending', async () => {
       renderTableWithPlaceholder(true)
 
-      const column = await getParentElement('Timestamp')
+      const column = await screen.findByText('Timestamp')
 
-      expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
-        true
-      )
+      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeTruthy()
     })
   })
 
