@@ -1,40 +1,56 @@
 import { Disposer } from '@hediet/std/disposable'
-import { spy, stub } from 'sinon'
+import { stub } from 'sinon'
 import expShowFixture from '../../fixtures/expShow/output'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import { Plots } from '../../../plots'
-import { BaseWebview } from '../../../webview'
-import { buildExperiments } from '../experiments/util'
-import { CliReader } from '../../../cli/reader'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
-import { PlotSize, Section } from '../../../plots/webview/contract'
-import { DefaultSectionNames, PlotsModel } from '../../../plots/model'
+import { PlotsModel } from '../../../plots/model'
 import { PlotsData } from '../../../plots/data'
+import { Experiments } from '../../../experiments'
+import { buildDependencies, buildMockData } from '../util'
 
-export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
-  const { experiments, internalCommands, updatesPaused, resourceLocator } =
-    buildExperiments(disposer, expShowFixture)
-
-  const messageSpy = spy(BaseWebview.prototype, 'show')
-  const mockPlotsDiff = stub(CliReader.prototype, 'plotsDiff').resolves(
-    plotsDiff
-  )
+export const buildPlots = async (
+  disposer: Disposer,
+  plotsDiff = {},
+  expShow = expShowFixture
+) => {
+  const {
+    internalCommands,
+    mockPlotsDiff,
+    messageSpy,
+    updatesPaused,
+    resourceLocator
+  } = buildDependencies(disposer, expShow, plotsDiff)
 
   const data = new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
 
-  const plots = disposer.track(
-    new Plots(
-      dvcDemoPath,
-      internalCommands,
-      updatesPaused,
-      resourceLocator.scatterGraph,
-      buildMockMemento(),
-      data
+  const [experiments, plots] = await Promise.all([
+    disposer.track(
+      new Experiments(
+        dvcDemoPath,
+        internalCommands,
+        updatesPaused,
+        resourceLocator,
+        buildMockMemento(),
+        buildMockData()
+      )
+    ),
+    disposer.track(
+      new Plots(
+        dvcDemoPath,
+        internalCommands,
+        updatesPaused,
+        resourceLocator.scatterGraph,
+        buildMockMemento(),
+        data
+      )
     )
-  )
+  ])
+  experiments.setState(expShow)
   plots.setExperiments(experiments)
+
   await plots.isReady()
 
   stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([dvcDemoPath])
@@ -44,11 +60,18 @@ export const buildPlots = async (disposer: Disposer, plotsDiff = {}) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const plotsModel: PlotsModel = (plots as any).model
 
-  return { data, experiments, messageSpy, mockPlotsDiff, plots, plotsModel }
+  return {
+    data,
+    experiments,
+    messageSpy,
+    mockPlotsDiff,
+    plots,
+    plotsModel
+  }
 }
 
 export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
-  const { plots } = livePlotsFixture
+  const { plots, sectionName, selectedMetrics, size } = livePlotsFixture
   return {
     live: {
       colors: {
@@ -59,9 +82,9 @@ export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
         title: plot.title,
         values: plot.values.filter(values => domain.includes(values.group))
       })),
-      sectionName: DefaultSectionNames[Section.LIVE_PLOTS],
-      selectedMetrics: undefined,
-      size: PlotSize.REGULAR
+      sectionName,
+      selectedMetrics,
+      size
     }
   }
 }

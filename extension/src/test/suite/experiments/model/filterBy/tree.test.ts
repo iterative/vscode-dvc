@@ -40,11 +40,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.isReady()
-      const experimentsWebview = await experiments.showWebview()
-      const messageSpy = spy(experimentsWebview, 'show')
+      await experiments.showWebview()
 
       const accuracyPath = joinMetricOrParamPath(
         'metrics',

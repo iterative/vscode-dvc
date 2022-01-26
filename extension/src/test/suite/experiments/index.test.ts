@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore, match } from 'sinon'
 import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
-import { buildExperiments, buildMockData } from './util'
+import { buildExperiments } from './util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
 import rowsFixture from '../../fixtures/expShow/rows'
@@ -15,6 +15,7 @@ import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { MetricOrParam, TableData } from '../../../experiments/webview/contract'
 import {
   buildInternalCommands,
+  buildMockData,
   closeAllEditors,
   experimentsUpdatedEvent,
   extensionUri
@@ -92,9 +93,10 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
-
-      const messageSpy = spy(BaseWebview.prototype, 'show')
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
 
       const webview = await experiments.showWebview()
 

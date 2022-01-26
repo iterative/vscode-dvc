@@ -1,5 +1,11 @@
-import { DefaultSectionNames, DefaultSectionSizes, PlotsModel } from '.'
-import { defaultSectionCollapsed, PlotSize, Section } from '../webview/contract'
+import { PlotsModel } from '.'
+import {
+  DEFAULT_SECTION_COLLAPSED,
+  DEFAULT_SECTION_NAMES,
+  DEFAULT_SECTION_SIZES,
+  PlotSize,
+  Section
+} from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
@@ -11,7 +17,7 @@ describe('plotsModel', () => {
   const memento = buildMockMemento({
     [MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [MementoPrefix.PLOT_SIZES + exampleDvcRoot]: DefaultSectionSizes
+    [MementoPrefix.PLOT_SIZES + exampleDvcRoot]: DEFAULT_SECTION_SIZES
   })
 
   beforeEach(() => {
@@ -63,16 +69,16 @@ describe('plotsModel', () => {
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       MementoPrefix.PLOT_SIZES + exampleDvcRoot,
-      { ...DefaultSectionSizes, [Section.LIVE_PLOTS]: PlotSize.SMALL }
+      { ...DEFAULT_SECTION_SIZES, [Section.LIVE_PLOTS]: PlotSize.SMALL }
     )
   })
 
   it('should change the the sectionName of a section when calling setSectionName', () => {
     expect(model.getSectionName(Section.LIVE_PLOTS)).toEqual(
-      DefaultSectionNames[Section.LIVE_PLOTS]
+      DEFAULT_SECTION_NAMES[Section.LIVE_PLOTS]
     )
     expect(model.getSectionName(Section.STATIC_PLOTS)).toEqual(
-      DefaultSectionNames[Section.STATIC_PLOTS]
+      DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS]
     )
 
     const newLivePlotsName = 'Live Section'
@@ -80,7 +86,7 @@ describe('plotsModel', () => {
 
     expect(model.getSectionName(Section.LIVE_PLOTS)).toEqual(newLivePlotsName)
     expect(model.getSectionName(Section.STATIC_PLOTS)).toEqual(
-      DefaultSectionNames[Section.STATIC_PLOTS]
+      DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS]
     )
 
     const newStaticPlotsName = 'Static'
@@ -101,9 +107,9 @@ describe('plotsModel', () => {
       MementoPrefix.PLOT_SECTION_NAMES + exampleDvcRoot,
       {
         [Section.LIVE_PLOTS]: newName,
-        [Section.STATIC_PLOTS]: DefaultSectionNames[Section.STATIC_PLOTS],
+        [Section.STATIC_PLOTS]: DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS],
         [Section.COMPARISON_TABLE]:
-          DefaultSectionNames[Section.COMPARISON_TABLE]
+          DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE]
       }
     )
   })
@@ -111,7 +117,7 @@ describe('plotsModel', () => {
   it('should update the persisted collapsible section state when calling setSectionCollapsed', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    expect(model.getSectionCollapsed()).toEqual(defaultSectionCollapsed)
+    expect(model.getSectionCollapsed()).toEqual(DEFAULT_SECTION_COLLAPSED)
 
     model.setSectionCollapsed({ [Section.LIVE_PLOTS]: true })
 
