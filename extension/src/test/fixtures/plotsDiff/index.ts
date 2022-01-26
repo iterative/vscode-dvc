@@ -1,8 +1,8 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import { DefaultSectionNames } from '../../../plots/model'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import {
+  DEFAULT_SECTION_NAMES,
   PlotSize,
   PlotsType,
   Section,
@@ -385,7 +385,7 @@ export const getSmallMemoryFootprintFixture = () => ({
   plots: {
     ...basicVega
   },
-  sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
+  sectionName: DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS],
   size: PlotSize.REGULAR
 })
 
@@ -434,7 +434,7 @@ export const getStaticWebviewMessage = (): StaticPlotsData => ({
   plots: {
     ...extendedSpecs({ ...basicVega, ...require('./vega').default })
   },
-  sectionName: DefaultSectionNames[Section.STATIC_PLOTS],
+  sectionName: DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS],
   size: PlotSize.REGULAR
 })
 
@@ -451,6 +451,6 @@ export const getComparisonWebviewMessage = (
     '1ba7bcd': '#cca700',
     main: '#13adc7'
   },
-  sectionName: DefaultSectionNames[Section.COMPARISON_TABLE],
+  sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
   size: PlotSize.REGULAR
 })

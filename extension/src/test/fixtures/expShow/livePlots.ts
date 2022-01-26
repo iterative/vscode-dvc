@@ -1,5 +1,5 @@
-import { DefaultSectionNames } from '../../../plots/model'
 import {
+  DEFAULT_SECTION_NAMES,
   LivePlotsData,
   PlotSize,
   Section
@@ -214,7 +214,7 @@ const data: LivePlotsData = {
   ],
   selectedMetrics: undefined,
   size: PlotSize.REGULAR,
-  sectionName: DefaultSectionNames[Section.LIVE_PLOTS]
+  sectionName: DEFAULT_SECTION_NAMES[Section.LIVE_PLOTS]
 }
 
 export default data
