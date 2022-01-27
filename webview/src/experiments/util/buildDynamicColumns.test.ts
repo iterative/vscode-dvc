@@ -1,4 +1,5 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
+import { join } from 'path'
 import { ColumnGroup } from 'react-table'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { collectMetricsAndParams } from 'dvc/src/experiments/metricsAndParams/collect'
@@ -70,8 +71,8 @@ describe('buildDynamicColumns', () => {
         id: 'params:params.yaml'
       },
       {
-        columns: [{ id: 'params:nested/params.yaml:test' }],
-        id: 'params:nested/params.yaml'
+        columns: [{ id: `params:${join('nested', 'params.yaml')}:test` }],
+        id: `params:${join('nested', 'params.yaml')}`
       }
     ])
   })
