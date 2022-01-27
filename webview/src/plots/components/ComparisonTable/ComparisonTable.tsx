@@ -1,4 +1,4 @@
-import { PlotsComparisonData, StaticPlot } from 'dvc/src/plots/webview/contract'
+import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { ComparisonTableRow } from './ComparisonTableRow'
@@ -38,15 +38,11 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
       <thead>
         <tr>{headers}</tr>
       </thead>
-      {Object.entries(plots).map(([path, plots]) => (
+      {plots.map(({ path, revisions }) => (
         <ComparisonTableRow
           key={path}
           path={path}
-          plots={
-            columns.map(column =>
-              plots.find(plot => plot.revisions?.[0] === column)
-            ) as StaticPlot[]
-          }
+          plots={columns.map(column => revisions[column])}
           nbColumns={columns.length}
         />
       ))}

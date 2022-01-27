@@ -4,7 +4,7 @@
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
+import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import {
   ComparisonTableRow,
   ComparisonTableRowProps
@@ -19,7 +19,10 @@ describe('ComparisonTableRow', () => {
   const basicProps: ComparisonTableRowProps = {
     nbColumns: 3,
     path: 'path/to/the-file/image.png',
-    plots: getImageData('.')['plots/acc.png']
+    plots: Object.values(
+      comparisonPlotsFixture.plots.find(({ path }) => path === 'plots/acc.png')
+        ?.revisions || {}
+    )
   }
 
   const renderRow = (props = basicProps) =>
