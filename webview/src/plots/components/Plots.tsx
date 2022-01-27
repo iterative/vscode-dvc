@@ -2,11 +2,11 @@ import React, { Dispatch, useState, useEffect } from 'react'
 import {
   LivePlotsColors,
   LivePlotData,
-  PlotsOutput,
   PlotSize,
   Section,
   LivePlotValues,
-  StaticPlot
+  VegaPlot,
+  VegaPlots
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
@@ -15,7 +15,6 @@ import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
 import styles from './styles.module.scss'
-import { StaticPlotComponent } from './StaticPlot'
 import { ComparisonTable } from './ComparisonTable/ComparisonTable'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
@@ -72,10 +71,10 @@ const LivePlots = ({
     EmptyState('No metrics selected')
   )
 
-const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
+const StaticPlots = ({ plots }: { plots: VegaPlots }) => (
   <>
     {Object.entries(plots).map(([path, plots]) =>
-      plots.map((plot: StaticPlot, i) => {
+      plots.map((plot: VegaPlot, i) => {
         const nbRevisions = (plot.multiView && plot.revisions?.length) || 1
         const className = cx(styles.plot, {
           [styles.multiViewPlot]: plot.multiView
@@ -86,7 +85,18 @@ const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
             style={withScale(nbRevisions)}
             key={`plot-${path}-${i}`}
           >
-            <StaticPlotComponent plot={plot} path={path} />
+            <VegaLite
+              actions={false}
+              config={config}
+              spec={
+                {
+                  ...plot.content,
+                  height: 'container',
+                  width: 'container'
+                } as VisualizationSpec
+              }
+              renderer="svg"
+            />
           </div>
         )
       })
