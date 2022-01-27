@@ -1,5 +1,4 @@
 import { join } from 'path'
-import { mocked } from 'ts-jest/utils'
 import { getOptions } from './options'
 import { Command, Flag } from './args'
 import { getProcessEnv } from '../env'
@@ -13,7 +12,7 @@ const mockedEnv = {
   DVC_NO_ANALYTICS: 'true',
   PATH: mockedPATH
 }
-const mockedGetProcessEnv = mocked(getProcessEnv)
+const mockedGetProcessEnv = jest.mocked(getProcessEnv)
 
 beforeEach(() => {
   jest.resetAllMocks()

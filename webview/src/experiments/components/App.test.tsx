@@ -4,7 +4,6 @@
 import React from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import { mocked } from 'ts-jest/utils'
 import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import {
@@ -17,8 +16,8 @@ import { vsCodeApi } from '../../shared/api'
 jest.mock('../../shared/api')
 
 const { postMessage, setState } = vsCodeApi
-const mockPostMessage = mocked(postMessage)
-const mockSetState = mocked(setState)
+const mockPostMessage = jest.mocked(postMessage)
+const mockSetState = jest.mocked(setState)
 
 beforeEach(() => {
   jest.clearAllMocks()

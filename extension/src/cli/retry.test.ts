@@ -1,8 +1,7 @@
-import { mocked } from 'ts-jest/utils'
 import { retry } from './retry'
 import { delay } from '../util/time'
 
-const mockedDelay = mocked(delay)
+const mockedDelay = jest.mocked(delay)
 
 jest.mock('../util/time')
 jest.mock('../common/logger')

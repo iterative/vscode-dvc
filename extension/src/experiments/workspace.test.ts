@@ -1,5 +1,4 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { mocked } from 'ts-jest/utils'
 import { Experiments } from '.'
 import { WorkspaceExperiments } from './workspace'
 import { quickPickOne } from '../vscode/quickPick'
@@ -14,12 +13,12 @@ import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 
 const mockedShowWebview = jest.fn()
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 const mockedDvcRoot = '/my/dvc/root'
 const mockedOtherDvcRoot = '/my/fun/dvc/root'
-const mockedQuickPickOne = mocked(quickPickOne)
+const mockedQuickPickOne = jest.mocked(quickPickOne)
 const mockedPickCurrentExperiment = jest.fn()
-const mockedGetInput = mocked(getInput)
+const mockedGetInput = jest.mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
 

@@ -1,4 +1,3 @@
-import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
 import { Experiments } from '../../../experiments'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
@@ -18,7 +17,7 @@ export const getFailingMockedProcess = (stderr: string): Process =>
   } as unknown as Process)
 
 export const buildMockedEventEmitter = <T = void>() => {
-  const mockedEmitter = mocked(new EventEmitter<T>())
+  const mockedEmitter = jest.mocked(new EventEmitter<T>())
   const mockedEmitterChangedFire = jest.fn()
   const mockedEmitterChangedEvent = jest.fn()
   mockedEmitter.fire = mockedEmitterChangedFire

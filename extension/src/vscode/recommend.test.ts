@@ -1,17 +1,16 @@
-import { mocked } from 'ts-jest/utils'
 import { commands, window } from 'vscode'
 import { setUserConfigValue } from './config'
 import { recommendRedHatExtension } from './recommend'
 import { Response } from './response'
 
 const mockedShowInformationMessage = jest.fn()
-const mockedWindow = mocked(window)
+const mockedWindow = jest.mocked(window)
 mockedWindow.showInformationMessage = mockedShowInformationMessage
 const mockedExecuteCommand = jest.fn()
-const mockedCommands = mocked(commands)
+const mockedCommands = jest.mocked(commands)
 mockedCommands.executeCommand = mockedExecuteCommand
 
-const mockedSetUserConfigValue = mocked(setUserConfigValue)
+const mockedSetUserConfigValue = jest.mocked(setUserConfigValue)
 
 jest.mock('vscode')
 jest.mock('./config')

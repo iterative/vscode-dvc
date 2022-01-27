@@ -1,6 +1,5 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { mocked } from 'ts-jest/utils'
 import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
 import { ExperimentsMetricsAndParamsTree } from './tree'
 import { joinMetricOrParamPath } from './paths'
@@ -11,15 +10,15 @@ import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 import { buildMockedExperiments } from '../../test/util/jest'
 
-const mockedCommands = mocked(commands)
+const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
 
 mockedCommands.registerCommand = jest.fn()
-const mockedWindow = mocked(window)
+const mockedWindow = jest.mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
-const mockedTreeItem = mocked(TreeItem)
+const mockedTreeItem = jest.mocked(TreeItem)
 
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 
 const { mockedExperiments, mockedGetChildMetricsOrParams, mockedGetDvcRoots } =
   buildMockedExperiments()
