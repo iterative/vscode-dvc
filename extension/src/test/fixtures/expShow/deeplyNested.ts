@@ -11,7 +11,6 @@ export const deeplyNestedOutput: ExperimentsOutput = {
         params: {
           'params.yaml': {
             data: {
-              outlier: 1,
               nested1: {
                 doubled: 'first instance!',
                 nested2: {
@@ -25,7 +24,8 @@ export const deeplyNestedOutput: ExperimentsOutput = {
                     }
                   }
                 }
-              }
+              },
+              outlier: 1
             }
           }
         },
@@ -37,9 +37,10 @@ export const deeplyNestedOutput: ExperimentsOutput = {
   }
 }
 
-const columns = collectMetricsAndParams(deeplyNestedOutput)
+export const columns = collectMetricsAndParams(deeplyNestedOutput)
+
 const { workspace, branches } = collectExperiments(deeplyNestedOutput)
-const rows = [workspace, ...branches]
+export const rows = [workspace, ...branches]
 
 const deeplyNestedTableData: TableData = {
   changes: [],
