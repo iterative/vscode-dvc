@@ -2,7 +2,8 @@
 import { ColumnGroup } from 'react-table'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { collectMetricsAndParams } from 'dvc/src/experiments/metricsAndParams/collect'
-import { columns as deeplyNestedColumns } from 'dvc/src/test/fixtures/expShow/deeplyNested'
+import { columns as deeplyNestedColumnsFixture } from 'dvc/src/test/fixtures/expShow/deeplyNested'
+import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import buildDynamicColumns from './buildDynamicColumns'
 
 interface MinimalColumn {
@@ -20,9 +21,64 @@ const simplifyColumns = (columns: ColumnGroup<Experiment>[]) =>
   })
 
 describe('buildDynamicColumns', () => {
+  it('Correctly parses the standard fixture', () => {
+    expect(
+      simplifyColumns([
+        ...buildDynamicColumns(columnsFixture, 'metrics'),
+        ...buildDynamicColumns(columnsFixture, 'params')
+      ])
+    ).toEqual([
+      {
+        columns: [
+          { id: 'metrics:summary.json:loss' },
+          { id: 'metrics:summary.json:accuracy' },
+          { id: 'metrics:summary.json:val_loss' },
+          { id: 'metrics:summary.json:val_accuracy' }
+        ],
+        id: 'metrics:summary.json'
+      },
+      {
+        columns: [
+          {
+            columns: [{ id: 'params:params.yaml:epochs' }],
+            id: 'params:params.yaml:epochs_previous_placeholder'
+          },
+          {
+            columns: [{ id: 'params:params.yaml:learning_rate' }],
+            id: 'params:params.yaml:learning_rate_previous_placeholder'
+          },
+          {
+            columns: [{ id: 'params:params.yaml:dvc_logs_dir' }],
+            id: 'params:params.yaml:dvc_logs_dir_previous_placeholder'
+          },
+          {
+            columns: [{ id: 'params:params.yaml:log_file' }],
+            id: 'params:params.yaml:log_file_previous_placeholder'
+          },
+          {
+            columns: [{ id: 'params:params.yaml:dropout' }],
+            id: 'params:params.yaml:dropout_previous_placeholder'
+          },
+          {
+            columns: [
+              { id: 'params:params.yaml:process.threshold' },
+              { id: 'params:params.yaml:process.test_arg' }
+            ],
+            id: 'params:params.yaml:process'
+          }
+        ],
+        id: 'params:params.yaml'
+      },
+      {
+        columns: [{ id: 'params:nested/params.yaml:test' }],
+        id: 'params:nested/params.yaml'
+      }
+    ])
+  })
+
   it('Correctly parses the deeply nested fixture', () => {
     expect(
-      simplifyColumns(buildDynamicColumns(deeplyNestedColumns, 'params'))
+      simplifyColumns(buildDynamicColumns(deeplyNestedColumnsFixture, 'params'))
     ).toEqual([
       {
         columns: [
