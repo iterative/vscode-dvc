@@ -125,7 +125,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
 
     return {
-      colors: this.model.getColors(),
       plots: comparison.map(({ path, revisions }) => {
         const revisionsWithCorrectUrls = Object.entries(revisions).reduce(
           (acc, [revision, plot]) => {
@@ -139,6 +138,7 @@ export class Plots extends BaseRepository<TPlotsData> {
         )
         return { path, revisions: revisionsWithCorrectUrls }
       }),
+      revisions: this.model.getComparisonRevisions(),
       sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
       size: this.model.getPlotSize(Section.COMPARISON_TABLE)
     }

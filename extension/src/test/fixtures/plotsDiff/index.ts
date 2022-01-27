@@ -461,11 +461,11 @@ export const getComparisonWebviewMessage = (
     acc.push({ path, revisions })
     return acc
   }, [] as ComparisonTableData),
-  colors: {
-    '4fb124a': '#f14c4c',
-    '42b8736': '#3794ff',
-    '1ba7bcd': '#cca700',
-    main: '#13adc7'
+  revisions: {
+    '4fb124a': { color: '#f14c4c' },
+    '42b8736': { color: '#3794ff' },
+    '1ba7bcd': { color: '#cca700' },
+    main: { color: '#13adc7' }
   },
   sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
   size: PlotSize.REGULAR

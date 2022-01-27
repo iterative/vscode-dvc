@@ -15,6 +15,7 @@ import {
 import {
   ComparisonRevisionData,
   ComparisonTableData,
+  ComparisonTableRevisions,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
@@ -160,6 +161,17 @@ export class PlotsModel {
       }
     })
     return colors
+  }
+
+  public getComparisonRevisions() {
+    return Object.entries({
+      ...(this.experiments?.getSelectedRevisions() || {})
+    }).reduce((acc, [revision, color]) => {
+      if (Object.keys(this.comparisonData).includes(revision)) {
+        acc[revision] = { color }
+      }
+      return acc
+    }, {} as ComparisonTableRevisions)
   }
 
   public getStaticPlots() {

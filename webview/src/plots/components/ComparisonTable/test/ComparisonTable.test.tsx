@@ -24,19 +24,21 @@ describe('ComparisonTable', () => {
     expect(table).toBeInTheDocument()
   })
 
-  it('should have as many columns as there are items in the domain of colors', () => {
+  it('should have as many columns as there are revisions', () => {
     renderTable()
 
     const columns = screen.getAllByRole('columnheader')
 
-    expect(columns.length).toBe(Object.keys(basicProps.colors).length)
+    expect(columns.length).toBe(Object.keys(basicProps.revisions).length)
   })
 
   it('should show the pinned column first', () => {
     renderTable()
 
     const [firstColumn, secondColumn] = screen.getAllByRole('columnheader')
-    const [firstExperiment, secondExperiment] = Object.keys(basicProps.colors)
+    const [firstExperiment, secondExperiment] = Object.keys(
+      basicProps.revisions
+    )
 
     const expectedFirstColumn = screen.getByText(firstExperiment)
 
@@ -64,7 +66,9 @@ describe('ComparisonTable', () => {
     renderTable()
 
     const [{ path: firstPlotEntry }] = basicProps.plots
-    const [firstExperiment, secondExperiment] = Object.keys(basicProps.colors)
+    const [firstExperiment, secondExperiment] = Object.keys(
+      basicProps.revisions
+    )
     const [firstPlot, secondPlot] = screen.getAllByRole('img')
     const expectedFirstPlot = screen.getByAltText(
       `Plot of ${firstPlotEntry} (${firstExperiment})`
