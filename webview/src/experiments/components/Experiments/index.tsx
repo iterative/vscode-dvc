@@ -23,7 +23,8 @@ import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
 import { sendMessage } from '../../../shared/vscode'
 
-const DEFAULT_COLUMN_WIDTH = 120
+const DEFAULT_COLUMN_WIDTH = 75
+const MINIMUM_COLUMN_WIDTH = 50
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
@@ -78,7 +79,8 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
         return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
       },
       Header: 'Timestamp',
-      accessor: 'timestamp'
+      accessor: 'timestamp',
+      width: 100
     },
     ...buildDynamicColumns(columns, 'metrics'),
     ...buildDynamicColumns(columns, 'params')
@@ -118,7 +120,8 @@ export const ExperimentsTable: React.FC<{
       } as Partial<TableState<Experiment>>
 
       const defaultColumn: Partial<Column<Experiment>> = {
-        minWidth: DEFAULT_COLUMN_WIDTH
+        minWidth: MINIMUM_COLUMN_WIDTH,
+        width: DEFAULT_COLUMN_WIDTH
       }
 
       const columns = getColumns(tableData.columns)
