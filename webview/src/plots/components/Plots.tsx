@@ -1,10 +1,4 @@
-import React, {
-  Dispatch,
-  useState,
-  useEffect,
-  DetailedHTMLProps,
-  HTMLAttributes
-} from 'react'
+import React, { Dispatch, useState, useEffect } from 'react'
 import {
   LivePlotsColors,
   LivePlotData,
@@ -16,6 +10,7 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
+import cx from 'classnames'
 import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
@@ -25,6 +20,7 @@ import { ComparisonTable } from './ComparisonTable/ComparisonTable'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
+import { withScale } from '../../util/styles'
 
 const Plot = ({
   values,
@@ -40,12 +36,7 @@ const Plot = ({
   return (
     <div
       className={styles.plot}
-      style={
-        { '--scale': 1 } as DetailedHTMLProps<
-          HTMLAttributes<HTMLDivElement>,
-          HTMLDivElement
-        >
-      }
+      style={withScale(1)}
       data-testid={`plot-${title}`}
     >
       <VegaLite
@@ -86,15 +77,13 @@ const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
     {Object.entries(plots).map(([path, plots]) =>
       plots.map((plot: StaticPlot, i) => {
         const nbRevisions = (plot.multiView && plot.revisions?.length) || 1
+        const className = cx(styles.plot, {
+          [styles.multiViewPlot]: plot.multiView
+        })
         return (
           <div
-            className={styles.plot}
-            style={
-              { '--scale': nbRevisions } as DetailedHTMLProps<
-                HTMLAttributes<HTMLDivElement>,
-                HTMLDivElement
-              >
-            }
+            className={className}
+            style={withScale(nbRevisions)}
             key={`plot-${path}-${i}`}
           >
             <StaticPlotComponent plot={plot} path={path} />
