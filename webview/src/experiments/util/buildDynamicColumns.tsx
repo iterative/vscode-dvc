@@ -60,12 +60,12 @@ const buildDynamicColumns = (
 const findMaxDepth = (columns: ColumnGroup<Experiment>[], depth = 1): number =>
   columns.reduce(
     (prev: number, curr: ColumnGroup<Experiment>) =>
-      curr.columns
-        ? Math.max(
-            prev,
-            findMaxDepth(curr.columns as ColumnGroup<Experiment>[], depth + 1)
-          )
-        : depth,
+      Math.max(
+        prev,
+        curr.columns
+          ? findMaxDepth(curr.columns as ColumnGroup<Experiment>[], depth + 1)
+          : depth
+      ),
     1
   )
 

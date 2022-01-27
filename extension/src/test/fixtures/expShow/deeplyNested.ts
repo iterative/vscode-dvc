@@ -11,7 +11,6 @@ export const deeplyNestedOutput: ExperimentsOutput = {
         params: {
           'params.yaml': {
             data: {
-              outlier: 1,
               nested1: {
                 doubled: 'first instance!',
                 nested2: {
@@ -25,7 +24,8 @@ export const deeplyNestedOutput: ExperimentsOutput = {
                     }
                   }
                 }
-              }
+              },
+              outlier: 1
             }
           }
         },
