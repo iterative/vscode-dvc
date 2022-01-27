@@ -9,12 +9,14 @@ export interface ComparisonTableRowProps {
   path: string
   plots: StaticPlot[]
   nbColumns: number
+  pinnedColumn: string
 }
 
 export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   path,
   plots,
-  nbColumns
+  nbColumns,
+  pinnedColumn
 }) => {
   const [isShown, setIsShown] = useState(true)
 
@@ -33,13 +35,22 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
         </td>
       </tr>
       <tr>
-        {plots.map((plot: StaticPlot) => (
-          <td key={path + plot.revisions?.[0]} data-something={plot.revisions}>
-            <div className={cx(styles.cell, { [styles.cellHidden]: !isShown })}>
-              <StaticPlotComponent plot={plot} path={path} />
-            </div>
-          </td>
-        ))}
+        {plots.map((plot: StaticPlot) => {
+          const revision = plot.revisions?.[0]
+          const isPinned = pinnedColumn === revision
+          return (
+            <td
+              key={path + plot.revisions?.[0]}
+              className={cx({ [styles.pinnedColumnCell]: isPinned })}
+            >
+              <div
+                className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
+              >
+                <StaticPlotComponent plot={plot} path={path} />
+              </div>
+            </td>
+          )
+        })}
       </tr>
     </tbody>
   )

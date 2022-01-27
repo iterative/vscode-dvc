@@ -55,6 +55,12 @@ $bg-color: var(--vscode-editor-background);
   }
 }
 
+.pinnedColumnCell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
 .cell {
   max-height: 100vh;
   width: 100%;

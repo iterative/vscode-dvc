@@ -130,6 +130,18 @@ $gap: 20px;
   table-layout: fixed;
   width: 100%;
   min-width: 100%;
+  position: relative;
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .pinnedColumn{
+    left: 0;
+    z-index: 3;
+  }
 
   .smallPlots & {
     width: 100%;
