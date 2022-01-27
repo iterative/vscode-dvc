@@ -7,7 +7,8 @@ import {
   PlotsType,
   Section,
   VegaPlots,
-  StaticPlotsData
+  StaticPlotsData,
+  PlotsOutput
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 
@@ -392,11 +393,13 @@ export const getSmallMemoryFootprintFixture = () => ({
 export const getFixture = (
   baseUrl: string,
   joinFunc?: (...args: string[]) => string
-) => ({
+): PlotsOutput => ({
   ...getImageData(baseUrl, joinFunc),
   ...basicVega,
   ...require('./vega').default
 })
+
+export const getMinimalFixture = () => basicVega
 
 const expectedRevisions = ['main', '1ba7bcd', '42b8736', '4fb124a']
 
