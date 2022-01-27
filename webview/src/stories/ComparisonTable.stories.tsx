@@ -10,8 +10,8 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: Story<PlotsComparisonData> = ({ plots, colors }) => (
-  <ComparisonTable plots={plots} colors={colors} />
+const Template: Story<PlotsComparisonData> = ({ plots, revisions }) => (
+  <ComparisonTable plots={plots} revisions={revisions} />
 )
 
 export const Basic = Template.bind({})

@@ -12,12 +12,12 @@ export type ComparisonTableProps = Omit<
 
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   plots,
-  colors
+  revisions
 }) => {
   const [pinnedColumn, setPinnedColumn] = useState('')
   const columns = [
     pinnedColumn,
-    ...Object.keys(colors).filter(exp => exp !== pinnedColumn)
+    ...Object.keys(revisions).filter(exp => exp !== pinnedColumn)
   ].filter(Boolean)
   const headers = columns.map(exp => {
     return (
@@ -25,7 +25,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
         <ComparisonTableHeader
           isPinned={pinnedColumn === exp}
           onClicked={() => setPinnedColumn(exp)}
-          color={colors[exp]}
+          color={revisions[exp].color}
         >
           {exp}
         </ComparisonTableHeader>
