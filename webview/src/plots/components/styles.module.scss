@@ -82,34 +82,40 @@ $gap: 20px;
 
 .largePlots .plot {
   width: calc(100% - $gap);
-  min-height: 60vw;
+  height: 60vw;
   max-width: calc(1000px * var(--scale));
-  max-height: calc(600px * var(--scale));
+  max-height: 600px;
 }
 
 .regularPlots .plot {
   width: calc(50% * var(--scale) - $gap);
-  min-height: 35vw;
+  height: 35vw;
   max-width: calc(500px * var(--scale));
-  max-height: calc(400px * var(--scale));
+  max-height: 400px;
 }
 
 .smallPlots .plot {
-  width: calc(33% * var(--scale));
-  min-height: 20vw;
+  width: calc(33% * var(--scale) - $gap);
+  height: 20vw;
   max-width: calc(300px * var(--scale));
-  max-height: calc(200px * var(--scale));;
+  max-height: 200px;
 }
 
 
 .plot {
   text-align: center;
+  flex-grow: 5;
 }
 
 .plot img,
 .plot svg {
   max-width: 100%;
   max-height: 100%;
+}
+
+.plot.multiViewPlot {
+  max-width: 100%;
+  min-width: 0;
 }
 
 .sectionRenamer {
@@ -119,4 +125,25 @@ $gap: 20px;
   font-weight: inherit;
   border: none;
   color: $fg-color;
+}
+
+.comparisonTable {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 100%;
+
+  .smallPlots & {
+    width: 100%;
+    padding-right: $gap;
+  }
+
+  .regularPlots & {
+    width: calc(33% * var(--scale));
+    padding-right: $gap;
+  }
+
+  .largePlots & {
+    width: calc(50% * var(--scale));
+    padding-right: $gap;
+  }
 }
