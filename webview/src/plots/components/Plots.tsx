@@ -9,7 +9,7 @@ import {
   VegaPlots
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { VegaLite } from 'react-vega'
+import { VegaLite, VisualizationSpec } from 'react-vega'
 import cx from 'classnames'
 import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
