@@ -55,7 +55,8 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     window.dispatchEvent(new Event('resize'))
   }, [size])
 
-  const sizeClass = cx(styles.plotsWrapper, {
+  const sizeClass = cx({
+    [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
     [styles.smallPlots]: size === PlotSize.SMALL,
     [styles.regularPlots]: size === PlotSize.REGULAR,
     [styles.largePlots]: size === PlotSize.LARGE

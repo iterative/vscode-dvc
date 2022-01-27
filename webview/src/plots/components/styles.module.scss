@@ -88,7 +88,7 @@ $gap: 20px;
 }
 
 .regularPlots .plot {
-  width: calc(50% * var(--scale) - $gap);
+  min-width: calc(50% * var(--scale) - $gap);
   min-height: 35vw;
   max-width: calc(500px * var(--scale));
   max-height: calc(400px * var(--scale));
@@ -98,7 +98,7 @@ $gap: 20px;
   width: calc(33% * var(--scale));
   min-height: 20vw;
   max-width: calc(300px * var(--scale));
-  max-height: calc(200px * var(--scale));;
+  max-height: calc(200px * var(--scale));
 }
 
 
@@ -112,6 +112,11 @@ $gap: 20px;
   max-height: 100%;
 }
 
+.plot.multiViewPlot {
+  max-width: 100%;
+  min-width: 0;
+}
+
 .sectionRenamer {
   background-color: transparent;
   font-size: 1.25rem;
@@ -119,4 +124,25 @@ $gap: 20px;
   font-weight: inherit;
   border: none;
   color: $fg-color;
+}
+
+.comparisonTable {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 100%;
+
+  .smallPlots & {
+    width: 100%;
+    padding-right: $gap;
+  }
+
+  .regularPlots & {
+    width: calc(33% * var(--scale));
+    padding-right: $gap;
+  }
+
+  .largePlots & {
+    width: calc(50% * var(--scale));
+    padding-right: $gap;
+  }
 }
