@@ -1,4 +1,5 @@
 import omit from 'lodash.omit'
+import isEmpty from 'lodash.isempty'
 import {
   collectBranchRevision,
   collectData,
@@ -12,6 +13,9 @@ import modifiedFixture from '../../test/fixtures/expShow/modified'
 import livePlotsFixture from '../../test/fixtures/expShow/livePlots'
 import { ExperimentsOutput } from '../../cli/reader'
 import { definedAndNonEmpty } from '../../util/array'
+import { VegaPlot } from '../webview/contract'
+
+const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as VegaPlot
 
 describe('collectLivePlotsData', () => {
   it('should return the expected data from the test fixture', () => {
@@ -67,15 +71,15 @@ describe('collectData', () => {
     const { revisionData, comparisonData } = collectData(plotsDiffFixture)
     const revisions = ['main', '42b8736', '1ba7bcd', '4fb124a']
 
-    revisions.forEach(revision =>
-      expect(revisionData[revision]['logs/loss.tsv']).toEqual(
-        (
-          plotsDiffFixture['logs/loss.tsv'][0].content.data.values as {
-            rev: string
-          }[]
-        ).filter(value => value.rev === revision)
-      )
-    )
+    const values =
+      (LogsLossTsv?.content?.data as { values: { rev: string }[] }).values || []
+
+    expect(isEmpty(values)).toBeFalsy()
+
+    revisions.forEach(revision => {
+      const expectedValues = values.filter(value => value.rev === revision)
+      expect(revisionData[revision]['logs/loss.tsv']).toEqual(expectedValues)
+    })
 
     expect(Object.keys(revisionData)).toEqual(revisions)
 
@@ -99,6 +103,9 @@ describe('collectData', () => {
 
 describe('collectTemplates', () => {
   it('should return the expected output from the test fixture', () => {
+    const { content } = LogsLossTsv
+    const expectedTemplate = omit(content, 'data')
+
     const templates = collectTemplates(plotsDiffFixture)
     expect(Object.keys(templates)).toEqual([
       'logs/loss.tsv',
@@ -106,12 +113,8 @@ describe('collectTemplates', () => {
       'predictions.json'
     ])
 
-    expect(templates['logs/loss.tsv']).not.toEqual(
-      plotsDiffFixture['logs/loss.tsv'][0].content
-    )
+    expect(templates['logs/loss.tsv']).not.toEqual(content)
 
-    expect(templates['logs/loss.tsv']).toEqual(
-      omit(plotsDiffFixture['logs/loss.tsv'][0].content, 'data')
-    )
+    expect(templates['logs/loss.tsv']).toEqual(expectedTemplate)
   })
 })
