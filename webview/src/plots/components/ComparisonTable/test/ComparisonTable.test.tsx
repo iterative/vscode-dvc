@@ -3,7 +3,7 @@
  */
 import '@testing-library/jest-dom/extend-expect'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
+import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
 import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
 
@@ -12,15 +12,7 @@ describe('ComparisonTable', () => {
     cleanup()
   })
 
-  const basicProps: ComparisonTableProps = {
-    colors: {
-      '1ba7bcd': '#000000',
-      '42b8736': '#3794ff',
-      '4fb124a': '#ffffff',
-      main: '#f14c4c'
-    },
-    plots: getImageData('.')
-  }
+  const basicProps: ComparisonTableProps = comparisonTableFixture
   const renderTable = (props = basicProps) =>
     render(<ComparisonTable {...props} />)
 
@@ -71,7 +63,7 @@ describe('ComparisonTable', () => {
   it('should display the plots in the rows in the same order as the columns', () => {
     renderTable()
 
-    const firstPlotEntry = Object.entries(basicProps.plots)[0][0]
+    const [{ path: firstPlotEntry }] = basicProps.plots
     const [firstExperiment, secondExperiment] = Object.keys(basicProps.colors)
     const [firstPlot, secondPlot] = screen.getAllByRole('img')
     const expectedFirstPlot = screen.getByAltText(

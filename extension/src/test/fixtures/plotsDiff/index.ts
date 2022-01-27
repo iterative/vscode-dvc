@@ -2,13 +2,15 @@ import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import {
+  ComparisonRevisionData,
+  ComparisonTableData,
   DEFAULT_SECTION_NAMES,
   PlotSize,
+  PlotsOutput,
   PlotsType,
   Section,
-  VegaPlots,
   StaticPlotsData,
-  PlotsOutput
+  VegaPlots
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 
@@ -314,28 +316,6 @@ const basicVega = {
 }
 
 export const getImageData = (baseUrl: string, joinFunc = join) => ({
-  'plots/heatmap.png': [
-    {
-      type: PlotsType.IMAGE,
-      revisions: ['main'],
-      url: joinFunc(baseUrl, 'main_plots_heatmap.png')
-    },
-    {
-      type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
-    },
-    {
-      type: PlotsType.IMAGE,
-      revisions: ['42b8736'],
-      url: joinFunc(baseUrl, '42b8736_plots_heatmap.png')
-    },
-    {
-      type: PlotsType.IMAGE,
-      revisions: ['4fb124a'],
-      url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
-    }
-  ],
   'plots/acc.png': [
     {
       type: PlotsType.IMAGE,
@@ -356,6 +336,28 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
       type: PlotsType.IMAGE,
       revisions: ['4fb124a'],
       url: joinFunc(baseUrl, '4fb124a_plots_acc.png')
+    }
+  ],
+  'plots/heatmap.png': [
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['main'],
+      url: joinFunc(baseUrl, 'main_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['1ba7bcd'],
+      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['42b8736'],
+      url: joinFunc(baseUrl, '42b8736_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['4fb124a'],
+      url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
     }
   ],
   'plots/loss.png': [
@@ -445,9 +447,20 @@ export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc?: (...args: string[]) => string
 ) => ({
-  plots: {
+  plots: Object.entries({
     ...getImageData(baseUrl, joinFunc)
-  },
+  }).reduce((acc, [path, plots]) => {
+    const revisions = plots.reduce((acc, { url, revisions }) => {
+      const revision = revisions?.[0]
+      if (revision) {
+        acc[revision] = { url, revision }
+      }
+      return acc
+    }, {} as ComparisonRevisionData)
+
+    acc.push({ path, revisions })
+    return acc
+  }, [] as ComparisonTableData),
   colors: {
     '4fb124a': '#f14c4c',
     '42b8736': '#3794ff',

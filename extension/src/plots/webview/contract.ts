@@ -54,7 +54,7 @@ export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
 export type StaticPlot = VegaPlot | ImagePlot
 
 export interface PlotsComparisonData {
-  plots: PlotsOutput
+  plots: ComparisonTableData
   colors: Record<string, string>
   sectionName: string
   size: PlotSize
@@ -105,3 +105,15 @@ export type PlotsData =
       comparison?: PlotsComparisonData | null
     }
   | undefined
+
+export type ComparisonTablePlot = {
+  url: string
+  revision: string
+}
+
+export type ComparisonRevisionData = { [revision: string]: ComparisonTablePlot }
+
+export type ComparisonTableData = {
+  path: string
+  revisions: ComparisonRevisionData
+}[]

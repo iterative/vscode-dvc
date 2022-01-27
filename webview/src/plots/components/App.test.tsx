@@ -4,6 +4,7 @@
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
+import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/static/webview'
 import {
@@ -17,7 +18,6 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
 import { App } from './App'
 import Plots from './Plots'
 import { vsCodeApi } from '../../shared/api'
@@ -154,17 +154,7 @@ describe('App', () => {
     })
 
     sendSetDataMessage({
-      comparison: {
-        colors: {
-          '1ba7bcd': '#000000',
-          '42b8736': '#3794ff',
-          '4fb124a': '#ffffff',
-          main: '#f14c4c'
-        },
-        plots: getImageData('.'),
-        sectionName: expectedSectionName,
-        size: PlotSize.REGULAR
-      }
+      comparison: comparisonTableFixture
     })
 
     expect(screen.getByText(expectedSectionName)).toBeInTheDocument()
