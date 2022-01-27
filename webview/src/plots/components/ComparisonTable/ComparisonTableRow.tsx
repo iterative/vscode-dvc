@@ -1,13 +1,12 @@
-import { StaticPlot } from 'dvc/src/plots/webview/contract'
+import { ComparisonTablePlot } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { AllIcons, Icon } from '../../../shared/components/icon/Icon'
-import { StaticPlotComponent } from '../StaticPlot'
 
 export interface ComparisonTableRowProps {
   path: string
-  plots: StaticPlot[]
+  plots: ComparisonTablePlot[]
   nbColumns: number
 }
 
@@ -33,10 +32,10 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
         </td>
       </tr>
       <tr>
-        {plots.map((plot: StaticPlot) => (
-          <td key={path + plot.revisions?.[0]} data-something={plot.revisions}>
+        {plots.map((plot: ComparisonTablePlot) => (
+          <td key={path + plot.revision}>
             <div className={cx(styles.cell, { [styles.cellHidden]: !isShown })}>
-              <StaticPlotComponent plot={plot} path={path} />
+              <img src={plot.url} alt={`Plot of ${path} (${plot.revision})`} />
             </div>
           </td>
         ))}

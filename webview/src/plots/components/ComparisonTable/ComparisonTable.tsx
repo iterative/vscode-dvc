@@ -1,4 +1,4 @@
-import { PlotsComparisonData, StaticPlot } from 'dvc/src/plots/webview/contract'
+import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { ComparisonTableRow } from './ComparisonTableRow'
@@ -12,12 +12,12 @@ export type ComparisonTableProps = Omit<
 
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   plots,
-  colors
+  revisions
 }) => {
   const [pinnedColumn, setPinnedColumn] = useState('')
   const columns = [
     pinnedColumn,
-    ...Object.keys(colors).filter(exp => exp !== pinnedColumn)
+    ...Object.keys(revisions).filter(exp => exp !== pinnedColumn)
   ].filter(Boolean)
   const headers = columns.map(exp => {
     return (
@@ -25,7 +25,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
         <ComparisonTableHeader
           isPinned={pinnedColumn === exp}
           onClicked={() => setPinnedColumn(exp)}
-          color={colors[exp]}
+          color={revisions[exp].color}
         >
           {exp}
         </ComparisonTableHeader>
@@ -38,15 +38,11 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
       <thead>
         <tr>{headers}</tr>
       </thead>
-      {Object.entries(plots).map(([path, plots]) => (
+      {plots.map(({ path, revisions }) => (
         <ComparisonTableRow
           key={path}
           path={path}
-          plots={
-            columns.map(column =>
-              plots.find(plot => plot.revisions?.[0] === column)
-            ) as StaticPlot[]
-          }
+          plots={columns.map(column => revisions[column])}
           nbColumns={columns.length}
         />
       ))}

@@ -201,7 +201,7 @@ const Plots = ({
         >
           <ComparisonTable
             plots={comparisonTable.plots}
-            colors={comparisonTable.colors}
+            revisions={comparisonTable.revisions}
           />
         </PlotsContainer>
       )}

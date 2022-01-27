@@ -1,8 +1,8 @@
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
-  ComparisonPlots,
-  ImagePlot,
+  ComparisonRevisionData,
+  ComparisonTablePlot,
   PlotsData as TPlotsData,
   Section
 } from './webview/contract'
@@ -125,21 +125,32 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
 
     return {
-      colors: this.model.getColors(),
-      plots: Object.entries(comparison).reduce((acc, [path, plots]) => {
-        acc[path] = plots.map(plot => this.getImagePlot(plot))
-        return acc
-      }, {} as ComparisonPlots),
+      plots: comparison.map(({ path, revisions }) => {
+        const revisionsWithCorrectUrls = Object.entries(revisions).reduce(
+          (acc, [revision, plot]) => {
+            const updatedPlot = this.getComparisonPlot(plot)
+            if (updatedPlot) {
+              acc[revision] = updatedPlot
+            }
+            return acc
+          },
+          {} as ComparisonRevisionData
+        )
+        return { path, revisions: revisionsWithCorrectUrls }
+      }),
+      revisions: this.model.getComparisonRevisions(),
       sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
       size: this.model.getPlotSize(Section.COMPARISON_TABLE)
     }
   }
 
-  private getImagePlot(plot: ImagePlot) {
-    return {
-      ...plot,
-      url: this.webview?.getWebviewUri(plot.url)
-    } as ImagePlot
+  private getComparisonPlot(plot: ComparisonTablePlot) {
+    if (this.webview) {
+      return {
+        ...plot,
+        url: this.webview.getWebviewUri(plot.url)
+      }
+    }
   }
 
   private handleMessageFromWebview() {
