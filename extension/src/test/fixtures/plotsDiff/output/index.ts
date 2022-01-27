@@ -1,6 +1,6 @@
 import { basePlotsUrl } from '../../../util'
-import { getFixture } from '..'
+import { getOutput } from '..'
 
-const data = getFixture(basePlotsUrl)
+const data = getOutput(basePlotsUrl)
 
 export default data

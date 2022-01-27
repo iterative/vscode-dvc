@@ -1,5 +1,5 @@
-import { getMinimalFixture } from '..'
+import { getMinimalOutput } from '..'
 
-const data = getMinimalFixture()
+const data = getMinimalOutput()
 
 export default data
