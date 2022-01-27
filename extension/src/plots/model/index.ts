@@ -14,8 +14,8 @@ import {
 } from './collect'
 import {
   ComparisonRevisionData,
-  ComparisonTableData,
-  ComparisonTableRevisions,
+  ComparisonPlots,
+  ComparisonRevisions,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
@@ -171,7 +171,7 @@ export class PlotsModel {
         acc[revision] = { color }
       }
       return acc
-    }, {} as ComparisonTableRevisions)
+    }, {} as ComparisonRevisions)
   }
 
   public getStaticPlots() {
@@ -219,7 +219,7 @@ export class PlotsModel {
       })
       acc.push(pathRevisions)
       return acc
-    }, [] as ComparisonTableData)
+    }, [] as ComparisonPlots)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {

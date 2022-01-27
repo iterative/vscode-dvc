@@ -3,7 +3,7 @@ import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import {
   ComparisonRevisionData,
-  ComparisonTableData,
+  ComparisonPlots,
   DEFAULT_SECTION_NAMES,
   PlotSize,
   PlotsOutput,
@@ -460,7 +460,7 @@ export const getComparisonWebviewMessage = (
 
     acc.push({ path, revisions })
     return acc
-  }, [] as ComparisonTableData),
+  }, [] as ComparisonPlots),
   revisions: {
     '4fb124a': { color: '#f14c4c' },
     '42b8736': { color: '#3794ff' },

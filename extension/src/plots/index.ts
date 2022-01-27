@@ -1,8 +1,8 @@
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
+  ComparisonPlot,
   ComparisonRevisionData,
-  ComparisonTablePlot,
   PlotsData as TPlotsData,
   Section
 } from './webview/contract'
@@ -128,7 +128,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       plots: comparison.map(({ path, revisions }) => {
         const revisionsWithCorrectUrls = Object.entries(revisions).reduce(
           (acc, [revision, plot]) => {
-            const updatedPlot = this.getComparisonPlot(plot)
+            const updatedPlot = this.addCorrectUrl(plot)
             if (updatedPlot) {
               acc[revision] = updatedPlot
             }
@@ -144,7 +144,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
   }
 
-  private getComparisonPlot(plot: ComparisonTablePlot) {
+  private addCorrectUrl(plot: ComparisonPlot) {
     if (this.webview) {
       return {
         ...plot,
