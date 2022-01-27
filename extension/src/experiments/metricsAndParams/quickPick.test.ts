@@ -1,4 +1,3 @@
-import { mocked } from 'ts-jest/utils'
 import { pickFromMetricsAndParams } from './quickPick'
 import { joinMetricOrParamPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
@@ -7,8 +6,8 @@ import { reportError } from '../../vscode/reporting'
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/reporting')
 
-const mockedQuickPickValue = mocked(quickPickValue)
-const mockedReportError = mocked(reportError)
+const mockedQuickPickValue = jest.mocked(quickPickValue)
+const mockedReportError = jest.mocked(reportError)
 
 beforeEach(() => {
   jest.resetAllMocks()

@@ -1,11 +1,10 @@
-import { mocked } from 'ts-jest/utils'
 import { pickExperiments } from './quickPicks'
 import { quickPickManyValues } from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
 
 jest.mock('../../vscode/quickPick')
 
-const mockedQuickPickManyValues = mocked(quickPickManyValues)
+const mockedQuickPickManyValues = jest.mocked(quickPickManyValues)
 
 beforeEach(() => {
   jest.resetAllMocks()

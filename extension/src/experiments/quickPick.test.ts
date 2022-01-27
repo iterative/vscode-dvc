@@ -1,4 +1,3 @@
-import { mocked } from 'ts-jest/utils'
 import { pickGarbageCollectionFlags, pickExperiment } from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { reportError } from '../vscode/reporting'
@@ -6,9 +5,9 @@ import { reportError } from '../vscode/reporting'
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/reporting')
 
-const mockedReportError = mocked(reportError)
-const mockedQuickPickValue = mocked(quickPickValue)
-const mockedQuickPickManyValues = mocked(quickPickManyValues)
+const mockedReportError = jest.mocked(reportError)
+const mockedQuickPickValue = jest.mocked(quickPickValue)
+const mockedQuickPickManyValues = jest.mocked(quickPickManyValues)
 
 beforeEach(() => {
   jest.resetAllMocks()

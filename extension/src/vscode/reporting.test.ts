@@ -1,13 +1,12 @@
-import { mocked } from 'ts-jest/utils'
 import { window } from 'vscode'
 import { reportErrorWithOptions, reportOutput } from './reporting'
 
 jest.mock('vscode')
 
-const mockedShowErrorMessage = mocked<
+const mockedShowErrorMessage = jest.mocked<
   (message: string, ...items: string[]) => Thenable<string | undefined>
 >(window.showErrorMessage)
-const mockedShowInformationMessage = mocked(window.showInformationMessage)
+const mockedShowInformationMessage = jest.mocked(window.showInformationMessage)
 
 beforeEach(() => {
   jest.resetAllMocks()

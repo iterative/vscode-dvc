@@ -1,8 +1,7 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { mocked } from 'ts-jest/utils'
 import { reset } from './disposable'
 
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 const mockedDispose = jest.fn()
 const mockedUntrack = jest.fn()
 

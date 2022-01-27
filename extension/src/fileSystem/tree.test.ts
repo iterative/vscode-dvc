@@ -1,7 +1,6 @@
 import { basename, join } from 'path'
 import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { mocked } from 'ts-jest/utils'
 import { exists, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
 import { InternalCommands } from '../commands/internal'
@@ -11,11 +10,11 @@ import { WorkspaceRepositories } from '../repository/workspace'
 import { Repository } from '../repository'
 import { dvcDemoPath } from '../test/util'
 
-const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
+const mockedWorkspaceChanged = jest.mocked(new EventEmitter<void>())
 const mockedWorkspaceChangedFire = jest.fn()
 mockedWorkspaceChanged.fire = mockedWorkspaceChangedFire
 
-const mockedTreeDataChanged = mocked(new EventEmitter<void>())
+const mockedTreeDataChanged = jest.mocked(new EventEmitter<void>())
 const mockedTreeDataChangedFire = jest.fn()
 mockedTreeDataChanged.fire = mockedTreeDataChangedFire
 mockedTreeDataChanged.event = jest.fn()
@@ -28,13 +27,13 @@ const mockedRepositories = {
   treeDataChanged: mockedTreeDataChanged
 } as unknown as WorkspaceRepositories
 
-const mockedCommands = mocked(commands)
+const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedWindow = mocked(window)
+const mockedWindow = jest.mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
-const mockedTreeItem = mocked(TreeItem)
+const mockedTreeItem = jest.mocked(TreeItem)
 
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 
 const mockedDisposer = {
   track: function <T>(disposable: T): T {
@@ -46,8 +45,8 @@ const mockedInternalCommands = new InternalCommands({
   show: jest.fn()
 } as unknown as OutputChannel)
 
-const mockedExists = mocked(exists)
-const mockedIsDirectory = mocked(isDirectory)
+const mockedExists = jest.mocked(exists)
+const mockedIsDirectory = jest.mocked(isDirectory)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')

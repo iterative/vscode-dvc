@@ -1,5 +1,4 @@
 import { resolve } from 'path'
-import { mocked } from 'ts-jest/utils'
 import { setup, setupWorkspace } from './setup'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
@@ -17,17 +16,17 @@ jest.mock('./vscode/workspaceFolders')
 
 const mockedCanRunCli = jest.fn()
 const mockedHasRoots = jest.fn()
-const mockedGetFirstWorkspaceFolder = mocked(getFirstWorkspaceFolder)
+const mockedGetFirstWorkspaceFolder = jest.mocked(getFirstWorkspaceFolder)
 const mockedCwd = __dirname
 const mockedInitialize = jest.fn()
 const mockedReset = jest.fn()
 const mockedSetRoots = jest.fn()
 
-const mockedQuickPickYesOrNo = mocked(quickPickYesOrNo)
-const mockedQuickPickValue = mocked(quickPickValue)
-const mockedSetConfigValue = mocked(setConfigValue)
-const mockedQuickPickOneOrInput = mocked(quickPickOneOrInput)
-const mockedPickFile = mocked(pickFile)
+const mockedQuickPickYesOrNo = jest.mocked(quickPickYesOrNo)
+const mockedQuickPickValue = jest.mocked(quickPickValue)
+const mockedSetConfigValue = jest.mocked(setConfigValue)
+const mockedQuickPickOneOrInput = jest.mocked(quickPickOneOrInput)
+const mockedPickFile = jest.mocked(pickFile)
 
 beforeEach(() => {
   jest.resetAllMocks()

@@ -1,9 +1,8 @@
-import { mocked } from 'ts-jest/utils'
 import { window } from 'vscode'
 import { getWarningResponse } from './modal'
 import { Response } from './response'
 
-const mockedWindow = mocked(window)
+const mockedWindow = jest.mocked(window)
 const mockedShowWarningMessage = jest.fn()
 mockedWindow.showWarningMessage = mockedShowWarningMessage
 const mockedShowErrorMessage = jest.fn()

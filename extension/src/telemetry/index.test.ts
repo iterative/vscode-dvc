@@ -1,4 +1,3 @@
-import { mocked } from 'ts-jest/utils'
 import { extensions } from 'vscode'
 import TelemetryReporter from 'vscode-extension-telemetry'
 import { getTelemetryReporter, sendTelemetryEvent } from '.'
@@ -8,9 +7,9 @@ import {
   IEventNamePropertyMapping
 } from './constants'
 
-const mockedTelemetryReporter = mocked(TelemetryReporter)
+const mockedTelemetryReporter = jest.mocked(TelemetryReporter)
 
-const mockedExtensions = mocked(extensions)
+const mockedExtensions = jest.mocked(extensions)
 const mockedGetExtension = jest.fn()
 mockedExtensions.getExtension = mockedGetExtension
 const mockedPackageJSON = {

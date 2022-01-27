@@ -1,5 +1,4 @@
 import { scm, Uri } from 'vscode'
-import { mocked } from 'ts-jest/utils'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   SourceControlManagement,
@@ -9,8 +8,8 @@ import {
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
-const mockedScm = mocked(scm)
-const mockedDisposable = mocked(Disposable)
+const mockedScm = jest.mocked(scm)
+const mockedDisposable = jest.mocked(Disposable)
 
 beforeEach(() => {
   jest.resetAllMocks()

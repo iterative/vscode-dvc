@@ -1,6 +1,5 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { mocked } from 'ts-jest/utils'
 import {
   commands,
   ThemeIcon,
@@ -29,14 +28,14 @@ function buildMockedTreeItem(
   return item
 }
 
-const mockedTreeItem = mocked(TreeItem)
+const mockedTreeItem = jest.mocked(TreeItem)
 
-const mockedCommands = mocked(commands)
+const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedWindow = mocked(window)
+const mockedWindow = jest.mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
 
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 
 const { mockedExperiments, mockedGetSorts, mockedGetDvcRoots } =
   buildMockedExperiments()

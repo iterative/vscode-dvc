@@ -1,10 +1,9 @@
 import { commands } from 'vscode'
-import { mocked } from 'ts-jest/utils'
 import { setContextValue } from './context'
 
 jest.mock('vscode')
 
-const mockedCommands = mocked(commands)
+const mockedCommands = jest.mocked(commands)
 const mockedExecuteCommand = jest.fn()
 mockedCommands.executeCommand = mockedExecuteCommand
 

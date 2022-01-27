@@ -14,7 +14,6 @@ import {
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
-import { mocked } from 'ts-jest/utils'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
@@ -24,7 +23,7 @@ import { vsCodeApi } from '../../../shared/api'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
-const mockedPostMessage = mocked(postMessage)
+const mockedPostMessage = jest.mocked(postMessage)
 
 const queryClosest = (textElement: Element, matcher: string) =>
   // eslint-disable-next-line testing-library/no-node-access

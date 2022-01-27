@@ -1,4 +1,3 @@
-import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Cli, CliResult, CliStarted, typeCheckCommands } from '.'
@@ -14,10 +13,10 @@ jest.mock('@hediet/std/disposable')
 jest.mock('../env')
 jest.mock('../processExecution')
 
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 
-const mockedGetEnv = mocked(getProcessEnv)
-const mockedCreateProcess = mocked(createProcess)
+const mockedGetEnv = jest.mocked(getProcessEnv)
+const mockedCreateProcess = jest.mocked(createProcess)
 
 beforeEach(() => {
   jest.resetAllMocks()
