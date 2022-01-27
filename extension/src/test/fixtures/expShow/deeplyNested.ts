@@ -37,9 +37,10 @@ export const deeplyNestedOutput: ExperimentsOutput = {
   }
 }
 
-const columns = collectMetricsAndParams(deeplyNestedOutput)
+export const columns = collectMetricsAndParams(deeplyNestedOutput)
+
 const { workspace, branches } = collectExperiments(deeplyNestedOutput)
-const rows = [workspace, ...branches]
+export const rows = [workspace, ...branches]
 
 const deeplyNestedTableData: TableData = {
   changes: [],

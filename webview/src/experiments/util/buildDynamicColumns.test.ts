@@ -1,6 +1,8 @@
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { ColumnGroup } from 'react-table'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { collectMetricsAndParams } from 'dvc/src/experiments/metricsAndParams/collect'
+import { columns as deeplyNestedColumns } from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import buildDynamicColumns from './buildDynamicColumns'
 
 interface MinimalColumn {
@@ -18,6 +20,85 @@ const simplifyColumns = (columns: ColumnGroup<Experiment>[]) =>
   })
 
 describe('buildDynamicColumns', () => {
+  it('Correctly parses the deeply nested fixture', () => {
+    expect(
+      simplifyColumns(buildDynamicColumns(deeplyNestedColumns, 'params'))
+    ).toEqual([
+      {
+        columns: [
+          {
+            columns: [
+              {
+                columns: [
+                  {
+                    columns: [{ id: 'params:params.yaml:nested1.doubled' }],
+                    id: 'params:params.yaml:nested1.doubled_previous_placeholder'
+                  }
+                ],
+                id: 'params:params.yaml:nested1.doubled_previous_placeholder'
+              }
+            ],
+            id: 'params:params.yaml:nested1'
+          },
+          {
+            columns: [
+              {
+                columns: [
+                  {
+                    columns: [
+                      {
+                        id: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6.nested7'
+                      }
+                    ],
+                    id: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6'
+                  }
+                ],
+                id: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5'
+              }
+            ],
+            id: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4'
+          },
+          {
+            columns: [
+              {
+                columns: [
+                  {
+                    columns: [
+                      {
+                        id: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6'
+                      },
+                      {
+                        id: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled'
+                      }
+                    ],
+                    id: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b'
+                  }
+                ],
+                id: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4'
+              }
+            ],
+            id: 'params:params.yaml:nested1%2Enested2%2Enested3'
+          },
+          {
+            columns: [
+              {
+                columns: [
+                  {
+                    columns: [{ id: 'params:params.yaml:outlier' }],
+                    id: 'params:params.yaml:outlier_previous_placeholder'
+                  }
+                ],
+                id: 'params:params.yaml:outlier_previous_placeholder'
+              }
+            ],
+            id: 'params:params.yaml:outlier_previous_placeholder'
+          }
+        ],
+        id: 'params:params.yaml'
+      }
+    ])
+  })
+
   it('Correctly parses a minimal input with a single-depth column at the start', () => {
     const input = collectMetricsAndParams({
       workspace: {
