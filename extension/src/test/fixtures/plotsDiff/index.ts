@@ -1,12 +1,12 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
+import { PlotsOutput } from '../../../cli/reader'
 import {
   ComparisonRevisionData,
-  ComparisonTableData,
+  ComparisonPlots,
   DEFAULT_SECTION_NAMES,
   PlotSize,
-  PlotsOutput,
   PlotsType,
   Section,
   StaticPlotsData,
@@ -460,7 +460,7 @@ export const getComparisonWebviewMessage = (
 
     acc.push({ path, revisions })
     return acc
-  }, [] as ComparisonTableData),
+  }, [] as ComparisonPlots),
   revisions: {
     '4fb124a': { color: '#f14c4c' },
     '42b8736': { color: '#3794ff' },

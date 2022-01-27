@@ -3,7 +3,6 @@ import { VisualizationSpec } from 'react-vega'
 import {
   LivePlotValues,
   LivePlotData,
-  PlotsOutput,
   isImagePlot,
   ImagePlot,
   VegaPlot
@@ -12,6 +11,7 @@ import {
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
   ExperimentsOutput,
+  PlotsOutput,
   Value,
   ValueTree
 } from '../../cli/reader'

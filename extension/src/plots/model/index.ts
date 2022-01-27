@@ -14,20 +14,19 @@ import {
 } from './collect'
 import {
   ComparisonRevisionData,
-  ComparisonTableData,
-  ComparisonTableRevisions,
+  ComparisonPlots,
+  ComparisonRevisions,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   LivePlotData,
   PlotSize,
-  PlotsOutput,
   PlotsType,
   Section,
   SectionCollapsed,
   VegaPlots
 } from '../../plots/webview/contract'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
@@ -171,7 +170,7 @@ export class PlotsModel {
         acc[revision] = { color }
       }
       return acc
-    }, {} as ComparisonTableRevisions)
+    }, {} as ComparisonRevisions)
   }
 
   public getStaticPlots() {
@@ -219,7 +218,7 @@ export class PlotsModel {
       })
       acc.push(pathRevisions)
       return acc
-    }, [] as ComparisonTableData)
+    }, [] as ComparisonPlots)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {
