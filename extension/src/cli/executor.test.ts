@@ -1,5 +1,4 @@
 import { join } from 'path'
-import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { CliResult, CliStarted } from '.'
@@ -15,10 +14,10 @@ jest.mock('@hediet/std/disposable')
 jest.mock('../processExecution')
 jest.mock('../env')
 
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 
-const mockedCreateProcess = mocked(createProcess)
-const mockedGetProcessEnv = mocked(getProcessEnv)
+const mockedCreateProcess = jest.mocked(createProcess)
+const mockedGetProcessEnv = jest.mocked(getProcessEnv)
 const mockedEnv = {
   DVC_NO_ANALYTICS: 'true',
   PATH: '/some/special/path'

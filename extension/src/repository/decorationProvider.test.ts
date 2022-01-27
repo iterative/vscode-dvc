@@ -1,5 +1,4 @@
 import { join } from 'path'
-import { mocked } from 'ts-jest/utils'
 import { EventEmitter, Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { DecorationProvider, DecorationState } from './decorationProvider'
@@ -7,9 +6,9 @@ import { DecorationProvider, DecorationState } from './decorationProvider'
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 
-const mockedDecorationsChanged = mocked(new EventEmitter<Uri[]>())
+const mockedDecorationsChanged = jest.mocked(new EventEmitter<Uri[]>())
 const mockedDecorationsChangedFire = jest.fn()
 mockedDecorationsChanged.fire = mockedDecorationsChangedFire
 

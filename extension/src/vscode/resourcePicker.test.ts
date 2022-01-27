@@ -1,12 +1,11 @@
 import { resolve } from 'path'
-import { mocked } from 'ts-jest/utils'
 import { Uri, window } from 'vscode'
 import { pickFile, pickResources } from './resourcePicker'
 
 jest.mock('vscode')
 
 const mockedShowOpenDialog = jest.fn()
-const mockedWindow = mocked(window)
+const mockedWindow = jest.mocked(window)
 mockedWindow.showOpenDialog = mockedShowOpenDialog
 
 beforeEach(() => {

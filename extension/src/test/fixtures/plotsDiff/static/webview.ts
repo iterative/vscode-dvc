@@ -1,5 +1,5 @@
-import { getSmallMemoryFootprintFixture } from '..'
+import { getMinimalWebviewMessage } from '..'
 
-const data = getSmallMemoryFootprintFixture()
+const data = getMinimalWebviewMessage()
 
 export default data

@@ -1,5 +1,4 @@
 import { QuickPickOptions, window } from 'vscode'
-import { mocked } from 'ts-jest/utils'
 import {
   QuickPickItemWithValue,
   quickPickManyValues,
@@ -11,7 +10,7 @@ import { Response } from './response'
 
 jest.mock('vscode')
 
-const mockedShowQuickPick = mocked<
+const mockedShowQuickPick = jest.mocked<
   (
     items: QuickPickItemWithValue[],
     options: QuickPickOptions

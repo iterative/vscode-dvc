@@ -1,13 +1,12 @@
 import { join, resolve, sep } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { mocked } from 'ts-jest/utils'
 import { RepositoryModel } from '.'
 import { ListOutput, StatusOutput } from '../../cli/reader'
 import { dvcDemoPath } from '../../test/util'
 
 jest.mock('@hediet/std/disposable')
 
-const mockedDisposable = mocked(Disposable)
+const mockedDisposable = jest.mocked(Disposable)
 
 beforeEach(() => {
   jest.resetAllMocks()

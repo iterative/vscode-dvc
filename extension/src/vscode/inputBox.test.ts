@@ -1,10 +1,9 @@
 import { window } from 'vscode'
-import { mocked } from 'ts-jest/utils'
 import { getInput } from './inputBox'
 
 jest.mock('vscode')
 
-const mockedWindow = mocked(window)
+const mockedWindow = jest.mocked(window)
 const mockedInputBox = mockedWindow.showInputBox
 
 beforeEach(() => {

@@ -1,4 +1,3 @@
-import { mocked } from 'ts-jest/utils'
 import { pickParamsToQueue } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { quickPickManyValues } from '../../../vscode/quickPick'
@@ -6,8 +5,8 @@ import { quickPickManyValues } from '../../../vscode/quickPick'
 jest.mock('../../../vscode/inputBox')
 jest.mock('../../../vscode/quickPick')
 
-const mockedGetInput = mocked(getInput)
-const mockedQuickPickManyValues = mocked(quickPickManyValues)
+const mockedGetInput = jest.mocked(getInput)
+const mockedQuickPickManyValues = jest.mocked(quickPickManyValues)
 
 beforeEach(() => {
   jest.resetAllMocks()

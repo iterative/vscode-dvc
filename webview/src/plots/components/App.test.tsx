@@ -17,7 +17,6 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { mocked } from 'ts-jest/utils'
 import { getImageData } from 'dvc/src/test/fixtures/plotsDiff'
 import { App } from './App'
 import Plots from './Plots'
@@ -35,8 +34,8 @@ jest.mock('./constants', () => ({
 }))
 
 const { postMessage, setState } = vsCodeApi
-const mockPostMessage = mocked(postMessage)
-const mockSetState = mocked(setState)
+const mockPostMessage = jest.mocked(postMessage)
+const mockSetState = jest.mocked(setState)
 
 beforeEach(() => {
   jest.clearAllMocks()
