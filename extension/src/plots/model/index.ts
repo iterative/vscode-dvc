@@ -21,13 +21,12 @@ import {
   DEFAULT_SECTION_SIZES,
   LivePlotData,
   PlotSize,
-  PlotsOutput,
   PlotsType,
   Section,
   SectionCollapsed,
   VegaPlots
 } from '../../plots/webview/contract'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'

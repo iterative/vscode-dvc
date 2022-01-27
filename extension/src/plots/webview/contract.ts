@@ -35,6 +35,24 @@ export const DEFAULT_SECTION_COLLAPSED = {
 
 export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
 
+export type ComparisonRevisionData = { [revision: string]: ComparisonPlot }
+
+export type ComparisonPlots = {
+  path: string
+  revisions: ComparisonRevisionData
+}[]
+
+export type ComparisonRevisions = {
+  [revision: string]: { color: string }
+}
+
+export interface PlotsComparisonData {
+  revisions: ComparisonRevisions
+  plots: ComparisonPlots
+  sectionName: string
+  size: PlotSize
+}
+
 export type LivePlotValues = { group: string; iteration: number; y: number }[]
 
 export type LivePlotsColors = { domain: string[]; range: string[] }
@@ -79,15 +97,6 @@ export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
 
 export type StaticPlot = VegaPlot | ImagePlot
 
-export interface PlotsComparisonData {
-  revisions: ComparisonRevisions
-  plots: ComparisonPlots
-  sectionName: string
-  size: PlotSize
-}
-
-export type PlotsOutput = Record<string, StaticPlot[]>
-
 export type VegaPlots = { [path: string]: VegaPlot[] }
 
 export interface StaticPlotsData {
@@ -96,27 +105,16 @@ export interface StaticPlotsData {
   size: PlotSize
 }
 
-export type PlotsData =
-  | {
-      live?: LivePlotsData | null
-      static?: StaticPlotsData | null
-      sectionCollapsed?: SectionCollapsed
-      comparison?: PlotsComparisonData | null
-    }
-  | undefined
-
 export type ComparisonPlot = {
   url: string
   revision: string
 }
 
-export type ComparisonRevisionData = { [revision: string]: ComparisonPlot }
-
-export type ComparisonPlots = {
-  path: string
-  revisions: ComparisonRevisionData
-}[]
-
-export type ComparisonRevisions = {
-  [revision: string]: { color: string }
-}
+export type PlotsData =
+  | {
+      comparison?: PlotsComparisonData | null
+      live?: LivePlotsData | null
+      static?: StaticPlotsData | null
+      sectionCollapsed?: SectionCollapsed
+    }
+  | undefined
