@@ -1,12 +1,12 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
+import { PlotsOutput } from '../../../cli/reader'
 import {
   ComparisonRevisionData,
   ComparisonPlots,
   DEFAULT_SECTION_NAMES,
   PlotSize,
-  PlotsOutput,
   PlotsType,
   Section,
   StaticPlotsData,
