@@ -1,5 +1,5 @@
 import {
-  defaultSectionCollapsed,
+  DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   Section
 } from 'dvc/src/plots/webview/contract'
@@ -56,7 +56,7 @@ const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
         data: {
           ...state.data,
           sectionCollapsed: {
-            ...(state.data?.sectionCollapsed || defaultSectionCollapsed),
+            ...(state.data?.sectionCollapsed || DEFAULT_SECTION_COLLAPSED),
             [action.sectionKey]:
               !state.data?.sectionCollapsed?.[action.sectionKey]
           }
