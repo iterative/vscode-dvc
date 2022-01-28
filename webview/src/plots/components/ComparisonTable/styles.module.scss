@@ -1,6 +1,4 @@
-$bullet-size: 9px;
-$fg-color: var(--vscode-editor-foreground);
-$bg-color: var(--vscode-editor-background);
+@import '../../../shared/variables.scss';
 
 .header {
   padding: 10px 5px;
@@ -55,10 +53,31 @@ $bg-color: var(--vscode-editor-background);
   }
 }
 
-.pinnedColumnCell {
+.comparisonTableHeader {
+  position: sticky;
+  top: -4px;
+  z-index: 2;
+}
+
+.pinnedColumnCell, .pinnedColumnHeader {
   position: sticky;
   left: 0;
   z-index: 1;
+
+  &::after {
+    content: '';
+    width: 4px;
+    height: calc(100% + 4px);
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: $bg-color;
+    z-index: 5;
+  }
+}
+
+.pinnedColumnHeader {
+  z-index: 3;
 }
 
 .cell {
@@ -79,3 +98,25 @@ $bg-color: var(--vscode-editor-background);
   height: auto;
 }
 
+$gap: 20px;
+.comparisonTable {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 100%;
+  position: relative;
+
+  .smallPlots & {
+    width: 100%;
+    padding-right: $gap;
+  }
+
+  .regularPlots & {
+    width: calc(33% * var(--scale));
+    padding-right: $gap;
+  }
+
+  .largePlots & {
+    width: calc(50% * var(--scale));
+    padding-right: $gap;
+  }
+}

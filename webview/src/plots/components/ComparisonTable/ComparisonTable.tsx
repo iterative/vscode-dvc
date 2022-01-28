@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { ComparisonTableRow } from './ComparisonTableRow'
-import styles from '../styles.module.scss'
+import styles from './styles.module.scss'
+import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 
 export type ComparisonTableProps = Omit<
@@ -24,7 +25,9 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     return (
       <th
         key={exp}
-        className={cx({ [styles.pinnedColumn]: exp === pinnedColumn })}
+        className={cx(styles.comparisonTableHeader, {
+          [styles.pinnedColumnHeader]: exp === pinnedColumn
+        })}
       >
         <ComparisonTableHeader
           isPinned={pinnedColumn === exp}
@@ -38,8 +41,11 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   })
 
   return (
-    <table className={styles.comparisonTable} style={withScale(columns.length)}>
-      <thead className={styles.comparisonTableHeaders}>
+    <table
+      className={plotsStyles.comparisonTable}
+      style={withScale(columns.length)}
+    >
+      <thead>
         <tr>{headers}</tr>
       </thead>
       {Object.entries(plots).map(([path, plots]) => (

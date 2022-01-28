@@ -1,12 +1,4 @@
-$fg-color: var(--vscode-editor-foreground);
-
-// Dark
-
-$watermark-color: rgba(255, 255, 255, 0.6);
-
-// Light
-
-$watermark-color-light: rgba(0, 0, 0, 0.68);
+@import '../../shared/variables.scss';
 
 .centered {
   display: flex;
@@ -131,17 +123,6 @@ $gap: 20px;
   width: 100%;
   min-width: 100%;
   position: relative;
-
-  th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-
-  .pinnedColumn{
-    left: 0;
-    z-index: 3;
-  }
 
   .smallPlots & {
     width: 100%;

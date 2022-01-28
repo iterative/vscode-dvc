@@ -25,7 +25,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   return (
     <tbody>
       <tr>
-        <td colSpan={nbColumns}>
+        <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
           <button className={styles.rowToggler} onClick={toggleIsShownState}>
             <Icon
               icon={isShown ? AllIcons.CHEVRON_DOWN : AllIcons.CHEVRON_RIGHT}
@@ -33,6 +33,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             {path}
           </button>
         </td>
+        <td colSpan={nbColumns - 1}></td>
       </tr>
       <tr>
         {plots.map((plot: StaticPlot) => {
