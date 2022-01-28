@@ -28,6 +28,12 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
   )
 }
 
+const Header: React.FC<{ column: Column<Experiment> }> = ({
+  column: { name }
+}) => {
+  return <span title={name}>{name}</span>
+}
+
 const getCellComponent = (): React.FC<{ value: Value }> => Cell
 
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
@@ -48,11 +54,12 @@ const buildDynamicColumns = (
 
       const column: ColumnGroup<Experiment> | Column<Experiment> = {
         Cell,
-        Header: data.name,
+        Header,
         accessor: pathArray && buildAccessor(pathArray),
         columns: childColumns.length ? childColumns : undefined,
         group,
-        id: path
+        id: path,
+        name: data.name
       }
       return column
     })
