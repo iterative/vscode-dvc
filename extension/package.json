@@ -1116,7 +1116,7 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.1.3",
     "ts-loader": "^9.2.6",
-    "vsce": "^2.5.1",
+    "vsce": "^2.6.5",
     "vscode-test": "^1.6.1",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.64.4",
