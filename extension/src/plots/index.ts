@@ -1,6 +1,5 @@
 import { join } from 'path'
 import { EventEmitter, Memento } from 'vscode'
-import { removeSync } from 'fs-extra'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -20,6 +19,7 @@ import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
 import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
+import { removeDir } from '../fileSystem'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -229,7 +229,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track({
       dispose: () => {
         const tempDir = join(this.dvcRoot, TEMP_PLOTS_DIR)
-        return removeSync(tempDir)
+        return removeDir(tempDir)
       }
     })
   }

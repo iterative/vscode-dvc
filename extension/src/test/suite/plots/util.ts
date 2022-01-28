@@ -1,5 +1,6 @@
 import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
+import * as FileSystem from '../../../fileSystem'
 import expShowFixture from '../../fixtures/expShow/output'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import { Plots } from '../../../plots'
@@ -25,6 +26,8 @@ export const buildPlots = async (
   } = buildDependencies(disposer, expShow, plotsDiff)
 
   const data = new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
+
+  const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
 
   const [experiments, plots] = await Promise.all([
     disposer.track(
@@ -65,6 +68,7 @@ export const buildPlots = async (
     experiments,
     messageSpy,
     mockPlotsDiff,
+    mockRemoveDir,
     plots,
     plotsModel
   }

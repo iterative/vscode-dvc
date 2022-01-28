@@ -1,3 +1,4 @@
+import { join } from 'path'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
@@ -21,6 +22,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData
 } from '../../../plots/webview/contract'
+import { TEMP_PLOTS_DIR } from '../../../cli/reader'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -84,6 +86,20 @@ suite('Plots Test Suite', () => {
 
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'main')
+    })
+
+    it('should remove the temporary plots directory on dispose', async () => {
+      const { mockRemoveDir, plots } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      plots.dispose()
+
+      expect(mockRemoveDir).to.be.calledOnce
+      expect(mockRemoveDir).to.be.calledWithExactly(
+        join(dvcDemoPath, TEMP_PLOTS_DIR)
+      )
     })
   })
 
