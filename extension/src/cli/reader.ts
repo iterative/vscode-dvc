@@ -3,7 +3,7 @@ import { Cli, typeCheckCommands } from '.'
 import { Args, Command, Flag, ListFlag, SubCommand } from './args'
 import { retry } from './retry'
 import { trimAndSplit } from '../util/stdout'
-import { PlotsOutput } from '../plots/webview/contract'
+import { StaticPlot } from '../plots/webview/contract'
 
 export type PathOutput = { path: string }
 
@@ -89,6 +89,10 @@ export interface ExperimentsOutput {
   workspace: {
     baseline: ExperimentFieldsOrError
   }
+}
+
+export interface PlotsOutput {
+  [path: string]: StaticPlot[]
 }
 
 export const autoRegisteredCommands = {
