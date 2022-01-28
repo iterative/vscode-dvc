@@ -1,5 +1,6 @@
 @import '../../../shared/variables.scss';
 
+$gap: 4px;
 .header {
   padding: 10px 5px;
   color: #fff;
@@ -8,7 +9,7 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
-  gap: 4px;
+  gap: $gap;
   border-radius: 4px 4px 0 0;
   font-size: 0.8125rem;
   position: relative;
@@ -55,7 +56,7 @@
 
 .comparisonTableHeader {
   position: sticky;
-  top: -4px;
+  top: -#{$gap};
   z-index: 2;
 }
 
@@ -66,8 +67,8 @@
 
   &::after {
     content: '';
-    width: 4px;
-    height: calc(100% + 4px);
+    width: $gap;
+    height: calc(100% + $gap);
     position: absolute;
     right: 0;
     top: 0;
@@ -96,27 +97,4 @@
 .cell img {
   width: 100%;
   height: auto;
-}
-
-$gap: 20px;
-.comparisonTable {
-  table-layout: fixed;
-  width: 100%;
-  min-width: 100%;
-  position: relative;
-
-  .smallPlots & {
-    width: 100%;
-    padding-right: $gap;
-  }
-
-  .regularPlots & {
-    width: calc(33% * var(--scale));
-    padding-right: $gap;
-  }
-
-  .largePlots & {
-    width: calc(50% * var(--scale));
-    padding-right: $gap;
-  }
 }

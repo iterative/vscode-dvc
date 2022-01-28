@@ -32,7 +32,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             {path}
           </button>
         </td>
-        <td colSpan={nbColumns - 1}></td>
+        {nbColumns > 1 && <td colSpan={nbColumns - 1}></td>}
       </tr>
       <tr>
         {plots.map((plot: ComparisonPlot) => {
