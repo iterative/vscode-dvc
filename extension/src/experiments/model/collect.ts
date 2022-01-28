@@ -9,13 +9,18 @@ import {
 } from '../../cli/reader'
 import { addToMapArray } from '../../util/map'
 
+export const isCheckpoint = (
+  checkpointTip: string | undefined,
+  sha: string
+): checkpointTip is string => !!(checkpointTip && checkpointTip !== sha)
+
 const collectExperimentOrCheckpoint = (
   acc: ExperimentsAccumulator,
   experiment: Experiment,
   branchName: string
 ) => {
   const { checkpoint_tip, id } = experiment
-  if (checkpoint_tip && checkpoint_tip !== id) {
+  if (isCheckpoint(checkpoint_tip, id)) {
     addToMapArray(acc.checkpointsByTip, checkpoint_tip, experiment)
   } else {
     addToMapArray(acc.experimentsByBranch, branchName, experiment)
