@@ -1,6 +1,5 @@
 import { join } from 'path'
 import { Uri } from 'vscode'
-import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
 import { getWarningResponse } from '../../vscode/modal'
 import { CommandId, InternalCommands } from '../../commands/internal'
@@ -8,7 +7,7 @@ import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceRepositories } from '../workspace'
 
 const mockedFunc = jest.fn()
-const mockedGetWarningResponse = mocked(getWarningResponse)
+const mockedGetWarningResponse = jest.mocked(getWarningResponse)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)

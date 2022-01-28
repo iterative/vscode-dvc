@@ -1,5 +1,11 @@
 import { basename, extname, join, relative, resolve } from 'path'
-import { createReadStream, existsSync, lstatSync, readdir } from 'fs-extra'
+import {
+  createReadStream,
+  existsSync,
+  lstatSync,
+  readdir,
+  removeSync
+} from 'fs-extra'
 import { Uri } from 'vscode'
 import { parse, Parser } from 'csv-parse'
 import { definedAndNonEmpty } from '../util/array'
@@ -68,3 +74,5 @@ export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
 
 export const readCsv = (path: string): Parser =>
   createReadStream(path).pipe(parse({ columns: true, delimiter: ',' }))
+
+export const removeDir = (path: string): void => removeSync(path)

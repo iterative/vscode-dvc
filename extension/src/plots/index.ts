@@ -1,8 +1,9 @@
+import { join } from 'path'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
-  ComparisonPlots,
-  ImagePlot,
+  ComparisonPlot,
+  ComparisonRevisionData,
   PlotsData as TPlotsData,
   Section
 } from './webview/contract'
@@ -17,7 +18,8 @@ import { InternalCommands } from '../commands/internal'
 import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
-import { ExperimentsOutput } from '../cli/reader'
+import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
+import { removeDir } from '../fileSystem'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -49,6 +51,8 @@ export class Plots extends BaseRepository<TPlotsData> {
         this.sendPlots()
       })
     )
+
+    this.ensureTempDirRemoved()
 
     this.handleMessageFromWebview()
 
@@ -125,21 +129,32 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
 
     return {
-      colors: this.model.getColors(),
-      plots: Object.entries(comparison).reduce((acc, [path, plots]) => {
-        acc[path] = plots.map(plot => this.getImagePlot(plot))
-        return acc
-      }, {} as ComparisonPlots),
+      plots: comparison.map(({ path, revisions }) => {
+        const revisionsWithCorrectUrls = Object.entries(revisions).reduce(
+          (acc, [revision, plot]) => {
+            const updatedPlot = this.addCorrectUrl(plot)
+            if (updatedPlot) {
+              acc[revision] = updatedPlot
+            }
+            return acc
+          },
+          {} as ComparisonRevisionData
+        )
+        return { path, revisions: revisionsWithCorrectUrls }
+      }),
+      revisions: this.model.getComparisonRevisions(),
       sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
       size: this.model.getPlotSize(Section.COMPARISON_TABLE)
     }
   }
 
-  private getImagePlot(plot: ImagePlot) {
-    return {
-      ...plot,
-      url: this.webview?.getWebviewUri(plot.url)
-    } as ImagePlot
+  private addCorrectUrl(plot: ComparisonPlot) {
+    if (this.webview) {
+      return {
+        ...plot,
+        url: this.webview.getWebviewUri(plot.url)
+      }
+    }
   }
 
   private handleMessageFromWebview() {
@@ -208,5 +223,14 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.data.managedUpdate()
     await this.data.isReady()
     this.deferred.resolve()
+  }
+
+  private ensureTempDirRemoved() {
+    this.dispose.track({
+      dispose: () => {
+        const tempDir = join(this.dvcRoot, TEMP_PLOTS_DIR)
+        return removeDir(tempDir)
+      }
+    })
   }
 }

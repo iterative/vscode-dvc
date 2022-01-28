@@ -1,13 +1,16 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
+import { PlotsOutput } from '../../../cli/reader'
 import {
+  ComparisonRevisionData,
+  ComparisonPlots,
   DEFAULT_SECTION_NAMES,
   PlotSize,
   PlotsType,
   Section,
-  VegaPlots,
-  StaticPlotsData
+  StaticPlotsData,
+  VegaPlots
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 
@@ -313,28 +316,6 @@ const basicVega = {
 }
 
 export const getImageData = (baseUrl: string, joinFunc = join) => ({
-  'plots/heatmap.png': [
-    {
-      type: PlotsType.IMAGE,
-      revisions: ['main'],
-      url: joinFunc(baseUrl, 'main_plots_heatmap.png')
-    },
-    {
-      type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
-    },
-    {
-      type: PlotsType.IMAGE,
-      revisions: ['42b8736'],
-      url: joinFunc(baseUrl, '42b8736_plots_heatmap.png')
-    },
-    {
-      type: PlotsType.IMAGE,
-      revisions: ['4fb124a'],
-      url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
-    }
-  ],
   'plots/acc.png': [
     {
       type: PlotsType.IMAGE,
@@ -355,6 +336,28 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
       type: PlotsType.IMAGE,
       revisions: ['4fb124a'],
       url: joinFunc(baseUrl, '4fb124a_plots_acc.png')
+    }
+  ],
+  'plots/heatmap.png': [
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['main'],
+      url: joinFunc(baseUrl, 'main_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['1ba7bcd'],
+      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['42b8736'],
+      url: joinFunc(baseUrl, '42b8736_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['4fb124a'],
+      url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
     }
   ],
   'plots/loss.png': [
@@ -381,22 +384,16 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
   ]
 })
 
-export const getSmallMemoryFootprintFixture = () => ({
-  plots: {
-    ...basicVega
-  },
-  sectionName: DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS],
-  size: PlotSize.REGULAR
-})
-
-export const getFixture = (
+export const getOutput = (
   baseUrl: string,
   joinFunc?: (...args: string[]) => string
-) => ({
+): PlotsOutput => ({
   ...getImageData(baseUrl, joinFunc),
   ...basicVega,
   ...require('./vega').default
 })
+
+export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
 
 const expectedRevisions = ['main', '1ba7bcd', '42b8736', '4fb124a']
 
@@ -430,6 +427,14 @@ const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
     return acc
   }, {} as VegaPlots)
 
+export const getMinimalWebviewMessage = () => ({
+  plots: {
+    ...basicVega
+  },
+  sectionName: DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS],
+  size: PlotSize.REGULAR
+})
+
 export const getStaticWebviewMessage = (): StaticPlotsData => ({
   plots: {
     ...extendedSpecs({ ...basicVega, ...require('./vega').default })
@@ -442,14 +447,25 @@ export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc?: (...args: string[]) => string
 ) => ({
-  plots: {
+  plots: Object.entries({
     ...getImageData(baseUrl, joinFunc)
-  },
-  colors: {
-    '4fb124a': '#f14c4c',
-    '42b8736': '#3794ff',
-    '1ba7bcd': '#cca700',
-    main: '#13adc7'
+  }).reduce((acc, [path, plots]) => {
+    const revisions = plots.reduce((acc, { url, revisions }) => {
+      const revision = revisions?.[0]
+      if (revision) {
+        acc[revision] = { url, revision }
+      }
+      return acc
+    }, {} as ComparisonRevisionData)
+
+    acc.push({ path, revisions })
+    return acc
+  }, [] as ComparisonPlots),
+  revisions: {
+    '4fb124a': { color: '#f14c4c' },
+    '42b8736': { color: '#3794ff' },
+    '1ba7bcd': { color: '#cca700' },
+    main: { color: '#13adc7' }
   },
   sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
   size: PlotSize.REGULAR

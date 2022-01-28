@@ -13,19 +13,20 @@ import {
   RevisionData
 } from './collect'
 import {
+  ComparisonRevisionData,
   ComparisonPlots,
+  ComparisonRevisions,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   LivePlotData,
   PlotSize,
-  PlotsOutput,
   PlotsType,
   Section,
   SectionCollapsed,
   VegaPlots
 } from '../../plots/webview/contract'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
@@ -96,7 +97,7 @@ export class PlotsModel {
   }
 
   public async transformAndSetPlots(data: PlotsOutput) {
-    const [{ comparisonData, revisionData }, templates, { plots, images }] =
+    const [{ comparisonData, revisionData }, templates, { comparison, plots }] =
       await Promise.all([
         collectData(data),
         collectTemplates(data),
@@ -107,7 +108,7 @@ export class PlotsModel {
     this.revisionData = { ...this.revisionData, ...revisionData }
     this.templates = { ...this.templates, ...templates }
     this.vegaPaths = plots
-    this.comparisonPaths = images
+    this.comparisonPaths = comparison
   }
 
   public getLivePlots() {
@@ -161,6 +162,17 @@ export class PlotsModel {
     return colors
   }
 
+  public getComparisonRevisions() {
+    return Object.entries({
+      ...(this.experiments?.getSelectedRevisions() || {})
+    }).reduce((acc, [revision, color]) => {
+      if (Object.keys(this.comparisonData).includes(revision)) {
+        acc[revision] = { color }
+      }
+      return acc
+    }, {} as ComparisonRevisions)
+  }
+
   public getStaticPlots() {
     return this.vegaPaths.reduce((acc, path) => {
       const template = this.templates[path]
@@ -193,15 +205,20 @@ export class PlotsModel {
 
   public getComparisonPlots() {
     return this.comparisonPaths.reduce((acc, path) => {
-      acc[path] = []
-      this.getSelectedRevisions().forEach(rev => {
-        const image = this.comparisonData?.[rev]?.[path]
+      const pathRevisions = {
+        path,
+        revisions: {} as ComparisonRevisionData
+      }
+
+      this.getSelectedRevisions().forEach(revision => {
+        const image = this.comparisonData?.[revision]?.[path]
         if (image) {
-          acc[path].push(image)
+          pathRevisions.revisions[revision] = { revision, url: image.url }
         }
       })
+      acc.push(pathRevisions)
       return acc
-    }, {} as ComparisonPlots)
+    }, [] as ComparisonPlots)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {

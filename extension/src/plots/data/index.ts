@@ -1,6 +1,6 @@
+import { PlotsOutput } from '../../cli/reader'
 import { AvailableCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import { PlotsOutput } from '../../plots/webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import { PlotsModel } from '../model'
 

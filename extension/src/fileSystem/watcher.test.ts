@@ -1,5 +1,4 @@
 import { join } from 'path'
-import { mocked } from 'ts-jest/utils'
 import { workspace } from 'vscode'
 import { FSWatcher, watch } from 'chokidar'
 import {
@@ -13,14 +12,14 @@ jest.mock('vscode')
 jest.mock('chokidar')
 jest.mock('../vscode/workspaceFolders')
 
-const mockedWorkspace = mocked(workspace)
+const mockedWorkspace = jest.mocked(workspace)
 const mockedCreateFileSystemWatcher = jest.fn()
 mockedWorkspace.createFileSystemWatcher = mockedCreateFileSystemWatcher
 
-const mockedGetWorkspaceFolders = mocked(getWorkspaceFolders)
+const mockedGetWorkspaceFolders = jest.mocked(getWorkspaceFolders)
 
-const mockedWatch = mocked(watch)
-const mockedWatcher = mocked(new FSWatcher())
+const mockedWatch = jest.mocked(watch)
+const mockedWatcher = jest.mocked(new FSWatcher())
 const mockedWatcherOn = jest.fn()
 const mockedWatcherClose = jest.fn()
 mockedWatcher.on = mockedWatcherOn

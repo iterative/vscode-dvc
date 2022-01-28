@@ -3,7 +3,7 @@ import { Cli, typeCheckCommands } from '.'
 import { Args, Command, Flag, ListFlag, SubCommand } from './args'
 import { retry } from './retry'
 import { trimAndSplit } from '../util/stdout'
-import { PlotsOutput } from '../plots/webview/contract'
+import { StaticPlot } from '../plots/webview/contract'
 
 export type PathOutput = { path: string }
 
@@ -91,6 +91,12 @@ export interface ExperimentsOutput {
   }
 }
 
+export interface PlotsOutput {
+  [path: string]: StaticPlot[]
+}
+
+export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
+
 export const autoRegisteredCommands = {
   DIFF: 'diff',
   EXPERIMENT_SHOW: 'experimentShow',
@@ -134,7 +140,7 @@ export class CliReader extends Cli {
       'diff',
       ...revisions,
       '-o',
-      join('.dvc', 'tmp', 'plots')
+      TEMP_PLOTS_DIR
     )
   }
 

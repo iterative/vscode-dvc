@@ -3,7 +3,6 @@ import { VisualizationSpec } from 'react-vega'
 import {
   LivePlotValues,
   LivePlotData,
-  PlotsOutput,
   isImagePlot,
   ImagePlot,
   VegaPlot
@@ -12,6 +11,7 @@ import {
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
   ExperimentsOutput,
+  PlotsOutput,
   Value,
   ValueTree
 } from '../../cli/reader'
@@ -321,18 +321,19 @@ export const collectTemplates = (data: PlotsOutput) =>
 
 export const collectPaths = (
   data: PlotsOutput
-): { plots: string[]; images: string[] } => {
-  const { images, plots } = Object.entries(data).reduce(
+): { plots: string[]; comparison: string[] } => {
+  const { comparison, plots } = Object.entries(data).reduce(
     (acc, [path, plots]) => {
       plots.forEach(plot => {
         if (isImagePlot(plot)) {
-          acc.images.add(path)
+          acc.comparison.add(path)
+          return
         }
         acc.plots.add(path)
       })
       return acc
     },
-    { images: new Set<string>(), plots: new Set<string>() }
+    { comparison: new Set<string>(), plots: new Set<string>() }
   )
-  return { images: [...images], plots: [...plots] }
+  return { comparison: [...comparison].sort(), plots: [...plots].sort() }
 }
