@@ -95,6 +95,8 @@ export interface PlotsOutput {
   [path: string]: StaticPlot[]
 }
 
+export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
+
 export const autoRegisteredCommands = {
   DIFF: 'diff',
   EXPERIMENT_SHOW: 'experimentShow',
@@ -138,7 +140,7 @@ export class CliReader extends Cli {
       'diff',
       ...revisions,
       '-o',
-      join('.dvc', 'tmp', 'plots')
+      TEMP_PLOTS_DIR
     )
   }
 

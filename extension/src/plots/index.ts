@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
@@ -17,7 +18,8 @@ import { InternalCommands } from '../commands/internal'
 import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
-import { ExperimentsOutput } from '../cli/reader'
+import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
+import { removeDir } from '../fileSystem'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -49,6 +51,8 @@ export class Plots extends BaseRepository<TPlotsData> {
         this.sendPlots()
       })
     )
+
+    this.ensureTempDirRemoved()
 
     this.handleMessageFromWebview()
 
@@ -219,5 +223,14 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.data.managedUpdate()
     await this.data.isReady()
     this.deferred.resolve()
+  }
+
+  private ensureTempDirRemoved() {
+    this.dispose.track({
+      dispose: () => {
+        const tempDir = join(this.dvcRoot, TEMP_PLOTS_DIR)
+        return removeDir(tempDir)
+      }
+    })
   }
 }
