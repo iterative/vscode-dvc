@@ -83,31 +83,26 @@ $gap: 20px;
 @mixin half() {
   width: calc(50% * var(--scale) - $gap);
   height: 35vw;
-  max-height: 400px;
 }
 
 @mixin third() {
   width: calc(33% * var(--scale) - $gap);
   height: 20vw;
-  max-height: 200px;
 }
 
 @mixin quarter() {
   width: calc(25% * var(--scale) - $gap);
-  height: 15vw;
-  max-height: 150px;
+  height: 10vw;
 }
 
 @mixin sixth() {
   width: calc(16% * var(--scale) - $gap);
   height: 10vw;
-  max-height: 100px;
 }
 
 .largePlots .plot {
   width: calc(100% - $gap);
   height: 60vw;
-  max-height: 600px;
 }
 
 .regularPlots .plot {
