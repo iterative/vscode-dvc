@@ -45,7 +45,7 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private branchNames: string[] = []
-  // private revisionsByTip = new Map<string, string[]>()
+  private revisionsByTip = new Map<string, string[]>()
   private revisionsByBranch = new Map<string, string[]>()
   private branchRevision = ''
 
@@ -92,21 +92,18 @@ export class PlotsModel {
       collectBranchRevision(data)
     ])
 
-    const {
-      branchNames,
-      // revisionsByTip,
-      revisionsByBranch
-    } = revisions
+    const { branchNames, revisionsByTip, revisionsByBranch } = revisions
 
     const branch = branchNames[0]
 
     this.removeStaleBranchData(branch, branchRevision)
-    this.removeStaleData(revisionsByBranch.get(branch) || [])
 
     this.livePlots = livePlots
     this.branchNames = branchNames
-    // this.revisionsByTip = revisionsByTip
+    this.revisionsByTip = revisionsByTip
     this.revisionsByBranch = revisionsByBranch
+
+    this.removeStaleData()
   }
 
   public async transformAndSetPlots(data: PlotsOutput) {
@@ -147,20 +144,17 @@ export class PlotsModel {
   }
 
   public getRevisions() {
-    const branch = this.branchNames[0]
-    const expRevisions = this.revisionsByBranch.get(branch) || []
-    // const checkpointRevisions = flatten(
-    //   expRevisions.map(exp => this.checkpointsByTip.get(exp) || [])
-    // )
-    return [
-      branch,
-      ...expRevisions
-      // ...checkpointRevisions
-    ]
+    const experimentRevisions = flatten(
+      this.branchNames.map(branch => this.revisionsByBranch.get(branch) || [])
+    )
+    const checkpointRevisions = flatten(
+      experimentRevisions.map(exp => this.revisionsByTip.get(exp) || [])
+    )
+    return [...this.branchNames, ...experimentRevisions, ...checkpointRevisions]
   }
 
   public getMissingRevisions() {
-    return this.getRevisions().filter(
+    return this.getSelectedRevisions().filter(
       rev =>
         !uniqueValues([
           ...Object.keys(this.comparisonData),
@@ -290,20 +284,19 @@ export class PlotsModel {
     }
   }
 
-  private removeStaleData(revisions: string[]) {
-    // need all revisions including checkpoints here
-    // Object.keys(this.comparisonData).map(revision => {
-    //   if (!revisions.includes(revision)) {
-    //     delete this.comparisonData[revision]
-    //   }
-    // })
-    // Object.keys(this.revisionData).map(revision => {
-    //   if (!revisions.includes(revision)) {
-    //     delete this.revisionData[revision]
-    //   }
-    // })
+  private removeStaleData() {
+    const revisions = this.getRevisions()
 
-    revisions.map(exp => exp) // null op for linter
+    Object.keys(this.comparisonData).map(revision => {
+      if (!revisions.includes(revision)) {
+        delete this.comparisonData[revision]
+      }
+    })
+    Object.keys(this.revisionData).map(revision => {
+      if (!revisions.includes(revision)) {
+        delete this.revisionData[revision]
+      }
+    })
   }
 
   private getSelectedRevisions() {
