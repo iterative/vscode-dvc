@@ -162,20 +162,14 @@ export class ExperimentsModel {
   }
 
   public setSelected(ids: string[]) {
-    const names = Object.entries(this.names).reduce((acc, [id, name]) => {
-      if (ids.includes(id) && name) {
-        acc.push(name)
+    this.status = this.flattenExperiments().reduce((acc, { id, name }) => {
+      if (!name) {
+        return acc
       }
-      return acc
-    }, [] as string[])
 
-    this.status = this.flattenExperiments().reduce((acc, { name }) => {
-      if (name) {
-        const status = names.includes(name)
-          ? Status.SELECTED
-          : Status.UNSELECTED
-        acc[name] = status
-      }
+      const status = ids.includes(id) ? Status.SELECTED : Status.UNSELECTED
+      acc[name] = status
+
       return acc
     }, {} as Record<string, Status>)
 
