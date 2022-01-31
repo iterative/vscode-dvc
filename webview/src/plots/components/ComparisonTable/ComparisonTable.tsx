@@ -1,8 +1,10 @@
 import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
+import cx from 'classnames'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { ComparisonTableRow } from './ComparisonTableRow'
-import styles from '../styles.module.scss'
+import styles from './styles.module.scss'
+import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 
 export type ComparisonTableProps = Omit<
@@ -21,7 +23,12 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   ].filter(Boolean)
   const headers = columns.map(exp => {
     return (
-      <th key={exp}>
+      <th
+        key={exp}
+        className={cx(styles.comparisonTableHeader, {
+          [styles.pinnedColumnHeader]: exp === pinnedColumn
+        })}
+      >
         <ComparisonTableHeader
           isPinned={pinnedColumn === exp}
           onClicked={() => setPinnedColumn(exp)}
@@ -34,7 +41,10 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   })
 
   return (
-    <table className={styles.comparisonTable} style={withScale(columns.length)}>
+    <table
+      className={plotsStyles.comparisonTable}
+      style={withScale(columns.length)}
+    >
       <thead>
         <tr>{headers}</tr>
       </thead>
@@ -44,6 +54,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
           path={path}
           plots={columns.map(column => revisions[column])}
           nbColumns={columns.length}
+          pinnedColumn={pinnedColumn}
         />
       ))}
     </table>

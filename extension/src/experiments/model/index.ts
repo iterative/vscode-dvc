@@ -70,19 +70,20 @@ export class ExperimentsModel {
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
 
-    Promise.all([this.setStatus(), this.setExperimentNames()])
+    this.setExperimentNames()
+    this.setStatus()
     return this.collectColors()
   }
 
   public toggleStatus(experimentId: string) {
-    const status = this.status[experimentId]
+    const newStatus = this.getStatus(experimentId)
       ? Status.UNSELECTED
       : Status.SELECTED
-    this.status[experimentId] = status
+    this.status[this.names[experimentId]] = newStatus
 
     this.setSelectionMode(false)
     this.persistStatus()
-    return status
+    return newStatus
   }
 
   public getSorts(): SortDefinition[] {
@@ -161,11 +162,18 @@ export class ExperimentsModel {
   }
 
   public setSelected(ids: string[]) {
-    this.status = Object.keys(this.status).reduce((acc, id) => {
+    this.status = this.flattenExperiments().reduce((acc, { id, name }) => {
+      if (!name) {
+        return acc
+      }
+
       const status = ids.includes(id) ? Status.SELECTED : Status.UNSELECTED
-      acc[id] = status
+      acc[name] = status
+
       return acc
     }, {} as Record<string, Status>)
+
+    this.persistStatus()
   }
 
   public setSelectionMode(useFilters: boolean) {
@@ -290,19 +298,29 @@ export class ExperimentsModel {
   }
 
   private getExperimentDetails(id: string) {
-    return { name: this.names[id], selected: !!this.status[id] }
+    return { name: this.names[id], selected: !!this.getStatus(id) }
   }
 
   private setStatus() {
-    this.status = this.flattenExperiments().reduce((acc, exp) => {
-      const { id, queued } = exp
-      if (!queued) {
-        acc[id] = hasKey(this.status, id) ? this.status[id] : Status.SELECTED
+    if (this.useFiltersForSelection) {
+      this.setSelectedToFilters()
+      return
+    }
+    this.status = this.getStatuses()
+
+    this.persistStatus()
+  }
+
+  private getStatuses() {
+    return this.flattenExperiments().reduce((acc, exp) => {
+      const { name, queued } = exp
+      if (name && !queued) {
+        acc[name] = hasKey(this.status, name)
+          ? this.status[name]
+          : Status.SELECTED
       }
       return acc
     }, {} as Record<string, Status>)
-
-    this.persistStatus()
   }
 
   private setExperimentNames() {
@@ -443,7 +461,7 @@ export class ExperimentsModel {
   private addDetails(experiment: Experiment, id?: string) {
     const assignedColors = this.getAssignedExperimentColors()
     const displayColor = assignedColors.get(id || experiment.id)
-    const status = this.status[id || experiment.id]
+    const status = this.getStatus(id || experiment.id)
     const selected = status !== undefined ? !!status : undefined
 
     return displayColor
@@ -465,5 +483,10 @@ export class ExperimentsModel {
 
   private getAssignedExperimentColors() {
     return this.experimentColors.assigned
+  }
+
+  private getStatus(experimentId: string) {
+    const name = this.names[experimentId]
+    return this.status[name]
   }
 }

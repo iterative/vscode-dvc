@@ -1,7 +1,6 @@
-$bullet-size: 9px;
-$fg-color: var(--vscode-editor-foreground);
-$bg-color: var(--vscode-editor-background);
+@import '../../../shared/variables.scss';
 
+$gap: 4px;
 .header {
   padding: 10px 5px;
   color: #fff;
@@ -10,7 +9,7 @@ $bg-color: var(--vscode-editor-background);
   align-items: center;
   justify-content: center;
   line-height: 1;
-  gap: 4px;
+  gap: $gap;
   border-radius: 4px 4px 0 0;
   font-size: 0.8125rem;
   position: relative;
@@ -55,6 +54,33 @@ $bg-color: var(--vscode-editor-background);
   }
 }
 
+.comparisonTableHeader {
+  position: sticky;
+  top: -#{$gap};
+  z-index: 2;
+}
+
+.pinnedColumnCell, .pinnedColumnHeader {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+
+  &::after {
+    content: '';
+    width: $gap;
+    height: calc(100% + $gap);
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: $bg-color;
+    z-index: 5;
+  }
+}
+
+.pinnedColumnHeader {
+  z-index: 3;
+}
+
 .cell {
   max-height: 100vh;
   width: 100%;
@@ -72,4 +98,3 @@ $bg-color: var(--vscode-editor-background);
   width: 100%;
   height: auto;
 }
-

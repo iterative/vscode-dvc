@@ -8,12 +8,14 @@ export interface ComparisonTableRowProps {
   path: string
   plots: ComparisonPlot[]
   nbColumns: number
+  pinnedColumn: string
 }
 
 export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   path,
   plots,
-  nbColumns
+  nbColumns,
+  pinnedColumn
 }) => {
   const [isShown, setIsShown] = useState(true)
 
@@ -22,7 +24,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   return (
     <tbody>
       <tr>
-        <td colSpan={nbColumns}>
+        <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
           <button className={styles.rowToggler} onClick={toggleIsShownState}>
             <Icon
               icon={isShown ? AllIcons.CHEVRON_DOWN : AllIcons.CHEVRON_RIGHT}
@@ -30,15 +32,28 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             {path}
           </button>
         </td>
+        {nbColumns > 1 && <td colSpan={nbColumns - 1}></td>}
       </tr>
       <tr>
-        {plots.map((plot: ComparisonPlot) => (
-          <td key={path + plot.revision}>
-            <div className={cx(styles.cell, { [styles.cellHidden]: !isShown })}>
-              <img src={plot.url} alt={`Plot of ${path} (${plot.revision})`} />
-            </div>
-          </td>
-        ))}
+        {plots.map((plot: ComparisonPlot) => {
+          const isPinned = pinnedColumn === plot.revision
+
+          return (
+            <td
+              key={path + plot.revision}
+              className={cx({ [styles.pinnedColumnCell]: isPinned })}
+            >
+              <div
+                className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
+              >
+                <img
+                  src={plot.url}
+                  alt={`Plot of ${path} (${plot.revision})`}
+                />
+              </div>
+            </td>
+          )
+        })}
       </tr>
     </tbody>
   )
