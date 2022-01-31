@@ -61,6 +61,7 @@ type MetricsAndDetailsOrUndefined =
       checkpoint_tip: string | undefined
       metrics: MetricsOrParams | undefined
       queued: boolean | undefined
+      running: boolean | undefined
     }
   | undefined
 
@@ -72,10 +73,11 @@ const transformExperimentData = (
     return
   }
 
-  const { checkpoint_tip, checkpoint_parent, queued } = experimentFields
+  const { checkpoint_tip, checkpoint_parent, queued, running } =
+    experimentFields
   const { metrics } = reduceMetricsAndParams(experimentFields)
 
-  return { checkpoint_parent, checkpoint_tip, metrics, queued }
+  return { checkpoint_parent, checkpoint_tip, metrics, queued, running }
 }
 
 type ValidCheckpointData = {
@@ -83,6 +85,7 @@ type ValidCheckpointData = {
   checkpoint_tip: string
   metrics: MetricsOrParams
   queued: boolean | undefined
+  running: boolean | undefined
 }
 
 const isValidCheckpoint = (
@@ -265,6 +268,34 @@ export const collectRevisions = (
 export const collectBranchRevision = (data: ExperimentsOutput): string => {
   const branchSha = Object.keys(data).find(id => id !== 'workspace') as string
   return getDisplayId(branchSha)
+}
+
+const collectRunningFromExperiment = (
+  acc: string[],
+  experimentsObject: {
+    [sha: string]: ExperimentFieldsOrError
+  }
+) => {
+  Object.entries(experimentsObject).map(([sha, experimentData]) => {
+    if (sha === 'baseline') {
+      return
+    }
+    const data = transformExperimentData(experimentData)
+    if (!data?.running) {
+      return
+    }
+
+    acc.push(getDisplayId(sha))
+  })
+}
+
+export const collectRunning = (data: ExperimentsOutput): string[] => {
+  const acc: string[] = []
+
+  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
+    collectRunningFromExperiment(acc, experimentsObject)
+  }
+  return acc
 }
 
 export type RevisionData = {

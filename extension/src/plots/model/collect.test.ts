@@ -7,6 +7,7 @@ import {
   collectLivePlotsData,
   collectPaths,
   collectRevisions,
+  collectRunning,
   collectTemplates
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
@@ -76,6 +77,13 @@ describe('collectBranchRevision', () => {
   it('should return the expected revision from the test fixture', () => {
     const revision = collectBranchRevision(expShowFixture)
     expect(revision).toEqual('53c3851')
+  })
+})
+
+describe('collectRunning', () => {
+  it('should return all of the running experiments from the test fixture', () => {
+    const running = collectRunning(expShowFixture)
+    expect(running).toEqual(['4fb124a'])
   })
 })
 
