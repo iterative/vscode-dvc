@@ -44,7 +44,9 @@ export class PlotsModel {
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
-  private revisions: string[] = []
+  private branchNames: string[] = []
+  private revisionsByTip = new Map<string, string[]>()
+  private revisionsByBranch = new Map<string, string[]>()
   private branchRevision = ''
 
   private vegaPaths: string[] = []
@@ -90,10 +92,18 @@ export class PlotsModel {
       collectBranchRevision(data)
     ])
 
-    this.removeStaleBranchData(revisions[0], branchRevision)
+    const { branchNames, revisionsByTip, revisionsByBranch } = revisions
+
+    const branch = branchNames[0]
+
+    this.removeStaleBranchData(branch, branchRevision)
 
     this.livePlots = livePlots
-    this.revisions = revisions
+    this.branchNames = branchNames
+    this.revisionsByTip = revisionsByTip
+    this.revisionsByBranch = revisionsByBranch
+
+    this.removeStaleData()
   }
 
   public async transformAndSetPlots(data: PlotsOutput) {
@@ -134,11 +144,17 @@ export class PlotsModel {
   }
 
   public getRevisions() {
-    return this.revisions
+    const experimentRevisions = flatten(
+      this.branchNames.map(branch => this.revisionsByBranch.get(branch) || [])
+    )
+    const checkpointRevisions = flatten(
+      experimentRevisions.map(exp => this.revisionsByTip.get(exp) || [])
+    )
+    return [...this.branchNames, ...experimentRevisions, ...checkpointRevisions]
   }
 
   public getMissingRevisions() {
-    return this.revisions.filter(
+    return this.getSelectedRevisions().filter(
       rev =>
         !uniqueValues([
           ...Object.keys(this.comparisonData),
@@ -268,11 +284,26 @@ export class PlotsModel {
     }
   }
 
+  private removeStaleData() {
+    const revisions = this.getRevisions()
+
+    Object.keys(this.comparisonData).map(revision => {
+      if (!revisions.includes(revision)) {
+        delete this.comparisonData[revision]
+      }
+    })
+    Object.keys(this.revisionData).map(revision => {
+      if (!revisions.includes(revision)) {
+        delete this.revisionData[revision]
+      }
+    })
+  }
+
   private getSelectedRevisions() {
     const selectedRevisions = Object.keys(
       this.experiments.getSelectedRevisions()
     )
-    return this.revisions.filter(rev => selectedRevisions.includes(rev))
+    return this.getRevisions().filter(rev => selectedRevisions.includes(rev))
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
