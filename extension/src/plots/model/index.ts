@@ -158,7 +158,7 @@ export class PlotsModel {
   }
 
   public getMissingRevisions() {
-    return [
+    return uniqueValues([
       ...this.getSelectedRevisions().filter(
         rev =>
           !uniqueValues([
@@ -168,7 +168,7 @@ export class PlotsModel {
           ]).includes(rev)
       ),
       ...(this.hasCheckpoints() ? [] : this.runningRevisions)
-    ]
+    ])
   }
 
   public getRevisionColors() {
