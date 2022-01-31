@@ -19,6 +19,7 @@ describe('ComparisonTableRow', () => {
   const basicProps: ComparisonTableRowProps = {
     nbColumns: 3,
     path: 'path/to/the-file/image.png',
+    pinnedColumn: '',
     plots: Object.values(
       comparisonPlotsFixture.plots.find(({ path }) => path === 'plots/acc.png')
         ?.revisions || {}
