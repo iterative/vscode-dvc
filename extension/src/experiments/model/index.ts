@@ -70,7 +70,8 @@ export class ExperimentsModel {
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
 
-    Promise.all([this.setStatus(), this.setExperimentNames()])
+    this.setExperimentNames()
+    this.setStatus()
     return this.collectColors()
   }
 
@@ -162,14 +163,19 @@ export class ExperimentsModel {
 
   public setSelected(ids: string[]) {
     const names = Object.entries(this.names).reduce((acc, [id, name]) => {
-      if (ids.includes(id)) {
+      if (ids.includes(id) && name) {
         acc.push(name)
       }
       return acc
     }, [] as string[])
-    this.status = Object.keys(this.status).reduce((acc, name) => {
-      const status = names.includes(name) ? Status.SELECTED : Status.UNSELECTED
-      acc[name] = status
+
+    this.status = this.flattenExperiments().reduce((acc, { name }) => {
+      if (name) {
+        const status = names.includes(name)
+          ? Status.SELECTED
+          : Status.UNSELECTED
+        acc[name] = status
+      }
       return acc
     }, {} as Record<string, Status>)
 
