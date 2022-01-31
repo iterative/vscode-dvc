@@ -8,6 +8,7 @@ import {
   collectLivePlotsData,
   collectPaths,
   collectRevisions,
+  collectRunning,
   collectTemplates,
   ComparisonData,
   RevisionData
@@ -47,6 +48,7 @@ export class PlotsModel {
   private branchNames: string[] = []
   private revisionsByTip = new Map<string, string[]>()
   private revisionsByBranch = new Map<string, string[]>()
+  private runningRevisions: string[] = []
   private branchRevision = ''
 
   private vegaPaths: string[] = []
@@ -86,10 +88,11 @@ export class PlotsModel {
   }
 
   public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, revisions, branchRevision] = await Promise.all([
+    const [livePlots, revisions, branchRevision, running] = await Promise.all([
       collectLivePlotsData(data),
       collectRevisions(data),
-      collectBranchRevision(data)
+      collectBranchRevision(data),
+      collectRunning(data)
     ])
 
     const { branchNames, revisionsByTip, revisionsByBranch } = revisions
@@ -102,6 +105,7 @@ export class PlotsModel {
     this.branchNames = branchNames
     this.revisionsByTip = revisionsByTip
     this.revisionsByBranch = revisionsByBranch
+    this.runningRevisions = running
 
     this.removeStaleData()
   }
@@ -154,14 +158,17 @@ export class PlotsModel {
   }
 
   public getMissingRevisions() {
-    return this.getSelectedRevisions().filter(
-      rev =>
-        !uniqueValues([
-          ...Object.keys(this.comparisonData),
-          ...Object.keys(this.revisionData),
-          'workspace'
-        ]).includes(rev)
-    )
+    return [
+      ...this.getSelectedRevisions().filter(
+        rev =>
+          !uniqueValues([
+            ...Object.keys(this.comparisonData),
+            ...Object.keys(this.revisionData),
+            'workspace'
+          ]).includes(rev)
+      ),
+      ...(this.hasCheckpoints() ? [] : this.runningRevisions)
+    ]
   }
 
   public getRevisionColors() {
@@ -274,6 +281,10 @@ export class PlotsModel {
 
   public getSectionName(section: Section): string {
     return this.sectionNames[section] || DEFAULT_SECTION_NAMES[section]
+  }
+
+  private hasCheckpoints() {
+    return !!this.revisionsByTip.size
   }
 
   private removeStaleBranchData(branchName: string, branchRevision: string) {
