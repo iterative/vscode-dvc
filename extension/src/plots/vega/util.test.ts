@@ -84,7 +84,5 @@ describe('extendVegaSpec', () => {
       legend: { disable: true },
       scale: colorScale
     })
-    expect(extendedSpec.padding.top).toEqual(5)
-    expect(extendedSpec.width).toEqual('container')
   })
 })

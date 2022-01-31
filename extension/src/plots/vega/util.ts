@@ -90,7 +90,20 @@ export const getColorScale = (
   return colorScale.domain.length ? colorScale : undefined
 }
 
-export const getSpecColorUpdate = (colorScale: ColorScale) => ({
+type EncodingUpdate = {
+  encoding: {
+    color: {
+      legend: {
+        disable: boolean
+      }
+      scale: ColorScale
+    }
+  }
+}
+
+export const getSpecEncodingUpdate = (
+  colorScale: ColorScale
+): EncodingUpdate => ({
   encoding: {
     color: {
       legend: { disable: true },
@@ -99,34 +112,8 @@ export const getSpecColorUpdate = (colorScale: ColorScale) => ({
   }
 })
 
-export const getSpecSizeUpdate = (
-  hasTitle: boolean,
-  width?: 'full' | number
-) => ({
-  height: 200,
-  padding: {
-    bottom: 5,
-    left: 5,
-    right: 5,
-    top: hasTitle ? 5 : 20
-  },
-  width: width === 'full' ? 'container' : width
-})
-
-const getUpdate = (spec: TopLevelSpec, colorScale?: ColorScale) => ({
-  ...(isMultiViewByCommitPlot(spec) || !colorScale
-    ? {}
-    : getSpecColorUpdate(colorScale)),
-  ...getSpecSizeUpdate(
-    !!spec.title,
-    !isMultiViewPlot(spec) ? 'full' : undefined
-  )
-})
-
-export const extendVegaSpec = (spec: TopLevelSpec, colorScale?: ColorScale) => {
+const mergeUpdate = (spec: TopLevelSpec, update: EncodingUpdate) => {
   let newSpec = cloneDeep(spec) as any
-
-  const update = getUpdate(spec, colorScale)
 
   if (newSpec.concat?.length) {
     newSpec.concat = newSpec.concat.map((c: any) => merge(c, update))
@@ -141,4 +128,14 @@ export const extendVegaSpec = (spec: TopLevelSpec, colorScale?: ColorScale) => {
   }
 
   return newSpec
+}
+
+export const extendVegaSpec = (spec: TopLevelSpec, colorScale?: ColorScale) => {
+  if (isMultiViewByCommitPlot(spec) || !colorScale) {
+    return spec
+  }
+
+  const update = getSpecEncodingUpdate(colorScale)
+
+  return mergeUpdate(spec, update)
 }
