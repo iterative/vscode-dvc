@@ -395,7 +395,7 @@ export const getOutput = (
 
 export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
 
-const expectedRevisions = ['main', '1ba7bcd', '42b8736', '4fb124a']
+const expectedRevisions = ['main', '4fb124a', '42b8736', '1ba7bcd']
 
 const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
   Object.entries(plotsOutput).reduce((acc, [id, plots]) => {
