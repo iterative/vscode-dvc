@@ -163,6 +163,7 @@ $gap: 20px;
   width: 100%;
   min-width: 100%;
   position: relative;
+  margin: 0 auto;
 
   .smallPlots & {
     width: 100%;
@@ -177,5 +178,39 @@ $gap: 20px;
   .largePlots & {
     width: calc(50% * var(--scale));
     padding-right: $gap;
+  }
+
+  @media (min-width: 1000px) {
+    min-width: 75%;
+
+    .smallPlots & {
+      width: 75%;
+    }
+  
+    .regularPlots & {
+      width: 100%;
+    }
+  
+    .largePlots & {
+      min-width: 100%;
+      width: calc(33% * var(--scale));
+    }
+  }
+  
+  @media (min-width: 2000px) {
+    min-width: 100%;
+
+    .smallPlots & {
+      width: 50%;
+    }
+  
+    .regularPlots & {
+      width: 75%;
+    }
+  
+    .largePlots & {
+      width: 100%;
+      padding-right: 0;
+    }
   }
 }
