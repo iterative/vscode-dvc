@@ -172,6 +172,8 @@ export class ExperimentsModel {
       acc[name] = status
       return acc
     }, {} as Record<string, Status>)
+
+    this.persistStatus()
   }
 
   public setSelectionMode(useFilters: boolean) {
@@ -300,7 +302,17 @@ export class ExperimentsModel {
   }
 
   private setStatus() {
-    this.status = this.flattenExperiments().reduce((acc, exp) => {
+    if (this.useFiltersForSelection) {
+      this.setSelectedToFilters()
+      return
+    }
+    this.status = this.getStatuses()
+
+    this.persistStatus()
+  }
+
+  private getStatuses() {
+    return this.flattenExperiments().reduce((acc, exp) => {
       const { name, queued } = exp
       if (name && !queued) {
         acc[name] = hasKey(this.status, name)
@@ -309,8 +321,6 @@ export class ExperimentsModel {
       }
       return acc
     }, {} as Record<string, Status>)
-
-    this.persistStatus()
   }
 
   private setExperimentNames() {
