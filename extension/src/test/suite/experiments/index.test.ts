@@ -460,9 +460,9 @@ suite('Experiments Test Suite', () => {
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses are persisted'
       ).to.deep.equal({
-        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
-        '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
-        '4fb124aebddb2adf1545030907687fa9a4c80e70': 1
+        'exp-83425': 1,
+        'exp-e7a67': 1,
+        'test-branch': 1
       })
 
       const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
@@ -545,9 +545,9 @@ suite('Experiments Test Suite', () => {
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses have been recorded in the memento'
       ).to.deep.equal({
-        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
-        '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
-        '4fb124aebddb2adf1545030907687fa9a4c80e70': 0
+        'exp-83425': 1,
+        'exp-e7a67': 0,
+        'test-branch': 1
       })
       expect(
         mockMemento.get('experimentsColors:test'),
@@ -575,9 +575,9 @@ suite('Experiments Test Suite', () => {
         'experimentsFilterBy:test': filterMapEntries,
         'experimentsSortBy:test': sortDefinitions,
         'experimentsStatus:test': {
-          '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
-          '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
-          '4fb124aebddb2adf1545030907687fa9a4c80e70': 0
+          'exp-83425': 1,
+          'exp-e7a67': 0,
+          'test-branch': 1
         }
       })
 

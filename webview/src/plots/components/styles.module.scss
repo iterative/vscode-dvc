@@ -1,12 +1,4 @@
-$fg-color: var(--vscode-editor-foreground);
-
-// Dark
-
-$watermark-color: rgba(255, 255, 255, 0.6);
-
-// Light
-
-$watermark-color-light: rgba(0, 0, 0, 0.68);
+@import '../../shared/variables.scss';
 
 .centered {
   display: flex;
@@ -61,6 +53,7 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
   position: absolute;
   right: 5%;
   top: -10px;
+  z-index: 10;
 }
 
 $gap: 20px;
@@ -131,6 +124,7 @@ $gap: 20px;
   table-layout: fixed;
   width: 100%;
   min-width: 100%;
+  position: relative;
 
   .smallPlots & {
     width: 100%;

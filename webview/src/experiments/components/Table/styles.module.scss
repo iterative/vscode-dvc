@@ -1,7 +1,7 @@
 // Variables
 
-$fg-color: var(--vscode-editor-foreground);
-$bg-color: var(--vscode-editor-background);
+@import '../../../shared/variables.scss';
+
 $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $border-color: grey;
