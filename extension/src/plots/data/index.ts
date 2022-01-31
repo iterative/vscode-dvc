@@ -1,14 +1,17 @@
 import { PlotsOutput } from '../../cli/reader'
 import { AvailableCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, uniqueValues } from '../../util/array'
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<PlotsOutput> {
   private model?: PlotsModel
 
   public async update(): Promise<void> {
-    const args = this.model?.getMissingRevisions() || []
+    const args = uniqueValues([
+      ...(this.model?.getMissingRevisions() || []),
+      ...(this.model?.getRunningRevisions() || [])
+    ])
 
     if (!definedAndNonEmpty(args)) {
       return

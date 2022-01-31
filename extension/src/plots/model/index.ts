@@ -166,9 +166,12 @@ export class PlotsModel {
             ...Object.keys(this.revisionData),
             'workspace'
           ]).includes(rev)
-      ),
-      ...(this.hasCheckpoints() ? [] : this.runningRevisions)
+      )
     ])
+  }
+
+  public getRunningRevisions() {
+    return this.hasCheckpoints() ? [] : this.runningRevisions
   }
 
   public getRevisionColors() {
