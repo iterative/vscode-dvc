@@ -44,11 +44,10 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWith(
         dvcDemoPath,
-        '1ba7bcd',
-        '42b8736',
-        '4fb124a',
         'main',
-        'workspace'
+        '4fb124a',
+        '42b8736',
+        '1ba7bcd'
       )
     })
 
