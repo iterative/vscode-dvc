@@ -73,31 +73,69 @@ $gap: 20px;
   }
 }
 
+@mixin half() {
+  width: calc(50% * var(--scale) - $gap);
+  height: 35vw;
+}
+
+@mixin third() {
+  width: calc(33% * var(--scale) - $gap);
+  height: 20vw;
+}
+
+@mixin quarter() {
+  width: calc(25% * var(--scale) - $gap);
+  height: 10vw;
+}
+
+@mixin sixth() {
+  width: calc(16% * var(--scale) - $gap);
+  height: 10vw;
+}
+
 .largePlots .plot {
   width: calc(100% - $gap);
   height: 60vw;
-  max-width: calc(1000px * var(--scale));
-  max-height: 600px;
 }
 
 .regularPlots .plot {
-  width: calc(50% * var(--scale) - $gap);
-  height: 35vw;
-  max-width: calc(500px * var(--scale));
-  max-height: 400px;
+  @include half();
 }
 
 .smallPlots .plot {
-  width: calc(33% * var(--scale) - $gap);
-  height: 20vw;
-  max-width: calc(300px * var(--scale));
-  max-height: 200px;
+  @include third();
 }
 
+@media (min-width: 1000px) {
+  .largePlots .plot {
+    @include half();
+  }
+
+  .regularPlots .plot {
+    @include third();
+  }
+
+  .smallPlots .plot {
+    @include quarter();
+  }
+}
+
+@media (min-width: 2000px) {
+  .largePlots .plot {
+    @include third();
+  }
+
+  .regularPlots .plot {
+    @include quarter();
+  }
+
+  .smallPlots .plot {
+    @include sixth();
+  }
+}
 
 .plot {
   text-align: center;
-  flex-grow: 5;
 }
 
 .plot img,
@@ -125,6 +163,7 @@ $gap: 20px;
   width: 100%;
   min-width: 100%;
   position: relative;
+  margin: 0 auto;
 
   .smallPlots & {
     width: 100%;
@@ -139,5 +178,39 @@ $gap: 20px;
   .largePlots & {
     width: calc(50% * var(--scale));
     padding-right: $gap;
+  }
+
+  @media (min-width: 1000px) {
+    min-width: 75%;
+
+    .smallPlots & {
+      width: 75%;
+    }
+  
+    .regularPlots & {
+      width: 100%;
+    }
+  
+    .largePlots & {
+      min-width: 100%;
+      width: calc(33% * var(--scale));
+    }
+  }
+  
+  @media (min-width: 2000px) {
+    min-width: 100%;
+
+    .smallPlots & {
+      width: 50%;
+    }
+  
+    .regularPlots & {
+      width: 75%;
+    }
+  
+    .largePlots & {
+      width: 100%;
+      padding-right: 0;
+    }
   }
 }
