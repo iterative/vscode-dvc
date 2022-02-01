@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, SinonStub } from 'sinon'
-import { window, commands, QuickPickItem, Uri, QuickPickOptions } from 'vscode'
+import { window, commands, QuickPickItem, QuickPickOptions } from 'vscode'
 import {
   buildExperiments,
   buildMultiRepoExperiments,
@@ -20,7 +20,6 @@ import {
 } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
-import { join } from '../../util/path'
 import { Param } from '../../../experiments/model/queue/collect'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 
@@ -88,57 +87,6 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockQuickPickOne).to.not.be.called
     })
   }).timeout(8000)
-
-  describe('dvc.queueExperimentsFromCsv', () => {
-    it('should be able to queue multiple experiments from a csv', async () => {
-      const mockExperimentRunQueue = stub(
-        CliExecutor.prototype,
-        'experimentRunQueue'
-      ).resolves('true')
-
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      const mockForceUpdate = stub()
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns({
-        forceUpdate: mockForceUpdate
-      } as unknown as Experiments)
-
-      const mockUri = Uri.file(join(dvcDemoPath, 'queue.csv'))
-
-      stub(window, 'showOpenDialog').resolves([mockUri])
-
-      await commands.executeCommand(
-        RegisteredCommands.QUEUE_EXPERIMENTS_FROM_CSV
-      )
-
-      expect(mockForceUpdate).to.be.calledThrice
-      expect(mockExperimentRunQueue).to.be.calledThrice
-      expect(mockExperimentRunQueue).to.be.calledWith(
-        dvcDemoPath,
-        '-S',
-        'lr=0.0001',
-        '-S',
-        'weight_decay=0.02'
-      )
-      expect(mockExperimentRunQueue).to.be.calledWith(
-        dvcDemoPath,
-        '-S',
-        'lr=0.00075',
-        '-S',
-        'weight_decay=0.01'
-      )
-      expect(mockExperimentRunQueue).to.be.calledWith(
-        dvcDemoPath,
-        '-S',
-        'lr=0.0005'
-      )
-    })
-  })
 
   describe('dvc.queueExperimentsFromExisting', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
