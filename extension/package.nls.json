@@ -27,7 +27,6 @@
   "command.pullTarget": "Pull",
   "command.push": "Push",
   "command.pushTarget": "Push",
-  "command.queueExperimentsFromCsv": "Queue Experiments From CSV",
   "command.queueExperimentFromExisting": "Queue Experiment From Existing",
   "command.queueExperiment": "Queue Experiment",
   "command.removeExperiment": "Remove Experiment",

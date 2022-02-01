@@ -1,6 +1,5 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
-import { readToQueueFromCsv } from './model/queue'
 import { TableData } from './webview/contract'
 import {
   CommandId,
@@ -12,7 +11,6 @@ import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { WorkspacePlots } from '../plots/workspace'
-import { pickCsv } from '../vscode/resourcePicker'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -101,32 +99,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     return this.getRepository(dvcRoot).autoApplyFilters(enable)
-  }
-
-  public async queueExperimentsFromCsv() {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
-    }
-    const repository = this.getRepository(cwd)
-
-    const csv = await pickCsv('Select a CSV to queue experiments from')
-    if (!csv) {
-      return
-    }
-
-    const toQueue = await readToQueueFromCsv(csv)
-
-    for (const params of toQueue) {
-      await repository.forceUpdate()
-      await reportOutput(
-        this.internalCommands.executeCommand(
-          AvailableCommands.EXPERIMENT_QUEUE,
-          cwd,
-          ...params
-        )
-      )
-    }
   }
 
   public async queueExperimentFromExisting() {

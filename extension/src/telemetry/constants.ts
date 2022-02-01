@@ -91,7 +91,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
-  [EventName.QUEUE_EXPERIMENTS_FROM_CSV]: undefined
   [EventName.QUEUE_EXPERIMENT_FROM_EXISTING]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
