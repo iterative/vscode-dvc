@@ -1,13 +1,6 @@
 import { basename, extname, join, relative, resolve } from 'path'
-import {
-  createReadStream,
-  existsSync,
-  lstatSync,
-  readdir,
-  removeSync
-} from 'fs-extra'
+import { existsSync, lstatSync, readdir, removeSync } from 'fs-extra'
 import { Uri } from 'vscode'
-import { parse, Parser } from 'csv-parse'
 import { definedAndNonEmpty } from '../util/array'
 
 export const exists = (path: string): boolean => existsSync(path)
@@ -71,8 +64,5 @@ export const isAnyDvcYaml = (path?: string): boolean =>
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
   relative(dvcRoot, uri.fsPath)
-
-export const readCsv = (path: string): Parser =>
-  createReadStream(path).pipe(parse({ columns: true, delimiter: ',' }))
 
 export const removeDir = (path: string): void => removeSync(path)
