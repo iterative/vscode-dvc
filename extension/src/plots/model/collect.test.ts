@@ -83,7 +83,7 @@ describe('collectBranchRevision', () => {
 describe('collectRunning', () => {
   it('should return all of the running experiments from the test fixture', () => {
     const running = collectRunning(expShowFixture)
-    expect(running).toEqual(['4fb124a'])
+    expect(running).toEqual(['workspace', '4fb124a'])
   })
 })
 

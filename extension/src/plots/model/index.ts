@@ -154,7 +154,12 @@ export class PlotsModel {
     const checkpointRevisions = flatten(
       experimentRevisions.map(exp => this.revisionsByTip.get(exp) || [])
     )
-    return [...this.branchNames, ...experimentRevisions, ...checkpointRevisions]
+    return [
+      'workspace',
+      ...this.branchNames,
+      ...experimentRevisions,
+      ...checkpointRevisions
+    ]
   }
 
   public getMissingRevisions() {

@@ -13,6 +13,7 @@ import {
   VegaPlots
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
+import { getWorkspaceColor } from '../../../experiments/model/colors'
 
 const basicVega = {
   'logs/loss.tsv': [
@@ -395,7 +396,7 @@ export const getOutput = (
 
 export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
 
-const expectedRevisions = ['main', '4fb124a', '42b8736', '1ba7bcd']
+const expectedRevisions = ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd']
 
 const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
   Object.entries(plotsOutput).reduce((acc, [id, plots]) => {
@@ -415,8 +416,14 @@ const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
           }
         } as TopLevelSpec,
         {
-          domain: ['main', '4fb124a', '42b8736', '1ba7bcd'],
-          range: ['#13adc7', '#f14c4c', '#3794ff', '#cca700']
+          domain: expectedRevisions,
+          range: [
+            getWorkspaceColor(),
+            '#13adc7',
+            '#f14c4c',
+            '#3794ff',
+            '#cca700'
+          ]
         }
       ) as VisualizationSpec,
       multiView: isMultiViewPlot(plot.content as TopLevelSpec),

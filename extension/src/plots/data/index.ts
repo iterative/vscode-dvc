@@ -1,7 +1,11 @@
 import { PlotsOutput } from '../../cli/reader'
 import { AvailableCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import { definedAndNonEmpty, uniqueValues } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  sameContents,
+  uniqueValues
+} from '../../util/array'
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<PlotsOutput> {
@@ -20,7 +24,9 @@ export class PlotsData extends BaseData<PlotsOutput> {
     const data = await this.internalCommands.executeCommand<PlotsOutput>(
       AvailableCommands.PLOTS_DIFF,
       this.dvcRoot,
-      ...args
+      ...(sameContents(args, ['workspace'])
+        ? []
+        : uniqueValues([...args, 'workspace']))
     )
 
     const files = this.collectFiles(data)
