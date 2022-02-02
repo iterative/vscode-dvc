@@ -18,10 +18,10 @@ export class PlotsData extends BaseData<PlotsOutput> {
     ])
 
     if (
-      !definedAndNonEmpty(revisions) &&
       (await this.internalCommands.executeCommand<boolean>(
         AvailableCommands.EXPERIMENT_IS_RUNNING
-      ))
+      )) &&
+      !definedAndNonEmpty(revisions)
     ) {
       return
     }
