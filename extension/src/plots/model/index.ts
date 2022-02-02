@@ -164,16 +164,16 @@ export class PlotsModel {
   }
 
   public getMissingRevisions() {
-    return uniqueValues([
-      ...this.getSelectedRevisions().filter(
+    return uniqueValues(
+      this.getSelectedRevisions().filter(
         rev =>
-          !uniqueValues([
+          ![
             ...Object.keys(this.comparisonData),
             ...Object.keys(this.revisionData),
             'workspace'
-          ]).includes(rev)
+          ].includes(rev)
       )
-    ])
+    )
   }
 
   public getMutableRevisions() {
