@@ -1,6 +1,6 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
-import React from 'react'
+import React, { useRef } from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { DragUpdate } from 'react-beautiful-dnd'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -19,7 +19,8 @@ export const TableHead: React.FC<TableHeadProps> = ({
   instance: {
     headerGroups,
     setColumnOrder,
-    state: { columnOrder }
+    state: { columnOrder },
+    allColumns
   },
   columns,
   sorts
@@ -28,18 +29,23 @@ export const TableHead: React.FC<TableHeadProps> = ({
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
 
+  const fullColumnOrder = useRef<string[]>()
+
+  const onDragStart = () => {
+    fullColumnOrder.current = allColumns.map(column => column.id)
+  }
+
   const onDragUpdate = (column: DragUpdate) => {
     if (!column.destination) {
       return
     }
     const { draggableId, destination } = column
     if (destination.index > 1) {
-      const colOrder = [...columnOrder]
-      const oldIndex = colOrder.indexOf(draggableId)
-
-      colOrder.splice(oldIndex, 1)
-      colOrder.splice(destination.index, 0, draggableId)
-      setColumnOrder(colOrder)
+      const newColumnOrder = [...(fullColumnOrder.current as string[])]
+      const oldIndex = newColumnOrder.indexOf(draggableId)
+      newColumnOrder.splice(oldIndex, 1)
+      newColumnOrder.splice(destination.index, 0, draggableId)
+      setColumnOrder(newColumnOrder)
     }
   }
 
@@ -60,6 +66,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
           headerGroup={headerGroup}
           columns={allHeaders}
           sorts={sorts}
+          onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
         />

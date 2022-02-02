@@ -166,13 +166,6 @@ export const ExperimentsTable: React.FC<{
           expandedRowCount
         })
       })
-      hooks.allColumns.push((allColumns, { instance: { state } }) => {
-        const { columnOrder } = state
-        if (!columnOrder || columnOrder.length === 0) {
-          state.columnOrder = allColumns.map(col => col.id)
-        }
-        return allColumns
-      })
     }
   )
 
