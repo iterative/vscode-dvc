@@ -1,24 +1,23 @@
 import { PlotsOutput } from '../../cli/reader'
 import { AvailableCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import {
-  definedAndNonEmpty,
-  flattenUnique,
-  sameContents
-} from '../../util/array'
+import { flattenUnique } from '../../util/array'
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<PlotsOutput> {
   private model?: PlotsModel
 
   public async update(): Promise<void> {
-    const missingRevisions = this.model?.getMissingRevisions() || []
-    const runningRevisions = this.model?.getRunningRevisions() || []
+    const args = flattenUnique([
+      this.model?.getMissingRevisions() || [],
+      this.model?.getMutableRevisions() || []
+    ])
 
-    const data = await this.getData(missingRevisions, runningRevisions)
-    if (!data) {
-      return
-    }
+    const data = await this.internalCommands.executeCommand<PlotsOutput>(
+      AvailableCommands.PLOTS_DIFF,
+      this.dvcRoot,
+      ...args
+    )
 
     const files = this.collectFiles(data)
 
@@ -33,27 +32,5 @@ export class PlotsData extends BaseData<PlotsOutput> {
 
   public setModel(model: PlotsModel) {
     this.model = model
-  }
-
-  private getData(missingRevisions: string[], runningRevisions: string[]) {
-    if (!definedAndNonEmpty([...missingRevisions, ...runningRevisions])) {
-      return
-    }
-
-    if (
-      !definedAndNonEmpty(missingRevisions) &&
-      sameContents(runningRevisions, ['workspace'])
-    ) {
-      return this.internalCommands.executeCommand<PlotsOutput>(
-        AvailableCommands.PLOTS_DIFF,
-        this.dvcRoot
-      )
-    }
-
-    return this.internalCommands.executeCommand<PlotsOutput>(
-      AvailableCommands.PLOTS_DIFF,
-      this.dvcRoot,
-      ...flattenUnique([missingRevisions, runningRevisions])
-    )
   }
 }

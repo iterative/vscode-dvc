@@ -175,7 +175,7 @@ export class PlotsModel {
     ])
   }
 
-  public getRunningRevisions() {
+  public getMutableRevisions() {
     return this.hasCheckpoints() ? [] : this.runningRevisions
   }
 

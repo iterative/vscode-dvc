@@ -292,10 +292,6 @@ const collectRunningFromExperiment = (
 export const collectRunning = (data: ExperimentsOutput): string[] => {
   const acc: string[] = []
 
-  if (data.workspace.baseline.data?.running) {
-    acc.push('workspace')
-  }
-
   for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
     collectRunningFromExperiment(acc, experimentsObject)
   }
