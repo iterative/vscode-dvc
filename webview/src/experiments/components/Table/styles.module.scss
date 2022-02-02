@@ -536,3 +536,10 @@ $spinner-color-light: #000;
   color: $meta-cell-color;
   font-size: 0.8em;
 }
+
+.timestampCellContentsWrapper {
+  @extend %truncateLeftParent;
+  .cellContents {
+    @extend %truncateLeftChild;
+  }
+}

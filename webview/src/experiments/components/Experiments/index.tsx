@@ -76,7 +76,13 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
           return null
         }
         const time = dayjs(value)
-        return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
+        return (
+          <span className={styles.timestampCellContentsWrapper}>
+            <span className={styles.cellContents}>
+              {time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')}
+            </span>
+          </span>
+        )
       },
       Header: 'Timestamp',
       accessor: 'timestamp',
