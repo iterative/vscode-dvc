@@ -45,8 +45,6 @@ suite('Plots Data Test Suite', () => {
 
     return {
       data,
-      mockGetMissingRevisions,
-      mockGetMutableRevisions,
       mockPlotsDiff
     }
   }
