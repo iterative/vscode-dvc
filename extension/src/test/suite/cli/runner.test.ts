@@ -48,7 +48,7 @@ suite('CLI Runner Test Suite', () => {
 
       const completed = onDidCompleteProcess()
 
-      expect(cliRunner.isRunning()).to.be.true
+      expect(cliRunner.isExperimentRunning()).to.be.true
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
         'dvc.runner.running',
@@ -60,7 +60,7 @@ suite('CLI Runner Test Suite', () => {
 
       await completed
 
-      expect(cliRunner.isRunning()).to.be.false
+      expect(cliRunner.isExperimentRunning()).to.be.false
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
         'dvc.runner.running',

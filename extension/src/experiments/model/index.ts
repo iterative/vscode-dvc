@@ -132,7 +132,10 @@ export class ExperimentsModel {
   }
 
   public getSelectedRevisions() {
-    const revisionColors = {} as Record<string, string>
+    const revisionColors = { workspace: getWorkspaceColor() } as Record<
+      string,
+      string
+    >
 
     this.getAssignedBranchColors().forEach((color: string, name: string) => {
       revisionColors[name] = color
