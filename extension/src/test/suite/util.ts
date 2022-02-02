@@ -10,6 +10,7 @@ import {
   workspace
 } from 'vscode'
 import { CliReader } from '../../cli/reader'
+import { CliRunner } from '../../cli/runner'
 import { InternalCommands } from '../../commands/internal'
 import { Config } from '../../config'
 import { Experiments } from '../../experiments'
@@ -115,13 +116,14 @@ export const bypassProcessManagerDebounce = (
 export const buildInternalCommands = (disposer: Disposer) => {
   const config = disposer.track(new Config())
   const cliReader = disposer.track(new CliReader(config))
+  const cliRunner = disposer.track(new CliRunner(config))
 
   const outputChannel = disposer.track(
     new OutputChannel([cliReader], '1', 'test output')
   )
 
   const internalCommands = disposer.track(
-    new InternalCommands(outputChannel, cliReader)
+    new InternalCommands(outputChannel, cliReader, cliRunner)
   )
 
   return { cliReader, internalCommands }
