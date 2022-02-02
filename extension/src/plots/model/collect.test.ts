@@ -5,6 +5,7 @@ import {
   collectBranchRevision,
   collectData,
   collectLivePlotsData,
+  collectMutableRevisions,
   collectPaths,
   collectRevisions,
   collectTemplates
@@ -76,6 +77,62 @@ describe('collectBranchRevision', () => {
   it('should return the expected revision from the test fixture', () => {
     const revision = collectBranchRevision(expShowFixture)
     expect(revision).toEqual('53c3851')
+  })
+})
+
+describe('collectMutableRevisions', () => {
+  it('should return all of the running non-checkpoint experiments from the test fixture', () => {
+    const mutable = collectMutableRevisions(expShowFixture)
+    expect(mutable).toEqual(['workspace'])
+  })
+
+  it('should return all running experiments when there are no checkpoints', () => {
+    const experimentsRunningInTemp = {
+      workspace: {
+        baseline: {
+          data: {
+            queued: false,
+            running: false,
+            executor: null
+          }
+        }
+      },
+      f5f308f5afc019de72823106d568248cd8270da4: {
+        baseline: {
+          data: {
+            queued: false,
+            running: false,
+            executor: null,
+            name: 'main'
+          }
+        },
+        b2880aefbeb48a51be5c832f7a9fd7577b97acd3: {
+          data: {
+            queued: false,
+            running: false,
+            executor: null,
+            name: 'exp-c3e8a'
+          }
+        },
+        '6ee95de8dd28fbaf9fe280a71cf254928d3fa830': {
+          data: {
+            queued: false,
+            running: true,
+            executor: 'temp'
+          }
+        },
+        ebaa07e67a983fe0b695312809e7798ac339d0f9: {
+          data: {
+            queued: false,
+            running: true,
+            executor: 'temp'
+          }
+        }
+      }
+    }
+
+    const mutable = collectMutableRevisions(experimentsRunningInTemp)
+    expect(mutable).toEqual(['6ee95de', 'ebaa07e'])
   })
 })
 

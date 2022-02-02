@@ -6,6 +6,7 @@ import {
   collectBranchRevision,
   collectData,
   collectLivePlotsData,
+  collectMutableRevisions,
   collectPaths,
   collectRevisions,
   collectTemplates,
@@ -48,6 +49,7 @@ export class PlotsModel {
   private revisionsByTip = new Map<string, string[]>()
   private revisionsByBranch = new Map<string, string[]>()
   private branchRevision = ''
+  private mutableRevisions: string[] = []
 
   private vegaPaths: string[] = []
   private comparisonPaths: string[] = []
@@ -86,11 +88,13 @@ export class PlotsModel {
   }
 
   public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, revisions, branchRevision] = await Promise.all([
-      collectLivePlotsData(data),
-      collectRevisions(data),
-      collectBranchRevision(data)
-    ])
+    const [livePlots, revisions, branchRevision, mutableRevisions] =
+      await Promise.all([
+        collectLivePlotsData(data),
+        collectRevisions(data),
+        collectBranchRevision(data),
+        collectMutableRevisions(data)
+      ])
 
     const { branchNames, revisionsByTip, revisionsByBranch } = revisions
 
@@ -102,6 +106,7 @@ export class PlotsModel {
     this.branchNames = branchNames
     this.revisionsByTip = revisionsByTip
     this.revisionsByBranch = revisionsByBranch
+    this.mutableRevisions = mutableRevisions
 
     this.removeStaleData()
   }
@@ -150,18 +155,29 @@ export class PlotsModel {
     const checkpointRevisions = flatten(
       experimentRevisions.map(exp => this.revisionsByTip.get(exp) || [])
     )
-    return [...this.branchNames, ...experimentRevisions, ...checkpointRevisions]
+    return [
+      'workspace',
+      ...this.branchNames,
+      ...experimentRevisions,
+      ...checkpointRevisions
+    ]
   }
 
   public getMissingRevisions() {
-    return this.getSelectedRevisions().filter(
-      rev =>
-        !uniqueValues([
-          ...Object.keys(this.comparisonData),
-          ...Object.keys(this.revisionData),
-          'workspace'
-        ]).includes(rev)
+    return uniqueValues(
+      this.getSelectedRevisions().filter(
+        rev =>
+          ![
+            ...Object.keys(this.comparisonData),
+            ...Object.keys(this.revisionData),
+            'workspace'
+          ].includes(rev)
+      )
     )
+  }
+
+  public getMutableRevisions() {
+    return this.mutableRevisions
   }
 
   public getRevisionColors() {
