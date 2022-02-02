@@ -126,7 +126,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
     new InternalCommands(outputChannel, cliReader, cliRunner)
   )
 
-  return { cliReader, internalCommands }
+  return { cliReader, cliRunner, internalCommands }
 }
 
 export const buildMockData = <T = ExperimentsData>() =>
@@ -140,7 +140,8 @@ export const buildDependencies = (
   expShow = expShowFixture,
   plotsDiff = plotsDiffFixture
 ) => {
-  const { cliReader, internalCommands } = buildInternalCommands(disposer)
+  const { cliReader, cliRunner, internalCommands } =
+    buildInternalCommands(disposer)
 
   const mockPlotsDiff = stub(cliReader, 'plotsDiff').resolves(plotsDiff)
 
@@ -154,6 +155,7 @@ export const buildDependencies = (
 
   return {
     cliReader,
+    cliRunner,
     internalCommands,
     messageSpy,
     mockExperimentShow,
