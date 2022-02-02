@@ -6,9 +6,9 @@ import {
   collectBranchRevision,
   collectData,
   collectLivePlotsData,
+  collectMutableRevisions,
   collectPaths,
   collectRevisions,
-  collectRunning,
   collectTemplates,
   ComparisonData,
   RevisionData
@@ -48,8 +48,8 @@ export class PlotsModel {
   private branchNames: string[] = []
   private revisionsByTip = new Map<string, string[]>()
   private revisionsByBranch = new Map<string, string[]>()
-  private runningRevisions: string[] = []
   private branchRevision = ''
+  private mutableRevisions: string[] = []
 
   private vegaPaths: string[] = []
   private comparisonPaths: string[] = []
@@ -88,12 +88,13 @@ export class PlotsModel {
   }
 
   public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, revisions, branchRevision, running] = await Promise.all([
-      collectLivePlotsData(data),
-      collectRevisions(data),
-      collectBranchRevision(data),
-      collectRunning(data)
-    ])
+    const [livePlots, revisions, branchRevision, mutableRevisions] =
+      await Promise.all([
+        collectLivePlotsData(data),
+        collectRevisions(data),
+        collectBranchRevision(data),
+        collectMutableRevisions(data)
+      ])
 
     const { branchNames, revisionsByTip, revisionsByBranch } = revisions
 
@@ -105,7 +106,7 @@ export class PlotsModel {
     this.branchNames = branchNames
     this.revisionsByTip = revisionsByTip
     this.revisionsByBranch = revisionsByBranch
-    this.runningRevisions = running
+    this.mutableRevisions = mutableRevisions
 
     this.removeStaleData()
   }
@@ -176,7 +177,7 @@ export class PlotsModel {
   }
 
   public getMutableRevisions() {
-    return this.hasCheckpoints() ? [] : this.runningRevisions
+    return this.mutableRevisions
   }
 
   public getRevisionColors() {
@@ -289,10 +290,6 @@ export class PlotsModel {
 
   public getSectionName(section: Section): string {
     return this.sectionNames[section] || DEFAULT_SECTION_NAMES[section]
-  }
-
-  public hasCheckpoints() {
-    return !!this.revisionsByTip.size
   }
 
   private removeStaleBranchData(branchName: string, branchRevision: string) {

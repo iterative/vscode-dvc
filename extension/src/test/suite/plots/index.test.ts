@@ -44,10 +44,10 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWith(
         dvcDemoPath,
-        'main',
-        '4fb124a',
+        '1ba7bcd',
         '42b8736',
-        '1ba7bcd'
+        '4fb124a',
+        'main'
       )
     })
 
@@ -85,7 +85,11 @@ suite('Plots Test Suite', () => {
       await dataUpdateEvent
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'main')
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        'main',
+        'workspace'
+      )
     })
 
     it('should remove the temporary plots directory on dispose', async () => {

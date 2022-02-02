@@ -5,9 +5,9 @@ import {
   collectBranchRevision,
   collectData,
   collectLivePlotsData,
+  collectMutableRevisions,
   collectPaths,
   collectRevisions,
-  collectRunning,
   collectTemplates
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
@@ -80,10 +80,10 @@ describe('collectBranchRevision', () => {
   })
 })
 
-describe('collectRunning', () => {
-  it('should return all of the running experiments from the test fixture', () => {
-    const running = collectRunning(expShowFixture)
-    expect(running).toEqual(['4fb124a'])
+describe('collectMutableRevisions', () => {
+  it('should return all of the running non-checkpoint experiments from the test fixture', () => {
+    const running = collectMutableRevisions(expShowFixture)
+    expect(running).toEqual(['workspace'])
   })
 })
 

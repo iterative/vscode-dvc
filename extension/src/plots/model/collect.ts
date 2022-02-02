@@ -270,7 +270,7 @@ export const collectBranchRevision = (data: ExperimentsOutput): string => {
   return getDisplayId(branchSha)
 }
 
-const collectRunningFromExperiment = (
+const collectMutableFromExperiment = (
   acc: string[],
   experimentsObject: {
     [sha: string]: ExperimentFieldsOrError
@@ -281,7 +281,7 @@ const collectRunningFromExperiment = (
       return
     }
     const data = transformExperimentData(experimentData)
-    if (!data?.running) {
+    if (!data?.running || data?.checkpoint_parent || data?.checkpoint_tip) {
       return
     }
 
@@ -289,11 +289,15 @@ const collectRunningFromExperiment = (
   })
 }
 
-export const collectRunning = (data: ExperimentsOutput): string[] => {
+export const collectMutableRevisions = (data: ExperimentsOutput): string[] => {
   const acc: string[] = []
 
+  if (data.workspace.baseline.data?.running) {
+    acc.push('workspace')
+  }
+
   for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
-    collectRunningFromExperiment(acc, experimentsObject)
+    collectMutableFromExperiment(acc, experimentsObject)
   }
   return acc
 }

@@ -1,27 +1,32 @@
 import { PlotsOutput } from '../../cli/reader'
 import { AvailableCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import { definedAndNonEmpty, flattenUnique } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  flattenUnique,
+  sameContents
+} from '../../util/array'
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<PlotsOutput> {
   private model?: PlotsModel
 
   public async update(): Promise<void> {
-    const args = flattenUnique([
+    const revisions = flattenUnique([
       this.model?.getMissingRevisions() || [],
       this.model?.getMutableRevisions() || []
     ])
 
     if (
-      !definedAndNonEmpty(args) &&
-      this.model?.hasCheckpoints() &&
+      !definedAndNonEmpty(revisions) &&
       (await this.internalCommands.executeCommand<boolean>(
         AvailableCommands.EXPERIMENT_IS_RUNNING
       ))
     ) {
       return
     }
+
+    const args = sameContents(revisions, ['workspace']) ? [] : revisions
 
     const data = await this.internalCommands.executeCommand<PlotsOutput>(
       AvailableCommands.PLOTS_DIFF,
