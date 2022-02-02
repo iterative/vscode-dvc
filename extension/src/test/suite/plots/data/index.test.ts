@@ -27,7 +27,7 @@ suite('Plots Data Test Suite', () => {
     const { internalCommands, updatesPaused, mockPlotsDiff, cliRunner } =
       buildDependencies(disposable)
 
-    stub(cliRunner, 'isRunning').returns(experimentIsRunning)
+    stub(cliRunner, 'isExperimentRunning').returns(experimentIsRunning)
 
     const data = disposable.track(
       new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
