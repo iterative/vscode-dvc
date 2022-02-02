@@ -291,7 +291,7 @@ export class PlotsModel {
     return this.sectionNames[section] || DEFAULT_SECTION_NAMES[section]
   }
 
-  private hasCheckpoints() {
+  public hasCheckpoints() {
     return !!this.revisionsByTip.size
   }
 

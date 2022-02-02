@@ -1,7 +1,7 @@
 import { PlotsOutput } from '../../cli/reader'
 import { AvailableCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import { flattenUnique } from '../../util/array'
+import { definedAndNonEmpty, flattenUnique } from '../../util/array'
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<PlotsOutput> {
@@ -12,6 +12,16 @@ export class PlotsData extends BaseData<PlotsOutput> {
       this.model?.getMissingRevisions() || [],
       this.model?.getMutableRevisions() || []
     ])
+
+    if (
+      !definedAndNonEmpty(args) &&
+      this.model?.hasCheckpoints() &&
+      (await this.internalCommands.executeCommand<boolean>(
+        AvailableCommands.EXPERIMENT_IS_RUNNING
+      ))
+    ) {
+      return
+    }
 
     const data = await this.internalCommands.executeCommand<PlotsOutput>(
       AvailableCommands.PLOTS_DIFF,

@@ -13,6 +13,7 @@ import { EventName } from '../telemetry/constants'
 import { reportError } from '../vscode/reporting'
 
 export const autoRegisteredCommands = {
+  EXPERIMENT_IS_RUNNING: 'isRunning',
   EXPERIMENT_RUN: 'runExperiment',
   EXPERIMENT_RUN_QUEUED: 'runExperimentQueue',
   EXPERIMENT_RUN_RESET: 'runExperimentReset'
