@@ -3,7 +3,7 @@ import { collectHasCheckpoints } from './collect'
 import { PartialDvcYaml } from '../../fileSystem'
 import { definedAndNonEmpty, uniqueValues } from '../../util/array'
 
-export class ExperimentCheckpointsModel {
+export class CheckpointsModel {
   public dispose = Disposable.fn()
 
   private yamlWithCheckpoints: string[] = []

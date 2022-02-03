@@ -1,10 +1,10 @@
 import { join } from 'path'
-import { ExperimentCheckpointsModel } from './model'
+import { CheckpointsModel } from './model'
 import { dvcDemoPath } from '../../test/util'
 
-describe('ExperimentCheckpointsModel', () => {
+describe('CheckpointsModel', () => {
   it('should keep a record of yaml files that have checkpoints', () => {
-    const experimentCheckpointsModel = new ExperimentCheckpointsModel()
+    const experimentCheckpointsModel = new CheckpointsModel()
     expect(experimentCheckpointsModel.hasCheckpoints()).toBe(false)
 
     const rootYamlHasCheckpoints = {
