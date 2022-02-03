@@ -81,9 +81,9 @@ describe('collectBranchRevision', () => {
 })
 
 describe('collectMutableRevisions', () => {
-  it('should return all of the running non-checkpoint experiments from the test fixture', () => {
-    const mutable = collectMutableRevisions(expShowFixture)
-    expect(mutable).toEqual(['workspace'])
+  it('should always return an empty array when checkpoints are present', () => {
+    const mutable = collectMutableRevisions(expShowFixture, true)
+    expect(mutable).toEqual([])
   })
 
   it('should return all running experiments when there are no checkpoints', () => {
@@ -131,7 +131,7 @@ describe('collectMutableRevisions', () => {
       }
     }
 
-    const mutable = collectMutableRevisions(experimentsRunningInTemp)
+    const mutable = collectMutableRevisions(experimentsRunningInTemp, false)
     expect(mutable).toEqual(['6ee95de', 'ebaa07e'])
   })
 })

@@ -93,7 +93,7 @@ export class PlotsModel {
         collectLivePlotsData(data),
         collectRevisions(data),
         collectBranchRevision(data),
-        collectMutableRevisions(data)
+        collectMutableRevisions(data, this.experiments.hasCheckpoints())
       ])
 
     const { branchNames, revisionsByTip, revisionsByBranch } = revisions

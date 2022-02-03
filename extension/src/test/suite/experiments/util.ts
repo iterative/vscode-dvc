@@ -7,6 +7,7 @@ import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { buildDependencies, buildMockData } from '../util'
 import { ExperimentsData } from '../../../experiments/data'
+import { FileSystemData } from '../../../fileSystem/data'
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -29,7 +30,8 @@ export const buildExperiments = (
       updatesPaused,
       resourceLocator,
       buildMockMemento(),
-      buildMockData<ExperimentsData>()
+      buildMockData<ExperimentsData>(),
+      buildMockData<FileSystemData>()
     )
   )
 
