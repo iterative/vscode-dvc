@@ -221,7 +221,7 @@ export class Extension implements IExtension {
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
         const stopWatch = new StopWatch()
-        const wasRunning = this.cliRunner.isRunning()
+        const wasRunning = this.cliRunner.isExperimentRunning()
         try {
           const stopped = await this.cliRunner.stop()
           sendTelemetryEvent(

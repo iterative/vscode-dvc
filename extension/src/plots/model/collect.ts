@@ -61,6 +61,7 @@ type MetricsAndDetailsOrUndefined =
       checkpoint_tip: string | undefined
       metrics: MetricsOrParams | undefined
       queued: boolean | undefined
+      running: boolean | undefined
     }
   | undefined
 
@@ -72,10 +73,11 @@ const transformExperimentData = (
     return
   }
 
-  const { checkpoint_tip, checkpoint_parent, queued } = experimentFields
+  const { checkpoint_tip, checkpoint_parent, queued, running } =
+    experimentFields
   const { metrics } = reduceMetricsAndParams(experimentFields)
 
-  return { checkpoint_parent, checkpoint_tip, metrics, queued }
+  return { checkpoint_parent, checkpoint_tip, metrics, queued, running }
 }
 
 type ValidCheckpointData = {
@@ -83,6 +85,7 @@ type ValidCheckpointData = {
   checkpoint_tip: string
   metrics: MetricsOrParams
   queued: boolean | undefined
+  running: boolean | undefined
 }
 
 const isValidCheckpoint = (
@@ -265,6 +268,45 @@ export const collectRevisions = (
 export const collectBranchRevision = (data: ExperimentsOutput): string => {
   const branchSha = Object.keys(data).find(id => id !== 'workspace') as string
   return getDisplayId(branchSha)
+}
+
+const collectMutableFromExperiment = (
+  acc: string[],
+  experimentsObject: {
+    [sha: string]: ExperimentFieldsOrError
+  }
+) => {
+  Object.entries(experimentsObject).map(([sha, experimentData]) => {
+    if (sha === 'baseline') {
+      return
+    }
+    const data = transformExperimentData(experimentData)
+    if (!data?.running || data?.checkpoint_parent || data?.checkpoint_tip) {
+      return
+    }
+
+    acc.push(getDisplayId(sha))
+  })
+}
+
+export const collectMutableRevisions = (
+  data: ExperimentsOutput,
+  hasCheckpoints: boolean
+): string[] => {
+  if (hasCheckpoints) {
+    return []
+  }
+
+  const acc: string[] = []
+
+  if (data.workspace.baseline.data?.running) {
+    acc.push('workspace')
+  }
+
+  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
+    collectMutableFromExperiment(acc, experimentsObject)
+  }
+  return acc
 }
 
 export type RevisionData = {

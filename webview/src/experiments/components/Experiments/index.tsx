@@ -76,7 +76,13 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
           return null
         }
         const time = dayjs(value)
-        return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
+        return (
+          <span className={styles.timestampCellContentsWrapper}>
+            <span className={styles.cellContents}>
+              {time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')}
+            </span>
+          </span>
+        )
       },
       Header: 'Timestamp',
       accessor: 'timestamp',
@@ -159,13 +165,6 @@ export const ExperimentsTable: React.FC<{
         Object.assign(instance, {
           expandedRowCount
         })
-      })
-      hooks.allColumns.push((allColumns, { instance: { state } }) => {
-        const { columnOrder } = state
-        if (!columnOrder || columnOrder.length === 0) {
-          state.columnOrder = allColumns.map(col => col.id)
-        }
-        return allColumns
       })
     }
   )

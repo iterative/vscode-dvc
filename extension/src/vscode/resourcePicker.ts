@@ -13,21 +13,6 @@ export const pickFile = async (title: string): Promise<string | undefined> => {
   }
 }
 
-export const pickCsv = async (title: string): Promise<string | undefined> => {
-  const uris = await window.showOpenDialog({
-    canSelectFiles: true,
-    canSelectFolders: false,
-    canSelectMany: false,
-    filters: { CSV: ['csv'] },
-    title
-  })
-
-  if (uris) {
-    const [{ fsPath }] = uris
-    return fsPath
-  }
-}
-
 export const pickResources = (title: string): Thenable<Uri[] | undefined> => {
   return window.showOpenDialog({
     canSelectFiles: true,

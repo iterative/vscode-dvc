@@ -15,7 +15,8 @@ import { reportError } from '../vscode/reporting'
 export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',
   EXPERIMENT_RUN_QUEUED: 'runExperimentQueue',
-  EXPERIMENT_RUN_RESET: 'runExperimentReset'
+  EXPERIMENT_RUN_RESET: 'runExperimentReset',
+  IS_EXPERIMENT_RUNNING: 'isExperimentRunning'
 } as const
 
 export class CliRunner implements ICli {
@@ -141,7 +142,7 @@ export class CliRunner implements ICli {
     }
   }
 
-  public isRunning() {
+  public isExperimentRunning() {
     return !!this.currentProcess
   }
 
