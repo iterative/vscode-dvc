@@ -31,7 +31,7 @@ suite('Experiments Data Test Suite', () => {
 
   describe('ExperimentsData', () => {
     it('should debounce all calls to update that are made within 200ms', async () => {
-      stub(Watcher, 'createFileSystemWatcher').resolves(mockWatcher)
+      stub(Watcher, 'createFileSystemWatcher').returns(mockWatcher)
       stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
 
       const { cliReader, internalCommands } = buildInternalCommands(disposable)
