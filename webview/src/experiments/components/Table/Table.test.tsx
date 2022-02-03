@@ -309,6 +309,14 @@ describe('Table', () => {
 
     const defaultCols = ['Experiment', 'Timestamp']
 
+    const expectHeaders = async (expectedHeaderNames: string[]) => {
+      const headers = (await screen.findAllByTestId('rendered-header')).map(
+        header => header.textContent
+      )
+
+      expect(headers).toEqual([...defaultCols, ...expectedHeaderNames])
+    }
+
     beforeEach(() => {
       mockGetComputedSpacing()
     })
@@ -316,11 +324,7 @@ describe('Table', () => {
     it('should move a column from its current position to its new position', async () => {
       const { getByText } = renderExperimentsTable()
 
-      let headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
-
-      expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
+      await expectHeaders(['A', 'B', 'C'])
 
       await makeDnd({
         direction: DND_DIRECTION_LEFT,
@@ -329,11 +333,7 @@ describe('Table', () => {
         positions: 1
       })
 
-      headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
-
-      expect(headers).toEqual([...defaultCols, 'A', 'C', 'B'])
+      await expectHeaders(['A', 'C', 'B'])
 
       await makeDnd({
         direction: DND_DIRECTION_RIGHT,
@@ -342,19 +342,11 @@ describe('Table', () => {
         positions: 2
       })
 
-      headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
-
-      expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
+      await expectHeaders(['C', 'B', 'A'])
     })
 
     it('should not move a column before the default columns', async () => {
       const { getByText } = renderExperimentsTable()
-
-      const headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
 
       await makeDnd({
         direction: DND_DIRECTION_LEFT,
@@ -363,7 +355,7 @@ describe('Table', () => {
         positions: 3
       })
 
-      expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
+      await expectHeaders(['B', 'A', 'C'])
     })
 
     it('should order the columns with the columnOrder from the data', async () => {
@@ -380,11 +372,7 @@ describe('Table', () => {
       }
       renderExperimentsTable(tableDataWithCustomColOrder)
 
-      const headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
-
-      expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
+      await expectHeaders(['C', 'B', 'A'])
     })
 
     it('should be able to order a column to the final space after a new column is added', async () => {
