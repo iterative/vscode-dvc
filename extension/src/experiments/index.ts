@@ -9,6 +9,7 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { MetricsAndParamsModel } from './metricsAndParams/model'
+import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
@@ -22,6 +23,7 @@ import {
   MessageFromWebviewType
 } from '../webview/contract'
 import { Logger } from '../common/logger'
+import { FileSystemData } from '../fileSystem/data'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -29,10 +31,12 @@ export class Experiments extends BaseRepository<TableData> {
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private readonly data: ExperimentsData
+  private readonly cliData: ExperimentsData
+  private readonly fileSystemData: FileSystemData
 
   private readonly experiments: ExperimentsModel
   private readonly metricsAndParams: MetricsAndParamsModel
+  private readonly checkpoints: CheckpointsModel
 
   private readonly experimentsChanged = this.dispose.track(
     new EventEmitter<ExperimentsOutput | void>()
@@ -48,7 +52,8 @@ export class Experiments extends BaseRepository<TableData> {
     updatesPaused: EventEmitter<boolean>,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
-    data?: ExperimentsData
+    cliData?: ExperimentsData,
+    fileSystemData?: FileSystemData
   ) {
     super(dvcRoot, resourceLocator.beaker)
 
@@ -63,11 +68,22 @@ export class Experiments extends BaseRepository<TableData> {
       new MetricsAndParamsModel(dvcRoot, workspaceState)
     )
 
-    this.data = this.dispose.track(
-      data || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
+    this.checkpoints = this.dispose.track(new CheckpointsModel())
+
+    this.cliData = this.dispose.track(
+      cliData || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
     )
 
-    this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
+    this.fileSystemData = this.dispose.track(
+      fileSystemData || new FileSystemData(dvcRoot)
+    )
+
+    this.dispose.track(this.cliData.onDidUpdate(data => this.setState(data)))
+    this.dispose.track(
+      this.fileSystemData.onDidUpdate(data =>
+        this.checkpoints.transformAndSet(data)
+      )
+    )
 
     this.handleMessageFromWebview()
 
@@ -81,11 +97,11 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public update() {
-    return this.data.managedUpdate()
+    return this.cliData.managedUpdate()
   }
 
   public forceUpdate() {
-    return this.data.forceUpdate()
+    return this.cliData.forceUpdate()
   }
 
   public async setState(data: ExperimentsOutput) {
@@ -95,6 +111,10 @@ export class Experiments extends BaseRepository<TableData> {
     ])
 
     return this.notifyChanged(data)
+  }
+
+  public hasCheckpoints() {
+    return this.checkpoints.hasCheckpoints()
   }
 
   public getChildMetricsOrParams(path?: string) {

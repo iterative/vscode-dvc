@@ -289,7 +289,14 @@ const collectMutableFromExperiment = (
   })
 }
 
-export const collectMutableRevisions = (data: ExperimentsOutput): string[] => {
+export const collectMutableRevisions = (
+  data: ExperimentsOutput,
+  hasCheckpoints: boolean
+): string[] => {
+  if (hasCheckpoints) {
+    return []
+  }
+
   const acc: string[] = []
 
   if (data.workspace.baseline.data?.running) {

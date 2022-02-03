@@ -1,7 +1,15 @@
 import { basename, extname, join, relative, resolve } from 'path'
-import { existsSync, lstatSync, readdir, removeSync } from 'fs-extra'
+import {
+  existsSync,
+  lstatSync,
+  readdir,
+  readFileSync,
+  removeSync
+} from 'fs-extra'
+import { load } from 'js-yaml'
 import { Uri } from 'vscode'
 import { definedAndNonEmpty } from '../util/array'
+import { Logger } from '../common/logger'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -54,6 +62,12 @@ export const isSameOrChild = (root: string, path: string) => {
   return !rel.startsWith('..')
 }
 
+export type PartialDvcYaml = {
+  stages: {
+    train: { outs: (string | Record<string, { checkpoint?: boolean }>)[] }
+  }
+}
+
 export const isAnyDvcYaml = (path?: string): boolean =>
   !!(
     path &&
@@ -66,3 +80,11 @@ export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
   relative(dvcRoot, uri.fsPath)
 
 export const removeDir = (path: string): void => removeSync(path)
+
+export const loadYaml = <T>(path: string): T | undefined => {
+  try {
+    return load(readFileSync(path, 'utf-8')) as T
+  } catch {
+    Logger.error(`failed to load yaml ${path}`)
+  }
+}

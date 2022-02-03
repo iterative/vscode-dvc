@@ -25,3 +25,8 @@ export const isInWorkspace = (pathOrGlob: string): boolean => {
 
   return definedAndNonEmpty(isContained)
 }
+
+export const findFiles = async (relativeGlob: string): Promise<string[]> => {
+  const files = await workspace.findFiles(relativeGlob)
+  return files.map(uri => uri.fsPath)
+}
