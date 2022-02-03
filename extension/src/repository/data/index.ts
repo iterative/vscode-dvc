@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
-import { isAnyDvcYaml } from '../../fileSystem'
+import { isAnyDvcYaml, isSameOrChild } from '../../fileSystem'
 import {
   DOT_GIT_HEAD,
   DOT_GIT_INDEX,
@@ -13,7 +13,6 @@ import {
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
-  createNecessaryFileSystemWatcher,
   ignoredDotDirectories
 } from '../../fileSystem/watcher'
 import { join } from '../../test/util/path'
@@ -159,12 +158,13 @@ export class RepositoryData {
       createFileSystemWatcher(join(this.dvcRoot, '**'), listener)
     )
 
-    this.dispose.track(
-      createNecessaryFileSystemWatcher(
-        gitRoot,
-        [join(gitRoot, DOT_GIT_INDEX), join(gitRoot, DOT_GIT_HEAD)],
-        listener
+    if (!isSameOrChild(this.dvcRoot, gitRoot)) {
+      this.dispose.track(
+        createFileSystemWatcher(
+          join(gitRoot, `{${DOT_GIT_INDEX},${DOT_GIT_HEAD}}`),
+          listener
+        )
       )
-    )
+    }
   }
 }
