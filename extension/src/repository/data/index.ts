@@ -4,17 +4,12 @@ import { Deferred } from '@hediet/std/synchronization'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
-import {
-  DOT_GIT_HEAD,
-  DOT_GIT_INDEX,
-  getAllUntracked,
-  getGitRepositoryRoot
-} from '../../git'
+import { DOT_GIT, getAllUntracked, getGitRepositoryRoot } from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
-  createNecessaryFileSystemWatcher,
-  ignoredDotDirectories
+  ignoredDotDirectories,
+  getRelativePattern
 } from '../../fileSystem/watcher'
 import { join } from '../../test/util/path'
 import { EXPERIMENTS_GIT_REFS } from '../../experiments/data/constants'
@@ -148,22 +143,24 @@ export class RepositoryData {
   private async watchWorkspace() {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
 
-    const listener = (path: string) => {
-      if (isExcluded(this.dvcRoot, path)) {
-        return
-      }
-      return this.managedUpdate(path)
-    }
-
     this.dispose.track(
-      createFileSystemWatcher(join(this.dvcRoot, '**'), listener)
+      createFileSystemWatcher(join(this.dvcRoot, '**'), (path: string) => {
+        if (isExcluded(this.dvcRoot, path)) {
+          return
+        }
+        return this.managedUpdate(path)
+      })
     )
 
     this.dispose.track(
-      createNecessaryFileSystemWatcher(
-        gitRoot,
-        [join(gitRoot, DOT_GIT_INDEX), join(gitRoot, DOT_GIT_HEAD)],
-        listener
+      createFileSystemWatcher(
+        getRelativePattern(join(gitRoot, DOT_GIT), '{HEAD,index}'),
+        (path: string) => {
+          if (!path) {
+            return
+          }
+          return this.managedUpdate(path)
+        }
       )
     )
   }

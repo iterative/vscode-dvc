@@ -2,11 +2,10 @@ import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import { Disposable } from '../../../../extension'
 import expShowFixture from '../../../fixtures/expShow/output'
 import {
-  buildInternalCommands,
   bypassProcessManagerDebounce,
   getFirstArgOfCall,
   getMockNow
@@ -14,12 +13,12 @@ import {
 import { dvcDemoPath } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
+import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
+import { InternalCommands } from '../../../../commands/internal'
+import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
-  const mockWatcher = {
-    dispose: stub()
-  } as Disposable
 
   beforeEach(() => {
     restore()
@@ -31,21 +30,7 @@ suite('Experiments Data Test Suite', () => {
 
   describe('ExperimentsData', () => {
     it('should debounce all calls to update that are made within 200ms', async () => {
-      stub(Watcher, 'createFileSystemWatcher').returns(mockWatcher)
-      stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
-
-      const { cliReader, internalCommands } = buildInternalCommands(disposable)
-      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        expShowFixture
-      )
-
-      const data = disposable.track(
-        new ExperimentsData(
-          dvcDemoPath,
-          internalCommands,
-          disposable.track(new EventEmitter<boolean>())
-        )
-      )
+      const { data, mockExperimentShow } = buildExperimentsData(disposable)
 
       await Promise.all([
         data.managedUpdate(),
@@ -60,25 +45,8 @@ suite('Experiments Data Test Suite', () => {
     })
 
     it('should call the updater function on setup', async () => {
-      stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
-
-      const { cliReader, internalCommands } = buildInternalCommands(disposable)
-      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        expShowFixture
-      )
-
-      const mockCreateFileSystemWatcher = stub(
-        Watcher,
-        'createFileSystemWatcher'
-      ).returns(mockWatcher)
-
-      const data = disposable.track(
-        new ExperimentsData(
-          dvcDemoPath,
-          internalCommands,
-          disposable.track(new EventEmitter<boolean>())
-        )
-      )
+      const { data, mockCreateFileSystemWatcher, mockExperimentShow } =
+        buildExperimentsData(disposable)
 
       await data.isReady()
 
@@ -95,22 +63,16 @@ suite('Experiments Data Test Suite', () => {
     })
 
     it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
-      stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
-
       const mockNow = getMockNow()
 
-      const { cliReader, internalCommands } = buildInternalCommands(disposable)
-
-      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        expShowFixture
-      )
+      const {
+        internalCommands,
+        mockCreateFileSystemWatcher,
+        mockExperimentShow
+      } = buildExperimentsDataDependencies(disposable)
 
       const mockDispose = stub()
 
-      const mockCreateFileSystemWatcher = stub(
-        Watcher,
-        'createFileSystemWatcher'
-      )
       mockCreateFileSystemWatcher.callsFake(() => {
         return { dispose: mockDispose } as unknown as FileSystemWatcher
       })
@@ -177,6 +139,36 @@ suite('Experiments Data Test Suite', () => {
           `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
         )
       )
+    })
+
+    it('should watch the .git directory for updates', async () => {
+      const mockNow = getMockNow()
+
+      const data = disposable.track(
+        new ExperimentsData(
+          dvcDemoPath,
+          {
+            dispose: stub(),
+            executeCommand: stub()
+          } as unknown as InternalCommands,
+          disposable.track(new EventEmitter<boolean>())
+        )
+      )
+
+      await data.isReady()
+      bypassProcessManagerDebounce(mockNow)
+
+      const gitRoot = await getGitRepositoryRoot(dvcDemoPath)
+
+      const managedUpdateSpy = spy(data, 'managedUpdate')
+      const dataUpdatedEvent = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      await Watcher.fireWatcher(join(gitRoot, DOT_GIT_HEAD))
+      await dataUpdatedEvent
+
+      expect(managedUpdateSpy).to.be.called
     })
   })
 })

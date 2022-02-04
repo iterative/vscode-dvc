@@ -25,6 +25,11 @@ import { ExperimentsData } from '../../experiments/data'
 import { ResourceLocator } from '../../resourceLocator'
 import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../processManager'
 import { FileSystemData } from '../../fileSystem/data'
+import * as Watcher from '../../fileSystem/watcher'
+
+export const mockDisposable = {
+  dispose: stub()
+} as Disposable
 
 export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
@@ -144,6 +149,11 @@ export const buildDependencies = (
   const { cliReader, cliRunner, internalCommands } =
     buildInternalCommands(disposer)
 
+  const mockCreateFileSystemWatcher = stub(
+    Watcher,
+    'createFileSystemWatcher'
+  ).returns(mockDisposable)
+
   const mockPlotsDiff = stub(cliReader, 'plotsDiff').resolves(plotsDiff)
 
   const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(expShow)
@@ -159,6 +169,7 @@ export const buildDependencies = (
     cliRunner,
     internalCommands,
     messageSpy,
+    mockCreateFileSystemWatcher,
     mockExperimentShow,
     mockPlotsDiff,
     resourceLocator,
