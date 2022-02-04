@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
+import { ensureDirSync } from 'fs-extra'
 import { Disposable } from '../../../../extension'
 import expShowFixture from '../../../fixtures/expShow/output'
 import {
@@ -200,6 +201,7 @@ suite('Experiments Data Test Suite', () => {
       )
 
       const absExpGitRefs = join(gitRoot, EXPERIMENTS_GIT_REFS)
+      ensureDirSync(absExpGitRefs)
 
       await Watcher.fireWatcher(absExpGitRefs)
       await dataUpdatedEvent
