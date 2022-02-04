@@ -3,20 +3,19 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
-import { Disposable, Disposer } from '../../../../extension'
+import { Disposable } from '../../../../extension'
 import expShowFixture from '../../../fixtures/expShow/output'
 import {
-  buildInternalCommands,
   bypassProcessManagerDebounce,
   getFirstArgOfCall,
-  getMockNow,
-  mockDisposable
+  getMockNow
 } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
 import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
 import { InternalCommands } from '../../../../commands/internal'
+import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -28,37 +27,6 @@ suite('Experiments Data Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
   })
-
-  const buildDependencies = (disposer: Disposer) => {
-    const mockCreateFileSystemWatcher = stub(
-      Watcher,
-      'createFileSystemWatcher'
-    ).returns(mockDisposable)
-
-    const { cliReader, internalCommands } = buildInternalCommands(disposer)
-    const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-      expShowFixture
-    )
-    return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
-  }
-
-  const buildExperimentsData = (disposer: Disposer) => {
-    const {
-      internalCommands,
-      mockExperimentShow,
-      mockCreateFileSystemWatcher
-    } = buildDependencies(disposer)
-
-    const data = disposer.track(
-      new ExperimentsData(
-        dvcDemoPath,
-        internalCommands,
-        disposer.track(new EventEmitter<boolean>())
-      )
-    )
-
-    return { data, mockCreateFileSystemWatcher, mockExperimentShow }
-  }
 
   describe('ExperimentsData', () => {
     it('should debounce all calls to update that are made within 200ms', async () => {
@@ -101,7 +69,7 @@ suite('Experiments Data Test Suite', () => {
         internalCommands,
         mockCreateFileSystemWatcher,
         mockExperimentShow
-      } = buildDependencies(disposable)
+      } = buildExperimentsDataDependencies(disposable)
 
       const mockDispose = stub()
 
