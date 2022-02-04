@@ -40,6 +40,8 @@ import {
   getWorkspaceColor
 } from '../../../experiments/model/colors'
 import { InternalCommands } from '../../../commands/internal'
+import { FileSystemData } from '../../../fileSystem/data'
+import { ExperimentsData } from '../../../experiments/data'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -224,7 +226,8 @@ suite('Experiments Test Suite', () => {
           updatesPaused,
           resourceLocator,
           buildMockMemento(),
-          buildMockData()
+          buildMockData<ExperimentsData>(),
+          buildMockData<FileSystemData>()
         )
       )
 
@@ -412,7 +415,8 @@ suite('Experiments Test Suite', () => {
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
-          buildMockData()
+          buildMockData<ExperimentsData>(),
+          buildMockData<FileSystemData>()
         )
       )
       testRepository.setState(expShowFixture)
@@ -589,7 +593,8 @@ suite('Experiments Test Suite', () => {
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
-          buildMockData()
+          buildMockData<ExperimentsData>(),
+          buildMockData<FileSystemData>()
         )
       )
       testRepository.setState(expShowFixture)

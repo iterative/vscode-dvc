@@ -24,6 +24,7 @@ import { BaseWebview } from '../../webview'
 import { ExperimentsData } from '../../experiments/data'
 import { ResourceLocator } from '../../resourceLocator'
 import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../processManager'
+import { FileSystemData } from '../../fileSystem/data'
 
 export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
@@ -129,7 +130,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
   return { cliReader, cliRunner, internalCommands }
 }
 
-export const buildMockData = <T = ExperimentsData>() =>
+export const buildMockData = <T extends ExperimentsData | FileSystemData>() =>
   ({
     dispose: stub(),
     onDidUpdate: stub()
