@@ -1,10 +1,12 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore } from 'sinon'
+import { restore, spy } from 'sinon'
 import { buildRepositoryData } from '../util'
 import { Disposable } from '../../../../extension'
 import { dvcDemoPath } from '../../../util'
+import { fireWatcher } from '../../../../fileSystem/watcher'
+import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
 
 suite('Repository Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -114,6 +116,26 @@ suite('Repository Data Test Suite', () => {
       expect(mockDiff).to.be.calledTwice
       expect(mockListDvcOnlyRecursive).to.be.calledOnce
       expect(mockStatus).to.be.calledTwice
+    })
+
+    it('should watch the .git index and HEAD for updates', async () => {
+      const { data } = await buildRepositoryData(disposable)
+      await data.isReady()
+
+      const gitRoot = await getGitRepositoryRoot(dvcDemoPath)
+
+      const managedUpdateSpy = spy(data, 'managedUpdate')
+      const dataUpdatedEvent = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      const absDotGitHead = join(gitRoot, DOT_GIT_HEAD)
+
+      await fireWatcher(absDotGitHead)
+      await dataUpdatedEvent
+
+      expect(managedUpdateSpy).to.be.calledOnce
+      expect(managedUpdateSpy).to.be.calledWithExactly(absDotGitHead)
     })
   })
 })

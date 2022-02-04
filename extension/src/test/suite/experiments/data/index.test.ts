@@ -2,7 +2,7 @@ import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import { Disposable } from '../../../../extension'
 import expShowFixture from '../../../fixtures/expShow/output'
 import {
@@ -14,6 +14,8 @@ import {
 import { dvcDemoPath } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
+import { getGitRepositoryRoot } from '../../../../git'
+import { EXPERIMENTS_GIT_REFS } from '../../../../experiments/data/constants'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -172,6 +174,37 @@ suite('Experiments Data Test Suite', () => {
           `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
         )
       )
+    })
+
+    it('should watch the .git directory for updates', async () => {
+      const mockNow = getMockNow()
+      const { cliReader, internalCommands } = buildInternalCommands(disposable)
+      stub(cliReader, 'experimentShow').resolves(expShowFixture)
+
+      const data = disposable.track(
+        new ExperimentsData(
+          dvcDemoPath,
+          internalCommands,
+          disposable.track(new EventEmitter<boolean>())
+        )
+      )
+
+      await data.isReady()
+      bypassProcessManagerDebounce(mockNow)
+
+      const gitRoot = await getGitRepositoryRoot(dvcDemoPath)
+
+      const managedUpdateSpy = spy(data, 'managedUpdate')
+      const dataUpdatedEvent = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      const absExpGitRefs = join(gitRoot, EXPERIMENTS_GIT_REFS)
+
+      await Watcher.fireWatcher(absExpGitRefs)
+      await dataUpdatedEvent
+
+      expect(managedUpdateSpy).to.be.calledOnce
     })
   })
 })
