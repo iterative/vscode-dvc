@@ -164,15 +164,20 @@ export class PlotsModel {
   }
 
   public getMissingRevisions() {
-    return uniqueValues(
-      this.getSelectedRevisions().filter(
-        rev =>
-          ![
-            ...Object.keys(this.comparisonData),
-            ...Object.keys(this.revisionData),
-            'workspace'
-          ].includes(rev)
+    const cachedRevisions = [
+      ...Object.keys(this.comparisonData),
+      ...Object.keys(this.revisionData)
+    ]
+
+    const selectableRevisions = [
+      ...this.branchNames,
+      ...flatten(
+        this.branchNames.map(branch => this.revisionsByBranch.get(branch) || [])
       )
+    ]
+
+    return uniqueValues(
+      selectableRevisions.filter(rev => !cachedRevisions.includes(rev))
     )
   }
 
