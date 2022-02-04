@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
-import { ensureDirSync } from 'fs-extra'
 import { Disposable } from '../../../../extension'
 import expShowFixture from '../../../fixtures/expShow/output'
 import {
@@ -15,8 +14,7 @@ import {
 import { dvcDemoPath } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
-import { getGitRepositoryRoot } from '../../../../git'
-import { EXPERIMENTS_GIT_REFS } from '../../../../experiments/data/constants'
+import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -200,13 +198,12 @@ suite('Experiments Data Test Suite', () => {
         data.onDidUpdate(() => resolve(undefined))
       )
 
-      const absExpGitRefs = join(gitRoot, EXPERIMENTS_GIT_REFS)
-      ensureDirSync(absExpGitRefs)
+      const absDotGitHead = join(gitRoot, DOT_GIT_HEAD)
 
-      await Watcher.fireWatcher(absExpGitRefs)
+      await Watcher.fireWatcher(absDotGitHead)
       await dataUpdatedEvent
 
-      expect(managedUpdateSpy).to.be.calledOnce
+      expect(managedUpdateSpy).to.be.called
     })
   })
 })
