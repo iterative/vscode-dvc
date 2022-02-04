@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import '@testing-library/jest-dom/extend-expect'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
@@ -14,12 +15,14 @@ import {
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
+import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnOrder'
 
 import { vsCodeApi } from '../../../shared/api'
+import { App } from '../App'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
@@ -293,32 +296,36 @@ describe('Table', () => {
       sorts: []
     }
 
+    const makeGetDragEl = (text: string) => () =>
+      // eslint-disable-next-line testing-library/no-node-access
+      screen.getByText(text).closest(DND_DRAGGABLE_DATA_ATTR)
+
     const renderExperimentsTable = (data: TableData = tableData) => {
       const view = render(<ExperimentsTable tableData={data} />)
 
       mockDndElSpacing(view)
 
-      const makeGetDragEl = (text: string) => () =>
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText(text).closest(DND_DRAGGABLE_DATA_ATTR)
-
-      return { makeGetDragEl, ...view }
+      return view
     }
 
     const defaultCols = ['Experiment', 'Timestamp']
+
+    const expectHeaders = async (expectedHeaderNames: string[]) => {
+      const headers = (await screen.findAllByTestId('rendered-header')).map(
+        header => header.textContent
+      )
+
+      expect(headers).toEqual([...defaultCols, ...expectedHeaderNames])
+    }
 
     beforeEach(() => {
       mockGetComputedSpacing()
     })
 
     it('should move a column from its current position to its new position', async () => {
-      const { getByText, makeGetDragEl } = renderExperimentsTable()
+      const { getByText } = renderExperimentsTable()
 
-      let headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
-
-      expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
+      await expectHeaders(['A', 'B', 'C'])
 
       await makeDnd({
         direction: DND_DIRECTION_LEFT,
@@ -327,11 +334,7 @@ describe('Table', () => {
         positions: 1
       })
 
-      headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
-
-      expect(headers).toEqual([...defaultCols, 'A', 'C', 'B'])
+      await expectHeaders(['A', 'C', 'B'])
 
       await makeDnd({
         direction: DND_DIRECTION_RIGHT,
@@ -340,19 +343,11 @@ describe('Table', () => {
         positions: 2
       })
 
-      headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
-
-      expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
+      await expectHeaders(['C', 'B', 'A'])
     })
 
     it('should not move a column before the default columns', async () => {
-      const { getByText, makeGetDragEl } = renderExperimentsTable()
-
-      const headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
+      const { getByText } = renderExperimentsTable()
 
       await makeDnd({
         direction: DND_DIRECTION_LEFT,
@@ -361,7 +356,7 @@ describe('Table', () => {
         positions: 3
       })
 
-      expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
+      await expectHeaders(['B', 'A', 'C'])
     })
 
     it('should order the columns with the columnOrder from the data', async () => {
@@ -378,11 +373,57 @@ describe('Table', () => {
       }
       renderExperimentsTable(tableDataWithCustomColOrder)
 
-      const headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
+      await expectHeaders(['C', 'B', 'A'])
+    })
+
+    it('should be able to order a column to the final space after a new column is added', async () => {
+      const view = render(<App />)
+      mockDndElSpacing(view)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
       )
 
-      expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
+      const changedData: TableData = {
+        ...tableData,
+        columns: [
+          ...columns,
+          {
+            ...basicProps,
+            id: 'D',
+            name: 'D',
+            path: 'params:D'
+          }
+        ]
+      }
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: changedData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      await makeDnd({
+        direction: DND_DIRECTION_RIGHT,
+        getByText: view.getByText,
+        getDragEl: makeGetDragEl('B'),
+        positions: 2
+      })
+
+      expect(
+        (await screen.findAllByTestId('rendered-header')).map(
+          header => header.textContent
+        )
+      ).toEqual([...defaultCols, 'A', 'C', 'D', 'B'])
     })
 
     it('should resize columns and persist new state when a separator is clicked and dragged', async () => {
