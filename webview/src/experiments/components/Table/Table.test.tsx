@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import '@testing-library/jest-dom/extend-expect'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
