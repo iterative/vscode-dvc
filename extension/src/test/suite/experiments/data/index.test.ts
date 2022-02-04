@@ -3,13 +3,14 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
-import { Disposable } from '../../../../extension'
+import { Disposable, Disposer } from '../../../../extension'
 import expShowFixture from '../../../fixtures/expShow/output'
 import {
   buildInternalCommands,
   bypassProcessManagerDebounce,
   getFirstArgOfCall,
-  getMockNow
+  getMockNow,
+  mockDisposable
 } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
@@ -19,9 +20,6 @@ import { InternalCommands } from '../../../../commands/internal'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
-  const mockWatcher = {
-    dispose: stub()
-  } as Disposable
 
   beforeEach(() => {
     restore()
@@ -31,22 +29,40 @@ suite('Experiments Data Test Suite', () => {
     disposable.dispose()
   })
 
+  const buildDependencies = (disposer: Disposer) => {
+    const mockCreateFileSystemWatcher = stub(
+      Watcher,
+      'createFileSystemWatcher'
+    ).returns(mockDisposable)
+
+    const { cliReader, internalCommands } = buildInternalCommands(disposer)
+    const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
+      expShowFixture
+    )
+    return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
+  }
+
+  const buildExperimentsData = (disposer: Disposer) => {
+    const {
+      internalCommands,
+      mockExperimentShow,
+      mockCreateFileSystemWatcher
+    } = buildDependencies(disposer)
+
+    const data = disposer.track(
+      new ExperimentsData(
+        dvcDemoPath,
+        internalCommands,
+        disposer.track(new EventEmitter<boolean>())
+      )
+    )
+
+    return { data, mockCreateFileSystemWatcher, mockExperimentShow }
+  }
+
   describe('ExperimentsData', () => {
     it('should debounce all calls to update that are made within 200ms', async () => {
-      stub(Watcher, 'createFileSystemWatcher').returns(mockWatcher)
-
-      const { cliReader, internalCommands } = buildInternalCommands(disposable)
-      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        expShowFixture
-      )
-
-      const data = disposable.track(
-        new ExperimentsData(
-          dvcDemoPath,
-          internalCommands,
-          disposable.track(new EventEmitter<boolean>())
-        )
-      )
+      const { data, mockExperimentShow } = buildExperimentsData(disposable)
 
       await Promise.all([
         data.managedUpdate(),
@@ -61,23 +77,8 @@ suite('Experiments Data Test Suite', () => {
     })
 
     it('should call the updater function on setup', async () => {
-      const { cliReader, internalCommands } = buildInternalCommands(disposable)
-      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        expShowFixture
-      )
-
-      const mockCreateFileSystemWatcher = stub(
-        Watcher,
-        'createFileSystemWatcher'
-      ).returns(mockWatcher)
-
-      const data = disposable.track(
-        new ExperimentsData(
-          dvcDemoPath,
-          internalCommands,
-          disposable.track(new EventEmitter<boolean>())
-        )
-      )
+      const { data, mockCreateFileSystemWatcher, mockExperimentShow } =
+        buildExperimentsData(disposable)
 
       await data.isReady()
 
@@ -96,18 +97,14 @@ suite('Experiments Data Test Suite', () => {
     it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
       const mockNow = getMockNow()
 
-      const { cliReader, internalCommands } = buildInternalCommands(disposable)
-
-      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        expShowFixture
-      )
+      const {
+        internalCommands,
+        mockCreateFileSystemWatcher,
+        mockExperimentShow
+      } = buildDependencies(disposable)
 
       const mockDispose = stub()
 
-      const mockCreateFileSystemWatcher = stub(
-        Watcher,
-        'createFileSystemWatcher'
-      )
       mockCreateFileSystemWatcher.callsFake(() => {
         return { dispose: mockDispose } as unknown as FileSystemWatcher
       })

@@ -1,5 +1,4 @@
 import { join } from 'path'
-
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'

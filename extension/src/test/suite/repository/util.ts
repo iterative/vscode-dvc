@@ -1,14 +1,24 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
 import { dvcDemoPath } from '../../util'
-import { buildInternalCommands, FIRST_TRUTHY_TIME } from '../util'
+import {
+  buildInternalCommands,
+  FIRST_TRUTHY_TIME,
+  mockDisposable
+} from '../util'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
 import * as Time from '../../../util/time'
+import * as Watcher from '../../../fileSystem/watcher'
 
 export const buildDependencies = (disposer: Disposer) => {
   const { cliReader, internalCommands } = buildInternalCommands(disposer)
+
+  const mockCreateFileSystemWatcher = stub(
+    Watcher,
+    'createFileSystemWatcher'
+  ).returns(mockDisposable)
 
   const mockListDvcOnlyRecursive = stub(cliReader, 'listDvcOnlyRecursive')
   const mockStatus = stub(cliReader, 'status')
@@ -22,6 +32,7 @@ export const buildDependencies = (disposer: Disposer) => {
 
   return {
     internalCommands,
+    mockCreateFileSystemWatcher,
     mockDiff,
     mockGetAllUntracked,
     mockListDvcOnlyRecursive,
@@ -36,6 +47,7 @@ export const buildDependencies = (disposer: Disposer) => {
 export const buildRepositoryData = async (disposer: Disposer) => {
   const {
     internalCommands,
+    mockCreateFileSystemWatcher,
     mockDiff,
     mockGetAllUntracked,
     mockListDvcOnlyRecursive,
@@ -62,6 +74,7 @@ export const buildRepositoryData = async (disposer: Disposer) => {
 
   return {
     data,
+    mockCreateFileSystemWatcher,
     mockDiff,
     mockGetAllUntracked,
     mockListDvcOnlyRecursive,
