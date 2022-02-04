@@ -15,6 +15,7 @@ import { dvcDemoPath } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
 import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
+import { InternalCommands } from '../../../../commands/internal'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -177,13 +178,14 @@ suite('Experiments Data Test Suite', () => {
 
     it('should watch the .git directory for updates', async () => {
       const mockNow = getMockNow()
-      const { cliReader, internalCommands } = buildInternalCommands(disposable)
-      stub(cliReader, 'experimentShow').resolves(expShowFixture)
 
       const data = disposable.track(
         new ExperimentsData(
           dvcDemoPath,
-          internalCommands,
+          {
+            dispose: stub(),
+            executeCommand: stub()
+          } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>())
         )
       )
@@ -198,9 +200,7 @@ suite('Experiments Data Test Suite', () => {
         data.onDidUpdate(() => resolve(undefined))
       )
 
-      const absDotGitHead = join(gitRoot, DOT_GIT_HEAD)
-
-      await Watcher.fireWatcher(absDotGitHead)
+      await Watcher.fireWatcher(join(gitRoot, DOT_GIT_HEAD))
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
