@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { EventEmitter } from 'vscode'
+import { EventEmitter, RelativePattern, Uri } from 'vscode'
 import { collectFiles } from './collect'
 import { EXPERIMENTS_GIT_REFS } from './constants'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
@@ -53,13 +53,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private async watchExpGitRefs(): Promise<void> {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
     const watchedRelPaths = [DOT_GIT_HEAD, EXPERIMENTS_GIT_REFS, HEADS_GIT_REFS]
+
     this.dispose.track(
       createFileSystemWatcher(
-        join(
-          gitRoot,
-          DOT_GIT,
-          `{${DOT_GIT_HEAD},${EXPERIMENTS_GIT_REFS},${HEADS_GIT_REFS}}`
-        ),
+        new RelativePattern(Uri.file(join(gitRoot, DOT_GIT)), '**'),
         (path: string) => {
           if (
             watchedRelPaths.some(watchedRelPath =>

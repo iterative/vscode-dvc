@@ -1,5 +1,5 @@
 import { utimes } from 'fs-extra'
-import { workspace } from 'vscode'
+import { GlobPattern, workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { isDirectory } from '.'
 
@@ -11,10 +11,10 @@ export const fireWatcher = (path: string): Promise<void> => {
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
 export const createFileSystemWatcher = (
-  glob: string,
+  glob: GlobPattern,
   listener: (path: string) => void
 ): Disposable => {
-  if (isDirectory(glob)) {
+  if (typeof glob === 'string' && isDirectory(glob)) {
     throw new Error(
       'FileSystemWatcher will not behave as expected under these circumstances.'
     )

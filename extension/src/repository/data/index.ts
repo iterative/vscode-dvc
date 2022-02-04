@@ -1,15 +1,10 @@
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, RelativePattern, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
-import { isAnyDvcYaml, isSameOrChild } from '../../fileSystem'
-import {
-  DOT_GIT_HEAD,
-  DOT_GIT_INDEX,
-  getAllUntracked,
-  getGitRepositoryRoot
-} from '../../git'
+import { isAnyDvcYaml } from '../../fileSystem'
+import { DOT_GIT, getAllUntracked, getGitRepositoryRoot } from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -147,24 +142,25 @@ export class RepositoryData {
   private async watchWorkspace() {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
 
-    const listener = (path: string) => {
-      if (isExcluded(this.dvcRoot, path)) {
-        return
-      }
-      return this.managedUpdate(path)
-    }
-
     this.dispose.track(
-      createFileSystemWatcher(join(this.dvcRoot, '**'), listener)
+      createFileSystemWatcher(join(this.dvcRoot, '**'), (path: string) => {
+        if (isExcluded(this.dvcRoot, path)) {
+          return
+        }
+        return this.managedUpdate(path)
+      })
     )
 
-    if (!isSameOrChild(this.dvcRoot, gitRoot)) {
-      this.dispose.track(
-        createFileSystemWatcher(
-          join(gitRoot, `{${DOT_GIT_INDEX},${DOT_GIT_HEAD}}`),
-          listener
-        )
+    this.dispose.track(
+      createFileSystemWatcher(
+        new RelativePattern(Uri.file(join(gitRoot, DOT_GIT)), '{HEAD,index}'),
+        (path: string) => {
+          if (!path) {
+            return
+          }
+          return this.managedUpdate(path)
+        }
       )
-    }
+    )
   }
 }
