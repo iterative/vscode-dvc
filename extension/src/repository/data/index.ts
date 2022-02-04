@@ -1,4 +1,4 @@
-import { Event, EventEmitter, RelativePattern, Uri } from 'vscode'
+import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
@@ -8,7 +8,8 @@ import { DOT_GIT, getAllUntracked, getGitRepositoryRoot } from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
-  ignoredDotDirectories
+  ignoredDotDirectories,
+  getRelativePattern
 } from '../../fileSystem/watcher'
 import { join } from '../../test/util/path'
 import { EXPERIMENTS_GIT_REFS } from '../../experiments/data/constants'
@@ -153,7 +154,7 @@ export class RepositoryData {
 
     this.dispose.track(
       createFileSystemWatcher(
-        new RelativePattern(Uri.file(join(gitRoot, DOT_GIT)), '{HEAD,index}'),
+        getRelativePattern(join(gitRoot, DOT_GIT), '{HEAD,index}'),
         (path: string) => {
           if (!path) {
             return

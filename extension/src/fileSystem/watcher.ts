@@ -1,7 +1,12 @@
 import { utimes } from 'fs-extra'
-import { GlobPattern, workspace } from 'vscode'
+import { GlobPattern, RelativePattern, Uri, workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { isDirectory } from '.'
+
+export const getRelativePattern = (
+  path: string,
+  pattern: string
+): RelativePattern => new RelativePattern(Uri.file(path), pattern)
 
 export const fireWatcher = (path: string): Promise<void> => {
   const now = new Date().getTime() / 1000

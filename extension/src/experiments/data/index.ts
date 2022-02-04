@@ -1,8 +1,11 @@
 import { join } from 'path'
-import { EventEmitter, RelativePattern, Uri } from 'vscode'
+import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
 import { EXPERIMENTS_GIT_REFS } from './constants'
-import { createFileSystemWatcher } from '../../fileSystem/watcher'
+import {
+  createFileSystemWatcher,
+  getRelativePattern
+} from '../../fileSystem/watcher'
 import {
   DOT_GIT,
   DOT_GIT_HEAD,
@@ -56,7 +59,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     this.dispose.track(
       createFileSystemWatcher(
-        new RelativePattern(Uri.file(join(gitRoot, DOT_GIT)), '**'),
+        getRelativePattern(join(gitRoot, DOT_GIT), '**'),
         (path: string) => {
           if (
             watchedRelPaths.some(watchedRelPath =>
