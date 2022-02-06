@@ -4,12 +4,17 @@ import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { Draggable } from 'react-beautiful-dnd'
+import {
+  ColumnSortType,
+  MessageFromWebviewType
+} from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import {
   countUpperLevels,
   getPlaceholders,
   isFirstLevelHeader
 } from '../../util/columns'
+import { sendMessage } from '../../../shared/vscode'
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
@@ -41,6 +46,24 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       countUpperLevels(orderedColumns, column, columns, 0)) ||
     0
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
+  const isSortAscending = !!sorts.find(
+    sort => !sort.descending && isSortedWithPlaceholder(sort)
+  )
+  const isSortDescending =
+    !isSortAscending &&
+    !!sorts.find(sort => sort.descending && sort.path === column.id)
+  const sendSortColumn = () =>
+    sendMessage({
+      payload: {
+        columnId: column.id,
+        columnSortType: isSortAscending
+          ? ColumnSortType.DESCENDING
+          : isSortDescending
+          ? ColumnSortType.REMOVE
+          : ColumnSortType.ASCENDING
+      },
+      type: MessageFromWebviewType.COLUMN_SORTED
+    })
 
   return (
     <Draggable
@@ -61,12 +84,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 [styles.paramHeaderCell]: column.group === 'params',
                 [styles.metricHeaderCell]: column.group === 'metrics',
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-                [styles.sortingHeaderCellAsc]: sorts.filter(
-                  sort => !sort.descending && isSortedWithPlaceholder(sort)
-                ).length,
-                [styles.sortingHeaderCellDesc]: sorts.filter(
-                  sort => sort.descending && sort.path === column.id
-                ).length
+                [styles.sortingHeaderCellAsc]: isSortAscending,
+                [styles.sortingHeaderCellDesc]: isSortDescending
               }
             )
           })}
@@ -95,6 +114,15 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               className={styles.columnResizer}
               style={{ height: resizerHeight }}
             />
+          )}
+          {isDraggable && (
+            <div
+              className={styles.headerCellSortIcon}
+              onClick={sendSortColumn}
+              onKeyDown={sendSortColumn}
+              role="button"
+              tabIndex={0}
+            ></div>
           )}
         </div>
       )}

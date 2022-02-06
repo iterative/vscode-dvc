@@ -12,10 +12,17 @@ export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   COLUMN_REORDERED = 'column-reordered',
   COLUMN_RESIZED = 'column-resized',
+  COLUMN_SORTED = 'column-sorted',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_SECTION_TOGGLED = 'plots-section-toggled',
   PLOTS_RESIZED = 'plots-resized',
   SECTION_RENAMED = 'section-renamed'
+}
+
+export enum ColumnSortType {
+  ASCENDING = 'ascending',
+  DESCENDING = 'descending',
+  REMOVE = 'remove'
 }
 
 export type ColumnReorderPayload = string[]
@@ -29,6 +36,10 @@ export type PlotsResizedPayload = { section: Section; size: PlotSize }
 export type PlotSectionRenamedPayload = {
   section: Section
   name: string
+}
+export type ColumnSortPayload = {
+  columnId: string
+  columnSortType: ColumnSortType
 }
 
 export type MessageFromWebview =
@@ -57,6 +68,10 @@ export type MessageFromWebview =
       payload: PlotSectionRenamedPayload
     }
   | { type: MessageFromWebviewType.INITIALIZED }
+  | {
+      type: MessageFromWebviewType.COLUMN_SORTED
+      payload: ColumnSortPayload
+    }
 
 export interface setData<T extends WebviewData> {
   type: MessageToWebviewType.SET_DATA

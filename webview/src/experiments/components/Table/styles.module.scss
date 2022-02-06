@@ -406,10 +406,18 @@ $spinner-color-light: #000;
 
   .sortingHeaderCellAsc {
     border-top: 1px solid white;
+
+    .headerCellSortIcon::before {
+      content: '\25B4';
+    }
   }
 
   .sortingHeaderCellDesc {
     border-bottom: 1px solid white;
+
+    .headerCellSortIcon::before {
+      content: '\25BE';
+    }
   }
 
   .metaCell {
@@ -502,6 +510,19 @@ $spinner-color-light: #000;
 
 .headerCellContentsWrapper {
   padding: 0.1em 0;
+}
+
+.headerCellSortIcon {
+  bottom: -0.3em;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  text-align: center;
+  width: 1em;
+
+  &::before {
+    content: '\2010';
+  }
 }
 
 .innerCell {

@@ -20,6 +20,8 @@ import { BaseRepository } from '../webview/repository'
 import {
   ColumnReorderPayload,
   ColumnResizePayload,
+  ColumnSortPayload,
+  ColumnSortType,
   MessageFromWebviewType
 } from '../webview/contract'
 import { Logger } from '../common/logger'
@@ -149,8 +151,7 @@ export class Experiments extends BaseRepository<TableData> {
     if (!sortToAdd) {
       return
     }
-    this.experiments.addSort(sortToAdd)
-    return this.notifyChanged()
+    return this.addSortAndNotify(sortToAdd)
   }
 
   public removeSort(pathToRemove: string) {
@@ -287,6 +288,23 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
+  private addSortAndNotify(sortToAdd: { descending: boolean; path: string }) {
+    this.experiments.addSort(sortToAdd)
+    return this.notifyChanged()
+  }
+
+  private handleSortMessage(payload: ColumnSortPayload | undefined) {
+    return (
+      payload &&
+      (payload.columnSortType === ColumnSortType.REMOVE
+        ? this.removeSort(payload.columnId)
+        : this.addSortAndNotify({
+            descending: payload.columnSortType === ColumnSortType.DESCENDING,
+            path: payload.columnId
+          }))
+    )
+  }
+
   private handleMessageFromWebview() {
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message => {
@@ -303,6 +321,9 @@ export class Experiments extends BaseRepository<TableData> {
             return (
               message.payload && this.metricsAndParams.setColumnWidth(id, width)
             )
+          }
+          case MessageFromWebviewType.COLUMN_SORTED: {
+            return this.handleSortMessage(message.payload)
           }
           default:
             Logger.error(`Unexpected message: ${message}`)
