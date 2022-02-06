@@ -12,6 +12,10 @@ It is recommended that you have a DVC project available to test the extension
 against. We have provided [the demo project](#the-demo-project) as part of this
 repo but feel free to use any DVC project that you have available.
 
+To enable formatting on save in VS Code, install the `esbenp.prettier-vscode`
+extension. This is optional, but highly recommended as PRs with improper format
+will be blocked from merge until the issue is fixed.
+
 <a id='note'></a>
 
 Note: When using any project that relies on an isolated python environment
@@ -29,17 +33,6 @@ Host as an Extension.
 Please be aware that having a separate (`.vsix`) version of the extension
 installed will cause all kinds of chaos in your development environment.
 
-There are two different ways to spin up a development environment: using an
-instance of Visual Studio Code or using the shell. Which one a contributor uses
-is up to individual preference, though the VS Code method has some extra
-features that the shell method can't replicate.
-
-### VS Code Development Environment
-
-This option is generally best for developers using VS Code as an editor to
-develop this extension. It also uniquely has access to the VS Code debugger and
-the ability to run the extension with VS Code Stable edition.
-
 - Open the monorepo root as a project in VS Code
 
 - Run `Tasks: Run Build Task` (Ctrl+Shift+b) to start the extension and webview
@@ -48,19 +41,15 @@ the ability to run the extension with VS Code Stable edition.
 - Open the Extension Development Host, a child instance of VS Code with the
   results of the dev servers installed as an extension, with `Start Debugging`
   (f5).  
-  Note: selecting the `Run Extension (Hot Reload + Dev UI for dev-server)`
-  option when running the debugger will prevent all other extensions from being
-  loaded into the VS code instance. This will improve the performance of VS code
-  but can cause certain DVC commands to fail if the project uses an isolated
-  python environment (see [this note](#note)).
+  Note: selecting the `Run Extension` option when running the debugger will
+  prevent all other extensions from being loaded into the VS code instance. This
+  will improve the performance of VS code but can cause certain DVC commands to
+  fail if the project uses an isolated python environment (see
+  [this note](#note)).
 
 - Open the demo or another DVC project in the Extension Development Host; VS
   Code will remember the last project opened, so this step only has to be done
   once.
-
-- To enable formatting on save, install the `esbenp.prettier-vscode` extension.
-  Optional, but highly recommended as PRs with improper format will be blocked
-  from merge until the issue is fixed.
 
 ## The demo project
 
