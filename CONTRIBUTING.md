@@ -62,28 +62,6 @@ the ability to run the extension with VS Code Stable edition.
   Optional, but highly recommended as PRs with improper format will be blocked
   from merge until the issue is fixed.
 
-### Shell-based Development Environment
-
-This option lacks access to the debugger, but uses less resources if using an
-editor other then VS Code to work on this project. These scripts also assume
-`code` is installed and accessible on `$PATH` (i.e. it can be run on the command
-line).
-
-- run `yarn dev-server` to start the extension and webview dev servers
-  (alternatively, use `extension-dev-server` and `webview-dev-server` to launch
-  them individually).
-
-- run `yarn dev-ui` to launch the Extension Development Host.
-
-- Open the demo or another DVC project in the Extension Development Host.
-  Alternatively, run `yarn dev-ui demo` to open the demo project directly, or
-  replace `demo` with path to the project directory of your choice. VS Code will
-  remember the last project opened, so this step only has to be done once.
-
-- Use the "Toggle Developer Tools" command in the Extension Development Host's
-  Command Palette to see any console output from the extension, as it won't be
-  in the shell.
-
 ## The demo project
 
 The demo project was initially forked from
