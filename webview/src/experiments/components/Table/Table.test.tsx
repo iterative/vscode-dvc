@@ -15,7 +15,11 @@ import {
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
-import { MessageToWebviewType } from 'dvc/src/webview/contract'
+import {
+  ColumnSortType,
+  MessageFromWebviewType,
+  MessageToWebviewType
+} from 'dvc/src/webview/contract'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
@@ -162,6 +166,24 @@ describe('Table', () => {
       expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
     })
 
+    it('should trigger to sort ascending if clicking on sort icon on not sorted column', async () => {
+      renderTable()
+      const column = await screen.findByTestId('header-sort-experiment')
+
+      fireEvent.click(column, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(mockedPostMessage).toBeCalledWith({
+        payload: {
+          columnId: 'experiment',
+          columnSortType: ColumnSortType.ASCENDING
+        },
+        type: MessageFromWebviewType.COLUMN_SORTED
+      })
+    })
+
     it('should apply the sortingHeaderCellAsc on the timestamp column if it is not descending in the sorts property', async () => {
       renderTable({
         sorts: [{ descending: false, path: 'timestamp' }]
@@ -173,6 +195,26 @@ describe('Table', () => {
       expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeTruthy()
     })
 
+    it('should trigger to sort descending if clicking on sort icon on sorted ascending column', async () => {
+      renderTable({
+        sorts: [{ descending: false, path: 'experiment' }]
+      })
+      const column = await screen.findByTestId('header-sort-experiment')
+
+      fireEvent.click(column, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(mockedPostMessage).toBeCalledWith({
+        payload: {
+          columnId: 'experiment',
+          columnSortType: ColumnSortType.DESCENDING
+        },
+        type: MessageFromWebviewType.COLUMN_SORTED
+      })
+    })
+
     it('should apply the sortingHeaderCellDesc on the timestamp column if it is descending in the sorts property', async () => {
       renderTable({
         sorts: [{ descending: true, path: 'timestamp' }]
@@ -182,6 +224,26 @@ describe('Table', () => {
 
       expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeTruthy()
       expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
+    })
+
+    it('should trigger to remove sort if clicking on sort icon on sorted descending column', async () => {
+      renderTable({
+        sorts: [{ descending: true, path: 'experiment' }]
+      })
+      const column = await screen.findByTestId('header-sort-experiment')
+
+      fireEvent.click(column, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(mockedPostMessage).toBeCalledWith({
+        payload: {
+          columnId: 'experiment',
+          columnSortType: ColumnSortType.REMOVE
+        },
+        type: MessageFromWebviewType.COLUMN_SORTED
+      })
     })
 
     it('should apply the sorting class if the cell is a placeholder above the column header when the sort is ascending', async () => {

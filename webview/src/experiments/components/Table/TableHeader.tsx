@@ -122,6 +122,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               onKeyDown={sendSortColumn}
               role="button"
               tabIndex={0}
+              data-testid={`header-sort-${column.id}`}
             ></div>
           )}
         </div>
