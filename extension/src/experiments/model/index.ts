@@ -65,7 +65,7 @@ export class ExperimentsModel {
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
       collectExperiments(data)
 
-    this.workspace = workspace
+    this.workspace = { ...workspace, displayColor: getWorkspaceColor() }
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
@@ -228,7 +228,7 @@ export class ExperimentsModel {
 
   public getRowData() {
     return [
-      { ...this.workspace, displayColor: getWorkspaceColor() },
+      this.workspace,
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
         const branchWithColor = {
