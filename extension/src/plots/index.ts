@@ -101,7 +101,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private notifyChanged() {
     this.plotsChanged.fire()
-    this.sendInitialWebviewData()
+    this.sendPlots()
   }
 
   private sendLivePlotsData() {
@@ -234,7 +234,7 @@ export class Plots extends BaseRepository<TPlotsData> {
           await this.model?.transformAndSetExperiments(data)
         }
 
-        this.sendPlots()
+        this.notifyChanged()
       })
     )
   }
