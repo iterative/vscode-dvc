@@ -24,6 +24,7 @@ import {
 } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
+import { delay } from '../util/time'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -92,10 +93,12 @@ export class Experiments extends BaseRepository<TableData> {
     this.handleMessageFromWebview()
 
     const waitForInitialData = this.dispose.track(
-      this.onDidChangeExperiments(() => {
+      this.onDidChangeExperiments(async data => {
         this.deferred.resolve()
         this.dispose.untrack(waitForInitialData)
         waitForInitialData.dispose()
+        await delay(200)
+        this.experimentsChanged.fire(data)
       })
     )
   }
