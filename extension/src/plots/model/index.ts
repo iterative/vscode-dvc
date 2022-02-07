@@ -146,7 +146,7 @@ export class PlotsModel {
       return
     }
 
-    const colors = getColorScale(this.experiments.getSelectedExperiments())
+    const colors = getColorScale(this.getSelectedRevisions(), 'name')
 
     if (!colors) {
       return
@@ -164,7 +164,7 @@ export class PlotsModel {
   }
 
   public getRevisions() {
-    const colors = this.experiments.getSelectedRevisions() || {}
+    const colors = this.experiments.getColors() || {}
 
     return [
       {
@@ -177,7 +177,7 @@ export class PlotsModel {
         displayColor: colors[branch],
         id: branch,
         name: undefined,
-        status: this.status[branch]
+        status: this.getStatus(branch)
       })),
       ...flatten(
         this.branchNames.map(branch =>
@@ -185,7 +185,7 @@ export class PlotsModel {
             displayColor: colors[id],
             id,
             name,
-            status: this.status[name]
+            status: this.getStatus(name)
           }))
         )
       )
@@ -234,32 +234,24 @@ export class PlotsModel {
     return this.mutableRevisions
   }
 
-  public getRevisionColors() {
-    return getColorScale(this.getColors())
-  }
-
-  public getColors() {
-    const colors = this.experiments.getSelectedRevisions() || {}
-
-    return Object.entries(this.status).reduce((acc, [revision, status]) => {
-      if (status === Status.SELECTED) {
-        acc[revision] = colors[revision]
-      }
-      return acc
-    }, {} as Record<string, string>)
+  public getSelectedRevisions() {
+    return this.getRevisions().filter(rev => rev.status === Status.SELECTED)
   }
 
   public getComparisonRevisions() {
-    return Object.entries(this.getColors()).reduce((acc, [revision, color]) => {
-      if (Object.keys(this.comparisonData).includes(revision)) {
-        acc[revision] = { color }
-      }
-      return acc
-    }, {} as ComparisonRevisions)
+    return this.getSelectedRevisions().reduce(
+      (acc, { id, displayColor: color }) => {
+        if (Object.keys(this.comparisonData).includes(id)) {
+          acc[id] = { color }
+        }
+        return acc
+      },
+      {} as ComparisonRevisions
+    )
   }
 
   public getStaticPlots() {
-    const selectedRevisions = this.getSelectedRevisions()
+    const selectedRevisions = this.getSelectedRevisionIds()
     if (!definedAndNonEmpty(selectedRevisions)) {
       return null
     }
@@ -281,7 +273,7 @@ export class PlotsModel {
                   )
                 }
               } as TopLevelSpec,
-              this.getRevisionColors()
+              getColorScale(this.getSelectedRevisions(), 'id')
             ),
             multiView: isMultiViewPlot(template as TopLevelSpec),
             revisions: selectedRevisions,
@@ -294,7 +286,7 @@ export class PlotsModel {
   }
 
   public getComparisonPlots() {
-    const selectedRevisions = this.getSelectedRevisions()
+    const selectedRevisions = this.getSelectedRevisionIds()
     if (!definedAndNonEmpty(selectedRevisions)) {
       return null
     }
@@ -315,9 +307,9 @@ export class PlotsModel {
     }, [] as ComparisonPlots)
   }
 
-  public toggleStatus(id: string) {
-    const status = this.getNextStatus(id)
-    this.status[id] = status
+  public toggleStatus(idOrName: string) {
+    const status = this.getNextStatus(idOrName)
+    this.status[idOrName] = status
     return status
   }
 
@@ -383,17 +375,8 @@ export class PlotsModel {
     })
   }
 
-  private getSelectedRevisions() {
-    const selectedRevisions = Object.entries(this.status).reduce(
-      (acc, [revision, status]) => {
-        if (status === Status.SELECTED) {
-          acc.push(revision)
-        }
-        return acc
-      },
-      [] as string[]
-    )
-    return this.getRevisionIds().filter(rev => selectedRevisions.includes(rev))
+  private getSelectedRevisionIds() {
+    return this.getSelectedRevisions().map(({ id }) => id)
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
@@ -465,8 +448,8 @@ export class PlotsModel {
     return currentStatus === undefined ? Status.UNSELECTED : currentStatus
   }
 
-  private getNextStatus(id: string) {
-    const status = this.status[id]
+  private getNextStatus(idOrName: string) {
+    const status = this.status[idOrName]
     if (status === Status.SELECTED) {
       return Status.UNSELECTED
     }

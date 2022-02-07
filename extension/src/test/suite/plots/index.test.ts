@@ -7,7 +7,6 @@ import { restore, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
-import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import {
   bypassProcessManagerDebounce,
@@ -179,13 +178,13 @@ suite('Plots Test Suite', () => {
       } = getFirstArgOfLastCall(messageSpy)
 
       expect(comparisonData).to.be.null
-      expect(liveData).to.deep.equal(livePlotsFixture)
+      expect(liveData).to.be.null
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
       expect(staticData).to.be.null
 
       const expectedPlotsData: TPlotsData = {
         comparison: null,
-        live: livePlotsFixture,
+        live: null,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
         static: null
       }

@@ -133,6 +133,60 @@ const basicVega = {
               timestamp: '1641966351758'
             },
             {
+              loss: '2.298783302307129',
+              rev: 'workspace',
+              step: '0',
+              timestamp: '1641966224600'
+            },
+            {
+              loss: '2.2779736518859863',
+              rev: 'workspace',
+              step: '1',
+              timestamp: '1641966239108'
+            },
+            {
+              loss: '2.2572131156921387',
+              rev: 'workspace',
+              step: '2',
+              timestamp: '1641966253176'
+            },
+            {
+              loss: '2.238112688064575',
+              rev: 'workspace',
+              step: '3',
+              timestamp: '1641966267354'
+            },
+            {
+              loss: '2.212251901626587',
+              rev: 'workspace',
+              step: '4',
+              timestamp: '1641966285745'
+            },
+            {
+              loss: '2.1894900798797607',
+              rev: 'workspace',
+              step: '5',
+              timestamp: '1641966303339'
+            },
+            {
+              loss: '2.165510654449463',
+              rev: 'workspace',
+              step: '6',
+              timestamp: '1641966320693'
+            },
+            {
+              loss: '2.135964870452881',
+              rev: 'workspace',
+              step: '7',
+              timestamp: '1641966335781'
+            },
+            {
+              loss: '2.114135265350342',
+              rev: 'workspace',
+              step: '8',
+              timestamp: '1641966351758'
+            },
+            {
               loss: '1.6454246044158936',
               rev: '42b8736',
               step: '0',

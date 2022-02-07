@@ -131,7 +131,7 @@ export class ExperimentsModel {
     return result
   }
 
-  public getSelectedRevisions() {
+  public getColors() {
     const revisionColors = { workspace: getWorkspaceColor() } as Record<
       string,
       string
@@ -142,10 +142,7 @@ export class ExperimentsModel {
     })
 
     this.getAssignedExperimentColors().forEach((color: string, id: string) => {
-      const { selected } = this.getExperimentDetails(id)
-      if (selected) {
-        revisionColors[getDisplayId(id)] = color
-      }
+      revisionColors[getDisplayId(id)] = color
     })
 
     return revisionColors

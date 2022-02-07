@@ -5,7 +5,6 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
-  TreeView,
   Uri
 } from 'vscode'
 import { WorkspacePlots } from '../workspace'
@@ -44,10 +43,7 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
   private readonly plots: WorkspacePlots
   private readonly resourceLocator: ResourceLocator
 
-  private readonly view: TreeView<string | RevisionItem>
   private viewed = false
-
-  private expandedRevisions: Record<string, boolean | undefined> = {}
 
   constructor(
     plots: WorkspacePlots,
@@ -56,20 +52,8 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
   ) {
     this.onDidChangeTreeData = plots.plotsChanged.event
 
-    this.view = this.dispose.track(
+    this.dispose.track(
       createTreeView<RevisionItem>('dvc.views.plotsTree', this)
-    )
-
-    this.dispose.track(
-      this.view.onDidCollapseElement(({ element }) => {
-        this.setExpanded(element, false)
-      })
-    )
-
-    this.dispose.track(
-      this.view.onDidExpandElement(({ element }) => {
-        this.setExpanded(element, true)
-      })
     )
 
     this.plots = plots
@@ -77,8 +61,9 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
 
     internalCommands.registerExternalCommand<RevisionItem>(
       RegisteredCommands.REVISION_TOGGLE,
-      ({ dvcRoot, id }) =>
-        this.plots.getRepository(dvcRoot).toggleRevisionStatus(id)
+      ({ dvcRoot, id }) => {
+        return this.plots.getRepository(dvcRoot).toggleRevisionStatus(id)
+      }
     )
   }
 
@@ -148,26 +133,16 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
       .map(({ displayColor, id, name, status }) => ({
         collapsibleState: TreeItemCollapsibleState.None,
         command: {
-          arguments: [{ dvcRoot, id }],
+          arguments: [{ dvcRoot, id: name || id }],
           command: RegisteredCommands.REVISION_TOGGLE,
           title: 'toggle'
         },
         description: name,
         dvcRoot,
         iconPath: this.getIconUri(status, displayColor),
-        id,
+        id: name || id,
         label: id
       }))
-  }
-
-  private setExpanded(element: string | RevisionItem, expanded: boolean) {
-    if (!this.isRoot(element) && element.description) {
-      this.setRevisionExpanded(element.description, expanded)
-    }
-  }
-
-  private setRevisionExpanded(description: string, expanded: boolean) {
-    this.expandedRevisions[description] = expanded
   }
 
   private isRoot(element: string | RevisionItem): element is string {

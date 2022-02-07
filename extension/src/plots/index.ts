@@ -89,8 +89,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     })
   }
 
-  public toggleRevisionStatus(id: string) {
-    const status = this.model?.toggleStatus(id)
+  public toggleRevisionStatus(idOrName: string) {
+    const status = this.model?.toggleStatus(idOrName)
     this.notifyChanged()
     return status
   }
