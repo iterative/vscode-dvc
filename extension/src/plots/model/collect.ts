@@ -60,6 +60,7 @@ type MetricsAndDetailsOrUndefined =
       checkpoint_parent: string | undefined
       checkpoint_tip: string | undefined
       metrics: MetricsOrParams | undefined
+      name: string | undefined
       queued: boolean | undefined
       running: boolean | undefined
     }
@@ -73,17 +74,18 @@ const transformExperimentData = (
     return
   }
 
-  const { checkpoint_tip, checkpoint_parent, queued, running } =
+  const { checkpoint_tip, checkpoint_parent, name, queued, running } =
     experimentFields
   const { metrics } = reduceMetricsAndParams(experimentFields)
 
-  return { checkpoint_parent, checkpoint_tip, metrics, queued, running }
+  return { checkpoint_parent, checkpoint_tip, metrics, name, queued, running }
 }
 
 type ValidCheckpointData = {
   checkpoint_parent: string
   checkpoint_tip: string
   metrics: MetricsOrParams
+  name: string | undefined
   queued: boolean | undefined
   running: boolean | undefined
 }
@@ -209,21 +211,30 @@ export const collectLivePlotsData = (
 
 type RevisionsAccumulator = {
   branchNames: string[]
-  revisionsByBranch: Map<string, string[]>
+  revisionsByBranch: Map<
+    string,
+    { name: string; id: string; running: boolean | undefined }[]
+  >
   revisionsByTip: Map<string, string[]>
 }
 
 const collectExperimentOrCheckpoint = (
   acc: RevisionsAccumulator,
   branchName: string,
-  sha: string,
-  checkpointTip: string | undefined
+  experimentOrCheckpoint: {
+    sha: string
+    name: string | undefined
+    checkpointTip: string | undefined
+    running: boolean | undefined
+  }
 ) => {
+  const { sha, checkpointTip, name, running } = experimentOrCheckpoint
+
   const id = getDisplayId(sha)
   if (isCheckpoint(checkpointTip, sha)) {
     addToMapArray(acc.revisionsByTip, getDisplayId(checkpointTip), id)
   } else {
-    addToMapArray(acc.revisionsByBranch, branchName, id)
+    addToMapArray(acc.revisionsByBranch, branchName, { id, name, running })
   }
 }
 
@@ -241,7 +252,12 @@ const collectBranchRevisions = (
       return
     }
 
-    collectExperimentOrCheckpoint(acc, branchName, sha, data.checkpoint_tip)
+    collectExperimentOrCheckpoint(acc, branchName, {
+      checkpointTip: data.checkpoint_tip,
+      name: data.name,
+      running: data.running,
+      sha
+    })
   })
 }
 
@@ -250,7 +266,10 @@ export const collectRevisions = (
 ): RevisionsAccumulator => {
   const acc: RevisionsAccumulator = {
     branchNames: [],
-    revisionsByBranch: new Map<string, string[]>(),
+    revisionsByBranch: new Map<
+      string,
+      { name: string; id: string; running: boolean | undefined }[]
+    >(),
     revisionsByTip: new Map<string, string[]>()
   }
 

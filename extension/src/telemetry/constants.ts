@@ -95,6 +95,7 @@ export interface IEventNamePropertyMapping {
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PLOTS_SHOW]: undefined
+  [EventName.REVISION_TOGGLE]: undefined
 
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined

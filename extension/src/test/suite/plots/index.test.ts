@@ -9,8 +9,6 @@ import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
-import staticPlotsFixture from '../../fixtures/plotsDiff/static'
-import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
 import {
   bypassProcessManagerDebounce,
   closeAllEditors,
@@ -180,16 +178,16 @@ suite('Plots Test Suite', () => {
         static: staticData
       } = getFirstArgOfLastCall(messageSpy)
 
-      expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
+      expect(comparisonData).to.be.null
       expect(liveData).to.deep.equal(livePlotsFixture)
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
-      expect(staticData).to.deep.equal(staticPlotsFixture)
+      expect(staticData).to.be.null
 
       const expectedPlotsData: TPlotsData = {
-        comparison: comparisonPlotsFixture,
+        comparison: null,
         live: livePlotsFixture,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-        static: staticPlotsFixture
+        static: null
       }
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)

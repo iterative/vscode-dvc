@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { EventEmitter, Memento } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -26,10 +26,14 @@ export type PlotsWebview = BaseWebview<TPlotsData>
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
+  public readonly onDidChangePlots: Event<void>
+
   private model?: PlotsModel
 
   private readonly data: PlotsData
   private readonly workspaceState: Memento
+
+  private readonly plotsChanged = this.dispose.track(new EventEmitter<void>())
 
   constructor(
     dvcRoot: string,
@@ -57,6 +61,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.handleMessageFromWebview()
 
     this.workspaceState = workspaceState
+
+    this.onDidChangePlots = this.plotsChanged.event
   }
 
   public setExperiments(experiments: Experiments) {
@@ -81,6 +87,21 @@ export class Plots extends BaseRepository<TPlotsData> {
       sectionCollapsed: this.model?.getSectionCollapsed(),
       static: this.getStaticPlots()
     })
+  }
+
+  public toggleRevisionStatus(id: string) {
+    const status = this.model?.toggleStatus(id)
+    this.notifyChanged()
+    return status
+  }
+
+  public getRevisions() {
+    return this.model?.getRevisions() || []
+  }
+
+  private notifyChanged() {
+    this.plotsChanged.fire()
+    this.sendInitialWebviewData()
   }
 
   private sendLivePlotsData() {

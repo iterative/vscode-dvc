@@ -61,7 +61,16 @@ describe('collectRevisions', () => {
       collectRevisions(expShowFixture)
     expect(branchNames).toEqual(['main'])
     expect(revisionsByBranch).toEqual(
-      new Map([['main', ['4fb124a', '42b8736', '1ba7bcd']]])
+      new Map([
+        [
+          'main',
+          [
+            { id: '4fb124a', name: 'exp-e7a67', running: true },
+            { id: '42b8736', name: 'test-branch', running: false },
+            { id: '1ba7bcd', name: 'exp-83425', running: false }
+          ]
+        ]
+      ])
     )
     expect(revisionsByTip).toEqual(
       new Map([

@@ -41,6 +41,7 @@ export enum RegisteredCommands {
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
   PLOTS_SHOW = 'dvc.showPlots',
+  REVISION_TOGGLE = 'dvc.views.plotsTree.toggleStatus',
 
   EXTENSION_GET_STARTED = 'dvc.getStarted',
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',

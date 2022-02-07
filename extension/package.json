@@ -890,6 +890,11 @@
           "id": "dvc.views.experimentsFilterByTree",
           "name": "Filter By",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "id": "dvc.views.plotsTree",
+          "name": "Plot Revisions",
+          "when": "dvc.commands.available && dvc.project.available"
         }
       ]
     },

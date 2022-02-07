@@ -14,6 +14,7 @@ import {
   ComparisonData,
   RevisionData
 } from './collect'
+import { Status } from './tree'
 import {
   ComparisonRevisionData,
   ComparisonPlots,
@@ -32,7 +33,7 @@ import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
-import { flatten, uniqueValues } from '../../util/array'
+import { definedAndNonEmpty, flatten, uniqueValues } from '../../util/array'
 
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
@@ -51,9 +52,11 @@ export class PlotsModel {
   private sectionNames: Record<Section, string>
   private branchNames: string[] = []
   private revisionsByTip = new Map<string, string[]>()
-  private revisionsByBranch = new Map<string, string[]>()
+  private revisionsByBranch = new Map<string, { id: string; name: string }[]>()
   private branchRevision = ''
   private mutableRevisions: string[] = []
+
+  private status: Record<string, Status> = {}
 
   private vegaPaths: string[] = []
   private comparisonPaths: string[] = []
@@ -116,6 +119,8 @@ export class PlotsModel {
     this.revisionsByBranch = revisionsByBranch
     this.mutableRevisions = mutableRevisions
 
+    this.status = this.collectStatus()
+
     this.removeStaleData()
   }
 
@@ -159,11 +164,42 @@ export class PlotsModel {
   }
 
   public getRevisions() {
+    const colors = this.experiments.getSelectedRevisions() || {}
+
+    return [
+      {
+        displayColor: colors.workspace,
+        id: 'workspace',
+        name: undefined,
+        status: this.status.workspace
+      },
+      ...this.branchNames.map(branch => ({
+        displayColor: colors[branch],
+        id: branch,
+        name: undefined,
+        status: this.status[branch]
+      })),
+      ...flatten(
+        this.branchNames.map(branch =>
+          (this.revisionsByBranch.get(branch) || []).map(({ id, name }) => ({
+            displayColor: colors[id],
+            id,
+            name,
+            status: this.status[name]
+          }))
+        )
+      )
+    ]
+  }
+
+  public getRevisionIds() {
     const experimentRevisions = flatten(
-      this.branchNames.map(branch => this.revisionsByBranch.get(branch) || [])
+      this.branchNames.map(branch =>
+        (this.revisionsByBranch.get(branch) || []).map(({ id }) => id)
+      )
     )
     const checkpointRevisions = flatten(
-      experimentRevisions.map(exp => this.revisionsByTip.get(exp) || [])
+      experimentRevisions.map(id => this.revisionsByTip.get(id) || [])
     )
     return [
       'workspace',
@@ -183,7 +219,9 @@ export class PlotsModel {
       'workspace',
       ...this.branchNames,
       ...flatten(
-        this.branchNames.map(branch => this.revisionsByBranch.get(branch) || [])
+        this.branchNames.map(branch =>
+          (this.revisionsByBranch.get(branch) || []).map(({ id }) => id)
+        )
       )
     ]
 
@@ -197,23 +235,22 @@ export class PlotsModel {
   }
 
   public getRevisionColors() {
-    return getColorScale(this.experiments?.getSelectedRevisions() || {})
+    return getColorScale(this.getColors())
   }
 
   public getColors() {
-    const colors = { ...(this.experiments?.getSelectedRevisions() || {}) }
-    Object.keys(colors).forEach(rev => {
-      if (!Object.keys(this.comparisonData).includes(rev)) {
-        delete colors[rev]
+    const colors = this.experiments.getSelectedRevisions() || {}
+
+    return Object.entries(this.status).reduce((acc, [revision, status]) => {
+      if (status === Status.SELECTED) {
+        acc[revision] = colors[revision]
       }
-    })
-    return colors
+      return acc
+    }, {} as Record<string, string>)
   }
 
   public getComparisonRevisions() {
-    return Object.entries({
-      ...(this.experiments?.getSelectedRevisions() || {})
-    }).reduce((acc, [revision, color]) => {
+    return Object.entries(this.getColors()).reduce((acc, [revision, color]) => {
       if (Object.keys(this.comparisonData).includes(revision)) {
         acc[revision] = { color }
       }
@@ -222,6 +259,11 @@ export class PlotsModel {
   }
 
   public getStaticPlots() {
+    const selectedRevisions = this.getSelectedRevisions()
+    if (!definedAndNonEmpty(selectedRevisions)) {
+      return null
+    }
+
     return this.vegaPaths.reduce((acc, path) => {
       const template = this.templates[path]
 
@@ -233,7 +275,7 @@ export class PlotsModel {
                 ...template,
                 data: {
                   values: flatten(
-                    this.getSelectedRevisions()
+                    selectedRevisions
                       .map(rev => this.revisionData?.[rev]?.[path])
                       .filter(Boolean)
                   )
@@ -242,7 +284,7 @@ export class PlotsModel {
               this.getRevisionColors()
             ),
             multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: this.getSelectedRevisions(),
+            revisions: selectedRevisions,
             type: PlotsType.VEGA
           }
         ]
@@ -252,13 +294,17 @@ export class PlotsModel {
   }
 
   public getComparisonPlots() {
+    const selectedRevisions = this.getSelectedRevisions()
+    if (!definedAndNonEmpty(selectedRevisions)) {
+      return null
+    }
+
     return this.comparisonPaths.reduce((acc, path) => {
       const pathRevisions = {
         path,
         revisions: {} as ComparisonRevisionData
       }
-
-      this.getSelectedRevisions().forEach(revision => {
+      selectedRevisions.forEach(revision => {
         const image = this.comparisonData?.[revision]?.[path]
         if (image) {
           pathRevisions.revisions[revision] = { revision, url: image.url }
@@ -267,6 +313,12 @@ export class PlotsModel {
       acc.push(pathRevisions)
       return acc
     }, [] as ComparisonPlots)
+  }
+
+  public toggleStatus(id: string) {
+    const status = this.getNextStatus(id)
+    this.status[id] = status
+    return status
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {
@@ -317,7 +369,7 @@ export class PlotsModel {
   }
 
   private removeStaleData() {
-    const revisions = this.getRevisions()
+    const revisions = this.getRevisionIds()
 
     Object.keys(this.comparisonData).map(revision => {
       if (!revisions.includes(revision)) {
@@ -332,10 +384,16 @@ export class PlotsModel {
   }
 
   private getSelectedRevisions() {
-    const selectedRevisions = Object.keys(
-      this.experiments.getSelectedRevisions()
+    const selectedRevisions = Object.entries(this.status).reduce(
+      (acc, [revision, status]) => {
+        if (status === Status.SELECTED) {
+          acc.push(revision)
+        }
+        return acc
+      },
+      [] as string[]
     )
-    return this.getRevisions().filter(rev => selectedRevisions.includes(rev))
+    return this.getRevisionIds().filter(rev => selectedRevisions.includes(rev))
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
@@ -376,5 +434,42 @@ export class PlotsModel {
       MementoPrefix.PLOT_SECTION_NAMES + this.dvcRoot,
       this.sectionNames
     )
+  }
+
+  private collectStatus() {
+    const acc: Record<string, Status> = {}
+
+    acc.workspace = this.getStatus('workspace')
+
+    const experiments = flatten(
+      this.branchNames.map(branch => {
+        acc[branch] = this.getStatus(branch)
+
+        const revisions = this.revisionsByBranch.get(branch) || []
+        revisions.map(({ name }) => (acc[name] = this.getStatus(name)))
+        return revisions
+      })
+    )
+
+    experiments.map(({ id }) =>
+      (this.revisionsByTip.get(id) || []).map(
+        id => (acc[id] = this.getStatus(id))
+      )
+    )
+
+    return acc
+  }
+
+  private getStatus(idOrName: string) {
+    const currentStatus = this.status[idOrName]
+    return currentStatus === undefined ? Status.UNSELECTED : currentStatus
+  }
+
+  private getNextStatus(id: string) {
+    const status = this.status[id]
+    if (status === Status.SELECTED) {
+      return Status.UNSELECTED
+    }
+    return Status.SELECTED
   }
 }
