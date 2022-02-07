@@ -138,7 +138,7 @@ const Plots = ({
   } = data
 
   if (!livePlots && !staticPlots && !comparisonTable) {
-    return EmptyState('No Plots to Display')
+    return EmptyState('No Revisions Selected')
   }
 
   const setSelectedMetrics = (metrics: string[]) => {
