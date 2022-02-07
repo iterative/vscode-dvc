@@ -78,7 +78,11 @@ export class Experiments extends BaseRepository<TableData> {
       fileSystemData || new FileSystemData(dvcRoot)
     )
 
-    this.dispose.track(this.cliData.onDidUpdate(data => this.setState(data)))
+    this.dispose.track(
+      this.cliData.onDidUpdate(data =>
+        Promise.all([this.experimentsChanged.fire(data), this.setState(data)])
+      )
+    )
     this.dispose.track(
       this.fileSystemData.onDidUpdate(data =>
         this.checkpoints.transformAndSet(data)
@@ -110,7 +114,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments.transformAndSet(data)
     ])
 
-    return this.notifyChanged(data)
+    return this.notifyChanged()
   }
 
   public hasCheckpoints() {
@@ -262,8 +266,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelectedExperiments()
   }
 
-  private notifyChanged(data?: ExperimentsOutput) {
-    this.experimentsChanged.fire(data)
+  private notifyChanged() {
+    this.experimentsChanged.fire()
     this.notifyMetricsOrParamsChanged()
   }
 

@@ -53,7 +53,7 @@ suite('Plots Test Suite', () => {
 
     it('should call plots diff with new experiment revisions but not checkpoints', async () => {
       const mockNow = getMockNow()
-      const { mockPlotsDiff, data, experiments } = await buildPlots(
+      const { mockPlotsDiff, data, dataUpdated } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
@@ -84,7 +84,7 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      experiments.setState(updatedExpShowFixture)
+      dataUpdated.fire(updatedExpShowFixture)
 
       await dataUpdateEvent
 
@@ -98,7 +98,7 @@ suite('Plots Test Suite', () => {
 
     it('should call plots diff with the branch name whenever the current branch commit changes', async () => {
       const mockNow = getMockNow()
-      const { data, experiments, mockPlotsDiff } = await buildPlots(
+      const { data, dataUpdated, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
@@ -125,7 +125,7 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      experiments.setState(updatedExpShowFixture)
+      dataUpdated.fire(updatedExpShowFixture)
 
       await dataUpdateEvent
 

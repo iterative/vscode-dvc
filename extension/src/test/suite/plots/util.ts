@@ -1,3 +1,4 @@
+import { EventEmitter } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
@@ -13,6 +14,7 @@ import { Experiments } from '../../../experiments'
 import { buildDependencies, buildMockData } from '../util'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
+import { ExperimentsOutput } from '../../../cli/reader'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -31,6 +33,14 @@ export const buildPlots = async (
 
   const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
 
+  const dataUpdated = disposer.track(new EventEmitter<ExperimentsOutput>())
+
+  const mockExperimentsData = {
+    dataUpdated,
+    dispose: stub(),
+    onDidUpdate: dataUpdated.event
+  } as unknown as ExperimentsData
+
   const [experiments, plots] = await Promise.all([
     disposer.track(
       new Experiments(
@@ -39,7 +49,7 @@ export const buildPlots = async (
         updatesPaused,
         resourceLocator,
         buildMockMemento(),
-        buildMockData<ExperimentsData>(),
+        mockExperimentsData,
         buildMockData<FileSystemData>()
       )
     ),
@@ -54,8 +64,8 @@ export const buildPlots = async (
       )
     )
   ])
-  experiments.setState(expShow)
   plots.setExperiments(experiments)
+  dataUpdated.fire(expShow)
 
   await plots.isReady()
 
@@ -68,6 +78,7 @@ export const buildPlots = async (
 
   return {
     data,
+    dataUpdated,
     experiments,
     messageSpy,
     mockPlotsDiff,
