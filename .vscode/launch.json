@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run Extension (Hot Reload + Dev UI for dev-server)",
+      "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -21,7 +21,7 @@
       }
     },
     {
-      "name": "Run All Extensions (Hot Reload + Dev UI for dev-server)",
+      "name": "Run All Extensions",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
