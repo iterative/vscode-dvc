@@ -157,7 +157,8 @@ describe('ComparisonTable', () => {
         revisions[0],
         revisions[1],
         revisions[2],
-        revisions[3]
+        revisions[3],
+        revisions[4]
       ])
 
       dragAndDrop(startingNode, endingNode)
@@ -168,7 +169,8 @@ describe('ComparisonTable', () => {
         revisions[0],
         revisions[3],
         revisions[1],
-        revisions[2]
+        revisions[2],
+        revisions[4]
       ])
     })
 
@@ -183,7 +185,8 @@ describe('ComparisonTable', () => {
         revisions[1],
         revisions[0],
         revisions[2],
-        revisions[3]
+        revisions[3],
+        revisions[4]
       ]
 
       const headers = getHeaders().map(header => header.textContent)
