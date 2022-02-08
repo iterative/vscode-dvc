@@ -160,7 +160,7 @@ describe('collectData', () => {
       expect(revisionData[revision]['logs/loss.tsv']).toEqual(expectedValues)
     })
 
-    expect(Object.keys(revisionData)).toEqual([...revisions, 'workspace'])
+    expect(Object.keys(revisionData)).toEqual(revisions)
 
     expect(Object.keys(revisionData.main)).toEqual([
       'logs/loss.tsv',
