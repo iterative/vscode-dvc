@@ -101,7 +101,7 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         null
       )
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
       stub(CliReader.prototype, 'help').rejects('still do not run setup')
@@ -144,7 +144,7 @@ suite('Extension Test Suite', () => {
       expect(workspace.getConfiguration().get(pythonPathOption)).to.equal(
         mockPath
       )
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should initialize the extension when the cli is usable', async () => {
       const createFileSystemWatcherSpy = spy(
@@ -320,7 +320,7 @@ suite('Extension Test Suite', () => {
         { error: mockErrorMessage },
         { duration: 0 }
       )
-    }).timeout(8000)
+    }).timeout(12000)
   })
 
   describe('dvc.stopRunningExperiment', () => {

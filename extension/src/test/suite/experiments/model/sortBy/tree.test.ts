@@ -247,7 +247,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         dvcDemoPath
       )
       expect(getParamsArray(), 'final sort clear').to.deep.equal([1, 3, 2, 4])
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should handle the user exiting from the choose repository quick pick', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -278,6 +278,6 @@ suite('Experiments Sort By Tree Test Suite', () => {
         getRepositorySpy,
         'should not call get repository in removeSorts without a root'
       ).not.to.be.called
-    }).timeout(8000)
+    }).timeout(12000)
   })
 })
