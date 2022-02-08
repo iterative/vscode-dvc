@@ -72,7 +72,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       expect(focusedExperiments).to.equal(experiments)
       expect(mockQuickPickOne).to.be.calledOnce
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should not prompt to pick a project if there is only one project', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
@@ -86,7 +86,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       expect(mockQuickPickOne).to.not.be.called
     })
-  }).timeout(8000)
+  }).timeout(12000)
 
   describe('dvc.queueExperimentsFromExisting', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
