@@ -103,6 +103,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.model?.getChildRevisions(id) || []
   }
 
+  public getSelectedCount() {
+    return this.model?.getSelectedCount() || 0
+  }
+
   private notifyChanged() {
     this.plotsChanged.fire()
     this.sendPlots()

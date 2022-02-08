@@ -5,6 +5,7 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
+  TreeView,
   Uri
 } from 'vscode'
 import { WorkspacePlots } from '../workspace'
@@ -42,6 +43,7 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
   private readonly plots: WorkspacePlots
   private readonly resourceLocator: ResourceLocator
 
+  private readonly view: TreeView<string | RevisionItem>
   private viewed = false
 
   constructor(
@@ -51,7 +53,7 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
   ) {
     this.onDidChangeTreeData = plots.plotsChanged.event
 
-    this.dispose.track(
+    this.view = this.dispose.track(
       createTreeView<RevisionItem>('dvc.views.plotsTree', this)
     )
 
@@ -64,6 +66,10 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
         return this.plots.getRepository(dvcRoot).toggleRevisionStatus(id)
       }
     )
+
+    this.plots.isReady().then(() => this.updateDescription())
+
+    this.updateDescriptionOnChange()
   }
 
   public getTreeItem(element: string | RevisionItem): TreeItem {
@@ -172,5 +178,28 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
         : IconName.CIRCLE_OUTLINE
 
     return this.resourceLocator.getExperimentsResource(iconName, displayColor)
+  }
+
+  private updateDescriptionOnChange() {
+    this.dispose.track(
+      this.onDidChangeTreeData(() => {
+        this.updateDescription()
+      })
+    )
+  }
+
+  private updateDescription() {
+    const selectedCounts = this.getSelectedCounts()
+    this.view.description = `${selectedCounts.reduce((a, b) => a + b, 0)} of ${
+      selectedCounts.length * 6
+    } Selected`
+  }
+
+  private getSelectedCounts() {
+    const dvcRoots = this.plots.getDvcRoots()
+
+    return dvcRoots.map(dvcRoot =>
+      this.plots.getRepository(dvcRoot).getSelectedCount()
+    )
   }
 }

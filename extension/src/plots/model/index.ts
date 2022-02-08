@@ -207,6 +207,10 @@ export class PlotsModel {
     }))
   }
 
+  public getSelectedCount() {
+    return this.getSelectedRevisionIds().length
+  }
+
   public getMissingRevisions() {
     const cachedRevisions = [
       ...Object.keys(this.comparisonData),
@@ -222,15 +226,7 @@ export class PlotsModel {
         )
       )
     ]
-    const selectedRevisions = Object.entries(this.status).reduce(
-      (acc, [rev, status]) => {
-        if (status) {
-          acc.push(rev)
-        }
-        return acc
-      },
-      [] as string[]
-    )
+    const selectedRevisions = this.getSelectedRevisionIds()
 
     return uniqueValues(
       [...selectedRevisions, ...selectableRevisions].filter(
@@ -314,7 +310,9 @@ export class PlotsModel {
 
   public toggleStatus(idOrName: string) {
     const status = this.getNextStatus(idOrName)
-    this.status[idOrName] = status
+    if (!status || this.getSelectedCount() < 6) {
+      this.status[idOrName] = status
+    }
     return status
   }
 
