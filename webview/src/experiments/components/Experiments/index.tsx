@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import {
   MetricOrParam,
   RowData as Experiment,
@@ -106,6 +106,7 @@ const reportResizedColumn = (state: TableState<Experiment>) => {
 export const ExperimentsTable: React.FC<{
   tableData: InitiallyUndefinedTableData
 }> = ({ tableData: initiallyUndefinedTableData }) => {
+  const getRowId = useCallback(({ id }: Experiment) => id, [])
   const [tableData, columns, defaultColumn, initialState] =
     React.useMemo(() => {
       const tableData: TableData = {
@@ -144,6 +145,7 @@ export const ExperimentsTable: React.FC<{
       data,
       defaultColumn,
       expandSubRows: false,
+      getRowId,
       initialState
     },
     hooks => {
