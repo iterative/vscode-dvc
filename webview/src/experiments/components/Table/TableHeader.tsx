@@ -28,6 +28,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   index,
   orderedColumns,
   isDragging
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const isLeaf =
     !column.placeholderOf &&
