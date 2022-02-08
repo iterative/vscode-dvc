@@ -49,13 +49,6 @@ module.exports = {
         'jest/valid-expect': 'off',
         'no-unused-expressions': 'off'
       }
-    },
-    {
-      files: ['webview/src/experiments/components/Table/TableHeader.tsx'],
-      rules: {
-        // React.FC is increased to 6
-        'sonarjs/cognitive-complexity': ['error', 6]
-      }
     }
   ],
   parser: '@typescript-eslint/parser',
