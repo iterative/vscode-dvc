@@ -119,9 +119,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               [styles.sortAscending]: isSortAscending,
               [styles.sortDescending]: isSortDescending
             })}
-            onKeyDown={sendSortColumn}
-            role="button"
-            tabIndex={0}
             data-testid={`header-sort-indicator-${column.id}`}
           ></div>
         </button>
