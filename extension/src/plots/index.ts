@@ -221,7 +221,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private async initializeData(data: ExperimentsOutput) {
     await this.model?.transformAndSetExperiments(data)
     this.data.managedUpdate()
-    await this.data.isReady()
+    await Promise.all([this.data.isReady(), this.model?.isReady()])
     this.deferred.resolve()
   }
 
