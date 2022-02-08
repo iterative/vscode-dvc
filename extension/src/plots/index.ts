@@ -99,6 +99,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.model?.getRevisions() || []
   }
 
+  public getChildRevisions(id: string) {
+    return this.model?.getChildRevisions(id) || []
+  }
+
   private notifyChanged() {
     this.plotsChanged.fire()
     this.sendPlots()

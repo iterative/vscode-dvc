@@ -91,7 +91,8 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
       return Promise.resolve(this.getRevisions(element))
     }
 
-    return Promise.resolve([])
+    const { dvcRoot, id } = element
+    return Promise.resolve(this.getChildRevisions(dvcRoot, id))
   }
 
   private async getRootElements() {
@@ -126,8 +127,10 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
     return this.plots
       .getRepository(dvcRoot)
       .getRevisions()
-      .map(({ displayColor, id, name, status }) => ({
-        collapsibleState: TreeItemCollapsibleState.None,
+      .map(({ displayColor, id, name, status, hasChildren }) => ({
+        collapsibleState: hasChildren
+          ? TreeItemCollapsibleState.Collapsed
+          : TreeItemCollapsibleState.None,
         command: {
           arguments: [{ dvcRoot, id: name || id }],
           command: RegisteredCommands.REVISION_TOGGLE,
@@ -135,7 +138,25 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
         },
         dvcRoot,
         iconPath: this.getIconUri(status, displayColor),
-        id: name || id,
+        id,
+        label: id
+      }))
+  }
+
+  private getChildRevisions(dvcRoot: string, id: string): RevisionItem[] {
+    return this.plots
+      .getRepository(dvcRoot)
+      .getChildRevisions(id)
+      .map(({ displayColor, id, status }) => ({
+        collapsibleState: TreeItemCollapsibleState.None,
+        command: {
+          arguments: [{ dvcRoot, id }],
+          command: RegisteredCommands.REVISION_TOGGLE,
+          title: 'toggle'
+        },
+        dvcRoot,
+        iconPath: this.getIconUri(status, displayColor),
+        id,
         label: id
       }))
   }

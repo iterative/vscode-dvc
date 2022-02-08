@@ -169,12 +169,14 @@ export class PlotsModel {
     return [
       {
         displayColor: colors.workspace,
+        hasChildren: false,
         id: 'workspace',
         name: undefined,
         status: this.status.workspace
       },
       ...this.branchNames.map(branch => ({
         displayColor: colors[branch],
+        hasChildren: false,
         id: branch,
         name: undefined,
         status: this.getStatus(branch)
@@ -183,6 +185,7 @@ export class PlotsModel {
         this.branchNames.map(branch =>
           (this.revisionsByBranch.get(branch) || []).map(({ id, name }) => ({
             displayColor: colors[id],
+            hasChildren: definedAndNonEmpty(this.revisionsByTip.get(id)),
             id,
             name,
             status: this.getStatus(name)
@@ -190,6 +193,18 @@ export class PlotsModel {
         )
       )
     ]
+  }
+
+  public getChildRevisions(id: string) {
+    const colors = this.experiments.getColors() || {}
+
+    const displayColor = colors[id]
+
+    return (this.revisionsByTip.get(id) || []).map(id => ({
+      displayColor,
+      id,
+      status: this.getStatus(id)
+    }))
   }
 
   public getMissingRevisions() {
@@ -207,9 +222,20 @@ export class PlotsModel {
         )
       )
     ]
+    const selectedRevisions = Object.entries(this.status).reduce(
+      (acc, [rev, status]) => {
+        if (status) {
+          acc.push(rev)
+        }
+        return acc
+      },
+      [] as string[]
+    )
 
     return uniqueValues(
-      selectableRevisions.filter(rev => !cachedRevisions.includes(rev))
+      [...selectedRevisions, ...selectableRevisions].filter(
+        rev => !cachedRevisions.includes(rev)
+      )
     )
   }
 
@@ -359,7 +385,24 @@ export class PlotsModel {
   }
 
   private getSelectedRevisions() {
-    return this.getRevisions().filter(rev => rev.status === Status.SELECTED)
+    return [
+      ...this.getRevisions().filter(rev => rev.status === Status.SELECTED),
+      ...this.getSelectedChildren()
+    ]
+  }
+
+  private getSelectedChildren() {
+    const colors = this.experiments.getColors() || {}
+    const selectedChildren: { displayColor: string; id: string }[] = []
+    this.revisionsByTip.forEach((ids, rev) => {
+      const displayColor = colors[rev]
+      ids.map(id => {
+        if (this.status[id]) {
+          selectedChildren.push({ displayColor, id })
+        }
+      })
+    })
+    return selectedChildren
   }
 
   private getSelectedRevisionIds() {
