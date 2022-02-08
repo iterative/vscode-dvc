@@ -65,9 +65,9 @@ describe('collectRevisions', () => {
         [
           'main',
           [
-            { id: '4fb124a', name: 'exp-e7a67', running: true },
-            { id: '42b8736', name: 'test-branch', running: false },
-            { id: '1ba7bcd', name: 'exp-83425', running: false }
+            { id: '4fb124a', name: 'exp-e7a67' },
+            { id: '42b8736', name: 'test-branch' },
+            { id: '1ba7bcd', name: 'exp-83425' }
           ]
         ]
       ])

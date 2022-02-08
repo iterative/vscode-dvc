@@ -28,7 +28,6 @@ export type RevisionItem = {
     title: string
   }
   dvcRoot: string
-  description: string | undefined
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
@@ -72,12 +71,9 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
       return getRootItem(element)
     }
 
-    const { label, collapsibleState, iconPath, command, description } = element
+    const { label, collapsibleState, iconPath, command } = element
     const item = new TreeItem(label, collapsibleState)
     item.iconPath = iconPath
-    if (description) {
-      item.description = description
-    }
     if (command) {
       item.command = command
     }
@@ -137,7 +133,6 @@ export class PlotsTree implements TreeDataProvider<string | RevisionItem> {
           command: RegisteredCommands.REVISION_TOGGLE,
           title: 'toggle'
         },
-        description: name,
         dvcRoot,
         iconPath: this.getIconUri(status, displayColor),
         id: name || id,

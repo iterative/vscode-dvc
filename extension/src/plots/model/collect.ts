@@ -211,10 +211,7 @@ export const collectLivePlotsData = (
 
 type RevisionsAccumulator = {
   branchNames: string[]
-  revisionsByBranch: Map<
-    string,
-    { name: string; id: string; running: boolean | undefined }[]
-  >
+  revisionsByBranch: Map<string, { name: string; id: string }[]>
   revisionsByTip: Map<string, string[]>
 }
 
@@ -225,16 +222,15 @@ const collectExperimentOrCheckpoint = (
     sha: string
     name: string | undefined
     checkpointTip: string | undefined
-    running: boolean | undefined
   }
 ) => {
-  const { sha, checkpointTip, name, running } = experimentOrCheckpoint
+  const { sha, checkpointTip, name } = experimentOrCheckpoint
 
   const id = getDisplayId(sha)
   if (isCheckpoint(checkpointTip, sha)) {
     addToMapArray(acc.revisionsByTip, getDisplayId(checkpointTip), id)
   } else {
-    addToMapArray(acc.revisionsByBranch, branchName, { id, name, running })
+    addToMapArray(acc.revisionsByBranch, branchName, { id, name })
   }
 }
 
@@ -255,7 +251,6 @@ const collectBranchRevisions = (
     collectExperimentOrCheckpoint(acc, branchName, {
       checkpointTip: data.checkpoint_tip,
       name: data.name,
-      running: data.running,
       sha
     })
   })
@@ -266,10 +261,7 @@ export const collectRevisions = (
 ): RevisionsAccumulator => {
   const acc: RevisionsAccumulator = {
     branchNames: [],
-    revisionsByBranch: new Map<
-      string,
-      { name: string; id: string; running: boolean | undefined }[]
-    >(),
+    revisionsByBranch: new Map<string, { name: string; id: string }[]>(),
     revisionsByTip: new Map<string, string[]>()
   }
 

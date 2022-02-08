@@ -193,20 +193,7 @@ export class PlotsModel {
   }
 
   public getRevisionIds() {
-    const experimentRevisions = flatten(
-      this.branchNames.map(branch =>
-        (this.revisionsByBranch.get(branch) || []).map(({ id }) => id)
-      )
-    )
-    const checkpointRevisions = flatten(
-      experimentRevisions.map(id => this.revisionsByTip.get(id) || [])
-    )
-    return [
-      'workspace',
-      ...this.branchNames,
-      ...experimentRevisions,
-      ...checkpointRevisions
-    ]
+    return this.getRevisions().map(({ id }) => id)
   }
 
   public getMissingRevisions() {
