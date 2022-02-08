@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run Extension (Hot Reload + Dev UI for dev-server)",
+      "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -11,35 +11,27 @@
         "--disable-extensions"
       ],
       "env": {
-        "HOT_RELOAD": "true",
-        "USE_DEV_UI": "true",
         "VSC_DEBUG": "true"
       },
       "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"],
       "windows": {
         "env": {
-          "HOT_RELOAD": "true",
-          "USE_DEV_UI": "true",
           "VSC_DEBUG": "true"
         }
       }
     },
     {
-      "name": "Run All Extensions (Hot Reload + Dev UI for dev-server)",
+      "name": "Run All Extensions",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}/extension"],
       "env": {
-        "HOT_RELOAD": "true",
-        "USE_DEV_UI": "true",
         "VSC_DEBUG": "true"
       },
       "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"],
       "windows": {
         "env": {
-          "HOT_RELOAD": "true",
-          "USE_DEV_UI": "true",
           "VSC_DEBUG": "true"
         }
       }

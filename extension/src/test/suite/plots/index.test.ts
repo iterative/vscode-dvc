@@ -42,12 +42,58 @@ suite('Plots Test Suite', () => {
       const { mockPlotsDiff } = await buildPlots(disposable)
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWith(
+      expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        'main'
+        'main',
+        'workspace'
+      )
+    })
+
+    it('should call plots diff with new experiment revisions but not checkpoints', async () => {
+      const mockNow = getMockNow()
+      const { mockPlotsDiff, data, experiments } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+      mockPlotsDiff.resetHistory()
+
+      const updatedExpShowFixture = merge(cloneDeep(expShowFixture), {
+        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
+          checkpoint: {
+            data: {
+              checkpoint_tip: 'experiment',
+              queued: false,
+              running: false
+            }
+          },
+          experiment: {
+            data: {
+              checkpoint_tip: 'experiment',
+              name: 'exp-e1new',
+              queued: false,
+              running: true
+            }
+          }
+        }
+      })
+
+      const dataUpdateEvent = new Promise(resolve =>
+        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      )
+
+      bypassProcessManagerDebounce(mockNow)
+      experiments.setState(updatedExpShowFixture)
+
+      await dataUpdateEvent
+
+      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        'experim',
+        'workspace'
       )
     })
 
@@ -150,6 +196,6 @@ suite('Plots Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    }).timeout(8000)
+    }).timeout(12000)
   })
 })

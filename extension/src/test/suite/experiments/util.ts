@@ -1,13 +1,20 @@
 import { stub } from 'sinon'
+import { EventEmitter } from 'vscode'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
-import { buildDependencies, buildMockData } from '../util'
+import {
+  buildDependencies,
+  buildInternalCommands,
+  buildMockData,
+  mockDisposable
+} from '../util'
 import { ExperimentsData } from '../../../experiments/data'
 import { FileSystemData } from '../../../fileSystem/data'
+import * as Watcher from '../../../fileSystem/watcher'
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -98,4 +105,32 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   experiments.setState(expShowFixture)
 
   return { messageSpy, workspaceExperiments }
+}
+
+export const buildExperimentsDataDependencies = (disposer: Disposer) => {
+  const mockCreateFileSystemWatcher = stub(
+    Watcher,
+    'createFileSystemWatcher'
+  ).returns(mockDisposable)
+
+  const { cliReader, internalCommands } = buildInternalCommands(disposer)
+  const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
+    expShowFixture
+  )
+  return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
+}
+
+export const buildExperimentsData = (disposer: Disposer) => {
+  const { internalCommands, mockExperimentShow, mockCreateFileSystemWatcher } =
+    buildExperimentsDataDependencies(disposer)
+
+  const data = disposer.track(
+    new ExperimentsData(
+      dvcDemoPath,
+      internalCommands,
+      disposer.track(new EventEmitter<boolean>())
+    )
+  )
+
+  return { data, mockCreateFileSystemWatcher, mockExperimentShow }
 }

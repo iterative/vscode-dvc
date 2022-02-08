@@ -11,6 +11,8 @@ import { PlotsModel } from '../../../plots/model'
 import { PlotsData } from '../../../plots/data'
 import { Experiments } from '../../../experiments'
 import { buildDependencies, buildMockData } from '../util'
+import { FileSystemData } from '../../../fileSystem/data'
+import { ExperimentsData } from '../../../experiments/data'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -37,7 +39,8 @@ export const buildPlots = async (
         updatesPaused,
         resourceLocator,
         buildMockMemento(),
-        buildMockData()
+        buildMockData<ExperimentsData>(),
+        buildMockData<FileSystemData>()
       )
     ),
     disposer.track(

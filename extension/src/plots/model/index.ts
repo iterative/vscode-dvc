@@ -1,4 +1,5 @@
 import { Memento } from 'vscode'
+import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
@@ -35,6 +36,9 @@ import { flatten, uniqueValues } from '../../util/array'
 
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
+
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
 
   private readonly dvcRoot: string
   private readonly experiments: Experiments
@@ -87,6 +91,10 @@ export class PlotsModel {
     )
   }
 
+  public isReady() {
+    return this.initialized
+  }
+
   public async transformAndSetExperiments(data: ExperimentsOutput) {
     const [livePlots, revisions, branchRevision, mutableRevisions] =
       await Promise.all([
@@ -124,6 +132,8 @@ export class PlotsModel {
     this.templates = { ...this.templates, ...templates }
     this.vegaPaths = plots
     this.comparisonPaths = comparison
+
+    this.deferred.resolve()
   }
 
   public getLivePlots() {
@@ -164,15 +174,21 @@ export class PlotsModel {
   }
 
   public getMissingRevisions() {
-    return uniqueValues(
-      this.getSelectedRevisions().filter(
-        rev =>
-          ![
-            ...Object.keys(this.comparisonData),
-            ...Object.keys(this.revisionData),
-            'workspace'
-          ].includes(rev)
+    const cachedRevisions = [
+      ...Object.keys(this.comparisonData),
+      ...Object.keys(this.revisionData)
+    ]
+
+    const selectableRevisions = [
+      'workspace',
+      ...this.branchNames,
+      ...flatten(
+        this.branchNames.map(branch => this.revisionsByBranch.get(branch) || [])
       )
+    ]
+
+    return uniqueValues(
+      selectableRevisions.filter(rev => !cachedRevisions.includes(rev))
     )
   }
 
