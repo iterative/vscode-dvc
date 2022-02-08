@@ -31,7 +31,7 @@ suite('CLI Runner Test Suite', () => {
       await cliRunner.run(cwd, '1000')
 
       expect(windowErrorMessageSpy).to.be.calledOnce
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should be able to stop a started command', async () => {
       const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
@@ -66,7 +66,7 @@ suite('CLI Runner Test Suite', () => {
         'dvc.runner.running',
         false
       )
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const text = ':weeeee:'

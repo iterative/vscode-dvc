@@ -115,7 +115,7 @@ suite('Experiments Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should only be able to open a single experiments webview', async () => {
       const { experiments } = buildExperiments(disposable)
@@ -142,7 +142,7 @@ suite('Experiments Test Suite', () => {
       expect(webview === sameWebview).to.be.true
 
       expect(windowSpy).not.to.have.been.called
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should handle column reordering messages from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -192,7 +192,7 @@ suite('Experiments Test Suite', () => {
       await columnOrderSet
 
       expect(mockSetColumnReordered).to.be.calledWith(columnOrder)
-    }).timeout(8000)
+    }).timeout(12000)
 
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
@@ -344,7 +344,7 @@ suite('Experiments Test Suite', () => {
         ],
         sorts: [{ descending: false, path: sortPath }]
       })
-    }).timeout(8000)
+    }).timeout(12000)
   })
 
   describe('persisted state', () => {
