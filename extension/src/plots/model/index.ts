@@ -119,7 +119,7 @@ export class PlotsModel {
     this.revisionsByBranch = revisionsByBranch
     this.mutableRevisions = mutableRevisions
 
-    this.status = this.collectStatus()
+    this.status = this.collectStatuses()
 
     this.removeStaleData()
   }
@@ -192,10 +192,6 @@ export class PlotsModel {
     ]
   }
 
-  public getRevisionIds() {
-    return this.getRevisions().map(({ id }) => id)
-  }
-
   public getMissingRevisions() {
     const cachedRevisions = [
       ...Object.keys(this.comparisonData),
@@ -219,10 +215,6 @@ export class PlotsModel {
 
   public getMutableRevisions() {
     return this.mutableRevisions
-  }
-
-  public getSelectedRevisions() {
-    return this.getRevisions().filter(rev => rev.status === Status.SELECTED)
   }
 
   public getComparisonRevisions() {
@@ -362,6 +354,14 @@ export class PlotsModel {
     })
   }
 
+  private getRevisionIds() {
+    return this.getRevisions().map(({ id }) => id)
+  }
+
+  private getSelectedRevisions() {
+    return this.getRevisions().filter(rev => rev.status === Status.SELECTED)
+  }
+
   private getSelectedRevisionIds() {
     return this.getSelectedRevisions().map(({ id }) => id)
   }
@@ -406,7 +406,7 @@ export class PlotsModel {
     )
   }
 
-  private collectStatus() {
+  private collectStatuses() {
     const acc: Record<string, Status> = {}
 
     acc.workspace = this.getStatus('workspace')
