@@ -42,12 +42,13 @@ suite('Plots Test Suite', () => {
       const { mockPlotsDiff } = await buildPlots(disposable)
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWith(
+      expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        'main'
+        'main',
+        'workspace'
       )
     })
 

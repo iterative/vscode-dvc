@@ -19,11 +19,65 @@ const basicVega = {
   'logs/loss.tsv': [
     {
       type: PlotsType.VEGA,
-      revisions: ['main', '42b8736', '1ba7bcd', '4fb124a'],
+      revisions: ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a'],
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
           values: [
+            {
+              loss: '2.298783302307129',
+              rev: 'workspace',
+              step: '0',
+              timestamp: '1641966224600'
+            },
+            {
+              loss: '2.2779736518859863',
+              rev: 'workspace',
+              step: '1',
+              timestamp: '1641966239108'
+            },
+            {
+              loss: '2.2572131156921387',
+              rev: 'workspace',
+              step: '2',
+              timestamp: '1641966253176'
+            },
+            {
+              loss: '2.238112688064575',
+              rev: 'workspace',
+              step: '3',
+              timestamp: '1641966267354'
+            },
+            {
+              loss: '2.212251901626587',
+              rev: 'workspace',
+              step: '4',
+              timestamp: '1641966285745'
+            },
+            {
+              loss: '2.1894900798797607',
+              rev: 'workspace',
+              step: '5',
+              timestamp: '1641966303339'
+            },
+            {
+              loss: '2.165510654449463',
+              rev: 'workspace',
+              step: '6',
+              timestamp: '1641966320693'
+            },
+            {
+              loss: '2.135964870452881',
+              rev: 'workspace',
+              step: '7',
+              timestamp: '1641966335781'
+            },
+            {
+              loss: '2.114135265350342',
+              rev: 'workspace',
+              step: '8',
+              timestamp: '1641966351758'
+            },
             {
               loss: '2.298783302307129',
               rev: 'main',
@@ -320,6 +374,11 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
   'plots/acc.png': [
     {
       type: PlotsType.IMAGE,
+      revisions: ['workspace'],
+      url: joinFunc(baseUrl, 'workspace_plots_acc.png')
+    },
+    {
+      type: PlotsType.IMAGE,
       revisions: ['main'],
       url: joinFunc(baseUrl, 'main_plots_acc.png')
     },
@@ -342,6 +401,11 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
   'plots/heatmap.png': [
     {
       type: PlotsType.IMAGE,
+      revisions: ['workspace'],
+      url: joinFunc(baseUrl, 'workspace_plots_heatmap.png')
+    },
+    {
+      type: PlotsType.IMAGE,
       revisions: ['main'],
       url: joinFunc(baseUrl, 'main_plots_heatmap.png')
     },
@@ -362,6 +426,11 @@ export const getImageData = (baseUrl: string, joinFunc = join) => ({
     }
   ],
   'plots/loss.png': [
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['workspace'],
+      url: joinFunc(baseUrl, 'workspace_plots_loss.png')
+    },
     {
       type: PlotsType.IMAGE,
       revisions: ['main'],
@@ -472,7 +541,8 @@ export const getComparisonWebviewMessage = (
     '4fb124a': { color: '#f14c4c' },
     '42b8736': { color: '#3794ff' },
     '1ba7bcd': { color: '#cca700' },
-    main: { color: '#13adc7' }
+    main: { color: '#13adc7' },
+    workspace: { color: getWorkspaceColor() }
   },
   sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
   size: PlotSize.REGULAR

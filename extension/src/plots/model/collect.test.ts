@@ -15,7 +15,7 @@ import expShowFixture from '../../test/fixtures/expShow/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 import livePlotsFixture from '../../test/fixtures/expShow/livePlots'
 import { ExperimentsOutput } from '../../cli/reader'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, sameContents } from '../../util/array'
 import { PlotsType, StaticPlot, VegaPlot } from '../webview/contract'
 
 const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as VegaPlot
@@ -139,7 +139,7 @@ describe('collectMutableRevisions', () => {
 describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
     const { revisionData, comparisonData } = collectData(plotsDiffFixture)
-    const revisions = ['main', '42b8736', '1ba7bcd', '4fb124a']
+    const revisions = ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a']
 
     const values =
       (LogsLossTsv?.content?.data as { values: { rev: string }[] }).values || []
@@ -165,8 +165,13 @@ describe('collectData', () => {
       'plots/loss.png'
     ])
 
-    expect(comparisonData['1ba7bcd']['plots/heatmap.png']).toEqual(
-      plotsDiffFixture['plots/heatmap.png'][1]
+    const _1ba7bcd_heatmap = comparisonData['1ba7bcd']['plots/heatmap.png']
+
+    expect(_1ba7bcd_heatmap).toBeDefined()
+    expect(_1ba7bcd_heatmap).toEqual(
+      plotsDiffFixture['plots/heatmap.png'].find(({ revisions }) =>
+        sameContents(revisions as string[], ['1ba7bcd'])
+      )
     )
   })
 })
