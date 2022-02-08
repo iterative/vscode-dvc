@@ -1,4 +1,4 @@
-import React, { DragEvent, useState } from 'react'
+import React, { DragEvent } from 'react'
 import cx from 'classnames'
 import { ComparisonRevisions } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
@@ -17,12 +17,11 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
-  const [dragOver, setDragOver] = useState('')
   const cols = Object.keys(columns)
 
   const handleDragStart = (e: DragEvent<HTMLTableCellElement>) => {
     const id = cols.indexOf(e.currentTarget.id).toString()
-    e.dataTransfer.setData('colId', id)
+    e.dataTransfer.setData('colIndex', id)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
   }
@@ -30,21 +29,18 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   const handleDragOver = (e: DragEvent<HTMLTableCellElement>) =>
     e.preventDefault()
 
-  const handleDragEnter = (e: DragEvent<HTMLTableCellElement>) =>
-    setDragOver(e.currentTarget.id)
-
   const handleOnDrop = (e: DragEvent<HTMLTableCellElement>) => {
-    const droppedColId = cols.indexOf(e.currentTarget.id)
+    const droppedColIndex = cols.indexOf(e.currentTarget.id)
 
-    if (cols[droppedColId] !== pinnedColumn) {
-      const draggedColId = parseInt(e.dataTransfer.getData('colId'), 10)
-      const tempColumns = [...cols]
+    if (cols[droppedColIndex] !== pinnedColumn) {
+      const draggedColIndex = parseInt(e.dataTransfer.getData('colIndex'), 10)
+      const newColumnOrder = [...cols]
+      const draggedColumn = newColumnOrder[draggedColIndex]
 
-      tempColumns[draggedColId] = cols[droppedColId]
-      tempColumns[droppedColId] = cols[draggedColId]
+      newColumnOrder.splice(draggedColIndex, 1)
+      newColumnOrder.splice(droppedColIndex, 0, draggedColumn)
 
-      setColumnsOrder(tempColumns)
-      setDragOver('')
+      setColumnsOrder(newColumnOrder)
     }
   }
 
@@ -58,14 +54,12 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
               key={exp}
               id={exp}
               className={cx(styles.comparisonTableHeader, {
-                [styles.pinnedColumnHeader]: isPinned,
-                [styles.other]: dragOver === exp
+                [styles.pinnedColumnHeader]: isPinned
               })}
               draggable={!isPinned}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleOnDrop}
-              onDragEnter={handleDragEnter}
             >
               <ComparisonTableHeader
                 isPinned={isPinned}
