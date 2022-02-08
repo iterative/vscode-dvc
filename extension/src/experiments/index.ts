@@ -12,6 +12,7 @@ import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { TableData } from './webview/contract'
+import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
@@ -288,7 +289,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
-  private addSortAndNotify(sortToAdd: { descending: boolean; path: string }) {
+  private addSortAndNotify(sortToAdd: SortDefinition) {
     this.experiments.addSort(sortToAdd)
     return this.notifyChanged()
   }

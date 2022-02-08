@@ -32,10 +32,6 @@ jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
 const mockedPostMessage = jest.mocked(postMessage)
 
-const queryClosest = (textElement: Element, matcher: string) =>
-  // eslint-disable-next-line testing-library/no-node-access
-  textElement.closest(`.${matcher}`)
-
 describe('Table', () => {
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
   const getHeaderGroupProps = (key: string) => () => ({ key })
@@ -160,15 +156,17 @@ describe('Table', () => {
 
     it('should not have any sorting classes if the sorts property is empty', async () => {
       renderTable()
-      const column = await screen.findByText('Timestamp')
+      const column = await screen.findByTestId(
+        'header-sort-indicator-experiment'
+      )
 
-      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeNull()
-      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
+      expect(column).not.toHaveClass(styles.sortAscending)
+      expect(column).not.toHaveClass(styles.sortDescending)
     })
 
-    it('should trigger to sort ascending if clicking on sort icon on not sorted column', async () => {
+    it('should trigger to sort ascending if clicking on column on not sorted column', async () => {
       renderTable()
-      const column = await screen.findByTestId('header-sort-experiment')
+      const column = await screen.findByTestId('header-experiment')
 
       fireEvent.click(column, {
         bubbles: true,
@@ -184,22 +182,24 @@ describe('Table', () => {
       })
     })
 
-    it('should apply the sortingHeaderCellAsc on the timestamp column if it is not descending in the sorts property', async () => {
+    it('should show sorting ascending on the experiment column if it is not descending in the sorts property', async () => {
       renderTable({
-        sorts: [{ descending: false, path: 'timestamp' }]
+        sorts: [{ descending: false, path: 'experiment' }]
       })
 
-      const column = await screen.findByText('Timestamp')
+      const column = await screen.findByTestId(
+        'header-sort-indicator-experiment'
+      )
 
-      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeNull()
-      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeTruthy()
+      expect(column).toHaveClass(styles.sortAscending)
+      expect(column).not.toHaveClass(styles.sortDescending)
     })
 
     it('should trigger to sort descending if clicking on sort icon on sorted ascending column', async () => {
       renderTable({
         sorts: [{ descending: false, path: 'experiment' }]
       })
-      const column = await screen.findByTestId('header-sort-experiment')
+      const column = await screen.findByTestId('header-experiment')
 
       fireEvent.click(column, {
         bubbles: true,
@@ -215,22 +215,24 @@ describe('Table', () => {
       })
     })
 
-    it('should apply the sortingHeaderCellDesc on the timestamp column if it is descending in the sorts property', async () => {
+    it('should show sorting descending on the experiment column if it is descending in the sorts property', async () => {
       renderTable({
-        sorts: [{ descending: true, path: 'timestamp' }]
+        sorts: [{ descending: true, path: 'experiment' }]
       })
 
-      const column = await screen.findByText('Timestamp')
+      const column = await screen.findByTestId(
+        'header-sort-indicator-experiment'
+      )
 
-      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeTruthy()
-      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
+      expect(column).not.toHaveClass(styles.sortAscending)
+      expect(column).toHaveClass(styles.sortDescending)
     })
 
     it('should trigger to remove sort if clicking on sort icon on sorted descending column', async () => {
       renderTable({
         sorts: [{ descending: true, path: 'experiment' }]
       })
-      const column = await screen.findByTestId('header-sort-experiment')
+      const column = await screen.findByTestId('header-experiment')
 
       fireEvent.click(column, {
         bubbles: true,
@@ -246,38 +248,41 @@ describe('Table', () => {
       })
     })
 
-    it('should apply the sorting class if the cell is a placeholder above the column header when the sort is ascending', async () => {
+    it('should not show sorting on a placeholder above the column header when the sort is ascending', async () => {
       renderTableWithPlaceholder(false)
 
-      const header = await screen.findByTestId(`header-${placeholderId}`)
-
-      expect(header?.className.includes(styles.sortingHeaderCellAsc)).toBe(true)
-    })
-
-    it('should not apply the sorting class if there is a placeholder above the column header when the sort is ascending', async () => {
-      renderTableWithPlaceholder(false)
-
-      const column = await screen.findByText('Timestamp')
-
-      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
-    })
-
-    it('should not apply the sorting class if the cell is a placeholder above the column header when the sort is descending', async () => {
-      renderTableWithPlaceholder(true)
-
-      const header = await screen.findByTestId(`header-${placeholderId}`)
-
-      expect(header?.className.includes(styles.sortingHeaderCellDesc)).toBe(
-        false
+      const header = await screen.findByTestId(
+        `header-sort-indicator-${placeholderId}`
       )
+
+      expect(header).not.toHaveClass(styles.sortAscending)
+      expect(header).not.toHaveClass(styles.sortDescending)
     })
 
-    it('should apply the sorting class if there is a placeholder above the column header when the sort is descending', async () => {
+    it('should not show sorting on a placeholder above the column header when the sort is descending', async () => {
       renderTableWithPlaceholder(true)
 
-      const column = await screen.findByText('Timestamp')
+      const header = await screen.findByTestId(
+        `header-sort-indicator-${placeholderId}`
+      )
 
-      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeTruthy()
+      expect(header).not.toHaveClass(styles.sortAscending)
+      expect(header).not.toHaveClass(styles.sortDescending)
+    })
+
+    it('placeholder does not trigger sort', async () => {
+      renderTableWithPlaceholder(false)
+
+      const header = await screen.findByTestId(`header-${placeholderId}`)
+
+      mockedPostMessage.mockClear()
+
+      fireEvent.click(header, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(mockedPostMessage).toHaveBeenCalledTimes(0)
     })
   })
 

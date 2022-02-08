@@ -9,11 +9,7 @@ import {
   MessageFromWebviewType
 } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
-import {
-  countUpperLevels,
-  getPlaceholders,
-  isFirstLevelHeader
-} from '../../util/columns'
+import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { sendMessage } from '../../../shared/vscode'
 
 interface TableHeaderProps {
@@ -22,6 +18,7 @@ interface TableHeaderProps {
   sorts: SortDefinition[]
   index: number
   orderedColumns: MetricOrParam[]
+  isDragging: boolean
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
@@ -29,14 +26,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   columns,
   sorts,
   index,
-  orderedColumns
+  orderedColumns,
+  isDragging
 }) => {
-  const nbPlaceholder = getPlaceholders(column, columns).length
-  const hasPlaceholder = nbPlaceholder > 0
-  const isSortedWithPlaceholder = (sort: SortDefinition) =>
-    sort.path === column.placeholderOf?.id ||
-    (!column.placeholderOf && !hasPlaceholder && sort.path === column.id)
-  const isDraggable =
+  const isLeaf =
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
     !column.columns
@@ -47,33 +40,39 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     0
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
   const isSortAscending = !!sorts.find(
-    sort => !sort.descending && isSortedWithPlaceholder(sort)
+    sort => !sort.descending && sort.path === column.id
   )
   const isSortDescending =
     !isSortAscending &&
     !!sorts.find(sort => sort.descending && sort.path === column.id)
-  const sendSortColumn = () =>
+  const nextSortTypeIfNotAscending = isSortDescending
+    ? ColumnSortType.REMOVE
+    : ColumnSortType.ASCENDING
+  const doSendSortColumn = () =>
     sendMessage({
       payload: {
         columnId: column.id,
         columnSortType: isSortAscending
           ? ColumnSortType.DESCENDING
-          : isSortDescending
-          ? ColumnSortType.REMOVE
-          : ColumnSortType.ASCENDING
+          : nextSortTypeIfNotAscending
       },
       type: MessageFromWebviewType.COLUMN_SORTED
     })
+  const sendSortColumn = () => {
+    if (isLeaf && !isDragging) {
+      doSendSortColumn()
+    }
+  }
 
   return (
     <Draggable
       key={column.id}
       draggableId={column.id}
       index={index}
-      isDragDisabled={!isDraggable}
+      isDragDisabled={!isLeaf}
     >
       {(provided, snapshot) => (
-        <div
+        <button
           {...column.getHeaderProps({
             className: cx(
               styles.th,
@@ -83,12 +82,11 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               {
                 [styles.paramHeaderCell]: column.group === 'params',
                 [styles.metricHeaderCell]: column.group === 'metrics',
-                [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-                [styles.sortingHeaderCellAsc]: isSortAscending,
-                [styles.sortingHeaderCellDesc]: isSortDescending
+                [styles.firstLevelHeader]: isFirstLevelHeader(column.id)
               }
             )
           })}
+          onClick={sendSortColumn}
           key={column.id}
           data-testid={`header-${column.id}`}
         >
@@ -115,17 +113,17 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               style={{ height: resizerHeight }}
             />
           )}
-          {isDraggable && (
-            <div
-              className={styles.headerCellSortIcon}
-              onClick={sendSortColumn}
-              onKeyDown={sendSortColumn}
-              role="button"
-              tabIndex={0}
-              data-testid={`header-sort-${column.id}`}
-            ></div>
-          )}
-        </div>
+          <div
+            className={cx(styles.headerCellSortIcon, {
+              [styles.sortAscending]: isSortAscending,
+              [styles.sortDescending]: isSortDescending
+            })}
+            onKeyDown={sendSortColumn}
+            role="button"
+            tabIndex={0}
+            data-testid={`header-sort-indicator-${column.id}`}
+          ></div>
+        </button>
       )}
     </Draggable>
   )

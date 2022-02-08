@@ -363,6 +363,7 @@ $spinner-color-light: #000;
     text-align: left;
     min-width: 0;
     position: relative;
+    border: 0 none;
   }
   .td {
     font-size: 0.8rem;
@@ -402,22 +403,6 @@ $spinner-color-light: #000;
     text-align: center;
     border-bottom: 2px solid $bg-color;
     padding: 0.31rem $cell-padding;
-  }
-
-  .sortingHeaderCellAsc {
-    border-top: 1px solid white;
-
-    .headerCellSortIcon::before {
-      content: '\25B4';
-    }
-  }
-
-  .sortingHeaderCellDesc {
-    border-bottom: 1px solid white;
-
-    .headerCellSortIcon::before {
-      content: '\25BE';
-    }
   }
 
   .metaCell {
@@ -514,14 +499,17 @@ $spinner-color-light: #000;
 
 .headerCellSortIcon {
   bottom: -0.3em;
-  cursor: pointer;
   left: 0;
   position: absolute;
   text-align: center;
   width: 1em;
 
-  &::before {
-    content: '\2010';
+  &.sortAscending::before {
+    content: '\25B4';
+  }
+
+  &.sortDescending::before {
+    content: '\25BE';
   }
 }
 

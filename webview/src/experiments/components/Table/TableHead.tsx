@@ -1,6 +1,6 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { DragUpdate } from 'react-beautiful-dnd'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -25,6 +25,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   columns,
   sorts
 }) => {
+  const [isDragging, setIsDragging] = useState(false)
   const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
@@ -33,6 +34,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
 
   const onDragStart = () => {
     fullColumnOrder.current = allColumns.map(column => column.id)
+    setIsDragging(true)
   }
 
   const onDragUpdate = (column: DragUpdate) => {
@@ -54,6 +56,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
       payload: columnOrder,
       type: MessageFromWebviewType.COLUMN_REORDERED
     })
+    setIsDragging(false)
   }
 
   return (
@@ -69,6 +72,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
           onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
+          isDragging={isDragging}
         />
       ))}
     </div>

@@ -13,12 +13,14 @@ export const MergedHeaderGroup: React.FC<
     columns: HeaderGroup<Experiment>[]
     sorts: SortDefinition[]
     orderedColumns: MetricOrParam[]
+    isDragging: boolean
   } & Responders
 > = ({
   headerGroup,
   sorts,
   columns,
   orderedColumns,
+  isDragging,
   onDragStart,
   onDragUpdate,
   onDragEnd
@@ -45,6 +47,7 @@ export const MergedHeaderGroup: React.FC<
                 columns={columns}
                 sorts={sorts}
                 index={i}
+                isDragging={isDragging}
               />
             ))}
             <div className={styles.dndPlaceholder}>{provided.placeholder}</div>
