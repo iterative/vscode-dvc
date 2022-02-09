@@ -9,7 +9,8 @@ import {
   MessageFromWebviewType
 } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
-import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
+import { TableHeaderResizer } from './TableHeaderResizer'
+import { isFirstLevelHeader } from '../../util/columns'
 import { sendMessage } from '../../../shared/vscode'
 
 interface TableHeaderProps {
@@ -28,37 +29,30 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   index,
   orderedColumns,
   isDragging
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const isLeaf =
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
     !column.columns
-  const canResize = column.canResize && !column.placeholderOf
-  const nbUpperLevels =
-    (!column.placeholderOf &&
-      countUpperLevels(orderedColumns, column, columns, 0)) ||
-    0
-  const resizerHeight = 100 + nbUpperLevels * 92 + '%'
   const isSortAscending = !!sorts.find(
     sort => !sort.descending && sort.path === column.id
   )
   const isSortDescending =
     !isSortAscending &&
     !!sorts.find(sort => sort.descending && sort.path === column.id)
-  const nextSortTypeIfNotAscending = isSortDescending
-    ? ColumnSortType.REMOVE
-    : ColumnSortType.ASCENDING
-  const doSendSortColumn = () =>
+  const doSendSortColumn = () => {
+    let nextSortType = isSortAscending
+      ? ColumnSortType.DESCENDING
+      : ColumnSortType.ASCENDING
+    nextSortType = isSortDescending ? ColumnSortType.REMOVE : nextSortType
     sendMessage({
       payload: {
         columnId: column.id,
-        columnSortType: isSortAscending
-          ? ColumnSortType.DESCENDING
-          : nextSortTypeIfNotAscending
+        columnSortType: nextSortType
       },
       type: MessageFromWebviewType.COLUMN_SORTED
     })
+  }
   const sendSortColumn = () => {
     if (isLeaf && !isDragging) {
       doSendSortColumn()
@@ -73,7 +67,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       isDragDisabled={!isLeaf}
     >
       {(provided, snapshot) => (
-        <button
+        <div
           {...column.getHeaderProps({
             className: cx(
               styles.th,
@@ -87,11 +81,14 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               }
             )
           })}
-          onClick={sendSortColumn}
           key={column.id}
           data-testid={`header-${column.id}`}
         >
-          <div className={styles.headerCellContentsWrapper}>
+          <button
+            className={styles.headerCellContentsWrapper}
+            onClick={sendSortColumn}
+            data-testid={`header-sort-${column.id}`}
+          >
             <span
               ref={provided.innerRef}
               {...provided.draggableProps}
@@ -106,14 +103,12 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             >
               {column.render('Header')}
             </span>
-          </div>
-          {canResize && (
-            <div
-              {...column.getResizerProps()}
-              className={styles.columnResizer}
-              style={{ height: resizerHeight }}
-            />
-          )}
+          </button>
+          <TableHeaderResizer
+            column={column}
+            columns={columns}
+            orderedColumns={orderedColumns}
+          />
           <div
             className={cx(styles.headerCellSortIcon, {
               [styles.sortAscending]: isSortAscending,
@@ -121,7 +116,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             })}
             data-testid={`header-sort-indicator-${column.id}`}
           ></div>
-        </button>
+        </div>
       )}
     </Draggable>
   )

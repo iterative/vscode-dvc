@@ -363,7 +363,6 @@ $spinner-color-light: #000;
     text-align: left;
     min-width: 0;
     position: relative;
-    border: 0 none;
   }
   .td {
     font-size: 0.8rem;
@@ -494,7 +493,11 @@ $spinner-color-light: #000;
 }
 
 .headerCellContentsWrapper {
+  background-color: inherit;
+  border: 0 none;
+  color: inherit;
   padding: 0.1em 0;
+  width: 100%;
 }
 
 .headerCellSortIcon {

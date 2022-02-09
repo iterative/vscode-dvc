@@ -166,7 +166,7 @@ describe('Table', () => {
 
     it('should trigger to sort ascending if clicking on column on not sorted column', async () => {
       renderTable()
-      const column = await screen.findByTestId('header-experiment')
+      const column = await screen.findByTestId('header-sort-experiment')
 
       fireEvent.click(column, {
         bubbles: true,
@@ -199,7 +199,7 @@ describe('Table', () => {
       renderTable({
         sorts: [{ descending: false, path: 'experiment' }]
       })
-      const column = await screen.findByTestId('header-experiment')
+      const column = await screen.findByTestId('header-sort-experiment')
 
       fireEvent.click(column, {
         bubbles: true,
@@ -232,7 +232,7 @@ describe('Table', () => {
       renderTable({
         sorts: [{ descending: true, path: 'experiment' }]
       })
-      const column = await screen.findByTestId('header-experiment')
+      const column = await screen.findByTestId('header-sort-experiment')
 
       fireEvent.click(column, {
         bubbles: true,
@@ -273,7 +273,7 @@ describe('Table', () => {
     it('placeholder does not trigger sort', async () => {
       renderTableWithPlaceholder(false)
 
-      const header = await screen.findByTestId(`header-${placeholderId}`)
+      const header = await screen.findByTestId(`header-sort-${placeholderId}`)
 
       mockedPostMessage.mockClear()
 
