@@ -90,4 +90,126 @@ describe('ComparisonTable', () => {
     expect(changedSecondPlot.isSameNode(expectedFirstPlot)).toBe(true)
     expect(changedFirstPlot.isSameNode(expectedSecondPlot)).toBe(true)
   })
+
+  describe('Columns drag and drop', () => {
+    const testStorage = new Map()
+    const createBubbledEvent = (type: string, props = {}) => {
+      const event = new Event(type, {
+        bubbles: true
+      })
+      Object.assign(event, props)
+      Object.assign(event, {
+        dataTransfer: {
+          getData: (key: string) => testStorage.get(key),
+          setData: (key: string, value: Object) => testStorage.set(key, value)
+        }
+      })
+      return event
+    }
+
+    const getHeaders = () => screen.getAllByRole('columnheader')
+
+    const pinSecondColumn = () => {
+      const secondColumn = screen.getByText(
+        Object.keys(basicProps.revisions)[1]
+      )
+
+      fireEvent.click(secondColumn, {
+        bubbles: true,
+        cancelable: true
+      })
+    }
+
+    const dragAndDrop = (
+      startingNode: HTMLElement,
+      endingNode: HTMLElement
+    ) => {
+      startingNode.dispatchEvent(createBubbledEvent('dragstart'))
+
+      endingNode.dispatchEvent(createBubbledEvent('drop'))
+    }
+
+    it('should make the columns draggable if they are not pinned', () => {
+      renderTable()
+
+      const headers = getHeaders()
+
+      headers.forEach(header => {
+        expect(header.getAttribute('draggable')).toBe('true')
+      })
+
+      pinSecondColumn()
+
+      const [firstHeader] = getHeaders()
+
+      expect(firstHeader.getAttribute('draggable')).toBe('false')
+    })
+
+    it('should reorder the columns accordingly after a column drag and drop', () => {
+      renderTable()
+
+      const [, endingNode, , startingNode] = getHeaders()
+      const revisions = Object.keys(basicProps.revisions)
+
+      let headers = getHeaders().map(header => header.textContent)
+
+      expect(headers).toEqual([
+        revisions[0],
+        revisions[1],
+        revisions[2],
+        revisions[3],
+        revisions[4]
+      ])
+
+      dragAndDrop(startingNode, endingNode)
+
+      headers = getHeaders().map(header => header.textContent)
+
+      expect(headers).toEqual([
+        revisions[0],
+        revisions[3],
+        revisions[1],
+        revisions[2],
+        revisions[4]
+      ])
+    })
+
+    it('should not change the column order if a column is dropped on a pinned column', () => {
+      renderTable()
+
+      pinSecondColumn()
+
+      const [, endingNode, , startingNode] = getHeaders()
+      const revisions = Object.keys(basicProps.revisions)
+      const expectedOrder = [
+        revisions[1],
+        revisions[0],
+        revisions[2],
+        revisions[3],
+        revisions[4]
+      ]
+
+      const headers = getHeaders().map(header => header.textContent)
+
+      expect(headers).toEqual(expectedOrder)
+
+      dragAndDrop(startingNode, endingNode)
+
+      expect(headers).toEqual(expectedOrder)
+    })
+
+    it('should prevent default behaviour when dragging over', () => {
+      renderTable()
+
+      const [firstNode] = getHeaders()
+
+      const dragOverEvent = createBubbledEvent('dragover', {
+        preventDefault: jest.fn()
+      })
+
+      firstNode.dispatchEvent(dragOverEvent)
+
+      expect(dragOverEvent.preventDefault).toHaveBeenCalled()
+    })
+  })
 })
