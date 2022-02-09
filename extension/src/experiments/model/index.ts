@@ -192,7 +192,6 @@ export class ExperimentsModel {
   }
 
   public getExperiments(): (Experiment & {
-    statusId: string
     hasChildren: boolean
     selected?: boolean
   })[] {
@@ -200,8 +199,7 @@ export class ExperimentsModel {
       {
         ...this.workspace,
         hasChildren: false,
-        selected: !!this.status.workspace,
-        statusId: 'workspace'
+        selected: !!this.status.workspace
       },
       ...this.branches.map(branch => {
         const name = branch.name as string
@@ -209,14 +207,12 @@ export class ExperimentsModel {
           ...branch,
           displayColor: this.getBranchColor(name),
           hasChildren: false,
-          selected: !!this.status[name],
-          statusId: name
+          selected: !!this.status[branch.statusId]
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
         ...this.addDetails(experiment),
-        hasChildren: !!this.checkpointsByTip.get(experiment.id),
-        statusId: experiment.name as string
+        hasChildren: !!this.checkpointsByTip.get(experiment.id)
       }))
     ]
   }
@@ -236,11 +232,9 @@ export class ExperimentsModel {
   }
 
   public getCheckpoints(experimentId: string): Experiment[] | undefined {
-    return this.checkpointsByTip.get(experimentId)?.map(checkpoint => ({
-      ...this.addDetails(checkpoint, experimentId),
-      selected: !!this.status[checkpoint.id],
-      statusId: checkpoint.id
-    }))
+    return this.checkpointsByTip
+      .get(experimentId)
+      ?.map(checkpoint => this.addDetails(checkpoint, experimentId))
   }
 
   public getRowData() {
@@ -318,7 +312,8 @@ export class ExperimentsModel {
   }
 
   private getExperimentDetails(id: string) {
-    return { name: this.names[id], selected: !!this.getStatus(id) }
+    const name = this.names[id]
+    return { name, selected: !!this.status[name] }
   }
 
   private setStatus() {
@@ -326,43 +321,40 @@ export class ExperimentsModel {
       this.setSelectedToFilters()
       return
     }
-    this.status = this.getStatuses()
+    this.status = this.collectStatuses()
 
     this.persistStatus()
   }
 
-  private getStatuses() {
-    const acc = [this.workspace, ...this.branches].reduce((acc, exp) => {
-      const { displayId } = exp
-      if (displayId) {
-        acc[displayId] = hasKey(this.status, displayId)
-          ? this.status[displayId]
-          : Status.SELECTED
-      }
+  private collectStatuses() {
+    const acc = [this.workspace, ...this.branches].reduce((acc, experiment) => {
+      this.collectStatus(acc, experiment, Status.SELECTED)
       return acc
     }, {} as Record<string, Status>)
 
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-    return this.flattenExperiments().reduce((acc, exp) => {
-      const { name, queued } = exp
-      if (name && !queued) {
-        acc[name] = hasKey(this.status, name)
-          ? this.status[name]
-          : Status.SELECTED
-      }
+    return this.flattenExperiments().reduce((acc, experiment) => {
+      this.collectStatus(acc, experiment, Status.SELECTED)
 
-      this.checkpointsByTip.get(exp.id)?.reduce((acc, checkpoint) => {
-        const { id } = checkpoint
-        if (id) {
-          acc[id] = hasKey(this.status, id)
-            ? this.status[id]
-            : Status.UNSELECTED
-        }
+      this.checkpointsByTip.get(experiment.id)?.reduce((acc, checkpoint) => {
+        this.collectStatus(acc, checkpoint, Status.UNSELECTED)
         return acc
       }, acc)
 
       return acc
     }, acc)
+  }
+
+  private collectStatus(
+    acc: Record<string, Status>,
+    experiment: Experiment,
+    defaultStatus: Status
+  ) {
+    const { statusId, queued } = experiment
+    if (statusId && !queued) {
+      acc[statusId] = hasKey(this.status, statusId)
+        ? this.status[statusId]
+        : defaultStatus
+    }
   }
 
   private setExperimentNames() {
@@ -503,8 +495,7 @@ export class ExperimentsModel {
   private addDetails(experiment: Experiment, id?: string) {
     const assignedColors = this.getAssignedExperimentColors()
     const displayColor = assignedColors.get(id || experiment.id)
-    const status = this.getStatus(id || experiment.id)
-    const selected = status !== undefined ? !!status : undefined
+    const selected = !!this.status[experiment.statusId]
 
     return displayColor
       ? {
@@ -525,10 +516,5 @@ export class ExperimentsModel {
 
   private getAssignedExperimentColors() {
     return this.experimentColors.assigned
-  }
-
-  private getStatus(experimentId: string) {
-    const name = this.names[experimentId]
-    return this.status[name]
   }
 }

@@ -134,7 +134,7 @@ const data: RowData[] = [
             displayId: 'd1343a8',
             displayColor: colorsList[0],
             id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
-            selected: true,
+            selected: false,
             statusId: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
           },
           {
@@ -168,7 +168,7 @@ const data: RowData[] = [
             displayColor: colorsList[0],
             displayId: '1ee5f2e',
             id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
-            selected: true,
+            selected: false,
             statusId: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53'
           }
         ],
@@ -240,7 +240,7 @@ const data: RowData[] = [
             displayColor: colorsList[1],
             displayId: '2173124',
             id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
-            selected: true,
+            selected: false,
             statusId: '217312476f8854dda1865450b737eb6bc7a3ba1b'
           },
           {
@@ -274,7 +274,7 @@ const data: RowData[] = [
             displayColor: colorsList[1],
             displayId: '9523bde',
             id: '9523bde67538cf31230efaff2dbc47d38a944ab5',
-            selected: true,
+            selected: false,
             statusId: '9523bde67538cf31230efaff2dbc47d38a944ab5'
           }
         ],
@@ -346,7 +346,7 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: '22e40e1',
             id: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
-            selected: true,
+            selected: false,
             statusId: '22e40e1fa3c916ac567f69b85969e3066a91dda4'
           },
           {
@@ -380,7 +380,7 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: '91116c1',
             id: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
-            selected: true,
+            selected: false,
             statusId: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15'
           },
           {
@@ -414,7 +414,7 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: 'e821416',
             id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
-            selected: true,
+            selected: false,
             statusId: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361'
           },
           {
@@ -448,7 +448,7 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: 'c658f8b',
             id: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
-            selected: true,
+            selected: false,
             statusId: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880'
           },
           {
@@ -482,7 +482,7 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: '23250b3',
             id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
-            selected: true,
+            selected: false,
             statusId: '23250b33e3d6dd0e136262d1d26a2face031cb03'
           }
         ],
