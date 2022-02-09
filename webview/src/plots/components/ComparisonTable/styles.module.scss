@@ -1,6 +1,12 @@
 @import '../../../shared/variables.scss';
 
 $gap: 4px;
+.comparisonTableHeader {
+  position: sticky;
+  top: -#{$gap};
+  z-index: 2;
+}
+
 .header {
   padding: 10px 5px;
   color: #fff;
@@ -15,6 +21,11 @@ $gap: 4px;
   position: relative;
   width: 100%;
   border: none;
+  cursor: grab;
+
+  .pinnedColumnHeader & {
+    cursor: initial;
+  }
 }
 
 .bullet {
@@ -52,12 +63,6 @@ $gap: 4px;
   svg {
     fill: $fg-color;
   }
-}
-
-.comparisonTableHeader {
-  position: sticky;
-  top: -#{$gap};
-  z-index: 2;
 }
 
 .pinnedColumnCell, .pinnedColumnHeader {
