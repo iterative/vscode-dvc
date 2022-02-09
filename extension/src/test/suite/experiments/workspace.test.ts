@@ -286,7 +286,6 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  // have a think about this one
   describe('dvc.applyExperiment', () => {
     it('should ask the user to pick an experiment and then apply that experiment to the workspace', async () => {
       const selectedExperimentName = 'test-branch'

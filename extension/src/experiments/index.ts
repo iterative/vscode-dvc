@@ -221,7 +221,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public pickCurrentExperiment() {
-    return pickExperiment(this.experiments.getSelectable())
+    return pickExperiment(this.experiments.getCurrentExperiments())
   }
 
   public async pickParamsToQueue() {

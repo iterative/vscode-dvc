@@ -146,10 +146,10 @@ export class ExperimentsTree
   }
 
   private getExperiments(dvcRoot: string): ExperimentItem[] {
-    const experiments = this.experiments.getRepository(dvcRoot)
-
-    return [
-      ...experiments.getExperiments().map(experiment => ({
+    return this.experiments
+      .getRepository(dvcRoot)
+      .getExperiments()
+      .map(experiment => ({
         collapsibleState: experiment.hasChildren
           ? this.getCollapsibleState(experiment.displayNameOrParent)
           : TreeItemCollapsibleState.None,
@@ -166,7 +166,6 @@ export class ExperimentsTree
         id: experiment.id,
         label: experiment.displayId
       }))
-    ]
   }
 
   private setExpanded(element: string | ExperimentItem, expanded: boolean) {

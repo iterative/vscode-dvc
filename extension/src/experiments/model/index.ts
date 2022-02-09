@@ -227,7 +227,7 @@ export class ExperimentsModel {
     return collectFlatExperimentParams(params)
   }
 
-  public getSelectable() {
+  public getCurrentExperiments() {
     return this.flattenExperiments().filter(({ queued }) => !queued)
   }
 
