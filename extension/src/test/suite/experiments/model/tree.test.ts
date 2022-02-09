@@ -42,11 +42,6 @@ suite('Experiments Tree Test Suite', () => {
 
   describe('ExperimentsTree', () => {
     const { colors } = livePlotsFixture
-    const ids = [
-      '4fb124aebddb2adf1545030907687fa9a4c80e70',
-      '42b8736b08170529903cd203a1f40382a4b4a8cd',
-      '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d'
-    ]
     const { domain, range } = colors
 
     it('should appear in the UI', async () => {
@@ -60,7 +55,6 @@ suite('Experiments Tree Test Suite', () => {
 
       const expectedDomain = [...domain]
       const expectedRange = [...range]
-      const expectedIds = [...ids]
 
       const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
       const getLivePlotsEvent = new Promise(resolve =>
@@ -94,15 +88,14 @@ suite('Experiments Tree Test Suite', () => {
         ).to.deep.equal(expectedData)
         messageSpy.resetHistory()
 
-        const id = expectedIds.pop()
-        expectedDomain.pop()
+        const statusId = expectedDomain.pop()
         expectedRange.pop()
 
         const unSelected = await commands.executeCommand(
           RegisteredCommands.EXPERIMENT_TOGGLE,
           {
             dvcRoot: dvcDemoPath,
-            id
+            statusId
           }
         )
 
@@ -129,7 +122,7 @@ suite('Experiments Tree Test Suite', () => {
         RegisteredCommands.EXPERIMENT_TOGGLE,
         {
           dvcRoot: dvcDemoPath,
-          id: ids[0]
+          statusId: domain[0]
         }
       )
 
@@ -149,15 +142,13 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
       const { plots, messageSpy } = await buildPlots(disposable)
 
-      const selectedId = ids[0]
-
       const selectedDisplayName = domain[0]
       const selectedColor = range[0]
       const selectedItem = {
         description: selectedDisplayName,
         label: '',
         picked: true,
-        value: selectedId
+        value: { statusId: selectedDisplayName }
       }
 
       await plots.showWebview()
@@ -178,29 +169,6 @@ suite('Experiments Tree Test Suite', () => {
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SELECT)
 
       expect(mockShowQuickPick).to.be.calledOnce
-      expect(mockShowQuickPick).to.be.calledWith(
-        [
-          {
-            description: `[${selectedDisplayName}]`,
-            label: selectedId.slice(0, 7),
-            picked: true,
-            value: selectedId
-          },
-          {
-            description: `[${domain[1]}]`,
-            label: ids[1].slice(0, 7),
-            picked: true,
-            value: ids[1]
-          },
-          {
-            description: `[${domain[2]}]`,
-            label: ids[2].slice(0, 7),
-            picked: true,
-            value: ids[2]
-          }
-        ],
-        { canPickMany: true, title: 'Select experiments' }
-      )
 
       expect(
         messageSpy,

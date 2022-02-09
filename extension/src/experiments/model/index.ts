@@ -75,11 +75,11 @@ export class ExperimentsModel {
     return this.collectColors()
   }
 
-  public toggleStatus(experimentId: string) {
-    const newStatus = this.getStatus(experimentId)
+  public toggleStatus(statusId: string) {
+    const newStatus = this.status[statusId]
       ? Status.UNSELECTED
       : Status.SELECTED
-    this.status[this.names[experimentId]] = newStatus
+    this.status[statusId] = newStatus
 
     this.setSelectionMode(false)
     this.persistStatus()
@@ -132,13 +132,15 @@ export class ExperimentsModel {
   }
 
   public getSelectedRevisions() {
-    const revisionColors = { workspace: getWorkspaceColor() } as Record<
-      string,
-      string
-    >
+    const revisionColors = {} as Record<string, string>
+    if (this.status.workspace) {
+      revisionColors.workspace = getWorkspaceColor()
+    }
 
     this.getAssignedBranchColors().forEach((color: string, name: string) => {
-      revisionColors[name] = color
+      if (this.status[name]) {
+        revisionColors[name] = color
+      }
     })
 
     this.getAssignedExperimentColors().forEach((color: string, id: string) => {
@@ -164,14 +166,14 @@ export class ExperimentsModel {
     return experimentColors
   }
 
-  public setSelected(ids: string[]) {
-    this.status = this.flattenExperiments().reduce((acc, { id, name }) => {
-      if (!name) {
-        return acc
-      }
+  public setSelected(experiments: Experiment[]) {
+    const selected = experiments.map(exp => exp.statusId)
 
-      const status = ids.includes(id) ? Status.SELECTED : Status.UNSELECTED
-      acc[name] = status
+    this.status = this.getExperiments().reduce((acc, { statusId }) => {
+      const status = selected.includes(statusId)
+        ? Status.SELECTED
+        : Status.UNSELECTED
+      acc[statusId] = status
 
       return acc
     }, {} as Record<string, Status>)
@@ -185,23 +187,38 @@ export class ExperimentsModel {
   }
 
   public setSelectedToFilters() {
-    const filtered = this.getSubRows(this.getSelectable()).map(exp => exp.id)
+    const filtered = this.getSubRows(this.getExperiments())
     this.setSelected(filtered)
   }
 
   public getExperiments(): (Experiment & {
+    statusId: string
     hasChildren: boolean
     selected?: boolean
   })[] {
-    const workspace = this.workspace.running ? [this.workspace] : []
-    return [...workspace, ...this.flattenExperiments()].map(experiment => ({
-      ...this.addDetails(experiment),
-      hasChildren: !!this.checkpointsByTip.get(experiment.id)
-    }))
-  }
-
-  public getExperimentsWithWorkspace() {
-    return [this.workspace, ...this.flattenExperiments()]
+    return [
+      {
+        ...this.workspace,
+        hasChildren: false,
+        selected: !!this.status.workspace,
+        statusId: 'workspace'
+      },
+      ...this.branches.map(branch => {
+        const name = branch.name as string
+        return {
+          ...branch,
+          displayColor: this.getBranchColor(name),
+          hasChildren: false,
+          selected: !!this.status[name],
+          statusId: name
+        }
+      }),
+      ...this.flattenExperiments().map(experiment => ({
+        ...this.addDetails(experiment),
+        hasChildren: !!this.checkpointsByTip.get(experiment.id),
+        statusId: experiment.name as string
+      }))
+    ]
   }
 
   public getExperimentParams(id: string) {
@@ -215,15 +232,15 @@ export class ExperimentsModel {
   }
 
   public getSelectable() {
-    return this.getExperiments().filter(
-      exp => exp.displayId !== 'workspace' && !exp.queued
-    )
+    return this.flattenExperiments().filter(({ queued }) => !queued)
   }
 
   public getCheckpoints(experimentId: string): Experiment[] | undefined {
-    return this.checkpointsByTip
-      .get(experimentId)
-      ?.map(checkpoint => this.addDetails(checkpoint, experimentId))
+    return this.checkpointsByTip.get(experimentId)?.map(checkpoint => ({
+      ...this.addDetails(checkpoint, experimentId),
+      selected: !!this.status[checkpoint.id],
+      statusId: checkpoint.id
+    }))
   }
 
   public getRowData() {
@@ -315,6 +332,17 @@ export class ExperimentsModel {
   }
 
   private getStatuses() {
+    const acc = [this.workspace, ...this.branches].reduce((acc, exp) => {
+      const { displayId } = exp
+      if (displayId) {
+        acc[displayId] = hasKey(this.status, displayId)
+          ? this.status[displayId]
+          : Status.SELECTED
+      }
+      return acc
+    }, {} as Record<string, Status>)
+
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     return this.flattenExperiments().reduce((acc, exp) => {
       const { name, queued } = exp
       if (name && !queued) {
@@ -322,8 +350,19 @@ export class ExperimentsModel {
           ? this.status[name]
           : Status.SELECTED
       }
+
+      this.checkpointsByTip.get(exp.id)?.reduce((acc, checkpoint) => {
+        const { id } = checkpoint
+        if (id) {
+          acc[id] = hasKey(this.status, id)
+            ? this.status[id]
+            : Status.UNSELECTED
+        }
+        return acc
+      }, acc)
+
       return acc
-    }, {} as Record<string, Status>)
+    }, acc)
   }
 
   private setExperimentNames() {

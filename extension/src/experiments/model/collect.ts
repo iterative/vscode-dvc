@@ -43,6 +43,19 @@ const transformMetricsAndParams = (
 
 export const getDisplayId = (sha: string) => sha.slice(0, 7)
 
+const getStatusId = (
+  sha: string,
+  experimentsFields: ExperimentFields
+): string => {
+  const { name, checkpoint_tip } = experimentsFields
+
+  if (isCheckpoint(checkpoint_tip, sha)) {
+    return sha
+  }
+
+  return name || sha
+}
+
 const transformExperimentData = (
   sha: string,
   experimentFieldsOrError: ExperimentFieldsOrError,
@@ -57,7 +70,8 @@ const transformExperimentData = (
   const experiment = {
     id: sha,
     ...experimentFields,
-    displayId
+    displayId,
+    statusId: getStatusId(sha, experimentFields)
   } as Experiment
 
   if (displayNameOrParent) {

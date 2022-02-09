@@ -13,6 +13,7 @@ describe('sortExperiments', () => {
     displayId: testDisplayId,
     id: testId,
     queued: false,
+    statusId: testId,
     timestamp: testTimestamp
   }
   const testPathArray = ['params', 'params.yaml', 'test']

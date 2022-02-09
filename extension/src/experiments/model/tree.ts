@@ -24,7 +24,7 @@ enum Status {
 
 export type ExperimentItem = {
   command?: {
-    arguments: [{ dvcRoot: string; id: string }]
+    arguments: { dvcRoot: string; statusId: string }[]
     command: RegisteredCommands
     title: string
   }
@@ -77,10 +77,11 @@ export class ExperimentsTree
     this.experiments = experiments
     this.resourceLocator = resourceLocator
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TOGGLE,
-      ({ dvcRoot, id }) =>
-        this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
+    internalCommands.registerExternalCommand<{
+      dvcRoot: string
+      statusId: string
+    }>(RegisteredCommands.EXPERIMENT_TOGGLE, ({ dvcRoot, statusId }) =>
+      this.experiments.getRepository(dvcRoot).toggleExperimentStatus(statusId)
     )
 
     this.updateDescriptionOnChange()
@@ -128,12 +129,12 @@ export class ExperimentsTree
       this.viewed = true
     }
 
-    const experimentNames = flatten(
+    const experiments = flatten(
       dvcRoots.map(dvcRoot =>
         this.experiments.getRepository(dvcRoot).getExperiments()
       )
     )
-    if (definedAndNonEmpty(experimentNames)) {
+    if (definedAndNonEmpty(experiments)) {
       if (dvcRoots.length === 1) {
         const [onlyRepo] = dvcRoots
         return this.getChildren(onlyRepo)
@@ -145,17 +146,17 @@ export class ExperimentsTree
   }
 
   private getExperiments(dvcRoot: string): ExperimentItem[] {
-    return this.experiments
-      .getRepository(dvcRoot)
-      .getExperiments()
-      .map(experiment => ({
+    const experiments = this.experiments.getRepository(dvcRoot)
+
+    return [
+      ...experiments.getExperiments().map(experiment => ({
         collapsibleState: experiment.hasChildren
           ? this.getCollapsibleState(experiment.displayNameOrParent)
           : TreeItemCollapsibleState.None,
         command: experiment.queued
           ? undefined
           : {
-              arguments: [{ dvcRoot, id: experiment.id }],
+              arguments: [{ dvcRoot, statusId: experiment.statusId }],
               command: RegisteredCommands.EXPERIMENT_TOGGLE,
               title: 'toggle'
             },
@@ -165,6 +166,7 @@ export class ExperimentsTree
         id: experiment.id,
         label: experiment.displayId
       }))
+    ]
   }
 
   private setExpanded(element: string | ExperimentItem, expanded: boolean) {
@@ -186,7 +188,6 @@ export class ExperimentsTree
 
   private getExperimentIcon({
     displayColor,
-    displayId,
     running,
     queued,
     selected
@@ -197,10 +198,9 @@ export class ExperimentsTree
     queued?: boolean
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
-    if (displayId === 'workspace' || running) {
+    if (running) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
-
     if (queued) {
       return this.resourceLocator.clock
     }
