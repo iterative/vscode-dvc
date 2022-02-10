@@ -70,7 +70,7 @@ export class ExperimentsModel {
   }
 
   public toggleStatus(id: string) {
-    const newStatus = this.status[id] ? Status.UNSELECTED : Status.SELECTED
+    const newStatus = this.getStatus(id) ? Status.UNSELECTED : Status.SELECTED
     this.status[id] = newStatus
 
     this.setSelectionMode(false)
@@ -129,9 +129,9 @@ export class ExperimentsModel {
       revisionColors.workspace = getWorkspaceColor()
     }
 
-    this.getAssignedBranchColors().forEach((color: string, name: string) => {
-      if (this.status[name]) {
-        revisionColors[name] = color
+    this.getAssignedBranchColors().forEach((color: string, id: string) => {
+      if (this.getStatus(id)) {
+        revisionColors[id] = color
       }
     })
 
@@ -149,7 +149,7 @@ export class ExperimentsModel {
     const experimentColors = {} as Record<string, string>
 
     this.getAssignedExperimentColors().forEach((color: string, id: string) => {
-      if (this.status[id]) {
+      if (this.getStatus(id)) {
         experimentColors[id] = color
       }
     })
@@ -191,12 +191,11 @@ export class ExperimentsModel {
         selected: !!this.status.workspace
       },
       ...this.branches.map(branch => {
-        const name = branch.name as string
         return {
           ...branch,
-          displayColor: this.getBranchColor(name),
+          displayColor: this.getBranchColor(branch.id),
           hasChildren: false,
-          selected: !!this.status[branch.id]
+          selected: !!this.getStatus(branch.id)
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
@@ -302,7 +301,7 @@ export class ExperimentsModel {
 
   private getExperimentDetails(id: string) {
     const revision = this.revisions[id]
-    return { revision, selected: !!this.status[id] }
+    return { revision, selected: this.getStatus(id) }
   }
 
   private setStatus() {
@@ -332,7 +331,7 @@ export class ExperimentsModel {
   private async collectColors() {
     const [branchColors, experimentColors] = await Promise.all([
       collectColors(
-        this.branches.map(branch => branch.name).filter(Boolean) as string[],
+        this.branches.map(branch => branch.id).filter(Boolean) as string[],
         this.getAssignedBranchColors(),
         this.branchColors.available,
         copyOriginalBranchColors
@@ -457,7 +456,7 @@ export class ExperimentsModel {
   private addDetails(experiment: Experiment, id?: string) {
     const assignedColors = this.getAssignedExperimentColors()
     const displayColor = assignedColors.get(id || experiment.id)
-    const selected = !!this.status[experiment.id]
+    const selected = !!this.getStatus(experiment.id)
 
     return displayColor
       ? {
@@ -472,11 +471,15 @@ export class ExperimentsModel {
     return this.branchColors.assigned
   }
 
-  private getBranchColor(name: string) {
-    return this.getAssignedBranchColors().get(name)
+  private getBranchColor(id: string) {
+    return this.getAssignedBranchColors().get(id)
   }
 
   private getAssignedExperimentColors() {
     return this.experimentColors.assigned
+  }
+
+  private getStatus(id: string) {
+    return !!this.status[id]
   }
 }
