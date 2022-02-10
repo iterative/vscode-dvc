@@ -9,6 +9,7 @@ import {
   ExperimentsOutput
 } from '../../cli/reader'
 import { addToMapArray } from '../../util/map'
+import { hasKey } from '../../util/object'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
 
@@ -200,4 +201,38 @@ export const collectExperiments = (
 
   collectFromBranchesObject(acc, branchesObject)
   return acc
+}
+
+export enum Status {
+  SELECTED = 1,
+  UNSELECTED = 0
+}
+
+const collectStatus = (
+  acc: Record<string, Status>,
+  experiment: Experiment,
+  status: Record<string, Status>,
+  defaultStatus: Status
+) => {
+  const { id, queued } = experiment
+  if (id && !queued) {
+    acc[id] = hasKey(status, id) ? status[id] : defaultStatus
+  }
+}
+
+export const collectStatuses = (
+  experiments: Experiment[],
+  checkpointsByTip: Map<string, Experiment[]>,
+  status: Record<string, Status>
+) => {
+  return experiments.reduce((acc, experiment) => {
+    collectStatus(acc, experiment, status, Status.SELECTED)
+
+    checkpointsByTip.get(experiment.id)?.reduce((acc, checkpoint) => {
+      collectStatus(acc, checkpoint, status, Status.UNSELECTED)
+      return acc
+    }, acc)
+
+    return acc
+  }, {} as Record<string, Status>)
 }

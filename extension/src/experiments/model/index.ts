@@ -7,7 +7,7 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import { collectExperiments } from './collect'
+import { collectExperiments, collectStatuses, Status } from './collect'
 import {
   copyOriginalBranchColors,
   copyOriginalExperimentColors,
@@ -18,14 +18,8 @@ import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
-import { hasKey } from '../../util/object'
 import { setContextValue } from '../../vscode/context'
 import { MementoPrefix } from '../../vscode/memento'
-
-export enum Status {
-  SELECTED = 1,
-  UNSELECTED = 0
-}
 
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
@@ -316,38 +310,13 @@ export class ExperimentsModel {
       this.setSelectedToFilters()
       return
     }
-    this.status = this.collectStatuses()
+    this.status = collectStatuses(
+      this.getExperiments(),
+      this.checkpointsByTip,
+      this.status
+    )
 
     this.persistStatus()
-  }
-
-  private collectStatuses() {
-    const acc = [this.workspace, ...this.branches].reduce((acc, experiment) => {
-      this.collectStatus(acc, experiment, Status.SELECTED)
-      return acc
-    }, {} as Record<string, Status>)
-
-    return this.flattenExperiments().reduce((acc, experiment) => {
-      this.collectStatus(acc, experiment, Status.SELECTED)
-
-      this.checkpointsByTip.get(experiment.id)?.reduce((acc, checkpoint) => {
-        this.collectStatus(acc, checkpoint, Status.UNSELECTED)
-        return acc
-      }, acc)
-
-      return acc
-    }, acc)
-  }
-
-  private collectStatus(
-    acc: Record<string, Status>,
-    experiment: Experiment,
-    defaultStatus: Status
-  ) {
-    const { id, queued } = experiment
-    if (id && !queued) {
-      acc[id] = hasKey(this.status, id) ? this.status[id] : defaultStatus
-    }
   }
 
   private setExperimentRevisions() {

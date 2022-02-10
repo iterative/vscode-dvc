@@ -11,7 +11,8 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '../../../../extension'
-import { ExperimentsModel, Status } from '../../../../experiments/model'
+import { ExperimentsModel } from '../../../../experiments/model'
+import { Status } from '../../../../experiments/model/collect'
 import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
