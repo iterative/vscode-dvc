@@ -58,25 +58,33 @@ beforeEach(() => {
 
 describe('ExperimentsTree', () => {
   describe('getChildren', () => {
-    it('should never return an empty array as experiments will always exist', async () => {
+    it('should return an empty array when no experiments exist for any of the multiple repositories', async () => {
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
         mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'second/repo'])
-      mockedGetExperiments.mockReturnValueOnce([
-        { displayId: 'workspace' },
-        { displayId: 'main' }
-      ])
-      mockedGetExperiments.mockReturnValueOnce([
-        { displayId: 'workspace' },
-        { displayId: 'main' }
-      ])
+      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([])
 
       const rootElements = await experimentsTree.getChildren()
 
-      expect(rootElements).toEqual(['demo', 'second/repo'])
+      expect(rootElements).toEqual([])
+    })
+
+    it('should return an empty array when no experiments exist for the single repository', async () => {
+      const experimentsTree = new ExperimentsTree(
+        mockedExperiments,
+        mockedInternalCommands,
+        mockedResourceLocator
+      )
+      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
+      mockedGetExperiments.mockReturnValueOnce([])
+
+      const rootElements = await experimentsTree.getChildren()
+
+      expect(rootElements).toEqual([])
     })
 
     it('should return an array of root elements when at least one experiment exists in one of the repositories', async () => {
