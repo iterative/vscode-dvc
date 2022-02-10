@@ -33,6 +33,7 @@ const data: RowData[] = [
     },
     displayColor: '#945dd6',
     displayId: 'workspace',
+    selected: true,
     id: 'workspace'
   },
   {
@@ -65,6 +66,7 @@ const data: RowData[] = [
     name: 'main',
     displayId: 'main',
     displayColor: '#13adc7',
+    selected: true,
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     subRows: [
       {

@@ -227,12 +227,13 @@ export class ExperimentsModel {
 
   public getRowData() {
     return [
-      this.workspace,
+      { ...this.workspace, selected: this.getStatus('workspace') },
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
         const branchWithColor = {
           ...branch,
-          displayColor: this.getBranchColor(branch.id)
+          displayColor: this.getBranchColor(branch.id),
+          selected: this.getStatus(branch.id)
         }
 
         if (!definedAndNonEmpty(experiments)) {

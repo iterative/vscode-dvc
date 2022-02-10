@@ -255,7 +255,8 @@ suite('Experiments Test Suite', () => {
             displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
-            params: { 'params.yaml': { test: 10 } }
+            params: { 'params.yaml': { test: 10 } },
+            selected: true
           },
           {
             displayColor: '#13adc7',
@@ -263,6 +264,7 @@ suite('Experiments Test Suite', () => {
             id: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
+            selected: true,
             sha: 'testBranch',
             subRows: [
               {
@@ -318,7 +320,8 @@ suite('Experiments Test Suite', () => {
             displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
-            params: { 'params.yaml': { test: 10 } }
+            params: { 'params.yaml': { test: 10 } },
+            selected: true
           },
           {
             displayColor: '#13adc7',
@@ -326,6 +329,7 @@ suite('Experiments Test Suite', () => {
             id: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
+            selected: true,
             sha: 'testBranch',
             subRows: [
               {
