@@ -203,6 +203,46 @@ export const collectExperiments = (
   return acc
 }
 
+const collectExperimentIds = (
+  acc: {
+    branchIds: string[]
+    experimentIds: string[]
+  },
+  experimentsObject: ExperimentsObject
+) => {
+  for (const [sha, experimentData] of Object.entries(experimentsObject)) {
+    const experimentFields = experimentData.data
+    if (!experimentFields?.name) {
+      continue
+    }
+    if (!isCheckpoint(experimentFields.checkpoint_tip, sha)) {
+      acc.experimentIds.push(experimentFields.name)
+    }
+  }
+}
+
+export const collectBranchAndExperimentIds = (branchesObject: {
+  [sha: string]: ExperimentsBranchOutput
+}) => {
+  const acc = { branchIds: [], experimentIds: [] } as {
+    branchIds: string[]
+    experimentIds: string[]
+  }
+  for (const { baseline, ...experimentsObject } of Object.values(
+    branchesObject
+  )) {
+    const experimentFields = baseline.data
+    if (!experimentFields?.name) {
+      continue
+    }
+
+    acc.branchIds.push(experimentFields.name)
+
+    collectExperimentIds(acc, experimentsObject)
+  }
+  return acc
+}
+
 export enum Status {
   SELECTED = 1,
   UNSELECTED = 0

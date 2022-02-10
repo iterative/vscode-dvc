@@ -288,9 +288,11 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.applyExperiment', () => {
     it('should ask the user to pick an experiment and then apply that experiment to the workspace', async () => {
-      const selectedExperimentName = 'test-branch'
+      const selectedExperiment = 'test-branch'
 
       const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
 
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -303,7 +305,7 @@ suite('Workspace Experiments Test Suite', () => {
         'getRepository'
       ).returns(experiments)
       const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
-        value: { id: 'a123456', name: selectedExperimentName }
+        value: { id: selectedExperiment, name: selectedExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
       const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
 
@@ -311,7 +313,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       expect(mockExperimentApply).to.be.calledWith(
         dvcDemoPath,
-        selectedExperimentName
+        selectedExperiment
       )
       expect(mockShowQuickPick).to.be.calledWith(
         [
@@ -350,9 +352,11 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.removeExperiment', () => {
     it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
-      const mockExperimentName = 'exp-to-remove'
+      const mockExperiment = 'exp-to-remove'
 
       const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
 
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -366,7 +370,7 @@ suite('Workspace Experiments Test Suite', () => {
       ).returns(experiments)
 
       stub(window, 'showQuickPick').resolves({
-        value: { id: 'f1245699', name: mockExperimentName }
+        value: { id: mockExperiment, name: mockExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
       const mockExperimentRemove = stub(
         CliExecutor.prototype,
@@ -375,10 +379,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
 
-      expect(mockExperimentRemove).to.be.calledWith(
-        dvcDemoPath,
-        mockExperimentName
-      )
+      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
     })
   })
 })

@@ -459,9 +459,9 @@ suite('Experiments Test Suite', () => {
         mockMemento.keys(),
         'Memento starts with the colors and status keys'
       ).to.deep.equal([
-        'experimentsStatus:test',
         'experimentsColors:test',
-        'branchColors:test'
+        'branchColors:test',
+        'experimentsStatus:test'
       ])
       expect(
         mockMemento.get('experimentsColors:test'),
