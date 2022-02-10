@@ -56,7 +56,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('getExperiments', () => {
-    it('should return all existing experiments', async () => {
+    it('should return all existing experiments, the workspace and branch (HEAD revision)', async () => {
       const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
@@ -65,6 +65,7 @@ suite('Experiments Test Suite', () => {
 
       expect(runs.map(experiment => experiment.displayId)).to.deep.equal([
         'workspace',
+        'main',
         '4fb124a',
         '42b8736',
         '1ba7bcd',
@@ -83,9 +84,7 @@ suite('Experiments Test Suite', () => {
       const notCheckpoints = experiments.getCheckpoints(notAnExperimentId)
       expect(notCheckpoints).to.be.undefined
 
-      const checkpoints = experiments.getCheckpoints(
-        '4fb124aebddb2adf1545030907687fa9a4c80e70'
-      )
+      const checkpoints = experiments.getCheckpoints('exp-e7a67')
 
       expect(
         checkpoints?.map(checkpoint => checkpoint.displayId)
@@ -256,7 +255,8 @@ suite('Experiments Test Suite', () => {
             displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
-            params: { 'params.yaml': { test: 10 } }
+            params: { 'params.yaml': { test: 10 } },
+            selected: true
           },
           {
             displayColor: '#13adc7',
@@ -264,21 +264,26 @@ suite('Experiments Test Suite', () => {
             id: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
+            selected: true,
+            sha: 'testBranch',
             subRows: [
               {
                 displayId: 'testExp',
                 id: 'testExp1',
-                params: { 'params.yaml': { test: 2 } }
+                params: { 'params.yaml': { test: 2 } },
+                sha: 'testExp1'
               },
               {
                 displayId: 'testExp',
                 id: 'testExp2',
-                params: { 'params.yaml': { test: 1 } }
+                params: { 'params.yaml': { test: 1 } },
+                sha: 'testExp2'
               },
               {
                 displayId: 'testExp',
                 id: 'testExp3',
-                params: { 'params.yaml': { test: 3 } }
+                params: { 'params.yaml': { test: 3 } },
+                sha: 'testExp3'
               }
             ]
           }
@@ -315,7 +320,8 @@ suite('Experiments Test Suite', () => {
             displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
-            params: { 'params.yaml': { test: 10 } }
+            params: { 'params.yaml': { test: 10 } },
+            selected: true
           },
           {
             displayColor: '#13adc7',
@@ -323,21 +329,26 @@ suite('Experiments Test Suite', () => {
             id: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
+            selected: true,
+            sha: 'testBranch',
             subRows: [
               {
                 displayId: 'testExp',
                 id: 'testExp2',
-                params: { 'params.yaml': { test: 1 } }
+                params: { 'params.yaml': { test: 1 } },
+                sha: 'testExp2'
               },
               {
                 displayId: 'testExp',
                 id: 'testExp1',
-                params: { 'params.yaml': { test: 2 } }
+                params: { 'params.yaml': { test: 2 } },
+                sha: 'testExp1'
               },
               {
                 displayId: 'testExp',
                 id: 'testExp3',
-                params: { 'params.yaml': { test: 3 } }
+                params: { 'params.yaml': { test: 3 } },
+                sha: 'testExp3'
               }
             ]
           }
@@ -394,9 +405,9 @@ suite('Experiments Test Suite', () => {
     it('should initialize given no persisted state and update persistence given any change', async () => {
       const expectedExperimentColors = {
         assigned: [
-          ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
-          ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
-          ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
+          ['exp-e7a67', '#f14c4c'],
+          ['test-branch', '#3794ff'],
+          ['exp-83425', '#cca700']
         ],
         available: copyOriginalExperimentColors().slice(3)
       }
@@ -464,9 +475,20 @@ suite('Experiments Test Suite', () => {
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses are persisted'
       ).to.deep.equal({
+        '1ee5f2ecb0fa4d83cbf614386536344cf894dd53': 0,
+        '217312476f8854dda1865450b737eb6bc7a3ba1b': 0,
+        '22e40e1fa3c916ac567f69b85969e3066a91dda4': 0,
+        '23250b33e3d6dd0e136262d1d26a2face031cb03': 0,
+        '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15': 0,
+        '9523bde67538cf31230efaff2dbc47d38a944ab5': 0,
+        c658f8b14ac819ac2a5ea0449da6c15dbe8eb880: 0,
+        d1343a87c6ee4a2e82d19525964d2fb2cb6756c9: 0,
+        e821416bfafb4bc28b3e0a8ddb322505b0ad2361: 0,
         'exp-83425': 1,
         'exp-e7a67': 1,
-        'test-branch': 1
+        main: 1,
+        'test-branch': 1,
+        workspace: 1
       })
 
       const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
@@ -542,16 +564,25 @@ suite('Experiments Test Suite', () => {
         'both filters should be removed from memento after removeFilters is run against them'
       ).to.deep.equal([])
 
-      testRepository.toggleExperimentStatus(
-        '4fb124aebddb2adf1545030907687fa9a4c80e70'
-      )
+      testRepository.toggleExperimentStatus('exp-e7a67')
       expect(
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses have been recorded in the memento'
       ).to.deep.equal({
+        '1ee5f2ecb0fa4d83cbf614386536344cf894dd53': 0,
+        '217312476f8854dda1865450b737eb6bc7a3ba1b': 0,
+        '22e40e1fa3c916ac567f69b85969e3066a91dda4': 0,
+        '23250b33e3d6dd0e136262d1d26a2face031cb03': 0,
+        '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15': 0,
+        '9523bde67538cf31230efaff2dbc47d38a944ab5': 0,
+        c658f8b14ac819ac2a5ea0449da6c15dbe8eb880: 0,
+        d1343a87c6ee4a2e82d19525964d2fb2cb6756c9: 0,
+        e821416bfafb4bc28b3e0a8ddb322505b0ad2361: 0,
         'exp-83425': 1,
         'exp-e7a67': 0,
-        'test-branch': 1
+        main: 1,
+        'test-branch': 1,
+        workspace: 1
       })
       expect(
         mockMemento.get('experimentsColors:test'),
@@ -565,9 +596,9 @@ suite('Experiments Test Suite', () => {
 
     it('should initialize with state reflected from the given Memento', async () => {
       const assigned: [string, string][] = [
-        ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#1e5a52'],
-        ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#96958f'],
-        ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#5f5856']
+        ['exp-e7a67', '#1e5a52'],
+        ['test-branch', '#96958f'],
+        ['exp-83425', '#5f5856']
       ]
       const available = ['#000000', '#FFFFFF', '#ABCDEF']
 

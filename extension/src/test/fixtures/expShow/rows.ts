@@ -31,12 +31,12 @@ const data: RowData[] = [
         val_accuracy: 0.5608000159263611
       }
     },
+    displayColor: '#945dd6',
     displayId: 'workspace',
-    id: 'workspace',
-    displayColor: '#945dd6'
+    selected: true,
+    id: 'workspace'
   },
   {
-    id: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     timestamp: '2020-11-21T19:58:22',
     params: {
       'params.yaml': {
@@ -62,9 +62,12 @@ const data: RowData[] = [
         val_accuracy: 0.4277999997138977
       }
     },
+    id: 'main',
     name: 'main',
     displayId: 'main',
     displayColor: '#13adc7',
+    selected: true,
+    sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     subRows: [
       {
         checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
@@ -98,7 +101,8 @@ const data: RowData[] = [
         displayId: '4fb124a',
         displayNameOrParent: '[exp-e7a67]',
         displayColor: colorsList[0],
-        id: '4fb124aebddb2adf1545030907687fa9a4c80e70',
+        id: 'exp-e7a67',
+        sha: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         subRows: [
           {
             checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
@@ -131,7 +135,8 @@ const data: RowData[] = [
             displayId: 'd1343a8',
             displayColor: colorsList[0],
             id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
-            selected: true
+            selected: false,
+            sha: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
           },
           {
             checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
@@ -164,7 +169,8 @@ const data: RowData[] = [
             displayColor: colorsList[0],
             displayId: '1ee5f2e',
             id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
-            selected: true
+            selected: false,
+            sha: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53'
           }
         ],
         selected: true
@@ -201,7 +207,8 @@ const data: RowData[] = [
         displayColor: colorsList[1],
         displayId: '42b8736',
         displayNameOrParent: '[test-branch]',
-        id: '42b8736b08170529903cd203a1f40382a4b4a8cd',
+        id: 'test-branch',
+        sha: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         subRows: [
           {
             checkpoint_tip: '42b8736b08170529903cd203a1f40382a4b4a8cd',
@@ -234,7 +241,8 @@ const data: RowData[] = [
             displayColor: colorsList[1],
             displayId: '2173124',
             id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
-            selected: true
+            selected: false,
+            sha: '217312476f8854dda1865450b737eb6bc7a3ba1b'
           },
           {
             checkpoint_tip: '42b8736b08170529903cd203a1f40382a4b4a8cd',
@@ -267,7 +275,8 @@ const data: RowData[] = [
             displayColor: colorsList[1],
             displayId: '9523bde',
             id: '9523bde67538cf31230efaff2dbc47d38a944ab5',
-            selected: true
+            selected: false,
+            sha: '9523bde67538cf31230efaff2dbc47d38a944ab5'
           }
         ],
         selected: true
@@ -304,7 +313,8 @@ const data: RowData[] = [
         displayColor: colorsList[2],
         displayId: '1ba7bcd',
         displayNameOrParent: '[exp-83425]',
-        id: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
+        id: 'exp-83425',
+        sha: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         subRows: [
           {
             checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
@@ -337,7 +347,8 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: '22e40e1',
             id: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
-            selected: true
+            selected: false,
+            sha: '22e40e1fa3c916ac567f69b85969e3066a91dda4'
           },
           {
             checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
@@ -370,7 +381,8 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: '91116c1',
             id: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
-            selected: true
+            selected: false,
+            sha: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15'
           },
           {
             checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
@@ -403,7 +415,8 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: 'e821416',
             id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
-            selected: true
+            selected: false,
+            sha: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361'
           },
           {
             checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
@@ -436,7 +449,8 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: 'c658f8b',
             id: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
-            selected: true
+            selected: false,
+            sha: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880'
           },
           {
             checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
@@ -469,7 +483,8 @@ const data: RowData[] = [
             displayColor: colorsList[2],
             displayId: '23250b3',
             id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
-            selected: true
+            selected: false,
+            sha: '23250b33e3d6dd0e136262d1d26a2face031cb03'
           }
         ],
         selected: true
@@ -491,7 +506,8 @@ const data: RowData[] = [
         },
         queued: true,
         displayId: '90aea7f',
-        id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
+        id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
+        sha: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
       }
     ]
   }

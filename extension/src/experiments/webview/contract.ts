@@ -13,6 +13,7 @@ export interface Experiment extends BaseExperimentFields {
   metrics?: MetricsOrParams
   displayColor?: string
   selected?: boolean
+  sha?: string
 }
 
 export interface RowData extends Experiment {
