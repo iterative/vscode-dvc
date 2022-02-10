@@ -84,9 +84,7 @@ suite('Experiments Test Suite', () => {
       const notCheckpoints = experiments.getCheckpoints(notAnExperimentId)
       expect(notCheckpoints).to.be.undefined
 
-      const checkpoints = experiments.getCheckpoints(
-        '4fb124aebddb2adf1545030907687fa9a4c80e70'
-      )
+      const checkpoints = experiments.getCheckpoints('exp-e7a67')
 
       expect(
         checkpoints?.map(checkpoint => checkpoint.displayId)
@@ -257,8 +255,7 @@ suite('Experiments Test Suite', () => {
             displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
-            params: { 'params.yaml': { test: 10 } },
-            statusId: 'workspace'
+            params: { 'params.yaml': { test: 10 } }
           },
           {
             displayColor: '#13adc7',
@@ -266,25 +263,25 @@ suite('Experiments Test Suite', () => {
             id: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
-            statusId: 'testBranch',
+            sha: 'testBranch',
             subRows: [
               {
                 displayId: 'testExp',
                 id: 'testExp1',
                 params: { 'params.yaml': { test: 2 } },
-                statusId: 'testExp1'
+                sha: 'testExp1'
               },
               {
                 displayId: 'testExp',
                 id: 'testExp2',
                 params: { 'params.yaml': { test: 1 } },
-                statusId: 'testExp2'
+                sha: 'testExp2'
               },
               {
                 displayId: 'testExp',
                 id: 'testExp3',
                 params: { 'params.yaml': { test: 3 } },
-                statusId: 'testExp3'
+                sha: 'testExp3'
               }
             ]
           }
@@ -321,8 +318,7 @@ suite('Experiments Test Suite', () => {
             displayColor: getWorkspaceColor(),
             displayId: 'workspace',
             id: 'workspace',
-            params: { 'params.yaml': { test: 10 } },
-            statusId: 'workspace'
+            params: { 'params.yaml': { test: 10 } }
           },
           {
             displayColor: '#13adc7',
@@ -330,25 +326,25 @@ suite('Experiments Test Suite', () => {
             id: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
-            statusId: 'testBranch',
+            sha: 'testBranch',
             subRows: [
               {
                 displayId: 'testExp',
                 id: 'testExp2',
                 params: { 'params.yaml': { test: 1 } },
-                statusId: 'testExp2'
+                sha: 'testExp2'
               },
               {
                 displayId: 'testExp',
                 id: 'testExp1',
                 params: { 'params.yaml': { test: 2 } },
-                statusId: 'testExp1'
+                sha: 'testExp1'
               },
               {
                 displayId: 'testExp',
                 id: 'testExp3',
                 params: { 'params.yaml': { test: 3 } },
-                statusId: 'testExp3'
+                sha: 'testExp3'
               }
             ]
           }
@@ -405,9 +401,9 @@ suite('Experiments Test Suite', () => {
     it('should initialize given no persisted state and update persistence given any change', async () => {
       const expectedExperimentColors = {
         assigned: [
-          ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
-          ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
-          ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
+          ['exp-e7a67', '#f14c4c'],
+          ['test-branch', '#3794ff'],
+          ['exp-83425', '#cca700']
         ],
         available: copyOriginalExperimentColors().slice(3)
       }
@@ -596,9 +592,9 @@ suite('Experiments Test Suite', () => {
 
     it('should initialize with state reflected from the given Memento', async () => {
       const assigned: [string, string][] = [
-        ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#1e5a52'],
-        ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#96958f'],
-        ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#5f5856']
+        ['exp-e7a67', '#1e5a52'],
+        ['test-branch', '#96958f'],
+        ['exp-83425', '#5f5856']
       ]
       const available = ['#000000', '#FFFFFF', '#ABCDEF']
 

@@ -24,7 +24,7 @@ enum Status {
 
 export type ExperimentItem = {
   command?: {
-    arguments: { dvcRoot: string; statusId: string }[]
+    arguments: { dvcRoot: string; id: string }[]
     command: RegisteredCommands
     title: string
   }
@@ -77,11 +77,10 @@ export class ExperimentsTree
     this.experiments = experiments
     this.resourceLocator = resourceLocator
 
-    internalCommands.registerExternalCommand<{
-      dvcRoot: string
-      statusId: string
-    }>(RegisteredCommands.EXPERIMENT_TOGGLE, ({ dvcRoot, statusId }) =>
-      this.experiments.getRepository(dvcRoot).toggleExperimentStatus(statusId)
+    internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TOGGLE,
+      ({ dvcRoot, id }) =>
+        this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
     )
 
     this.updateDescriptionOnChange()
@@ -156,7 +155,7 @@ export class ExperimentsTree
         command: experiment.queued
           ? undefined
           : {
-              arguments: [{ dvcRoot, statusId: experiment.statusId }],
+              arguments: [{ dvcRoot, id: experiment.id }],
               command: RegisteredCommands.EXPERIMENT_TOGGLE,
               title: 'toggle'
             },
@@ -209,12 +208,9 @@ export class ExperimentsTree
     return this.getUriOrIcon(displayColor, iconName)
   }
 
-  private getCheckpoints(
-    dvcRoot: string,
-    experimentId: string
-  ): ExperimentItem[] {
+  private getCheckpoints(dvcRoot: string, id: string): ExperimentItem[] {
     return (
-      this.experiments.getRepository(dvcRoot).getCheckpoints(experimentId) || []
+      this.experiments.getRepository(dvcRoot).getCheckpoints(id) || []
     ).map(checkpoint => ({
       collapsibleState: TreeItemCollapsibleState.None,
       description: checkpoint.displayNameOrParent,

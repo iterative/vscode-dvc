@@ -24,7 +24,7 @@ describe('collectExperiments', () => {
       }
     },
     branchB: {
-      baseline: { data: {} }
+      baseline: { data: { name: 'branchB' } }
     },
     workspace: {
       baseline: {}
@@ -59,7 +59,7 @@ describe('collectExperiments', () => {
     branchA: {
       baseline: { data: {} },
       tip1: {
-        data: { checkpoint_tip: 'tip1' }
+        data: { checkpoint_tip: 'tip1', name: 'tip1' }
       },
       tip1cp1: {
         data: { checkpoint_tip: 'tip1' }
@@ -97,7 +97,7 @@ describe('collectExperiments', () => {
     const { checkpointsByTip } = collectExperiments(modifiedFixture)
 
     const modifiedExperiment = checkpointsByTip
-      .get('55a07df59246a1a6280feb16dd022877178e80f6')
+      .get('exp-01b3a')
       ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
 
     expect(modifiedExperiment).toHaveLength(1)

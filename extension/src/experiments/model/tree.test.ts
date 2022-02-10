@@ -58,33 +58,25 @@ beforeEach(() => {
 
 describe('ExperimentsTree', () => {
   describe('getChildren', () => {
-    it('should return an empty array when no experiments exist for any of the multiple repositories', async () => {
+    it('should never return an empty array as experiments will always exist', async () => {
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
         mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'second/repo'])
-      mockedGetExperiments.mockReturnValueOnce([])
-      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([
+        { displayId: 'workspace' },
+        { displayId: 'main' }
+      ])
+      mockedGetExperiments.mockReturnValueOnce([
+        { displayId: 'workspace' },
+        { displayId: 'main' }
+      ])
 
       const rootElements = await experimentsTree.getChildren()
 
-      expect(rootElements).toEqual([])
-    })
-
-    it('should return an empty array when no experiments exist for the single repository', async () => {
-      const experimentsTree = new ExperimentsTree(
-        mockedExperiments,
-        mockedInternalCommands,
-        mockedResourceLocator
-      )
-      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      mockedGetExperiments.mockReturnValueOnce([])
-
-      const rootElements = await experimentsTree.getChildren()
-
-      expect(rootElements).toEqual([])
+      expect(rootElements).toEqual(['demo', 'second/repo'])
     })
 
     it('should return an array of root elements when at least one experiment exists in one of the repositories', async () => {
@@ -123,34 +115,30 @@ describe('ExperimentsTree', () => {
           displayColor: '#b180d7',
           displayId: '90aea7f',
           hasChildren: true,
-          id: '90aea7f',
-          selected: true,
-          statusId: 'exp-12345'
+          id: 'exp-12345',
+          selected: true
         },
         {
           displayColor: '#1a1c19',
           displayId: 'f0778b3',
           hasChildren: false,
-          id: 'f0778b3',
+          id: 'exp-67899',
           running: true,
-          selected: true,
-          statusId: 'exp-67899'
+          selected: true
         },
         {
           displayColor: '#4063e2',
           displayId: 'e350702',
           hasChildren: false,
-          id: 'e350702',
+          id: 'exp-abcdef',
           running: false,
-          selected: false,
-          statusId: 'exp-abcdef'
+          selected: false
         },
         {
           displayId: 'f81f1b5',
           hasChildren: false,
           id: 'f81f1b5',
-          queued: true,
-          statusId: 'f81f1b5'
+          queued: true
         }
       ]
       const experimentsTree = new ExperimentsTree(
@@ -170,37 +158,37 @@ describe('ExperimentsTree', () => {
         {
           collapsibleState: 1,
           command: {
-            arguments: [{ dvcRoot: 'repo', statusId: 'exp-12345' }],
+            arguments: [{ dvcRoot: 'repo', id: 'exp-12345' }],
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-filled', '#b180d7'),
-          id: '90aea7f',
+          id: 'exp-12345',
           label: '90aea7f'
         },
         {
           collapsibleState: 0,
           command: {
-            arguments: [{ dvcRoot: 'repo', statusId: 'exp-67899' }],
+            arguments: [{ dvcRoot: 'repo', id: 'exp-67899' }],
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
           dvcRoot: 'repo',
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
-          id: 'f0778b3',
+          id: 'exp-67899',
           label: 'f0778b3'
         },
         {
           collapsibleState: 0,
           command: {
-            arguments: [{ dvcRoot: 'repo', statusId: 'exp-abcdef' }],
+            arguments: [{ dvcRoot: 'repo', id: 'exp-abcdef' }],
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-outline', '#4063e2'),
-          id: 'e350702',
+          id: 'exp-abcdef',
           label: 'e350702'
         },
         {

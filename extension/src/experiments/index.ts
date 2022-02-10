@@ -133,8 +133,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.metricsAndParams.getTerminalNodeStatuses()
   }
 
-  public toggleExperimentStatus(statusId: string) {
-    const status = this.experiments.toggleStatus(statusId)
+  public toggleExperimentStatus(id: string) {
+    const status = this.experiments.toggleStatus(id)
     this.notifyChanged()
     return status
   }
@@ -244,8 +244,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperiments()
   }
 
-  public getCheckpoints(experimentId: string) {
-    return this.experiments.getCheckpoints(experimentId)
+  public getCheckpoints(id: string) {
+    return this.experiments.getCheckpoints(id)
   }
 
   public sendInitialWebviewData() {

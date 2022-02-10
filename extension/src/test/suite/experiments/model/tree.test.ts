@@ -88,14 +88,14 @@ suite('Experiments Tree Test Suite', () => {
         ).to.deep.equal(expectedData)
         messageSpy.resetHistory()
 
-        const statusId = expectedDomain.pop()
+        const id = expectedDomain.pop()
         expectedRange.pop()
 
         const unSelected = await commands.executeCommand(
           RegisteredCommands.EXPERIMENT_TOGGLE,
           {
             dvcRoot: dvcDemoPath,
-            statusId
+            id
           }
         )
 
@@ -122,7 +122,7 @@ suite('Experiments Tree Test Suite', () => {
         RegisteredCommands.EXPERIMENT_TOGGLE,
         {
           dvcRoot: dvcDemoPath,
-          statusId: domain[0]
+          id: domain[0]
         }
       )
 
@@ -148,7 +148,7 @@ suite('Experiments Tree Test Suite', () => {
         description: selectedDisplayName,
         label: '',
         picked: true,
-        value: { statusId: selectedDisplayName }
+        value: { id: selectedDisplayName }
       }
 
       await plots.showWebview()
