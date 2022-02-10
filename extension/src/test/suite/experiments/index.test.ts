@@ -272,18 +272,21 @@ suite('Experiments Test Suite', () => {
                 id: 'testExp1',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 2 } },
+                selected: true,
                 sha: 'testExp1'
               },
               {
                 id: 'testExp2',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 1 } },
+                selected: true,
                 sha: 'testExp2'
               },
               {
                 id: 'testExp3',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 3 } },
+                selected: true,
                 sha: 'testExp3'
               }
             ]
@@ -337,18 +340,21 @@ suite('Experiments Test Suite', () => {
                 id: 'testExp2',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 1 } },
+                selected: true,
                 sha: 'testExp2'
               },
               {
                 id: 'testExp1',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 2 } },
+                selected: true,
                 sha: 'testExp1'
               },
               {
                 id: 'testExp3',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 3 } },
+                selected: true,
                 sha: 'testExp3'
               }
             ]

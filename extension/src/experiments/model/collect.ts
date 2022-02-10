@@ -1,5 +1,6 @@
 import omit from 'lodash.omit'
 import { ExperimentsAccumulator } from './accumulator'
+import { getWorkspaceColor } from './colors'
 import { reduceMetricsAndParams } from '../metricsAndParams/reduce'
 import { Experiment } from '../webview/contract'
 import {
@@ -20,7 +21,10 @@ export const isCheckpoint = (
   sha: string
 ): checkpointTip is string => !!(checkpointTip && checkpointTip !== sha)
 
-const getId = (sha: string, experimentsFields: ExperimentFields): string => {
+const getExperimentId = (
+  sha: string,
+  experimentsFields: ExperimentFields
+): string => {
   const { name, checkpoint_tip } = experimentsFields
 
   if (isCheckpoint(checkpoint_tip, sha)) {
@@ -61,6 +65,12 @@ const getCheckpointTipId = (
   return experimentsObject[checkpointTip]?.data?.name
 }
 
+const getColor = (
+  experimentColors: Map<string, string>,
+  checkpointTipId: string | undefined,
+  id: string
+) => experimentColors.get(checkpointTipId || id)
+
 const transformMetricsAndParams = (
   experiment: Experiment,
   experimentFields: ExperimentFields
@@ -79,13 +89,14 @@ const transformExperimentData = (
   id: string,
   experimentFields: ExperimentFields,
   label: string | undefined,
+  displayColor: string | undefined,
   sha?: string,
   displayNameOrParent?: string
 ): Experiment => {
   const experiment = {
     id,
-    ...omit(experimentFields, ['metrics', 'params']),
-    label
+    label,
+    ...omit(experimentFields, ['metrics', 'params'])
   } as Experiment
 
   if (displayNameOrParent) {
@@ -96,6 +107,10 @@ const transformExperimentData = (
     experiment.sha = sha
   }
 
+  if (displayColor) {
+    experiment.displayColor = displayColor
+  }
+
   transformMetricsAndParams(experiment, experimentFields)
 
   return experiment
@@ -103,16 +118,37 @@ const transformExperimentData = (
 
 const transformExperimentOrCheckpointData = (
   sha: string,
-  experimentFields: ExperimentFields,
-  displayNameOrParent: string | undefined
-) =>
-  transformExperimentData(
-    getId(sha, experimentFields),
-    experimentFields,
-    getLabel(sha),
-    sha,
-    displayNameOrParent
+  experimentData: ExperimentFieldsOrError,
+  experimentsObject: ExperimentsObject,
+  experimentColors: Map<string, string>
+): {
+  checkpointTipId?: string
+  experiment: Experiment | undefined
+} => {
+  const experimentFields = experimentData.data
+  if (!experimentFields) {
+    return { experiment: undefined }
+  }
+
+  const checkpointTipId = getCheckpointTipId(
+    experimentFields.checkpoint_tip,
+    experimentsObject
   )
+
+  const id = getExperimentId(sha, experimentFields)
+
+  return {
+    checkpointTipId,
+    experiment: transformExperimentData(
+      id,
+      experimentFields,
+      getLabel(sha),
+      getColor(experimentColors, checkpointTipId, id),
+      sha,
+      getDisplayNameOrParent(sha, experimentsObject)
+    )
+  }
+}
 
 const collectExperimentOrCheckpoint = (
   acc: ExperimentsAccumulator,
@@ -137,24 +173,16 @@ const collectFromExperimentsObject = (
   branchName: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experimentFields = experimentData.data
-    if (!experimentFields) {
-      continue
-    }
-
-    const experiment = transformExperimentOrCheckpointData(
+    const { checkpointTipId, experiment } = transformExperimentOrCheckpointData(
       sha,
-      experimentFields,
-      getDisplayNameOrParent(sha, experimentsObject)
+      experimentData,
+      experimentsObject,
+      acc.experimentColors
     )
-
     if (!experiment) {
       continue
     }
-    const checkpointTipId = getCheckpointTipId(
-      experiment.checkpoint_tip,
-      experimentsObject
-    )
+
     collectExperimentOrCheckpoint(acc, experiment, branchName, checkpointTipId)
   }
 }
@@ -163,7 +191,7 @@ const collectFromBranchesObject = (
   acc: ExperimentsAccumulator,
   branchesObject: { [name: string]: ExperimentsBranchOutput }
 ) => {
-  for (const [branchSha, { baseline, ...experimentsObject }] of Object.entries(
+  for (const [sha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
   )) {
     const experimentFields = baseline.data
@@ -171,11 +199,14 @@ const collectFromBranchesObject = (
       continue
     }
 
+    const name = experimentFields.name as string
+
     const branch = transformExperimentData(
-      experimentFields.name as string,
+      name,
       experimentFields,
-      experimentFields.name,
-      branchSha
+      name,
+      acc.branchColors.get(name),
+      sha
     )
 
     if (branch) {
@@ -187,17 +218,28 @@ const collectFromBranchesObject = (
 }
 
 export const collectExperiments = (
-  data: ExperimentsOutput
+  data: ExperimentsOutput,
+  branchColors: Map<string, string> = new Map(),
+  experimentColors: Map<string, string> = new Map()
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
   const workspaceId = 'workspace'
 
   const workspaceFields = workspace.baseline.data
   const workspaceBaseline = workspaceFields
-    ? transformExperimentData(workspaceId, workspaceFields, workspaceId)
+    ? transformExperimentData(
+        workspaceId,
+        workspaceFields,
+        workspaceId,
+        getWorkspaceColor()
+      )
     : undefined
 
-  const acc = new ExperimentsAccumulator(workspaceBaseline)
+  const acc = new ExperimentsAccumulator(
+    workspaceBaseline,
+    branchColors,
+    experimentColors
+  )
 
   collectFromBranchesObject(acc, branchesObject)
   return acc
