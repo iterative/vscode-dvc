@@ -49,14 +49,12 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
     {
       Cell: ({
         row: {
-          original: { displayId, displayNameOrParent }
+          original: { label, displayNameOrParent }
         }
       }: Cell<Experiment>) => {
         return (
           <div className={styles.experimentCellContents}>
-            <span className={styles.experimentCellPrimaryName}>
-              {displayId}
-            </span>
+            <span className={styles.experimentCellPrimaryName}>{label}</span>
             {displayNameOrParent && (
               <span className={styles.experimentCellSecondaryName}>
                 {displayNameOrParent}

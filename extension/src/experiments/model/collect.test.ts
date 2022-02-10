@@ -102,14 +102,14 @@ describe('collectExperiments', () => {
 
     expect(modifiedExperiment).toHaveLength(1)
     expect(modifiedExperiment?.[0].displayNameOrParent).toEqual('(3b0c6ac)')
-    expect(modifiedExperiment?.[0].displayId).toEqual('7e3cb21')
+    expect(modifiedExperiment?.[0].label).toEqual('7e3cb21')
 
     checkpointsByTip.forEach(checkpoints => {
       const continuationCheckpoints = checkpoints.filter(checkpoint => {
-        const { displayId, displayNameOrParent } = checkpoint
+        const { label, displayNameOrParent } = checkpoint
         return (
           displayNameOrParent?.includes('(') &&
-          displayId !== '7e3cb21' &&
+          label !== '7e3cb21' &&
           displayNameOrParent !== '(3b0c6ac)'
         )
       })

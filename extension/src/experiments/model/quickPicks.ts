@@ -13,7 +13,7 @@ export const pickExperiments = (
   return quickPickManyValues<Experiment>(
     experiments.map(experiment => ({
       description: experiment.displayNameOrParent,
-      label: experiment.displayId,
+      label: experiment.label,
       picked: experiment.selected,
       value: experiment
     })),

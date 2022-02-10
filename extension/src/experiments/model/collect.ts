@@ -13,7 +13,7 @@ import { hasKey } from '../../util/object'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
 
-export const getDisplayId = (sha: string) => sha.slice(0, 7)
+export const getLabel = (sha: string) => sha.slice(0, 7)
 
 export const isCheckpoint = (
   checkpointTip: string | undefined,
@@ -44,7 +44,7 @@ const getDisplayNameOrParent = (
     parentTip &&
     experimentsObject[parentTip]?.data?.checkpoint_tip === parentTip
   ) {
-    return `(${getDisplayId(parentTip)})`
+    return `(${getLabel(parentTip)})`
   }
   if (name) {
     return `[${name}]`
@@ -78,14 +78,14 @@ const transformMetricsAndParams = (
 const transformExperimentData = (
   id: string,
   experimentFields: ExperimentFields,
-  displayId: string | undefined,
+  label: string | undefined,
   sha?: string,
   displayNameOrParent?: string
 ): Experiment => {
   const experiment = {
     id,
     ...omit(experimentFields, ['metrics', 'params']),
-    displayId
+    label
   } as Experiment
 
   if (displayNameOrParent) {
@@ -109,7 +109,7 @@ const transformExperimentOrCheckpointData = (
   transformExperimentData(
     getId(sha, experimentFields),
     experimentFields,
-    getDisplayId(sha),
+    getLabel(sha),
     sha,
     displayNameOrParent
   )
@@ -179,7 +179,7 @@ const collectFromBranchesObject = (
     )
 
     if (branch) {
-      collectFromExperimentsObject(acc, experimentsObject, branch.displayId)
+      collectFromExperimentsObject(acc, experimentsObject, branch.label)
 
       acc.branches.push(branch)
     }

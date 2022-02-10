@@ -88,9 +88,9 @@ describe('Table', () => {
             render: () => new Date('2021-09-09').toString()
           }
         ],
-        displayId: 'workspace',
         getRowProps: getProps,
         id: 'workspace',
+        label: 'workspace',
         original: {
           queued: false,
           running: false
