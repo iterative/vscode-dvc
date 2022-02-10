@@ -19,13 +19,13 @@ describe('pickExperiments', () => {
 
   it('should return the selected experiment ids', async () => {
     const selectedExperiment = {
-      displayId: 'exp-789',
       id: '7c366f6',
+      label: 'exp-789',
       selected: false
     }
     const mockedExperiments = [
-      { displayId: 'exp-123', id: '73de3fe', selected: false },
-      { displayId: 'exp-456', id: '0be657c', selected: true },
+      { id: '73de3fe', label: 'exp-123', selected: false },
+      { id: '0be657c', label: 'exp-456', selected: true },
       selectedExperiment
     ] as Experiment[]
 

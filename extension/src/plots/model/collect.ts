@@ -22,7 +22,7 @@ import {
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
-import { getDisplayId, isCheckpoint } from '../../experiments/model/collect'
+import { getLabel, isCheckpoint } from '../../experiments/model/collect'
 
 type LivePlotAccumulator = Map<string, LivePlotValues>
 
@@ -219,9 +219,9 @@ const collectExperimentOrCheckpoint = (
   sha: string,
   checkpointTip: string | undefined
 ) => {
-  const id = getDisplayId(sha)
+  const id = getLabel(sha)
   if (isCheckpoint(checkpointTip, sha)) {
-    addToMapArray(acc.revisionsByTip, getDisplayId(checkpointTip), id)
+    addToMapArray(acc.revisionsByTip, getLabel(checkpointTip), id)
   } else {
     addToMapArray(acc.revisionsByBranch, branchName, id)
   }
@@ -267,7 +267,7 @@ export const collectRevisions = (
 
 export const collectBranchRevision = (data: ExperimentsOutput): string => {
   const branchSha = Object.keys(data).find(id => id !== 'workspace') as string
-  return getDisplayId(branchSha)
+  return getLabel(branchSha)
 }
 
 const collectMutableFromExperiment = (
@@ -285,7 +285,7 @@ const collectMutableFromExperiment = (
       return
     }
 
-    acc.push(getDisplayId(sha))
+    acc.push(getLabel(sha))
   })
 }
 

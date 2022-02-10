@@ -63,7 +63,7 @@ suite('Experiments Test Suite', () => {
 
       const runs = experiments.getExperiments()
 
-      expect(runs.map(experiment => experiment.displayId)).to.deep.equal([
+      expect(runs.map(experiment => experiment.label)).to.deep.equal([
         'workspace',
         'main',
         '4fb124a',
@@ -86,9 +86,10 @@ suite('Experiments Test Suite', () => {
 
       const checkpoints = experiments.getCheckpoints('exp-e7a67')
 
-      expect(
-        checkpoints?.map(checkpoint => checkpoint.displayId)
-      ).to.deep.equal(['d1343a8', '1ee5f2e'])
+      expect(checkpoints?.map(checkpoint => checkpoint.label)).to.deep.equal([
+        'd1343a8',
+        '1ee5f2e'
+      ])
     })
   })
 
@@ -253,35 +254,35 @@ suite('Experiments Test Suite', () => {
         rows: [
           {
             displayColor: getWorkspaceColor(),
-            displayId: 'workspace',
             id: 'workspace',
+            label: 'workspace',
             params: { 'params.yaml': { test: 10 } },
             selected: true
           },
           {
             displayColor: '#13adc7',
-            displayId: 'testBranch',
             id: 'testBranch',
+            label: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
             selected: true,
             sha: 'testBranch',
             subRows: [
               {
-                displayId: 'testExp',
                 id: 'testExp1',
+                label: 'testExp',
                 params: { 'params.yaml': { test: 2 } },
                 sha: 'testExp1'
               },
               {
-                displayId: 'testExp',
                 id: 'testExp2',
+                label: 'testExp',
                 params: { 'params.yaml': { test: 1 } },
                 sha: 'testExp2'
               },
               {
-                displayId: 'testExp',
                 id: 'testExp3',
+                label: 'testExp',
                 params: { 'params.yaml': { test: 3 } },
                 sha: 'testExp3'
               }
@@ -318,35 +319,35 @@ suite('Experiments Test Suite', () => {
         rows: [
           {
             displayColor: getWorkspaceColor(),
-            displayId: 'workspace',
             id: 'workspace',
+            label: 'workspace',
             params: { 'params.yaml': { test: 10 } },
             selected: true
           },
           {
             displayColor: '#13adc7',
-            displayId: 'testBranch',
             id: 'testBranch',
+            label: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
             selected: true,
             sha: 'testBranch',
             subRows: [
               {
-                displayId: 'testExp',
                 id: 'testExp2',
+                label: 'testExp',
                 params: { 'params.yaml': { test: 1 } },
                 sha: 'testExp2'
               },
               {
-                displayId: 'testExp',
                 id: 'testExp1',
+                label: 'testExp',
                 params: { 'params.yaml': { test: 2 } },
                 sha: 'testExp1'
               },
               {
-                displayId: 'testExp',
                 id: 'testExp3',
+                label: 'testExp',
                 params: { 'params.yaml': { test: 3 } },
                 sha: 'testExp3'
               }

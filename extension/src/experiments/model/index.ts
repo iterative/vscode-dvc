@@ -289,7 +289,7 @@ export class ExperimentsModel {
   }
 
   private getExperimentsByBranch(branch: Experiment) {
-    const experiments = this.experimentsByBranch.get(branch.displayId)
+    const experiments = this.experimentsByBranch.get(branch.label)
     if (!experiments) {
       return
     }
@@ -321,9 +321,9 @@ export class ExperimentsModel {
 
   private setExperimentRevisions() {
     this.revisions = this.flattenExperiments().reduce((acc, exp) => {
-      const { id, displayId } = exp
-      if (displayId) {
-        acc[id] = displayId
+      const { id, label } = exp
+      if (label) {
+        acc[id] = label
       }
       return acc
     }, {} as Record<string, string>)

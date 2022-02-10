@@ -163,7 +163,7 @@ export class ExperimentsTree
         dvcRoot,
         iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
-        label: experiment.displayId
+        label: experiment.label
       }))
   }
 
@@ -191,7 +191,7 @@ export class ExperimentsTree
     selected
   }: {
     displayColor?: string
-    displayId: string
+    label: string
     running?: boolean
     queued?: boolean
     selected?: boolean
@@ -220,7 +220,7 @@ export class ExperimentsTree
         this.getIconName(checkpoint.selected)
       ),
       id: checkpoint.id,
-      label: checkpoint.displayId
+      label: checkpoint.label
     }))
   }
 
