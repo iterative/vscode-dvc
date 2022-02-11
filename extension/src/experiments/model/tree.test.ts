@@ -97,7 +97,11 @@ describe('ExperimentsTree', () => {
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
       mockedGetExperiments.mockReturnValueOnce([])
       mockedGetExperiments.mockReturnValueOnce([])
-      mockedGetExperiments.mockReturnValueOnce([{ displayId: '90aea7f' }])
+      mockedGetExperiments.mockReturnValueOnce([
+        { label: 'workspace' },
+        { label: 'main' },
+        { label: '90aea7f' }
+      ])
 
       const rootElements = await experimentsTree.getChildren()
 
@@ -117,31 +121,31 @@ describe('ExperimentsTree', () => {
       const experiments = [
         {
           displayColor: '#b180d7',
-          displayId: '90aea7f',
           hasChildren: true,
-          id: '90aea7f',
+          id: 'exp-12345',
+          label: '90aea7f',
           selected: true
         },
         {
           displayColor: '#1a1c19',
-          displayId: 'f0778b3',
           hasChildren: false,
-          id: 'f0778b3',
+          id: 'exp-67899',
+          label: 'f0778b3',
           running: true,
           selected: true
         },
         {
           displayColor: '#4063e2',
-          displayId: 'e350702',
           hasChildren: false,
-          id: 'e350702',
+          id: 'exp-abcdef',
+          label: 'e350702',
           running: false,
           selected: false
         },
         {
-          displayId: 'f81f1b5',
           hasChildren: false,
           id: 'f81f1b5',
+          label: 'f81f1b5',
           queued: true
         }
       ]
@@ -162,37 +166,37 @@ describe('ExperimentsTree', () => {
         {
           collapsibleState: 1,
           command: {
-            arguments: [{ dvcRoot: 'repo', id: '90aea7f' }],
+            arguments: [{ dvcRoot: 'repo', id: 'exp-12345' }],
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-filled', '#b180d7'),
-          id: '90aea7f',
+          id: 'exp-12345',
           label: '90aea7f'
         },
         {
           collapsibleState: 0,
           command: {
-            arguments: [{ dvcRoot: 'repo', id: 'f0778b3' }],
+            arguments: [{ dvcRoot: 'repo', id: 'exp-67899' }],
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
           dvcRoot: 'repo',
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
-          id: 'f0778b3',
+          id: 'exp-67899',
           label: 'f0778b3'
         },
         {
           collapsibleState: 0,
           command: {
-            arguments: [{ dvcRoot: 'repo', id: 'e350702' }],
+            arguments: [{ dvcRoot: 'repo', id: 'exp-abcdef' }],
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-outline', '#4063e2'),
-          id: 'e350702',
+          id: 'exp-abcdef',
           label: 'e350702'
         },
         {
@@ -218,8 +222,8 @@ describe('ExperimentsTree', () => {
       )
 
       const checkpoints = [
-        { displayId: 'aaaaaaa', id: 'aaaaaaaaaaaaaaaaa' },
-        { displayId: 'bbbbbbb', id: 'bbbbbbbbbbbbbbbbb' }
+        { id: 'aaaaaaaaaaaaaaaaa', label: 'aaaaaaa' },
+        { id: 'bbbbbbbbbbbbbbbbb', label: 'bbbbbbb' }
       ]
       mockedGetCheckpoints.mockReturnValueOnce(checkpoints)
 
@@ -300,7 +304,7 @@ describe('ExperimentsTree', () => {
       expect(treeItem).toEqual(mockedItem)
     })
 
-    it('should return a tree item for the workspace (running experiment)', () => {
+    it('should return a tree item for the workspace', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
         expect(collapsibleState).toEqual(0)

@@ -4,7 +4,7 @@ import { reportError } from '../vscode/reporting'
 
 export const pickExperiment = (
   experiments: {
-    displayId: string
+    label: string
     displayNameOrParent?: string
     id: string
     name?: string
@@ -14,10 +14,10 @@ export const pickExperiment = (
     reportError('There are no experiments to select.')
   } else {
     return quickPickValue<{ id: string; name: string }>(
-      experiments.map(({ displayId, displayNameOrParent, id, name }) => ({
+      experiments.map(({ label, displayNameOrParent, id, name }) => ({
         description: displayNameOrParent,
-        label: displayId,
-        value: { id, name: name || displayId }
+        label,
+        value: { id, name: name || label }
       })),
       { title: 'Select an experiment' }
     )

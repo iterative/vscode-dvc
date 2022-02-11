@@ -24,7 +24,7 @@ enum Status {
 
 export type ExperimentItem = {
   command?: {
-    arguments: [{ dvcRoot: string; id: string }]
+    arguments: { dvcRoot: string; id: string }[]
     command: RegisteredCommands
     title: string
   }
@@ -128,12 +128,12 @@ export class ExperimentsTree
       this.viewed = true
     }
 
-    const experimentNames = flatten(
+    const experiments = flatten(
       dvcRoots.map(dvcRoot =>
         this.experiments.getRepository(dvcRoot).getExperiments()
       )
     )
-    if (definedAndNonEmpty(experimentNames)) {
+    if (definedAndNonEmpty(experiments)) {
       if (dvcRoots.length === 1) {
         const [onlyRepo] = dvcRoots
         return this.getChildren(onlyRepo)
@@ -163,7 +163,7 @@ export class ExperimentsTree
         dvcRoot,
         iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
-        label: experiment.displayId
+        label: experiment.label
       }))
   }
 
@@ -186,21 +186,19 @@ export class ExperimentsTree
 
   private getExperimentIcon({
     displayColor,
-    displayId,
     running,
     queued,
     selected
   }: {
     displayColor?: string
-    displayId: string
+    label: string
     running?: boolean
     queued?: boolean
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
-    if (displayId === 'workspace' || running) {
+    if (running) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
-
     if (queued) {
       return this.resourceLocator.clock
     }
@@ -210,12 +208,9 @@ export class ExperimentsTree
     return this.getUriOrIcon(displayColor, iconName)
   }
 
-  private getCheckpoints(
-    dvcRoot: string,
-    experimentId: string
-  ): ExperimentItem[] {
+  private getCheckpoints(dvcRoot: string, id: string): ExperimentItem[] {
     return (
-      this.experiments.getRepository(dvcRoot).getCheckpoints(experimentId) || []
+      this.experiments.getRepository(dvcRoot).getCheckpoints(id) || []
     ).map(checkpoint => ({
       collapsibleState: TreeItemCollapsibleState.None,
       description: checkpoint.displayNameOrParent,
@@ -225,7 +220,7 @@ export class ExperimentsTree
         this.getIconName(checkpoint.selected)
       ),
       id: checkpoint.id,
-      label: checkpoint.displayId
+      label: checkpoint.label
     }))
   }
 

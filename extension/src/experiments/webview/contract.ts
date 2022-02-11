@@ -7,12 +7,13 @@ export interface MetricsOrParams {
 
 export interface Experiment extends BaseExperimentFields {
   id: string
-  displayId: string
+  label: string
   displayNameOrParent?: string
   params?: MetricsOrParams
   metrics?: MetricsOrParams
   displayColor?: string
   selected?: boolean
+  sha?: string
 }
 
 export interface RowData extends Experiment {

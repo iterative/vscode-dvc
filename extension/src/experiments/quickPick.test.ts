@@ -14,72 +14,72 @@ beforeEach(() => {
 })
 
 const mockedExp = {
-  displayId: 'abcdefb',
   displayNameOrParent: '[exp-0580a]',
   id: 'abcdefb',
+  label: 'abcdefb',
   name: 'exp-0580a'
 }
 
 const mockedExpList = [
   mockedExp,
   {
-    displayId: 'abcdefa',
     displayNameOrParent: '[exp-c54c4]',
     id: 'abcdefa',
+    label: 'abcdefa',
     name: 'exp-c54c4'
   },
   {
-    displayId: 'abcdef1',
     displayNameOrParent: '[exp-054f1]',
     id: 'abcdef1',
+    label: 'abcdef1',
     name: 'exp-054f1'
   },
   {
-    displayId: 'abcdef2',
     displayNameOrParent: '[exp-ae4fa]',
     id: 'abcdef2',
+    label: 'abcdef2',
     name: 'exp-ae4fa'
   },
   {
-    displayId: 'abcdef3',
     displayNameOrParent: '[exp-1324e]',
     id: 'abcdef3',
+    label: 'abcdef3',
     name: 'exp-1324e'
   },
   {
-    displayId: 'abcdef4',
     displayNameOrParent: '[exp-3bd24]',
     id: 'abcdef4',
+    label: 'abcdef4',
     name: 'exp-3bd24'
   },
   {
-    displayId: 'abcdef5',
     displayNameOrParent: '[exp-5d170]',
     id: 'abcdef5',
+    label: 'abcdef5',
     name: 'exp-5d170'
   },
   {
-    displayId: 'abcdef6',
     displayNameOrParent: '[exp-9fe22]',
     id: 'abcdef6',
+    label: 'abcdef6',
     name: 'exp-9fe22'
   },
   {
-    displayId: 'abcdef7',
     displayNameOrParent: '[exp-b707b]',
     id: 'abcdef7',
+    label: 'abcdef7',
     name: 'exp-b707b'
   },
   {
-    displayId: 'abcdef8',
     displayNameOrParent: '[exp-47694]',
     id: 'abcdef8',
+    label: 'abcdef8',
     name: 'exp-47694'
   },
   {
-    displayId: 'abcdef9',
     displayNameOrParent: '[exp-59807]',
     id: 'abcdef9',
+    label: 'abcdef9',
     name: 'exp-59807'
   }
 ]
