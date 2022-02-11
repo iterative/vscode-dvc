@@ -29,6 +29,11 @@ const hasCheckpoints = (data: ExperimentsOutput) => {
   )
 }
 
+export const mockHasCheckpoints = (data: ExperimentsOutput) =>
+  stub(CheckpointsModel.prototype, 'hasCheckpoints').returns(
+    hasCheckpoints(data)
+  )
+
 export const buildExperiments = (
   disposer: Disposer,
   experimentShowData = expShowFixture,
@@ -55,9 +60,7 @@ export const buildExperiments = (
     )
   )
 
-  stub(CheckpointsModel.prototype, 'hasCheckpoints').returns(
-    hasCheckpoints(experimentShowData)
-  )
+  mockHasCheckpoints(experimentShowData)
 
   experiments.setState(experimentShowData)
 

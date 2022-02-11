@@ -6,7 +6,6 @@ import { VisualizationSpec } from 'react-vega'
 import {
   collectData,
   collectLivePlotsData,
-  collectMutableRevisions,
   collectPaths,
   collectTemplates,
   ComparisonData,
@@ -48,7 +47,6 @@ export class PlotsModel {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private branchRevisions: Record<string, string> = {}
-  private mutableRevisions: string[] = []
 
   private vegaPaths: string[] = []
   private comparisonPaths: string[] = []
@@ -90,14 +88,10 @@ export class PlotsModel {
     return this.initialized
   }
 
-  public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, mutableRevisions] = await Promise.all([
-      collectLivePlotsData(data),
-      collectMutableRevisions(data, this.experiments.hasCheckpoints())
-    ])
+  public transformAndSetExperiments(data: ExperimentsOutput) {
+    const livePlots = collectLivePlotsData(data)
 
     this.livePlots = livePlots
-    this.mutableRevisions = mutableRevisions
 
     return this.removeStaleData()
   }
@@ -153,7 +147,7 @@ export class PlotsModel {
   }
 
   public getMutableRevisions() {
-    return this.mutableRevisions
+    return this.experiments.getMutableRevisions()
   }
 
   public getRevisionColors() {

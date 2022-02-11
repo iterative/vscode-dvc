@@ -148,6 +148,20 @@ export class ExperimentsModel {
     ].map(({ label }) => label)
   }
 
+  public getMutableRevisions() {
+    return [
+      this.workspace,
+      ...this.branches,
+      ...this.flattenExperiments(),
+      ...this.flattenCheckpoints()
+    ].reduce((acc, { label, mutable }) => {
+      if (mutable) {
+        acc.push(label)
+      }
+      return acc
+    }, [] as string[])
+  }
+
   public getSelectedRevisions() {
     return [
       this.workspace,

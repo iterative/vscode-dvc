@@ -260,6 +260,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getBranchRevisions()
   }
 
+  public getMutableRevisions() {
+    return this.experiments.getMutableRevisions()
+  }
+
   public getRevisions() {
     return this.experiments.getRevisions()
   }
