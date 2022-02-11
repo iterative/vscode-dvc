@@ -9,7 +9,6 @@ import {
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
-  ExperimentsBranchOutput,
   ExperimentsOutput,
   PlotsOutput,
   Value,
@@ -205,64 +204,6 @@ export const collectLivePlotsData = (
   })
 
   return plotsData
-}
-
-type RevisionsAccumulator = {
-  branchNames: string[]
-  revisionsByBranch: Map<string, string[]>
-  revisionsByTip: Map<string, string[]>
-}
-
-const collectExperimentOrCheckpoint = (
-  acc: RevisionsAccumulator,
-  branchName: string,
-  sha: string,
-  checkpointTip: string | undefined
-) => {
-  const id = getLabel(sha)
-  if (isCheckpoint(checkpointTip, sha)) {
-    addToMapArray(acc.revisionsByTip, getLabel(checkpointTip), id)
-  } else {
-    addToMapArray(acc.revisionsByBranch, branchName, id)
-  }
-}
-
-const collectBranchRevisions = (
-  acc: RevisionsAccumulator,
-  branchName: string,
-  experimentsObject: ExperimentsBranchOutput
-): void => {
-  Object.entries(experimentsObject).map(([sha, experimentData]) => {
-    if (sha === 'baseline') {
-      return
-    }
-    const data = transformExperimentData(experimentData)
-    if (!data || data.queued) {
-      return
-    }
-
-    collectExperimentOrCheckpoint(acc, branchName, sha, data.checkpoint_tip)
-  })
-}
-
-export const collectRevisions = (
-  data: ExperimentsOutput
-): RevisionsAccumulator => {
-  const acc: RevisionsAccumulator = {
-    branchNames: [],
-    revisionsByBranch: new Map<string, string[]>(),
-    revisionsByTip: new Map<string, string[]>()
-  }
-
-  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
-    const branchName = experimentsObject.baseline.data?.name
-
-    if (branchName) {
-      acc.branchNames.push(branchName)
-      collectBranchRevisions(acc, branchName, experimentsObject)
-    }
-  }
-  return acc
 }
 
 const collectMutableFromExperiment = (

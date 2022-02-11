@@ -6,7 +6,6 @@ import {
   collectLivePlotsData,
   collectMutableRevisions,
   collectPaths,
-  collectRevisions,
   collectTemplates
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
@@ -51,24 +50,6 @@ describe('collectLivePlotsData', () => {
   it('should return undefined given no input', () => {
     const data = collectLivePlotsData({} as ExperimentsOutput)
     expect(data).toBeUndefined()
-  })
-})
-
-describe('collectRevisions', () => {
-  it('should return the expected revisions from the test fixture', () => {
-    const { branchNames, revisionsByTip, revisionsByBranch } =
-      collectRevisions(expShowFixture)
-    expect(branchNames).toEqual(['main'])
-    expect(revisionsByBranch).toEqual(
-      new Map([['main', ['4fb124a', '42b8736', '1ba7bcd']]])
-    )
-    expect(revisionsByTip).toEqual(
-      new Map([
-        ['4fb124a', ['d1343a8', '1ee5f2e']],
-        ['42b8736', ['2173124', '9523bde']],
-        ['1ba7bcd', ['22e40e1', '91116c1', 'e821416', 'c658f8b', '23250b3']]
-      ])
-    )
   })
 })
 
