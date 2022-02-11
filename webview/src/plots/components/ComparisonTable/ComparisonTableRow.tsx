@@ -36,7 +36,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
       </tr>
       <tr>
         {plots.map((plot: ComparisonPlot) => {
-          const isPinned = plot && pinnedColumn === plot.revision
+          const isPinned = pinnedColumn === plot.revision
 
           return (
             <td
