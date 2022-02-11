@@ -1,5 +1,5 @@
 import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import {
   ComparisonTableColumn,
@@ -25,33 +25,36 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   ): ComparisonTableColumn[] =>
     columns.filter(exp => exp.revision !== pinnedColumn.current)
 
-  const getPinnedColumnRevision = () =>
-    (!!pinnedColumn.current && {
-      color: revisions[pinnedColumn.current].color,
-      revision: pinnedColumn.current
-    }) ||
-    null
+  const getPinnedColumnRevision = useCallback(
+    () =>
+      (!!pinnedColumn.current && {
+        color: revisions[pinnedColumn.current].color,
+        revision: pinnedColumn.current
+      }) ||
+      null,
+    [revisions]
+  )
 
   useEffect(() => {
     const revisionKeys = Object.keys(revisions)
-    const columnKeys = columns.map(col => col.revision)
-    const filteredColumns = columns.filter(col =>
-      revisionKeys.includes(col.revision)
-    )
-    const newColKeys = revisionKeys.filter(rev => !columnKeys.includes(rev))
-    const newCols = newColKeys.map(key => ({
-      color: revisions[key].color,
-      revision: key
-    }))
 
-    setColumns(
-      [
+    setColumns(prevColumns => {
+      const columnKeys = prevColumns.map(col => col.revision)
+      const filteredColumns = prevColumns.filter(col =>
+        revisionKeys.includes(col.revision)
+      )
+      const newColKeys = revisionKeys.filter(rev => !columnKeys.includes(rev))
+      const newCols = newColKeys.map(key => ({
+        color: revisions[key].color,
+        revision: key
+      }))
+
+      return [
         getPinnedColumnRevision(),
         ...withoutPinned([...filteredColumns, ...newCols])
       ].filter(Boolean) as ComparisonTableColumn[]
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [revisions])
+    })
+  }, [revisions, getPinnedColumnRevision])
 
   const changePinnedColumn = (column: string) => {
     pinnedColumn.current = column
