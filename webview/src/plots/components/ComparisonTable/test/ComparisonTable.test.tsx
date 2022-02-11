@@ -16,6 +16,8 @@ describe('ComparisonTable', () => {
   const renderTable = (props = basicProps) =>
     render(<ComparisonTable {...props} />)
 
+  const getHeaders = () => screen.getAllByRole('columnheader')
+
   it('should render a table', () => {
     renderTable()
 
@@ -27,7 +29,7 @@ describe('ComparisonTable', () => {
   it('should have as many columns as there are revisions', () => {
     renderTable()
 
-    const columns = screen.getAllByRole('columnheader')
+    const columns = getHeaders()
 
     expect(columns.length).toBe(Object.keys(basicProps.revisions).length)
   })
@@ -49,7 +51,7 @@ describe('ComparisonTable', () => {
       cancelable: true
     })
 
-    const [pinnedColumn] = screen.getAllByRole('columnheader')
+    const [pinnedColumn] = getHeaders()
 
     expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
   })
@@ -91,6 +93,45 @@ describe('ComparisonTable', () => {
     expect(changedFirstPlot.isSameNode(expectedSecondPlot)).toBe(true)
   })
 
+  it('should remove a column if it is not part of the revisions anymore', () => {
+    const { rerender } = renderTable()
+
+    const revisions = Object.keys(basicProps.revisions)
+
+    let headers = getHeaders().map(header => header.textContent)
+
+    expect(headers).toEqual(revisions)
+
+    const filteredRevisions = { ...basicProps.revisions }
+    delete filteredRevisions[revisions[3]]
+
+    rerender(<ComparisonTable {...basicProps} revisions={filteredRevisions} />)
+
+    headers = getHeaders().map(header => header.textContent)
+
+    expect(headers).toEqual([
+      revisions[0],
+      revisions[1],
+      revisions[2],
+      revisions[4]
+    ])
+  })
+
+  it('should add a new column if there is a new revision', () => {
+    const { rerender } = renderTable()
+    const newRevName = 'newRev'
+    const newRevisions = {
+      ...basicProps.revisions,
+      [newRevName]: { color: '#000000' }
+    }
+
+    rerender(<ComparisonTable {...basicProps} revisions={newRevisions} />)
+    const revisions = Object.keys(basicProps.revisions)
+    const headers = getHeaders().map(header => header.textContent)
+
+    expect(headers).toEqual([...revisions, newRevName])
+  })
+
   describe('Columns drag and drop', () => {
     const testStorage = new Map()
     const createBubbledEvent = (type: string, props = {}) => {
@@ -106,8 +147,6 @@ describe('ComparisonTable', () => {
       })
       return event
     }
-
-    const getHeaders = () => screen.getAllByRole('columnheader')
 
     const pinSecondColumn = () => {
       const secondColumn = screen.getByText(
@@ -153,13 +192,7 @@ describe('ComparisonTable', () => {
 
       let headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toEqual([
-        revisions[0],
-        revisions[1],
-        revisions[2],
-        revisions[3],
-        revisions[4]
-      ])
+      expect(headers).toEqual(revisions)
 
       dragAndDrop(startingNode, endingNode)
 
