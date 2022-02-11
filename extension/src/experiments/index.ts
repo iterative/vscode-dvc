@@ -133,8 +133,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.metricsAndParams.getTerminalNodeStatuses()
   }
 
-  public toggleExperimentStatus(experimentId: string) {
-    const status = this.experiments.toggleStatus(experimentId)
+  public toggleExperimentStatus(id: string) {
+    const status = this.experiments.toggleStatus(id)
     this.notifyChanged()
     return status
   }
@@ -199,7 +199,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async selectExperiments() {
-    const experiments = this.experiments.getSelectable()
+    const experiments = this.experiments.getExperiments()
 
     const selected = await pickExperiments(experiments)
     if (!selected) {
@@ -221,13 +221,11 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public pickCurrentExperiment() {
-    return pickExperiment(this.experiments.getSelectable())
+    return pickExperiment(this.experiments.getCurrentExperiments())
   }
 
   public async pickParamsToQueue() {
-    const base = await pickExperiment(
-      this.experiments.getExperimentsWithWorkspace()
-    )
+    const base = await pickExperiment(this.experiments.getExperiments())
 
     if (!base) {
       return
@@ -246,8 +244,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperiments()
   }
 
-  public getCheckpoints(experimentId: string) {
-    return this.experiments.getCheckpoints(experimentId)
+  public getCheckpoints(id: string) {
+    return this.experiments.getCheckpoints(id)
   }
 
   public sendInitialWebviewData() {

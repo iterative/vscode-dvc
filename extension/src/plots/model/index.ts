@@ -32,7 +32,7 @@ import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
-import { flatten, uniqueValues } from '../../util/array'
+import { definedAndNonEmpty, flatten, uniqueValues } from '../../util/array'
 
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
@@ -222,6 +222,12 @@ export class PlotsModel {
   }
 
   public getStaticPlots() {
+    const selectedRevisions = this.getSelectedRevisions()
+
+    if (!definedAndNonEmpty(selectedRevisions)) {
+      return
+    }
+
     return this.vegaPaths.reduce((acc, path) => {
       const template = this.templates[path]
 
@@ -233,7 +239,7 @@ export class PlotsModel {
                 ...template,
                 data: {
                   values: flatten(
-                    this.getSelectedRevisions()
+                    selectedRevisions
                       .map(rev => this.revisionData?.[rev]?.[path])
                       .filter(Boolean)
                   )
@@ -242,7 +248,7 @@ export class PlotsModel {
               this.getRevisionColors()
             ),
             multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: this.getSelectedRevisions(),
+            revisions: selectedRevisions,
             type: PlotsType.VEGA
           }
         ]
@@ -252,13 +258,18 @@ export class PlotsModel {
   }
 
   public getComparisonPlots() {
+    const selectedRevisions = this.getSelectedRevisions()
+    if (!definedAndNonEmpty(selectedRevisions)) {
+      return
+    }
+
     return this.comparisonPaths.reduce((acc, path) => {
       const pathRevisions = {
         path,
         revisions: {} as ComparisonRevisionData
       }
 
-      this.getSelectedRevisions().forEach(revision => {
+      selectedRevisions.forEach(revision => {
         const image = this.comparisonData?.[revision]?.[path]
         if (image) {
           pathRevisions.revisions[revision] = { revision, url: image.url }

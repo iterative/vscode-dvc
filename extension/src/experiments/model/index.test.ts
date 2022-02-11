@@ -67,9 +67,9 @@ describe('ExperimentsModel', () => {
     await experimentsModel.transformAndSet({
       testBranch: {
         baseline: buildTestExperiment(2),
-        testExp0: buildTestExperiment(0, 'testExp2'),
-        testExp1: buildTestExperiment(1, 'testExp2'),
-        testExp2: buildTestExperiment(2, 'testExp2', runningExperiment)
+        test0: buildTestExperiment(0, 'tip'),
+        test1: buildTestExperiment(1, 'tip'),
+        tip: buildTestExperiment(2, 'tip', runningExperiment)
       },
       workspace: {
         baseline: buildTestExperiment(3)
@@ -90,17 +90,17 @@ describe('ExperimentsModel', () => {
 
     const unfilteredCheckpoint = buildTestExperiment(
       3,
-      'testExp3',
+      'tip',
       runningExperiment
     )
 
     const experimentWithNewCheckpoint = {
       testBranch: {
         baseline: buildTestExperiment(2),
-        testExp0: buildTestExperiment(0, 'testExp3'),
-        testExp1: buildTestExperiment(1, 'testExp3'),
-        testExp2: buildTestExperiment(2, 'testExp3'),
-        testExp3: unfilteredCheckpoint
+        test0: buildTestExperiment(0, 'tip'),
+        test1: buildTestExperiment(1, 'tip'),
+        test2: buildTestExperiment(2, 'tip'),
+        tip: unfilteredCheckpoint
       },
       workspace: {
         baseline: buildTestExperiment(3)

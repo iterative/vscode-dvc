@@ -5,17 +5,17 @@ import { Experiment } from '../webview/contract'
 
 export const pickExperiments = (
   experiments: Experiment[]
-): Thenable<string[] | undefined> => {
+): Thenable<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {
     return reportError('There are no experiments to select.')
   }
 
-  return quickPickManyValues<string>(
+  return quickPickManyValues<Experiment>(
     experiments.map(experiment => ({
       description: experiment.displayNameOrParent,
-      label: experiment.displayId,
+      label: experiment.label,
       picked: experiment.selected,
-      value: experiment.id
+      value: experiment
     })),
     {
       title: 'Select experiments'

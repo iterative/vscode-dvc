@@ -319,7 +319,7 @@ suite('Workspace Experiments Test Suite', () => {
             description: '[exp-e7a67]',
             label: '4fb124a',
             value: {
-              id: '4fb124aebddb2adf1545030907687fa9a4c80e70',
+              id: 'exp-e7a67',
               name: 'exp-e7a67'
             }
           },
@@ -327,7 +327,7 @@ suite('Workspace Experiments Test Suite', () => {
             description: '[test-branch]',
             label: '42b8736',
             value: {
-              id: '42b8736b08170529903cd203a1f40382a4b4a8cd',
+              id: 'test-branch',
               name: 'test-branch'
             }
           },
@@ -335,7 +335,7 @@ suite('Workspace Experiments Test Suite', () => {
             description: '[exp-83425]',
             label: '1ba7bcd',
             value: {
-              id: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
+              id: 'exp-83425',
               name: 'exp-83425'
             }
           }
