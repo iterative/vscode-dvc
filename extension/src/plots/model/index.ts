@@ -4,7 +4,6 @@ import { Disposable } from '@hediet/std/disposable'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import {
-  collectBranchRevision,
   collectData,
   collectLivePlotsData,
   collectMutableRevisions,
@@ -52,7 +51,7 @@ export class PlotsModel {
   private branchNames: string[] = []
   private revisionsByTip = new Map<string, string[]>()
   private revisionsByBranch = new Map<string, string[]>()
-  private branchRevision = ''
+  private branchRevisions: Record<string, string> = {}
   private mutableRevisions: string[] = []
 
   private vegaPaths: string[] = []
@@ -96,19 +95,17 @@ export class PlotsModel {
   }
 
   public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, revisions, branchRevision, mutableRevisions] =
-      await Promise.all([
-        collectLivePlotsData(data),
-        collectRevisions(data),
-        collectBranchRevision(data),
-        collectMutableRevisions(data, this.experiments.hasCheckpoints())
-      ])
+    const [livePlots, revisions, mutableRevisions] = await Promise.all([
+      collectLivePlotsData(data),
+      collectRevisions(data),
+      collectMutableRevisions(data, this.experiments.hasCheckpoints())
+    ])
 
     const { branchNames, revisionsByTip, revisionsByBranch } = revisions
 
-    const branch = branchNames[0]
-
-    this.removeStaleBranchData(branch, branchRevision)
+    this.experiments.getBranchRevisions().forEach(({ id, sha }) => {
+      this.removeStaleBranchData(id, sha)
+    })
 
     this.livePlots = livePlots
     this.branchNames = branchNames
@@ -319,11 +316,11 @@ export class PlotsModel {
     return this.sectionNames[section] || DEFAULT_SECTION_NAMES[section]
   }
 
-  private removeStaleBranchData(branchName: string, branchRevision: string) {
-    if (this.branchRevision !== branchRevision) {
-      delete this.revisionData[branchName]
-      delete this.comparisonData[branchName]
-      this.branchRevision = branchRevision
+  private removeStaleBranchData(id: string, sha: string | undefined) {
+    if (sha && this.branchRevisions[id] !== sha) {
+      delete this.revisionData[id]
+      delete this.comparisonData[id]
+      this.branchRevisions[id] = sha
     }
   }
 

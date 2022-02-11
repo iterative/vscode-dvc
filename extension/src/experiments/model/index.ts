@@ -131,6 +131,10 @@ export class ExperimentsModel {
     return result
   }
 
+  public getBranchRevisions() {
+    return this.branches.map(({ id, sha }) => ({ id, sha }))
+  }
+
   public getSelectedRevisions() {
     return [
       this.workspace,

@@ -265,11 +265,6 @@ export const collectRevisions = (
   return acc
 }
 
-export const collectBranchRevision = (data: ExperimentsOutput): string => {
-  const branchSha = Object.keys(data).find(id => id !== 'workspace') as string
-  return getLabel(branchSha)
-}
-
 const collectMutableFromExperiment = (
   acc: string[],
   experimentsObject: {

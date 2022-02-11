@@ -2,7 +2,6 @@
 import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
 import {
-  collectBranchRevision,
   collectData,
   collectLivePlotsData,
   collectMutableRevisions,
@@ -70,13 +69,6 @@ describe('collectRevisions', () => {
         ['1ba7bcd', ['22e40e1', '91116c1', 'e821416', 'c658f8b', '23250b3']]
       ])
     )
-  })
-})
-
-describe('collectBranchRevision', () => {
-  it('should return the expected revision from the test fixture', () => {
-    const revision = collectBranchRevision(expShowFixture)
-    expect(revision).toEqual('53c3851')
   })
 })
 
