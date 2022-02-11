@@ -39,21 +39,19 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           const isPinned = plot && pinnedColumn === plot.revision
 
           return (
-            plot && (
-              <td
-                key={path + plot.revision}
-                className={cx({ [styles.pinnedColumnCell]: isPinned })}
+            <td
+              key={path + plot.revision}
+              className={cx({ [styles.pinnedColumnCell]: isPinned })}
+            >
+              <div
+                className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                <div
-                  className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
-                >
-                  <img
-                    src={plot.url}
-                    alt={`Plot of ${path} (${plot.revision})`}
-                  />
-                </div>
-              </td>
-            )
+                <img
+                  src={plot.url}
+                  alt={`Plot of ${path} (${plot.revision})`}
+                />
+              </div>
+            </td>
           )
         })}
       </tr>
