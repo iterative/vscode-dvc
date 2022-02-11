@@ -99,7 +99,7 @@ export class PlotsModel {
     this.livePlots = livePlots
     this.mutableRevisions = mutableRevisions
 
-    this.removeStaleData()
+    return this.removeStaleData()
   }
 
   public async transformAndSetPlots(data: PlotsOutput) {
@@ -280,8 +280,10 @@ export class PlotsModel {
   }
 
   private removeStaleData() {
-    this.removeStaleBranches()
-    this.removeStaleRevisions()
+    return Promise.all([
+      this.removeStaleBranches(),
+      this.removeStaleRevisions()
+    ])
   }
 
   private removeStaleRevisions() {
