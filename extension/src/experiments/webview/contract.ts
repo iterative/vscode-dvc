@@ -13,6 +13,7 @@ export interface Experiment extends BaseExperimentFields {
   metrics?: MetricsOrParams
   displayColor?: string
   selected?: boolean
+  mutable?: boolean
   sha?: string
 }
 

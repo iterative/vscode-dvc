@@ -18,7 +18,7 @@ beforeEach(() => {
 describe('ExperimentsModel', () => {
   it('should return rows that equal the rows fixture when given the output fixture', async () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    await model.transformAndSet(outputFixture)
+    await model.transformAndSet(outputFixture, true)
     expect(model.getRowData()).toEqual(rowsFixture)
   })
 

@@ -59,14 +59,18 @@ export class ExperimentsModel {
     this.workspaceState = workspaceState
   }
 
-  public async transformAndSet(data: ExperimentsOutput) {
+  public async transformAndSet(
+    data: ExperimentsOutput,
+    hasCheckpoints = false
+  ) {
     await this.collectColors(data)
 
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
       collectExperiments(
         data,
         this.getAssignedBranchColors(),
-        this.getAssignedExperimentColors()
+        this.getAssignedExperimentColors(),
+        hasCheckpoints
       )
 
     this.workspace = workspace
