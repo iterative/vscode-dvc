@@ -239,6 +239,11 @@ describe('ExperimentsTree', () => {
       expect(children).toEqual([
         {
           collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'aaaaaaaaaaaaaaaaa' }],
+            command: 'dvc.views.experimentsTree.toggleStatus',
+            title: 'toggle'
+          },
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('circle-filled'),
           id: 'aaaaaaaaaaaaaaaaa',
@@ -246,6 +251,11 @@ describe('ExperimentsTree', () => {
         },
         {
           collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'bbbbbbbbbbbbbbbbb' }],
+            command: 'dvc.views.experimentsTree.toggleStatus',
+            title: 'toggle'
+          },
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('circle-filled'),
           id: 'bbbbbbbbbbbbbbbbb',
