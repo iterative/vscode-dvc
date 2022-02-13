@@ -269,9 +269,7 @@ suite('Experiments Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const expectedMessage = {
-        live: null
-      }
+      const expectedMessage = { comparison: null, live: null, static: null }
 
       expect(
         messageSpy,

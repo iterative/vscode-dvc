@@ -7,11 +7,15 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import { collectExperiments, collectStatuses, Status } from './collect'
+import {
+  collectBranchAndExperimentIds,
+  collectExperiments,
+  collectStatuses,
+  Status
+} from './collect'
 import {
   copyOriginalBranchColors,
-  copyOriginalExperimentColors,
-  getWorkspaceColor
+  copyOriginalExperimentColors
 } from './colors'
 import { collectColors, Colors } from './colors/collect'
 import { collectFlatExperimentParams } from './queue/collect'
@@ -20,6 +24,7 @@ import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
 import { MementoPrefix } from '../../vscode/memento'
+import { hasKey } from '../../util/object'
 
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
@@ -31,7 +36,6 @@ export class ExperimentsModel {
   private branchColors: Colors
   private experimentColors: Colors
   private status: Record<string, Status>
-  private revisions: Record<string, string> = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
   private useFiltersForSelection = false
@@ -55,18 +59,22 @@ export class ExperimentsModel {
     this.workspaceState = workspaceState
   }
 
-  public transformAndSet(data: ExperimentsOutput) {
-    const { workspace, branches, experimentsByBranch, checkpointsByTip } =
-      collectExperiments(data)
+  public async transformAndSet(data: ExperimentsOutput) {
+    await this.collectColors(data)
 
-    this.workspace = { ...workspace, displayColor: getWorkspaceColor() }
+    const { workspace, branches, experimentsByBranch, checkpointsByTip } =
+      collectExperiments(
+        data,
+        this.getAssignedBranchColors(),
+        this.getAssignedExperimentColors()
+      )
+
+    this.workspace = workspace
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
 
-    this.setExperimentRevisions()
     this.setStatus()
-    return this.collectColors()
   }
 
   public toggleStatus(id: string) {
@@ -123,38 +131,40 @@ export class ExperimentsModel {
     return result
   }
 
+  public getBranchRevisions() {
+    return this.branches.map(({ id, sha }) => ({ id, sha }))
+  }
+
+  public getRevisions() {
+    return [
+      this.workspace,
+      ...this.branches,
+      ...this.flattenExperiments(),
+      ...this.flattenCheckpoints()
+    ].map(({ label }) => label)
+  }
+
   public getSelectedRevisions() {
-    const revisionColors = {} as Record<string, string>
-    if (this.status.workspace) {
-      revisionColors.workspace = getWorkspaceColor()
-    }
-
-    this.getAssignedBranchColors().forEach((color: string, id: string) => {
-      if (this.getStatus(id)) {
-        revisionColors[id] = color
+    return [
+      this.workspace,
+      ...this.branches,
+      ...this.flattenExperiments(),
+      ...this.flattenCheckpoints()
+    ].reduce((acc, { id, label, displayColor }) => {
+      if (displayColor && this.getStatus(id)) {
+        acc[label] = displayColor
       }
-    })
-
-    this.getAssignedExperimentColors().forEach((color: string, id: string) => {
-      const { selected, revision } = this.getExperimentDetails(id)
-      if (selected) {
-        revisionColors[revision] = color
-      }
-    })
-
-    return revisionColors
+      return acc
+    }, {} as Record<string, string>)
   }
 
   public getSelectedExperiments() {
-    const experimentColors = {} as Record<string, string>
-
-    this.getAssignedExperimentColors().forEach((color: string, id: string) => {
-      if (this.getStatus(id)) {
-        experimentColors[id] = color
+    return this.flattenExperiments().reduce((acc, { id, displayColor }) => {
+      if (displayColor && this.getStatus(id)) {
+        acc[id] = displayColor
       }
-    })
-
-    return experimentColors
+      return acc
+    }, {} as Record<string, string>)
   }
 
   public setSelected(experiments: Experiment[]) {
@@ -193,13 +203,12 @@ export class ExperimentsModel {
       ...this.branches.map(branch => {
         return {
           ...branch,
-          displayColor: this.getBranchColor(branch.id),
           hasChildren: false,
           selected: !!this.getStatus(branch.id)
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
-        ...this.addDetails(experiment),
+        ...this.addSelected(experiment),
         hasChildren: !!this.checkpointsByTip.get(experiment.id)
       }))
     ]
@@ -222,7 +231,7 @@ export class ExperimentsModel {
   public getCheckpoints(id: string): Experiment[] | undefined {
     return this.checkpointsByTip
       .get(id)
-      ?.map(checkpoint => this.addDetails(checkpoint, id))
+      ?.map(checkpoint => this.addSelected(checkpoint))
   }
 
   public getRowData() {
@@ -230,18 +239,17 @@ export class ExperimentsModel {
       { ...this.workspace, selected: this.getStatus('workspace') },
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
-        const branchWithColor = {
+        const branchWithSelected = {
           ...branch,
-          displayColor: this.getBranchColor(branch.id),
           selected: this.getStatus(branch.id)
         }
 
         if (!definedAndNonEmpty(experiments)) {
-          return branchWithColor
+          return branchWithSelected
         }
 
         return {
-          ...branchWithColor,
+          ...branchWithSelected,
           subRows: this.getSubRows(experiments)
         }
       })
@@ -253,12 +261,12 @@ export class ExperimentsModel {
       .map(experiment => {
         const checkpoints = this.getFilteredCheckpointsByTip(experiment.id)
         if (!checkpoints) {
-          return this.addDetails(experiment)
+          return this.addSelected(experiment)
         }
         return {
-          ...this.addDetails(experiment),
+          ...this.addSelected(experiment),
           subRows: checkpoints.map(checkpoint => ({
-            ...this.addDetails(checkpoint, experiment.id)
+            ...this.addSelected(checkpoint)
           }))
         }
       })
@@ -300,9 +308,8 @@ export class ExperimentsModel {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
   }
 
-  private getExperimentDetails(id: string) {
-    const revision = this.revisions[id]
-    return { revision, selected: this.getStatus(id) }
+  private flattenCheckpoints() {
+    return flatten<Experiment>([...this.checkpointsByTip.values()])
   }
 
   private setStatus() {
@@ -319,31 +326,23 @@ export class ExperimentsModel {
     this.persistStatus()
   }
 
-  private setExperimentRevisions() {
-    this.revisions = this.flattenExperiments().reduce((acc, exp) => {
-      const { id, label } = exp
-      if (label) {
-        acc[id] = label
-      }
-      return acc
-    }, {} as Record<string, string>)
-  }
-
-  private async collectColors() {
+  private async collectColors(data: ExperimentsOutput) {
+    const { branchIds, experimentIds } = collectBranchAndExperimentIds(data)
     const [branchColors, experimentColors] = await Promise.all([
       collectColors(
-        this.branches.map(branch => branch.id).filter(Boolean) as string[],
+        branchIds,
         this.getAssignedBranchColors(),
         this.branchColors.available,
         copyOriginalBranchColors
       ),
       collectColors(
-        this.getExperimentIds(),
+        experimentIds,
         this.getAssignedExperimentColors(),
         this.experimentColors.available,
         copyOriginalExperimentColors
       )
     ])
+
     this.branchColors = branchColors
     this.experimentColors = experimentColors
 
@@ -444,36 +443,22 @@ export class ExperimentsModel {
     }
   }
 
-  private getExperimentIds() {
-    return this.flattenExperiments().reduce((acc, { id, queued }) => {
-      if (!queued) {
-        acc.push(id)
-      }
+  private addSelected(experiment: Experiment) {
+    const { id } = experiment
+    if (!hasKey(this.status, id)) {
+      return experiment
+    }
 
-      return acc
-    }, [] as string[])
-  }
+    const selected = !!this.getStatus(id)
 
-  private addDetails(experiment: Experiment, id?: string) {
-    const assignedColors = this.getAssignedExperimentColors()
-    const displayColor = assignedColors.get(id || experiment.id)
-    const selected = !!this.getStatus(experiment.id)
-
-    return displayColor
-      ? {
-          ...experiment,
-          displayColor,
-          selected
-        }
-      : experiment
+    return {
+      ...experiment,
+      selected
+    }
   }
 
   private getAssignedBranchColors() {
     return this.branchColors.assigned
-  }
-
-  private getBranchColor(id: string) {
-    return this.getAssignedBranchColors().get(id)
   }
 
   private getAssignedExperimentColors() {

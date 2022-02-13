@@ -213,6 +213,11 @@ export class ExperimentsTree
       this.experiments.getRepository(dvcRoot).getCheckpoints(id) || []
     ).map(checkpoint => ({
       collapsibleState: TreeItemCollapsibleState.None,
+      command: {
+        arguments: [{ dvcRoot, id: checkpoint.id }],
+        command: RegisteredCommands.EXPERIMENT_TOGGLE,
+        title: 'toggle'
+      },
       description: checkpoint.displayNameOrParent,
       dvcRoot,
       iconPath: this.getUriOrIcon(
