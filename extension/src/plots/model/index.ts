@@ -154,16 +154,6 @@ export class PlotsModel {
     return getColorScale(this.experiments?.getSelectedRevisions() || {})
   }
 
-  public getColors() {
-    const colors = { ...(this.experiments?.getSelectedRevisions() || {}) }
-    Object.keys(colors).forEach(rev => {
-      if (!Object.keys(this.comparisonData).includes(rev)) {
-        delete colors[rev]
-      }
-    })
-    return colors
-  }
-
   public getComparisonRevisions() {
     return Object.entries({
       ...(this.experiments?.getSelectedRevisions() || {})
