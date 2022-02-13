@@ -63,10 +63,11 @@ describe('ExperimentsModel', () => {
       path: testPath,
       value: '2'
     })
+    const baseline = buildTestExperiment(2, undefined, 'testBranch')
 
     await experimentsModel.transformAndSet({
       testBranch: {
-        baseline: buildTestExperiment(2),
+        baseline,
         test0: buildTestExperiment(0, 'tip'),
         test1: buildTestExperiment(1, 'tip'),
         tip: buildTestExperiment(2, 'tip', runningExperiment)
@@ -96,7 +97,7 @@ describe('ExperimentsModel', () => {
 
     const experimentWithNewCheckpoint = {
       testBranch: {
-        baseline: buildTestExperiment(2),
+        baseline,
         test0: buildTestExperiment(0, 'tip'),
         test1: buildTestExperiment(1, 'tip'),
         test2: buildTestExperiment(2, 'tip'),

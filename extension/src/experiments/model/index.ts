@@ -7,7 +7,12 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import { collectExperiments, collectStatuses, Status } from './collect'
+import {
+  collectBranchAndExperimentIds,
+  collectExperiments,
+  collectStatuses,
+  Status
+} from './collect'
 import {
   copyOriginalBranchColors,
   copyOriginalExperimentColors,
@@ -55,7 +60,9 @@ export class ExperimentsModel {
     this.workspaceState = workspaceState
   }
 
-  public transformAndSet(data: ExperimentsOutput) {
+  public async transformAndSet(data: ExperimentsOutput) {
+    await this.collectColors(data)
+
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
       collectExperiments(data)
 
@@ -66,7 +73,6 @@ export class ExperimentsModel {
 
     this.setExperimentRevisions()
     this.setStatus()
-    return this.collectColors()
   }
 
   public toggleStatus(id: string) {
@@ -329,21 +335,23 @@ export class ExperimentsModel {
     }, {} as Record<string, string>)
   }
 
-  private async collectColors() {
+  private async collectColors(data: ExperimentsOutput) {
+    const { branchIds, experimentIds } = collectBranchAndExperimentIds(data)
     const [branchColors, experimentColors] = await Promise.all([
       collectColors(
-        this.branches.map(branch => branch.id).filter(Boolean) as string[],
+        branchIds,
         this.getAssignedBranchColors(),
         this.branchColors.available,
         copyOriginalBranchColors
       ),
       collectColors(
-        this.getExperimentIds(),
+        experimentIds,
         this.getAssignedExperimentColors(),
         this.experimentColors.available,
         copyOriginalExperimentColors
       )
     ])
+
     this.branchColors = branchColors
     this.experimentColors = experimentColors
 
@@ -442,16 +450,6 @@ export class ExperimentsModel {
       assigned: new Map(assigned),
       available: available
     }
-  }
-
-  private getExperimentIds() {
-    return this.flattenExperiments().reduce((acc, { id, queued }) => {
-      if (!queued) {
-        acc.push(id)
-      }
-
-      return acc
-    }, [] as string[])
   }
 
   private addDetails(experiment: Experiment, id?: string) {
