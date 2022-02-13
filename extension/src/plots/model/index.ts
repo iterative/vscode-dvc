@@ -4,12 +4,10 @@ import { Disposable } from '@hediet/std/disposable'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import {
-  collectBranchRevision,
   collectData,
   collectLivePlotsData,
   collectMutableRevisions,
   collectPaths,
-  collectRevisions,
   collectTemplates,
   ComparisonData,
   RevisionData
@@ -32,7 +30,7 @@ import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
-import { definedAndNonEmpty, flatten, uniqueValues } from '../../util/array'
+import { definedAndNonEmpty, flatten } from '../../util/array'
 
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
@@ -49,10 +47,7 @@ export class PlotsModel {
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
-  private branchNames: string[] = []
-  private revisionsByTip = new Map<string, string[]>()
-  private revisionsByBranch = new Map<string, string[]>()
-  private branchRevision = ''
+  private branchRevisions: Record<string, string> = {}
   private mutableRevisions: string[] = []
 
   private vegaPaths: string[] = []
@@ -96,27 +91,15 @@ export class PlotsModel {
   }
 
   public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [livePlots, revisions, branchRevision, mutableRevisions] =
-      await Promise.all([
-        collectLivePlotsData(data),
-        collectRevisions(data),
-        collectBranchRevision(data),
-        collectMutableRevisions(data, this.experiments.hasCheckpoints())
-      ])
-
-    const { branchNames, revisionsByTip, revisionsByBranch } = revisions
-
-    const branch = branchNames[0]
-
-    this.removeStaleBranchData(branch, branchRevision)
+    const [livePlots, mutableRevisions] = await Promise.all([
+      collectLivePlotsData(data),
+      collectMutableRevisions(data, this.experiments.hasCheckpoints())
+    ])
 
     this.livePlots = livePlots
-    this.branchNames = branchNames
-    this.revisionsByTip = revisionsByTip
-    this.revisionsByBranch = revisionsByBranch
     this.mutableRevisions = mutableRevisions
 
-    this.removeStaleData()
+    return this.removeStaleData()
   }
 
   public async transformAndSetPlots(data: PlotsOutput) {
@@ -158,37 +141,14 @@ export class PlotsModel {
     }
   }
 
-  public getRevisions() {
-    const experimentRevisions = flatten(
-      this.branchNames.map(branch => this.revisionsByBranch.get(branch) || [])
-    )
-    const checkpointRevisions = flatten(
-      experimentRevisions.map(exp => this.revisionsByTip.get(exp) || [])
-    )
-    return [
-      'workspace',
-      ...this.branchNames,
-      ...experimentRevisions,
-      ...checkpointRevisions
-    ]
-  }
-
   public getMissingRevisions() {
     const cachedRevisions = [
       ...Object.keys(this.comparisonData),
       ...Object.keys(this.revisionData)
     ]
 
-    const selectableRevisions = [
-      'workspace',
-      ...this.branchNames,
-      ...flatten(
-        this.branchNames.map(branch => this.revisionsByBranch.get(branch) || [])
-      )
-    ]
-
-    return uniqueValues(
-      selectableRevisions.filter(rev => !cachedRevisions.includes(rev))
+    return this.getSelectedRevisions().filter(
+      rev => !cachedRevisions.includes(rev)
     )
   }
 
@@ -319,16 +279,15 @@ export class PlotsModel {
     return this.sectionNames[section] || DEFAULT_SECTION_NAMES[section]
   }
 
-  private removeStaleBranchData(branchName: string, branchRevision: string) {
-    if (this.branchRevision !== branchRevision) {
-      delete this.revisionData[branchName]
-      delete this.comparisonData[branchName]
-      this.branchRevision = branchRevision
-    }
+  private removeStaleData() {
+    return Promise.all([
+      this.removeStaleBranches(),
+      this.removeStaleRevisions()
+    ])
   }
 
-  private removeStaleData() {
-    const revisions = this.getRevisions()
+  private removeStaleRevisions() {
+    const revisions = this.experiments.getRevisions()
 
     Object.keys(this.comparisonData).map(revision => {
       if (!revisions.includes(revision)) {
@@ -342,11 +301,18 @@ export class PlotsModel {
     })
   }
 
+  private removeStaleBranches() {
+    this.experiments.getBranchRevisions().forEach(({ id, sha }) => {
+      if (sha && this.branchRevisions[id] !== sha) {
+        delete this.revisionData[id]
+        delete this.comparisonData[id]
+        this.branchRevisions[id] = sha
+      }
+    })
+  }
+
   private getSelectedRevisions() {
-    const selectedRevisions = Object.keys(
-      this.experiments.getSelectedRevisions()
-    )
-    return this.getRevisions().filter(rev => selectedRevisions.includes(rev))
+    return Object.keys(this.experiments.getSelectedRevisions())
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {

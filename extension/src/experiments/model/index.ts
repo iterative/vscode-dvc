@@ -131,6 +131,19 @@ export class ExperimentsModel {
     return result
   }
 
+  public getBranchRevisions() {
+    return this.branches.map(({ id, sha }) => ({ id, sha }))
+  }
+
+  public getRevisions() {
+    return [
+      this.workspace,
+      ...this.branches,
+      ...this.flattenExperiments(),
+      ...this.flattenCheckpoints()
+    ].map(({ label }) => label)
+  }
+
   public getSelectedRevisions() {
     return [
       this.workspace,
