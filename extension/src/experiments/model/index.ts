@@ -188,7 +188,12 @@ export class ExperimentsModel {
   public setSelected(experiments: Experiment[]) {
     const selected = experiments.map(exp => exp.id)
 
-    this.status = this.getExperiments().reduce((acc, { id }) => {
+    this.status = [
+      this.workspace,
+      ...this.branches,
+      ...this.flattenExperiments(),
+      ...this.flattenCheckpoints()
+    ].reduce((acc, { id }) => {
       const status = selected.includes(id) ? Status.SELECTED : Status.UNSELECTED
       acc[id] = status
 
@@ -204,8 +209,15 @@ export class ExperimentsModel {
   }
 
   public setSelectedToFilters() {
-    const filtered = this.getSubRows(this.getExperiments())
-    this.setSelected(filtered)
+    const filteredExperiments = this.getSubRows(this.getExperiments())
+
+    const filteredCheckpoints = flatten<Experiment>(
+      filteredExperiments.map(
+        ({ id }) => this.getFilteredCheckpointsByTip(id) || []
+      )
+    )
+
+    this.setSelected([...filteredExperiments, ...filteredCheckpoints])
   }
 
   public getExperiments(): (Experiment & {
