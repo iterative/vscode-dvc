@@ -140,21 +140,11 @@ export class ExperimentsModel {
   }
 
   public getRevisions() {
-    return [
-      this.workspace,
-      ...this.branches,
-      ...this.flattenExperiments(),
-      ...this.flattenCheckpoints()
-    ].map(({ label }) => label)
+    return this.getCombinedList().map(({ label }) => label)
   }
 
   public getMutableRevisions() {
-    return [
-      this.workspace,
-      ...this.branches,
-      ...this.flattenExperiments(),
-      ...this.flattenCheckpoints()
-    ].reduce((acc, { label, mutable }) => {
+    return this.getCombinedList().reduce((acc, { label, mutable }) => {
       if (mutable) {
         acc.push(label)
       }
@@ -163,12 +153,7 @@ export class ExperimentsModel {
   }
 
   public getSelectedRevisions() {
-    return [
-      this.workspace,
-      ...this.branches,
-      ...this.flattenExperiments(),
-      ...this.flattenCheckpoints()
-    ].reduce((acc, { id, label, displayColor }) => {
+    return this.getCombinedList().reduce((acc, { id, label, displayColor }) => {
       if (displayColor && this.getStatus(id)) {
         acc[label] = displayColor
       }
@@ -188,7 +173,7 @@ export class ExperimentsModel {
   public setSelected(experiments: Experiment[]) {
     const selected = experiments.map(exp => exp.id)
 
-    this.status = this.getExperiments().reduce((acc, { id }) => {
+    this.status = this.getCombinedList().reduce((acc, { id }) => {
       const status = selected.includes(id) ? Status.SELECTED : Status.UNSELECTED
       acc[id] = status
 
@@ -204,8 +189,15 @@ export class ExperimentsModel {
   }
 
   public setSelectedToFilters() {
-    const filtered = this.getSubRows(this.getExperiments())
-    this.setSelected(filtered)
+    const filteredExperiments = this.getSubRows(this.getExperiments())
+
+    const filteredCheckpoints = flatten<Experiment>(
+      filteredExperiments.map(
+        ({ id }) => this.getFilteredCheckpointsByTip(id) || []
+      )
+    )
+
+    this.setSelected([...filteredExperiments, ...filteredCheckpoints])
   }
 
   public getExperiments(): (Experiment & {
@@ -271,6 +263,15 @@ export class ExperimentsModel {
           subRows: this.getSubRows(experiments)
         }
       })
+    ]
+  }
+
+  private getCombinedList() {
+    return [
+      this.workspace,
+      ...this.branches,
+      ...this.flattenExperiments(),
+      ...this.flattenCheckpoints()
     ]
   }
 
