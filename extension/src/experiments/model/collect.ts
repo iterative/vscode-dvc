@@ -14,7 +14,7 @@ import { hasKey } from '../../util/object'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
 
-export const getLabel = (sha: string) => sha.slice(0, 7)
+const getShortSha = (sha: string) => sha.slice(0, 7)
 
 export const isCheckpoint = (
   checkpointTip: string | undefined,
@@ -36,19 +36,25 @@ const getExperimentId = (
 
 const getDisplayNameOrParent = (
   sha: string,
-  experimentsObject: ExperimentsObject
+  branchSha: string,
+  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ): string | undefined => {
   const experiment = experimentsObject[sha]?.data
   if (!experiment) {
     return
   }
 
-  const { checkpoint_parent: parentTip, name } = experiment
+  const {
+    checkpoint_parent: checkpointParent,
+    checkpoint_tip: checkpointTip,
+    name
+  } = experiment
   if (
-    parentTip &&
-    experimentsObject[parentTip]?.data?.checkpoint_tip === parentTip
+    checkpointParent &&
+    branchSha !== checkpointParent &&
+    experimentsObject[checkpointParent]?.data?.checkpoint_tip !== checkpointTip
   ) {
-    return `(${getLabel(parentTip)})`
+    return `(${getShortSha(checkpointParent)})`
   }
   if (name) {
     return `[${name}]`
@@ -122,6 +128,7 @@ const transformExperimentOrCheckpointData = (
   sha: string,
   experimentData: ExperimentFieldsOrError,
   experimentsObject: ExperimentsObject,
+  branchSha: string,
   experimentColors: Map<string, string>,
   hasCheckpoints: boolean
 ): {
@@ -145,11 +152,11 @@ const transformExperimentOrCheckpointData = (
     experiment: transformExperimentData(
       id,
       experimentFields,
-      getLabel(sha),
+      getShortSha(sha),
       getColor(experimentColors, checkpointTipId, id),
       hasCheckpoints,
       sha,
-      getDisplayNameOrParent(sha, experimentsObject)
+      getDisplayNameOrParent(sha, branchSha, experimentsObject)
     )
   }
 }
@@ -174,6 +181,7 @@ const collectExperimentOrCheckpoint = (
 const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
   experimentsObject: ExperimentsObject,
+  branchSha: string,
   branchName: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
@@ -181,6 +189,7 @@ const collectFromExperimentsObject = (
       sha,
       experimentData,
       experimentsObject,
+      branchSha,
       acc.experimentColors,
       acc.hasCheckpoints
     )
@@ -216,7 +225,7 @@ const collectFromBranchesObject = (
     )
 
     if (branch) {
-      collectFromExperimentsObject(acc, experimentsObject, branch.label)
+      collectFromExperimentsObject(acc, experimentsObject, sha, branch.label)
 
       acc.branches.push(branch)
     }
