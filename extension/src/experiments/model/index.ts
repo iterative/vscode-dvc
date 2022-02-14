@@ -59,14 +59,18 @@ export class ExperimentsModel {
     this.workspaceState = workspaceState
   }
 
-  public async transformAndSet(data: ExperimentsOutput) {
+  public async transformAndSet(
+    data: ExperimentsOutput,
+    hasCheckpoints = false
+  ) {
     await this.collectColors(data)
 
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
       collectExperiments(
         data,
         this.getAssignedBranchColors(),
-        this.getAssignedExperimentColors()
+        this.getAssignedExperimentColors(),
+        hasCheckpoints
       )
 
     this.workspace = workspace
@@ -142,6 +146,20 @@ export class ExperimentsModel {
       ...this.flattenExperiments(),
       ...this.flattenCheckpoints()
     ].map(({ label }) => label)
+  }
+
+  public getMutableRevisions() {
+    return [
+      this.workspace,
+      ...this.branches,
+      ...this.flattenExperiments(),
+      ...this.flattenCheckpoints()
+    ].reduce((acc, { label, mutable }) => {
+      if (mutable) {
+        acc.push(label)
+      }
+      return acc
+    }, [] as string[])
   }
 
   public getSelectedRevisions() {
