@@ -20,9 +20,11 @@ import { FileSystemData } from '../../../fileSystem/data'
 import * as Watcher from '../../../fileSystem/watcher'
 
 const hasCheckpoints = (data: ExperimentsOutput) => {
-  const experimentFields = Object.values(
-    omit(Object.values(omit(data, 'workspace'))[0], 'baseline')
-  )[0]?.data
+  const [experimentsWithBaseline] = Object.values(omit(data, 'workspace'))
+  const [firstExperiment] = Object.values(
+    omit(experimentsWithBaseline, 'baseline')
+  )
+  const experimentFields = firstExperiment?.data
 
   return !!(
     experimentFields?.checkpoint_parent || experimentFields?.checkpoint_tip
