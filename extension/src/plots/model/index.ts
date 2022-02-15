@@ -118,7 +118,11 @@ export class PlotsModel {
       return
     }
 
-    const colors = getColorScale(this.experiments.getSelectedExperiments())
+    const colors = getColorScale(
+      this.experiments
+        .getSelectedExperiments()
+        .map(({ displayColor, id: revision }) => ({ displayColor, revision }))
+    )
 
     if (!colors) {
       return
@@ -141,9 +145,9 @@ export class PlotsModel {
       ...Object.keys(this.revisionData)
     ]
 
-    return this.getSelectedRevisions().reduce((acc, { id }) => {
-      if (!cachedRevisions.includes(id)) {
-        acc.push(id)
+    return this.getSelectedRevisions().reduce((acc, { revision }) => {
+      if (!cachedRevisions.includes(revision)) {
+        acc.push(revision)
       }
       return acc
     }, [] as string[])
@@ -158,12 +162,15 @@ export class PlotsModel {
   }
 
   public getComparisonRevisions() {
-    return this.getSelectedRevisions().reduce((acc, { id, displayColor }) => {
-      if (Object.keys(this.comparisonData).includes(id)) {
-        acc[id] = { color: displayColor }
-      }
-      return acc
-    }, {} as ComparisonRevisions)
+    return this.getSelectedRevisions().reduce(
+      (acc, { revision, displayColor }) => {
+        if (Object.keys(this.comparisonData).includes(revision)) {
+          acc[revision] = { color: displayColor }
+        }
+        return acc
+      },
+      {} as ComparisonRevisions
+    )
   }
 
   public getStaticPlots() {
@@ -185,7 +192,9 @@ export class PlotsModel {
                 data: {
                   values: flatten(
                     selectedRevisions
-                      .map(({ id }) => this.revisionData?.[id]?.[path])
+                      .map(
+                        ({ revision }) => this.revisionData?.[revision]?.[path]
+                      )
                       .filter(Boolean)
                   )
                 }
@@ -193,7 +202,7 @@ export class PlotsModel {
               this.getRevisionColors()
             ),
             multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: selectedRevisions.map(({ id }) => id),
+            revisions: selectedRevisions.map(({ revision }) => revision),
             type: PlotsType.VEGA
           }
         ]
@@ -214,10 +223,13 @@ export class PlotsModel {
         revisions: {} as ComparisonRevisionData
       }
 
-      selectedRevisions.forEach(({ id }) => {
-        const image = this.comparisonData?.[id]?.[path]
+      selectedRevisions.forEach(({ revision }) => {
+        const image = this.comparisonData?.[revision]?.[path]
         if (image) {
-          pathRevisions.revisions[id] = { revision: id, url: image.url }
+          pathRevisions.revisions[revision] = {
+            revision,
+            url: image.url
+          }
         }
       })
       acc.push(pathRevisions)
@@ -299,7 +311,7 @@ export class PlotsModel {
   private getSelectedRevisions() {
     return this.experiments
       .getSelectedRevisions()
-      .map(({ label: id, displayColor }) => ({ displayColor, id }))
+      .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {

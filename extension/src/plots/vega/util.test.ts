@@ -61,8 +61,8 @@ describe('getColorScale', () => {
   it('should convert an object to a vega color scale', () => {
     expect(
       getColorScale([
-        { displayColor: '#000000', id: 'main' },
-        { displayColor: '#FFFFFF', id: 'workspace' }
+        { displayColor: '#000000', revision: 'main' },
+        { displayColor: '#FFFFFF', revision: 'workspace' }
       ])
     ).toEqual({
       domain: ['main', 'workspace'],
