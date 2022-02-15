@@ -153,21 +153,23 @@ export class ExperimentsModel {
   }
 
   public getSelectedRevisions() {
-    return this.getCombinedList().reduce((acc, { id, label, displayColor }) => {
+    return this.getCombinedList().reduce((acc, experiment) => {
+      const { id, displayColor } = experiment
       if (displayColor && this.getStatus(id)) {
-        acc[label] = displayColor
+        acc.push(experiment)
       }
       return acc
-    }, {} as Record<string, string>)
+    }, [] as Experiment[])
   }
 
   public getSelectedExperiments() {
-    return this.flattenExperiments().reduce((acc, { id, displayColor }) => {
+    return this.flattenExperiments().reduce((acc, experiment) => {
+      const { displayColor, id } = experiment
       if (displayColor && this.getStatus(id)) {
-        acc[id] = displayColor
+        acc.push(experiment)
       }
       return acc
-    }, {} as Record<string, string>)
+    }, [] as Experiment[])
   }
 
   public setSelected(experiments: Experiment[]) {

@@ -21,7 +21,12 @@ beforeEach(() => {
 })
 
 describe('ExperimentsModel', () => {
-  const buildTestExperiment = (
+  const runningExperiment = 'exp-12345'
+  const [expColor] = copyOriginalExperimentColors()
+  const [branchColor] = copyOriginalBranchColors()
+  const workspaceColor = getWorkspaceColor()
+
+  const buildTestData = (
     testParam: number,
     checkpoint_tip?: string,
     name?: string
@@ -51,6 +56,38 @@ describe('ExperimentsModel', () => {
     return { data }
   }
 
+  const buildTestExperiment = (
+    sha: string,
+    id: string,
+    color: string,
+    testParam: number
+  ) => ({
+    checkpoint_tip: sha,
+    displayColor: color,
+    displayNameOrParent: `[${id}]`,
+    id,
+    label: sha,
+    mutable: false,
+    name: id,
+    params: { 'params.yaml': { test: testParam } },
+    sha
+  })
+
+  const buildTestCheckpoint = (
+    sha: string,
+    checkpointTip: string,
+    color: string,
+    testParam: number
+  ) => ({
+    checkpoint_tip: checkpointTip,
+    displayColor: color,
+    id: sha,
+    label: sha.slice(0, 7),
+    mutable: false,
+    params: { 'params.yaml': { test: testParam } },
+    sha: sha
+  })
+
   it('should return rows that equal the rows fixture when given the output fixture', async () => {
     const model = new ExperimentsModel('', buildMockMemento())
     await model.transformAndSet(outputFixture, true)
@@ -58,8 +95,6 @@ describe('ExperimentsModel', () => {
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', async () => {
-    const runningExperiment = 'exp-12345'
-
     const testPath = joinMetricOrParamPath('params', 'params.yaml', 'test')
 
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
@@ -68,59 +103,50 @@ describe('ExperimentsModel', () => {
       path: testPath,
       value: '2'
     })
-    const baseline = buildTestExperiment(2, undefined, 'testBranch')
+    const baseline = buildTestData(2, undefined, 'testBranch')
 
     await experimentsModel.transformAndSet({
       testBranch: {
         baseline,
-        test0: buildTestExperiment(0, 'tip'),
-        test1: buildTestExperiment(1, 'tip'),
-        tip: buildTestExperiment(2, 'tip', runningExperiment)
+        test0: buildTestData(0, 'tip2'),
+        test1: buildTestData(1, 'tip2'),
+        tip2: buildTestData(2, 'tip2', runningExperiment)
       },
       workspace: {
-        baseline: buildTestExperiment(3)
+        baseline: buildTestData(3)
       }
     })
 
-    const unfilteredExperiments = {
-      [runningExperiment]: '#f14c4c'
-    }
-
-    expect(experimentsModel.getSelectedExperiments()).toEqual(
-      unfilteredExperiments
-    )
+    expect(experimentsModel.getSelectedExperiments()).toEqual([
+      buildTestExperiment('tip2', runningExperiment, expColor, 2)
+    ])
 
     experimentsModel.setSelectionMode(true)
     experimentsModel.setSelectedToFilters()
-    expect(experimentsModel.getSelectedExperiments()).toEqual({})
+    expect(experimentsModel.getSelectedExperiments()).toEqual([])
 
-    const unfilteredCheckpoint = buildTestExperiment(
-      3,
-      'tip',
-      runningExperiment
-    )
+    const unfilteredCheckpoint = buildTestData(3, 'tip3', runningExperiment)
 
     const experimentWithNewCheckpoint = {
       testBranch: {
         baseline,
-        test0: buildTestExperiment(0, 'tip'),
-        test1: buildTestExperiment(1, 'tip'),
-        test2: buildTestExperiment(2, 'tip'),
-        tip: unfilteredCheckpoint
+        test0: buildTestData(0, 'tip3'),
+        test1: buildTestData(1, 'tip3'),
+        test2: buildTestData(2, 'tip3'),
+        tip3: unfilteredCheckpoint
       },
       workspace: {
-        baseline: buildTestExperiment(3)
+        baseline: buildTestData(3)
       }
     }
 
     await experimentsModel.transformAndSet(experimentWithNewCheckpoint)
-    expect(experimentsModel.getSelectedExperiments()).toEqual(
-      unfilteredExperiments
-    )
+    expect(experimentsModel.getSelectedExperiments()).toEqual([
+      buildTestExperiment('tip3', runningExperiment, expColor, 3)
+    ])
   })
 
   it('should apply filters to checkpoints and experiments if selection mode is set to use filters', async () => {
-    const runningExperiment = 'exp-12345'
     const testPath = joinMetricOrParamPath('params', 'params.yaml', 'test')
 
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
@@ -129,38 +155,47 @@ describe('ExperimentsModel', () => {
       path: testPath,
       value: '2'
     })
-    const baseline = buildTestExperiment(2, undefined, 'testBranch')
+    const baseline = buildTestData(2, undefined, 'testBranch')
 
     await experimentsModel.transformAndSet({
       testBranch: {
-        '0notIncluded': buildTestExperiment(0, 'tip'),
-        '1notIncluded': buildTestExperiment(1, 'tip'),
-        '2included': buildTestExperiment(2, 'tip'),
-        '3included': buildTestExperiment(2.05, 'tip'),
-        '4included': buildTestExperiment(2.05, 'tip'),
+        '0notIncluded': buildTestData(0, 'tip'),
+        '1notIncluded': buildTestData(1, 'tip'),
+        '2included': buildTestData(2, 'tip'),
+        '3included': buildTestData(2.05, 'tip'),
+        '4included': buildTestData(2.05, 'tip'),
         baseline,
-        tip: buildTestExperiment(2.1, 'tip', runningExperiment)
+        tip: buildTestData(2.1, 'tip', runningExperiment)
       },
       workspace: {
-        baseline: buildTestExperiment(3)
+        baseline: buildTestData(3)
       }
     })
 
     experimentsModel.setSelectionMode(true)
     experimentsModel.setSelectedToFilters()
 
-    const [expColor] = copyOriginalExperimentColors()
-    const [branchColor] = copyOriginalBranchColors()
-
-    const filteredRevisions = {
-      '2includ': expColor,
-      '3includ': expColor,
-      '4includ': expColor,
-      testBranch: branchColor,
-      tip: expColor,
-      workspace: getWorkspaceColor()
-    }
-
-    expect(experimentsModel.getSelectedRevisions()).toEqual(filteredRevisions)
+    expect(experimentsModel.getSelectedRevisions()).toEqual([
+      {
+        displayColor: workspaceColor,
+        id: 'workspace',
+        label: 'workspace',
+        mutable: false,
+        params: { 'params.yaml': { test: 3 } }
+      },
+      {
+        displayColor: branchColor,
+        id: 'testBranch',
+        label: 'testBranch',
+        mutable: false,
+        name: 'testBranch',
+        params: { 'params.yaml': { test: 2 } },
+        sha: 'testBranch'
+      },
+      buildTestExperiment('tip', runningExperiment, expColor, 2.1),
+      buildTestCheckpoint('2included', 'tip', expColor, 2),
+      buildTestCheckpoint('3included', 'tip', expColor, 2.05),
+      buildTestCheckpoint('4included', 'tip', expColor, 2.05)
+    ])
   })
 })

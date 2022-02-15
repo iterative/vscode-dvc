@@ -55,11 +55,16 @@ describe('isMultiViewByCommitPlot', () => {
 
 describe('getColorScale', () => {
   it('should return undefined given an empty object', () => {
-    expect(getColorScale({})).toBeUndefined()
+    expect(getColorScale([])).toBeUndefined()
   })
 
   it('should convert an object to a vega color scale', () => {
-    expect(getColorScale({ main: '#000000', workspace: '#FFFFFF' })).toEqual({
+    expect(
+      getColorScale([
+        { displayColor: '#000000', id: 'main' },
+        { displayColor: '#FFFFFF', id: 'workspace' }
+      ])
+    ).toEqual({
       domain: ['main', 'workspace'],
       range: ['#000000', '#FFFFFF']
     })
