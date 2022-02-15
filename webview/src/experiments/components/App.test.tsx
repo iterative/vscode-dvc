@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import React from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
@@ -10,8 +11,21 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
+import {
+  mockDndElSpacing,
+  mockGetComputedSpacing,
+  makeDnd,
+  DND_DIRECTION_RIGHT
+} from 'react-beautiful-dnd-test-utils'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
+import {
+  commonColumnFields,
+  expectHeaders,
+  makeGetDragEl,
+  tableData as sortingTableDataFixture
+} from '../../test/sort'
 
 jest.mock('../../shared/api')
 
@@ -85,5 +99,52 @@ describe('App', () => {
       })
     )
     expect(mockSetState).toBeCalledWith({ dvcRoot })
+  })
+
+  it('should be able to order a column to the final space after a new column is added', async () => {
+    const view = render(<App />)
+    mockDndElSpacing(view)
+    mockGetComputedSpacing()
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: sortingTableDataFixture,
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+
+    const changedData: TableData = {
+      ...sortingTableDataFixture,
+      columns: [
+        ...sortingTableDataFixture.columns,
+        {
+          ...commonColumnFields,
+          id: 'D',
+          name: 'D',
+          path: 'params:D'
+        }
+      ]
+    }
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: changedData,
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+
+    await makeDnd({
+      direction: DND_DIRECTION_RIGHT,
+      getByText: view.getByText,
+      getDragEl: makeGetDragEl('B'),
+      positions: 2
+    })
+
+    await expectHeaders(['A', 'C', 'D', 'B'])
   })
 })

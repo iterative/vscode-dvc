@@ -11,18 +11,20 @@ import {
   mockGetComputedSpacing,
   mockDndElSpacing,
   makeDnd,
-  DND_DRAGGABLE_DATA_ATTR,
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
-import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnOrder'
 
 import { vsCodeApi } from '../../../shared/api'
-import { App } from '../App'
+import {
+  expectHeaders,
+  makeGetDragEl,
+  tableData as sortingTableDataFixture
+} from '../../../test/sort'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
@@ -262,60 +264,14 @@ describe('Table', () => {
   })
 
   describe('Columns order', () => {
-    const basicProps = {
-      group: 'params',
-      hasChildren: false,
-      parentPath: 'params'
-    }
-    const columns = [
-      {
-        ...basicProps,
-        id: 'A',
-        name: 'A',
-        path: 'params:A'
-      },
-      {
-        ...basicProps,
-        id: 'B',
-        name: 'B',
-        path: 'params:B'
-      },
-      {
-        ...basicProps,
-        id: 'C',
-        name: 'C',
-        path: 'params:C'
-      }
-    ]
-    const tableData = {
-      changes: [],
-      columnOrder: [],
-      columnWidths: {},
-      columns,
-      rows: [],
-      sorts: []
-    }
-
-    const makeGetDragEl = (text: string) => () =>
-      // eslint-disable-next-line testing-library/no-node-access
-      screen.getByText(text).closest(DND_DRAGGABLE_DATA_ATTR)
-
-    const renderExperimentsTable = (data: TableData = tableData) => {
+    const renderExperimentsTable = (
+      data: TableData = sortingTableDataFixture
+    ) => {
       const view = render(<ExperimentsTable tableData={data} />)
 
       mockDndElSpacing(view)
 
       return view
-    }
-
-    const defaultCols = ['Experiment', 'Timestamp']
-
-    const expectHeaders = async (expectedHeaderNames: string[]) => {
-      const headers = (await screen.findAllByTestId('rendered-header')).map(
-        header => header.textContent
-      )
-
-      expect(headers).toEqual([...defaultCols, ...expectedHeaderNames])
     }
 
     beforeEach(() => {
@@ -368,7 +324,7 @@ describe('Table', () => {
         'params:A'
       ]
       const tableDataWithCustomColOrder = {
-        ...tableData,
+        ...sortingTableDataFixture,
         columnOrder
       }
       renderExperimentsTable(tableDataWithCustomColOrder)
@@ -376,59 +332,9 @@ describe('Table', () => {
       await expectHeaders(['C', 'B', 'A'])
     })
 
-    it('should be able to order a column to the final space after a new column is added', async () => {
-      const view = render(<App />)
-      mockDndElSpacing(view)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
-
-      const changedData: TableData = {
-        ...tableData,
-        columns: [
-          ...columns,
-          {
-            ...basicProps,
-            id: 'D',
-            name: 'D',
-            path: 'params:D'
-          }
-        ]
-      }
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: changedData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
-
-      await makeDnd({
-        direction: DND_DIRECTION_RIGHT,
-        getByText: view.getByText,
-        getDragEl: makeGetDragEl('B'),
-        positions: 2
-      })
-
-      expect(
-        (await screen.findAllByTestId('rendered-header')).map(
-          header => header.textContent
-        )
-      ).toEqual([...defaultCols, 'A', 'C', 'D', 'B'])
-    })
-
     it('should resize columns and persist new state when a separator is clicked and dragged', async () => {
       const tableDataWithColumnSetting: TableData = {
-        ...tableData,
+        ...sortingTableDataFixture,
         columnWidths: {
           id: 333
         }
