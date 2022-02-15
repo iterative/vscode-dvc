@@ -33,12 +33,12 @@ const { postMessage, setState } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
 const mockSetState = jest.mocked(setState)
 
-afterEach(() => {
-  cleanup()
-})
-
 beforeEach(() => {
   jest.clearAllMocks()
+})
+
+afterEach(() => {
+  cleanup()
 })
 
 describe('App', () => {
