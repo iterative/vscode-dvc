@@ -26,6 +26,11 @@ import { setContextValue } from '../../vscode/context'
 import { MementoPrefix } from '../../vscode/memento'
 import { hasKey } from '../../util/object'
 
+type SelectedExperimentWithColor = Experiment & {
+  displayColor: string
+  selected: true
+}
+
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
@@ -153,23 +158,11 @@ export class ExperimentsModel {
   }
 
   public getSelectedRevisions() {
-    return this.getCombinedList().reduce((acc, experiment) => {
-      const { id, displayColor } = experiment
-      if (displayColor && this.getStatus(id)) {
-        acc.push(experiment)
-      }
-      return acc
-    }, [] as Experiment[])
+    return this.getSelectedFromList(() => this.getCombinedList())
   }
 
   public getSelectedExperiments() {
-    return this.flattenExperiments().reduce((acc, experiment) => {
-      const { displayColor, id } = experiment
-      if (displayColor && this.getStatus(id)) {
-        acc.push(experiment)
-      }
-      return acc
-    }, [] as Experiment[])
+    return this.getSelectedFromList(() => this.flattenExperiments())
   }
 
   public setSelected(experiments: Experiment[]) {
@@ -488,5 +481,21 @@ export class ExperimentsModel {
 
   private getStatus(id: string) {
     return !!this.status[id]
+  }
+
+  private getSelectedFromList(getList: () => Experiment[]) {
+    return getList().reduce((acc, experiment) => {
+      if (this.isSelectedExperimentWithColor(experiment)) {
+        acc.push(experiment)
+      }
+      return acc
+    }, [] as SelectedExperimentWithColor[])
+  }
+
+  private isSelectedExperimentWithColor(
+    experiment: Experiment
+  ): experiment is SelectedExperimentWithColor {
+    const { id, displayColor } = experiment
+    return !!(displayColor && this.getStatus(id))
   }
 }

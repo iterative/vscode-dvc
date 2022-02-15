@@ -159,7 +159,7 @@ export class PlotsModel {
 
   public getComparisonRevisions() {
     return this.getSelectedRevisions().reduce((acc, { id, displayColor }) => {
-      if (Object.keys(this.comparisonData).includes(id) && displayColor) {
+      if (Object.keys(this.comparisonData).includes(id)) {
         acc[id] = { color: displayColor }
       }
       return acc
