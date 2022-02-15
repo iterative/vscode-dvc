@@ -18,6 +18,10 @@ import {
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
 import { TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  ascendingSortableRowsTableDataFixture,
+  sortableRowsTableDataFixture
+} from 'dvc/src/test/fixtures/expShow/sortable'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -146,5 +150,70 @@ describe('App', () => {
     })
 
     await expectHeaders(['A', 'C', 'D', 'B'])
+  })
+
+  it('should maintain expansion status when rows are reordered', () => {
+    render(<App />)
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: sortableRowsTableDataFixture,
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+
+    const getRowLabels = () =>
+      screen
+        .queryAllByText(/^exp\w(checkpoint\w)?$/)
+        .map(element => element.textContent)
+
+    expect(getRowLabels()).toEqual([
+      'expA',
+      'expAcheckpointA',
+      'expAcheckpointB',
+      'expB',
+      'expBcheckpointA',
+      'expBcheckpointB',
+      'expC',
+      'expCcheckpointA',
+      'expCcheckpointB'
+    ])
+
+    fireEvent.click(screen.getByText('expA'))
+
+    expect(getRowLabels()).toEqual([
+      'expA',
+      'expB',
+      'expBcheckpointA',
+      'expBcheckpointB',
+      'expC',
+      'expCcheckpointA',
+      'expCcheckpointB'
+    ])
+
+    const changedData: TableData = ascendingSortableRowsTableDataFixture
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: changedData,
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+
+    expect(getRowLabels()).toEqual([
+      'expC',
+      'expCcheckpointA',
+      'expCcheckpointB',
+      'expA',
+      'expB',
+      'expBcheckpointA',
+      'expBcheckpointB'
+    ])
   })
 })
