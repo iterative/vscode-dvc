@@ -74,11 +74,3 @@ The DVC Extension for Visual Studio Code collects usage data and sends it to
 Azure to help improve our products and services. This extension respects the
 `telemetry.enableTelemetry` setting which you can learn more about at
 https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting.
-
-## VSCode Forks
-
-While the DVC Extension can work with VSCode forks like
-[VSCodium](https://vscodium.com/), our team only supports the official Microsoft
-build and it's possible that issues can arise. The Python extension in
-particular has problems with VSCodium, and often causes our extension's
-integration with it to fail.

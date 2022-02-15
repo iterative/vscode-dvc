@@ -12,4 +12,10 @@ This can be done via the welcome view underneath the `DVC Tracked` view in the
 side bar's explorer view container or `DVC: Setup The Workspace` from the
 command palette.
 
+In some situations, like when using [VSCodium](https://vscodium.com/), the
+Python extension integration will fail. If this happens and you need to use DVC
+from inside a virtual environment, try using the "Yes, and I want to select the
+Python interpreter" option to specify a Python interpreter for DVC outside of
+the Python extension.
+
 Once you have setup your workspace the rest of the walkthrough will appear.
