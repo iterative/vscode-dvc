@@ -53,7 +53,12 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
 
       return [
         getPinnedColumnRevision(),
-        ...withoutPinned([...filteredColumns, ...newColumns])
+        ...withoutPinned([
+          ...filteredColumns.sort(function ({ revision: a }, { revision: b }) {
+            return prevColumnKeys.indexOf(a) - prevColumnKeys.indexOf(b)
+          }),
+          ...newColumns
+        ])
       ].filter(Boolean) as ComparisonTableColumn[]
     })
   }, [revisions, getPinnedColumnRevision])

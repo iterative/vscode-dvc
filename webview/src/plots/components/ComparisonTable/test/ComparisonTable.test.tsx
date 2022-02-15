@@ -236,5 +236,38 @@ describe('ComparisonTable', () => {
 
       expect(dragOverEvent.preventDefault).toHaveBeenCalled()
     })
+
+    it('should not reorder existing columns when adding a new one after a drag and drop', () => {
+      const { rerender } = renderTable()
+
+      const [, endingNode, , startingNode] = getHeaders()
+
+      dragAndDrop(startingNode, endingNode)
+
+      let headers = getHeaders().map(header => header.textContent)
+
+      const reorderedRevisions = [
+        revisions[0],
+        revisions[3],
+        revisions[1],
+        revisions[2],
+        revisions[4]
+      ]
+
+      expect(headers).toEqual(reorderedRevisions)
+
+      const newRevName = 'newRev'
+      const originalRevisionsWithNew = [
+        ...basicProps.revisions,
+        { displayColor: '#000000', revision: newRevName }
+      ]
+
+      rerender(
+        <ComparisonTable {...basicProps} revisions={originalRevisionsWithNew} />
+      )
+
+      headers = getHeaders().map(header => header.textContent)
+      expect(headers).toEqual([...reorderedRevisions, newRevName])
+    })
   })
 })
