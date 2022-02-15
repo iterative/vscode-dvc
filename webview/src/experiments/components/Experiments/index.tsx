@@ -104,8 +104,11 @@ const reportResizedColumn = (state: TableState<Experiment>) => {
 export const ExperimentsTable: React.FC<{
   tableData: InitiallyUndefinedTableData
 }> = ({ tableData: initiallyUndefinedTableData }) => {
-  const getRowId = useCallback(({ id }: Experiment) => id, [])
-
+  const getRowId = useCallback(
+    (experiment: Experiment, _index, parent?: Row<Experiment>) =>
+      parent ? [parent.id, experiment.id].join('.') : experiment.id,
+    []
+  )
   const [tableData, columns, defaultColumn, initialState] =
     React.useMemo(() => {
       const tableData: TableData = {
