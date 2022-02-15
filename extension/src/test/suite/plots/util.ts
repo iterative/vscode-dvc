@@ -13,6 +13,7 @@ import { Experiments } from '../../../experiments'
 import { buildDependencies, buildMockData } from '../util'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
+import { mockHasCheckpoints } from '../experiments/util'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -54,6 +55,7 @@ export const buildPlots = async (
       )
     )
   ])
+  mockHasCheckpoints(expShow)
   experiments.setState(expShow)
   plots.setExperiments(experiments)
 

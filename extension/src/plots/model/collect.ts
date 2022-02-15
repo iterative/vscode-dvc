@@ -9,7 +9,6 @@ import {
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
-  ExperimentsBranchOutput,
   ExperimentsOutput,
   PlotsOutput,
   Value,
@@ -22,7 +21,7 @@ import {
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../../util/map'
-import { getLabel, isCheckpoint } from '../../experiments/model/collect'
+import { isCheckpoint } from '../../experiments/model/collect'
 
 type LivePlotAccumulator = Map<string, LivePlotValues>
 
@@ -205,108 +204,6 @@ export const collectLivePlotsData = (
   })
 
   return plotsData
-}
-
-type RevisionsAccumulator = {
-  branchNames: string[]
-  revisionsByBranch: Map<string, string[]>
-  revisionsByTip: Map<string, string[]>
-}
-
-const collectExperimentOrCheckpoint = (
-  acc: RevisionsAccumulator,
-  branchName: string,
-  sha: string,
-  checkpointTip: string | undefined
-) => {
-  const id = getLabel(sha)
-  if (isCheckpoint(checkpointTip, sha)) {
-    addToMapArray(acc.revisionsByTip, getLabel(checkpointTip), id)
-  } else {
-    addToMapArray(acc.revisionsByBranch, branchName, id)
-  }
-}
-
-const collectBranchRevisions = (
-  acc: RevisionsAccumulator,
-  branchName: string,
-  experimentsObject: ExperimentsBranchOutput
-): void => {
-  Object.entries(experimentsObject).map(([sha, experimentData]) => {
-    if (sha === 'baseline') {
-      return
-    }
-    const data = transformExperimentData(experimentData)
-    if (!data || data.queued) {
-      return
-    }
-
-    collectExperimentOrCheckpoint(acc, branchName, sha, data.checkpoint_tip)
-  })
-}
-
-export const collectRevisions = (
-  data: ExperimentsOutput
-): RevisionsAccumulator => {
-  const acc: RevisionsAccumulator = {
-    branchNames: [],
-    revisionsByBranch: new Map<string, string[]>(),
-    revisionsByTip: new Map<string, string[]>()
-  }
-
-  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
-    const branchName = experimentsObject.baseline.data?.name
-
-    if (branchName) {
-      acc.branchNames.push(branchName)
-      collectBranchRevisions(acc, branchName, experimentsObject)
-    }
-  }
-  return acc
-}
-
-export const collectBranchRevision = (data: ExperimentsOutput): string => {
-  const branchSha = Object.keys(data).find(id => id !== 'workspace') as string
-  return getLabel(branchSha)
-}
-
-const collectMutableFromExperiment = (
-  acc: string[],
-  experimentsObject: {
-    [sha: string]: ExperimentFieldsOrError
-  }
-) => {
-  Object.entries(experimentsObject).map(([sha, experimentData]) => {
-    if (sha === 'baseline') {
-      return
-    }
-    const data = transformExperimentData(experimentData)
-    if (!data?.running || data?.checkpoint_parent || data?.checkpoint_tip) {
-      return
-    }
-
-    acc.push(getLabel(sha))
-  })
-}
-
-export const collectMutableRevisions = (
-  data: ExperimentsOutput,
-  hasCheckpoints: boolean
-): string[] => {
-  if (hasCheckpoints) {
-    return []
-  }
-
-  const acc: string[] = []
-
-  if (data.workspace.baseline.data?.running) {
-    acc.push('workspace')
-  }
-
-  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
-    collectMutableFromExperiment(acc, experimentsObject)
-  }
-  return acc
 }
 
 export type RevisionData = {

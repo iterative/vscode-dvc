@@ -1,13 +1,17 @@
 import React, { DragEvent } from 'react'
 import cx from 'classnames'
-import { ComparisonRevisions } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 
+export type ComparisonTableColumn = {
+  revision: string
+  color: string
+}
+
 interface ComparisonTableHeadProps {
-  columns: ComparisonRevisions
+  columns: ComparisonTableColumn[]
   pinnedColumn: string
-  setColumnsOrder: (columns: string[]) => void
+  setColumnsOrder: (columns: ComparisonTableColumn[]) => void
   setPinnedColumn: (column: string) => void
 }
 
@@ -17,7 +21,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
-  const cols = Object.keys(columns)
+  const cols = columns.map(col => col.revision)
 
   const handleDragStart = (e: DragEvent<HTMLTableCellElement>) => {
     const id = cols.indexOf(e.currentTarget.id).toString()
@@ -34,7 +38,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
 
     if (cols[droppedColIndex] !== pinnedColumn) {
       const draggedColIndex = parseInt(e.dataTransfer.getData('colIndex'), 10)
-      const newColumnOrder = [...cols]
+      const newColumnOrder = [...columns]
       const draggedColumn = newColumnOrder[draggedColIndex]
 
       newColumnOrder.splice(draggedColIndex, 1)
@@ -47,12 +51,12 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   return (
     <thead>
       <tr>
-        {cols.map(exp => {
-          const isPinned = exp === pinnedColumn
+        {columns.map(({ revision, color }) => {
+          const isPinned = revision === pinnedColumn
           return (
             <th
-              key={exp}
-              id={exp}
+              key={revision}
+              id={revision}
               className={cx(styles.comparisonTableHeader, {
                 [styles.pinnedColumnHeader]: isPinned
               })}
@@ -63,10 +67,10 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
             >
               <ComparisonTableHeader
                 isPinned={isPinned}
-                onClicked={() => setPinnedColumn(exp)}
-                color={columns[exp].color}
+                onClicked={() => setPinnedColumn(revision)}
+                color={color}
               >
-                {exp}
+                {revision}
               </ComparisonTableHeader>
             </th>
           )
