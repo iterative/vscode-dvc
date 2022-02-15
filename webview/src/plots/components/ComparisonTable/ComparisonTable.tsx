@@ -32,6 +32,15 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     [revisions]
   )
 
+  const retainOrder = (
+    originalOrder: string[],
+    revisions: ComparisonTableColumn[]
+  ) =>
+    revisions.sort(
+      ({ revision: a }, { revision: b }) =>
+        originalOrder.indexOf(a) - originalOrder.indexOf(b)
+    )
+
   useEffect(() => {
     setColumns(prevColumns => {
       const prevColumnKeys = prevColumns.map(col => col.revision)
@@ -54,9 +63,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
       return [
         getPinnedColumnRevision(),
         ...withoutPinned([
-          ...filteredColumns.sort(function ({ revision: a }, { revision: b }) {
-            return prevColumnKeys.indexOf(a) - prevColumnKeys.indexOf(b)
-          }),
+          ...retainOrder(prevColumnKeys, filteredColumns),
           ...newColumns
         ])
       ].filter(Boolean) as ComparisonTableColumn[]
