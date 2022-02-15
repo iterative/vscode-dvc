@@ -537,13 +537,13 @@ export const getComparisonWebviewMessage = (
     acc.push({ path, revisions })
     return acc
   }, [] as ComparisonPlots),
-  revisions: {
-    '4fb124a': { color: '#f14c4c' },
-    '42b8736': { color: '#3794ff' },
-    '1ba7bcd': { color: '#cca700' },
-    main: { color: '#13adc7' },
-    workspace: { color: getWorkspaceColor() }
-  },
+  revisions: [
+    { revision: 'workspace', displayColor: getWorkspaceColor() },
+    { revision: 'main', displayColor: '#13adc7' },
+    { revision: '4fb124a', displayColor: '#f14c4c' },
+    { revision: '42b8736', displayColor: '#3794ff' },
+    { revision: '1ba7bcd', displayColor: '#cca700' }
+  ],
   sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
   size: PlotSize.REGULAR
 })
