@@ -118,7 +118,11 @@ export class PlotsModel {
       return
     }
 
-    const colors = getColorScale(this.experiments.getSelectedExperiments())
+    const colors = getColorScale(
+      this.experiments
+        .getSelectedExperiments()
+        .map(({ displayColor, id: revision }) => ({ displayColor, revision }))
+    )
 
     if (!colors) {
       return
@@ -142,7 +146,7 @@ export class PlotsModel {
     ]
 
     return this.getSelectedRevisions().filter(
-      rev => !cachedRevisions.includes(rev)
+      revision => !cachedRevisions.includes(revision)
     )
   }
 
@@ -151,18 +155,19 @@ export class PlotsModel {
   }
 
   public getRevisionColors() {
-    return getColorScale(this.experiments?.getSelectedRevisions() || {})
+    return getColorScale(this.getSelectedRevisionDetails())
   }
 
   public getComparisonRevisions() {
-    return Object.entries({
-      ...(this.experiments?.getSelectedRevisions() || {})
-    }).reduce((acc, [revision, color]) => {
-      if (Object.keys(this.comparisonData).includes(revision)) {
-        acc[revision] = { color }
-      }
-      return acc
-    }, {} as ComparisonRevisions)
+    return this.getSelectedRevisionDetails().reduce(
+      (acc, { revision, displayColor }) => {
+        if (Object.keys(this.comparisonData).includes(revision)) {
+          acc[revision] = { color: displayColor }
+        }
+        return acc
+      },
+      {} as ComparisonRevisions
+    )
   }
 
   public getStaticPlots() {
@@ -184,7 +189,7 @@ export class PlotsModel {
                 data: {
                   values: flatten(
                     selectedRevisions
-                      .map(rev => this.revisionData?.[rev]?.[path])
+                      .map(revision => this.revisionData?.[revision]?.[path])
                       .filter(Boolean)
                   )
                 }
@@ -216,7 +221,10 @@ export class PlotsModel {
       selectedRevisions.forEach(revision => {
         const image = this.comparisonData?.[revision]?.[path]
         if (image) {
-          pathRevisions.revisions[revision] = { revision, url: image.url }
+          pathRevisions.revisions[revision] = {
+            revision,
+            url: image.url
+          }
         }
       })
       acc.push(pathRevisions)
@@ -295,8 +303,14 @@ export class PlotsModel {
     })
   }
 
+  private getSelectedRevisionDetails() {
+    return this.experiments
+      .getSelectedRevisions()
+      .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
+  }
+
   private getSelectedRevisions() {
-    return Object.keys(this.experiments.getSelectedRevisions())
+    return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
   private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
