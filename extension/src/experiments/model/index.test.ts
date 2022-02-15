@@ -21,6 +21,11 @@ beforeEach(() => {
 })
 
 describe('ExperimentsModel', () => {
+  const runningExperiment = 'exp-12345'
+  const [expColor] = copyOriginalExperimentColors()
+  const [branchColor] = copyOriginalBranchColors()
+  const workspaceColor = getWorkspaceColor()
+
   const buildTestExperiment = (
     testParam: number,
     checkpoint_tip?: string,
@@ -58,8 +63,6 @@ describe('ExperimentsModel', () => {
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', async () => {
-    const runningExperiment = 'exp-12345'
-
     const testPath = joinMetricOrParamPath('params', 'params.yaml', 'test')
 
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
@@ -73,40 +76,40 @@ describe('ExperimentsModel', () => {
     await experimentsModel.transformAndSet({
       testBranch: {
         baseline,
-        test0: buildTestExperiment(0, 'tip'),
-        test1: buildTestExperiment(1, 'tip'),
-        tip: buildTestExperiment(2, 'tip', runningExperiment)
+        test0: buildTestExperiment(0, 'tip2'),
+        test1: buildTestExperiment(1, 'tip2'),
+        tip2: buildTestExperiment(2, 'tip2', runningExperiment)
       },
       workspace: {
         baseline: buildTestExperiment(3)
       }
     })
 
-    const unfilteredExperiments = {
-      [runningExperiment]: '#f14c4c'
-    }
-
-    expect(experimentsModel.getSelectedExperiments()).toEqual(
-      unfilteredExperiments
-    )
+    expect(experimentsModel.getSelectedExperiments()).toEqual([
+      expect.objectContaining({
+        displayColor: expColor,
+        id: runningExperiment,
+        label: 'tip2'
+      })
+    ])
 
     experimentsModel.setSelectionMode(true)
     experimentsModel.setSelectedToFilters()
-    expect(experimentsModel.getSelectedExperiments()).toEqual({})
+    expect(experimentsModel.getSelectedExperiments()).toEqual([])
 
     const unfilteredCheckpoint = buildTestExperiment(
       3,
-      'tip',
+      'tip3',
       runningExperiment
     )
 
     const experimentWithNewCheckpoint = {
       testBranch: {
         baseline,
-        test0: buildTestExperiment(0, 'tip'),
-        test1: buildTestExperiment(1, 'tip'),
-        test2: buildTestExperiment(2, 'tip'),
-        tip: unfilteredCheckpoint
+        test0: buildTestExperiment(0, 'tip3'),
+        test1: buildTestExperiment(1, 'tip3'),
+        test2: buildTestExperiment(2, 'tip3'),
+        tip3: unfilteredCheckpoint
       },
       workspace: {
         baseline: buildTestExperiment(3)
@@ -114,13 +117,16 @@ describe('ExperimentsModel', () => {
     }
 
     await experimentsModel.transformAndSet(experimentWithNewCheckpoint)
-    expect(experimentsModel.getSelectedExperiments()).toEqual(
-      unfilteredExperiments
-    )
+    expect(experimentsModel.getSelectedExperiments()).toEqual([
+      expect.objectContaining({
+        displayColor: expColor,
+        id: runningExperiment,
+        label: 'tip3'
+      })
+    ])
   })
 
   it('should apply filters to checkpoints and experiments if selection mode is set to use filters', async () => {
-    const runningExperiment = 'exp-12345'
     const testPath = joinMetricOrParamPath('params', 'params.yaml', 'test')
 
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
@@ -149,18 +155,37 @@ describe('ExperimentsModel', () => {
     experimentsModel.setSelectionMode(true)
     experimentsModel.setSelectedToFilters()
 
-    const [expColor] = copyOriginalExperimentColors()
-    const [branchColor] = copyOriginalBranchColors()
-
-    const filteredRevisions = {
-      '2includ': expColor,
-      '3includ': expColor,
-      '4includ': expColor,
-      testBranch: branchColor,
-      tip: expColor,
-      workspace: getWorkspaceColor()
-    }
-
-    expect(experimentsModel.getSelectedRevisions()).toEqual(filteredRevisions)
+    expect(experimentsModel.getSelectedRevisions()).toEqual([
+      expect.objectContaining({
+        displayColor: workspaceColor,
+        id: 'workspace',
+        label: 'workspace'
+      }),
+      expect.objectContaining({
+        displayColor: branchColor,
+        id: 'testBranch',
+        label: 'testBranch'
+      }),
+      expect.objectContaining({
+        displayColor: expColor,
+        id: runningExperiment,
+        label: 'tip'
+      }),
+      expect.objectContaining({
+        displayColor: expColor,
+        id: '2included',
+        label: '2includ'
+      }),
+      expect.objectContaining({
+        displayColor: expColor,
+        id: '3included',
+        label: '3includ'
+      }),
+      expect.objectContaining({
+        displayColor: expColor,
+        id: '4included',
+        label: '4includ'
+      })
+    ])
   })
 })
