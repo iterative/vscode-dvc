@@ -96,21 +96,29 @@ describe('collectExperiments', () => {
   it('should handle the continuation of a modified checkpoint', () => {
     const { checkpointsByTip } = collectExperiments(modifiedFixture)
 
-    const modifiedExperiment = checkpointsByTip
+    const modifiedCheckpointTip = checkpointsByTip
       .get('exp-01b3a')
       ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
 
-    expect(modifiedExperiment).toHaveLength(1)
-    expect(modifiedExperiment?.[0].displayNameOrParent).toEqual('(3b0c6ac)')
-    expect(modifiedExperiment?.[0].label).toEqual('7e3cb21')
+    expect(modifiedCheckpointTip).toHaveLength(1)
+    expect(modifiedCheckpointTip?.[0].displayNameOrParent).toEqual('(3b0c6ac)')
+    expect(modifiedCheckpointTip?.[0].label).toEqual('7e3cb21')
+
+    const modifiedCheckpoint = checkpointsByTip
+      .get('exp-9bc1b')
+      ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
+
+    expect(modifiedCheckpoint).toHaveLength(1)
+    expect(modifiedCheckpoint?.[0].displayNameOrParent).toEqual('(df39067)')
+    expect(modifiedCheckpoint?.[0].label).toEqual('98cb38c')
 
     checkpointsByTip.forEach(checkpoints => {
       const continuationCheckpoints = checkpoints.filter(checkpoint => {
         const { label, displayNameOrParent } = checkpoint
         return (
           displayNameOrParent?.includes('(') &&
-          label !== '7e3cb21' &&
-          displayNameOrParent !== '(3b0c6ac)'
+          !(label === '7e3cb21' && displayNameOrParent === '(3b0c6ac)') &&
+          !(label === '98cb38c' && displayNameOrParent === '(df39067)')
         )
       })
       expect(continuationCheckpoints).toHaveLength(0)

@@ -55,6 +55,79 @@ const data = {
         name: 'main'
       }
     },
+    '80d3ef4c9c6f0a60bccc7ee33f74f778f459c608': {
+      data: {
+        checkpoint_tip: '80d3ef4c9c6f0a60bccc7ee33f74f778f459c608',
+        timestamp: '2022-02-14T09:36:24',
+        params: {
+          'params.yaml': { data: { seed: 473987, lr: 0.001, weight_decay: 0 } }
+        },
+        queued: false,
+        running: false,
+        executor: null,
+        metrics: {
+          'logs.json': {
+            data: { step: 11, loss: 1.8944456577301025, acc: 0.6476 }
+          }
+        },
+        name: 'exp-9bc1b',
+        checkpoint_parent: 'eb74cc07d7367659173b70aca487e91af847b99d'
+      }
+    },
+    eb74cc07d7367659173b70aca487e91af847b99d: {
+      data: {
+        checkpoint_tip: '80d3ef4c9c6f0a60bccc7ee33f74f778f459c608',
+        timestamp: '2022-02-14T09:36:11',
+        params: {
+          'params.yaml': { data: { seed: 473987, lr: 0.001, weight_decay: 0 } }
+        },
+        queued: false,
+        running: false,
+        executor: null,
+        metrics: {
+          'logs.json': {
+            data: { step: 10, loss: 1.9335600137710571, acc: 0.5902 }
+          }
+        },
+        checkpoint_parent: '737d95ac80116db88b053a1eea250406252dda7c'
+      }
+    },
+    '737d95ac80116db88b053a1eea250406252dda7c': {
+      data: {
+        checkpoint_tip: '80d3ef4c9c6f0a60bccc7ee33f74f778f459c608',
+        timestamp: '2022-02-14T09:35:57',
+        params: {
+          'params.yaml': { data: { seed: 473987, lr: 0.001, weight_decay: 0 } }
+        },
+        queued: false,
+        running: false,
+        executor: null,
+        metrics: {
+          'logs.json': {
+            data: { step: 9, loss: 1.9798905849456787, acc: 0.627 }
+          }
+        },
+        checkpoint_parent: '98cb38c1092abd0dfb2ff459eccb6432f89218fb'
+      }
+    },
+    '98cb38c1092abd0dfb2ff459eccb6432f89218fb': {
+      data: {
+        checkpoint_tip: '80d3ef4c9c6f0a60bccc7ee33f74f778f459c608',
+        timestamp: '2022-02-14T09:35:43',
+        params: {
+          'params.yaml': { data: { seed: 473987, lr: 0.001, weight_decay: 0 } }
+        },
+        queued: false,
+        running: false,
+        executor: null,
+        metrics: {
+          'logs.json': {
+            data: { step: 8, loss: 2.017061233520508, acc: 0.5586 }
+          }
+        },
+        checkpoint_parent: 'df390673456d69f098e99fedbcf4064b0e0a272a'
+      }
+    },
     f65419f2eec04e6a0376b6ee3939441fc5f50794: {
       data: {
         checkpoint_tip: 'f65419f2eec04e6a0376b6ee3939441fc5f50794',

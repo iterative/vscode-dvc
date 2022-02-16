@@ -107,7 +107,7 @@ export class Experiments extends BaseRepository<TableData> {
   public async setState(data: ExperimentsOutput) {
     await Promise.all([
       this.metricsAndParams.transformAndSet(data),
-      this.experiments.transformAndSet(data)
+      this.experiments.transformAndSet(data, this.checkpoints.hasCheckpoints())
     ])
 
     return this.notifyChanged(data)
@@ -258,6 +258,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getBranchRevisions() {
     return this.experiments.getBranchRevisions()
+  }
+
+  public getMutableRevisions() {
+    return this.experiments.getMutableRevisions()
   }
 
   public getRevisions() {

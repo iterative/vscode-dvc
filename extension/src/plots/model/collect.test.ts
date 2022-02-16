@@ -4,7 +4,6 @@ import isEmpty from 'lodash.isempty'
 import {
   collectData,
   collectLivePlotsData,
-  collectMutableRevisions,
   collectPaths,
   collectTemplates
 } from './collect'
@@ -50,62 +49,6 @@ describe('collectLivePlotsData', () => {
   it('should return undefined given no input', () => {
     const data = collectLivePlotsData({} as ExperimentsOutput)
     expect(data).toBeUndefined()
-  })
-})
-
-describe('collectMutableRevisions', () => {
-  it('should always return an empty array when checkpoints are present', () => {
-    const mutable = collectMutableRevisions(expShowFixture, true)
-    expect(mutable).toEqual([])
-  })
-
-  it('should return all running experiments when there are no checkpoints', () => {
-    const experimentsRunningInTemp = {
-      workspace: {
-        baseline: {
-          data: {
-            queued: false,
-            running: false,
-            executor: null
-          }
-        }
-      },
-      f5f308f5afc019de72823106d568248cd8270da4: {
-        baseline: {
-          data: {
-            queued: false,
-            running: false,
-            executor: null,
-            name: 'main'
-          }
-        },
-        b2880aefbeb48a51be5c832f7a9fd7577b97acd3: {
-          data: {
-            queued: false,
-            running: false,
-            executor: null,
-            name: 'exp-c3e8a'
-          }
-        },
-        '6ee95de8dd28fbaf9fe280a71cf254928d3fa830': {
-          data: {
-            queued: false,
-            running: true,
-            executor: 'temp'
-          }
-        },
-        ebaa07e67a983fe0b695312809e7798ac339d0f9: {
-          data: {
-            queued: false,
-            running: true,
-            executor: 'temp'
-          }
-        }
-      }
-    }
-
-    const mutable = collectMutableRevisions(experimentsRunningInTemp, false)
-    expect(mutable).toEqual(['6ee95de', 'ebaa07e'])
   })
 })
 

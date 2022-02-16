@@ -1,5 +1,6 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
+import omit from 'lodash.omit'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
@@ -12,9 +13,28 @@ import {
   buildMockData,
   mockDisposable
 } from '../util'
+import { ExperimentsOutput } from '../../../cli/reader'
 import { ExperimentsData } from '../../../experiments/data'
+import { CheckpointsModel } from '../../../experiments/checkpoints/model'
 import { FileSystemData } from '../../../fileSystem/data'
 import * as Watcher from '../../../fileSystem/watcher'
+
+const hasCheckpoints = (data: ExperimentsOutput) => {
+  const [experimentsWithBaseline] = Object.values(omit(data, 'workspace'))
+  const [firstExperiment] = Object.values(
+    omit(experimentsWithBaseline, 'baseline')
+  )
+  const experimentFields = firstExperiment?.data
+
+  return !!(
+    experimentFields?.checkpoint_parent || experimentFields?.checkpoint_tip
+  )
+}
+
+export const mockHasCheckpoints = (data: ExperimentsOutput) =>
+  stub(CheckpointsModel.prototype, 'hasCheckpoints').returns(
+    hasCheckpoints(data)
+  )
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -41,6 +61,8 @@ export const buildExperiments = (
       buildMockData<FileSystemData>()
     )
   )
+
+  mockHasCheckpoints(experimentShowData)
 
   experiments.setState(experimentShowData)
 
