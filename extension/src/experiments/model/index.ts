@@ -87,12 +87,23 @@ export class ExperimentsModel {
   }
 
   public toggleStatus(id: string) {
-    const newStatus = this.getStatus(id) ? Status.UNSELECTED : Status.SELECTED
+    // leave dumb
+    const newStatus = this.isSelected(id) ? Status.UNSELECTED : Status.SELECTED
     this.status[id] = newStatus
 
     this.setSelectionMode(false)
     this.persistStatus()
     return newStatus
+  }
+
+  public getSelectedCount() {
+    // temp - looking at a set instead of object as it will only ever contain 6 values
+    return Object.values(this.status).reduce((acc, status) => {
+      if (status) {
+        acc += 1
+      }
+      return acc
+    }, 0)
   }
 
   public getSorts(): SortDefinition[] {
@@ -184,6 +195,7 @@ export class ExperimentsModel {
   }
 
   public setSelectedToFilters() {
+    // break this up to be a getter that we can check the number of to pass in to setSelected
     const filteredExperiments = this.getSubRows(this.getExperiments())
 
     const filteredCheckpoints = flatten<Experiment>(
@@ -209,7 +221,7 @@ export class ExperimentsModel {
         return {
           ...branch,
           hasChildren: false,
-          selected: !!this.getStatus(branch.id)
+          selected: !!this.isSelected(branch.id)
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
@@ -241,12 +253,12 @@ export class ExperimentsModel {
 
   public getRowData() {
     return [
-      { ...this.workspace, selected: this.getStatus('workspace') },
+      { ...this.workspace, selected: this.isSelected('workspace') },
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
         const branchWithSelected = {
           ...branch,
-          selected: this.getStatus(branch.id)
+          selected: this.isSelected(branch.id)
         }
 
         if (!definedAndNonEmpty(experiments)) {
@@ -259,6 +271,10 @@ export class ExperimentsModel {
         }
       })
     ]
+  }
+
+  public isSelected(id: string) {
+    return !!this.status[id]
   }
 
   private getCombinedList() {
@@ -463,7 +479,7 @@ export class ExperimentsModel {
       return experiment
     }
 
-    const selected = !!this.getStatus(id)
+    const selected = !!this.isSelected(id)
 
     return {
       ...experiment,
@@ -479,10 +495,6 @@ export class ExperimentsModel {
     return this.experimentColors.assigned
   }
 
-  private getStatus(id: string) {
-    return !!this.status[id]
-  }
-
   private getSelectedFromList(getList: () => Experiment[]) {
     return getList().reduce((acc, experiment) => {
       if (this.isSelectedExperimentWithColor(experiment)) {
@@ -496,6 +508,6 @@ export class ExperimentsModel {
     experiment: Experiment
   ): experiment is SelectedExperimentWithColor {
     const { id, displayColor } = experiment
-    return !!(displayColor && this.getStatus(id))
+    return !!(displayColor && this.isSelected(id))
   }
 }
