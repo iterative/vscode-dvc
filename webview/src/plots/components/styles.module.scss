@@ -136,12 +136,21 @@ $gap: 20px;
 
 .plot {
   text-align: center;
+  overflow: visible;
+  position: relative;
+
+  @for $i from 1 through 100 {
+    &:nth-child(#{$i}) {
+      z-index: #{100 - $i};
+    }
+  }
 }
 
 .plot img,
 .plot svg {
   max-width: 100%;
   max-height: 100%;
+  overflow: visible;
 }
 
 .plot.multiViewPlot {
