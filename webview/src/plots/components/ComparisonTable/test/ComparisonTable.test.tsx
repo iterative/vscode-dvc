@@ -55,6 +55,35 @@ describe('ComparisonTable', () => {
     expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
   })
 
+  it('should unpin a column with a second click', () => {
+    renderTable()
+
+    const [firstColumn, secondColumn] = screen.getAllByRole('columnheader')
+    const [firstExperiment, secondExperiment] = revisions
+
+    const expectedFirstColumn = screen.getByText(firstExperiment)
+
+    expect(firstColumn.textContent).toBe(expectedFirstColumn.textContent)
+
+    fireEvent.click(screen.getByText(secondExperiment), {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const [pinnedColumn] = getHeaders()
+    expect(pinnedColumn.getAttribute('draggable')).toBe('false')
+    expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
+
+    fireEvent.click(screen.getByText(secondExperiment), {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const [unpinnedColumn] = getHeaders()
+    expect(unpinnedColumn.getAttribute('draggable')).toBe('true')
+    expect(unpinnedColumn.textContent).toBe(secondColumn.textContent)
+  })
+
   it('should have as many twice as many rows as there are plots entries', () => {
     renderTable()
 
