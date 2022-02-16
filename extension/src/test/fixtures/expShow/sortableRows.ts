@@ -205,13 +205,13 @@ export const sortableRowsWorkspaceRowFixture = {
 }
 
 export const sortableRowsBranchRowFixture = {
-  id: 'fix-checkout-collapse',
-  label: 'fix-checkout-collapse',
+  id: 'main',
+  label: 'main',
   timestamp: '2022-02-14T22:00:05',
   queued: false,
   running: false,
   executor: null,
-  name: 'fix-checkout-collapse',
+  name: 'main',
   mutable: false,
   sha: '11c01dfb4aa5fb41915610c3a256b418fc095610',
   displayColor: '#13adc7',

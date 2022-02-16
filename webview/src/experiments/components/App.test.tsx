@@ -21,7 +21,7 @@ import { TableData } from 'dvc/src/experiments/webview/contract'
 import {
   ascendingSortableRowsTableDataFixture,
   sortableRowsTableDataFixture
-} from 'dvc/src/test/fixtures/expShow/sortable'
+} from 'dvc/src/test/fixtures/expShow/sortableRows'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 import {
