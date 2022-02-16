@@ -1,12 +1,10 @@
 import React, { DragEvent } from 'react'
+import { ComparisonRevision } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 
-export type ComparisonTableColumn = {
-  revision: string
-  color: string
-}
+export type ComparisonTableColumn = ComparisonRevision
 
 interface ComparisonTableHeadProps {
   columns: ComparisonTableColumn[]
@@ -51,7 +49,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   return (
     <thead>
       <tr>
-        {columns.map(({ revision, color }) => {
+        {columns.map(({ revision, displayColor }) => {
           const isPinned = revision === pinnedColumn
           return (
             <th
@@ -68,7 +66,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
               <ComparisonTableHeader
                 isPinned={isPinned}
                 onClicked={() => setPinnedColumn(revision)}
-                color={color}
+                displayColor={displayColor}
               >
                 {revision}
               </ComparisonTableHeader>
