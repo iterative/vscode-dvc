@@ -23,6 +23,7 @@ import {
   PlotsData as TPlotsData
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/reader'
+import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -188,6 +189,6 @@ suite('Plots Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 })
