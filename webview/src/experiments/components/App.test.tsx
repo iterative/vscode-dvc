@@ -20,7 +20,9 @@ import {
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import {
   ascendingSortableRowsTableDataFixture,
-  sortableRowsTableDataFixture
+  sortableRowsBranchRowFixture,
+  sortableRowsTableDataFixture,
+  sortableRowsWorkspaceRowFixture
 } from 'dvc/src/test/fixtures/expShow/sortableRows'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
@@ -152,68 +154,142 @@ describe('App', () => {
     await expectHeaders(['A', 'C', 'D', 'B'])
   })
 
-  it('should maintain expansion status when rows are reordered', () => {
-    render(<App />)
-
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: sortableRowsTableDataFixture,
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
-
+  describe('Row expansion', () => {
     const getRowLabels = () =>
       screen
         .queryAllByText(/^exp\w(checkpoint\w)?$/)
         .map(element => element.textContent)
 
-    expect(getRowLabels()).toEqual([
-      'expA',
-      'expAcheckpointA',
-      'expAcheckpointB',
-      'expB',
-      'expBcheckpointA',
-      'expBcheckpointB',
-      'expC',
-      'expCcheckpointA',
-      'expCcheckpointB'
-    ])
+    it('should maintain expansion status when rows are reordered', () => {
+      render(<App />)
 
-    fireEvent.click(screen.getByText('expA'))
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: sortableRowsTableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
 
-    expect(getRowLabels()).toEqual([
-      'expA',
-      'expB',
-      'expBcheckpointA',
-      'expBcheckpointB',
-      'expC',
-      'expCcheckpointA',
-      'expCcheckpointB'
-    ])
+      expect(getRowLabels()).toEqual([
+        'expA',
+        'expAcheckpointA',
+        'expAcheckpointB',
+        'expB',
+        'expBcheckpointA',
+        'expBcheckpointB',
+        'expC',
+        'expCcheckpointA',
+        'expCcheckpointB'
+      ])
 
-    const changedData: TableData = ascendingSortableRowsTableDataFixture
+      fireEvent.click(screen.getByText('expA'))
 
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: changedData,
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+      expect(getRowLabels()).toEqual([
+        'expA',
+        'expB',
+        'expBcheckpointA',
+        'expBcheckpointB',
+        'expC',
+        'expCcheckpointA',
+        'expCcheckpointB'
+      ])
 
-    expect(getRowLabels()).toEqual([
-      'expC',
-      'expCcheckpointA',
-      'expCcheckpointB',
-      'expA',
-      'expB',
-      'expBcheckpointA',
-      'expBcheckpointB'
-    ])
+      const changedData: TableData = ascendingSortableRowsTableDataFixture
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: changedData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(getRowLabels()).toEqual([
+        'expC',
+        'expCcheckpointA',
+        'expCcheckpointB',
+        'expA',
+        'expB',
+        'expBcheckpointA',
+        'expBcheckpointB'
+      ])
+    })
+
+    it('should maintain expansion status when the branch changes', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: sortableRowsTableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(getRowLabels()).toEqual([
+        'expA',
+        'expAcheckpointA',
+        'expAcheckpointB',
+        'expB',
+        'expBcheckpointA',
+        'expBcheckpointB',
+        'expC',
+        'expCcheckpointA',
+        'expCcheckpointB'
+      ])
+
+      fireEvent.click(screen.getByText('expA'))
+
+      expect(getRowLabels()).toEqual([
+        'expA',
+        'expB',
+        'expBcheckpointA',
+        'expBcheckpointB',
+        'expC',
+        'expCcheckpointA',
+        'expCcheckpointB'
+      ])
+
+      const changedData: TableData = {
+        ...sortableRowsTableDataFixture,
+        rows: [
+          sortableRowsWorkspaceRowFixture,
+          {
+            ...sortableRowsBranchRowFixture,
+            id: 'changed-branch',
+            label: 'changed-branch',
+            name: 'changed-branch',
+            sha: '99999dfb4aa5fb41915610c3a256b418fc095610'
+          }
+        ]
+      }
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: changedData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(getRowLabels()).toEqual([
+        'expA',
+        'expB',
+        'expBcheckpointA',
+        'expBcheckpointB',
+        'expC',
+        'expCcheckpointA',
+        'expCcheckpointB'
+      ])
+    })
   })
 })
