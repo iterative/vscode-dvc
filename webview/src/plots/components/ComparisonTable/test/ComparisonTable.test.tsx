@@ -13,6 +13,7 @@ describe('ComparisonTable', () => {
   })
 
   const basicProps: ComparisonTableProps = comparisonTableFixture
+  const revisions = basicProps.revisions.map(({ revision }) => revision)
   const renderTable = (props = basicProps) =>
     render(<ComparisonTable {...props} />)
 
@@ -31,16 +32,14 @@ describe('ComparisonTable', () => {
 
     const columns = getHeaders()
 
-    expect(columns.length).toBe(Object.keys(basicProps.revisions).length)
+    expect(columns.length).toBe(basicProps.revisions.length)
   })
 
   it('should show the pinned column first', () => {
     renderTable()
 
     const [firstColumn, secondColumn] = screen.getAllByRole('columnheader')
-    const [firstExperiment, secondExperiment] = Object.keys(
-      basicProps.revisions
-    )
+    const [firstExperiment, secondExperiment] = revisions
 
     const expectedFirstColumn = screen.getByText(firstExperiment)
 
@@ -56,6 +55,35 @@ describe('ComparisonTable', () => {
     expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
   })
 
+  it('should unpin a column with a second click', () => {
+    renderTable()
+
+    const [firstColumn, secondColumn] = screen.getAllByRole('columnheader')
+    const [firstExperiment, secondExperiment] = revisions
+
+    const expectedFirstColumn = screen.getByText(firstExperiment)
+
+    expect(firstColumn.textContent).toBe(expectedFirstColumn.textContent)
+
+    fireEvent.click(screen.getByText(secondExperiment), {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const [pinnedColumn] = getHeaders()
+    expect(pinnedColumn.getAttribute('draggable')).toBe('false')
+    expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
+
+    fireEvent.click(screen.getByText(secondExperiment), {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const [unpinnedColumn] = getHeaders()
+    expect(unpinnedColumn.getAttribute('draggable')).toBe('true')
+    expect(unpinnedColumn.textContent).toBe(secondColumn.textContent)
+  })
+
   it('should have as many twice as many rows as there are plots entries', () => {
     renderTable()
 
@@ -68,9 +96,8 @@ describe('ComparisonTable', () => {
     renderTable()
 
     const [{ path: firstPlotEntry }] = basicProps.plots
-    const [firstExperiment, secondExperiment] = Object.keys(
-      basicProps.revisions
-    )
+    const [firstExperiment, secondExperiment] = revisions
+
     const [firstPlot, secondPlot] = screen.getAllByRole('img')
     const expectedFirstPlot = screen.getByAltText(
       `Plot of ${firstPlotEntry} (${firstExperiment})`
@@ -96,14 +123,13 @@ describe('ComparisonTable', () => {
   it('should remove a column if it is not part of the revisions anymore', () => {
     const { rerender } = renderTable()
 
-    const revisions = Object.keys(basicProps.revisions)
-
     let headers = getHeaders().map(header => header.textContent)
 
     expect(headers).toEqual(revisions)
 
-    const filteredRevisions = { ...basicProps.revisions }
-    delete filteredRevisions[revisions[3]]
+    const filteredRevisions = basicProps.revisions.filter(
+      ({ revision }) => revision !== revisions[3]
+    )
 
     rerender(<ComparisonTable {...basicProps} revisions={filteredRevisions} />)
 
@@ -120,13 +146,12 @@ describe('ComparisonTable', () => {
   it('should add a new column if there is a new revision', () => {
     const { rerender } = renderTable()
     const newRevName = 'newRev'
-    const newRevisions = {
+    const newRevisions = [
       ...basicProps.revisions,
-      [newRevName]: { color: '#000000' }
-    }
+      { displayColor: '#000000', revision: newRevName }
+    ]
 
     rerender(<ComparisonTable {...basicProps} revisions={newRevisions} />)
-    const revisions = Object.keys(basicProps.revisions)
     const headers = getHeaders().map(header => header.textContent)
 
     expect(headers).toEqual([...revisions, newRevName])
@@ -149,9 +174,7 @@ describe('ComparisonTable', () => {
     }
 
     const pinSecondColumn = () => {
-      const secondColumn = screen.getByText(
-        Object.keys(basicProps.revisions)[1]
-      )
+      const secondColumn = screen.getByText(revisions[1])
 
       fireEvent.click(secondColumn, {
         bubbles: true,
@@ -188,7 +211,6 @@ describe('ComparisonTable', () => {
       renderTable()
 
       const [, endingNode, , startingNode] = getHeaders()
-      const revisions = Object.keys(basicProps.revisions)
 
       let headers = getHeaders().map(header => header.textContent)
 
@@ -213,7 +235,6 @@ describe('ComparisonTable', () => {
       pinSecondColumn()
 
       const [, endingNode, , startingNode] = getHeaders()
-      const revisions = Object.keys(basicProps.revisions)
       const expectedOrder = [
         revisions[1],
         revisions[0],
@@ -243,6 +264,39 @@ describe('ComparisonTable', () => {
       firstNode.dispatchEvent(dragOverEvent)
 
       expect(dragOverEvent.preventDefault).toHaveBeenCalled()
+    })
+
+    it('should not reorder existing columns when adding a new one after a drag and drop', () => {
+      const { rerender } = renderTable()
+
+      const [, endingNode, , startingNode] = getHeaders()
+
+      dragAndDrop(startingNode, endingNode)
+
+      let headers = getHeaders().map(header => header.textContent)
+
+      const reorderedRevisions = [
+        revisions[0],
+        revisions[3],
+        revisions[1],
+        revisions[2],
+        revisions[4]
+      ]
+
+      expect(headers).toEqual(reorderedRevisions)
+
+      const newRevName = 'newRev'
+      const originalRevisionsWithNew = [
+        ...basicProps.revisions,
+        { displayColor: '#000000', revision: newRevName }
+      ]
+
+      rerender(
+        <ComparisonTable {...basicProps} revisions={originalRevisionsWithNew} />
+      )
+
+      headers = getHeaders().map(header => header.textContent)
+      expect(headers).toEqual([...reorderedRevisions, newRevName])
     })
   })
 })

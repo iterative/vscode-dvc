@@ -1,6 +1,6 @@
 {
   "displayName": "DVC",
-  "description": "DVC VSCode extension",
+  "description": "DVC VS Code extension",
   "command.addExperimentsTableFilter": "Add Filter To Experiments Table",
   "command.addExperimentsTableSort": "Add Or Update Sort On Experiments Table",
   "command.addTarget": "Add Target",

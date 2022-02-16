@@ -19,7 +19,7 @@ describe('ComparisonTableHeader', () => {
   })
 
   const basicProps: ComparisonTableHeaderProps = {
-    color: '#ffffff',
+    displayColor: '#ffffff',
     isPinned: false,
     onClicked: jest.fn()
   }

@@ -3,7 +3,7 @@ import React from 'react'
 import { ComparisonTableHeader } from '../plots/components/ComparisonTable/ComparisonTableHeader'
 
 const basicArgs = {
-  color: '#945DD6',
+  displayColor: '#945DD6',
   name: 'exp-11caa2a'
 }
 
@@ -17,14 +17,14 @@ export default {
 } as Meta
 
 const Template: Story<{
-  color: string
+  displayColor: string
   name: string
   onClicked: () => void
   index: number
   isPinned: boolean
-}> = ({ name, color, onClicked, isPinned }) => (
+}> = ({ name, displayColor, onClicked, isPinned }) => (
   <ComparisonTableHeader
-    color={color}
+    displayColor={displayColor}
     onClicked={onClicked}
     isPinned={isPinned}
   >
@@ -37,7 +37,7 @@ export const Basic = Template.bind({})
 export const OtherColor = Template.bind({})
 OtherColor.args = {
   ...basicArgs,
-  color: '#13ADC7'
+  displayColor: '#13ADC7'
 }
 
 export const Pinned = Template.bind({})
