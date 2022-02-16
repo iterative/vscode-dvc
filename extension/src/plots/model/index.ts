@@ -14,7 +14,6 @@ import {
 import {
   ComparisonRevisionData,
   ComparisonPlots,
-  ComparisonRevisions,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
@@ -158,16 +157,10 @@ export class PlotsModel {
     return getColorScale(this.getSelectedRevisionDetails())
   }
 
-  public getComparisonRevisions() {
-    return this.getSelectedRevisionDetails().reduce(
-      (acc, { revision, displayColor }) => {
-        if (Object.keys(this.comparisonData).includes(revision)) {
-          acc[revision] = { color: displayColor }
-        }
-        return acc
-      },
-      {} as ComparisonRevisions
-    )
+  public getSelectedRevisionDetails() {
+    return this.experiments
+      .getSelectedRevisions()
+      .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
   }
 
   public getStaticPlots() {
@@ -301,12 +294,6 @@ export class PlotsModel {
         this.branchRevisions[id] = sha
       }
     })
-  }
-
-  private getSelectedRevisionDetails() {
-    return this.experiments
-      .getSelectedRevisions()
-      .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
   }
 
   private getSelectedRevisions() {

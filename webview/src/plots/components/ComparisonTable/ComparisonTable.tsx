@@ -23,35 +23,49 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   const withoutPinned = (
     columns: ComparisonTableColumn[]
   ): ComparisonTableColumn[] =>
-    columns.filter(exp => exp.revision !== pinnedColumn.current)
+    columns.filter(({ revision }) => revision !== pinnedColumn.current)
 
   const getPinnedColumnRevision = useCallback(
     () =>
-      (!!pinnedColumn.current && {
-        color: revisions[pinnedColumn.current].color,
-        revision: pinnedColumn.current
-      }) ||
+      revisions.find(({ revision }) => revision === pinnedColumn.current) ||
       null,
     [revisions]
   )
 
-  useEffect(() => {
-    const revisionKeys = Object.keys(revisions)
+  const retainOrder = (
+    originalOrder: string[],
+    revisions: ComparisonTableColumn[]
+  ) =>
+    revisions.sort(
+      ({ revision: a }, { revision: b }) =>
+        originalOrder.indexOf(a) - originalOrder.indexOf(b)
+    )
 
+  useEffect(() => {
     setColumns(prevColumns => {
-      const columnKeys = prevColumns.map(col => col.revision)
-      const filteredColumns = prevColumns.filter(col =>
-        revisionKeys.includes(col.revision)
+      const prevColumnKeys = prevColumns.map(col => col.revision)
+      const { filteredColumns, newColumns } = revisions.reduce(
+        (acc, column) => {
+          if (prevColumnKeys.includes(column.revision)) {
+            acc.filteredColumns.push(column)
+          } else {
+            acc.newColumns.push(column)
+          }
+
+          return acc
+        },
+        {
+          filteredColumns: [] as ComparisonTableColumn[],
+          newColumns: [] as ComparisonTableColumn[]
+        }
       )
-      const newColKeys = revisionKeys.filter(rev => !columnKeys.includes(rev))
-      const newCols = newColKeys.map(key => ({
-        color: revisions[key].color,
-        revision: key
-      }))
 
       return [
         getPinnedColumnRevision(),
-        ...withoutPinned([...filteredColumns, ...newCols])
+        ...withoutPinned([
+          ...retainOrder(prevColumnKeys, filteredColumns),
+          ...newColumns
+        ])
       ].filter(Boolean) as ComparisonTableColumn[]
     })
   }, [revisions, getPinnedColumnRevision])

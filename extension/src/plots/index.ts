@@ -142,7 +142,7 @@ export class Plots extends BaseRepository<TPlotsData> {
         )
         return { path, revisions: revisionsWithCorrectUrls }
       }),
-      revisions: this.model.getComparisonRevisions(),
+      revisions: this.model.getSelectedRevisionDetails(),
       sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
       size: this.model.getPlotSize(Section.COMPARISON_TABLE)
     }
