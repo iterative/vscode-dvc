@@ -8,11 +8,13 @@ export class ExperimentsAccumulator {
 
   public branchColors: Map<string, string>
   public experimentColors: Map<string, string>
+  public hasCheckpoints: boolean
 
   constructor(
     workspace: Experiment | undefined,
     branchColors: Map<string, string>,
-    experimentColors: Map<string, string>
+    experimentColors: Map<string, string>,
+    hasCheckpoints: boolean
   ) {
     if (workspace) {
       this.workspace = workspace
@@ -20,5 +22,6 @@ export class ExperimentsAccumulator {
 
     this.branchColors = branchColors
     this.experimentColors = experimentColors
+    this.hasCheckpoints = hasCheckpoints
   }
 }

@@ -90,11 +90,7 @@ suite('Plots Test Suite', () => {
       await dataUpdateEvent
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        'experim',
-        'workspace'
-      )
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'experim')
     })
 
     it('should call plots diff with the branch name whenever the current branch commit changes', async () => {
@@ -131,11 +127,7 @@ suite('Plots Test Suite', () => {
       await dataUpdateEvent
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        'main',
-        'workspace'
-      )
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'main')
     })
 
     it('should remove the temporary plots directory on dispose', async () => {

@@ -14,7 +14,7 @@ import { hasKey } from '../../util/object'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
 
-export const getLabel = (sha: string) => sha.slice(0, 7)
+const getShortSha = (sha: string) => sha.slice(0, 7)
 
 export const isCheckpoint = (
   checkpointTip: string | undefined,
@@ -36,19 +36,25 @@ const getExperimentId = (
 
 const getDisplayNameOrParent = (
   sha: string,
-  experimentsObject: ExperimentsObject
+  branchSha: string,
+  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ): string | undefined => {
   const experiment = experimentsObject[sha]?.data
   if (!experiment) {
     return
   }
 
-  const { checkpoint_parent: parentTip, name } = experiment
+  const {
+    checkpoint_parent: checkpointParent,
+    checkpoint_tip: checkpointTip,
+    name
+  } = experiment
   if (
-    parentTip &&
-    experimentsObject[parentTip]?.data?.checkpoint_tip === parentTip
+    checkpointParent &&
+    branchSha !== checkpointParent &&
+    experimentsObject[checkpointParent]?.data?.checkpoint_tip !== checkpointTip
   ) {
-    return `(${getLabel(parentTip)})`
+    return `(${getShortSha(checkpointParent)})`
   }
   if (name) {
     return `[${name}]`
@@ -90,13 +96,15 @@ const transformExperimentData = (
   experimentFields: ExperimentFields,
   label: string | undefined,
   displayColor: string | undefined,
+  hasCheckpoints: boolean,
   sha?: string,
   displayNameOrParent?: string
 ): Experiment => {
   const experiment = {
     id,
     label,
-    ...omit(experimentFields, ['metrics', 'params'])
+    ...omit(experimentFields, ['metrics', 'params']),
+    mutable: !!(!hasCheckpoints && experimentFields.running)
   } as Experiment
 
   if (displayNameOrParent) {
@@ -120,7 +128,9 @@ const transformExperimentOrCheckpointData = (
   sha: string,
   experimentData: ExperimentFieldsOrError,
   experimentsObject: ExperimentsObject,
-  experimentColors: Map<string, string>
+  branchSha: string,
+  experimentColors: Map<string, string>,
+  hasCheckpoints: boolean
 ): {
   checkpointTipId?: string
   experiment: Experiment | undefined
@@ -142,10 +152,11 @@ const transformExperimentOrCheckpointData = (
     experiment: transformExperimentData(
       id,
       experimentFields,
-      getLabel(sha),
+      getShortSha(sha),
       getColor(experimentColors, checkpointTipId, id),
+      hasCheckpoints,
       sha,
-      getDisplayNameOrParent(sha, experimentsObject)
+      getDisplayNameOrParent(sha, branchSha, experimentsObject)
     )
   }
 }
@@ -170,6 +181,7 @@ const collectExperimentOrCheckpoint = (
 const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
   experimentsObject: ExperimentsObject,
+  branchSha: string,
   branchName: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
@@ -177,7 +189,9 @@ const collectFromExperimentsObject = (
       sha,
       experimentData,
       experimentsObject,
-      acc.experimentColors
+      branchSha,
+      acc.experimentColors,
+      acc.hasCheckpoints
     )
     if (!experiment) {
       continue
@@ -206,11 +220,12 @@ const collectFromBranchesObject = (
       experimentFields,
       name,
       acc.branchColors.get(name),
+      acc.hasCheckpoints,
       sha
     )
 
     if (branch) {
-      collectFromExperimentsObject(acc, experimentsObject, branch.label)
+      collectFromExperimentsObject(acc, experimentsObject, sha, branch.label)
 
       acc.branches.push(branch)
     }
@@ -220,7 +235,8 @@ const collectFromBranchesObject = (
 export const collectExperiments = (
   data: ExperimentsOutput,
   branchColors: Map<string, string> = new Map(),
-  experimentColors: Map<string, string> = new Map()
+  experimentColors: Map<string, string> = new Map(),
+  hasCheckpoints = false
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
   const workspaceId = 'workspace'
@@ -231,14 +247,16 @@ export const collectExperiments = (
         workspaceId,
         workspaceFields,
         workspaceId,
-        getWorkspaceColor()
+        getWorkspaceColor(),
+        hasCheckpoints
       )
     : undefined
 
   const acc = new ExperimentsAccumulator(
     workspaceBaseline,
     branchColors,
-    experimentColors
+    experimentColors,
+    hasCheckpoints
   )
 
   collectFromBranchesObject(acc, branchesObject)

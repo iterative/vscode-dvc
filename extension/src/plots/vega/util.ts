@@ -75,14 +75,12 @@ export const isMultiViewByCommitPlot = (template?: TopLevelSpec): boolean =>
 export type ColorScale = { domain: string[]; range: string[] }
 
 export const getColorScale = (
-  colors: Record<string, string>
+  revisions: { revision: string; displayColor: string }[]
 ): ColorScale | undefined => {
-  const colorScale = Object.entries(colors).reduce(
-    (acc, [name, color]) => {
-      if (name && color) {
-        acc.domain.push(name)
-        acc.range.push(color)
-      }
+  const colorScale = revisions.reduce(
+    (acc, { revision, displayColor }) => {
+      acc.domain.push(revision)
+      acc.range.push(displayColor)
       return acc
     },
     { domain: [], range: [] } as ColorScale

@@ -256,6 +256,7 @@ suite('Experiments Test Suite', () => {
             displayColor: getWorkspaceColor(),
             id: 'workspace',
             label: 'workspace',
+            mutable: false,
             params: { 'params.yaml': { test: 10 } },
             selected: true
           },
@@ -263,6 +264,7 @@ suite('Experiments Test Suite', () => {
             displayColor: '#13adc7',
             id: 'testBranch',
             label: 'testBranch',
+            mutable: false,
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
             selected: true,
@@ -271,6 +273,7 @@ suite('Experiments Test Suite', () => {
               {
                 id: 'testExp1',
                 label: 'testExp',
+                mutable: false,
                 params: { 'params.yaml': { test: 2 } },
                 selected: true,
                 sha: 'testExp1'
@@ -278,6 +281,7 @@ suite('Experiments Test Suite', () => {
               {
                 id: 'testExp2',
                 label: 'testExp',
+                mutable: false,
                 params: { 'params.yaml': { test: 1 } },
                 selected: true,
                 sha: 'testExp2'
@@ -285,6 +289,7 @@ suite('Experiments Test Suite', () => {
               {
                 id: 'testExp3',
                 label: 'testExp',
+                mutable: false,
                 params: { 'params.yaml': { test: 3 } },
                 selected: true,
                 sha: 'testExp3'
@@ -324,6 +329,7 @@ suite('Experiments Test Suite', () => {
             displayColor: getWorkspaceColor(),
             id: 'workspace',
             label: 'workspace',
+            mutable: false,
             params: { 'params.yaml': { test: 10 } },
             selected: true
           },
@@ -331,6 +337,7 @@ suite('Experiments Test Suite', () => {
             displayColor: '#13adc7',
             id: 'testBranch',
             label: 'testBranch',
+            mutable: false,
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
             selected: true,
@@ -339,6 +346,7 @@ suite('Experiments Test Suite', () => {
               {
                 id: 'testExp2',
                 label: 'testExp',
+                mutable: false,
                 params: { 'params.yaml': { test: 1 } },
                 selected: true,
                 sha: 'testExp2'
@@ -346,6 +354,7 @@ suite('Experiments Test Suite', () => {
               {
                 id: 'testExp1',
                 label: 'testExp',
+                mutable: false,
                 params: { 'params.yaml': { test: 2 } },
                 selected: true,
                 sha: 'testExp1'
@@ -353,6 +362,7 @@ suite('Experiments Test Suite', () => {
               {
                 id: 'testExp3',
                 label: 'testExp',
+                mutable: false,
                 params: { 'params.yaml': { test: 3 } },
                 selected: true,
                 sha: 'testExp3'
@@ -645,11 +655,16 @@ suite('Experiments Test Suite', () => {
         firstFilterDefinition,
         secondFilterDefinition
       ])
-      const selected = testRepository.getSelectedExperiments()
-      expect(selected).to.deep.equal({
-        'exp-83425': '#5f5856',
-        'test-branch': '#96958f'
-      })
+      const selected = testRepository
+        .getSelectedExperiments()
+        .map(({ displayColor, id }) => ({ displayColor, id }))
+      expect(selected).to.deep.equal([
+        { displayColor: '#96958f', id: 'test-branch' },
+        {
+          displayColor: '#5f5856',
+          id: 'exp-83425'
+        }
+      ])
     })
   })
 })
