@@ -71,11 +71,8 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   }, [revisions, getPinnedColumnRevision])
 
   const changePinnedColumn = (column: string) => {
-    if (pinnedColumn.current === column) {
-      pinnedColumn.current = ''
-    } else {
-      pinnedColumn.current = column
-    }
+    pinnedColumn.current = pinnedColumn.current === column ? '' : column
+
     setColumns(
       [getPinnedColumnRevision(), ...withoutPinned(columns)].filter(
         Boolean
