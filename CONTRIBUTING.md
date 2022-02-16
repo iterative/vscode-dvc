@@ -81,7 +81,7 @@ Start Storybook with `yarn storybook` in either the monorepo root or the
 without requiring VS Code as a dev environment.
 
 There are some discrepancies between the Storybook environment and the
-environment of a real VSCode extension, custom themes being one big one. Always
+environment of a real VS Code extension, custom themes being one big one. Always
 make sure to try out changed components in the full dev environment before
 merging!
 
