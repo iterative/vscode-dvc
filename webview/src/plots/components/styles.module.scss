@@ -61,7 +61,6 @@ $gap: 20px;
   width: 100%;
   display: grid;
   gap: $gap;
-  justify-content: space-around;
   grid-auto-flow: row;
 
   :global(.vega-embed) {
@@ -88,13 +87,20 @@ $gap: 20px;
 
 .plot {
   aspect-ratio: var(--scale);
+  grid-column: span var(--scale);
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 800px) {
+  .plotsWrapper {
+    justify-content: space-around;
+  }
+
   .largePlots {
     grid-template-columns: 1fr 1fr;
   }
+}
 
+@media (min-width: 1200px) {
   .regularPlots {
     grid-template-columns: 1fr 1fr 1fr;
   }
@@ -102,13 +108,9 @@ $gap: 20px;
   .smallPlots {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
-
-  .plot {
-    grid-column: span var(--scale);
-  }
 }
 
-@media (min-width: 2000px) {
+@media (min-width: 1600px) {
   .largePlots {
     grid-template-columns: 1fr 1fr 1fr;
   }
@@ -122,6 +124,20 @@ $gap: 20px;
   }
 }
 
+@media (min-width: 2000px) {
+  .largePlots {
+    grid-template-columns: repeat(auto-fill, minmax(1fr, 1000px));
+  }
+
+  .regularPlots {
+    grid-template-columns: repeat(auto-fill, minmax(1fr, 800px));
+  }
+
+  .smallPlots {
+    grid-template-columns: repeat(auto-fill, minmax(1fr, 500px));
+  }
+}
+
 .plot img,
 .plot svg {
   max-width: 100%;
@@ -129,8 +145,17 @@ $gap: 20px;
 }
 
 .plot.multiViewPlot {
-  max-width: 100%;
-  min-width: 0;
+  .largePlots & {
+    min-width: calc(500px * var(--scale));
+  }
+  
+  .regularPlots & {
+    min-width: calc(400px * var(--scale));
+  }
+  
+  .smallPlots & {
+    min-width: calc(300px * var(--scale));
+  }
 }
 
 .sectionRenamer {
