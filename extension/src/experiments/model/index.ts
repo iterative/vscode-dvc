@@ -8,6 +8,7 @@ import {
   getFilterId
 } from './filterBy'
 import {
+  canSelect,
   collectBranchAndExperimentIds,
   collectExperiments,
   collectStatuses,
@@ -96,14 +97,8 @@ export class ExperimentsModel {
     return newStatus
   }
 
-  public getSelectedCount() {
-    // temp - looking at a set instead of object as it will only ever contain 6 values
-    return Object.values(this.status).reduce((acc, status) => {
-      if (status) {
-        acc += 1
-      }
-      return acc
-    }, 0)
+  public canSelect() {
+    return canSelect(this.status)
   }
 
   public getSorts(): SortDefinition[] {
@@ -194,8 +189,7 @@ export class ExperimentsModel {
     this.useFiltersForSelection = useFilters
   }
 
-  public setSelectedToFilters() {
-    // break this up to be a getter that we can check the number of to pass in to setSelected
+  public getFilteredExperiments() {
     const filteredExperiments = this.getSubRows(this.getExperiments())
 
     const filteredCheckpoints = flatten<Experiment>(
@@ -204,7 +198,11 @@ export class ExperimentsModel {
       )
     )
 
-    this.setSelected([...filteredExperiments, ...filteredCheckpoints])
+    return [...filteredExperiments, ...filteredCheckpoints]
+  }
+
+  public setSelectedToFilters() {
+    this.setSelected(this.getFilteredExperiments())
   }
 
   public getExperiments(): (Experiment & {
@@ -344,6 +342,7 @@ export class ExperimentsModel {
 
   private setStatus() {
     if (this.useFiltersForSelection) {
+      // need behaviour for an experiment running could spill over 6 - might want to turn off auto apply when running
       this.setSelectedToFilters()
       return
     }
@@ -393,6 +392,7 @@ export class ExperimentsModel {
   }
 
   private applyAndPersistFilters() {
+    // can only get in here from add or remove, block higher
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
     }

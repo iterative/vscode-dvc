@@ -11,6 +11,7 @@ import {
 } from '../../cli/reader'
 import { addToMapArray } from '../../util/map'
 import { hasKey } from '../../util/object'
+import { flatten } from '../../util/array'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
 
@@ -308,6 +309,29 @@ export enum Status {
   UNSELECTED = 0
 }
 
+const getSelectedCount = (status: Record<string, Status>): number =>
+  Object.values(status).reduce((acc, expStatus) => acc + expStatus, 0)
+
+export const canSelect = (status: Record<string, Status>): boolean =>
+  getSelectedCount(status) < 6
+
+const getStatus = (
+  acc: Record<string, Status>,
+  id: string,
+  status: Record<string, Status>,
+  defaultStatus: Status
+) => {
+  if (hasKey(status, id)) {
+    return status[id]
+  }
+
+  if (defaultStatus && canSelect(acc)) {
+    return defaultStatus
+  }
+
+  return Status.UNSELECTED
+}
+
 const collectStatus = (
   acc: Record<string, Status>,
   experiment: Experiment,
@@ -316,7 +340,7 @@ const collectStatus = (
 ) => {
   const { id, queued } = experiment
   if (id && !queued) {
-    acc[id] = hasKey(status, id) ? status[id] : defaultStatus
+    acc[id] = getStatus(acc, id, status, defaultStatus)
   }
 }
 
@@ -325,6 +349,17 @@ export const collectStatuses = (
   checkpointsByTip: Map<string, Experiment[]>,
   status: Record<string, Status>
 ) => {
+  const previouslySelected = [
+    ...experiments,
+    ...flatten<Experiment>([...checkpointsByTip.values()])
+  ].reduce((acc, experiment) => {
+    const { id } = experiment
+    if (status[id]) {
+      acc[id] = Status.SELECTED
+    }
+    return acc
+  }, {} as Record<string, Status>)
+
   return experiments.reduce((acc, experiment) => {
     collectStatus(acc, experiment, status, Status.SELECTED)
 
@@ -334,5 +369,5 @@ export const collectStatuses = (
     }, acc)
 
     return acc
-  }, {} as Record<string, Status>)
+  }, previouslySelected)
 }

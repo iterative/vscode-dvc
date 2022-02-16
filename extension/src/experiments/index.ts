@@ -135,7 +135,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public toggleExperimentStatus(id: string) {
     const selected = this.experiments.isSelected(id)
-    if (!selected && this.experiments.getSelectedCount() >= 6) {
+    if (!selected && !this.experiments.canSelect()) {
       // do not need to send notification for this one, add to tree x of 6 selected
       return
     }
@@ -188,7 +188,8 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public removeFilter(id: string) {
-    // if auto apply is being used need to calculate the number of experiments that will be selected and pop a warning if > 6
+    // if auto apply is being used need to calculate the number of experiments that will be selected
+    // and pop a warning if > 6
     if (this.experiments.removeFilter(id)) {
       return this.notifyChanged()
     }

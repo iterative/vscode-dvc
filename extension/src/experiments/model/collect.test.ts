@@ -1,4 +1,4 @@
-import { collectExperiments } from './collect'
+import { canSelect, collectExperiments, collectStatuses } from './collect'
 import { Experiment } from '../webview/contract'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 
@@ -122,6 +122,210 @@ describe('collectExperiments', () => {
         )
       })
       expect(continuationCheckpoints).toHaveLength(0)
+    })
+  })
+})
+
+describe('canSelect', () => {
+  const mockStatus = {
+    exp1: 1,
+    exp2: 1,
+    exp3: 1,
+    exp4: 1,
+    exp5: 1
+  }
+
+  it('should return true when there are less than 6 experiments selected', () => {
+    expect(canSelect(mockStatus)).toBe(true)
+  })
+
+  it('should return false when there are 6 experiments selected', () => {
+    expect(canSelect({ ...mockStatus, exp6: 1 })).toBe(false)
+  })
+})
+
+describe('collectStatuses', () => {
+  const buildMockExperiments = (n: number, prefix = 'exp') =>
+    [...Array(n).keys()].map(id => ({
+      id: `${prefix}${id + 1}`
+    })) as Experiment[]
+
+  it('should set new experiments to selected if there are less than 6', () => {
+    const experiments = buildMockExperiments(4)
+
+    expect(collectStatuses(experiments, new Map(), {})).toEqual({
+      exp1: 1,
+      exp2: 1,
+      exp3: 1,
+      exp4: 1
+    })
+  })
+
+  it('should not push queued experiments into the returned object', () => {
+    const experiments = [
+      { id: 'exp1' },
+      { id: 'exp2', queued: true }
+    ] as Experiment[]
+
+    expect(collectStatuses(experiments, new Map(), {})).toEqual({
+      exp1: 1
+    })
+  })
+
+  it('should not set more than 6 experiments to selected', () => {
+    const experiments = buildMockExperiments(7)
+
+    expect(collectStatuses(experiments, new Map(), {})).toEqual({
+      exp1: 1,
+      exp2: 1,
+      exp3: 1,
+      exp4: 1,
+      exp5: 1,
+      exp6: 1,
+      exp7: 0
+    })
+  })
+
+  it('should drop statuses when the experiment is no longer present', () => {
+    const experiments = buildMockExperiments(1)
+
+    expect(
+      collectStatuses(experiments, new Map(), {
+        exp2: 0,
+        exp3: 1,
+        exp4: 0,
+        exp5: 1,
+        exp6: 0,
+        exp7: 1,
+        exp8: 0
+      })
+    ).toEqual({ exp1: 1 })
+  })
+
+  it('should respect the existing status of experiments', () => {
+    const experiments = buildMockExperiments(9)
+
+    expect(
+      collectStatuses(experiments, new Map(), {
+        exp1: 0,
+        exp2: 0,
+        exp9: 1
+      })
+    ).toEqual({
+      exp1: 0,
+      exp2: 0,
+      exp3: 1,
+      exp4: 1,
+      exp5: 1,
+      exp6: 1,
+      exp7: 1,
+      exp8: 0,
+      exp9: 1
+    })
+  })
+
+  it('should not unselect an experiment that is existing and selected', () => {
+    const experiments = buildMockExperiments(8)
+
+    expect(collectStatuses(experiments, new Map(), { exp8: 1 })).toEqual({
+      exp1: 1,
+      exp2: 1,
+      exp3: 1,
+      exp4: 1,
+      exp5: 1,
+      exp6: 0,
+      exp7: 0,
+      exp8: 1
+    })
+  })
+
+  it('should set the first new experiment to selected', () => {
+    const experiments = buildMockExperiments(8)
+
+    expect(
+      collectStatuses(experiments, new Map(), {
+        exp4: 1,
+        exp5: 1,
+        exp6: 1,
+        exp7: 1,
+        exp8: 1
+      })
+    ).toEqual({
+      exp1: 1,
+      exp2: 0,
+      exp3: 0,
+      exp4: 1,
+      exp5: 1,
+      exp6: 1,
+      exp7: 1,
+      exp8: 1
+    })
+  })
+
+  it('should default checkpoints to unselected', () => {
+    const experiments = [{ id: 'exp1' }] as Experiment[]
+    const checkpointsByTip = new Map<string, Experiment[]>([
+      ['exp1', buildMockExperiments(5, 'check')]
+    ])
+
+    expect(collectStatuses(experiments, checkpointsByTip, {})).toEqual({
+      check1: 0,
+      check2: 0,
+      check3: 0,
+      check4: 0,
+      check5: 0,
+      exp1: 1
+    })
+  })
+
+  it('should respect existing checkpoint statuses', () => {
+    const experiments = [
+      { id: 'expA' },
+      { id: 'expB' },
+      { id: 'expC' },
+      { id: 'expD' }
+    ] as Experiment[]
+    const checkpointsByTip = new Map<string, Experiment[]>([
+      ['expA', buildMockExperiments(5, 'checkA')],
+      ['expB', buildMockExperiments(5, 'checkB')],
+      ['expC', buildMockExperiments(5, 'checkC')],
+      ['expD', buildMockExperiments(5, 'checkD')]
+    ])
+
+    expect(
+      collectStatuses(experiments, checkpointsByTip, {
+        checkC1: 1,
+        checkD2: 1,
+        checkD3: 1,
+        checkD4: 1,
+        checkD5: 1,
+        expD: 1
+      })
+    ).toEqual({
+      checkA1: 0,
+      checkA2: 0,
+      checkA3: 0,
+      checkA4: 0,
+      checkA5: 0,
+      checkB1: 0,
+      checkB2: 0,
+      checkB3: 0,
+      checkB4: 0,
+      checkB5: 0,
+      checkC1: 1,
+      checkC2: 0,
+      checkC3: 0,
+      checkC4: 0,
+      checkC5: 0,
+      checkD1: 0,
+      checkD2: 1,
+      checkD3: 1,
+      checkD4: 1,
+      checkD5: 1,
+      expA: 0,
+      expB: 0,
+      expC: 0,
+      expD: 1
     })
   })
 })
