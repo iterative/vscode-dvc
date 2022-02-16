@@ -8,6 +8,7 @@ import { CliRunner } from '../../../cli/runner'
 import { CliResult, CliStarted } from '../../../cli'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
+import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 
 suite('CLI Runner Test Suite', () => {
   const disposable = Disposable.fn()
@@ -31,7 +32,7 @@ suite('CLI Runner Test Suite', () => {
       await cliRunner.run(cwd, '1000')
 
       expect(windowErrorMessageSpy).to.be.calledOnce
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to stop a started command', async () => {
       const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
@@ -66,7 +67,7 @@ suite('CLI Runner Test Suite', () => {
         'dvc.runner.running',
         false
       )
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const text = ':weeeee:'
