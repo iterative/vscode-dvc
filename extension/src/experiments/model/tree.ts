@@ -239,38 +239,25 @@ export class ExperimentsTree
   private updateDescriptionOnChange() {
     this.dispose.track(
       this.onDidChangeTreeData(() => {
-        const statuses = this.getStatuses()
-        this.view.description = this.getDescription(statuses)
+        this.view.description = this.getDescription()
       })
     )
   }
 
-  private getStatuses() {
+  private getDescription() {
     const dvcRoots = this.experiments.getDvcRoots()
-
-    return {
-      repos: dvcRoots.length,
-      selected: dvcRoots.reduce(
-        (acc, dvcRoot) =>
-          acc +
-          this.experiments.getRepository(dvcRoot).getSelectedRevisions().length,
-        0
-      )
-    }
-  }
-
-  private getDescription({
-    selected,
-    repos
-  }: {
-    selected: number
-    repos: number
-  }) {
-    if (!repos) {
+    if (!definedAndNonEmpty(dvcRoots)) {
       return
     }
 
-    return `${selected} of ${repos * MAX_SELECTED_EXPERIMENTS}`
+    const selected = dvcRoots.reduce(
+      (acc, dvcRoot) =>
+        acc +
+        this.experiments.getRepository(dvcRoot).getSelectedRevisions().length,
+      0
+    )
+
+    return `${selected} of ${dvcRoots.length * MAX_SELECTED_EXPERIMENTS}`
   }
 
   private isRoot(element: string | ExperimentItem): element is string {
