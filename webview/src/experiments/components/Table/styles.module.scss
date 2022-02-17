@@ -551,6 +551,7 @@ $spinner-color-light: #000;
 
 .timestampCellContentsWrapper {
   line-height: normal;
+  text-align: right;
   @extend %truncateLeftParent;
 }
 
