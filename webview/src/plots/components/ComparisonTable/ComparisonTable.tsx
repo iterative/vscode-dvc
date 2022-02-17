@@ -1,4 +1,7 @@
-import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
+import {
+  ComparisonRevision,
+  PlotsComparisonData
+} from 'dvc/src/plots/webview/contract'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import {
@@ -13,6 +16,11 @@ export type ComparisonTableProps = Omit<
   'sectionName' | 'size'
 >
 
+type ColumnAccumulator = {
+  filteredColumns: ComparisonRevision[]
+  newColumns: ComparisonRevision[]
+}
+
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   plots,
   revisions
@@ -20,15 +28,11 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   const pinnedColumn = useRef('')
   const [columns, setColumns] = useState<ComparisonTableColumn[]>([])
 
-  const withoutPinned = (
-    columns: ComparisonTableColumn[]
-  ): ComparisonTableColumn[] =>
-    columns.filter(({ revision }) => revision !== pinnedColumn.current)
+  const isPinned = (column: ComparisonTableColumn): boolean =>
+    column.revision === pinnedColumn.current
 
   const getPinnedColumnRevision = useCallback(
-    () =>
-      revisions.find(({ revision }) => revision === pinnedColumn.current) ||
-      null,
+    () => revisions.find(isPinned) || null,
     [revisions]
   )
 
@@ -41,42 +45,53 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
         originalOrder.indexOf(a) - originalOrder.indexOf(b)
     )
 
-  useEffect(() => {
-    setColumns(prevColumns => {
-      const prevColumnKeys = prevColumns.map(col => col.revision)
-      const { filteredColumns, newColumns } = revisions.reduce(
-        (acc, column) => {
-          if (prevColumnKeys.includes(column.revision)) {
-            acc.filteredColumns.push(column)
-          } else {
-            acc.newColumns.push(column)
-          }
+  const splitColumns = (
+    acc: ColumnAccumulator,
+    column: ComparisonRevision,
+    prevColumnKeys: string[]
+  ) => {
+    prevColumnKeys.includes(column.revision)
+      ? acc.filteredColumns.push(column)
+      : acc.newColumns.push(column)
 
-          return acc
-        },
-        {
-          filteredColumns: [] as ComparisonTableColumn[],
-          newColumns: [] as ComparisonTableColumn[]
-        }
-      )
+    return acc
+  }
 
-      return [
-        getPinnedColumnRevision(),
-        ...withoutPinned([
+  useEffect(
+    () =>
+      setColumns(prevColumns => {
+        const prevColumnKeys = prevColumns.map(col => col.revision)
+        const { filteredColumns, newColumns } = revisions.reduce(
+          (acc, column) => {
+            if (isPinned(column)) {
+              return acc
+            }
+
+            return splitColumns(acc, column, prevColumnKeys)
+          },
+          {
+            filteredColumns: [],
+            newColumns: []
+          } as ColumnAccumulator
+        )
+
+        return [
+          getPinnedColumnRevision(),
           ...retainOrder(prevColumnKeys, filteredColumns),
           ...newColumns
-        ])
-      ].filter(Boolean) as ComparisonTableColumn[]
-    })
-  }, [revisions, getPinnedColumnRevision])
+        ].filter(Boolean) as ComparisonTableColumn[]
+      }),
+    [revisions, getPinnedColumnRevision]
+  )
 
   const changePinnedColumn = (column: string) => {
     pinnedColumn.current = pinnedColumn.current === column ? '' : column
 
     setColumns(
-      [getPinnedColumnRevision(), ...withoutPinned(columns)].filter(
-        Boolean
-      ) as ComparisonTableColumn[]
+      [
+        getPinnedColumnRevision(),
+        ...columns.filter(column => !isPinned(column))
+      ].filter(Boolean) as ComparisonTableColumn[]
     )
   }
 

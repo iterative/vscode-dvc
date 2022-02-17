@@ -10,14 +10,14 @@ import {
 import {
   collectBranchAndExperimentIds,
   collectExperiments,
-  collectStatuses,
-  Status
+  collectStatuses
 } from './collect'
 import {
   copyOriginalBranchColors,
   copyOriginalExperimentColors
 } from './colors'
 import { collectColors, Colors } from './colors/collect'
+import { canSelect, Status, Statuses } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -40,7 +40,7 @@ export class ExperimentsModel {
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private branchColors: Colors
   private experimentColors: Colors
-  private status: Record<string, Status>
+  private status: Statuses
 
   private filters: Map<string, FilterDefinition> = new Map()
   private useFiltersForSelection = false
@@ -87,12 +87,16 @@ export class ExperimentsModel {
   }
 
   public toggleStatus(id: string) {
-    const newStatus = this.getStatus(id) ? Status.UNSELECTED : Status.SELECTED
+    const newStatus = this.isSelected(id) ? Status.UNSELECTED : Status.SELECTED
     this.status[id] = newStatus
 
     this.setSelectionMode(false)
     this.persistStatus()
     return newStatus
+  }
+
+  public canSelect() {
+    return canSelect(this.status)
   }
 
   public getSorts(): SortDefinition[] {
@@ -173,7 +177,7 @@ export class ExperimentsModel {
       acc[id] = status
 
       return acc
-    }, {} as Record<string, Status>)
+    }, {} as Statuses)
 
     this.persistStatus()
   }
@@ -183,7 +187,7 @@ export class ExperimentsModel {
     this.useFiltersForSelection = useFilters
   }
 
-  public setSelectedToFilters() {
+  public getFilteredExperiments() {
     const filteredExperiments = this.getSubRows(this.getExperiments())
 
     const filteredCheckpoints = flatten<Experiment>(
@@ -192,7 +196,11 @@ export class ExperimentsModel {
       )
     )
 
-    this.setSelected([...filteredExperiments, ...filteredCheckpoints])
+    return [...filteredExperiments, ...filteredCheckpoints]
+  }
+
+  public setSelectedToFilters() {
+    this.setSelected(this.getFilteredExperiments())
   }
 
   public getExperiments(): (Experiment & {
@@ -209,7 +217,7 @@ export class ExperimentsModel {
         return {
           ...branch,
           hasChildren: false,
-          selected: !!this.getStatus(branch.id)
+          selected: this.isSelected(branch.id)
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
@@ -241,12 +249,12 @@ export class ExperimentsModel {
 
   public getRowData() {
     return [
-      { ...this.workspace, selected: this.getStatus('workspace') },
+      { ...this.workspace, selected: this.isSelected('workspace') },
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
         const branchWithSelected = {
           ...branch,
-          selected: this.getStatus(branch.id)
+          selected: this.isSelected(branch.id)
         }
 
         if (!definedAndNonEmpty(experiments)) {
@@ -259,6 +267,10 @@ export class ExperimentsModel {
         }
       })
     ]
+  }
+
+  public isSelected(id: string) {
+    return !!this.status[id]
   }
 
   private getCombinedList() {
@@ -328,6 +340,7 @@ export class ExperimentsModel {
 
   private setStatus() {
     if (this.useFiltersForSelection) {
+      // need behaviour for an experiment running could spill over 6 - might want to turn off auto apply when running
       this.setSelectedToFilters()
       return
     }
@@ -377,6 +390,7 @@ export class ExperimentsModel {
   }
 
   private applyAndPersistFilters() {
+    // can only get in here from add or remove, block higher
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
     }
@@ -408,7 +422,7 @@ export class ExperimentsModel {
     experimentColors: Colors
     currentSorts: SortDefinition[]
     filters: Map<string, FilterDefinition>
-    status: Record<string, Status>
+    status: Statuses
   } {
     return {
       branchColors: this.reviveColors(
@@ -431,7 +445,7 @@ export class ExperimentsModel {
           []
         )
       ),
-      status: workspaceState.get<Record<string, Status>>(
+      status: workspaceState.get<Statuses>(
         MementoPrefix.EXPERIMENTS_STATUS + dvcRoot,
         {}
       )
@@ -463,7 +477,7 @@ export class ExperimentsModel {
       return experiment
     }
 
-    const selected = !!this.getStatus(id)
+    const selected = this.isSelected(id)
 
     return {
       ...experiment,
@@ -479,10 +493,6 @@ export class ExperimentsModel {
     return this.experimentColors.assigned
   }
 
-  private getStatus(id: string) {
-    return !!this.status[id]
-  }
-
   private getSelectedFromList(getList: () => Experiment[]) {
     return getList().reduce((acc, experiment) => {
       if (this.isSelectedExperimentWithColor(experiment)) {
@@ -496,6 +506,6 @@ export class ExperimentsModel {
     experiment: Experiment
   ): experiment is SelectedExperimentWithColor {
     const { id, displayColor } = experiment
-    return !!(displayColor && this.getStatus(id))
+    return !!(displayColor && this.isSelected(id))
   }
 }
