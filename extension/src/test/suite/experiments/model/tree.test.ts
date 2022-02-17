@@ -29,6 +29,7 @@ import {
 import { buildSingleRepoExperiments } from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { InternalCommands } from '../../../../commands/internal'
+import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -138,7 +139,7 @@ suite('Experiments Tree Test Suite', () => {
         setSelectionModeSpy,
         'selecting any experiment disables auto apply filters to experiments selection'
       ).to.be.calledOnceWith(false)
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
       const { plots, messageSpy } = await buildPlots(disposable)
@@ -181,7 +182,7 @@ suite('Experiments Tree Test Suite', () => {
         setSelectionModeSpy,
         'auto apply filters to experiment selection is disabled'
       ).to.be.calledOnceWith(false)
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to apply filters using dvc.views.experimentsTree.autoApplyFilters', async () => {
       const { plots, messageSpy } = await buildPlots(disposable)
@@ -224,7 +225,7 @@ suite('Experiments Tree Test Suite', () => {
         'auto apply filters to experiment selection is enabled'
       ).to.be.calledOnceWith(true)
       messageSpy.resetHistory()
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should automatically apply filters to experiments selection if dvc.experiments.filter.selected has been set via dvc.views.experimentsTree.autoApplyFilters', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -294,7 +295,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'the old filters are still applied to the message'
       ).to.be.calledWith(expectedMessage)
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should retain the expanded state of experiment tree items', () => {
       const { workspaceExperiments } = buildSingleRepoExperiments(disposable)
