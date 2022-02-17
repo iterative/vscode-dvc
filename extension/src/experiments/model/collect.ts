@@ -1,6 +1,7 @@
 import omit from 'lodash.omit'
 import { ExperimentsAccumulator } from './accumulator'
 import { getWorkspaceColor } from './colors'
+import { canSelect, Status, Statuses } from './status'
 import { reduceMetricsAndParams } from '../metricsAndParams/reduce'
 import { Experiment } from '../webview/contract'
 import {
@@ -11,6 +12,7 @@ import {
 } from '../../cli/reader'
 import { addToMapArray } from '../../util/map'
 import { hasKey } from '../../util/object'
+import { flatten } from '../../util/array'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
 
@@ -303,36 +305,51 @@ export const collectBranchAndExperimentIds = (branchesObject: {
   return acc
 }
 
-export enum Status {
-  SELECTED = 1,
-  UNSELECTED = 0
+const getStatus = (acc: Statuses, defaultStatus: Status) => {
+  if (defaultStatus && canSelect(acc)) {
+    return defaultStatus
+  }
+
+  return Status.UNSELECTED
 }
 
 const collectStatus = (
-  acc: Record<string, Status>,
+  acc: Statuses,
   experiment: Experiment,
-  status: Record<string, Status>,
   defaultStatus: Status
 ) => {
   const { id, queued } = experiment
-  if (id && !queued) {
-    acc[id] = hasKey(status, id) ? status[id] : defaultStatus
+  if (!id || queued || hasKey(acc, id)) {
+    return
   }
+  acc[id] = getStatus(acc, defaultStatus)
 }
 
 export const collectStatuses = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
-  status: Record<string, Status>
+  previousStatuses: Statuses
 ) => {
+  const existingStatus = [
+    ...experiments,
+    ...flatten<Experiment>([...checkpointsByTip.values()])
+  ].reduce((acc, experiment) => {
+    const { id } = experiment
+    if (hasKey(previousStatuses, id)) {
+      acc[id] = previousStatuses[id]
+    }
+
+    return acc
+  }, {} as Statuses)
+
   return experiments.reduce((acc, experiment) => {
-    collectStatus(acc, experiment, status, Status.SELECTED)
+    collectStatus(acc, experiment, Status.SELECTED)
 
     checkpointsByTip.get(experiment.id)?.reduce((acc, checkpoint) => {
-      collectStatus(acc, checkpoint, status, Status.UNSELECTED)
+      collectStatus(acc, checkpoint, Status.UNSELECTED)
       return acc
     }, acc)
 
     return acc
-  }, {} as Record<string, Status>)
+  }, existingStatus)
 }
