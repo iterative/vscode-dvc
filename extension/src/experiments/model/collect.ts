@@ -339,9 +339,10 @@ const collectStatus = (
   defaultStatus: Status
 ) => {
   const { id, queued } = experiment
-  if (id && !queued) {
-    acc[id] = getStatus(acc, id, status, defaultStatus)
+  if (!id || queued || hasKey(acc, id)) {
+    return
   }
+  acc[id] = getStatus(acc, id, status, defaultStatus)
 }
 
 export const collectStatuses = (
@@ -357,6 +358,7 @@ export const collectStatuses = (
     if (status[id]) {
       acc[id] = Status.SELECTED
     }
+
     return acc
   }, {} as Record<string, Status>)
 
