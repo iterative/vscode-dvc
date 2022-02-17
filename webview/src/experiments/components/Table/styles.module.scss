@@ -64,6 +64,10 @@ $spinner-color-light: #000;
   direction: ltr;
 }
 
+%headerCellPadding {
+  padding: 0.1em 0;
+}
+
 // Concrete selectors
 
 @keyframes spin {
@@ -266,7 +270,7 @@ $spinner-color-light: #000;
   .headerRow {
     font-size: 0.7rem;
 
-    .headerCellContentsWrapper {
+    .headerCellWrapper {
       @extend %truncateLeftParent;
       opacity: 0.6;
     }
@@ -302,11 +306,12 @@ $spinner-color-light: #000;
         text-align: right;
       }
 
-      .headerCellContentsWrapper {
+      .headerCellWrapper {
         opacity: 1;
       }
 
-      .experimentHeaderCell {
+      .experimentHeader {
+        @extend %headerCellPadding;
         padding-left: $cell-padding;
         text-align: left;
         direction: ltr;
@@ -511,8 +516,8 @@ $spinner-color-light: #000;
   text-overflow: ellipsis;
 }
 
-.headerCellContentsWrapper {
-  padding: 0.1em 0;
+.headerCellWrapper {
+  @extend %headerCellPadding;
 }
 
 .innerCell {
@@ -565,6 +570,7 @@ $spinner-color-light: #000;
 }
 
 .timestampHeader {
+  @extend %headerCellPadding;
   overflow-x: hidden;
   text-overflow: ellipsis;
 }

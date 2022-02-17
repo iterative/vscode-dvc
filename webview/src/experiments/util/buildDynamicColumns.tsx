@@ -32,7 +32,7 @@ const Header: React.FC<{ column: Column<Experiment> }> = ({
   column: { name }
 }) => {
   return (
-    <div className={styles.headerCellContentsWrapper}>
+    <div className={styles.headerCellWrapper}>
       <span title={name}>{name}</span>
     </div>
   )

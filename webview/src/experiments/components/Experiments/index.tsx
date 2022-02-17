@@ -47,8 +47,12 @@ const countRowsAndAddIndexes: (
   return index
 }
 
-const ExperimentHeaderCell = () => (
-  <div className={styles.experimentHeaderCell}>Experiment</div>
+const ExperimentHeader = () => (
+  <div className={styles.experimentHeader}>Experiment</div>
+)
+
+const TimestampHeader = () => (
+  <div className={styles.timestampHeader}>Timestamp</div>
 )
 
 const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
@@ -70,7 +74,7 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
           </div>
         )
       },
-      Header: ExperimentHeaderCell,
+      Header: ExperimentHeader,
       accessor: 'id',
       id: 'id',
       width: 150
@@ -94,7 +98,7 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
           </span>
         )
       },
-      Header: () => <div className={styles.timestampHeader}>Timestamp</div>,
+      Header: TimestampHeader,
       accessor: 'timestamp',
       width: 100
     },
