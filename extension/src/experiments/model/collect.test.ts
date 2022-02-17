@@ -221,7 +221,7 @@ describe('collectStatuses', () => {
     })
   })
 
-  it('should set the first new experiment to selected', () => {
+  it('should set the first new experiment to selected when there are already 5 selected', () => {
     const experiments = buildMockExperiments(8)
 
     expect(
