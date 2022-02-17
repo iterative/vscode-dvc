@@ -22,6 +22,7 @@ import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
 import { Param } from '../../../experiments/model/queue/collect'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
+import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -72,7 +73,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       expect(focusedExperiments).to.equal(experiments)
       expect(mockQuickPickOne).to.be.calledOnce
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should not prompt to pick a project if there is only one project', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
@@ -86,7 +87,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       expect(mockQuickPickOne).to.not.be.called
     })
-  }).timeout(12000)
+  }).timeout(WEBVIEW_TEST_TIMEOUT)
 
   describe('dvc.queueExperimentsFromExisting', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {

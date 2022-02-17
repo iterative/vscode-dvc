@@ -10,6 +10,7 @@ import {
   quickPickInitialized,
   selectQuickPickItem
 } from './util'
+import { WEBVIEW_TEST_TIMEOUT } from './timeouts'
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import expShowFixture from '../fixtures/expShow/output'
@@ -101,7 +102,7 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         null
       )
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
       stub(CliReader.prototype, 'help').rejects('still do not run setup')
@@ -144,7 +145,7 @@ suite('Extension Test Suite', () => {
       expect(workspace.getConfiguration().get(pythonPathOption)).to.equal(
         mockPath
       )
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should initialize the extension when the cli is usable', async () => {
       const createFileSystemWatcherSpy = spy(
@@ -320,7 +321,7 @@ suite('Extension Test Suite', () => {
         { error: mockErrorMessage },
         { duration: 0 }
       )
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('dvc.stopRunningExperiment', () => {
