@@ -8,6 +8,7 @@ import {
   TreeView,
   Uri
 } from 'vscode'
+import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -269,7 +270,7 @@ export class ExperimentsTree
       return
     }
 
-    return `${selected} of ${repos * 6}`
+    return `${selected} of ${repos * MAX_SELECTED_EXPERIMENTS}`
   }
 
   private isRoot(element: string | ExperimentItem): element is string {

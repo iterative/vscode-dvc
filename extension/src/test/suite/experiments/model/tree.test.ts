@@ -12,7 +12,7 @@ import {
 } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel } from '../../../../experiments/model'
-import { Status } from '../../../../experiments/model/collect'
+import { Status } from '../../../../experiments/model/status'
 import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'

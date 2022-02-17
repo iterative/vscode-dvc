@@ -8,17 +8,16 @@ import {
   getFilterId
 } from './filterBy'
 import {
-  canSelect,
   collectBranchAndExperimentIds,
   collectExperiments,
-  collectStatuses,
-  Status
+  collectStatuses
 } from './collect'
 import {
   copyOriginalBranchColors,
   copyOriginalExperimentColors
 } from './colors'
 import { collectColors, Colors } from './colors/collect'
+import { canSelect, Status, Statuses } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -41,7 +40,7 @@ export class ExperimentsModel {
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private branchColors: Colors
   private experimentColors: Colors
-  private status: Record<string, Status>
+  private status: Statuses
 
   private filters: Map<string, FilterDefinition> = new Map()
   private useFiltersForSelection = false
@@ -88,7 +87,6 @@ export class ExperimentsModel {
   }
 
   public toggleStatus(id: string) {
-    // leave dumb
     const newStatus = this.isSelected(id) ? Status.UNSELECTED : Status.SELECTED
     this.status[id] = newStatus
 
@@ -179,7 +177,7 @@ export class ExperimentsModel {
       acc[id] = status
 
       return acc
-    }, {} as Record<string, Status>)
+    }, {} as Statuses)
 
     this.persistStatus()
   }
@@ -424,7 +422,7 @@ export class ExperimentsModel {
     experimentColors: Colors
     currentSorts: SortDefinition[]
     filters: Map<string, FilterDefinition>
-    status: Record<string, Status>
+    status: Statuses
   } {
     return {
       branchColors: this.reviveColors(
@@ -447,7 +445,7 @@ export class ExperimentsModel {
           []
         )
       ),
-      status: workspaceState.get<Record<string, Status>>(
+      status: workspaceState.get<Statuses>(
         MementoPrefix.EXPERIMENTS_STATUS + dvcRoot,
         {}
       )

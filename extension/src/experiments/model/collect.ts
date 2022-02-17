@@ -1,6 +1,7 @@
 import omit from 'lodash.omit'
 import { ExperimentsAccumulator } from './accumulator'
 import { getWorkspaceColor } from './colors'
+import { canSelect, Status, Statuses } from './status'
 import { reduceMetricsAndParams } from '../metricsAndParams/reduce'
 import { Experiment } from '../webview/contract'
 import {
@@ -304,21 +305,10 @@ export const collectBranchAndExperimentIds = (branchesObject: {
   return acc
 }
 
-export enum Status {
-  SELECTED = 1,
-  UNSELECTED = 0
-}
-
-const getSelectedCount = (status: Record<string, Status>): number =>
-  Object.values(status).reduce((acc, expStatus) => acc + expStatus, 0)
-
-export const canSelect = (status: Record<string, Status>): boolean =>
-  getSelectedCount(status) < 6
-
 const getStatus = (
-  acc: Record<string, Status>,
+  acc: Statuses,
   id: string,
-  status: Record<string, Status>,
+  status: Statuses,
   defaultStatus: Status
 ) => {
   if (hasKey(status, id)) {
@@ -333,9 +323,9 @@ const getStatus = (
 }
 
 const collectStatus = (
-  acc: Record<string, Status>,
+  acc: Statuses,
   experiment: Experiment,
-  status: Record<string, Status>,
+  status: Statuses,
   defaultStatus: Status
 ) => {
   const { id, queued } = experiment
@@ -348,7 +338,7 @@ const collectStatus = (
 export const collectStatuses = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
-  status: Record<string, Status>
+  status: Statuses
 ) => {
   const previouslySelected = [
     ...experiments,
@@ -360,7 +350,7 @@ export const collectStatuses = (
     }
 
     return acc
-  }, {} as Record<string, Status>)
+  }, {} as Statuses)
 
   return experiments.reduce((acc, experiment) => {
     collectStatus(acc, experiment, status, Status.SELECTED)
