@@ -17,7 +17,6 @@ import {
   Cell
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
@@ -73,11 +72,16 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
         if (!value || value === '') {
           return null
         }
-        const time = dayjs(value)
+        const date = new Date(value)
         return (
           <span className={styles.timestampCellContentsWrapper}>
             <span className={styles.cellContents}>
-              {time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')}
+              <div className={styles.timestampTime}>
+                {date.toLocaleTimeString()}
+              </div>
+              <div className={styles.timestampDate}>
+                {date.toLocaleDateString()}
+              </div>
             </span>
           </span>
         )
