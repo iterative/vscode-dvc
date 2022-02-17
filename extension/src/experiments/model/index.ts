@@ -217,7 +217,7 @@ export class ExperimentsModel {
         return {
           ...branch,
           hasChildren: false,
-          selected: !!this.isSelected(branch.id)
+          selected: this.isSelected(branch.id)
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
@@ -477,7 +477,7 @@ export class ExperimentsModel {
       return experiment
     }
 
-    const selected = !!this.isSelected(id)
+    const selected = this.isSelected(id)
 
     return {
       ...experiment,
