@@ -562,3 +562,8 @@ $spinner-color-light: #000;
   @extend %truncateLeftChild;
   font-size: 0.9em;
 }
+
+.timestampHeader {
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}

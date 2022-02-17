@@ -25,6 +25,14 @@ import { sendMessage } from '../../../shared/vscode'
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
 
+const timeFormatter = new Intl.DateTimeFormat([], {
+  hour: '2-digit',
+  minute: '2-digit'
+})
+const dateFormatter = new Intl.DateTimeFormat([], {
+  dateStyle: 'medium'
+})
+
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
   index?: number
@@ -77,16 +85,16 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
           <span className={styles.timestampCellContentsWrapper}>
             <span className={styles.cellContents}>
               <div className={styles.timestampTime}>
-                {date.toLocaleTimeString()}
+                {timeFormatter.format(date)}
               </div>
               <div className={styles.timestampDate}>
-                {date.toLocaleDateString()}
+                {dateFormatter.format(date)}
               </div>
             </span>
           </span>
         )
       },
-      Header: 'Timestamp',
+      Header: () => <div className={styles.timestampHeader}>Timestamp</div>,
       accessor: 'timestamp',
       width: 100
     },
