@@ -305,16 +305,7 @@ export const collectBranchAndExperimentIds = (branchesObject: {
   return acc
 }
 
-const getStatus = (
-  acc: Statuses,
-  id: string,
-  status: Statuses,
-  defaultStatus: Status
-) => {
-  if (hasKey(status, id)) {
-    return status[id]
-  }
-
+const getStatus = (acc: Statuses, defaultStatus: Status) => {
   if (defaultStatus && canSelect(acc)) {
     return defaultStatus
   }
@@ -325,41 +316,40 @@ const getStatus = (
 const collectStatus = (
   acc: Statuses,
   experiment: Experiment,
-  status: Statuses,
   defaultStatus: Status
 ) => {
   const { id, queued } = experiment
   if (!id || queued || hasKey(acc, id)) {
     return
   }
-  acc[id] = getStatus(acc, id, status, defaultStatus)
+  acc[id] = getStatus(acc, defaultStatus)
 }
 
 export const collectStatuses = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
-  status: Statuses
+  previousStatuses: Statuses
 ) => {
-  const previouslySelected = [
+  const existingStatus = [
     ...experiments,
     ...flatten<Experiment>([...checkpointsByTip.values()])
   ].reduce((acc, experiment) => {
     const { id } = experiment
-    if (status[id]) {
-      acc[id] = Status.SELECTED
+    if (hasKey(previousStatuses, id)) {
+      acc[id] = previousStatuses[id]
     }
 
     return acc
   }, {} as Statuses)
 
   return experiments.reduce((acc, experiment) => {
-    collectStatus(acc, experiment, status, Status.SELECTED)
+    collectStatus(acc, experiment, Status.SELECTED)
 
     checkpointsByTip.get(experiment.id)?.reduce((acc, checkpoint) => {
-      collectStatus(acc, checkpoint, status, Status.UNSELECTED)
+      collectStatus(acc, checkpoint, Status.UNSELECTED)
       return acc
     }, acc)
 
     return acc
-  }, previouslySelected)
+  }, existingStatus)
 }
