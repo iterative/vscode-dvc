@@ -139,10 +139,8 @@ $gap: 20px;
   overflow: visible;
   position: relative;
 
-  @for $i from 1 through 100 {
-    &:nth-child(#{$i}) {
-      z-index: #{100 - $i};
-    }
+  &:hover {
+    z-index: 2;
   }
 }
 
