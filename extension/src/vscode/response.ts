@@ -1,4 +1,5 @@
 export enum Response {
+  CANCEL = 'Cancel',
   CLOSE = 'Close',
   DISCARD = 'Discard Changes',
   FORCE = 'Force',

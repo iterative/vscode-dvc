@@ -16,3 +16,8 @@ export const reportOutput = async (
   const output = (await stdout) || 'Operation successful.'
   window.showInformationMessage(output)
 }
+
+export const reportWarningWithOptions = (
+  message: string,
+  ...items: string[]
+): Thenable<string | undefined> => window.showWarningMessage(message, ...items)

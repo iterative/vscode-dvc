@@ -7,6 +7,7 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
+import { MAX_SELECTED_EXPERIMENTS } from './model/status'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
@@ -24,6 +25,9 @@ import {
 } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
+import { reportWarningWithOptions } from '../vscode/reporting'
+import { Response } from '../vscode/response'
+import { setUserConfigValue } from '../vscode/config'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -221,12 +225,43 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public autoApplyFilters(useFilters: boolean) {
-    // if auto apply is selected need to calculate the number of experiments that will be selected and pop a warning if > 6
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  public async autoApplyFilters(useFilters: boolean) {
     this.experiments.setSelectionMode(useFilters)
 
     if (useFilters) {
-      this.experiments.setSelectedToFilters()
+      const filteredExperiments = this.experiments.getFilteredExperiments()
+      if (filteredExperiments.length > MAX_SELECTED_EXPERIMENTS) {
+        this.experiments.setSelectionMode(false)
+        const response = await reportWarningWithOptions(
+          'Too many experiments would be selected by applying the current filter(s), how would you like to proceed?',
+          Response.CANCEL,
+          'Select the 6 most recent',
+          Response.NEVER
+        )
+
+        if (response === Response.CANCEL) {
+          return
+        }
+
+        if (response === Response.NEVER) {
+          setUserConfigValue('dvc.doNotShowUnableToFilter', true)
+          return
+        }
+
+        if (response === 'Select the 6 most recent') {
+          const firstSix = filteredExperiments
+            .sort(
+              (a, b) =>
+                new Date(b.timestamp || 0).getTime() -
+                new Date(a.timestamp || 0).getTime()
+            )
+            .slice(0, MAX_SELECTED_EXPERIMENTS)
+          this.experiments.setSelected(firstSix)
+        }
+      } else {
+        this.experiments.setSelected(filteredExperiments)
+      }
       return this.notifyChanged()
     }
   }

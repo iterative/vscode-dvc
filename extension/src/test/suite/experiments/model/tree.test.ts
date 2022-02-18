@@ -257,11 +257,6 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       await plots.showWebview()
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
-      )
-      expect(setSelectionModeSpy).to.be.calledOnceWith(true)
-      setSelectionModeSpy.resetHistory()
 
       messageSpy.resetHistory()
 
@@ -289,6 +284,12 @@ suite('Experiments Tree Test Suite', () => {
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
       await tableFilterAdded
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
+      )
+      expect(setSelectionModeSpy).to.be.calledOnceWith(true)
+      setSelectionModeSpy.resetHistory()
 
       const expectedMessage = { comparison: null, live: null, static: null }
 

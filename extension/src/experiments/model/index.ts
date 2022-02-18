@@ -191,12 +191,12 @@ export class ExperimentsModel {
     this.useFiltersForSelection = useFilters
   }
 
-  public getFilteredExperiments() {
-    const filteredExperiments = this.getSubRows(this.getExperiments())
+  public getFilteredExperiments(filters = this.getFilters()) {
+    const filteredExperiments = this.getSubRows(this.getExperiments(), filters)
 
     const filteredCheckpoints = flatten<Experiment>(
       filteredExperiments.map(
-        ({ id }) => this.getFilteredCheckpointsByTip(id) || []
+        ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
       )
     )
 
@@ -300,10 +300,13 @@ export class ExperimentsModel {
     ]
   }
 
-  private getSubRows(experiments: Experiment[]) {
+  private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
     return experiments
       .map(experiment => {
-        const checkpoints = this.getFilteredCheckpointsByTip(experiment.id)
+        const checkpoints = this.getFilteredCheckpointsByTip(
+          experiment.id,
+          filters
+        )
         if (!checkpoints) {
           return this.addSelected(experiment)
         }
@@ -314,30 +317,33 @@ export class ExperimentsModel {
           }))
         }
       })
-      .filter((row: RowData) => this.filterTableRow(row))
+      .filter((row: RowData) => this.filterTableRow(row, filters))
   }
 
   private findIndexByPath(pathToRemove: string) {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
 
-  private filterTableRow(row: RowData): boolean {
+  private filterTableRow(row: RowData, filters: FilterDefinition[]): boolean {
     const hasUnfilteredCheckpoints = definedAndNonEmpty(row.subRows)
     if (hasUnfilteredCheckpoints) {
       return true
     }
-    if (filterExperiment(this.getFilters(), row)) {
+    if (filterExperiment(filters, row)) {
       return true
     }
     return false
   }
 
-  private getFilteredCheckpointsByTip(sha: string) {
+  private getFilteredCheckpointsByTip(
+    sha: string,
+    filters: FilterDefinition[]
+  ) {
     const checkpoints = this.checkpointsByTip.get(sha)
     if (!checkpoints) {
       return
     }
-    return filterExperiments(this.getFilters(), checkpoints)
+    return filterExperiments(filters, checkpoints)
   }
 
   private getExperimentsByBranch(branch: Experiment) {
