@@ -27,6 +27,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
+import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   const { join } = path
@@ -199,7 +200,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       await activeEditorChanged
 
       expect(getActiveTextEditorFilename()).to.equal(fileToOpen)
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to open a file to the side', async () => {
       const fileToOpen = join(dvcDemoPath, 'logs.json')

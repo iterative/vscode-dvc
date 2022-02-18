@@ -5,8 +5,7 @@
 import React from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
-import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
+import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -17,7 +16,7 @@ import {
   makeDnd,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
-import { TableData } from 'dvc/src/experiments/webview/contract'
+import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -65,11 +64,7 @@ describe('App', () => {
   describe('Given a message to add experiments to the state', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
-        data: {
-          columns: columnsFixture,
-          rows: rowsFixture,
-          sorts: []
-        },
+        data: tableDataFixture,
         type: MessageToWebviewType.SET_DATA
       }
     })
@@ -146,5 +141,109 @@ describe('App', () => {
     })
 
     await expectHeaders(['A', 'C', 'D', 'B'])
+  })
+
+  describe('Row expansion', () => {
+    const experimentLabel = '1ba7bcd'
+    const checkpointLabel = '22e40e1'
+
+    it('should maintain expansion status when rows are reordered', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
+      expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
+
+      fireEvent.click(screen.getByText(experimentLabel))
+
+      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
+      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+
+      const changedData: TableData = {
+        ...tableDataFixture,
+        rows: [
+          tableDataFixture.rows[0],
+          {
+            ...tableDataFixture.rows[1],
+            subRows: [
+              ...(tableDataFixture.rows[1].subRows as RowData[])
+            ].reverse()
+          }
+        ]
+      }
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: changedData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
+      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+    })
+
+    it('should maintain expansion status when the branch changes', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
+      expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
+
+      fireEvent.click(screen.getByText(experimentLabel))
+
+      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
+      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+
+      const changedBranchName = 'changed-branch'
+
+      const changedRows = [...tableDataFixture.rows]
+      changedRows[1] = {
+        ...changedRows[1],
+        id: changedBranchName,
+        label: changedBranchName,
+        name: changedBranchName,
+        sha: '99999dfb4aa5fb41915610c3a256b418fc095610'
+      }
+      const changedData: TableData = {
+        ...tableDataFixture,
+        rows: changedRows
+      }
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: changedData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(screen.getByText(changedBranchName)).toBeInTheDocument()
+      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
+      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+    })
   })
 })

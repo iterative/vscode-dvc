@@ -19,7 +19,7 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { App } from './App'
-import Plots from './Plots'
+import { Plots } from './Plots'
 import { vsCodeApi } from '../../shared/api'
 
 jest.mock('../../shared/api')

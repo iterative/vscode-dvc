@@ -73,22 +73,20 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           key={column.id}
           data-testid={`header-${column.id}`}
         >
-          <div className={styles.headerCellContentsWrapper}>
-            <span
-              ref={provided.innerRef}
-              {...provided.draggableProps}
-              {...provided.dragHandleProps}
-              data-testid="rendered-header"
-              style={provided.draggableProps.style}
-              className={cx(styles.cellContents, {
-                [styles.draggingColumn]: snapshot.isDragging,
-                [styles.staticColumn]: !snapshot.isDragging,
-                [styles.isDroppedColumn]: snapshot.isDropAnimating
-              })}
-            >
-              {column.render('Header')}
-            </span>
-          </div>
+          <span
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            data-testid="rendered-header"
+            style={provided.draggableProps.style}
+            className={cx(styles.cellContents, {
+              [styles.draggingColumn]: snapshot.isDragging,
+              [styles.staticColumn]: !snapshot.isDragging,
+              [styles.isDroppedColumn]: snapshot.isDropAnimating
+            })}
+          >
+            {column.render('Header')}
+          </span>
           {canResize && (
             <div
               {...column.getResizerProps()}

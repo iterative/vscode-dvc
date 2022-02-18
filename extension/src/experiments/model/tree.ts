@@ -8,19 +8,15 @@ import {
   TreeView,
   Uri
 } from 'vscode'
+import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
+import { definedAndNonEmpty, flatten } from '../../util/array'
 import { createTreeView, getRootItem } from '../../vscode/tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
-
-enum Status {
-  RUNNING = 1,
-  QUEUED = 2
-}
 
 export type ExperimentItem = {
   command?: {
@@ -243,58 +239,25 @@ export class ExperimentsTree
   private updateDescriptionOnChange() {
     this.dispose.track(
       this.onDidChangeTreeData(() => {
-        const statuses = this.getStatuses()
-        this.view.description = this.getDescription(statuses)
+        this.view.description = this.getDescription()
       })
     )
   }
 
-  private getStatuses() {
+  private getDescription() {
     const dvcRoots = this.experiments.getDvcRoots()
-
-    return flatten<Status>(
-      dvcRoots.map(dvcRoot =>
-        this.experiments
-          .getRepository(dvcRoot)
-          .getExperiments()
-          .filter(experiment => experiment.running || experiment.queued)
-          .map(experiment =>
-            experiment.running ? Status.RUNNING : Status.QUEUED
-          )
-      )
-    )
-  }
-
-  private getDescription(statuses: Status[]) {
-    if (!definedAndNonEmpty(statuses)) {
+    if (!definedAndNonEmpty(dvcRoots)) {
       return
     }
 
-    const { active, queued } = statuses.reduce(
-      (acc, status) => {
-        if (status === Status.RUNNING) {
-          acc.active += 1
-        }
-
-        if (status === Status.QUEUED) {
-          acc.queued += 1
-        }
-
-        return acc
-      },
-      { active: 0, queued: 0 }
+    const selected = dvcRoots.reduce(
+      (acc, dvcRoot) =>
+        acc +
+        this.experiments.getRepository(dvcRoot).getSelectedRevisions().length,
+      0
     )
-    return joinTruthyItems(
-      [
-        this.getSubDescription(active, 'active'),
-        this.getSubDescription(queued, 'queued')
-      ],
-      ', '
-    )
-  }
 
-  private getSubDescription(count: number, label: string) {
-    return count ? `${count} ${label}` : ''
+    return `${selected} of ${dvcRoots.length * MAX_SELECTED_EXPERIMENTS}`
   }
 
   private isRoot(element: string | ExperimentItem): element is string {

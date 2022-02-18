@@ -31,7 +31,11 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
 const Header: React.FC<{ column: Column<Experiment> }> = ({
   column: { name }
 }) => {
-  return <span title={name}>{name}</span>
+  return (
+    <div className={styles.headerCellWrapper}>
+      <span title={name}>{name}</span>
+    </div>
+  )
 }
 
 const getCellComponent = (): React.FC<{ value: Value }> => Cell

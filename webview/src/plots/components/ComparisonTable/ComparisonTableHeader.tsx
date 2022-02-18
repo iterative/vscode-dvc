@@ -4,14 +4,14 @@ import styles from './styles.module.scss'
 import { Pin } from '../../../shared/components/icons'
 
 export interface ComparisonTableHeaderProps {
-  color: string
+  displayColor: string
   onClicked: () => void
   isPinned?: boolean
 }
 
 export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
+  displayColor,
   children,
-  color,
   onClicked,
   isPinned
 }) => {
@@ -24,7 +24,10 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
       <div className={pinClasses}>
         <Pin />
       </div>
-      <span className={styles.bullet} style={{ backgroundColor: color }} />
+      <span
+        className={styles.bullet}
+        style={{ backgroundColor: displayColor }}
+      />
       {children}
     </button>
   )

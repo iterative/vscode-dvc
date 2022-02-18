@@ -134,6 +134,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public toggleExperimentStatus(id: string) {
+    const selected = this.experiments.isSelected(id)
+    if (!selected && !this.experiments.canSelect()) {
+      return
+    }
     const status = this.experiments.toggleStatus(id)
     this.notifyChanged()
     return status
@@ -183,6 +187,8 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public removeFilter(id: string) {
+    // if auto apply is being used need to calculate the number of experiments that will be selected
+    // and pop a warning if > 6
     if (this.experiments.removeFilter(id)) {
       return this.notifyChanged()
     }
@@ -190,6 +196,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async removeFilters() {
     const filters = this.experiments.getFilters()
+    // if auto apply is being used need to calculate the number of experiments that will be selected and pop a warning if > 6
     const filtersToRemove = await pickFiltersToRemove(filters)
     if (!filtersToRemove) {
       return
@@ -201,6 +208,9 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectExperiments() {
     const experiments = this.experiments.getExperiments()
 
+    // need this to limit to 6,
+    // as a start could de-select all checkpoints, if not need to revisit the UI
+    // use quickPick to limit amount of selectedItems can use createQuickPick, selectedItems and onDidChangeSelection
     const selected = await pickExperiments(experiments)
     if (!selected) {
       return
@@ -212,6 +222,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public autoApplyFilters(useFilters: boolean) {
+    // if auto apply is selected need to calculate the number of experiments that will be selected and pop a warning if > 6
     this.experiments.setSelectionMode(useFilters)
 
     if (useFilters) {

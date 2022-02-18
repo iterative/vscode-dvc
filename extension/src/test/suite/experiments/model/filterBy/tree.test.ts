@@ -17,6 +17,7 @@ import { joinMetricOrParamPath } from '../../../../../experiments/metricsAndPara
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
 import { TableData } from '../../../../../experiments/webview/contract'
+import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -136,7 +137,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWith(expectedTableData)
-    }).timeout(12000)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to remove all filters with dvc.views.experimentsFilterByTree.removeAllFilters', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')

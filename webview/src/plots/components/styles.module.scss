@@ -59,9 +59,6 @@
 $gap: 20px;
 .plotsWrapper {
   width: 100%;
-  display: grid;
-  gap: $gap;
-  grid-auto-flow: row;
 
   :global(.vega-embed) {
     width: 100%;
@@ -73,68 +70,79 @@ $gap: 20px;
   }
 }
 
-.largePlots {
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-}
+.singleViewPlotsGrid, .multiViewPlotsGrid {
+  width: 100%;
+  display: grid;
+  gap: $gap;
+  grid-auto-flow: row;
 
-.regularPlots {
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-}
+  .largePlots & {
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  }
 
-.smallPlots {
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  .regularPlots & {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  }
+
+  .smallPlots & {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  @media (min-width: 800px) {
+    :not(.multiViewPlotsGrid) {
+      justify-content: space-around;
+    }
+
+    .largePlots & {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .regularPlots & {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  
+    .smallPlots & {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .largePlots & {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  
+    .regularPlots & {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  
+    .smallPlots & {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 2000px) {
+    .largePlots & {
+      grid-template-columns: repeat(auto-fill, minmax(1fr, 1000px));
+    }
+  
+    .regularPlots & {
+      grid-template-columns: repeat(auto-fill, minmax(1fr, 800px));
+    }
+  
+    .smallPlots & {
+      grid-template-columns: repeat(auto-fill, minmax(1fr, 500px));
+    }
+  }
 }
 
 .plot {
-  aspect-ratio: var(--scale);
-  grid-column: span var(--scale);
-}
+  aspect-ratio: 4 / 3;
+  overflow: visible;
 
-@media (min-width: 800px) {
-  .plotsWrapper {
-    justify-content: space-around;
-  }
-
-  .largePlots {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: 1200px) {
-  .regularPlots {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .smallPlots {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-}
-
-@media (min-width: 1600px) {
-  .largePlots {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .regularPlots {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-
-  .smallPlots {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-  }
-}
-
-@media (min-width: 2000px) {
-  .largePlots {
-    grid-template-columns: repeat(auto-fill, minmax(1fr, 1000px));
-  }
-
-  .regularPlots {
-    grid-template-columns: repeat(auto-fill, minmax(1fr, 800px));
-  }
-
-  .smallPlots {
-    grid-template-columns: repeat(auto-fill, minmax(1fr, 500px));
+  &:hover {
+    z-index: 2;
   }
 }
 
@@ -142,9 +150,13 @@ $gap: 20px;
 .plot svg {
   max-width: 100%;
   max-height: 100%;
+  overflow: visible;
 }
 
 .plot.multiViewPlot {
+  aspect-ratio: var(--scale);
+  grid-column: span var(--scale);
+
   .largePlots & {
     min-width: calc(500px * var(--scale));
   }

@@ -17,7 +17,6 @@ import {
   Cell
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
@@ -25,6 +24,14 @@ import { sendMessage } from '../../../shared/vscode'
 
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
+
+const timeFormatter = new Intl.DateTimeFormat([], {
+  hour: '2-digit',
+  minute: '2-digit'
+})
+const dateFormatter = new Intl.DateTimeFormat([], {
+  dateStyle: 'medium'
+})
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
@@ -40,8 +47,12 @@ const countRowsAndAddIndexes: (
   return index
 }
 
-const ExperimentHeaderCell = () => (
-  <div className={styles.experimentHeaderCell}>Experiment</div>
+const ExperimentHeader = () => (
+  <div className={styles.experimentHeader}>Experiment</div>
+)
+
+const TimestampHeader = () => (
+  <div className={styles.timestampHeader}>Timestamp</div>
 )
 
 const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
@@ -63,7 +74,7 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
           </div>
         )
       },
-      Header: ExperimentHeaderCell,
+      Header: ExperimentHeader,
       accessor: 'id',
       id: 'id',
       width: 150
@@ -73,16 +84,21 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
         if (!value || value === '') {
           return null
         }
-        const time = dayjs(value)
+        const date = new Date(value)
         return (
           <span className={styles.timestampCellContentsWrapper}>
             <span className={styles.cellContents}>
-              {time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')}
+              <div className={styles.timestampTime}>
+                {timeFormatter.format(date)}
+              </div>
+              <div className={styles.timestampDate}>
+                {dateFormatter.format(date)}
+              </div>
             </span>
           </span>
         )
       },
-      Header: 'Timestamp',
+      Header: TimestampHeader,
       accessor: 'timestamp',
       width: 100
     },
@@ -105,8 +121,8 @@ export const ExperimentsTable: React.FC<{
   tableData: InitiallyUndefinedTableData
 }> = ({ tableData: initiallyUndefinedTableData }) => {
   const getRowId = useCallback(
-    (experiment: Experiment, _index, parent?: Row<Experiment>) =>
-      parent ? [parent.id, experiment.id].join('.') : experiment.id,
+    (experiment: Experiment, relativeIndex: number, parent?: Row<Experiment>) =>
+      parent ? [parent.id, experiment.id].join('.') : String(relativeIndex),
     []
   )
   const [tableData, columns, defaultColumn, initialState] =
