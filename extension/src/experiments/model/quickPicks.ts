@@ -14,37 +14,43 @@ type QuickPickItemAccumulator = {
   selectedItems: QuickPickItemWithValue<Experiment | undefined>[]
 }
 
-const getCheckpointItems = (
+const getSeparator = (experiment: Experiment) => ({
+  kind: QuickPickItemKind.Separator,
+  label: experiment.id,
+  value: undefined
+})
+
+const getItem = (experiment: Experiment) => ({
+  label: experiment.label,
+  value: omit(experiment, 'checkpoints')
+})
+
+const collectItem = (
+  acc: QuickPickItemAccumulator,
+  experiment: Experiment,
+  transformer = getItem
+) => {
+  const item = transformer(experiment)
+  acc.items.push(item)
+  if (experiment.selected) {
+    acc.selectedItems.push(item)
+  }
+  return acc
+}
+
+const collectCheckpointItems = (
   experiments: (Experiment & { checkpoints?: Experiment[] })[]
 ) =>
   experiments.reduce(
     (acc, experiment) => {
       if (experiment.checkpoints) {
-        acc.items.push({
-          kind: QuickPickItemKind.Separator,
-          label: experiment.id,
-          value: undefined
-        })
-      }
-      const item = {
-        label: experiment.label,
-        value: omit(experiment, 'checkpoints')
+        acc.items.push(getSeparator(experiment))
       }
 
-      acc.items.push(item)
-      if (experiment.selected) {
-        acc.selectedItems.push(item)
-      }
+      collectItem(acc, experiment)
 
       experiment.checkpoints?.map(checkpoint => {
-        const item = {
-          label: checkpoint.label,
-          value: checkpoint
-        }
-        acc.items.push(item)
-        if (checkpoint.selected) {
-          acc.selectedItems.push(item)
-        }
+        return collectItem(acc, checkpoint)
       })
 
       return acc
@@ -55,34 +61,27 @@ const getCheckpointItems = (
     } as QuickPickItemAccumulator
   )
 
-const getExperimentOnlyItems = (experiments: Experiment[]) =>
+const collectExperimentOnlyItems = (experiments: Experiment[]) =>
   experiments.reduce(
-    (acc, experiment) => {
-      const item = {
-        description: experiment.displayNameOrParent,
-        label: experiment.label,
-        value: experiment
-      }
-      acc.items.push(item)
-      if (experiment.selected) {
-        acc.selectedItems.push(item)
-      }
-      return acc
-    },
+    (acc, experiment) =>
+      collectItem(acc, experiment, (experiment: Experiment) => ({
+        ...getItem(experiment),
+        description: experiment.displayNameOrParent
+      })),
     {
       items: [],
       selectedItems: []
     } as QuickPickItemAccumulator
   )
 
-const getItems = (
+const collectItems = (
   experiments: (Experiment & { checkpoints?: Experiment[] })[],
   hasCheckpoints: boolean
 ): QuickPickItemAccumulator => {
   if (hasCheckpoints) {
-    return getCheckpointItems(experiments)
+    return collectCheckpointItems(experiments)
   }
-  return getExperimentOnlyItems(experiments)
+  return collectExperimentOnlyItems(experiments)
 }
 
 export const pickExperiments = (
@@ -93,7 +92,7 @@ export const pickExperiments = (
     return reportError('There are no experiments to select.')
   }
 
-  const { items, selectedItems } = getItems(experiments, hasCheckpoints)
+  const { items, selectedItems } = collectItems(experiments, hasCheckpoints)
 
   return quickPickLimitedValues<Experiment | undefined>(
     items,

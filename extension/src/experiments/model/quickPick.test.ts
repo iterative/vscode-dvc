@@ -1,3 +1,4 @@
+import { QuickPickItemKind } from 'vscode'
 import { pickExperiments } from './quickPicks'
 import { quickPickLimitedValues } from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
@@ -17,15 +18,15 @@ describe('pickExperiments', () => {
     expect(mockedQuickPickLimitedValues).not.toBeCalled()
   })
 
-  it('should return the selected experiment ids', async () => {
+  it('should return the selected experiment', async () => {
     const selectedExperiment = {
-      id: '7c366f6',
-      label: 'exp-789',
+      displayNameOrParent: '[exp-789]',
+      label: '7c366f6',
       selected: false
     }
     const mockedExperiments = [
-      { id: '73de3fe', label: 'exp-123', selected: false },
-      { id: '0be657c', label: 'exp-456', selected: true },
+      { displayNameOrParent: '[exp-123]', label: '73de3fe', selected: false },
+      { displayNameOrParent: '[exp-456]', label: '0be657c', selected: true },
       selectedExperiment
     ] as Experiment[]
 
@@ -36,11 +37,117 @@ describe('pickExperiments', () => {
     expect(mockedQuickPickLimitedValues).toBeCalledTimes(1)
     expect(mockedQuickPickLimitedValues).toBeCalledWith(
       [
-        { label: 'exp-123', value: mockedExperiments[0] },
-        { label: 'exp-456', value: mockedExperiments[1] },
-        { label: 'exp-789', value: mockedExperiments[2] }
+        {
+          description: '[exp-123]',
+          label: '73de3fe',
+          value: mockedExperiments[0]
+        },
+        {
+          description: '[exp-456]',
+          label: '0be657c',
+          value: mockedExperiments[1]
+        },
+        {
+          description: '[exp-789]',
+          label: '7c366f6',
+          value: mockedExperiments[2]
+        }
       ],
-      [{ label: 'exp-456', value: mockedExperiments[1] }],
+      [
+        {
+          description: '[exp-456]',
+          label: '0be657c',
+          value: mockedExperiments[1]
+        }
+      ],
+      6,
+      'Select up to 6 experiments'
+    )
+  })
+
+  it('should spend separators to the quick pick when there are checkpoints', async () => {
+    const selectedExperiment = {
+      displayNameOrParent: '[exp-2]',
+      id: 'exp-2',
+      label: '7c366f6',
+      selected: false
+    }
+
+    const selectedCheckpoint = {
+      label: '6c366f6',
+      selected: true
+    }
+
+    const mockedWorkspace = { label: 'workspace', selected: false }
+    const mockedBranch = { label: 'main', selected: false }
+
+    const mockedExp1 = {
+      displayNameOrParent: '[exp-1]',
+      id: 'exp-1',
+      label: '73de3fe',
+      selected: false
+    }
+    const mockedExp1Checkpoint1 = {
+      label: '63de3fe'
+    }
+    const mockedExp1Checkpoint2 = { label: '53de3fe' }
+
+    const mockedExp2 = selectedExperiment
+    const mockedExp2Checkpoint1 = selectedCheckpoint
+    const mockedExp2Checkpoint2 = { label: '5be657c' }
+
+    mockedQuickPickLimitedValues.mockResolvedValueOnce([
+      selectedExperiment,
+      selectedCheckpoint
+    ])
+
+    const picked = await pickExperiments(
+      [
+        mockedWorkspace,
+        mockedBranch,
+        {
+          ...mockedExp1,
+          checkpoints: [mockedExp1Checkpoint1, mockedExp1Checkpoint2]
+        },
+        {
+          ...mockedExp2,
+          checkpoints: [mockedExp2Checkpoint1, mockedExp2Checkpoint2]
+        }
+      ] as (Experiment & { checkpoints?: Experiment[] })[],
+      true
+    )
+
+    const getExpectedItem = <T extends { label: string }>(
+      item: T
+    ): { label: string; value: T } => ({
+      label: item.label,
+      value: item
+    })
+
+    expect(picked).toEqual([selectedExperiment, selectedCheckpoint])
+    expect(mockedQuickPickLimitedValues).toBeCalledTimes(1)
+    expect(mockedQuickPickLimitedValues).toBeCalledWith(
+      [
+        getExpectedItem(mockedWorkspace),
+        getExpectedItem(mockedBranch),
+        {
+          kind: QuickPickItemKind.Separator,
+          label: mockedExp1.id,
+          value: undefined
+        },
+        getExpectedItem(mockedExp1),
+        getExpectedItem(mockedExp1Checkpoint1),
+        getExpectedItem(mockedExp1Checkpoint2),
+        {
+          kind: QuickPickItemKind.Separator,
+          label: mockedExp2.id,
+          value: undefined
+        },
+        getExpectedItem(mockedExp2),
+        getExpectedItem(mockedExp2Checkpoint1),
+        getExpectedItem(mockedExp2Checkpoint2)
+      ],
+      [getExpectedItem(selectedCheckpoint)],
       6,
       'Select up to 6 experiments'
     )
