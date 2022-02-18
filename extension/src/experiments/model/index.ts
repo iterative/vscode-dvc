@@ -222,9 +222,23 @@ export class ExperimentsModel {
       }),
       ...this.flattenExperiments().map(experiment => ({
         ...this.addSelected(experiment),
-        hasChildren: !!this.checkpointsByTip.get(experiment.id)
+        hasChildren: definedAndNonEmpty(
+          this.checkpointsByTip.get(experiment.id)
+        )
       }))
     ]
+  }
+
+  public getExperimentsWithCheckpoints() {
+    return this.getExperiments().map(experiment => {
+      const checkpoints = this.checkpointsByTip
+        .get(experiment.id)
+        ?.map(checkpoint => this.addSelected(checkpoint))
+      if (!definedAndNonEmpty(checkpoints)) {
+        return experiment
+      }
+      return { ...experiment, checkpoints }
+    })
   }
 
   public getExperimentParams(id: string) {
