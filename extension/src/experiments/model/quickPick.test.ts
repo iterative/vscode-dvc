@@ -88,9 +88,7 @@ describe('pickExperiments', () => {
       label: '73de3fe',
       selected: false
     }
-    const mockedExp1Checkpoint1 = {
-      label: '63de3fe'
-    }
+    const mockedExp1Checkpoint1 = { label: '63de3fe' }
     const mockedExp1Checkpoint2 = { label: '53de3fe' }
 
     const mockedExp2 = selectedExperiment
