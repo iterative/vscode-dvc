@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, SinonStub, spy } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import {
   commands,
   EventEmitter,
+  QuickPick,
   QuickPickItem,
-  QuickPickOptions,
   TreeView,
   TreeViewExpansionEvent,
   window
@@ -30,6 +30,7 @@ import { buildSingleRepoExperiments } from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { InternalCommands } from '../../../../commands/internal'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
+import { QuickPickItemWithValue } from '../../../../vscode/quickPick'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -149,28 +150,47 @@ suite('Experiments Tree Test Suite', () => {
       const selectedItem = {
         description: selectedDisplayName,
         label: '',
-        picked: true,
         value: { id: selectedDisplayName }
       }
 
       await plots.showWebview()
 
-      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
-        [
-          items: readonly QuickPickItem[],
-          options: QuickPickOptions & { canPickMany: true }
-        ],
-        Thenable<QuickPickItem[] | undefined>
-      >
-      mockShowQuickPick.resolves([selectedItem])
+      const inputAccepted = disposable.track(new EventEmitter<void>())
+      const mockEvent = disposable.track(new EventEmitter()).event
+
+      const mockCreateQuickPick = stub(window, 'createQuickPick')
+      const mockQuickPick = {
+        onDidAccept: inputAccepted.event,
+        onDidChangeSelection: mockEvent,
+        onDidHide: mockEvent,
+        placeholder: undefined,
+        selectedItems: [] as { id: string }[],
+        show: stub(),
+        value: undefined
+      } as unknown as QuickPick<QuickPickItemWithValue<{ id: string }>>
+
+      const quickPickCreated = new Promise(resolve =>
+        mockCreateQuickPick.callsFake(() => {
+          resolve(undefined)
+          return mockQuickPick
+        })
+      )
+
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,
         'setSelectionMode'
       )
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SELECT)
+      const selectExperiments = commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_SELECT
+      )
 
-      expect(mockShowQuickPick).to.be.calledOnce
+      await quickPickCreated
+      mockQuickPick.selectedItems = [selectedItem]
+      inputAccepted.fire()
+      await selectExperiments
+
+      expect(mockCreateQuickPick).to.be.calledOnce
 
       expect(
         messageSpy,

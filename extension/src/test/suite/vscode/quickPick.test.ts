@@ -1,9 +1,22 @@
-import { describe, it, suite } from 'mocha'
+import { window } from 'vscode'
+import { stub } from 'sinon'
+import { afterEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { quickPickOneOrInput } from '../../../vscode/quickPick'
+import { Disposable } from '../../../extension'
+import {
+  QuickPickItemWithValue,
+  quickPickLimitedValues,
+  quickPickOneOrInput
+} from '../../../vscode/quickPick'
 import { selectQuickPickItem } from '../util'
 
 suite('Quick Pick Test Suite', () => {
+  const disposable = Disposable.fn()
+
+  afterEach(() => {
+    disposable.dispose()
+  })
+
   describe('quickPickOneOrInput', () => {
     it('should return the currently selected value', async () => {
       const expectedSelection = 'b'
@@ -43,6 +56,54 @@ suite('Quick Pick Test Suite', () => {
       const result = await resultPromise
 
       expect(result).to.equal(expectedDefault)
+    })
+  })
+
+  describe('quickPickLimitedValues', () => {
+    it('should limit the number of values that can be selected to the max selected items', async () => {
+      const quickPick = window.createQuickPick<QuickPickItemWithValue<number>>()
+      stub(window, 'createQuickPick').returns(quickPick)
+
+      const maxSelectedItems = 3
+
+      const items = [
+        { label: 'A', value: 1 },
+        { label: 'B', value: 2 },
+        { label: 'C', value: 3 },
+        { label: 'D', value: 4 },
+        { label: 'E', value: 5 },
+        { label: 'F', value: 6 },
+        { label: 'G', value: 7 },
+        { label: 'H', value: 8 },
+        { label: 'I', value: 9 }
+      ]
+
+      const limitedItems = quickPickLimitedValues(
+        items,
+        items.slice(0, maxSelectedItems),
+        maxSelectedItems,
+        'select up to 3 values'
+      )
+      expect(quickPick.selectedItems).to.have.lengthOf(maxSelectedItems)
+
+      const updateEvent = new Promise(resolve =>
+        disposable.track(
+          quickPick.onDidChangeSelection(() => resolve(undefined))
+        )
+      )
+
+      quickPick.selectedItems = items
+
+      expect(quickPick.selectedItems).to.have.lengthOf.greaterThan(
+        maxSelectedItems
+      )
+
+      await updateEvent
+
+      expect(quickPick.selectedItems).to.have.lengthOf(maxSelectedItems)
+      quickPick.hide()
+
+      expect(await limitedItems).to.be.undefined
     })
   })
 })

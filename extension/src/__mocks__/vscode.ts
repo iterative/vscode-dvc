@@ -5,6 +5,9 @@ export const commands = jest.fn()
 export const EventEmitter = jest.fn()
 export const Extension = jest.fn()
 export const extensions = jest.fn()
+export enum QuickPickItemKind {
+  Separator = '999'
+}
 export const scm = jest.fn()
 export const Terminal = jest.fn()
 export const ThemeColor = jest.fn()
