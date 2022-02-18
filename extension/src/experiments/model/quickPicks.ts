@@ -1,5 +1,6 @@
 import { QuickPickItemKind } from 'vscode'
 import omit from 'lodash.omit'
+import { ExperimentWithCheckpoints } from '.'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { definedAndNonEmpty } from '../../util/array'
 import {
@@ -38,9 +39,7 @@ const collectItem = (
   return acc
 }
 
-const collectCheckpointItems = (
-  experiments: (Experiment & { checkpoints?: Experiment[] })[]
-) =>
+const collectCheckpointItems = (experiments: ExperimentWithCheckpoints[]) =>
   experiments.reduce(
     (acc, experiment) => {
       if (experiment.checkpoints) {
@@ -75,7 +74,7 @@ const collectExperimentOnlyItems = (experiments: Experiment[]) =>
   )
 
 const collectItems = (
-  experiments: (Experiment & { checkpoints?: Experiment[] })[],
+  experiments: ExperimentWithCheckpoints[],
   hasCheckpoints: boolean
 ): QuickPickItemAccumulator => {
   if (hasCheckpoints) {
@@ -85,7 +84,7 @@ const collectItems = (
 }
 
 export const pickExperiments = (
-  experiments: (Experiment & { checkpoints?: Experiment[] })[],
+  experiments: ExperimentWithCheckpoints[],
   hasCheckpoints: boolean
 ): Promise<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {

@@ -31,6 +31,10 @@ type SelectedExperimentWithColor = Experiment & {
   selected: true
 }
 
+export type ExperimentWithCheckpoints = Experiment & {
+  checkpoints?: Experiment[]
+}
+
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
@@ -229,7 +233,7 @@ export class ExperimentsModel {
     ]
   }
 
-  public getExperimentsWithCheckpoints() {
+  public getExperimentsWithCheckpoints(): ExperimentWithCheckpoints[] {
     return this.getExperiments().map(experiment => {
       const checkpoints = this.checkpointsByTip
         .get(experiment.id)

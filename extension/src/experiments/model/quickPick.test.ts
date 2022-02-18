@@ -1,4 +1,5 @@
 import { QuickPickItemKind } from 'vscode'
+import { ExperimentWithCheckpoints } from '.'
 import { pickExperiments } from './quickPicks'
 import { quickPickLimitedValues } from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
@@ -65,7 +66,7 @@ describe('pickExperiments', () => {
     )
   })
 
-  it('should spend separators to the quick pick when there are checkpoints', async () => {
+  it('should send separators containing the experiment name to the quick pick when there are checkpoints', async () => {
     const selectedExperiment = {
       displayNameOrParent: '[exp-2]',
       id: 'exp-2',
@@ -113,7 +114,7 @@ describe('pickExperiments', () => {
           ...mockedExp2,
           checkpoints: [mockedExp2Checkpoint1, mockedExp2Checkpoint2]
         }
-      ] as (Experiment & { checkpoints?: Experiment[] })[],
+      ] as ExperimentWithCheckpoints[],
       true
     )
 
