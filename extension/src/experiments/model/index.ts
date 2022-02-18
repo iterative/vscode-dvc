@@ -203,10 +203,6 @@ export class ExperimentsModel {
     return [...filteredExperiments, ...filteredCheckpoints]
   }
 
-  public setSelectedToFilters() {
-    this.setSelected(this.getFilteredExperiments())
-  }
-
   public getExperiments(): (Experiment & {
     hasChildren: boolean
     selected?: boolean
@@ -364,8 +360,11 @@ export class ExperimentsModel {
 
   private setStatus() {
     if (this.useFiltersForSelection) {
-      // need behaviour for an experiment running could spill over 6 - might want to turn off auto apply when running
-      this.setSelectedToFilters()
+      // need behaviour for an experiment running could spill over 6
+      // - might want to turn off auto apply when running
+      // go straight to turning off and selecting 6 most recent which is close to what collection does
+      // that is what collection should do...
+      this.setSelected(this.getFilteredExperiments())
       return
     }
     this.status = collectStatuses(
@@ -416,7 +415,7 @@ export class ExperimentsModel {
   private applyAndPersistFilters() {
     // can only get in here from add or remove, block higher
     if (this.useFiltersForSelection) {
-      this.setSelectedToFilters()
+      this.setSelected(this.getFilteredExperiments())
     }
     return this.workspaceState.update(
       MementoPrefix.EXPERIMENTS_FILTER_BY + this.dvcRoot,

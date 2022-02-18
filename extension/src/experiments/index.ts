@@ -240,7 +240,7 @@ export class Experiments extends BaseRepository<TableData> {
           Response.NEVER
         )
 
-        if (response === Response.CANCEL) {
+        if (!response || response === Response.CANCEL) {
           return
         }
 

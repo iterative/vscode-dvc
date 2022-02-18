@@ -94,7 +94,8 @@ describe('ExperimentsModel', () => {
     ])
 
     experimentsModel.setSelectionMode(true)
-    experimentsModel.setSelectedToFilters()
+
+    experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
     expect(experimentsModel.getSelectedExperiments()).toEqual([])
 
     const unfilteredCheckpoint = buildTestExperiment(
@@ -153,7 +154,7 @@ describe('ExperimentsModel', () => {
     })
 
     experimentsModel.setSelectionMode(true)
-    experimentsModel.setSelectedToFilters()
+    experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
 
     expect(experimentsModel.getSelectedRevisions()).toEqual([
       expect.objectContaining({
