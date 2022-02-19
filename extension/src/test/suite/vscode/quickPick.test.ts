@@ -1,6 +1,6 @@
 import { window } from 'vscode'
-import { stub } from 'sinon'
-import { afterEach, describe, it, suite } from 'mocha'
+import { restore, stub } from 'sinon'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { Disposable } from '../../../extension'
 import {
@@ -12,6 +12,10 @@ import { selectQuickPickItem } from '../util'
 
 suite('Quick Pick Test Suite', () => {
   const disposable = Disposable.fn()
+
+  beforeEach(() => {
+    restore()
+  })
 
   afterEach(() => {
     disposable.dispose()
