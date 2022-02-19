@@ -58,7 +58,9 @@ export const quickPickInitialized = (
         ...options,
         onDidSelectItem: (item: unknown) => {
           resolve(item)
-          options?.onDidSelectItem
+          if (options?.onDidSelectItem) {
+            options.onDidSelectItem(item)
+          }
         }
       })
     )
