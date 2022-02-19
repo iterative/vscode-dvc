@@ -206,12 +206,12 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async selectExperiments() {
-    const experiments = this.experiments.getExperiments()
+    const experiments = this.experiments.getExperimentsWithCheckpoints()
 
-    // need this to limit to 6,
-    // as a start could de-select all checkpoints, if not need to revisit the UI
-    // use quickPick to limit amount of selectedItems can use createQuickPick, selectedItems and onDidChangeSelection
-    const selected = await pickExperiments(experiments)
+    const selected = await pickExperiments(
+      experiments,
+      this.checkpoints.hasCheckpoints()
+    )
     if (!selected) {
       return
     }
