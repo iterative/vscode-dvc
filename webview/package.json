@@ -19,6 +19,8 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@tippyjs/react": "^4.2.6",
+    "add": "^2.0.6",
     "classnames": "^2.2.6",
     "react": "^17.0.1",
     "react-beautiful-dnd": "^13.1.0",
@@ -26,7 +28,8 @@
     "react-table": "^7.7.0",
     "react-vega": "^7.4.4",
     "vega": "^5.21.0",
-    "vega-lite": "^5.2.0"
+    "vega-lite": "^5.2.0",
+    "yarn": "^1.22.17"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
