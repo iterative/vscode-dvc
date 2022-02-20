@@ -41,6 +41,7 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
     onClick?.()
     onClickNode && canShowOnClickNode && setShowOnClickNode(true)
   }
+
   const onClickElseWhere = () => {
     setShowTooltip(false)
     onClickNode && setShowOnClickNode(false)
@@ -52,22 +53,18 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
   const onMouseLeave = () => {
     setShowTooltip(false)
   }
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) =>
-    e.key === 'Enter' && onClickItem()
 
   const classes = cx(styles.item, { [styles.last]: last })
 
   return (
     <li>
-      <div
+      <button
         className={classes}
-        role="button"
         tabIndex={index}
         onClick={onClickItem}
         onBlur={onClickElseWhere}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        onKeyDown={onKeyDown}
         data-testid="icon-menu-item"
       >
         <Icon icon={icon} data-testid="icon-menu-item-icon" width={15} />
@@ -84,7 +81,7 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
             </HoverMenu>
           )}
         </div>
-      </div>
+      </button>
     </li>
   )
 }

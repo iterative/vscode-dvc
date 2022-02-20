@@ -182,19 +182,6 @@ describe('IconMenuItem', () => {
     expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
 
-  it('should call the onClick prop on enter key down event', () => {
-    const onClickSpy = jest.fn()
-    renderItem({ ...item, onClick: onClickSpy })
-
-    fireEvent.keyDown(screen.getByTestId('icon-menu-item'), {
-      bubbles: true,
-      cancelable: true,
-      key: 'Enter'
-    })
-
-    expect(onClickSpy).toHaveBeenCalledTimes(1)
-  })
-
   it('should not call the onClick prop on any other key down event', () => {
     const onClickSpy = jest.fn()
     renderItem({ ...item, onClick: onClickSpy })
