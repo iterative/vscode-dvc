@@ -255,7 +255,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
       mockShowQuickPick
         .onFirstCall()
         .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
         .onSecondCall()
         .resolves({ value: filter.operator } as unknown as QuickPickItem)
       mockShowInputBox.resolves(filter.value)
