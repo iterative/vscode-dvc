@@ -138,8 +138,11 @@ export class ExperimentsModel {
       return true
     }
 
-    const filters = this.getRemainingFilters(...filterIdsToRemove)
-    const filteredExperiments = this.getFilteredExperiments(filters)
+    const filters = new Map(this.filters)
+    filterIdsToRemove.forEach(id => filters.delete(id))
+    const filteredExperiments = this.getFilteredExperiments([
+      ...filters.values()
+    ])
     return filteredExperiments.length <= MAX_SELECTED_EXPERIMENTS
   }
 
@@ -546,11 +549,5 @@ export class ExperimentsModel {
   ): experiment is SelectedExperimentWithColor {
     const { id, displayColor } = experiment
     return !!(displayColor && this.isSelected(id))
-  }
-
-  private getRemainingFilters(...ids: string[]) {
-    const filters = new Map(this.filters)
-    ids.forEach(id => filters.delete(id))
-    return [...filters.values()]
   }
 }
