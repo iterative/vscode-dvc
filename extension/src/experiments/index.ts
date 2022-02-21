@@ -12,6 +12,7 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
+import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
@@ -26,8 +27,6 @@ import {
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
-import { getConfigValue, setUserConfigValue } from '../vscode/config'
-import { ReportLevel, reportWithOptions } from '../vscode/reporting'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -353,7 +352,7 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    const response = await this.getUserApplyFilterResponse(
+    const response = await askToDisableAutoApplyFilters(
       'Auto apply filters to experiment selection is currently active. Too many experiments would be selected by removing the selected the filter(s), how would you like to proceed?',
       Response.TURN_OFF
     )
@@ -366,7 +365,7 @@ export class Experiments extends BaseRepository<TableData> {
   private async warnAndDoNotAutoApply(filteredExperiments: Experiment[]) {
     this.experiments.setSelectionMode(false)
 
-    const response = await this.getUserApplyFilterResponse(
+    const response = await askToDisableAutoApplyFilters(
       'Too many experiments would be selected by applying the current filter(s), how would you like to proceed?',
       Response.SELECT_MOST_RECENT
     )
@@ -374,34 +373,5 @@ export class Experiments extends BaseRepository<TableData> {
     if (response === Response.SELECT_MOST_RECENT) {
       this.experiments.setSelected(filteredExperiments)
     }
-  }
-
-  private async getUserApplyFilterResponse(
-    title: string,
-    option: Response
-  ): Promise<Response | undefined> {
-    const DO_NOT_SHOW_UNABLE_TO_FILTER = 'dvc.doNotShowUnableToFilter'
-
-    if (getConfigValue<boolean>(DO_NOT_SHOW_UNABLE_TO_FILTER)) {
-      return
-    }
-
-    const response = await reportWithOptions(
-      ReportLevel.WARNING,
-      title,
-      Response.CANCEL,
-      option,
-      Response.NEVER
-    )
-
-    if (!response || response === Response.CANCEL) {
-      return Response.CANCEL
-    }
-
-    if (response === Response.NEVER) {
-      setUserConfigValue(DO_NOT_SHOW_UNABLE_TO_FILTER, true)
-    }
-
-    return response
   }
 }
