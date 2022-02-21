@@ -17,7 +17,13 @@ import {
   copyOriginalExperimentColors
 } from './colors'
 import { collectColors, Colors } from './colors/collect'
-import { canSelect, MAX_SELECTED_EXPERIMENTS, Status, Statuses } from './status'
+import {
+  canSelect,
+  getMaxSelected,
+  MAX_SELECTED_EXPERIMENTS,
+  Status,
+  Statuses
+} from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -187,6 +193,11 @@ export class ExperimentsModel {
   }
 
   public setSelected(experiments: Experiment[]) {
+    if (experiments.length > MAX_SELECTED_EXPERIMENTS) {
+      experiments = getMaxSelected(experiments)
+      this.setSelectionMode(false)
+    }
+
     const selected = experiments.map(exp => exp.id)
 
     this.status = this.getCombinedList().reduce((acc, { id }) => {
@@ -432,7 +443,6 @@ export class ExperimentsModel {
   }
 
   private applyAndPersistFilters() {
-    // can only get in here from add or remove, block higher
     if (this.useFiltersForSelection) {
       this.setSelected(this.getFilteredExperiments())
     }
