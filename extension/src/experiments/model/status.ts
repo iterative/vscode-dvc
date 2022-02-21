@@ -24,7 +24,7 @@ const getEpoch = (timestamp: string | null | undefined) =>
 const compareTimestamps = (a: Experiment, b: Experiment) =>
   getEpoch(b.timestamp) - getEpoch(a.timestamp)
 
-export const getMaxSelected = (experiments: Experiment[]) =>
+export const limitToMaxSelected = (experiments: Experiment[]) =>
   experiments
     .sort((a, b) => {
       if (a.running === b.running) {

@@ -1,4 +1,4 @@
-import { canSelect, getMaxSelected } from './status'
+import { canSelect, limitToMaxSelected } from './status'
 import { Experiment } from '../webview/contract'
 
 describe('canSelect', () => {
@@ -19,7 +19,7 @@ describe('canSelect', () => {
   })
 })
 
-describe('getMaxSelected', () => {
+describe('limitToMaxSelected', () => {
   const mockedExperiments = [
     { id: '1', label: 'A' },
     { id: '2', label: 'B', timestamp: null },
@@ -34,7 +34,7 @@ describe('getMaxSelected', () => {
 
   it('should return the first 6 selected by timestamp', () => {
     expect(
-      getMaxSelected(mockedExperiments)
+      limitToMaxSelected(mockedExperiments)
         .map(({ label }) => label)
         .sort()
     ).toEqual(['D', 'E', 'F', 'G', 'H', 'I'])
@@ -42,7 +42,7 @@ describe('getMaxSelected', () => {
 
   it('should give running experiments precedence', () => {
     expect(
-      getMaxSelected([
+      limitToMaxSelected([
         ...mockedExperiments,
         { id: '1', label: 'R', running: true }
       ])

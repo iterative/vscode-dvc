@@ -19,7 +19,7 @@ import {
 import { collectColors, Colors } from './colors/collect'
 import {
   canSelect,
-  getMaxSelected,
+  limitToMaxSelected,
   Status,
   Statuses,
   tooManySelected
@@ -194,7 +194,7 @@ export class ExperimentsModel {
 
   public setSelected(experiments: Experiment[]) {
     if (tooManySelected(experiments)) {
-      experiments = getMaxSelected(experiments)
+      experiments = limitToMaxSelected(experiments)
       this.setSelectionMode(false)
     }
 
