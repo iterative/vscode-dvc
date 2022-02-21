@@ -39,4 +39,16 @@ describe('askToDisableAutoApplyFilters', () => {
     expect(response).toEqual(Response.NEVER)
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
   })
+
+  it('should return cancel when the user dismisses the toast', async () => {
+    mockedGetConfigValue.mockReturnValueOnce(undefined)
+    mockedReportWithOptions.mockResolvedValueOnce(undefined)
+
+    const response = await askToDisableAutoApplyFilters(
+      'Can we turn off auto apply filters?',
+      Response.TURN_OFF
+    )
+    expect(response).toEqual(Response.CANCEL)
+    expect(mockedSetUserConfigValue).not.toBeCalled()
+  })
 })
