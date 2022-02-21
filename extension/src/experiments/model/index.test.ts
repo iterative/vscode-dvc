@@ -10,6 +10,7 @@ import outputFixture from '../../test/fixtures/expShow/output'
 import rowsFixture from '../../test/fixtures/expShow/rows'
 import { buildMockMemento } from '../../test/util'
 import { joinMetricOrParamPath } from '../metricsAndParams/paths'
+import { Experiment } from '../webview/contract'
 
 jest.mock('vscode')
 
@@ -188,5 +189,40 @@ describe('ExperimentsModel', () => {
         label: '4includ'
       })
     ])
+  })
+
+  it('should always limit the number of selected experiments to 6', async () => {
+    const experimentsModel = new ExperimentsModel('', buildMockMemento())
+
+    await experimentsModel.transformAndSet({
+      testBranch: {
+        baseline: buildTestExperiment(2, undefined, 'testBranch'),
+        exp1: buildTestExperiment(0, 'tip'),
+        exp2: buildTestExperiment(0, 'tip'),
+        exp3: buildTestExperiment(0, 'tip'),
+        exp4: buildTestExperiment(0, 'tip'),
+        exp5: buildTestExperiment(0, 'tip'),
+        tip: buildTestExperiment(0, 'tip', runningExperiment)
+      },
+      workspace: {
+        baseline: buildTestExperiment(3)
+      }
+    })
+
+    experimentsModel.setSelectionMode(true)
+
+    experimentsModel.setSelected([
+      { id: 'exp1' },
+      { id: 'exp2' },
+      { id: 'exp3' },
+      { id: 'exp4' },
+      { id: 'exp5' },
+      { id: 'testBranch' },
+      { id: 'tip' },
+      { id: 'workspace' }
+    ] as Experiment[])
+    expect(experimentsModel.getSelectedRevisions()).toHaveLength(6)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((experimentsModel as any).useFiltersForSelection).toBe(false)
   })
 })
