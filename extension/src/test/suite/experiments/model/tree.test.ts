@@ -251,10 +251,8 @@ suite('Experiments Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should warn the user if enabling dvc.views.experimentsTree.autoApplyFilters would select too many experiments', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, experiments, plotsModel, messageSpy, mockPlotsDiff } =
+        await buildPlots(disposable, plotsDiffFixture)
 
       await plots.showWebview()
       const initiallySelectedRevisions = plotsModel.getSelectedRevisionDetails()
@@ -272,9 +270,13 @@ suite('Experiments Tree Test Suite', () => {
 
       messageSpy.resetHistory()
 
+      const firstUpdateEvent = experimentsUpdatedEvent(experiments)
+
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
       )
+
+      await firstUpdateEvent
 
       expect(
         getFirstArgOfLastCall(setSelectionModeSpy),
@@ -291,9 +293,13 @@ suite('Experiments Tree Test Suite', () => {
       setSelectionModeSpy.resetHistory()
       messageSpy.resetHistory()
 
+      const secondUpdateEvent = experimentsUpdatedEvent(experiments)
+
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
       )
+
+      await secondUpdateEvent
 
       expect(
         getFirstArgOfLastCall(setSelectionModeSpy),
@@ -310,6 +316,10 @@ suite('Experiments Tree Test Suite', () => {
         { displayColor: '#f14c4c', revision: '1ee5f2e' },
         { displayColor: '#3794ff', revision: '2173124' }
       ])
+      expect(
+        mockPlotsDiff,
+        'the missing revisions have been requested'
+      ).to.be.calledWithExactly(dvcDemoPath, '1ee5f2e', '2173124', 'd1343a8')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should automatically apply filters to experiments selection if dvc.experiments.filter.selected has been set via dvc.views.experimentsTree.autoApplyFilters', async () => {
