@@ -299,11 +299,6 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.calledWith(expectedMessage)
       messageSpy.resetHistory()
 
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS
-      )
-      expect(setSelectionModeSpy).to.be.calledOnceWith(false)
-
       const tableFilterRemoved = experimentsUpdatedEvent(experiments)
 
       await commands.executeCommand(
@@ -311,6 +306,10 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       await tableFilterRemoved
+      expect(
+        setSelectionModeSpy,
+        'auto apply filters is automatically disabled when all filters are removed from the tree'
+      ).to.be.calledOnceWith(false)
 
       expect(
         messageSpy,

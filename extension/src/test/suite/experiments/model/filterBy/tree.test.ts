@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, QuickPickItem } from 'vscode'
+import { window, commands, QuickPickItem, MessageItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
 import columnsFixture from '../../../../fixtures/expShow/columns'
 import rowsFixture from '../../../../fixtures/expShow/rows'
@@ -18,6 +18,8 @@ import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
 import { TableData } from '../../../../../experiments/webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
+import { Response } from '../../../../../vscode/response'
+import { ExperimentsModel } from '../../../../../experiments/model'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -228,6 +230,88 @@ suite('Experiments Filter By Tree Test Suite', () => {
       )
 
       expect(mockShowInputBox).not.to.be.called
+    })
+
+    it('should prompt the user when auto apply filters is enabled and removing a filter will select too many experiments', async () => {
+      const mockShowQuickPick = stub(window, 'showQuickPick')
+      const mockShowInputBox = stub(window, 'showInputBox')
+
+      const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
+
+      const loss = columnsFixture.find(
+        metricOrParam => metricOrParam.path === lossPath
+      )
+
+      const filter = {
+        operator: Operator.EQUAL,
+        path: lossPath,
+        value: '0'
+      }
+
+      mockShowQuickPick
+        .onFirstCall()
+        .resolves({ value: loss } as unknown as QuickPickItem)
+      mockShowQuickPick
+        .onSecondCall()
+        .resolves({ value: filter.operator } as unknown as QuickPickItem)
+      mockShowInputBox.resolves(filter.value)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getFocusedOrOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
+      )
+
+      const setSelectionModeSpy = spy(
+        ExperimentsModel.prototype,
+        'setSelectionMode'
+      )
+
+      const mockShowWarningMessage = stub(window, 'showWarningMessage')
+        .onFirstCall()
+        .resolves(Response.CANCEL as unknown as MessageItem)
+        .onSecondCall()
+        .resolves(Response.TURN_OFF as unknown as MessageItem)
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: getFilterId(filter)
+        }
+      )
+
+      expect(
+        mockShowWarningMessage,
+        'no further action is taken when the user cancels'
+      ).to.be.calledOnce
+      expect(setSelectionModeSpy).not.to.be.called
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: getFilterId(filter)
+        }
+      )
+
+      expect(
+        mockShowWarningMessage,
+        'auto apply filters is turned off when the user selects turn off'
+      ).to.be.calledTwice
+      expect(setSelectionModeSpy).to.be.calledOnce
+      expect(setSelectionModeSpy).to.be.calledWith(false)
     })
 
     it('should handle the user exiting from the choose repository quick pick', async () => {
