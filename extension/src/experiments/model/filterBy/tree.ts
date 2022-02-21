@@ -122,12 +122,15 @@ export class ExperimentsFilterByTree
       return
     }
 
+    this.experiments.getRepository(element).autoApplyFilters(false)
     const filters = await this.getChildren(element)
     filters.map(filter => this.removeFilter(filter as FilterItem))
   }
 
   private removeFilter(filter: FilterItem) {
-    this.experiments.getRepository(filter.dvcRoot).removeFilter(filter.id)
+    return this.experiments
+      .getRepository(filter.dvcRoot)
+      .removeFilter(filter.id)
   }
 
   private isRoot(element: string | FilterItem): element is string {

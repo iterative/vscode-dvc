@@ -7,12 +7,12 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { MAX_SELECTED_EXPERIMENTS } from './model/status'
+import { getMaxSelected, MAX_SELECTED_EXPERIMENTS } from './model/status'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
-import { TableData } from './webview/contract'
+import { Experiment, TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
@@ -25,9 +25,9 @@ import {
 } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
-import { reportWarningWithOptions } from '../vscode/reporting'
 import { Response } from '../vscode/response'
-import { setUserConfigValue } from '../vscode/config'
+import { getConfigValue, setUserConfigValue } from '../vscode/config'
+import { reportWarningWithOptions } from '../vscode/reporting'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -190,9 +190,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public removeFilter(id: string) {
-    // if auto apply is being used need to calculate the number of experiments that will be selected
-    // and pop a warning if > 6
+  public async removeFilter(id: string) {
+    const response = await this.checkAutoApplyFilters(id)
+    if (response === Response.CANCEL) {
+      return
+    }
+
     if (this.experiments.removeFilter(id)) {
       return this.notifyChanged()
     }
@@ -200,12 +203,17 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async removeFilters() {
     const filters = this.experiments.getFilters()
-    // if auto apply is being used need to calculate the number of experiments that will be selected and pop a warning if > 6
-    const filtersToRemove = await pickFiltersToRemove(filters)
-    if (!filtersToRemove) {
+    const filterIdsToRemove = await pickFiltersToRemove(filters)
+    if (!filterIdsToRemove) {
       return
     }
-    this.experiments.removeFilters(filtersToRemove)
+
+    const response = await this.checkAutoApplyFilters(...filterIdsToRemove)
+    if (response === Response.CANCEL) {
+      return
+    }
+
+    this.experiments.removeFilters(filterIdsToRemove)
     return this.notifyChanged()
   }
 
@@ -225,40 +233,13 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   public async autoApplyFilters(useFilters: boolean) {
     this.experiments.setSelectionMode(useFilters)
 
     if (useFilters) {
       const filteredExperiments = this.experiments.getFilteredExperiments()
       if (filteredExperiments.length > MAX_SELECTED_EXPERIMENTS) {
-        this.experiments.setSelectionMode(false)
-        const response = await reportWarningWithOptions(
-          'Too many experiments would be selected by applying the current filter(s), how would you like to proceed?',
-          Response.CANCEL,
-          'Select the 6 most recent',
-          Response.NEVER
-        )
-
-        if (!response || response === Response.CANCEL) {
-          return
-        }
-
-        if (response === Response.NEVER) {
-          setUserConfigValue('dvc.doNotShowUnableToFilter', true)
-          return
-        }
-
-        if (response === 'Select the 6 most recent') {
-          const firstSix = filteredExperiments
-            .sort(
-              (a, b) =>
-                new Date(b.timestamp || 0).getTime() -
-                new Date(a.timestamp || 0).getTime()
-            )
-            .slice(0, MAX_SELECTED_EXPERIMENTS)
-          this.experiments.setSelected(firstSix)
-        }
+        await this.warnAndDoNotAutoApply(filteredExperiments)
       } else {
         this.experiments.setSelected(filteredExperiments)
       }
@@ -365,5 +346,62 @@ export class Experiments extends BaseRepository<TableData> {
         }
       })
     )
+  }
+
+  private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
+    if (this.experiments.canAutoApplyFilters(...filterIdsToRemove)) {
+      return
+    }
+
+    const response = await this.getUserApplyFilterResponse(
+      'Auto apply filters to experiment selection is currently active. Too many experiments would be selected by removing the selected the filter(s), how would you like to proceed?',
+      Response.TURN_OFF
+    )
+    if (response !== Response.CANCEL) {
+      this.autoApplyFilters(false)
+    }
+    return response
+  }
+
+  private async warnAndDoNotAutoApply(filteredExperiments: Experiment[]) {
+    this.experiments.setSelectionMode(false)
+
+    const response = await this.getUserApplyFilterResponse(
+      'Too many experiments would be selected by applying the current filter(s), how would you like to proceed?',
+      Response.SELECT_MOST_RECENT
+    )
+
+    if (response === Response.SELECT_MOST_RECENT) {
+      const maxSelected = getMaxSelected(filteredExperiments)
+      this.experiments.setSelected(maxSelected)
+    }
+  }
+
+  private async getUserApplyFilterResponse(
+    title: string,
+    option: Response
+  ): Promise<Response | undefined> {
+    const DO_NOT_SHOW_UNABLE_TO_FILTER = 'dvc.doNotShowUnableToFilter'
+
+    if (getConfigValue<boolean>(DO_NOT_SHOW_UNABLE_TO_FILTER)) {
+      return
+    }
+
+    const response = await reportWarningWithOptions(
+      title,
+      Response.CANCEL,
+      option,
+      Response.NEVER
+    )
+
+    if (!response || response === Response.CANCEL) {
+      return Response.CANCEL
+    }
+
+    if (response === Response.NEVER) {
+      setUserConfigValue(DO_NOT_SHOW_UNABLE_TO_FILTER, true)
+    }
+
+    return response
   }
 }

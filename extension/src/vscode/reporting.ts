@@ -1,9 +1,17 @@
 import { window } from 'vscode'
+import { Response } from './response'
+
+const reportWithOptions = (
+  level: 'Error' | 'Warning',
+  message: string,
+  ...items: Response[]
+) => window[`show${level}Message`](message, ...items)
 
 export const reportErrorWithOptions = (
   message: string,
-  ...items: string[]
-): Thenable<string | undefined> => window.showErrorMessage(message, ...items)
+  ...items: Response[]
+): Thenable<Response | undefined> =>
+  reportWithOptions('Error', message, ...items)
 
 export const reportError = (message: string): Promise<undefined> => {
   window.showErrorMessage(message)
@@ -19,5 +27,6 @@ export const reportOutput = async (
 
 export const reportWarningWithOptions = (
   message: string,
-  ...items: string[]
-): Thenable<string | undefined> => window.showWarningMessage(message, ...items)
+  ...items: Response[]
+): Thenable<Response | undefined> =>
+  reportWithOptions('Warning', message, ...items)

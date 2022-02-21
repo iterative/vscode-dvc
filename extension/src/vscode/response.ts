@@ -6,6 +6,8 @@ export enum Response {
   MOVE = 'Move',
   NEVER = "Don't Show Again",
   NO = 'No',
+  SELECT_MOST_RECENT = 'Select Most Recent',
   SHOW = 'Show',
+  TURN_OFF = 'Turn Off',
   YES = 'Yes'
 }

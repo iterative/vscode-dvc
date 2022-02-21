@@ -1,3 +1,5 @@
+import { Experiment } from '../webview/contract'
+
 export const MAX_SELECTED_EXPERIMENTS = 6
 
 export enum Status {
@@ -12,3 +14,16 @@ const getSelectedCount = (status: Statuses): number =>
 
 export const canSelect = (status: Statuses): boolean =>
   getSelectedCount(status) < MAX_SELECTED_EXPERIMENTS
+
+export const getMaxSelected = (experiments: Experiment[]) =>
+  experiments
+    .sort((a, b) => {
+      if (a.running === b.running) {
+        return (
+          new Date(b.timestamp || 0).getTime() -
+          new Date(a.timestamp || 0).getTime()
+        )
+      }
+      return a.running ? -1 : 1
+    })
+    .slice(0, MAX_SELECTED_EXPERIMENTS)

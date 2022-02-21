@@ -1,4 +1,4 @@
-import { FilterDefinition, Operator } from '.'
+import { FilterDefinition, getFilterId, Operator } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 import { getInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
@@ -116,16 +116,16 @@ export const pickFilterToAdd = async (
 
 export const pickFiltersToRemove = (
   filters: FilterDefinition[]
-): Thenable<FilterDefinition[] | undefined> => {
+): Thenable<string[] | undefined> => {
   if (!definedAndNonEmpty(filters)) {
     return reportError('There are no filters to remove.')
   }
 
-  return quickPickManyValues<FilterDefinition>(
+  return quickPickManyValues(
     filters.map(filter => ({
       description: [filter.operator, filter.value].join(' '),
       label: filter.path,
-      value: filter
+      value: getFilterId(filter)
     })),
     {
       title: 'Select filter(s) to remove'

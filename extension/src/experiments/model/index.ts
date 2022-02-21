@@ -17,7 +17,7 @@ import {
   copyOriginalExperimentColors
 } from './colors'
 import { collectColors, Colors } from './colors/collect'
-import { canSelect, Status, Statuses } from './status'
+import { canSelect, MAX_SELECTED_EXPERIMENTS, Status, Statuses } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -133,13 +133,23 @@ export class ExperimentsModel {
     return [...this.filters.values()]
   }
 
+  public canAutoApplyFilters(...filterIdsToRemove: string[]): boolean {
+    if (!this.useFiltersForSelection) {
+      return true
+    }
+
+    const filters = this.getRemainingFilters(...filterIdsToRemove)
+    const filteredExperiments = this.getFilteredExperiments(filters)
+    return filteredExperiments.length <= MAX_SELECTED_EXPERIMENTS
+  }
+
   public addFilter(filter: FilterDefinition) {
     this.filters.set(getFilterId(filter), filter)
     this.applyAndPersistFilters()
   }
 
-  public removeFilters(filters: FilterDefinition[]) {
-    filters.map(filter => this.removeFilter(getFilterId(filter)))
+  public removeFilters(filterIds: string[]) {
+    filterIds.map(id => this.removeFilter(id))
   }
 
   public removeFilter(id: string) {
@@ -189,6 +199,10 @@ export class ExperimentsModel {
   public setSelectionMode(useFilters: boolean) {
     setContextValue('dvc.experiments.filter.selected', useFilters)
     this.useFiltersForSelection = useFilters
+  }
+
+  public usingFilters() {
+    return this.useFiltersForSelection
   }
 
   public getFilteredExperiments(filters = this.getFilters()) {
@@ -364,6 +378,8 @@ export class ExperimentsModel {
       // - might want to turn off auto apply when running
       // go straight to turning off and selecting 6 most recent which is close to what collection does
       // that is what collection should do...
+      // remember workspace has no timestamp maybe fill with now? or it will always be last
+      // maybe this is ok too
       this.setSelected(this.getFilteredExperiments())
       return
     }
@@ -530,5 +546,11 @@ export class ExperimentsModel {
   ): experiment is SelectedExperimentWithColor {
     const { id, displayColor } = experiment
     return !!(displayColor && this.isSelected(id))
+  }
+
+  private getRemainingFilters(...ids: string[]) {
+    const filters = new Map(this.filters)
+    ids.forEach(id => filters.delete(id))
+    return [...filters.values()]
   }
 }

@@ -192,12 +192,20 @@ suite('Experiments Filter By Tree Test Suite', () => {
           {
             description: '< 2',
             label: lossPath,
-            value: { operator: '<', path: lossPath, value: '2' }
+            value: getFilterId({
+              operator: Operator.LESS_THAN,
+              path: lossPath,
+              value: '2'
+            })
           },
           {
             description: '> 0',
             label: lossPath,
-            value: { operator: '>', path: lossPath, value: '0' }
+            value: getFilterId({
+              operator: Operator.GREATER_THAN,
+              path: lossPath,
+              value: '0'
+            })
           }
         ],
         { canPickMany: true, title: 'Select filter(s) to remove' }
