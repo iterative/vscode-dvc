@@ -215,10 +215,6 @@ export class ExperimentsModel {
     this.useFiltersForSelection = useFilters
   }
 
-  public usingFilters() {
-    return this.useFiltersForSelection
-  }
-
   public getFilteredExperiments(filters = this.getFilters()) {
     const filteredExperiments = this.getSubRows(this.getExperiments(), filters)
 
