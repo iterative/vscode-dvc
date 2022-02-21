@@ -21,8 +21,8 @@ describe('canSelect', () => {
 
 describe('getMaxSelected', () => {
   const mockedExperiments = [
-    { id: '1', label: 'A', timestamp: '2022-02-20T09:10:50' },
-    { id: '2', label: 'B', timestamp: '2022-02-20T09:10:51' },
+    { id: '1', label: 'A' },
+    { id: '2', label: 'B', timestamp: null },
     { id: '3', label: 'C', timestamp: '2022-02-20T09:10:52' },
     { id: '4', label: 'D', timestamp: '2022-02-20T09:10:53' },
     { id: '5', label: 'E', timestamp: '2022-02-20T09:10:54' },

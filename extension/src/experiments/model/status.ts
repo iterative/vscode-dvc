@@ -15,14 +15,17 @@ const getSelectedCount = (status: Statuses): number =>
 export const canSelect = (status: Statuses): boolean =>
   getSelectedCount(status) < MAX_SELECTED_EXPERIMENTS
 
+const getEpoch = (timestamp: string | null | undefined) =>
+  new Date(timestamp || 0).getTime()
+
+const compareTimestamps = (a: Experiment, b: Experiment) =>
+  getEpoch(b.timestamp) - getEpoch(a.timestamp)
+
 export const getMaxSelected = (experiments: Experiment[]) =>
   experiments
     .sort((a, b) => {
       if (a.running === b.running) {
-        return (
-          new Date(b.timestamp || 0).getTime() -
-          new Date(a.timestamp || 0).getTime()
-        )
+        return compareTimestamps(a, b)
       }
       return a.running ? -1 : 1
     })
