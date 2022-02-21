@@ -20,9 +20,9 @@ import { collectColors, Colors } from './colors/collect'
 import {
   canSelect,
   getMaxSelected,
-  MAX_SELECTED_EXPERIMENTS,
   Status,
-  Statuses
+  Statuses,
+  tooManySelected
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
@@ -149,7 +149,7 @@ export class ExperimentsModel {
     const filteredExperiments = this.getFilteredExperiments([
       ...filters.values()
     ])
-    return filteredExperiments.length <= MAX_SELECTED_EXPERIMENTS
+    return !tooManySelected(filteredExperiments)
   }
 
   public addFilter(filter: FilterDefinition) {
@@ -193,7 +193,7 @@ export class ExperimentsModel {
   }
 
   public setSelected(experiments: Experiment[]) {
-    if (experiments.length > MAX_SELECTED_EXPERIMENTS) {
+    if (tooManySelected(experiments)) {
       experiments = getMaxSelected(experiments)
       this.setSelectionMode(false)
     }

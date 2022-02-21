@@ -15,6 +15,9 @@ const getSelectedCount = (status: Statuses): number =>
 export const canSelect = (status: Statuses): boolean =>
   getSelectedCount(status) < MAX_SELECTED_EXPERIMENTS
 
+export const tooManySelected = (experiments: Experiment[]): boolean =>
+  experiments.length > MAX_SELECTED_EXPERIMENTS
+
 const getEpoch = (timestamp: string | null | undefined) =>
   new Date(timestamp || 0).getTime()
 

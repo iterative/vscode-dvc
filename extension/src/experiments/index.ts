@@ -7,7 +7,7 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { MAX_SELECTED_EXPERIMENTS } from './model/status'
+import { tooManySelected } from './model/status'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
@@ -237,7 +237,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     if (useFilters) {
       const filteredExperiments = this.experiments.getFilteredExperiments()
-      if (filteredExperiments.length > MAX_SELECTED_EXPERIMENTS) {
+      if (tooManySelected(filteredExperiments)) {
         await this.warnAndDoNotAutoApply(filteredExperiments)
       } else {
         this.experiments.setSelected(filteredExperiments)
