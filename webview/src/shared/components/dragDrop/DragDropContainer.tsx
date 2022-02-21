@@ -20,8 +20,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     e.dataTransfer.dropEffect = 'move'
   }
 
-  const handleDragOver = (e: DragEvent<HTMLElement>) =>
-    e.preventDefault()
+  const handleDragOver = (e: DragEvent<HTMLElement>) => e.preventDefault()
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
     const droppedIndex = order.indexOf(e.currentTarget.id)
