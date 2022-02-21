@@ -7,7 +7,7 @@ import {
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/static'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import Plots from '../plots/components/Plots'
+import { Plots } from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'
 
 import './test-vscode-styles.scss'
