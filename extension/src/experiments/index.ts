@@ -7,7 +7,7 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { getMaxSelected, MAX_SELECTED_EXPERIMENTS } from './model/status'
+import { MAX_SELECTED_EXPERIMENTS } from './model/status'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
@@ -372,8 +372,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     if (response === Response.SELECT_MOST_RECENT) {
-      const maxSelected = getMaxSelected(filteredExperiments)
-      this.experiments.setSelected(maxSelected)
+      this.experiments.setSelected(filteredExperiments)
     }
   }
 

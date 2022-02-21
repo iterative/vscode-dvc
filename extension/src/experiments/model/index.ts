@@ -388,13 +388,7 @@ export class ExperimentsModel {
 
   private setStatus() {
     if (this.useFiltersForSelection) {
-      // need behaviour for an experiment running could spill over 6
-      // - might want to turn off auto apply when running
-      // go straight to turning off and selecting 6 most recent which is close to what collection does
-      // that is what collection should do...
-      // remember workspace has no timestamp maybe fill with now? or it will always be last
-      // maybe this is ok too
-      this.setSelected(this.getFilteredExperiments())
+      this.setSelectedToFilters()
       return
     }
     this.status = collectStatuses(
@@ -404,6 +398,11 @@ export class ExperimentsModel {
     )
 
     this.persistStatus()
+  }
+
+  private setSelectedToFilters() {
+    const filteredExperiments = this.getFilteredExperiments()
+    this.setSelected(filteredExperiments)
   }
 
   private async collectColors(data: ExperimentsOutput) {
@@ -444,7 +443,7 @@ export class ExperimentsModel {
 
   private applyAndPersistFilters() {
     if (this.useFiltersForSelection) {
-      this.setSelected(this.getFilteredExperiments())
+      this.setSelectedToFilters()
     }
     return this.workspaceState.update(
       MementoPrefix.EXPERIMENTS_FILTER_BY + this.dvcRoot,
