@@ -27,7 +27,7 @@ import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
 import { getConfigValue, setUserConfigValue } from '../vscode/config'
-import { reportWarningWithOptions } from '../vscode/reporting'
+import { ReportLevel, reportWithOptions } from '../vscode/reporting'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -387,7 +387,8 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    const response = await reportWarningWithOptions(
+    const response = await reportWithOptions(
+      ReportLevel.WARNING,
       title,
       Response.CANCEL,
       option,

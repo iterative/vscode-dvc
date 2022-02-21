@@ -1,5 +1,5 @@
 import { window } from 'vscode'
-import { reportErrorWithOptions, reportOutput } from './reporting'
+import { ReportLevel, reportOutput, reportWithOptions } from './reporting'
 import { Response } from './response'
 
 jest.mock('vscode')
@@ -24,7 +24,7 @@ describe('reportErrorWithOptions', () => {
 
     mockedShowErrorMessage.mockResolvedValueOnce(option1)
 
-    await reportErrorWithOptions(message, option1, option2)
+    await reportWithOptions(ReportLevel.ERROR, message, option1, option2)
 
     expect(mockedShowErrorMessage).toBeCalledTimes(1)
     expect(mockedShowErrorMessage).toBeCalledWith(message, option1, option2)
