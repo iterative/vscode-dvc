@@ -13,17 +13,17 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   disabledDropIds,
   items
 }) => {
-  const handleDragStart = (e: DragEvent<HTMLTableCellElement>) => {
+  const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const id = order.indexOf(e.currentTarget.id).toString()
     e.dataTransfer.setData('itemIndex', id)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
   }
 
-  const handleDragOver = (e: DragEvent<HTMLTableCellElement>) =>
+  const handleDragOver = (e: DragEvent<HTMLElement>) =>
     e.preventDefault()
 
-  const handleOnDrop = (e: DragEvent<HTMLTableCellElement>) => {
+  const handleOnDrop = (e: DragEvent<HTMLElement>) => {
     const droppedIndex = order.indexOf(e.currentTarget.id)
 
     if (!disabledDropIds.includes(order[droppedIndex])) {
