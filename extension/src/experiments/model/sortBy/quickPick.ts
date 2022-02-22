@@ -1,7 +1,7 @@
 import { SortDefinition } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
-import { reportError } from '../../../vscode/reporting'
+import { Toast } from '../../../vscode/toast'
 import { pickFromMetricsAndParams } from '../../metricsAndParams/quickPick'
 import { MetricOrParam } from '../../webview/contract'
 
@@ -32,7 +32,7 @@ export const pickSortsToRemove = (
   sorts: SortDefinition[]
 ): Thenable<SortDefinition[] | undefined> => {
   if (!definedAndNonEmpty(sorts)) {
-    return reportError('There are no sorts to remove.')
+    return Toast.showError('There are no sorts to remove.')
   }
 
   return quickPickManyValues<SortDefinition>(

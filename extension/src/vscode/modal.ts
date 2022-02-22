@@ -1,7 +1,7 @@
 import { window } from 'vscode'
 import { Response } from './response'
 
-export const getWarningResponse = (
+export const warnOfConsequences = (
   text: string,
   ...items: Response[]
 ): Thenable<string | undefined> =>
