@@ -353,7 +353,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     const response = await askToDisableAutoApplyFilters(
-      'Auto apply filters to experiment selection is currently active. Too many experiments would be selected by removing the selected the filter(s), how would you like to proceed?',
+      'Auto apply filters to experiment selection is currently active. Too many experiments would be selected by removing the selected filter(s), how would you like to proceed?',
       Response.TURN_OFF
     )
     if (response !== Response.CANCEL) {
