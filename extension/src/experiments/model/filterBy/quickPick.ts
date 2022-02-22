@@ -2,7 +2,7 @@ import { FilterDefinition, getFilterId, Operator } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 import { getInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
-import { reportError } from '../../../vscode/reporting'
+import { Toast } from '../../../vscode/toast'
 import { pickFromMetricsAndParams } from '../../metricsAndParams/quickPick'
 import { MetricOrParam } from '../../webview/contract'
 
@@ -118,7 +118,7 @@ export const pickFiltersToRemove = (
   filters: FilterDefinition[]
 ): Thenable<string[] | undefined> => {
   if (!definedAndNonEmpty(filters)) {
-    return reportError('There are no filters to remove.')
+    return Toast.showError('There are no filters to remove.')
   }
 
   return quickPickManyValues(
