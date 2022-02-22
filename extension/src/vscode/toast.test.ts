@@ -1,5 +1,5 @@
 import { window } from 'vscode'
-import { errorWithOptions, reportOutput } from './toast'
+import { Toast } from './toast'
 import { Response } from './response'
 
 jest.mock('vscode')
@@ -16,45 +16,49 @@ beforeEach(() => {
 const defaultPath = '/home/user/project'
 const exampleExpName = 'exp-2021'
 
-describe('errorWithOptions', () => {
-  it('should call window showErrorMessage with the correct details', async () => {
-    const message = 'what do you want to do?'
-    const option1 = 'go on' as Response
-    const option2 = 'give up' as Response
+describe('Toast', () => {
+  describe('error', () => {
+    it('should call window showErrorMessage with the correct details', async () => {
+      const message = 'what do you want to do?'
+      const option1 = 'go on' as Response
+      const option2 = 'give up' as Response
 
-    mockedShowErrorMessage.mockResolvedValueOnce(option1)
+      mockedShowErrorMessage.mockResolvedValueOnce(option1)
 
-    await errorWithOptions(message, option1, option2)
+      await Toast.error(message, option1, option2)
 
-    expect(mockedShowErrorMessage).toBeCalledTimes(1)
-    expect(mockedShowErrorMessage).toBeCalledWith(message, option1, option2)
-  })
-})
-
-describe('reportOutput', () => {
-  it('reports the output of the given command', async () => {
-    const mockedExperimentApply = jest.fn()
-    const mockedStdOut = 'I applied your experiment boss'
-    mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
-
-    await reportOutput(mockedExperimentApply(defaultPath, exampleExpName))
-
-    expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
-
-    expect(mockedShowInformationMessage).toBeCalledTimes(1)
-    expect(mockedShowInformationMessage).toBeCalledWith(mockedStdOut)
+      expect(mockedShowErrorMessage).toBeCalledTimes(1)
+      expect(mockedShowErrorMessage).toBeCalledWith(message, option1, option2)
+    })
   })
 
-  it('reports operation successful when no output is returned for the given command', async () => {
-    const mockedExperimentApply = jest.fn()
-    const mockedStdOut = ''
-    mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
+  describe('showOutput', () => {
+    it('reports the output of the given command', async () => {
+      const mockedExperimentApply = jest.fn()
+      const mockedStdOut = 'I applied your experiment boss'
+      mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
 
-    await reportOutput(mockedExperimentApply(defaultPath, exampleExpName))
+      await Toast.showOutput(mockedExperimentApply(defaultPath, exampleExpName))
 
-    expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
+      expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
 
-    expect(mockedShowInformationMessage).toBeCalledTimes(1)
-    expect(mockedShowInformationMessage).toBeCalledWith('Operation successful.')
+      expect(mockedShowInformationMessage).toBeCalledTimes(1)
+      expect(mockedShowInformationMessage).toBeCalledWith(mockedStdOut)
+    })
+
+    it('reports operation successful when no output is returned for the given command', async () => {
+      const mockedExperimentApply = jest.fn()
+      const mockedStdOut = ''
+      mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
+
+      await Toast.showOutput(mockedExperimentApply(defaultPath, exampleExpName))
+
+      expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
+
+      expect(mockedShowInformationMessage).toBeCalledTimes(1)
+      expect(mockedShowInformationMessage).toBeCalledWith(
+        'Operation successful.'
+      )
+    })
   })
 })

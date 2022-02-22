@@ -9,7 +9,7 @@ import { autoRegisteredCommands as CliRunnerCommands } from '../cli/runner'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
-import { errorWithOptions } from '../vscode/toast'
+import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
@@ -121,7 +121,7 @@ export class InternalCommands {
   }
 
   private async offerToShowError() {
-    const response = await errorWithOptions(
+    const response = await Toast.error(
       'Something went wrong, please see the DVC output channel for more details.',
       Response.SHOW,
       Response.CLOSE

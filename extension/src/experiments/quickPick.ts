@@ -1,6 +1,6 @@
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
-import { reportError } from '../vscode/toast'
+import { Toast } from '../vscode/toast'
 
 export const pickExperiment = (
   experiments: {
@@ -11,7 +11,7 @@ export const pickExperiment = (
   }[]
 ): Thenable<{ id: string; name: string } | undefined> | undefined => {
   if (experiments.length === 0) {
-    reportError('There are no experiments to select.')
+    Toast.showError('There are no experiments to select.')
   } else {
     return quickPickValue<{ id: string; name: string }>(
       experiments.map(({ label, displayNameOrParent, id, name }) => ({

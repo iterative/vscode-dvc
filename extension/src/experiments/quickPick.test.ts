@@ -1,11 +1,13 @@
 import { pickGarbageCollectionFlags, pickExperiment } from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
-import { reportError } from '../vscode/toast'
+import { Toast } from '../vscode/toast'
 
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/toast')
 
-const mockedReportError = jest.mocked(reportError)
+const mockedToast = jest.mocked(Toast)
+const mockedShowError = jest.fn()
+mockedToast.showError = mockedShowError
 const mockedQuickPickValue = jest.mocked(quickPickValue)
 const mockedQuickPickManyValues = jest.mocked(quickPickManyValues)
 
@@ -103,7 +105,7 @@ describe('pickExperiment', () => {
 
   it('should call showErrorMessage when no experiment names are provided', async () => {
     await pickExperiment([])
-    expect(mockedReportError).toHaveBeenCalledTimes(1)
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
   })
 })
 

@@ -7,7 +7,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
-import { reportOutput } from '../vscode/toast'
+import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { WorkspacePlots } from '../plots/workspace'
@@ -117,7 +117,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return reportOutput(
+    return Toast.showOutput(
       this.internalCommands.executeCommand(
         AvailableCommands.EXPERIMENT_QUEUE,
         cwd,
@@ -146,7 +146,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!stdout) {
       return
     }
-    return reportOutput(stdout)
+    return Toast.showOutput(stdout)
   }
 
   public getExpNameThenRun = async (commandId: CommandId) => {
@@ -160,7 +160,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!experiment) {
       return
     }
-    return reportOutput(
+    return Toast.showOutput(
       this.internalCommands.executeCommand(commandId, cwd, experiment.name)
     )
   }
@@ -176,7 +176,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     const result = await quickPick()
 
     if (result) {
-      return reportOutput(
+      return Toast.showOutput(
         this.internalCommands.executeCommand(commandId, cwd, ...result)
       )
     }
@@ -198,7 +198,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
     const input = await getInput(title)
     if (input) {
-      return reportOutput(
+      return Toast.showOutput(
         this.internalCommands.executeCommand(
           commandId,
           cwd,
