@@ -1,4 +1,4 @@
-import { FilterDefinition, Operator } from '.'
+import { FilterDefinition, getFilterId, Operator } from '.'
 import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
@@ -151,9 +151,12 @@ describe('pickFiltersToRemove', () => {
       ...selectedFilters,
       { operator: Operator.EQUAL, path: epochsParam.path, value: '4' }
     ]
-    mockedQuickPickManyValues.mockResolvedValueOnce(selectedFilters)
+
+    const selectedIds = selectedFilters.map(filter => getFilterId(filter))
+
+    mockedQuickPickManyValues.mockResolvedValueOnce(selectedIds)
 
     const filtersToRemove = await pickFiltersToRemove(allFilters)
-    expect(filtersToRemove).toEqual(selectedFilters)
+    expect(filtersToRemove).toEqual(selectedIds)
   })
 })

@@ -1,9 +1,16 @@
 import { window } from 'vscode'
+import { Response } from './response'
 
-export const reportErrorWithOptions = (
+export enum ReportLevel {
+  ERROR = 'Error',
+  WARNING = 'Warning'
+}
+
+export const reportWithOptions = (
+  level: ReportLevel,
   message: string,
-  ...items: string[]
-): Thenable<string | undefined> => window.showErrorMessage(message, ...items)
+  ...items: Response[]
+) => window[`show${level}Message`](message, ...items)
 
 export const reportError = (message: string): Promise<undefined> => {
   window.showErrorMessage(message)

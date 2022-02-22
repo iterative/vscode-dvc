@@ -17,7 +17,13 @@ import {
   copyOriginalExperimentColors
 } from './colors'
 import { collectColors, Colors } from './colors/collect'
-import { canSelect, Status, Statuses } from './status'
+import {
+  canSelect,
+  limitToMaxSelected,
+  Status,
+  Statuses,
+  tooManySelected
+} from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -133,13 +139,26 @@ export class ExperimentsModel {
     return [...this.filters.values()]
   }
 
+  public canAutoApplyFilters(...filterIdsToRemove: string[]): boolean {
+    if (!this.useFiltersForSelection) {
+      return true
+    }
+
+    const filters = new Map(this.filters)
+    filterIdsToRemove.forEach(id => filters.delete(id))
+    const filteredExperiments = this.getFilteredExperiments([
+      ...filters.values()
+    ])
+    return !tooManySelected(filteredExperiments)
+  }
+
   public addFilter(filter: FilterDefinition) {
     this.filters.set(getFilterId(filter), filter)
     this.applyAndPersistFilters()
   }
 
-  public removeFilters(filters: FilterDefinition[]) {
-    filters.map(filter => this.removeFilter(getFilterId(filter)))
+  public removeFilters(filterIds: string[]) {
+    filterIds.map(id => this.removeFilter(id))
   }
 
   public removeFilter(id: string) {
@@ -174,6 +193,11 @@ export class ExperimentsModel {
   }
 
   public setSelected(experiments: Experiment[]) {
+    if (tooManySelected(experiments)) {
+      experiments = limitToMaxSelected(experiments)
+      this.setSelectionMode(false)
+    }
+
     const selected = experiments.map(exp => exp.id)
 
     this.status = this.getCombinedList().reduce((acc, { id }) => {
@@ -191,20 +215,16 @@ export class ExperimentsModel {
     this.useFiltersForSelection = useFilters
   }
 
-  public getFilteredExperiments() {
-    const filteredExperiments = this.getSubRows(this.getExperiments())
+  public getFilteredExperiments(filters = this.getFilters()) {
+    const filteredExperiments = this.getSubRows(this.getExperiments(), filters)
 
     const filteredCheckpoints = flatten<Experiment>(
       filteredExperiments.map(
-        ({ id }) => this.getFilteredCheckpointsByTip(id) || []
+        ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
       )
     )
 
     return [...filteredExperiments, ...filteredCheckpoints]
-  }
-
-  public setSelectedToFilters() {
-    this.setSelected(this.getFilteredExperiments())
   }
 
   public getExperiments(): (Experiment & {
@@ -300,10 +320,13 @@ export class ExperimentsModel {
     ]
   }
 
-  private getSubRows(experiments: Experiment[]) {
+  private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
     return experiments
       .map(experiment => {
-        const checkpoints = this.getFilteredCheckpointsByTip(experiment.id)
+        const checkpoints = this.getFilteredCheckpointsByTip(
+          experiment.id,
+          filters
+        )
         if (!checkpoints) {
           return this.addSelected(experiment)
         }
@@ -314,30 +337,33 @@ export class ExperimentsModel {
           }))
         }
       })
-      .filter((row: RowData) => this.filterTableRow(row))
+      .filter((row: RowData) => this.filterTableRow(row, filters))
   }
 
   private findIndexByPath(pathToRemove: string) {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
 
-  private filterTableRow(row: RowData): boolean {
+  private filterTableRow(row: RowData, filters: FilterDefinition[]): boolean {
     const hasUnfilteredCheckpoints = definedAndNonEmpty(row.subRows)
     if (hasUnfilteredCheckpoints) {
       return true
     }
-    if (filterExperiment(this.getFilters(), row)) {
+    if (filterExperiment(filters, row)) {
       return true
     }
     return false
   }
 
-  private getFilteredCheckpointsByTip(sha: string) {
+  private getFilteredCheckpointsByTip(
+    sha: string,
+    filters: FilterDefinition[]
+  ) {
     const checkpoints = this.checkpointsByTip.get(sha)
     if (!checkpoints) {
       return
     }
-    return filterExperiments(this.getFilters(), checkpoints)
+    return filterExperiments(filters, checkpoints)
   }
 
   private getExperimentsByBranch(branch: Experiment) {
@@ -358,7 +384,6 @@ export class ExperimentsModel {
 
   private setStatus() {
     if (this.useFiltersForSelection) {
-      // need behaviour for an experiment running could spill over 6 - might want to turn off auto apply when running
       this.setSelectedToFilters()
       return
     }
@@ -369,6 +394,11 @@ export class ExperimentsModel {
     )
 
     this.persistStatus()
+  }
+
+  private setSelectedToFilters() {
+    const filteredExperiments = this.getFilteredExperiments()
+    this.setSelected(filteredExperiments)
   }
 
   private async collectColors(data: ExperimentsOutput) {
@@ -408,7 +438,6 @@ export class ExperimentsModel {
   }
 
   private applyAndPersistFilters() {
-    // can only get in here from add or remove, block higher
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
     }
