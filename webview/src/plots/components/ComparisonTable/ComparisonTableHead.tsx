@@ -1,8 +1,9 @@
-import React, { DragEvent } from 'react'
+import React from 'react'
 import { ComparisonRevision } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
+import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 
 export type ComparisonTableColumn = ComparisonRevision
 
@@ -19,60 +20,43 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
-  const cols = columns.map(col => col.revision)
-
-  const handleDragStart = (e: DragEvent<HTMLTableCellElement>) => {
-    const id = cols.indexOf(e.currentTarget.id).toString()
-    e.dataTransfer.setData('colIndex', id)
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.dropEffect = 'move'
+  const setOrder = (order: string[]) => {
+    const newOrder = order
+      .map(item => columns.find(col => col.revision === item))
+      .filter(Boolean)
+    setColumnsOrder(newOrder as ComparisonRevision[])
   }
 
-  const handleDragOver = (e: DragEvent<HTMLTableCellElement>) =>
-    e.preventDefault()
-
-  const handleOnDrop = (e: DragEvent<HTMLTableCellElement>) => {
-    const droppedColIndex = cols.indexOf(e.currentTarget.id)
-
-    if (cols[droppedColIndex] !== pinnedColumn) {
-      const draggedColIndex = parseInt(e.dataTransfer.getData('colIndex'), 10)
-      const newColumnOrder = [...columns]
-      const draggedColumn = newColumnOrder[draggedColIndex]
-
-      newColumnOrder.splice(draggedColIndex, 1)
-      newColumnOrder.splice(droppedColIndex, 0, draggedColumn)
-
-      setColumnsOrder(newColumnOrder)
-    }
-  }
+  const items = columns.map(({ revision, displayColor }) => {
+    const isPinned = revision === pinnedColumn
+    return (
+      <th
+        key={revision}
+        id={revision}
+        className={cx(styles.comparisonTableHeader, {
+          [styles.pinnedColumnHeader]: isPinned
+        })}
+      >
+        <ComparisonTableHeader
+          isPinned={isPinned}
+          onClicked={() => setPinnedColumn(revision)}
+          displayColor={displayColor}
+        >
+          {revision}
+        </ComparisonTableHeader>
+      </th>
+    )
+  })
 
   return (
     <thead>
       <tr>
-        {columns.map(({ revision, displayColor }) => {
-          const isPinned = revision === pinnedColumn
-          return (
-            <th
-              key={revision}
-              id={revision}
-              className={cx(styles.comparisonTableHeader, {
-                [styles.pinnedColumnHeader]: isPinned
-              })}
-              draggable={!isPinned}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDrop={handleOnDrop}
-            >
-              <ComparisonTableHeader
-                isPinned={isPinned}
-                onClicked={() => setPinnedColumn(revision)}
-                displayColor={displayColor}
-              >
-                {revision}
-              </ComparisonTableHeader>
-            </th>
-          )
-        })}
+        <DragDropContainer
+          order={columns.map(col => col.revision)}
+          setOrder={setOrder}
+          disabledDropIds={[pinnedColumn]}
+          items={items}
+        />
       </tr>
     </thead>
   )
