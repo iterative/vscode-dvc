@@ -1,14 +1,16 @@
 import { askToDisableAutoApplyFilters } from './toast'
 import { getConfigValue, setUserConfigValue } from '../vscode/config'
-import { reportWithOptions } from '../vscode/reporting'
+import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
 
 jest.mock('../vscode/config')
-jest.mock('../vscode/reporting')
+jest.mock('../vscode/toast')
 
 const mockedGetConfigValue = jest.mocked(getConfigValue)
 const mockedSetUserConfigValue = jest.mocked(setUserConfigValue)
-const mockedReportWithOptions = jest.mocked(reportWithOptions)
+const mockedToast = jest.mocked(Toast)
+const mockedWarnWithOptions = jest.fn()
+mockedToast.warnWithOptions = mockedWarnWithOptions
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -25,12 +27,12 @@ describe('askToDisableAutoApplyFilters', () => {
     expect(response).toBeUndefined()
     expect(mockedGetConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedReportWithOptions).not.toBeCalled()
+    expect(mockedWarnWithOptions).not.toBeCalled()
   })
 
   it("should set the appropriate config option when the user response with Don't Show Again", async () => {
     mockedGetConfigValue.mockReturnValueOnce(undefined)
-    mockedReportWithOptions.mockResolvedValueOnce(Response.NEVER)
+    mockedWarnWithOptions.mockResolvedValueOnce(Response.NEVER)
 
     const response = await askToDisableAutoApplyFilters(
       'Can we turn off auto apply filters?',
@@ -42,7 +44,7 @@ describe('askToDisableAutoApplyFilters', () => {
 
   it('should return cancel when the user dismisses the toast', async () => {
     mockedGetConfigValue.mockReturnValueOnce(undefined)
-    mockedReportWithOptions.mockResolvedValueOnce(undefined)
+    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
     const response = await askToDisableAutoApplyFilters(
       'Can we turn off auto apply filters?',
