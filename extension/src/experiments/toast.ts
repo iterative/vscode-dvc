@@ -12,7 +12,7 @@ export const askToDisableAutoApplyFilters = async (
     return
   }
 
-  const response = await Toast.warn(
+  const response = await Toast.warnWithOptions(
     title,
     Response.CANCEL,
     option,

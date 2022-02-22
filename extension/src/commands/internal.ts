@@ -121,7 +121,7 @@ export class InternalCommands {
   }
 
   private async offerToShowError() {
-    const response = await Toast.error(
+    const response = await Toast.errorWithOptions(
       'Something went wrong, please see the DVC output channel for more details.',
       Response.SHOW,
       Response.CLOSE

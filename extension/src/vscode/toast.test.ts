@@ -17,7 +17,7 @@ const defaultPath = '/home/user/project'
 const exampleExpName = 'exp-2021'
 
 describe('Toast', () => {
-  describe('error', () => {
+  describe('errorWithOptions', () => {
     it('should call window showErrorMessage with the correct details', async () => {
       const message = 'what do you want to do?'
       const option1 = 'go on' as Response
@@ -25,7 +25,7 @@ describe('Toast', () => {
 
       mockedShowErrorMessage.mockResolvedValueOnce(option1)
 
-      await Toast.error(message, option1, option2)
+      await Toast.errorWithOptions(message, option1, option2)
 
       expect(mockedShowErrorMessage).toBeCalledTimes(1)
       expect(mockedShowErrorMessage).toBeCalledWith(message, option1, option2)
