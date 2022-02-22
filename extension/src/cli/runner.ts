@@ -10,7 +10,7 @@ import { setContextValue } from '../vscode/context'
 import { StopWatch } from '../util/time'
 import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
-import { reportError } from '../vscode/reporting'
+import { reportError } from '../vscode/toast'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',

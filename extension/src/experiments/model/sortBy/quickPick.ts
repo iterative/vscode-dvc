@@ -1,7 +1,7 @@
 import { SortDefinition } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
-import { reportError } from '../../../vscode/reporting'
+import { reportError } from '../../../vscode/toast'
 import { pickFromMetricsAndParams } from '../../metricsAndParams/quickPick'
 import { MetricOrParam } from '../../webview/contract'
 

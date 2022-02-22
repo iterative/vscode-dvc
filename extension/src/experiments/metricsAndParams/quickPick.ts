@@ -1,7 +1,7 @@
 import { QuickPickOptions } from 'vscode'
 import { definedAndNonEmpty } from '../../util/array'
 import { quickPickValue } from '../../vscode/quickPick'
-import { reportError } from '../../vscode/reporting'
+import { reportError } from '../../vscode/toast'
 import { MetricOrParam } from '../webview/contract'
 
 export const pickFromMetricsAndParams = (

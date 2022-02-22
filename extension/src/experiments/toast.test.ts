@@ -1,14 +1,14 @@
 import { askToDisableAutoApplyFilters } from './toast'
 import { getConfigValue, setUserConfigValue } from '../vscode/config'
-import { reportWithOptions } from '../vscode/reporting'
+import { report } from '../vscode/toast'
 import { Response } from '../vscode/response'
 
 jest.mock('../vscode/config')
-jest.mock('../vscode/reporting')
+jest.mock('../vscode/toast')
 
 const mockedGetConfigValue = jest.mocked(getConfigValue)
 const mockedSetUserConfigValue = jest.mocked(setUserConfigValue)
-const mockedReportWithOptions = jest.mocked(reportWithOptions)
+const mockedReportWithOptions = jest.mocked(report)
 
 beforeEach(() => {
   jest.resetAllMocks()

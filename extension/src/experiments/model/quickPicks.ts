@@ -7,7 +7,7 @@ import {
   QuickPickItemWithValue,
   quickPickLimitedValues
 } from '../../vscode/quickPick'
-import { reportError } from '../../vscode/reporting'
+import { reportError } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 
 type QuickPickItemAccumulator = {

@@ -7,7 +7,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
-import { reportOutput } from '../vscode/reporting'
+import { reportOutput } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { WorkspacePlots } from '../plots/workspace'

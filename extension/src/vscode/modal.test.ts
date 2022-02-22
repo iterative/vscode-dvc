@@ -1,5 +1,5 @@
 import { window } from 'vscode'
-import { getWarningResponse } from './modal'
+import { warnOfConsequences } from './modal'
 import { Response } from './response'
 
 const mockedWindow = jest.mocked(window)
@@ -14,14 +14,14 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('getWarningResponse', () => {
+describe('warnOfConsequences', () => {
   it('should return the text of the response provided by the user', async () => {
     const userSelection = Response.YES
     const options = [userSelection, Response.NO, Response.NEVER]
 
     mockedShowWarningMessage.mockResolvedValueOnce(Response.YES)
 
-    const response = await getWarningResponse('WHAT DO I DO?', ...options)
+    const response = await warnOfConsequences('WHAT DO I DO?', ...options)
 
     expect(response).toEqual(userSelection)
     expect(mockedShowWarningMessage).toBeCalledTimes(1)
@@ -33,7 +33,7 @@ describe('getWarningResponse', () => {
 
     mockedShowWarningMessage.mockResolvedValueOnce(modalCancelled)
 
-    const response = await getWarningResponse('WHAT DO I DO?', ...options)
+    const response = await warnOfConsequences('WHAT DO I DO?', ...options)
 
     expect(response).toEqual(modalCancelled)
     expect(mockedShowWarningMessage).toBeCalledTimes(1)

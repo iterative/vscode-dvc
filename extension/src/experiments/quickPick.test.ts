@@ -1,9 +1,9 @@
 import { pickGarbageCollectionFlags, pickExperiment } from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
-import { reportError } from '../vscode/reporting'
+import { reportError } from '../vscode/toast'
 
 jest.mock('../vscode/quickPick')
-jest.mock('../vscode/reporting')
+jest.mock('../vscode/toast')
 
 const mockedReportError = jest.mocked(reportError)
 const mockedQuickPickValue = jest.mocked(quickPickValue)

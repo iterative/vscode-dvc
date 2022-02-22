@@ -1,6 +1,6 @@
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
-import { reportError } from '../vscode/reporting'
+import { reportError } from '../vscode/toast'
 
 export const pickExperiment = (
   experiments: {
