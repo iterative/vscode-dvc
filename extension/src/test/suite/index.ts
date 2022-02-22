@@ -38,6 +38,7 @@ export async function run() {
   const mocha = new Mocha({
     checkLeaks: true,
     color: true,
+    reporterOptions: { maxDiffSize: 0 },
     timeout: 4000,
     ui: 'tdd'
   })
