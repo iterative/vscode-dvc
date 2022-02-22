@@ -1,5 +1,5 @@
 import { getConfigValue, setUserConfigValue } from '../vscode/config'
-import { ToastLevel, report } from '../vscode/toast'
+import { warnWithOptions } from '../vscode/toast'
 import { Response } from '../vscode/response'
 
 export const askToDisableAutoApplyFilters = async (
@@ -12,8 +12,7 @@ export const askToDisableAutoApplyFilters = async (
     return
   }
 
-  const response = await report(
-    ToastLevel.WARNING,
+  const response = await warnWithOptions(
     title,
     Response.CANCEL,
     option,

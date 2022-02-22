@@ -1,5 +1,5 @@
 import { window } from 'vscode'
-import { ToastLevel, reportOutput, report } from './toast'
+import { errorWithOptions, reportOutput } from './toast'
 import { Response } from './response'
 
 jest.mock('vscode')
@@ -16,7 +16,7 @@ beforeEach(() => {
 const defaultPath = '/home/user/project'
 const exampleExpName = 'exp-2021'
 
-describe('reportErrorWithOptions', () => {
+describe('errorWithOptions', () => {
   it('should call window showErrorMessage with the correct details', async () => {
     const message = 'what do you want to do?'
     const option1 = 'go on' as Response
@@ -24,7 +24,7 @@ describe('reportErrorWithOptions', () => {
 
     mockedShowErrorMessage.mockResolvedValueOnce(option1)
 
-    await report(ToastLevel.ERROR, message, option1, option2)
+    await errorWithOptions(message, option1, option2)
 
     expect(mockedShowErrorMessage).toBeCalledTimes(1)
     expect(mockedShowErrorMessage).toBeCalledWith(message, option1, option2)
