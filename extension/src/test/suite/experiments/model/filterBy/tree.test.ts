@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, QuickPickItem, MessageItem } from 'vscode'
+import { window, commands, MessageItem } from 'vscode'
+import { addFilterViaQuickInput } from './util'
 import { Disposable } from '../../../../../extension'
 import columnsFixture from '../../../../fixtures/expShow/columns'
 import rowsFixture from '../../../../fixtures/expShow/rows'
@@ -40,13 +41,17 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockShowInputBox = stub(window, 'showInputBox')
-
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.isReady()
       await experiments.showWebview()
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getFocusedOrOnlyOrPickProject'
+      ).returns(dvcDemoPath)
 
       const accuracyPath = joinMetricOrParamPath(
         'metrics',
@@ -60,29 +65,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         value: '0.45'
       }
 
-      const accuracy = columnsFixture.find(
-        metricOrParam => metricOrParam.path === accuracyPath
-      )
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: accuracy } as unknown as QuickPickItem)
-      mockShowQuickPick.onSecondCall().resolves({
-        value: accuracyFilter.operator
-      } as unknown as QuickPickItem)
-      mockShowInputBox.resolves(accuracyFilter.value)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getFocusedOrOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      const tableFilterAdded = experimentsUpdatedEvent(experiments)
-
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
-
-      await tableFilterAdded
+      await addFilterViaQuickInput(experiments, accuracyFilter)
 
       const [workspace, main] = rowsFixture
 
@@ -149,19 +132,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
-
-      const loss = columnsFixture.find(
-        metricOrParam => metricOrParam.path === lossPath
-      )
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: '<' } as unknown as QuickPickItem)
-      mockShowInputBox.resolves('2')
-
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -169,18 +139,29 @@ suite('Experiments Filter By Tree Test Suite', () => {
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
+      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
 
-      mockShowQuickPick.resetHistory()
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: '>' } as unknown as QuickPickItem)
-      mockShowInputBox.resolves('0')
+      await addFilterViaQuickInput(
+        experiments,
+        {
+          operator: Operator.LESS_THAN,
+          path: lossPath,
+          value: '2'
+        },
+        mockShowQuickPick,
+        mockShowInputBox
+      )
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
+      await addFilterViaQuickInput(
+        experiments,
+        {
+          operator: Operator.GREATER_THAN,
+          path: lossPath,
+          value: '0'
+        },
+        mockShowQuickPick,
+        mockShowInputBox
+      )
 
       mockShowQuickPick.resetHistory()
       mockShowQuickPick.onFirstCall().resolves(undefined)
@@ -233,31 +214,16 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should prompt the user when auto apply filters is enabled and removing a filter will select too many experiments', async () => {
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockShowInputBox = stub(window, 'showInputBox')
-
       const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
 
-      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
-
-      const loss = columnsFixture.find(
-        metricOrParam => metricOrParam.path === lossPath
-      )
-
       const filter = {
         operator: Operator.EQUAL,
-        path: lossPath,
+        path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
         value: '0'
       }
-
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-        .onSecondCall()
-        .resolves({ value: filter.operator } as unknown as QuickPickItem)
-      mockShowInputBox.resolves(filter.value)
+      const filterId = getFilterId(filter)
 
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(
@@ -266,7 +232,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
+      await addFilterViaQuickInput(experiments, filter)
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
@@ -287,7 +253,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
         {
           dvcRoot: dvcDemoPath,
-          id: getFilterId(filter)
+          id: filterId
         }
       )
 
@@ -301,7 +267,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
         {
           dvcRoot: dvcDemoPath,
-          id: getFilterId(filter)
+          id: filterId
         }
       )
 
