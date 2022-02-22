@@ -6,11 +6,11 @@ import {
   EventEmitter,
   MessageItem,
   QuickPick,
-  QuickPickItem,
   TreeView,
   TreeViewExpansionEvent,
   window
 } from 'vscode'
+import { addFilterViaQuickInput } from './filterBy/util'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel } from '../../../../experiments/model'
 import { Status } from '../../../../experiments/model/status'
@@ -21,7 +21,6 @@ import { buildPlots, getExpectedLivePlotsData } from '../../plots/util'
 import livePlotsFixture from '../../../fixtures/expShow/livePlots'
 import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
 import expShowFixture from '../../../fixtures/expShow/output'
-import columnsFixture from '../../../fixtures/expShow/columns'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
 import {
@@ -323,8 +322,6 @@ suite('Experiments Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should automatically apply filters to experiments selection if dvc.experiments.filter.selected has been set via dvc.views.experimentsTree.autoApplyFilters', async () => {
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockShowInputBox = stub(window, 'showInputBox')
       const { experiments, plots, messageSpy } = await buildPlots(disposable)
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,
@@ -335,30 +332,11 @@ suite('Experiments Tree Test Suite', () => {
 
       messageSpy.resetHistory()
 
-      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
-
-      const lossFilter = {
+      await addFilterViaQuickInput(experiments, {
         operator: Operator.EQUAL,
-        path: lossPath,
+        path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
         value: '0'
-      }
-
-      const loss = columnsFixture.find(
-        metricOrParam => metricOrParam.path === lossPath
-      )
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick.onSecondCall().resolves({
-        value: lossFilter.operator
-      } as unknown as QuickPickItem)
-      mockShowInputBox.resolves(lossFilter.value)
-
-      const tableFilterAdded = experimentsUpdatedEvent(experiments)
-
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
-
-      await tableFilterAdded
+      })
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
