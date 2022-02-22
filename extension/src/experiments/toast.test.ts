@@ -21,7 +21,7 @@ describe('askToDisableAutoApplyFilters', () => {
     mockedGetConfigValue.mockReturnValueOnce(true)
 
     const response = await askToDisableAutoApplyFilters(
-      'Can we turn off auto apply filters?',
+      'Can we turn off auto-apply filters?',
       Response.TURN_OFF
     )
     expect(response).toBeUndefined()
@@ -35,7 +35,7 @@ describe('askToDisableAutoApplyFilters', () => {
     mockedWarnWithOptions.mockResolvedValueOnce(Response.NEVER)
 
     const response = await askToDisableAutoApplyFilters(
-      'Can we turn off auto apply filters?',
+      'Can we turn off auto-apply filters?',
       Response.TURN_OFF
     )
     expect(response).toEqual(Response.NEVER)
@@ -47,7 +47,7 @@ describe('askToDisableAutoApplyFilters', () => {
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
     const response = await askToDisableAutoApplyFilters(
-      'Can we turn off auto apply filters?',
+      'Can we turn off auto-apply filters?',
       Response.TURN_OFF
     )
     expect(response).toEqual(Response.CANCEL)
