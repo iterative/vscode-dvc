@@ -18,7 +18,7 @@ export class Toast {
     return Promise.resolve(undefined)
   }
 
-  static askShowOrCloseOrNever(message: string): Thenable<string | undefined> {
+  static askShowOrCloseOrNever(message: string) {
     return Toast.infoWithOptions(
       message,
       Response.SHOW,
