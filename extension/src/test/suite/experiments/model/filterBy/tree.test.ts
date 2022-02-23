@@ -213,7 +213,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       expect(mockShowInputBox).not.to.be.called
     })
 
-    it('should prompt the user when auto apply filters is enabled and removing a filter will select too many experiments', async () => {
+    it('should prompt the user when auto-apply filters is enabled and removing a filter will select too many experiments', async () => {
       const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
@@ -273,7 +273,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(
         mockShowWarningMessage,
-        'auto apply filters is turned off when the user selects turn off'
+        'auto-apply filters is turned off when the user selects turn off'
       ).to.be.calledTwice
       expect(setSelectionModeSpy).to.be.calledOnce
       expect(setSelectionModeSpy).to.be.calledWith(false)
