@@ -107,7 +107,7 @@ suite('Experiments Tree Test Suite', () => {
         expect(unSelected).to.equal(Status.UNSELECTED)
         expect(
           setSelectionModeSpy,
-          'de-selecting any experiment disables auto apply filters to experiments selection'
+          'de-selecting any experiment disables auto-apply filters to experiments selection'
         ).to.be.calledOnceWith(false)
         setSelectionModeSpy.resetHistory()
       }
@@ -140,7 +140,7 @@ suite('Experiments Tree Test Suite', () => {
       )
       expect(
         setSelectionModeSpy,
-        'selecting any experiment disables auto apply filters to experiments selection'
+        'selecting any experiment disables auto-apply filters to experiments selection'
       ).to.be.calledOnceWith(false)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -202,7 +202,7 @@ suite('Experiments Tree Test Suite', () => {
       )
       expect(
         setSelectionModeSpy,
-        'auto apply filters to experiment selection is disabled'
+        'auto-apply filters to experiment selection is disabled'
       ).to.be.calledOnceWith(false)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -244,7 +244,7 @@ suite('Experiments Tree Test Suite', () => {
       )
       expect(
         setSelectionModeSpy,
-        'auto apply filters to experiment selection is enabled'
+        'auto-apply filters to experiment selection is enabled'
       ).to.be.calledOnceWith(true)
       messageSpy.resetHistory()
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -279,7 +279,7 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         getFirstArgOfLastCall(setSelectionModeSpy),
-        'auto apply filters to experiment selection is not enabled when the user selects to cancel'
+        'auto-apply filters to experiment selection is not enabled when the user selects to cancel'
       ).to.be.false
       expect(
         messageSpy,
@@ -302,7 +302,7 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         getFirstArgOfLastCall(setSelectionModeSpy),
-        'auto apply filters to experiment selection is not enabled when the user selects to use the most recent'
+        'auto-apply filters to experiment selection is not enabled when the user selects to use the most recent'
       ).to.be.false
       expect(
         plotsModel.getSelectedRevisionDetails(),
@@ -361,7 +361,7 @@ suite('Experiments Tree Test Suite', () => {
       await tableFilterRemoved
       expect(
         setSelectionModeSpy,
-        'auto apply filters is automatically disabled when all filters are removed from the tree'
+        'auto-apply filters is automatically disabled when all filters are removed from the tree'
       ).to.be.calledOnceWith(false)
 
       expect(
