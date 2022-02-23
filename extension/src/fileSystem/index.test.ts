@@ -8,7 +8,8 @@ const {
   findAbsoluteDvcRootPath,
   findDvcRootPaths,
   isDirectory,
-  isSameOrChild
+  isSameOrChild,
+  getModifiedTime
 } = FileSystem
 
 jest.mock('../cli/reader')
@@ -106,5 +107,14 @@ describe('isSameOrChild', () => {
     expect(isSameOrChild(mockedRoot, resolve(mockedRoot, '..', '..'))).toBe(
       false
     )
+  })
+})
+
+describe('getModifiedTime', () => {
+  it('should return a number for a file that exists on the system', () => {
+    const epoch = getModifiedTime(__filename)
+
+    expect(typeof epoch).toBe('number')
+    expect(epoch).toBeGreaterThan(1640995200000)
   })
 })
