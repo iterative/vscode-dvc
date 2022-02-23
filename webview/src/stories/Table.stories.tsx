@@ -21,11 +21,9 @@ const tableData: TableData = {
     ...row,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      selected: experiment.label !== '42b8736',
       subRows: experiment.subRows?.map(checkpoint => ({
         ...checkpoint,
-        running: checkpoint.running || checkpoint.label === '23250b3',
-        selected: experiment.label !== '42b8736'
+        running: checkpoint.running || checkpoint.label === '23250b3'
       }))
     }))
   })),
