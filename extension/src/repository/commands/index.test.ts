@@ -1,13 +1,13 @@
 import { join } from 'path'
 import { Uri } from 'vscode'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
-import { getWarningResponse } from '../../vscode/modal'
+import { warnOfConsequences } from '../../vscode/modal'
 import { CommandId, InternalCommands } from '../../commands/internal'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceRepositories } from '../workspace'
 
 const mockedFunc = jest.fn()
-const mockedGetWarningResponse = jest.mocked(getWarningResponse)
+const mockedGetWarningResponse = jest.mocked(warnOfConsequences)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
@@ -73,7 +73,7 @@ describe('getResourceCommand', () => {
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
-  it('should return a function that calls getWarningResponse if the first function fails with a force prompt', async () => {
+  it('should return a function that calls warnOfConsequences if the first function fails with a force prompt', async () => {
     const stderr = `I deed, but ${TRY_FORCE}`
     const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
@@ -237,7 +237,7 @@ describe('getRootCommand', () => {
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
-  it('should return a function that calls getWarningResponse if the first function fails with a force prompt', async () => {
+  it('should return a function that calls warnOfConsequences if the first function fails with a force prompt', async () => {
     mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
     const stderr = `I deed, but ${TRY_FORCE}`
     const userCancelled = undefined

@@ -79,18 +79,74 @@ export const quickPickOneOrInput = (
     quickPick.show()
   })
 
+const needsCollapse = <T>(
+  quickPick: QuickPick<QuickPickItemWithValue<T>>,
+  maxSelectedItems: number,
+  selectedItems?: readonly QuickPickItemWithValue<T>[]
+): boolean =>
+  quickPick.items.length > maxSelectedItems &&
+  (selectedItems || quickPick.selectedItems).length === maxSelectedItems
+
+const collapse = <T>(
+  quickPick: QuickPick<QuickPickItemWithValue<T>>,
+  selectedItems = quickPick.selectedItems,
+  activeItems = quickPick.activeItems
+): void => {
+  quickPick.items = selectedItems
+  quickPick.selectedItems = selectedItems
+  quickPick.activeItems = activeItems
+}
+
+const needsExpand = <T>(
+  quickPick: QuickPick<QuickPickItemWithValue<T>>,
+  maxSelectedItems: number,
+  selectedItems: readonly QuickPickItemWithValue<T>[]
+): boolean =>
+  quickPick.items.length === maxSelectedItems &&
+  selectedItems.length < maxSelectedItems
+
+const expand = <T>(
+  quickPick: QuickPick<QuickPickItemWithValue<T>>,
+  items: readonly QuickPickItemWithValue<T>[],
+  selectedItems: readonly QuickPickItemWithValue<T>[],
+  activeItems: readonly QuickPickItemWithValue<T>[]
+): void => {
+  quickPick.items = items
+  quickPick.selectedItems = selectedItems
+  quickPick.activeItems = activeItems
+}
+
+const collapseOrExpand = <T>(
+  quickPick: QuickPick<QuickPickItemWithValue<T>>,
+  maxSelectedItems: number,
+  items: readonly QuickPickItemWithValue<T>[],
+  selectedItems: readonly QuickPickItemWithValue<T>[],
+  activeItems = quickPick.activeItems
+) => {
+  if (needsCollapse(quickPick, maxSelectedItems, selectedItems)) {
+    collapse(quickPick, selectedItems, activeItems)
+  }
+  if (needsExpand(quickPick, maxSelectedItems, selectedItems)) {
+    expand(quickPick, items, selectedItems, activeItems)
+  }
+}
+
 const limitSelected = <T>(
   quickPick: QuickPick<QuickPickItemWithValue<T>>,
   maxSelectedItems: number
 ) => {
-  let selected = quickPick.selectedItems
-  quickPick.onDidChangeSelection(selectedItems => {
-    if (selectedItems.length > maxSelectedItems) {
-      quickPick.selectedItems = selected
-    } else {
-      selected = selectedItems
-    }
-  })
+  if (quickPick.items.length <= maxSelectedItems) {
+    return
+  }
+
+  const items = [...quickPick.items]
+  if (needsCollapse(quickPick, maxSelectedItems)) {
+    collapse(quickPick)
+  }
+
+  quickPick.onDidChangeSelection(selectedItems =>
+    collapseOrExpand(quickPick, maxSelectedItems, items, selectedItems)
+  )
 }
 
 export const quickPickLimitedValues = <T>(

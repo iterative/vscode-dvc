@@ -1,13 +1,15 @@
 import { pickFromMetricsAndParams } from './quickPick'
 import { joinMetricOrParamPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
-import { reportError } from '../../vscode/reporting'
+import { Toast } from '../../vscode/toast'
 
 jest.mock('../../vscode/quickPick')
-jest.mock('../../vscode/reporting')
+jest.mock('../../vscode/toast')
 
 const mockedQuickPickValue = jest.mocked(quickPickValue)
-const mockedReportError = jest.mocked(reportError)
+const mockedToast = jest.mocked(Toast)
+const mockedShowError = jest.fn()
+mockedToast.showError = mockedShowError
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -44,7 +46,7 @@ describe('pickFromMetricsAndParams', () => {
       title: "can't pick from no params or metrics"
     })
     expect(picked).toBeUndefined()
-    expect(mockedReportError).toBeCalledTimes(1)
+    expect(mockedShowError).toBeCalledTimes(1)
     expect(mockedQuickPickValue).not.toBeCalled()
   })
 

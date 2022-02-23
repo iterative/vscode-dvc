@@ -88,23 +88,39 @@ suite('Quick Pick Test Suite', () => {
         maxSelectedItems,
         'select up to 3 values'
       )
-      expect(quickPick.selectedItems).to.have.lengthOf(maxSelectedItems)
+
+      expect(
+        quickPick.selectedItems,
+        'the max number of items are selected'
+      ).to.have.lengthOf(maxSelectedItems)
+      expect(
+        quickPick.items,
+        'all items which could be selected are hidden'
+      ).to.have.lengthOf(maxSelectedItems)
 
       const updateEvent = new Promise(resolve =>
         disposable.track(
-          quickPick.onDidChangeSelection(() => resolve(undefined))
+          quickPick.onDidChangeSelection(selectedItems => {
+            if (selectedItems.length < maxSelectedItems) {
+              resolve(undefined)
+            }
+          })
         )
       )
 
-      quickPick.selectedItems = items
-
-      expect(quickPick.selectedItems).to.have.lengthOf.greaterThan(
-        maxSelectedItems
-      )
+      quickPick.selectedItems = items.slice(0, maxSelectedItems - 1)
 
       await updateEvent
 
-      expect(quickPick.selectedItems).to.have.lengthOf(maxSelectedItems)
+      expect(
+        quickPick.selectedItems,
+        'less than the max number of items are selected'
+      ).to.have.lengthOf.lessThan(maxSelectedItems)
+      expect(
+        quickPick.items,
+        'the items are returned to their original state'
+      ).to.deep.equal(items)
+
       quickPick.hide()
 
       expect(await limitedItems).to.be.undefined

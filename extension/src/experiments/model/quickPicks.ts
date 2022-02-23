@@ -7,7 +7,7 @@ import {
   QuickPickItemWithValue,
   quickPickLimitedValues
 } from '../../vscode/quickPick'
-import { reportError } from '../../vscode/reporting'
+import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 
 type QuickPickItemAccumulator = {
@@ -88,7 +88,7 @@ export const pickExperiments = (
   hasCheckpoints: boolean
 ): Promise<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {
-    return reportError('There are no experiments to select.')
+    return Toast.showError('There are no experiments to select.')
   }
 
   const { items, selectedItems } = collectItems(experiments, hasCheckpoints)
