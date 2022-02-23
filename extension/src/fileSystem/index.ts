@@ -21,6 +21,9 @@ export const isDirectory = (path: string): boolean => {
   }
 }
 
+export const getModifiedTime = (path: string): number =>
+  lstatSync(path).mtime.getTime()
+
 export const findDvcSubRootPaths = async (
   cwd: string
 ): Promise<string[] | undefined> => {

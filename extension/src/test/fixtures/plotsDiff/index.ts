@@ -370,7 +370,7 @@ const basicVega = {
   ]
 }
 
-export const getImageData = (baseUrl: string, joinFunc = join) => ({
+const getImageData = (baseUrl: string, joinFunc = join) => ({
   'plots/acc.png': [
     {
       type: PlotsType.IMAGE,
@@ -519,6 +519,8 @@ export const getStaticWebviewMessage = (): StaticPlotsData => ({
   size: PlotSize.REGULAR
 })
 
+export const MOCK_IMAGE_MTIME = 946684800000
+
 export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc?: (...args: string[]) => string
@@ -529,7 +531,7 @@ export const getComparisonWebviewMessage = (
     const revisions = plots.reduce((acc, { url, revisions }) => {
       const revision = revisions?.[0]
       if (revision) {
-        acc[revision] = { url, revision }
+        acc[revision] = { url: `${url}?${MOCK_IMAGE_MTIME}`, revision }
       }
       return acc
     }, {} as ComparisonRevisionData)
