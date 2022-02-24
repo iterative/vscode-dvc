@@ -1,4 +1,4 @@
-import { Configuration } from 'webpack'
+import webpack from 'webpack'
 import webpackConfig from '../webpack.config'
 
 export default {
@@ -25,7 +25,7 @@ export default {
   typescript: {
     reactDocgen: false
   },
-  webpackFinal: (config: Configuration) => {
+  webpackFinal: (config: webpack.Configuration) => {
     return {
       ...config,
       module: webpackConfig.module
