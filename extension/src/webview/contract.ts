@@ -59,7 +59,7 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.INITIALIZED }
   | {
-      type: MessageFromWebviewType.EXPERIMENT_TOGGLED,
+      type: MessageFromWebviewType.EXPERIMENT_TOGGLED
       payload: string
     }
 

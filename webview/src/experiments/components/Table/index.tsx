@@ -5,11 +5,11 @@ import {
   RowData as Experiment,
   TableData
 } from 'dvc/src/experiments/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import ClockIcon from '../../../shared/components/icons/Clock'
 import { sendMessage } from '../../../shared/vscode'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -78,7 +78,12 @@ const FirstCell: React.FC<{
             />
           )}
         </span>
-        <span className={styles.bullet} style={{ color: bulletColor }} onClick={onBulletClick}>
+        <span
+          className={styles.bullet}
+          style={{ color: bulletColor }}
+          onClick={onBulletClick}
+          aria-hidden="true"
+        >
           {cell.row.original.queued && <ClockIcon />}
         </span>
         {cell.isPlaceholder ? null : (
@@ -160,7 +165,11 @@ export const RowContent: React.FC<
       })}
       data-testid={isWorkspace && 'workspace-row'}
     >
-      <FirstCell cell={firstCell} bulletColor={original.displayColor} onBulletClick={toggleExperiment} />
+      <FirstCell
+        cell={firstCell}
+        bulletColor={original.displayColor}
+        onBulletClick={toggleExperiment}
+      />
       {cells.map(cell => {
         const cellId = `${cell.column.id}___${cell.row.id}`
         return (

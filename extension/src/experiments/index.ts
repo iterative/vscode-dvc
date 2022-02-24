@@ -341,7 +341,9 @@ export class Experiments extends BaseRepository<TableData> {
             )
           }
           case MessageFromWebviewType.EXPERIMENT_TOGGLED:
-            return message.payload && this.toggleExperimentStatus(message.payload)
+            return (
+              message.payload && this.toggleExperimentStatus(message.payload)
+            )
           default:
             Logger.error(`Unexpected message: ${message}`)
         }
