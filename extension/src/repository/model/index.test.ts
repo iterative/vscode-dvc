@@ -24,7 +24,7 @@ describe('RepositoryState', () => {
   describe('updateStatus', () => {
     it('should correctly process the outputs of list, diff and status', () => {
       const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
-      const logDir = 'logs'
+      const logDir = join('logs', 'scalar')
       const logAcc = join(logDir, 'acc.tsv')
       const logLoss = join(logDir, 'loss.tsv')
       const output = 'model.pt'
@@ -62,7 +62,10 @@ describe('RepositoryState', () => {
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           {
-            'changed outs': { logs: 'modified', 'predictions.json': 'modified' }
+            'changed outs': {
+              [logDir]: 'modified',
+              'predictions.json': 'modified'
+            }
           },
           'always changed'
         ]
@@ -90,7 +93,10 @@ describe('RepositoryState', () => {
         renamed: new Set([join(dvcDemoPath, renamed)]),
         tracked: new Set([
           ...list.map(entry => join(dvcDemoPath, entry.path)),
+          join(dvcDemoPath, 'data'),
+          join(dvcDemoPath, 'data', 'MNIST'),
           join(dvcDemoPath, rawDataDir),
+          join(dvcDemoPath, 'logs'),
           join(dvcDemoPath, logDir)
         ]),
         untracked: emptySet
@@ -128,8 +134,10 @@ describe('RepositoryState', () => {
         notInCache: emptySet,
         renamed: emptySet,
         tracked: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, data)
+          join(dvcDemoPath, data),
+          join(dvcDemoPath, 'data'),
+          join(dvcDemoPath, 'data', 'MNIST'),
+          join(dvcDemoPath, rawDataDir)
         ]),
         untracked: emptySet
       })
@@ -165,8 +173,10 @@ describe('RepositoryState', () => {
         notInCache: emptySet,
         renamed: emptySet,
         tracked: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, data)
+          join(dvcDemoPath, 'data'),
+          join(dvcDemoPath, 'data', 'MNIST'),
+          join(dvcDemoPath, data),
+          join(dvcDemoPath, rawDataDir)
         ]),
         untracked: emptySet
       })
@@ -351,6 +361,8 @@ describe('RepositoryState', () => {
         renamed: emptySet,
         tracked: new Set([
           ...list.map(({ path }) => resolve(dvcDemoPath, path)),
+          resolve(dvcDemoPath, 'data'),
+          resolve(dvcDemoPath, 'data', 'MNIST'),
           resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
           resolve(dvcDemoPath, 'logs')
         ]),
