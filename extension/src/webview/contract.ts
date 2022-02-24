@@ -12,11 +12,11 @@ export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   COLUMN_REORDERED = 'column-reordered',
   COLUMN_RESIZED = 'column-resized',
+  EXPERIMENT_TOGGLED = 'experiment-toggled',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_SECTION_TOGGLED = 'plots-section-toggled',
   PLOTS_RESIZED = 'plots-resized',
-  SECTION_RENAMED = 'section-renamed',
-  EXPERIMENT_TOGGLED = 'experiment-toggled'
+  SECTION_RENAMED = 'section-renamed'
 }
 
 export type ColumnReorderPayload = string[]
@@ -42,6 +42,10 @@ export type MessageFromWebview =
       payload: ColumnResizePayload
     }
   | {
+      type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      payload: string
+    }
+  | {
       type: MessageFromWebviewType.METRIC_TOGGLED
       payload: MetricToggledPayload
     }
@@ -58,10 +62,6 @@ export type MessageFromWebview =
       payload: PlotSectionRenamedPayload
     }
   | { type: MessageFromWebviewType.INITIALIZED }
-  | {
-      type: MessageFromWebviewType.EXPERIMENT_TOGGLED
-      payload: string
-    }
 
 export interface setData<T extends WebviewData> {
   type: MessageToWebviewType.SET_DATA
