@@ -1,4 +1,4 @@
-type Items = { [key: string]: unknown }[]
+export type Items = { [key: string]: unknown }[]
 
 export const reorderObjectList = (
   order: string[],

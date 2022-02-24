@@ -17,7 +17,7 @@ export const AllIcons = {
   CHEVRON_RIGHT: ChevronRight,
   DOTS: Dots,
   DOWN_ARROW: DownArrow,
-  GRIPPPER: Gripper,
+  GRIPPER: Gripper,
   LINES: Lines,
   PENCIL: Pencil,
   UP_ARROW: UpArrow

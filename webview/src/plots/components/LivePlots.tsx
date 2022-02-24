@@ -4,9 +4,9 @@ import { EmptyState } from './EmptyState'
 import { Plot } from './Plot'
 import styles from './styles.module.scss'
 import { DragDropContainer } from '../../shared/components/dragDrop/DragDropContainer'
-import { AllIcons, Icon } from '../../shared/components/icon/Icon'
 import { performOrderedUpdate } from '../../util/objects'
 import { withScale } from '../../util/styles'
+import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
 interface LivePlotsProps {
   plots: LivePlotData[]
@@ -36,13 +36,7 @@ export const LivePlots: React.FC<LivePlotsProps> = ({ plots, colors }) => {
           key={key}
           data-testid={key}
         >
-          <Icon
-            icon={AllIcons.GRIPPPER}
-            color="#ffffff"
-            width={30}
-            height={30}
-            className={styles.plotGripIcon}
-          />
+          <GripIcon className={styles.plotGripIcon} />
           <Plot values={values} scale={colors} title={title} />
         </div>
       )
