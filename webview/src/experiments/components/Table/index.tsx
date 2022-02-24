@@ -10,6 +10,7 @@ import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import ClockIcon from '../../../shared/components/icons/Clock'
 import { sendMessage } from '../../../shared/vscode'
+
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -83,6 +84,7 @@ const FirstCell: React.FC<{
           style={{ color: bulletColor }}
           onClick={onBulletClick}
           aria-hidden="true"
+          data-testid={`${row.original.id}-bullet`}
         >
           {cell.row.original.queued && <ClockIcon />}
         </span>

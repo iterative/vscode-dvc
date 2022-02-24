@@ -246,4 +246,37 @@ describe('App', () => {
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
     })
   })
+
+  describe('Toggle experiment status', () => {
+    it('should send a message to the extension to toggle an experiment when the bullet is clicked', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      const testClick = (id: string) => {
+        mockPostMessage.mockReset()
+        const bullet = screen.getByTestId(`${id}-bullet`)
+
+        fireEvent.click(bullet)
+
+        expect(mockPostMessage).toBeCalledTimes(1)
+        expect(mockPostMessage).toBeCalledWith({
+          payload: id,
+          type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+        })
+      }
+
+      testClick('workspace')
+      testClick('main')
+      testClick('exp-e7a67')
+      testClick('e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+    })
+  })
 })
