@@ -8,6 +8,8 @@ import {
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import ClockIcon from '../../../shared/components/icons/Clock'
+import { sendMessage } from '../../../shared/vscode'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -55,8 +57,9 @@ const getFirstCellProps = (
 
 const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
+  onBulletClick: (e: React.MouseEvent<HTMLSpanElement>) => void
   bulletColor?: string
-}> = ({ cell, bulletColor }) => {
+}> = ({ cell, bulletColor, onBulletClick }) => {
   const { row } = cell
 
   const firstCellProps = getFirstCellProps(cell, row)
@@ -75,7 +78,7 @@ const FirstCell: React.FC<{
             />
           )}
         </span>
-        <span className={styles.bullet} style={{ color: bulletColor }}>
+        <span className={styles.bullet} style={{ color: bulletColor }} onClick={onBulletClick}>
           {cell.row.original.queued && <ClockIcon />}
         </span>
         {cell.isPlaceholder ? null : (
@@ -135,6 +138,13 @@ export const RowContent: React.FC<
 }): JSX.Element => {
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
+  const toggleExperiment = (e: React.MouseEvent<HTMLSpanElement>) => {
+    e.stopPropagation()
+    sendMessage({
+      payload: id,
+      type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+    })
+  }
   return (
     <div
       {...getRowProps({
@@ -150,7 +160,7 @@ export const RowContent: React.FC<
       })}
       data-testid={isWorkspace && 'workspace-row'}
     >
-      <FirstCell cell={firstCell} bulletColor={original.displayColor} />
+      <FirstCell cell={firstCell} bulletColor={original.displayColor} onBulletClick={toggleExperiment} />
       {cells.map(cell => {
         const cellId = `${cell.column.id}___${cell.row.id}`
         return (
