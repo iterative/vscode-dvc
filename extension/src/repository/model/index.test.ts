@@ -277,67 +277,67 @@ describe('RepositoryState', () => {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
+          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
+          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/t10k-labels-idx1-ubyte'
+          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
+          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/train-images-idx3-ubyte'
+          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
+          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/train-labels-idx1-ubyte'
+          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
+          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'logs/acc.tsv'
+          path: join('logs', 'acc.tsv')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'logs/loss.tsv'
+          path: join('logs', 'loss.tsv')
         },
         {
           isdir: false,
           isexec: false,
           isout: true,
-          path: 'model.pt'
+          path: join('model.pt')
         }
       ]
 
