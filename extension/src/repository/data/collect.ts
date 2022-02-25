@@ -1,7 +1,9 @@
-import { dirname, join, sep } from 'path'
+import { dirname, join, resolve, sep } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
+import { PathOutput } from '../../cli/reader'
+import { isSameOrChild } from '../../fileSystem'
 
 export type PathItem = Resource & {
   isDirectory: boolean
@@ -60,3 +62,60 @@ export const collectTree = (
 
   return transform(dvcRoot, acc, isTracked)
 }
+
+const collectMissingParents = (acc: string[], absPath: string) => {
+  if (!acc.length) {
+    return
+  }
+
+  const prevAbsPath = acc.slice(-1)[0]
+  if (!isSameOrChild(prevAbsPath, absPath)) {
+    return
+  }
+
+  let dir = dirname(absPath)
+  while (dir !== prevAbsPath) {
+    acc.push(dir)
+    dir = dirname(dir)
+  }
+}
+
+export const collectModifiedAgainstHead = (
+  dvcRoot: string,
+  modified: PathOutput[],
+  tracked: Set<string>
+): string[] =>
+  modified.reduce((acc, { path }) => {
+    const absPath = resolve(dvcRoot, path)
+    if (!tracked.has(absPath)) {
+      return acc
+    }
+
+    collectMissingParents(acc, absPath)
+    acc.push(absPath)
+
+    return acc
+  }, [] as string[])
+
+export const collectTracked = (
+  dvcRoot: string,
+  paths: string[] = []
+): Set<string> =>
+  paths.reduce((acc, path) => {
+    acc.add(join(dvcRoot, path))
+
+    const dir = dirname(path)
+    if (acc.has(join(dvcRoot, dir))) {
+      return acc
+    }
+
+    const pathArray = dir.split(sep)
+    path.split(sep).reduce((acc, _, i) => {
+      const path = getPath(pathArray, i)
+      if (path) {
+        acc.add(join(dvcRoot, path))
+      }
+      return acc
+    }, acc)
+    return acc
+  }, new Set<string>())
