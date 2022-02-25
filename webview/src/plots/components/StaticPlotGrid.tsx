@@ -60,6 +60,7 @@ export const StaticPlotGrid: React.FC<StaticPlotGirdProps> = ({ entries }) => {
       <div
         key={plot.id}
         id={plot.id}
+        data-testid={plot.id}
         className={className}
         style={withScale(nbRevisions)}
       >
