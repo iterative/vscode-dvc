@@ -25,8 +25,9 @@ describe('RepositoryState', () => {
     it('should correctly process the outputs of list, diff and status', () => {
       const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
       const logDir = 'logs'
-      const logAcc = join(logDir, 'acc.tsv')
-      const logLoss = join(logDir, 'loss.tsv')
+      const scalarDir = join(logDir, 'scalar')
+      const logAcc = join(scalarDir, 'acc.tsv')
+      const logLoss = join(scalarDir, 'loss.tsv')
       const output = 'model.pt'
       const predictions = 'predictions.json'
       const rawDataDir = join('data', 'MNIST', 'raw')
@@ -62,7 +63,10 @@ describe('RepositoryState', () => {
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           {
-            'changed outs': { logs: 'modified', 'predictions.json': 'modified' }
+            'changed outs': {
+              [logDir]: 'modified',
+              'predictions.json': 'modified'
+            }
           },
           'always changed'
         ]
@@ -83,6 +87,7 @@ describe('RepositoryState', () => {
         modified: new Set([
           join(dvcDemoPath, rawDataDir),
           join(dvcDemoPath, logDir),
+          join(dvcDemoPath, scalarDir),
           join(dvcDemoPath, logAcc),
           join(dvcDemoPath, logLoss)
         ]),
@@ -90,8 +95,11 @@ describe('RepositoryState', () => {
         renamed: new Set([join(dvcDemoPath, renamed)]),
         tracked: new Set([
           ...list.map(entry => join(dvcDemoPath, entry.path)),
+          join(dvcDemoPath, 'data'),
+          join(dvcDemoPath, 'data', 'MNIST'),
           join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, logDir)
+          join(dvcDemoPath, logDir),
+          join(dvcDemoPath, scalarDir)
         ]),
         untracked: emptySet
       })
@@ -128,8 +136,10 @@ describe('RepositoryState', () => {
         notInCache: emptySet,
         renamed: emptySet,
         tracked: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, data)
+          join(dvcDemoPath, data),
+          join(dvcDemoPath, 'data'),
+          join(dvcDemoPath, 'data', 'MNIST'),
+          join(dvcDemoPath, rawDataDir)
         ]),
         untracked: emptySet
       })
@@ -165,8 +175,10 @@ describe('RepositoryState', () => {
         notInCache: emptySet,
         renamed: emptySet,
         tracked: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, data)
+          join(dvcDemoPath, 'data'),
+          join(dvcDemoPath, 'data', 'MNIST'),
+          join(dvcDemoPath, data),
+          join(dvcDemoPath, rawDataDir)
         ]),
         untracked: emptySet
       })
@@ -267,67 +279,67 @@ describe('RepositoryState', () => {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
+          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
+          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/t10k-labels-idx1-ubyte'
+          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
+          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/train-images-idx3-ubyte'
+          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
+          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/train-labels-idx1-ubyte'
+          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
+          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'logs/acc.tsv'
+          path: join('logs', 'acc.tsv')
         },
         {
           isdir: false,
           isexec: false,
           isout: false,
-          path: 'logs/loss.tsv'
+          path: join('logs', 'loss.tsv')
         },
         {
           isdir: false,
           isexec: false,
           isout: true,
-          path: 'model.pt'
+          path: join('model.pt')
         }
       ]
 
@@ -339,7 +351,7 @@ describe('RepositoryState', () => {
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toEqual({
+      expect(model.getState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
@@ -351,6 +363,8 @@ describe('RepositoryState', () => {
         renamed: emptySet,
         tracked: new Set([
           ...list.map(({ path }) => resolve(dvcDemoPath, path)),
+          resolve(dvcDemoPath, 'data'),
+          resolve(dvcDemoPath, 'data', 'MNIST'),
           resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
           resolve(dvcDemoPath, 'logs')
         ]),
