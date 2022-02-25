@@ -23,16 +23,21 @@ interface StaticPlotEntry extends VegaPlot {
 }
 
 export const StaticPlotGrid: React.FC<StaticPlotGirdProps> = ({ entries }) => {
-  const allPlots = Object.entries(entries).reduce(
-    (acc: StaticPlotEntry[], [path, plots]) => {
-      return acc.concat(
-        plots.map((plot, i) => ({ ...plot, id: `plot-${path}-${i}`, path }))
-      )
-    },
-    []
-  )
+  const [allPlots, setAllPlots] = useState<StaticPlotEntry[]>([])
+  const [order, setOrder] = useState<string[]>([])
 
-  const [order, setOrder] = useState(allPlots.map(plot => plot.id) as string[])
+  useEffect(() => {
+    setAllPlots(
+      Object.entries(entries).reduce(
+        (acc: StaticPlotEntry[], [path, plots]) => {
+          return acc.concat(
+            plots.map((plot, i) => ({ ...plot, id: `plot-${path}-${i}`, path }))
+          )
+        },
+        []
+      )
+    )
+  }, [entries])
 
   useEffect(() => {
     setOrder(pastOrder =>
