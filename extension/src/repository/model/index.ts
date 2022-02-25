@@ -1,7 +1,12 @@
 import { dirname, resolve } from 'path'
 import isEqual from 'lodash.isequal'
 import { Disposable } from '@hediet/std/disposable'
-import { collectTracked, collectTree, PathItem } from '../data/collect'
+import {
+  collectModifiedAgainstHead,
+  collectTracked,
+  collectTree,
+  PathItem
+} from '../data/collect'
 import { SourceControlManagementModel } from '../sourceControlManagement'
 import { DecorationModel } from '../decorationProvider'
 import {
@@ -15,6 +20,7 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../../cli/reader'
+import { isSameOrChild } from '../../fileSystem'
 
 type OutputData = {
   diffFromCache: StatusOutput
@@ -184,7 +190,12 @@ export class RepositoryModel
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
-    const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
+    const modifiedAgainstHead = collectModifiedAgainstHead(
+      this.dvcRoot,
+      diffOutput.modified || [],
+      this.state.tracked
+    )
+
     const {
       [Status.MODIFIED]: modifiedAgainstCache,
       [Status.NOT_IN_CACHE]: notInCache

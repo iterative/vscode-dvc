@@ -87,6 +87,7 @@ describe('RepositoryState', () => {
         modified: new Set([
           join(dvcDemoPath, rawDataDir),
           join(dvcDemoPath, logDir),
+          join(dvcDemoPath, scalarDir),
           join(dvcDemoPath, logAcc),
           join(dvcDemoPath, logLoss)
         ]),
