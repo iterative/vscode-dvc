@@ -45,13 +45,13 @@ export const StaticPlotGrid: React.FC<StaticPlotGirdProps> = ({ entries }) => {
     )
   }, [allPlots])
 
-  const items = (
-    reorderObjectList(
-      order,
-      allPlots as unknown as Items,
-      'id'
-    ) as unknown as StaticPlotEntry[]
-  ).map((plot: StaticPlotEntry) => {
+  const reorderedItems = reorderObjectList(
+    order,
+    allPlots as unknown as Items,
+    'id'
+  ) as unknown as StaticPlotEntry[]
+
+  const items = reorderedItems.map((plot: StaticPlotEntry) => {
     const nbRevisions = (plot.multiView && plot.revisions?.length) || 1
     const className = cx(styles.plot, {
       [styles.multiViewPlot]: plot.multiView
