@@ -472,16 +472,14 @@ describe('App', () => {
 
   it('should display the static plots in the order stored', () => {
     renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       static: {
         ...staticPlotsFixture,
         plots: {
           ...staticPlotsFixture.plots,
-          'other/plot.tsv': [
-            ...staticPlotsFixture.plots['logs/loss.tsv']
-          ]
+          'other/plot.tsv': [...staticPlotsFixture.plots['logs/loss.tsv']]
         }
-      },
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      }
     })
 
     let plots = screen.getAllByTestId(/^plot-/)
