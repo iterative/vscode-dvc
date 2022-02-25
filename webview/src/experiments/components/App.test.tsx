@@ -163,7 +163,7 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
 
-      fireEvent.click(screen.getByText(experimentLabel))
+      fireEvent.click(screen.getByTestId(`${experimentLabel}-chevron`))
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
@@ -211,7 +211,7 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
 
-      fireEvent.click(screen.getByText(experimentLabel))
+      fireEvent.click(screen.getByTestId(`${experimentLabel}-chevron`))
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
@@ -260,11 +260,10 @@ describe('App', () => {
           }
         })
       )
-      const testClick = (id: string) => {
+      const testClick = (label: string, id = label) => {
         mockPostMessage.mockReset()
-        const bullet = screen.getByTestId(`${id}-bullet`)
 
-        fireEvent.click(bullet)
+        fireEvent.click(screen.getByText(label))
 
         expect(mockPostMessage).toBeCalledTimes(1)
         expect(mockPostMessage).toBeCalledWith({
@@ -275,8 +274,9 @@ describe('App', () => {
 
       testClick('workspace')
       testClick('main')
-      testClick('exp-e7a67')
-      testClick('e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+      testClick('[exp-e7a67]', 'exp-e7a67')
+      testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
+      testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
     })
   })
 })
