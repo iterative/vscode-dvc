@@ -27,46 +27,23 @@ export interface RowProp {
   row: Row<Experiment>
 }
 
-const getFirstCellProps = (
-  cell: Cell<Experiment, unknown>,
-  row: Row<Experiment>
-) => {
-  const baseFirstCellProps = cell.getCellProps({
-    className: cx(
-      styles.firstCell,
-      styles.td,
-      styles.experimentCell,
-      cell.isPlaceholder && styles.groupPlaceholder
-    )
-  })
-
-  if (!row.canExpand) {
-    return baseFirstCellProps
-  }
-
-  return row.getToggleRowExpandedProps({
-    ...baseFirstCellProps,
-    className: cx(
-      baseFirstCellProps.className,
-      styles.expandableExperimentCell,
-      row.isExpanded
-        ? styles.expandedExperimentCell
-        : styles.contractedExperimentCell
-    )
-  })
-}
-
 const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
-  onBulletClick: (e: React.MouseEvent<HTMLSpanElement>) => void
   bulletColor?: string
-}> = ({ cell, bulletColor, onBulletClick }) => {
+}> = ({ cell, bulletColor }) => {
   const { row } = cell
 
-  const firstCellProps = getFirstCellProps(cell, row)
-
   return (
-    <div {...firstCellProps}>
+    <div
+      {...cell.getCellProps({
+        className: cx(
+          styles.firstCell,
+          styles.td,
+          styles.experimentCell,
+          cell.isPlaceholder && styles.groupPlaceholder
+        )
+      })}
+    >
       <div className={styles.innerCell}>
         <span className={styles.rowArrowPlaceholder}>
           {row.canExpand && (
@@ -76,16 +53,16 @@ const FirstCell: React.FC<{
                   ? styles.expandedRowArrow
                   : styles.contractedRowArrow
               }
+              onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
+                e.stopPropagation()
+                row.toggleRowExpanded()
+              }}
+              aria-hidden="true"
+              data-testid={`${row.original.label}-chevron`}
             />
           )}
         </span>
-        <span
-          className={styles.bullet}
-          style={{ color: bulletColor }}
-          onClick={onBulletClick}
-          aria-hidden="true"
-          data-testid={`${row.original.id}-bullet`}
-        >
+        <span className={styles.bullet} style={{ color: bulletColor }}>
           {cell.row.original.queued && <ClockIcon />}
         </span>
         {cell.isPlaceholder ? null : (
@@ -145,8 +122,7 @@ export const RowContent: React.FC<
 }): JSX.Element => {
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
-  const toggleExperiment = (e: React.MouseEvent<HTMLSpanElement>) => {
-    e.stopPropagation()
+  const toggleExperiment = () => {
     sendMessage({
       payload: id,
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
@@ -165,13 +141,11 @@ export const RowContent: React.FC<
           isWorkspace && changes?.length && styles.workspaceWithChanges
         )
       })}
+      onClick={toggleExperiment}
+      aria-hidden="true"
       data-testid={isWorkspace && 'workspace-row'}
     >
-      <FirstCell
-        cell={firstCell}
-        bulletColor={original.displayColor}
-        onBulletClick={toggleExperiment}
-      />
+      <FirstCell cell={firstCell} bulletColor={original.displayColor} />
       {cells.map(cell => {
         const cellId = `${cell.column.id}___${cell.row.id}`
         return (
