@@ -60,3 +60,26 @@ export const collectTree = (
 
   return transform(dvcRoot, acc, isTracked)
 }
+
+export const collectTracked = (
+  dvcRoot: string,
+  paths: string[] = []
+): Set<string> =>
+  paths.reduce((acc, path) => {
+    acc.add(join(dvcRoot, path))
+
+    const dir = dirname(path)
+    if (acc.has(join(dvcRoot, dir))) {
+      return acc
+    }
+
+    const pathArray = dir.split(sep)
+    path.split(sep).reduce((acc, _, i) => {
+      const path = getPath(pathArray, i)
+      if (path) {
+        acc.add(join(dvcRoot, path))
+      }
+      return acc
+    }, acc)
+    return acc
+  }, new Set<string>())

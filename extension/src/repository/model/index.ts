@@ -1,7 +1,7 @@
-import { dirname, join, resolve, sep } from 'path'
+import { dirname, resolve } from 'path'
 import isEqual from 'lodash.isequal'
 import { Disposable } from '@hediet/std/disposable'
-import { collectTree, PathItem } from '../data/collect'
+import { collectTracked, collectTree, PathItem } from '../data/collect'
 import { SourceControlManagementModel } from '../sourceControlManagement'
 import { DecorationModel } from '../decorationProvider'
 import {
@@ -87,31 +87,6 @@ export class RepositoryModel
 
   private getAbsolutePath(path: string): string {
     return resolve(this.dvcRoot, path)
-  }
-
-  private getAbsolutePaths(paths: string[] = []): string[] {
-    return paths.map(path => this.getAbsolutePath(path))
-  }
-
-  private getAbsoluteParentPaths(files: string[] = []): string[] {
-    return [
-      ...files.reduce((acc, file) => {
-        const dir = dirname(file)
-        if (acc.has(dir)) {
-          return acc
-        }
-
-        const pathArray = dir.split(sep)
-        file.split(sep).reduce((acc, _, i) => {
-          const path = pathArray.slice(0, i).join(sep)
-          if (path) {
-            acc.add(join(this.dvcRoot, path))
-          }
-          return acc
-        }, acc)
-        return acc
-      }, new Set<string>())
-    ]
   }
 
   private getChangedOutsStatuses(
@@ -253,12 +228,7 @@ export class RepositoryModel
   private updateTracked(listOutput: ListOutput[]): void {
     const trackedPaths = listOutput.map(tracked => tracked.path)
 
-    const absoluteTrackedPaths = this.getAbsolutePaths(trackedPaths)
-
-    const tracked = new Set([
-      ...absoluteTrackedPaths,
-      ...this.getAbsoluteParentPaths(trackedPaths)
-    ])
+    const tracked = collectTracked(this.dvcRoot, trackedPaths)
 
     if (!isEqual(tracked, this.state.tracked)) {
       this.tree = collectTree(this.dvcRoot, trackedPaths)

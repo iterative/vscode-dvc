@@ -349,7 +349,7 @@ describe('RepositoryState', () => {
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toEqual({
+      expect(model.getState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
