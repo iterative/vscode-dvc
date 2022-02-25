@@ -6,7 +6,7 @@ import {
   collectTracked,
   collectTree,
   PathItem
-} from '../data/collect'
+} from './collect'
 import { SourceControlManagementModel } from '../sourceControlManagement'
 import { DecorationModel } from '../decorationProvider'
 import {
