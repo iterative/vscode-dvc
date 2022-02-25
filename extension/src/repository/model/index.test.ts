@@ -24,9 +24,10 @@ describe('RepositoryState', () => {
   describe('updateStatus', () => {
     it('should correctly process the outputs of list, diff and status', () => {
       const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
-      const logDir = join('logs', 'scalar')
-      const logAcc = join(logDir, 'acc.tsv')
-      const logLoss = join(logDir, 'loss.tsv')
+      const logDir = 'logs'
+      const scalarDir = join(logDir, 'scalar')
+      const logAcc = join(scalarDir, 'acc.tsv')
+      const logLoss = join(scalarDir, 'loss.tsv')
       const output = 'model.pt'
       const predictions = 'predictions.json'
       const rawDataDir = join('data', 'MNIST', 'raw')
@@ -96,8 +97,8 @@ describe('RepositoryState', () => {
           join(dvcDemoPath, 'data'),
           join(dvcDemoPath, 'data', 'MNIST'),
           join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, 'logs'),
-          join(dvcDemoPath, logDir)
+          join(dvcDemoPath, logDir),
+          join(dvcDemoPath, scalarDir)
         ]),
         untracked: emptySet
       })

@@ -15,7 +15,6 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../../cli/reader'
-import { isDirectory } from '../../fileSystem'
 
 type OutputData = {
   diffFromCache: StatusOutput
@@ -153,10 +152,13 @@ export class RepositoryModel
     path: string,
     set: Set<string> = new Set()
   ): boolean => {
-    if (isDirectory(path)) {
-      return !set.has(path)
+    while (this.dvcRoot !== path) {
+      if (set.has(path)) {
+        return false
+      }
+      path = dirname(path)
     }
-    return !(set.has(path) || set.has(dirname(path)))
+    return true
   }
 
   private splitModifiedAgainstHead(
