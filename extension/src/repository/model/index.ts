@@ -20,7 +20,6 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../../cli/reader'
-import { isSameOrChild } from '../../fileSystem'
 
 type OutputData = {
   diffFromCache: StatusOutput
