@@ -62,7 +62,7 @@ describe('getTelemetryReporter', () => {
   it('should return the reporter on all subsequent calls', () => {
     const sameTelemetryReporter = getTelemetryReporter()
 
-    expect(telemetryReporter).toEqual(sameTelemetryReporter)
+    expect(telemetryReporter).toStrictEqual(sameTelemetryReporter)
     expect(mockedTelemetryReporter).not.toBeCalled()
     expect(mockedGetExtension).not.toBeCalled()
   })

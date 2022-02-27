@@ -32,12 +32,12 @@ describe('plotsModel', () => {
   })
 
   it('should change the selectedMetrics when calling setSelectedMetrics', () => {
-    expect(model.getSelectedMetrics()).toEqual(persistedSelectedMetrics)
+    expect(model.getSelectedMetrics()).toStrictEqual(persistedSelectedMetrics)
 
     const newSelectedMetrics = ['one', 'two', 'four', 'hundred']
     model.setSelectedMetrics(newSelectedMetrics)
 
-    expect(model.getSelectedMetrics()).toEqual(newSelectedMetrics)
+    expect(model.getSelectedMetrics()).toStrictEqual(newSelectedMetrics)
   })
 
   it('should update the persisted selected metrics when calling setSelectedMetrics', () => {
@@ -54,11 +54,13 @@ describe('plotsModel', () => {
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
-    expect(model.getPlotSize(Section.LIVE_PLOTS)).toEqual(PlotSize.REGULAR)
+    expect(model.getPlotSize(Section.LIVE_PLOTS)).toStrictEqual(
+      PlotSize.REGULAR
+    )
 
     model.setPlotSize(Section.LIVE_PLOTS, PlotSize.LARGE)
 
-    expect(model.getPlotSize(Section.LIVE_PLOTS)).toEqual(PlotSize.LARGE)
+    expect(model.getPlotSize(Section.LIVE_PLOTS)).toStrictEqual(PlotSize.LARGE)
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
@@ -74,24 +76,26 @@ describe('plotsModel', () => {
   })
 
   it('should change the the sectionName of a section when calling setSectionName', () => {
-    expect(model.getSectionName(Section.LIVE_PLOTS)).toEqual(
+    expect(model.getSectionName(Section.LIVE_PLOTS)).toStrictEqual(
       DEFAULT_SECTION_NAMES[Section.LIVE_PLOTS]
     )
-    expect(model.getSectionName(Section.STATIC_PLOTS)).toEqual(
+    expect(model.getSectionName(Section.STATIC_PLOTS)).toStrictEqual(
       DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS]
     )
 
     const newLivePlotsName = 'Live Section'
     model.setSectionName(Section.LIVE_PLOTS, newLivePlotsName)
 
-    expect(model.getSectionName(Section.LIVE_PLOTS)).toEqual(newLivePlotsName)
-    expect(model.getSectionName(Section.STATIC_PLOTS)).toEqual(
+    expect(model.getSectionName(Section.LIVE_PLOTS)).toStrictEqual(
+      newLivePlotsName
+    )
+    expect(model.getSectionName(Section.STATIC_PLOTS)).toStrictEqual(
       DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS]
     )
 
     const newStaticPlotsName = 'Static'
     model.setSectionName(Section.STATIC_PLOTS, newStaticPlotsName)
-    expect(model.getSectionName(Section.STATIC_PLOTS)).toEqual(
+    expect(model.getSectionName(Section.STATIC_PLOTS)).toStrictEqual(
       newStaticPlotsName
     )
   })
@@ -117,7 +121,7 @@ describe('plotsModel', () => {
   it('should update the persisted collapsible section state when calling setSectionCollapsed', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    expect(model.getSectionCollapsed()).toEqual(DEFAULT_SECTION_COLLAPSED)
+    expect(model.getSectionCollapsed()).toStrictEqual(DEFAULT_SECTION_COLLAPSED)
 
     model.setSectionCollapsed({ [Section.LIVE_PLOTS]: true })
 
@@ -133,6 +137,6 @@ describe('plotsModel', () => {
       expectedSectionCollapsed
     )
 
-    expect(model.getSectionCollapsed()).toEqual(expectedSectionCollapsed)
+    expect(model.getSectionCollapsed()).toStrictEqual(expectedSectionCollapsed)
   })
 })

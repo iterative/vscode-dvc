@@ -20,7 +20,7 @@ const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as VegaPlot
 describe('collectLivePlotsData', () => {
   it('should return the expected data from the test fixture', () => {
     const data = collectLivePlotsData(expShowFixture)
-    expect(data).toEqual(livePlotsFixture.plots)
+    expect(data).toStrictEqual(livePlotsFixture.plots)
   })
 
   it('should provide a continuous series for a modified experiment', () => {
@@ -39,8 +39,8 @@ describe('collectLivePlotsData', () => {
       const lastIterationInitial = initialExperiment?.slice(-1)[0]
       const firstIterationModified = modifiedExperiment[0]
 
-      expect(lastIterationInitial).not.toEqual(firstIterationModified)
-      expect(omit(lastIterationInitial, 'group')).toEqual(
+      expect(lastIterationInitial).not.toStrictEqual(firstIterationModified)
+      expect(omit(lastIterationInitial, 'group')).toStrictEqual(
         omit(firstIterationModified, 'group')
       )
     })
@@ -64,18 +64,20 @@ describe('collectData', () => {
 
     revisions.forEach(revision => {
       const expectedValues = values.filter(value => value.rev === revision)
-      expect(revisionData[revision]['logs/loss.tsv']).toEqual(expectedValues)
+      expect(revisionData[revision]['logs/loss.tsv']).toStrictEqual(
+        expectedValues
+      )
     })
 
-    expect(Object.keys(revisionData)).toEqual(revisions)
+    expect(Object.keys(revisionData)).toStrictEqual(revisions)
 
-    expect(Object.keys(revisionData.main)).toEqual([
+    expect(Object.keys(revisionData.main)).toStrictEqual([
       'logs/loss.tsv',
       'logs/acc.tsv',
       'predictions.json'
     ])
 
-    expect(Object.keys(comparisonData.main)).toEqual([
+    expect(Object.keys(comparisonData.main)).toStrictEqual([
       'plots/acc.png',
       'plots/heatmap.png',
       'plots/loss.png'
@@ -84,7 +86,7 @@ describe('collectData', () => {
     const _1ba7bcd_heatmap = comparisonData['1ba7bcd']['plots/heatmap.png']
 
     expect(_1ba7bcd_heatmap).toBeDefined()
-    expect(_1ba7bcd_heatmap).toEqual(
+    expect(_1ba7bcd_heatmap).toStrictEqual(
       plotsDiffFixture['plots/heatmap.png'].find(({ revisions }) =>
         sameContents(revisions as string[], ['1ba7bcd'])
       )
@@ -98,15 +100,15 @@ describe('collectTemplates', () => {
     const expectedTemplate = omit(content, 'data')
 
     const templates = collectTemplates(plotsDiffFixture)
-    expect(Object.keys(templates)).toEqual([
+    expect(Object.keys(templates)).toStrictEqual([
       'logs/loss.tsv',
       'logs/acc.tsv',
       'predictions.json'
     ])
 
-    expect(templates['logs/loss.tsv']).not.toEqual(content)
+    expect(templates['logs/loss.tsv']).not.toStrictEqual(content)
 
-    expect(templates['logs/loss.tsv']).toEqual(expectedTemplate)
+    expect(templates['logs/loss.tsv']).toStrictEqual(expectedTemplate)
   })
 })
 
@@ -121,7 +123,7 @@ describe('collectPaths', () => {
       f: [{ type: PlotsType.VEGA } as StaticPlot]
     })
 
-    expect(comparison).toEqual(['a', 'b', 'z'])
-    expect(plots).toEqual(['c', 'f', 'y'])
+    expect(comparison).toStrictEqual(['a', 'b', 'z'])
+    expect(plots).toStrictEqual(['c', 'f', 'y'])
   })
 })

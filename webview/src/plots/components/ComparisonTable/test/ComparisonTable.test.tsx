@@ -125,7 +125,7 @@ describe('ComparisonTable', () => {
 
     let headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toEqual(revisions)
+    expect(headers).toStrictEqual(revisions)
 
     const filteredRevisions = basicProps.revisions.filter(
       ({ revision }) => revision !== revisions[3]
@@ -135,7 +135,7 @@ describe('ComparisonTable', () => {
 
     headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toEqual([
+    expect(headers).toStrictEqual([
       revisions[0],
       revisions[1],
       revisions[2],
@@ -154,7 +154,7 @@ describe('ComparisonTable', () => {
     rerender(<ComparisonTable {...basicProps} revisions={newRevisions} />)
     const headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toEqual([...revisions, newRevName])
+    expect(headers).toStrictEqual([...revisions, newRevName])
   })
 
   describe('Columns drag and drop', () => {
@@ -214,13 +214,13 @@ describe('ComparisonTable', () => {
 
       let headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toEqual(revisions)
+      expect(headers).toStrictEqual(revisions)
 
       dragAndDrop(startingNode, endingNode)
 
       headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toEqual([
+      expect(headers).toStrictEqual([
         revisions[0],
         revisions[3],
         revisions[1],
@@ -245,11 +245,11 @@ describe('ComparisonTable', () => {
 
       const headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toEqual(expectedOrder)
+      expect(headers).toStrictEqual(expectedOrder)
 
       dragAndDrop(startingNode, endingNode)
 
-      expect(headers).toEqual(expectedOrder)
+      expect(headers).toStrictEqual(expectedOrder)
     })
 
     it('should prevent default behaviour when dragging over', () => {
@@ -283,7 +283,7 @@ describe('ComparisonTable', () => {
         revisions[4]
       ]
 
-      expect(headers).toEqual(reorderedRevisions)
+      expect(headers).toStrictEqual(reorderedRevisions)
 
       const newRevName = 'newRev'
       const originalRevisionsWithNew = [
@@ -296,7 +296,7 @@ describe('ComparisonTable', () => {
       )
 
       headers = getHeaders().map(header => header.textContent)
-      expect(headers).toEqual([...reorderedRevisions, newRevName])
+      expect(headers).toStrictEqual([...reorderedRevisions, newRevName])
     })
   })
 })

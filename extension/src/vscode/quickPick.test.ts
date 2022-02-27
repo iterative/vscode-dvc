@@ -58,7 +58,7 @@ describe('quickPickValue', () => {
       placeHolder,
       title
     })
-    expect(probablyC).toEqual('c')
+    expect(probablyC).toStrictEqual('c')
   })
 })
 
@@ -96,7 +96,7 @@ describe('quickPickManyValues', () => {
       placeHolder,
       title
     })
-    expect(result).toEqual(['b', 'c'])
+    expect(result).toStrictEqual(['b', 'c'])
   })
 })
 
@@ -111,7 +111,7 @@ describe('quickPickOne', () => {
       canPickMany: false,
       placeHolder
     })
-    expect(noResponse).toEqual(undefined)
+    expect(noResponse).toStrictEqual(undefined)
   })
 })
 
@@ -144,6 +144,6 @@ describe('quickPickYesOrNo', () => {
         title
       }
     )
-    expect(response).toEqual(true)
+    expect(response).toStrictEqual(true)
   })
 })

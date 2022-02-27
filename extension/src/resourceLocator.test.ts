@@ -11,7 +11,7 @@ describe('ResourceLocator', () => {
     const dark = Uri.file('some/path/resources/dark/dvc-color.svg')
     const light = Uri.file('some/path/resources/light/dvc-color.svg')
 
-    expect(resourceLocator.dvcIcon).toEqual({
+    expect(resourceLocator.dvcIcon).toStrictEqual({
       dark,
       light
     })
@@ -27,7 +27,7 @@ describe('ResourceLocator', () => {
 
     expect(
       resourceLocator.getExperimentsResource(IconName.CIRCLE_FILLED, '#f14c4c')
-    ).toEqual(redCircleFilled)
+    ).toStrictEqual(redCircleFilled)
 
     const redCircleOutline = Uri.file(
       'some/path/resources/experiments/circle-outline-#f14c4c.svg'
@@ -35,7 +35,7 @@ describe('ResourceLocator', () => {
 
     expect(
       resourceLocator.getExperimentsResource(IconName.CIRCLE_OUTLINE, '#f14c4c')
-    ).toEqual(redCircleOutline)
+    ).toStrictEqual(redCircleOutline)
 
     const blueSpinner = Uri.file(
       'some/path/resources/experiments/loading-spin-#3794ff.svg'
@@ -43,6 +43,6 @@ describe('ResourceLocator', () => {
 
     expect(
       resourceLocator.getExperimentsResource(IconName.LOADING_SPIN, '#3794ff')
-    ).toEqual(blueSpinner)
+    ).toStrictEqual(blueSpinner)
   })
 })

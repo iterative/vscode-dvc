@@ -24,7 +24,7 @@ describe('getOptions', () => {
 
   it('should give the correct options given a basic environment', () => {
     const options = getOptions(undefined, '', cwd, Command.CHECKOUT, Flag.FORCE)
-    expect(options).toEqual({
+    expect(options).toStrictEqual({
       args: ['checkout', '-f'],
       command: 'dvc checkout -f',
       cwd,
@@ -36,7 +36,7 @@ describe('getOptions', () => {
   it('should append -m dvc to the args and use the python as the executable if only an isolated python env is in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
     const options = getOptions(pythonBinPath, '', cwd, Command.DIFF)
-    expect(options).toEqual({
+    expect(options).toStrictEqual({
       args: ['-m', 'dvc', 'diff'],
       command: `${pythonBinPath} -m dvc diff`,
       cwd,
@@ -52,7 +52,7 @@ describe('getOptions', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
     const cliPath = join('custom', 'path', 'to', 'dvc')
     const options = getOptions(pythonBinPath, cliPath, cwd, Command.DIFF)
-    expect(options).toEqual({
+    expect(options).toStrictEqual({
       args: ['diff'],
       command: `${cliPath} diff`,
       cwd,
