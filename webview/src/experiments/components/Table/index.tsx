@@ -5,9 +5,12 @@ import {
   RowData as Experiment,
   TableData
 } from 'dvc/src/experiments/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import ClockIcon from '../../../shared/components/icons/Clock'
+import { sendMessage } from '../../../shared/vscode'
+
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -24,45 +27,23 @@ export interface RowProp {
   row: Row<Experiment>
 }
 
-const getFirstCellProps = (
-  cell: Cell<Experiment, unknown>,
-  row: Row<Experiment>
-) => {
-  const baseFirstCellProps = cell.getCellProps({
-    className: cx(
-      styles.firstCell,
-      styles.td,
-      styles.experimentCell,
-      cell.isPlaceholder && styles.groupPlaceholder
-    )
-  })
-
-  if (!row.canExpand) {
-    return baseFirstCellProps
-  }
-
-  return row.getToggleRowExpandedProps({
-    ...baseFirstCellProps,
-    className: cx(
-      baseFirstCellProps.className,
-      styles.expandableExperimentCell,
-      row.isExpanded
-        ? styles.expandedExperimentCell
-        : styles.contractedExperimentCell
-    )
-  })
-}
-
 const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
   bulletColor?: string
 }> = ({ cell, bulletColor }) => {
   const { row } = cell
 
-  const firstCellProps = getFirstCellProps(cell, row)
-
   return (
-    <div {...firstCellProps}>
+    <div
+      {...cell.getCellProps({
+        className: cx(
+          styles.firstCell,
+          styles.td,
+          styles.experimentCell,
+          cell.isPlaceholder && styles.groupPlaceholder
+        )
+      })}
+    >
       <div className={styles.innerCell}>
         <span className={styles.rowArrowPlaceholder}>
           {row.canExpand && (
@@ -72,6 +53,12 @@ const FirstCell: React.FC<{
                   ? styles.expandedRowArrow
                   : styles.contractedRowArrow
               }
+              onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
+                e.stopPropagation()
+                row.toggleRowExpanded()
+              }}
+              aria-hidden="true"
+              data-testid={`${row.original.label}-chevron`}
             />
           )}
         </span>
@@ -135,6 +122,12 @@ export const RowContent: React.FC<
 }): JSX.Element => {
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
+  const toggleExperiment = () => {
+    sendMessage({
+      payload: id,
+      type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+    })
+  }
   return (
     <div
       {...getRowProps({
@@ -148,6 +141,8 @@ export const RowContent: React.FC<
           isWorkspace && changes?.length && styles.workspaceWithChanges
         )
       })}
+      onClick={toggleExperiment}
+      aria-hidden="true"
       data-testid={isWorkspace && 'workspace-row'}
     >
       <FirstCell cell={firstCell} bulletColor={original.displayColor} />

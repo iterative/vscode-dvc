@@ -340,6 +340,10 @@ export class Experiments extends BaseRepository<TableData> {
               message.payload && this.metricsAndParams.setColumnWidth(id, width)
             )
           }
+          case MessageFromWebviewType.EXPERIMENT_TOGGLED:
+            return (
+              message.payload && this.toggleExperimentStatus(message.payload)
+            )
           default:
             Logger.error(`Unexpected message: ${message}`)
         }
