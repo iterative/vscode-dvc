@@ -11,7 +11,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "chromatic": "npx chromatic --project-token fexq6zfy6",
-    "svgr": "svgr -d src/shared/components/icons icons/"
+    "svgr": "svgr --out-dir src/shared/components/icons --ignore-existing ../node_modules/@vscode/codicons/src/icons && svgr -d src/shared/components/icons icons/"
   },
   "main": "./index.js",
   "peerDependencies": {

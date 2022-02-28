@@ -4,6 +4,7 @@ import cx from 'classnames'
 import styles from './styles.module.scss'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import { reorderObjectList } from '../../../util/objects'
 
 export type ComparisonTableColumn = ComparisonRevision
 
@@ -21,9 +22,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setPinnedColumn
 }) => {
   const setOrder = (order: string[]) => {
-    const newOrder = order
-      .map(item => columns.find(col => col.revision === item))
-      .filter(Boolean)
+    const newOrder = reorderObjectList(order, columns, 'revision')
     setColumnsOrder(newOrder as ComparisonRevision[])
   }
 
