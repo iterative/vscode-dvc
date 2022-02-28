@@ -926,7 +926,7 @@
     "walkthroughs": [
       {
         "id": "welcome",
-        "title": "Get started with DVC",
+        "title": "Get Started with DVC",
         "description": "Your first steps to set up a DVC project with all the powerful tools and features that the DVC extension has to offer!",
         "steps": [
           {
@@ -943,8 +943,8 @@
           },
           {
             "id": "dvc.setup",
-            "title": "Setup the workspace",
-            "description": "Setup the workspace for the dvc extension.\n[Setup the workspace](command:dvc.setupWorkspace)",
+            "title": "Setup The Workspace",
+            "description": "Setup the workspace for the dvc extension.\n[Setup The Workspace](command:dvc.setupWorkspace)",
             "media": {
               "markdown": "resources/walkthrough/setup-workspace.md"
             },
@@ -954,8 +954,8 @@
           },
           {
             "id": "dvc.showCommands",
-            "title": "Available commands",
-            "description": "View all of the available commands.\n[View commands](command:dvc.showCommands)",
+            "title": "Available Commands",
+            "description": "View all of the available commands.\n[View Commands](command:dvc.showCommands)",
             "media": {
               "markdown": "resources/walkthrough/command-palette.md"
             },
@@ -966,20 +966,20 @@
           },
           {
             "id": "dvc.showOutput",
-            "title": "Output channel",
-            "description": "View the DVC output channel.\n[View output](command:dvc.showOutput)",
+            "title": "Output Channel",
+            "description": "View the DVC output channel.\n[View Output](command:dvc.showOutput)",
             "media": {
               "markdown": "resources/walkthrough/output-channel.md"
             },
             "completionEvents": [
               "onCommand:dvc.showOutput"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.scm",
-            "title": "Source control management",
-            "description": "Open the DVC scm view.\n[Show scm](command:workbench.view.scm)",
+            "title": "Source Control Management",
+            "description": "Open the DVC scm view.\n[Show SCM](command:workbench.view.scm)",
             "media": {
               "markdown": "resources/walkthrough/source-control-management.md"
             },
@@ -990,8 +990,8 @@
           },
           {
             "id": "dvc.tracked",
-            "title": "Tracked resources",
-            "description": "Open the DVC tracked view.\n[Show tracked](command:dvc.views.trackedExplorerTree.focus)",
+            "title": "Tracked Resources",
+            "description": "Open the DVC tracked view.\n[Show Tracked](command:dvc.views.trackedExplorerTree.focus)",
             "media": {
               "markdown": "resources/walkthrough/tracked-explorer.md"
             },
@@ -1002,8 +1002,8 @@
           },
           {
             "id": "dvc.viewContainer",
-            "title": "DVC view container",
-            "description": "Open the DVC view container.\n[Show views](command:workbench.view.extension.dvc-views)",
+            "title": "DVC View Container",
+            "description": "Open the DVC view container.\n[Show Views](command:workbench.view.extension.dvc-views)",
             "media": {
               "markdown": "resources/walkthrough/view-container.md"
             },
@@ -1014,8 +1014,8 @@
           },
           {
             "id": "dvc.experimentsTable",
-            "title": "Experiments table",
-            "description": "Open the experiments table.\n[Show table](command:dvc.showExperiments)",
+            "title": "Experiments Table",
+            "description": "Open the experiments table.\n[Show Table](command:dvc.showExperiments)",
             "media": {
               "markdown": "resources/walkthrough/experiments-table.md"
             },
@@ -1027,7 +1027,7 @@
           {
             "id": "dvc.plots",
             "title": "Plots",
-            "description": "Open plots.\n[Show plots](command:dvc.showPlots)",
+            "description": "Open plots.\n[Show Plots](command:dvc.showPlots)",
             "media": {
               "markdown": "resources/walkthrough/plots.md"
             },
@@ -1038,8 +1038,8 @@
           },
           {
             "id": "dvc.learnMore",
-            "title": "Explore more resources",
-            "description": "Take a look into our [documentation](https://dvc.org/doc) to learn more about DVC. \n[Learn more](https://dvc.org/doc)",
+            "title": "Explore More Resources",
+            "description": "Take a look into our [documentation](https://dvc.org/doc) to learn more about DVC. \n[Learn More](https://dvc.org/doc)",
             "media": {
               "markdown": "resources/walkthrough/dvc-learn-more.md"
             },
