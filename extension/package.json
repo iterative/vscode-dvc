@@ -979,7 +979,7 @@
           {
             "id": "dvc.scm",
             "title": "Source Control Management",
-            "description": "Open the DVC scm view.\n[Show SCM](command:workbench.view.scm)",
+            "description": "Open the DVC SCM view.\n[Show SCM](command:workbench.view.scm)",
             "media": {
               "markdown": "resources/walkthrough/source-control-management.md"
             },
