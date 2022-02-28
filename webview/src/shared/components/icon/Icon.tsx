@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Dots,
   DownArrow,
+  Gripper,
   Lines,
   Pencil,
   UpArrow
@@ -16,6 +17,7 @@ export const AllIcons = {
   CHEVRON_RIGHT: ChevronRight,
   DOTS: Dots,
   DOWN_ARROW: DownArrow,
+  GRIPPER: Gripper,
   LINES: Lines,
   PENCIL: Pencil,
   UP_ARROW: UpArrow

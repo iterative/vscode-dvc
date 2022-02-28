@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/extend-expect'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
+import { createBubbledEvent, dragAndDrop } from '../../../../test/dragDrop'
 import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
 
 describe('ComparisonTable', () => {
@@ -158,21 +159,6 @@ describe('ComparisonTable', () => {
   })
 
   describe('Columns drag and drop', () => {
-    const testStorage = new Map()
-    const createBubbledEvent = (type: string, props = {}) => {
-      const event = new Event(type, {
-        bubbles: true
-      })
-      Object.assign(event, props)
-      Object.assign(event, {
-        dataTransfer: {
-          getData: (key: string) => testStorage.get(key),
-          setData: (key: string, value: Object) => testStorage.set(key, value)
-        }
-      })
-      return event
-    }
-
     const pinSecondColumn = () => {
       const secondColumn = screen.getByText(revisions[1])
 
@@ -180,15 +166,6 @@ describe('ComparisonTable', () => {
         bubbles: true,
         cancelable: true
       })
-    }
-
-    const dragAndDrop = (
-      startingNode: HTMLElement,
-      endingNode: HTMLElement
-    ) => {
-      startingNode.dispatchEvent(createBubbledEvent('dragstart'))
-
-      endingNode.dispatchEvent(createBubbledEvent('drop'))
     }
 
     it('should make the columns draggable if they are not pinned', () => {
