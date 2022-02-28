@@ -10,20 +10,22 @@ describe('getCommandString', () => {
       Command.CHECKOUT,
       Flag.FORCE
     )
-    expect(commandString).toEqual('dvc checkout -f')
+    expect(commandString).toStrictEqual('dvc checkout -f')
   })
 
   it('should give the correct command string given an isolated python env is in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv')
     const commandString = getCommandString(pythonBinPath, 'dvc', Command.DIFF)
-    expect(commandString).toEqual(`${join(pythonBinPath, 'python')} dvc diff`)
+    expect(commandString).toStrictEqual(
+      `${join(pythonBinPath, 'python')} dvc diff`
+    )
   })
 
   it('should give the correct command string given both an isolated python env and direct path to dvc are in use', () => {
     const pythonBinPath = join('path', 'to', 'conda', '.venv')
     const cliPath = join('custom', 'path', 'to', 'dvc')
     const commandString = getCommandString(pythonBinPath, cliPath, Command.PUSH)
-    expect(commandString).toEqual(
+    expect(commandString).toStrictEqual(
       `${join(pythonBinPath, 'python')} ${cliPath} push`
     )
   })

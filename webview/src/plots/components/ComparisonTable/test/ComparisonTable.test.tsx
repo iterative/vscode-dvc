@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/extend-expect'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
+import { createBubbledEvent, dragAndDrop } from '../../../../test/dragDrop'
 import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
 
 describe('ComparisonTable', () => {
@@ -125,7 +126,7 @@ describe('ComparisonTable', () => {
 
     let headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toEqual(revisions)
+    expect(headers).toStrictEqual(revisions)
 
     const filteredRevisions = basicProps.revisions.filter(
       ({ revision }) => revision !== revisions[3]
@@ -135,7 +136,7 @@ describe('ComparisonTable', () => {
 
     headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toEqual([
+    expect(headers).toStrictEqual([
       revisions[0],
       revisions[1],
       revisions[2],
@@ -154,25 +155,10 @@ describe('ComparisonTable', () => {
     rerender(<ComparisonTable {...basicProps} revisions={newRevisions} />)
     const headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toEqual([...revisions, newRevName])
+    expect(headers).toStrictEqual([...revisions, newRevName])
   })
 
   describe('Columns drag and drop', () => {
-    const testStorage = new Map()
-    const createBubbledEvent = (type: string, props = {}) => {
-      const event = new Event(type, {
-        bubbles: true
-      })
-      Object.assign(event, props)
-      Object.assign(event, {
-        dataTransfer: {
-          getData: (key: string) => testStorage.get(key),
-          setData: (key: string, value: Object) => testStorage.set(key, value)
-        }
-      })
-      return event
-    }
-
     const pinSecondColumn = () => {
       const secondColumn = screen.getByText(revisions[1])
 
@@ -180,15 +166,6 @@ describe('ComparisonTable', () => {
         bubbles: true,
         cancelable: true
       })
-    }
-
-    const dragAndDrop = (
-      startingNode: HTMLElement,
-      endingNode: HTMLElement
-    ) => {
-      startingNode.dispatchEvent(createBubbledEvent('dragstart'))
-
-      endingNode.dispatchEvent(createBubbledEvent('drop'))
     }
 
     it('should make the columns draggable if they are not pinned', () => {
@@ -214,13 +191,13 @@ describe('ComparisonTable', () => {
 
       let headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toEqual(revisions)
+      expect(headers).toStrictEqual(revisions)
 
       dragAndDrop(startingNode, endingNode)
 
       headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toEqual([
+      expect(headers).toStrictEqual([
         revisions[0],
         revisions[3],
         revisions[1],
@@ -245,11 +222,11 @@ describe('ComparisonTable', () => {
 
       const headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toEqual(expectedOrder)
+      expect(headers).toStrictEqual(expectedOrder)
 
       dragAndDrop(startingNode, endingNode)
 
-      expect(headers).toEqual(expectedOrder)
+      expect(headers).toStrictEqual(expectedOrder)
     })
 
     it('should prevent default behaviour when dragging over', () => {
@@ -283,7 +260,7 @@ describe('ComparisonTable', () => {
         revisions[4]
       ]
 
-      expect(headers).toEqual(reorderedRevisions)
+      expect(headers).toStrictEqual(reorderedRevisions)
 
       const newRevName = 'newRev'
       const originalRevisionsWithNew = [
@@ -296,7 +273,7 @@ describe('ComparisonTable', () => {
       )
 
       headers = getHeaders().map(header => header.textContent)
-      expect(headers).toEqual([...reorderedRevisions, newRevName])
+      expect(headers).toStrictEqual([...reorderedRevisions, newRevName])
     })
   })
 })

@@ -40,7 +40,7 @@ describe('joinTruthyItems', () => {
       'e'
     ])
 
-    expect(string).toEqual('a b c d e')
+    expect(string).toStrictEqual('a b c d e')
   })
 
   it('should join the truthy items in the given array with the given separator', () => {
@@ -61,7 +61,7 @@ describe('joinTruthyItems', () => {
       ':'
     )
 
-    expect(string).toEqual('a:b:c:d:e')
+    expect(string).toStrictEqual('a:b:c:d:e')
   })
 })
 
@@ -82,21 +82,21 @@ describe('uniqueValues', () => {
         '5',
         undefined
       ])
-    ).toEqual([1, 2, undefined, 3, 4, 5, 6, '5'])
+    ).toStrictEqual([1, 2, undefined, 3, 4, 5, 6, '5'])
   })
 })
 
 describe('flatten', () => {
   it('should flatten an array of arrays', () => {
-    expect(flatten<number>([[1], [2, 3, 4], [5, 6, 7, 8, 9, 10]])).toEqual([
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-    ])
+    expect(
+      flatten<number>([[1], [2, 3, 4], [5, 6, 7, 8, 9, 10]])
+    ).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
 
   it('should return all of the original items', () => {
     expect(
       flatten<number>([[1], [2, 3, 4, 5, 6, 7, 8], [5, 6, 7, 8, 9, 10]])
-    ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 5, 6, 7, 8, 9, 10])
+    ).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8, 5, 6, 7, 8, 9, 10])
   })
 })
 
@@ -104,7 +104,7 @@ describe('flattenUnique', () => {
   it('should return only unique items', () => {
     expect(
       flattenUnique<number>([[1], [2, 3, 4, 5, 6, 7, 8], [5, 6, 7, 8, 9, 10]])
-    ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    ).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
 
   it('should return only unique items from mixed type arrays', () => {
@@ -114,7 +114,7 @@ describe('flattenUnique', () => {
         [2, undefined, 4, 5, 6, 7, 8],
         ['5', undefined, 1, undefined, 6, 7, 8, 9, 10]
       ])
-    ).toEqual([1, 2, undefined, 4, 5, 6, 7, 8, '5', 9, 10])
+    ).toStrictEqual([1, 2, undefined, 4, 5, 6, 7, 8, '5', 9, 10])
   })
 })
 

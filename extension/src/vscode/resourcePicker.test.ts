@@ -34,7 +34,7 @@ describe('pickFile', () => {
 
     const pickedFile = await pickFile(mockedTitle)
 
-    expect(pickedFile).toEqual(mockedUri.fsPath)
+    expect(pickedFile).toStrictEqual(mockedUri.fsPath)
   })
 })
 
@@ -62,6 +62,6 @@ describe('pickResources', () => {
 
     const pickedResources = await pickResources(mockedTitle)
 
-    expect(pickedResources).toEqual([mockedUri])
+    expect(pickedResources).toStrictEqual([mockedUri])
   })
 })

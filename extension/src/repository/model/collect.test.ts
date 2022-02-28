@@ -25,7 +25,7 @@ describe('collectTree', () => {
 
     const treeData = collectTree(dvcDemoPath, paths)
 
-    expect(treeData).toEqual(
+    expect(treeData).toStrictEqual(
       new Map([
         [
           dvcDemoPath,
