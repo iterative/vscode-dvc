@@ -20,10 +20,12 @@ import {
   joinMetricOrParamFilePath
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
-import { addToMapArray, addToMapCount } from '../../util/map'
-import { isCheckpoint } from '../../experiments/model/collect'
+import { addToMapArray } from '../../util/map'
 
-type LivePlotAccumulator = Map<string, LivePlotValues>
+type LivePlotAccumulator = {
+  iterations: Record<string, number>
+  plots: Map<string, LivePlotValues>
+}
 
 const collectFromMetricsFile = (
   acc: LivePlotAccumulator,
@@ -51,7 +53,7 @@ const collectFromMetricsFile = (
 
   const path = joinMetricOrParamFilePath(...pathArray)
 
-  addToMapArray(acc, path, { group: name, iteration, y: value })
+  addToMapArray(acc.plots, path, { group: name, iteration, y: value })
 }
 
 type MetricsAndDetailsOrUndefined =
@@ -79,7 +81,7 @@ const transformExperimentData = (
   return { checkpoint_parent, checkpoint_tip, metrics, queued, running }
 }
 
-type ValidCheckpointData = {
+type ValidData = {
   checkpoint_parent: string
   checkpoint_tip: string
   metrics: MetricsOrParams
@@ -87,11 +89,8 @@ type ValidCheckpointData = {
   running: boolean | undefined
 }
 
-const isValidCheckpoint = (
-  data: MetricsAndDetailsOrUndefined,
-  sha: string
-): data is ValidCheckpointData =>
-  !!(isCheckpoint(data?.checkpoint_tip, sha) && data?.metrics)
+const isValid = (data: MetricsAndDetailsOrUndefined): data is ValidData =>
+  !!(data?.checkpoint_tip && data?.checkpoint_parent && data?.metrics)
 
 const collectFromMetrics = (
   acc: LivePlotAccumulator,
@@ -111,46 +110,51 @@ const collectFromMetrics = (
   )
 }
 
+const getLastIteration = (
+  acc: LivePlotAccumulator,
+  checkpointParent: string
+): number => acc.iterations[checkpointParent] || 0
+
+const collectIteration = (
+  acc: LivePlotAccumulator,
+  sha: string,
+  checkpointParent: string
+): number => {
+  const iteration = getLastIteration(acc, checkpointParent) + 1
+  acc.iterations[sha] = iteration
+  return iteration
+}
+
 const linkModified = (
   acc: LivePlotAccumulator,
-  checkpointCount: Map<string, number>,
-  currentCheckpoint: {
-    experimentName: string
-    checkpointParent: string
-    checkpointTip: string
-  },
-  lastCheckpoint: {
-    metrics: MetricsOrParams
-    iteration: number
-    checkpointTip: string
-  }
+  experimentName: string,
+  checkpointTip: string,
+  checkpointParent: string,
+  parent: ExperimentFieldsOrError | undefined
 ) => {
-  const { experimentName, checkpointParent, checkpointTip } = currentCheckpoint
-
-  const {
-    metrics: lastMetrics,
-    checkpointTip: lastCheckpointTip,
-    iteration: lastIteration
-  } = lastCheckpoint
-
-  if (lastCheckpointTip && checkpointParent === lastCheckpointTip) {
-    checkpointCount.set(checkpointTip, lastIteration)
-    collectFromMetrics(acc, experimentName, lastIteration, lastMetrics)
+  if (!parent) {
+    return
   }
+
+  const parentData = transformExperimentData(parent)
+  if (!isValid(parentData) || parentData.checkpoint_tip === checkpointTip) {
+    return
+  }
+
+  const lastIteration = getLastIteration(acc, checkpointParent)
+  collectFromMetrics(acc, experimentName, lastIteration, parentData.metrics)
 }
 
 const collectFromExperimentsObject = (
   acc: LivePlotAccumulator,
-  experimentsObject: { [sha: string]: ExperimentFieldsOrError },
-  checkpointCount = new Map<string, number>(),
-  lastCheckpoint = { checkpointTip: '', iteration: 0, metrics: {} }
+  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ) => {
   for (const [sha, experimentData] of Object.entries(
     experimentsObject
   ).reverse()) {
     const data = transformExperimentData(experimentData)
 
-    if (!isValidCheckpoint(data, sha)) {
+    if (!isValid(data)) {
       continue
     }
     const {
@@ -166,22 +170,24 @@ const collectFromExperimentsObject = (
 
     linkModified(
       acc,
-      checkpointCount,
-      { checkpointParent, checkpointTip, experimentName },
-      lastCheckpoint
+      experimentName,
+      checkpointTip,
+      checkpointParent,
+      experimentsObject[checkpointParent]
     )
 
-    const iteration = addToMapCount(checkpointTip, checkpointCount)
+    const iteration = collectIteration(acc, sha, checkpointParent)
     collectFromMetrics(acc, experimentName, iteration, metrics)
-
-    lastCheckpoint = { checkpointTip, iteration, metrics }
   }
 }
 
 export const collectLivePlotsData = (
   data: ExperimentsOutput
 ): LivePlotData[] | undefined => {
-  const acc = new Map<string, LivePlotValues>()
+  const acc = {
+    iterations: {},
+    plots: new Map<string, LivePlotValues>()
+  }
 
   for (const { baseline, ...experimentsObject } of Object.values(
     omit(data, 'workspace')
@@ -193,13 +199,13 @@ export const collectLivePlotsData = (
     }
   }
 
-  if (!acc.size) {
+  if (!acc.plots.size) {
     return
   }
 
   const plotsData: LivePlotData[] = []
 
-  acc.forEach((value, key) => {
+  acc.plots.forEach((value, key) => {
     plotsData.push({ title: decodeMetricOrParam(key), values: value })
   })
 

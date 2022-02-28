@@ -1,7 +1,7 @@
 import { VegaPlot, VegaPlots } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import styles from './styles.module.scss'
-import { StaticPlot } from './StaticPlot'
+import { StaticPlotGrid } from './StaticPlotGrid'
 
 interface StaticPlotsProps {
   plots: VegaPlots
@@ -35,22 +35,13 @@ export const StaticPlots: React.FC<StaticPlotsProps> = ({ plots }) => {
     { multiViewPlots: {}, singleViewPlots: {} }
   )
 
-  const makeKey = (path: string, i: number) => `plot-${path}-${i}`
-
-  const renderPlots = (entries: VegaPlots) =>
-    Object.entries(entries).map(([path, plots]) =>
-      plots.map((plot: VegaPlot, i) => (
-        <StaticPlot key={makeKey(path, i)} plot={plot} />
-      ))
-    )
-
   return (
     <>
       <div className={styles.singleViewPlotsGrid}>
-        {renderPlots(singleViewPlots)}
+        <StaticPlotGrid entries={singleViewPlots} />
       </div>
       <div className={styles.multiViewPlotsGrid}>
-        {renderPlots(multiViewPlots)}
+        <StaticPlotGrid entries={multiViewPlots} />
       </div>
     </>
   )

@@ -20,7 +20,7 @@ const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as VegaPlot
 describe('collectLivePlotsData', () => {
   it('should return the expected data from the test fixture', () => {
     const data = collectLivePlotsData(expShowFixture)
-    expect(data).toEqual(livePlotsFixture.plots)
+    expect(data).toStrictEqual(livePlotsFixture.plots)
   })
 
   it('should provide a continuous series for a modified experiment', () => {
@@ -40,8 +40,21 @@ describe('collectLivePlotsData', () => {
       const firstIterationModified = modifiedExperiment[0]
 
       expect(lastIterationInitial).not.toEqual(firstIterationModified)
-      expect(omit(lastIterationInitial, 'group')).toEqual(
+      expect(omit(lastIterationInitial, 'group')).toStrictEqual(
         omit(firstIterationModified, 'group')
+      )
+
+      const baseExperiment = values.filter(point => point.group === 'exp-920fc')
+      const restartedExperiment = values.filter(
+        point => point.group === 'exp-9bc1b'
+      )
+
+      const iterationRestartedFrom = baseExperiment?.slice(5)[0]
+      const firstIterationAfterRestart = restartedExperiment[0]
+
+      expect(iterationRestartedFrom).not.toEqual(firstIterationAfterRestart)
+      expect(omit(iterationRestartedFrom, 'group')).toStrictEqual(
+        omit(firstIterationAfterRestart, 'group')
       )
     })
   })
