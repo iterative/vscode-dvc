@@ -111,14 +111,19 @@ const collectFromMetrics = (
 }
 
 const getLastIteration = (
-  iterations: Record<string, number>,
+  acc: LivePlotAccumulator,
   checkpointParent: string
-): number => iterations[checkpointParent] || 0
+): number => acc.iterations[checkpointParent] || 0
 
-const getCurrentIteration = (
-  iterations: Record<string, number>,
+const collectIteration = (
+  acc: LivePlotAccumulator,
+  sha: string,
   checkpointParent: string
-): number => getLastIteration(iterations, checkpointParent) + 1
+): number => {
+  const iteration = getLastIteration(acc, checkpointParent) + 1
+  acc.iterations[sha] = iteration
+  return iteration
+}
 
 const linkModified = (
   acc: LivePlotAccumulator,
@@ -136,8 +141,7 @@ const linkModified = (
     return
   }
 
-  const lastIteration = getLastIteration(acc.iterations, checkpointParent)
-
+  const lastIteration = getLastIteration(acc, checkpointParent)
   collectFromMetrics(acc, experimentName, lastIteration, parentData.metrics)
 }
 
@@ -172,9 +176,7 @@ const collectFromExperimentsObject = (
       experimentsObject[checkpointParent]
     )
 
-    const iteration = getCurrentIteration(acc.iterations, checkpointParent)
-    acc.iterations[sha] = iteration
-
+    const iteration = collectIteration(acc, sha, checkpointParent)
     collectFromMetrics(acc, experimentName, iteration, metrics)
   }
 }
