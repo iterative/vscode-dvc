@@ -13,7 +13,7 @@ import { DragDropContainer } from '../../shared/components/dragDrop/DragDropCont
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../util/styles'
 
-interface StaticPlotGirdProps {
+interface StaticPlotGridProps {
   entries: VegaPlots
 }
 
@@ -22,7 +22,7 @@ interface StaticPlotEntry extends VegaPlot {
   id: string
 }
 
-export const StaticPlotGrid: React.FC<StaticPlotGirdProps> = ({ entries }) => {
+export const StaticPlotGrid: React.FC<StaticPlotGridProps> = ({ entries }) => {
   const [allPlots, setAllPlots] = useState<StaticPlotEntry[]>([])
   const [order, setOrder] = useState<string[]>([])
 
