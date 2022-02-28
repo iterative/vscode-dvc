@@ -122,8 +122,8 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
-    expect(screen.queryByText('Static Plots')).not.toBeInTheDocument()
+    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
+    expect(screen.queryByText('Plots')).not.toBeInTheDocument()
     expect(screen.queryByText('Comparison')).not.toBeInTheDocument()
   })
 
@@ -142,8 +142,8 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
-    expect(screen.getByText('Static Plots')).toBeInTheDocument()
+    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
+    expect(screen.getByText('Plots')).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -167,12 +167,12 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
+    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
 
     sendSetDataMessage({
       live: null
     })
-    expect(screen.queryByText('Live Experiments Plots')).not.toBeInTheDocument()
+    expect(screen.queryByText('Experiment Checkpoints')).not.toBeInTheDocument()
   })
 
   it('should toggle the live plots section in state when its header is clicked', async () => {
@@ -181,7 +181,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const summaryElement = await screen.findByText('Live Experiments Plots')
+    const summaryElement = await screen.findByText('Experiment Checkpoints')
     const [plot] = await screen.findAllByLabelText('Vega visualization')
     expect(plot).toBeInTheDocument()
 
@@ -213,7 +213,7 @@ describe('App', () => {
       />
     )
 
-    const summaryElement = await screen.findByText('Live Experiments Plots')
+    const summaryElement = await screen.findByText('Experiment Checkpoints')
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
@@ -352,7 +352,7 @@ describe('App', () => {
       live: livePlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
-    const originalText = 'Live Experiments Plots'
+    const originalText = 'Experiment Checkpoints'
 
     expect(screen.getByText(originalText)).toBeInTheDocument()
 
