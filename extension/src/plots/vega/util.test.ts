@@ -64,7 +64,7 @@ describe('getColorScale', () => {
         { displayColor: '#000000', revision: 'main' },
         { displayColor: '#FFFFFF', revision: 'workspace' }
       ])
-    ).toEqual({
+    ).toStrictEqual({
       domain: ['main', 'workspace'],
       range: ['#000000', '#FFFFFF']
     })
@@ -84,8 +84,8 @@ describe('extendVegaSpec', () => {
     }
     const extendedSpec = extendVegaSpec(linearTemplate, colorScale)
 
-    expect(extendedSpec).not.toEqual(defaultTemplate)
-    expect(extendedSpec.encoding.color).toEqual({
+    expect(extendedSpec).not.toStrictEqual(defaultTemplate)
+    expect(extendedSpec.encoding.color).toStrictEqual({
       legend: { disable: true },
       scale: colorScale
     })

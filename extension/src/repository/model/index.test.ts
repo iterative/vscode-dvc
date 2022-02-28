@@ -80,7 +80,7 @@ describe('RepositoryState', () => {
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toEqual({
+      expect(model.getState()).toStrictEqual({
         added: emptySet,
         deleted: new Set([join(dvcDemoPath, deleted)]),
         gitModified: new Set([join(dvcDemoPath, output)]),
@@ -125,7 +125,7 @@ describe('RepositoryState', () => {
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toEqual({
+      expect(model.getState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: new Set([
@@ -167,7 +167,7 @@ describe('RepositoryState', () => {
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toEqual({
+      expect(model.getState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
@@ -202,7 +202,7 @@ describe('RepositoryState', () => {
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toEqual({
+      expect(model.getState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,

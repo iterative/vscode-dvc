@@ -94,7 +94,7 @@ describe('pickExperiment', () => {
     }
     mockedQuickPickValue.mockResolvedValueOnce(expectedDetails)
     const experiment = await pickExperiment(mockedExpList)
-    expect(experiment).toEqual(expectedDetails)
+    expect(experiment).toStrictEqual(expectedDetails)
   })
 
   it('should return undefined if the user cancels the popup dialog', async () => {

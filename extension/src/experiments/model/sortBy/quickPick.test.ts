@@ -68,7 +68,7 @@ describe('pickSortToAdd', () => {
       ],
       { title: 'Select a direction to sort in' }
     )
-    expect(resolvedPromise).toEqual({
+    expect(resolvedPromise).toStrictEqual({
       descending: false,
       path: epochsParamPath
     })
@@ -79,7 +79,7 @@ describe('pickSortToAdd', () => {
     mockedQuickPickValue.mockResolvedValueOnce(false)
     const resolvedPromise = await pickSortToAdd(exampleMetricsAndParams)
     expect(mockedQuickPickValue).toBeCalledTimes(2)
-    expect(resolvedPromise).toEqual({
+    expect(resolvedPromise).toStrictEqual({
       descending: false,
       path: paramsYamlPath
     })
@@ -106,6 +106,6 @@ describe('pickSortsToRemove', () => {
     mockedQuickPickManyValues.mockResolvedValueOnce(selectedSorts)
 
     const sortsToRemove = await pickSortsToRemove(allSorts)
-    expect(sortsToRemove).toEqual(selectedSorts)
+    expect(sortsToRemove).toStrictEqual(selectedSorts)
   })
 })

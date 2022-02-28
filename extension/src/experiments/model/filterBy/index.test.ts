@@ -40,7 +40,7 @@ describe('filterExperiments', () => {
 
   it('should return the original experiments if no filters are provided', () => {
     const unFilteredExperiments = filterExperiments([], experiments)
-    expect(unFilteredExperiments).toEqual(experiments)
+    expect(unFilteredExperiments).toStrictEqual(experiments)
   })
 
   it('should filter the experiments by a given filter', () => {
@@ -54,7 +54,9 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toEqual([3])
+    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
+      3
+    ])
   })
 
   it('should filter the experiments by an equals filter', () => {
@@ -68,7 +70,9 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toEqual([2])
+    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
+      2
+    ])
   })
 
   it('should filter the experiments by a not equals filter', () => {
@@ -82,7 +86,9 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toEqual([1, 3])
+    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
+      1, 3
+    ])
   })
 
   it('should filter the experiments by multiple filters', () => {
@@ -101,7 +107,9 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toEqual([1, 2])
+    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
+      1, 2
+    ])
   })
 
   it('should filter the experiments by multiple filters on multiple params', () => {
@@ -125,7 +133,7 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments).toEqual([])
+    expect(filteredExperiments).toStrictEqual([])
   })
 
   it('should filter the experiments using string contains', () => {
@@ -139,7 +147,9 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(experimentsWithText.map(experiment => experiment.id)).toEqual([1])
+    expect(experimentsWithText.map(experiment => experiment.id)).toStrictEqual([
+      1
+    ])
   })
 
   it('should filter all experiments if given a numeric column to filter with string contains', () => {
@@ -153,7 +163,7 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(noExperiments).toEqual([])
+    expect(noExperiments).toStrictEqual([])
   })
 
   it('should not filter any experiments if given a numeric column to filter with string does not contain', () => {
@@ -167,7 +177,7 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(unfilteredExperiments).toEqual(experiments)
+    expect(unfilteredExperiments).toStrictEqual(experiments)
   })
 
   it('should filter the experiments using string does not contain', () => {
@@ -181,9 +191,9 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(experimentsWithoutText.map(experiment => experiment.id)).toEqual([
-      2, 3
-    ])
+    expect(
+      experimentsWithoutText.map(experiment => experiment.id)
+    ).toStrictEqual([2, 3])
   })
 
   it('should filter the experiments using boolean is true', () => {
@@ -197,9 +207,9 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(experimentsWithTrueBool.map(experiment => experiment.id)).toEqual([
-      1
-    ])
+    expect(
+      experimentsWithTrueBool.map(experiment => experiment.id)
+    ).toStrictEqual([1])
   })
 
   it('should filter the experiments using boolean is false', () => {
@@ -213,8 +223,8 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(experimentsWithFalseBool.map(experiment => experiment.id)).toEqual([
-      2
-    ])
+    expect(
+      experimentsWithFalseBool.map(experiment => experiment.id)
+    ).toStrictEqual([2])
   })
 })

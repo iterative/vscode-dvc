@@ -67,7 +67,7 @@ describe('CliReader', () => {
       )
 
       const experiments = await cliReader.experimentShow(cwd)
-      expect(experiments).toEqual(expShowFixture)
+      expect(experiments).toStrictEqual(expShowFixture)
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'show', SHOW_JSON],
         cwd,
@@ -99,7 +99,7 @@ describe('CliReader', () => {
       )
       const statusOutput = await cliReader.diff(cwd)
 
-      expect(statusOutput).toEqual(cliOutput)
+      expect(statusOutput).toStrictEqual(cliOutput)
 
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['diff', SHOW_JSON],
@@ -119,7 +119,7 @@ describe('CliReader', () => {
         .mockReturnValueOnce(getMockedProcess(JSON.stringify(cliOutput)))
       const statusOutput = await cliReader.diff(cwd)
 
-      expect(statusOutput).toEqual(cliOutput)
+      expect(statusOutput).toStrictEqual(cliOutput)
 
       expect(mockedCreateProcess).toBeCalledTimes(2)
       expect(mockedCreateProcess).toBeCalledWith({
@@ -180,7 +180,7 @@ describe('CliReader', () => {
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
       const output = await cliReader.help(cwd)
 
-      expect(output).toEqual(stdout)
+      expect(output).toStrictEqual(stdout)
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['-h'],
         cwd,
@@ -251,7 +251,7 @@ describe('CliReader', () => {
       )
       const tracked = await cliReader.listDvcOnlyRecursive(cwd)
 
-      expect(tracked).toEqual(listOutput)
+      expect(tracked).toStrictEqual(listOutput)
 
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['list', '.', '--dvc-only', '-R', SHOW_JSON],
@@ -270,7 +270,7 @@ describe('CliReader', () => {
         )
 
         const plots = await cliReader.plotsDiff(cwd, 'HEAD')
-        expect(plots).toEqual(plotsDiffFixture)
+        expect(plots).toStrictEqual(plotsDiffFixture)
         expect(mockedCreateProcess).toBeCalledWith({
           args: [
             'plots',
@@ -293,7 +293,7 @@ describe('CliReader', () => {
         const cwd = __dirname
         mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
         const relativeRoot = await cliReader.root(cwd)
-        expect(relativeRoot).toEqual(stdout)
+        expect(relativeRoot).toStrictEqual(stdout)
         expect(mockedCreateProcess).toBeCalledWith({
           args: ['root'],
           cwd,
@@ -340,7 +340,7 @@ describe('CliReader', () => {
       )
       const diffOutput = await cliReader.status(cwd)
 
-      expect(diffOutput).toEqual(cliOutput)
+      expect(diffOutput).toStrictEqual(cliOutput)
 
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['status', SHOW_JSON],

@@ -78,7 +78,7 @@ describe('ExperimentsSortByTree', () => {
         mockedInternalCommands
       )
       const rootElements = await experimentsSortByTree.getChildren(undefined)
-      expect(rootElements).toEqual([])
+      expect(rootElements).toStrictEqual([])
     })
 
     it('should return an empty array if there are roots but no sorts', async () => {
@@ -89,7 +89,7 @@ describe('ExperimentsSortByTree', () => {
         mockedInternalCommands
       )
       const rootElements = await experimentsSortByTree.getChildren(undefined)
-      expect(rootElements).toEqual([])
+      expect(rootElements).toStrictEqual([])
     })
 
     it('should display sorts at the top level when only one project exists', async () => {
@@ -99,7 +99,7 @@ describe('ExperimentsSortByTree', () => {
         mockedExperiments,
         mockedInternalCommands
       )
-      expect(await experimentsSortByTree.getChildren(undefined)).toEqual(
+      expect(await experimentsSortByTree.getChildren(undefined)).toStrictEqual(
         singleSortDefinitionWithParentArray
       )
     })
@@ -111,7 +111,7 @@ describe('ExperimentsSortByTree', () => {
         mockedExperiments,
         mockedInternalCommands
       )
-      expect(await experimentsSortByTree.getChildren(undefined)).toEqual([
+      expect(await experimentsSortByTree.getChildren(undefined)).toStrictEqual([
         dvcRoot,
         'demo2'
       ])
@@ -123,7 +123,7 @@ describe('ExperimentsSortByTree', () => {
         mockedExperiments,
         mockedInternalCommands
       )
-      expect(await experimentsSortByTree.getChildren(dvcRoot)).toEqual(
+      expect(await experimentsSortByTree.getChildren(dvcRoot)).toStrictEqual(
         singleSortDefinitionWithParentArray
       )
     })
@@ -136,7 +136,7 @@ describe('ExperimentsSortByTree', () => {
         mockedExperiments,
         mockedInternalCommands
       )
-      expect(experimentsSortByTree.getTreeItem(dvcRoot)).toEqual({
+      expect(experimentsSortByTree.getTreeItem(dvcRoot)).toStrictEqual({
         collapsibleState: TreeItemCollapsibleState.Expanded,
         contextValue: 'dvcRoot',
         id: dvcRoot,
@@ -152,7 +152,7 @@ describe('ExperimentsSortByTree', () => {
       )
       expect(
         experimentsSortByTree.getTreeItem(exampleSortDefinitionWithParent)
-      ).toEqual({
+      ).toStrictEqual({
         collapsibleState: TreeItemCollapsibleState.None,
         iconPath: new ThemeIcon('arrow-down'),
         label: examplePath
@@ -174,7 +174,7 @@ describe('ExperimentsSortByTree', () => {
             path: otherPath
           }
         })
-      ).toEqual({
+      ).toStrictEqual({
         collapsibleState: TreeItemCollapsibleState.None,
         iconPath: new ThemeIcon('arrow-down'),
         label: otherPath
