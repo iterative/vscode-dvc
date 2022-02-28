@@ -70,6 +70,10 @@ $gap: 20px;
   }
 }
 
+.multiViewPlotsGrid {
+  margin-top: $gap;
+}
+
 .singleViewPlotsGrid, .multiViewPlotsGrid {
   width: 100%;
   display: grid;

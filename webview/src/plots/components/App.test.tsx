@@ -469,4 +469,33 @@ describe('App', () => {
       'summary.json:new-plot'
     ])
   })
+
+  it('should display the static plots in the order stored', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      static: {
+        ...staticPlotsFixture,
+        plots: {
+          ...staticPlotsFixture.plots,
+          'other/plot.tsv': [...staticPlotsFixture.plots['logs/loss.tsv']]
+        }
+      }
+    })
+
+    let plots = screen.getAllByTestId(/^plot-/)
+
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'plot-logs/loss.tsv-0',
+      'plot-other/plot.tsv-0'
+    ])
+
+    dragAndDrop(plots[1], plots[0])
+
+    plots = screen.getAllByTestId(/^plot-/)
+
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'plot-other/plot.tsv-0',
+      'plot-logs/loss.tsv-0'
+    ])
+  })
 })
