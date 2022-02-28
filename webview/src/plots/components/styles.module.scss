@@ -70,6 +70,10 @@ $gap: 20px;
   }
 }
 
+.multiViewPlotsGrid {
+  margin-top: $gap;
+}
+
 .singleViewPlotsGrid, .multiViewPlotsGrid {
   width: 100%;
   display: grid;
@@ -140,10 +144,21 @@ $gap: 20px;
 .plot {
   aspect-ratio: 4 / 3;
   overflow: visible;
+  padding: 10px 10px 10px 20px;
+  border-radius: 5px;
+  border: 1px solid rgba(#fff, 0.5);
+  cursor: grab;
+  position: relative;
 
   &:hover {
     z-index: 2;
   }
+}
+
+.plotGripIcon {
+  position: absolute;
+  z-index: 2;
+  left: 10px;
 }
 
 .plot img,

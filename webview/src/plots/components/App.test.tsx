@@ -21,6 +21,7 @@ import {
 import { App } from './App'
 import { Plots } from './Plots'
 import { vsCodeApi } from '../../shared/api'
+import { dragAndDrop } from '../../test/dragDrop'
 
 jest.mock('../../shared/api')
 
@@ -121,8 +122,8 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
-    expect(screen.queryByText('Static Plots')).not.toBeInTheDocument()
+    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
+    expect(screen.queryByText('Plots')).not.toBeInTheDocument()
     expect(screen.queryByText('Comparison')).not.toBeInTheDocument()
   })
 
@@ -141,8 +142,8 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
-    expect(screen.getByText('Static Plots')).toBeInTheDocument()
+    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
+    expect(screen.getByText('Plots')).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -166,12 +167,12 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
+    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
 
     sendSetDataMessage({
       live: null
     })
-    expect(screen.queryByText('Live Experiments Plots')).not.toBeInTheDocument()
+    expect(screen.queryByText('Experiment Checkpoints')).not.toBeInTheDocument()
   })
 
   it('should toggle the live plots section in state when its header is clicked', async () => {
@@ -180,7 +181,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const summaryElement = await screen.findByText('Live Experiments Plots')
+    const summaryElement = await screen.findByText('Experiment Checkpoints')
     const [plot] = await screen.findAllByLabelText('Vega visualization')
     expect(plot).toBeInTheDocument()
 
@@ -212,7 +213,7 @@ describe('App', () => {
       />
     )
 
-    const summaryElement = await screen.findByText('Live Experiments Plots')
+    const summaryElement = await screen.findByText('Experiment Checkpoints')
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
@@ -351,7 +352,7 @@ describe('App', () => {
       live: livePlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
-    const originalText = 'Live Experiments Plots'
+    const originalText = 'Experiment Checkpoints'
 
     expect(screen.getByText(originalText)).toBeInTheDocument()
 
@@ -386,5 +387,115 @@ describe('App', () => {
       payload: { name: newTitle, section: Section.LIVE_PLOTS },
       type: MessageFromWebviewType.SECTION_RENAMED
     })
+  })
+
+  it('should display the live plots in the order stored', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    let plots = screen.getAllByTestId(/summary\.json/)
+
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy'
+    ])
+
+    dragAndDrop(plots[1], plots[0])
+
+    plots = screen.getAllByTestId(/summary\.json/)
+
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:accuracy',
+      'summary.json:loss',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy'
+    ])
+  })
+
+  it('should remove the live plot from the order if it is removed from the plots', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    let plots = screen.getAllByTestId(/summary\.json/)
+    dragAndDrop(plots[1], plots[0])
+
+    sendSetDataMessage({
+      live: {
+        ...livePlotsFixture,
+        plots: livePlotsFixture.plots.slice(1)
+      }
+    })
+    plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy'
+    ])
+  })
+
+  it('should add the new plot at the end of the set order', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    let plots = screen.getAllByTestId(/summary\.json/)
+    dragAndDrop(plots[3], plots[0])
+
+    sendSetDataMessage({
+      live: {
+        ...livePlotsFixture,
+        plots: [
+          {
+            title: 'summary.json:new-plot',
+            values: livePlotsFixture.plots[0].values
+          },
+          ...livePlotsFixture.plots
+        ]
+      }
+    })
+    plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:val_accuracy',
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:new-plot'
+    ])
+  })
+
+  it('should display the static plots in the order stored', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      static: {
+        ...staticPlotsFixture,
+        plots: {
+          ...staticPlotsFixture.plots,
+          'other/plot.tsv': [...staticPlotsFixture.plots['logs/loss.tsv']]
+        }
+      }
+    })
+
+    let plots = screen.getAllByTestId(/^plot-/)
+
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'plot-logs/loss.tsv-0',
+      'plot-other/plot.tsv-0'
+    ])
+
+    dragAndDrop(plots[1], plots[0])
+
+    plots = screen.getAllByTestId(/^plot-/)
+
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'plot-other/plot.tsv-0',
+      'plot-logs/loss.tsv-0'
+    ])
   })
 })

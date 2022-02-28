@@ -43,6 +43,21 @@ describe('collectLivePlotsData', () => {
       expect(omit(lastIterationInitial, 'group')).toStrictEqual(
         omit(firstIterationModified, 'group')
       )
+
+      const baseExperiment = values.filter(point => point.group === 'exp-920fc')
+      const restartedExperiment = values.filter(
+        point => point.group === 'exp-9bc1b'
+      )
+
+      const iterationRestartedFrom = baseExperiment?.slice(5)[0]
+      const firstIterationAfterRestart = restartedExperiment[0]
+
+      expect(iterationRestartedFrom).not.toStrictEqual(
+        firstIterationAfterRestart
+      )
+      expect(omit(iterationRestartedFrom, 'group')).toStrictEqual(
+        omit(firstIterationAfterRestart, 'group')
+      )
     })
   })
 
