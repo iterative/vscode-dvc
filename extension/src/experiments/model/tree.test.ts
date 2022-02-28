@@ -70,7 +70,7 @@ describe('ExperimentsTree', () => {
 
       const rootElements = await experimentsTree.getChildren()
 
-      expect(rootElements).toEqual([])
+      expect(rootElements).toStrictEqual([])
     })
 
     it('should return an empty array when no experiments exist for the single repository', async () => {
@@ -84,7 +84,7 @@ describe('ExperimentsTree', () => {
 
       const rootElements = await experimentsTree.getChildren()
 
-      expect(rootElements).toEqual([])
+      expect(rootElements).toStrictEqual([])
     })
 
     it('should return an array of root elements when at least one experiment exists in one of the repositories', async () => {
@@ -105,7 +105,7 @@ describe('ExperimentsTree', () => {
 
       const rootElements = await experimentsTree.getChildren()
 
-      expect(rootElements).toEqual(dvcRoots)
+      expect(rootElements).toStrictEqual(dvcRoots)
     })
 
     it('should return an array of experiment items when only a single repository is available', async () => {
@@ -162,7 +162,7 @@ describe('ExperimentsTree', () => {
 
       const children = await experimentsTree.getChildren()
 
-      expect(children).toEqual([
+      expect(children).toStrictEqual([
         {
           collapsibleState: 1,
           command: {
@@ -170,6 +170,7 @@ describe('ExperimentsTree', () => {
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
+          description: undefined,
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-filled', '#b180d7'),
           id: 'exp-12345',
@@ -182,6 +183,7 @@ describe('ExperimentsTree', () => {
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
+          description: undefined,
           dvcRoot: 'repo',
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
           id: 'exp-67899',
@@ -194,6 +196,7 @@ describe('ExperimentsTree', () => {
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
             title: 'toggle'
           },
+          description: undefined,
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-outline', '#4063e2'),
           id: 'exp-abcdef',
@@ -202,6 +205,7 @@ describe('ExperimentsTree', () => {
         {
           collapsibleState: 0,
           command: undefined,
+          description: undefined,
           dvcRoot: 'repo',
           iconPath: mockedClockResource,
           id: 'f81f1b5',
@@ -236,7 +240,7 @@ describe('ExperimentsTree', () => {
         label: 'ebbd66f'
       })
 
-      expect(children).toEqual([
+      expect(children).toStrictEqual([
         {
           collapsibleState: 0,
           command: {
@@ -244,6 +248,7 @@ describe('ExperimentsTree', () => {
             command: 'dvc.views.experimentsTree.toggleStatus',
             title: 'toggle'
           },
+          description: undefined,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('circle-filled'),
           id: 'aaaaaaaaaaaaaaaaa',
@@ -256,6 +261,7 @@ describe('ExperimentsTree', () => {
             command: 'dvc.views.experimentsTree.toggleStatus',
             title: 'toggle'
           },
+          description: undefined,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('circle-filled'),
           id: 'bbbbbbbbbbbbbbbbb',
@@ -269,7 +275,7 @@ describe('ExperimentsTree', () => {
     it('should return a tree item for a root element', async () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toEqual(2)
+        expect(collapsibleState).toStrictEqual(2)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -286,13 +292,13 @@ describe('ExperimentsTree', () => {
       await experimentsTree.getChildren()
 
       const treeItem = experimentsTree.getTreeItem('demo')
-      expect(treeItem).toEqual({ ...mockedItem })
+      expect(treeItem).toStrictEqual({ ...mockedItem })
     })
 
     it('should return a tree item for a queued experiment', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toEqual(0)
+        expect(collapsibleState).toStrictEqual(0)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -311,14 +317,14 @@ describe('ExperimentsTree', () => {
         id: 'f0778b3',
         label: 'f0778b3'
       })
-      expect(treeItem).toEqual(mockedItem)
+      expect(treeItem).toStrictEqual(mockedItem)
     })
 
     it('should return a tree item for the workspace', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
-        expect(collapsibleState).toEqual(0)
-        expect(label).toEqual('workspace')
+        expect(collapsibleState).toStrictEqual(0)
+        expect(label).toStrictEqual('workspace')
         mockedItem = { collapsibleState, label }
         return mockedItem
       })
@@ -341,7 +347,7 @@ describe('ExperimentsTree', () => {
         label: 'workspace'
       })
 
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem,
         iconPath: { id: 'loading~spin' }
       })
@@ -350,7 +356,7 @@ describe('ExperimentsTree', () => {
     it('should return a tree item for a running experiment', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
-        expect(collapsibleState).toEqual(1)
+        expect(collapsibleState).toStrictEqual(1)
         mockedItem = { collapsibleState, label }
         return mockedItem
       })
@@ -373,7 +379,7 @@ describe('ExperimentsTree', () => {
         label: 'f0778b3'
       })
 
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem,
         iconPath: { id: 'loading~spin' }
       })
@@ -382,7 +388,7 @@ describe('ExperimentsTree', () => {
     it("should return a tree item for an experiment's checkpoint", () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
-        expect(collapsibleState).toEqual(0)
+        expect(collapsibleState).toStrictEqual(0)
         mockedItem = { collapsibleState, label }
         return mockedItem
       })
@@ -404,7 +410,7 @@ describe('ExperimentsTree', () => {
         id: 'f0778b3',
         label: 'f0778b3'
       })
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem,
         iconPath: { id: 'circle-filled' }
       })
@@ -436,7 +442,7 @@ describe('ExperimentsTree', () => {
         label: 'f0998a3'
       })
 
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem,
         iconPath: { id: 'circle-filled' }
       })

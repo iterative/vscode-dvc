@@ -49,7 +49,7 @@ describe('getResourceCommand', () => {
       resourceUri: { fsPath: mockedTarget } as Uri
     })
 
-    expect(output).toEqual(stdout)
+    expect(output).toStrictEqual(stdout)
     expect(mockedFunc).toBeCalledWith(mockedDvcRoot, mockedRelPath)
     expect(mockedFunc).toBeCalledTimes(1)
   })
@@ -89,7 +89,7 @@ describe('getResourceCommand', () => {
       resourceUri: { fsPath: mockedTarget } as Uri
     })
 
-    expect(undef).toEqual(userCancelled)
+    expect(undef).toStrictEqual(userCancelled)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
@@ -109,7 +109,7 @@ describe('getResourceCommand', () => {
       resourceUri: { fsPath: mockedTarget } as Uri
     })
 
-    expect(undef).toEqual(undefined)
+    expect(undef).toStrictEqual(undefined)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
@@ -152,7 +152,7 @@ describe('getResourceCommand', () => {
       resourceUri: { fsPath: mockedTarget } as Uri
     })
 
-    expect(output).toEqual(forcedStdout)
+    expect(output).toStrictEqual(forcedStdout)
     expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot, mockedRelPath)
     expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot, mockedRelPath, '-f')
     expect(mockedFunc).toHaveBeenCalledTimes(2)
@@ -174,7 +174,7 @@ describe('getSimpleResourceCommand', () => {
       resourceUri: { fsPath: mockedTarget } as Uri
     })
 
-    expect(output).toEqual(stdout)
+    expect(output).toStrictEqual(stdout)
     expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot, mockedRelPath)
   })
 })
@@ -193,7 +193,7 @@ describe('getRootCommand', () => {
 
     const output = await commandToRegister()
 
-    expect(output).toEqual(undefined)
+    expect(output).toStrictEqual(undefined)
     expect(mockedFunc).not.toHaveBeenCalled()
   })
 
@@ -212,7 +212,7 @@ describe('getRootCommand', () => {
       rootUri: { fsPath: mockedDvcRoot } as Uri
     })
 
-    expect(output).toEqual(stdout)
+    expect(output).toStrictEqual(stdout)
     expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
@@ -254,7 +254,7 @@ describe('getRootCommand', () => {
       rootUri: { fsPath: mockedDvcRoot } as Uri
     })
 
-    expect(undef).toEqual(userCancelled)
+    expect(undef).toStrictEqual(userCancelled)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
@@ -275,7 +275,7 @@ describe('getRootCommand', () => {
       rootUri: { fsPath: mockedDvcRoot } as Uri
     })
 
-    expect(undef).toEqual(undefined)
+    expect(undef).toStrictEqual(undefined)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
@@ -320,7 +320,7 @@ describe('getRootCommand', () => {
       rootUri: { fsPath: mockedDvcRoot } as Uri
     })
 
-    expect(output).toEqual(forcedStdout)
+    expect(output).toStrictEqual(forcedStdout)
     expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot)
     expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot, '-f')
     expect(mockedFunc).toHaveBeenCalledTimes(2)

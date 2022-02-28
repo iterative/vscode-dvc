@@ -49,7 +49,7 @@ describe('ExperimentsFilterByTree', () => {
       )
       mockedGetDvcRoots.mockReturnValueOnce([])
       const rootElements = await experimentsFilterByTree.getChildren()
-      expect(rootElements).toEqual([])
+      expect(rootElements).toStrictEqual([])
     })
   })
 
@@ -61,7 +61,7 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetDvcRoots.mockReturnValueOnce(['demo'])
     mockedGetFilters.mockReturnValueOnce([])
     const rootElements = await experimentsFilterByTree.getChildren()
-    expect(rootElements).toEqual([])
+    expect(rootElements).toStrictEqual([])
   })
 
   it("should return the repository's filters if there is only one repository", async () => {
@@ -82,7 +82,7 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetFilters.mockReturnValueOnce(mockedFilters)
 
     const filters = await experimentsFilterByTree.getChildren()
-    expect(filters).toEqual([
+    expect(filters).toStrictEqual([
       {
         description: '== 90000',
         dvcRoot: 'demo',
@@ -108,7 +108,7 @@ describe('ExperimentsFilterByTree', () => {
     ])
     mockedGetFilters.mockReturnValueOnce([])
     const rootElements = await experimentsFilterByTree.getChildren()
-    expect(rootElements).toEqual(dvcRoots)
+    expect(rootElements).toStrictEqual(dvcRoots)
   })
 
   it("should return the dvcRoot's filters if one is provided", async () => {
@@ -139,7 +139,7 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetFilters.mockReturnValueOnce(mockedFilters)
     const filters = await experimentsFilterByTree.getChildren('demo')
 
-    expect(filters).toEqual([
+    expect(filters).toStrictEqual([
       {
         description: '== 90000',
         dvcRoot: 'demo',
@@ -159,7 +159,7 @@ describe('ExperimentsFilterByTree', () => {
     it('should return a tree item for a root element', async () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toEqual(2)
+        expect(collapsibleState).toStrictEqual(2)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -173,7 +173,7 @@ describe('ExperimentsFilterByTree', () => {
       await experimentsFilterByTree.getChildren()
       const item = experimentsFilterByTree.getTreeItem(dvcRoot)
 
-      expect(item).toEqual({ ...mockedItem, contextValue: 'dvcRoot' })
+      expect(item).toStrictEqual({ ...mockedItem, contextValue: 'dvcRoot' })
     })
 
     it('should return a tree item for a filter', async () => {
@@ -188,7 +188,7 @@ describe('ExperimentsFilterByTree', () => {
       }
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
-        expect(collapsibleState).toEqual(0)
+        expect(collapsibleState).toStrictEqual(0)
         mockedItem = { collapsibleState, label }
         return mockedItem
       })
@@ -222,7 +222,7 @@ describe('ExperimentsFilterByTree', () => {
         )
       })
 
-      expect(item).toEqual({
+      expect(item).toStrictEqual({
         ...mockedItem,
         description: '>= 100',
         iconPath: { id: 'filter' }

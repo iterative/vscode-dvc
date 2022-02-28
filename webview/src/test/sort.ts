@@ -49,7 +49,7 @@ export const getHeaders = async () =>
   )
 
 export const expectHeaders = async (expectedHeaderNames: string[]) => {
-  expect(await getHeaders()).toEqual([
+  expect(await getHeaders()).toStrictEqual([
     ...defaultColumns,
     ...expectedHeaderNames
   ])

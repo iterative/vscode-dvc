@@ -34,7 +34,7 @@ describe('useColumnOrder', () => {
     const columnOrder: string[] = ['g2:C', 'g1:A', 'g1:B']
     const groupedParams = useColumnOrder(params, columnOrder)
 
-    expect(groupedParams.map(col => col.path)).toEqual([
+    expect(groupedParams.map(col => col.path)).toStrictEqual([
       '0/g2:C',
       '1/g1:A',
       '1/g1:B',

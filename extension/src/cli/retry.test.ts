@@ -19,7 +19,7 @@ describe('retry', () => {
 
     const output = await retry<string>(promiseRefresher, 'Definitely did not')
 
-    expect(output).toEqual(returnValue)
+    expect(output).toStrictEqual(returnValue)
 
     expect(promiseRefresher).toBeCalledTimes(1)
     expect(mockedDelay).not.toBeCalled()

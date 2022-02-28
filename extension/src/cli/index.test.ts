@@ -47,7 +47,7 @@ describe('typeCheckCommands', () => {
 
   it('should return the list of commands that are on the class', () => {
     const commandsToAutoRegister = typeCheckCommands({ FUNC: 'func' }, cli)
-    expect(commandsToAutoRegister).toEqual(['func'])
+    expect(commandsToAutoRegister).toStrictEqual(['func'])
   })
 })
 

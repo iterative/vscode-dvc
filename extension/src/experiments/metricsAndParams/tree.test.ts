@@ -84,7 +84,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce(mockedDvcRoots)
 
-      expect(await experimentsMetricsAndParamsTree.getChildren()).toEqual(
+      expect(await experimentsMetricsAndParamsTree.getChildren()).toStrictEqual(
         mockedDvcRoots
       )
     })
@@ -103,7 +103,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
 
       const children = await experimentsMetricsAndParamsTree.getChildren()
 
-      expect(children).toEqual([
+      expect(children).toStrictEqual([
         {
           collapsibleState: 1,
           description: undefined,
@@ -156,7 +156,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
         'process'
       )
 
-      expect(children).toEqual([
+      expect(children).toStrictEqual([
         {
           collapsibleState: 1,
           description: undefined,
@@ -208,33 +208,38 @@ describe('ExperimentsMetricsAndParamsTree', () => {
         iconPath: mockedSelectedCheckbox,
         path: paramsPath
       })
-      expect(grandChildren).toEqual([
+      expect(grandChildren).toStrictEqual([
         {
           collapsibleState: 0,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           path: joinMetricOrParamPath(paramsPath, 'epochs')
         },
         {
           collapsibleState: 0,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           path: joinMetricOrParamPath(paramsPath, 'learning_rate')
         },
         {
           collapsibleState: 0,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           path: joinMetricOrParamPath(paramsPath, 'dvc_logs_dir')
         },
         {
           collapsibleState: 0,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           path: joinMetricOrParamPath(paramsPath, 'log_file')
         },
         {
           collapsibleState: 0,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           path: joinMetricOrParamPath(paramsPath, 'dropout')
@@ -267,7 +272,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           path: processPath
         })
 
-      expect(greatGrandChildren).toEqual([
+      expect(greatGrandChildren).toStrictEqual([
         {
           collapsibleState: 0,
           description: undefined,
@@ -300,7 +305,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
     it('should return the correct tree item for a repository root', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toEqual(1)
+        expect(collapsibleState).toStrictEqual(1)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -318,7 +323,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
         experimentsMetricsAndParamsTree.getTreeItem(mockedDvcRoot)
 
       expect(mockedTreeItem).toBeCalledTimes(1)
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem
       })
     })
@@ -351,7 +356,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
       experimentsMetricsAndParamsTree.getTreeItem(metricsAndParamsItem)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
-    expect(treeItem).toEqual({
+    expect(treeItem).toStrictEqual({
       collapsibleState: 1,
       command: {
         arguments: [{ dvcRoot: mockedDvcRoot, path: relParamsPath }],
@@ -391,7 +396,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
       experimentsMetricsAndParamsTree.getTreeItem(metricsAndParamsItem)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
-    expect(treeItem).toEqual({
+    expect(treeItem).toStrictEqual({
       collapsibleState: 0,
       command: {
         arguments: [{ dvcRoot: mockedDvcRoot, path: relParamsPath }],

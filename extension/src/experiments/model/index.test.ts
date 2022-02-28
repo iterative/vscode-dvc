@@ -60,7 +60,7 @@ describe('ExperimentsModel', () => {
   it('should return rows that equal the rows fixture when given the output fixture', async () => {
     const model = new ExperimentsModel('', buildMockMemento())
     await model.transformAndSet(outputFixture, true)
-    expect(model.getRowData()).toEqual(rowsFixture)
+    expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', async () => {
@@ -86,7 +86,7 @@ describe('ExperimentsModel', () => {
       }
     })
 
-    expect(experimentsModel.getSelectedExperiments()).toEqual([
+    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
         displayColor: expColor,
         id: runningExperiment,
@@ -97,7 +97,7 @@ describe('ExperimentsModel', () => {
     experimentsModel.setSelectionMode(true)
 
     experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
-    expect(experimentsModel.getSelectedExperiments()).toEqual([])
+    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([])
 
     const unfilteredCheckpoint = buildTestExperiment(
       3,
@@ -119,7 +119,7 @@ describe('ExperimentsModel', () => {
     }
 
     await experimentsModel.transformAndSet(experimentWithNewCheckpoint)
-    expect(experimentsModel.getSelectedExperiments()).toEqual([
+    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
         displayColor: expColor,
         id: runningExperiment,
@@ -157,7 +157,7 @@ describe('ExperimentsModel', () => {
     experimentsModel.setSelectionMode(true)
     experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
 
-    expect(experimentsModel.getSelectedRevisions()).toEqual([
+    expect(experimentsModel.getSelectedRevisions()).toStrictEqual([
       expect.objectContaining({
         displayColor: workspaceColor,
         id: 'workspace',

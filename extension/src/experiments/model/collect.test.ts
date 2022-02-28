@@ -9,7 +9,7 @@ describe('collectExperiments', () => {
         baseline: {}
       }
     })
-    expect(branches).toEqual([])
+    expect(branches).toStrictEqual([])
   })
 
   const repoWithTwoBranches = {
@@ -38,17 +38,17 @@ describe('collectExperiments', () => {
   })
 
   it('should find two branches from a repo with two branches', () => {
-    expect(branches.length).toEqual(2)
+    expect(branches.length).toStrictEqual(2)
   })
 
   const [branchA, branchB] = branches
   it('should list branches in the same order as they are collected', () => {
-    expect(branchA.id).toEqual('branchA')
-    expect(branchB.id).toEqual('branchB')
+    expect(branchA.id).toStrictEqual('branchA')
+    expect(branchB.id).toStrictEqual('branchB')
   })
 
   it('should find two experiments on branchA', () => {
-    expect(experimentsByBranch.get('branchA')?.length).toEqual(2)
+    expect(experimentsByBranch.get('branchA')?.length).toStrictEqual(2)
   })
 
   it('should find no experiments on branchB', () => {
@@ -77,20 +77,20 @@ describe('collectExperiments', () => {
 
   it('should only list the tip as a top-level experiment', () => {
     const { experimentsByBranch } = acc
-    expect(experimentsByBranch.size).toEqual(1)
+    expect(experimentsByBranch.size).toStrictEqual(1)
   })
 
   const checkpoints = acc.checkpointsByTip.get('tip1') as Experiment[]
 
   it('should find three checkpoints on the tip', () => {
-    expect(checkpoints?.length).toEqual(3)
+    expect(checkpoints?.length).toStrictEqual(3)
   })
   const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
 
   it('should find checkpoints in the correct order', () => {
-    expect(tip1cp1.id).toEqual('tip1cp1')
-    expect(tip1cp2.id).toEqual('tip1cp2')
-    expect(tip1cp3.id).toEqual('tip1cp3')
+    expect(tip1cp1.id).toStrictEqual('tip1cp1')
+    expect(tip1cp2.id).toStrictEqual('tip1cp2')
+    expect(tip1cp3.id).toStrictEqual('tip1cp3')
   })
 
   it('should handle the continuation of a modified checkpoint', () => {
@@ -101,16 +101,20 @@ describe('collectExperiments', () => {
       ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
 
     expect(modifiedCheckpointTip).toHaveLength(1)
-    expect(modifiedCheckpointTip?.[0].displayNameOrParent).toEqual('(3b0c6ac)')
-    expect(modifiedCheckpointTip?.[0].label).toEqual('7e3cb21')
+    expect(modifiedCheckpointTip?.[0].displayNameOrParent).toStrictEqual(
+      '(3b0c6ac)'
+    )
+    expect(modifiedCheckpointTip?.[0].label).toStrictEqual('7e3cb21')
 
     const modifiedCheckpoint = checkpointsByTip
       .get('exp-9bc1b')
       ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
 
     expect(modifiedCheckpoint).toHaveLength(1)
-    expect(modifiedCheckpoint?.[0].displayNameOrParent).toEqual('(df39067)')
-    expect(modifiedCheckpoint?.[0].label).toEqual('98cb38c')
+    expect(modifiedCheckpoint?.[0].displayNameOrParent).toStrictEqual(
+      '(df39067)'
+    )
+    expect(modifiedCheckpoint?.[0].label).toStrictEqual('98cb38c')
 
     checkpointsByTip.forEach(checkpoints => {
       const continuationCheckpoints = checkpoints.filter(checkpoint => {
@@ -135,7 +139,7 @@ describe('collectStatuses', () => {
   it('should set new experiments to selected if there are less than 6', () => {
     const experiments = buildMockExperiments(4)
 
-    expect(collectStatuses(experiments, new Map(), {})).toEqual({
+    expect(collectStatuses(experiments, new Map(), {})).toStrictEqual({
       exp1: 1,
       exp2: 1,
       exp3: 1,
@@ -149,7 +153,7 @@ describe('collectStatuses', () => {
       { id: 'exp2', queued: true }
     ] as Experiment[]
 
-    expect(collectStatuses(experiments, new Map(), {})).toEqual({
+    expect(collectStatuses(experiments, new Map(), {})).toStrictEqual({
       exp1: 1
     })
   })
@@ -157,7 +161,7 @@ describe('collectStatuses', () => {
   it('should not set more than 6 experiments to selected', () => {
     const experiments = buildMockExperiments(7)
 
-    expect(collectStatuses(experiments, new Map(), {})).toEqual({
+    expect(collectStatuses(experiments, new Map(), {})).toStrictEqual({
       exp1: 1,
       exp2: 1,
       exp3: 1,
@@ -181,7 +185,7 @@ describe('collectStatuses', () => {
         exp7: 1,
         exp8: 0
       })
-    ).toEqual({ exp1: 1 })
+    ).toStrictEqual({ exp1: 1 })
   })
 
   it('should respect the existing status of experiments', () => {
@@ -193,7 +197,7 @@ describe('collectStatuses', () => {
         exp2: 0,
         exp9: 1
       })
-    ).toEqual({
+    ).toStrictEqual({
       exp1: 0,
       exp2: 0,
       exp3: 1,
@@ -209,7 +213,7 @@ describe('collectStatuses', () => {
   it('should not unselect an experiment that is existing and selected', () => {
     const experiments = buildMockExperiments(8)
 
-    expect(collectStatuses(experiments, new Map(), { exp8: 1 })).toEqual({
+    expect(collectStatuses(experiments, new Map(), { exp8: 1 })).toStrictEqual({
       exp1: 1,
       exp2: 1,
       exp3: 1,
@@ -232,7 +236,7 @@ describe('collectStatuses', () => {
         exp7: 1,
         exp8: 1
       })
-    ).toEqual({
+    ).toStrictEqual({
       exp1: 1,
       exp2: 0,
       exp3: 0,
@@ -250,7 +254,7 @@ describe('collectStatuses', () => {
       ['exp1', buildMockExperiments(5, 'check')]
     ])
 
-    expect(collectStatuses(experiments, checkpointsByTip, {})).toEqual({
+    expect(collectStatuses(experiments, checkpointsByTip, {})).toStrictEqual({
       check1: 0,
       check2: 0,
       check3: 0,
@@ -283,7 +287,7 @@ describe('collectStatuses', () => {
         checkD5: 1,
         expD: 1
       })
-    ).toEqual({
+    ).toStrictEqual({
       checkA1: 0,
       checkA2: 0,
       checkA3: 0,

@@ -61,7 +61,7 @@ describe('pickParamsToQueue', () => {
       ...initialUserResponse
     ])
 
-    expect(paramsToQueue).toEqual([
+    expect(paramsToQueue).toStrictEqual([
       '-S',
       `params.yaml:dropout=${firstInput}`,
       '-S',
