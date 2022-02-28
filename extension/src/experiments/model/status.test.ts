@@ -37,7 +37,7 @@ describe('limitToMaxSelected', () => {
       limitToMaxSelected(mockedExperiments)
         .map(({ label }) => label)
         .sort()
-    ).toEqual(['D', 'E', 'F', 'G', 'H', 'I'])
+    ).toStrictEqual(['D', 'E', 'F', 'G', 'H', 'I'])
   })
 
   it('should give running experiments precedence', () => {
@@ -48,6 +48,6 @@ describe('limitToMaxSelected', () => {
       ])
         .map(({ label }) => label)
         .sort()
-    ).toEqual(['E', 'F', 'G', 'H', 'I', 'R'])
+    ).toStrictEqual(['E', 'F', 'G', 'H', 'I', 'R'])
   })
 })

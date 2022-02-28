@@ -38,7 +38,7 @@ describe('askToDisableAutoApplyFilters', () => {
       'Can we turn off auto-apply filters?',
       Response.TURN_OFF
     )
-    expect(response).toEqual(Response.NEVER)
+    expect(response).toStrictEqual(Response.NEVER)
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
   })
 
@@ -50,7 +50,7 @@ describe('askToDisableAutoApplyFilters', () => {
       'Can we turn off auto-apply filters?',
       Response.TURN_OFF
     )
-    expect(response).toEqual(Response.CANCEL)
+    expect(response).toStrictEqual(Response.CANCEL)
     expect(mockedSetUserConfigValue).not.toBeCalled()
   })
 })

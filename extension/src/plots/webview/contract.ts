@@ -16,8 +16,8 @@ export enum Section {
 }
 
 export const DEFAULT_SECTION_NAMES = {
-  [Section.LIVE_PLOTS]: 'Live Experiments Plots',
-  [Section.STATIC_PLOTS]: 'Static Plots',
+  [Section.LIVE_PLOTS]: 'Experiment Checkpoints',
+  [Section.STATIC_PLOTS]: 'Plots',
   [Section.COMPARISON_TABLE]: 'Comparison'
 }
 

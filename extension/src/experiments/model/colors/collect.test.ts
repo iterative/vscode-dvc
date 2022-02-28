@@ -16,7 +16,7 @@ describe('collectColors', () => {
       copyOriginalExperimentColors(),
       copyOriginalExperimentColors
     )
-    expect(assigned).toEqual(
+    expect(assigned).toStrictEqual(
       new Map([
         ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700'],
         ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
@@ -32,7 +32,7 @@ describe('collectColors', () => {
       copyOriginalExperimentColors(),
       copyOriginalExperimentColors
     )
-    expect(available).toEqual(copyOriginalExperimentColors())
+    expect(available).toStrictEqual(copyOriginalExperimentColors())
   })
 
   it('should return the original colors list if all existing experiments are removed', () => {
@@ -46,8 +46,8 @@ describe('collectColors', () => {
       [],
       copyOriginalExperimentColors
     )
-    expect(assigned).toEqual(new Map())
-    expect(available).toEqual(copyOriginalExperimentColors())
+    expect(assigned).toStrictEqual(new Map())
+    expect(available).toStrictEqual(copyOriginalExperimentColors())
   })
 
   it('should add the colors of experiments which are no longer found back into the color list', () => {
@@ -63,8 +63,8 @@ describe('collectColors', () => {
       originalColorsList.slice(3),
       copyOriginalExperimentColors
     )
-    expect(assigned).toEqual(new Map())
-    expect(available).toEqual(originalColorsList)
+    expect(assigned).toStrictEqual(new Map())
+    expect(available).toStrictEqual(originalColorsList)
   })
 
   it('should return the original assigned and available colors given the same info', () => {
@@ -87,8 +87,8 @@ describe('collectColors', () => {
       originalAvailable,
       copyOriginalExperimentColors
     )
-    expect(assigned).toEqual(originalAssigned)
-    expect(available).toEqual(originalAvailable)
+    expect(assigned).toStrictEqual(originalAssigned)
+    expect(available).toStrictEqual(originalAvailable)
   })
 
   it('should return the correct colors after exhausting the first 50', () => {
@@ -105,13 +105,13 @@ describe('collectColors', () => {
       copyOriginalExperimentColors
     )
 
-    expect(assigned.get('exp-50')).toEqual(lastColor)
-    expect(assigned.get('exp-51')).toEqual(firstColor)
-    expect(assigned.get('exp-100')).toEqual(lastColor)
-    expect(assigned.get('exp-101')).toEqual(firstColor)
-    expect(assigned.get('exp-150')).toEqual(lastColor)
-    expect(assigned.get('exp-151')).toEqual(firstColor)
-    expect(available).toEqual(originalColorsList.slice(1))
+    expect(assigned.get('exp-50')).toStrictEqual(lastColor)
+    expect(assigned.get('exp-51')).toStrictEqual(firstColor)
+    expect(assigned.get('exp-100')).toStrictEqual(lastColor)
+    expect(assigned.get('exp-101')).toStrictEqual(firstColor)
+    expect(assigned.get('exp-150')).toStrictEqual(lastColor)
+    expect(assigned.get('exp-151')).toStrictEqual(firstColor)
+    expect(available).toStrictEqual(originalColorsList.slice(1))
   })
 
   it('should not duplicate available colors', () => {
@@ -127,8 +127,8 @@ describe('collectColors', () => {
       copyOriginalExperimentColors
     )
 
-    expect(assigned.get('exp-50')).toEqual(lastColor)
-    expect(available).toEqual(originalColorsList.slice(1))
+    expect(assigned.get('exp-50')).toStrictEqual(lastColor)
+    expect(available).toStrictEqual(originalColorsList.slice(1))
 
     const { assigned: stillAssigned, available: nowAvailable } = collectColors(
       experimentNames.filter(name => name !== 'exp-50'),
@@ -138,7 +138,7 @@ describe('collectColors', () => {
     )
 
     expect(stillAssigned.has('exp-50')).toBeFalsy()
-    expect(nowAvailable).toEqual(originalColorsList.slice(1))
+    expect(nowAvailable).toStrictEqual(originalColorsList.slice(1))
   })
 
   it('should be able to collect branch colors', () => {
@@ -151,13 +151,13 @@ describe('collectColors', () => {
       copyOriginalBranchColors(),
       copyOriginalBranchColors
     )
-    expect(assigned).toEqual(
+    expect(assigned).toStrictEqual(
       new Map([
         ['workspace', originalColorsList[0]],
         ['main', originalColorsList[1]],
         ['some-other-branch', originalColorsList[2]]
       ])
     )
-    expect(available).toEqual(originalColorsList.slice(3))
+    expect(available).toStrictEqual(originalColorsList.slice(3))
   })
 })
