@@ -2,6 +2,7 @@ import { pickFromMetricsAndParams } from './quickPick'
 import { joinMetricOrParamPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
+import { Title } from '../../vscode/title'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -43,7 +44,7 @@ describe('pickFromMetricsAndParams', () => {
 
   it('should return early if no params or metrics are provided', async () => {
     const picked = await pickFromMetricsAndParams([], {
-      title: "can't pick from no params or metrics"
+      title: "can't pick from no params or metrics" as Title
     })
     expect(picked).toBeUndefined()
     expect(mockedShowError).toBeCalledTimes(1)
@@ -51,7 +52,7 @@ describe('pickFromMetricsAndParams', () => {
   })
 
   it('should invoke a QuickPick with the correct options', async () => {
-    const title = 'Test title'
+    const title = 'Test title' as Title
     await pickFromMetricsAndParams(exampleMetricsAndParams, { title })
     expect(mockedQuickPickValue).toBeCalledWith(
       [

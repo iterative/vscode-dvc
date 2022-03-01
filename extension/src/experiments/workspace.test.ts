@@ -11,6 +11,7 @@ import { getInput } from '../vscode/inputBox'
 import { buildMockMemento } from '../test/util'
 import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
+import { Title } from '../vscode/title'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -193,7 +194,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getExpNameAndInputThenRun(
         mockedCommandId,
-        'enter your password please'
+        'enter your password please' as Title
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -207,7 +208,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getExpNameAndInputThenRun(
         mockedCommandId,
-        'please name the branch'
+        'please name the branch' as Title
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -225,7 +226,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getExpNameAndInputThenRun(
         mockedCommandId,
-        'please enter your bank account number and sort code'
+        'please enter your bank account number and sort code' as Title
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)

@@ -21,6 +21,7 @@ import { TableData } from '../../../../../experiments/webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { Response } from '../../../../../vscode/response'
 import { ExperimentsModel } from '../../../../../experiments/model'
+import { Title } from '../../../../../vscode/title'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -191,7 +192,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
             })
           }
         ],
-        { canPickMany: true, title: 'Select filter(s) to remove' }
+        { canPickMany: true, title: Title.SELECT_FILTERS_TO_REMOVE }
       )
 
       mockShowInputBox.resetHistory()
