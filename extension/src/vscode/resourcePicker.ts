@@ -1,6 +1,7 @@
 import { Uri, window } from 'vscode'
+import { Title } from './title'
 
-export const pickFile = async (title: string): Promise<string | undefined> => {
+export const pickFile = async (title: Title): Promise<string | undefined> => {
   const uris = await window.showOpenDialog({
     canSelectFolders: false,
     canSelectMany: false,
@@ -13,7 +14,7 @@ export const pickFile = async (title: string): Promise<string | undefined> => {
   }
 }
 
-export const pickResources = (title: string): Thenable<Uri[] | undefined> => {
+export const pickResources = (title: Title): Thenable<Uri[] | undefined> => {
   return window.showOpenDialog({
     canSelectFiles: true,
     canSelectFolders: true,

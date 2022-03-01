@@ -3,6 +3,7 @@ import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
+import { Title } from '../../../vscode/title'
 
 jest.mock('../../../vscode/inputBox')
 jest.mock('../../../vscode/quickPick')
@@ -75,7 +76,7 @@ describe('pickFilterToAdd', () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
     await pickFilterToAdd(params)
     expect(mockedQuickPickValue).toBeCalledWith(operators, {
-      title: 'Select an operator'
+      title: Title.SELECT_OPERATOR
     })
   })
 
@@ -101,7 +102,7 @@ describe('pickFilterToAdd', () => {
     expect(mockedQuickPickValue).toBeCalledWith(
       operators.filter(operator => operator.types.includes('boolean')),
       {
-        title: 'Select an operator'
+        title: Title.SELECT_OPERATOR
       }
     )
     expect(mockedGetInput).not.toBeCalled()
@@ -121,7 +122,7 @@ describe('pickFilterToAdd', () => {
     expect(mockedQuickPickValue).toBeCalledWith(
       operators.filter(operator => operator.types.includes('number')),
       {
-        title: 'Select an operator'
+        title: Title.SELECT_OPERATOR
       }
     )
   })

@@ -3,6 +3,7 @@ import { ExperimentWithCheckpoints } from '.'
 import { pickExperiments } from './quickPicks'
 import { quickPickLimitedValues } from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
+import { Title } from '../../vscode/title'
 
 jest.mock('../../vscode/quickPick')
 
@@ -62,7 +63,7 @@ describe('pickExperiments', () => {
         }
       ],
       6,
-      'Select up to 6 experiments'
+      Title.SELECT_EXPERIMENTS
     )
   })
 
@@ -148,7 +149,7 @@ describe('pickExperiments', () => {
       ],
       [getExpectedItem(selectedCheckpoint)],
       6,
-      'Select up to 6 experiments'
+      Title.SELECT_EXPERIMENTS
     )
   })
 })

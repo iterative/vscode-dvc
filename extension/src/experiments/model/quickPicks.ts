@@ -9,6 +9,7 @@ import {
 } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
+import { Title } from '../../vscode/title'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -97,6 +98,6 @@ export const pickExperiments = (
     items,
     selectedItems,
     MAX_SELECTED_EXPERIMENTS,
-    'Select up to 6 experiments'
+    Title.SELECT_EXPERIMENTS
   )
 }

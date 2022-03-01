@@ -31,6 +31,7 @@ import { Response } from '../vscode/response'
 import { Resource } from '../repository/commands'
 import { WorkspaceRepositories } from '../repository/workspace'
 import { PathItem } from '../repository/model/collect'
+import { Title } from '../vscode/title'
 
 export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   public readonly dispose = Disposable.fn()
@@ -193,9 +194,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     this.internalCommands.registerExternalCommand<Resource>(
       RegisteredCommands.MOVE_TARGETS,
       async ({ resourceUri: destination }) => {
-        const targets = await pickResources(
-          'pick resources to add to the dataset'
-        )
+        const targets = await pickResources(Title.CHOOSE_RESOURCES)
         if (targets) {
           const response = await warnOfConsequences(
             'Are you sure you want to move the selected data into this dataset?',
@@ -229,7 +228,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       async ({ dvcRoot, resourceUri }) => {
         const relPath = relativeWithUri(dvcRoot, resourceUri)
         const relDestination = await getInput(
-          'Enter a destination relative to the root',
+          Title.ENTER_RELATIVE_DESTINATION,
           relPath
         )
         if (!relDestination || relDestination === relPath) {
