@@ -3,6 +3,7 @@ import { quickPickManyValues } from '../../../vscode/quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { Flag } from '../../../cli/args'
 import { definedAndNonEmpty } from '../../../util/array'
+import { getEnterValueTitle, Title } from '../../../vscode/title'
 
 const pickParamsToVary = (params: Param[]): Thenable<Param[] | undefined> =>
   quickPickManyValues<Param>(
@@ -12,7 +13,7 @@ const pickParamsToVary = (params: Param[]): Thenable<Param[] | undefined> =>
       picked: true,
       value: param
     })),
-    { title: 'Select a param to vary' }
+    { title: Title.SELECT_PARAM_TO_VARY }
   )
 
 const pickNewParamValues = async (
@@ -20,7 +21,7 @@ const pickNewParamValues = async (
 ): Promise<string[] | undefined> => {
   const args: string[] = []
   for (const { path, value } of paramsToVary) {
-    const input = await getInput(`Enter a value for ${path}`, `${value}`)
+    const input = await getInput(getEnterValueTitle(path), `${value}`)
     if (input === undefined) {
       return
     }

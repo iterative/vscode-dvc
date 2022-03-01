@@ -1,6 +1,7 @@
 import { pickSortsToRemove, pickSortToAdd } from './quickPick'
 import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
+import { Title } from '../../../vscode/title'
 
 jest.mock('../../../vscode/quickPick')
 
@@ -66,7 +67,7 @@ describe('pickSortToAdd', () => {
         { label: 'Ascending', value: false },
         { label: 'Descending', value: true }
       ],
-      { title: 'Select a direction to sort in' }
+      { title: Title.SELECT_SORT_DIRECTION }
     )
     expect(resolvedPromise).toStrictEqual({
       descending: false,

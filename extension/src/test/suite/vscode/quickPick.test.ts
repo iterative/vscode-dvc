@@ -9,6 +9,7 @@ import {
   quickPickOneOrInput
 } from '../../../vscode/quickPick'
 import { selectQuickPickItem } from '../util'
+import { Title } from '../../../vscode/title'
 
 suite('Quick Pick Test Suite', () => {
   const disposable = Disposable.fn()
@@ -36,7 +37,7 @@ suite('Quick Pick Test Suite', () => {
       const resultPromise = quickPickOneOrInput(items, {
         defaultValue: 'do not want this value',
         placeholder: 'pick the second item',
-        title: 'just pick it'
+        title: 'just pick it' as Title
       })
 
       await selectQuickPickItem(2)
@@ -52,7 +53,7 @@ suite('Quick Pick Test Suite', () => {
       const resultPromise = quickPickOneOrInput([], {
         defaultValue: expectedDefault,
         placeholder: 'no items to pick from (get the default)',
-        title: 'this is fun'
+        title: 'this is fun' as Title
       })
 
       await selectQuickPickItem(1)
@@ -86,7 +87,7 @@ suite('Quick Pick Test Suite', () => {
         items,
         items.slice(0, maxSelectedItems),
         maxSelectedItems,
-        'select up to 3 values'
+        'select up to 3 values' as Title
       )
 
       expect(

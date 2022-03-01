@@ -2,6 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { StatusBarItem, window } from 'vscode'
 import { ICli } from './cli'
 import { RegisteredCommands } from './commands/external'
+import { Title } from './vscode/title'
 
 export class Status {
   public readonly dispose = Disposable.fn()
@@ -71,7 +72,7 @@ export class Status {
     }
     return {
       command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-      title: 'Setup the workspace'
+      title: Title.SETUP_WORKSPACE
     }
   }
 }
