@@ -31,7 +31,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
           {
             name: 'computeStyles',
             options: {
-              adaptive: false // true by default
+              adaptive: false
             }
           }
         ]
