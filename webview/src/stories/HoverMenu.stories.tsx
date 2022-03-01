@@ -5,6 +5,7 @@ import { SelectMenuOptionProps } from '../shared/components/selectMenu/SelectMen
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
 import { HoverMenu } from '../shared/components/hoverMenu/HoverMenu'
+import { Theme } from '../shared/components/theme/Theme'
 
 const options: SelectMenuOptionProps[] = [
   {
@@ -40,13 +41,15 @@ const Template: Story<{
   options?: SelectMenuOptionProps[]
   onClick: (id: string) => void
 }> = ({ options, onClick }) => (
-  <HoverMenu show>
-    {options ? (
-      <SelectMenu options={options} onClick={onClick} />
-    ) : (
-      <div>Tooltip</div>
-    )}
-  </HoverMenu>
+  <Theme>
+    <HoverMenu show>
+      {options ? (
+        <SelectMenu options={options} onClick={onClick} />
+      ) : (
+        <div>Tooltip</div>
+      )}
+    </HoverMenu>
+  </Theme>
 )
 
 export const Tooltip = Template.bind({})

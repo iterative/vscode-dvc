@@ -9,6 +9,7 @@ import { StaticPlots } from './StaticPlots'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
+import { Theme } from '../../shared/components/theme/Theme'
 
 const getMetricsFromPlots = (plots?: LivePlotData[]): string[] =>
   plots?.map(plot => getDisplayNameFromPath(plot.title)) || []
@@ -77,7 +78,7 @@ export const Plots = ({
   }
 
   return (
-    <>
+    <Theme>
       {livePlots && (
         <PlotsContainer
           title={livePlots.sectionName}
@@ -121,6 +122,6 @@ export const Plots = ({
           />
         </PlotsContainer>
       )}
-    </>
+    </Theme>
   )
 }

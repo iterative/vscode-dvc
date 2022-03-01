@@ -9,8 +9,8 @@ $gap: 4px;
 
 .header {
   padding: 10px 5px;
-  color: #fff;
-  background-color: #303031;
+  color: $fg-color;
+  background-color: var(--editor-foreground-transparency-1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,6 +41,10 @@ $gap: 4px;
   top: 10px;
   transform: rotate(-90deg);
   opacity: 0;
+
+  path {
+    fill: $fg-color;
+  }
 }
 
 .header:hover .pin {
