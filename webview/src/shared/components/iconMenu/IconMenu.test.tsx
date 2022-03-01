@@ -86,25 +86,27 @@ describe('IconMenu', () => {
   })
 
   it('should not show the tooltip hover menu once the onClickNode is shown', () => {
-    const onClickSpy = jest.fn()
-    renderItem({
-      ...item,
-      onClick: onClickSpy,
-      onClickNode: 'Menu'
-    })
+    renderItem()
 
-    fireEvent.mouseEnter(screen.getByTestId('icon-menu-item'), {
-      bubbles: true,
-      cancelable: true
-    })
+    fireEvent.mouseEnter(screen.getByTestId('icon-menu-item'))
 
+    expect(screen.getByText('Tooltip')).toBeInTheDocument()
     expect(screen.queryByText('Menu')).not.toBeInTheDocument()
 
     const iconMenuItem = screen.getByTestId('icon-menu-item')
     fireEvent.click(iconMenuItem)
 
-    expect(onClickSpy).toBeCalledTimes(1)
+    // Tooltip should be dismissed on first click
 
+    expect(screen.queryByText('Tooltip')).not.toBeInTheDocument()
+    expect(screen.getByText('Menu')).toBeInTheDocument()
+
+    // Tooltip should not come back while menu is open
+
+    fireEvent.mouseLeave(screen.getByTestId('icon-menu-item'))
+    fireEvent.mouseEnter(screen.getByTestId('icon-menu-item'))
+
+    expect(screen.queryByText('Tooltip')).not.toBeInTheDocument()
     expect(screen.getByText('Menu')).toBeInTheDocument()
   })
 
