@@ -1,34 +1,67 @@
+import Tippy, { useSingleton } from '@tippyjs/react'
 import React, { useState } from 'react'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
 import styles from './styles.module.scss'
+import sharedStyles from '../../styles.module.scss'
 
-export enum IconMenuDirection {
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT'
-}
 interface IconMenuProps {
   items: IconMenuItemProps[]
-  direction?: IconMenuDirection
 }
 
-export const IconMenu: React.FC<IconMenuProps> = ({
-  items,
-  direction = IconMenuDirection.RIGHT
-}) => {
-  const [hoverKey, setHoverKey] = useState('')
+export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
+  const [tooltipDisabled, setTooltipDisabled] = useState<boolean>(false)
+  const [menuSource, menuTarget] = useSingleton()
+  const [tooltipSource, tooltipTarget] = useSingleton({
+    disabled: tooltipDisabled
+  })
 
   return (
-    <ul className={styles.menu} role="menu">
-      {items.map((item, i) => (
-        <IconMenuItem
-          key={item.tooltip}
-          {...item}
-          canShowOnClickNode={item.tooltip === hoverKey}
-          onMouseOver={setHoverKey}
-          last={i >= items.length - 2 && direction === IconMenuDirection.RIGHT}
-          index={i}
-        />
-      ))}
-    </ul>
+    <Tippy
+      singleton={tooltipSource}
+      className={sharedStyles.menu}
+      animation={false}
+      placement="bottom-end"
+      disabled={tooltipDisabled}
+      popperOptions={{
+        modifiers: [
+          {
+            enabled: false,
+            name: 'flip'
+          },
+          {
+            name: 'computeStyles',
+            options: {
+              adaptive: false // true by default
+            }
+          }
+        ]
+      }}
+    >
+      <Tippy
+        trigger="click"
+        interactive
+        singleton={menuSource}
+        className={sharedStyles.menu}
+        animation={false}
+        placement="bottom"
+        onShow={() => {
+          setTooltipDisabled(true)
+        }}
+        onHide={() => {
+          setTooltipDisabled(false)
+        }}
+      >
+        <ul className={styles.menu} role="menu">
+          {items.map(item => (
+            <IconMenuItem
+              {...item}
+              key={item.tooltip}
+              tooltipTarget={tooltipTarget}
+              menuTarget={menuTarget}
+            />
+          ))}
+        </ul>
+      </Tippy>
+    </Tippy>
   )
 }

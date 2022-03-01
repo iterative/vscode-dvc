@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import cx from 'classnames'
+import React from 'react'
+import Tippy, { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
-import { HoverMenu } from '../hoverMenu/HoverMenu'
+import sharedStyles from '../../styles.module.scss'
 import { Icon, IconValues } from '../icon/Icon'
 
 export interface IconMenuItemProps {
@@ -12,76 +12,40 @@ export interface IconMenuItemProps {
 }
 
 export interface IconMenuItemAllProps extends IconMenuItemProps {
-  canShowOnClickNode?: boolean
-  index: number
-  onMouseOver: (id: string) => void
-  last?: boolean
+  tooltipTarget: TippyProps['singleton']
+  menuTarget: TippyProps['singleton']
 }
 
 export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
   icon,
-  index,
   onClick,
   onClickNode,
   tooltip,
-  onMouseOver,
-  canShowOnClickNode,
-  last
+  tooltipTarget,
+  menuTarget
 }) => {
-  const [showTooltip, setShowTooltip] = useState(false)
-  const [showOnClickNode, setShowOnClickNode] = useState(false)
-
-  useEffect(() => {
-    if (!canShowOnClickNode && showOnClickNode) {
-      setShowOnClickNode(false)
-    }
-  }, [canShowOnClickNode, showOnClickNode])
-
-  const onClickItem = () => {
-    onClick?.()
-    onClickNode && canShowOnClickNode && setShowOnClickNode(true)
-  }
-
-  const onClickElseWhere = () => {
-    setShowTooltip(false)
-    onClickNode && setShowOnClickNode(false)
-  }
-  const onMouseEnter = () => {
-    setShowTooltip(true)
-    onMouseOver(tooltip)
-  }
-  const onMouseLeave = () => {
-    setShowTooltip(false)
-  }
-
-  const classes = cx(styles.item, { [styles.last]: last })
-
-  return (
-    <li>
+  let button = (
+    <Tippy
+      content={tooltip}
+      singleton={tooltipTarget}
+      className={sharedStyles.menu}
+    >
       <button
-        className={classes}
-        tabIndex={index}
-        onClick={onClickItem}
-        onBlur={onClickElseWhere}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
+        aria-label={tooltip}
+        className={styles.item}
+        onClick={onClick}
         data-testid="icon-menu-item"
       >
         <Icon icon={icon} data-testid="icon-menu-item-icon" width={15} />
-        <div className={styles.hoverMenu}>
-          <HoverMenu show={showTooltip && !showOnClickNode}>
-            {tooltip}
-          </HoverMenu>
-          {onClickNode && (
-            <HoverMenu
-              show={showOnClickNode}
-              hideWithDelay={canShowOnClickNode}
-            >
-              {onClickNode}
-            </HoverMenu>
-          )}
-        </div>
       </button>
-    </li>
+    </Tippy>
   )
+  if (onClickNode) {
+    button = (
+      <Tippy content={onClickNode} singleton={menuTarget}>
+        {button}
+      </Tippy>
+    )
+  }
+  return <li>{button}</li>
 }
