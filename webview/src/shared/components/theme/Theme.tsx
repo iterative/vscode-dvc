@@ -25,7 +25,7 @@ export const Theme: React.FC = ({ children }) => {
 
     const variables: { [key: string]: string } = {}
     for (const key in ColorsWithOpacity) {
-      for (let i = 1; i < 9; i++) {
+      for (let i = 1; i < 10; i++) {
         variables[`--${key}-transparency-${i}`] = alphaToHex(
           ColorsWithOpacity[key as ColorsWithOpacityKey],
           i / 10
@@ -59,5 +59,9 @@ export const Theme: React.FC = ({ children }) => {
     return observer.disconnect
   }, [createCSSVariables, createOberver])
 
-  return <div style={variables}>{children}</div>
+  return (
+    <div style={variables} data-testid="theme-wrapper">
+      {children}
+    </div>
+  )
 }
