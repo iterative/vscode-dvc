@@ -17,16 +17,16 @@ stages:
         weight_decay: 0
     outs:
     - path: logs
-      md5: 80dc74f70f717975372170339679d598.dir
-      size: 574
+      md5: e97c9b6938efba82e955301e1bbfa4c6.dir
+      size: 572
       nfiles: 2
     - path: model.pt
-      md5: 75e1a474b8973de4b575389bcee11e40
+      md5: d06ada7ceb6a17c0e9d88c178de52a33
       size: 410191
     - path: plots
-      md5: c69f11d2ad06f2824eb93be6a0fae823.dir
-      size: 10415
+      md5: e04749646f33be203f210c5f1ea63a2a.dir
+      size: 10783
       nfiles: 1
     - path: predictions.json
-      md5: 92918d849aac7229f283c8344d9661b4
+      md5: e6b7b45e9dcf958ff5ddaf8fd920919f
       size: 310000
