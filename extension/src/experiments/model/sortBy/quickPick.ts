@@ -1,13 +1,14 @@
 import { SortDefinition } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
+import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
 import { pickFromMetricsAndParams } from '../../metricsAndParams/quickPick'
 import { MetricOrParam } from '../../webview/contract'
 
 export const pickSortToAdd = async (metricsAndParams: MetricOrParam[]) => {
   const picked = await pickFromMetricsAndParams(metricsAndParams, {
-    title: 'Select a param or metric to sort by'
+    title: Title.SELECT_PARAM_OR_METRIC_SORT
   })
   if (picked === undefined) {
     return
@@ -17,7 +18,7 @@ export const pickSortToAdd = async (metricsAndParams: MetricOrParam[]) => {
       { label: 'Ascending', value: false },
       { label: 'Descending', value: true }
     ],
-    { title: 'Select a direction to sort in' }
+    { title: Title.SELECT_SORT_DIRECTION }
   )
   if (descending === undefined) {
     return
@@ -42,7 +43,7 @@ export const pickSortsToRemove = (
       value: sort
     })),
     {
-      title: 'Select sort(s) to remove'
+      title: Title.SELECT_SORTS_TO_REMOVE
     }
   )
 }

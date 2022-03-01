@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, SinonStub } from 'sinon'
-import { window, commands, QuickPickItem, QuickPickOptions } from 'vscode'
+import { window, commands, QuickPickItem } from 'vscode'
 import {
   buildExperiments,
   buildMultiRepoExperiments,
@@ -21,8 +21,12 @@ import {
 import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
 import { Param } from '../../../experiments/model/queue/collect'
-import { QuickPickItemWithValue } from '../../../vscode/quickPick'
+import {
+  QuickPickItemWithValue,
+  QuickPickOptionsWithTitle
+} from '../../../vscode/quickPick'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
+import { Title } from '../../../vscode/title'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -107,7 +111,7 @@ suite('Workspace Experiments Test Suite', () => {
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
-        [items: readonly QuickPickItem[], options: QuickPickOptions],
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
         Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
       mockShowQuickPick
@@ -345,7 +349,7 @@ suite('Workspace Experiments Test Suite', () => {
         ],
         {
           canPickMany: false,
-          title: 'Select an experiment'
+          title: Title.SELECT_EXPERIMENT
         }
       )
     })

@@ -2,6 +2,7 @@ import { FilterDefinition, getFilterId, Operator } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 import { getInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
+import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
 import { pickFromMetricsAndParams } from '../../metricsAndParams/quickPick'
 import { MetricOrParam } from '../../webview/contract'
@@ -70,7 +71,7 @@ export const operators = [
 ]
 
 const addFilterValue = async (path: string, operator: Operator) => {
-  const value = await getInput('Enter a filter value')
+  const value = await getInput(Title.ENTER_FILTER_VALUE)
   if (!value) {
     return
   }
@@ -86,7 +87,7 @@ export const pickFilterToAdd = async (
   metricsAndParams: MetricOrParam[] | undefined
 ): Promise<FilterDefinition | undefined> => {
   const picked = await pickFromMetricsAndParams(metricsAndParams, {
-    title: 'Select a param or metric to filter by'
+    title: Title.SELECT_PARAM_OR_METRIC_FILTER
   })
   if (!picked) {
     return
@@ -97,7 +98,7 @@ export const pickFilterToAdd = async (
   )
 
   const operator = await quickPickValue<Operator>(typedOperators, {
-    title: 'Select an operator'
+    title: Title.SELECT_OPERATOR
   })
   if (!operator) {
     return
@@ -128,7 +129,7 @@ export const pickFiltersToRemove = (
       value: getFilterId(filter)
     })),
     {
-      title: 'Select filter(s) to remove'
+      title: Title.SELECT_FILTERS_TO_REMOVE
     }
   )
 }

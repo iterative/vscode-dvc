@@ -8,8 +8,7 @@ import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { Response } from './vscode/response'
-
-const setupTitle = 'Setup the workspace'
+import { getSelectTitle, Title } from './vscode/title'
 
 const setConfigPath = async (
   option: string,
@@ -37,12 +36,13 @@ const enterPathOrFind = (text: string): Promise<string | undefined> =>
     {
       defaultValue: 'pick',
       placeholder: `Enter path to a ${text}`,
-      title: setupTitle
+      title: Title.SETUP_WORKSPACE
     }
   )
 
 const findPath = async (option: string, text: string) => {
-  const path = await pickFile(`Select a ${text}`)
+  const title = getSelectTitle(text)
+  const path = await pickFile(title)
   if (!path) {
     return false
   }
@@ -67,7 +67,7 @@ const pickCliPath = async () => {
   const isGlobal = await quickPickYesOrNo(
     "DVC can be located via the system's PATH environment variable",
     'I need to specify a path',
-    { placeHolder: 'Is DVC available globally?', title: setupTitle }
+    { placeHolder: 'Is DVC available globally?', title: Title.SETUP_WORKSPACE }
   )
 
   if (isGlobal === undefined) {
@@ -87,7 +87,7 @@ const pickVenvOptions = async () => {
     'this project needs access to a DVC CLI outside of the virtual environment',
     {
       placeHolder: 'Is DVC installed within the environment?',
-      title: setupTitle
+      title: Title.SETUP_WORKSPACE
     }
   )
   if (dvcInVenv === undefined) {
@@ -124,13 +124,13 @@ const quickPickVenvOption = () =>
     ],
     {
       placeHolder: 'Does your project use a Python virtual environment?',
-      title: setupTitle
+      title: Title.SETUP_WORKSPACE
     }
   )
 
 const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {
   if (usesVenv === 1) {
-    return enterPathOrPickFile('dvc.pythonPath', 'Python interpreter')
+    return enterPathOrPickFile('dvc.pythonPath', 'Python Interpreter')
   }
 
   return setPythonPath(undefined)

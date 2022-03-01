@@ -1,6 +1,7 @@
 import { pickGarbageCollectionFlags, pickExperiment } from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { Toast } from '../vscode/toast'
+import { Title } from '../vscode/title'
 
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/toast')
@@ -142,7 +143,8 @@ describe('pickGarbageCollectionFlags', () => {
         }
       ],
       {
-        placeHolder: 'Select which experiments to preserve'
+        placeHolder: 'Select which experiments to preserve',
+        title: Title.GARBAGE_COLLECT_EXPERIMENTS
       }
     )
   })

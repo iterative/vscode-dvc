@@ -8,6 +8,7 @@ import { Status } from '../../status'
 import { Cli, CliResult, CliStarted } from '../../cli'
 import { Config } from '../../config'
 import { RegisteredCommands } from '../../commands/external'
+import { Title } from '../../vscode/title'
 
 suite('Status Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -105,7 +106,7 @@ suite('Status Test Suite', () => {
       expect(mockStatusBarItem.text).to.equal(disabledText)
       expect(mockStatusBarItem.command).to.deep.equal({
         command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        title: 'Setup the workspace'
+        title: Title.SETUP_WORKSPACE
       })
     })
 

@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { Uri, window } from 'vscode'
 import { pickFile, pickResources } from './resourcePicker'
+import { Title } from './title'
 
 jest.mock('vscode')
 
@@ -14,7 +15,7 @@ beforeEach(() => {
 
 describe('pickFile', () => {
   it('should called window.showOpenDialog with the correct options', async () => {
-    const mockedTitle = 'I decided to not decide'
+    const mockedTitle = 'I decided to not decide' as Title
     mockedShowOpenDialog.mockResolvedValueOnce(undefined)
 
     await pickFile(mockedTitle)
@@ -29,7 +30,7 @@ describe('pickFile', () => {
   it('should return a path if a file is selected', async () => {
     const mockedUri = Uri.file(resolve('mock', 'path', 'fun'))
     const mockedPickedUri = [mockedUri]
-    const mockedTitle = 'this is a fun time'
+    const mockedTitle = 'this is a fun time' as Title
     mockedShowOpenDialog.mockResolvedValueOnce(mockedPickedUri)
 
     const pickedFile = await pickFile(mockedTitle)
@@ -40,7 +41,7 @@ describe('pickFile', () => {
 
 describe('pickResources', () => {
   it('should called window.showOpenDialog with the correct options', async () => {
-    const mockedTitle = 'I decided to not decide'
+    const mockedTitle = 'I decided to not decide' as Title
     mockedShowOpenDialog.mockResolvedValueOnce(undefined)
 
     await pickResources(mockedTitle)
@@ -57,7 +58,7 @@ describe('pickResources', () => {
   it('should return an array of uris if any are selected', async () => {
     const mockedUri = Uri.file(resolve('mock', 'multiple', 'resource', 'fun'))
     const mockedPickedUri = [mockedUri]
-    const mockedTitle = 'this is even more fun'
+    const mockedTitle = 'this is even more fun' as Title
     mockedShowOpenDialog.mockResolvedValueOnce(mockedPickedUri)
 
     const pickedResources = await pickResources(mockedTitle)
