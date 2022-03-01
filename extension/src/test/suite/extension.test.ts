@@ -22,6 +22,7 @@ import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
+import { QuickPickItemWithValue } from '../../vscode/quickPick'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -44,39 +45,10 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
-    const selectDvcPathFromFilePicker = async () => {
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-
-      const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
-      const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
-
-      const setupWorkspaceWizard = commands.executeCommand(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
-      )
-      await venvQuickPickActive
-
-      const selectNoVenv = selectQuickPickItem(3)
-      await selectNoVenv
-
-      await globalQuickPickActive
-      mockShowQuickPick.restore()
-
-      const selectNotGlobal = selectQuickPickItem(2)
-      await selectNotGlobal
-
-      const selectToFindCLI = selectQuickPickItem(1)
-      await selectToFindCLI
-      await configurationChangeEvent(dvcPathOption, disposable)
-
-      return setupWorkspaceWizard
-    }
-
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(CliReader.prototype, 'help').rejects('do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-
-      await workspace.getConfiguration().update(dvcPathOption, '/fun')
 
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
       const dvcInVenvQuickPickActive = quickPickInitialized(
@@ -121,6 +93,14 @@ suite('Extension Test Suite', () => {
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
       const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
+      const quickPick = window.createQuickPick<QuickPickItemWithValue<string>>()
+      const mockCreateQuickPick = stub(window, 'createQuickPick').returns(
+        quickPick
+      )
+      const pickOneOrInputActive = new Promise(resolve => {
+        disposable.track(quickPick.onDidChangeActive(() => resolve(undefined)))
+      })
+
       const setupWorkspaceWizard = commands.executeCommand(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE
       )
@@ -129,6 +109,9 @@ suite('Extension Test Suite', () => {
 
       const selectVenvAndInterpreter = selectQuickPickItem(2)
       await selectVenvAndInterpreter
+
+      await pickOneOrInputActive
+      mockCreateQuickPick.restore()
 
       const selectToFindInterpreter = selectQuickPickItem(1)
       await selectToFindInterpreter
@@ -148,6 +131,55 @@ suite('Extension Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should initialize the extension when the cli is usable', async () => {
+      const selectDvcPathFromFilePicker = async () => {
+        const quickPick =
+          window.createQuickPick<QuickPickItemWithValue<string>>()
+
+        const mockShowQuickPick = stub(window, 'showQuickPick')
+
+        const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
+        const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
+
+        const mockCreateQuickPick = stub(window, 'createQuickPick').returns(
+          quickPick
+        )
+        const pickOneOrInputActive = new Promise(resolve => {
+          disposable.track(
+            quickPick.onDidChangeActive(() => resolve(undefined))
+          )
+        })
+
+        const setupWorkspaceWizard = commands.executeCommand(
+          RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+        )
+
+        await venvQuickPickActive
+
+        const selectNoVenv = selectQuickPickItem(3)
+        await selectNoVenv
+
+        await globalQuickPickActive
+        mockShowQuickPick.restore()
+
+        const selectNotGlobal = selectQuickPickItem(2)
+        await selectNotGlobal
+
+        await pickOneOrInputActive
+        mockCreateQuickPick.restore()
+
+        const dvcPathChanged = configurationChangeEvent(
+          dvcPathOption,
+          disposable
+        )
+
+        const selectToFindCLI = selectQuickPickItem(1)
+        await selectToFindCLI
+
+        await dvcPathChanged
+
+        return setupWorkspaceWizard
+      }
+
       const createFileSystemWatcherSpy = spy(
         workspace,
         'createFileSystemWatcher'

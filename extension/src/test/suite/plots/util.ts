@@ -14,6 +14,7 @@ import { buildDependencies, buildMockData } from '../util'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
 import { mockHasCheckpoints } from '../experiments/util'
+import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -31,6 +32,9 @@ export const buildPlots = async (
   const data = new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
 
   const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
+  const mockGetModifiedTime = stub(FileSystem, 'getModifiedTime').returns(
+    MOCK_IMAGE_MTIME
+  )
 
   const [experiments, plots] = await Promise.all([
     disposer.track(
@@ -72,6 +76,7 @@ export const buildPlots = async (
     data,
     experiments,
     messageSpy,
+    mockGetModifiedTime,
     mockPlotsDiff,
     mockRemoveDir,
     plots,

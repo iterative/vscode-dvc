@@ -19,7 +19,7 @@ import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
 import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
-import { removeDir } from '../fileSystem'
+import { getModifiedTime, removeDir } from '../fileSystem'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -152,7 +152,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     if (this.webview) {
       return {
         ...plot,
-        url: this.webview.getWebviewUri(plot.url)
+        url: `${this.webview.getWebviewUri(plot.url)}?${getModifiedTime(
+          plot.url
+        )}`
       }
     }
   }

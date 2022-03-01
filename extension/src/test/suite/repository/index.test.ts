@@ -112,6 +112,7 @@ suite('Repository Test Suite', () => {
         resolve(dvcDemoPath, model),
         resolve(dvcDemoPath, dataDir),
         resolve(dvcDemoPath, logDir),
+        resolve(dvcDemoPath, 'data'),
         resolve(dvcDemoPath, MNISTDir)
       ])
 
@@ -219,6 +220,8 @@ suite('Repository Test Suite', () => {
         resolve(dvcDemoPath, logAcc),
         resolve(dvcDemoPath, logLoss),
         resolve(dvcDemoPath, model),
+        resolve(dvcDemoPath, 'data'),
+        resolve(dvcDemoPath, 'data', 'MNIST'),
         resolve(dvcDemoPath, dataDir),
         resolve(dvcDemoPath, logDir)
       ])

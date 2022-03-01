@@ -10,6 +10,7 @@ import outputFixture from '../../test/fixtures/expShow/output'
 import rowsFixture from '../../test/fixtures/expShow/rows'
 import { buildMockMemento } from '../../test/util'
 import { joinMetricOrParamPath } from '../metricsAndParams/paths'
+import { Experiment } from '../webview/contract'
 
 jest.mock('vscode')
 
@@ -59,7 +60,7 @@ describe('ExperimentsModel', () => {
   it('should return rows that equal the rows fixture when given the output fixture', async () => {
     const model = new ExperimentsModel('', buildMockMemento())
     await model.transformAndSet(outputFixture, true)
-    expect(model.getRowData()).toEqual(rowsFixture)
+    expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', async () => {
@@ -85,7 +86,7 @@ describe('ExperimentsModel', () => {
       }
     })
 
-    expect(experimentsModel.getSelectedExperiments()).toEqual([
+    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
         displayColor: expColor,
         id: runningExperiment,
@@ -94,8 +95,9 @@ describe('ExperimentsModel', () => {
     ])
 
     experimentsModel.setSelectionMode(true)
-    experimentsModel.setSelectedToFilters()
-    expect(experimentsModel.getSelectedExperiments()).toEqual([])
+
+    experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
+    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([])
 
     const unfilteredCheckpoint = buildTestExperiment(
       3,
@@ -117,7 +119,7 @@ describe('ExperimentsModel', () => {
     }
 
     await experimentsModel.transformAndSet(experimentWithNewCheckpoint)
-    expect(experimentsModel.getSelectedExperiments()).toEqual([
+    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
         displayColor: expColor,
         id: runningExperiment,
@@ -153,9 +155,9 @@ describe('ExperimentsModel', () => {
     })
 
     experimentsModel.setSelectionMode(true)
-    experimentsModel.setSelectedToFilters()
+    experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
 
-    expect(experimentsModel.getSelectedRevisions()).toEqual([
+    expect(experimentsModel.getSelectedRevisions()).toStrictEqual([
       expect.objectContaining({
         displayColor: workspaceColor,
         id: 'workspace',
@@ -187,5 +189,40 @@ describe('ExperimentsModel', () => {
         label: '4includ'
       })
     ])
+  })
+
+  it('should always limit the number of selected experiments to 6', async () => {
+    const experimentsModel = new ExperimentsModel('', buildMockMemento())
+
+    await experimentsModel.transformAndSet({
+      testBranch: {
+        baseline: buildTestExperiment(2, undefined, 'testBranch'),
+        exp1: buildTestExperiment(0, 'tip'),
+        exp2: buildTestExperiment(0, 'tip'),
+        exp3: buildTestExperiment(0, 'tip'),
+        exp4: buildTestExperiment(0, 'tip'),
+        exp5: buildTestExperiment(0, 'tip'),
+        tip: buildTestExperiment(0, 'tip', runningExperiment)
+      },
+      workspace: {
+        baseline: buildTestExperiment(3)
+      }
+    })
+
+    experimentsModel.setSelectionMode(true)
+
+    experimentsModel.setSelected([
+      { id: 'exp1' },
+      { id: 'exp2' },
+      { id: 'exp3' },
+      { id: 'exp4' },
+      { id: 'exp5' },
+      { id: 'testBranch' },
+      { id: 'tip' },
+      { id: 'workspace' }
+    ] as Experiment[])
+    expect(experimentsModel.getSelectedRevisions()).toHaveLength(6)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((experimentsModel as any).useFiltersForSelection).toBe(false)
   })
 })

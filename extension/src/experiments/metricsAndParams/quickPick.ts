@@ -1,7 +1,7 @@
 import { QuickPickOptions } from 'vscode'
 import { definedAndNonEmpty } from '../../util/array'
 import { quickPickValue } from '../../vscode/quickPick'
-import { reportError } from '../../vscode/reporting'
+import { Toast } from '../../vscode/toast'
 import { MetricOrParam } from '../webview/contract'
 
 export const pickFromMetricsAndParams = (
@@ -9,7 +9,7 @@ export const pickFromMetricsAndParams = (
   quickPickOptions: QuickPickOptions
 ) => {
   if (!definedAndNonEmpty(metricsAndParams)) {
-    return reportError('There are no params or metrics to select from')
+    return Toast.showError('There are no params or metrics to select from')
   }
   return quickPickValue<MetricOrParam>(
     metricsAndParams.map(metricOrParam => ({

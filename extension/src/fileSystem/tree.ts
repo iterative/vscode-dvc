@@ -26,11 +26,11 @@ import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
 import { pickResources } from '../vscode/resourcePicker'
-import { getWarningResponse } from '../vscode/modal'
+import { warnOfConsequences } from '../vscode/modal'
 import { Response } from '../vscode/response'
 import { Resource } from '../repository/commands'
 import { WorkspaceRepositories } from '../repository/workspace'
-import { PathItem } from '../repository/data/collect'
+import { PathItem } from '../repository/model/collect'
 
 export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   public readonly dispose = Disposable.fn()
@@ -197,7 +197,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
           'pick resources to add to the dataset'
         )
         if (targets) {
-          const response = await getWarningResponse(
+          const response = await warnOfConsequences(
             'Are you sure you want to move the selected data into this dataset?',
             Response.MOVE
           )

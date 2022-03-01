@@ -1,7 +1,12 @@
 import { dirname, resolve } from 'path'
 import isEqual from 'lodash.isequal'
 import { Disposable } from '@hediet/std/disposable'
-import { collectTree, PathItem } from '../data/collect'
+import {
+  collectModifiedAgainstHead,
+  collectTracked,
+  collectTree,
+  PathItem
+} from './collect'
 import { SourceControlManagementModel } from '../sourceControlManagement'
 import { DecorationModel } from '../decorationProvider'
 import {
@@ -15,7 +20,6 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../../cli/reader'
-import { isDirectory } from '../../fileSystem'
 
 type OutputData = {
   diffFromCache: StatusOutput
@@ -89,16 +93,6 @@ export class RepositoryModel
     return resolve(this.dvcRoot, path)
   }
 
-  private getAbsolutePaths(paths: string[] = []): string[] {
-    return paths.map(path => this.getAbsolutePath(path))
-  }
-
-  private getAbsoluteParentPath(files: string[] = []): string[] {
-    return files
-      .map(file => this.getAbsolutePath(dirname(file)))
-      .filter(dir => dir !== this.dvcRoot)
-  }
-
   private getChangedOutsStatuses(
     fileOrStage: StatusesOrAlwaysChanged[]
   ): PathStatus[] {
@@ -163,10 +157,13 @@ export class RepositoryModel
     path: string,
     set: Set<string> = new Set()
   ): boolean => {
-    if (isDirectory(path)) {
-      return !set.has(path)
+    while (this.dvcRoot !== path) {
+      if (set.has(path)) {
+        return false
+      }
+      path = dirname(path)
     }
-    return !(set.has(path) || set.has(dirname(path)))
+    return true
   }
 
   private splitModifiedAgainstHead(
@@ -192,7 +189,12 @@ export class RepositoryModel
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
-    const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
+    const modifiedAgainstHead = collectModifiedAgainstHead(
+      this.dvcRoot,
+      diffOutput.modified || [],
+      this.state.tracked
+    )
+
     const {
       [Status.MODIFIED]: modifiedAgainstCache,
       [Status.NOT_IN_CACHE]: notInCache
@@ -238,12 +240,7 @@ export class RepositoryModel
   private updateTracked(listOutput: ListOutput[]): void {
     const trackedPaths = listOutput.map(tracked => tracked.path)
 
-    const absoluteTrackedPaths = this.getAbsolutePaths(trackedPaths)
-
-    const tracked = new Set([
-      ...absoluteTrackedPaths,
-      ...this.getAbsoluteParentPath(trackedPaths)
-    ])
+    const tracked = collectTracked(this.dvcRoot, trackedPaths)
 
     if (!isEqual(tracked, this.state.tracked)) {
       this.tree = collectTree(this.dvcRoot, trackedPaths)

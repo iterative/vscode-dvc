@@ -105,6 +105,7 @@ module.exports = {
         withinDescribe: 'it'
       }
     ],
+    'jest/prefer-strict-equal': ['error'],
     // Let us wrap Radio components in labels.
     'jsx-a11y/label-has-associated-control': [
       2,

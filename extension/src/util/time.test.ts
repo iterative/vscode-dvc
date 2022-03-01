@@ -14,10 +14,10 @@ describe('delay', () => {
     const delayThenChangePromise = delay(5000).then(() => {
       changedAfterDelay = true
     })
-    expect(changedAfterDelay).toEqual(false)
+    expect(changedAfterDelay).toStrictEqual(false)
     jest.advanceTimersByTime(5000)
     await delayThenChangePromise
-    expect(changedAfterDelay).toEqual(true)
+    expect(changedAfterDelay).toStrictEqual(true)
   })
 })
 
@@ -33,7 +33,7 @@ describe('StopWatch', () => {
 
     await timeToWait
 
-    expect(stopWatch.getElapsedTime()).toEqual(elapsedTime)
+    expect(stopWatch.getElapsedTime()).toStrictEqual(elapsedTime)
   })
 
   it('should be able to reset the elapsed time to 0', async () => {
@@ -47,8 +47,8 @@ describe('StopWatch', () => {
 
     await timeToWait
 
-    expect(stopWatch.getElapsedTime()).not.toEqual(0)
+    expect(stopWatch.getElapsedTime()).not.toStrictEqual(0)
     stopWatch.reset()
-    expect(stopWatch.getElapsedTime()).toEqual(0)
+    expect(stopWatch.getElapsedTime()).toStrictEqual(0)
   })
 })

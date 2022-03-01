@@ -30,7 +30,7 @@ describe('MetricsAndParamsModel', () => {
         buildMockMemento()
       )
       await model.transformAndSet(exampleData)
-      expect(model.getSelected()).toEqual([
+      expect(model.getSelected()).toStrictEqual([
         {
           group: 'params',
           hasChildren: true,
@@ -62,7 +62,7 @@ describe('MetricsAndParamsModel', () => {
         })
       )
       await model.transformAndSet(exampleData)
-      expect(model.getSelected()).toEqual([
+      expect(model.getSelected()).toStrictEqual([
         {
           group: 'params',
           hasChildren: true,
@@ -88,7 +88,7 @@ describe('MetricsAndParamsModel', () => {
             persistedState
         })
       )
-      expect(model.getColumnOrder()).toEqual(persistedState)
+      expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
     it('should re-order the columns if a new columnOrder is set', () => {
@@ -104,7 +104,7 @@ describe('MetricsAndParamsModel', () => {
       )
       const newState = ['C', 'B', 'A']
       model.setColumnOrder(newState)
-      expect(model.getColumnOrder()).toEqual(newState)
+      expect(model.getColumnOrder()).toStrictEqual(newState)
     })
   })
 
@@ -122,7 +122,7 @@ describe('MetricsAndParamsModel', () => {
             persistedState
         })
       )
-      expect(model.getColumnOrder()).toEqual(persistedState)
+      expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
     it('should set the width to a column when calling setColumnWidth', () => {

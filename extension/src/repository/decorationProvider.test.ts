@@ -116,14 +116,14 @@ describe('DecorationProvider', () => {
       tracked
     }
 
-    expect(initialState.added).toEqual(updatedState.added)
-    expect(initialState.deleted).toEqual(updatedState.deleted)
-    expect(initialState.renamed).toEqual(updatedState.renamed)
-    expect(initialState.gitModified).toEqual(updatedState.gitModified)
+    expect(initialState.added).toStrictEqual(updatedState.added)
+    expect(initialState.deleted).toStrictEqual(updatedState.deleted)
+    expect(initialState.renamed).toStrictEqual(updatedState.renamed)
+    expect(initialState.gitModified).toStrictEqual(updatedState.gitModified)
 
-    expect(initialState.modified).not.toEqual(updatedState.modified)
-    expect(initialState.notInCache).not.toEqual(updatedState.notInCache)
-    expect(initialState.tracked).not.toEqual(updatedState.tracked)
+    expect(initialState.modified).not.toStrictEqual(updatedState.modified)
+    expect(initialState.notInCache).not.toStrictEqual(updatedState.notInCache)
+    expect(initialState.tracked).not.toStrictEqual(updatedState.tracked)
 
     const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
     decorationProvider.setState(initialState)

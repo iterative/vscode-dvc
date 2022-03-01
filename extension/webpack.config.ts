@@ -1,3 +1,4 @@
+/* eslint-disable import/default */
 import { join, resolve } from 'path'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { readFileSync } from 'fs-extra'

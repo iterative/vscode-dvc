@@ -27,7 +27,7 @@ describe('reset', () => {
 
     disposables = reset<Disposer>(disposables, disposer)
 
-    expect(disposables).toEqual({})
+    expect(disposables).toStrictEqual({})
   })
 
   it('should call dispose on all of the disposables', () => {

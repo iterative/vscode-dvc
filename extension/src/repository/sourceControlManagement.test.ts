@@ -40,7 +40,7 @@ describe('SourceControlManagement', () => {
         initialState
       )
       expect(mockedCreateSourceControl).toBeCalledTimes(1)
-      expect(sourceControlManagement.getState()).toEqual({
+      expect(sourceControlManagement.getState()).toStrictEqual({
         changes: [],
         gitCommitReady: [],
         notInCache: []
@@ -56,7 +56,7 @@ describe('SourceControlManagement', () => {
 
       sourceControlManagement.setState(updatedState)
 
-      expect(sourceControlManagement.getState()).toEqual({
+      expect(sourceControlManagement.getState()).toStrictEqual({
         changes: [
           {
             contextValue: 'deleted',
@@ -91,7 +91,7 @@ describe('SourceControlManagement', () => {
       })
 
       sourceControlManagement.setState(initialState)
-      expect(sourceControlManagement.getState()).toEqual({
+      expect(sourceControlManagement.getState()).toStrictEqual({
         changes: [],
         gitCommitReady: [],
         notInCache: []

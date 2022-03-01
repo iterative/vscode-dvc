@@ -6,7 +6,7 @@ import { join } from '../../../test/util/path'
 describe('collectFlatExperimentParams', () => {
   it('should flatten the params into an array', () => {
     const params = collectFlatExperimentParams(rowsFixture[0].params)
-    expect(params).toEqual([
+    expect(params).toStrictEqual([
       { path: joinMetricOrParamFilePath('params.yaml', 'epochs'), value: 2 },
       {
         path: joinMetricOrParamFilePath('params.yaml', 'learning_rate'),

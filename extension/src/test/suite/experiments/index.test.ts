@@ -22,7 +22,11 @@ import {
 } from '../util'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
-import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
+import {
+  FilterDefinition,
+  getFilterId,
+  Operator
+} from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
@@ -543,7 +547,7 @@ suite('Experiments Test Suite', () => {
         'second filter should be added to memento after addFilter'
       ).to.deep.equal(filterMapEntries)
 
-      testRepository.removeFilter(firstFilterId)
+      await testRepository.removeFilter(firstFilterId)
       expect(
         mockMemento.get('experimentsFilterBy:test'),
         'first filter should be removed from memento after removeFilter'
@@ -575,7 +579,10 @@ suite('Experiments Test Suite', () => {
       const pickFiltersStub = stub(FilterQuickPicks, 'pickFiltersToRemove')
       pickFiltersStub
         .onFirstCall()
-        .resolves([firstFilterDefinition, secondFilterDefinition])
+        .resolves([
+          getFilterId(firstFilterDefinition),
+          getFilterId(secondFilterDefinition)
+        ])
       await testRepository.removeFilters()
       expect(
         mockMemento.get('experimentsFilterBy:test'),

@@ -8,7 +8,7 @@ import {
 } from '../../commands/internal'
 import { relativeWithUri } from '../../fileSystem'
 import { gitReset, gitResetWorkspace, gitStageAll } from '../../git'
-import { getWarningResponse } from '../../vscode/modal'
+import { warnOfConsequences } from '../../vscode/modal'
 import { Response } from '../../vscode/response'
 import { WorkspaceRepositories } from '../workspace'
 
@@ -111,7 +111,7 @@ export const getResetRootCommand =
       return
     }
 
-    const response = await getWarningResponse(
+    const response = await warnOfConsequences(
       'Are you sure you want to discard ALL workspace changes?\n' +
         'This is IRREVERSIBLE!\n' +
         'Your current working set will be FOREVER LOST if you proceed.',

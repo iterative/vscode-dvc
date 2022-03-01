@@ -28,7 +28,7 @@ describe('getAllUntracked', () => {
 
     await Promise.all([remove(untrackedDir), remove(untrackedPython)])
 
-    expect(gitUntrackedPaths).toEqual(
+    expect(gitUntrackedPaths).toStrictEqual(
       expect.arrayContaining([
         untrackedDir,
         untrackedPerl,
@@ -37,10 +37,10 @@ describe('getAllUntracked', () => {
       ])
     )
 
-    expect(dvcUntrackedPaths).toEqual(
+    expect(dvcUntrackedPaths).toStrictEqual(
       expect.arrayContaining([untrackedDir, untrackedPerl, untrackedText])
     )
-    expect(dvcUntrackedPaths).not.toEqual(
+    expect(dvcUntrackedPaths).not.toStrictEqual(
       expect.arrayContaining([untrackedPython])
     )
   })

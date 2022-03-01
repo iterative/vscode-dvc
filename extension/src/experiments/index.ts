@@ -7,11 +7,13 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
+import { tooManySelected } from './model/status'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
-import { TableData } from './webview/contract'
+import { askToDisableAutoApplyFilters } from './toast'
+import { Experiment, TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
@@ -24,6 +26,7 @@ import {
 } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
+import { Response } from '../vscode/response'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -186,9 +189,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public removeFilter(id: string) {
-    // if auto apply is being used need to calculate the number of experiments that will be selected
-    // and pop a warning if > 6
+  public async removeFilter(id: string) {
+    const response = await this.checkAutoApplyFilters(id)
+    if (response === Response.CANCEL) {
+      return
+    }
+
     if (this.experiments.removeFilter(id)) {
       return this.notifyChanged()
     }
@@ -196,22 +202,27 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async removeFilters() {
     const filters = this.experiments.getFilters()
-    // if auto apply is being used need to calculate the number of experiments that will be selected and pop a warning if > 6
-    const filtersToRemove = await pickFiltersToRemove(filters)
-    if (!filtersToRemove) {
+    const filterIdsToRemove = await pickFiltersToRemove(filters)
+    if (!filterIdsToRemove) {
       return
     }
-    this.experiments.removeFilters(filtersToRemove)
+
+    const response = await this.checkAutoApplyFilters(...filterIdsToRemove)
+    if (response === Response.CANCEL) {
+      return
+    }
+
+    this.experiments.removeFilters(filterIdsToRemove)
     return this.notifyChanged()
   }
 
   public async selectExperiments() {
-    const experiments = this.experiments.getExperiments()
+    const experiments = this.experiments.getExperimentsWithCheckpoints()
 
-    // need this to limit to 6,
-    // as a start could de-select all checkpoints, if not need to revisit the UI
-    // use quickPick to limit amount of selectedItems can use createQuickPick, selectedItems and onDidChangeSelection
-    const selected = await pickExperiments(experiments)
+    const selected = await pickExperiments(
+      experiments,
+      this.checkpoints.hasCheckpoints()
+    )
     if (!selected) {
       return
     }
@@ -221,12 +232,16 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public autoApplyFilters(useFilters: boolean) {
-    // if auto apply is selected need to calculate the number of experiments that will be selected and pop a warning if > 6
+  public async autoApplyFilters(useFilters: boolean) {
     this.experiments.setSelectionMode(useFilters)
 
     if (useFilters) {
-      this.experiments.setSelectedToFilters()
+      const filteredExperiments = this.experiments.getFilteredExperiments()
+      if (tooManySelected(filteredExperiments)) {
+        await this.warnAndDoNotAutoApply(filteredExperiments)
+      } else {
+        this.experiments.setSelected(filteredExperiments)
+      }
       return this.notifyChanged()
     }
   }
@@ -325,10 +340,42 @@ export class Experiments extends BaseRepository<TableData> {
               message.payload && this.metricsAndParams.setColumnWidth(id, width)
             )
           }
+          case MessageFromWebviewType.EXPERIMENT_TOGGLED:
+            return (
+              message.payload && this.toggleExperimentStatus(message.payload)
+            )
           default:
             Logger.error(`Unexpected message: ${message}`)
         }
       })
     )
+  }
+
+  private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
+    if (this.experiments.canAutoApplyFilters(...filterIdsToRemove)) {
+      return
+    }
+
+    const response = await askToDisableAutoApplyFilters(
+      'Auto apply filters to experiment selection is currently active. Too many experiments would be selected by removing the selected filter(s), how would you like to proceed?',
+      Response.TURN_OFF
+    )
+    if (response !== Response.CANCEL) {
+      this.autoApplyFilters(false)
+    }
+    return response
+  }
+
+  private async warnAndDoNotAutoApply(filteredExperiments: Experiment[]) {
+    this.experiments.setSelectionMode(false)
+
+    const response = await askToDisableAutoApplyFilters(
+      'Too many experiments would be selected by applying the current filter(s), how would you like to proceed?',
+      Response.SELECT_MOST_RECENT
+    )
+
+    if (response === Response.SELECT_MOST_RECENT) {
+      this.experiments.setSelected(filteredExperiments)
+    }
   }
 }

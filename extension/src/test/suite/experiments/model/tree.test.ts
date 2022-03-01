@@ -1,15 +1,16 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, SinonStub, spy } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import {
   commands,
   EventEmitter,
-  QuickPickItem,
-  QuickPickOptions,
+  MessageItem,
+  QuickPick,
   TreeView,
   TreeViewExpansionEvent,
   window
 } from 'vscode'
+import { addFilterViaQuickInput } from './filterBy/util'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel } from '../../../../experiments/model'
 import { Status } from '../../../../experiments/model/status'
@@ -18,8 +19,8 @@ import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
 import { buildPlots, getExpectedLivePlotsData } from '../../plots/util'
 import livePlotsFixture from '../../../fixtures/expShow/livePlots'
+import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
 import expShowFixture from '../../../fixtures/expShow/output'
-import columnsFixture from '../../../fixtures/expShow/columns'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
 import {
@@ -30,6 +31,8 @@ import { buildSingleRepoExperiments } from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { InternalCommands } from '../../../../commands/internal'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
+import { QuickPickItemWithValue } from '../../../../vscode/quickPick'
+import { Response } from '../../../../vscode/response'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -104,7 +107,7 @@ suite('Experiments Tree Test Suite', () => {
         expect(unSelected).to.equal(Status.UNSELECTED)
         expect(
           setSelectionModeSpy,
-          'de-selecting any experiment disables auto apply filters to experiments selection'
+          'de-selecting any experiment disables auto-apply filters to experiments selection'
         ).to.be.calledOnceWith(false)
         setSelectionModeSpy.resetHistory()
       }
@@ -137,7 +140,7 @@ suite('Experiments Tree Test Suite', () => {
       )
       expect(
         setSelectionModeSpy,
-        'selecting any experiment disables auto apply filters to experiments selection'
+        'selecting any experiment disables auto-apply filters to experiments selection'
       ).to.be.calledOnceWith(false)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -149,28 +152,47 @@ suite('Experiments Tree Test Suite', () => {
       const selectedItem = {
         description: selectedDisplayName,
         label: '',
-        picked: true,
         value: { id: selectedDisplayName }
       }
 
       await plots.showWebview()
 
-      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
-        [
-          items: readonly QuickPickItem[],
-          options: QuickPickOptions & { canPickMany: true }
-        ],
-        Thenable<QuickPickItem[] | undefined>
-      >
-      mockShowQuickPick.resolves([selectedItem])
+      const inputAccepted = disposable.track(new EventEmitter<void>())
+      const mockEvent = disposable.track(new EventEmitter()).event
+
+      const mockCreateQuickPick = stub(window, 'createQuickPick')
+      const mockQuickPick = {
+        onDidAccept: inputAccepted.event,
+        onDidChangeSelection: mockEvent,
+        onDidHide: mockEvent,
+        placeholder: undefined,
+        selectedItems: [] as { id: string }[],
+        show: stub(),
+        value: undefined
+      } as unknown as QuickPick<QuickPickItemWithValue<{ id: string }>>
+
+      const quickPickCreated = new Promise(resolve =>
+        mockCreateQuickPick.callsFake(() => {
+          resolve(undefined)
+          return mockQuickPick
+        })
+      )
+
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,
         'setSelectionMode'
       )
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SELECT)
+      const selectExperiments = commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_SELECT
+      )
 
-      expect(mockShowQuickPick).to.be.calledOnce
+      await quickPickCreated
+      mockQuickPick.selectedItems = [selectedItem]
+      inputAccepted.fire()
+      await selectExperiments
+
+      expect(mockCreateQuickPick).to.be.calledOnce
 
       expect(
         messageSpy,
@@ -180,7 +202,7 @@ suite('Experiments Tree Test Suite', () => {
       )
       expect(
         setSelectionModeSpy,
-        'auto apply filters to experiment selection is disabled'
+        'auto-apply filters to experiment selection is disabled'
       ).to.be.calledOnceWith(false)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -222,14 +244,84 @@ suite('Experiments Tree Test Suite', () => {
       )
       expect(
         setSelectionModeSpy,
-        'auto apply filters to experiment selection is enabled'
+        'auto-apply filters to experiment selection is enabled'
       ).to.be.calledOnceWith(true)
       messageSpy.resetHistory()
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should warn the user if enabling dvc.views.experimentsTree.autoApplyFilters would select too many experiments', async () => {
+      const { plots, experiments, plotsModel, messageSpy, mockPlotsDiff } =
+        await buildPlots(disposable, plotsDiffFixture)
+
+      await plots.showWebview()
+      const initiallySelectedRevisions = plotsModel.getSelectedRevisionDetails()
+
+      const setSelectionModeSpy = spy(
+        ExperimentsModel.prototype,
+        'setSelectionMode'
+      )
+
+      stub(window, 'showWarningMessage')
+        .onFirstCall()
+        .resolves(Response.CANCEL as unknown as MessageItem)
+        .onFirstCall()
+        .resolves(Response.SELECT_MOST_RECENT as unknown as MessageItem)
+
+      messageSpy.resetHistory()
+
+      const firstUpdateEvent = experimentsUpdatedEvent(experiments)
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
+      )
+
+      await firstUpdateEvent
+
+      expect(
+        getFirstArgOfLastCall(setSelectionModeSpy),
+        'auto-apply filters to experiment selection is not enabled when the user selects to cancel'
+      ).to.be.false
+      expect(
+        messageSpy,
+        'the same experiments are still selected'
+      ).to.be.calledWithMatch({
+        comparison: {
+          revisions: initiallySelectedRevisions
+        }
+      })
+      setSelectionModeSpy.resetHistory()
+      messageSpy.resetHistory()
+
+      const secondUpdateEvent = experimentsUpdatedEvent(experiments)
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
+      )
+
+      await secondUpdateEvent
+
+      expect(
+        getFirstArgOfLastCall(setSelectionModeSpy),
+        'auto-apply filters to experiment selection is not enabled when the user selects to use the most recent'
+      ).to.be.false
+      expect(
+        plotsModel.getSelectedRevisionDetails(),
+        'all running and the most recent experiments are now selected'
+      ).to.deep.equal([
+        { displayColor: '#945dd6', revision: 'workspace' },
+        { displayColor: '#f14c4c', revision: '4fb124a' },
+        { displayColor: '#3794ff', revision: '42b8736' },
+        { displayColor: '#f14c4c', revision: 'd1343a8' },
+        { displayColor: '#f14c4c', revision: '1ee5f2e' },
+        { displayColor: '#3794ff', revision: '2173124' }
+      ])
+      expect(
+        mockPlotsDiff,
+        'the missing revisions have been requested'
+      ).to.be.calledWithExactly(dvcDemoPath, '1ee5f2e', '2173124', 'd1343a8')
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should automatically apply filters to experiments selection if dvc.experiments.filter.selected has been set via dvc.views.experimentsTree.autoApplyFilters', async () => {
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockShowInputBox = stub(window, 'showInputBox')
       const { experiments, plots, messageSpy } = await buildPlots(disposable)
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,
@@ -237,38 +329,20 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       await plots.showWebview()
+
+      messageSpy.resetHistory()
+
+      await addFilterViaQuickInput(experiments, {
+        operator: Operator.EQUAL,
+        path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
+        value: '0'
+      })
+
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
       )
       expect(setSelectionModeSpy).to.be.calledOnceWith(true)
       setSelectionModeSpy.resetHistory()
-
-      messageSpy.resetHistory()
-
-      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
-
-      const lossFilter = {
-        operator: Operator.EQUAL,
-        path: lossPath,
-        value: '0'
-      }
-
-      const loss = columnsFixture.find(
-        metricOrParam => metricOrParam.path === lossPath
-      )
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick.onSecondCall().resolves({
-        value: lossFilter.operator
-      } as unknown as QuickPickItem)
-      mockShowInputBox.resolves(lossFilter.value)
-
-      const tableFilterAdded = experimentsUpdatedEvent(experiments)
-
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
-
-      await tableFilterAdded
 
       const expectedMessage = { comparison: null, live: null, static: null }
 
@@ -278,11 +352,6 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.calledWith(expectedMessage)
       messageSpy.resetHistory()
 
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS
-      )
-      expect(setSelectionModeSpy).to.be.calledOnceWith(false)
-
       const tableFilterRemoved = experimentsUpdatedEvent(experiments)
 
       await commands.executeCommand(
@@ -290,6 +359,10 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       await tableFilterRemoved
+      expect(
+        setSelectionModeSpy,
+        'auto-apply filters is automatically disabled when all filters are removed from the tree'
+      ).to.be.calledOnceWith(false)
 
       expect(
         messageSpy,

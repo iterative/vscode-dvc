@@ -8,7 +8,8 @@ const {
   findAbsoluteDvcRootPath,
   findDvcRootPaths,
   isDirectory,
-  isSameOrChild
+  isSameOrChild,
+  getModifiedTime
 } = FileSystem
 
 jest.mock('../cli/reader')
@@ -21,7 +22,7 @@ describe('findDvcRootPaths', () => {
   it('should find the dvc root if it exists in the given folder', async () => {
     const dvcRoots = await findDvcRootPaths(dvcDemoPath)
 
-    expect(dvcRoots).toEqual([dvcDemoPath])
+    expect(dvcRoots).toStrictEqual([dvcDemoPath])
   })
 
   it('should find multiple roots if available one directory below the given folder', async () => {
@@ -33,7 +34,7 @@ describe('findDvcRootPaths', () => {
 
     remove(mockDvcRoot)
 
-    expect(dvcRoots).toEqual([dvcDemoPath, mockDvcRoot].sort())
+    expect([...dvcRoots]).toStrictEqual([dvcDemoPath, mockDvcRoot])
   })
 })
 
@@ -46,7 +47,7 @@ describe('findAbsoluteDvcRootPath', () => {
       Promise.resolve('..')
     )
 
-    expect(dvcRoots).toEqual([dvcDemoPath])
+    expect(dvcRoots).toStrictEqual([dvcDemoPath])
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
@@ -54,7 +55,7 @@ describe('findAbsoluteDvcRootPath', () => {
       __dirname,
       Promise.resolve(undefined)
     )
-    expect(dvcRoots).toEqual([])
+    expect(dvcRoots).toStrictEqual([])
   })
 })
 
@@ -106,5 +107,14 @@ describe('isSameOrChild', () => {
     expect(isSameOrChild(mockedRoot, resolve(mockedRoot, '..', '..'))).toBe(
       false
     )
+  })
+})
+
+describe('getModifiedTime', () => {
+  it('should return a number for a file that exists on the system', () => {
+    const epoch = getModifiedTime(__filename)
+
+    expect(typeof epoch).toBe('number')
+    expect(epoch).toBeGreaterThan(1640995200000)
   })
 })
