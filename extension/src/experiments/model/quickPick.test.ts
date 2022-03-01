@@ -34,7 +34,7 @@ describe('pickExperiments', () => {
     mockedQuickPickLimitedValues.mockResolvedValueOnce([selectedExperiment])
     const picked = await pickExperiments(mockedExperiments, false)
 
-    expect(picked).toEqual([selectedExperiment])
+    expect(picked).toStrictEqual([selectedExperiment])
     expect(mockedQuickPickLimitedValues).toBeCalledTimes(1)
     expect(mockedQuickPickLimitedValues).toBeCalledWith(
       [
@@ -123,7 +123,7 @@ describe('pickExperiments', () => {
       value: item
     })
 
-    expect(picked).toEqual([selectedExperiment, selectedCheckpoint])
+    expect(picked).toStrictEqual([selectedExperiment, selectedCheckpoint])
     expect(mockedQuickPickLimitedValues).toBeCalledTimes(1)
     expect(mockedQuickPickLimitedValues).toBeCalledWith(
       [

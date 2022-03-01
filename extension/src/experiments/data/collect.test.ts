@@ -5,7 +5,7 @@ import expShowFixture from '../../test/fixtures/expShow/output'
 
 describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {
-    expect(collectFiles(expShowFixture)).toEqual([
+    expect(collectFiles(expShowFixture)).toStrictEqual([
       'params.yaml',
       join('nested', 'params.yaml'),
       'summary.json'
@@ -21,7 +21,7 @@ describe('collectFiles', () => {
       }
     }
 
-    expect(collectFiles(workspace)).toEqual([])
+    expect(collectFiles(workspace)).toStrictEqual([])
   })
 
   it('should handle a missing params key', () => {
@@ -37,7 +37,7 @@ describe('collectFiles', () => {
       }
     }
 
-    expect(collectFiles(workspace)).toEqual(['logs.json'])
+    expect(collectFiles(workspace)).toStrictEqual(['logs.json'])
   })
 
   it('should handle a missing metrics key', () => {
@@ -53,7 +53,7 @@ describe('collectFiles', () => {
       }
     }
 
-    expect(collectFiles(workspace)).toEqual(['params.yaml'])
+    expect(collectFiles(workspace)).toStrictEqual(['params.yaml'])
   })
 
   it('should collect all of the available files from a more complex example', () => {
@@ -76,7 +76,7 @@ describe('collectFiles', () => {
       }
     } as ExperimentsOutput
 
-    expect(collectFiles(workspace).sort()).toEqual([
+    expect(collectFiles(workspace).sort()).toStrictEqual([
       'further/nested/params.yaml',
       'logs.json',
       'metrics.json',

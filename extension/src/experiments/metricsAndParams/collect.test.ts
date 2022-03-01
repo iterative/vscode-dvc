@@ -9,7 +9,7 @@ import { ExperimentsOutput } from '../../cli/reader'
 describe('collectMetricsAndParams', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {
     const metricsAndParams = collectMetricsAndParams(outputFixture)
-    expect(metricsAndParams).toEqual(columnsFixture)
+    expect(metricsAndParams).toStrictEqual(columnsFixture)
   })
 
   it('should output both params and metrics when both are present', () => {
@@ -73,7 +73,7 @@ describe('collectMetricsAndParams', () => {
         baseline: {}
       }
     })
-    expect(metricsAndParams).toEqual([])
+    expect(metricsAndParams).toStrictEqual([])
   })
 
   const exampleBigNumber = 3000000000
@@ -129,7 +129,7 @@ describe('collectMetricsAndParams', () => {
   ) as MetricOrParam
 
   it('should correctly identify mixed type params', () => {
-    expect(exampleMixedParam.types).toEqual([
+    expect(exampleMixedParam.types).toStrictEqual([
       'number',
       'string',
       'boolean',
@@ -138,12 +138,12 @@ describe('collectMetricsAndParams', () => {
   })
 
   it('should correctly identify a number as the highest string length of a mixed param', () => {
-    expect(exampleMixedParam.maxStringLength).toEqual(10)
+    expect(exampleMixedParam.maxStringLength).toStrictEqual(10)
   })
 
   it('should add the highest and lowest number from the one present', () => {
-    expect(exampleMixedParam.maxNumber).toEqual(exampleBigNumber)
-    expect(exampleMixedParam.minNumber).toEqual(exampleBigNumber)
+    expect(exampleMixedParam.maxNumber).toStrictEqual(exampleBigNumber)
+    expect(exampleMixedParam.minNumber).toStrictEqual(exampleBigNumber)
   })
 
   it('should find a different minNumber and maxNumber on a mixed param', () => {
@@ -196,8 +196,8 @@ describe('collectMetricsAndParams', () => {
         joinMetricOrParamPath('params', 'params.yaml', 'mixedNumber')
     ) as MetricOrParam
 
-    expect(mixedParam.minNumber).toEqual(-1)
-    expect(mixedParam.maxNumber).toEqual(1)
+    expect(mixedParam.minNumber).toStrictEqual(-1)
+    expect(mixedParam.maxNumber).toStrictEqual(1)
   })
 
   const numericMetricsAndParams = collectMetricsAndParams({
@@ -250,15 +250,15 @@ describe('collectMetricsAndParams', () => {
   })
 
   it('should find the min number of -1', () => {
-    expect(paramWithNumbers.minNumber).toEqual(-1)
+    expect(paramWithNumbers.minNumber).toStrictEqual(-1)
   })
 
   it('should find the max number of 2', () => {
-    expect(paramWithNumbers.maxNumber).toEqual(2)
+    expect(paramWithNumbers.maxNumber).toStrictEqual(2)
   })
 
   it('should find a max string length of two from -1', () => {
-    expect(paramWithNumbers.maxStringLength).toEqual(2)
+    expect(paramWithNumbers.maxStringLength).toStrictEqual(2)
   })
 
   it('should aggregate multiple different field names', () => {
@@ -313,7 +313,7 @@ describe('collectMetricsAndParams', () => {
         joinMetricOrParamPath('params', 'params.yaml')
     ) as MetricOrParam[]
 
-    expect(params?.map(({ name }) => name)).toEqual([
+    expect(params?.map(({ name }) => name)).toStrictEqual([
       'one',
       'two',
       'three',
@@ -342,7 +342,7 @@ describe('collectMetricsAndParams', () => {
       }
     })
 
-    expect(metricsAndParams.map(({ path }) => path)).toEqual([
+    expect(metricsAndParams.map(({ path }) => path)).toStrictEqual([
       joinMetricOrParamPath('params', 'params.yaml'),
       joinMetricOrParamPath('params', 'params.yaml', 'one.two.three.four'),
       joinMetricOrParamPath(
@@ -394,7 +394,7 @@ describe('collectMetricsAndParams', () => {
         joinMetricOrParamPath('params', 'params.yaml')
     ) as MetricOrParam
 
-    expect(objectParam.name).toEqual('onlyHasChild')
+    expect(objectParam.name).toStrictEqual('onlyHasChild')
     expect(objectParam.types).toBeUndefined()
 
     const primitiveParam = metricsAndParams.find(
@@ -403,7 +403,7 @@ describe('collectMetricsAndParams', () => {
         joinMetricOrParamPath('params', 'params.yaml', 'onlyHasChild')
     ) as MetricOrParam
 
-    expect(primitiveParam.name).toEqual('onlyHasPrimitive')
+    expect(primitiveParam.name).toStrictEqual('onlyHasPrimitive')
     expect(primitiveParam.types).toBeDefined()
 
     const onlyHasPrimitiveChild = metricsAndParams.find(
@@ -423,7 +423,7 @@ describe('collectMetricsAndParams', () => {
   it('should collect all params and metrics from the test fixture', () => {
     expect(
       collectMetricsAndParams(outputFixture).map(({ path }) => path)
-    ).toEqual([
+    ).toStrictEqual([
       joinMetricOrParamPath('metrics', 'summary.json'),
       joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
       joinMetricOrParamPath('metrics', 'summary.json', 'accuracy'),
@@ -468,7 +468,7 @@ describe('collectChanges', () => {
       workspace: mockedExperimentData
     }
 
-    expect(collectChanges(data)).toEqual([])
+    expect(collectChanges(data)).toStrictEqual([])
   })
 
   it('should collect the changes between the current commit and the workspace', () => {
@@ -481,7 +481,7 @@ describe('collectChanges', () => {
       workspace: mockedExperimentData
     }
 
-    expect(collectChanges(data)).toEqual([
+    expect(collectChanges(data)).toStrictEqual([
       'metrics:logs.json:acc',
       'metrics:logs.json:loss',
       'metrics:logs.json:step',
@@ -541,7 +541,7 @@ describe('collectChanges', () => {
       workspace: mockedWorkspaceData
     }
 
-    expect(collectChanges(data)).toEqual([
+    expect(collectChanges(data)).toStrictEqual([
       joinMetricOrParamPath(
         'params',
         'params.yaml',

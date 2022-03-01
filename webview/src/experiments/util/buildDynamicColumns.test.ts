@@ -31,7 +31,7 @@ describe('buildDynamicColumns', () => {
         ...buildDynamicColumns(columnsFixture, 'metrics'),
         ...buildDynamicColumns(columnsFixture, 'params')
       ])
-    ).toEqual([
+    ).toStrictEqual([
       {
         columns: [
           { id: joinMetricOrParamPath('metrics', 'summary.json', 'loss') },
@@ -143,7 +143,7 @@ describe('buildDynamicColumns', () => {
   it('Correctly parses the deeply nested fixture', () => {
     expect(
       simplifyColumns(buildDynamicColumns(deeplyNestedColumnsFixture, 'params'))
-    ).toEqual([
+    ).toStrictEqual([
       {
         columns: [
           {
@@ -328,29 +328,31 @@ describe('buildDynamicColumns', () => {
         }
       }
     })
-    expect(simplifyColumns(buildDynamicColumns(input, 'params'))).toEqual([
-      {
-        columns: [
-          {
-            columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', 'a') }
-            ],
-            id: joinMetricOrParamPath(
-              'params',
-              'params.yaml',
-              'a_previous_placeholder'
-            )
-          },
-          {
-            columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', 'c', 'd') }
-            ],
-            id: joinMetricOrParamPath('params', 'params.yaml', 'c')
-          }
-        ],
-        id: joinMetricOrParamPath('params', 'params.yaml')
-      }
-    ])
+    expect(simplifyColumns(buildDynamicColumns(input, 'params'))).toStrictEqual(
+      [
+        {
+          columns: [
+            {
+              columns: [
+                { id: joinMetricOrParamPath('params', 'params.yaml', 'a') }
+              ],
+              id: joinMetricOrParamPath(
+                'params',
+                'params.yaml',
+                'a_previous_placeholder'
+              )
+            },
+            {
+              columns: [
+                { id: joinMetricOrParamPath('params', 'params.yaml', 'c', 'd') }
+              ],
+              id: joinMetricOrParamPath('params', 'params.yaml', 'c')
+            }
+          ],
+          id: joinMetricOrParamPath('params', 'params.yaml')
+        }
+      ]
+    )
   })
 
   it('Correctly parses a minimal input with a single-depth number-keyed column at the end', () => {
@@ -372,29 +374,31 @@ describe('buildDynamicColumns', () => {
         }
       }
     })
-    expect(simplifyColumns(buildDynamicColumns(input, 'params'))).toEqual([
-      {
-        columns: [
-          {
-            columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', '1') }
-            ],
-            id: joinMetricOrParamPath(
-              'params',
-              'params.yaml',
-              '1_previous_placeholder'
-            )
-          },
-          {
-            columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', 'c', 'd') }
-            ],
-            id: joinMetricOrParamPath('params', 'params.yaml', 'c')
-          }
-        ],
-        id: joinMetricOrParamPath('params', 'params.yaml')
-      }
-    ])
+    expect(simplifyColumns(buildDynamicColumns(input, 'params'))).toStrictEqual(
+      [
+        {
+          columns: [
+            {
+              columns: [
+                { id: joinMetricOrParamPath('params', 'params.yaml', '1') }
+              ],
+              id: joinMetricOrParamPath(
+                'params',
+                'params.yaml',
+                '1_previous_placeholder'
+              )
+            },
+            {
+              columns: [
+                { id: joinMetricOrParamPath('params', 'params.yaml', 'c', 'd') }
+              ],
+              id: joinMetricOrParamPath('params', 'params.yaml', 'c')
+            }
+          ],
+          id: joinMetricOrParamPath('params', 'params.yaml')
+        }
+      ]
+    )
   })
 
   it('Correctly parses a minimal input with a single-depth string-keyed column at the end', () => {
@@ -420,7 +424,7 @@ describe('buildDynamicColumns', () => {
       simplifyColumns(
         buildDynamicColumns(input, joinMetricOrParamPath('params'))
       )
-    ).toEqual([
+    ).toStrictEqual([
       {
         columns: [
           {

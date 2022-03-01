@@ -100,7 +100,7 @@ describe('TrackedTreeView', () => {
 
       const rootElements = await trackedTreeView.getChildren()
 
-      expect(rootElements).toEqual(mockedDvcRoots.map(getRootPathItem))
+      expect(rootElements).toStrictEqual(mockedDvcRoots.map(getRootPathItem))
       expect(mockedGetRepository).toBeCalledTimes(2)
       expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
       expect(mockedGetRepository).toBeCalledWith(mockedOtherRoot)
@@ -148,7 +148,7 @@ describe('TrackedTreeView', () => {
 
       expect(
         rootElements.map(({ resourceUri }) => basename(resourceUri.fsPath))
-      ).toEqual(['data', 'logs', 'plots', 'model.pt'])
+      ).toStrictEqual(['data', 'logs', 'plots', 'model.pt'])
       expect(mockedGetRepository).toBeCalledTimes(1)
       expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
       expect(mockedGetChildren).toBeCalledTimes(1)
@@ -189,7 +189,7 @@ describe('TrackedTreeView', () => {
       expect(mockedGetRepository).toBeCalledTimes(1)
       expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
       expect(mockedGetChildren).toBeCalledWith(dvcDemoPath)
-      expect(rootElements).toEqual(mockedRootItems)
+      expect(rootElements).toStrictEqual(mockedRootItems)
 
       mockedGetRepository.mockClear()
       mockedGetChildren.mockClear()
@@ -214,7 +214,7 @@ describe('TrackedTreeView', () => {
       expect(mockedGetRepository).toBeCalledTimes(1)
       expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
       expect(mockedGetChildren).toBeCalledWith(data.fsPath)
-      expect(child).toEqual(mockedDirItems)
+      expect(child).toStrictEqual(mockedDirItems)
     })
   })
 
@@ -222,7 +222,7 @@ describe('TrackedTreeView', () => {
     it('should return the correct tree item for a virtual directory', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toEqual(1)
+        expect(collapsibleState).toStrictEqual(1)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -243,7 +243,7 @@ describe('TrackedTreeView', () => {
       })
 
       expect(mockedTreeItem).toBeCalledTimes(1)
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem,
         contextValue: 'virtual'
       })
@@ -272,7 +272,7 @@ describe('TrackedTreeView', () => {
       })
 
       expect(mockedTreeItem).toBeCalledTimes(1)
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem,
         contextValue: 'virtual'
       })
@@ -302,7 +302,7 @@ describe('TrackedTreeView', () => {
       })
 
       expect(mockedTreeItem).toBeCalledTimes(1)
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem,
         contextValue: 'dirData'
       })
@@ -312,8 +312,8 @@ describe('TrackedTreeView', () => {
       let mockedItem = {}
       const log = Uri.file(join(dvcDemoPath, 'logs', 'acc.tsv'))
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toEqual(0)
-        expect(uri).toEqual(log)
+        expect(collapsibleState).toStrictEqual(0)
+        expect(uri).toStrictEqual(log)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -333,7 +333,7 @@ describe('TrackedTreeView', () => {
       })
 
       expect(mockedTreeItem).toBeCalledTimes(1)
-      expect(treeItem).toEqual({
+      expect(treeItem).toStrictEqual({
         ...mockedItem,
         command: {
           arguments: [log],

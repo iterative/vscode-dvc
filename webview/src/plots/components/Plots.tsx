@@ -79,26 +79,6 @@ export const Plots = ({
 
   return (
     <Theme>
-      {livePlots && (
-        <PlotsContainer
-          title={livePlots.sectionName}
-          sectionKey={Section.LIVE_PLOTS}
-          menu={{
-            metrics,
-            selectedMetrics: selectedPlots,
-            setSelectedPlots: setSelectedMetrics
-          }}
-          currentSize={livePlots.size}
-          {...basicContainerProps}
-        >
-          <LivePlots
-            plots={livePlots.plots.filter(plot =>
-              selectedPlots?.includes(getDisplayNameFromPath(plot.title))
-            )}
-            colors={livePlots.colors}
-          />
-        </PlotsContainer>
-      )}
       {staticPlots && (
         <PlotsContainer
           title={staticPlots.sectionName}
@@ -119,6 +99,26 @@ export const Plots = ({
           <ComparisonTable
             plots={comparisonTable.plots}
             revisions={comparisonTable.revisions}
+          />
+        </PlotsContainer>
+      )}
+      {livePlots && (
+        <PlotsContainer
+          title={livePlots.sectionName}
+          sectionKey={Section.LIVE_PLOTS}
+          menu={{
+            metrics,
+            selectedMetrics: selectedPlots,
+            setSelectedPlots: setSelectedMetrics
+          }}
+          currentSize={livePlots.size}
+          {...basicContainerProps}
+        >
+          <LivePlots
+            plots={livePlots.plots.filter(plot =>
+              selectedPlots?.includes(getDisplayNameFromPath(plot.title))
+            )}
+            colors={livePlots.colors}
           />
         </PlotsContainer>
       )}
