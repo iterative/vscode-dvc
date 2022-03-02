@@ -3,6 +3,7 @@ import React from 'react'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
 import { ComparisonTable } from '../plots/components/ComparisonTable/ComparisonTable'
+import { Theme } from '../shared/components/theme/Theme'
 
 export default {
   args: comparisonTableFixture,
@@ -11,7 +12,9 @@ export default {
 } as Meta
 
 const Template: Story<PlotsComparisonData> = ({ plots, revisions }) => (
-  <ComparisonTable plots={plots} revisions={revisions} />
+  <Theme>
+    <ComparisonTable plots={plots} revisions={revisions} />
+  </Theme>
 )
 
 export const Basic = Template.bind({})

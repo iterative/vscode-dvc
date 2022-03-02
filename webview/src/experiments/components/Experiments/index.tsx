@@ -21,6 +21,7 @@ import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
 import { sendMessage } from '../../../shared/vscode'
+import { Theme } from '../../../shared/components/theme/Theme'
 
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
@@ -202,13 +203,15 @@ const Experiments: React.FC<{
   tableData?: TableData | null
 }> = ({ tableData }) => {
   return (
-    <div className={styles.experiments}>
-      {tableData ? (
-        <ExperimentsTable tableData={tableData} />
-      ) : (
-        <p>Loading experiments...</p>
-      )}
-    </div>
+    <Theme>
+      <div className={styles.experiments}>
+        {tableData ? (
+          <ExperimentsTable tableData={tableData} />
+        ) : (
+          <p>Loading experiments...</p>
+        )}
+      </div>
+    </Theme>
   )
 }
 
