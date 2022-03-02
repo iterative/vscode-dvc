@@ -144,11 +144,11 @@ $gap: 20px;
 .plot {
   aspect-ratio: 4 / 3;
   overflow: visible;
-  padding: 10px 10px 10px 20px;
-  border-radius: 5px;
-  border: 1px solid var(--editor-foreground-transparency-5);
+  padding: 10px 10px 10px 30px;
   cursor: grab;
   position: relative;
+  border-radius: 5px;
+  background: var(--editor-foreground-transparency-1);
 
   &:hover {
     z-index: 2;
@@ -158,7 +158,13 @@ $gap: 20px;
 .plotGripIcon {
   position: absolute;
   z-index: 2;
-  left: 10px;
+  left: 0;
+  top: 0;
+  background: var(--editor-foreground-transparency-2);
+  padding: 5px;
+  height: 100%;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 .plot img,
