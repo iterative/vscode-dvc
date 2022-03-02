@@ -10,6 +10,7 @@ import {
 } from '../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../shared/components/iconMenu/IconMenuItem'
 import { AllIcons } from '../shared/components/icon/Icon'
+import { Theme } from '../shared/components/theme/Theme'
 
 const items: IconMenuItemProps[] = [
   {
@@ -92,7 +93,9 @@ export default {
 const Template: Story<{
   items: IconMenuItemProps[]
 }> = ({ items }) => (
-  <IconMenu items={items} direction={IconMenuDirection.LEFT} />
+  <Theme>
+    <IconMenu items={items} direction={IconMenuDirection.LEFT} />
+  </Theme>
 )
 
 export const MenuWithIcons = Template.bind({})
