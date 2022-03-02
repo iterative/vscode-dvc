@@ -1,5 +1,7 @@
 @import '../../shared/variables.scss';
 
+$gap: 20px;
+
 .centered {
   display: flex;
   align-items: center;
@@ -51,12 +53,11 @@
 
 .iconMenu {
   position: absolute;
-  right: 5%;
-  top: -10px;
+  right: $gap;
+  top: -15px;
   z-index: 10;
 }
 
-$gap: 20px;
 .plotsWrapper {
   width: 100%;
 
@@ -70,12 +71,9 @@ $gap: 20px;
   }
 }
 
-.multiViewPlotsGrid {
-  margin-top: $gap;
-}
-
 .singleViewPlotsGrid, .multiViewPlotsGrid {
-  width: 100%;
+  width: calc(100% - $gap * 2);
+  margin-left: $gap;
   display: grid;
   gap: $gap;
   grid-auto-flow: row;
@@ -141,12 +139,18 @@ $gap: 20px;
   }
 }
 
+.multiViewPlotsGrid {
+  margin-top: $gap;
+  width: max-content;
+  padding-right: $gap;
+}
+
 .plot {
   aspect-ratio: 4 / 3;
   overflow: visible;
   padding: 10px 10px 10px 20px;
   border-radius: 5px;
-  border: 1px solid rgba(#fff, 0.5);
+  border: 1px solid var(--editor-foreground-transparency-5);
   cursor: grab;
   position: relative;
 
