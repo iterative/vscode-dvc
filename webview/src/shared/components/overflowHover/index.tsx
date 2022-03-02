@@ -1,7 +1,7 @@
 import Tippy, { TippyProps } from '@tippyjs/react'
 import React, { useRef } from 'react'
-import sharedStyles from '../../shared/styles.module.scss'
 import { useIsFullyContained } from './useIsFullyContained'
+import sharedStyles from '../../shared/styles.module.scss'
 
 export const OverflowHoverTooltip: React.FC<
   Pick<TippyProps, 'content' | 'children'>

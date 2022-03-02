@@ -7,6 +7,6 @@ export const useIsFullyContained = (wrapperRef: RefObject<HTMLElement>) => {
       !(
         wrapperRef.current && (clientWidth as number) < (scrollWidth as number)
       ),
-    [scrollWidth, clientWidth]
+    [wrapperRef, scrollWidth, clientWidth]
   )
 }
