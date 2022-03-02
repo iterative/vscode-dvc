@@ -4,12 +4,10 @@ import '../shared/style.scss'
 import './test-vscode-styles.scss'
 import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 
-import {
-  IconMenu,
-  IconMenuDirection
-} from '../shared/components/iconMenu/IconMenu'
+import { IconMenu } from '../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../shared/components/iconMenu/IconMenuItem'
 import { AllIcons } from '../shared/components/icon/Icon'
+import { Theme } from '../shared/components/theme/Theme'
 
 const items: IconMenuItemProps[] = [
   {
@@ -66,7 +64,7 @@ const items: IconMenuItemProps[] = [
           {
             id: 'regular',
             isSelected: false,
-            label: 'regular'
+            label: 'Regular'
           },
           {
             id: 'large',
@@ -92,7 +90,9 @@ export default {
 const Template: Story<{
   items: IconMenuItemProps[]
 }> = ({ items }) => (
-  <IconMenu items={items} direction={IconMenuDirection.LEFT} />
+  <Theme>
+    <IconMenu items={items} />
+  </Theme>
 )
 
 export const MenuWithIcons = Template.bind({})

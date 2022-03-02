@@ -5,8 +5,5 @@
   max-width: max-content;
   color: var(--vscode-editor-background);
   font-size: 0.8rem;
-}
-
-.removedMenu {
-  display: none;
+  transition: none;
 }
