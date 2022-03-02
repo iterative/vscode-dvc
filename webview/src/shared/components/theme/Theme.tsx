@@ -36,18 +36,12 @@ export const Theme: React.FC = ({ children }) => {
     setVariables(variables)
   }, [])
 
-  const createOberver = useCallback(() => {
+  const createObserver = useCallback(() => {
     const targetNode = document.documentElement
     const config = { attributes: true, childList: false, subtree: false }
-
-    const callback = (mutationsList: MutationRecord[]) => {
-      mutationsList.forEach((mutation: MutationRecord) => {
-        if (mutation.type === 'attributes') {
-          createCSSVariables()
-        }
-      })
-    }
+    const callback = () => createCSSVariables()
     const observer = new MutationObserver(callback)
+
     observer.observe(targetNode, config)
 
     return observer
@@ -55,9 +49,11 @@ export const Theme: React.FC = ({ children }) => {
 
   useLayoutEffect(() => {
     createCSSVariables()
-    const observer = createOberver()
-    return observer.disconnect
-  }, [createCSSVariables, createOberver])
+    const observer = createObserver()
+    return () => {
+      observer.disconnect()
+    }
+  }, [createCSSVariables, createObserver])
 
   return (
     <div style={variables} data-testid="theme-wrapper">
