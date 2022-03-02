@@ -1,19 +1,21 @@
-import { QuickPickOptions, window } from 'vscode'
+import { window } from 'vscode'
 import {
   QuickPickItemWithValue,
   quickPickManyValues,
   quickPickOne,
+  QuickPickOptionsWithTitle,
   quickPickValue,
   quickPickYesOrNo
 } from './quickPick'
 import { Response } from './response'
+import { Title } from './title'
 
 jest.mock('vscode')
 
 const mockedShowQuickPick = jest.mocked<
   (
     items: QuickPickItemWithValue[],
-    options: QuickPickOptions
+    options: QuickPickOptionsWithTitle
   ) => Thenable<
     | QuickPickItemWithValue[]
     | QuickPickItemWithValue
@@ -31,7 +33,7 @@ describe('quickPickValue', () => {
   it('should call window.showQuickPick with the correct arguments', async () => {
     mockedShowQuickPick.mockResolvedValueOnce({ value: 'c' } as unknown)
     const placeHolder = 'these letters are very important'
-    const title = 'Choose a letter, any letter...'
+    const title = 'Choose a letter, any letter...' as Title
     const items = [
       {
         description: 'Definitely A',
@@ -69,7 +71,7 @@ describe('quickPickManyValues', () => {
       { value: 'c' }
     ] as unknown[])
     const placeHolder = 'these letters are very important'
-    const title = 'Choose a letter, any letter...'
+    const title = 'Choose a letter, any letter...' as Title
     const items = [
       {
         description: 'Definitely A',
@@ -117,7 +119,7 @@ describe('quickPickOne', () => {
 
 describe('quickPickYesOrNo', () => {
   it('should call window.showQuickPick with the correct arguments', async () => {
-    const title = 'THIS IS THE MOST IMPORTANT DECISION OF YOUR LIFE'
+    const title = 'THIS IS THE MOST IMPORTANT DECISION OF YOUR LIFE' as Title
     const placeHolder = 'you have 5 seconds'
     const yesDescription = 'help'
     const yesItem = {

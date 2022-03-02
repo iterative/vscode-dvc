@@ -5,6 +5,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
+import { Title } from '../../vscode/title'
 
 const registerExperimentCwdCommands = (
   experiments: WorkspaceExperiments,
@@ -51,7 +52,7 @@ const registerExperimentInputCommands = (
     () =>
       experiments.getExpNameAndInputThenRun(
         AvailableCommands.EXPERIMENT_BRANCH,
-        'Enter a name for the new branch'
+        Title.ENTER_BRANCH_NAME
       )
   )
 

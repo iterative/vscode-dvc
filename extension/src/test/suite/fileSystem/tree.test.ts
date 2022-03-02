@@ -28,6 +28,7 @@ import {
   RegisteredCommands
 } from '../../../commands/external'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
+import { Title } from '../../../vscode/title'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   const { join } = path
@@ -296,7 +297,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(mockMove).to.be.calledOnce
       expect(mockInputBox).to.be.calledOnce
       expect(mockInputBox).to.be.calledWith({
-        title: 'Enter a destination relative to the root',
+        title: Title.ENTER_RELATIVE_DESTINATION,
         value: relPath
       })
     })

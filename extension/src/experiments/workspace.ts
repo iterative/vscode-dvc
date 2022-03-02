@@ -11,6 +11,7 @@ import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { WorkspacePlots } from '../plots/workspace'
+import { Title } from '../vscode/title'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -184,7 +185,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public getExpNameAndInputThenRun = async (
     commandId: CommandId,
-    title: string
+    title: Title
   ) => {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {

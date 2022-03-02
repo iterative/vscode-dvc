@@ -1,5 +1,6 @@
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
+import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
 
 export const pickExperiment = (
@@ -19,7 +20,7 @@ export const pickExperiment = (
         label,
         value: { id, name: name || label }
       })),
-      { title: 'Select an experiment' }
+      { title: Title.SELECT_EXPERIMENT }
     )
   }
 }
@@ -54,5 +55,8 @@ export const pickGarbageCollectionFlags = () =>
         value: GcPreserveFlag.QUEUED
       }
     ],
-    { placeHolder: 'Select which experiments to preserve' }
+    {
+      placeHolder: 'Select which experiments to preserve',
+      title: Title.GARBAGE_COLLECT_EXPERIMENTS
+    }
   )
