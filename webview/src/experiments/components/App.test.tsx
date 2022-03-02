@@ -17,6 +17,8 @@ import {
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
 import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
+import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
+import { mocked } from 'jest-mock'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -25,15 +27,13 @@ import {
   makeGetDragEl,
   tableData as sortingTableDataFixture
 } from '../../test/sort'
-import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
-import { mocked } from 'jest-mock'
+import { useIsFullyContained } from '../../shared/components/overflowHover/useIsFullyContained'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
 jest.mock('../../shared/components/overflowHover/useIsFullyContained', () => ({
   useIsFullyContained: jest.fn()
 }))
-import { useIsFullyContained } from '../../shared/components/overflowHover/useIsFullyContained'
 const mockedUseIsFullyContained = mocked(useIsFullyContained)
 
 const { postMessage, setState } = vsCodeApi
@@ -307,6 +307,9 @@ describe('App', () => {
 
     const testData = {
       ...tableDataFixture,
+      columnWidths: {
+        [testParamPath]: 100
+      },
       columns: [
         {
           group: 'metrics',
@@ -318,14 +321,14 @@ describe('App', () => {
         {
           group: 'metrics',
           hasChildren: false,
+          maxNumber: testMetricNumber,
           maxStringLength: 18,
+          minNumber: testMetricNumber,
           name: 'loss',
           parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
           path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
           pathArray: ['metrics', 'summary.json', 'loss'],
-          types: ['number'],
-          maxNumber: testMetricNumber,
-          minNumber: testMetricNumber
+          types: ['number']
         },
         {
           group: 'params',
@@ -347,7 +350,16 @@ describe('App', () => {
       ],
       rows: [
         {
-          timestamp: null,
+          displayColor: '#945dd6',
+          executor: 'workspace',
+          id: 'workspace',
+          label: 'workspace',
+          metrics: {
+            'summary.json': {
+              loss: testMetricNumber
+            }
+          },
+          mutable: false,
           params: {
             'params.yaml': {
               test_param: longTestParamString
@@ -355,25 +367,13 @@ describe('App', () => {
           },
           queued: false,
           running: true,
-          executor: 'workspace',
-          metrics: {
-            'summary.json': {
-              loss: testMetricNumber
-            }
-          },
-          displayColor: '#945dd6',
-          label: 'workspace',
-          mutable: false,
           selected: true,
-          id: 'workspace'
+          timestamp: null
         }
-      ],
-      columnWidths: {
-        [testParamPath]: 100
-      }
+      ]
     }
 
-    it(`Shows and hides a tooltip on mouseIn and mouseOut of a header with a ${tooltipDelayTime}ms delay`, () => {
+    it(`Shows and hides a tooltip on mouseEnter and mouseLeave of a header with a ${tooltipDelayTime}ms delay`, () => {
       mockedUseIsFullyContained.mockReturnValue(false)
 
       render(<App />)
@@ -390,10 +390,8 @@ describe('App', () => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       const testParamHeader = screen.getByText(testParamName)
-        .parentElement as HTMLElement
 
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
-      fireEvent.mouseOver(testParamHeader, { bubbles: true })
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       jest.advanceTimersByTime(tooltipDelayTime - 1)
@@ -403,7 +401,7 @@ describe('App', () => {
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
       expect(screen.getByRole('tooltip')).toHaveTextContent(testParamName)
 
-      fireEvent.mouseLeave(testParamHeader)
+      fireEvent.mouseLeave(testParamHeader, { bubbles: true })
 
       jest.advanceTimersByTime(tooltipDelayTime - 1)
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
@@ -429,10 +427,8 @@ describe('App', () => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       const testParamHeader = screen.getByText(testParamName)
-        .parentElement as HTMLElement
 
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
-      fireEvent.mouseOver(testParamHeader, { bubbles: true })
       jest.advanceTimersByTime(tooltipDelayTime)
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
