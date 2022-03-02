@@ -20,6 +20,10 @@
   border-radius: 4px;
   cursor: pointer;
 
+  border: none;
+  padding: 0;
+  background: inherit;
+
   &:hover {
     background-color: var(--editor-foreground-transparency-1);
   }
