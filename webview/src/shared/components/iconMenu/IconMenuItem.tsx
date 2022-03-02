@@ -70,7 +70,12 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
         onKeyDown={onKeyDown}
         data-testid="icon-menu-item"
       >
-        <Icon icon={icon} data-testid="icon-menu-item-icon" width={15} />
+        <Icon
+          icon={icon}
+          className={styles.icon}
+          data-testid="icon-menu-item-icon"
+          width={15}
+        />
         <div className={styles.hoverMenu}>
           <HoverMenu show={showTooltip && !showOnClickNode}>
             {tooltip}

@@ -10,7 +10,7 @@ function SvgUpArrow(props: React.SVGProps<SVGSVGElement>) {
     >
       <path
         d="M10.855 5.086L5.847.094h-.704L.151 5.086l.704.72L5 1.662v10.432h1.008V1.646l4.144 4.16.704-.72z"
-        fill="#CCC"
+        fill="currentColor"
       />
     </svg>
   )
