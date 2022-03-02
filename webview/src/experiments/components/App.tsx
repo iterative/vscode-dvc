@@ -8,8 +8,8 @@ import Experiments from './Experiments'
 import { vsCodeApi } from '../../shared/api'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
-export const App: React.FC<Record<string, unknown>> = () => {
-  const [tableData, setTableData] = useState<TableData>()
+export const App: React.FC<{ initialData?: TableData }> = ({ initialData }) => {
+  const [tableData, setTableData] = useState<TableData | undefined>(initialData)
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<TableData> }) => {
