@@ -92,7 +92,7 @@ export const createSpec = (
 }
 
 const foregroundColor = 'var(--vscode-foreground)'
-const backgroundColor = 'var(--vscode-editor-background)'
+const backgroundColor = 'var(--vscode-editor-foreground-transparency-1)'
 export const config: Config = {
   axis: {
     domain: false,
