@@ -10,8 +10,8 @@ export const GripIcon: React.FC<GripIconProps> = ({ className }) => (
   <Icon
     icon={AllIcons.GRIPPER}
     color={getThemeValue(ThemeProperty.FOREGROUND_COLOR)}
-    width={30}
-    height={30}
+    width={35}
+    height={35}
     className={className}
   />
 )
