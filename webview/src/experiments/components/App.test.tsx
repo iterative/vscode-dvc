@@ -295,21 +295,20 @@ describe('App', () => {
     afterAll(() => {
       jest.useRealTimers()
     })
+
+    const headerTooltipDelay = 100
+
     const testParamName = 'test_param_with_long_name'
     const testParamPath = joinMetricOrParamPath(
       'params',
       'params.yaml',
       testParamName
     )
-    const longTestParamString = 'Very Long Test Param'
-    const testMetricNumber = 1.9293040037155151
-    const tooltipDelayTime = 100
+    const testParamStringValue = 'Test Value'
+    const testMetricNumberValue = 1.9293040037155151
 
     const testData = {
       ...tableDataFixture,
-      columnWidths: {
-        [testParamPath]: 100
-      },
       columns: [
         {
           group: 'metrics',
@@ -321,9 +320,9 @@ describe('App', () => {
         {
           group: 'metrics',
           hasChildren: false,
-          maxNumber: testMetricNumber,
+          maxNumber: testMetricNumberValue,
           maxStringLength: 18,
-          minNumber: testMetricNumber,
+          minNumber: testMetricNumberValue,
           name: 'loss',
           parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
           path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
@@ -350,30 +349,24 @@ describe('App', () => {
       ],
       rows: [
         {
-          displayColor: '#945dd6',
-          executor: 'workspace',
           id: 'workspace',
           label: 'workspace',
           metrics: {
             'summary.json': {
-              loss: testMetricNumber
+              loss: testMetricNumberValue
             }
           },
           mutable: false,
           params: {
             'params.yaml': {
-              test_param: longTestParamString
+              test_param: testParamStringValue
             }
-          },
-          queued: false,
-          running: true,
-          selected: true,
-          timestamp: null
+          }
         }
       ]
     }
 
-    it(`Shows and hides a tooltip on mouseEnter and mouseLeave of a header with a ${tooltipDelayTime}ms delay`, () => {
+    it(`Shows and hides a tooltip on mouseEnter and mouseLeave of a header with a ${headerTooltipDelay}ms delay`, () => {
       mockedUseIsFullyContained.mockReturnValue(false)
 
       render(<App />)
@@ -394,7 +387,7 @@ describe('App', () => {
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      jest.advanceTimersByTime(tooltipDelayTime - 1)
+      jest.advanceTimersByTime(headerTooltipDelay - 1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -403,7 +396,7 @@ describe('App', () => {
 
       fireEvent.mouseLeave(testParamHeader, { bubbles: true })
 
-      jest.advanceTimersByTime(tooltipDelayTime - 1)
+      jest.advanceTimersByTime(headerTooltipDelay - 1)
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -429,7 +422,7 @@ describe('App', () => {
       const testParamHeader = screen.getByText(testParamName)
 
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
-      jest.advanceTimersByTime(tooltipDelayTime)
+      jest.advanceTimersByTime(headerTooltipDelay)
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
