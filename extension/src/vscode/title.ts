@@ -5,7 +5,7 @@ export enum Title {
   ENTER_RELATIVE_DESTINATION = 'Enter a Destination Relative to the Root',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',
   SELECT_EXPERIMENT = 'Select an Experiment',
-  SELECT_EXPERIMENTS = 'Select up to 6 Experiments',
+  SELECT_EXPERIMENTS = 'Select up to 7 Experiments',
   SELECT_FILTERS_TO_REMOVE = 'Select Filter(s) to Remove',
   SELECT_OPERATOR = 'Select an Operator',
   SELECT_PARAM_OR_METRIC_FILTER = 'Select a Param or Metric to Filter by',

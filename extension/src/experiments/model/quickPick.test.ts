@@ -1,6 +1,7 @@
 import { QuickPickItemKind } from 'vscode'
 import { ExperimentWithCheckpoints } from '.'
 import { pickExperiments } from './quickPicks'
+import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { quickPickLimitedValues } from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
@@ -62,7 +63,7 @@ describe('pickExperiments', () => {
           value: mockedExperiments[1]
         }
       ],
-      6,
+      MAX_SELECTED_EXPERIMENTS,
       Title.SELECT_EXPERIMENTS
     )
   })
@@ -148,7 +149,7 @@ describe('pickExperiments', () => {
         getExpectedItem(mockedExp2Checkpoint2)
       ],
       [getExpectedItem(selectedCheckpoint)],
-      6,
+      MAX_SELECTED_EXPERIMENTS,
       Title.SELECT_EXPERIMENTS
     )
   })

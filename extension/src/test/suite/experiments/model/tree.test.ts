@@ -313,12 +313,19 @@ suite('Experiments Tree Test Suite', () => {
         { displayColor: '#3794ff', revision: '42b8736' },
         { displayColor: '#f14c4c', revision: 'd1343a8' },
         { displayColor: '#f14c4c', revision: '1ee5f2e' },
-        { displayColor: '#3794ff', revision: '2173124' }
+        { displayColor: '#3794ff', revision: '2173124' },
+        { displayColor: '#3794ff', revision: '9523bde' }
       ])
       expect(
         mockPlotsDiff,
         'the missing revisions have been requested'
-      ).to.be.calledWithExactly(dvcDemoPath, '1ee5f2e', '2173124', 'd1343a8')
+      ).to.be.calledWithExactly(
+        dvcDemoPath,
+        '1ee5f2e',
+        '2173124',
+        '9523bde',
+        'd1343a8'
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should automatically apply filters to experiments selection if dvc.experiments.filter.selected has been set via dvc.views.experimentsTree.autoApplyFilters', async () => {
