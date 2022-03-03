@@ -1,6 +1,6 @@
 import { Experiment } from '../webview/contract'
 
-export const MAX_SELECTED_EXPERIMENTS = 6
+export const MAX_SELECTED_EXPERIMENTS = 7
 
 export enum Status {
   SELECTED = 1,

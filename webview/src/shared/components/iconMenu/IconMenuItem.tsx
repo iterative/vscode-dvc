@@ -36,12 +36,7 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
         onClick={onClick}
         data-testid="icon-menu-item"
       >
-        <Icon
-          icon={icon}
-          className={styles.icon}
-          data-testid="icon-menu-item-icon"
-          width={15}
-        />
+        <Icon icon={icon} data-testid="icon-menu-item-icon" width={15} />
       </button>
     </Tippy>
   )

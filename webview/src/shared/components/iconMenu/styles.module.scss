@@ -19,10 +19,10 @@
   justify-content: center;
   border-radius: 4px;
   cursor: pointer;
-
   border: none;
   padding: 0;
   background: inherit;
+  color: $fg-color;
 
   &:hover {
     background-color: var(--editor-foreground-transparency-1);
@@ -41,8 +41,4 @@
     left: auto;
     right: 5px;
   }
-}
-
-.icon {
-  fill: $fg-color;
 }

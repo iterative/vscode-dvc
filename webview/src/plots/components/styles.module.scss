@@ -162,6 +162,7 @@ $gap: 20px;
 .plotGripIcon {
   position: absolute;
   z-index: 2;
+  fill: $fg-color;
   left: 0;
   top: 0;
   background: var(--editor-foreground-transparency-2);
