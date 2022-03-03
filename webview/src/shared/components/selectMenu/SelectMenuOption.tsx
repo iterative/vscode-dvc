@@ -17,8 +17,7 @@ export const SelectMenuOption: React.FC<SelectMenuOptionAllProps> = ({
   id,
   label,
   isSelected,
-  onClick,
-  index
+  onClick
 }) => {
   const memoizedOnClick = useCallback(() => onClick(id), [id, onClick])
   const onKeyDown = useCallback(
@@ -33,8 +32,8 @@ export const SelectMenuOption: React.FC<SelectMenuOptionAllProps> = ({
       onKeyDown={onKeyDown}
       role="menuitemcheckbox"
       aria-checked={isSelected}
-      tabIndex={index}
       data-testid="select-menu-option"
+      tabIndex={0}
     >
       <div className={styles.itemLabel} data-testid="select-menu-option-label">
         {label}
