@@ -1,6 +1,7 @@
 {
   "name": "dvc",
   "private": true,
+  "preview": true,
   "displayName": "%displayName%",
   "description": "%description%",
   "publisher": "iterative",
