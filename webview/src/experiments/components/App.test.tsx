@@ -18,7 +18,6 @@ import {
 } from 'react-beautiful-dnd-test-utils'
 import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
 import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
-import { mocked } from 'jest-mock'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -34,7 +33,7 @@ jest.mock('../../util/styles')
 jest.mock('../../shared/components/overflowHover/useIsFullyContained', () => ({
   useIsFullyContained: jest.fn()
 }))
-const mockedUseIsFullyContained = mocked(useIsFullyContained)
+const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)
 
 const { postMessage, setState } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
