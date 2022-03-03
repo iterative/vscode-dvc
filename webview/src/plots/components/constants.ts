@@ -99,7 +99,8 @@ export const config: Config = {
     gridOpacity: 0.25,
     labelAngle: 0,
     tickColor: foregroundColor,
-    titleColor: foregroundColor
+    titleColor: foregroundColor,
+    gridColor: foregroundColor
   },
   background: backgroundColor,
   mark: {
