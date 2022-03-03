@@ -365,7 +365,7 @@ describe('App', () => {
       ]
     }
 
-    it(`Shows and hides a tooltip on mouseEnter and mouseLeave of a header with a ${headerTooltipDelay}ms delay`, () => {
+    it(`should show and hide a tooltip on mouseEnter and mouseLeave of a header with a ${headerTooltipDelay}ms delay`, () => {
       mockedUseIsFullyContained.mockReturnValue(false)
 
       render(<App />)
@@ -402,7 +402,7 @@ describe('App', () => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
-    it('Does not show a tooltip after hovering on a header if its content is overflowing', () => {
+    it('should not show a tooltip after hovering on a header if its content is not overflowing', () => {
       mockedUseIsFullyContained.mockReturnValue(true)
 
       render(<App />)
