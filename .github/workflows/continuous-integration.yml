@@ -2,7 +2,7 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 concurrency:
@@ -51,7 +51,7 @@ jobs:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           storybookBuildDir: 'webview/storybook-static'
           exitOnceUploaded: true
-          autoAcceptChanges: 'master'
+          autoAcceptChanges: 'main'
 
       - name: Upload
         uses: actions/upload-artifact@v2
