@@ -10,7 +10,7 @@ function SvgLines(props: React.SVGProps<SVGSVGElement>) {
     >
       <path
         d="M4 9.094V8.086h4v1.008H4zM2 4.086h8v1.008H2V4.086zm10-4v1.008H0V.086h12z"
-        fill="#CCC"
+        fill="currentColor"
       />
     </svg>
   )
