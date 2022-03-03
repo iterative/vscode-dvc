@@ -1,5 +1,4 @@
 import React from 'react'
-import { getThemeValue, ThemeProperty } from '../../../util/styles'
 import {
   Check,
   ChevronDown,
@@ -30,20 +29,18 @@ export type IconValues = typeof AllIcons[IconKeys]
 interface IconProps {
   icon: IconValues
   className?: string
-  color?: string
   width?: number
   height?: number
 }
 
 export const Icon: React.FC<IconProps> = ({
   icon,
-  color,
   width,
   height,
   ...other
 }) => {
   const I = icon
-  const fill = color || getThemeValue(ThemeProperty.BACKGROUND_COLOR)
+  const fill = 'magenta' // This color is used to make sure we change it in CSS
   const w = width || 20
   const h = height || 20
 
