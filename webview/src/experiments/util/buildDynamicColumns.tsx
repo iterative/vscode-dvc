@@ -35,7 +35,7 @@ const Header: React.FC<{ column: Column<Experiment> }> = ({
   return (
     <OverflowHoverTooltip content={name}>
       <div className={styles.headerCellWrapper}>
-        <span title={name}>{name}</span>
+        <span>{name}</span>
       </div>
     </OverflowHoverTooltip>
   )
