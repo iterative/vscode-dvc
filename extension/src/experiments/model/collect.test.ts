@@ -136,7 +136,7 @@ describe('collectStatuses', () => {
       id: `${prefix}${id + 1}`
     })) as Experiment[]
 
-  it('should set new experiments to selected if there are less than 6', () => {
+  it('should set new experiments to selected if there are less than 7', () => {
     const experiments = buildMockExperiments(4)
 
     expect(collectStatuses(experiments, new Map(), {})).toStrictEqual({
@@ -158,8 +158,8 @@ describe('collectStatuses', () => {
     })
   })
 
-  it('should not set more than 6 experiments to selected', () => {
-    const experiments = buildMockExperiments(7)
+  it('should not set more than 7 experiments to selected', () => {
+    const experiments = buildMockExperiments(8)
 
     expect(collectStatuses(experiments, new Map(), {})).toStrictEqual({
       exp1: 1,
@@ -168,7 +168,8 @@ describe('collectStatuses', () => {
       exp4: 1,
       exp5: 1,
       exp6: 1,
-      exp7: 0
+      exp7: 1,
+      exp8: 0
     })
   })
 
@@ -189,16 +190,18 @@ describe('collectStatuses', () => {
   })
 
   it('should respect the existing status of experiments', () => {
-    const experiments = buildMockExperiments(9)
+    const experiments = buildMockExperiments(10)
 
     expect(
       collectStatuses(experiments, new Map(), {
         exp1: 0,
+        exp10: 1,
         exp2: 0,
         exp9: 1
       })
     ).toStrictEqual({
       exp1: 0,
+      exp10: 1,
       exp2: 0,
       exp3: 1,
       exp4: 1,
@@ -211,22 +214,23 @@ describe('collectStatuses', () => {
   })
 
   it('should not unselect an experiment that is existing and selected', () => {
-    const experiments = buildMockExperiments(8)
+    const experiments = buildMockExperiments(9)
 
-    expect(collectStatuses(experiments, new Map(), { exp8: 1 })).toStrictEqual({
+    expect(collectStatuses(experiments, new Map(), { exp9: 1 })).toStrictEqual({
       exp1: 1,
       exp2: 1,
       exp3: 1,
       exp4: 1,
       exp5: 1,
-      exp6: 0,
+      exp6: 1,
       exp7: 0,
-      exp8: 1
+      exp8: 0,
+      exp9: 1
     })
   })
 
-  it('should set the first new experiment to selected when there are already 5 selected', () => {
-    const experiments = buildMockExperiments(8)
+  it('should set the first new experiment to selected when there are already 7 selected', () => {
+    const experiments = buildMockExperiments(9)
 
     expect(
       collectStatuses(experiments, new Map(), {
@@ -234,7 +238,8 @@ describe('collectStatuses', () => {
         exp5: 1,
         exp6: 1,
         exp7: 1,
-        exp8: 1
+        exp8: 1,
+        exp9: 1
       })
     ).toStrictEqual({
       exp1: 1,
@@ -244,7 +249,8 @@ describe('collectStatuses', () => {
       exp5: 1,
       exp6: 1,
       exp7: 1,
-      exp8: 1
+      exp8: 1,
+      exp9: 1
     })
   })
 
@@ -275,7 +281,7 @@ describe('collectStatuses', () => {
       ['expA', buildMockExperiments(5, 'checkA')],
       ['expB', buildMockExperiments(5, 'checkB')],
       ['expC', buildMockExperiments(5, 'checkC')],
-      ['expD', buildMockExperiments(5, 'checkD')]
+      ['expD', buildMockExperiments(6, 'checkD')]
     ])
 
     expect(
@@ -285,6 +291,7 @@ describe('collectStatuses', () => {
         checkD3: 1,
         checkD4: 1,
         checkD5: 1,
+        checkD6: 1,
         expD: 1
       })
     ).toStrictEqual({
@@ -308,6 +315,7 @@ describe('collectStatuses', () => {
       checkD3: 1,
       checkD4: 1,
       checkD5: 1,
+      checkD6: 1,
       expA: 0,
       expB: 0,
       expC: 0,
