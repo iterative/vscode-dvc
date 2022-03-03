@@ -1057,7 +1057,7 @@
     "build": "yarn build-webpack && yarn package",
     "build-webpack": "webpack --mode production",
     "package": "vsce package --yarn",
-    "pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
+    "pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/main/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/main/extension",
     "test-vscode-build": "tsc -p .",
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
