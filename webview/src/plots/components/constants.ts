@@ -130,9 +130,9 @@ export const config: Config = {
     },
     'guide-label': {
       fill: foregroundColor,
-      stroke: foregroundColor,
       font,
-      fontWeight
+      fontWeight,
+      stroke: foregroundColor
     },
     'guide-title': {
       fill: foregroundColor,
