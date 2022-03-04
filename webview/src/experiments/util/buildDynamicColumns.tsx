@@ -38,6 +38,8 @@ const CellTooltip: React.FC<{
   )
 }
 
+export const CELL_TOOLTIP_DELAY = 1000
+
 const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
   const { value } = cell
   if (value === undefined) {
@@ -58,7 +60,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
       className={sharedStyles.menu}
       placement="bottom"
       arrow={true}
-      delay={500}
+      delay={CELL_TOOLTIP_DELAY}
     >
       <div className={styles.innerCell}>
         <CopyButton value={stringValue} />

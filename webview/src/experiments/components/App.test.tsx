@@ -27,6 +27,8 @@ import {
   tableData as sortingTableDataFixture
 } from '../../test/sort'
 import { useIsFullyContained } from '../../shared/components/overflowHover/useIsFullyContained'
+import { HEADER_TOOLTIP_DELAY } from '../../shared/components/overflowHover'
+import { CELL_TOOLTIP_DELAY } from '../util/buildDynamicColumns'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -295,9 +297,6 @@ describe('App', () => {
       jest.useRealTimers()
     })
 
-    const headerTooltipDelay = 100
-    const cellTooltipDelay = 500
-
     const testParamName = 'test_param_with_long_name'
     const testParamPath = joinMetricOrParamPath(
       'params',
@@ -366,7 +365,7 @@ describe('App', () => {
       ]
     }
 
-    it(`should show and hide a tooltip on mouseEnter and mouseLeave of a header with a ${headerTooltipDelay}ms delay`, () => {
+    it('should show and hide a tooltip on mouseEnter and mouseLeave of a header', () => {
       mockedUseIsFullyContained.mockReturnValue(false)
 
       render(<App />)
@@ -387,7 +386,7 @@ describe('App', () => {
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      jest.advanceTimersByTime(headerTooltipDelay - 1)
+      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY - 1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -396,7 +395,7 @@ describe('App', () => {
 
       fireEvent.mouseLeave(testParamHeader, { bubbles: true })
 
-      jest.advanceTimersByTime(headerTooltipDelay - 1)
+      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY - 1)
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -422,12 +421,12 @@ describe('App', () => {
       const testParamHeader = screen.getByText(testParamName)
 
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
-      jest.advanceTimersByTime(headerTooltipDelay)
+      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY)
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
-    it(`should show and hide a tooltip on mouseEnter and mouseLeave of a cell with a ${cellTooltipDelay}ms delay`, () => {
+    it('should show and hide a tooltip on mouseEnter and mouseLeave of a cell', () => {
       render(<App />)
       fireEvent(
         window,
@@ -442,7 +441,7 @@ describe('App', () => {
       const testParamCell = screen.getByText(testParamStringValue)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(cellTooltipDelay - 1)
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY - 1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -453,7 +452,7 @@ describe('App', () => {
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(cellTooltipDelay - 1)
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY - 1)
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -475,7 +474,7 @@ describe('App', () => {
       const testMetricCell = screen.getByText('1.9293')
       fireEvent.mouseEnter(testMetricCell, { bubbles: true })
 
-      jest.advanceTimersByTime(cellTooltipDelay)
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
       expect(tooltip).toHaveTextContent(

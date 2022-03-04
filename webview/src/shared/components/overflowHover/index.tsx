@@ -3,6 +3,8 @@ import React, { useRef } from 'react'
 import { useIsFullyContained } from './useIsFullyContained'
 import sharedStyles from '../../styles.module.scss'
 
+export const HEADER_TOOLTIP_DELAY = 100
+
 export const OverflowHoverTooltip: React.FC<
   Pick<TippyProps, 'content' | 'children'>
 > = ({ children, content }) => {
@@ -16,7 +18,7 @@ export const OverflowHoverTooltip: React.FC<
       placement="bottom-start"
       className={sharedStyles.menu}
       disabled={isDisabled}
-      delay={100}
+      delay={HEADER_TOOLTIP_DELAY}
       ref={wrapperRef}
     >
       {children}
