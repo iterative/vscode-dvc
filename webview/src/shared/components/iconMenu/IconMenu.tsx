@@ -17,6 +17,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
 
   return (
     <Tippy
+      arrow={false}
       singleton={tooltipSource}
       className={sharedStyles.menu}
       animation={false}
@@ -38,6 +39,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
       }}
     >
       <Tippy
+        arrow={false}
         trigger="click"
         interactive
         singleton={menuSource}

@@ -2,10 +2,14 @@ import React from 'react'
 import get from 'lodash/get'
 import { Column, Accessor, ColumnGroup, ColumnInstance } from 'react-table'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
+import Tippy from '@tippyjs/react'
 import { formatFloat } from './numberFormatting'
 import styles from '../components/Table/styles.module.scss'
+import sharedStyles from '../../shared/styles.module.scss'
 import { CopyButton } from '../components/CopyButton'
 import { OverflowHoverTooltip } from '../../shared/components/overflowHover'
+
+import 'tippy.js/dist/tippy.css'
 
 type Value = string | number
 
@@ -22,10 +26,19 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
       : String(value)
 
   return (
-    <>
-      <CopyButton value={displayValue} />
-      <span className={styles.cellContents}>{displayValue}</span>
-    </>
+    <Tippy
+      animation={false}
+      content={value}
+      className={sharedStyles.menu}
+      placement="bottom"
+      arrow={true}
+      delay={500}
+    >
+      <div className={styles.innerCell}>
+        <CopyButton value={displayValue} />
+        <span className={styles.cellContents}>{displayValue}</span>
+      </div>
+    </Tippy>
   )
 }
 
@@ -41,8 +54,6 @@ const Header: React.FC<{ column: Column<Experiment> }> = ({
   )
 }
 
-const getCellComponent = (): React.FC<{ value: Value }> => Cell
-
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow =>
     get(originalRow, pathArray)
@@ -56,7 +67,6 @@ const buildDynamicColumns = (
     .map(data => {
       const { path, group, pathArray, name } = data
 
-      const Cell = getCellComponent()
       const childColumns = buildDynamicColumns(properties, path)
 
       const column: ColumnGroup<Experiment> | Column<Experiment> = {

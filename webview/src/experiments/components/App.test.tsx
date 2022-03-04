@@ -296,6 +296,7 @@ describe('App', () => {
     })
 
     const headerTooltipDelay = 100
+    const cellTooltipDelay = 500
 
     const testParamName = 'test_param_with_long_name'
     const testParamPath = joinMetricOrParamPath(
@@ -358,7 +359,7 @@ describe('App', () => {
           mutable: false,
           params: {
             'params.yaml': {
-              test_param: testParamStringValue
+              [testParamName]: testParamStringValue
             }
           }
         }
@@ -423,6 +424,60 @@ describe('App', () => {
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
       jest.advanceTimersByTime(headerTooltipDelay)
 
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    })
+
+    it('should show a tooltip with the full number on number cells', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testMetricCell = screen.getByText('1.9293')
+      fireEvent.mouseEnter(testMetricCell, { bubbles: true })
+
+      jest.advanceTimersByTime(cellTooltipDelay)
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent(String(testMetricNumberValue))
+    })
+
+    it(`should show and hide a tooltip with an un-shortened number on mouseEnter and mouseLeave of a cell with a ${cellTooltipDelay}ms delay`, () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testParamCell = screen.getByText(testParamStringValue)
+      fireEvent.mouseEnter(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(cellTooltipDelay - 1)
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      jest.advanceTimersByTime(1)
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+
+      expect(tooltip.textContent).toBe(testParamStringValue)
+
+      fireEvent.mouseLeave(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(cellTooltipDelay - 1)
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+
+      jest.advanceTimersByTime(1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
   })

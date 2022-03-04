@@ -10,6 +10,7 @@ export const OverflowHoverTooltip: React.FC<
   const isDisabled = useIsFullyContained(wrapperRef)
   return (
     <Tippy
+      arrow={false}
       animation={false}
       content={content}
       placement="bottom-start"

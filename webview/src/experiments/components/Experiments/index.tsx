@@ -17,6 +17,7 @@ import {
   Cell
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import cn from 'classnames'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
@@ -56,6 +57,16 @@ const TimestampHeader = () => (
   <div className={styles.timestampHeader}>Timestamp</div>
 )
 
+const DateCellContents: React.FC<{ value: string }> = ({ value }) => {
+  const date = new Date(value)
+  return (
+    <span className={styles.cellContents}>
+      <div className={styles.timestampTime}>{timeFormatter.format(date)}</div>
+      <div className={styles.timestampDate}>{dateFormatter.format(date)}</div>
+    </span>
+  )
+}
+
 const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
   [
     {
@@ -82,21 +93,15 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
     },
     {
       Cell: ({ value }: { value: string }) => {
-        if (!value || value === '') {
-          return null
-        }
-        const date = new Date(value)
         return (
-          <span className={styles.timestampCellContentsWrapper}>
-            <span className={styles.cellContents}>
-              <div className={styles.timestampTime}>
-                {timeFormatter.format(date)}
-              </div>
-              <div className={styles.timestampDate}>
-                {dateFormatter.format(date)}
-              </div>
-            </span>
-          </span>
+          <div
+            className={cn(
+              styles.innerCell,
+              styles.timestampCellContentsWrapper
+            )}
+          >
+            {value && <DateCellContents value={value} />}
+          </div>
         )
       },
       Header: TimestampHeader,
