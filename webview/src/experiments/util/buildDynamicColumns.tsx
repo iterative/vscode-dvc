@@ -19,15 +19,9 @@ import 'tippy.js/dist/tippy.css'
 
 const UndefinedCell = <>. . .</>
 
-const getGroupName: (group: string | undefined) => string = group => {
-  switch (group) {
-    case 'params':
-      return 'Parameter'
-    case 'metrics':
-      return 'Metric'
-    default:
-      return 'Other'
-  }
+const groupLabels: Record<string, string> = {
+  params: 'Parameter',
+  metrics: 'Metric'
 }
 
 const CellTooltip: React.FC<{
@@ -39,7 +33,7 @@ const CellTooltip: React.FC<{
   } = cell
   return (
     <>
-      {getGroupName(group)}: {value}
+      {groupLabels[group as string]}: {value}
     </>
   )
 }
