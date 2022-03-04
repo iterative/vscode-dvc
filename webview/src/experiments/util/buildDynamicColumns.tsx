@@ -1,6 +1,12 @@
 import React from 'react'
 import get from 'lodash/get'
-import { Column, Accessor, ColumnGroup, ColumnInstance } from 'react-table'
+import {
+  Column,
+  Accessor,
+  ColumnGroup,
+  ColumnInstance,
+  Cell
+} from 'react-table'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import Tippy from '@tippyjs/react'
 import { formatFloat } from './numberFormatting'
@@ -11,31 +17,57 @@ import { OverflowHoverTooltip } from '../../shared/components/overflowHover'
 
 import 'tippy.js/dist/tippy.css'
 
-type Value = string | number
-
 const UndefinedCell = <>. . .</>
 
-const Cell: React.FC<{ value: Value }> = ({ value }) => {
+const getGroupName: (group: string | undefined) => string = group => {
+  switch (group) {
+    case 'params':
+      return 'Parameter'
+    case 'metrics':
+      return 'Metric'
+    default:
+      return 'Other'
+  }
+}
+
+const CellTooltip: React.FC<{
+  cell: Cell<Experiment, string | number>
+}> = ({ cell }) => {
+  const {
+    column: { group },
+    value
+  } = cell
+  return (
+    <>
+      {getGroupName(group)}: {value}
+    </>
+  )
+}
+
+const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
+  const { value } = cell
   if (value === undefined) {
     return UndefinedCell
   }
 
+  const stringValue = String(value)
+
   const displayValue =
     typeof value === 'number' && !Number.isInteger(value)
       ? formatFloat(value as number)
-      : String(value)
+      : stringValue
 
   return (
     <Tippy
       animation={false}
-      content={value}
+      content={<CellTooltip cell={cell} />}
       className={sharedStyles.menu}
       placement="bottom"
       arrow={true}
       delay={500}
     >
       <div className={styles.innerCell}>
-        <CopyButton value={displayValue} />
+        <CopyButton value={stringValue} />
         <span className={styles.cellContents}>{displayValue}</span>
       </div>
     </Tippy>
