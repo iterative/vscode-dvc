@@ -17,6 +17,7 @@ import {
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
 import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
+import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -25,8 +26,14 @@ import {
   makeGetDragEl,
   tableData as sortingTableDataFixture
 } from '../../test/sort'
+import { useIsFullyContained } from '../../shared/components/overflowHover/useIsFullyContained'
 
 jest.mock('../../shared/api')
+jest.mock('../../util/styles')
+jest.mock('../../shared/components/overflowHover/useIsFullyContained', () => ({
+  useIsFullyContained: jest.fn()
+}))
+const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)
 
 const { postMessage, setState } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
@@ -277,6 +284,146 @@ describe('App', () => {
       testClick('[exp-e7a67]', 'exp-e7a67')
       testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
       testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+    })
+  })
+
+  describe('Tooltips', () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+    })
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
+    const headerTooltipDelay = 100
+
+    const testParamName = 'test_param_with_long_name'
+    const testParamPath = joinMetricOrParamPath(
+      'params',
+      'params.yaml',
+      testParamName
+    )
+    const testParamStringValue = 'Test Value'
+    const testMetricNumberValue = 1.9293040037155151
+
+    const testData = {
+      ...tableDataFixture,
+      columns: [
+        {
+          group: 'metrics',
+          hasChildren: true,
+          name: 'summary.json',
+          parentPath: joinMetricOrParamPath('metrics'),
+          path: joinMetricOrParamPath('metrics', 'summary.json')
+        },
+        {
+          group: 'metrics',
+          hasChildren: false,
+          maxNumber: testMetricNumberValue,
+          maxStringLength: 18,
+          minNumber: testMetricNumberValue,
+          name: 'loss',
+          parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
+          path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
+          pathArray: ['metrics', 'summary.json', 'loss'],
+          types: ['number']
+        },
+        {
+          group: 'params',
+          hasChildren: true,
+          name: 'params.yaml',
+          parentPath: joinMetricOrParamPath('params'),
+          path: joinMetricOrParamPath('params', 'params.yaml')
+        },
+        {
+          group: 'params',
+          hasChildren: false,
+          maxStringLength: 10,
+          name: testParamName,
+          parentPath: joinMetricOrParamPath('params', 'params.yaml'),
+          path: testParamPath,
+          pathArray: ['params', 'params.yaml', testParamName],
+          types: ['string']
+        }
+      ],
+      rows: [
+        {
+          id: 'workspace',
+          label: 'workspace',
+          metrics: {
+            'summary.json': {
+              loss: testMetricNumberValue
+            }
+          },
+          mutable: false,
+          params: {
+            'params.yaml': {
+              test_param: testParamStringValue
+            }
+          }
+        }
+      ]
+    }
+
+    it(`should show and hide a tooltip on mouseEnter and mouseLeave of a header with a ${headerTooltipDelay}ms delay`, () => {
+      mockedUseIsFullyContained.mockReturnValue(false)
+
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      const testParamHeader = screen.getByText(testParamName)
+
+      fireEvent.mouseEnter(testParamHeader, { bubbles: true })
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      jest.advanceTimersByTime(headerTooltipDelay - 1)
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      jest.advanceTimersByTime(1)
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+      expect(screen.getByRole('tooltip')).toHaveTextContent(testParamName)
+
+      fireEvent.mouseLeave(testParamHeader, { bubbles: true })
+
+      jest.advanceTimersByTime(headerTooltipDelay - 1)
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+
+      jest.advanceTimersByTime(1)
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    })
+
+    it('should not show a tooltip after hovering on a header if its content is not overflowing', () => {
+      mockedUseIsFullyContained.mockReturnValue(true)
+
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      const testParamHeader = screen.getByText(testParamName)
+
+      fireEvent.mouseEnter(testParamHeader, { bubbles: true })
+      jest.advanceTimersByTime(headerTooltipDelay)
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
   })
 })

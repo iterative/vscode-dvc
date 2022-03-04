@@ -88,6 +88,10 @@ $gap: 20px;
 
   .smallPlots & {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+
+    :global(.role-axis-title) text {
+      font-size: 12px;
+    }
   }
 
   @media (min-width: 800px) {

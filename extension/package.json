@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1056,8 +1056,7 @@
     "dev": "shx rm -rf dist && tsc -watch -p ./",
     "build": "yarn build-webpack && yarn package",
     "build-webpack": "webpack --mode production",
-    "package": "vsce package --yarn",
-    "pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
+    "package": "vsce package --yarn -o ./dvc.vsix",
     "test-vscode-build": "tsc -p .",
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
