@@ -42,7 +42,7 @@ jobs:
           coverageCommand: xvfb-run -a yarn run cover
           coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
 
-      - run: yarn run-p "build-extension -o ./vscode-dvc.vsix" build-storybook
+      - run: yarn run-p build-extension build-storybook
 
       - name: Publish to Chromatic
         uses: chromaui/action@v1
@@ -57,4 +57,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Built package
-          path: ./extension/vscode-dvc.vsix
+          path: ./extension/dvc.vsix
