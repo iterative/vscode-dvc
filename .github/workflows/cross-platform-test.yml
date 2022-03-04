@@ -2,7 +2,7 @@ name: Cross-Platform Test
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 concurrency:
