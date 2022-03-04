@@ -5,6 +5,7 @@ import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
 import styles from '../components/Table/styles.module.scss'
 import { CopyButton } from '../components/CopyButton'
+import { OverflowHoverTooltip } from '../../shared/components/overflowHover'
 
 type Value = string | number
 
@@ -32,9 +33,11 @@ const Header: React.FC<{ column: Column<Experiment> }> = ({
   column: { name }
 }) => {
   return (
-    <div className={styles.headerCellWrapper}>
-      <span title={name}>{name}</span>
-    </div>
+    <OverflowHoverTooltip content={name}>
+      <div className={styles.headerCellWrapper}>
+        <span>{name}</span>
+      </div>
+    </OverflowHoverTooltip>
   )
 }
 
