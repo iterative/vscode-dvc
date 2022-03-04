@@ -8,7 +8,7 @@ import { BaseWorkspaceWebviews } from './workspace'
 import { WorkspaceExperiments } from '../experiments/workspace'
 import { TableData } from '../experiments/webview/contract'
 import { WorkspacePlots } from '../plots/workspace'
-import { PlotsData } from '../plots/webview/contract'
+import { CombinedPlotsData } from '../plots/webview/contract'
 
 export class WebviewSerializer {
   public readonly dispose = Disposable.fn()
@@ -16,7 +16,7 @@ export class WebviewSerializer {
   constructor(experiments: WorkspaceExperiments, plots: WorkspacePlots) {
     this.registerSerializer<TableData>(ViewKey.EXPERIMENTS, experiments)
 
-    this.registerSerializer<PlotsData>(ViewKey.PLOTS, plots)
+    this.registerSerializer<CombinedPlotsData>(ViewKey.PLOTS, plots)
   }
 
   private registerSerializer<T extends WebviewData>(

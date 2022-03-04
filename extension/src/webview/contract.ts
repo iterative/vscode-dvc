@@ -1,12 +1,12 @@
 import { TableData } from '../experiments/webview/contract'
 import {
-  PlotsData,
+  CombinedPlotsData,
   PlotSize,
   Section,
   SectionCollapsed
 } from '../plots/webview/contract'
 
-export type WebviewData = TableData | PlotsData
+export type WebviewData = TableData | CombinedPlotsData
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',

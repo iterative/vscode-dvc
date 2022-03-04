@@ -1,12 +1,15 @@
-import { LivePlotsColors, LivePlotValues } from 'dvc/src/plots/webview/contract'
+import {
+  CheckpointPlotColors,
+  CheckpointPlotValues
+} from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { VegaLite } from 'react-vega'
 import { config, createSpec } from './constants'
 
 interface PlotProps {
-  values: LivePlotValues
+  values: CheckpointPlotValues
   title: string
-  scale?: LivePlotsColors
+  scale?: CheckpointPlotColors
 }
 
 export const Plot: React.FC<PlotProps> = ({ values, title, scale }) => {

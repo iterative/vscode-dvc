@@ -1,4 +1,7 @@
-import { LivePlotData, LivePlotsColors } from 'dvc/src/plots/webview/contract'
+import {
+  CheckpointPlotColors,
+  CheckpointPlotData
+} from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { EmptyState } from './EmptyState'
 import { Plot } from './Plot'
@@ -8,12 +11,15 @@ import { performOrderedUpdate } from '../../util/objects'
 import { withScale } from '../../util/styles'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
-interface LivePlotsProps {
-  plots: LivePlotData[]
-  colors: LivePlotsColors
+interface CheckpointPlotsProps {
+  plots: CheckpointPlotData[]
+  colors: CheckpointPlotColors
 }
 
-export const LivePlots: React.FC<LivePlotsProps> = ({ plots, colors }) => {
+export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
+  plots,
+  colors
+}) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import {
   collectData,
-  collectLivePlotsData,
+  collectCheckpointPlotsData,
   collectPaths,
   collectTemplates,
   ComparisonData,
@@ -17,7 +17,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
-  LivePlotData,
+  CheckpointPlotData,
   PlotSize,
   PlotsType,
   Section,
@@ -40,7 +40,7 @@ export class PlotsModel {
   private readonly experiments: Experiments
   private readonly workspaceState: Memento
 
-  private livePlots?: LivePlotData[]
+  private livePlots?: CheckpointPlotData[]
   private selectedMetrics?: string[]
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
@@ -88,7 +88,7 @@ export class PlotsModel {
   }
 
   public transformAndSetExperiments(data: ExperimentsOutput) {
-    const livePlots = collectLivePlotsData(data)
+    const livePlots = collectCheckpointPlotsData(data)
 
     this.livePlots = livePlots
 
@@ -112,7 +112,7 @@ export class PlotsModel {
     this.deferred.resolve()
   }
 
-  public getLivePlots() {
+  public getCheckpointPlots() {
     if (!this.livePlots) {
       return
     }
@@ -131,10 +131,10 @@ export class PlotsModel {
 
     return {
       colors,
-      plots: this.getPlots(this.livePlots, selectedExperiments),
-      sectionName: this.getSectionName(Section.LIVE_PLOTS),
+      plots: this.getCheckpointPlotData(this.livePlots, selectedExperiments),
+      sectionName: this.getSectionName(Section.CHECKPOINT_PLOTS),
       selectedMetrics: this.getSelectedMetrics(),
-      size: this.getPlotSize(Section.LIVE_PLOTS)
+      size: this.getPlotSize(Section.CHECKPOINT_PLOTS)
     }
   }
 
@@ -163,7 +163,7 @@ export class PlotsModel {
       .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
   }
 
-  public getStaticPlots() {
+  public getPlots() {
     const selectedRevisions = this.getSelectedRevisions()
 
     if (!definedAndNonEmpty(selectedRevisions)) {
@@ -300,8 +300,11 @@ export class PlotsModel {
     return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
-  private getPlots(livePlots: LivePlotData[], selectedExperiments: string[]) {
-    return livePlots.map(plot => {
+  private getCheckpointPlotData(
+    checkpointPlots: CheckpointPlotData[],
+    selectedExperiments: string[]
+  ) {
+    return checkpointPlots.map(plot => {
       const { title, values } = plot
       return {
         title,

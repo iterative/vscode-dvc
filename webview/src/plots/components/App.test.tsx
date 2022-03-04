@@ -4,13 +4,13 @@
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/static/webview'
+import plotsFixture from 'dvc/src/test/fixtures/plotsDiff/plots/webview'
 import {
+  CombinedPlotsData,
   DEFAULT_SECTION_COLLAPSED,
-  LivePlotsColors,
-  PlotsData,
+  CheckpointPlotColors,
   PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
@@ -27,7 +27,7 @@ jest.mock('../../shared/api')
 
 jest.mock('./constants', () => ({
   ...jest.requireActual('./constants'),
-  createSpec: (title: string, scale?: LivePlotsColors) => ({
+  createSpec: (title: string, scale?: CheckpointPlotColors) => ({
     ...jest.requireActual('./constants').createSpec(title, scale),
     height: 100,
     width: 100
@@ -47,7 +47,7 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  const sendSetDataMessage = (data: PlotsData) => {
+  const sendSetDataMessage = (data: CombinedPlotsData) => {
     const message = new MessageEvent('message', {
       data: {
         data,
@@ -57,7 +57,7 @@ describe('App', () => {
     fireEvent(window, message)
   }
 
-  const renderAppWithData = (data: PlotsData) => {
+  const renderAppWithData = (data: CombinedPlotsData) => {
     render(<App />)
     sendSetDataMessage(data)
   }
@@ -96,7 +96,7 @@ describe('App', () => {
 
   it('should render the loading state when not initially provided with collapsed sections', async () => {
     renderAppWithData({
-      live: null
+      checkpoints: null
     })
 
     const loadingState = await screen.findByText('Loading Plots...')
@@ -106,7 +106,7 @@ describe('App', () => {
 
   it('should render the empty state when given data with no plots', async () => {
     renderAppWithData({
-      live: null,
+      checkpoints: null,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
     const emptyState = await screen.findByText('No Plots to Display')
@@ -117,7 +117,7 @@ describe('App', () => {
   it('should render only live plots when given a message with only live plots data', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -129,7 +129,7 @@ describe('App', () => {
 
   it('should render live and static plots when given messages with both types of plots data', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -138,7 +138,7 @@ describe('App', () => {
       .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
       .mockImplementation(() => heightToSuppressVegaError)
     sendSetDataMessage({
-      static: staticPlotsFixture
+      plots: plotsFixture
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
@@ -150,7 +150,7 @@ describe('App', () => {
     const expectedSectionName = 'Comparison'
 
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -163,21 +163,21 @@ describe('App', () => {
 
   it('should remove live plots given a message showing live plots as null', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
     expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
 
     sendSetDataMessage({
-      live: null
+      checkpoints: null
     })
     expect(screen.queryByText('Experiment Checkpoints')).not.toBeInTheDocument()
   })
 
   it('should toggle the live plots section in state when its header is clicked', async () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -194,7 +194,7 @@ describe('App', () => {
       screen.queryByLabelText('Vega visualization')
     ).not.toBeInTheDocument()
     expect(mockPostMessage).toBeCalledWith({
-      payload: { [Section.LIVE_PLOTS]: true },
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
     })
   })
@@ -204,9 +204,9 @@ describe('App', () => {
       <Plots
         state={{
           data: {
-            live: livePlotsFixture,
+            checkpoints: checkpointPlotsFixture,
             sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-            static: null
+            plots: null
           }
         }}
         dispatch={jest.fn}
@@ -247,7 +247,7 @@ describe('App', () => {
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -280,7 +280,7 @@ describe('App', () => {
 
   it('should change the size of the plots according to the size picker', async () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -307,7 +307,7 @@ describe('App', () => {
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -319,7 +319,7 @@ describe('App', () => {
     fireEvent.click(largeButton)
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: { section: Section.LIVE_PLOTS, size: PlotSize.LARGE },
+      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
       type: MessageFromWebviewType.PLOTS_RESIZED
     })
 
@@ -327,14 +327,14 @@ describe('App', () => {
     fireEvent.click(smallButton)
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: { section: Section.LIVE_PLOTS, size: PlotSize.SMALL },
+      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.SMALL },
       type: MessageFromWebviewType.PLOTS_RESIZED
     })
   })
 
   it('should show an input to rename the section when clicking the rename icon button', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -349,7 +349,7 @@ describe('App', () => {
 
   it('should change the title of the section when hitting enter on the title input', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
     const originalText = 'Experiment Checkpoints'
@@ -370,7 +370,7 @@ describe('App', () => {
 
   it('should send a message to the extension with the new section name after a section rename', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -384,14 +384,14 @@ describe('App', () => {
     fireEvent.keyDown(titleInput, { key: 'Enter' })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: { name: newTitle, section: Section.LIVE_PLOTS },
+      payload: { name: newTitle, section: Section.CHECKPOINT_PLOTS },
       type: MessageFromWebviewType.SECTION_RENAMED
     })
   })
 
   it('should display the live plots in the order stored', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -418,7 +418,7 @@ describe('App', () => {
 
   it('should remove the live plot from the order if it is removed from the plots', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -426,9 +426,9 @@ describe('App', () => {
     dragAndDrop(plots[1], plots[0])
 
     sendSetDataMessage({
-      live: {
-        ...livePlotsFixture,
-        plots: livePlotsFixture.plots.slice(1)
+      checkpoints: {
+        ...checkpointPlotsFixture,
+        plots: checkpointPlotsFixture.plots.slice(1)
       }
     })
     plots = screen.getAllByTestId(/summary\.json/)
@@ -441,7 +441,7 @@ describe('App', () => {
 
   it('should add the new plot at the end of the set order', () => {
     renderAppWithData({
-      live: livePlotsFixture,
+      checkpoints: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
@@ -449,14 +449,14 @@ describe('App', () => {
     dragAndDrop(plots[3], plots[0])
 
     sendSetDataMessage({
-      live: {
-        ...livePlotsFixture,
+      checkpoints: {
+        ...checkpointPlotsFixture,
         plots: [
           {
             title: 'summary.json:new-plot',
-            values: livePlotsFixture.plots[0].values
+            values: checkpointPlotsFixture.plots[0].values
           },
-          ...livePlotsFixture.plots
+          ...checkpointPlotsFixture.plots
         ]
       }
     })
@@ -473,11 +473,11 @@ describe('App', () => {
   it('should display the static plots in the order stored', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-      static: {
-        ...staticPlotsFixture,
+      plots: {
+        ...plotsFixture,
         plots: {
-          ...staticPlotsFixture.plots,
-          'other/plot.tsv': [...staticPlotsFixture.plots['logs/loss.tsv']]
+          ...plotsFixture.plots,
+          'other/plot.tsv': [...plotsFixture.plots['logs/loss.tsv']]
         }
       }
     })

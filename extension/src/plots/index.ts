@@ -4,7 +4,7 @@ import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
   ComparisonRevisionData,
-  PlotsData as TPlotsData,
+  CombinedPlotsData as TPlotsData,
   Section
 } from './webview/contract'
 import { PlotsData } from './data'
@@ -76,49 +76,49 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async sendInitialWebviewData() {
     await this.isReady()
     this.webview?.show({
+      checkpoints: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
-      live: this.getLivePlots(),
-      sectionCollapsed: this.model?.getSectionCollapsed(),
-      static: this.getStaticPlots()
+      plots: this.getPlots(),
+      sectionCollapsed: this.model?.getSectionCollapsed()
     })
   }
 
-  private sendLivePlotsData() {
+  private sendCheckpointPlotsData() {
     this.webview?.show({
-      live: this.getLivePlots()
+      checkpoints: this.getCheckpointPlots()
     })
   }
 
-  private getLivePlots() {
-    return this.model?.getLivePlots() || null
+  private getCheckpointPlots() {
+    return this.model?.getCheckpointPlots() || null
   }
 
   private async sendPlots() {
     if (definedAndNonEmpty(this.model?.getMissingRevisions())) {
-      this.sendLivePlotsData()
+      this.sendCheckpointPlotsData()
       return this.data.managedUpdate()
     }
 
     await this.isReady()
 
     this.webview?.show({
+      checkpoints: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
-      live: this.getLivePlots(),
-      static: this.getStaticPlots()
+      plots: this.getPlots()
     })
   }
 
-  private getStaticPlots() {
-    const staticPlots = this.model?.getStaticPlots()
+  private getPlots() {
+    const plots = this.model?.getPlots()
 
-    if (!this.model || !staticPlots || isEmpty(staticPlots)) {
+    if (!this.model || !plots || isEmpty(plots)) {
       return null
     }
 
     return {
-      plots: staticPlots,
-      sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
-      size: this.model.getPlotSize(Section.STATIC_PLOTS)
+      plots: plots,
+      sectionName: this.model.getSectionName(Section.PLOTS),
+      size: this.model.getPlotSize(Section.PLOTS)
     }
   }
 

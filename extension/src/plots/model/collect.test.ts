@@ -3,28 +3,28 @@ import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
 import {
   collectData,
-  collectLivePlotsData,
+  collectCheckpointPlotsData,
   collectPaths,
   collectTemplates
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
-import livePlotsFixture from '../../test/fixtures/expShow/livePlots'
+import checkpointPlotsFixture from '../../test/fixtures/expShow/checkpointPlots'
 import { ExperimentsOutput } from '../../cli/reader'
 import { definedAndNonEmpty, sameContents } from '../../util/array'
-import { PlotsType, StaticPlot, VegaPlot } from '../webview/contract'
+import { PlotsType, Plot, VegaPlot } from '../webview/contract'
 
 const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as VegaPlot
 
-describe('collectLivePlotsData', () => {
+describe('collectCheckpointPlotsData', () => {
   it('should return the expected data from the test fixture', () => {
-    const data = collectLivePlotsData(expShowFixture)
-    expect(data).toStrictEqual(livePlotsFixture.plots)
+    const data = collectCheckpointPlotsData(expShowFixture)
+    expect(data).toStrictEqual(checkpointPlotsFixture.plots)
   })
 
   it('should provide a continuous series for a modified experiment', () => {
-    const data = collectLivePlotsData(modifiedFixture)
+    const data = collectCheckpointPlotsData(modifiedFixture)
 
     expect(definedAndNonEmpty(data)).toBeTruthy()
 
@@ -62,7 +62,7 @@ describe('collectLivePlotsData', () => {
   })
 
   it('should return undefined given no input', () => {
-    const data = collectLivePlotsData({} as ExperimentsOutput)
+    const data = collectCheckpointPlotsData({} as ExperimentsOutput)
     expect(data).toBeUndefined()
   })
 })
@@ -130,12 +130,12 @@ describe('collectTemplates', () => {
 describe('collectPaths', () => {
   it('should always return the paths in order', () => {
     const { comparison, plots } = collectPaths({
-      z: [{ type: PlotsType.IMAGE } as StaticPlot],
-      b: [{ type: PlotsType.IMAGE } as StaticPlot],
-      a: [{ type: PlotsType.IMAGE } as StaticPlot],
-      y: [{ type: PlotsType.VEGA } as StaticPlot],
-      c: [{ type: PlotsType.VEGA } as StaticPlot],
-      f: [{ type: PlotsType.VEGA } as StaticPlot]
+      z: [{ type: PlotsType.IMAGE } as Plot],
+      b: [{ type: PlotsType.IMAGE } as Plot],
+      a: [{ type: PlotsType.IMAGE } as Plot],
+      y: [{ type: PlotsType.VEGA } as Plot],
+      c: [{ type: PlotsType.VEGA } as Plot],
+      f: [{ type: PlotsType.VEGA } as Plot]
     })
 
     expect(comparison).toStrictEqual(['a', 'b', 'z'])

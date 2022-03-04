@@ -7,9 +7,9 @@ import { restore, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
-import livePlotsFixture from '../../fixtures/expShow/livePlots'
+import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
-import staticPlotsFixture from '../../fixtures/plotsDiff/static'
+import plotsFixture from '../../fixtures/plotsDiff/plots'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
 import {
   bypassProcessManagerDebounce,
@@ -19,8 +19,8 @@ import {
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
-  DEFAULT_SECTION_COLLAPSED,
-  PlotsData as TPlotsData
+  CombinedPlotsData,
+  DEFAULT_SECTION_COLLAPSED
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -153,36 +153,36 @@ suite('Plots Test Suite', () => {
         plotsDiffFixture
       )
 
-      const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
-      const getLivePlotsEvent = new Promise(resolve =>
-        mockGetLivePlots.callsFake(() => {
+      const mockGetCheckpointPlots = stub(plotsModel, 'getCheckpointPlots')
+      const getCheckpointPlotsEvent = new Promise(resolve =>
+        mockGetCheckpointPlots.callsFake(() => {
           resolve(undefined)
-          return mockGetLivePlots.wrappedMethod.bind(plotsModel)()
+          return mockGetCheckpointPlots.wrappedMethod.bind(plotsModel)()
         })
       )
 
       const webview = await plots.showWebview()
-      await getLivePlotsEvent
+      await getCheckpointPlotsEvent
 
       expect(mockPlotsDiff).to.be.called
 
       const {
         comparison: comparisonData,
-        live: liveData,
-        sectionCollapsed,
-        static: staticData
+        checkpoints: checkpointsData,
+        plots: plotsData,
+        sectionCollapsed
       } = getFirstArgOfLastCall(messageSpy)
 
       expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
-      expect(liveData).to.deep.equal(livePlotsFixture)
+      expect(checkpointsData).to.deep.equal(checkpointPlotsFixture)
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
-      expect(staticData).to.deep.equal(staticPlotsFixture)
+      expect(plotsData).to.deep.equal(plotsFixture)
 
-      const expectedPlotsData: TPlotsData = {
+      const expectedPlotsData: CombinedPlotsData = {
+        checkpoints: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
-        live: livePlotsFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-        static: staticPlotsFixture
+        plots: plotsFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
       }
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)

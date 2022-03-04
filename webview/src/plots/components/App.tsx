@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { PlotsData } from 'dvc/src/plots/webview/contract'
+import { CombinedPlotsData } from 'dvc/src/plots/webview/contract'
 import { MessageToWebview } from 'dvc/src/webview/contract'
 import { Plots } from './Plots'
 import { useAppReducer } from '../hooks/useAppReducer'
@@ -10,7 +10,7 @@ export const App = () => {
 
   useVsCodeMessaging(
     useCallback(
-      ({ data }: { data: MessageToWebview<PlotsData> }) => {
+      ({ data }: { data: MessageToWebview<CombinedPlotsData> }) => {
         dispatch(data)
       },
       [dispatch]

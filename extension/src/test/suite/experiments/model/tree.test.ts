@@ -17,8 +17,8 @@ import { Status } from '../../../../experiments/model/status'
 import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
-import { buildPlots, getExpectedLivePlotsData } from '../../plots/util'
-import livePlotsFixture from '../../../fixtures/expShow/livePlots'
+import { buildPlots, getExpectedCheckpointPlotsData } from '../../plots/util'
+import checkpointPlotsFixture from '../../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
 import expShowFixture from '../../../fixtures/expShow/output'
 import { Operator } from '../../../../experiments/model/filterBy'
@@ -46,7 +46,7 @@ suite('Experiments Tree Test Suite', () => {
   })
 
   describe('ExperimentsTree', () => {
-    const { colors } = livePlotsFixture
+    const { colors } = checkpointPlotsFixture
     const { domain, range } = colors
 
     it('should appear in the UI', async () => {
@@ -61,18 +61,18 @@ suite('Experiments Tree Test Suite', () => {
       const expectedDomain = [...domain]
       const expectedRange = [...range]
 
-      const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
-      const getLivePlotsEvent = new Promise(resolve =>
-        mockGetLivePlots.callsFake(() => {
+      const mockGetCheckpointPlots = stub(plotsModel, 'getCheckpointPlots')
+      const getCheckpointPlotsEvent = new Promise(resolve =>
+        mockGetCheckpointPlots.callsFake(() => {
           resolve(undefined)
-          return mockGetLivePlots.wrappedMethod.bind(plotsModel)()
+          return mockGetCheckpointPlots.wrappedMethod.bind(plotsModel)()
         })
       )
 
       await plots.showWebview()
-      await getLivePlotsEvent
+      await getCheckpointPlotsEvent
 
-      mockGetLivePlots.restore()
+      mockGetCheckpointPlots.restore()
 
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,
@@ -80,15 +80,15 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       while (expectedDomain.length) {
-        const expectedData = getExpectedLivePlotsData(
+        const expectedData = getExpectedCheckpointPlotsData(
           expectedDomain,
           expectedRange
         )
 
-        const { live } = getFirstArgOfLastCall(messageSpy)
+        const { checkpoints } = getFirstArgOfLastCall(messageSpy)
 
         expect(
-          { live },
+          { checkpoints },
           'a message is sent with colors for the currently selected experiments'
         ).to.deep.equal(expectedData)
         messageSpy.resetHistory()
@@ -116,7 +116,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'when there are no experiments selected we send undefined (show empty state)'
       ).to.be.calledWith({
-        live: null
+        checkpoints: null
       })
       messageSpy.resetHistory()
 
@@ -136,7 +136,7 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       expect(messageSpy, 'we no longer send undefined').to.be.calledWith(
-        getExpectedLivePlotsData(expectedDomain, expectedRange)
+        getExpectedCheckpointPlotsData(expectedDomain, expectedRange)
       )
       expect(
         setSelectionModeSpy,
@@ -198,7 +198,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'a message is sent with colors for the currently selected experiments'
       ).to.be.calledWith(
-        getExpectedLivePlotsData([selectedDisplayName], [selectedColor])
+        getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
       )
       expect(
         setSelectionModeSpy,
@@ -240,7 +240,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'the filter is applied and one experiment remains because of a single checkpoint'
       ).to.be.calledWith(
-        getExpectedLivePlotsData([selectedDisplayName], [selectedColor])
+        getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
       )
       expect(
         setSelectionModeSpy,
@@ -351,7 +351,11 @@ suite('Experiments Tree Test Suite', () => {
       expect(setSelectionModeSpy).to.be.calledOnceWith(true)
       setSelectionModeSpy.resetHistory()
 
-      const expectedMessage = { comparison: null, live: null, static: null }
+      const expectedMessage = {
+        checkpoints: null,
+        comparison: null,
+        plots: null
+      }
 
       expect(
         messageSpy,

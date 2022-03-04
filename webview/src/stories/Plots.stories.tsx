@@ -1,11 +1,11 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import {
-  PlotsData,
+  CombinedPlotsData,
   DEFAULT_SECTION_COLLAPSED
 } from 'dvc/src/plots/webview/contract'
-import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/static'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import plotsFixture from 'dvc/src/test/fixtures/plotsDiff/plots'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { Plots } from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'
@@ -17,10 +17,10 @@ import '../plots/components/styles.module.scss'
 export default {
   args: {
     data: {
+      checkpoints: checkpointPlotsFixture,
       comparison: comparisonPlotsFixture,
-      live: livePlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-      static: staticPlotsFixture
+      plots: plotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     }
   },
   component: Plots,
@@ -28,7 +28,7 @@ export default {
 } as Meta
 
 const Template: Story<{
-  data?: PlotsData
+  data?: CombinedPlotsData
 }> = ({ data }) => {
   const [state, dispatch] = useAppReducer({ data })
   return <Plots state={state} dispatch={dispatch} />
@@ -39,7 +39,7 @@ export const WithData = Template.bind({})
 export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   data: {
-    live: livePlotsFixture,
+    checkpoints: checkpointPlotsFixture,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED
   }
 }
@@ -48,7 +48,7 @@ export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
   data: {
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    static: staticPlotsFixture
+    plots: plotsFixture
   }
 }
 

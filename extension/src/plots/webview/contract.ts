@@ -10,26 +10,26 @@ type PlotSizeKeys = keyof typeof PlotSize
 export type PlotSize = typeof PlotSize[PlotSizeKeys]
 
 export enum Section {
-  LIVE_PLOTS = 'live-plots',
-  STATIC_PLOTS = 'static-plots',
+  CHECKPOINT_PLOTS = 'checkpoint-plots',
+  PLOTS = 'plots',
   COMPARISON_TABLE = 'comparison-table'
 }
 
 export const DEFAULT_SECTION_NAMES = {
-  [Section.LIVE_PLOTS]: 'Experiment Checkpoints',
-  [Section.STATIC_PLOTS]: 'Plots',
+  [Section.CHECKPOINT_PLOTS]: 'Experiment Checkpoints',
+  [Section.PLOTS]: 'Plots',
   [Section.COMPARISON_TABLE]: 'Comparison'
 }
 
 export const DEFAULT_SECTION_SIZES = {
-  [Section.LIVE_PLOTS]: PlotSize.REGULAR,
-  [Section.STATIC_PLOTS]: PlotSize.REGULAR,
+  [Section.CHECKPOINT_PLOTS]: PlotSize.REGULAR,
+  [Section.PLOTS]: PlotSize.REGULAR,
   [Section.COMPARISON_TABLE]: PlotSize.REGULAR
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
-  [Section.LIVE_PLOTS]: false,
-  [Section.STATIC_PLOTS]: false,
+  [Section.CHECKPOINT_PLOTS]: false,
+  [Section.PLOTS]: false,
   [Section.COMPARISON_TABLE]: false
 }
 
@@ -44,25 +44,29 @@ export type ComparisonPlots = {
 
 export type ComparisonRevision = { revision: string; displayColor: string }
 
-export interface PlotsComparisonData {
+export type PlotsComparisonData = {
   revisions: ComparisonRevision[]
   plots: ComparisonPlots
   sectionName: string
   size: PlotSize
 }
 
-export type LivePlotValues = { group: string; iteration: number; y: number }[]
+export type CheckpointPlotValues = {
+  group: string
+  iteration: number
+  y: number
+}[]
 
-export type LivePlotsColors = { domain: string[]; range: string[] }
+export type CheckpointPlotColors = { domain: string[]; range: string[] }
 
-export type LivePlotData = {
+export type CheckpointPlotData = {
   title: string
-  values: LivePlotValues
+  values: CheckpointPlotValues
 }
 
-export type LivePlotsData = {
-  plots: LivePlotData[]
-  colors: LivePlotsColors
+export type CheckpointPlotsData = {
+  plots: CheckpointPlotData[]
+  colors: CheckpointPlotColors
   size: PlotSize
   sectionName: string
   selectedMetrics?: string[]
@@ -73,7 +77,7 @@ export enum PlotsType {
   IMAGE = 'image'
 }
 
-export const isVegaPlot = (plot: StaticPlot): plot is VegaPlot =>
+export const isVegaPlot = (plot: Plot): plot is VegaPlot =>
   plot.type === PlotsType.VEGA
 
 export type VegaPlot = {
@@ -90,14 +94,14 @@ export type ImagePlot = {
   multiView?: boolean
 }
 
-export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
+export const isImagePlot = (plot: Plot): plot is ImagePlot =>
   plot.type === PlotsType.IMAGE
 
-export type StaticPlot = VegaPlot | ImagePlot
+export type Plot = VegaPlot | ImagePlot
 
 export type VegaPlots = { [path: string]: VegaPlot[] }
 
-export interface StaticPlotsData {
+export type PlotsData = {
   plots: VegaPlots
   sectionName: string
   size: PlotSize
@@ -108,11 +112,11 @@ export type ComparisonPlot = {
   revision: string
 }
 
-export type PlotsData =
+export type CombinedPlotsData =
   | {
       comparison?: PlotsComparisonData | null
-      live?: LivePlotsData | null
-      static?: StaticPlotsData | null
+      checkpoints?: CheckpointPlotsData | null
+      plots?: PlotsData | null
       sectionCollapsed?: SectionCollapsed
     }
   | undefined

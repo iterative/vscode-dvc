@@ -1,6 +1,6 @@
 import {
   DEFAULT_SECTION_COLLAPSED,
-  PlotsData,
+  CombinedPlotsData,
   Section
 } from 'dvc/src/plots/webview/contract'
 import {
@@ -13,7 +13,7 @@ import { vsCodeApi } from '../../shared/api'
 import { sendMessage } from '../../shared/vscode'
 
 export interface PlotsWebviewState {
-  data?: PlotsData
+  data?: CombinedPlotsData
   dvcRoot?: string
 }
 
@@ -22,7 +22,7 @@ export enum CollapsibleSectionsActions {
 }
 
 export type PlotsReducerAction =
-  | MessageToWebview<PlotsData>
+  | MessageToWebview<CombinedPlotsData>
   | {
       type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
       sectionKey: Section

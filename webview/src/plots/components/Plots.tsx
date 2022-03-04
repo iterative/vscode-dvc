@@ -1,17 +1,21 @@
 import React, { Dispatch, useState, useEffect } from 'react'
-import { LivePlotData, PlotSize, Section } from 'dvc/src/plots/webview/contract'
+import {
+  CheckpointPlotData,
+  PlotSize,
+  Section
+} from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
 import { ComparisonTable } from './ComparisonTable/ComparisonTable'
-import { LivePlots } from './LivePlots'
+import { CheckpointPlots } from './CheckpointPlots'
 import { StaticPlots } from './StaticPlots'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
 import { Theme } from '../../shared/components/theme/Theme'
 
-const getMetricsFromPlots = (plots?: LivePlotData[]): string[] =>
+const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(plot => getDisplayNameFromPath(plot.title)) || []
 
 export const Plots = ({
@@ -28,23 +32,18 @@ export const Plots = ({
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
   useEffect(() => {
-    const newMetrics = getMetricsFromPlots(data?.live?.plots)
+    const newMetrics = getMetricsFromPlots(data?.checkpoints?.plots)
     setMetrics(newMetrics)
-    setSelectedPlots(data?.live?.selectedMetrics || newMetrics)
+    setSelectedPlots(data?.checkpoints?.selectedMetrics || newMetrics)
   }, [data, setSelectedPlots, setMetrics])
 
   if (!data || !data.sectionCollapsed) {
     return EmptyState('Loading Plots...')
   }
 
-  const {
-    sectionCollapsed,
-    live: livePlots,
-    static: staticPlots,
-    comparison: comparisonTable
-  } = data
+  const { sectionCollapsed, checkpoints, plots, comparison } = data
 
-  if (!livePlots && !staticPlots && !comparisonTable) {
+  if (!checkpoints && !plots && !comparison) {
     return EmptyState('No Plots to Display')
   }
 
@@ -79,46 +78,46 @@ export const Plots = ({
 
   return (
     <Theme>
-      {staticPlots && (
+      {plots && (
         <PlotsContainer
-          title={staticPlots.sectionName}
-          sectionKey={Section.STATIC_PLOTS}
-          currentSize={staticPlots.size}
+          title={plots.sectionName}
+          sectionKey={Section.PLOTS}
+          currentSize={plots.size}
           {...basicContainerProps}
         >
-          <StaticPlots plots={staticPlots.plots} />
+          <StaticPlots plots={plots.plots} />
         </PlotsContainer>
       )}
-      {comparisonTable && (
+      {comparison && (
         <PlotsContainer
-          title={comparisonTable.sectionName}
+          title={comparison.sectionName}
           sectionKey={Section.COMPARISON_TABLE}
-          currentSize={comparisonTable.size}
+          currentSize={comparison.size}
           {...basicContainerProps}
         >
           <ComparisonTable
-            plots={comparisonTable.plots}
-            revisions={comparisonTable.revisions}
+            plots={comparison.plots}
+            revisions={comparison.revisions}
           />
         </PlotsContainer>
       )}
-      {livePlots && (
+      {checkpoints && (
         <PlotsContainer
-          title={livePlots.sectionName}
-          sectionKey={Section.LIVE_PLOTS}
+          title={checkpoints.sectionName}
+          sectionKey={Section.CHECKPOINT_PLOTS}
           menu={{
             metrics,
             selectedMetrics: selectedPlots,
             setSelectedPlots: setSelectedMetrics
           }}
-          currentSize={livePlots.size}
+          currentSize={checkpoints.size}
           {...basicContainerProps}
         >
-          <LivePlots
-            plots={livePlots.plots.filter(plot =>
+          <CheckpointPlots
+            plots={checkpoints.plots.filter(plot =>
               selectedPlots?.includes(getDisplayNameFromPath(plot.title))
             )}
-            colors={livePlots.colors}
+            colors={checkpoints.colors}
           />
         </PlotsContainer>
       )}
