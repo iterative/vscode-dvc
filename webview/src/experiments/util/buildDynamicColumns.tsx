@@ -20,8 +20,8 @@ import 'tippy.js/dist/tippy.css'
 const UndefinedCell = <>. . .</>
 
 const groupLabels: Record<string, string> = {
-  params: 'Parameter',
-  metrics: 'Metric'
+  metrics: 'Metric',
+  params: 'Parameter'
 }
 
 const CellTooltip: React.FC<{
