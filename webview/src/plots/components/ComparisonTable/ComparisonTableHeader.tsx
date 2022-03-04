@@ -2,6 +2,7 @@ import cx from 'classnames'
 import React from 'react'
 import styles from './styles.module.scss'
 import { Pin } from '../../../shared/components/icons'
+import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 
 export interface ComparisonTableHeaderProps {
   displayColor: string
@@ -21,6 +22,7 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
 
   return (
     <button className={styles.header} onClick={onClicked}>
+      {!isPinned && <GripIcon className={styles.gripIcon} />}
       <div className={pinClasses}>
         <Pin />
       </div>
