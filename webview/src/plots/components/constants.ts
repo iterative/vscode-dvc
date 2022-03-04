@@ -96,6 +96,7 @@ const backgroundColor = 'var(--vscode-editor-foreground-transparency-1)'
 export const config: Config = {
   axis: {
     domain: false,
+    gridColor: foregroundColor,
     gridOpacity: 0.25,
     labelAngle: 0,
     tickColor: foregroundColor,
