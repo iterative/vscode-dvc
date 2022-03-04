@@ -427,28 +427,7 @@ describe('App', () => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
-    it('should show a tooltip with the full number on number cells', () => {
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: testData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
-
-      const testMetricCell = screen.getByText('1.9293')
-      fireEvent.mouseEnter(testMetricCell, { bubbles: true })
-
-      jest.advanceTimersByTime(cellTooltipDelay)
-      const tooltip = screen.getByRole('tooltip')
-      expect(tooltip).toBeInTheDocument()
-      expect(tooltip).toHaveTextContent(String(testMetricNumberValue))
-    })
-
-    it(`should show and hide a tooltip with an un-shortened number on mouseEnter and mouseLeave of a cell with a ${cellTooltipDelay}ms delay`, () => {
+    it(`should show and hide a tooltip on mouseEnter and mouseLeave of a cell with a ${cellTooltipDelay}ms delay`, () => {
       render(<App />)
       fireEvent(
         window,
@@ -479,6 +458,27 @@ describe('App', () => {
 
       jest.advanceTimersByTime(1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    })
+
+    it('should show a tooltip with the full number on number cells', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testMetricCell = screen.getByText('1.9293')
+      fireEvent.mouseEnter(testMetricCell, { bubbles: true })
+
+      jest.advanceTimersByTime(cellTooltipDelay)
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent(String(testMetricNumberValue))
     })
   })
 })
