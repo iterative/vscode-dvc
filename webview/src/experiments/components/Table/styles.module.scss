@@ -356,7 +356,8 @@ $spinner-color-light: #000;
       }
     }
 
-    .innerCell {
+    .innerCell,
+    .timestampInnerCell {
       height: 100%;
       width: 100%;
       background-color: none;
@@ -554,7 +555,7 @@ $spinner-color-light: #000;
   font-size: 0.8em;
 }
 
-.timestampCellContentsWrapper {
+.timestampInnerCell {
   line-height: normal;
   text-align: right;
   @extend %truncateLeftParent;

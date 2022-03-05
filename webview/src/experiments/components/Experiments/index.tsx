@@ -17,7 +17,6 @@ import {
   Cell
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import cn from 'classnames'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
@@ -94,12 +93,7 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
     {
       Cell: ({ value }: { value: string }) => {
         return (
-          <div
-            className={cn(
-              styles.innerCell,
-              styles.timestampCellContentsWrapper
-            )}
-          >
+          <div className={styles.timestampInnerCell}>
             {value && <DateCellContents value={value} />}
           </div>
         )
