@@ -10,7 +10,7 @@ import { RegisteredCommands } from '../../../../commands/external'
 import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
 import { buildExperiments } from '../util'
 
-suite('Experiments Params And Metrics Tree Test Suite', () => {
+suite('Experiments Metrics And Params Tree Test Suite', () => {
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()
 
