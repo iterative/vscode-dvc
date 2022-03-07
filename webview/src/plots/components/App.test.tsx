@@ -368,6 +368,27 @@ describe('App', () => {
     expect(screen.getByText(newTitle)).toBeInTheDocument()
   })
 
+  it('should change the title of the section on the blur event of the input', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+    const originalText = 'Experiment Checkpoints'
+
+    expect(screen.getByText(originalText)).toBeInTheDocument()
+
+    const [renameButton] = screen.getAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(renameButton)
+    fireEvent.click(renameButton)
+
+    const titleInput = screen.getByRole('textbox')
+    const newTitle = 'Brand new section'
+    fireEvent.change(titleInput, { target: { value: newTitle } })
+    fireEvent.blur(titleInput)
+
+    expect(screen.getByText(newTitle)).toBeInTheDocument()
+  })
+
   it('should send a message to the extension with the new section name after a section rename', () => {
     renderAppWithData({
       live: livePlotsFixture,
