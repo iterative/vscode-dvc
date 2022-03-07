@@ -55,6 +55,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           setOrder={setOrder}
           disabledDropIds={[pinnedColumn]}
           items={items}
+          group="comparison"
         />
       </tr>
     </thead>

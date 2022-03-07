@@ -50,6 +50,7 @@ export const LivePlots: React.FC<LivePlotsProps> = ({ plots, colors }) => {
         setOrder={setOrder}
         disabledDropIds={[]}
         items={items as JSX.Element[]}
+        group="live-plots"
       />
     </div>
   ) : (
