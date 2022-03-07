@@ -38,10 +38,10 @@ export const StaticPlots: React.FC<StaticPlotsProps> = ({ plots }) => {
   return (
     <>
       <div className={styles.singleViewPlotsGrid}>
-        <StaticPlotGrid entries={singleViewPlots} />
+        <StaticPlotGrid entries={singleViewPlots} group="static-single" />
       </div>
       <div className={styles.multiViewPlotsGrid}>
-        <StaticPlotGrid entries={multiViewPlots} />
+        <StaticPlotGrid entries={multiViewPlots} group="static-multi" />
       </div>
     </>
   )

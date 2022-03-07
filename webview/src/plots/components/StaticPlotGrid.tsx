@@ -15,6 +15,7 @@ import { withScale } from '../../util/styles'
 
 interface StaticPlotGridProps {
   entries: VegaPlots
+  group: string
 }
 
 interface StaticPlotEntry extends VegaPlot {
@@ -22,7 +23,10 @@ interface StaticPlotEntry extends VegaPlot {
   id: string
 }
 
-export const StaticPlotGrid: React.FC<StaticPlotGridProps> = ({ entries }) => {
+export const StaticPlotGrid: React.FC<StaticPlotGridProps> = ({
+  entries,
+  group
+}) => {
   const [allPlots, setAllPlots] = useState<StaticPlotEntry[]>([])
   const [order, setOrder] = useState<string[]>([])
 
@@ -87,6 +91,7 @@ export const StaticPlotGrid: React.FC<StaticPlotGridProps> = ({ entries }) => {
       setOrder={setOrder}
       disabledDropIds={[]}
       items={items as JSX.Element[]}
+      group={group}
     />
   )
 }

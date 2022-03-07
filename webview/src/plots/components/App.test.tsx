@@ -470,6 +470,26 @@ describe('App', () => {
     ])
   })
 
+  it('should not be possible to drag a plot from a section to another', () => {
+    renderAppWithData({
+      live: livePlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      static: staticPlotsFixture
+    })
+
+    const livePlots = screen.getAllByTestId(/summary\.json/)
+    const staticPlots = screen.getAllByTestId(/^plot-/)
+
+    dragAndDrop(staticPlots[0], livePlots[2])
+
+    expect(livePlots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy'
+    ])
+  })
+
   it('should display the static plots in the order stored', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,

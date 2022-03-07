@@ -5,17 +5,20 @@ interface DragDropContainerProps {
   setOrder: (order: string[]) => void
   disabledDropIds: string[]
   items: JSX.Element[] // Every item must have a id prop for drag and drop to work
+  group: string
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   order,
   setOrder,
   disabledDropIds,
-  items
+  items,
+  group
 }) => {
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const id = order.indexOf(e.currentTarget.id).toString()
     e.dataTransfer.setData('itemIndex', id)
+    e.dataTransfer.setData('group', group)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
   }
@@ -24,8 +27,12 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
     const droppedIndex = order.indexOf(e.currentTarget.id)
+    const draggedGroup = e.dataTransfer.getData('group')
 
-    if (!disabledDropIds.includes(order[droppedIndex])) {
+    if (
+      draggedGroup === group &&
+      !disabledDropIds.includes(order[droppedIndex])
+    ) {
       const draggedIndex = parseInt(e.dataTransfer.getData('itemIndex'), 10)
       const newOrder = [...order]
       const dragged = newOrder[draggedIndex]
