@@ -6,7 +6,6 @@ import { VisualizationSpec } from 'react-vega'
 import {
   collectData,
   collectLivePlotsData,
-  collectPaths,
   collectTemplates,
   ComparisonData,
   RevisionData
@@ -47,8 +46,6 @@ export class PlotsModel {
   private sectionNames: Record<Section, string>
   private branchRevisions: Record<string, string> = {}
 
-  private vegaPaths: string[] = []
-  private comparisonPaths: string[] = []
   private comparisonData: ComparisonData = {}
   private revisionData: RevisionData = {}
   private templates: Record<string, VisualizationSpec> = {}
@@ -96,18 +93,14 @@ export class PlotsModel {
   }
 
   public async transformAndSetPlots(data: PlotsOutput) {
-    const [{ comparisonData, revisionData }, templates, { comparison, plots }] =
-      await Promise.all([
-        collectData(data),
-        collectTemplates(data),
-        collectPaths(data)
-      ])
+    const [{ comparisonData, revisionData }, templates] = await Promise.all([
+      collectData(data),
+      collectTemplates(data)
+    ])
 
     this.comparisonData = { ...this.comparisonData, ...comparisonData }
     this.revisionData = { ...this.revisionData, ...revisionData }
     this.templates = { ...this.templates, ...templates }
-    this.vegaPaths = plots
-    this.comparisonPaths = comparison
 
     this.deferred.resolve()
   }
@@ -163,14 +156,18 @@ export class PlotsModel {
       .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
   }
 
-  public getStaticPlots() {
+  public getStaticPlots(paths: string[] | undefined) {
+    if (!paths) {
+      return
+    }
+
     const selectedRevisions = this.getSelectedRevisions()
 
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
     }
 
-    return this.vegaPaths.reduce((acc, path) => {
+    return paths.reduce((acc, path) => {
       const template = this.templates[path]
 
       if (template) {
@@ -199,13 +196,17 @@ export class PlotsModel {
     }, {} as VegaPlots)
   }
 
-  public getComparisonPlots() {
+  public getComparisonPlots(paths: string[] | undefined) {
+    if (!paths) {
+      return
+    }
+
     const selectedRevisions = this.getSelectedRevisions()
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
     }
 
-    return this.comparisonPaths.reduce((acc, path) => {
+    return paths.reduce((acc, path) => {
       const pathRevisions = {
         path,
         revisions: {} as ComparisonRevisionData

@@ -9,6 +9,7 @@ import {
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
+import { PathsModel } from './paths/model'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -26,7 +27,8 @@ export type PlotsWebview = BaseWebview<TPlotsData>
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
-  private model?: PlotsModel
+  private plots?: PlotsModel
+  private paths?: PathsModel
 
   private readonly data: PlotsData
   private readonly workspaceState: Memento
@@ -47,7 +49,10 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.dispose.track(
       this.data.onDidUpdate(async data => {
-        await this.model?.transformAndSetPlots(data)
+        await Promise.all([
+          this.plots?.transformAndSetPlots(data),
+          this.paths?.transformAndSet(data)
+        ])
         this.sendPlots()
       })
     )
@@ -60,11 +65,12 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public setExperiments(experiments: Experiments) {
-    this.model = this.dispose.track(
+    this.plots = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
+    this.paths = this.dispose.track(new PathsModel())
 
-    this.data.setModel(this.model)
+    this.data.setModel(this.plots)
 
     this.waitForInitialData(experiments)
 
@@ -78,7 +84,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webview?.show({
       comparison: this.getComparisonPlots(),
       live: this.getLivePlots(),
-      sectionCollapsed: this.model?.getSectionCollapsed(),
+      sectionCollapsed: this.plots?.getSectionCollapsed(),
       static: this.getStaticPlots()
     })
   }
@@ -90,11 +96,11 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getLivePlots() {
-    return this.model?.getLivePlots() || null
+    return this.plots?.getLivePlots() || null
   }
 
   private async sendPlots() {
-    if (definedAndNonEmpty(this.model?.getMissingRevisions())) {
+    if (definedAndNonEmpty(this.plots?.getMissingRevisions())) {
       this.sendLivePlotsData()
       return this.data.managedUpdate()
     }
@@ -109,22 +115,24 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getStaticPlots() {
-    const staticPlots = this.model?.getStaticPlots()
+    const paths = this.paths?.getVegaPaths()
+    const staticPlots = this.plots?.getStaticPlots(paths)
 
-    if (!this.model || !staticPlots || isEmpty(staticPlots)) {
+    if (!this.plots || !staticPlots || isEmpty(staticPlots)) {
       return null
     }
 
     return {
       plots: staticPlots,
-      sectionName: this.model.getSectionName(Section.STATIC_PLOTS),
-      size: this.model.getPlotSize(Section.STATIC_PLOTS)
+      sectionName: this.plots.getSectionName(Section.STATIC_PLOTS),
+      size: this.plots.getPlotSize(Section.STATIC_PLOTS)
     }
   }
 
   private getComparisonPlots() {
-    const comparison = this.model?.getComparisonPlots()
-    if (!this.model || !comparison || isEmpty(comparison)) {
+    const paths = this.paths?.getComparisonPaths()
+    const comparison = this.plots?.getComparisonPlots(paths)
+    if (!this.plots || !comparison || isEmpty(comparison)) {
       return null
     }
 
@@ -142,9 +150,9 @@ export class Plots extends BaseRepository<TPlotsData> {
         )
         return { path, revisions: revisionsWithCorrectUrls }
       }),
-      revisions: this.model.getSelectedRevisionDetails(),
-      sectionName: this.model.getSectionName(Section.COMPARISON_TABLE),
-      size: this.model.getPlotSize(Section.COMPARISON_TABLE)
+      revisions: this.plots.getSelectedRevisionDetails(),
+      sectionName: this.plots.getSectionName(Section.COMPARISON_TABLE),
+      size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
     }
   }
 
@@ -165,12 +173,12 @@ export class Plots extends BaseRepository<TPlotsData> {
         switch (message.type) {
           case MessageFromWebviewType.METRIC_TOGGLED:
             return (
-              message.payload && this.model?.setSelectedMetrics(message.payload)
+              message.payload && this.plots?.setSelectedMetrics(message.payload)
             )
           case MessageFromWebviewType.PLOTS_RESIZED:
             return (
               message.payload &&
-              this.model?.setPlotSize(
+              this.plots?.setPlotSize(
                 message.payload.section,
                 message.payload.size
               )
@@ -178,12 +186,12 @@ export class Plots extends BaseRepository<TPlotsData> {
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return (
               message.payload &&
-              this.model?.setSectionCollapsed(message.payload)
+              this.plots?.setSectionCollapsed(message.payload)
             )
           case MessageFromWebviewType.SECTION_RENAMED:
             return (
               message.payload &&
-              this.model?.setSectionName(
+              this.plots?.setSectionName(
                 message.payload.section,
                 message.payload.name
               )
@@ -212,7 +220,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       experiments.onDidChangeExperiments(async data => {
         if (data) {
-          await this.model?.transformAndSetExperiments(data)
+          await this.plots?.transformAndSetExperiments(data)
         }
 
         this.sendPlots()
@@ -221,9 +229,13 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private async initializeData(data: ExperimentsOutput) {
-    await this.model?.transformAndSetExperiments(data)
+    await this.plots?.transformAndSetExperiments(data)
     this.data.managedUpdate()
-    await Promise.all([this.data.isReady(), this.model?.isReady()])
+    await Promise.all([
+      this.data.isReady(),
+      this.plots?.isReady(),
+      this.paths?.isReady()
+    ])
     this.deferred.resolve()
   }
 

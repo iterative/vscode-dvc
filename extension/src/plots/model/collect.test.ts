@@ -1,19 +1,13 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
-import {
-  collectData,
-  collectLivePlotsData,
-  collectPaths,
-  collectTemplates
-} from './collect'
+import { collectData, collectLivePlotsData, collectTemplates } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 import livePlotsFixture from '../../test/fixtures/expShow/livePlots'
 import { ExperimentsOutput } from '../../cli/reader'
 import { definedAndNonEmpty, sameContents } from '../../util/array'
-import { PlotsType, StaticPlot, VegaPlot } from '../webview/contract'
+import { VegaPlot } from '../webview/contract'
 
 const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as VegaPlot
 
@@ -124,21 +118,5 @@ describe('collectTemplates', () => {
     expect(templates['logs/loss.tsv']).not.toStrictEqual(content)
 
     expect(templates['logs/loss.tsv']).toStrictEqual(expectedTemplate)
-  })
-})
-
-describe('collectPaths', () => {
-  it('should always return the paths in order', () => {
-    const { comparison, plots } = collectPaths({
-      z: [{ type: PlotsType.IMAGE } as StaticPlot],
-      b: [{ type: PlotsType.IMAGE } as StaticPlot],
-      a: [{ type: PlotsType.IMAGE } as StaticPlot],
-      y: [{ type: PlotsType.VEGA } as StaticPlot],
-      c: [{ type: PlotsType.VEGA } as StaticPlot],
-      f: [{ type: PlotsType.VEGA } as StaticPlot]
-    })
-
-    expect(comparison).toStrictEqual(['a', 'b', 'z'])
-    expect(plots).toStrictEqual(['c', 'f', 'y'])
   })
 })
