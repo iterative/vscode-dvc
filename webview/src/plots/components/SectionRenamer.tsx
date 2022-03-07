@@ -1,4 +1,4 @@
-import React, { createRef, KeyboardEvent, useEffect } from 'react'
+import React, { createRef, FormEvent, KeyboardEvent, useEffect } from 'react'
 import styles from './styles.module.scss'
 
 interface SectionRenamerProps {
@@ -30,6 +30,9 @@ export const SectionRenamer: React.FC<SectionRenamerProps> = ({
       ref={inputRef}
       defaultValue={defaultTitle}
       onKeyDown={onKeyDown}
+      onBlur={(e: FormEvent<HTMLInputElement>) =>
+        onChangeTitle(e.currentTarget.value)
+      }
     />
   )
 }
