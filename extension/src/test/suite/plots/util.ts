@@ -70,7 +70,7 @@ export const buildPlots = async (
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const plotsModel: PlotsModel = (plots as any).model
+  const plotsModel: PlotsModel = (plots as any).plots
 
   return {
     data,
