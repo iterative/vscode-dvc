@@ -7,9 +7,9 @@ import modifiedFixture from '../../test/fixtures/expShow/modified'
 import livePlotsFixture from '../../test/fixtures/expShow/livePlots'
 import { ExperimentsOutput } from '../../cli/reader'
 import { definedAndNonEmpty, sameContents } from '../../util/array'
-import { VegaPlot } from '../webview/contract'
+import { TemplatePlot } from '../webview/contract'
 
-const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as VegaPlot
+const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as TemplatePlot
 
 describe('collectLivePlotsData', () => {
   it('should return the expected data from the test fixture', () => {

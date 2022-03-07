@@ -3,8 +3,8 @@ import { PlotsOutput } from '../../cli/reader'
 
 export const collectPaths = (
   data: PlotsOutput
-): { plots: string[]; comparison: string[] } => {
-  const { comparison, plots } = Object.entries(data).reduce(
+): { templates: string[]; comparison: string[] } => {
+  const { comparison, plots: templates } = Object.entries(data).reduce(
     (acc, [path, plots]) => {
       plots.forEach(plot => {
         if (isImagePlot(plot)) {
@@ -17,5 +17,8 @@ export const collectPaths = (
     },
     { comparison: new Set<string>(), plots: new Set<string>() }
   )
-  return { comparison: [...comparison].sort(), plots: [...plots].sort() }
+  return {
+    comparison: [...comparison].sort(),
+    templates: [...templates].sort()
+  }
 }

@@ -11,25 +11,25 @@ export type PlotSize = typeof PlotSize[PlotSizeKeys]
 
 export enum Section {
   LIVE_PLOTS = 'live-plots',
-  STATIC_PLOTS = 'static-plots',
+  TEMPLATE_PLOTS = 'template-plots',
   COMPARISON_TABLE = 'comparison-table'
 }
 
 export const DEFAULT_SECTION_NAMES = {
   [Section.LIVE_PLOTS]: 'Experiment Checkpoints',
-  [Section.STATIC_PLOTS]: 'Plots',
+  [Section.TEMPLATE_PLOTS]: 'Plots',
   [Section.COMPARISON_TABLE]: 'Comparison'
 }
 
 export const DEFAULT_SECTION_SIZES = {
   [Section.LIVE_PLOTS]: PlotSize.REGULAR,
-  [Section.STATIC_PLOTS]: PlotSize.REGULAR,
+  [Section.TEMPLATE_PLOTS]: PlotSize.REGULAR,
   [Section.COMPARISON_TABLE]: PlotSize.REGULAR
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
   [Section.LIVE_PLOTS]: false,
-  [Section.STATIC_PLOTS]: false,
+  [Section.TEMPLATE_PLOTS]: false,
   [Section.COMPARISON_TABLE]: false
 }
 
@@ -73,10 +73,10 @@ export enum PlotsType {
   IMAGE = 'image'
 }
 
-export const isVegaPlot = (plot: StaticPlot): plot is VegaPlot =>
+export const isVegaPlot = (plot: Plot): plot is TemplatePlot =>
   plot.type === PlotsType.VEGA
 
-export type VegaPlot = {
+export type TemplatePlot = {
   content: VisualizationSpec
   revisions?: string[]
   type: PlotsType
@@ -90,14 +90,14 @@ export type ImagePlot = {
   multiView?: boolean
 }
 
-export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
+export const isImagePlot = (plot: Plot): plot is ImagePlot =>
   plot.type === PlotsType.IMAGE
 
-export type StaticPlot = VegaPlot | ImagePlot
+export type Plot = TemplatePlot | ImagePlot
 
-export type VegaPlots = { [path: string]: VegaPlot[] }
+export type VegaPlots = { [path: string]: TemplatePlot[] }
 
-export interface StaticPlotsData {
+export interface TemplatePlotsData {
   plots: VegaPlots
   sectionName: string
   size: PlotSize
@@ -112,7 +112,7 @@ export type PlotsData =
   | {
       comparison?: PlotsComparisonData | null
       live?: LivePlotsData | null
-      static?: StaticPlotsData | null
+      template?: TemplatePlotsData | null
       sectionCollapsed?: SectionCollapsed
     }
   | undefined

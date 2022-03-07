@@ -6,7 +6,7 @@ import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/static/webview'
+import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import {
   DEFAULT_SECTION_COLLAPSED,
   LivePlotsColors,
@@ -127,7 +127,7 @@ describe('App', () => {
     expect(screen.queryByText('Comparison')).not.toBeInTheDocument()
   })
 
-  it('should render live and static plots when given messages with both types of plots data', () => {
+  it('should render live and template plots when given messages with both types of plots data', () => {
     renderAppWithData({
       live: livePlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
@@ -138,7 +138,7 @@ describe('App', () => {
       .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
       .mockImplementation(() => heightToSuppressVegaError)
     sendSetDataMessage({
-      static: staticPlotsFixture
+      template: templatePlotsFixture
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
@@ -206,7 +206,7 @@ describe('App', () => {
           data: {
             live: livePlotsFixture,
             sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-            static: null
+            template: null
           }
         }}
         dispatch={jest.fn}
@@ -495,7 +495,7 @@ describe('App', () => {
     renderAppWithData({
       live: livePlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-      static: staticPlotsFixture
+      template: templatePlotsFixture
     })
 
     const livePlots = screen.getAllByTestId(/summary\.json/)
@@ -511,14 +511,14 @@ describe('App', () => {
     ])
   })
 
-  it('should display the static plots in the order stored', () => {
+  it('should display the template plots in the order stored', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-      static: {
-        ...staticPlotsFixture,
+      template: {
+        ...templatePlotsFixture,
         plots: {
-          ...staticPlotsFixture.plots,
-          'other/plot.tsv': [...staticPlotsFixture.plots['logs/loss.tsv']]
+          ...templatePlotsFixture.plots,
+          'other/plot.tsv': [...templatePlotsFixture.plots['logs/loss.tsv']]
         }
       }
     })

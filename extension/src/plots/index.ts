@@ -85,7 +85,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       comparison: this.getComparisonPlots(),
       live: this.getLivePlots(),
       sectionCollapsed: this.plots?.getSectionCollapsed(),
-      static: this.getStaticPlots()
+      template: this.getTemplatePlots()
     })
   }
 
@@ -110,22 +110,22 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webview?.show({
       comparison: this.getComparisonPlots(),
       live: this.getLivePlots(),
-      static: this.getStaticPlots()
+      template: this.getTemplatePlots()
     })
   }
 
-  private getStaticPlots() {
-    const paths = this.paths?.getVegaPaths()
-    const staticPlots = this.plots?.getStaticPlots(paths)
+  private getTemplatePlots() {
+    const paths = this.paths?.getTemplatePaths()
+    const plots = this.plots?.getTemplatePlots(paths)
 
-    if (!this.plots || !staticPlots || isEmpty(staticPlots)) {
+    if (!this.plots || !plots || isEmpty(plots)) {
       return null
     }
 
     return {
-      plots: staticPlots,
-      sectionName: this.plots.getSectionName(Section.STATIC_PLOTS),
-      size: this.plots.getPlotSize(Section.STATIC_PLOTS)
+      plots,
+      sectionName: this.plots.getSectionName(Section.TEMPLATE_PLOTS),
+      size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
     }
   }
 

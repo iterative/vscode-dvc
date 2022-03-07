@@ -156,7 +156,7 @@ export class PlotsModel {
       .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
   }
 
-  public getStaticPlots(paths: string[] | undefined) {
+  public getTemplatePlots(paths: string[] | undefined) {
     if (!paths) {
       return
     }

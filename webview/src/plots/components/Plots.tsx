@@ -5,7 +5,7 @@ import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
 import { ComparisonTable } from './ComparisonTable/ComparisonTable'
 import { LivePlots } from './LivePlots'
-import { StaticPlots } from './StaticPlots'
+import { TemplatePlots } from './TemplatePlots'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
@@ -40,11 +40,11 @@ export const Plots = ({
   const {
     sectionCollapsed,
     live: livePlots,
-    static: staticPlots,
+    template: templatePlots,
     comparison: comparisonTable
   } = data
 
-  if (!livePlots && !staticPlots && !comparisonTable) {
+  if (!livePlots && !templatePlots && !comparisonTable) {
     return EmptyState('No Plots to Display')
   }
 
@@ -79,14 +79,14 @@ export const Plots = ({
 
   return (
     <Theme>
-      {staticPlots && (
+      {templatePlots && (
         <PlotsContainer
-          title={staticPlots.sectionName}
-          sectionKey={Section.STATIC_PLOTS}
-          currentSize={staticPlots.size}
+          title={templatePlots.sectionName}
+          sectionKey={Section.TEMPLATE_PLOTS}
+          currentSize={templatePlots.size}
           {...basicContainerProps}
         >
-          <StaticPlots plots={staticPlots.plots} />
+          <TemplatePlots plots={templatePlots.plots} />
         </PlotsContainer>
       )}
       {comparisonTable && (
