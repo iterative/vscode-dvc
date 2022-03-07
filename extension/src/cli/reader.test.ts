@@ -260,64 +260,64 @@ describe('CliReader', () => {
         executable: 'dvc'
       })
     })
+  })
 
-    describe('plotsDiff', () => {
-      it('should match the expected output', async () => {
-        const cwd = __dirname
+  describe('plotsDiff', () => {
+    it('should match the expected output', async () => {
+      const cwd = __dirname
 
-        mockedCreateProcess.mockReturnValueOnce(
-          getMockedProcess(JSON.stringify(plotsDiffFixture))
-        )
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess(JSON.stringify(plotsDiffFixture))
+      )
 
-        const plots = await cliReader.plotsDiff(cwd, 'HEAD')
-        expect(plots).toStrictEqual(plotsDiffFixture)
-        expect(mockedCreateProcess).toBeCalledWith({
-          args: [
-            'plots',
-            'diff',
-            'HEAD',
-            '-o',
-            join('.dvc', 'tmp', 'plots'),
-            SHOW_JSON
-          ],
-          cwd,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
+      const plots = await cliReader.plotsDiff(cwd, 'HEAD')
+      expect(plots).toStrictEqual(plotsDiffFixture)
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: [
+          'plots',
+          'diff',
+          'HEAD',
+          '-o',
+          join('.dvc', 'tmp', 'plots'),
+          SHOW_JSON
+        ],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('root', () => {
+    it('should return the root relative to the cwd', async () => {
+      const stdout = join('..', '..')
+      const cwd = __dirname
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+      const relativeRoot = await cliReader.root(cwd)
+      expect(relativeRoot).toStrictEqual(stdout)
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: ['root'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
 
-    describe('root', () => {
-      it('should return the root relative to the cwd', async () => {
-        const stdout = join('..', '..')
-        const cwd = __dirname
-        mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-        const relativeRoot = await cliReader.root(cwd)
-        expect(relativeRoot).toStrictEqual(stdout)
-        expect(mockedCreateProcess).toBeCalledWith({
-          args: ['root'],
-          cwd,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
-      })
-
-      it('should return undefined when run outside of a project', async () => {
-        const cwd = __dirname
-        mockedCreateProcess.mockReturnValueOnce(
-          getFailingMockedProcess(
-            "ERROR: you are not inside of a DVC repository (checked up to mount point '/' )"
-          )
+    it('should return undefined when run outside of a project', async () => {
+      const cwd = __dirname
+      mockedCreateProcess.mockReturnValueOnce(
+        getFailingMockedProcess(
+          "ERROR: you are not inside of a DVC repository (checked up to mount point '/' )"
         )
+      )
 
-        const relativeRoot = await cliReader.root(cwd)
-        expect(relativeRoot).toBeUndefined()
-        expect(mockedCreateProcess).toBeCalledWith({
-          args: ['root'],
-          cwd,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
+      const relativeRoot = await cliReader.root(cwd)
+      expect(relativeRoot).toBeUndefined()
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: ['root'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
