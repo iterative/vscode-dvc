@@ -351,7 +351,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(setSelectionModeSpy).to.be.calledOnceWith(true)
       setSelectionModeSpy.resetHistory()
 
-      const expectedMessage = { comparison: null, live: null, static: null }
+      const expectedMessage = { comparison: null, live: null, template: null }
 
       expect(
         messageSpy,

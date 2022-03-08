@@ -5,7 +5,7 @@ import {
   DEFAULT_SECTION_COLLAPSED
 } from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import staticPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/static'
+import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { Plots } from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'
@@ -20,7 +20,7 @@ export default {
       comparison: comparisonPlotsFixture,
       live: livePlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-      static: staticPlotsFixture
+      template: templatePlotsFixture
     }
   },
   component: Plots,
@@ -44,11 +44,11 @@ WithLiveOnly.args = {
   }
 }
 
-export const WithStaticOnly = Template.bind({})
-WithStaticOnly.args = {
+export const WithTemplateOnly = Template.bind({})
+WithTemplateOnly.args = {
   data: {
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    static: staticPlotsFixture
+    template: templatePlotsFixture
   }
 }
 

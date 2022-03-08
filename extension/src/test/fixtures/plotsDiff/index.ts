@@ -9,7 +9,7 @@ import {
   PlotSize,
   PlotsType,
   Section,
-  StaticPlotsData,
+  TemplatePlotsData,
   VegaPlots
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
@@ -507,15 +507,15 @@ export const getMinimalWebviewMessage = () => ({
   plots: {
     ...basicVega
   },
-  sectionName: DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS],
+  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })
 
-export const getStaticWebviewMessage = (): StaticPlotsData => ({
+export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: {
     ...extendedSpecs({ ...basicVega, ...require('./vega').default })
   },
-  sectionName: DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS],
+  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })
 

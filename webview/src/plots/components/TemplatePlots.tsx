@@ -1,28 +1,28 @@
-import { VegaPlot, VegaPlots } from 'dvc/src/plots/webview/contract'
+import { TemplatePlot, VegaPlots } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import styles from './styles.module.scss'
-import { StaticPlotGrid } from './StaticPlotGrid'
+import { TemplatePlotGrid } from './TemplatePlotGrid'
 
-interface StaticPlotsProps {
+interface TemplatePlotsProps {
   plots: VegaPlots
 }
 
-type StaticPlotAccumulator = {
+type TemplatePlotAccumulator = {
   singleViewPlots: VegaPlots
   multiViewPlots: VegaPlots
 }
 
-export const StaticPlots: React.FC<StaticPlotsProps> = ({ plots }) => {
+export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
   const fillInPlotsType = (
     plotsType: VegaPlots,
     path: string,
-    plot: VegaPlot
+    plot: TemplatePlot
   ) => {
     plotsType[path] = plotsType[path] ? [...plotsType[path], plot] : [plot]
   }
 
   const { singleViewPlots, multiViewPlots } = Object.entries(plots).reduce(
-    (acc: StaticPlotAccumulator, [path, plots]) => {
+    (acc: TemplatePlotAccumulator, [path, plots]) => {
       plots.forEach(plot => {
         if (plot.multiView) {
           fillInPlotsType(acc.multiViewPlots, path, plot)
@@ -38,10 +38,10 @@ export const StaticPlots: React.FC<StaticPlotsProps> = ({ plots }) => {
   return (
     <>
       <div className={styles.singleViewPlotsGrid}>
-        <StaticPlotGrid entries={singleViewPlots} group="static-single" />
+        <TemplatePlotGrid entries={singleViewPlots} group="static-single" />
       </div>
       <div className={styles.multiViewPlotsGrid}>
-        <StaticPlotGrid entries={multiViewPlots} group="static-multi" />
+        <TemplatePlotGrid entries={multiViewPlots} group="static-multi" />
       </div>
     </>
   )

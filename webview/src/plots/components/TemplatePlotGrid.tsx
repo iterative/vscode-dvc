@@ -1,4 +1,4 @@
-import { VegaPlot, VegaPlots } from 'dvc/src/plots/webview/contract'
+import { TemplatePlot, VegaPlots } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import cx from 'classnames'
@@ -13,27 +13,27 @@ import { DragDropContainer } from '../../shared/components/dragDrop/DragDropCont
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../util/styles'
 
-interface StaticPlotGridProps {
+interface TemplatePlotGridProps {
   entries: VegaPlots
   group: string
 }
 
-interface StaticPlotEntry extends VegaPlot {
+interface TemplatePlotEntry extends TemplatePlot {
   path: string
   id: string
 }
 
-export const StaticPlotGrid: React.FC<StaticPlotGridProps> = ({
+export const TemplatePlotGrid: React.FC<TemplatePlotGridProps> = ({
   entries,
   group
 }) => {
-  const [allPlots, setAllPlots] = useState<StaticPlotEntry[]>([])
+  const [allPlots, setAllPlots] = useState<TemplatePlotEntry[]>([])
   const [order, setOrder] = useState<string[]>([])
 
   useEffect(() => {
     setAllPlots(
       Object.entries(entries).reduce(
-        (acc: StaticPlotEntry[], [path, plots]) => {
+        (acc: TemplatePlotEntry[], [path, plots]) => {
           return acc.concat(
             plots.map((plot, i) => ({ ...plot, id: `plot-${path}-${i}`, path }))
           )
@@ -53,9 +53,9 @@ export const StaticPlotGrid: React.FC<StaticPlotGridProps> = ({
     order,
     allPlots as unknown as Items,
     'id'
-  ) as unknown as StaticPlotEntry[]
+  ) as unknown as TemplatePlotEntry[]
 
-  const items = reorderedItems.map((plot: StaticPlotEntry) => {
+  const items = reorderedItems.map((plot: TemplatePlotEntry) => {
     const nbRevisions = (plot.multiView && plot.revisions?.length) || 1
     const className = cx(styles.plot, {
       [styles.multiViewPlot]: plot.multiView

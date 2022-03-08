@@ -9,13 +9,13 @@ export class PathsModel {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private vegaPaths: string[] = []
+  private templatePaths: string[] = []
   private comparisonPaths: string[] = []
 
   public transformAndSet(data: PlotsOutput) {
-    const { comparison, plots } = collectPaths(data)
+    const { comparison, templates } = collectPaths(data)
 
-    this.vegaPaths = plots
+    this.templatePaths = templates
     this.comparisonPaths = comparison
 
     this.deferred.resolve()
@@ -25,8 +25,8 @@ export class PathsModel {
     return this.initialized
   }
 
-  public getVegaPaths() {
-    return this.vegaPaths
+  public getTemplatePaths() {
+    return this.templatePaths
   }
 
   public getComparisonPaths() {

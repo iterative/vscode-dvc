@@ -5,7 +5,7 @@ import {
   LivePlotData,
   isImagePlot,
   ImagePlot,
-  VegaPlot
+  TemplatePlot
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -241,7 +241,11 @@ const collectImageData = (
   acc[rev][path] = plot
 }
 
-const collectPlotData = (acc: RevisionData, path: string, plot: VegaPlot) => {
+const collectPlotData = (
+  acc: RevisionData,
+  path: string,
+  plot: TemplatePlot
+) => {
   plot.revisions?.forEach(rev => {
     if (!acc[rev]) {
       acc[rev] = {}

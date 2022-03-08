@@ -3,7 +3,7 @@ import { Cli, typeCheckCommands } from '.'
 import { Args, Command, Flag, ListFlag, SubCommand } from './args'
 import { retry } from './retry'
 import { trimAndSplit } from '../util/stdout'
-import { StaticPlot } from '../plots/webview/contract'
+import { Plot } from '../plots/webview/contract'
 
 export type PathOutput = { path: string }
 
@@ -92,7 +92,7 @@ export interface ExperimentsOutput {
 }
 
 export interface PlotsOutput {
-  [path: string]: StaticPlot[]
+  [path: string]: Plot[]
 }
 
 export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')

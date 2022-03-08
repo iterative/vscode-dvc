@@ -79,8 +79,8 @@ describe('plotsModel', () => {
     expect(model.getSectionName(Section.LIVE_PLOTS)).toStrictEqual(
       DEFAULT_SECTION_NAMES[Section.LIVE_PLOTS]
     )
-    expect(model.getSectionName(Section.STATIC_PLOTS)).toStrictEqual(
-      DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS]
+    expect(model.getSectionName(Section.TEMPLATE_PLOTS)).toStrictEqual(
+      DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS]
     )
 
     const newLivePlotsName = 'Live Section'
@@ -89,14 +89,14 @@ describe('plotsModel', () => {
     expect(model.getSectionName(Section.LIVE_PLOTS)).toStrictEqual(
       newLivePlotsName
     )
-    expect(model.getSectionName(Section.STATIC_PLOTS)).toStrictEqual(
-      DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS]
+    expect(model.getSectionName(Section.TEMPLATE_PLOTS)).toStrictEqual(
+      DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS]
     )
 
-    const newStaticPlotsName = 'Static'
-    model.setSectionName(Section.STATIC_PLOTS, newStaticPlotsName)
-    expect(model.getSectionName(Section.STATIC_PLOTS)).toStrictEqual(
-      newStaticPlotsName
+    const newTemplatePlotsName = 'Previously Called Static'
+    model.setSectionName(Section.TEMPLATE_PLOTS, newTemplatePlotsName)
+    expect(model.getSectionName(Section.TEMPLATE_PLOTS)).toStrictEqual(
+      newTemplatePlotsName
     )
   })
 
@@ -111,7 +111,7 @@ describe('plotsModel', () => {
       MementoPrefix.PLOT_SECTION_NAMES + exampleDvcRoot,
       {
         [Section.LIVE_PLOTS]: newName,
-        [Section.STATIC_PLOTS]: DEFAULT_SECTION_NAMES[Section.STATIC_PLOTS],
+        [Section.TEMPLATE_PLOTS]: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
         [Section.COMPARISON_TABLE]:
           DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE]
       }
@@ -127,7 +127,7 @@ describe('plotsModel', () => {
 
     const expectedSectionCollapsed = {
       [Section.LIVE_PLOTS]: true,
-      [Section.STATIC_PLOTS]: false,
+      [Section.TEMPLATE_PLOTS]: false,
       [Section.COMPARISON_TABLE]: false
     }
 
