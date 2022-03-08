@@ -31,32 +31,28 @@ type PlotPath = {
 }
 
 export const collectPathsWithParents = (data: PlotsOutput): PlotPath[] => {
-  const { paths } = Object.keys(data).reduce(
-    (acc, path) => {
-      const pathArray = getPathArray(path)
-      pathArray.reduce((acc, _, i) => {
-        const reverseIdx = pathArray.length - i
-        const path = getPath(pathArray, reverseIdx)
-        if (acc.included.has(path)) {
-          return acc
-        }
+  const included = new Set<string>()
+  const pathsWithParents: PlotPath[] = []
 
-        acc.paths.push({
-          hasChildren: !!i,
-          parentPath: getParent(pathArray, reverseIdx),
-          path
-        })
-        acc.included.add(path)
+  const plotPaths = Object.keys(data)
 
-        return acc
-      }, acc)
+  plotPaths.forEach(path => {
+    const pathArray = getPathArray(path)
 
-      return acc
-    },
-    {
-      included: new Set<string>(),
-      paths: [] as PlotPath[]
+    for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
+      const path = getPath(pathArray, reverseIdx)
+      if (included.has(path)) {
+        continue
+      }
+
+      pathsWithParents.push({
+        hasChildren: reverseIdx !== pathArray.length,
+        parentPath: getParent(pathArray, reverseIdx),
+        path
+      })
+      included.add(path)
     }
-  )
-  return paths
+  })
+
+  return pathsWithParents
 }
