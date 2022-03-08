@@ -61,7 +61,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.4.7",
     "jest-canvas-mock": "^2.3.1",
-    "lint-staged": "^12.1.2",
+    "lint-staged": "^12.3.5",
     "raw-loader": "^4.0.2",
     "react-beautiful-dnd-test-utils": "^3.2.2",
     "sass": "^1.43.4",

@@ -1101,7 +1101,7 @@
     "copy-webpack-plugin": "^10.2.4",
     "fork-ts-checker-webpack-plugin": "^6.5.0",
     "jest": "^27.4.7",
-    "lint-staged": "^12.1.2",
+    "lint-staged": "^12.3.5",
     "mocha": "^9.2.1",
     "shx": "^0.3.3",
     "sinon": "^12.0.1",
