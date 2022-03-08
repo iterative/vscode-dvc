@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { join } from 'path'
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
@@ -21,8 +22,9 @@ describe('ComparisonTableRow', () => {
     path: 'path/to/the-file/image.png',
     pinnedColumn: '',
     plots: Object.values(
-      comparisonPlotsFixture.plots.find(({ path }) => path === 'plots/acc.png')
-        ?.revisions || {}
+      comparisonPlotsFixture.plots.find(
+        ({ path }) => path === join('plots', 'acc.png')
+      )?.revisions || {}
     )
   }
 
