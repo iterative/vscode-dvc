@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { join } from 'path'
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
@@ -518,7 +519,9 @@ describe('App', () => {
         ...templatePlotsFixture,
         plots: {
           ...templatePlotsFixture.plots,
-          'other/plot.tsv': [...templatePlotsFixture.plots['logs/loss.tsv']]
+          [join('other', 'plot.tsv')]: [
+            ...templatePlotsFixture.plots[join('logs', 'loss.tsv')]
+          ]
         }
       }
     })
@@ -526,8 +529,8 @@ describe('App', () => {
     let plots = screen.getAllByTestId(/^plot-/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'plot-logs/loss.tsv-0',
-      'plot-other/plot.tsv-0'
+      join('plot-logs', 'loss.tsv-0'),
+      join('plot-other', 'plot.tsv-0')
     ])
 
     dragAndDrop(plots[1], plots[0])
@@ -535,8 +538,8 @@ describe('App', () => {
     plots = screen.getAllByTestId(/^plot-/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'plot-other/plot.tsv-0',
-      'plot-logs/loss.tsv-0'
+      join('plot-other', 'plot.tsv-0'),
+      join('plot-logs', 'loss.tsv-0')
     ])
   })
 })

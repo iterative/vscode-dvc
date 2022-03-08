@@ -23,7 +23,7 @@ const includeDependency = (location: string) => {
 
 const includeFiles = () =>
   new CopyWebpackPlugin({
-    patterns: ['README.md', 'LICENSE'].map(file => ({
+    patterns: ['README.md', 'LICENSE', 'CHANGELOG.md'].map(file => ({
       from: r(`../${file}`),
       to: r('.')
     }))
