@@ -16,7 +16,7 @@ import { join } from '../../util/path'
 import { getWorkspaceColor } from '../../../experiments/model/colors'
 
 const basicVega = {
-  'logs/loss.tsv': [
+  [join('logs', 'loss.tsv')]: [
     {
       type: PlotsType.VEGA,
       revisions: ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a'],
@@ -371,7 +371,7 @@ const basicVega = {
 }
 
 const getImageData = (baseUrl: string, joinFunc = join) => ({
-  'plots/acc.png': [
+  [join('plots', 'acc.png')]: [
     {
       type: PlotsType.IMAGE,
       revisions: ['workspace'],
@@ -398,7 +398,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
       url: joinFunc(baseUrl, '4fb124a_plots_acc.png')
     }
   ],
-  'plots/heatmap.png': [
+  [join('plots', 'heatmap.png')]: [
     {
       type: PlotsType.IMAGE,
       revisions: ['workspace'],
@@ -425,7 +425,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
       url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
     }
   ],
-  'plots/loss.png': [
+  [join('plots', 'loss.png')]: [
     {
       type: PlotsType.IMAGE,
       revisions: ['workspace'],

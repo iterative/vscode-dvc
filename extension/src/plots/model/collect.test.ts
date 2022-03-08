@@ -1,3 +1,4 @@
+import { join } from 'path'
 import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
 import {
@@ -13,7 +14,9 @@ import { ExperimentsOutput } from '../../cli/reader'
 import { definedAndNonEmpty, sameContents } from '../../util/array'
 import { TemplatePlot } from '../webview/contract'
 
-const LogsLossTsv = (plotsDiffFixture['logs/loss.tsv'][0] || {}) as TemplatePlot
+const logsLossPath = join('logs', 'loss.tsv')
+
+const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
 
 describe('collectCheckpointPlotsData', () => {
   it('should return the expected data from the test fixture', () => {
@@ -71,36 +74,37 @@ describe('collectData', () => {
     const revisions = ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a']
 
     const values =
-      (LogsLossTsv?.content?.data as { values: { rev: string }[] }).values || []
+      (logsLossPlot?.content?.data as { values: { rev: string }[] }).values ||
+      []
 
     expect(isEmpty(values)).toBeFalsy()
 
     revisions.forEach(revision => {
       const expectedValues = values.filter(value => value.rev === revision)
-      expect(revisionData[revision]['logs/loss.tsv']).toStrictEqual(
-        expectedValues
-      )
+      expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
     })
 
     expect(Object.keys(revisionData)).toStrictEqual(revisions)
 
     expect(Object.keys(revisionData.main)).toStrictEqual([
-      'logs/loss.tsv',
-      'logs/acc.tsv',
+      logsLossPath,
+      join('logs', 'acc.tsv'),
       'predictions.json'
     ])
 
+    const heatmapPlot = join('plots', 'heatmap.png')
+
     expect(Object.keys(comparisonData.main)).toStrictEqual([
-      'plots/acc.png',
-      'plots/heatmap.png',
-      'plots/loss.png'
+      join('plots', 'acc.png'),
+      heatmapPlot,
+      join('plots', 'loss.png')
     ])
 
-    const _1ba7bcd_heatmap = comparisonData['1ba7bcd']['plots/heatmap.png']
+    const _1ba7bcd_heatmap = comparisonData['1ba7bcd'][heatmapPlot]
 
     expect(_1ba7bcd_heatmap).toBeDefined()
     expect(_1ba7bcd_heatmap).toStrictEqual(
-      plotsDiffFixture['plots/heatmap.png'].find(({ revisions }) =>
+      plotsDiffFixture[heatmapPlot].find(({ revisions }) =>
         sameContents(revisions as string[], ['1ba7bcd'])
       )
     )
@@ -109,18 +113,18 @@ describe('collectData', () => {
 
 describe('collectTemplates', () => {
   it('should return the expected output from the test fixture', () => {
-    const { content } = LogsLossTsv
+    const { content } = logsLossPlot
     const expectedTemplate = omit(content, 'data')
 
     const templates = collectTemplates(plotsDiffFixture)
     expect(Object.keys(templates)).toStrictEqual([
-      'logs/loss.tsv',
-      'logs/acc.tsv',
+      logsLossPath,
+      join('logs', 'acc.tsv'),
       'predictions.json'
     ])
 
-    expect(templates['logs/loss.tsv']).not.toStrictEqual(content)
+    expect(templates[logsLossPath]).not.toStrictEqual(content)
 
-    expect(templates['logs/loss.tsv']).toStrictEqual(expectedTemplate)
+    expect(templates[logsLossPath]).toStrictEqual(expectedTemplate)
   })
 })

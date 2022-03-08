@@ -26,26 +26,26 @@ describe('collectPath', () => {
       {
         hasChildren: false,
         parentPath: 'plots',
-        path: 'plots/acc.png'
+        path: join('plots', 'acc.png')
       },
       { hasChildren: true, parentPath: undefined, path: 'plots' },
       {
         hasChildren: false,
         parentPath: 'plots',
-        path: 'plots/heatmap.png'
+        path: join('plots', 'heatmap.png')
       },
       {
         hasChildren: false,
         parentPath: 'plots',
-        path: 'plots/loss.png'
+        path: join('plots', 'loss.png')
       },
       {
         hasChildren: false,
         parentPath: 'logs',
-        path: 'logs/loss.tsv'
+        path: join('logs', 'loss.tsv')
       },
       { hasChildren: true, parentPath: undefined, path: 'logs' },
-      { hasChildren: false, parentPath: 'logs', path: 'logs/acc.tsv' },
+      { hasChildren: false, parentPath: 'logs', path: join('logs', 'acc.tsv') },
       { hasChildren: false, parentPath: undefined, path: 'predictions.json' }
     ])
   })
