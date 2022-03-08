@@ -7,7 +7,7 @@ import { restore, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
-import livePlotsFixture from '../../fixtures/expShow/livePlots'
+import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
@@ -153,34 +153,34 @@ suite('Plots Test Suite', () => {
         plotsDiffFixture
       )
 
-      const mockGetLivePlots = stub(plotsModel, 'getLivePlots')
-      const getLivePlotsEvent = new Promise(resolve =>
-        mockGetLivePlots.callsFake(() => {
+      const mockGetCheckpointPlots = stub(plotsModel, 'getCheckpointPlots')
+      const getCheckpointPlotsEvent = new Promise(resolve =>
+        mockGetCheckpointPlots.callsFake(() => {
           resolve(undefined)
-          return mockGetLivePlots.wrappedMethod.bind(plotsModel)()
+          return mockGetCheckpointPlots.wrappedMethod.bind(plotsModel)()
         })
       )
 
       const webview = await plots.showWebview()
-      await getLivePlotsEvent
+      await getCheckpointPlotsEvent
 
       expect(mockPlotsDiff).to.be.called
 
       const {
+        checkpoint: checkpointData,
         comparison: comparisonData,
-        live: liveData,
         sectionCollapsed,
         template: templateData
       } = getFirstArgOfLastCall(messageSpy)
 
+      expect(checkpointData).to.deep.equal(checkpointPlotsFixture)
       expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
-      expect(liveData).to.deep.equal(livePlotsFixture)
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
       expect(templateData).to.deep.equal(templatePlotsFixture)
 
       const expectedPlotsData: TPlotsData = {
+        checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
-        live: livePlotsFixture,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
         template: templatePlotsFixture
       }

@@ -1,10 +1,10 @@
-import { LivePlotsColors } from 'dvc/src/plots/webview/contract'
+import { CheckpointPlotsColors } from 'dvc/src/plots/webview/contract'
 import { Config, FontWeight } from 'vega'
 import { VisualizationSpec } from 'react-vega'
 
 export const createSpec = (
   title: string,
-  scale?: LivePlotsColors
+  scale?: CheckpointPlotsColors
 ): VisualizationSpec => {
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',

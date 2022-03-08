@@ -4,7 +4,7 @@ import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED
 } from 'dvc/src/plots/webview/contract'
-import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { Plots } from '../plots/components/Plots'
@@ -17,8 +17,8 @@ import '../plots/components/styles.module.scss'
 export default {
   args: {
     data: {
+      checkpoint: checkpointPlotsFixture,
       comparison: comparisonPlotsFixture,
-      live: livePlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: templatePlotsFixture
     }
@@ -36,10 +36,10 @@ const Template: Story<{
 
 export const WithData = Template.bind({})
 
-export const WithLiveOnly = Template.bind({})
-WithLiveOnly.args = {
+export const WithCheckpointOnly = Template.bind({})
+WithCheckpointOnly.args = {
   data: {
-    live: livePlotsFixture,
+    checkpoint: checkpointPlotsFixture,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED
   }
 }

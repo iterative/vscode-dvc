@@ -1,17 +1,21 @@
 import React, { Dispatch, useState, useEffect } from 'react'
-import { LivePlotData, PlotSize, Section } from 'dvc/src/plots/webview/contract'
+import {
+  CheckpointPlotData,
+  PlotSize,
+  Section
+} from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
+import { CheckpointPlots } from './CheckpointPlots'
 import { ComparisonTable } from './ComparisonTable/ComparisonTable'
-import { LivePlots } from './LivePlots'
 import { TemplatePlots } from './TemplatePlots'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
 import { Theme } from '../../shared/components/theme/Theme'
 
-const getMetricsFromPlots = (plots?: LivePlotData[]): string[] =>
+const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(plot => getDisplayNameFromPath(plot.title)) || []
 
 export const Plots = ({
@@ -28,9 +32,9 @@ export const Plots = ({
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
   useEffect(() => {
-    const newMetrics = getMetricsFromPlots(data?.live?.plots)
+    const newMetrics = getMetricsFromPlots(data?.checkpoint?.plots)
     setMetrics(newMetrics)
-    setSelectedPlots(data?.live?.selectedMetrics || newMetrics)
+    setSelectedPlots(data?.checkpoint?.selectedMetrics || newMetrics)
   }, [data, setSelectedPlots, setMetrics])
 
   if (!data || !data.sectionCollapsed) {
@@ -38,13 +42,13 @@ export const Plots = ({
   }
 
   const {
+    checkpoint: checkpointPlots,
     sectionCollapsed,
-    live: livePlots,
     template: templatePlots,
     comparison: comparisonTable
   } = data
 
-  if (!livePlots && !templatePlots && !comparisonTable) {
+  if (!checkpointPlots && !templatePlots && !comparisonTable) {
     return EmptyState('No Plots to Display')
   }
 
@@ -102,23 +106,23 @@ export const Plots = ({
           />
         </PlotsContainer>
       )}
-      {livePlots && (
+      {checkpointPlots && (
         <PlotsContainer
-          title={livePlots.sectionName}
-          sectionKey={Section.LIVE_PLOTS}
+          title={checkpointPlots.sectionName}
+          sectionKey={Section.CHECKPOINT_PLOTS}
           menu={{
             metrics,
             selectedMetrics: selectedPlots,
             setSelectedPlots: setSelectedMetrics
           }}
-          currentSize={livePlots.size}
+          currentSize={checkpointPlots.size}
           {...basicContainerProps}
         >
-          <LivePlots
-            plots={livePlots.plots.filter(plot =>
+          <CheckpointPlots
+            plots={checkpointPlots.plots.filter(plot =>
               selectedPlots?.includes(getDisplayNameFromPath(plot.title))
             )}
-            colors={livePlots.colors}
+            colors={checkpointPlots.colors}
           />
         </PlotsContainer>
       )}

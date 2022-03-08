@@ -54,40 +54,42 @@ describe('plotsModel', () => {
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
-    expect(model.getPlotSize(Section.LIVE_PLOTS)).toStrictEqual(
+    expect(model.getPlotSize(Section.CHECKPOINT_PLOTS)).toStrictEqual(
       PlotSize.REGULAR
     )
 
-    model.setPlotSize(Section.LIVE_PLOTS, PlotSize.LARGE)
+    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotSize.LARGE)
 
-    expect(model.getPlotSize(Section.LIVE_PLOTS)).toStrictEqual(PlotSize.LARGE)
+    expect(model.getPlotSize(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+      PlotSize.LARGE
+    )
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setPlotSize(Section.LIVE_PLOTS, PlotSize.SMALL)
+    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotSize.SMALL)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       MementoPrefix.PLOT_SIZES + exampleDvcRoot,
-      { ...DEFAULT_SECTION_SIZES, [Section.LIVE_PLOTS]: PlotSize.SMALL }
+      { ...DEFAULT_SECTION_SIZES, [Section.CHECKPOINT_PLOTS]: PlotSize.SMALL }
     )
   })
 
   it('should change the the sectionName of a section when calling setSectionName', () => {
-    expect(model.getSectionName(Section.LIVE_PLOTS)).toStrictEqual(
-      DEFAULT_SECTION_NAMES[Section.LIVE_PLOTS]
+    expect(model.getSectionName(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+      DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS]
     )
     expect(model.getSectionName(Section.TEMPLATE_PLOTS)).toStrictEqual(
       DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS]
     )
 
-    const newLivePlotsName = 'Live Section'
-    model.setSectionName(Section.LIVE_PLOTS, newLivePlotsName)
+    const newCheckpointPlotsName = 'Previously called live'
+    model.setSectionName(Section.CHECKPOINT_PLOTS, newCheckpointPlotsName)
 
-    expect(model.getSectionName(Section.LIVE_PLOTS)).toStrictEqual(
-      newLivePlotsName
+    expect(model.getSectionName(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+      newCheckpointPlotsName
     )
     expect(model.getSectionName(Section.TEMPLATE_PLOTS)).toStrictEqual(
       DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS]
@@ -104,13 +106,13 @@ describe('plotsModel', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
     const newName = 'Important Plots'
-    model.setSectionName(Section.LIVE_PLOTS, newName)
+    model.setSectionName(Section.CHECKPOINT_PLOTS, newName)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       MementoPrefix.PLOT_SECTION_NAMES + exampleDvcRoot,
       {
-        [Section.LIVE_PLOTS]: newName,
+        [Section.CHECKPOINT_PLOTS]: newName,
         [Section.TEMPLATE_PLOTS]: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
         [Section.COMPARISON_TABLE]:
           DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE]
@@ -123,10 +125,10 @@ describe('plotsModel', () => {
 
     expect(model.getSectionCollapsed()).toStrictEqual(DEFAULT_SECTION_COLLAPSED)
 
-    model.setSectionCollapsed({ [Section.LIVE_PLOTS]: true })
+    model.setSectionCollapsed({ [Section.CHECKPOINT_PLOTS]: true })
 
     const expectedSectionCollapsed = {
-      [Section.LIVE_PLOTS]: true,
+      [Section.CHECKPOINT_PLOTS]: true,
       [Section.TEMPLATE_PLOTS]: false,
       [Section.COMPARISON_TABLE]: false
     }
