@@ -1,5 +1,7 @@
+import { join } from '../../util/path'
+
 const data = {
-  'logs/acc.tsv': [
+  [join('logs', 'acc.tsv')]: [
     {
       multiView: false,
       type: 'vega',
