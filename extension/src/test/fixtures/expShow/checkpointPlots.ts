@@ -1,11 +1,11 @@
 import {
   DEFAULT_SECTION_NAMES,
-  LivePlotsData,
+  CheckpointPlotsData,
   PlotSize,
   Section
 } from '../../../plots/webview/contract'
 
-const data: LivePlotsData = {
+const data: CheckpointPlotsData = {
   colors: {
     domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
     range: ['#f14c4c', '#3794ff', '#cca700']
@@ -82,7 +82,7 @@ const data: LivePlotsData = {
   ],
   selectedMetrics: undefined,
   size: PlotSize.REGULAR,
-  sectionName: DEFAULT_SECTION_NAMES[Section.LIVE_PLOTS]
+  sectionName: DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS]
 }
 
 export default data

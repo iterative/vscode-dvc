@@ -82,34 +82,34 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async sendInitialWebviewData() {
     await this.isReady()
     this.webview?.show({
+      checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
-      live: this.getLivePlots(),
       sectionCollapsed: this.plots?.getSectionCollapsed(),
       template: this.getTemplatePlots()
     })
   }
 
-  private sendLivePlotsData() {
+  private sendCheckpointPlotsData() {
     this.webview?.show({
-      live: this.getLivePlots()
+      checkpoint: this.getCheckpointPlots()
     })
   }
 
-  private getLivePlots() {
-    return this.plots?.getLivePlots() || null
+  private getCheckpointPlots() {
+    return this.plots?.getCheckpointPlots() || null
   }
 
   private async sendPlots() {
     if (definedAndNonEmpty(this.plots?.getMissingRevisions())) {
-      this.sendLivePlotsData()
+      this.sendCheckpointPlotsData()
       return this.data.managedUpdate()
     }
 
     await this.isReady()
 
     this.webview?.show({
+      checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
-      live: this.getLivePlots(),
       template: this.getTemplatePlots()
     })
   }

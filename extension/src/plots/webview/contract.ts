@@ -10,25 +10,25 @@ type PlotSizeKeys = keyof typeof PlotSize
 export type PlotSize = typeof PlotSize[PlotSizeKeys]
 
 export enum Section {
-  LIVE_PLOTS = 'live-plots',
+  CHECKPOINT_PLOTS = 'checkpoint-plots',
   TEMPLATE_PLOTS = 'template-plots',
   COMPARISON_TABLE = 'comparison-table'
 }
 
 export const DEFAULT_SECTION_NAMES = {
-  [Section.LIVE_PLOTS]: 'Experiment Checkpoints',
+  [Section.CHECKPOINT_PLOTS]: 'Experiment Checkpoints',
   [Section.TEMPLATE_PLOTS]: 'Plots',
   [Section.COMPARISON_TABLE]: 'Comparison'
 }
 
 export const DEFAULT_SECTION_SIZES = {
-  [Section.LIVE_PLOTS]: PlotSize.REGULAR,
+  [Section.CHECKPOINT_PLOTS]: PlotSize.REGULAR,
   [Section.TEMPLATE_PLOTS]: PlotSize.REGULAR,
   [Section.COMPARISON_TABLE]: PlotSize.REGULAR
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
-  [Section.LIVE_PLOTS]: false,
+  [Section.CHECKPOINT_PLOTS]: false,
   [Section.TEMPLATE_PLOTS]: false,
   [Section.COMPARISON_TABLE]: false
 }
@@ -51,18 +51,22 @@ export interface PlotsComparisonData {
   size: PlotSize
 }
 
-export type LivePlotValues = { group: string; iteration: number; y: number }[]
+export type CheckpointPlotValues = {
+  group: string
+  iteration: number
+  y: number
+}[]
 
-export type LivePlotsColors = { domain: string[]; range: string[] }
+export type CheckpointPlotsColors = { domain: string[]; range: string[] }
 
-export type LivePlotData = {
+export type CheckpointPlotData = {
   title: string
-  values: LivePlotValues
+  values: CheckpointPlotValues
 }
 
-export type LivePlotsData = {
-  plots: LivePlotData[]
-  colors: LivePlotsColors
+export type CheckpointPlotsData = {
+  plots: CheckpointPlotData[]
+  colors: CheckpointPlotsColors
   size: PlotSize
   sectionName: string
   selectedMetrics?: string[]
@@ -111,7 +115,7 @@ export type ComparisonPlot = {
 export type PlotsData =
   | {
       comparison?: PlotsComparisonData | null
-      live?: LivePlotsData | null
+      checkpoint?: CheckpointPlotsData | null
       template?: TemplatePlotsData | null
       sectionCollapsed?: SectionCollapsed
     }

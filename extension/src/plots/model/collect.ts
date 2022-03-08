@@ -1,8 +1,8 @@
 import omit from 'lodash.omit'
 import { VisualizationSpec } from 'react-vega'
 import {
-  LivePlotValues,
-  LivePlotData,
+  CheckpointPlotValues,
+  CheckpointPlotData,
   isImagePlot,
   ImagePlot,
   TemplatePlot
@@ -22,13 +22,13 @@ import {
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 
-type LivePlotAccumulator = {
+type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
-  plots: Map<string, LivePlotValues>
+  plots: Map<string, CheckpointPlotValues>
 }
 
 const collectFromMetricsFile = (
-  acc: LivePlotAccumulator,
+  acc: CheckpointPlotAccumulator,
   name: string,
   iteration: number,
   key: string | undefined,
@@ -93,7 +93,7 @@ const isValid = (data: MetricsAndDetailsOrUndefined): data is ValidData =>
   !!(data?.checkpoint_tip && data?.checkpoint_parent && data?.metrics)
 
 const collectFromMetrics = (
-  acc: LivePlotAccumulator,
+  acc: CheckpointPlotAccumulator,
   experimentName: string,
   iteration: number,
   metrics: MetricsOrParams
@@ -111,12 +111,12 @@ const collectFromMetrics = (
 }
 
 const getLastIteration = (
-  acc: LivePlotAccumulator,
+  acc: CheckpointPlotAccumulator,
   checkpointParent: string
 ): number => acc.iterations[checkpointParent] || 0
 
 const collectIteration = (
-  acc: LivePlotAccumulator,
+  acc: CheckpointPlotAccumulator,
   sha: string,
   checkpointParent: string
 ): number => {
@@ -126,7 +126,7 @@ const collectIteration = (
 }
 
 const linkModified = (
-  acc: LivePlotAccumulator,
+  acc: CheckpointPlotAccumulator,
   experimentName: string,
   checkpointTip: string,
   checkpointParent: string,
@@ -146,7 +146,7 @@ const linkModified = (
 }
 
 const collectFromExperimentsObject = (
-  acc: LivePlotAccumulator,
+  acc: CheckpointPlotAccumulator,
   experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ) => {
   for (const [sha, experimentData] of Object.entries(
@@ -181,12 +181,12 @@ const collectFromExperimentsObject = (
   }
 }
 
-export const collectLivePlotsData = (
+export const collectCheckpointPlotsData = (
   data: ExperimentsOutput
-): LivePlotData[] | undefined => {
+): CheckpointPlotData[] | undefined => {
   const acc = {
     iterations: {},
-    plots: new Map<string, LivePlotValues>()
+    plots: new Map<string, CheckpointPlotValues>()
   }
 
   for (const { baseline, ...experimentsObject } of Object.values(
@@ -203,7 +203,7 @@ export const collectLivePlotsData = (
     return
   }
 
-  const plotsData: LivePlotData[] = []
+  const plotsData: CheckpointPlotData[] = []
 
   acc.plots.forEach((value, key) => {
     plotsData.push({ title: decodeMetricOrParam(key), values: value })

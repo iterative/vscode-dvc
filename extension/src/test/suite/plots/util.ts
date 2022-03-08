@@ -2,7 +2,7 @@ import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
 import expShowFixture from '../../fixtures/expShow/output'
-import livePlotsFixture from '../../fixtures/expShow/livePlots'
+import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
 import { Plots } from '../../../plots'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
@@ -84,10 +84,13 @@ export const buildPlots = async (
   }
 }
 
-export const getExpectedLivePlotsData = (domain: string[], range: string[]) => {
-  const { plots, sectionName, selectedMetrics, size } = livePlotsFixture
+export const getExpectedCheckpointPlotsData = (
+  domain: string[],
+  range: string[]
+) => {
+  const { plots, sectionName, selectedMetrics, size } = checkpointPlotsFixture
   return {
-    live: {
+    checkpoint: {
       colors: {
         domain,
         range
