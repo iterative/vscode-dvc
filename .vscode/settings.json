@@ -21,6 +21,7 @@
     "isequal",
     "isexec",
     "isout",
+    "lintstagedrc",
     "MNIST",
     "pseudoterminal",
     "rwlock",
