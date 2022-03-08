@@ -1059,7 +1059,6 @@
     "package": "vsce package --yarn -o ./dvc.vsix",
     "test-vscode-build": "tsc -p .",
     "test-vscode-run": "node ./dist/test/runTest.js",
-    "test-staged": "lint-staged",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "vscode:prepublish": ""
@@ -1113,9 +1112,6 @@
     "vscode-uri": "^3.0.2",
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2"
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": "jest --bail --findRelatedTests"
   },
   "peerDependencies": {
     "typescript": "*"

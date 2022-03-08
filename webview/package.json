@@ -7,7 +7,6 @@
     "build": "webpack --mode production",
     "test": "jest",
     "cover": "jest --collect-coverage",
-    "test-staged": "lint-staged",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "chromatic": "npx chromatic --project-token fexq6zfy6",
@@ -72,9 +71,6 @@
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4"
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": "jest --bail --findRelatedTests"
   },
   "svgr": {
     "typescript": true,
