@@ -138,22 +138,25 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     return {
       plots: comparison.map(({ path, revisions }) => {
-        const revisionsWithCorrectUrls = Object.entries(revisions).reduce(
-          (acc, [revision, plot]) => {
-            const updatedPlot = this.addCorrectUrl(plot)
-            if (updatedPlot) {
-              acc[revision] = updatedPlot
-            }
-            return acc
-          },
-          {} as ComparisonRevisionData
-        )
-        return { path, revisions: revisionsWithCorrectUrls }
+        return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
       revisions: this.plots.getSelectedRevisionDetails(),
       sectionName: this.plots.getSectionName(Section.COMPARISON_TABLE),
       size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
     }
+  }
+
+  private getRevisionsWithCorrectUrls(revisions: ComparisonRevisionData) {
+    const acc: ComparisonRevisionData = {}
+
+    Object.entries(revisions).forEach(([revision, plot]) => {
+      const updatedPlot = this.addCorrectUrl(plot)
+      if (!updatedPlot) {
+        return
+      }
+      acc[revision] = updatedPlot
+    })
+    return acc
   }
 
   private addCorrectUrl(plot: ComparisonPlot) {
