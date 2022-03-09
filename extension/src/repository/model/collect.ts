@@ -1,20 +1,15 @@
-import { dirname, join, resolve, sep } from 'path'
+import { dirname, join, resolve } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 import { PathOutput } from '../../cli/reader'
 import { isSameOrChild } from '../../fileSystem'
+import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
 
 export type PathItem = Resource & {
   isDirectory: boolean
   isTracked: boolean
 }
-
-const getPath = (pathArray: string[], idx: number) =>
-  pathArray.slice(0, idx).join(sep)
-
-const getDirectChild = (pathArray: string[], idx: number) =>
-  getPath(pathArray, idx + 1)
 
 const transform = (
   dvcRoot: string,
@@ -45,7 +40,7 @@ export const collectTree = (
   const isTracked = new Set<string>()
 
   paths.forEach(path => {
-    const pathArray = path.split(sep)
+    const pathArray = getPathArray(path)
 
     isTracked.add(path)
     const dir = dirname(path)
@@ -109,8 +104,8 @@ export const collectTracked = (
       return acc
     }
 
-    const pathArray = dir.split(sep)
-    path.split(sep).reduce((acc, _, i) => {
+    const pathArray = getPathArray(dir)
+    getPathArray(path).reduce((acc, _, i) => {
       const path = getPath(pathArray, i)
       if (path) {
         acc.add(join(dvcRoot, path))
