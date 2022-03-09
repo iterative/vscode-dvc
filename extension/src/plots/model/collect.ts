@@ -257,26 +257,36 @@ const collectPlotData = (
   )
 }
 
-export const collectData = (
-  data: PlotsOutput
-): { revisionData: RevisionData; comparisonData: ComparisonData } =>
-  Object.entries(data).reduce(
-    (acc, [path, plots]) => {
-      plots.forEach(plot => {
-        if (isImagePlot(plot)) {
-          return collectImageData(acc.comparisonData, path, plot)
-        }
+type DataAccumulator = {
+  revisionData: RevisionData
+  comparisonData: ComparisonData
+}
 
-        return collectPlotData(acc.revisionData, path, plot)
-      })
-      return acc
-    },
+export const collectData = (data: PlotsOutput): DataAccumulator => {
+  const acc = {
+    comparisonData: {},
+    revisionData: {}
+  } as DataAccumulator
 
-    { comparisonData: {} as ComparisonData, revisionData: {} as RevisionData }
-  )
+  Object.entries(data).forEach(([path, plots]) => {
+    plots.forEach(plot => {
+      if (isImagePlot(plot)) {
+        return collectImageData(acc.comparisonData, path, plot)
+      }
 
-export const collectTemplates = (data: PlotsOutput) =>
-  Object.entries(data).reduce((acc, [path, plots]) => {
+      return collectPlotData(acc.revisionData, path, plot)
+    })
+  })
+
+  return acc
+}
+
+type TemplateAccumulator = Record<string, VisualizationSpec>
+
+export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
+  const acc: TemplateAccumulator = {}
+
+  Object.entries(data).forEach(([path, plots]) => {
     plots.forEach(plot => {
       if (isImagePlot(plot) || acc[path]) {
         return
@@ -287,5 +297,7 @@ export const collectTemplates = (data: PlotsOutput) =>
       delete template.data
       acc[path] = template
     })
-    return acc
-  }, {} as Record<string, VisualizationSpec>)
+  })
+
+  return acc
+}
