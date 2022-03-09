@@ -66,7 +66,9 @@ suite('Quick Pick Test Suite', () => {
 
   describe('quickPickLimitedValues', () => {
     it('should limit the number of values that can be selected to the max selected items', async () => {
-      const quickPick = window.createQuickPick<QuickPickItemWithValue<number>>()
+      const quickPick = disposable.track(
+        window.createQuickPick<QuickPickItemWithValue<number>>()
+      )
       stub(window, 'createQuickPick').returns(quickPick)
 
       const maxSelectedItems = 3
@@ -99,32 +101,43 @@ suite('Quick Pick Test Suite', () => {
         'all items which could be selected are hidden'
       ).to.have.lengthOf(maxSelectedItems)
 
-      const updateEvent = new Promise(resolve =>
-        disposable.track(
-          quickPick.onDidChangeSelection(selectedItems => {
-            if (selectedItems.length < maxSelectedItems) {
-              resolve(undefined)
-            }
-          })
-        )
+      quickPick.hide()
+
+      expect(await limitedItems).to.be.undefined
+    })
+
+    it('should show all items when less than the max number of items are selected', () => {
+      const quickPick = disposable.track(
+        window.createQuickPick<QuickPickItemWithValue<number>>()
       )
+      stub(window, 'createQuickPick').returns(quickPick)
 
-      quickPick.selectedItems = items.slice(0, maxSelectedItems - 1)
+      const maxSelectedItems = 5
 
-      await updateEvent
+      const items = [
+        { label: 'J', value: 1 },
+        { label: 'K', value: 2 },
+        { label: 'L', value: 3 },
+        { label: 'M', value: 4 },
+        { label: 'N', value: 5 },
+        { label: 'O', value: 6 },
+        { label: 'P', value: 7 },
+        { label: 'Q', value: 8 },
+        { label: 'R', value: 9 }
+      ]
+
+      quickPickLimitedValues(
+        items,
+        items.slice(0, maxSelectedItems - 1),
+        maxSelectedItems,
+        'select up to 5 values' as Title
+      )
 
       expect(
         quickPick.selectedItems,
         'less than the max number of items are selected'
       ).to.have.lengthOf.lessThan(maxSelectedItems)
-      expect(
-        quickPick.items,
-        'the items are returned to their original state'
-      ).to.deep.equal(items)
-
-      quickPick.hide()
-
-      expect(await limitedItems).to.be.undefined
+      expect(quickPick.items, 'all items are shown').to.deep.equal(items)
     })
   })
 })

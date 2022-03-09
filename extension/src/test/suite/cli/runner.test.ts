@@ -157,6 +157,6 @@ suite('CLI Runner Test Suite', () => {
       expect(error.message).to.have.length.greaterThan(0)
       expect(command).to.equal('sleep 1 && then die')
       expect(exitCode).to.be.greaterThan(0)
-    }).timeout(5000)
+    }).timeout(6000)
   })
 })
