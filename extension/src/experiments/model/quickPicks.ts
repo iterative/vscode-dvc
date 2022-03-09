@@ -40,39 +40,42 @@ const collectItem = (
   return acc
 }
 
-const collectCheckpointItems = (experiments: ExperimentWithCheckpoints[]) =>
-  experiments.reduce(
-    (acc, experiment) => {
-      if (experiment.checkpoints) {
-        acc.items.push(getSeparator(experiment))
-      }
+const collectCheckpointItems = (experiments: ExperimentWithCheckpoints[]) => {
+  const acc: QuickPickItemAccumulator = {
+    items: [],
+    selectedItems: []
+  }
 
-      collectItem(acc, experiment)
+  experiments.forEach(experiment => {
+    if (experiment.checkpoints) {
+      acc.items.push(getSeparator(experiment))
+    }
 
-      experiment.checkpoints?.map(checkpoint => {
-        return collectItem(acc, checkpoint)
-      })
+    collectItem(acc, experiment)
 
-      return acc
-    },
-    {
-      items: [],
-      selectedItems: []
-    } as QuickPickItemAccumulator
+    experiment.checkpoints?.forEach(checkpoint => {
+      return collectItem(acc, checkpoint)
+    })
+  })
+
+  return acc
+}
+
+const collectExperimentOnlyItems = (experiments: Experiment[]) => {
+  const acc: QuickPickItemAccumulator = {
+    items: [],
+    selectedItems: []
+  }
+
+  experiments.forEach(experiment =>
+    collectItem(acc, experiment, (experiment: Experiment) => ({
+      ...getItem(experiment),
+      description: experiment.displayNameOrParent
+    }))
   )
 
-const collectExperimentOnlyItems = (experiments: Experiment[]) =>
-  experiments.reduce(
-    (acc, experiment) =>
-      collectItem(acc, experiment, (experiment: Experiment) => ({
-        ...getItem(experiment),
-        description: experiment.displayNameOrParent
-      })),
-    {
-      items: [],
-      selectedItems: []
-    } as QuickPickItemAccumulator
-  )
+  return acc
+}
 
 const collectItems = (
   experiments: ExperimentWithCheckpoints[],
