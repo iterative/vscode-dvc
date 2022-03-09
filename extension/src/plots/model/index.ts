@@ -167,33 +167,7 @@ export class PlotsModel {
       return
     }
 
-    return paths.reduce((acc, path) => {
-      const template = this.templates[path]
-
-      if (template) {
-        acc[path] = [
-          {
-            content: extendVegaSpec(
-              {
-                ...template,
-                data: {
-                  values: flatten(
-                    selectedRevisions
-                      .map(revision => this.revisionData?.[revision]?.[path])
-                      .filter(Boolean)
-                  )
-                }
-              } as TopLevelSpec,
-              this.getRevisionColors()
-            ),
-            multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: selectedRevisions,
-            type: PlotsType.VEGA
-          }
-        ]
-      }
-      return acc
-    }, {} as VegaPlots)
+    return this.getSelectedTemplatePlots(paths, selectedRevisions)
   }
 
   public getComparisonPlots(paths: string[] | undefined) {
@@ -206,24 +180,7 @@ export class PlotsModel {
       return
     }
 
-    return paths.reduce((acc, path) => {
-      const pathRevisions = {
-        path,
-        revisions: {} as ComparisonRevisionData
-      }
-
-      selectedRevisions.forEach(revision => {
-        const image = this.comparisonData?.[revision]?.[path]
-        if (image) {
-          pathRevisions.revisions[revision] = {
-            revision,
-            url: image.url
-          }
-        }
-      })
-      acc.push(pathRevisions)
-      return acc
-    }, [] as ComparisonPlots)
+    return this.getSelectedComparisonPlots(paths, selectedRevisions)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {
@@ -314,6 +271,65 @@ export class PlotsModel {
         )
       }
     })
+  }
+
+  private getSelectedComparisonPlots(
+    paths: string[],
+    selectedRevisions: string[]
+  ) {
+    const acc: ComparisonPlots = []
+    paths.forEach(path => {
+      const pathRevisions = {
+        path,
+        revisions: {} as ComparisonRevisionData
+      }
+
+      selectedRevisions.forEach(revision => {
+        const image = this.comparisonData?.[revision]?.[path]
+        if (image) {
+          pathRevisions.revisions[revision] = {
+            revision,
+            url: image.url
+          }
+        }
+      })
+      acc.push(pathRevisions)
+    })
+    return acc
+  }
+
+  private getSelectedTemplatePlots(
+    paths: string[],
+    selectedRevisions: string[]
+  ) {
+    const acc: VegaPlots = {}
+    paths.forEach(path => {
+      const template = this.templates[path]
+
+      if (template) {
+        acc[path] = [
+          {
+            content: extendVegaSpec(
+              {
+                ...template,
+                data: {
+                  values: flatten(
+                    selectedRevisions
+                      .map(revision => this.revisionData?.[revision]?.[path])
+                      .filter(Boolean)
+                  )
+                }
+              } as TopLevelSpec,
+              this.getRevisionColors()
+            ),
+            multiView: isMultiViewPlot(template as TopLevelSpec),
+            revisions: selectedRevisions,
+            type: PlotsType.VEGA
+          }
+        ]
+      }
+    })
+    return acc
   }
 
   private persistSelectedMetrics() {
