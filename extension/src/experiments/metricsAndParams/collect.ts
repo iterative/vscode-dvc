@@ -218,17 +218,20 @@ const getData = (value: { baseline: ExperimentFieldsOrError }) =>
 export const collectChanges = (data: ExperimentsOutput): string[] => {
   const changes: string[] = []
 
-  const { workspace, currentCommit } = Object.entries(data).reduce(
-    (acc, [key, value]) => {
-      if (key === 'workspace') {
-        acc.workspace = getData(value)
-        return acc
-      }
-      acc.currentCommit = getData(value)
-      return acc
-    },
-    {} as Record<string, ExperimentFields>
-  )
+  let workspace
+  let currentCommit
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (key === 'workspace') {
+      workspace = getData(value)
+      return
+    }
+    currentCommit = getData(value)
+  })
+
+  if (!(workspace && currentCommit)) {
+    return changes
+  }
 
   collectMetricsAndParamsChanges(changes, workspace, currentCommit)
 
