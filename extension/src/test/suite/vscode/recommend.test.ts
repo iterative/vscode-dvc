@@ -51,6 +51,6 @@ suite('Recommend Test Suite', () => {
         mockShowInformationMessage,
         'should not recommend to install the red hat yaml extension on subsequent calls'
       ).not.to.be.called
-    })
+    }).timeout(6000)
   })
 })

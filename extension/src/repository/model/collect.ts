@@ -48,11 +48,10 @@ export const collectTree = (
       isTracked.add(dir)
     }
 
-    pathArray.reduce((acc, _, i) => {
-      const path = getPath(pathArray, i)
-      addToMapSet(acc, path, getDirectChild(pathArray, i))
-      return acc
-    }, acc)
+    for (let idx = 0; idx < pathArray.length; idx++) {
+      const path = getPath(pathArray, idx)
+      addToMapSet(acc, path, getDirectChild(pathArray, idx))
+    }
   })
 
   return transform(dvcRoot, acc, isTracked)
@@ -95,22 +94,21 @@ export const collectModifiedAgainstHead = (
 export const collectTracked = (
   dvcRoot: string,
   paths: string[] = []
-): Set<string> =>
-  paths.reduce((acc, path) => {
-    acc.add(join(dvcRoot, path))
+): Set<string> => {
+  const acc = new Set<string>()
 
-    const dir = dirname(path)
-    if (acc.has(join(dvcRoot, dir))) {
-      return acc
-    }
+  paths.forEach(path => {
+    const pathArray = getPathArray(path)
 
-    const pathArray = getPathArray(dir)
-    getPathArray(path).reduce((acc, _, i) => {
-      const path = getPath(pathArray, i)
-      if (path) {
-        acc.add(join(dvcRoot, path))
+    for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
+      const path = join(dvcRoot, getPath(pathArray, reverseIdx))
+      if (acc.has(path)) {
+        continue
       }
-      return acc
-    }, acc)
-    return acc
-  }, new Set<string>())
+
+      acc.add(path)
+    }
+  })
+
+  return acc
+}
