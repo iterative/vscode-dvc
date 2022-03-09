@@ -14,7 +14,7 @@ import {
   Value,
   ValueTree
 } from '../../cli/reader'
-import { reduceMetricsAndParams } from '../../experiments/metricsAndParams/reduce'
+import { extractMetricsAndParams } from '../../experiments/metricsAndParams/extract'
 import {
   decodeMetricOrParam,
   joinMetricOrParamFilePath
@@ -76,7 +76,7 @@ const transformExperimentData = (
 
   const { checkpoint_tip, checkpoint_parent, queued, running } =
     experimentFields
-  const { metrics } = reduceMetricsAndParams(experimentFields)
+  const { metrics } = extractMetricsAndParams(experimentFields)
 
   return { checkpoint_parent, checkpoint_tip, metrics, queued, running }
 }
