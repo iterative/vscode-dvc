@@ -17,6 +17,7 @@ import { createTreeView, getRootItem } from '../../vscode/tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
+import { sum } from '../../util/math'
 
 export type ExperimentItem = {
   command?: {
@@ -250,11 +251,11 @@ export class ExperimentsTree
       return
     }
 
-    const selected = dvcRoots.reduce(
-      (acc, dvcRoot) =>
-        acc +
-        this.experiments.getRepository(dvcRoot).getSelectedRevisions().length,
-      0
+    const selected = sum(
+      dvcRoots.map(
+        dvcRoot =>
+          this.experiments.getRepository(dvcRoot).getSelectedRevisions().length
+      )
     )
 
     return `${selected} of ${dvcRoots.length * MAX_SELECTED_EXPERIMENTS}`
