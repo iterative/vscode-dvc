@@ -77,15 +77,17 @@ export type ColorScale = { domain: string[]; range: string[] }
 export const getColorScale = (
   revisions: { revision: string; displayColor: string }[]
 ): ColorScale | undefined => {
-  const colorScale = revisions.reduce(
-    (acc, { revision, displayColor }) => {
+  const acc: ColorScale = { domain: [], range: [] }
+
+  revisions.forEach(
+    ({ revision, displayColor }) => {
       acc.domain.push(revision)
       acc.range.push(displayColor)
-      return acc
     },
-    { domain: [], range: [] } as ColorScale
+    { domain: [], range: [] }
   )
-  return colorScale.domain.length ? colorScale : undefined
+
+  return acc.domain.length ? acc : undefined
 }
 
 type EncodingUpdate = {
