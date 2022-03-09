@@ -2,7 +2,7 @@ import omit from 'lodash.omit'
 import { ExperimentsAccumulator } from './accumulator'
 import { getWorkspaceColor } from './colors'
 import { canSelect, Status, Statuses } from './status'
-import { reduceMetricsAndParams } from '../metricsAndParams/reduce'
+import { extractMetricsAndParams } from '../metricsAndParams/extract'
 import { Experiment } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -83,7 +83,7 @@ const transformMetricsAndParams = (
   experiment: Experiment,
   experimentFields: ExperimentFields
 ) => {
-  const { metrics, params } = reduceMetricsAndParams(experimentFields)
+  const { metrics, params } = extractMetricsAndParams(experimentFields)
 
   if (metrics) {
     experiment.metrics = metrics
