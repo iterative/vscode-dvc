@@ -176,12 +176,14 @@ export class ExperimentsModel {
   }
 
   public getMutableRevisions() {
-    return this.getCombinedList().reduce((acc, { label, mutable }) => {
+    const acc: string[] = []
+
+    this.getCombinedList().forEach(({ label, mutable }) => {
       if (mutable) {
         acc.push(label)
       }
-      return acc
-    }, [] as string[])
+    })
+    return acc
   }
 
   public getSelectedRevisions() {
@@ -200,12 +202,14 @@ export class ExperimentsModel {
 
     const selected = experiments.map(exp => exp.id)
 
-    this.status = this.getCombinedList().reduce((acc, { id }) => {
+    const acc: Statuses = {}
+
+    this.getCombinedList().forEach(({ id }) => {
       const status = selected.includes(id) ? Status.SELECTED : Status.UNSELECTED
       acc[id] = status
+    })
 
-      return acc
-    }, {} as Statuses)
+    this.status = acc
 
     this.persistStatus()
   }
@@ -541,12 +545,15 @@ export class ExperimentsModel {
   }
 
   private getSelectedFromList(getList: () => Experiment[]) {
-    return getList().reduce((acc, experiment) => {
+    const acc: SelectedExperimentWithColor[] = []
+
+    getList().forEach(experiment => {
       if (this.isSelectedExperimentWithColor(experiment)) {
         acc.push(experiment)
       }
-      return acc
-    }, [] as SelectedExperimentWithColor[])
+    })
+
+    return acc
   }
 
   private isSelectedExperimentWithColor(
