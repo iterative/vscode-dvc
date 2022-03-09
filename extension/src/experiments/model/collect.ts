@@ -325,31 +325,43 @@ const collectStatus = (
   acc[id] = getStatus(acc, defaultStatus)
 }
 
+const collectExistingStatuses = (
+  experiments: Experiment[],
+  checkpointsByTip: Map<string, Experiment[]>,
+  previousStatuses: Statuses
+) => {
+  const existingStatuses: Statuses = {}
+  ;[
+    ...experiments,
+    ...flatten<Experiment>([...checkpointsByTip.values()])
+  ].forEach(experiment => {
+    const { id } = experiment
+    if (!hasKey(previousStatuses, id)) {
+      return
+    }
+
+    existingStatuses[id] = previousStatuses[id]
+  })
+  return existingStatuses
+}
+
 export const collectStatuses = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
   previousStatuses: Statuses
 ) => {
-  const existingStatus = [
-    ...experiments,
-    ...flatten<Experiment>([...checkpointsByTip.values()])
-  ].reduce((acc, experiment) => {
-    const { id } = experiment
-    if (hasKey(previousStatuses, id)) {
-      acc[id] = previousStatuses[id]
-    }
+  const statuses = collectExistingStatuses(
+    experiments,
+    checkpointsByTip,
+    previousStatuses
+  )
 
-    return acc
-  }, {} as Statuses)
+  experiments.forEach(experiment => {
+    collectStatus(statuses, experiment, Status.SELECTED)
 
-  return experiments.reduce((acc, experiment) => {
-    collectStatus(acc, experiment, Status.SELECTED)
-
-    checkpointsByTip.get(experiment.id)?.reduce((acc, checkpoint) => {
-      collectStatus(acc, checkpoint, Status.UNSELECTED)
-      return acc
-    }, acc)
-
-    return acc
-  }, existingStatus)
+    checkpointsByTip.get(experiment.id)?.forEach(checkpoint => {
+      collectStatus(statuses, checkpoint, Status.UNSELECTED)
+    })
+  })
+  return statuses
 }
