@@ -250,11 +250,12 @@ export class ExperimentsTree
       return
     }
 
-    const selected = dvcRoots.reduce(
-      (acc, dvcRoot) =>
-        acc +
-        this.experiments.getRepository(dvcRoot).getSelectedRevisions().length,
-      0
+    let selected = 0
+    dvcRoots.forEach(
+      dvcRoot =>
+        (selected += this.experiments
+          .getRepository(dvcRoot)
+          .getSelectedRevisions().length)
     )
 
     return `${selected} of ${dvcRoots.length * MAX_SELECTED_EXPERIMENTS}`
