@@ -9,8 +9,11 @@ export enum Status {
 
 export type Statuses = Record<string, Status>
 
-const getSelectedCount = (status: Statuses): number =>
-  Object.values(status).reduce((acc, expStatus) => acc + expStatus, 0)
+const getSelectedCount = (status: Statuses): number => {
+  let count = 0
+  Object.values(status).forEach(expStatus => (count += expStatus))
+  return count
+}
 
 export const canSelect = (status: Statuses): boolean =>
   getSelectedCount(status) < MAX_SELECTED_EXPERIMENTS
