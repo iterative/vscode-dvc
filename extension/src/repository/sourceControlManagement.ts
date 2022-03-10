@@ -65,22 +65,19 @@ export class SourceControlManagement {
   }
 
   public setState(state: SourceControlManagementState) {
-    this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
-      this.getResourceStatesReducer(
-        Object.values(Status).filter(
-          status => ![...gitCommitReady, Status.NOT_IN_CACHE].includes(status)
-        )
-      ),
-      []
+    this.changedResourceGroup.resourceStates = this.collectResourceStates(
+      state,
+      Object.values(Status).filter(
+        status => ![...gitCommitReady, Status.NOT_IN_CACHE].includes(status)
+      )
     )
 
-    this.gitCommitReadyResourceGroup.resourceStates = Object.entries(
-      state
-    ).reduce(this.getResourceStatesReducer(gitCommitReady), [])
+    this.gitCommitReadyResourceGroup.resourceStates =
+      this.collectResourceStates(state, gitCommitReady)
 
-    this.notInCacheResourceGroup.resourceStates = Object.entries(state).reduce(
-      this.getResourceStatesReducer([Status.NOT_IN_CACHE]),
-      []
+    this.notInCacheResourceGroup.resourceStates = this.collectResourceStates(
+      state,
+      [Status.NOT_IN_CACHE]
     )
   }
 
@@ -108,19 +105,18 @@ export class SourceControlManagement {
     return resourceGroup
   }
 
-  private getResourceStatesReducer(validStatuses: Status[]) {
-    return (
-      resourceStates: ResourceState[],
-      entry: [string, Set<string>]
-    ): ResourceState[] => {
+  private collectResourceStates(
+    state: SourceControlManagementState,
+    validStatuses: Status[]
+  ) {
+    const acc: ResourceState[] = []
+    Object.entries(state).forEach(entry => {
       const [status, resources] = entry as [Status, Set<string>]
-      return [
-        ...resourceStates,
-        ...(validStatuses.includes(status)
-          ? this.getResourceStates(status, resources)
-          : [])
-      ]
-    }
+      if (validStatuses.includes(status)) {
+        acc.push(...this.getResourceStates(status, resources))
+      }
+    })
+    return acc
   }
 
   private getResourceStates(
