@@ -467,8 +467,10 @@ export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
 
 const expectedRevisions = ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd']
 
-const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
-  Object.entries(plotsOutput).reduce((acc, [id, plots]) => {
+const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots => {
+  const acc: VegaPlots = {}
+
+  Object.entries(plotsOutput).forEach(([id, plots]) => {
     acc[id] = plots.map(plot => ({
       content: extendVegaSpec(
         {
@@ -499,9 +501,10 @@ const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots =>
       revisions: expectedRevisions,
       type: PlotsType.VEGA
     }))
+  })
 
-    return acc
-  }, {} as VegaPlots)
+  return acc
+}
 
 export const getMinimalWebviewMessage = () => ({
   plots: {
@@ -524,28 +527,34 @@ export const MOCK_IMAGE_MTIME = 946684800000
 export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc?: (...args: string[]) => string
-) => ({
-  plots: Object.entries({
+) => {
+  const plotAcc = [] as ComparisonPlots
+  Object.entries({
     ...getImageData(baseUrl, joinFunc)
-  }).reduce((acc, [path, plots]) => {
-    const revisions = plots.reduce((acc, { url, revisions }) => {
+  }).forEach(([path, plots]) => {
+    const revisionsAcc: ComparisonRevisionData = {}
+    plots.forEach(({ url, revisions }) => {
       const revision = revisions?.[0]
-      if (revision) {
-        acc[revision] = { url: `${url}?${MOCK_IMAGE_MTIME}`, revision }
+      if (!revision) {
+        return
       }
-      return acc
-    }, {} as ComparisonRevisionData)
+      revisionsAcc[revision] = { url: `${url}?${MOCK_IMAGE_MTIME}`, revision }
+    })
 
-    acc.push({ path, revisions })
-    return acc
-  }, [] as ComparisonPlots),
-  revisions: [
-    { revision: 'workspace', displayColor: getWorkspaceColor() },
-    { revision: 'main', displayColor: '#13adc7' },
-    { revision: '4fb124a', displayColor: '#f14c4c' },
-    { revision: '42b8736', displayColor: '#3794ff' },
-    { revision: '1ba7bcd', displayColor: '#cca700' }
-  ],
-  sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
-  size: PlotSize.REGULAR
-})
+    plotAcc.push({ path, revisions: revisionsAcc })
+    return plotAcc
+  })
+
+  return {
+    plots: plotAcc,
+    revisions: [
+      { revision: 'workspace', displayColor: getWorkspaceColor() },
+      { revision: 'main', displayColor: '#13adc7' },
+      { revision: '4fb124a', displayColor: '#f14c4c' },
+      { revision: '42b8736', displayColor: '#3794ff' },
+      { revision: '1ba7bcd', displayColor: '#cca700' }
+    ],
+    sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
+    size: PlotSize.REGULAR
+  }
+}
