@@ -78,8 +78,10 @@ export const collectModifiedAgainstHead = (
   dvcRoot: string,
   modified: PathOutput[],
   tracked: Set<string>
-): string[] =>
-  modified.reduce((acc, { path }) => {
+): string[] => {
+  const acc: string[] = []
+
+  modified.forEach(({ path }) => {
     const absPath = resolve(dvcRoot, path)
     if (!tracked.has(absPath)) {
       return acc
@@ -87,9 +89,10 @@ export const collectModifiedAgainstHead = (
 
     collectMissingParents(acc, absPath)
     acc.push(absPath)
+  })
 
-    return acc
-  }, [] as string[])
+  return acc
+}
 
 export const collectTracked = (
   dvcRoot: string,
