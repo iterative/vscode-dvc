@@ -22,6 +22,22 @@ const getOrderedData = (
     .filter(Boolean) as MetricOrParam[]
 }
 
+const collectParentNode = (
+  orderedData: MetricOrParam[],
+  parentPath: string,
+  groupNumberPrefix: string,
+  columnsByPath: Record<string, MetricOrParam>
+) => {
+  const parentNode = {
+    ...columnsByPath[parentPath]
+  }
+  parentNode.path = groupNumberPrefix + parentPath
+
+  if (!orderedData.some(column => column.path === parentNode.path)) {
+    orderedData.push(parentNode as MetricOrParam)
+  }
+}
+
 const collectOrderedData = (
   orderedData: MetricOrParam[],
   previousGroups: string[],
@@ -42,18 +58,11 @@ const collectOrderedData = (
     node.path = groupNumberPrefix + path
     node.parentPath = groupNumberPrefix + parentPath
 
-    const parentNode = {
-      ...columnsByPath[parentPath]
-    }
-    parentNode.path = groupNumberPrefix + parentPath
-
-    if (!orderedData.some(column => column.path === parentNode.path)) {
-      orderedData.push(parentNode as MetricOrParam)
-    }
+    collectParentNode(orderedData, parentPath, groupNumberPrefix, columnsByPath)
   }
 }
 
-const getOrderedDataWithGroups = (
+const collectOrderedDataWithGroups = (
   columns: MetricOrParam[],
   columnOrder: string[]
 ) => {
@@ -74,7 +83,7 @@ export const useColumnOrder = (
 ): MetricOrParam[] =>
   useMemo(() => {
     if (params && columnOrder) {
-      return getOrderedDataWithGroups(params, columnOrder)
+      return collectOrderedDataWithGroups(params, columnOrder)
     }
     return []
   }, [params, columnOrder])

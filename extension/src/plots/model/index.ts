@@ -279,23 +279,31 @@ export class PlotsModel {
   ) {
     const acc: ComparisonPlots = []
     for (const path of paths) {
-      const pathRevisions = {
-        path,
-        revisions: {} as ComparisonRevisionData
-      }
-
-      for (const revision of selectedRevisions) {
-        const image = this.comparisonData?.[revision]?.[path]
-        if (image) {
-          pathRevisions.revisions[revision] = {
-            revision,
-            url: image.url
-          }
-        }
-      }
-      acc.push(pathRevisions)
+      this.collectSelectedPathComparisonPlots(acc, path, selectedRevisions)
     }
     return acc
+  }
+
+  private collectSelectedPathComparisonPlots(
+    acc: ComparisonPlots,
+    path: string,
+    selectedRevisions: string[]
+  ) {
+    const pathRevisions = {
+      path,
+      revisions: {} as ComparisonRevisionData
+    }
+
+    for (const revision of selectedRevisions) {
+      const image = this.comparisonData?.[revision]?.[path]
+      if (image) {
+        pathRevisions.revisions[revision] = {
+          revision,
+          url: image.url
+        }
+      }
+    }
+    acc.push(pathRevisions)
   }
 
   private getSelectedTemplatePlots(

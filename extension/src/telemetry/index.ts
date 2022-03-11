@@ -105,7 +105,7 @@ export const sendErrorTelemetryEvent = <
   properties = {} as P[E]
 ) =>
   sendTelemetryEvent(
-    `errors.${eventName}` as E,
+    `errors.${String(eventName)}` as E,
     { ...properties, error: e.message } as P[E],
     {
       duration

@@ -38,6 +38,25 @@ type PlotPath = {
   hasChildren: boolean
 }
 
+const collectSubPathsWithParents = (
+  pathsWithParents: PlotPath[],
+  included: Set<string>,
+  pathArray: string[],
+  reverseIdx: number
+) => {
+  const path = getPath(pathArray, reverseIdx)
+  if (included.has(path)) {
+    return
+  }
+
+  pathsWithParents.push({
+    hasChildren: reverseIdx !== pathArray.length,
+    parentPath: getParent(pathArray, reverseIdx),
+    path
+  })
+  included.add(path)
+}
+
 export const collectPathsWithParents = (data: PlotsOutput): PlotPath[] => {
   const included = new Set<string>()
   const pathsWithParents: PlotPath[] = []
@@ -48,17 +67,12 @@ export const collectPathsWithParents = (data: PlotsOutput): PlotPath[] => {
     const pathArray = getPathArray(path)
 
     for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-      const path = getPath(pathArray, reverseIdx)
-      if (included.has(path)) {
-        continue
-      }
-
-      pathsWithParents.push({
-        hasChildren: reverseIdx !== pathArray.length,
-        parentPath: getParent(pathArray, reverseIdx),
-        path
-      })
-      included.add(path)
+      collectSubPathsWithParents(
+        pathsWithParents,
+        included,
+        pathArray,
+        reverseIdx
+      )
     }
   }
 
