@@ -154,6 +154,23 @@ const limitSelected = <T>(
   )
 }
 
+const isDefined = <T>(value: T): value is Exclude<T, undefined> => !!value
+
+const collectResult = <T>(
+  selectedItems: readonly QuickPickItemWithValue<T>[]
+): Exclude<T, undefined>[] => {
+  const acc: Exclude<T, undefined>[] = []
+
+  selectedItems.forEach(({ value }) => {
+    if (!isDefined(value)) {
+      return
+    }
+    acc.push(value)
+  })
+
+  return acc
+}
+
 export const quickPickLimitedValues = <T>(
   items: QuickPickItemWithValue<T>[],
   selectedItems: readonly QuickPickItemWithValue<T>[],
@@ -169,13 +186,7 @@ export const quickPickLimitedValues = <T>(
     limitSelected<T>(quickPick, maxSelectedItems)
 
     quickPick.onDidAccept(() => {
-      const result = quickPick.selectedItems.reduce((acc, { value }) => {
-        if (value) {
-          acc.push(value)
-        }
-        return acc
-      }, [] as T[])
-      resolve(result as Exclude<T, undefined>[])
+      resolve(collectResult(quickPick.selectedItems))
       quickPick.dispose()
     })
 
