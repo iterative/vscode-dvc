@@ -10,11 +10,11 @@ const getOrderedColorsToUnassign = (
   currentColors: Map<string, string>
 ): string[] => {
   const colorsToUnassign: string[] = []
-  currentColors.forEach((color: string, id: string) => {
+  for (const [id, color] of currentColors) {
     if (!experimentIds.includes(id)) {
       colorsToUnassign.unshift(color)
     }
-  })
+  }
   return colorsToUnassign
 }
 
@@ -29,11 +29,11 @@ const unassignColors = (
   }
 
   const colorsToUnassign = getOrderedColorsToUnassign(experimentIds, current)
-  colorsToUnassign.forEach(color => {
+  for (const color of colorsToUnassign) {
     if (!unassigned.includes(color)) {
       unassigned.unshift(color)
     }
-  })
+  }
   return unassigned
 }
 
@@ -45,7 +45,7 @@ const assignColors = (
 ): Colors => {
   const assigned = new Map()
 
-  experimentIds.forEach(id => {
+  for (const id of experimentIds) {
     if (available.length === 0) {
       available = copyOriginalColors()
     }
@@ -53,12 +53,12 @@ const assignColors = (
 
     if (existingColor) {
       assigned.set(id, existingColor)
-      return
+      continue
     }
 
     const nextColor = available.shift() as string
     assigned.set(id, nextColor)
-  })
+  }
   return { assigned, available }
 }
 

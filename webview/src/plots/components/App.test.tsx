@@ -285,7 +285,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const [, , sizePickerButton] = screen.getAllByTestId('icon-menu-item')
+    const sizePickerButton = screen.getAllByTestId('icon-menu-item')[2]
     fireEvent.mouseEnter(sizePickerButton)
     fireEvent.click(sizePickerButton)
 
@@ -312,7 +312,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const [, , sizeButton] = screen.getAllByTestId('icon-menu-item')
+    const sizeButton = screen.getAllByTestId('icon-menu-item')[2]
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 

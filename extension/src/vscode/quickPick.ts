@@ -13,19 +13,25 @@ export interface QuickPickOptionsWithTitle extends QuickPickOptions {
 export const quickPickValue: <T = string>(
   items: QuickPickItemWithValue<T>[],
   options: Omit<QuickPickOptionsWithTitle, 'canPickMany'>
-) => Thenable<T | undefined> = async (items, options) =>
-  (await window.showQuickPick(items, { canPickMany: false, ...options }))?.value
+) => Thenable<T | undefined> = async (items, options) => {
+  const result = await window.showQuickPick(items, {
+    canPickMany: false,
+    ...options
+  })
+  return result?.value
+}
 
 export const quickPickManyValues: <T = string>(
   items: QuickPickItemWithValue<T>[],
   options: Omit<QuickPickOptionsWithTitle, 'canPickMany'>
-) => Thenable<T[] | undefined> = async (items, options = {}) =>
-  (
-    await window.showQuickPick(items, {
-      ...options,
-      canPickMany: true
-    })
-  )?.map(item => item.value)
+) => Thenable<T[] | undefined> = async (items, options = {}) => {
+  const result = await window.showQuickPick(items, {
+    ...options,
+    canPickMany: true
+  })
+
+  return result?.map(item => item.value)
+}
 
 export const quickPickOne = (
   items: string[],
@@ -161,12 +167,12 @@ const collectResult = <T>(
 ): Exclude<T, undefined>[] => {
   const acc: Exclude<T, undefined>[] = []
 
-  selectedItems.forEach(({ value }) => {
+  for (const { value } of selectedItems) {
     if (!isDefined(value)) {
-      return
+      continue
     }
     acc.push(value)
-  })
+  }
 
   return acc
 }

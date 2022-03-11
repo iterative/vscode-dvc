@@ -65,12 +65,12 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
           newColumns: []
         }
 
-        revisions.forEach(column => {
+        for (const column of revisions) {
           if (isPinned(column)) {
-            return
+            continue
           }
           splitColumns(acc, column, prevColumnKeys)
-        })
+        }
 
         return [
           getPinnedColumnRevision(),

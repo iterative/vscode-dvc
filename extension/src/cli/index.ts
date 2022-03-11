@@ -37,7 +37,7 @@ export const typeCheckCommands = (
 ) =>
   Object.values(autoRegisteredCommands).map(value => {
     if (typeof against[value as keyof typeof against] !== 'function') {
-      throw new Error(
+      throw new TypeError(
         `${against.constructor.name} tried to register an internal command that does not exist. ` +
           'If you are a user and see this message then something has gone very wrong.'
       )
@@ -100,9 +100,9 @@ export class Cli implements ICli {
         exitCode
       })
       return stdout
-    } catch (e: unknown) {
+    } catch (error: unknown) {
       throw this.processCliError(
-        e as MaybeConsoleError,
+        error as MaybeConsoleError,
         options,
         baseEvent,
         stopWatch.getElapsedTime()

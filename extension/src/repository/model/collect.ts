@@ -18,7 +18,7 @@ const transform = (
 ): Map<string, PathItem[]> => {
   const treeMap = new Map<string, PathItem[]>()
 
-  acc.forEach((paths, path) => {
+  for (const [path, paths] of acc.entries()) {
     const items = [...paths].map(path => ({
       dvcRoot,
       isDirectory: !!acc.get(path),
@@ -27,7 +27,7 @@ const transform = (
     }))
     const absPath = Uri.file(join(dvcRoot, path)).fsPath
     treeMap.set(absPath, items)
-  })
+  }
 
   return treeMap
 }
@@ -39,7 +39,7 @@ export const collectTree = (
   const acc = new Map<string, Set<string>>()
   const isTracked = new Set<string>()
 
-  paths.forEach(path => {
+  for (const path of paths) {
     const pathArray = getPathArray(path)
 
     isTracked.add(path)
@@ -52,13 +52,13 @@ export const collectTree = (
       const path = getPath(pathArray, idx)
       addToMapSet(acc, path, getDirectChild(pathArray, idx))
     }
-  })
+  }
 
   return transform(dvcRoot, acc, isTracked)
 }
 
 const collectMissingParents = (acc: string[], absPath: string) => {
-  if (!acc.length) {
+  if (acc.length === 0) {
     return
   }
 
@@ -81,17 +81,30 @@ export const collectModifiedAgainstHead = (
 ): string[] => {
   const acc: string[] = []
 
-  modified.forEach(({ path }) => {
+  for (const { path } of modified) {
     const absPath = resolve(dvcRoot, path)
     if (!tracked.has(absPath)) {
-      return acc
+      continue
     }
 
     collectMissingParents(acc, absPath)
     acc.push(absPath)
-  })
+  }
 
   return acc
+}
+
+const collectPath = (acc: Set<string>, dvcRoot: string, path: string) => {
+  const pathArray = getPathArray(path)
+
+  for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
+    const path = join(dvcRoot, getPath(pathArray, reverseIdx))
+    if (acc.has(path)) {
+      continue
+    }
+
+    acc.add(path)
+  }
 }
 
 export const collectTracked = (
@@ -100,18 +113,9 @@ export const collectTracked = (
 ): Set<string> => {
   const acc = new Set<string>()
 
-  paths.forEach(path => {
-    const pathArray = getPathArray(path)
-
-    for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-      const path = join(dvcRoot, getPath(pathArray, reverseIdx))
-      if (acc.has(path)) {
-        continue
-      }
-
-      acc.add(path)
-    }
-  })
+  for (const path of paths) {
+    collectPath(acc, dvcRoot, path)
+  }
 
   return acc
 }

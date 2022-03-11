@@ -81,11 +81,11 @@ export class RepositoryModel
 
   public hasChanges(): boolean {
     return !!(
-      this.state.added.size ||
-      this.state.deleted.size ||
-      this.state.gitModified.size ||
-      this.state.modified.size ||
-      this.state.renamed.size
+      this.state.added.size > 0 ||
+      this.state.deleted.size > 0 ||
+      this.state.gitModified.size > 0 ||
+      this.state.modified.size > 0 ||
+      this.state.renamed.size > 0
     )
   }
 
@@ -125,10 +125,10 @@ export class RepositoryModel
       [Status.NOT_IN_CACHE]: new Set()
     }
 
-    Object.values(statusOutput).forEach((entry: StatusesOrAlwaysChanged[]) => {
+    for (const entry of Object.values(statusOutput)) {
       const statuses = this.getChangedOutsStatuses(entry)
       statuses.map(entry => this.collectStatuses(acc, entry))
-    }, acc)
+    }
 
     return acc
   }

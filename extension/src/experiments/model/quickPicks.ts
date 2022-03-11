@@ -46,17 +46,17 @@ const collectCheckpointItems = (experiments: ExperimentWithCheckpoints[]) => {
     selectedItems: []
   }
 
-  experiments.forEach(experiment => {
+  for (const experiment of experiments) {
     if (experiment.checkpoints) {
       acc.items.push(getSeparator(experiment))
     }
 
     collectItem(acc, experiment)
 
-    experiment.checkpoints?.forEach(checkpoint => {
-      return collectItem(acc, checkpoint)
-    })
-  })
+    for (const checkpoint of experiment.checkpoints || []) {
+      collectItem(acc, checkpoint)
+    }
+  }
 
   return acc
 }
@@ -67,12 +67,12 @@ const collectExperimentOnlyItems = (experiments: Experiment[]) => {
     selectedItems: []
   }
 
-  experiments.forEach(experiment =>
+  for (const experiment of experiments) {
     collectItem(acc, experiment, (experiment: Experiment) => ({
       ...getItem(experiment),
       description: experiment.displayNameOrParent
     }))
-  )
+  }
 
   return acc
 }

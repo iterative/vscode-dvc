@@ -86,7 +86,7 @@ export const removeDir = (path: string): void => removeSync(path)
 
 export const loadYaml = <T>(path: string): T | undefined => {
   try {
-    return load(readFileSync(path, 'utf-8')) as T
+    return load(readFileSync(path, 'utf8')) as T
   } catch {
     Logger.error(`failed to load yaml ${path}`)
   }

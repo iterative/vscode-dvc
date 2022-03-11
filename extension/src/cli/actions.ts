@@ -29,13 +29,13 @@ export const tryThenMaybeForce = async (
 ): Promise<string | undefined> => {
   try {
     return await internalCommands.executeCommand(commandId, ...args)
-  } catch (e: unknown) {
-    const stderr = (e as MaybeConsoleError).stderr
+  } catch (error: unknown) {
+    const stderr = (error as MaybeConsoleError).stderr
 
     if (stderr && Prompt.TRY_FORCE.test(stderr)) {
       return offerToForce(stderr, internalCommands, commandId, ...args)
     }
 
-    throw e
+    throw error
   }
 }

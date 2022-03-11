@@ -144,11 +144,11 @@ export class MetricsAndParamsModel {
   private transformAndSetMetricsAndParams(data: ExperimentsOutput) {
     const metricsAndParams = collectMetricsAndParams(data)
 
-    metricsAndParams.forEach(metricOrParam => {
+    for (const metricOrParam of metricsAndParams) {
       if (this.status[metricOrParam.path] === undefined) {
         this.status[metricOrParam.path] = Status.SELECTED
       }
-    })
+    }
 
     this.data = metricsAndParams
   }

@@ -1,6 +1,21 @@
-import { isImagePlot } from '../webview/contract'
+import { isImagePlot, Plot } from '../webview/contract'
 import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
+
+const collectPathByType = (
+  comparison: Set<string>,
+  templates: Set<string>,
+  path: string,
+  plots: Plot[]
+) => {
+  for (const plot of plots) {
+    if (isImagePlot(plot)) {
+      comparison.add(path)
+      continue
+    }
+    templates.add(path)
+  }
+}
 
 export const collectPaths = (
   data: PlotsOutput
@@ -8,15 +23,9 @@ export const collectPaths = (
   const comparison = new Set<string>()
   const templates = new Set<string>()
 
-  Object.entries(data).forEach(([path, plots]) => {
-    plots.forEach(plot => {
-      if (isImagePlot(plot)) {
-        comparison.add(path)
-        return
-      }
-      templates.add(path)
-    })
-  })
+  for (const [path, plots] of Object.entries(data)) {
+    collectPathByType(comparison, templates, path, plots)
+  }
   return {
     comparison: [...comparison].sort(),
     templates: [...templates].sort()
@@ -35,7 +44,7 @@ export const collectPathsWithParents = (data: PlotsOutput): PlotPath[] => {
 
   const plotPaths = Object.keys(data)
 
-  plotPaths.forEach(path => {
+  for (const path of plotPaths) {
     const pathArray = getPathArray(path)
 
     for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
@@ -51,7 +60,7 @@ export const collectPathsWithParents = (data: PlotsOutput): PlotPath[] => {
       })
       included.add(path)
     }
-  })
+  }
 
   return pathsWithParents
 }

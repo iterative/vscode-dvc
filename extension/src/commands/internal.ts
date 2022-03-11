@@ -29,7 +29,9 @@ export class InternalCommands {
   private readonly outputChannel: OutputChannel
 
   constructor(outputChannel: OutputChannel, ...cliInteractors: ICli[]) {
-    cliInteractors.forEach(cli => this.autoRegisterCommands(cli))
+    for (const cli of cliInteractors) {
+      this.autoRegisterCommands(cli)
+    }
     this.outputChannel = outputChannel
   }
 
@@ -61,7 +63,7 @@ export class InternalCommands {
       commands.registerCommand(name, async (arg: T) => {
         try {
           return await this.runAndSendTelemetry<T>(name, func, arg)
-        } catch (e: unknown) {
+        } catch {
           this.offerToShowError()
         }
       })
@@ -91,17 +93,17 @@ export class InternalCommands {
         duration: stopWatch.getElapsedTime()
       })
       return res
-    } catch (e: unknown) {
+    } catch (error: unknown) {
       return sendTelemetryEventAndThrow(
         name,
-        e as Error,
+        error as Error,
         stopWatch.getElapsedTime()
       )
     }
   }
 
   private autoRegisterCommands(cli: ICli) {
-    cli.autoRegisteredCommands.forEach((commandId: string) => {
+    for (const commandId of cli.autoRegisteredCommands) {
       if (!this.confirmedId(commandId)) {
         throw new Error(
           'This should be an impossible error. ' +
@@ -113,7 +115,7 @@ export class InternalCommands {
         (dvcRoot: string, ...args: Args): Promise<string> =>
           (cli[commandId as keyof typeof cli] as Function)(dvcRoot, ...args)
       )
-    })
+    }
   }
 
   private confirmedId(commandId: string): commandId is CommandId {

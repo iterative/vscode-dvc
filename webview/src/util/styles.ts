@@ -15,9 +15,8 @@ export const getThemeValue = (property: ThemeProperty) =>
   getComputedStyle(document.documentElement).getPropertyValue(property).trim()
 
 export const alphaToHex = (color: string, alpha: number): string => {
-  const fullColor: string =
-    color.length === 4 ? color + color.substr(-3) : color
+  const fullColor: string = color.length === 4 ? color + color.slice(-3) : color
   return `${fullColor}${(Math.round(alpha * 255) + 0x10000)
     .toString(16)
-    .substr(-2)}`
+    .slice(-2)}`
 }

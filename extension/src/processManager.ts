@@ -87,7 +87,7 @@ export class ProcessManager {
   }
 
   private anyOngoing(): boolean {
-    return !!this.locked.size
+    return this.locked.size > 0
   }
 
   private runQueued(): Promise<void> {

@@ -16,7 +16,11 @@ const compareExperimentsByPath = (
 ): number => {
   const valueA = get(a, path)
   const valueB = get(b, path)
-  return valueA === valueB ? 0 : valueA < valueB ? -1 : 1
+  if (valueA === valueB) {
+    return 0
+  }
+
+  return valueA < valueB ? -1 : 1
 }
 
 const buildSingleExperimentSortFunction = ({

@@ -16,15 +16,8 @@ export class CheckpointsModel {
     const { path, yaml } = data
     const hasCheckpoints = collectHasCheckpoints(yaml)
 
-    if (hasCheckpoints) {
-      this.yamlWithCheckpoints = uniqueValues([
-        ...this.yamlWithCheckpoints,
-        path
-      ])
-    } else {
-      this.yamlWithCheckpoints = this.yamlWithCheckpoints.filter(
-        file => file !== path
-      )
-    }
+    this.yamlWithCheckpoints = hasCheckpoints
+      ? uniqueValues([...this.yamlWithCheckpoints, path])
+      : this.yamlWithCheckpoints.filter(file => file !== path)
   }
 }

@@ -8,8 +8,8 @@ export const retry = async <T>(
 ): Promise<T> => {
   try {
     return await getNewPromise()
-  } catch (e: unknown) {
-    const errorMessage = (e as Error).message
+  } catch (error: unknown) {
+    const errorMessage = (error as Error).message
     Logger.error(`${args} failed with ${errorMessage} retrying...`)
 
     await delay(waitBeforeRetry)

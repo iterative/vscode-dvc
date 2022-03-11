@@ -8,6 +8,8 @@ import React from 'react'
 import { createBubbledEvent, dragAndDrop } from '../../../../test/dragDrop'
 import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
 
+const getHeaders = () => screen.getAllByRole('columnheader')
+
 describe('ComparisonTable', () => {
   afterEach(() => {
     cleanup()
@@ -17,8 +19,6 @@ describe('ComparisonTable', () => {
   const revisions = basicProps.revisions.map(({ revision }) => revision)
   const renderTable = (props = basicProps) =>
     render(<ComparisonTable {...props} />)
-
-  const getHeaders = () => screen.getAllByRole('columnheader')
 
   it('should render a table', () => {
     renderTable()
@@ -173,9 +173,9 @@ describe('ComparisonTable', () => {
 
       const headers = getHeaders()
 
-      headers.forEach(header => {
+      for (const header of headers) {
         expect(header.getAttribute('draggable')).toBe('true')
-      })
+      }
 
       pinSecondColumn()
 

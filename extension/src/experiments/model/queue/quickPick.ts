@@ -25,17 +25,15 @@ const pickNewParamValues = async (
     if (input === undefined) {
       return
     }
-    args.push(Flag.SET_PARAM)
-    args.push([path, input.trim()].join('='))
+    args.push(Flag.SET_PARAM, [path, input.trim()].join('='))
   }
   return args
 }
 
 const addUnchanged = (args: string[], unchanged: Param[]) => {
-  unchanged.forEach(({ path, value }) => {
-    args.push(Flag.SET_PARAM)
-    args.push([path, value].join('='))
-  })
+  for (const { path, value } of unchanged) {
+    args.push(Flag.SET_PARAM, [path, value].join('='))
+  }
 
   return args
 }
@@ -55,10 +53,8 @@ export const pickParamsToQueue = async (
     return
   }
 
-  const paramPathsToVary = paramsToVary.map(param => param.path)
-  const unchanged = params.filter(
-    param => !paramPathsToVary.includes(param.path)
-  )
+  const paramPathsToVary = new Set(paramsToVary.map(param => param.path))
+  const unchanged = params.filter(param => !paramPathsToVary.has(param.path))
 
   return addUnchanged(args, unchanged)
 }

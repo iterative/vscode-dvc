@@ -122,8 +122,9 @@ suite('CLI Runner Test Suite', () => {
 
       cliRunner.run(cwd, text)
 
-      await started
-      expect((await eventStream).includes(text)).to.be.true
+      const [, output] = await Promise.all([started, eventStream])
+
+      expect(output.includes(text)).to.be.true
       return completed
     })
 

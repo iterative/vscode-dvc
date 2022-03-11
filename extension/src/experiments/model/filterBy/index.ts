@@ -69,7 +69,7 @@ const evaluate = <T>(
     case Operator.NOT_CONTAINS:
       return !stringContains(valueToEvaluate, filterValue)
     default:
-      throw Error('filter operator not found')
+      throw new Error('filter operator not found')
   }
 }
 

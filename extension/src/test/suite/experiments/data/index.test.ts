@@ -97,13 +97,13 @@ suite('Experiments Data Test Suite', () => {
               baseline: {
                 data: {
                   metrics: {
-                    ...(expShowFixture.workspace.baseline.data?.metrics || {}),
+                    ...expShowFixture.workspace.baseline.data?.metrics,
                     'new_summary.json': {
                       data: { auc: 0, loss: 1 }
                     }
                   },
                   params: {
-                    ...(expShowFixture.workspace.baseline.data?.params || {}),
+                    ...expShowFixture.workspace.baseline.data?.params,
                     'new_params.yml': {
                       data: { new_seed: 10000, new_weight_decay: 0 }
                     }

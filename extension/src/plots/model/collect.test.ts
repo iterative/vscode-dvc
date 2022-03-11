@@ -29,16 +29,16 @@ describe('collectCheckpointPlotsData', () => {
 
     expect(definedAndNonEmpty(data)).toBeTruthy()
 
-    data?.forEach(({ values }) => {
+    for (const { values } of data || []) {
       const initialExperiment = values.filter(
         point => point.group === 'exp-908bd'
       )
-      const modifiedExperiment = values.filter(
+      const modifiedExperiment = values.find(
         point => point.group === 'exp-01b3a'
       )
 
       const lastIterationInitial = initialExperiment?.slice(-1)[0]
-      const firstIterationModified = modifiedExperiment[0]
+      const firstIterationModified = modifiedExperiment
 
       expect(lastIterationInitial).not.toStrictEqual(firstIterationModified)
       expect(omit(lastIterationInitial, 'group')).toStrictEqual(
@@ -46,12 +46,12 @@ describe('collectCheckpointPlotsData', () => {
       )
 
       const baseExperiment = values.filter(point => point.group === 'exp-920fc')
-      const restartedExperiment = values.filter(
+      const restartedExperiment = values.find(
         point => point.group === 'exp-9bc1b'
       )
 
       const iterationRestartedFrom = baseExperiment?.slice(5)[0]
-      const firstIterationAfterRestart = restartedExperiment[0]
+      const firstIterationAfterRestart = restartedExperiment
 
       expect(iterationRestartedFrom).not.toStrictEqual(
         firstIterationAfterRestart
@@ -59,7 +59,7 @@ describe('collectCheckpointPlotsData', () => {
       expect(omit(iterationRestartedFrom, 'group')).toStrictEqual(
         omit(firstIterationAfterRestart, 'group')
       )
-    })
+    }
   })
 
   it('should return undefined given no input', () => {
@@ -79,10 +79,10 @@ describe('collectData', () => {
 
     expect(isEmpty(values)).toBeFalsy()
 
-    revisions.forEach(revision => {
+    for (const revision of revisions) {
       const expectedValues = values.filter(value => value.rev === revision)
       expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
-    })
+    }
 
     expect(Object.keys(revisionData)).toStrictEqual(revisions)
 

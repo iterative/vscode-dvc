@@ -331,17 +331,17 @@ const collectExistingStatuses = (
   previousStatuses: Statuses
 ) => {
   const existingStatuses: Statuses = {}
-  ;[
+  for (const experiment of [
     ...experiments,
     ...flatten<Experiment>([...checkpointsByTip.values()])
-  ].forEach(experiment => {
+  ]) {
     const { id } = experiment
     if (!hasKey(previousStatuses, id)) {
-      return
+      continue
     }
 
     existingStatuses[id] = previousStatuses[id]
-  })
+  }
   return existingStatuses
 }
 
@@ -356,12 +356,12 @@ export const collectStatuses = (
     previousStatuses
   )
 
-  experiments.forEach(experiment => {
+  for (const experiment of experiments) {
     collectStatus(statuses, experiment, Status.SELECTED)
 
-    checkpointsByTip.get(experiment.id)?.forEach(checkpoint => {
+    for (const checkpoint of checkpointsByTip.get(experiment.id) || []) {
       collectStatus(statuses, checkpoint, Status.UNSELECTED)
-    })
-  })
+    }
+  }
   return statuses
 }

@@ -9,11 +9,11 @@ export const getRelativePattern = (
 ): RelativePattern => new RelativePattern(Uri.file(path), pattern)
 
 export const fireWatcher = (path: string): Promise<void> => {
-  const now = new Date().getTime() / 1000
+  const now = Date.now() / 1000
   return utimes(path, now, now)
 }
 
-export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
+export const ignoredDotDirectories = /.*[/\\|]\.(dvc|(v)?env)[/\\|].*/
 
 export const createFileSystemWatcher = (
   glob: GlobPattern,

@@ -49,7 +49,7 @@ export const createSpec = (
             { field: 'group', title: 'name' },
             {
               field: 'y',
-              title: title.substring(title.indexOf(':') + 1),
+              title: title.slice(Math.max(0, title.indexOf(':') + 1)),
               type: 'quantitative'
             }
           ]

@@ -41,9 +41,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public linkRepositories(workspacePlots: WorkspacePlots) {
-    Object.entries(this.repositories).forEach(([dvcRoot, repository]) =>
+    for (const [dvcRoot, repository] of Object.entries(this.repositories)) {
       workspacePlots.getRepository(dvcRoot).setExperiments(repository)
-    )
+    }
   }
 
   public getFocusedWebview(): Experiments | undefined {

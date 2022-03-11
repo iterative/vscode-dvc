@@ -1,5 +1,7 @@
 export const sum = (values: number[]): number => {
   let sum = 0
-  values.forEach(value => (sum += value))
+  for (const value of values) {
+    sum += value
+  }
   return sum
 }

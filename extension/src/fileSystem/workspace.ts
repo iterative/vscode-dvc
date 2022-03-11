@@ -12,9 +12,10 @@ export const deleteTarget = (uri: Uri) => {
 
 export const moveTargets = (targets: Uri[], destination: Uri) => {
   const edit = new WorkspaceEdit()
-  targets.forEach(uri =>
+  for (const uri of targets) {
     edit.renameFile(uri, Uri.joinPath(destination, basename(uri.fsPath)))
-  )
+  }
+
   return workspace.applyEdit(edit)
 }
 
