@@ -12,7 +12,7 @@ type TemplatePlotAccumulator = {
   multiViewPlots: VegaPlots
 }
 
-export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
+const splitPlotsByViewType = (plots: VegaPlots): TemplatePlotAccumulator => {
   const fillInPlotsType = (
     plotsType: VegaPlots,
     path: string,
@@ -21,19 +21,25 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
     plotsType[path] = plotsType[path] ? [...plotsType[path], plot] : [plot]
   }
 
-  const { singleViewPlots, multiViewPlots } = Object.entries(plots).reduce(
-    (acc: TemplatePlotAccumulator, [path, plots]) => {
-      plots.forEach(plot => {
-        if (plot.multiView) {
-          fillInPlotsType(acc.multiViewPlots, path, plot)
-          return
-        }
-        fillInPlotsType(acc.singleViewPlots, path, plot)
-      })
-      return acc
-    },
-    { multiViewPlots: {}, singleViewPlots: {} }
-  )
+  const acc: TemplatePlotAccumulator = {
+    multiViewPlots: {},
+    singleViewPlots: {}
+  }
+
+  Object.entries(plots).forEach(([path, plots]) => {
+    plots.forEach(plot => {
+      if (plot.multiView) {
+        fillInPlotsType(acc.multiViewPlots, path, plot)
+        return
+      }
+      fillInPlotsType(acc.singleViewPlots, path, plot)
+    })
+  })
+  return acc
+}
+
+export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
+  const { singleViewPlots, multiViewPlots } = splitPlotsByViewType(plots)
 
   return (
     <>
