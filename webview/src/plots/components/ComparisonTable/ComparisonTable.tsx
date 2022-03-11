@@ -53,32 +53,29 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     prevColumnKeys.includes(column.revision)
       ? acc.filteredColumns.push(column)
       : acc.newColumns.push(column)
-
-    return acc
   }
 
   useEffect(
     () =>
       setColumns(prevColumns => {
         const prevColumnKeys = prevColumns.map(col => col.revision)
-        const { filteredColumns, newColumns } = revisions.reduce(
-          (acc, column) => {
-            if (isPinned(column)) {
-              return acc
-            }
 
-            return splitColumns(acc, column, prevColumnKeys)
-          },
-          {
-            filteredColumns: [],
-            newColumns: []
-          } as ColumnAccumulator
-        )
+        const acc: ColumnAccumulator = {
+          filteredColumns: [],
+          newColumns: []
+        }
+
+        revisions.forEach(column => {
+          if (isPinned(column)) {
+            return
+          }
+          splitColumns(acc, column, prevColumnKeys)
+        })
 
         return [
           getPinnedColumnRevision(),
-          ...retainOrder(prevColumnKeys, filteredColumns),
-          ...newColumns
+          ...retainOrder(prevColumnKeys, acc.filteredColumns),
+          ...acc.newColumns
         ].filter(Boolean) as ComparisonTableColumn[]
       }),
     [revisions, getPinnedColumnRevision]

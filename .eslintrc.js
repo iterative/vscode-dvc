@@ -64,7 +64,8 @@ module.exports = {
     'react-hooks',
     'sonarjs',
     'sort-keys-fix',
-    'testing-library'
+    'testing-library',
+    'unicorn'
   ],
   root: true,
   rules: {
@@ -137,7 +138,8 @@ module.exports = {
     'require-await': 'error',
     'security/detect-object-injection': 'off',
     'sonarjs/cognitive-complexity': ['error', 5],
-    'sort-keys-fix/sort-keys-fix': 'warn'
+    'sort-keys-fix/sort-keys-fix': 'warn',
+    'unicorn/no-array-reduce': 'error'
   },
   settings: {
     linkComponents: [{ linkAttribute: 'to', name: 'Link' }],
