@@ -101,10 +101,7 @@ export class RepositoryModel
       .filter(value => value) as PathStatus[]
   }
 
-  private collectStatuses(
-    entry: PathStatus,
-    reducedStatus: ModifiedAndNotInCache
-  ) {
+  private collectStatuses(acc: ModifiedAndNotInCache, entry: PathStatus) {
     Object.entries(entry)
       .filter(([, status]) =>
         [Status.NOT_IN_CACHE, Status.MODIFIED].includes(status)
@@ -116,28 +113,24 @@ export class RepositoryModel
           return
         }
 
-        reducedStatus[status as Status.NOT_IN_CACHE | Status.MODIFIED].add(
-          absolutePath
-        )
+        acc[status as Status.NOT_IN_CACHE | Status.MODIFIED].add(absolutePath)
       })
   }
 
-  private reduceStatus(statusOutput: StatusOutput): ModifiedAndNotInCache {
-    const statusReducer = (
-      modifiedAndNotInCache: ModifiedAndNotInCache,
-      entry: StatusesOrAlwaysChanged[]
-    ): ModifiedAndNotInCache => {
-      const statuses = this.getChangedOutsStatuses(entry)
-
-      statuses.map(entry => this.collectStatuses(entry, modifiedAndNotInCache))
-
-      return modifiedAndNotInCache
-    }
-
-    return Object.values(statusOutput).reduce(statusReducer, {
+  private collectModifiedAndNotInCache(
+    statusOutput: StatusOutput
+  ): ModifiedAndNotInCache {
+    const acc: ModifiedAndNotInCache = {
       [Status.MODIFIED]: new Set(),
       [Status.NOT_IN_CACHE]: new Set()
-    })
+    }
+
+    Object.values(statusOutput).forEach((entry: StatusesOrAlwaysChanged[]) => {
+      const statuses = this.getChangedOutsStatuses(entry)
+      statuses.map(entry => this.collectStatuses(acc, entry))
+    }, acc)
+
+    return acc
   }
 
   private mapToTrackedPaths(diff: PathOutput[] = []): string[] {
@@ -198,7 +191,7 @@ export class RepositoryModel
     const {
       [Status.MODIFIED]: modifiedAgainstCache,
       [Status.NOT_IN_CACHE]: notInCache
-    } = this.reduceStatus(statusOutput)
+    } = this.collectModifiedAndNotInCache(statusOutput)
 
     this.state.gitModified = this.splitModifiedAgainstHead(
       modifiedAgainstHead,
