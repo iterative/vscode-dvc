@@ -72,15 +72,12 @@ const buildDynamicColumns = (
     })
 
 const findMaxDepth = (columns: ColumnGroup<Experiment>[], depth = 1): number =>
-  columns.reduce(
-    (prev: number, curr: ColumnGroup<Experiment>) =>
-      Math.max(
-        prev,
-        curr.columns
-          ? findMaxDepth(curr.columns as ColumnGroup<Experiment>[], depth + 1)
-          : depth
-      ),
-    1
+  Math.max(
+    ...columns.map(column =>
+      column.columns
+        ? findMaxDepth(column.columns as ColumnGroup<Experiment>[], depth + 1)
+        : depth
+    )
   )
 
 const findDeepest = (
