@@ -1,6 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { collectPaths, PlotPath } from './collect'
+import { collectPaths, PathType, PlotPath } from './collect'
 import { PlotsOutput } from '../../cli/reader'
 
 export class PathsModel {
@@ -24,14 +24,16 @@ export class PathsModel {
   }
 
   public getTemplatePaths() {
-    return this.data
-      .filter(path => path.type?.has('template'))
-      .map(({ path }) => path)
+    return this.getPathsByType(PathType.TEMPLATE)
   }
 
   public getComparisonPaths() {
+    return this.getPathsByType(PathType.COMPARISON)
+  }
+
+  private getPathsByType(type: PathType) {
     return this.data
-      .filter(path => path.type?.has('comparison'))
+      .filter(path => path.type?.has(type))
       .map(({ path }) => path)
   }
 }

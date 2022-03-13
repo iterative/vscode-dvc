@@ -3,9 +3,14 @@ import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { definedAndNonEmpty } from '../../util/array'
 
+export enum PathType {
+  COMPARISON = 'comparison',
+  TEMPLATE = 'template'
+}
+
 export type PlotPath = {
   path: string
-  type?: Set<'comparison' | 'template'>
+  type?: Set<PathType>
   parentPath: string | undefined
   hasChildren: boolean
 }
@@ -14,7 +19,7 @@ const getType = (
   data: PlotsOutput,
   hasChildren: boolean,
   path: string
-): Set<'comparison' | 'template'> | undefined => {
+): Set<PathType> | undefined => {
   if (hasChildren) {
     return
   }
@@ -24,14 +29,14 @@ const getType = (
     return
   }
 
-  const type = new Set<'comparison' | 'template'>()
+  const type = new Set<PathType>()
 
   for (const plot of plots) {
     if (isImagePlot(plot)) {
-      type.add('comparison')
+      type.add(PathType.COMPARISON)
       continue
     }
-    type.add('template')
+    type.add(PathType.TEMPLATE)
   }
 
   return type
