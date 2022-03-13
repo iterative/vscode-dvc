@@ -1,4 +1,3 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join } from 'path'
 import { collectPaths } from './collect'
 import { PlotsType } from '../webview/contract'
@@ -52,30 +51,30 @@ describe('collectPath', () => {
     const mockPlotsDiff = {
       [join('logs', 'scalars', 'acc.tsv')]: [
         {
-          type: PlotsType.VEGA,
+          content: {},
           revisions: ['workspace'],
-          content: {}
+          type: PlotsType.VEGA
         }
       ],
       [join('logs', 'scalars', 'loss.tsv')]: [
         {
-          type: PlotsType.VEGA,
+          content: {},
           revisions: ['workspace'],
-          content: {}
+          type: PlotsType.VEGA
         }
       ],
       [join('plots', 'heatmap.png')]: [
         {
-          type: PlotsType.IMAGE,
           revisions: ['workspace'],
+          type: PlotsType.IMAGE,
           url: join('plots', 'heatmap.png')
         }
       ],
       'predictions.json': [
         {
-          type: PlotsType.VEGA,
+          content: {},
           revisions: ['workspace'],
-          content: {}
+          type: PlotsType.VEGA
         }
       ]
     }
