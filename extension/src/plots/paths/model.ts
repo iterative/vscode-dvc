@@ -45,7 +45,9 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   private getPathsByType(type: PathType) {
     return this.data
-      .filter(path => path.type?.has(type))
+      .filter(
+        plotPath => plotPath.type?.has(type) && this.status[plotPath.path]
+      )
       .map(({ path }) => path)
   }
 }
