@@ -1,57 +1,93 @@
 import { isImagePlot } from '../webview/contract'
 import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
+import { definedAndNonEmpty } from '../../util/array'
 
-export const collectPaths = (
-  data: PlotsOutput
-): { templates: string[]; comparison: string[] } => {
-  const comparison = new Set<string>()
-  const templates = new Set<string>()
-
-  Object.entries(data).forEach(([path, plots]) => {
-    plots.forEach(plot => {
-      if (isImagePlot(plot)) {
-        comparison.add(path)
-        return
-      }
-      templates.add(path)
-    })
-  })
-  return {
-    comparison: [...comparison].sort(),
-    templates: [...templates].sort()
-  }
+export enum PathType {
+  COMPARISON = 'comparison',
+  TEMPLATE = 'template'
 }
 
-type PlotPath = {
+export type PlotPath = {
   path: string
+  type?: Set<PathType>
   parentPath: string | undefined
   hasChildren: boolean
 }
 
-export const collectPathsWithParents = (data: PlotsOutput): PlotPath[] => {
-  const included = new Set<string>()
-  const pathsWithParents: PlotPath[] = []
+const getType = (
+  data: PlotsOutput,
+  hasChildren: boolean,
+  path: string
+): Set<PathType> | undefined => {
+  if (hasChildren) {
+    return
+  }
 
-  const plotPaths = Object.keys(data)
+  const plots = data[path]
+  if (!definedAndNonEmpty(plots)) {
+    return
+  }
 
-  plotPaths.forEach(path => {
+  const type = new Set<PathType>()
+
+  for (const plot of plots) {
+    if (isImagePlot(plot)) {
+      type.add(PathType.COMPARISON)
+      continue
+    }
+    type.add(PathType.TEMPLATE)
+  }
+
+  return type
+}
+
+type PathAccumulator = {
+  plotPaths: PlotPath[]
+  included: Set<string>
+}
+
+const collectPath = (
+  acc: PathAccumulator,
+  data: PlotsOutput,
+  pathArray: string[],
+  idx: number
+) => {
+  const path = getPath(pathArray, idx)
+
+  if (acc.included.has(path)) {
+    return
+  }
+
+  const hasChildren = idx !== pathArray.length
+
+  const plotPath: PlotPath = {
+    hasChildren,
+    parentPath: getParent(pathArray, idx),
+    path
+  }
+
+  const type = getType(data, hasChildren, path)
+  if (type) {
+    plotPath.type = type
+  }
+
+  acc.plotPaths.push(plotPath)
+  acc.included.add(path)
+}
+
+export const collectPaths = (data: PlotsOutput): PlotPath[] => {
+  const acc: PathAccumulator = { included: new Set<string>(), plotPaths: [] }
+
+  const paths = Object.keys(data)
+
+  for (const path of paths) {
     const pathArray = getPathArray(path)
 
     for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-      const path = getPath(pathArray, reverseIdx)
-      if (included.has(path)) {
-        continue
-      }
-
-      pathsWithParents.push({
-        hasChildren: reverseIdx !== pathArray.length,
-        parentPath: getParent(pathArray, reverseIdx),
-        path
-      })
-      included.add(path)
+      collectPath(acc, data, pathArray, reverseIdx)
     }
-  })
+  }
 
-  return pathsWithParents
+  return acc.plotPaths
 }
