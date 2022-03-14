@@ -85,7 +85,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     if (this.webview) {
       this.sendInitialWebviewData()
     }
-    this.pathsChanged.fire()
   }
 
   public async sendInitialWebviewData() {
