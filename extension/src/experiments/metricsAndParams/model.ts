@@ -53,7 +53,7 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
   }
 
   public filterChildren(path?: string) {
-    return this.data?.filter(element =>
+    return this.data.filter(element =>
       path
         ? element.parentPath === path
         : ['metrics', 'params'].includes(element.parentPath)
