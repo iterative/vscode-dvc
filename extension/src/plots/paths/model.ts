@@ -1,15 +1,17 @@
-import { Disposable } from '@hediet/std/disposable'
+import { Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { collectPaths, PathType, PlotPath } from './collect'
 import { PlotsOutput } from '../../cli/reader'
+import { PathSelectionModel } from '../../path/selection/model'
+import { MementoPrefix } from '../../vscode/memento'
 
-export class PathsModel {
-  public readonly dispose = Disposable.fn()
-
+export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private data: PlotPath[] = []
+  constructor(dvcRoot: string, workspaceState: Memento) {
+    super(dvcRoot, workspaceState, MementoPrefix.PLOT_PATH_STATUS)
+  }
 
   public transformAndSet(data: PlotsOutput) {
     const paths = collectPaths(data)
@@ -21,6 +23,10 @@ export class PathsModel {
 
   public isReady() {
     return this.initialized
+  }
+
+  public filterChildren(path?: string): PlotPath[] {
+    return this.data.filter(element => element.parentPath === path)
   }
 
   public getTemplatePaths() {

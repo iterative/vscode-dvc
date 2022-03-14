@@ -1,6 +1,7 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { MetricOrParam } from '../../experiments/webview/contract'
+import { PlotPath } from '../../plots/paths/collect'
 import { flatten } from '../../util/array'
 import { MementoPrefix } from '../../vscode/memento'
 
@@ -10,7 +11,7 @@ export enum Status {
   UNSELECTED = 0
 }
 
-export abstract class PathSelectionModel<T extends MetricOrParam> {
+export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
   public readonly dispose = Disposable.fn()
 
   protected status: Record<string, Status>
@@ -84,7 +85,7 @@ export abstract class PathSelectionModel<T extends MetricOrParam> {
     })
   }
 
-  private getElement(path: string) {
+  private getElement(path: T['parentPath']) {
     return this.data?.find(element => element.path === path)
   }
 

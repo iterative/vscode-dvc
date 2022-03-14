@@ -68,7 +68,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.plots = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
-    this.paths = this.dispose.track(new PathsModel())
+    this.paths = this.dispose.track(
+      new PathsModel(this.dvcRoot, this.workspaceState)
+    )
 
     this.data.setModel(this.plots)
 
