@@ -44,6 +44,7 @@ import { WorkspaceRepositories } from './repository/workspace'
 import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WebviewSerializer } from './webview/serializer'
 import { WorkspacePlots } from './plots/workspace'
+import { PlotsPathsTree } from './plots/paths/tree'
 
 export { Disposable, Disposer }
 
@@ -155,6 +156,14 @@ export class Extension implements IExtension {
     this.dispose.track(
       new ExperimentsTree(
         this.experiments,
+        this.internalCommands,
+        this.resourceLocator
+      )
+    )
+
+    this.dispose.track(
+      new PlotsPathsTree(
+        this.plots,
         this.internalCommands,
         this.resourceLocator
       )

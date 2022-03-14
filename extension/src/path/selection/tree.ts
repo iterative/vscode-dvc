@@ -154,24 +154,53 @@ export abstract class BasePathSelectionTree<
       return []
     }
 
-    const [dvcRoot, path] = this.getDetails(element)
-
-    return this.getRepositoryChildren(dvcRoot, path)
-  }
-
-  private getDetails(element: string | T) {
     if (this.isRoot(element)) {
-      return [element, '']
+      return this.transformRepositoryChildren(element, undefined)
     }
+
     const { dvcRoot, path } = element
-    return [dvcRoot, path]
+
+    return this.transformRepositoryChildren(dvcRoot, path)
   }
 
   private isRoot(element: string | T): element is string {
     return typeof element === 'string'
   }
 
+  private transformRepositoryChildren(
+    dvcRoot: string,
+    path: string | undefined
+  ) {
+    return this.getRepositoryChildren(dvcRoot, path).map(element => {
+      const { descendantStatuses, hasChildren, path, status, label } = element
+
+      const description = this.getDescription(descendantStatuses, '/')
+      const iconPath = this.getIconPath(status)
+      const collapsibleState = hasChildren
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
+
+      return {
+        collapsibleState,
+        description,
+        dvcRoot,
+        iconPath,
+        label,
+        path
+      } as T
+    })
+  }
+
   abstract getRepositoryStatuses(dvcRoot: string): Status[]
 
-  abstract getRepositoryChildren(dvcRoot: string, path: string): T[]
+  abstract getRepositoryChildren(
+    dvcRoot: string,
+    path: string | undefined
+  ): {
+    descendantStatuses: Status[]
+    hasChildren: boolean
+    label: string
+    path: string
+    status: Status
+  }[]
 }

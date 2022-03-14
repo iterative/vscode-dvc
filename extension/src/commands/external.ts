@@ -40,6 +40,7 @@ export enum RegisteredCommands {
   QUEUE_EXPERIMENT_FROM_EXISTING = 'dvc.queueExperimentFromExisting',
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
+  PLOTS_PATH_TOGGLE = 'dvc.views.plotsPathsTree.toggleStatus',
   PLOTS_SHOW = 'dvc.showPlots',
 
   EXTENSION_GET_STARTED = 'dvc.getStarted',

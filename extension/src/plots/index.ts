@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { EventEmitter, Memento } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -26,6 +26,10 @@ export type PlotsWebview = BaseWebview<TPlotsData>
 
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
+
+  public readonly onDidChangePaths: Event<void>
+
+  private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
 
   private plots?: PlotsModel
   private paths?: PathsModel
@@ -62,6 +66,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.handleMessageFromWebview()
 
     this.workspaceState = workspaceState
+
+    this.onDidChangePaths = this.pathsChanged.event
   }
 
   public setExperiments(experiments: Experiments) {
@@ -79,6 +85,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     if (this.webview) {
       this.sendInitialWebviewData()
     }
+    this.pathsChanged.fire()
   }
 
   public async sendInitialWebviewData() {
@@ -89,6 +96,24 @@ export class Plots extends BaseRepository<TPlotsData> {
       sectionCollapsed: this.plots?.getSectionCollapsed(),
       template: this.getTemplatePlots()
     })
+  }
+
+  public togglePathStatus(path: string) {
+    this.paths?.toggleStatus(path)
+    this.notifyChanged()
+  }
+
+  public getChildPaths(path: string) {
+    return this.paths?.getChildren(path) || []
+  }
+
+  public getPathStatuses() {
+    return this.paths?.getTerminalNodeStatuses() || []
+  }
+
+  private notifyChanged() {
+    this.pathsChanged.fire()
+    this.sendPlots()
   }
 
   private sendCheckpointPlotsData() {

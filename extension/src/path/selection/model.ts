@@ -23,15 +23,19 @@ export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
 
   private readonly statusKey: MementoPrefix
 
+  private readonly splitFunc: (path: string) => string[]
+
   constructor(
     dvcRoot: string,
     workspaceState: Memento,
-    statusKey: MementoPrefix
+    statusKey: MementoPrefix,
+    splitFunc: (path: string) => string[]
   ) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
     this.statusKey = statusKey
     this.status = workspaceState.get(this.statusKey + dvcRoot, {})
+    this.splitFunc = splitFunc
   }
 
   public getSelected() {
@@ -46,11 +50,12 @@ export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
     return this.data.filter(element => !element.hasChildren)
   }
 
-  public getChildren(path?: string) {
+  public getChildren(path: string | undefined) {
     return this.filterChildren(path).map(element => {
       return {
         ...element,
         descendantStatuses: this.getTerminalNodeStatuses(element.path),
+        label: this.getLabel(element.path),
         status: this.status[element.path]
       }
     })
@@ -136,6 +141,11 @@ export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
       this.statusKey + this.dvcRoot,
       this.status
     )
+  }
+
+  private getLabel(path: string) {
+    const [label] = this.splitFunc(path).slice(-1)
+    return label
   }
 
   abstract filterChildren(path?: string): T[]

@@ -1,5 +1,6 @@
 import { Memento } from 'vscode'
 import { collectChanges, collectMetricsAndParams } from './collect'
+import { splitMetricOrParamPath } from './paths'
 import { MetricOrParam } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { MementoPrefix } from '../../vscode/memento'
@@ -11,7 +12,12 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
   private metricsAndParamsChanges: string[] = []
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    super(dvcRoot, workspaceState, MementoPrefix.METRICS_AND_PARAMS_STATUS)
+    super(
+      dvcRoot,
+      workspaceState,
+      MementoPrefix.METRICS_AND_PARAMS_STATUS,
+      splitMetricOrParamPath
+    )
 
     this.columnOrderState = workspaceState.get(
       MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + dvcRoot,
