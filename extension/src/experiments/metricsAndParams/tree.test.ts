@@ -5,10 +5,10 @@ import { ExperimentsMetricsAndParamsTree } from './tree'
 import { joinMetricOrParamPath } from './paths'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
-import { Status } from '../metricsAndParams/model'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 import { buildMockedExperiments } from '../../test/util/jest'
+import { Status } from '../../path/selection/model'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()

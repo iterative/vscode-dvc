@@ -7,13 +7,13 @@ import {
   Uri
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { Status } from './model'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { WorkspacePlots } from '../../plots/workspace'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { createTreeView } from '../../vscode/tree'
 import { definedAndNonEmpty, flatten } from '../../util/array'
-import { Status } from '../../experiments/metricsAndParams/model'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { ViewOpenedEventName } from '../../telemetry/constants'
 
