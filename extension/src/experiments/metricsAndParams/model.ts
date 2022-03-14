@@ -4,7 +4,7 @@ import { splitMetricOrParamPath } from './paths'
 import { MetricOrParam } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { MementoPrefix } from '../../vscode/memento'
-import { PathSelectionModel, Status } from '../../path/selection/model'
+import { PathSelectionModel } from '../../path/selection/model'
 
 export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
   private columnOrderState: string[] = []
@@ -83,11 +83,7 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
   private transformAndSetMetricsAndParams(data: ExperimentsOutput) {
     const metricsAndParams = collectMetricsAndParams(data)
 
-    metricsAndParams.forEach(metricOrParam => {
-      if (this.status[metricOrParam.path] === undefined) {
-        this.status[metricOrParam.path] = Status.SELECTED
-      }
-    })
+    this.setNewStatuses(metricsAndParams)
 
     this.data = metricsAndParams
   }

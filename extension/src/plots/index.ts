@@ -57,7 +57,7 @@ export class Plots extends BaseRepository<TPlotsData> {
           this.plots?.transformAndSetPlots(data),
           this.paths?.transformAndSet(data)
         ])
-        this.sendPlots()
+        this.notifyChanged()
       })
     )
 

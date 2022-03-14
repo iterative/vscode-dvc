@@ -82,6 +82,14 @@ export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
     return flatten<Status>(nestedStatuses)
   }
 
+  protected setNewStatuses(data: { path: string }[]) {
+    for (const { path } of data) {
+      if (this.status[path] === undefined) {
+        this.status[path] = Status.SELECTED
+      }
+    }
+  }
+
   private setAreChildrenSelected(path: string, status: Status) {
     return this.getChildren(path)?.map(element => {
       const path = element.path
