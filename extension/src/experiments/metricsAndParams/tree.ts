@@ -1,4 +1,3 @@
-import { Disposable } from '@hediet/std/disposable'
 import { TreeItemCollapsibleState } from 'vscode'
 import { BasePathSelectionTree } from '../../path/selection/tree'
 import { WorkspaceExperiments } from '../workspace'
@@ -20,8 +19,6 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<
   MetricsAndParamsItem,
   WorkspaceExperiments
 > {
-  public readonly dispose = Disposable.fn()
-
   constructor(
     experiments: WorkspaceExperiments,
     internalCommands: InternalCommands,

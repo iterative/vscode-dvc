@@ -1,4 +1,3 @@
-import { Disposable } from '@hediet/std/disposable'
 import { TreeItemCollapsibleState } from 'vscode'
 import { BasePathSelectionTree } from '../../path/selection/tree'
 import { WorkspacePlots } from '../workspace'
@@ -20,8 +19,6 @@ export class PlotsPathsTree extends BasePathSelectionTree<
   PlotPathItem,
   WorkspacePlots
 > {
-  public readonly dispose = Disposable.fn()
-
   constructor(
     plots: WorkspacePlots,
     internalCommands: InternalCommands,
