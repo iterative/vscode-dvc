@@ -11,6 +11,7 @@ const ViewOpenedEvent = {
     'views.experimentsMetricsAndParamsTree.opened',
   VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED: 'views.experimentsSortByTree.opened',
   VIEWS_EXPERIMENTS_TREE_OPENED: 'views.experimentsTree.opened',
+  VIEWS_PLOTS_PATH_TREE_OPENED: 'views.plotsPathTree.opened',
   VIEWS_TRACKED_EXPLORER_TREE_OPENED: 'views.trackedExplorerTree.opened'
 } as const
 
@@ -94,6 +95,7 @@ export interface IEventNamePropertyMapping {
   [EventName.QUEUE_EXPERIMENT_FROM_EXISTING]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
+  [EventName.PLOTS_PATH_TOGGLE]: undefined
   [EventName.PLOTS_SHOW]: undefined
 
   [EventName.ADD_TARGET]: undefined
@@ -140,6 +142,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
+  [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount
 
   [EventName.VIEWS_TERMINAL_CLOSED]: undefined
   [EventName.VIEWS_TERMINAL_FOCUS_CHANGED]: { active: boolean }

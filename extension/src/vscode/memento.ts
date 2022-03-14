@@ -7,6 +7,7 @@ export enum MementoPrefix {
   METRICS_AND_PARAMS_COLUMN_ORDER = 'metricsAndParamsColumnOrder:',
   METRICS_AND_PARAMS_COLUMN_WIDTHS = 'metricsAndParamsColumnWidths:',
   METRICS_AND_PARAMS_STATUS = 'metricsAndParamsStatus:',
+  PLOT_PATH_STATUS = 'plotPathStatus:',
   PLOT_SECTION_COLLAPSED = 'plotSectionCollapsed:',
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOT_SIZES = 'plotSizes:',

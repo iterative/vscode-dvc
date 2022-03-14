@@ -1,6 +1,7 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { MetricOrParam } from '../../experiments/webview/contract'
+import { PlotPath } from '../../plots/paths/collect'
 import { flatten } from '../../util/array'
 import { MementoPrefix } from '../../vscode/memento'
 
@@ -10,7 +11,7 @@ export enum Status {
   UNSELECTED = 0
 }
 
-export abstract class PathSelectionModel<T extends MetricOrParam> {
+export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
   public readonly dispose = Disposable.fn()
 
   protected status: Record<string, Status>
@@ -22,15 +23,19 @@ export abstract class PathSelectionModel<T extends MetricOrParam> {
 
   private readonly statusKey: MementoPrefix
 
+  private readonly splitFunc: (path: string) => string[]
+
   constructor(
     dvcRoot: string,
     workspaceState: Memento,
-    statusKey: MementoPrefix
+    statusKey: MementoPrefix,
+    splitFunc: (path: string) => string[]
   ) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
     this.statusKey = statusKey
     this.status = workspaceState.get(this.statusKey + dvcRoot, {})
+    this.splitFunc = splitFunc
   }
 
   public getSelected() {
@@ -45,11 +50,12 @@ export abstract class PathSelectionModel<T extends MetricOrParam> {
     return this.data.filter(element => !element.hasChildren)
   }
 
-  public getChildren(path?: string) {
+  public getChildren(path: string | undefined) {
     return this.filterChildren(path).map(element => {
       return {
         ...element,
         descendantStatuses: this.getTerminalNodeStatuses(element.path),
+        label: this.getLabel(element.path),
         status: this.status[element.path]
       }
     })
@@ -76,6 +82,14 @@ export abstract class PathSelectionModel<T extends MetricOrParam> {
     return flatten<Status>(nestedStatuses)
   }
 
+  protected setNewStatuses(data: { path: string }[]) {
+    for (const { path } of data) {
+      if (this.status[path] === undefined) {
+        this.status[path] = Status.SELECTED
+      }
+    }
+  }
+
   private setAreChildrenSelected(path: string, status: Status) {
     return this.getChildren(path)?.map(element => {
       const path = element.path
@@ -84,7 +98,7 @@ export abstract class PathSelectionModel<T extends MetricOrParam> {
     })
   }
 
-  private getElement(path: string) {
+  private getElement(path: T['parentPath']) {
     return this.data?.find(element => element.path === path)
   }
 
@@ -135,6 +149,11 @@ export abstract class PathSelectionModel<T extends MetricOrParam> {
       this.statusKey + this.dvcRoot,
       this.status
     )
+  }
+
+  private getLabel(path: string) {
+    const [label] = this.splitFunc(path).slice(-1)
+    return label
   }
 
   abstract filterChildren(path?: string): T[]

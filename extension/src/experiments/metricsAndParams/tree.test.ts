@@ -2,7 +2,7 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
 import { ExperimentsMetricsAndParamsTree } from './tree'
-import { joinMetricOrParamPath } from './paths'
+import { joinMetricOrParamPath, splitMetricOrParamPath } from './paths'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
@@ -59,6 +59,12 @@ beforeEach(() => {
 })
 
 describe('ExperimentsMetricsAndParamsTree', () => {
+  const getLabel = (path: string): string => {
+    const pathArray = splitMetricOrParamPath(path)
+    const [label] = pathArray.slice(-1)
+    return label
+  }
+
   const rootMetricsAndParams = columnsFixture
     .filter(metricOrParam =>
       ['metrics', 'params'].includes(metricOrParam.parentPath)
@@ -66,6 +72,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
     .map(metricOrParam => ({
       ...metricOrParam,
       descendantStatuses: [],
+      label: getLabel(metricOrParam.path),
       status: Status.SELECTED
     }))
 
@@ -195,6 +202,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
                 ...param,
                 descendantStatuses: [Status.UNSELECTED, Status.SELECTED],
                 hasChildren: true,
+                label: getLabel(param.path),
                 status: Status.INDETERMINATE
               }
             }
@@ -202,6 +210,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
               ...param,
               descendantStatuses: undefined,
               hasChildren: false,
+              label: getLabel(param.path),
               status: Status.SELECTED
             }
           })
@@ -273,6 +282,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
             ...param,
             descendantStatuses: undefined,
             hasChildren: false,
+            label: getLabel(param.path),
             status: Status.SELECTED
           }))
       )
