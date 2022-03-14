@@ -23,22 +23,19 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<
 > {
   public readonly dispose = Disposable.fn()
 
-  public readonly workspace: WorkspaceExperiments
-
   constructor(
     experiments: WorkspaceExperiments,
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {
     super(
+      experiments,
       resourceLocator,
       'dvc.views.experimentsMetricsAndParamsTree',
       experiments.metricsOrParamsChanged.event,
       RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
       EventName.VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED
     )
-
-    this.workspace = experiments
 
     internalCommands.registerExternalCommand<MetricsAndParamsItem>(
       RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
