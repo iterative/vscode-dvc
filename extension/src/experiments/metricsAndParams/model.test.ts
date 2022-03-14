@@ -1,7 +1,8 @@
-import { MetricsAndParamsModel, Status } from './model'
+import { MetricsAndParamsModel } from './model'
 import { joinMetricOrParamPath } from './paths'
 import { buildMockMemento } from '../../test/util'
 import { MementoPrefix } from '../../vscode/memento'
+import { Status } from '../../path/selection/model'
 
 describe('MetricsAndParamsModel', () => {
   const exampleDvcRoot = 'test'
