@@ -66,36 +66,34 @@ export abstract class PathSelectionModel<T extends MetricOrParam> {
   }
 
   public getTerminalNodeStatuses(parentPath?: string): Status[] {
-    const nestedStatuses = (this.getChildren(parentPath) || []).map(
-      metricOrParam => {
-        const terminalStatuses = metricOrParam.hasChildren
-          ? this.getTerminalNodeStatuses(metricOrParam.path)
-          : [this.status[metricOrParam.path]]
-        return [...terminalStatuses]
-      }
-    )
+    const nestedStatuses = (this.getChildren(parentPath) || []).map(element => {
+      const terminalStatuses = element.hasChildren
+        ? this.getTerminalNodeStatuses(element.path)
+        : [this.status[element.path]]
+      return [...terminalStatuses]
+    })
 
     return flatten<Status>(nestedStatuses)
   }
 
   private setAreChildrenSelected(path: string, status: Status) {
-    return this.getChildren(path)?.map(metricOrParam => {
-      const path = metricOrParam.path
+    return this.getChildren(path)?.map(element => {
+      const path = element.path
       this.status[path] = status
       this.setAreChildrenSelected(path, status)
     })
   }
 
-  private getMetricOrParam(path: string) {
-    return this.data?.find(metricOrParam => metricOrParam.path === path)
+  private getElement(path: string) {
+    return this.data?.find(element => element.path === path)
   }
 
   private setAreParentsSelected(path: string) {
-    const changed = this.getMetricOrParam(path)
+    const changed = this.getElement(path)
     if (!changed) {
       return
     }
-    const parent = this.getMetricOrParam(changed.parentPath)
+    const parent = this.getElement(changed.parentPath)
     if (!parent) {
       return
     }
