@@ -43,10 +43,10 @@ export const makeGetDragEl = (text: string) => () =>
   // eslint-disable-next-line testing-library/no-node-access
   screen.getByText(text).closest(DND_DRAGGABLE_DATA_ATTR)
 
-export const getHeaders = async () =>
-  (await screen.findAllByTestId('rendered-header')).map(
-    header => header.textContent
-  )
+export const getHeaders = async () => {
+  const renderedHeader = await screen.findAllByTestId('rendered-header')
+  return renderedHeader.map(header => header.textContent)
+}
 
 export const expectHeaders = async (expectedHeaderNames: string[]) => {
   expect(await getHeaders()).toStrictEqual([

@@ -1,9 +1,9 @@
 import { MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { useMemo } from 'react'
 
-function getColumnsByPath(
+const getColumnsByPath = (
   columns: MetricOrParam[]
-): Record<string, MetricOrParam> {
+): Record<string, MetricOrParam> => {
   const columnsByPath: Record<string, MetricOrParam> = {}
   for (const column of columns) {
     columnsByPath[column.path] = column
@@ -11,10 +11,10 @@ function getColumnsByPath(
   return columnsByPath
 }
 
-function getOrderedData(
+const getOrderedData = (
   columnsByPath: Record<string, MetricOrParam>,
   columnOrder: string[]
-): MetricOrParam[] {
+): MetricOrParam[] => {
   return columnOrder
     .map(path => ({
       ...columnsByPath[path]
@@ -22,17 +22,30 @@ function getOrderedData(
     .filter(Boolean) as MetricOrParam[]
 }
 
-function getOrderedDataWithGroups(
-  columns: MetricOrParam[],
-  columnOrder: string[]
-) {
-  const columnsByPath = getColumnsByPath(columns)
-  const orderedData = [...getOrderedData(columnsByPath, columnOrder)]
-  const previousGroups: string[] = []
+const collectParentNode = (
+  orderedData: MetricOrParam[],
+  parentPath: string,
+  groupNumberPrefix: string,
+  columnsByPath: Record<string, MetricOrParam>
+) => {
+  const parentNode = {
+    ...columnsByPath[parentPath]
+  }
+  parentNode.path = groupNumberPrefix + parentPath
 
-  let previousGroup = (orderedData?.length && orderedData[0].parentPath) || ''
+  if (!orderedData.some(column => column.path === parentNode.path)) {
+    orderedData.push(parentNode as MetricOrParam)
+  }
+}
 
-  orderedData.forEach(node => {
+const collectOrderedData = (
+  orderedData: MetricOrParam[],
+  previousGroups: string[],
+  previousGroup: string,
+  columnsByPath: Record<string, MetricOrParam>
+) => {
+  const copy = [...orderedData]
+  for (const node of copy) {
     const { parentPath, path } = node
 
     if (parentPath !== previousGroup) {
@@ -45,15 +58,22 @@ function getOrderedDataWithGroups(
     node.path = groupNumberPrefix + path
     node.parentPath = groupNumberPrefix + parentPath
 
-    const parentNode = {
-      ...columnsByPath[parentPath]
-    }
-    parentNode.path = groupNumberPrefix + parentPath
+    collectParentNode(orderedData, parentPath, groupNumberPrefix, columnsByPath)
+  }
+}
 
-    if (!orderedData.find(column => column.path === parentNode.path)) {
-      orderedData.push(parentNode as MetricOrParam)
-    }
-  })
+const collectOrderedDataWithGroups = (
+  columns: MetricOrParam[],
+  columnOrder: string[]
+) => {
+  const columnsByPath = getColumnsByPath(columns)
+  const orderedData = [...getOrderedData(columnsByPath, columnOrder)]
+  const previousGroups: string[] = []
+
+  const previousGroup = (orderedData?.length && orderedData[0].parentPath) || ''
+
+  collectOrderedData(orderedData, previousGroups, previousGroup, columnsByPath)
+
   return orderedData
 }
 
@@ -63,7 +83,7 @@ export const useColumnOrder = (
 ): MetricOrParam[] =>
   useMemo(() => {
     if (params && columnOrder) {
-      return getOrderedDataWithGroups(params, columnOrder)
+      return collectOrderedDataWithGroups(params, columnOrder)
     }
     return []
   }, [params, columnOrder])

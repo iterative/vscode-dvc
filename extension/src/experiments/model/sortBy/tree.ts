@@ -87,15 +87,11 @@ export class ExperimentsSortByTree
     if (dvcRoots.length === 1) {
       return this.getChildren(dvcRoots[0])
     }
-    if (
-      dvcRoots.find(
-        dvcRoot => this.experiments.getRepository(dvcRoot).getSorts().length > 0
-      )
-    ) {
-      return dvcRoots.sort((a, b) => a.localeCompare(b))
-    } else {
-      return []
-    }
+    return dvcRoots.some(
+      dvcRoot => this.experiments.getRepository(dvcRoot).getSorts().length > 0
+    )
+      ? dvcRoots.sort((a, b) => a.localeCompare(b))
+      : []
   }
 
   private getTreeItemFromSortDefinition(sortWithParent: SortItem) {

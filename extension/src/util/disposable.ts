@@ -6,10 +6,10 @@ export const reset = <T extends Disposable>(
   disposables: Disposables<T>,
   disposer: Disposer
 ): Disposables<T> => {
-  Object.values(disposables).forEach(disposable => {
+  for (const disposable of Object.values(disposables)) {
     disposer.untrack(disposable)
     disposable.dispose()
-  })
+  }
   disposables = {} as Disposables<T>
   return disposables
 }

@@ -145,7 +145,9 @@ export class ExperimentsModel {
     }
 
     const filters = new Map(this.filters)
-    filterIdsToRemove.forEach(id => filters.delete(id))
+    for (const id of filterIdsToRemove) {
+      filters.delete(id)
+    }
     const filteredExperiments = this.getFilteredExperiments([
       ...filters.values()
     ])
@@ -178,11 +180,11 @@ export class ExperimentsModel {
   public getMutableRevisions() {
     const acc: string[] = []
 
-    this.getCombinedList().forEach(({ label, mutable }) => {
+    for (const { label, mutable } of this.getCombinedList()) {
       if (mutable) {
         acc.push(label)
       }
-    })
+    }
     return acc
   }
 
@@ -200,14 +202,14 @@ export class ExperimentsModel {
       this.setSelectionMode(false)
     }
 
-    const selected = experiments.map(exp => exp.id)
+    const selected = new Set(experiments.map(exp => exp.id))
 
     const acc: Statuses = {}
 
-    this.getCombinedList().forEach(({ id }) => {
-      const status = selected.includes(id) ? Status.SELECTED : Status.UNSELECTED
+    for (const { id } of this.getCombinedList()) {
+      const status = selected.has(id) ? Status.SELECTED : Status.UNSELECTED
       acc[id] = status
-    })
+    }
 
     this.status = acc
 
@@ -547,11 +549,11 @@ export class ExperimentsModel {
   private getSelectedFromList(getList: () => Experiment[]) {
     const acc: SelectedExperimentWithColor[] = []
 
-    getList().forEach(experiment => {
+    for (const experiment of getList()) {
       if (this.isSelectedExperimentWithColor(experiment)) {
         acc.push(experiment)
       }
-    })
+    }
 
     return acc
   }

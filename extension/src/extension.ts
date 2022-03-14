@@ -1,5 +1,5 @@
 import { commands, Event, EventEmitter, ExtensionContext } from 'vscode'
-import { Disposable, Disposer } from '@hediet/std/disposable'
+import { Disposable } from '@hediet/std/disposable'
 import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
@@ -45,8 +45,6 @@ import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WebviewSerializer } from './webview/serializer'
 import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
-
-export { Disposable, Disposer }
 
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
@@ -185,10 +183,10 @@ export class Extension implements IExtension {
           { duration: stopWatch.getElapsedTime() }
         )
       )
-      .catch(e =>
+      .catch(error =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
-          e,
+          error,
           stopWatch.getElapsedTime(),
           this.getEventProperties()
         )
@@ -211,10 +209,10 @@ export class Extension implements IExtension {
             this.getEventProperties(),
             { duration: stopWatch.getElapsedTime() }
           )
-        } catch (e: unknown) {
+        } catch (error: unknown) {
           return sendTelemetryEventAndThrow(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
-            e as Error,
+            error as Error,
             stopWatch.getElapsedTime(),
             this.getEventProperties()
           )
@@ -241,10 +239,10 @@ export class Extension implements IExtension {
             }
           )
           return stopped
-        } catch (e: unknown) {
+        } catch (error: unknown) {
           return sendTelemetryEventAndThrow(
             RegisteredCommands.STOP_EXPERIMENT,
-            e as Error,
+            error as Error,
             stopWatch.getElapsedTime()
           )
         }
@@ -280,10 +278,10 @@ export class Extension implements IExtension {
               }
             )
             return completed
-          } catch (e: unknown) {
+          } catch (error: unknown) {
             return sendTelemetryEventAndThrow(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-              e as Error,
+              error as Error,
               stopWatch.getElapsedTime()
             )
           }
@@ -405,3 +403,5 @@ export function deactivate(): void {
     extension.dispose()
   }
 }
+
+export { Disposer, Disposable } from '@hediet/std/disposable'

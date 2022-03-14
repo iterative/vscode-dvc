@@ -54,7 +54,7 @@ const buildDynamicColumns = (
   properties
     .filter(column => column.parentPath === parentPath)
     .map(data => {
-      const { path, group, pathArray } = data
+      const { path, group, pathArray, name } = data
 
       const Cell = getCellComponent()
       const childColumns = buildDynamicColumns(properties, path)
@@ -63,10 +63,10 @@ const buildDynamicColumns = (
         Cell,
         Header,
         accessor: pathArray && buildAccessor(pathArray),
-        columns: childColumns.length ? childColumns : undefined,
+        columns: childColumns.length > 0 ? childColumns : undefined,
         group,
         id: path,
-        name: data.name
+        name
       }
       return column
     })

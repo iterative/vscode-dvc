@@ -29,7 +29,10 @@ export const getPythonExtensionSettings = async (): Promise<
 
 export const getPythonExecutionDetails = async (): Promise<
   string[] | undefined
-> => (await getPythonExtensionSettings())?.getExecutionDetails().execCommand
+> => {
+  const settings = await getPythonExtensionSettings()
+  return settings?.getExecutionDetails().execCommand
+}
 
 export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
@@ -43,7 +46,9 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
   }
 }
 
-export const getOnDidChangePythonExecutionDetails = async () =>
-  (await getPythonExtensionSettings())?.onDidChangeExecutionDetails
+export const getOnDidChangePythonExecutionDetails = async () => {
+  const settings = await getPythonExtensionSettings()
+  return settings?.onDidChangeExecutionDetails
+}
 
 export const isPythonExtensionInstalled = () => isInstalled(PYTHON_EXTENSION_ID)

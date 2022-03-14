@@ -9,13 +9,13 @@ const extractMetricsOrParams = (
   }
   const acc: MetricsOrParams = {}
 
-  Object.entries(metricsOrParams).forEach(([file, dataOrError]) => {
+  for (const [file, dataOrError] of Object.entries(metricsOrParams)) {
     const data = dataOrError?.data
     if (!data) {
-      return
+      continue
     }
     acc[file] = data
-  })
+  }
 
   return acc
 }

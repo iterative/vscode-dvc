@@ -25,11 +25,12 @@ interface TemplatePlotEntry extends TemplatePlot {
 
 const addIdAndPath = (entries: VegaPlots) => {
   let acc: TemplatePlotEntry[] = []
-  Object.entries(entries).forEach(([path, plots]) => {
-    acc = acc.concat(
-      plots.map((plot, i) => ({ ...plot, id: `plot-${path}-${i}`, path }))
-    )
-  })
+  for (const [path, plots] of Object.entries(entries)) {
+    acc = [
+      ...acc,
+      ...plots.map((plot, i) => ({ ...plot, id: `plot-${path}-${i}`, path }))
+    ]
+  }
   return acc
 }
 

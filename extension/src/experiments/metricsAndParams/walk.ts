@@ -73,11 +73,15 @@ const walkBranch = (
 ) => {
   const { baseline, ...rest } = branch
   walkExperiment(baseline, onValue)
-  Object.values(rest).forEach(experiment => walkExperiment(experiment, onValue))
+  for (const experiment of Object.values(rest)) {
+    walkExperiment(experiment, onValue)
+  }
 }
 
 export const walkRepo = (repo: ExperimentsOutput, onValue: OnValueCallback) => {
   const { workspace, ...rest } = repo
   walkBranch(workspace, onValue)
-  Object.values(rest).forEach(branch => walkBranch(branch, onValue))
+  for (const branch of Object.values(rest)) {
+    walkBranch(branch, onValue)
+  }
 }

@@ -175,13 +175,13 @@ export class Plots extends BaseRepository<TPlotsData> {
   private getRevisionsWithCorrectUrls(revisions: ComparisonRevisionData) {
     const acc: ComparisonRevisionData = {}
 
-    Object.entries(revisions).forEach(([revision, plot]) => {
+    for (const [revision, plot] of Object.entries(revisions)) {
       const updatedPlot = this.addCorrectUrl(plot)
       if (!updatedPlot) {
-        return
+        continue
       }
       acc[revision] = updatedPlot
-    })
+    }
     return acc
   }
 

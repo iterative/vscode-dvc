@@ -31,7 +31,7 @@ const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
   bulletColor?: string
 }> = ({ cell, bulletColor }) => {
-  const { row } = cell
+  const { row, isPlaceholder } = cell
 
   return (
     <div
@@ -40,7 +40,7 @@ const FirstCell: React.FC<{
           styles.firstCell,
           styles.td,
           styles.experimentCell,
-          cell.isPlaceholder && styles.groupPlaceholder
+          isPlaceholder && styles.groupPlaceholder
         )
       })}
     >
@@ -63,9 +63,9 @@ const FirstCell: React.FC<{
           )}
         </span>
         <span className={styles.bullet} style={{ color: bulletColor }}>
-          {cell.row.original.queued && <ClockIcon />}
+          {row.original.queued && <ClockIcon />}
         </span>
-        {cell.isPlaceholder ? null : (
+        {isPlaceholder ? null : (
           <div className={styles.cellContents}>{cell.render('Cell')}</div>
         )}
       </div>

@@ -44,7 +44,7 @@ export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export type Value = string | number | boolean | null
 
-interface ValueTreeOrError {
+export interface ValueTreeOrError {
   data?: ValueTree
   error?: { type: string; msg: string }
 }

@@ -49,7 +49,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     })
     .filter(Boolean)
 
-  return plots.length ? (
+  return plots.length > 0 ? (
     <div className={styles.singleViewPlotsGrid}>
       <DragDropContainer
         order={order}

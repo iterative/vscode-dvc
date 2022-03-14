@@ -27,7 +27,9 @@ export const TableHead: React.FC<TableHeadProps> = ({
 }) => {
   const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
-  headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
+  for (const headerGroup of headerGroups) {
+    allHeaders.push(...headerGroup.headers)
+  }
 
   const fullColumnOrder = useRef<string[]>()
 

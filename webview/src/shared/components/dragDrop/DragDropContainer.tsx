@@ -33,7 +33,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       draggedGroup === group &&
       !disabledDropIds.includes(order[droppedIndex])
     ) {
-      const draggedIndex = parseInt(e.dataTransfer.getData('itemIndex'), 10)
+      const draggedIndex = Number.parseInt(
+        e.dataTransfer.getData('itemIndex'),
+        10
+      )
       const newOrder = [...order]
       const dragged = newOrder[draggedIndex]
 

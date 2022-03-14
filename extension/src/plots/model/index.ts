@@ -132,13 +132,13 @@ export class PlotsModel {
   }
 
   public getMissingRevisions() {
-    const cachedRevisions = [
+    const cachedRevisions = new Set([
       ...Object.keys(this.comparisonData),
       ...Object.keys(this.revisionData)
-    ]
+    ])
 
     return this.getSelectedRevisions().filter(
-      revision => !cachedRevisions.includes(revision)
+      revision => !cachedRevisions.has(revision)
     )
   }
 
@@ -245,13 +245,13 @@ export class PlotsModel {
   }
 
   private removeStaleBranches() {
-    this.experiments.getBranchRevisions().forEach(({ id, sha }) => {
+    for (const { id, sha } of this.experiments.getBranchRevisions()) {
       if (sha && this.branchRevisions[id] !== sha) {
         delete this.revisionData[id]
         delete this.comparisonData[id]
         this.branchRevisions[id] = sha
       }
-    })
+    }
   }
 
   private getSelectedRevisions() {
@@ -278,24 +278,32 @@ export class PlotsModel {
     selectedRevisions: string[]
   ) {
     const acc: ComparisonPlots = []
-    paths.forEach(path => {
-      const pathRevisions = {
-        path,
-        revisions: {} as ComparisonRevisionData
-      }
-
-      selectedRevisions.forEach(revision => {
-        const image = this.comparisonData?.[revision]?.[path]
-        if (image) {
-          pathRevisions.revisions[revision] = {
-            revision,
-            url: image.url
-          }
-        }
-      })
-      acc.push(pathRevisions)
-    })
+    for (const path of paths) {
+      this.collectSelectedPathComparisonPlots(acc, path, selectedRevisions)
+    }
     return acc
+  }
+
+  private collectSelectedPathComparisonPlots(
+    acc: ComparisonPlots,
+    path: string,
+    selectedRevisions: string[]
+  ) {
+    const pathRevisions = {
+      path,
+      revisions: {} as ComparisonRevisionData
+    }
+
+    for (const revision of selectedRevisions) {
+      const image = this.comparisonData?.[revision]?.[path]
+      if (image) {
+        pathRevisions.revisions[revision] = {
+          revision,
+          url: image.url
+        }
+      }
+    }
+    acc.push(pathRevisions)
   }
 
   private getSelectedTemplatePlots(
@@ -303,7 +311,7 @@ export class PlotsModel {
     selectedRevisions: string[]
   ) {
     const acc: VegaPlots = {}
-    paths.forEach(path => {
+    for (const path of paths) {
       const template = this.templates[path]
 
       if (template) {
@@ -328,7 +336,7 @@ export class PlotsModel {
           }
         ]
       }
-    })
+    }
     return acc
   }
 

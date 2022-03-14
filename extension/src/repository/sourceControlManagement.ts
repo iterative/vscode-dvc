@@ -110,12 +110,12 @@ export class SourceControlManagement {
     validStatuses: Status[]
   ) {
     const acc: ResourceState[] = []
-    Object.entries(state).forEach(entry => {
+    for (const entry of Object.entries(state)) {
       const [status, resources] = entry as [Status, Set<string>]
       if (validStatuses.includes(status)) {
         acc.push(...this.getResourceStates(status, resources))
       }
-    })
+    }
     return acc
   }
 

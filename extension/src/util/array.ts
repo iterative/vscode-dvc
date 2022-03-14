@@ -7,7 +7,7 @@ export const definedAndNonEmpty = (
 }
 
 export const flatten = <T = string>(arrayOfArrays: T[][]): T[] =>
-  ([] as T[]).concat(...arrayOfArrays)
+  arrayOfArrays.flat()
 
 export const uniqueValues = <T = string>(array: T[]): T[] => [
   ...new Set<T>(array)

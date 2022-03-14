@@ -13,12 +13,14 @@ module.exports = {
     'plugin:jsx-a11y/recommended',
     'plugin:sonarjs/recommended',
     'plugin:import/recommended',
-    'plugin:import/typescript'
+    'plugin:import/typescript',
+    'plugin:unicorn/recommended'
   ],
   ignorePatterns: [
+    '**/coverage/**',
     '**/dist/**',
-    'webview/storybook-static/**',
-    'extension/src/test/fixtures/**'
+    'extension/src/test/fixtures/**',
+    'webview/storybook-static/**'
   ],
   overrides: [
     {
@@ -139,7 +141,17 @@ module.exports = {
     'security/detect-object-injection': 'off',
     'sonarjs/cognitive-complexity': ['error', 5],
     'sort-keys-fix/sort-keys-fix': 'warn',
-    'unicorn/no-array-reduce': 'error'
+    'unicorn/consistent-function-scoping': 'off',
+    'unicorn/filename-case': 'off',
+    'unicorn/import-style': 'off',
+    'unicorn/no-array-callback-reference': 'off',
+    'unicorn/no-null': 'off',
+    'unicorn/no-process-exit': 'off',
+    'unicorn/no-useless-undefined': 'off',
+    'unicorn/numeric-separators-style': 'off',
+    'unicorn/prefer-module': 'off',
+    'unicorn/prefer-node-protocol': 'off',
+    'unicorn/prevent-abbreviations': 'off'
   },
   settings: {
     linkComponents: [{ linkAttribute: 'to', name: 'Link' }],

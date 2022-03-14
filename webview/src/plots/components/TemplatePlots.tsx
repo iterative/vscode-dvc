@@ -12,29 +12,37 @@ type TemplatePlotAccumulator = {
   multiViewPlots: VegaPlots
 }
 
-const splitPlotsByViewType = (plots: VegaPlots): TemplatePlotAccumulator => {
-  const fillInPlotsType = (
-    plotsType: VegaPlots,
-    path: string,
-    plot: TemplatePlot
-  ) => {
-    plotsType[path] = plotsType[path] ? [...plotsType[path], plot] : [plot]
-  }
+const fillInPlotsType = (
+  plotsType: VegaPlots,
+  path: string,
+  plot: TemplatePlot
+) => {
+  plotsType[path] = plotsType[path] ? [...plotsType[path], plot] : [plot]
+}
 
+const collectPlot = (
+  acc: TemplatePlotAccumulator,
+  path: string,
+  plot: TemplatePlot
+) => {
+  if (plot.multiView) {
+    fillInPlotsType(acc.multiViewPlots, path, plot)
+    return
+  }
+  fillInPlotsType(acc.singleViewPlots, path, plot)
+}
+
+const splitPlotsByViewType = (plots: VegaPlots): TemplatePlotAccumulator => {
   const acc: TemplatePlotAccumulator = {
     multiViewPlots: {},
     singleViewPlots: {}
   }
 
-  Object.entries(plots).forEach(([path, plots]) => {
-    plots.forEach(plot => {
-      if (plot.multiView) {
-        fillInPlotsType(acc.multiViewPlots, path, plot)
-        return
-      }
-      fillInPlotsType(acc.singleViewPlots, path, plot)
-    })
-  })
+  for (const [path, pathPlots] of Object.entries(plots)) {
+    for (const plot of pathPlots) {
+      collectPlot(acc, path, plot)
+    }
+  }
   return acc
 }
 

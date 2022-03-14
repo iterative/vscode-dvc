@@ -33,7 +33,7 @@ export const getExtensionVersion = <T>(id: string): string | undefined => {
 }
 
 export const isInstalled = (id: string): boolean =>
-  !!extensions.all.find(extension => extension.id === id)
+  !!extensions.all.some(extension => extension.id === id)
 
 export const showExtension = (id: string) =>
   commands.executeCommand('workbench.extensions.search', `@id:${id}`)
