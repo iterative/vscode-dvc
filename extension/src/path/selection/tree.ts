@@ -17,27 +17,28 @@ import { definedAndNonEmpty, flatten } from '../../util/array'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { ViewOpenedEventName } from '../../telemetry/constants'
 
+export type PathSelectionItem = {
+  description: string | undefined
+  dvcRoot: string
+  collapsibleState: TreeItemCollapsibleState
+  label: string
+  path: string
+  iconPath: Resource
+}
+
 export abstract class BasePathSelectionTree<
-  T extends {
-    dvcRoot: string
-    path: string
-    label: string
-    collapsibleState: TreeItemCollapsibleState
-    description: string | undefined
-    iconPath: Resource
-  },
-  U extends WorkspaceExperiments | WorkspacePlots
-> implements TreeDataProvider<string | T>
+  T extends WorkspaceExperiments | WorkspacePlots
+> implements TreeDataProvider<string | PathSelectionItem>
 {
   public readonly dispose = Disposable.fn()
 
-  public readonly onDidChangeTreeData: Event<T | void>
+  public readonly onDidChangeTreeData: Event<PathSelectionItem | void>
 
-  protected readonly workspace: U
+  protected readonly workspace: T
 
   private readonly resourceLocator: ResourceLocator
 
-  private readonly view: TreeView<string | T>
+  private readonly view: TreeView<string | PathSelectionItem>
 
   private viewed = false
   private readonly openEventName: ViewOpenedEventName
@@ -45,10 +46,10 @@ export abstract class BasePathSelectionTree<
   private readonly toggleCommand: RegisteredCommands
 
   constructor(
-    workspace: U,
+    workspace: T,
     resourceLocator: ResourceLocator,
     name: string,
-    changeEvent: Event<T | void>,
+    changeEvent: Event<PathSelectionItem | void>,
     toggleCommand: RegisteredCommands,
     openEventName: ViewOpenedEventName
   ) {
@@ -57,7 +58,9 @@ export abstract class BasePathSelectionTree<
 
     this.onDidChangeTreeData = changeEvent
 
-    this.view = this.dispose.track(createTreeView<T>(name, this))
+    this.view = this.dispose.track(
+      createTreeView<PathSelectionItem>(name, this)
+    )
 
     this.toggleCommand = toggleCommand
 
@@ -66,7 +69,7 @@ export abstract class BasePathSelectionTree<
     this.updateDescriptionOnChange()
   }
 
-  public getTreeItem(element: string | T): TreeItem {
+  public getTreeItem(element: string | PathSelectionItem): TreeItem {
     if (this.isRoot(element)) {
       const resourceUri = Uri.file(element)
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
@@ -91,7 +94,9 @@ export abstract class BasePathSelectionTree<
     return treeItem
   }
 
-  public getChildren(element?: string | T): Promise<T[] | string[]> {
+  public getChildren(
+    element?: string | PathSelectionItem
+  ): Promise<PathSelectionItem[] | string[]> {
     if (element) {
       return Promise.resolve(this.getChildElements(element))
     }
@@ -149,7 +154,9 @@ export abstract class BasePathSelectionTree<
     return dvcRoots.sort((a, b) => a.localeCompare(b))
   }
 
-  private getChildElements(element: string | T): T[] {
+  private getChildElements(
+    element: string | PathSelectionItem
+  ): PathSelectionItem[] {
     if (!element) {
       return []
     }
@@ -163,7 +170,7 @@ export abstract class BasePathSelectionTree<
     return this.transformRepositoryChildren(dvcRoot, path)
   }
 
-  private isRoot(element: string | T): element is string {
+  private isRoot(element: string | PathSelectionItem): element is string {
     return typeof element === 'string'
   }
 
@@ -187,7 +194,7 @@ export abstract class BasePathSelectionTree<
         iconPath,
         label,
         path
-      } as T
+      } as PathSelectionItem
     })
   }
 
