@@ -5,6 +5,8 @@ import { ResourceLocator } from '../resourceLocator'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 
 export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
+  public readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
+
   public createRepository(
     dvcRoot: string,
     updatesPaused: EventEmitter<boolean>,
@@ -21,6 +23,12 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
     )
 
     this.setRepository(dvcRoot, plots)
+
+    plots.dispose.track(
+      plots.onDidChangePaths(() => {
+        this.pathsChanged.fire()
+      })
+    )
 
     return plots
   }

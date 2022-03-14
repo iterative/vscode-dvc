@@ -2,13 +2,13 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
 import { ExperimentsMetricsAndParamsTree } from './tree'
-import { joinMetricOrParamPath } from './paths'
+import { joinMetricOrParamPath, splitMetricOrParamPath } from './paths'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
-import { Status } from '../metricsAndParams/model'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 import { buildMockedExperiments } from '../../test/util/jest'
+import { Status } from '../../path/selection/model'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -59,6 +59,12 @@ beforeEach(() => {
 })
 
 describe('ExperimentsMetricsAndParamsTree', () => {
+  const getLabel = (path: string): string => {
+    const pathArray = splitMetricOrParamPath(path)
+    const [label] = pathArray.slice(-1)
+    return label
+  }
+
   const rootMetricsAndParams = columnsFixture
     .filter(metricOrParam =>
       ['metrics', 'params'].includes(metricOrParam.parentPath)
@@ -66,6 +72,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
     .map(metricOrParam => ({
       ...metricOrParam,
       descendantStatuses: [],
+      label: getLabel(metricOrParam.path),
       status: Status.SELECTED
     }))
 
@@ -109,6 +116,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'summary.json',
           path: joinMetricOrParamPath('metrics', 'summary.json')
         },
         {
@@ -116,6 +124,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'params.yaml',
           path: joinMetricOrParamPath('params', 'params.yaml')
         },
         {
@@ -123,6 +132,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: join('nested', 'params.yaml'),
           path: joinMetricOrParamPath('params', join('nested', 'params.yaml'))
         }
       ])
@@ -162,6 +172,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'summary.json',
           path: joinMetricOrParamPath('metrics', 'summary.json')
         },
         {
@@ -169,6 +180,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'params.yaml',
           path: paramsPath
         },
         {
@@ -176,6 +188,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: join('nested', 'params.yaml'),
           path: joinMetricOrParamPath('params', join('nested', 'params.yaml'))
         }
       ])
@@ -189,6 +202,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
                 ...param,
                 descendantStatuses: [Status.UNSELECTED, Status.SELECTED],
                 hasChildren: true,
+                label: getLabel(param.path),
                 status: Status.INDETERMINATE
               }
             }
@@ -196,6 +210,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
               ...param,
               descendantStatuses: undefined,
               hasChildren: false,
+              label: getLabel(param.path),
               status: Status.SELECTED
             }
           })
@@ -206,6 +221,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
         description: undefined,
         dvcRoot: mockedDvcRoot,
         iconPath: mockedSelectedCheckbox,
+        label: 'params.yaml',
         path: paramsPath
       })
       expect(grandChildren).toStrictEqual([
@@ -214,6 +230,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'epochs',
           path: joinMetricOrParamPath(paramsPath, 'epochs')
         },
         {
@@ -221,6 +238,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'learning_rate',
           path: joinMetricOrParamPath(paramsPath, 'learning_rate')
         },
         {
@@ -228,6 +246,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'dvc_logs_dir',
           path: joinMetricOrParamPath(paramsPath, 'dvc_logs_dir')
         },
         {
@@ -235,6 +254,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'log_file',
           path: joinMetricOrParamPath(paramsPath, 'log_file')
         },
         {
@@ -242,6 +262,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'dropout',
           path: joinMetricOrParamPath(paramsPath, 'dropout')
         },
         {
@@ -249,6 +270,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: '1/2',
           dvcRoot: mockedDvcRoot,
           iconPath: mockedIndeterminateCheckbox,
+          label: 'process',
           path: processPath
         }
       ])
@@ -260,6 +282,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
             ...param,
             descendantStatuses: undefined,
             hasChildren: false,
+            label: getLabel(param.path),
             status: Status.SELECTED
           }))
       )
@@ -269,6 +292,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: '1/2',
           dvcRoot: mockedDvcRoot,
           iconPath: mockedIndeterminateCheckbox,
+          label: 'process',
           path: processPath
         })
 
@@ -278,6 +302,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'threshold',
           path: joinMetricOrParamPath(
             'params',
             'params.yaml',
@@ -290,6 +315,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'test_arg',
           path: joinMetricOrParamPath(
             'params',
             'params.yaml',
@@ -349,6 +375,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
       description: '3/4',
       dvcRoot: mockedDvcRoot,
       iconPath: mockedSelectedCheckbox,
+      label: filename,
       path: relParamsPath
     }
 
@@ -389,6 +416,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
       description: undefined,
       dvcRoot: mockedDvcRoot,
       iconPath: mockedEmptyCheckbox,
+      label: filename,
       path: relParamsPath
     }
 

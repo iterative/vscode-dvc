@@ -897,6 +897,11 @@
           "id": "dvc.views.experimentsFilterByTree",
           "name": "Filter By",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "id": "dvc.views.plotsPathsTree",
+          "name": "Plots",
+          "when": "dvc.commands.available && dvc.project.available"
         }
       ]
     },
@@ -922,6 +927,10 @@
       {
         "view": "dvc.views.experimentsFilterByTree",
         "contents": "No filters applied. \n[Add Filter](command:dvc.addExperimentsTableFilter)\n"
+      },
+      {
+        "view": "dvc.views.plotsPathsTree",
+        "contents": "No plots to display."
       }
     ],
     "walkthroughs": [
