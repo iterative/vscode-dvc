@@ -17,7 +17,11 @@ import { OverflowHoverTooltip } from '../../shared/components/overflowHover'
 
 import 'tippy.js/dist/tippy.css'
 
-const UndefinedCell = <>. . .</>
+const UndefinedCell = (
+  <div className={styles.innerCell}>
+    <span className={styles.cellContents}>. . .</span>
+  </div>
+)
 
 const groupLabels: Record<string, string> = {
   metrics: 'Metric',
