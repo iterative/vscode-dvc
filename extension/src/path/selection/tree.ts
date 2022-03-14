@@ -33,7 +33,6 @@ export abstract class BasePathSelectionTree<
 
   public readonly onDidChangeTreeData: Event<T | void>
 
-  private readonly workspace: U
   private readonly resourceLocator: ResourceLocator
 
   private readonly view: TreeView<string | T>
@@ -43,16 +42,15 @@ export abstract class BasePathSelectionTree<
 
   private readonly toggleCommand: RegisteredCommands
 
+  abstract readonly workspace: U
+
   constructor(
-    workspace: U,
     resourceLocator: ResourceLocator,
     name: string,
     changeEvent: Event<T | void>,
     toggleCommand: RegisteredCommands,
     openEventName: ViewOpenedEventName
   ) {
-    this.workspace = workspace
-
     this.resourceLocator = resourceLocator
 
     this.onDidChangeTreeData = changeEvent

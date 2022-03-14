@@ -23,7 +23,7 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<
 > {
   public readonly dispose = Disposable.fn()
 
-  private readonly experiments: WorkspaceExperiments
+  public readonly workspace: WorkspaceExperiments
 
   constructor(
     experiments: WorkspaceExperiments,
@@ -31,7 +31,6 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<
     resourceLocator: ResourceLocator
   ) {
     super(
-      experiments,
       resourceLocator,
       'dvc.views.experimentsMetricsAndParamsTree',
       experiments.metricsOrParamsChanged.event,
@@ -39,12 +38,12 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<
       EventName.VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED
     )
 
-    this.experiments = experiments
+    this.workspace = experiments
 
     internalCommands.registerExternalCommand<MetricsAndParamsItem>(
       RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
       ({ dvcRoot, path }) =>
-        this.experiments.getRepository(dvcRoot).toggleMetricOrParamStatus(path)
+        this.workspace.getRepository(dvcRoot).toggleMetricOrParamStatus(path)
     )
   }
 
@@ -52,7 +51,7 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<
     dvcRoot: string,
     path: string
   ): MetricsAndParamsItem[] {
-    return this.experiments
+    return this.workspace
       .getRepository(dvcRoot)
       .getChildMetricsOrParams(path)
       .map(metricOrParam => {
@@ -72,6 +71,6 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<
   }
 
   public getRepositoryStatuses(dvcRoot: string) {
-    return this.experiments.getRepository(dvcRoot).getMetricsAndParamsStatuses()
+    return this.workspace.getRepository(dvcRoot).getMetricsAndParamsStatuses()
   }
 }
