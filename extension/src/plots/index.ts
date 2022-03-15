@@ -98,8 +98,9 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public togglePathStatus(path: string) {
-    this.paths?.toggleStatus(path)
+    const status = this.paths?.toggleStatus(path)
     this.notifyChanged()
+    return status
   }
 
   public getChildPaths(path: string) {
