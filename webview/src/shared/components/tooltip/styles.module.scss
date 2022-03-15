@@ -5,6 +5,7 @@
   color: var(--vscode-editor-background);
   font-size: 0.8rem;
   transition: none;
+  white-space: nowrap;
   & > :global(.tippy-arrow) {
     color: var(--vscode-editor-foreground);
   }
