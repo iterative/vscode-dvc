@@ -1,21 +1,30 @@
 import { TemplatePlot, VegaPlots } from 'dvc/src/plots/webview/contract'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, MutableRefObject } from 'react'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import cx from 'classnames'
-import styles from './styles.module.scss'
-import { config } from './constants'
+import styles from '../styles.module.scss'
+import { config } from '../constants'
 import {
   Items,
   performOrderedUpdate,
   reorderObjectList
-} from '../../util/objects'
-import { DragDropContainer } from '../../shared/components/dragDrop/DragDropContainer'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
-import { withScale } from '../../util/styles'
+} from '../../../util/objects'
+import {
+  DragDropContainer,
+  DraggedInfo
+} from '../../../shared/components/dragDrop/DragDropContainer'
+import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
+import { withScale } from '../../../util/styles'
 
-interface TemplatePlotGridProps {
+interface TemplatePlotsGridProps {
   entries: VegaPlots
   group: string
+  onDropInSection: (
+    draggedId: string,
+    draggedGroup: string,
+    groupId: string
+  ) => void
+  draggedRef?: MutableRefObject<DraggedInfo | undefined>
 }
 
 interface TemplatePlotEntry extends TemplatePlot {
@@ -23,9 +32,11 @@ interface TemplatePlotEntry extends TemplatePlot {
   id: string
 }
 
-export const TemplatePlotGrid: React.FC<TemplatePlotGridProps> = ({
+export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   entries,
-  group
+  group,
+  onDropInSection,
+  draggedRef
 }) => {
   const [allPlots, setAllPlots] = useState<TemplatePlotEntry[]>([])
   const [order, setOrder] = useState<string[]>([])
@@ -35,7 +46,7 @@ export const TemplatePlotGrid: React.FC<TemplatePlotGridProps> = ({
       Object.entries(entries).reduce(
         (acc: TemplatePlotEntry[], [path, plots]) => {
           return acc.concat(
-            plots.map((plot, i) => ({ ...plot, id: `plot-${path}-${i}`, path }))
+            plots.map((plot, i) => ({ ...plot, id: `plot_${path}_${i}`, path }))
           )
         },
         []
@@ -92,6 +103,8 @@ export const TemplatePlotGrid: React.FC<TemplatePlotGridProps> = ({
       disabledDropIds={[]}
       items={items as JSX.Element[]}
       group={group}
+      onDrop={onDropInSection}
+      draggedRef={draggedRef}
     />
   )
 }

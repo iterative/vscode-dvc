@@ -1,4 +1,14 @@
-import React, { DragEvent } from 'react'
+import React, { DragEvent, MutableRefObject } from 'react'
+import {
+  getIdentifierIndex,
+  getIdentifierWithoutIndex
+} from '../../../util/ids'
+
+export type DraggedInfo = {
+  itemIndex: string
+  itemId: string
+  group: string
+}
 
 interface DragDropContainerProps {
   order: string[]
@@ -6,6 +16,8 @@ interface DragDropContainerProps {
   disabledDropIds: string[]
   items: JSX.Element[] // Every item must have a id prop for drag and drop to work
   group: string
+  onDrop?: (draggedId: string, draggedGroup: string, groupId: string) => void
+  draggedRef?: MutableRefObject<DraggedInfo | undefined>
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -13,34 +25,62 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   setOrder,
   disabledDropIds,
   items,
-  group
+  group,
+  onDrop,
+  draggedRef
 }) => {
+  const setDraggedRef = (draggedInfo?: DraggedInfo) => {
+    if (draggedRef) {
+      draggedRef.current = draggedInfo
+    }
+  }
+
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
-    const id = order.indexOf(e.currentTarget.id).toString()
-    e.dataTransfer.setData('itemIndex', id)
+    const idx = order.indexOf(e.currentTarget.id).toString()
+    e.dataTransfer.setData('itemIndex', idx)
+    e.dataTransfer.setData('itemId', e.currentTarget.id)
     e.dataTransfer.setData('group', group)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
+    setDraggedRef({
+      group,
+      itemId: e.currentTarget.id,
+      itemIndex: idx
+    })
   }
 
   const handleDragOver = (e: DragEvent<HTMLElement>) => e.preventDefault()
 
+  const applyDrop = (e: DragEvent<HTMLElement>, droppedIndex: number) => {
+    const newOrder = [...order]
+    const draggedId = e.dataTransfer.getData('itemId')
+    const isNew = !order.includes(draggedId)
+    if (isNew) {
+      newOrder.push(draggedId)
+    }
+    const draggedIndex = isNew
+      ? newOrder.length - 1
+      : getIdentifierIndex(e.dataTransfer.getData('itemIndex'))
+    const dragged = newOrder[draggedIndex]
+
+    newOrder.splice(draggedIndex, 1)
+    newOrder.splice(droppedIndex, 0, dragged)
+
+    setOrder(newOrder)
+    setDraggedRef(undefined)
+    onDrop?.(draggedId, e.dataTransfer.getData('group'), group)
+  }
+
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
     const droppedIndex = order.indexOf(e.currentTarget.id)
-    const draggedGroup = e.dataTransfer.getData('group')
+    const draggedGroup = getIdentifierWithoutIndex(
+      e.dataTransfer.getData('group')
+    )
+    const isSameGroup = draggedGroup === getIdentifierWithoutIndex(group)
+    const isEnabled = !disabledDropIds.includes(order[droppedIndex])
 
-    if (
-      draggedGroup === group &&
-      !disabledDropIds.includes(order[droppedIndex])
-    ) {
-      const draggedIndex = parseInt(e.dataTransfer.getData('itemIndex'), 10)
-      const newOrder = [...order]
-      const dragged = newOrder[draggedIndex]
-
-      newOrder.splice(draggedIndex, 1)
-      newOrder.splice(droppedIndex, 0, dragged)
-
-      setOrder(newOrder)
+    if (isEnabled && isSameGroup) {
+      applyDrop(e, droppedIndex)
     }
   }
 

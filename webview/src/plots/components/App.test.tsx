@@ -499,7 +499,7 @@ describe('App', () => {
     })
 
     const checkpointPlots = screen.getAllByTestId(/summary\.json/)
-    const templatePlots = screen.getAllByTestId(/^plot-/)
+    const templatePlots = screen.getAllByTestId(/^plot_/)
 
     dragAndDrop(templatePlots[0], checkpointPlots[2])
 
@@ -523,20 +523,20 @@ describe('App', () => {
       }
     })
 
-    let plots = screen.getAllByTestId(/^plot-/)
+    let plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'plot-logs/loss.tsv-0',
-      'plot-other/plot.tsv-0'
+      'plot_logs/loss.tsv_0',
+      'plot_other/plot.tsv_0'
     ])
 
     dragAndDrop(plots[1], plots[0])
 
-    plots = screen.getAllByTestId(/^plot-/)
+    plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'plot-other/plot.tsv-0',
-      'plot-logs/loss.tsv-0'
+      'plot_other/plot.tsv_0',
+      'plot_logs/loss.tsv_0'
     ])
   })
 })
