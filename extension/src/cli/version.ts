@@ -1,7 +1,10 @@
+import { getConfigValue, setUserConfigValue } from '../vscode/config'
+import { Response } from '../vscode/response'
 import { Toast } from '../vscode/toast'
 
 export const MIN_VERSION = '2.9.5'
 const MAX_VERSION = '3'
+const DO_NOT_WARN_UNEXPECTED_VERSION = 'dvc.doNotWarnCLIVersion'
 
 export const splitSemver = (
   stdout: string
@@ -21,11 +24,23 @@ const getWarningText = (
 ) => `You are using version ${currentVersion} of the DVC CLI. The expected version is ${MIN_VERSION} <= DVC < ${MAX_VERSION}.
 ${warn} will lead to the extension behaving in unexpected ways. It is recommended that you upgrade to the most recent version of the ${update}.`
 
+const sendWarning = async (text: string) => {
+  const response = await Toast.warnWithOptions(text, Response.NEVER)
+  if (response !== Response.NEVER) {
+    return
+  }
+  setUserConfigValue(DO_NOT_WARN_UNEXPECTED_VERSION, true)
+}
+
 export const isVersionCompatible = (version: string) => {
+  if (getConfigValue<boolean>(DO_NOT_WARN_UNEXPECTED_VERSION)) {
+    return
+  }
+
   const currentSemVer = splitSemver(version)
   if (!currentSemVer) {
-    return Toast.warnWithOptions(
-      'Unable to verify the version number of DVC. The extension could behave in unexpected ways.'
+    return sendWarning(
+      'Unable to verify the DVC CLI version. The extension could behave in unexpected ways.'
     )
   }
 
@@ -41,7 +56,7 @@ export const isVersionCompatible = (version: string) => {
       'Being a major version ahead',
       'extension'
     )
-    return Toast.warnWithOptions(aheadWarning)
+    return sendWarning(aheadWarning)
   }
 
   const [minMajor, minMinor, minPatch] = MIN_VERSION.split('.')
@@ -56,6 +71,6 @@ export const isVersionCompatible = (version: string) => {
       `Using any version before ${MIN_VERSION}`,
       'CLI'
     )
-    return Toast.warnWithOptions(behindWarning)
+    return sendWarning(behindWarning)
   }
 }
