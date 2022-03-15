@@ -131,65 +131,6 @@ describe('CliReader', () => {
     })
   })
 
-  describe('help', () => {
-    it('should call execute process with the correct parameters', async () => {
-      const cwd = __dirname
-      const stdout = `
-	  	Available Commands:
-		COMMAND            Use \`dvc COMMAND --help\` for command-specific help.
-			init             Initialize DVC in the current directory.
-			get              Download file or directory tracked by DVC or by Git.
-			get-url          Download or copy files from URL.
-			destroy          Remove DVC files, local DVC config and data cache.
-			add              Track data files or directories with DVC.
-			remove           Remove stages from dvc.yaml and/or stop tracking files or directories.
-			move             Rename or move a DVC controlled data file or a directory.
-			unprotect        Unprotect tracked files or directories (when hardlinks or symlinks have been enabled with \`dvc config cache.type\`).
-			run              Generate a dvc.yaml file from a command and execute the command.
-			repro            Reproduce complete or partial pipelines by executing their stages.
-			pull             Download tracked files or directories from remote storage.
-			push             Upload tracked files or directories to remote storage.
-			fetch            Download files or directories from remote storage to the cache.
-			status           Show changed stages, compare local cache and a remote storage.
-			gc               Garbage collect unused objects from cache or remote storage.
-			import           Download file or directory tracked by DVC or by Git into the workspace, and track it.
-			import-url       Download or copy file from URL and take it under DVC control.
-			config           Get or set config options.
-			checkout         Checkout data files from cache.
-			remote           Set up and manage data remotes.
-			cache            Manage cache settings.
-			metrics          Commands to display and compare metrics.
-			params           Commands to display params.
-			install          Install DVC git hooks into the repository.
-			root             Return the relative path to the root of the DVC project.
-			list             List repository contents, including files and directories tracked by DVC and by Git.
-			freeze           Freeze stages or .dvc files.
-			unfreeze         Unfreeze stages or .dvc files.
-			dag              Visualize DVC project DAG.
-			commit           Record changes to files or directories tracked by DVC by storing the current versions in the cache.
-			completion       Generate shell tab completion.
-			diff             Show added, modified, or deleted data between commits in the DVC repository, or between a commit and the workspace.
-			version (doctor)
-							Display the DVC version and system/environment information.
-			update           Update data artifacts imported from other DVC repositories.
-			plots            Commands to visualize and compare plot metrics in structured files (JSON, YAML, CSV, TSV).
-			stage            Commands to list and create stages.
-			experiments (exp)
-							Commands to run and compare experiments.
-			check-ignore     Check whether files or directories are excluded due to \`.dvcignore\`.`
-      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-      const output = await cliReader.help(cwd)
-
-      expect(output).toStrictEqual(stdout)
-      expect(mockedCreateProcess).toBeCalledWith({
-        args: ['-h'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
   describe('listDvcOnlyRecursive', () => {
     it('should return all relative tracked paths', async () => {
       const cwd = __dirname
@@ -344,6 +285,23 @@ describe('CliReader', () => {
 
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['status', SHOW_JSON],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('version', () => {
+    it('should call execute process with the correct parameters', async () => {
+      const cwd = __dirname
+      const stdout = '3.9.11'
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+      const output = await cliReader.version(cwd)
+
+      expect(output).toStrictEqual(stdout)
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: ['--version'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

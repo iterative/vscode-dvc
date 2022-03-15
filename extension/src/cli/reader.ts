@@ -2,7 +2,7 @@ import { join } from 'path'
 import { Cli, typeCheckCommands } from '.'
 import { Args, Command, Flag, ListFlag, SubCommand } from './args'
 import { retry } from './retry'
-import { trimAndSplit } from '../util/stdout'
+import { trim, trimAndSplit } from '../util/stdout'
 import { Plot } from '../plots/webview/contract'
 
 export type PathOutput = { path: string }
@@ -119,10 +119,6 @@ export class CliReader extends Cli {
     return this.readProcessJson<DiffOutput>(cwd, Command.DIFF)
   }
 
-  public help(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Flag.HELP)
-  }
-
   public listDvcOnlyRecursive(cwd: string): Promise<ListOutput[]> {
     return this.readProcessJson<ListOutput[]>(
       cwd,
@@ -154,9 +150,13 @@ export class CliReader extends Cli {
     return this.readProcessJson<StatusOutput>(cwd, Command.STATUS)
   }
 
+  public version(cwd: string): Promise<string> {
+    return this.readProcess(cwd, trim, Flag.VERSION)
+  }
+
   private async readProcess<T = string>(
     cwd: string,
-    formatter: typeof trimAndSplit | typeof JSON.parse,
+    formatter: typeof trimAndSplit | typeof JSON.parse | typeof trim,
     ...args: Args
   ): Promise<T> {
     const output = await retry(

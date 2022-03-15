@@ -23,11 +23,11 @@ export enum SubCommand {
 
 export enum Flag {
   FORCE = '-f',
-  HELP = '-h',
   RECURSIVE = '-R',
   SHOW_JSON = '--show-json',
   SUBDIRECTORY = '--subdir',
-  SET_PARAM = '-S'
+  SET_PARAM = '-S',
+  VERSION = '--version'
 }
 
 export enum ExperimentSubCommand {

@@ -4,6 +4,7 @@ import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
+import { isVersionCompatible } from './cli/version'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
@@ -296,7 +297,9 @@ export class Extension implements IExtension {
   public async canRunCli(cwd: string) {
     try {
       await this.config.isReady()
-      return this.setAvailable(!!(await this.cliReader.help(cwd)))
+      const version = await this.cliReader.version(cwd)
+      isVersionCompatible(version)
+      return this.setAvailable(!!version)
     } catch {
       return this.setAvailable(false)
     }
