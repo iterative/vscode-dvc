@@ -295,7 +295,7 @@ describe('CliReader', () => {
   describe('version', () => {
     it('should call execute process with the correct parameters', async () => {
       const cwd = __dirname
-      const stdout = ''
+      const stdout = '3.9.11'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
       const output = await cliReader.version(cwd)
 
