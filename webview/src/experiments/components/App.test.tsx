@@ -19,6 +19,7 @@ import {
 import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
 import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { App } from './App'
+import { useIsFullyContained } from './OverflowHoverTooltip/useIsFullyContained'
 import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
@@ -26,13 +27,14 @@ import {
   makeGetDragEl,
   tableData as sortingTableDataFixture
 } from '../../test/sort'
-import { useIsFullyContained } from '../../shared/components/overflowHover/useIsFullyContained'
-import { HEADER_TOOLTIP_DELAY } from '../../shared/components/overflowHover'
-import { CELL_TOOLTIP_DELAY } from '../util/buildDynamicColumns'
+import {
+  CELL_TOOLTIP_DELAY,
+  HEADER_TOOLTIP_DELAY
+} from '../../shared/components/tooltip/Tooltip'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
-jest.mock('../../shared/components/overflowHover/useIsFullyContained', () => ({
+jest.mock('./OverflowHoverTooltip/useIsFullyContained', () => ({
   useIsFullyContained: jest.fn()
 }))
 const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)

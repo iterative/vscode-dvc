@@ -1,9 +1,9 @@
 import { TippyProps } from '@tippyjs/react'
 import React, { useRef } from 'react'
 import { useIsFullyContained } from './useIsFullyContained'
-import Tooltip from '../tooltip/Tooltip'
-
-export const HEADER_TOOLTIP_DELAY = 100
+import Tooltip, {
+  HEADER_TOOLTIP_DELAY
+} from '../../../shared/components/tooltip/Tooltip'
 
 export const OverflowHoverTooltip: React.FC<
   Pick<TippyProps, 'content' | 'children'>

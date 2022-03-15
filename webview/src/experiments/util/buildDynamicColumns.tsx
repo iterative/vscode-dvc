@@ -9,10 +9,12 @@ import {
 } from 'react-table'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
-import Tooltip from '../../shared/components/tooltip/Tooltip'
+import Tooltip, {
+  CELL_TOOLTIP_DELAY
+} from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/Table/styles.module.scss'
 import { CopyButton } from '../components/CopyButton'
-import { OverflowHoverTooltip } from '../../shared/components/overflowHover'
+import { OverflowHoverTooltip } from '../components/OverflowHoverTooltip'
 
 const UndefinedCell = (
   <div className={styles.innerCell}>
@@ -38,8 +40,6 @@ const CellTooltip: React.FC<{
     </>
   )
 }
-
-export const CELL_TOOLTIP_DELAY = 1000
 
 const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
   const { value } = cell
