@@ -55,7 +55,7 @@ describe('isVersionCompatible', () => {
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
   })
 
-  it('should send a toast message if the provided minor is before the minimum expected version', async () => {
+  it('should send a toast message if the provided minor version is before the minimum expected version', async () => {
     mockedGetConfigValue.mockReturnValueOnce(false)
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
