@@ -1,8 +1,8 @@
-import Tippy, { useSingleton } from '@tippyjs/react'
 import React, { useState } from 'react'
+import { useSingleton } from '@tippyjs/react'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
 import styles from './styles.module.scss'
-import sharedStyles from '../../styles.module.scss'
+import Tooltip from '../tooltip/Tooltip'
 
 interface IconMenuProps {
   items: IconMenuItemProps[]
@@ -16,35 +16,15 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
   })
 
   return (
-    <Tippy
-      arrow={false}
+    <Tooltip
       singleton={tooltipSource}
-      className={sharedStyles.menu}
-      animation={false}
       placement="bottom-end"
       disabled={tooltipDisabled}
-      popperOptions={{
-        modifiers: [
-          {
-            enabled: false,
-            name: 'flip'
-          },
-          {
-            name: 'computeStyles',
-            options: {
-              adaptive: false
-            }
-          }
-        ]
-      }}
     >
-      <Tippy
-        arrow={false}
+      <Tooltip
         trigger="click"
         interactive
         singleton={menuSource}
-        className={sharedStyles.menu}
-        animation={false}
         placement="bottom"
         onShow={() => {
           setTooltipDisabled(true)
@@ -63,7 +43,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
             />
           ))}
         </ul>
-      </Tippy>
-    </Tippy>
+      </Tooltip>
+    </Tooltip>
   )
 }

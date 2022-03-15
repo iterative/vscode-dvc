@@ -8,14 +8,11 @@ import {
   Cell
 } from 'react-table'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
-import Tippy from '@tippyjs/react'
 import { formatFloat } from './numberFormatting'
+import Tooltip from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/Table/styles.module.scss'
-import sharedStyles from '../../shared/styles.module.scss'
 import { CopyButton } from '../components/CopyButton'
 import { OverflowHoverTooltip } from '../../shared/components/overflowHover'
-
-import 'tippy.js/dist/tippy.css'
 
 const UndefinedCell = (
   <div className={styles.innerCell}>
@@ -58,10 +55,8 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
       : stringValue
 
   return (
-    <Tippy
-      animation={false}
+    <Tooltip
       content={<CellTooltip cell={cell} />}
-      className={sharedStyles.menu}
       placement="bottom"
       arrow={true}
       delay={CELL_TOOLTIP_DELAY}
@@ -70,7 +65,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
         <CopyButton value={stringValue} />
         <span className={styles.cellContents}>{displayValue}</span>
       </div>
-    </Tippy>
+    </Tooltip>
   )
 }
 
