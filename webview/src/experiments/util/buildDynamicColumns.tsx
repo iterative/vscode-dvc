@@ -59,7 +59,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
       content={<CellTooltip cell={cell} />}
       placement="bottom"
       arrow={true}
-      delay={CELL_TOOLTIP_DELAY}
+      delay={[CELL_TOOLTIP_DELAY, 0]}
     >
       <div className={styles.innerCell}>
         <CopyButton value={stringValue} />

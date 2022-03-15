@@ -429,6 +429,9 @@ describe('App', () => {
     })
 
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a cell', () => {
+      jest
+        .spyOn(window, 'requestAnimationFrame')
+        .mockImplementation(cb => window.setTimeout(cb, 1))
       render(<App />)
       fireEvent(
         window,
@@ -454,11 +457,10 @@ describe('App', () => {
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY - 1)
-      expect(screen.getByRole('tooltip')).toBeInTheDocument()
-
       jest.advanceTimersByTime(1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      jest.mocked(window.requestAnimationFrame).mockRestore()
     })
 
     it('should show a tooltip with the full number on number cells', () => {
