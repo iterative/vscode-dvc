@@ -80,4 +80,18 @@ describe('isVersionCompatible', () => {
 
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
   })
+
+  it('should send a toast message if the provided version is malformed', async () => {
+    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+
+    await isVersionCompatible('not a valid version')
+
+    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+  })
+
+  it('should not send a toast message if the provided version matches the min version', async () => {
+    await isVersionCompatible(MIN_VERSION)
+
+    expect(mockedWarnWithOptions).not.toBeCalled()
+  })
 })
