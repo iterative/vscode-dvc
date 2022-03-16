@@ -298,8 +298,7 @@ export class Extension implements IExtension {
     try {
       await this.config.isReady()
       const version = await this.cliReader.version(cwd)
-      isVersionCompatible(version)
-      return this.setAvailable(!!version)
+      return this.setAvailable(isVersionCompatible(version))
     } catch {
       return this.setAvailable(false)
     }
