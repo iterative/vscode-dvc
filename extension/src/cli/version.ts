@@ -16,17 +16,12 @@ export const extractSemver = (
 
 const getWarningText = (
   currentVersion: string,
-  warn: string,
   update: 'CLI' | 'extension'
-): string => `You are using version ${currentVersion} of the DVC CLI. The expected version is ${MIN_VERSION} <= DVC < ${MAX_VERSION}.
-${warn} will lead to the extension behaving in unexpected ways. It is recommended that you upgrade to the most recent version of the ${update}.`
+): string => `The extension cannot initialize because you are using version ${currentVersion} of the DVC CLI.
+The expected version is ${MIN_VERSION} <= DVC < ${MAX_VERSION}. Please upgrade to the most recent version of the ${update}.`
 
-const getTextAndSend = (
-  version: string,
-  warn: string,
-  update: 'CLI' | 'extension'
-): void => {
-  const text = getWarningText(version, warn, update)
+const getTextAndSend = (version: string, update: 'CLI' | 'extension'): void => {
+  const text = getWarningText(version, update)
   Toast.warnWithOptions(text)
 }
 
@@ -41,7 +36,7 @@ const checkCLIVersion = (
   } = currentSemVer
 
   if (currentMajor >= Number(MAX_VERSION)) {
-    getTextAndSend(version, 'Being a major version ahead', 'extension')
+    getTextAndSend(version, 'extension')
     return false
   }
 
@@ -52,7 +47,7 @@ const checkCLIVersion = (
     currentMinor < Number(minMinor) ||
     currentPatch < Number(minPatch)
   ) {
-    getTextAndSend(version, `Using any version before ${MIN_VERSION}`, 'CLI')
+    getTextAndSend(version, 'CLI')
     return false
   }
 
@@ -63,7 +58,7 @@ export const isVersionCompatible = (version: string): boolean => {
   const currentSemVer = extractSemver(version)
   if (!currentSemVer) {
     Toast.warnWithOptions(
-      'Unable to verify the DVC CLI version. The extension could behave in unexpected ways.'
+      'The extension cannot initialize as we were unable to verify the DVC CLI version.'
     )
     return false
   }
