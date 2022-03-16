@@ -31,6 +31,7 @@ import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
 import { MementoPrefix } from '../../vscode/memento'
 import { hasKey } from '../../util/object'
+import { flattenMapValues } from '../../util/map'
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: string
@@ -379,11 +380,11 @@ export class ExperimentsModel {
   }
 
   private flattenExperiments() {
-    return [...this.experimentsByBranch.values()].flat()
+    return flattenMapValues(this.experimentsByBranch)
   }
 
   private flattenCheckpoints() {
-    return [...this.checkpointsByTip.values()].flat()
+    return flattenMapValues(this.checkpointsByTip)
   }
 
   private setStatus() {

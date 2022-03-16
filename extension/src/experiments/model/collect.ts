@@ -10,7 +10,7 @@ import {
   ExperimentsBranchOutput,
   ExperimentsOutput
 } from '../../cli/reader'
-import { addToMapArray } from '../../util/map'
+import { addToMapArray, flattenMapValues } from '../../util/map'
 import { hasKey } from '../../util/object'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
@@ -332,7 +332,7 @@ const collectExistingStatuses = (
   const existingStatuses: Statuses = {}
   for (const experiment of [
     ...experiments,
-    ...[...checkpointsByTip.values()].flat()
+    ...flattenMapValues(checkpointsByTip)
   ]) {
     const { id } = experiment
     if (!hasKey(previousStatuses, id)) {
