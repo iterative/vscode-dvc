@@ -361,12 +361,6 @@
           "type": "boolean",
           "default": null
         },
-        "dvc.doNotWarnCLIVersion": {
-          "title": "%config.doNotWarnCLIVersion.title%",
-          "description": "%config.doNotWarnCLIVersion.description%",
-          "type": "boolean",
-          "default": null
-        },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",

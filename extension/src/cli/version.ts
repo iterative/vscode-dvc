@@ -1,10 +1,7 @@
-import { getConfigValue, setUserConfigValue } from '../vscode/config'
-import { Response } from '../vscode/response'
 import { Toast } from '../vscode/toast'
 
 export const MIN_VERSION = '2.9.5'
 const MAX_VERSION = '3'
-const DO_NOT_WARN_UNEXPECTED_VERSION = 'dvc.doNotWarnCLIVersion'
 
 export const extractSemver = (
   stdout: string
@@ -24,26 +21,19 @@ const getWarningText = (
 ): string => `You are using version ${currentVersion} of the DVC CLI. The expected version is ${MIN_VERSION} <= DVC < ${MAX_VERSION}.
 ${warn} will lead to the extension behaving in unexpected ways. It is recommended that you upgrade to the most recent version of the ${update}.`
 
-const sendWarning = async (text: string): Promise<void> => {
-  const response = await Toast.warnWithOptions(text, Response.NEVER)
-  if (response === Response.NEVER) {
-    setUserConfigValue(DO_NOT_WARN_UNEXPECTED_VERSION, true)
-  }
-}
-
 const getTextAndSend = (
   version: string,
   warn: string,
   update: 'CLI' | 'extension'
-): Promise<void> => {
+): void => {
   const text = getWarningText(version, warn, update)
-  return sendWarning(text)
+  Toast.warnWithOptions(text)
 }
 
 const checkCLIVersion = (
   version: string,
   currentSemVer: { major: number; minor: number; patch: number }
-): Promise<void> | void => {
+): boolean => {
   const {
     major: currentMajor,
     minor: currentMinor,
@@ -51,7 +41,8 @@ const checkCLIVersion = (
   } = currentSemVer
 
   if (currentMajor >= Number(MAX_VERSION)) {
-    return getTextAndSend(version, 'Being a major version ahead', 'extension')
+    getTextAndSend(version, 'Being a major version ahead', 'extension')
+    return false
   }
 
   const [minMajor, minMinor, minPatch] = MIN_VERSION.split('.')
@@ -61,24 +52,20 @@ const checkCLIVersion = (
     currentMinor < Number(minMinor) ||
     currentPatch < Number(minPatch)
   ) {
-    return getTextAndSend(
-      version,
-      `Using any version before ${MIN_VERSION}`,
-      'CLI'
-    )
+    getTextAndSend(version, `Using any version before ${MIN_VERSION}`, 'CLI')
+    return false
   }
+
+  return true
 }
 
-export const isVersionCompatible = (version: string): Promise<void> | void => {
-  if (getConfigValue<boolean>(DO_NOT_WARN_UNEXPECTED_VERSION)) {
-    return
-  }
-
+export const isVersionCompatible = (version: string): boolean => {
   const currentSemVer = extractSemver(version)
   if (!currentSemVer) {
-    return sendWarning(
+    Toast.warnWithOptions(
       'Unable to verify the DVC CLI version. The extension could behave in unexpected ways.'
     )
+    return false
   }
 
   return checkCLIVersion(version, currentSemVer)
