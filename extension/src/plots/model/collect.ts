@@ -5,7 +5,8 @@ import {
   CheckpointPlotData,
   isImagePlot,
   ImagePlot,
-  TemplatePlot
+  TemplatePlot,
+  Plot
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -14,7 +15,7 @@ import {
   Value,
   ValueTree
 } from '../../cli/reader'
-import { reduceMetricsAndParams } from '../../experiments/metricsAndParams/reduce'
+import { extractMetricsAndParams } from '../../experiments/metricsAndParams/extract'
 import {
   decodeMetricOrParam,
   joinMetricOrParamFilePath
@@ -38,8 +39,8 @@ const collectFromMetricsFile = (
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
   if (typeof value === 'object') {
-    Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
-      return collectFromMetricsFile(
+    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
+      collectFromMetricsFile(
         acc,
         name,
         iteration,
@@ -47,7 +48,7 @@ const collectFromMetricsFile = (
         childValue,
         pathArray
       )
-    })
+    }
     return
   }
 
@@ -76,7 +77,7 @@ const transformExperimentData = (
 
   const { checkpoint_tip, checkpoint_parent, queued, running } =
     experimentFields
-  const { metrics } = reduceMetricsAndParams(experimentFields)
+  const { metrics } = extractMetricsAndParams(experimentFields)
 
   return { checkpoint_parent, checkpoint_tip, metrics, queued, running }
 }
@@ -98,7 +99,7 @@ const collectFromMetrics = (
   iteration: number,
   metrics: MetricsOrParams
 ) => {
-  Object.keys(metrics).forEach(file =>
+  for (const file of Object.keys(metrics)) {
     collectFromMetricsFile(
       acc,
       experimentName,
@@ -107,7 +108,7 @@ const collectFromMetrics = (
       metrics[file],
       [file]
     )
-  )
+  }
 }
 
 const getLastIteration = (
@@ -199,15 +200,15 @@ export const collectCheckpointPlotsData = (
     }
   }
 
-  if (!acc.plots.size) {
+  if (acc.plots.size === 0) {
     return
   }
 
   const plotsData: CheckpointPlotData[] = []
 
-  acc.plots.forEach((value, key) => {
+  for (const [key, value] of acc.plots.entries()) {
     plotsData.push({ title: decodeMetricOrParam(key), values: value })
-  })
+  }
 
   return plotsData
 }
@@ -246,46 +247,72 @@ const collectPlotData = (
   path: string,
   plot: TemplatePlot
 ) => {
-  plot.revisions?.forEach(rev => {
+  for (const rev of plot.revisions || []) {
     if (!acc[rev]) {
       acc[rev] = {}
     }
     acc[rev][path] = []
-  })
-  ;(plot.content.data as { values: { rev: string }[] }).values.forEach(value =>
-    (acc[value.rev][path] as unknown[]).push(value)
-  )
+  }
+  for (const value of (plot.content.data as { values: { rev: string }[] })
+    .values) {
+    ;(acc[value.rev][path] as unknown[]).push(value)
+  }
 }
 
-export const collectData = (
-  data: PlotsOutput
-): { revisionData: RevisionData; comparisonData: ComparisonData } =>
-  Object.entries(data).reduce(
-    (acc, [path, plots]) => {
-      plots.forEach(plot => {
-        if (isImagePlot(plot)) {
-          return collectImageData(acc.comparisonData, path, plot)
-        }
+type DataAccumulator = {
+  revisionData: RevisionData
+  comparisonData: ComparisonData
+}
 
-        return collectPlotData(acc.revisionData, path, plot)
-      })
-      return acc
-    },
+const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
+  for (const plot of plots) {
+    if (isImagePlot(plot)) {
+      collectImageData(acc.comparisonData, path, plot)
+      continue
+    }
 
-    { comparisonData: {} as ComparisonData, revisionData: {} as RevisionData }
-  )
+    collectPlotData(acc.revisionData, path, plot)
+  }
+}
 
-export const collectTemplates = (data: PlotsOutput) =>
-  Object.entries(data).reduce((acc, [path, plots]) => {
-    plots.forEach(plot => {
-      if (isImagePlot(plot) || acc[path]) {
-        return
-      }
-      const template = {
-        ...plot.content
-      }
-      delete template.data
-      acc[path] = template
-    })
-    return acc
-  }, {} as Record<string, VisualizationSpec>)
+export const collectData = (data: PlotsOutput): DataAccumulator => {
+  const acc = {
+    comparisonData: {},
+    revisionData: {}
+  } as DataAccumulator
+
+  for (const [path, plots] of Object.entries(data)) {
+    collectPathData(acc, path, plots)
+  }
+
+  return acc
+}
+
+type TemplateAccumulator = Record<string, VisualizationSpec>
+
+const collectTemplate = (
+  acc: TemplateAccumulator,
+  path: string,
+  plot: Plot
+) => {
+  if (isImagePlot(plot) || acc[path]) {
+    return
+  }
+  const template = {
+    ...plot.content
+  }
+  delete template.data
+  acc[path] = template
+}
+
+export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
+  const acc: TemplateAccumulator = {}
+
+  for (const [path, plots] of Object.entries(data)) {
+    for (const plot of plots) {
+      collectTemplate(acc, path, plot)
+    }
+  }
+
+  return acc
+}

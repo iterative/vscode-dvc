@@ -1,20 +1,15 @@
-import { dirname, join, resolve, sep } from 'path'
+import { dirname, join, resolve } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 import { PathOutput } from '../../cli/reader'
 import { isSameOrChild } from '../../fileSystem'
+import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
 
 export type PathItem = Resource & {
   isDirectory: boolean
   isTracked: boolean
 }
-
-const getPath = (pathArray: string[], idx: number) =>
-  pathArray.slice(0, idx).join(sep)
-
-const getDirectChild = (pathArray: string[], idx: number) =>
-  getPath(pathArray, idx + 1)
 
 const transform = (
   dvcRoot: string,
@@ -23,7 +18,7 @@ const transform = (
 ): Map<string, PathItem[]> => {
   const treeMap = new Map<string, PathItem[]>()
 
-  acc.forEach((paths, path) => {
+  for (const [path, paths] of acc.entries()) {
     const items = [...paths].map(path => ({
       dvcRoot,
       isDirectory: !!acc.get(path),
@@ -32,7 +27,7 @@ const transform = (
     }))
     const absPath = Uri.file(join(dvcRoot, path)).fsPath
     treeMap.set(absPath, items)
-  })
+  }
 
   return treeMap
 }
@@ -44,8 +39,8 @@ export const collectTree = (
   const acc = new Map<string, Set<string>>()
   const isTracked = new Set<string>()
 
-  paths.forEach(path => {
-    const pathArray = path.split(sep)
+  for (const path of paths) {
+    const pathArray = getPathArray(path)
 
     isTracked.add(path)
     const dir = dirname(path)
@@ -53,18 +48,17 @@ export const collectTree = (
       isTracked.add(dir)
     }
 
-    pathArray.reduce((acc, _, i) => {
-      const path = getPath(pathArray, i)
-      addToMapSet(acc, path, getDirectChild(pathArray, i))
-      return acc
-    }, acc)
-  })
+    for (let idx = 0; idx < pathArray.length; idx++) {
+      const path = getPath(pathArray, idx)
+      addToMapSet(acc, path, getDirectChild(pathArray, idx))
+    }
+  }
 
   return transform(dvcRoot, acc, isTracked)
 }
 
 const collectMissingParents = (acc: string[], absPath: string) => {
-  if (!acc.length) {
+  if (acc.length === 0) {
     return
   }
 
@@ -84,38 +78,44 @@ export const collectModifiedAgainstHead = (
   dvcRoot: string,
   modified: PathOutput[],
   tracked: Set<string>
-): string[] =>
-  modified.reduce((acc, { path }) => {
+): string[] => {
+  const acc: string[] = []
+
+  for (const { path } of modified) {
     const absPath = resolve(dvcRoot, path)
     if (!tracked.has(absPath)) {
-      return acc
+      continue
     }
 
     collectMissingParents(acc, absPath)
     acc.push(absPath)
+  }
 
-    return acc
-  }, [] as string[])
+  return acc
+}
+
+const collectPath = (acc: Set<string>, dvcRoot: string, path: string) => {
+  const pathArray = getPathArray(path)
+
+  for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
+    const path = join(dvcRoot, getPath(pathArray, reverseIdx))
+    if (acc.has(path)) {
+      continue
+    }
+
+    acc.add(path)
+  }
+}
 
 export const collectTracked = (
   dvcRoot: string,
   paths: string[] = []
-): Set<string> =>
-  paths.reduce((acc, path) => {
-    acc.add(join(dvcRoot, path))
+): Set<string> => {
+  const acc = new Set<string>()
 
-    const dir = dirname(path)
-    if (acc.has(join(dvcRoot, dir))) {
-      return acc
-    }
+  for (const path of paths) {
+    collectPath(acc, dvcRoot, path)
+  }
 
-    const pathArray = dir.split(sep)
-    path.split(sep).reduce((acc, _, i) => {
-      const path = getPath(pathArray, i)
-      if (path) {
-        acc.add(join(dvcRoot, path))
-      }
-      return acc
-    }, acc)
-    return acc
-  }, new Set<string>())
+  return acc
+}

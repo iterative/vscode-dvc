@@ -32,6 +32,17 @@ interface TemplatePlotEntry extends TemplatePlot {
   id: string
 }
 
+const addIdAndPath = (entries: VegaPlots) => {
+  let acc: TemplatePlotEntry[] = []
+  for (const [path, plots] of Object.entries(entries)) {
+    acc = [
+      ...acc,
+      ...plots.map((plot, i) => ({ ...plot, id: `plot_${path}_${i}`, path }))
+    ]
+  }
+  return acc
+}
+
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   entries,
   group,
@@ -42,16 +53,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   const [order, setOrder] = useState<string[]>([])
 
   useEffect(() => {
-    setAllPlots(
-      Object.entries(entries).reduce(
-        (acc: TemplatePlotEntry[], [path, plots]) => {
-          return acc.concat(
-            plots.map((plot, i) => ({ ...plot, id: `plot_${path}_${i}`, path }))
-          )
-        },
-        []
-      )
-    )
+    const templatePlots = addIdAndPath(entries)
+    setAllPlots(templatePlots)
   }, [entries])
 
   useEffect(() => {

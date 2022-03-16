@@ -54,8 +54,8 @@ export const restoreWebview = <T extends WebviewData>(
   return new Promise((resolve, reject) => {
     try {
       resolve(create(viewKey, webviewPanel, state.dvcRoot))
-    } catch (e: unknown) {
-      reject(e)
+    } catch (error: unknown) {
+      reject(error)
     }
   })
 }

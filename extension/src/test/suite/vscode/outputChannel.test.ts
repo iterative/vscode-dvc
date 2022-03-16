@@ -53,10 +53,10 @@ suite('Output Channel Test Suite', () => {
 
       expect(mockOutputChannel).to.be.called
       expect(mockAppend).to.be.calledWithMatch(
-        /\[.*?\] > some command - INITIALIZED\n/
+        /\[.*?] > some command - INITIALIZED\n/
       )
       expect(mockAppend).to.be.calledWithMatch(
-        /\[.*?\] > some command - COMPLETED \(500ms\)\n/
+        /\[.*?] > some command - COMPLETED \(500ms\)\n/
       )
     })
 
@@ -86,7 +86,7 @@ suite('Output Channel Test Suite', () => {
 
       expect(mockOutputChannel).to.be.called
       expect(mockAppend).to.be.calledWithMatch(
-        /\[.*?\] > some command - FAILED with code -9 \(20ms\).*?/
+        /\[.*?] > some command - FAILED with code -9 \(20ms\).*?/
       )
     })
   })

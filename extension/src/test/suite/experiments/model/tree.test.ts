@@ -79,7 +79,7 @@ suite('Experiments Tree Test Suite', () => {
         'setSelectionMode'
       )
 
-      while (expectedDomain.length) {
+      while (expectedDomain.length > 0) {
         const expectedData = getExpectedCheckpointPlotsData(
           expectedDomain,
           expectedRange

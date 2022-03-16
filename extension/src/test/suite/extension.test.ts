@@ -23,6 +23,7 @@ import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
+import { MIN_VERSION } from '../../cli/version'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -46,7 +47,7 @@ suite('Extension Test Suite', () => {
 
   describe('dvc.setupWorkspace', () => {
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
-      stub(CliReader.prototype, 'help').rejects('do not run setup')
+      stub(CliReader.prototype, 'version').rejects('do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
@@ -77,7 +78,7 @@ suite('Extension Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
-      stub(CliReader.prototype, 'help').rejects('still do not run setup')
+      stub(CliReader.prototype, 'version').rejects('still do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockUri = Uri.file(
@@ -185,9 +186,9 @@ suite('Extension Test Suite', () => {
         'createFileSystemWatcher'
       )
 
-      const mockCanRunCli = stub(CliReader.prototype, 'help')
+      const mockCanRunCli = stub(CliReader.prototype, 'version')
         .onFirstCall()
-        .resolves('ok, initialize everything')
+        .resolves(MIN_VERSION)
         .onSecondCall()
         .rejects('CLI is gone, dispose of everything')
 

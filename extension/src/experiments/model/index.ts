@@ -145,7 +145,9 @@ export class ExperimentsModel {
     }
 
     const filters = new Map(this.filters)
-    filterIdsToRemove.forEach(id => filters.delete(id))
+    for (const id of filterIdsToRemove) {
+      filters.delete(id)
+    }
     const filteredExperiments = this.getFilteredExperiments([
       ...filters.values()
     ])
@@ -176,12 +178,14 @@ export class ExperimentsModel {
   }
 
   public getMutableRevisions() {
-    return this.getCombinedList().reduce((acc, { label, mutable }) => {
+    const acc: string[] = []
+
+    for (const { label, mutable } of this.getCombinedList()) {
       if (mutable) {
         acc.push(label)
       }
-      return acc
-    }, [] as string[])
+    }
+    return acc
   }
 
   public getSelectedRevisions() {
@@ -198,14 +202,16 @@ export class ExperimentsModel {
       this.setSelectionMode(false)
     }
 
-    const selected = experiments.map(exp => exp.id)
+    const selected = new Set(experiments.map(exp => exp.id))
 
-    this.status = this.getCombinedList().reduce((acc, { id }) => {
-      const status = selected.includes(id) ? Status.SELECTED : Status.UNSELECTED
+    const acc: Statuses = {}
+
+    for (const { id } of this.getCombinedList()) {
+      const status = selected.has(id) ? Status.SELECTED : Status.UNSELECTED
       acc[id] = status
+    }
 
-      return acc
-    }, {} as Statuses)
+    this.status = acc
 
     this.persistStatus()
   }
@@ -541,12 +547,15 @@ export class ExperimentsModel {
   }
 
   private getSelectedFromList(getList: () => Experiment[]) {
-    return getList().reduce((acc, experiment) => {
+    const acc: SelectedExperimentWithColor[] = []
+
+    for (const experiment of getList()) {
       if (this.isSelectedExperimentWithColor(experiment)) {
         acc.push(experiment)
       }
-      return acc
-    }, [] as SelectedExperimentWithColor[])
+    }
+
+    return acc
   }
 
   private isSelectedExperimentWithColor(

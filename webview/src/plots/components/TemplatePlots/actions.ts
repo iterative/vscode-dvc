@@ -25,7 +25,7 @@ export const removeFromPreviousSectionAndAddToNewSection = (
             sectionEntry => sectionEntry[0] !== entryId
           )
         )
-        return Object.keys(entries).length
+        return Object.keys(entries).length > 0
           ? {
               entries,
               group: section.group

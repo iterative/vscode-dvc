@@ -81,11 +81,11 @@ export class RepositoryModel
 
   public hasChanges(): boolean {
     return !!(
-      this.state.added.size ||
-      this.state.deleted.size ||
-      this.state.gitModified.size ||
-      this.state.modified.size ||
-      this.state.renamed.size
+      this.state.added.size > 0 ||
+      this.state.deleted.size > 0 ||
+      this.state.gitModified.size > 0 ||
+      this.state.modified.size > 0 ||
+      this.state.renamed.size > 0
     )
   }
 
@@ -101,10 +101,7 @@ export class RepositoryModel
       .filter(value => value) as PathStatus[]
   }
 
-  private collectStatuses(
-    entry: PathStatus,
-    reducedStatus: ModifiedAndNotInCache
-  ) {
+  private collectStatuses(acc: ModifiedAndNotInCache, entry: PathStatus) {
     Object.entries(entry)
       .filter(([, status]) =>
         [Status.NOT_IN_CACHE, Status.MODIFIED].includes(status)
@@ -116,28 +113,24 @@ export class RepositoryModel
           return
         }
 
-        reducedStatus[status as Status.NOT_IN_CACHE | Status.MODIFIED].add(
-          absolutePath
-        )
+        acc[status as Status.NOT_IN_CACHE | Status.MODIFIED].add(absolutePath)
       })
   }
 
-  private reduceStatus(statusOutput: StatusOutput): ModifiedAndNotInCache {
-    const statusReducer = (
-      modifiedAndNotInCache: ModifiedAndNotInCache,
-      entry: StatusesOrAlwaysChanged[]
-    ): ModifiedAndNotInCache => {
-      const statuses = this.getChangedOutsStatuses(entry)
-
-      statuses.map(entry => this.collectStatuses(entry, modifiedAndNotInCache))
-
-      return modifiedAndNotInCache
-    }
-
-    return Object.values(statusOutput).reduce(statusReducer, {
+  private collectModifiedAndNotInCache(
+    statusOutput: StatusOutput
+  ): ModifiedAndNotInCache {
+    const acc: ModifiedAndNotInCache = {
       [Status.MODIFIED]: new Set(),
       [Status.NOT_IN_CACHE]: new Set()
-    })
+    }
+
+    for (const entry of Object.values(statusOutput)) {
+      const statuses = this.getChangedOutsStatuses(entry)
+      statuses.map(entry => this.collectStatuses(acc, entry))
+    }
+
+    return acc
   }
 
   private mapToTrackedPaths(diff: PathOutput[] = []): string[] {
@@ -198,7 +191,7 @@ export class RepositoryModel
     const {
       [Status.MODIFIED]: modifiedAgainstCache,
       [Status.NOT_IN_CACHE]: notInCache
-    } = this.reduceStatus(statusOutput)
+    } = this.collectModifiedAndNotInCache(statusOutput)
 
     this.state.gitModified = this.splitModifiedAgainstHead(
       modifiedAgainstHead,

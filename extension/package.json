@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.1",
+  "version": "0.2.3",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -897,6 +897,11 @@
           "id": "dvc.views.experimentsFilterByTree",
           "name": "Filter By",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "id": "dvc.views.plotsPathsTree",
+          "name": "Plots",
+          "when": "dvc.commands.available && dvc.project.available"
         }
       ]
     },
@@ -922,6 +927,10 @@
       {
         "view": "dvc.views.experimentsFilterByTree",
         "contents": "No filters applied. \n[Add Filter](command:dvc.addExperimentsTableFilter)\n"
+      },
+      {
+        "view": "dvc.views.plotsPathsTree",
+        "contents": "No plots to display."
       }
     ],
     "walkthroughs": [
@@ -1059,7 +1068,6 @@
     "package": "vsce package --yarn -o ./dvc.vsix",
     "test-vscode-build": "tsc -p .",
     "test-vscode-run": "node ./dist/test/runTest.js",
-    "test-staged": "lint-staged",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "vscode:prepublish": ""
@@ -1101,7 +1109,7 @@
     "copy-webpack-plugin": "^10.2.4",
     "fork-ts-checker-webpack-plugin": "^6.5.0",
     "jest": "^27.4.7",
-    "lint-staged": "^12.1.2",
+    "lint-staged": "^12.3.5",
     "mocha": "^9.2.1",
     "shx": "^0.3.3",
     "sinon": "^12.0.1",
@@ -1113,9 +1121,6 @@
     "vscode-uri": "^3.0.2",
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2"
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": "jest --bail --findRelatedTests"
   },
   "peerDependencies": {
     "typescript": "*"

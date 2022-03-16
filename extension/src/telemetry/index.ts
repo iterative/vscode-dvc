@@ -39,6 +39,23 @@ const convertProperty = (prop: object | string | number | boolean): string => {
   return prop.toString()
 }
 
+const sanitizeProperty = (
+  eventName: string,
+  sanitizedProperties: Record<string, string>,
+  key: string,
+  value: object | string | number | boolean
+) => {
+  try {
+    // If there are any errors in serializing one property, ignore that and move on.
+    // Else nothing will be sent.
+    sanitizedProperties[key] = convertProperty(value)
+  } catch (error: unknown) {
+    Logger.error(
+      `Failed to serialize ${key} for ${String(eventName)}: ${error}`
+    )
+  }
+}
+
 const sanitizeProperties = <
   P extends IEventNamePropertyMapping,
   E extends keyof P
@@ -47,18 +64,12 @@ const sanitizeProperties = <
   data: P[E]
 ) => {
   const sanitizedProperties: Record<string, string> = {}
-  Object.entries(data).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(data)) {
     if (value === undefined || value === null) {
-      return
+      continue
     }
-    try {
-      // If there are any errors in serializing one property, ignore that and move on.
-      // Else nothing will be sent.
-      sanitizedProperties[key] = convertProperty(value)
-    } catch (e: unknown) {
-      Logger.error(`Failed to serialize ${key} for ${eventName}: ${e}`)
-    }
-  })
+    sanitizeProperty(eventName as string, sanitizedProperties, key, value)
+  }
   return sanitizedProperties
 }
 
@@ -94,7 +105,7 @@ export const sendErrorTelemetryEvent = <
   properties = {} as P[E]
 ) =>
   sendTelemetryEvent(
-    `errors.${eventName}` as E,
+    `errors.${String(eventName)}` as E,
     { ...properties, error: e.message } as P[E],
     {
       duration

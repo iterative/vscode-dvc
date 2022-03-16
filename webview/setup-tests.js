@@ -1,6 +1,6 @@
 const StyleUtils = require('./src/util/styles')
 
-/* eslint-disable */
+// eslint-disable-next-line no-global-assign
 window = {
   addEventListener: jest.fn(),
   dispatchEvent: jest.fn()
@@ -8,8 +8,8 @@ window = {
 
 const mutationObserverMock = jest.fn().mockImplementation(() => {
   return {
-    observe: jest.fn(),
     disconnect: jest.fn(),
+    observe: jest.fn(),
     takeRecords: jest.fn()
   }
 })

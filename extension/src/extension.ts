@@ -1,9 +1,10 @@
 import { commands, Event, EventEmitter, ExtensionContext } from 'vscode'
-import { Disposable, Disposer } from '@hediet/std/disposable'
+import { Disposable } from '@hediet/std/disposable'
 import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
+import { isVersionCompatible } from './cli/version'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
@@ -44,8 +45,7 @@ import { WorkspaceRepositories } from './repository/workspace'
 import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WebviewSerializer } from './webview/serializer'
 import { WorkspacePlots } from './plots/workspace'
-
-export { Disposable, Disposer }
+import { PlotsPathsTree } from './plots/paths/tree'
 
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
@@ -160,6 +160,14 @@ export class Extension implements IExtension {
       )
     )
 
+    this.dispose.track(
+      new PlotsPathsTree(
+        this.plots,
+        this.internalCommands,
+        this.resourceLocator
+      )
+    )
+
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(
         this.internalCommands,
@@ -176,10 +184,10 @@ export class Extension implements IExtension {
           { duration: stopWatch.getElapsedTime() }
         )
       )
-      .catch(e =>
+      .catch(error =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
-          e,
+          error,
           stopWatch.getElapsedTime(),
           this.getEventProperties()
         )
@@ -202,10 +210,10 @@ export class Extension implements IExtension {
             this.getEventProperties(),
             { duration: stopWatch.getElapsedTime() }
           )
-        } catch (e: unknown) {
+        } catch (error: unknown) {
           return sendTelemetryEventAndThrow(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
-            e as Error,
+            error as Error,
             stopWatch.getElapsedTime(),
             this.getEventProperties()
           )
@@ -232,10 +240,10 @@ export class Extension implements IExtension {
             }
           )
           return stopped
-        } catch (e: unknown) {
+        } catch (error: unknown) {
           return sendTelemetryEventAndThrow(
             RegisteredCommands.STOP_EXPERIMENT,
-            e as Error,
+            error as Error,
             stopWatch.getElapsedTime()
           )
         }
@@ -271,10 +279,10 @@ export class Extension implements IExtension {
               }
             )
             return completed
-          } catch (e: unknown) {
+          } catch (error: unknown) {
             return sendTelemetryEventAndThrow(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-              e as Error,
+              error as Error,
               stopWatch.getElapsedTime()
             )
           }
@@ -289,7 +297,8 @@ export class Extension implements IExtension {
   public async canRunCli(cwd: string) {
     try {
       await this.config.isReady()
-      return this.setAvailable(!!(await this.cliReader.help(cwd)))
+      const version = await this.cliReader.version(cwd)
+      return this.setAvailable(isVersionCompatible(version))
     } catch {
       return this.setAvailable(false)
     }
@@ -396,3 +405,5 @@ export function deactivate(): void {
     extension.dispose()
   }
 }
+
+export { Disposer, Disposable } from '@hediet/std/disposable'

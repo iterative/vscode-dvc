@@ -7,7 +7,8 @@ import {
   ExperimentFieldsOrError,
   ExperimentsOutput,
   Value,
-  ValueTree
+  ValueTree,
+  ValueTreeOrError
 } from '../../cli/reader'
 
 const getValueType = (value: Value) => {
@@ -55,7 +56,7 @@ const mergeValueIntoColumn = (
 ) => {
   if (!column.types) {
     column.types = [valueType]
-  } else if (column.types.findIndex(x => x === valueType) < 0) {
+  } else if (!column.types.includes(valueType)) {
     column.types.push(valueType)
   }
 
@@ -74,10 +75,7 @@ export const collectMetricsAndParams = (
   const mergeParentColumnByPath = (path: string[], group: string) => {
     const name = path[path.length - 1]
     const columnPath = joinMetricOrParamPath(group, ...path)
-    const parentPath = joinMetricOrParamPath(
-      group,
-      ...path.slice(0, path.length - 1)
-    )
+    const parentPath = joinMetricOrParamPath(group, ...path.slice(0, -1))
     if (!collectedColumns[columnPath]) {
       collectedColumns[columnPath] = {
         group,
@@ -175,17 +173,12 @@ const collectChange = (
   ancestors: string[] = []
 ) => {
   if (typeof value === 'object') {
-    Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
-      return collectChange(
-        changes,
-        type,
-        file,
-        childKey,
-        childValue,
-        commitData,
-        [...ancestors, key]
-      )
-    })
+    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
+      collectChange(changes, type, file, childKey, childValue, commitData, [
+        ...ancestors,
+        key
+      ])
+    }
     return
   }
 
@@ -194,23 +187,34 @@ const collectChange = (
   }
 }
 
+const collectFileChanges = (
+  changes: string[],
+  type: 'params' | 'metrics',
+  commitData: ExperimentFields,
+  file: string,
+  value: ValueTreeOrError
+) => {
+  const data = value.data
+  if (!data) {
+    return
+  }
+
+  for (const [key, value] of Object.entries(data)) {
+    collectChange(changes, type, file, key, value, commitData)
+  }
+}
+
 const collectMetricsAndParamsChanges = (
   changes: string[],
   workspaceData: ExperimentFields,
   commitData: ExperimentFields
-) =>
-  (['params', 'metrics'] as ('params' | 'metrics')[]).forEach(type =>
-    Object.entries(workspaceData?.[type] || {}).forEach(([file, value]) => {
-      const data = value.data
-      if (!data) {
-        return
-      }
-
-      Object.entries(data).forEach(([key, value]) =>
-        collectChange(changes, type, file, key, value, commitData)
-      )
-    })
-  )
+) => {
+  for (const type of ['params', 'metrics'] as ('params' | 'metrics')[]) {
+    for (const [file, value] of Object.entries(workspaceData?.[type] || {})) {
+      collectFileChanges(changes, type, commitData, file, value)
+    }
+  }
+}
 
 const getData = (value: { baseline: ExperimentFieldsOrError }) =>
   value.baseline.data || {}
@@ -218,17 +222,20 @@ const getData = (value: { baseline: ExperimentFieldsOrError }) =>
 export const collectChanges = (data: ExperimentsOutput): string[] => {
   const changes: string[] = []
 
-  const { workspace, currentCommit } = Object.entries(data).reduce(
-    (acc, [key, value]) => {
-      if (key === 'workspace') {
-        acc.workspace = getData(value)
-        return acc
-      }
-      acc.currentCommit = getData(value)
-      return acc
-    },
-    {} as Record<string, ExperimentFields>
-  )
+  let workspace
+  let currentCommit
+
+  for (const [key, value] of Object.entries(data)) {
+    if (key === 'workspace') {
+      workspace = getData(value)
+      continue
+    }
+    currentCommit = getData(value)
+  }
+
+  if (!(workspace && currentCommit)) {
+    return changes
+  }
 
   collectMetricsAndParamsChanges(changes, workspace, currentCommit)
 

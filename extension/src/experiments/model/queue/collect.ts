@@ -16,9 +16,9 @@ const collectFromParamsFile = (
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
   if (typeof value === 'object') {
-    Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
-      return collectFromParamsFile(acc, childKey, childValue, pathArray)
-    })
+    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
+      collectFromParamsFile(acc, childKey, childValue, pathArray)
+    }
     return
   }
 
@@ -29,8 +29,9 @@ const collectFromParamsFile = (
 
 export const collectFlatExperimentParams = (params: MetricsOrParams = {}) => {
   const acc: { path: string; value: string | number | boolean }[] = []
-  Object.keys(params).forEach(file =>
+  for (const file of Object.keys(params)) {
     collectFromParamsFile(acc, undefined, params[file], [file])
-  )
+  }
+
   return acc
 }

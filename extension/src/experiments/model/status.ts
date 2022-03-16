@@ -1,3 +1,4 @@
+import { sum } from '../../util/math'
 import { Experiment } from '../webview/contract'
 
 export const MAX_SELECTED_EXPERIMENTS = 7
@@ -10,7 +11,7 @@ export enum Status {
 export type Statuses = Record<string, Status>
 
 const getSelectedCount = (status: Statuses): number =>
-  Object.values(status).reduce((acc, expStatus) => acc + expStatus, 0)
+  sum(Object.values(status))
 
 export const canSelect = (status: Statuses): boolean =>
   getSelectedCount(status) < MAX_SELECTED_EXPERIMENTS

@@ -19,6 +19,7 @@ import {
 import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
 import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { App } from './App'
+import { useIsFullyContained } from './OverflowHoverTooltip/useIsFullyContained'
 import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
@@ -26,11 +27,14 @@ import {
   makeGetDragEl,
   tableData as sortingTableDataFixture
 } from '../../test/sort'
-import { useIsFullyContained } from '../../shared/components/overflowHover/useIsFullyContained'
+import {
+  CELL_TOOLTIP_DELAY,
+  HEADER_TOOLTIP_DELAY
+} from '../../shared/components/tooltip/Tooltip'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
-jest.mock('../../shared/components/overflowHover/useIsFullyContained', () => ({
+jest.mock('./OverflowHoverTooltip/useIsFullyContained', () => ({
   useIsFullyContained: jest.fn()
 }))
 const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)
@@ -295,8 +299,6 @@ describe('App', () => {
       jest.useRealTimers()
     })
 
-    const headerTooltipDelay = 100
-
     const testParamName = 'test_param_with_long_name'
     const testParamPath = joinMetricOrParamPath(
       'params',
@@ -358,14 +360,14 @@ describe('App', () => {
           mutable: false,
           params: {
             'params.yaml': {
-              test_param: testParamStringValue
+              [testParamName]: testParamStringValue
             }
           }
         }
       ]
     }
 
-    it(`should show and hide a tooltip on mouseEnter and mouseLeave of a header with a ${headerTooltipDelay}ms delay`, () => {
+    it('should show and hide a tooltip on mouseEnter and mouseLeave of a header', () => {
       mockedUseIsFullyContained.mockReturnValue(false)
 
       render(<App />)
@@ -386,7 +388,7 @@ describe('App', () => {
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      jest.advanceTimersByTime(headerTooltipDelay - 1)
+      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY - 1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -395,7 +397,7 @@ describe('App', () => {
 
       fireEvent.mouseLeave(testParamHeader, { bubbles: true })
 
-      jest.advanceTimersByTime(headerTooltipDelay - 1)
+      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY - 1)
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -421,9 +423,67 @@ describe('App', () => {
       const testParamHeader = screen.getByText(testParamName)
 
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
-      jest.advanceTimersByTime(headerTooltipDelay)
+      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY)
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    })
+
+    it('should show and hide a tooltip on mouseEnter and mouseLeave of a cell', () => {
+      jest
+        .spyOn(window, 'requestAnimationFrame')
+        .mockImplementation(cb => window.setTimeout(cb, 1))
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testParamCell = screen.getByText(testParamStringValue)
+      fireEvent.mouseEnter(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY - 1)
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      jest.advanceTimersByTime(1)
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+
+      expect(tooltip).toHaveTextContent(`Parameter: ${testParamStringValue}`)
+
+      fireEvent.mouseLeave(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(1)
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      jest.mocked(window.requestAnimationFrame).mockRestore()
+    })
+
+    it('should show a tooltip with the full number on number cells', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testMetricCell = screen.getByText('1.9293')
+      fireEvent.mouseEnter(testMetricCell, { bubbles: true })
+
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent(
+        `Metric: ${String(testMetricNumberValue)}`
+      )
     })
   })
 })

@@ -4,11 +4,11 @@ import { stub, restore } from 'sinon'
 import { commands } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
-import { Status } from '../../../../experiments/metricsAndParams/model'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
 import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
 import { buildExperiments } from '../util'
+import { Status } from '../../../../path/selection/model'
 
 suite('Experiments Metrics And Params Tree Test Suite', () => {
   const paramsFile = 'params.yaml'

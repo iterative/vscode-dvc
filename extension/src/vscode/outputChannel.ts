@@ -17,10 +17,10 @@ export class OutputChannel {
     this.outputChannel = this.dispose.track(window.createOutputChannel(name))
     this.version = version
 
-    cliInteractors.forEach(cli => {
+    for (const cli of cliInteractors) {
       this.onDidStartProcess(cli)
       this.onDidCompleteProcess(cli)
-    })
+    }
   }
 
   public show() {

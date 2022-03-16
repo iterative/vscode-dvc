@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { join } from 'path'
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
@@ -284,7 +285,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const [, , sizePickerButton] = screen.getAllByTestId('icon-menu-item')
+    const sizePickerButton = screen.getAllByTestId('icon-menu-item')[2]
     fireEvent.mouseEnter(sizePickerButton)
     fireEvent.click(sizePickerButton)
 
@@ -311,7 +312,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const [, , sizeButton] = screen.getAllByTestId('icon-menu-item')
+    const sizeButton = screen.getAllByTestId('icon-menu-item')[2]
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 
@@ -518,7 +519,9 @@ describe('App', () => {
         ...templatePlotsFixture,
         plots: {
           ...templatePlotsFixture.plots,
-          'other/plot.tsv': [...templatePlotsFixture.plots['logs/loss.tsv']]
+          [join('other', 'plot.tsv')]: [
+            ...templatePlotsFixture.plots[join('logs', 'loss.tsv')]
+          ]
         }
       }
     })
@@ -526,8 +529,8 @@ describe('App', () => {
     let plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'plot_logs/loss.tsv_0',
-      'plot_other/plot.tsv_0'
+      join('plot_logs', 'loss.tsv_0'),
+      join('plot_other', 'plot.tsv_0')
     ])
 
     dragAndDrop(plots[1], plots[0])
@@ -535,8 +538,8 @@ describe('App', () => {
     plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'plot_other/plot.tsv_0',
-      'plot_logs/loss.tsv_0'
+      join('plot_other', 'plot.tsv_0'),
+      join('plot_logs', 'loss.tsv_0')
     ])
   })
 })

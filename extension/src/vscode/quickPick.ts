@@ -13,19 +13,25 @@ export interface QuickPickOptionsWithTitle extends QuickPickOptions {
 export const quickPickValue: <T = string>(
   items: QuickPickItemWithValue<T>[],
   options: Omit<QuickPickOptionsWithTitle, 'canPickMany'>
-) => Thenable<T | undefined> = async (items, options) =>
-  (await window.showQuickPick(items, { canPickMany: false, ...options }))?.value
+) => Thenable<T | undefined> = async (items, options) => {
+  const result = await window.showQuickPick(items, {
+    canPickMany: false,
+    ...options
+  })
+  return result?.value
+}
 
 export const quickPickManyValues: <T = string>(
   items: QuickPickItemWithValue<T>[],
   options: Omit<QuickPickOptionsWithTitle, 'canPickMany'>
-) => Thenable<T[] | undefined> = async (items, options = {}) =>
-  (
-    await window.showQuickPick(items, {
-      ...options,
-      canPickMany: true
-    })
-  )?.map(item => item.value)
+) => Thenable<T[] | undefined> = async (items, options = {}) => {
+  const result = await window.showQuickPick(items, {
+    ...options,
+    canPickMany: true
+  })
+
+  return result?.map(item => item.value)
+}
 
 export const quickPickOne = (
   items: string[],
@@ -154,6 +160,23 @@ const limitSelected = <T>(
   )
 }
 
+const isDefined = <T>(value: T): value is Exclude<T, undefined> => !!value
+
+const collectResult = <T>(
+  selectedItems: readonly QuickPickItemWithValue<T>[]
+): Exclude<T, undefined>[] => {
+  const acc: Exclude<T, undefined>[] = []
+
+  for (const { value } of selectedItems) {
+    if (!isDefined(value)) {
+      continue
+    }
+    acc.push(value)
+  }
+
+  return acc
+}
+
 export const quickPickLimitedValues = <T>(
   items: QuickPickItemWithValue<T>[],
   selectedItems: readonly QuickPickItemWithValue<T>[],
@@ -169,13 +192,7 @@ export const quickPickLimitedValues = <T>(
     limitSelected<T>(quickPick, maxSelectedItems)
 
     quickPick.onDidAccept(() => {
-      const result = quickPick.selectedItems.reduce((acc, { value }) => {
-        if (value) {
-          acc.push(value)
-        }
-        return acc
-      }, [] as T[])
-      resolve(result as Exclude<T, undefined>[])
+      resolve(collectResult(quickPick.selectedItems))
       quickPick.dispose()
     })
 

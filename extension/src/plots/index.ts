@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { EventEmitter, Memento } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -27,6 +27,10 @@ export type PlotsWebview = BaseWebview<TPlotsData>
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
+  public readonly onDidChangePaths: Event<void>
+
+  private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
+
   private plots?: PlotsModel
   private paths?: PathsModel
 
@@ -53,7 +57,7 @@ export class Plots extends BaseRepository<TPlotsData> {
           this.plots?.transformAndSetPlots(data),
           this.paths?.transformAndSet(data)
         ])
-        this.sendPlots()
+        this.notifyChanged()
       })
     )
 
@@ -62,13 +66,17 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.handleMessageFromWebview()
 
     this.workspaceState = workspaceState
+
+    this.onDidChangePaths = this.pathsChanged.event
   }
 
   public setExperiments(experiments: Experiments) {
     this.plots = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
-    this.paths = this.dispose.track(new PathsModel())
+    this.paths = this.dispose.track(
+      new PathsModel(this.dvcRoot, this.workspaceState)
+    )
 
     this.data.setModel(this.plots)
 
@@ -87,6 +95,25 @@ export class Plots extends BaseRepository<TPlotsData> {
       sectionCollapsed: this.plots?.getSectionCollapsed(),
       template: this.getTemplatePlots()
     })
+  }
+
+  public togglePathStatus(path: string) {
+    const status = this.paths?.toggleStatus(path)
+    this.notifyChanged()
+    return status
+  }
+
+  public getChildPaths(path: string) {
+    return this.paths?.getChildren(path) || []
+  }
+
+  public getPathStatuses() {
+    return this.paths?.getTerminalNodeStatuses() || []
+  }
+
+  private notifyChanged() {
+    this.pathsChanged.fire()
+    this.sendPlots()
   }
 
   private sendCheckpointPlotsData() {
@@ -138,22 +165,25 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     return {
       plots: comparison.map(({ path, revisions }) => {
-        const revisionsWithCorrectUrls = Object.entries(revisions).reduce(
-          (acc, [revision, plot]) => {
-            const updatedPlot = this.addCorrectUrl(plot)
-            if (updatedPlot) {
-              acc[revision] = updatedPlot
-            }
-            return acc
-          },
-          {} as ComparisonRevisionData
-        )
-        return { path, revisions: revisionsWithCorrectUrls }
+        return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
       revisions: this.plots.getSelectedRevisionDetails(),
       sectionName: this.plots.getSectionName(Section.COMPARISON_TABLE),
       size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
     }
+  }
+
+  private getRevisionsWithCorrectUrls(revisions: ComparisonRevisionData) {
+    const acc: ComparisonRevisionData = {}
+
+    for (const [revision, plot] of Object.entries(revisions)) {
+      const updatedPlot = this.addCorrectUrl(plot)
+      if (!updatedPlot) {
+        continue
+      }
+      acc[revision] = updatedPlot
+    }
+    return acc
   }
 
   private addCorrectUrl(plot: ComparisonPlot) {

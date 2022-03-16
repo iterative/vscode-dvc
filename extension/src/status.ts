@@ -19,7 +19,7 @@ export class Status {
     this.statusBarItem.show()
     this.statusBarItem.tooltip = 'DVC Extension Status'
 
-    cliInteractors.forEach(cli => {
+    for (const cli of cliInteractors) {
       this.dispose.track(
         cli.onDidStartProcess(() => {
           this.addWorker()
@@ -31,7 +31,7 @@ export class Status {
           this.removeWorker()
         })
       )
-    })
+    }
   }
 
   public setAvailability = (available: boolean) => {

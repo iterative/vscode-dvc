@@ -1,31 +1,71 @@
 import React from 'react'
 import get from 'lodash/get'
-import { Column, Accessor, ColumnGroup, ColumnInstance } from 'react-table'
+import {
+  Column,
+  Accessor,
+  ColumnGroup,
+  ColumnInstance,
+  Cell
+} from 'react-table'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
+import Tooltip, {
+  CELL_TOOLTIP_DELAY
+} from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/Table/styles.module.scss'
 import { CopyButton } from '../components/CopyButton'
-import { OverflowHoverTooltip } from '../../shared/components/overflowHover'
+import { OverflowHoverTooltip } from '../components/OverflowHoverTooltip'
 
-type Value = string | number
+const UndefinedCell = (
+  <div className={styles.innerCell}>
+    <span className={styles.cellContents}>. . .</span>
+  </div>
+)
 
-const UndefinedCell = <>. . .</>
+const groupLabels: Record<string, string> = {
+  metrics: 'Metric',
+  params: 'Parameter'
+}
 
-const Cell: React.FC<{ value: Value }> = ({ value }) => {
+const CellTooltip: React.FC<{
+  cell: Cell<Experiment, string | number>
+}> = ({ cell }) => {
+  const {
+    column: { group },
+    value
+  } = cell
+  return (
+    <>
+      {groupLabels[group as string]}: {value}
+    </>
+  )
+}
+
+const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
+  const { value } = cell
   if (value === undefined) {
     return UndefinedCell
   }
 
+  const stringValue = String(value)
+
   const displayValue =
     typeof value === 'number' && !Number.isInteger(value)
       ? formatFloat(value as number)
-      : String(value)
+      : stringValue
 
   return (
-    <>
-      <CopyButton value={displayValue} />
-      <span className={styles.cellContents}>{displayValue}</span>
-    </>
+    <Tooltip
+      content={<CellTooltip cell={cell} />}
+      placement="bottom"
+      arrow={true}
+      delay={[CELL_TOOLTIP_DELAY, 0]}
+    >
+      <div className={styles.innerCell}>
+        <CopyButton value={stringValue} />
+        <span className={styles.cellContents}>{displayValue}</span>
+      </div>
+    </Tooltip>
   )
 }
 
@@ -41,8 +81,6 @@ const Header: React.FC<{ column: Column<Experiment> }> = ({
   )
 }
 
-const getCellComponent = (): React.FC<{ value: Value }> => Cell
-
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow =>
     get(originalRow, pathArray)
@@ -54,33 +92,29 @@ const buildDynamicColumns = (
   properties
     .filter(column => column.parentPath === parentPath)
     .map(data => {
-      const { path, group, pathArray } = data
+      const { path, group, pathArray, name } = data
 
-      const Cell = getCellComponent()
       const childColumns = buildDynamicColumns(properties, path)
 
       const column: ColumnGroup<Experiment> | Column<Experiment> = {
         Cell,
         Header,
         accessor: pathArray && buildAccessor(pathArray),
-        columns: childColumns.length ? childColumns : undefined,
+        columns: childColumns.length > 0 ? childColumns : undefined,
         group,
         id: path,
-        name: data.name
+        name
       }
       return column
     })
 
 const findMaxDepth = (columns: ColumnGroup<Experiment>[], depth = 1): number =>
-  columns.reduce(
-    (prev: number, curr: ColumnGroup<Experiment>) =>
-      Math.max(
-        prev,
-        curr.columns
-          ? findMaxDepth(curr.columns as ColumnGroup<Experiment>[], depth + 1)
-          : depth
-      ),
-    1
+  Math.max(
+    ...columns.map(column =>
+      column.columns
+        ? findMaxDepth(column.columns as ColumnGroup<Experiment>[], depth + 1)
+        : depth
+    )
   )
 
 const findDeepest = (

@@ -30,33 +30,47 @@ enum NewSectionBlock {
   BOTTOM = 'drop-section-bottom'
 }
 
+const fillInPlotsType = (
+  plotsType: VegaPlots,
+  path: string,
+  plot: TemplatePlot
+) => {
+  plotsType[path] = plotsType[path] ? [...plotsType[path], plot] : [plot]
+}
+
+const collectPlot = (
+  acc: TemplatePlotAccumulator,
+  path: string,
+  plot: TemplatePlot
+) => {
+  if (plot.multiView) {
+    fillInPlotsType(acc.multiViewPlots, path, plot)
+    return
+  }
+  fillInPlotsType(acc.singleViewPlots, path, plot)
+}
+
+const splitPlotsByViewType = (plots: VegaPlots): TemplatePlotAccumulator => {
+  const acc: TemplatePlotAccumulator = {
+    multiViewPlots: {},
+    singleViewPlots: {}
+  }
+
+  for (const [path, pathPlots] of Object.entries(plots)) {
+    for (const plot of pathPlots) {
+      collectPlot(acc, path, plot)
+    }
+  }
+  return acc
+}
+
 export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
   const [sections, setSections] = useState<PlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
   const draggedRef = useRef<DraggedInfo>()
 
   useEffect(() => {
-    const fillInPlotsType = (
-      plotsType: VegaPlots,
-      path: string,
-      plot: TemplatePlot
-    ) => {
-      plotsType[path] = plotsType[path] ? [...plotsType[path], plot] : [plot]
-    }
-
-    const { singleViewPlots, multiViewPlots } = Object.entries(plots).reduce(
-      (acc: TemplatePlotAccumulator, [path, plots]) => {
-        plots.forEach(plot => {
-          if (plot.multiView) {
-            fillInPlotsType(acc.multiViewPlots, path, plot)
-            return
-          }
-          fillInPlotsType(acc.singleViewPlots, path, plot)
-        })
-        return acc
-      },
-      { multiViewPlots: {}, singleViewPlots: {} }
-    )
+    const { singleViewPlots, multiViewPlots } = splitPlotsByViewType(plots)
     setSections([
       {
         entries: singleViewPlots,

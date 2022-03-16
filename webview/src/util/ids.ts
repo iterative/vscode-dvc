@@ -16,4 +16,4 @@ export const getIdentifierWithoutIndexOrPrefix = (id: string) =>
   id.split(ID_SEPARATOR)[1]
 
 export const getIdentifierIndex = (id: string) =>
-  parseInt(id.split(ID_SEPARATOR).reverse()[0], 10)
+  Number.parseInt(id.split(ID_SEPARATOR).reverse()[0], 10)

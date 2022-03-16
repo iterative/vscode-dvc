@@ -116,7 +116,7 @@ describe('collectExperiments', () => {
     )
     expect(modifiedCheckpoint?.[0].label).toStrictEqual('98cb38c')
 
-    checkpointsByTip.forEach(checkpoints => {
+    for (const checkpoints of checkpointsByTip.values()) {
       const continuationCheckpoints = checkpoints.filter(checkpoint => {
         const { label, displayNameOrParent } = checkpoint
         return (
@@ -126,15 +126,20 @@ describe('collectExperiments', () => {
         )
       })
       expect(continuationCheckpoints).toHaveLength(0)
-    })
+    }
   })
 })
 
 describe('collectStatuses', () => {
-  const buildMockExperiments = (n: number, prefix = 'exp') =>
-    [...Array(n).keys()].map(id => ({
-      id: `${prefix}${id + 1}`
-    })) as Experiment[]
+  const buildMockExperiments = (n: number, prefix = 'exp') => {
+    const mockExperiments: Experiment[] = []
+    for (let id = 0; id < n; id++) {
+      mockExperiments.push({
+        id: `${prefix}${id + 1}`
+      } as Experiment)
+    }
+    return mockExperiments
+  }
 
   it('should set new experiments to selected if there are less than 7', () => {
     const experiments = buildMockExperiments(4)

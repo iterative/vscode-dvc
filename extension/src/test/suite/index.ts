@@ -56,7 +56,9 @@ export async function run() {
         }
 
         // Add files to the test suite
-        files.forEach(f => mocha.addFile(resolvePath(testsRoot, f)))
+        for (const f of files) {
+          mocha.addFile(resolvePath(testsRoot, f))
+        }
 
         try {
           // Run the mocha test
@@ -67,9 +69,9 @@ export async function run() {
               resolve()
             }
           })
-        } catch (e: unknown) {
-          Logger.error((e as Error).toString())
-          throw e
+        } catch (error: unknown) {
+          Logger.error((error as Error).toString())
+          throw error
         }
       })
     })
