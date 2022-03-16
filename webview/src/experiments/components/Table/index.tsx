@@ -87,9 +87,7 @@ const CellWrapper: React.FC<{
     })}
     data-testid={cellId}
   >
-    <div className={styles.innerCell}>
-      {cell.isPlaceholder ? null : cell.render('Cell')}
-    </div>
+    {cell.render('Cell')}
   </div>
 )
 

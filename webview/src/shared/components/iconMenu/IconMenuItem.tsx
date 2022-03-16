@@ -1,8 +1,8 @@
 import React from 'react'
-import Tippy, { TippyProps } from '@tippyjs/react'
+import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
-import sharedStyles from '../../styles.module.scss'
 import { Icon, IconValues } from '../icon/Icon'
+import Tooltip from '../tooltip/Tooltip'
 
 export interface IconMenuItemProps {
   icon: IconValues
@@ -25,11 +25,7 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
   menuTarget
 }) => {
   let button = (
-    <Tippy
-      content={tooltip}
-      singleton={tooltipTarget}
-      className={sharedStyles.menu}
-    >
+    <Tooltip content={tooltip} singleton={tooltipTarget}>
       <button
         aria-label={tooltip}
         className={styles.item}
@@ -38,13 +34,13 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
       >
         <Icon icon={icon} data-testid="icon-menu-item-icon" width={15} />
       </button>
-    </Tippy>
+    </Tooltip>
   )
   if (onClickNode) {
     button = (
-      <Tippy content={onClickNode} singleton={menuTarget}>
+      <Tooltip content={onClickNode} singleton={menuTarget}>
         {button}
-      </Tippy>
+      </Tooltip>
     )
   }
   return <li>{button}</li>
