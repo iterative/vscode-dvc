@@ -2,7 +2,6 @@ import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { MetricOrParam } from '../../experiments/webview/contract'
 import { PlotPath } from '../../plots/paths/collect'
-import { flatten } from '../../util/array'
 import { MementoPrefix } from '../../vscode/memento'
 
 export enum Status {
@@ -72,14 +71,12 @@ export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
   }
 
   public getTerminalNodeStatuses(parentPath?: string): Status[] {
-    const nestedStatuses = (this.getChildren(parentPath) || []).map(element => {
+    return (this.getChildren(parentPath) || []).flatMap(element => {
       const terminalStatuses = element.hasChildren
         ? this.getTerminalNodeStatuses(element.path)
         : [this.status[element.path]]
       return [...terminalStatuses]
     })
-
-    return flatten<Status>(nestedStatuses)
   }
 
   protected setNewStatuses(data: { path: string }[]) {

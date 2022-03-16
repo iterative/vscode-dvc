@@ -6,15 +6,12 @@ export const definedAndNonEmpty = (
   return !!maybeArray?.length
 }
 
-export const flatten = <T = string>(arrayOfArrays: T[][]): T[] =>
-  arrayOfArrays.flat()
-
 export const uniqueValues = <T = string>(array: T[]): T[] => [
   ...new Set<T>(array)
 ]
 
 export const flattenUnique = <T = string>(arrayOfArrays: T[][]): T[] =>
-  uniqueValues(flatten<T>(arrayOfArrays))
+  uniqueValues(arrayOfArrays.flat())
 
 export const joinTruthyItems = (array: (string | undefined)[], sep = ' ') =>
   array.filter(Boolean).join(sep)

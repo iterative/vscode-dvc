@@ -27,7 +27,7 @@ import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
-import { definedAndNonEmpty, flatten } from '../../util/array'
+import { definedAndNonEmpty } from '../../util/array'
 
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
@@ -321,11 +321,9 @@ export class PlotsModel {
               {
                 ...template,
                 data: {
-                  values: flatten(
-                    selectedRevisions
-                      .map(revision => this.revisionData?.[revision]?.[path])
-                      .filter(Boolean)
-                  )
+                  values: selectedRevisions
+                    .flatMap(revision => this.revisionData?.[revision]?.[path])
+                    .filter(Boolean)
                 }
               } as TopLevelSpec,
               this.getRevisionColors()

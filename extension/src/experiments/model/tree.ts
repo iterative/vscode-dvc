@@ -12,7 +12,7 @@ import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { definedAndNonEmpty, flatten } from '../../util/array'
+import { definedAndNonEmpty } from '../../util/array'
 import { createTreeView, getRootItem } from '../../vscode/tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
@@ -125,10 +125,8 @@ export class ExperimentsTree
       this.viewed = true
     }
 
-    const experiments = flatten(
-      dvcRoots.map(dvcRoot =>
-        this.experiments.getRepository(dvcRoot).getExperiments()
-      )
+    const experiments = dvcRoots.flatMap(dvcRoot =>
+      this.experiments.getRepository(dvcRoot).getExperiments()
     )
     if (definedAndNonEmpty(experiments)) {
       if (dvcRoots.length === 1) {

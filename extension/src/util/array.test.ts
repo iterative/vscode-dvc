@@ -1,6 +1,5 @@
 import {
   definedAndNonEmpty,
-  flatten,
   flattenUnique,
   joinTruthyItems,
   sameContents,
@@ -83,20 +82,6 @@ describe('uniqueValues', () => {
         undefined
       ])
     ).toStrictEqual([1, 2, undefined, 3, 4, 5, 6, '5'])
-  })
-})
-
-describe('flatten', () => {
-  it('should flatten an array of arrays', () => {
-    expect(
-      flatten<number>([[1], [2, 3, 4], [5, 6, 7, 8, 9, 10]])
-    ).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-  })
-
-  it('should return all of the original items', () => {
-    expect(
-      flatten<number>([[1], [2, 3, 4, 5, 6, 7, 8], [5, 6, 7, 8, 9, 10]])
-    ).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8, 5, 6, 7, 8, 9, 10])
   })
 })
 
