@@ -1,7 +1,9 @@
-import Tippy, { TippyProps } from '@tippyjs/react'
+import { TippyProps } from '@tippyjs/react'
 import React, { useRef } from 'react'
 import { useIsFullyContained } from './useIsFullyContained'
-import sharedStyles from '../../styles.module.scss'
+import Tooltip, {
+  HEADER_TOOLTIP_DELAY
+} from '../../../shared/components/tooltip/Tooltip'
 
 export const OverflowHoverTooltip: React.FC<
   Pick<TippyProps, 'content' | 'children'>
@@ -9,16 +11,14 @@ export const OverflowHoverTooltip: React.FC<
   const wrapperRef = useRef<HTMLDivElement>(null)
   const isDisabled = useIsFullyContained(wrapperRef)
   return (
-    <Tippy
-      animation={false}
+    <Tooltip
       content={content}
       placement="bottom-start"
-      className={sharedStyles.menu}
       disabled={isDisabled}
-      delay={100}
+      delay={HEADER_TOOLTIP_DELAY}
       ref={wrapperRef}
     >
       {children}
-    </Tippy>
+    </Tooltip>
   )
 }
