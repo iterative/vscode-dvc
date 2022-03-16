@@ -12,7 +12,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import { definedAndNonEmpty, flatten } from '../../../util/array'
+import { definedAndNonEmpty } from '../../../util/array'
 import { createTreeView, getRootItem } from '../../../vscode/tree'
 
 type FilterItem = {
@@ -98,10 +98,8 @@ export class ExperimentsFilterByTree
       this.viewed = true
     }
 
-    const filters = flatten(
-      dvcRoots.map(dvcRoot =>
-        this.experiments.getRepository(dvcRoot).getFilters()
-      )
+    const filters = dvcRoots.flatMap(dvcRoot =>
+      this.experiments.getRepository(dvcRoot).getFilters()
     )
     if (definedAndNonEmpty(filters)) {
       if (dvcRoots.length === 1) {

@@ -26,7 +26,7 @@ import {
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
-import { definedAndNonEmpty, flatten } from '../../util/array'
+import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
 import { MementoPrefix } from '../../vscode/memento'
@@ -224,10 +224,8 @@ export class ExperimentsModel {
   public getFilteredExperiments(filters = this.getFilters()) {
     const filteredExperiments = this.getSubRows(this.getExperiments(), filters)
 
-    const filteredCheckpoints = flatten<Experiment>(
-      filteredExperiments.map(
-        ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
-      )
+    const filteredCheckpoints = filteredExperiments.flatMap(
+      ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
     )
 
     return [...filteredExperiments, ...filteredCheckpoints]
@@ -381,11 +379,11 @@ export class ExperimentsModel {
   }
 
   private flattenExperiments() {
-    return flatten<Experiment>([...this.experimentsByBranch.values()])
+    return [...this.experimentsByBranch.values()].flat()
   }
 
   private flattenCheckpoints() {
-    return flatten<Experiment>([...this.checkpointsByTip.values()])
+    return [...this.checkpointsByTip.values()].flat()
   }
 
   private setStatus() {
