@@ -18,7 +18,7 @@ const getWarningText = (
   currentVersion: string,
   update: 'CLI' | 'extension'
 ): string => `The extension cannot initialize because you are using version ${currentVersion} of the DVC CLI.
-The expected version is ${MIN_VERSION} <= DVC < ${MAX_VERSION}. Please upgrade to the most recent version of the ${update}.`
+The expected version is ${MIN_VERSION} <= DVC < ${MAX_VERSION}. Please upgrade to the most recent version of the ${update} and reload this window.`
 
 const getTextAndSend = (version: string, update: 'CLI' | 'extension'): void => {
   const text = getWarningText(version, update)
