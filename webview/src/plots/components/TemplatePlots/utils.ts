@@ -10,6 +10,32 @@ export type PlotSection = {
   entries: VegaPlots
 }
 
+const remove = (section: PlotSection, entryId: string) => {
+  const entries = Object.fromEntries(
+    Object.entries(section.entries).filter(
+      sectionEntry => sectionEntry[0] !== entryId
+    )
+  )
+  return Object.keys(entries).length > 0
+    ? {
+        entries,
+        group: section.group
+      }
+    : null
+}
+
+const add = (
+  section: PlotSection,
+  entryId: string,
+  entry?: TemplatePlot[]
+) => ({
+  entries: {
+    ...section.entries,
+    [entryId]: entry
+  },
+  group: section.group
+})
+
 export const removeFromPreviousSectionAndAddToNewSection = (
   sections: PlotSection[],
   oldSectionIndex: number,
@@ -20,25 +46,9 @@ export const removeFromPreviousSectionAndAddToNewSection = (
   sections
     .map((section, i) => {
       if (i === oldSectionIndex) {
-        const entries = Object.fromEntries(
-          Object.entries(section.entries).filter(
-            sectionEntry => sectionEntry[0] !== entryId
-          )
-        )
-        return Object.keys(entries).length > 0
-          ? {
-              entries,
-              group: section.group
-            }
-          : null
+        return remove(section, entryId)
       } else if (i === newGroupIndex) {
-        return {
-          entries: {
-            ...section.entries,
-            [entryId]: entry
-          },
-          group: section.group
-        }
+        return add(section, entryId, entry)
       }
       return section
     })
