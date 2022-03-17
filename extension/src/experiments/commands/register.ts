@@ -26,6 +26,12 @@ const registerExperimentCwdCommands = (
         experiments.queueExperimentFromExisting()
       )
   )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUE,
+    () =>
+      experiments.getCwdThenReport(AvailableCommands.EXPERIMENT_REMOVE_QUEUE)
+  )
 }
 
 const registerExperimentNameCommands = (
@@ -40,6 +46,11 @@ const registerExperimentNameCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_REMOVE,
     () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUED,
+    () => experiments.getQueuedExpThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
 }
 

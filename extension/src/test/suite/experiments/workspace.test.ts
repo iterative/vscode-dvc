@@ -387,4 +387,69 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
     })
   })
+
+  describe('dvc.removeExperimentQueue', () => {
+    it('should remove all queued experiments from the selected repository', async () => {
+      const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getRepository'
+      ).returns(experiments)
+
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      )
+
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUE
+      )
+
+      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, '--queue')
+    })
+  })
+
+  describe('dvc.removeQueuedExperiment', () => {
+    it('should ask the user to pick a queued experiment and then remove that experiment from the workspace', async () => {
+      const mockExperiment = 'queued-exp-to-remove'
+
+      const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getRepository'
+      ).returns(experiments)
+
+      stub(window, 'showQuickPick').resolves({
+        value: { id: mockExperiment, name: mockExperiment }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      )
+
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUED
+      )
+
+      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
+    })
+  })
 })

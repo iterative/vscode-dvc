@@ -17,6 +17,7 @@ export const autoRegisteredCommands = {
   EXPERIMENT_GARBAGE_COLLECT: 'experimentGarbageCollect',
   EXPERIMENT_QUEUE: 'experimentRunQueue',
   EXPERIMENT_REMOVE: 'experimentRemove',
+  EXPERIMENT_REMOVE_QUEUE: 'experimentRemoveQueue',
   INIT: 'init',
   MOVE: 'move',
   PULL: 'pull',
@@ -81,6 +82,10 @@ export class CliExecutor extends Cli {
       ExperimentSubCommand.REMOVE,
       experimentName
     )
+  }
+
+  public experimentRemoveQueue(cwd: string) {
+    return this.experimentRemove(cwd, ExperimentFlag.QUEUE)
   }
 
   public experimentRunQueue(cwd: string, ...args: Args) {

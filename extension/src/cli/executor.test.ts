@@ -320,6 +320,24 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('experimentRemoveQueue', () => {
+    it('should call createProcess with the correct parameters to remove all existing queued experiments from the workspace', async () => {
+      const cwd = __dirname
+      const stdout = ''
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await cliExecutor.experimentRemoveQueue(cwd)
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: ['exp', 'remove', '--queue'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
   describe('experimentRunQueue', () => {
     it('should call createProcess with the correct parameters to queue an experiment for later execution', async () => {
       const cwd = __dirname

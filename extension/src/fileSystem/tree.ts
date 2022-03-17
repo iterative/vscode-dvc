@@ -12,7 +12,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { exists, relativeWithUri } from '.'
 import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
-import { definedAndNonEmpty, flatten } from '../util/array'
+import { definedAndNonEmpty } from '../util/array'
 import {
   AvailableCommands,
   CommandId,
@@ -120,11 +120,11 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       return this.getRepoChildren(onlyRoot)
     }
 
-    return flatten(
-      await Promise.all(
-        this.dvcRoots.map(dvcRoot => this.getRepoChildren(dvcRoot))
-      )
+    const rootChildren = await Promise.all(
+      this.dvcRoots.map(dvcRoot => this.getRepoChildren(dvcRoot))
     )
+
+    return rootChildren.flat()
   }
 
   private getDataPlaceholder({ fsPath }: { fsPath: string }): string {
