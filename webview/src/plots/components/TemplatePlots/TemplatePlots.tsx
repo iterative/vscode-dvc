@@ -84,7 +84,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
   }, [plots, setSections])
 
   const firstSection = sections[0]
-  const lastSection = sections.at(-1)
+  const lastSection = sections.slice(-1)[0]
 
   if (!firstSection || !lastSection) {
     return null
