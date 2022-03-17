@@ -11,7 +11,6 @@ import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContain
 import {
   createIdentifierWithIndex,
   getIdentifierIndex,
-  getIdentifierWithoutIndex,
   getIdentifierWithoutIndexOrPrefix
 } from '../../../util/ids'
 import styles from '../styles.module.scss'
@@ -136,19 +135,6 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
     }
   }
 
-  const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    const draggedGroup = getIdentifierWithoutIndex(draggedRef.current?.group)
-    const closestSection =
-      e.currentTarget.id === NewSectionBlock.TOP ? firstSection : lastSection
-    if (draggedGroup !== closestSection.group) {
-      setHoveredSection(e.currentTarget.id)
-    }
-  }
-
-  const handleDragLeave = () => {
-    setHoveredSection('')
-  }
-
   const handleDropInSection = (
     draggedId: string,
     draggedGroup: string,
@@ -173,10 +159,10 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
   }
 
   const newDropSection = {
-    onDragEnter: handleDragEnter,
-    onDragLeave: handleDragLeave,
-    onDragOver: (e: DragEvent<HTMLElement>) => e.preventDefault(),
-    onDrop: handleDropInNewSection
+    draggedRef,
+    hoveredSection,
+    onDrop: handleDropInNewSection,
+    setHoveredSection
   }
 
   return (
@@ -184,7 +170,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       <AddedSection
         {...newDropSection}
         id={NewSectionBlock.TOP}
-        hoveredSection={hoveredSection}
+        closestSection={firstSection}
       />
       {sections.map((section, i) => {
         const groupId = createIdentifierWithIndex(section.group, i)
@@ -211,7 +197,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       <AddedSection
         {...newDropSection}
         id={NewSectionBlock.BOTTOM}
-        hoveredSection={hoveredSection}
+        closestSection={lastSection}
       />
     </div>
   )

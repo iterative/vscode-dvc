@@ -1,33 +1,45 @@
-import React, { DragEvent } from 'react'
+import React, { DragEvent, MutableRefObject } from 'react'
 import cx from 'classnames'
+import { PlotSection } from './utils'
 import styles from '../styles.module.scss'
-
-type DragFunction = (e: DragEvent<HTMLElement>) => void
+import { getIdentifierWithoutIndex } from '../../../util/ids'
+import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 
 interface AddedSectionProps {
   id: string
   hoveredSection: string
-  onDragEnter: DragFunction
-  onDragLeave: DragFunction
-  onDragOver: DragFunction
-  onDrop: DragFunction
+  setHoveredSection: (section: string) => void
+  onDrop: (e: DragEvent<HTMLElement>) => void
+  closestSection: PlotSection
+  draggedRef: MutableRefObject<DraggedInfo | undefined>
 }
 
 export const AddedSection: React.FC<AddedSectionProps> = ({
   id,
-  onDragEnter,
-  onDragLeave,
-  onDragOver,
   onDrop,
-  hoveredSection
+  hoveredSection,
+  setHoveredSection,
+  closestSection,
+  draggedRef
 }) => {
+  const handleDragLeave = () => {
+    setHoveredSection('')
+  }
+
+  const handleDragEnter = (e: DragEvent<HTMLElement>) => {
+    const draggedGroup = getIdentifierWithoutIndex(draggedRef.current?.group)
+    if (draggedGroup !== closestSection.group) {
+      setHoveredSection(e.currentTarget.id)
+    }
+  }
+
   return (
     <div
       id={id}
       data-testid={id}
-      onDragEnter={onDragEnter}
-      onDragLeave={onDragLeave}
-      onDragOver={onDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
       onDrop={onDrop}
       className={cx(styles.dropSection, {
         [styles.dropSectionMaximized]: hoveredSection === id
