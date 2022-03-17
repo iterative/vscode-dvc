@@ -91,47 +91,36 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
 
   const handleDropInNewSection = (e: DragEvent<HTMLElement>) => {
     const dropInSection = e.currentTarget.id
-    const draggedSection = e.dataTransfer.getData('group')
-    const draggedSectionId = getIdentifierIndex(draggedSection)
+    const draggedSectionId = getIdentifierIndex(e.dataTransfer.getData('group'))
     const draggedId = getIdentifierWithoutIndexOrPrefix(
       e.dataTransfer.getData('itemId')
     )
 
-    const section = sections[draggedSectionId]
-    const entry = section.entries[draggedId]
     const updatedSections = removeFromPreviousSectionAndAddToNewSection(
       sections,
       draggedSectionId,
       draggedId
     )
 
+    const { group, entries } = sections[draggedSectionId]
+
     setHoveredSection('')
+    const newSection = {
+      entries: {
+        [draggedId]: entries[draggedId]
+      },
+      group: group
+    }
 
     if (dropInSection === NewSectionBlock.TOP) {
-      if (firstSection.group !== section.group) {
-        setSections([
-          {
-            entries: {
-              [draggedId]: entry
-            },
-            group: section.group
-          },
-          ...updatedSections
-        ])
+      if (firstSection.group !== group) {
+        setSections([newSection, ...updatedSections])
       }
 
       return
     }
-    if (lastSection.group !== section.group) {
-      setSections([
-        ...updatedSections,
-        {
-          entries: {
-            [draggedId]: entry
-          },
-          group: section.group
-        }
-      ])
+    if (lastSection.group !== group) {
+      setSections([...updatedSections, newSection])
     }
   }
 

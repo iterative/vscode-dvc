@@ -13,7 +13,7 @@ export type DraggedInfo = {
 interface DragDropContainerProps {
   order: string[]
   setOrder: (order: string[]) => void
-  disabledDropIds: string[]
+  disabledDropIds?: string[]
   items: JSX.Element[] // Every item must have a id prop for drag and drop to work
   group: string
   onDrop?: (draggedId: string, draggedGroup: string, groupId: string) => void
@@ -23,7 +23,7 @@ interface DragDropContainerProps {
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   order,
   setOrder,
-  disabledDropIds,
+  disabledDropIds = [],
   items,
   group,
   onDrop,

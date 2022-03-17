@@ -43,6 +43,11 @@ const addIdAndPath = (entries: VegaPlots) => {
   return acc
 }
 
+const autoSize = {
+  height: 'container',
+  width: 'container'
+}
+
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   entries,
   group,
@@ -89,8 +94,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           spec={
             {
               ...plot.content,
-              height: 'container',
-              width: 'container'
+              ...autoSize
             } as VisualizationSpec
           }
           renderer="svg"
@@ -103,7 +107,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     <DragDropContainer
       order={order}
       setOrder={setOrder}
-      disabledDropIds={[]}
       items={items as JSX.Element[]}
       group={group}
       onDrop={onDropInSection}
