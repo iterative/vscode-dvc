@@ -229,6 +229,11 @@
         "icon": "$(close-all)"
       },
       {
+        "title": "%command.removeQueuedExperiment%",
+        "command": "dvc.removeQueuedExperiment",
+        "category": "DVC"
+      },
+      {
         "title": "%command.removeTarget%",
         "command": "dvc.removeTarget",
         "category": "DVC",
@@ -511,6 +516,10 @@
         },
         {
           "command": "dvc.removeExperimentsTableSorts",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.removeQueuedExperiment",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {

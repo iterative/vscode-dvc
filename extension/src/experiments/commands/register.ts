@@ -47,6 +47,11 @@ const registerExperimentNameCommands = (
     RegisteredCliCommands.EXPERIMENT_REMOVE,
     () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUED,
+    () => experiments.getQueuedExpThenRun(AvailableCommands.EXPERIMENT_REMOVE)
+  )
 }
 
 const registerExperimentInputCommands = (
