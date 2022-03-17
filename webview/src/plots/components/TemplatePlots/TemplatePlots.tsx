@@ -1,12 +1,12 @@
 import { TemplatePlot, VegaPlots } from 'dvc/src/plots/webview/contract'
 import React, { DragEvent, useState, useEffect, useRef } from 'react'
-import cx from 'classnames'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import {
   PlotSection,
   PlotsGroup,
   removeFromPreviousSectionAndAddToNewSection
-} from './actions'
+} from './utils'
+import { AddedSection } from './AddedSection'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 import {
   createIdentifierWithIndex,
@@ -181,13 +181,10 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
 
   return (
     <div>
-      <div
-        id={NewSectionBlock.TOP}
-        data-testid={NewSectionBlock.TOP}
+      <AddedSection
         {...newDropSection}
-        className={cx(styles.dropSection, {
-          [styles.dropSectionMaximized]: hoveredSection === NewSectionBlock.TOP
-        })}
+        id={NewSectionBlock.TOP}
+        hoveredSection={hoveredSection}
       />
       {sections.map((section, i) => {
         const groupId = createIdentifierWithIndex(section.group, i)
@@ -211,14 +208,10 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
           </div>
         )
       })}
-      <div
-        id={NewSectionBlock.BOTTOM}
-        data-testid={NewSectionBlock.BOTTOM}
+      <AddedSection
         {...newDropSection}
-        className={cx(styles.dropSection, {
-          [styles.dropSectionMaximized]:
-            hoveredSection === NewSectionBlock.BOTTOM
-        })}
+        id={NewSectionBlock.BOTTOM}
+        hoveredSection={hoveredSection}
       />
     </div>
   )
