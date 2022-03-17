@@ -81,6 +81,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_GARBAGE_COLLECT]: undefined
   [EventName.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
+  [EventName.EXPERIMENT_REMOVE_QUEUE]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RUN_QUEUED]: undefined
   [EventName.EXPERIMENT_RUN_RESET]: undefined
