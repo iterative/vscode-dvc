@@ -279,7 +279,11 @@ export class ExperimentsModel {
   }
 
   public getCurrentExperiments() {
-    return this.flattenExperiments().filter(({ queued }) => !queued)
+    return this.splitExperimentsByQueued()
+  }
+
+  public getQueuedExperiments() {
+    return this.splitExperimentsByQueued(true)
   }
 
   public getCheckpoints(id: string): Experiment[] | undefined {
@@ -379,6 +383,15 @@ export class ExperimentsModel {
 
   private flattenExperiments() {
     return flattenMapValues(this.experimentsByBranch)
+  }
+
+  private splitExperimentsByQueued(getQueued = false) {
+    return this.flattenExperiments().filter(({ queued }) => {
+      if (getQueued) {
+        return queued
+      }
+      return !queued
+    })
   }
 
   private flattenCheckpoints() {

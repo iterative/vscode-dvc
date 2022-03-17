@@ -150,19 +150,15 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return Toast.showOutput(stdout)
   }
 
-  public getExpNameThenRun = async (commandId: CommandId) => {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
-    }
+  public getExpNameThenRun(commandId: CommandId) {
+    return this.pickExpThenRun(commandId, cwd =>
+      this.pickCurrentExperiment(cwd)
+    )
+  }
 
-    const experiment = await this.pickCurrentExperiment(cwd)
-
-    if (!experiment) {
-      return
-    }
-    return Toast.showOutput(
-      this.internalCommands.executeCommand(commandId, cwd, experiment.name)
+  public getQueuedExpThenRun(commandId: CommandId) {
+    return this.pickExpThenRun(commandId, cwd =>
+      this.getRepository(cwd).pickQueuedExperiment()
     )
   }
 
@@ -245,6 +241,27 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     return experiments
+  }
+
+  private async pickExpThenRun(
+    commandId: CommandId,
+    pickFunc: (
+      cwd: string
+    ) => Thenable<{ id: string; name: string } | undefined> | undefined
+  ) {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const experiment = await pickFunc(cwd)
+
+    if (!experiment) {
+      return
+    }
+    return Toast.showOutput(
+      this.internalCommands.executeCommand(commandId, cwd, experiment.name)
+    )
   }
 
   private async getDvcRoot(overrideRoot?: string) {
