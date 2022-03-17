@@ -36,7 +36,7 @@ const CellTooltip: React.FC<{
   } = cell
   return (
     <>
-      {groupLabels[group as string]}: {value}
+      {groupLabels[group as string]}: {String(value)}
     </>
   )
 }
