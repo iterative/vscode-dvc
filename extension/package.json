@@ -213,6 +213,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.removeExperimentQueue%",
+        "command": "dvc.removeExperimentQueue",
+        "category": "DVC"
+      },
+      {
         "title": "%command.removeExperimentsTableFilters%",
         "command": "dvc.removeExperimentsTableFilters",
         "category": "DVC"
@@ -494,6 +499,10 @@
         },
         {
           "command": "dvc.removeExperiment",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.removeExperimentQueue",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {

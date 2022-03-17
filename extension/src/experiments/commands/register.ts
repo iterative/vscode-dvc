@@ -26,6 +26,12 @@ const registerExperimentCwdCommands = (
         experiments.queueExperimentFromExisting()
       )
   )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUE,
+    () =>
+      experiments.getCwdThenReport(AvailableCommands.EXPERIMENT_REMOVE_QUEUE)
+  )
 }
 
 const registerExperimentNameCommands = (

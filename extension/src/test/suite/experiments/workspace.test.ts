@@ -387,4 +387,34 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
     })
   })
+
+  describe('dvc.removeExperimentQueue', () => {
+    it('should remove all queued experiments from the selected repository', async () => {
+      const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getRepository'
+      ).returns(experiments)
+
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      )
+
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUE
+      )
+
+      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, '--queue')
+    })
+  })
 })
