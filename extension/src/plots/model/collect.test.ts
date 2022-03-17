@@ -194,14 +194,20 @@ describe('collectData', () => {
     const revisions = ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a']
 
     const values =
-      (logsLossPlot?.content?.data as { values: { rev: string }[] }).values ||
-      []
+      (logsLossPlot?.datapoints as {
+        [revision: string]: Record<string, unknown>[]
+      }) || {}
 
     expect(isEmpty(values)).toBeFalsy()
 
     for (const revision of revisions) {
-      const expectedValues = values.filter(value => value.rev === revision)
-      expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
+      const expectedValues = values[revision].map(value => ({
+        ...value,
+        rev: revision
+      }))
+      expect(revisionData[revision]['logs/loss.tsv']).toStrictEqual(
+        expectedValues
+      )
     }
 
     expect(Object.keys(revisionData)).toStrictEqual(revisions)
@@ -234,7 +240,6 @@ describe('collectData', () => {
 describe('collectTemplates', () => {
   it('should return the expected output from the test fixture', () => {
     const { content } = logsLossPlot
-    const expectedTemplate = omit(content, 'data')
 
     const templates = collectTemplates(plotsDiffFixture)
     expect(Object.keys(templates)).toStrictEqual([
@@ -243,8 +248,6 @@ describe('collectTemplates', () => {
       'predictions.json'
     ])
 
-    expect(templates[logsLossPath]).not.toStrictEqual(content)
-
-    expect(templates[logsLossPath]).toStrictEqual(expectedTemplate)
+    expect(JSON.parse(templates['logs/loss.tsv'])).toStrictEqual(content)
   })
 })

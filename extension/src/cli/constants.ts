@@ -23,10 +23,12 @@ export enum SubCommand {
 
 export enum Flag {
   FORCE = '-f',
+  OUTPUT_PATH = '-o',
   RECURSIVE = '-R',
   SHOW_JSON = '--show-json',
   SUBDIRECTORY = '--subdir',
   SET_PARAM = '-S',
+  SPLIT = '--split',
   VERSION = '--version'
 }
 

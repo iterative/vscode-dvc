@@ -1,5 +1,4 @@
 import omit from 'lodash.omit'
-import { VisualizationSpec } from 'react-vega'
 import { TopLevelSpec } from 'vega-lite'
 import {
   CheckpointPlotValues,
@@ -306,6 +305,17 @@ const collectImageData = (
   acc[rev][path] = plot
 }
 
+const collectDatapoints = (
+  acc: RevisionData,
+  path: string,
+  rev: string,
+  values: Record<string, unknown>[] = []
+) => {
+  for (const value of values) {
+    ;(acc[rev][path] as unknown[]).push({ ...value, rev })
+  }
+}
+
 const collectPlotData = (
   acc: RevisionData,
   path: string,
@@ -316,10 +326,8 @@ const collectPlotData = (
       acc[rev] = {}
     }
     acc[rev][path] = []
-  }
-  for (const value of (plot.content.data as { values: { rev: string }[] })
-    .values) {
-    ;(acc[value.rev][path] as unknown[]).push(value)
+
+    collectDatapoints(acc, path, rev, plot.datapoints?.[rev])
   }
 }
 
@@ -352,7 +360,7 @@ export const collectData = (data: PlotsOutput): DataAccumulator => {
   return acc
 }
 
-type TemplateAccumulator = Record<string, VisualizationSpec>
+type TemplateAccumulator = Record<string, string>
 
 const collectTemplate = (
   acc: TemplateAccumulator,
@@ -362,10 +370,7 @@ const collectTemplate = (
   if (isImagePlot(plot) || acc[path]) {
     return
   }
-  const template = {
-    ...plot.content
-  }
-  delete template.data
+  const template = JSON.stringify(plot.content)
   acc[path] = template
 }
 
@@ -382,33 +387,21 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
 }
 
 const fillTemplate = (
-  template: VisualizationSpec,
+  template: string,
   datapoints: unknown[],
   revisionColors: ColorScale | undefined
 ) =>
   extendVegaSpec(
-    {
-      ...template,
-      data: {
-        values: datapoints
-      }
-    } as TopLevelSpec,
+    JSON.parse(
+      template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+    ) as TopLevelSpec,
     revisionColors
   )
-
-const collectDatapoints = (
-  path: string,
-  selectedRevisions: string[],
-  revisionData: RevisionData
-): unknown[] =>
-  selectedRevisions
-    .flatMap(revision => revisionData?.[revision]?.[path])
-    .filter(Boolean)
 
 const collectTemplateGroup = (
   paths: string[],
   selectedRevisions: string[],
-  templates: Record<string, VisualizationSpec>,
+  templates: Record<string, string>,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
 ): TemplatePlotEntry[] => {
@@ -417,15 +410,16 @@ const collectTemplateGroup = (
     const template = templates[path]
 
     if (template) {
-      const datapoints = collectDatapoints(
-        path,
-        selectedRevisions,
-        revisionData
-      )
+      const datapoints = selectedRevisions
+        .flatMap(revision => revisionData?.[revision]?.[path])
+        .filter(Boolean)
+
+      const content = fillTemplate(template, datapoints, revisionColors)
+
       acc.push({
-        content: fillTemplate(template, datapoints, revisionColors),
+        content,
         id: path,
-        multiView: isMultiViewPlot(template),
+        multiView: isMultiViewPlot(content),
         revisions: selectedRevisions,
         type: PlotsType.VEGA
       })
@@ -437,7 +431,7 @@ const collectTemplateGroup = (
 export const collectSelectedTemplatePlots = (
   order: TemplateOrder,
   selectedRevisions: string[],
-  templates: Record<string, VisualizationSpec>,
+  templates: Record<string, string>,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
 ): TemplatePlotSection[] | undefined => {

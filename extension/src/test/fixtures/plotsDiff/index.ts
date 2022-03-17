@@ -22,281 +22,248 @@ const basicVega = {
     {
       type: PlotsType.VEGA,
       revisions: ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a'],
+      datapoints: {
+        workspace: [
+          {
+            loss: '2.298783302307129',
+            step: '0',
+            timestamp: '1641966224600'
+          },
+          {
+            loss: '2.2779736518859863',
+            step: '1',
+            timestamp: '1641966239108'
+          },
+          {
+            loss: '2.2572131156921387',
+            step: '2',
+            timestamp: '1641966253176'
+          },
+          {
+            loss: '2.238112688064575',
+            step: '3',
+            timestamp: '1641966267354'
+          },
+          {
+            loss: '2.212251901626587',
+            step: '4',
+            timestamp: '1641966285745'
+          },
+          {
+            loss: '2.1894900798797607',
+            step: '5',
+            timestamp: '1641966303339'
+          },
+          {
+            loss: '2.165510654449463',
+            step: '6',
+            timestamp: '1641966320693'
+          },
+          {
+            loss: '2.135964870452881',
+            step: '7',
+            timestamp: '1641966335781'
+          },
+          {
+            loss: '2.114135265350342',
+            step: '8',
+            timestamp: '1641966351758'
+          }
+        ],
+        main: [
+          {
+            loss: '2.298783302307129',
+            step: '0',
+            timestamp: '1641966224600'
+          },
+          {
+            loss: '2.2779736518859863',
+            step: '1',
+            timestamp: '1641966239108'
+          },
+          {
+            loss: '2.2572131156921387',
+            step: '2',
+            timestamp: '1641966253176'
+          },
+          {
+            loss: '2.238112688064575',
+            step: '3',
+            timestamp: '1641966267354'
+          },
+          {
+            loss: '2.212251901626587',
+            step: '4',
+            timestamp: '1641966285745'
+          },
+          {
+            loss: '2.1894900798797607',
+            step: '5',
+            timestamp: '1641966303339'
+          },
+          {
+            loss: '2.165510654449463',
+            step: '6',
+            timestamp: '1641966320693'
+          },
+          {
+            loss: '2.135964870452881',
+            step: '7',
+            timestamp: '1641966335781'
+          },
+          {
+            loss: '2.114135265350342',
+            step: '8',
+            timestamp: '1641966351758'
+          }
+        ],
+        '42b8736': [
+          {
+            loss: '1.6454246044158936',
+            step: '0',
+            timestamp: '1642041785966'
+          },
+          {
+            loss: '1.6063436269760132',
+            step: '1',
+            timestamp: '1642041804111'
+          },
+          {
+            loss: '1.5570942163467407',
+            step: '2',
+            timestamp: '1642041820386'
+          },
+          {
+            loss: '1.5230435132980347',
+            step: '3',
+            timestamp: '1642041836358'
+          },
+          {
+            loss: '1.473145842552185',
+            step: '4',
+            timestamp: '1642041851764'
+          },
+          {
+            loss: '1.444159984588623',
+            step: '5',
+            timestamp: '1642041866838'
+          },
+          {
+            loss: '1.3941730260849',
+            step: '6',
+            timestamp: '1642041881837'
+          },
+          {
+            loss: '1.370380163192749',
+            step: '7',
+            timestamp: '1642041897483'
+          },
+          {
+            loss: '1.3217320442199707',
+            step: '8',
+            timestamp: '1642041912764'
+          }
+        ],
+        '1ba7bcd': [
+          {
+            loss: '2.273470401763916',
+            step: '0',
+            timestamp: '1642041482186'
+          },
+          {
+            loss: '2.20936918258667',
+            step: '1',
+            timestamp: '1642041500577'
+          },
+          {
+            loss: '2.153379201889038',
+
+            step: '2',
+            timestamp: '1642041519065'
+          },
+          {
+            loss: '2.0221104621887207',
+            step: '3',
+            timestamp: '1642041543481'
+          },
+          {
+            loss: '2.024623155593872',
+            step: '4',
+            timestamp: '1642041565772'
+          },
+          {
+            loss: '1.8110722303390503',
+            step: '5',
+            timestamp: '1642041586986'
+          },
+          {
+            loss: '1.7324824333190918',
+            step: '6',
+            timestamp: '1642041609569'
+          },
+          {
+            loss: '1.6054636240005493',
+            step: '7',
+            timestamp: '1642041631783'
+          },
+          {
+            loss: '1.5145071744918823',
+            step: '8',
+            timestamp: '1642041648829'
+          }
+        ],
+        '4fb124a': [
+          {
+            loss: '2.0380799770355225',
+            step: '0',
+            timestamp: '1642041230991'
+          },
+          {
+            loss: '2.0002100467681885',
+            step: '1',
+            timestamp: '1642041244696'
+          },
+          {
+            loss: '1.9573605060577393',
+            step: '2',
+            timestamp: '1642041257185'
+          },
+          {
+            loss: '1.91573965549469',
+            step: '3',
+            timestamp: '1642041270652'
+          },
+          {
+            loss: '1.8714964389801025',
+            step: '4',
+            timestamp: '1642041284801'
+          },
+          {
+            loss: '1.8267308473587036',
+            step: '5',
+            timestamp: '1642041301919'
+          },
+          {
+            loss: '1.7825157642364502',
+            step: '6',
+            timestamp: '1642041318814'
+          },
+          {
+            loss: '1.7360031604766846',
+            step: '7',
+            timestamp: '1642041335775'
+          },
+          {
+            loss: '1.6929490566253662',
+            step: '8',
+            timestamp: '1642041350855'
+          }
+        ]
+      },
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
-          values: [
-            {
-              loss: '2.298783302307129',
-              rev: 'workspace',
-              step: '0',
-              timestamp: '1641966224600'
-            },
-            {
-              loss: '2.2779736518859863',
-              rev: 'workspace',
-              step: '1',
-              timestamp: '1641966239108'
-            },
-            {
-              loss: '2.2572131156921387',
-              rev: 'workspace',
-              step: '2',
-              timestamp: '1641966253176'
-            },
-            {
-              loss: '2.238112688064575',
-              rev: 'workspace',
-              step: '3',
-              timestamp: '1641966267354'
-            },
-            {
-              loss: '2.212251901626587',
-              rev: 'workspace',
-              step: '4',
-              timestamp: '1641966285745'
-            },
-            {
-              loss: '2.1894900798797607',
-              rev: 'workspace',
-              step: '5',
-              timestamp: '1641966303339'
-            },
-            {
-              loss: '2.165510654449463',
-              rev: 'workspace',
-              step: '6',
-              timestamp: '1641966320693'
-            },
-            {
-              loss: '2.135964870452881',
-              rev: 'workspace',
-              step: '7',
-              timestamp: '1641966335781'
-            },
-            {
-              loss: '2.114135265350342',
-              rev: 'workspace',
-              step: '8',
-              timestamp: '1641966351758'
-            },
-            {
-              loss: '2.298783302307129',
-              rev: 'main',
-              step: '0',
-              timestamp: '1641966224600'
-            },
-            {
-              loss: '2.2779736518859863',
-              rev: 'main',
-              step: '1',
-              timestamp: '1641966239108'
-            },
-            {
-              loss: '2.2572131156921387',
-              rev: 'main',
-              step: '2',
-              timestamp: '1641966253176'
-            },
-            {
-              loss: '2.238112688064575',
-              rev: 'main',
-              step: '3',
-              timestamp: '1641966267354'
-            },
-            {
-              loss: '2.212251901626587',
-              rev: 'main',
-              step: '4',
-              timestamp: '1641966285745'
-            },
-            {
-              loss: '2.1894900798797607',
-              rev: 'main',
-              step: '5',
-              timestamp: '1641966303339'
-            },
-            {
-              loss: '2.165510654449463',
-              rev: 'main',
-              step: '6',
-              timestamp: '1641966320693'
-            },
-            {
-              loss: '2.135964870452881',
-              rev: 'main',
-              step: '7',
-              timestamp: '1641966335781'
-            },
-            {
-              loss: '2.114135265350342',
-              rev: 'main',
-              step: '8',
-              timestamp: '1641966351758'
-            },
-            {
-              loss: '1.6454246044158936',
-              rev: '42b8736',
-              step: '0',
-              timestamp: '1642041785966'
-            },
-            {
-              loss: '1.6063436269760132',
-              rev: '42b8736',
-              step: '1',
-              timestamp: '1642041804111'
-            },
-            {
-              loss: '1.5570942163467407',
-              rev: '42b8736',
-              step: '2',
-              timestamp: '1642041820386'
-            },
-            {
-              loss: '1.5230435132980347',
-              rev: '42b8736',
-              step: '3',
-              timestamp: '1642041836358'
-            },
-            {
-              loss: '1.473145842552185',
-              rev: '42b8736',
-              step: '4',
-              timestamp: '1642041851764'
-            },
-            {
-              loss: '1.444159984588623',
-              rev: '42b8736',
-              step: '5',
-              timestamp: '1642041866838'
-            },
-            {
-              loss: '1.3941730260849',
-              rev: '42b8736',
-              step: '6',
-              timestamp: '1642041881837'
-            },
-            {
-              loss: '1.370380163192749',
-              rev: '42b8736',
-              step: '7',
-              timestamp: '1642041897483'
-            },
-            {
-              loss: '1.3217320442199707',
-              rev: '42b8736',
-              step: '8',
-              timestamp: '1642041912764'
-            },
-            {
-              loss: '2.273470401763916',
-              rev: '1ba7bcd',
-              step: '0',
-              timestamp: '1642041482186'
-            },
-            {
-              loss: '2.20936918258667',
-              rev: '1ba7bcd',
-              step: '1',
-              timestamp: '1642041500577'
-            },
-            {
-              loss: '2.153379201889038',
-              rev: '1ba7bcd',
-              step: '2',
-              timestamp: '1642041519065'
-            },
-            {
-              loss: '2.0221104621887207',
-              rev: '1ba7bcd',
-              step: '3',
-              timestamp: '1642041543481'
-            },
-            {
-              loss: '2.024623155593872',
-              rev: '1ba7bcd',
-              step: '4',
-              timestamp: '1642041565772'
-            },
-            {
-              loss: '1.8110722303390503',
-              rev: '1ba7bcd',
-              step: '5',
-              timestamp: '1642041586986'
-            },
-            {
-              loss: '1.7324824333190918',
-              rev: '1ba7bcd',
-              step: '6',
-              timestamp: '1642041609569'
-            },
-            {
-              loss: '1.6054636240005493',
-              rev: '1ba7bcd',
-              step: '7',
-              timestamp: '1642041631783'
-            },
-            {
-              loss: '1.5145071744918823',
-              rev: '1ba7bcd',
-              step: '8',
-              timestamp: '1642041648829'
-            },
-            {
-              loss: '2.0380799770355225',
-              rev: '4fb124a',
-              step: '0',
-              timestamp: '1642041230991'
-            },
-            {
-              loss: '2.0002100467681885',
-              rev: '4fb124a',
-              step: '1',
-              timestamp: '1642041244696'
-            },
-            {
-              loss: '1.9573605060577393',
-              rev: '4fb124a',
-              step: '2',
-              timestamp: '1642041257185'
-            },
-            {
-              loss: '1.91573965549469',
-              rev: '4fb124a',
-              step: '3',
-              timestamp: '1642041270652'
-            },
-            {
-              loss: '1.8714964389801025',
-              rev: '4fb124a',
-              step: '4',
-              timestamp: '1642041284801'
-            },
-            {
-              loss: '1.8267308473587036',
-              rev: '4fb124a',
-              step: '5',
-              timestamp: '1642041301919'
-            },
-            {
-              loss: '1.7825157642364502',
-              rev: '4fb124a',
-              step: '6',
-              timestamp: '1642041318814'
-            },
-            {
-              loss: '1.7360031604766846',
-              rev: '4fb124a',
-              step: '7',
-              timestamp: '1642041335775'
-            },
-            {
-              loss: '1.6929490566253662',
-              rev: '4fb124a',
-              step: '8',
-              timestamp: '1642041350855'
-            }
-          ]
+          values: '<DVC_METRIC_DATA>'
         },
         title: '',
         width: 300,
@@ -487,13 +454,12 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             ...originalPlot.content,
             data: {
               values:
-                (
-                  originalPlot.content.data as { values: { rev: string }[] }
-                ).values.sort(function ({ rev: a }, { rev: b }) {
-                  return (
-                    expectedRevisions.indexOf(a) - expectedRevisions.indexOf(b)
-                  )
-                }) || []
+                expectedRevisions.flatMap(revision =>
+                  originalPlot.datapoints?.[revision].map(values => ({
+                    ...values,
+                    rev: revision
+                  }))
+                ) || []
             }
           } as TopLevelSpec,
           {
