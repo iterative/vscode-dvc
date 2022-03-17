@@ -13,7 +13,7 @@ import { WorkspacePlots } from '../../plots/workspace'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { createTreeView } from '../../vscode/tree'
-import { definedAndNonEmpty, flatten } from '../../util/array'
+import { definedAndNonEmpty } from '../../util/array'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { ViewOpenedEventName } from '../../telemetry/constants'
 
@@ -129,9 +129,10 @@ export abstract class BasePathSelectionTree<
     this.dispose.track(
       this.onDidChangeTreeData(() => {
         const dvcRoots = this.workspace.getDvcRoots()
-        const statuses = flatten<Status>(
-          dvcRoots.map(dvcRoot => this.getRepositoryStatuses(dvcRoot))
+        const statuses = dvcRoots.flatMap(dvcRoot =>
+          this.getRepositoryStatuses(dvcRoot)
         )
+
         this.view.description = this.getDescription(statuses, ' of ')
       })
     )

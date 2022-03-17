@@ -26,11 +26,12 @@ import {
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
-import { definedAndNonEmpty, flatten } from '../../util/array'
+import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
 import { MementoPrefix } from '../../vscode/memento'
 import { hasKey } from '../../util/object'
+import { flattenMapValues } from '../../util/map'
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: string
@@ -224,10 +225,8 @@ export class ExperimentsModel {
   public getFilteredExperiments(filters = this.getFilters()) {
     const filteredExperiments = this.getSubRows(this.getExperiments(), filters)
 
-    const filteredCheckpoints = flatten<Experiment>(
-      filteredExperiments.map(
-        ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
-      )
+    const filteredCheckpoints = filteredExperiments.flatMap(
+      ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
     )
 
     return [...filteredExperiments, ...filteredCheckpoints]
@@ -272,17 +271,19 @@ export class ExperimentsModel {
   }
 
   public getExperimentParams(id: string) {
-    const params =
-      id === 'workspace'
-        ? this.workspace.params
-        : this.flattenExperiments().find(experiment => experiment.id === id)
-            ?.params
+    const params = this.getExperiments().find(
+      experiment => experiment.id === id
+    )?.params
 
     return collectFlatExperimentParams(params)
   }
 
   public getCurrentExperiments() {
-    return this.flattenExperiments().filter(({ queued }) => !queued)
+    return this.splitExperimentsByQueued()
+  }
+
+  public getQueuedExperiments() {
+    return this.splitExperimentsByQueued(true)
   }
 
   public getCheckpoints(id: string): Experiment[] | undefined {
@@ -381,11 +382,20 @@ export class ExperimentsModel {
   }
 
   private flattenExperiments() {
-    return flatten<Experiment>([...this.experimentsByBranch.values()])
+    return flattenMapValues(this.experimentsByBranch)
+  }
+
+  private splitExperimentsByQueued(getQueued = false) {
+    return this.flattenExperiments().filter(({ queued }) => {
+      if (getQueued) {
+        return queued
+      }
+      return !queued
+    })
   }
 
   private flattenCheckpoints() {
-    return flatten<Experiment>([...this.checkpointsByTip.values()])
+    return flattenMapValues(this.checkpointsByTip)
   }
 
   private setStatus() {

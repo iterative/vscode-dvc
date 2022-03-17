@@ -213,6 +213,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.removeExperimentQueue%",
+        "command": "dvc.removeExperimentQueue",
+        "category": "DVC"
+      },
+      {
         "title": "%command.removeExperimentsTableFilters%",
         "command": "dvc.removeExperimentsTableFilters",
         "category": "DVC"
@@ -222,6 +227,11 @@
         "command": "dvc.removeExperimentsTableSorts",
         "category": "DVC",
         "icon": "$(close-all)"
+      },
+      {
+        "title": "%command.removeQueuedExperiment%",
+        "command": "dvc.removeQueuedExperiment",
+        "category": "DVC"
       },
       {
         "title": "%command.removeTarget%",
@@ -497,11 +507,19 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "command": "dvc.removeExperimentQueue",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "command": "dvc.removeExperimentsTableFilters",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.removeExperimentsTableSorts",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.removeQueuedExperiment",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {

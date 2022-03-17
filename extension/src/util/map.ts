@@ -35,3 +35,8 @@ export const addToMapCount = (
   map.set(key, count)
   return count
 }
+
+export const flattenMapValues = <T>(map: Map<string, T[]>): T[] => {
+  const iterator: IterableIterator<T[]> = map.values()
+  return [...iterator].flat()
+}
