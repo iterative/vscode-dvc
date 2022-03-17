@@ -25,7 +25,7 @@ type TemplatePlotAccumulator = {
   multiViewPlots: VegaPlots
 }
 
-enum NewSectionBlock {
+export enum NewSectionBlock {
   TOP = 'drop-section-top',
   BOTTOM = 'drop-section-bottom'
 }
@@ -183,6 +183,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
     <div>
       <div
         id={NewSectionBlock.TOP}
+        data-testid={NewSectionBlock.TOP}
         {...newDropSection}
         className={cx(styles.dropSection, {
           [styles.dropSectionMaximized]: hoveredSection === NewSectionBlock.TOP
@@ -194,6 +195,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
           <div
             key={groupId}
             id={groupId}
+            data-testid={`plots-section_${groupId}`}
             className={
               section.group === PlotsGroup.MULTI_VIEW
                 ? styles.multiViewPlotsGrid
@@ -211,6 +213,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       })}
       <div
         id={NewSectionBlock.BOTTOM}
+        data-testid={NewSectionBlock.BOTTOM}
         {...newDropSection}
         className={cx(styles.dropSection, {
           [styles.dropSectionMaximized]:

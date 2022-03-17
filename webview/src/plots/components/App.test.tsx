@@ -13,7 +13,8 @@ import {
   CheckpointPlotsColors,
   PlotsData,
   PlotSize,
-  Section
+  Section,
+  TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -21,6 +22,7 @@ import {
 } from 'dvc/src/webview/contract'
 import { App } from './App'
 import { Plots } from './Plots'
+import { NewSectionBlock } from './TemplatePlots/TemplatePlots'
 import { vsCodeApi } from '../../shared/api'
 import { dragAndDrop } from '../../test/dragDrop'
 
@@ -62,6 +64,16 @@ describe('App', () => {
     render(<App />)
     sendSetDataMessage(data)
   }
+
+  const templatePlot = templatePlotsFixture.plots[join('logs', 'loss.tsv')]
+  const complexTemplatePlotsFixture = {
+    ...templatePlotsFixture,
+    plots: {
+      ...templatePlotsFixture.plots,
+      [join('other', 'plot.tsv')]: [...templatePlot],
+      [join('other', 'multiview.tsv')]: [{ ...templatePlot, multiView: true }]
+    }
+  } as TemplatePlotsData
 
   it('should send the initialized message on first render', () => {
     render(<App />)
@@ -515,22 +527,15 @@ describe('App', () => {
   it('should display the template plots in the order stored', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-      template: {
-        ...templatePlotsFixture,
-        plots: {
-          ...templatePlotsFixture.plots,
-          [join('other', 'plot.tsv')]: [
-            ...templatePlotsFixture.plots[join('logs', 'loss.tsv')]
-          ]
-        }
-      }
+      template: complexTemplatePlotsFixture
     })
 
     let plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
       join('plot_logs', 'loss.tsv_0'),
-      join('plot_other', 'plot.tsv_0')
+      join('plot_other', 'plot.tsv_0'),
+      join('plot_other', 'multiview.tsv_0')
     ])
 
     dragAndDrop(plots[1], plots[0])
@@ -539,7 +544,127 @@ describe('App', () => {
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
       join('plot_other', 'plot.tsv_0'),
+      join('plot_logs', 'loss.tsv_0'),
+      join('plot_other', 'multiview.tsv_0')
+    ])
+  })
+
+  it('should render two template plot sections', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'static-single_0',
+      'static-multi_1'
+    ])
+  })
+
+  it('should create a new section above the others if the template plot type is different than the first section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+    const multiViewPlot = screen.getByTestId(
+      join('plot_other', 'multiview.tsv_0')
+    )
+
+    dragAndDrop(multiViewPlot, topSection)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'static-multi_0',
+      'static-single_1'
+    ])
+  })
+
+  it('should not create a new section above the others by dragging a template plot from the same type as the first section above it', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv_0'))
+
+    dragAndDrop(aSingleViewPlot, topSection)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'static-single_0',
+      'static-multi_1'
+    ])
+  })
+
+  it('should create a new section below the others if the template plot type is different than the last section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv_0'))
+
+    dragAndDrop(aSingleViewPlot, bottomSection)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'static-single_0',
+      'static-multi_1',
+      'static-single_2'
+    ])
+  })
+
+  it('should not create a new section below the others by dragging a template plot from the same type as the last section below it', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+    const multiViewPlot = screen.getByTestId(
+      join('plot_other', 'multiview.tsv_0')
+    )
+
+    dragAndDrop(multiViewPlot, bottomSection)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'static-single_0',
+      'static-multi_1'
+    ])
+  })
+
+  it('should move a template plot from one type in another section of the same type', async () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv_0'))
+
+    dragAndDrop(aSingleViewPlot, bottomSection)
+
+    await screen.findByTestId('plots-section_static-single_2')
+    const anotherSingleViewPlot = screen.getByTestId(
       join('plot_logs', 'loss.tsv_0')
+    )
+    const movedSingleViewPlot = screen.getByTestId(
+      join('plot_other', 'plot.tsv_0')
+    )
+
+    dragAndDrop(anotherSingleViewPlot, movedSingleViewPlot)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'static-multi_0',
+      'static-single_1'
     ])
   })
 })
