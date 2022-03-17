@@ -205,9 +205,7 @@ describe('collectData', () => {
         ...value,
         rev: revision
       }))
-      expect(revisionData[revision]['logs/loss.tsv']).toStrictEqual(
-        expectedValues
-      )
+      expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
     }
 
     expect(Object.keys(revisionData)).toStrictEqual(revisions)
@@ -248,6 +246,6 @@ describe('collectTemplates', () => {
       'predictions.json'
     ])
 
-    expect(JSON.parse(templates['logs/loss.tsv'])).toStrictEqual(content)
+    expect(JSON.parse(templates[logsLossPath])).toStrictEqual(content)
   })
 })
