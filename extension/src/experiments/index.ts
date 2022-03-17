@@ -27,6 +27,7 @@ import {
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
+import { Title } from '../vscode/title'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -255,7 +256,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async pickParamsToQueue() {
-    const base = await pickExperiment(this.experiments.getExperiments())
+    const base = await pickExperiment(
+      this.experiments.getExperiments(),
+      Title.SELECT_BASE_EXPERIMENT
+    )
 
     if (!base) {
       return
