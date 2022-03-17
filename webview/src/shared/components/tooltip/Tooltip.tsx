@@ -36,6 +36,8 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onShow,
     onHide,
     placement,
+    onTrigger,
+    onUntrigger,
     animation = false,
     className = styles.menu,
     arrow = false,
@@ -54,6 +56,8 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     popperOptions={popperOptions}
     singleton={singleton}
     trigger={trigger}
+    onTrigger={onTrigger}
+    onUntrigger={onUntrigger}
     interactive={interactive}
     onShow={onShow}
     onHide={onHide}

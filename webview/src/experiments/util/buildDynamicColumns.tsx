@@ -60,6 +60,18 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
       placement="bottom"
       arrow={true}
       delay={[CELL_TOOLTIP_DELAY, 0]}
+      trigger="mouseenter focus click"
+      onTrigger={(instance, e) => {
+        if (e.type === 'click') {
+          instance.setProps({ interactive: true })
+          instance.show()
+        }
+      }}
+      onHide={instance => {
+        instance.setProps({
+          interactive: false
+        })
+      }}
     >
       <div className={styles.innerCell}>
         <CopyButton value={stringValue} />
