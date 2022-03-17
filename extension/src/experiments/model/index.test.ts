@@ -11,6 +11,7 @@ import rowsFixture from '../../test/fixtures/expShow/rows'
 import { buildMockMemento } from '../../test/util'
 import { joinMetricOrParamPath } from '../metricsAndParams/paths'
 import { Experiment } from '../webview/contract'
+import { definedAndNonEmpty } from '../../util/array'
 
 jest.mock('vscode')
 
@@ -224,5 +225,37 @@ describe('ExperimentsModel', () => {
     expect(experimentsModel.getSelectedRevisions()).toHaveLength(6)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((experimentsModel as any).useFiltersForSelection).toBe(false)
+  })
+
+  it('should fetch branch params', async () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    await model.transformAndSet(outputFixture, true)
+
+    const branchParams = model.getExperimentParams('main')
+    expect(definedAndNonEmpty(branchParams)).toBe(true)
+  })
+
+  it('should fetch workspace params', async () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    await model.transformAndSet(outputFixture, true)
+
+    const workspaceParams = model.getExperimentParams('workspace')
+    expect(definedAndNonEmpty(workspaceParams)).toBe(true)
+  })
+
+  it("should fetch an experiment's params", async () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    await model.transformAndSet(outputFixture, true)
+
+    const experimentParams = model.getExperimentParams('exp-e7a67')
+    expect(definedAndNonEmpty(experimentParams)).toBe(true)
+  })
+
+  it("should fetch an empty array if the experiment's params cannot be found", async () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    await model.transformAndSet(outputFixture, true)
+
+    const noParams = model.getExperimentParams('not-an-experiment')
+    expect(definedAndNonEmpty(noParams)).toBe(false)
   })
 })
