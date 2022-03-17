@@ -274,8 +274,7 @@ export class ExperimentsModel {
     const params =
       id === 'workspace'
         ? this.workspace.params
-        : this.flattenExperiments().find(experiment => experiment.id === id)
-            ?.params
+        : this.getExperiments().find(experiment => experiment.id === id)?.params
 
     return collectFlatExperimentParams(params)
   }

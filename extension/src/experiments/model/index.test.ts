@@ -11,6 +11,7 @@ import rowsFixture from '../../test/fixtures/expShow/rows'
 import { buildMockMemento } from '../../test/util'
 import { joinMetricOrParamPath } from '../metricsAndParams/paths'
 import { Experiment } from '../webview/contract'
+import { definedAndNonEmpty } from '../../util/array'
 
 jest.mock('vscode')
 
@@ -224,5 +225,13 @@ describe('ExperimentsModel', () => {
     expect(experimentsModel.getSelectedRevisions()).toHaveLength(6)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((experimentsModel as any).useFiltersForSelection).toBe(false)
+  })
+
+  it('should fetch branch params', async () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    await model.transformAndSet(outputFixture, true)
+
+    const branchParams = model.getExperimentParams('main')
+    expect(definedAndNonEmpty(branchParams)).toBe(true)
   })
 })
