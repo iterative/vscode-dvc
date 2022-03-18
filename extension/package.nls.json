@@ -53,6 +53,7 @@
   "command.views.experimentsSortByTree.removeSort": "Remove Sort From Experiments Table",
   "command.views.experimentsTree.autoApplyFilters": "Auto Apply Filters To Experiment Selection",
   "command.views.experimentsTree.disableAutoApplyFilters": "Disable Auto Apply Filters To Experiment Selection",
+  "command.views.experimentsTree.removeExperiment": "Remove",
   "command.views.experimentsTree.selectExperiments": "Select Experiments",
   "config.doNotRecommendRedHatExtension.description": "Do not prompt to install the Red Hat YAML extension to assist with DVC YAML schema validation.",
   "config.doNotRecommendRedHatExtension.title": "Do not prompt to install the Red Hat YAML extension.",

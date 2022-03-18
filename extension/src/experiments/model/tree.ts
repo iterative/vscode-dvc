@@ -8,6 +8,7 @@ import {
   TreeView,
   Uri
 } from 'vscode'
+import { ExperimentType } from '.'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
@@ -16,7 +17,7 @@ import { definedAndNonEmpty } from '../../util/array'
 import { createTreeView, getRootItem } from '../../vscode/tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
-import { InternalCommands } from '../../commands/internal'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
 
 export type ExperimentItem = {
@@ -30,6 +31,7 @@ export type ExperimentItem = {
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
+  type: ExperimentType
   iconPath: ThemeIcon | Uri | Resource
 }
 
@@ -80,6 +82,16 @@ export class ExperimentsTree
         this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
     )
 
+    internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TREE_REMOVE,
+      ({ dvcRoot, id }: ExperimentItem) =>
+        this.experiments.runCommand(
+          AvailableCommands.EXPERIMENT_REMOVE,
+          dvcRoot,
+          id
+        )
+    )
+
     this.updateDescriptionOnChange()
   }
 
@@ -88,10 +100,12 @@ export class ExperimentsTree
       return getRootItem(element)
     }
 
-    const { label, collapsibleState, iconPath, command, description } = element
+    const { label, collapsibleState, iconPath, command, description, type } =
+      element
     const item = new TreeItem(label, collapsibleState)
     item.iconPath = iconPath
     item.description = description
+    item.contextValue = type
     if (command) {
       item.command = command
     }
@@ -158,7 +172,8 @@ export class ExperimentsTree
         dvcRoot,
         iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
-        label: experiment.label
+        label: experiment.label,
+        type: experiment.type
       }))
   }
 
@@ -182,19 +197,19 @@ export class ExperimentsTree
   private getExperimentIcon({
     displayColor,
     running,
-    queued,
+    type,
     selected
   }: {
     displayColor?: string
     label: string
     running?: boolean
-    queued?: boolean
+    type?: ExperimentType
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
     if (running) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
-    if (queued) {
+    if (type === ExperimentType.QUEUED) {
       return this.resourceLocator.clock
     }
 
@@ -220,7 +235,8 @@ export class ExperimentsTree
         this.getIconName(checkpoint.selected)
       ),
       id: checkpoint.id,
-      label: checkpoint.label
+      label: checkpoint.label,
+      type: checkpoint.type
     }))
   }
 
