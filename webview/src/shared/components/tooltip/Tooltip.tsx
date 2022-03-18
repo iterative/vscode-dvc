@@ -30,6 +30,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     content,
     delay,
     disabled,
+    duration,
     singleton,
     trigger,
     interactive,
@@ -38,6 +39,8 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     placement,
     onTrigger,
     onUntrigger,
+    hideOnClick,
+    onClickOutside,
     animation = false,
     className = styles.menu,
     arrow = false,
@@ -49,6 +52,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     animation={animation}
     content={content}
     className={className}
+    duration={duration}
     placement={placement}
     arrow={arrow}
     delay={delay}
@@ -58,6 +62,8 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     trigger={trigger}
     onTrigger={onTrigger}
     onUntrigger={onUntrigger}
+    hideOnClick={hideOnClick}
+    onClickOutside={onClickOutside}
     interactive={interactive}
     onShow={onShow}
     onHide={onHide}

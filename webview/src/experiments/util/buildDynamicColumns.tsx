@@ -59,15 +59,31 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
       content={<CellTooltip cell={cell} />}
       placement="bottom"
       arrow={true}
+      duration={0}
       delay={[CELL_TOOLTIP_DELAY, 0]}
-      trigger="mouseenter focus click"
+      trigger="mouseenter click"
+      onShow={() => {
+        console.log('Show!')
+      }}
+      onClickOutside={(_instance, e) => {
+        console.log('Clicked outside!', e)
+        e.preventDefault()
+        e.stopPropagation()
+      }}
+      onUntrigger={(_instance, e) => {
+        console.log('Untrigger!', e.type)
+      }}
       onTrigger={(instance, e) => {
+        console.log('Trigger!', e.type)
+        e.stopImmediatePropagation()
+        e.preventDefault()
         if (e.type === 'click') {
           instance.setProps({ interactive: true })
-          instance.show()
+          setTimeout(() => instance.show())
         }
       }}
       onHide={instance => {
+        console.log('Hide!')
         instance.setProps({
           interactive: false
         })

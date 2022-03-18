@@ -428,10 +428,41 @@ describe('App', () => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
+    it.only('should show a persistent tooltip when a cell is clicked', async () => {
+      jest.useRealTimers()
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testParamCell = screen.getByText(testParamStringValue)
+
+      await new Promise(resolve => setTimeout(resolve))
+      fireEvent.click(testParamCell)
+
+      const tooltip = await screen.findByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+
+      /*
+      fireEvent.mouseLeave(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(1)
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+      jest.advanceTimersByTime(99999)
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+
+      fireEvent.click(testParamCell, { bubbles: true })
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+      */
+    })
+
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a cell', () => {
-      jest
-        .spyOn(window, 'requestAnimationFrame')
-        .mockImplementation(cb => window.setTimeout(cb, 1))
       render(<App />)
       fireEvent(
         window,
@@ -459,8 +490,6 @@ describe('App', () => {
 
       jest.advanceTimersByTime(1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-
-      jest.mocked(window.requestAnimationFrame).mockRestore()
     })
 
     it('should show a tooltip with the full number on number cells', () => {
