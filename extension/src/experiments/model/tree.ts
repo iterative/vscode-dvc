@@ -122,11 +122,11 @@ export class ExperimentsTree
 
     internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_APPLY,
-      ({ dvcRoot, id }: ExperimentItem) =>
+      ({ dvcRoot, id, label, type }: ExperimentItem) =>
         this.experiments.runCommand(
           AvailableCommands.EXPERIMENT_APPLY,
           dvcRoot,
-          id
+          type === ExperimentType.CHECKPOINT ? label : id
         )
     )
 

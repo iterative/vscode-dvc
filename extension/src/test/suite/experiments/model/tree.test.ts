@@ -456,7 +456,9 @@ suite('Experiments Tree Test Suite', () => {
       const mockExperimentApply = stub(
         CliExecutor.prototype,
         'experimentApply'
-      ).resolves('experiment applied')
+      ).resolves(
+        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+      )
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_APPLY, {
         dvcRoot: dvcDemoPath,
