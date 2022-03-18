@@ -4,7 +4,7 @@
   "command.addExperimentsTableFilter": "Add Filter To Experiments Table",
   "command.addExperimentsTableSort": "Add Or Update Sort On Experiments Table",
   "command.addTarget": "Add Target",
-  "command.applyExperiment": "Apply Experiment to Workspace",
+  "command.applyExperiment": "Apply Experiment To Workspace",
   "command.branchExperiment": "Branch Experiment",
   "command.checkout": "Checkout",
   "command.checkoutTarget": "Checkout Target",
