@@ -121,6 +121,16 @@ export class ExperimentsTree
     )
 
     internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TREE_APPLY,
+      ({ dvcRoot, id }: ExperimentItem) =>
+        this.experiments.runCommand(
+          AvailableCommands.EXPERIMENT_APPLY,
+          dvcRoot,
+          id
+        )
+    )
+
+    internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_REMOVE,
       ({ dvcRoot, id }: ExperimentItem) =>
         this.experiments.runCommand(
