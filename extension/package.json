@@ -343,6 +343,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.views.experimentsTree.branchExperiment%",
+        "command": "dvc.views.experimentsTree.branchExperiment",
+        "category": "DVC"
+      },
+      {
         "title": "%command.views.experimentsTree.removeExperiment%",
         "command": "dvc.views.experimentsTree.removeExperiment",
         "category": "DVC",
@@ -579,6 +584,10 @@
         },
         {
           "command": "dvc.views.experimentsTree.applyExperiment",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsTree.branchExperiment",
           "when": "false"
         },
         {
@@ -832,6 +841,11 @@
         {
           "command": "dvc.views.experimentsTree.applyExperiment",
           "group": "1_do@1",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/"
+        },
+        {
+          "command": "dvc.views.experimentsTree.branchExperiment",
+          "group": "1_do@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/"
         },
         {

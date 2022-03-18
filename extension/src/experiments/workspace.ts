@@ -189,9 +189,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!experiment) {
       return
     }
+    return this.getInputAndRun(commandId, cwd, title, experiment.name)
+  }
+
+  public async getInputAndRun(
+    commandId: CommandId,
+    cwd: string,
+    title: Title,
+    ...args: string[]
+  ) {
     const input = await getInput(title)
     if (input) {
-      return this.runCommand(commandId, cwd, experiment.name, input)
+      return this.runCommand(commandId, cwd, ...args, input)
     }
   }
 

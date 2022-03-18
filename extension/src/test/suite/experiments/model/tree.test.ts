@@ -12,7 +12,7 @@ import {
 } from 'vscode'
 import { addFilterViaQuickInput } from './filterBy/util'
 import { Disposable } from '../../../../extension'
-import { ExperimentsModel } from '../../../../experiments/model'
+import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
 import { Status } from '../../../../experiments/model/status'
 import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
@@ -470,5 +470,52 @@ suite('Experiments Tree Test Suite', () => {
         mockExperiment
       )
     })
+  })
+
+  it('should not create a new branch from an experiment with dvc.views.experimentsTree.branchExperiment if the user cancels', async () => {
+    const mockCheckpoint = 'a2c44b8'
+
+    const mockExperimentBranch = stub(CliExecutor.prototype, 'experimentBranch')
+    const mockShowInputBox = stub(window, 'showInputBox').resolves(undefined)
+
+    await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_BRANCH, {
+      dvcRoot: dvcDemoPath,
+      id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
+      label: mockCheckpoint,
+      type: ExperimentType.CHECKPOINT
+    })
+
+    expect(mockShowInputBox).to.be.calledOnce
+    expect(mockExperimentBranch).not.to.be.called
+  })
+
+  it('should be able to create a new branch from an experiment with dvc.views.experimentsTree.branchExperiment', async () => {
+    const mockCheckpoint = 'a2c44b8'
+    const mockBranch = 'it-is-a-branch'
+
+    const mockExperimentBranch = stub(
+      CliExecutor.prototype,
+      'experimentBranch'
+    ).resolves(
+      `Git branch '${mockBranch}' has been created from experiment '${mockCheckpoint}'.        
+			To switch to the new branch run:
+			
+							git checkout fun`
+    )
+    const mockShowInputBox = stub(window, 'showInputBox').resolves(mockBranch)
+
+    await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_BRANCH, {
+      dvcRoot: dvcDemoPath,
+      id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
+      label: mockCheckpoint,
+      type: ExperimentType.CHECKPOINT
+    })
+
+    expect(mockShowInputBox).to.be.calledOnce
+    expect(mockExperimentBranch).to.be.calledWithExactly(
+      dvcDemoPath,
+      mockCheckpoint,
+      mockBranch
+    )
   })
 })
