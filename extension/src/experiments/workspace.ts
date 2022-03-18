@@ -118,12 +118,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return Toast.showOutput(
-      this.internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_QUEUE,
-        cwd,
-        ...paramsToQueue
-      )
+    return this.runCommand(
+      AvailableCommands.EXPERIMENT_QUEUE,
+      cwd,
+      ...paramsToQueue
     )
   }
 
@@ -173,9 +171,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     const result = await quickPick()
 
     if (result) {
-      return Toast.showOutput(
-        this.internalCommands.executeCommand(commandId, cwd, ...result)
-      )
+      return this.runCommand(commandId, cwd, ...result)
     }
   }
 
@@ -195,15 +191,14 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
     const input = await getInput(title)
     if (input) {
-      return Toast.showOutput(
-        this.internalCommands.executeCommand(
-          commandId,
-          cwd,
-          experiment.name,
-          input
-        )
-      )
+      return this.runCommand(commandId, cwd, experiment.name, input)
     }
+  }
+
+  public runCommand(commandId: CommandId, cwd: string, ...args: string[]) {
+    return Toast.showOutput(
+      this.internalCommands.executeCommand(commandId, cwd, ...args)
+    )
   }
 
   public createRepository(
@@ -259,9 +254,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!experiment) {
       return
     }
-    return Toast.showOutput(
-      this.internalCommands.executeCommand(commandId, cwd, experiment.name)
-    )
+    return this.runCommand(commandId, cwd, experiment.name)
   }
 
   private async getDvcRoot(overrideRoot?: string) {

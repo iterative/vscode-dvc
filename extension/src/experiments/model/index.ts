@@ -42,6 +42,14 @@ export type ExperimentWithCheckpoints = Experiment & {
   checkpoints?: Experiment[]
 }
 
+export enum ExperimentType {
+  WORKSPACE = 'workspace',
+  BRANCH = 'branch',
+  EXPERIMENT = 'experiment',
+  CHECKPOINT = 'checkpoint',
+  QUEUED = 'queued'
+}
+
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
@@ -235,25 +243,31 @@ export class ExperimentsModel {
   public getExperiments(): (Experiment & {
     hasChildren: boolean
     selected?: boolean
+    type: ExperimentType
   })[] {
     return [
       {
         ...this.workspace,
         hasChildren: false,
-        selected: !!this.status.workspace
+        selected: !!this.status.workspace,
+        type: ExperimentType.WORKSPACE
       },
       ...this.branches.map(branch => {
         return {
           ...branch,
           hasChildren: false,
-          selected: this.isSelected(branch.id)
+          selected: this.isSelected(branch.id),
+          type: ExperimentType.BRANCH
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
         ...this.addSelected(experiment),
         hasChildren: definedAndNonEmpty(
           this.checkpointsByTip.get(experiment.id)
-        )
+        ),
+        type: experiment.queued
+          ? ExperimentType.QUEUED
+          : ExperimentType.EXPERIMENT
       }))
     ]
   }
@@ -286,10 +300,13 @@ export class ExperimentsModel {
     return this.splitExperimentsByQueued(true)
   }
 
-  public getCheckpoints(id: string): Experiment[] | undefined {
-    return this.checkpointsByTip
-      .get(id)
-      ?.map(checkpoint => this.addSelected(checkpoint))
+  public getCheckpoints(
+    id: string
+  ): (Experiment & { type: ExperimentType })[] | undefined {
+    return this.checkpointsByTip.get(id)?.map(checkpoint => ({
+      ...this.addSelected(checkpoint),
+      type: ExperimentType.CHECKPOINT
+    }))
   }
 
   public getRowData() {
