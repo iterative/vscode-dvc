@@ -255,17 +255,13 @@ export class Experiments extends BaseRepository<TableData> {
     return pickExperiment(this.experiments.getQueuedExperiments())
   }
 
-  public async pickParamsToQueue() {
-    const base = await pickExperiment(
-      this.experiments.getExperiments(),
-      Title.SELECT_BASE_EXPERIMENT
-    )
-
-    if (!base) {
+  public async pickParamsToQueue(overrideId?: string) {
+    const id = await this.getExperimentId(overrideId)
+    if (!id) {
       return
     }
 
-    const params = this.experiments.getExperimentParams(base.id)
+    const params = this.experiments.getExperimentParams(id)
 
     if (!params) {
       return
@@ -385,5 +381,18 @@ export class Experiments extends BaseRepository<TableData> {
     if (response === Response.SELECT_MOST_RECENT) {
       this.experiments.setSelected(filteredExperiments)
     }
+  }
+
+  private async getExperimentId(overrideId?: string) {
+    if (overrideId) {
+      return overrideId
+    }
+
+    const experiment = await pickExperiment(
+      this.experiments.getExperiments(),
+      Title.SELECT_BASE_EXPERIMENT
+    )
+
+    return experiment?.id
   }
 }

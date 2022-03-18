@@ -19,6 +19,7 @@ import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
+import { Title } from '../../vscode/title'
 
 export type ExperimentItem = {
   command?: {
@@ -126,8 +127,26 @@ export class ExperimentsTree
         this.experiments.runCommand(
           AvailableCommands.EXPERIMENT_APPLY,
           dvcRoot,
-          type === ExperimentType.CHECKPOINT ? label : id
+          this.getDisplayId(type, label, id)
         )
+    )
+
+    internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TREE_BRANCH,
+      ({ dvcRoot, id, label, type }: ExperimentItem) => {
+        this.experiments.getInputAndRun(
+          AvailableCommands.EXPERIMENT_BRANCH,
+          dvcRoot,
+          Title.ENTER_BRANCH_NAME,
+          this.getDisplayId(type, label, id)
+        )
+      }
+    )
+
+    internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TREE_QUEUE,
+      ({ dvcRoot, id }: ExperimentItem) =>
+        this.experiments.queueExperimentFromExisting(dvcRoot, id)
     )
 
     internalCommands.registerExternalCommand<ExperimentItem>(
@@ -291,5 +310,9 @@ export class ExperimentsTree
 
   private isRoot(element: string | ExperimentItem): element is string {
     return typeof element === 'string'
+  }
+
+  private getDisplayId(type: ExperimentType, label: string, id: string) {
+    return type === ExperimentType.CHECKPOINT ? label : id
   }
 }
