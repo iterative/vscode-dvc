@@ -449,5 +449,26 @@ suite('Experiments Tree Test Suite', () => {
         mockExperiment
       )
     })
+
+    it('should be able to apply an experiment to the workspace with dvc.views.experimentsTree.applyExperiment', async () => {
+      const mockExperiment = 'exp-to-apply'
+
+      const mockExperimentApply = stub(
+        CliExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+      )
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_APPLY, {
+        dvcRoot: dvcDemoPath,
+        id: mockExperiment
+      })
+
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperiment
+      )
+    })
   })
 })
