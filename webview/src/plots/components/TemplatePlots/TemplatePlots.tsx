@@ -4,14 +4,14 @@ import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import {
   PlotSection,
   PlotsGroup,
-  removeFromPreviousSectionAndAddToNewSection
+  removeFromPreviousAndAddToNewSection
 } from './utils'
 import { AddedSection } from './AddedSection'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 import {
-  createIdentifierWithIndex,
-  getIdentifierIndex,
-  getIdentifierWithoutIndexOrPrefix
+  createIDWithIndex,
+  getIDIndex,
+  getIDWithoutIndexOrPrefix
 } from '../../../util/ids'
 import styles from '../styles.module.scss'
 
@@ -90,13 +90,12 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
   }
 
   const handleDropInNewSection = (e: DragEvent<HTMLElement>) => {
-    const dropInSection = e.currentTarget.id
-    const draggedSectionId = getIdentifierIndex(e.dataTransfer.getData('group'))
-    const draggedId = getIdentifierWithoutIndexOrPrefix(
+    const draggedSectionId = getIDIndex(e.dataTransfer.getData('group'))
+    const draggedId = getIDWithoutIndexOrPrefix(
       e.dataTransfer.getData('itemId')
     )
 
-    const updatedSections = removeFromPreviousSectionAndAddToNewSection(
+    const updatedSections = removeFromPreviousAndAddToNewSection(
       sections,
       draggedSectionId,
       draggedId
@@ -109,14 +108,13 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       entries: {
         [draggedId]: entries[draggedId]
       },
-      group: group
+      group
     }
 
-    if (dropInSection === NewSectionBlock.TOP) {
+    if (e.currentTarget.id === NewSectionBlock.TOP) {
       if (firstSection.group !== group) {
         setSections([newSection, ...updatedSections])
       }
-
       return
     }
     if (lastSection.group !== group) {
@@ -132,11 +130,11 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
     if (draggedGroup === groupId) {
       return
     }
-    const oldGroupId = getIdentifierIndex(draggedGroup)
-    const newGroupId = getIdentifierIndex(groupId)
-    const entryId = getIdentifierWithoutIndexOrPrefix(draggedId)
+    const oldGroupId = getIDIndex(draggedGroup)
+    const newGroupId = getIDIndex(groupId)
+    const entryId = getIDWithoutIndexOrPrefix(draggedId)
     const entry = sections[oldGroupId].entries[entryId]
-    const updatedSections = removeFromPreviousSectionAndAddToNewSection(
+    const updatedSections = removeFromPreviousAndAddToNewSection(
       sections,
       oldGroupId,
       entryId,
@@ -162,7 +160,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
         closestSection={firstSection}
       />
       {sections.map((section, i) => {
-        const groupId = createIdentifierWithIndex(section.group, i)
+        const groupId = createIDWithIndex(section.group, i)
         return (
           <div
             key={groupId}
@@ -179,6 +177,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
               group={groupId}
               onDropInSection={handleDropInSection}
               draggedRef={draggedRef}
+              multiView={section.group === PlotsGroup.MULTI_VIEW}
             />
           </div>
         )

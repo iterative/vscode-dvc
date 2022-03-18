@@ -36,7 +36,7 @@ const add = (
   group: section.group
 })
 
-export const removeFromPreviousSectionAndAddToNewSection = (
+export const removeFromPreviousAndAddToNewSection = (
   sections: PlotSection[],
   oldSectionIndex: number,
   entryId: string,

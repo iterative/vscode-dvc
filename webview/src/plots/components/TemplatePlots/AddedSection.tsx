@@ -2,7 +2,7 @@ import React, { DragEvent, MutableRefObject } from 'react'
 import cx from 'classnames'
 import { PlotSection } from './utils'
 import styles from '../styles.module.scss'
-import { getIdentifierWithoutIndex } from '../../../util/ids'
+import { getIDWithoutIndex } from '../../../util/ids'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 
 interface AddedSectionProps {
@@ -27,7 +27,7 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    const draggedGroup = getIdentifierWithoutIndex(draggedRef.current?.group)
+    const draggedGroup = getIDWithoutIndex(draggedRef.current?.group)
     if (draggedGroup !== closestSection.group) {
       setHoveredSection(e.currentTarget.id)
     }

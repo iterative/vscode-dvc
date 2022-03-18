@@ -1,8 +1,5 @@
 import React, { DragEvent, MutableRefObject } from 'react'
-import {
-  getIdentifierIndex,
-  getIdentifierWithoutIndex
-} from '../../../util/ids'
+import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 
 export type DraggedInfo = {
   itemIndex: string
@@ -49,8 +46,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     })
   }
 
-  const handleDragOver = (e: DragEvent<HTMLElement>) => e.preventDefault()
-
   const applyDrop = (e: DragEvent<HTMLElement>, droppedIndex: number) => {
     const newOrder = [...order]
     const draggedId = e.dataTransfer.getData('itemId')
@@ -60,7 +55,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }
     const draggedIndex = isNew
       ? newOrder.length - 1
-      : getIdentifierIndex(e.dataTransfer.getData('itemIndex'))
+      : getIDIndex(e.dataTransfer.getData('itemIndex'))
     const dragged = newOrder[draggedIndex]
 
     newOrder.splice(draggedIndex, 1)
@@ -73,10 +68,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
     const droppedIndex = order.indexOf(e.currentTarget.id)
-    const draggedGroup = getIdentifierWithoutIndex(
-      e.dataTransfer.getData('group')
-    )
-    const isSameGroup = draggedGroup === getIdentifierWithoutIndex(group)
+    const draggedGroup = getIDWithoutIndex(e.dataTransfer.getData('group'))
+    const isSameGroup = draggedGroup === getIDWithoutIndex(group)
     const isEnabled = !disabledDropIds.includes(order[droppedIndex])
 
     if (isEnabled && isSameGroup) {
@@ -93,7 +86,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
               key={item.key}
               {...item.props}
               onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
+              onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
               onDrop={handleOnDrop}
               draggable={!disabledDropIds.includes(item.props.id)}
             />
