@@ -498,9 +498,8 @@ suite('Experiments Tree Test Suite', () => {
       'experimentBranch'
     ).resolves(
       `Git branch '${mockBranch}' has been created from experiment '${mockCheckpoint}'.        
-			To switch to the new branch run:
-			
-							git checkout fun`
+       To switch to the new branch run:
+             git checkout ${mockBranch}`
     )
     const mockShowInputBox = stub(window, 'showInputBox').resolves(mockBranch)
 
