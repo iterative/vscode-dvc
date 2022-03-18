@@ -102,8 +102,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).autoApplyFilters(enable)
   }
 
-  public async queueExperimentFromExisting() {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
+  public async queueExperimentFromExisting(
+    overrideRoot?: string,
+    overrideId?: string
+  ) {
+    const cwd = await this.getDvcRoot(overrideRoot)
     if (!cwd) {
       return
     }
@@ -113,7 +116,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const paramsToQueue = await repository.pickParamsToQueue()
+    const paramsToQueue = await repository.pickParamsToQueue(overrideId)
     if (!paramsToQueue) {
       return
     }

@@ -112,11 +112,15 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
+        Thenable<
+          QuickPickItem[] | QuickPickItemWithValue<{ id: string }> | undefined
+        >
       >
       mockShowQuickPick
         .onFirstCall()
-        .resolves({ value: 'workspace' } as QuickPickItemWithValue)
+        .resolves({ value: { id: 'workspace' } } as QuickPickItemWithValue<{
+          id: string
+        }>)
         .onSecondCall()
         .resolves([
           {
