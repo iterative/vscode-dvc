@@ -76,21 +76,7 @@ export class ExperimentsTree
     this.experiments = experiments
     this.resourceLocator = resourceLocator
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TOGGLE,
-      ({ dvcRoot, id }) =>
-        this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
-    )
-
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_REMOVE,
-      ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.runCommand(
-          AvailableCommands.EXPERIMENT_REMOVE,
-          dvcRoot,
-          id
-        )
-    )
+    this.registerCommands(internalCommands)
 
     this.updateDescriptionOnChange()
   }
@@ -125,6 +111,24 @@ export class ExperimentsTree
 
     const { dvcRoot, id } = element
     return Promise.resolve(this.getCheckpoints(dvcRoot, id))
+  }
+
+  private registerCommands(internalCommands: InternalCommands) {
+    internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TOGGLE,
+      ({ dvcRoot, id }) =>
+        this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
+    )
+
+    internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TREE_REMOVE,
+      ({ dvcRoot, id }: ExperimentItem) =>
+        this.experiments.runCommand(
+          AvailableCommands.EXPERIMENT_REMOVE,
+          dvcRoot,
+          id
+        )
+    )
   }
 
   private async getRootElements() {
