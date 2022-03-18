@@ -485,5 +485,33 @@ describe('App', () => {
         `Metric: ${String(testMetricNumberValue)}`
       )
     })
+
+    it('should show a persistent tooltip when a cell is clicked', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testParamCell = screen.getByText(testParamStringValue)
+      fireEvent.mouseEnter(testParamCell, { bubbles: true })
+      fireEvent.focus(testParamCell, { bubbles: true })
+      fireEvent.click(testParamCell, { bubbles: true })
+
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+
+      expect(tooltip).toHaveTextContent(`Parameter: ${testParamStringValue}`)
+
+      fireEvent.mouseLeave(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(1)
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+    })
   })
 })
