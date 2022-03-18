@@ -144,6 +144,12 @@ export class ExperimentsTree
     )
 
     internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TREE_QUEUE,
+      ({ dvcRoot, id }: ExperimentItem) =>
+        this.experiments.queueExperimentFromExisting(dvcRoot, id)
+    )
+
+    internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_REMOVE,
       ({ dvcRoot, id }: ExperimentItem) =>
         this.experiments.runCommand(
