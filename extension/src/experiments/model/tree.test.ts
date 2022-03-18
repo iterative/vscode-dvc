@@ -1,6 +1,7 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { commands, ThemeIcon, TreeItem, Uri, window } from 'vscode'
+import { ExperimentType } from '.'
 import { ExperimentsTree } from './tree'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
@@ -124,7 +125,8 @@ describe('ExperimentsTree', () => {
           hasChildren: true,
           id: 'exp-12345',
           label: '90aea7f',
-          selected: true
+          selected: true,
+          type: ExperimentType.EXPERIMENT
         },
         {
           displayColor: '#1a1c19',
@@ -132,7 +134,8 @@ describe('ExperimentsTree', () => {
           id: 'exp-67899',
           label: 'f0778b3',
           running: true,
-          selected: true
+          selected: true,
+          type: ExperimentType.EXPERIMENT
         },
         {
           displayColor: '#4063e2',
@@ -140,13 +143,15 @@ describe('ExperimentsTree', () => {
           id: 'exp-abcdef',
           label: 'e350702',
           running: false,
-          selected: false
+          selected: false,
+          type: ExperimentType.EXPERIMENT
         },
         {
           hasChildren: false,
           id: 'f81f1b5',
           label: 'f81f1b5',
-          queued: true
+          queued: true,
+          type: ExperimentType.QUEUED
         }
       ]
       const experimentsTree = new ExperimentsTree(
@@ -174,7 +179,8 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-filled', '#b180d7'),
           id: 'exp-12345',
-          label: '90aea7f'
+          label: '90aea7f',
+          type: ExperimentType.EXPERIMENT
         },
         {
           collapsibleState: 0,
@@ -187,7 +193,8 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
           id: 'exp-67899',
-          label: 'f0778b3'
+          label: 'f0778b3',
+          type: ExperimentType.EXPERIMENT
         },
         {
           collapsibleState: 0,
@@ -200,7 +207,8 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-outline', '#4063e2'),
           id: 'exp-abcdef',
-          label: 'e350702'
+          label: 'e350702',
+          type: ExperimentType.EXPERIMENT
         },
         {
           collapsibleState: 0,
@@ -209,7 +217,8 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: mockedClockResource,
           id: 'f81f1b5',
-          label: 'f81f1b5'
+          label: 'f81f1b5',
+          type: ExperimentType.QUEUED
         }
       ])
     })
@@ -226,8 +235,16 @@ describe('ExperimentsTree', () => {
       )
 
       const checkpoints = [
-        { id: 'aaaaaaaaaaaaaaaaa', label: 'aaaaaaa' },
-        { id: 'bbbbbbbbbbbbbbbbb', label: 'bbbbbbb' }
+        {
+          id: 'aaaaaaaaaaaaaaaaa',
+          label: 'aaaaaaa',
+          type: ExperimentType.CHECKPOINT
+        },
+        {
+          id: 'bbbbbbbbbbbbbbbbb',
+          label: 'bbbbbbb',
+          type: ExperimentType.CHECKPOINT
+        }
       ]
       mockedGetCheckpoints.mockReturnValueOnce(checkpoints)
 
@@ -237,7 +254,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'repo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'ebbd66f',
-        label: 'ebbd66f'
+        label: 'ebbd66f',
+        type: ExperimentType.EXPERIMENT
       })
 
       expect(children).toStrictEqual([
@@ -252,7 +270,8 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('circle-filled'),
           id: 'aaaaaaaaaaaaaaaaa',
-          label: 'aaaaaaa'
+          label: 'aaaaaaa',
+          type: ExperimentType.CHECKPOINT
         },
         {
           collapsibleState: 0,
@@ -265,7 +284,8 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('circle-filled'),
           id: 'bbbbbbbbbbbbbbbbb',
-          label: 'bbbbbbb'
+          label: 'bbbbbbb',
+          type: ExperimentType.CHECKPOINT
         }
       ])
     })
@@ -315,7 +335,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: mockedClockResource,
         id: 'f0778b3',
-        label: 'f0778b3'
+        label: 'f0778b3',
+        type: ExperimentType.QUEUED
       })
       expect(treeItem).toStrictEqual(mockedItem)
     })
@@ -344,7 +365,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'workspace',
-        label: 'workspace'
+        label: 'workspace',
+        type: ExperimentType.WORKSPACE
       })
 
       expect(treeItem).toStrictEqual({
@@ -376,7 +398,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'f0778b3',
-        label: 'f0778b3'
+        label: 'f0778b3',
+        type: ExperimentType.EXPERIMENT
       })
 
       expect(treeItem).toStrictEqual({
@@ -408,7 +431,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0778b3',
-        label: 'f0778b3'
+        label: 'f0778b3',
+        type: ExperimentType.EXPERIMENT
       })
       expect(treeItem).toStrictEqual({
         ...mockedItem,
@@ -439,7 +463,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0998a3',
-        label: 'f0998a3'
+        label: 'f0998a3',
+        type: ExperimentType.EXPERIMENT
       })
 
       expect(treeItem).toStrictEqual({

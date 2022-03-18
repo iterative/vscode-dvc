@@ -33,6 +33,7 @@ import { InternalCommands } from '../../../../commands/internal'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import { QuickPickItemWithValue } from '../../../../vscode/quickPick'
 import { Response } from '../../../../vscode/response'
+import { CliExecutor } from '../../../../cli/executor'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -428,6 +429,46 @@ suite('Experiments Tree Test Suite', () => {
         setExpandedSpy,
         'the experiment should be set to collapsed'
       ).to.be.calledOnceWith(description, false)
+    })
+
+    it('should be able to remove an experiment with dvc.views.experimentsTree.removeExperiment', async () => {
+      const mockExperiment = 'exp-to-remove'
+
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      ).resolves('')
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
+        dvcRoot: dvcDemoPath,
+        id: mockExperiment
+      })
+
+      expect(mockExperimentRemove).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperiment
+      )
+    })
+
+    it('should be able to apply an experiment to the workspace with dvc.views.experimentsTree.applyExperiment', async () => {
+      const mockExperiment = 'exp-to-apply'
+
+      const mockExperimentApply = stub(
+        CliExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+      )
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_APPLY, {
+        dvcRoot: dvcDemoPath,
+        id: mockExperiment
+      })
+
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperiment
+      )
     })
   })
 })
