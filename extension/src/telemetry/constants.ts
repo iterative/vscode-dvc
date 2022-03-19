@@ -81,6 +81,8 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_GARBAGE_COLLECT]: undefined
   [EventName.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
+  [EventName.EXPERIMENT_REMOVE_QUEUE]: undefined
+  [EventName.EXPERIMENT_REMOVE_QUEUED]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RUN_QUEUED]: undefined
   [EventName.EXPERIMENT_RUN_RESET]: undefined
@@ -90,6 +92,10 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_SORT_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
+  [EventName.EXPERIMENT_TREE_APPLY]: undefined
+  [EventName.EXPERIMENT_TREE_BRANCH]: undefined
+  [EventName.EXPERIMENT_TREE_QUEUE]: undefined
+  [EventName.EXPERIMENT_TREE_REMOVE]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.QUEUE_EXPERIMENT_FROM_EXISTING]: undefined

@@ -1,18 +1,19 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy } from 'sinon'
+import { stub, restore, spy, SinonStub } from 'sinon'
 import {
   commands,
   EventEmitter,
   MessageItem,
   QuickPick,
+  QuickPickItem,
   TreeView,
   TreeViewExpansionEvent,
   window
 } from 'vscode'
 import { addFilterViaQuickInput } from './filterBy/util'
 import { Disposable } from '../../../../extension'
-import { ExperimentsModel } from '../../../../experiments/model'
+import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
 import { Status } from '../../../../experiments/model/status'
 import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
@@ -27,12 +28,18 @@ import {
   ExperimentItem,
   ExperimentsTree
 } from '../../../../experiments/model/tree'
-import { buildSingleRepoExperiments } from '../util'
+import { buildExperiments, buildSingleRepoExperiments } from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { InternalCommands } from '../../../../commands/internal'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
-import { QuickPickItemWithValue } from '../../../../vscode/quickPick'
+import {
+  QuickPickItemWithValue,
+  QuickPickOptionsWithTitle
+} from '../../../../vscode/quickPick'
 import { Response } from '../../../../vscode/response'
+import { CliExecutor } from '../../../../cli/executor'
+import { Param } from '../../../../experiments/model/queue/collect'
+import { WorkspaceExperiments } from '../../../../experiments/workspace'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -429,5 +436,152 @@ suite('Experiments Tree Test Suite', () => {
         'the experiment should be set to collapsed'
       ).to.be.calledOnceWith(description, false)
     })
+
+    it('should be able to remove an experiment with dvc.views.experimentsTree.removeExperiment', async () => {
+      const mockExperiment = 'exp-to-remove'
+
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      ).resolves('')
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
+        dvcRoot: dvcDemoPath,
+        id: mockExperiment
+      })
+
+      expect(mockExperimentRemove).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperiment
+      )
+    })
+
+    it('should be able to apply an experiment to the workspace with dvc.views.experimentsTree.applyExperiment', async () => {
+      const mockExperiment = 'exp-to-apply'
+
+      const mockExperimentApply = stub(
+        CliExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+      )
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_APPLY, {
+        dvcRoot: dvcDemoPath,
+        id: mockExperiment
+      })
+
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperiment
+      )
+    })
+  })
+
+  it('should not create a new branch from an experiment with dvc.views.experimentsTree.branchExperiment if the user cancels', async () => {
+    const mockCheckpoint = 'a2c44b8'
+
+    const mockExperimentBranch = stub(CliExecutor.prototype, 'experimentBranch')
+    const mockShowInputBox = stub(window, 'showInputBox').resolves(undefined)
+
+    await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_BRANCH, {
+      dvcRoot: dvcDemoPath,
+      id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
+      label: mockCheckpoint,
+      type: ExperimentType.CHECKPOINT
+    })
+
+    expect(mockShowInputBox).to.be.calledOnce
+    expect(mockExperimentBranch).not.to.be.called
+  })
+
+  it('should be able to create a new branch from an experiment with dvc.views.experimentsTree.branchExperiment', async () => {
+    const mockCheckpoint = 'a2c44b8'
+    const mockBranch = 'it-is-a-branch'
+
+    const mockExperimentBranch = stub(
+      CliExecutor.prototype,
+      'experimentBranch'
+    ).resolves(
+      `Git branch '${mockBranch}' has been created from experiment '${mockCheckpoint}'.        
+       To switch to the new branch run:
+             git checkout ${mockBranch}`
+    )
+    const mockShowInputBox = stub(window, 'showInputBox').resolves(mockBranch)
+
+    await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_BRANCH, {
+      dvcRoot: dvcDemoPath,
+      id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
+      label: mockCheckpoint,
+      type: ExperimentType.CHECKPOINT
+    })
+
+    expect(mockShowInputBox).to.be.calledOnce
+    expect(mockExperimentBranch).to.be.calledWithExactly(
+      dvcDemoPath,
+      mockCheckpoint,
+      mockBranch
+    )
+  })
+
+  it('should be able to queue an experiment from an existing one with dvc.views.experimentsTree.queueExperiment', async () => {
+    const baseExperimentId = 'workspace'
+
+    const { experiments, experimentsModel } = buildExperiments(disposable)
+
+    await experiments.isReady()
+
+    const mockExperimentRunQueue = stub(
+      CliExecutor.prototype,
+      'experimentRunQueue'
+    ).resolves('true')
+
+    const mockGetOnlyOrPickProject = stub(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (WorkspaceExperiments as any).prototype,
+      'getOnlyOrPickProject'
+    )
+    stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+    const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
+
+    const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+      [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+      Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
+    >
+    mockShowQuickPick.resolves([
+      {
+        label: 'params.yaml:dropout',
+        value: { path: 'params.yaml:dropout', value: 0.122 }
+      },
+      {
+        label: 'params.yaml:process.threshold',
+        value: { path: 'params.yaml:process.threshold', value: 0.86 }
+      }
+    ] as QuickPickItemWithValue<Param>[])
+
+    stub(window, 'showInputBox')
+      .onFirstCall()
+      .resolves('0.101')
+      .onSecondCall()
+      .resolves('0.102')
+
+    await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_QUEUE, {
+      dvcRoot: dvcDemoPath,
+      id: baseExperimentId
+    })
+
+    expect(mockGetOnlyOrPickProject).not.to.be.called
+    expect(getParamsSpy).to.be.calledOnce
+    expect(getParamsSpy).to.be.calledWithExactly(baseExperimentId)
+    expect(mockShowQuickPick).to.be.calledOnce
+    expect(mockExperimentRunQueue).to.be.calledOnce
+    expect(mockExperimentRunQueue).to.be.calledWith(
+      dvcDemoPath,
+      '-S',
+      'params.yaml:dropout=0.101',
+      '-S',
+      'params.yaml:process.threshold=0.102'
+    )
   })
 })

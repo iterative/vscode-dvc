@@ -14,7 +14,7 @@ import { TrackedExplorerTree } from './fileSystem/tree'
 import { IExtension } from './interfaces'
 import { registerRepositoryCommands } from './repository/commands/register'
 import { ResourceLocator } from './resourceLocator'
-import { definedAndNonEmpty, flatten } from './util/array'
+import { definedAndNonEmpty } from './util/array'
 import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
@@ -298,21 +298,19 @@ export class Extension implements IExtension {
     try {
       await this.config.isReady()
       const version = await this.cliReader.version(cwd)
-      isVersionCompatible(version)
-      return this.setAvailable(!!version)
+      return this.setAvailable(isVersionCompatible(version))
     } catch {
       return this.setAvailable(false)
     }
   }
 
   public async setRoots() {
-    this.dvcRoots = flatten(
-      await Promise.all(
-        getWorkspaceFolders().map(workspaceFolder =>
-          this.findDvcRoots(workspaceFolder)
-        )
+    const nestedRoots = await Promise.all(
+      getWorkspaceFolders().map(workspaceFolder =>
+        this.findDvcRoots(workspaceFolder)
       )
-    ).sort()
+    )
+    this.dvcRoots = nestedRoots.flat().sort()
 
     return this.setProjectAvailability()
   }

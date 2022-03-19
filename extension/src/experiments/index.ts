@@ -27,6 +27,7 @@ import {
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
+import { Title } from '../vscode/title'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -250,14 +251,17 @@ export class Experiments extends BaseRepository<TableData> {
     return pickExperiment(this.experiments.getCurrentExperiments())
   }
 
-  public async pickParamsToQueue() {
-    const base = await pickExperiment(this.experiments.getExperiments())
+  public pickQueuedExperiment() {
+    return pickExperiment(this.experiments.getQueuedExperiments())
+  }
 
-    if (!base) {
+  public async pickParamsToQueue(overrideId?: string) {
+    const id = await this.getExperimentId(overrideId)
+    if (!id) {
       return
     }
 
-    const params = this.experiments.getExperimentParams(base.id)
+    const params = this.experiments.getExperimentParams(id)
 
     if (!params) {
       return
@@ -377,5 +381,18 @@ export class Experiments extends BaseRepository<TableData> {
     if (response === Response.SELECT_MOST_RECENT) {
       this.experiments.setSelected(filteredExperiments)
     }
+  }
+
+  private async getExperimentId(overrideId?: string) {
+    if (overrideId) {
+      return overrideId
+    }
+
+    const experiment = await pickExperiment(
+      this.experiments.getExperiments(),
+      Title.SELECT_BASE_EXPERIMENT
+    )
+
+    return experiment?.id
   }
 }

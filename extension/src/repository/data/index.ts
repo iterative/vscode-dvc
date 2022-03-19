@@ -12,7 +12,10 @@ import {
   getRelativePattern
 } from '../../fileSystem/watcher'
 import { join } from '../../test/util/path'
-import { EXPERIMENTS_GIT_REFS } from '../../experiments/data/constants'
+import {
+  EXPERIMENTS_GIT_LOGS_REFS,
+  EXPERIMENTS_GIT_REFS
+} from '../../experiments/data/constants'
 
 export type Data = {
   diffFromHead: DiffOutput
@@ -28,6 +31,7 @@ export const isExcluded = (dvcRoot: string, path: string) =>
     (path.includes('.git') && (path.includes('HEAD') || path.includes('index')))
   ) ||
   path.includes(EXPERIMENTS_GIT_REFS) ||
+  path.includes(EXPERIMENTS_GIT_LOGS_REFS) ||
   ignoredDotDirectories.test(path)
 
 export class RepositoryData {

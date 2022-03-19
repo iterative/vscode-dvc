@@ -26,11 +26,12 @@ import {
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
-import { definedAndNonEmpty, flatten } from '../../util/array'
+import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
 import { MementoPrefix } from '../../vscode/memento'
 import { hasKey } from '../../util/object'
+import { flattenMapValues } from '../../util/map'
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: string
@@ -39,6 +40,14 @@ type SelectedExperimentWithColor = Experiment & {
 
 export type ExperimentWithCheckpoints = Experiment & {
   checkpoints?: Experiment[]
+}
+
+export enum ExperimentType {
+  WORKSPACE = 'workspace',
+  BRANCH = 'branch',
+  EXPERIMENT = 'experiment',
+  CHECKPOINT = 'checkpoint',
+  QUEUED = 'queued'
 }
 
 export class ExperimentsModel {
@@ -224,10 +233,8 @@ export class ExperimentsModel {
   public getFilteredExperiments(filters = this.getFilters()) {
     const filteredExperiments = this.getSubRows(this.getExperiments(), filters)
 
-    const filteredCheckpoints = flatten<Experiment>(
-      filteredExperiments.map(
-        ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
-      )
+    const filteredCheckpoints = filteredExperiments.flatMap(
+      ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
     )
 
     return [...filteredExperiments, ...filteredCheckpoints]
@@ -236,25 +243,31 @@ export class ExperimentsModel {
   public getExperiments(): (Experiment & {
     hasChildren: boolean
     selected?: boolean
+    type: ExperimentType
   })[] {
     return [
       {
         ...this.workspace,
         hasChildren: false,
-        selected: !!this.status.workspace
+        selected: !!this.status.workspace,
+        type: ExperimentType.WORKSPACE
       },
       ...this.branches.map(branch => {
         return {
           ...branch,
           hasChildren: false,
-          selected: this.isSelected(branch.id)
+          selected: this.isSelected(branch.id),
+          type: ExperimentType.BRANCH
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
         ...this.addSelected(experiment),
         hasChildren: definedAndNonEmpty(
           this.checkpointsByTip.get(experiment.id)
-        )
+        ),
+        type: experiment.queued
+          ? ExperimentType.QUEUED
+          : ExperimentType.EXPERIMENT
       }))
     ]
   }
@@ -272,23 +285,28 @@ export class ExperimentsModel {
   }
 
   public getExperimentParams(id: string) {
-    const params =
-      id === 'workspace'
-        ? this.workspace.params
-        : this.flattenExperiments().find(experiment => experiment.id === id)
-            ?.params
+    const params = this.getExperiments().find(
+      experiment => experiment.id === id
+    )?.params
 
     return collectFlatExperimentParams(params)
   }
 
   public getCurrentExperiments() {
-    return this.flattenExperiments().filter(({ queued }) => !queued)
+    return this.splitExperimentsByQueued()
   }
 
-  public getCheckpoints(id: string): Experiment[] | undefined {
-    return this.checkpointsByTip
-      .get(id)
-      ?.map(checkpoint => this.addSelected(checkpoint))
+  public getQueuedExperiments() {
+    return this.splitExperimentsByQueued(true)
+  }
+
+  public getCheckpoints(
+    id: string
+  ): (Experiment & { type: ExperimentType })[] | undefined {
+    return this.checkpointsByTip.get(id)?.map(checkpoint => ({
+      ...this.addSelected(checkpoint),
+      type: ExperimentType.CHECKPOINT
+    }))
   }
 
   public getRowData() {
@@ -381,11 +399,20 @@ export class ExperimentsModel {
   }
 
   private flattenExperiments() {
-    return flatten<Experiment>([...this.experimentsByBranch.values()])
+    return flattenMapValues(this.experimentsByBranch)
+  }
+
+  private splitExperimentsByQueued(getQueued = false) {
+    return this.flattenExperiments().filter(({ queued }) => {
+      if (getQueued) {
+        return queued
+      }
+      return !queued
+    })
   }
 
   private flattenCheckpoints() {
-    return flatten<Experiment>([...this.checkpointsByTip.values()])
+    return flattenMapValues(this.checkpointsByTip)
   }
 
   private setStatus() {

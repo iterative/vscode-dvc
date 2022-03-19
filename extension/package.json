@@ -213,6 +213,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.removeExperimentQueue%",
+        "command": "dvc.removeExperimentQueue",
+        "category": "DVC"
+      },
+      {
         "title": "%command.removeExperimentsTableFilters%",
         "command": "dvc.removeExperimentsTableFilters",
         "category": "DVC"
@@ -222,6 +227,11 @@
         "command": "dvc.removeExperimentsTableSorts",
         "category": "DVC",
         "icon": "$(close-all)"
+      },
+      {
+        "title": "%command.removeQueuedExperiment%",
+        "command": "dvc.removeQueuedExperiment",
+        "category": "DVC"
       },
       {
         "title": "%command.removeTarget%",
@@ -328,6 +338,31 @@
         "icon": "$(close)"
       },
       {
+        "title": "%command.views.experimentsTree.applyExperiment%",
+        "command": "dvc.views.experimentsTree.applyExperiment",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.views.experimentsTree.branchExperiment%",
+        "command": "dvc.views.experimentsTree.branchExperiment",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.views.experimentsTree.queueExperiment%",
+        "command": "dvc.views.experimentsTree.queueExperiment",
+        "category": "DVC",
+        "icon": {
+          "dark": "resources/dark/queue-experiment.svg",
+          "light": "resources/light/queue-experiment.svg"
+        }
+      },
+      {
+        "title": "%command.views.experimentsTree.removeExperiment%",
+        "command": "dvc.views.experimentsTree.removeExperiment",
+        "category": "DVC",
+        "icon": "$(close)"
+      },
+      {
         "title": "%command.views.experimentsTree.selectExperiments%",
         "command": "dvc.views.experimentsTree.selectExperiments",
         "category": "DVC",
@@ -358,12 +393,6 @@
         "dvc.doNotShowUnableToFilter": {
           "title": "%config.doNotShowUnableToFilter.title%",
           "description": "%config.doNotShowUnableToFilter.description%",
-          "type": "boolean",
-          "default": null
-        },
-        "dvc.doNotWarnCLIVersion": {
-          "title": "%config.doNotWarnCLIVersion.title%",
-          "description": "%config.doNotWarnCLIVersion.description%",
           "type": "boolean",
           "default": null
         },
@@ -503,11 +532,19 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "command": "dvc.removeExperimentQueue",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "command": "dvc.removeExperimentsTableFilters",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.removeExperimentsTableSorts",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.removeQueuedExperiment",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -553,6 +590,22 @@
         {
           "command": "dvc.stopRunningExperiment",
           "when": "dvc.commands.available && dvc.project.available && dvc.runner.running"
+        },
+        {
+          "command": "dvc.views.experimentsTree.applyExperiment",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsTree.branchExperiment",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsTree.queueExperiment",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsTree.removeExperiment",
+          "when": "false"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
@@ -797,6 +850,26 @@
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "group": "inline",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.experimentsTree.applyExperiment",
+          "group": "1_do@1",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/"
+        },
+        {
+          "command": "dvc.views.experimentsTree.branchExperiment",
+          "group": "1_do@2",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/"
+        },
+        {
+          "command": "dvc.views.experimentsTree.queueExperiment",
+          "group": "1_do@3",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/"
+        },
+        {
+          "command": "dvc.views.experimentsTree.removeExperiment",
+          "group": "7_modification@1",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/"
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",

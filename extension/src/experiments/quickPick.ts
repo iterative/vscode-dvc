@@ -9,7 +9,8 @@ export const pickExperiment = (
     displayNameOrParent?: string
     id: string
     name?: string
-  }[]
+  }[],
+  title: Title = Title.SELECT_EXPERIMENT
 ): Thenable<{ id: string; name: string } | undefined> | undefined => {
   if (experiments.length === 0) {
     Toast.showError('There are no experiments to select.')
@@ -20,7 +21,7 @@ export const pickExperiment = (
         label,
         value: { id, name: name || label }
       })),
-      { title: Title.SELECT_EXPERIMENT }
+      { title }
     )
   }
 }
