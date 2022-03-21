@@ -14,6 +14,7 @@ export enum MessageFromWebviewType {
   COLUMN_RESIZED = 'column-resized',
   EXPERIMENT_TOGGLED = 'experiment-toggled',
   METRIC_TOGGLED = 'metric-toggled',
+  PLOTS_COMPARISON_REORDERED = 'plots-comparison-reordered',
   PLOTS_SECTION_TOGGLED = 'plots-section-toggled',
   PLOTS_RESIZED = 'plots-resized',
   SECTION_RENAMED = 'section-renamed'
@@ -48,6 +49,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.METRIC_TOGGLED
       payload: MetricToggledPayload
+    }
+  | {
+      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+      payload: string[]
     }
   | {
       type: MessageFromWebviewType.PLOTS_RESIZED

@@ -195,17 +195,19 @@ describe('App', () => {
     })
 
     const summaryElement = await screen.findByText('Experiment Checkpoints')
-    const [plot] = await screen.findAllByLabelText('Vega visualization')
-    expect(plot).toBeInTheDocument()
+    const visiblePlots = await screen.findAllByLabelText('Vega visualization')
+    visiblePlots.map(visiblePlot => {
+      expect(visiblePlot).toBeInTheDocument()
+      expect(visiblePlot).toBeVisible()
+    })
 
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
     })
 
-    expect(
-      screen.queryByLabelText('Vega visualization')
-    ).not.toBeInTheDocument()
+    const hiddenPlots = await screen.findAllByLabelText('Vega visualization')
+    hiddenPlots.map(hiddenPlot => expect(hiddenPlot).not.toBeVisible())
     expect(mockPostMessage).toBeCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED

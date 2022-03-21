@@ -16,11 +16,6 @@ export type ComparisonTableProps = Omit<
   'sectionName' | 'size'
 >
 
-type ColumnAccumulator = {
-  filteredColumns: ComparisonRevision[]
-  newColumns: ComparisonRevision[]
-}
-
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   plots,
   revisions
@@ -36,47 +31,21 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     [revisions]
   )
 
-  const retainOrder = (
-    originalOrder: string[],
-    revisions: ComparisonTableColumn[]
-  ) =>
-    revisions.sort(
-      ({ revision: a }, { revision: b }) =>
-        originalOrder.indexOf(a) - originalOrder.indexOf(b)
-    )
-
-  const splitColumns = (
-    acc: ColumnAccumulator,
-    column: ComparisonRevision,
-    prevColumnKeys: string[]
-  ) => {
-    prevColumnKeys.includes(column.revision)
-      ? acc.filteredColumns.push(column)
-      : acc.newColumns.push(column)
-  }
-
   useEffect(
     () =>
-      setColumns(prevColumns => {
-        const prevColumnKeys = prevColumns.map(col => col.revision)
-
-        const acc: ColumnAccumulator = {
-          filteredColumns: [],
-          newColumns: []
-        }
+      setColumns(() => {
+        const acc: ComparisonRevision[] = []
 
         for (const column of revisions) {
           if (isPinned(column)) {
             continue
           }
-          splitColumns(acc, column, prevColumnKeys)
+          acc.push(column)
         }
 
-        return [
-          getPinnedColumnRevision(),
-          ...retainOrder(prevColumnKeys, acc.filteredColumns),
-          ...acc.newColumns
-        ].filter(Boolean) as ComparisonTableColumn[]
+        return [getPinnedColumnRevision(), ...acc].filter(
+          Boolean
+        ) as ComparisonTableColumn[]
       }),
     [revisions, getPinnedColumnRevision]
   )
