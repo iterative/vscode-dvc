@@ -10,6 +10,14 @@ import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 
+const mockedRevisions = [
+  { displayColor: 'white', label: 'workspace' },
+  { displayColor: 'red', label: 'main' },
+  { displayColor: 'blue', label: '71f31cf' },
+  { displayColor: 'black', label: 'e93c7e6' },
+  { displayColor: 'brown', label: 'ffbe811' }
+]
+
 describe('plotsModel', () => {
   let model: PlotsModel
   const exampleDvcRoot = 'test'
@@ -145,13 +153,7 @@ describe('plotsModel', () => {
   })
 
   it('should reorder comparison revisions after receiving a message to reorder', () => {
-    mockedGetSelectedRevisions.mockReturnValue([
-      { displayColor: 'white', label: 'workspace' },
-      { displayColor: 'red', label: 'main' },
-      { displayColor: 'blue', label: '71f31cf' },
-      { displayColor: 'black', label: 'e93c7e6' },
-      { displayColor: 'brown', label: 'ffbe811' }
-    ])
+    mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
 
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
     const newOrder = ['71f31cf', 'e93c7e6', 'ffbe811', 'workspace', 'main']
@@ -163,43 +165,30 @@ describe('plotsModel', () => {
       newOrder
     )
 
-    expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'blue', revision: '71f31cf' },
-      { displayColor: 'black', revision: 'e93c7e6' },
-      { displayColor: 'brown', revision: 'ffbe811' },
-      { displayColor: 'white', revision: 'workspace' },
-      { displayColor: 'red', revision: 'main' }
-    ])
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual(newOrder)
   })
 
   it('should always send new revisions to the end of the list', () => {
-    mockedGetSelectedRevisions.mockReturnValue([
-      { displayColor: 'white', label: 'workspace' },
-      { displayColor: 'red', label: 'main' },
-      { displayColor: 'blue', label: '71f31cf' },
-      { displayColor: 'black', label: 'e93c7e6' },
-      { displayColor: 'brown', label: 'ffbe811' }
-    ])
+    mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
 
     const newOrder = ['71f31cf', 'e93c7e6']
 
     model.setComparisonOrder(newOrder)
 
-    expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'blue', revision: '71f31cf' },
-      { displayColor: 'black', revision: 'e93c7e6' },
-      { displayColor: 'white', revision: 'workspace' },
-      { displayColor: 'red', revision: 'main' },
-      { displayColor: 'brown', revision: 'ffbe811' }
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual([
+      ...newOrder,
+      ...mockedRevisions
+        .map(({ label }) => label)
+        .filter(revision => !newOrder.includes(revision))
     ])
   })
 
   it('should send previously selected revisions to the end of the list', () => {
-    const allRevisions = [
-      { displayColor: 'white', label: 'workspace' },
-      { displayColor: 'red', label: 'main' },
-      { displayColor: 'blue', label: '71f31cf' }
-    ]
+    const allRevisions = mockedRevisions.slice(0, 3)
     const revisionDropped = allRevisions.filter(({ label }) => label !== 'main')
     const revisionReAdded = allRevisions
 
@@ -214,23 +203,20 @@ describe('plotsModel', () => {
     const initialOrder = ['workspace', 'main', '71f31cf']
     model.setComparisonOrder(initialOrder)
 
-    expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'white', revision: 'workspace' },
-      { displayColor: 'red', revision: 'main' },
-      { displayColor: 'blue', revision: '71f31cf' }
-    ])
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual(initialOrder)
 
     model.setComparisonOrder()
-    expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'white', revision: 'workspace' },
-      { displayColor: 'blue', revision: '71f31cf' }
-    ])
+
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual(initialOrder.filter(revision => revision !== 'main'))
 
     model.setComparisonOrder()
-    expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'white', revision: 'workspace' },
-      { displayColor: 'blue', revision: '71f31cf' },
-      { displayColor: 'red', revision: 'main' }
-    ])
+
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual(['workspace', '71f31cf', 'main'])
   })
 })
