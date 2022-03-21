@@ -50,7 +50,7 @@ export class PlotsModel {
   private revisionData: RevisionData = {}
   private templates: Record<string, VisualizationSpec> = {}
 
-  private comparisonOrder: string[] = []
+  private comparisonOrder: string[]
 
   constructor(
     dvcRoot: string,
@@ -79,6 +79,11 @@ export class PlotsModel {
     this.sectionNames = workspaceState.get(
       MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
       DEFAULT_SECTION_NAMES
+    )
+
+    this.comparisonOrder = workspaceState.get(
+      MementoPrefix.PLOT_COMPARISON_ORDER + dvcRoot,
+      []
     )
   }
 
