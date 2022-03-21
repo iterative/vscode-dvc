@@ -109,6 +109,8 @@ export class PlotsModel {
     this.revisionData = { ...this.revisionData, ...revisionData }
     this.templates = { ...this.templates, ...templates }
 
+    this.setComparisonOrder()
+
     this.deferred.resolve()
   }
 
@@ -197,8 +199,19 @@ export class PlotsModel {
     return this.getSelectedComparisonPlots(paths, selectedRevisions)
   }
 
-  public setComparisonOrder(revisions: string[]) {
-    this.comparisonOrder = revisions
+  public setComparisonOrder(revisions: string[] = this.comparisonOrder) {
+    const currentRevisions = Object.keys(this.comparisonData)
+
+    this.comparisonOrder = revisions.filter(revision =>
+      currentRevisions.includes(revision)
+    )
+
+    currentRevisions.map(revision => {
+      if (!this.comparisonOrder.includes(revision)) {
+        this.comparisonOrder.push(revision)
+      }
+    })
+
     this.persistComparisonOrder()
   }
 

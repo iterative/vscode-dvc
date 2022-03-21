@@ -7,6 +7,7 @@ import {
   Section
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
+import plotsDiffFixture from '../../test/fixtures/plotsDiff/output/image'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 
@@ -19,17 +20,13 @@ describe('plotsModel', () => {
       persistedSelectedMetrics,
     [MementoPrefix.PLOT_SIZES + exampleDvcRoot]: DEFAULT_SECTION_SIZES
   })
+  const mockedGetSelectedRevisions = jest.fn()
 
   beforeEach(() => {
     model = new PlotsModel(
       exampleDvcRoot,
       {
-        getSelectedRevisions: () => [
-          { displayColor: 'white', label: 'workspace' },
-          { displayColor: 'red', label: 'main' },
-          { displayColor: 'blue', label: 'exp-abc1' },
-          { displayColor: 'black', label: 'exp-def2' }
-        ],
+        getSelectedRevisions: mockedGetSelectedRevisions,
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
       memento
@@ -148,44 +145,55 @@ describe('plotsModel', () => {
     expect(model.getSectionCollapsed()).toStrictEqual(expectedSectionCollapsed)
   })
 
-  it('should reorder comparison revisions after receiving a message to reorder', () => {
-    const mementoUpdateSpy = jest.spyOn(memento, 'update')
-
-    expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'white', revision: 'workspace' },
-      { displayColor: 'red', revision: 'main' },
-      { displayColor: 'blue', revision: 'exp-abc1' },
-      { displayColor: 'black', revision: 'exp-def2' }
+  it('should reorder comparison revisions after receiving a message to reorder', async () => {
+    mockedGetSelectedRevisions.mockReturnValue([
+      { displayColor: 'white', label: 'workspace' },
+      { displayColor: 'red', label: 'main' },
+      { displayColor: 'blue', label: '4fb124a' },
+      { displayColor: 'black', label: '42b8736' },
+      { displayColor: 'brown', label: '1ba7bcd' }
     ])
+    await model.transformAndSetPlots(plotsDiffFixture)
 
-    const newOrder = ['exp-abc1', 'exp-def2', 'workspace', 'main']
-
+    const mementoUpdateSpy = jest.spyOn(memento, 'update')
+    const newOrder = ['4fb124a', '42b8736', '1ba7bcd', 'workspace', 'main']
     model.setComparisonOrder(newOrder)
 
-    expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       MementoPrefix.PLOT_COMPARISON_ORDER + exampleDvcRoot,
       newOrder
     )
 
     expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'blue', revision: 'exp-abc1' },
-      { displayColor: 'black', revision: 'exp-def2' },
+      { displayColor: 'blue', revision: '4fb124a' },
+      { displayColor: 'black', revision: '42b8736' },
+      { displayColor: 'brown', revision: '1ba7bcd' },
       { displayColor: 'white', revision: 'workspace' },
       { displayColor: 'red', revision: 'main' }
     ])
   })
 
-  it('should always send new revisions to the end of the list', () => {
-    const newOrder = ['exp-def2', 'main']
+  it('should always send new revisions to the end of the list', async () => {
+    mockedGetSelectedRevisions.mockReturnValue([
+      { displayColor: 'white', label: 'workspace' },
+      { displayColor: 'red', label: 'main' },
+      { displayColor: 'blue', label: '4fb124a' },
+      { displayColor: 'black', label: '42b8736' },
+      { displayColor: 'brown', label: '1ba7bcd' }
+    ])
+
+    await model.transformAndSetPlots(plotsDiffFixture)
+
+    const newOrder = ['4fb124a', '42b8736']
 
     model.setComparisonOrder(newOrder)
 
     expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'black', revision: 'exp-def2' },
-      { displayColor: 'red', revision: 'main' },
+      { displayColor: 'blue', revision: '4fb124a' },
+      { displayColor: 'black', revision: '42b8736' },
       { displayColor: 'white', revision: 'workspace' },
-      { displayColor: 'blue', revision: 'exp-abc1' }
+      { displayColor: 'red', revision: 'main' },
+      { displayColor: 'brown', revision: '1ba7bcd' }
     ])
   })
 })
