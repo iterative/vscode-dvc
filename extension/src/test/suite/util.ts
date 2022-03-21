@@ -26,6 +26,9 @@ import { ResourceLocator } from '../../resourceLocator'
 import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../processManager'
 import { FileSystemData } from '../../fileSystem/data'
 import * as Watcher from '../../fileSystem/watcher'
+import { MessageFromWebview } from '../../webview/contract'
+import { PlotsData } from '../../plots/webview/contract'
+import { TableData } from '../../experiments/webview/contract'
 
 export const mockDisposable = {
   dispose: stub()
@@ -178,3 +181,8 @@ export const buildDependencies = (
     updatesPaused
   }
 }
+
+export const getMessageReceivedEmitter = (
+  webview: BaseWebview<PlotsData | TableData>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): EventEmitter<MessageFromWebview> => (webview as any).messageReceived
