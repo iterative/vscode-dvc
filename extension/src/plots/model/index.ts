@@ -153,13 +153,16 @@ export class PlotsModel {
   }
 
   public getSelectedRevisionDetails() {
-    return this.experiments
-      .getSelectedRevisions()
+    const revisions = this.experiments.getSelectedRevisions()
+    const length = revisions.length
+    const getIndex = ({ revision }: { revision: string }): number =>
+      !this.comparisonOrder.includes(revision)
+        ? length
+        : this.comparisonOrder.indexOf(revision)
+
+    return revisions
       .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
-      .sort(
-        ({ revision: a }, { revision: b }) =>
-          this.comparisonOrder.indexOf(a) - this.comparisonOrder.indexOf(b)
-      )
+      .sort((a, b) => getIndex(a) - getIndex(b))
   }
 
   public getTemplatePlots(paths: string[] | undefined) {

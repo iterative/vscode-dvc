@@ -175,4 +175,17 @@ describe('plotsModel', () => {
       { displayColor: 'red', revision: 'main' }
     ])
   })
+
+  it('should always send new revisions to the end of the list', () => {
+    const newOrder = ['exp-def2', 'main']
+
+    model.setComparisonOrder(newOrder)
+
+    expect(model.getSelectedRevisionDetails()).toStrictEqual([
+      { displayColor: 'black', revision: 'exp-def2' },
+      { displayColor: 'red', revision: 'main' },
+      { displayColor: 'white', revision: 'workspace' },
+      { displayColor: 'blue', revision: 'exp-abc1' }
+    ])
+  })
 })
