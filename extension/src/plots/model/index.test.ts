@@ -7,7 +7,6 @@ import {
   Section
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
-import plotsDiffFixture from '../../test/fixtures/plotsDiff/output/image'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 
@@ -145,55 +144,53 @@ describe('plotsModel', () => {
     expect(model.getSectionCollapsed()).toStrictEqual(expectedSectionCollapsed)
   })
 
-  it('should reorder comparison revisions after receiving a message to reorder', async () => {
+  it('should reorder comparison revisions after receiving a message to reorder', () => {
     mockedGetSelectedRevisions.mockReturnValue([
       { displayColor: 'white', label: 'workspace' },
       { displayColor: 'red', label: 'main' },
-      { displayColor: 'blue', label: '4fb124a' },
-      { displayColor: 'black', label: '42b8736' },
-      { displayColor: 'brown', label: '1ba7bcd' }
+      { displayColor: 'blue', label: '71f31cf' },
+      { displayColor: 'black', label: 'e93c7e6' },
+      { displayColor: 'brown', label: 'ffbe811' }
     ])
-    await model.transformAndSetPlots(plotsDiffFixture)
 
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
-    const newOrder = ['4fb124a', '42b8736', '1ba7bcd', 'workspace', 'main']
+    const newOrder = ['71f31cf', 'e93c7e6', 'ffbe811', 'workspace', 'main']
     model.setComparisonOrder(newOrder)
 
+    expect(mementoUpdateSpy).toBeCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       MementoPrefix.PLOT_COMPARISON_ORDER + exampleDvcRoot,
       newOrder
     )
 
     expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'blue', revision: '4fb124a' },
-      { displayColor: 'black', revision: '42b8736' },
-      { displayColor: 'brown', revision: '1ba7bcd' },
+      { displayColor: 'blue', revision: '71f31cf' },
+      { displayColor: 'black', revision: 'e93c7e6' },
+      { displayColor: 'brown', revision: 'ffbe811' },
       { displayColor: 'white', revision: 'workspace' },
       { displayColor: 'red', revision: 'main' }
     ])
   })
 
-  it('should always send new revisions to the end of the list', async () => {
+  it('should always send new revisions to the end of the list', () => {
     mockedGetSelectedRevisions.mockReturnValue([
       { displayColor: 'white', label: 'workspace' },
       { displayColor: 'red', label: 'main' },
-      { displayColor: 'blue', label: '4fb124a' },
-      { displayColor: 'black', label: '42b8736' },
-      { displayColor: 'brown', label: '1ba7bcd' }
+      { displayColor: 'blue', label: '71f31cf' },
+      { displayColor: 'black', label: 'e93c7e6' },
+      { displayColor: 'brown', label: 'ffbe811' }
     ])
 
-    await model.transformAndSetPlots(plotsDiffFixture)
-
-    const newOrder = ['4fb124a', '42b8736']
+    const newOrder = ['71f31cf', 'e93c7e6']
 
     model.setComparisonOrder(newOrder)
 
     expect(model.getSelectedRevisionDetails()).toStrictEqual([
-      { displayColor: 'blue', revision: '4fb124a' },
-      { displayColor: 'black', revision: '42b8736' },
+      { displayColor: 'blue', revision: '71f31cf' },
+      { displayColor: 'black', revision: 'e93c7e6' },
       { displayColor: 'white', revision: 'workspace' },
       { displayColor: 'red', revision: 'main' },
-      { displayColor: 'brown', revision: '1ba7bcd' }
+      { displayColor: 'brown', revision: 'ffbe811' }
     ])
   })
 })

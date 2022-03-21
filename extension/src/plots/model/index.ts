@@ -197,7 +197,7 @@ export class PlotsModel {
   }
 
   public setComparisonOrder(revisions: string[] = this.comparisonOrder) {
-    const currentRevisions = Object.keys(this.comparisonData)
+    const currentRevisions = this.getSelectedRevisions()
 
     this.comparisonOrder = revisions.filter(revision =>
       currentRevisions.includes(revision)

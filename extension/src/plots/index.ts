@@ -245,6 +245,8 @@ export class Plots extends BaseRepository<TPlotsData> {
           await this.plots?.transformAndSetExperiments(data)
         }
 
+        this.plots?.setComparisonOrder()
+
         this.sendPlots()
       })
     )

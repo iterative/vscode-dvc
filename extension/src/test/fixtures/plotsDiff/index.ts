@@ -370,7 +370,7 @@ const basicVega = {
   ]
 }
 
-export const getImageData = (baseUrl: string, joinFunc = join) => ({
+const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'acc.png')]: [
     {
       type: PlotsType.IMAGE,
