@@ -188,18 +188,6 @@ $gap: 20px;
 .plot.multiViewPlot {
   aspect-ratio: var(--scale) - 1;
   grid-column: span var(--scale);
-
-  .largePlots & {
-    min-width: calc(500px * var(--scale));
-  }
-  
-  .regularPlots & {
-    min-width: calc(400px * var(--scale));
-  }
-  
-  .smallPlots & {
-    min-width: calc(300px * var(--scale));
-  }
 }
 
 .sectionRenamer {
