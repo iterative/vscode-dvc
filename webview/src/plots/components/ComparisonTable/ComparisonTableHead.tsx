@@ -1,10 +1,12 @@
 import React from 'react'
 import { ComparisonRevision } from 'dvc/src/plots/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 import { reorderObjectList } from '../../../util/objects'
+import { sendMessage } from '../../../shared/vscode'
 
 export type ComparisonTableColumn = ComparisonRevision
 
@@ -22,8 +24,16 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setPinnedColumn
 }) => {
   const setOrder = (order: string[]) => {
-    const newOrder = reorderObjectList(order, columns, 'revision')
-    setColumnsOrder(newOrder as ComparisonRevision[])
+    const newOrder = reorderObjectList(
+      order,
+      columns,
+      'revision'
+    ) as ComparisonRevision[]
+    setColumnsOrder(newOrder)
+    sendMessage({
+      payload: newOrder.map(({ revision }) => revision),
+      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+    })
   }
 
   const items = columns.map(({ revision, displayColor }) => {
