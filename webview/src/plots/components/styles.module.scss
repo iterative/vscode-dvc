@@ -186,7 +186,7 @@ $gap: 20px;
 }
 
 .plot.multiViewPlot {
-  aspect-ratio: var(--scale);
+  aspect-ratio: var(--scale) - 1;
   grid-column: span var(--scale);
 
   .largePlots & {
