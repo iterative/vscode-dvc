@@ -160,16 +160,13 @@ export class PlotsModel {
   }
 
   public getSelectedRevisionDetails() {
-    const revisions = this.experiments.getSelectedRevisions()
-    const length = revisions.length
-    const getIndex = ({ revision }: { revision: string }): number =>
-      !this.comparisonOrder.includes(revision)
-        ? length
-        : this.comparisonOrder.indexOf(revision)
-
-    return revisions
+    return this.experiments
+      .getSelectedRevisions()
       .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
-      .sort((a, b) => getIndex(a) - getIndex(b))
+      .sort(
+        ({ revision: a }, { revision: b }) =>
+          this.comparisonOrder.indexOf(a) - this.comparisonOrder.indexOf(b)
+      )
   }
 
   public getTemplatePlots(paths: string[] | undefined) {

@@ -312,16 +312,18 @@ suite('Experiments Tree Test Suite', () => {
         'auto-apply filters to experiment selection is not enabled when the user selects to use the most recent'
       ).to.be.false
       expect(
-        plotsModel.getSelectedRevisionDetails(),
+        plotsModel
+          .getSelectedRevisionDetails()
+          .sort(({ revision: a }, { revision: b }) => a.localeCompare(b)),
         'all running and the most recent experiments are now selected'
       ).to.deep.equal([
-        { displayColor: '#945dd6', revision: 'workspace' },
-        { displayColor: '#f14c4c', revision: '4fb124a' },
-        { displayColor: '#3794ff', revision: '42b8736' },
-        { displayColor: '#f14c4c', revision: 'd1343a8' },
         { displayColor: '#f14c4c', revision: '1ee5f2e' },
         { displayColor: '#3794ff', revision: '2173124' },
-        { displayColor: '#3794ff', revision: '9523bde' }
+        { displayColor: '#3794ff', revision: '42b8736' },
+        { displayColor: '#f14c4c', revision: '4fb124a' },
+        { displayColor: '#3794ff', revision: '9523bde' },
+        { displayColor: '#f14c4c', revision: 'd1343a8' },
+        { displayColor: '#945dd6', revision: 'workspace' }
       ])
       expect(
         mockPlotsDiff,
