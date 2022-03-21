@@ -10,6 +10,14 @@ import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 
+const mockedRevisions = [
+  { displayColor: 'white', label: 'workspace' },
+  { displayColor: 'red', label: 'main' },
+  { displayColor: 'blue', label: '71f31cf' },
+  { displayColor: 'black', label: 'e93c7e6' },
+  { displayColor: 'brown', label: 'ffbe811' }
+]
+
 describe('plotsModel', () => {
   let model: PlotsModel
   const exampleDvcRoot = 'test'
@@ -19,11 +27,13 @@ describe('plotsModel', () => {
       persistedSelectedMetrics,
     [MementoPrefix.PLOT_SIZES + exampleDvcRoot]: DEFAULT_SECTION_SIZES
   })
+  const mockedGetSelectedRevisions = jest.fn()
 
   beforeEach(() => {
     model = new PlotsModel(
       exampleDvcRoot,
       {
+        getSelectedRevisions: mockedGetSelectedRevisions,
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
       memento
@@ -140,5 +150,73 @@ describe('plotsModel', () => {
     )
 
     expect(model.getSectionCollapsed()).toStrictEqual(expectedSectionCollapsed)
+  })
+
+  it('should reorder comparison revisions after receiving a message to reorder', () => {
+    mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
+
+    const mementoUpdateSpy = jest.spyOn(memento, 'update')
+    const newOrder = ['71f31cf', 'e93c7e6', 'ffbe811', 'workspace', 'main']
+    model.setComparisonOrder(newOrder)
+
+    expect(mementoUpdateSpy).toBeCalledTimes(1)
+    expect(mementoUpdateSpy).toHaveBeenCalledWith(
+      MementoPrefix.PLOT_COMPARISON_ORDER + exampleDvcRoot,
+      newOrder
+    )
+
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual(newOrder)
+  })
+
+  it('should always send new revisions to the end of the list', () => {
+    mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
+
+    const newOrder = ['71f31cf', 'e93c7e6']
+
+    model.setComparisonOrder(newOrder)
+
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual([
+      ...newOrder,
+      ...mockedRevisions
+        .map(({ label }) => label)
+        .filter(revision => !newOrder.includes(revision))
+    ])
+  })
+
+  it('should send previously selected revisions to the end of the list', () => {
+    const allRevisions = mockedRevisions.slice(0, 3)
+    const revisionDropped = allRevisions.filter(({ label }) => label !== 'main')
+    const revisionReAdded = allRevisions
+
+    mockedGetSelectedRevisions
+      .mockReturnValueOnce(allRevisions)
+      .mockReturnValueOnce(allRevisions)
+      .mockReturnValueOnce(revisionDropped)
+      .mockReturnValueOnce(revisionDropped)
+      .mockReturnValueOnce(revisionReAdded)
+      .mockReturnValueOnce(revisionReAdded)
+
+    const initialOrder = ['workspace', 'main', '71f31cf']
+    model.setComparisonOrder(initialOrder)
+
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual(initialOrder)
+
+    model.setComparisonOrder()
+
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual(initialOrder.filter(revision => revision !== 'main'))
+
+    model.setComparisonOrder()
+
+    expect(
+      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+    ).toStrictEqual(['workspace', '71f31cf', 'main'])
   })
 })

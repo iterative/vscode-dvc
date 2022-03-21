@@ -202,30 +202,22 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
           case MessageFromWebviewType.METRIC_TOGGLED:
-            return (
-              message.payload && this.plots?.setSelectedMetrics(message.payload)
-            )
+            return this.plots?.setSelectedMetrics(message.payload)
           case MessageFromWebviewType.PLOTS_RESIZED:
-            return (
-              message.payload &&
-              this.plots?.setPlotSize(
-                message.payload.section,
-                message.payload.size
-              )
+            return this.plots?.setPlotSize(
+              message.payload.section,
+              message.payload.size
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
-            return (
-              message.payload &&
-              this.plots?.setSectionCollapsed(message.payload)
-            )
+            return this.plots?.setSectionCollapsed(message.payload)
+
           case MessageFromWebviewType.SECTION_RENAMED:
-            return (
-              message.payload &&
-              this.plots?.setSectionName(
-                message.payload.section,
-                message.payload.name
-              )
+            return this.plots?.setSectionName(
+              message.payload.section,
+              message.payload.name
             )
+          case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
+            return this.plots?.setComparisonOrder(message.payload)
           default:
             Logger.error(`Unexpected message: ${message}`)
         }
@@ -252,6 +244,8 @@ export class Plots extends BaseRepository<TPlotsData> {
         if (data) {
           await this.plots?.transformAndSetExperiments(data)
         }
+
+        this.plots?.setComparisonOrder()
 
         this.sendPlots()
       })

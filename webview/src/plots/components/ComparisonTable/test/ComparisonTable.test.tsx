@@ -3,12 +3,19 @@
  */
 import '@testing-library/jest-dom/extend-expect'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
 import { createBubbledEvent, dragAndDrop } from '../../../../test/dragDrop'
 import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
+import { vsCodeApi } from '../../../../shared/api'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
+
+jest.mock('../../../../shared/api')
+
+const { postMessage } = vsCodeApi
+const mockPostMessage = jest.mocked(postMessage)
 
 describe('ComparisonTable', () => {
   afterEach(() => {
@@ -184,7 +191,7 @@ describe('ComparisonTable', () => {
       expect(firstHeader.getAttribute('draggable')).toBe('false')
     })
 
-    it('should reorder the columns accordingly after a column drag and drop', () => {
+    it('should reorder the columns accordingly and send a message to the extension after a column drag and drop', () => {
       renderTable()
 
       const [, endingNode, , startingNode] = getHeaders()
@@ -197,13 +204,20 @@ describe('ComparisonTable', () => {
 
       headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toStrictEqual([
+      const expectedRevisions = [
         revisions[0],
         revisions[3],
         revisions[1],
         revisions[2],
         revisions[4]
-      ])
+      ]
+
+      expect(headers).toStrictEqual(expectedRevisions)
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: expectedRevisions,
+        type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+      })
     })
 
     it('should not change the column order if a column is dropped on a pinned column', () => {
@@ -241,39 +255,6 @@ describe('ComparisonTable', () => {
       firstNode.dispatchEvent(dragOverEvent)
 
       expect(dragOverEvent.preventDefault).toHaveBeenCalled()
-    })
-
-    it('should not reorder existing columns when adding a new one after a drag and drop', () => {
-      const { rerender } = renderTable()
-
-      const [, endingNode, , startingNode] = getHeaders()
-
-      dragAndDrop(startingNode, endingNode)
-
-      let headers = getHeaders().map(header => header.textContent)
-
-      const reorderedRevisions = [
-        revisions[0],
-        revisions[3],
-        revisions[1],
-        revisions[2],
-        revisions[4]
-      ]
-
-      expect(headers).toStrictEqual(reorderedRevisions)
-
-      const newRevName = 'newRev'
-      const originalRevisionsWithNew = [
-        ...basicProps.revisions,
-        { displayColor: '#000000', revision: newRevName }
-      ]
-
-      rerender(
-        <ComparisonTable {...basicProps} revisions={originalRevisionsWithNew} />
-      )
-
-      headers = getHeaders().map(header => header.textContent)
-      expect(headers).toStrictEqual([...reorderedRevisions, newRevName])
     })
   })
 })
