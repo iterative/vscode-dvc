@@ -15,7 +15,8 @@ import {
   bypassProcessManagerDebounce,
   closeAllEditors,
   getFirstArgOfLastCall,
-  getMockNow
+  getMockNow,
+  getMessageReceivedEmitter
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
@@ -153,8 +154,7 @@ suite('Plots Test Suite', () => {
 
       const webview = await plots.showWebview()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockMessageReceived = (webview as any).messageReceived
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSelectedMetrics = ['some', 'selected', 'metrics']
       const mockSetSelectedMetrics = stub(

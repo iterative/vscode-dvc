@@ -18,7 +18,8 @@ import {
   buildMockData,
   closeAllEditors,
   experimentsUpdatedEvent,
-  extensionUri
+  extensionUri,
+  getMessageReceivedEmitter
 } from '../util'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
@@ -32,11 +33,7 @@ import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
 import { BaseWebview } from '../../../webview'
 import { MetricsAndParamsModel } from '../../../experiments/metricsAndParams/model'
-import * as Factory from '../../../webview/factory'
-import {
-  MessageFromWebview,
-  MessageFromWebviewType
-} from '../../../webview/contract'
+import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import {
   copyOriginalBranchColors,
@@ -46,6 +43,7 @@ import {
 import { InternalCommands } from '../../../commands/internal'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
+import { Status } from '../../../experiments/model/status'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 
 suite('Experiments Test Suite', () => {
@@ -149,27 +147,14 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle column reordering messages from the webview', async () => {
+    it('should be able to handle all of the messages that can be sent from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
 
-      const mockMessageReceived = disposable.track(
-        new EventEmitter<MessageFromWebview>()
-      )
+      const webview = await experiments.showWebview()
 
-      const onDidReceiveMessage = mockMessageReceived.event
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      stub(Factory, 'createWebview').resolves({
-        dispose: stub(),
-        isReady: () => Promise.resolve(),
-        onDidChangeIsFocused: stub(),
-        onDidDispose: stub(),
-        onDidReceiveMessage,
-        show: stub()
-      } as unknown as BaseWebview<TableData>)
-
-      await experiments.showWebview()
-
-      const columnOrder = [
+      const mockColumnOrder = [
         'id',
         'timestamp',
         'params:params.yaml:lr',
@@ -183,20 +168,55 @@ suite('Experiments Test Suite', () => {
       const mockSetColumnReordered = stub(
         MetricsAndParamsModel.prototype,
         'setColumnOrder'
-      )
-
-      const columnOrderSet = new Promise(resolve =>
-        mockSetColumnReordered.callsFake(() => resolve(undefined))
-      )
+      ).returns(undefined)
 
       mockMessageReceived.fire({
-        payload: columnOrder,
+        payload: mockColumnOrder,
         type: MessageFromWebviewType.COLUMN_REORDERED
       })
 
-      await columnOrderSet
+      expect(mockSetColumnReordered).to.be.calledOnce
+      expect(
+        mockSetColumnReordered,
+        'should correctly handle a columns reordered message'
+      ).to.be.calledWithExactly(mockColumnOrder)
 
-      expect(mockSetColumnReordered).to.be.calledWith(columnOrder)
+      const mockSetColumnWidth = stub(
+        MetricsAndParamsModel.prototype,
+        'setColumnWidth'
+      ).returns(undefined)
+
+      const mockColumnId = mockColumnOrder[2]
+      const mockWidth = 400
+
+      mockMessageReceived.fire({
+        payload: { id: mockColumnId, width: mockWidth },
+        type: MessageFromWebviewType.COLUMN_RESIZED
+      })
+
+      expect(mockSetColumnWidth).to.be.calledOnce
+      expect(
+        mockSetColumnWidth,
+        'should correctly handle a column resized message'
+      ).to.be.calledWithExactly(mockColumnId, mockWidth)
+
+      const mockToggleExperimentStatus = stub(
+        experiments,
+        'toggleExperimentStatus'
+      ).returns(Status.SELECTED)
+
+      const mockExperimentId = 'workspace'
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      })
+
+      expect(mockToggleExperimentStatus).to.be.calledOnce
+      expect(
+        mockToggleExperimentStatus,
+        'should correctly handle an experiment toggled message'
+      ).to.be.calledWithExactly(mockExperimentId)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to sort', async () => {

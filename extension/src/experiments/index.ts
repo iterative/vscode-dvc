@@ -19,11 +19,7 @@ import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
-import {
-  ColumnReorderPayload,
-  ColumnResizePayload,
-  MessageFromWebviewType
-} from '../webview/contract'
+import { MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
@@ -332,22 +328,13 @@ export class Experiments extends BaseRepository<TableData> {
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
           case MessageFromWebviewType.COLUMN_REORDERED:
-            return (
-              message.payload &&
-              this.metricsAndParams.setColumnOrder(
-                message.payload as ColumnReorderPayload
-              )
-            )
+            return this.metricsAndParams.setColumnOrder(message.payload)
           case MessageFromWebviewType.COLUMN_RESIZED: {
-            const { id, width } = message.payload as ColumnResizePayload
-            return (
-              message.payload && this.metricsAndParams.setColumnWidth(id, width)
-            )
+            const { id, width } = message.payload
+            return this.metricsAndParams.setColumnWidth(id, width)
           }
           case MessageFromWebviewType.EXPERIMENT_TOGGLED:
-            return (
-              message.payload && this.toggleExperimentStatus(message.payload)
-            )
+            return this.toggleExperimentStatus(message.payload)
           default:
             Logger.error(`Unexpected message: ${message}`)
         }
