@@ -193,4 +193,44 @@ describe('plotsModel', () => {
       { displayColor: 'brown', revision: 'ffbe811' }
     ])
   })
+
+  it('should send previously selected revisions to the end of the list', () => {
+    const allRevisions = [
+      { displayColor: 'white', label: 'workspace' },
+      { displayColor: 'red', label: 'main' },
+      { displayColor: 'blue', label: '71f31cf' }
+    ]
+    const revisionDropped = allRevisions.filter(({ label }) => label !== 'main')
+    const revisionReAdded = allRevisions
+
+    mockedGetSelectedRevisions
+      .mockReturnValueOnce(allRevisions)
+      .mockReturnValueOnce(allRevisions)
+      .mockReturnValueOnce(revisionDropped)
+      .mockReturnValueOnce(revisionDropped)
+      .mockReturnValueOnce(revisionReAdded)
+      .mockReturnValueOnce(revisionReAdded)
+
+    const initialOrder = ['workspace', 'main', '71f31cf']
+    model.setComparisonOrder(initialOrder)
+
+    expect(model.getSelectedRevisionDetails()).toStrictEqual([
+      { displayColor: 'white', revision: 'workspace' },
+      { displayColor: 'red', revision: 'main' },
+      { displayColor: 'blue', revision: '71f31cf' }
+    ])
+
+    model.setComparisonOrder()
+    expect(model.getSelectedRevisionDetails()).toStrictEqual([
+      { displayColor: 'white', revision: 'workspace' },
+      { displayColor: 'blue', revision: '71f31cf' }
+    ])
+
+    model.setComparisonOrder()
+    expect(model.getSelectedRevisionDetails()).toStrictEqual([
+      { displayColor: 'white', revision: 'workspace' },
+      { displayColor: 'blue', revision: '71f31cf' },
+      { displayColor: 'red', revision: 'main' }
+    ])
+  })
 })
