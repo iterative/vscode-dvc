@@ -24,6 +24,12 @@ describe('plotsModel', () => {
     model = new PlotsModel(
       exampleDvcRoot,
       {
+        getSelectedRevisions: () => [
+          { displayColor: 'white', label: 'workspace' },
+          { displayColor: 'red', label: 'main' },
+          { displayColor: 'blue', label: 'exp-abc1' },
+          { displayColor: 'black', label: 'exp-def2' }
+        ],
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
       memento
@@ -140,5 +146,33 @@ describe('plotsModel', () => {
     )
 
     expect(model.getSectionCollapsed()).toStrictEqual(expectedSectionCollapsed)
+  })
+
+  it('should reorder comparison revisions after receiving a message to reorder', () => {
+    const mementoUpdateSpy = jest.spyOn(memento, 'update')
+
+    expect(model.getSelectedRevisionDetails()).toStrictEqual([
+      { displayColor: 'white', revision: 'workspace' },
+      { displayColor: 'red', revision: 'main' },
+      { displayColor: 'blue', revision: 'exp-abc1' },
+      { displayColor: 'black', revision: 'exp-def2' }
+    ])
+
+    const newOrder = ['exp-abc1', 'exp-def2', 'workspace', 'main']
+
+    model.setComparisonOrder(newOrder)
+
+    expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
+    expect(mementoUpdateSpy).toHaveBeenCalledWith(
+      MementoPrefix.PLOT_COMPARISON_ORDER + exampleDvcRoot,
+      newOrder
+    )
+
+    expect(model.getSelectedRevisionDetails()).toStrictEqual([
+      { displayColor: 'blue', revision: 'exp-abc1' },
+      { displayColor: 'black', revision: 'exp-def2' },
+      { displayColor: 'white', revision: 'workspace' },
+      { displayColor: 'red', revision: 'main' }
+    ])
   })
 })

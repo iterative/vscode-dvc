@@ -199,6 +199,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private handleMessageFromWebview() {
     this.dispose.track(
+      // eslint-disable-next-line sonarjs/cognitive-complexity
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
           case MessageFromWebviewType.METRIC_TOGGLED:
@@ -225,6 +226,10 @@ export class Plots extends BaseRepository<TPlotsData> {
                 message.payload.section,
                 message.payload.name
               )
+            )
+          case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
+            return (
+              message.payload && this.plots?.setComparisonOrder(message.payload)
             )
           default:
             Logger.error(`Unexpected message: ${message}`)

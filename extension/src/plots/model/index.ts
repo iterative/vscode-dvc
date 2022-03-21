@@ -50,6 +50,8 @@ export class PlotsModel {
   private revisionData: RevisionData = {}
   private templates: Record<string, VisualizationSpec> = {}
 
+  private comparisonOrder: string[] = []
+
   constructor(
     dvcRoot: string,
     experiments: Experiments,
@@ -154,6 +156,10 @@ export class PlotsModel {
     return this.experiments
       .getSelectedRevisions()
       .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
+      .sort(
+        ({ revision: a }, { revision: b }) =>
+          this.comparisonOrder.indexOf(a) - this.comparisonOrder.indexOf(b)
+      )
   }
 
   public getTemplatePlots(paths: string[] | undefined) {
@@ -181,6 +187,11 @@ export class PlotsModel {
     }
 
     return this.getSelectedComparisonPlots(paths, selectedRevisions)
+  }
+
+  public setComparisonOrder(revisions: string[]) {
+    this.comparisonOrder = revisions
+    this.persistComparisonOrder()
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {
@@ -363,6 +374,13 @@ export class PlotsModel {
     this.workspaceState.update(
       MementoPrefix.PLOT_SECTION_NAMES + this.dvcRoot,
       this.sectionNames
+    )
+  }
+
+  private persistComparisonOrder() {
+    this.workspaceState.update(
+      MementoPrefix.PLOT_COMPARISON_ORDER + this.dvcRoot,
+      this.comparisonOrder
     )
   }
 }

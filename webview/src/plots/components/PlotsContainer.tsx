@@ -131,11 +131,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           )}
         </summary>
         <div className={styles.centered}>
-          {open && (
+          {
             <div className={sizeClass} data-testid="plots-wrapper">
               {children}
             </div>
-          )}
+          }
         </div>
       </details>
       <div className={styles.iconMenu}>
