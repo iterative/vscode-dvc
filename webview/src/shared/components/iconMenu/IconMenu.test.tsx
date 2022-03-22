@@ -10,8 +10,8 @@ import {
   fireEvent,
   waitForElementToBeRemoved
 } from '@testing-library/react'
-import { IconMenuItemProps } from './IconMenuItem'
 import { IconMenu } from '.'
+import { IconMenuItemProps } from './IconMenuItem'
 import { AllIcons } from '../Icon'
 
 const items: IconMenuItemProps[] = [
