@@ -4,11 +4,10 @@ export const reorderObjectList = (
   order: string[],
   items: Items,
   compareKey: string
-): Items => {
-  const copy = [...items]
+) => {
   return order
-    .map(orderedItem => copy?.find(item => item[compareKey] === orderedItem))
-    .filter(Boolean) as Items
+    .map(orderedItem => items.find(item => item[compareKey] === orderedItem))
+    .filter(Boolean)
 }
 
 export const performOrderedUpdate = (
@@ -16,9 +15,8 @@ export const performOrderedUpdate = (
   items: Items,
   key: string
 ): string[] => {
-  const copy = [...items]
-  const current = reorderObjectList(order, copy, key)
-  const added = copy?.filter(item => !order.includes(item[key] as string))
+  const current = reorderObjectList(order, items, key)
+  const added = items.filter(item => !order.includes(item[key] as string))
 
   return [...current, ...added].map(item => item?.[key]) as string[]
 }

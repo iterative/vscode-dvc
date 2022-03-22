@@ -2,7 +2,7 @@ import { PlotSection, TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 
 const remove = (section: PlotSection, entryId: string) => {
   const entries = section.entries.filter(({ id }) => id !== entryId)
-  return entries && entries.length > 0
+  return entries.length > 0
     ? {
         entries,
         group: section.group
