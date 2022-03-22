@@ -57,6 +57,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
   return (
     <Tooltip
       content={<CellTooltip cell={cell} />}
+      appendTo={document.body}
       placement="bottom"
       arrow={true}
       delay={[CELL_TOOLTIP_DELAY, 0]}

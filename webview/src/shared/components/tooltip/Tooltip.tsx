@@ -27,6 +27,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
 > = (
   {
     children,
+    appendTo,
     content,
     delay,
     disabled,
@@ -47,6 +48,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
 ) => (
   <Tippy
     animation={animation}
+    appendTo={appendTo}
     content={content}
     className={className}
     placement={placement}
