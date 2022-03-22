@@ -8,7 +8,7 @@ import {
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
-import ClockIcon from '../../../shared/components/icons/Clock'
+import ClockIcon from '../../../shared/components/Icons/Clock'
 import { sendMessage } from '../../../shared/vscode'
 
 export interface InstanceProp {

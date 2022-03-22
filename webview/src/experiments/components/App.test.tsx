@@ -30,7 +30,7 @@ import {
 import {
   CELL_TOOLTIP_DELAY,
   HEADER_TOOLTIP_DELAY
-} from '../../shared/components/tooltip/Tooltip'
+} from '../../shared/components/Tooltip'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')

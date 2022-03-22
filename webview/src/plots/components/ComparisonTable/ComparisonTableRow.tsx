@@ -2,7 +2,7 @@ import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
-import { AllIcons, Icon } from '../../../shared/components/icon/Icon'
+import { AllIcons, Icon } from '../../../shared/components/Icon'
 
 export interface ComparisonTableRowProps {
   path: string

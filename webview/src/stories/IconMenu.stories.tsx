@@ -2,12 +2,12 @@ import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
-import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
+import { SelectMenu } from '../shared/components/SelectMenu/SelectMenu'
 
-import { IconMenu } from '../shared/components/iconMenu/IconMenu'
-import { IconMenuItemProps } from '../shared/components/iconMenu/IconMenuItem'
-import { AllIcons } from '../shared/components/icon/Icon'
-import { Theme } from '../shared/components/theme/Theme'
+import { IconMenu } from '../shared/components/IconMenu'
+import { IconMenuItemProps } from '../shared/components/IconMenu/IconMenuItem'
+import { AllIcons } from '../shared/components/Icon'
+import { Theme } from '../shared/components/Theme'
 
 const items: IconMenuItemProps[] = [
   {

@@ -1,8 +1,8 @@
 import cx from 'classnames'
 import React from 'react'
 import styles from './styles.module.scss'
-import { Pin } from '../../../shared/components/icons'
-import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
+import { Pin } from '../../../shared/components/Icons'
+import { GripIcon } from '../../../shared/components/DragDrop/GripIcon'
 
 export interface ComparisonTableHeaderProps {
   displayColor: string

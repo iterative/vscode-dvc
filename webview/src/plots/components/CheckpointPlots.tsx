@@ -6,10 +6,10 @@ import React, { useEffect, useState } from 'react'
 import { EmptyState } from './EmptyState'
 import { Plot } from './Plot'
 import styles from './styles.module.scss'
-import { DragDropContainer } from '../../shared/components/dragDrop/DragDropContainer'
+import { DragDropContainer } from '../../shared/components/DragDrop/DragDropContainer'
 import { performOrderedUpdate } from '../../util/objects'
 import { withScale } from '../../util/styles'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
+import { GripIcon } from '../../shared/components/DragDrop/GripIcon'
 
 interface CheckpointPlotsProps {
   plots: CheckpointPlotData[]

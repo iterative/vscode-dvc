@@ -3,7 +3,7 @@ import React, { useRef } from 'react'
 import { useIsFullyContained } from './useIsFullyContained'
 import Tooltip, {
   HEADER_TOOLTIP_DELAY
-} from '../../../shared/components/tooltip/Tooltip'
+} from '../../../shared/components/Tooltip'
 
 export const OverflowHoverTooltip: React.FC<
   Pick<TippyProps, 'content' | 'children'>

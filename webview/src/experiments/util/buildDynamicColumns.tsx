@@ -11,7 +11,7 @@ import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
 import Tooltip, {
   CELL_TOOLTIP_DELAY
-} from '../../shared/components/tooltip/Tooltip'
+} from '../../shared/components/Tooltip'
 import styles from '../components/Table/styles.module.scss'
 import { CopyButton } from '../components/CopyButton'
 import { OverflowHoverTooltip } from '../components/OverflowHoverTooltip'

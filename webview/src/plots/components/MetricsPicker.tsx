@@ -1,5 +1,5 @@
 import React from 'react'
-import { MultiSelect } from '../../shared/components/selectMenu/MultiSelect'
+import { MultiSelect } from '../../shared/components/SelectMenu/MultiSelect'
 
 export const MetricsPicker: React.FC<{
   metrics: string[]

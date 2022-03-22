@@ -2,8 +2,8 @@ import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { PlotsComparisonData } from 'dvc/src/plots/webview/contract'
-import { ComparisonTable } from '../plots/components/ComparisonTable/ComparisonTable'
-import { Theme } from '../shared/components/theme/Theme'
+import { ComparisonTable } from '../plots/components/ComparisonTable'
+import { Theme } from '../shared/components/Theme'
 
 export default {
   args: comparisonTableFixture,

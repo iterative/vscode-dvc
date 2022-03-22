@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
 import { ComparisonTableHeader } from '../plots/components/ComparisonTable/ComparisonTableHeader'
-import { Theme } from '../shared/components/theme/Theme'
+import { Theme } from '../shared/components/Theme'
 
 const basicArgs = {
   displayColor: '#945DD6',

@@ -11,8 +11,8 @@ import {
   waitForElementToBeRemoved
 } from '@testing-library/react'
 import { IconMenuItemProps } from './IconMenuItem'
-import { IconMenu } from './IconMenu'
-import { AllIcons } from '../icon/Icon'
+import { IconMenu } from '.'
+import { AllIcons } from '../Icon'
 
 const items: IconMenuItemProps[] = [
   {

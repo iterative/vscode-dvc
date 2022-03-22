@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react'
-import CopyIcon from '../../../shared/components/icons/Copy'
-import CheckIcon from '../../../shared/components/icons/Check'
+import CopyIcon from '../../../shared/components/Icons/Copy'
+import CheckIcon from '../../../shared/components/Icons/Check'
 import styles from '../Table/styles.module.scss'
 
 const enum CopyButtonState {
