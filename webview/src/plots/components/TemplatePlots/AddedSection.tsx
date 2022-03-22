@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { PlotSection } from './utils'
 import styles from '../styles.module.scss'
 import { getIDWithoutIndex } from '../../../util/ids'
-import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
+import { DraggedInfo } from '../../../shared/components/DragDrop/DragDropContainer'
 
 interface AddedSectionProps {
   id: string

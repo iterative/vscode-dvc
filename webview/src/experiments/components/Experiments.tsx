@@ -18,7 +18,7 @@ import {
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './Table'
-import styles from '../Table/styles.module.scss'
+import styles from './Table/styles.module.scss'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
 import { Theme } from '../../shared/components/Theme'
