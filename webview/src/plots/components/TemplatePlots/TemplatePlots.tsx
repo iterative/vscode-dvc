@@ -1,66 +1,23 @@
-import { TemplatePlot, VegaPlots } from 'dvc/src/plots/webview/contract'
+import {
+  PlotsGroup,
+  PlotSection,
+  TemplatePlotEntry
+} from 'dvc/src/plots/webview/contract'
 import React, { DragEvent, useState, useEffect, useRef } from 'react'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
-import {
-  PlotSection,
-  PlotsGroup,
-  removeFromPreviousAndAddToNewSection
-} from './utils'
+import { removeFromPreviousAndAddToNewSection } from './utils'
 import { AddedSection } from './AddedSection'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
-import {
-  createIDWithIndex,
-  getIDIndex,
-  getIDWithoutIndexOrPrefix
-} from '../../../util/ids'
+import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 
 interface TemplatePlotsProps {
-  plots: VegaPlots
-}
-
-type TemplatePlotAccumulator = {
-  singleViewPlots: VegaPlots
-  multiViewPlots: VegaPlots
+  plots: PlotSection[]
 }
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
   BOTTOM = 'drop-section-bottom'
-}
-
-const fillInPlotsType = (
-  plotsType: VegaPlots,
-  path: string,
-  plot: TemplatePlot
-) => {
-  plotsType[path] = plotsType[path] ? [...plotsType[path], plot] : [plot]
-}
-
-const collectPlot = (
-  acc: TemplatePlotAccumulator,
-  path: string,
-  plot: TemplatePlot
-) => {
-  if (plot.multiView) {
-    fillInPlotsType(acc.multiViewPlots, path, plot)
-    return
-  }
-  fillInPlotsType(acc.singleViewPlots, path, plot)
-}
-
-const splitPlotsByViewType = (plots: VegaPlots): TemplatePlotAccumulator => {
-  const acc: TemplatePlotAccumulator = {
-    multiViewPlots: {},
-    singleViewPlots: {}
-  }
-
-  for (const [path, pathPlots] of Object.entries(plots)) {
-    for (const plot of pathPlots) {
-      collectPlot(acc, path, plot)
-    }
-  }
-  return acc
 }
 
 export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
@@ -69,17 +26,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
   const draggedRef = useRef<DraggedInfo>()
 
   useEffect(() => {
-    const { singleViewPlots, multiViewPlots } = splitPlotsByViewType(plots)
-    setSections([
-      {
-        entries: singleViewPlots,
-        group: PlotsGroup.SINGLE_VIEW
-      },
-      {
-        entries: multiViewPlots,
-        group: PlotsGroup.MULTI_VIEW
-      }
-    ])
+    setSections(plots)
   }, [plots, setSections])
 
   const firstSection = sections[0]
@@ -91,9 +38,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
 
   const handleDropInNewSection = (e: DragEvent<HTMLElement>) => {
     const draggedSectionId = getIDIndex(e.dataTransfer.getData('group'))
-    const draggedId = getIDWithoutIndexOrPrefix(
-      e.dataTransfer.getData('itemId')
-    )
+    const draggedId = e.dataTransfer.getData('itemId')
 
     const updatedSections = removeFromPreviousAndAddToNewSection(
       sections,
@@ -104,10 +49,11 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
     const { group, entries } = sections[draggedSectionId]
 
     setHoveredSection('')
+    const entry = entries.find(
+      ({ id }) => id === draggedId
+    ) as TemplatePlotEntry
     const newSection = {
-      entries: {
-        [draggedId]: entries[draggedId]
-      },
+      entries: [entry],
       group
     }
 
@@ -132,12 +78,13 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
     }
     const oldGroupId = getIDIndex(draggedGroup)
     const newGroupId = getIDIndex(groupId)
-    const entryId = getIDWithoutIndexOrPrefix(draggedId)
-    const entry = sections[oldGroupId].entries[entryId]
+    const entry = sections[oldGroupId].entries.find(
+      ({ id }) => id === draggedId
+    ) as TemplatePlotEntry
     const updatedSections = removeFromPreviousAndAddToNewSection(
       sections,
       oldGroupId,
-      entryId,
+      draggedId,
       newGroupId,
       entry
     )
@@ -161,6 +108,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       />
       {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
+
         return (
           <div
             key={groupId}

@@ -101,8 +101,20 @@ export type Plot = TemplatePlot | ImagePlot
 
 export type VegaPlots = { [path: string]: TemplatePlot[] }
 
+export enum PlotsGroup {
+  MULTI_VIEW = 'template-multi',
+  SINGLE_VIEW = 'template-single'
+}
+
+export type TemplatePlotEntry = TemplatePlot & { id: string }
+
+export type PlotSection = {
+  group: PlotsGroup
+  entries: TemplatePlotEntry[]
+}
+
 export interface TemplatePlotsData {
-  plots: VegaPlots
+  plots: PlotSection[]
   sectionName: string
   size: PlotSize
 }

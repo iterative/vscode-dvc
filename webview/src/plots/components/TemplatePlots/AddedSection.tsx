@@ -1,6 +1,6 @@
 import React, { DragEvent, MutableRefObject } from 'react'
 import cx from 'classnames'
-import { PlotSection } from './utils'
+import { PlotSection } from 'dvc/src/plots/webview/contract'
 import styles from '../styles.module.scss'
 import { getIDWithoutIndex } from '../../../util/ids'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'

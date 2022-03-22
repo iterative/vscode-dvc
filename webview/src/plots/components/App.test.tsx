@@ -12,6 +12,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   CheckpointPlotsColors,
   PlotsData,
+  PlotsGroup,
   PlotSize,
   Section,
   TemplatePlotsData
@@ -65,14 +66,22 @@ describe('App', () => {
     sendSetDataMessage(data)
   }
 
-  const templatePlot = templatePlotsFixture.plots[join('logs', 'loss.tsv')]
+  const templatePlot = templatePlotsFixture.plots[0].entries[0]
   const complexTemplatePlotsFixture = {
     ...templatePlotsFixture,
-    plots: {
-      ...templatePlotsFixture.plots,
-      [join('other', 'plot.tsv')]: [...templatePlot],
-      [join('other', 'multiview.tsv')]: [{ ...templatePlot, multiView: true }]
-    }
+    plots: [
+      {
+        entries: [
+          ...templatePlotsFixture.plots[0].entries,
+          { ...templatePlot, id: join('plot_other', 'plot.tsv') }
+        ],
+        group: PlotsGroup.SINGLE_VIEW
+      },
+      {
+        entries: [{ ...templatePlot, id: join('plot_other', 'multiview.tsv') }],
+        group: PlotsGroup.MULTI_VIEW
+      }
+    ]
   } as TemplatePlotsData
 
   it('should send the initialized message on first render', () => {
@@ -535,9 +544,9 @@ describe('App', () => {
     let plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('plot_logs', 'loss.tsv_0'),
-      join('plot_other', 'plot.tsv_0'),
-      join('plot_other', 'multiview.tsv_0')
+      join('plot_logs', 'loss.tsv'),
+      join('plot_other', 'plot.tsv'),
+      join('plot_other', 'multiview.tsv')
     ])
 
     dragAndDrop(plots[1], plots[0])
@@ -545,9 +554,9 @@ describe('App', () => {
     plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('plot_other', 'plot.tsv_0'),
-      join('plot_logs', 'loss.tsv_0'),
-      join('plot_other', 'multiview.tsv_0')
+      join('plot_other', 'plot.tsv'),
+      join('plot_logs', 'loss.tsv'),
+      join('plot_other', 'multiview.tsv')
     ])
   })
 
@@ -560,8 +569,8 @@ describe('App', () => {
     const sections = screen.getAllByTestId(/^plots-section_/)
 
     expect(sections.map(section => section.id)).toStrictEqual([
-      'static-single_0',
-      'static-multi_1'
+      'template-single_0',
+      'template-multi_1'
     ])
   })
 
@@ -573,15 +582,15 @@ describe('App', () => {
 
     const topSection = screen.getByTestId(NewSectionBlock.TOP)
     const multiViewPlot = screen.getByTestId(
-      join('plot_other', 'multiview.tsv_0')
+      join('plot_other', 'multiview.tsv')
     )
 
     dragAndDrop(multiViewPlot, topSection)
 
     const sections = screen.getAllByTestId(/^plots-section_/)
     expect(sections.map(section => section.id)).toStrictEqual([
-      'static-multi_0',
-      'static-single_1'
+      'template-multi_0',
+      'template-single_1'
     ])
   })
 
@@ -592,14 +601,14 @@ describe('App', () => {
     })
 
     const topSection = screen.getByTestId(NewSectionBlock.TOP)
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv_0'))
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
 
     dragAndDrop(aSingleViewPlot, topSection)
 
     const sections = screen.getAllByTestId(/^plots-section_/)
     expect(sections.map(section => section.id)).toStrictEqual([
-      'static-single_0',
-      'static-multi_1'
+      'template-single_0',
+      'template-multi_1'
     ])
   })
 
@@ -610,15 +619,15 @@ describe('App', () => {
     })
 
     const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv_0'))
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
 
     dragAndDrop(aSingleViewPlot, bottomSection)
 
     const sections = screen.getAllByTestId(/^plots-section_/)
     expect(sections.map(section => section.id)).toStrictEqual([
-      'static-single_0',
-      'static-multi_1',
-      'static-single_2'
+      'template-single_0',
+      'template-multi_1',
+      'template-single_2'
     ])
   })
 
@@ -630,15 +639,15 @@ describe('App', () => {
 
     const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
     const multiViewPlot = screen.getByTestId(
-      join('plot_other', 'multiview.tsv_0')
+      join('plot_other', 'multiview.tsv')
     )
 
     dragAndDrop(multiViewPlot, bottomSection)
 
     const sections = screen.getAllByTestId(/^plots-section_/)
     expect(sections.map(section => section.id)).toStrictEqual([
-      'static-single_0',
-      'static-multi_1'
+      'template-single_0',
+      'template-multi_1'
     ])
   })
 
@@ -649,24 +658,24 @@ describe('App', () => {
     })
 
     const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv_0'))
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
 
     dragAndDrop(aSingleViewPlot, bottomSection)
 
-    await screen.findByTestId('plots-section_static-single_2')
+    await screen.findByTestId('plots-section_template-single_2')
     const anotherSingleViewPlot = screen.getByTestId(
-      join('plot_logs', 'loss.tsv_0')
+      join('plot_logs', 'loss.tsv')
     )
     const movedSingleViewPlot = screen.getByTestId(
-      join('plot_other', 'plot.tsv_0')
+      join('plot_other', 'plot.tsv')
     )
 
     dragAndDrop(anotherSingleViewPlot, movedSingleViewPlot)
 
     const sections = screen.getAllByTestId(/^plots-section_/)
     expect(sections.map(section => section.id)).toStrictEqual([
-      'static-multi_0',
-      'static-single_1'
+      'template-multi_0',
+      'template-single_1'
     ])
   })
 })

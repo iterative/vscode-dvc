@@ -1,22 +1,8 @@
-import { TemplatePlot, VegaPlots } from 'dvc/src/plots/webview/contract'
-
-export enum PlotsGroup {
-  MULTI_VIEW = 'static-multi',
-  SINGLE_VIEW = 'static-single'
-}
-
-export type PlotSection = {
-  group: PlotsGroup
-  entries: VegaPlots
-}
+import { PlotSection, TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 
 const remove = (section: PlotSection, entryId: string) => {
-  const entries = Object.fromEntries(
-    Object.entries(section.entries).filter(
-      sectionEntry => sectionEntry[0] !== entryId
-    )
-  )
-  return Object.keys(entries).length > 0
+  const entries = section.entries.filter(({ id }) => id !== entryId)
+  return entries && entries.length > 0
     ? {
         entries,
         group: section.group
@@ -24,31 +10,24 @@ const remove = (section: PlotSection, entryId: string) => {
     : null
 }
 
-const add = (
-  section: PlotSection,
-  entryId: string,
-  entry?: TemplatePlot[]
-) => ({
-  entries: {
-    ...section.entries,
-    [entryId]: entry
-  },
-  group: section.group
-})
+const add = (section: PlotSection, entry: TemplatePlotEntry) => {
+  section.entries.push(entry)
+  return { entries: section.entries, group: section.group }
+}
 
 export const removeFromPreviousAndAddToNewSection = (
   sections: PlotSection[],
   oldSectionIndex: number,
   entryId: string,
   newGroupIndex?: number,
-  entry?: TemplatePlot[]
+  entry?: TemplatePlotEntry
 ) =>
   sections
     .map((section, i) => {
       if (i === oldSectionIndex) {
         return remove(section, entryId)
-      } else if (i === newGroupIndex) {
-        return add(section, entryId, entry)
+      } else if (i === newGroupIndex && entry) {
+        return add(section, entry)
       }
       return section
     })
