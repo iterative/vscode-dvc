@@ -1,23 +1,19 @@
-import { TemplatePlot, VegaPlots } from 'dvc/src/plots/webview/contract'
+import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState, MutableRefObject } from 'react'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import cx from 'classnames'
 import styles from '../styles.module.scss'
 import { config } from '../constants'
 import {
-  Items,
-  performOrderedUpdate,
-  reorderObjectList
-} from '../../../util/objects'
-import {
   DragDropContainer,
   DraggedInfo
 } from '../../../shared/components/dragDrop/DragDropContainer'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../../util/styles'
+import { performOrderedUpdate, reorderObjectList } from '../../../util/objects'
 
 interface TemplatePlotsGridProps {
-  entries: VegaPlots
+  entries: TemplatePlotEntry[]
   group: string
   onDropInSection: (
     draggedId: string,
@@ -26,22 +22,6 @@ interface TemplatePlotsGridProps {
   ) => void
   draggedRef?: MutableRefObject<DraggedInfo | undefined>
   multiView?: boolean
-}
-
-interface TemplatePlotEntry extends TemplatePlot {
-  path: string
-  id: string
-}
-
-const addIdAndPath = (entries: VegaPlots) => {
-  let acc: TemplatePlotEntry[] = []
-  for (const [path, plots] of Object.entries(entries)) {
-    acc = [
-      ...acc,
-      ...plots.map((plot, i) => ({ ...plot, id: `plot_${path}_${i}`, path }))
-    ]
-  }
-  return acc
 }
 
 const autoSize = {
@@ -56,25 +36,18 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   draggedRef,
   multiView
 }) => {
-  const [allPlots, setAllPlots] = useState<TemplatePlotEntry[]>([])
   const [order, setOrder] = useState<string[]>([])
 
   useEffect(() => {
-    const templatePlots = addIdAndPath(entries)
-    setAllPlots(templatePlots)
+    setOrder(pastOrder => performOrderedUpdate(pastOrder, entries, 'id'))
   }, [entries])
-
-  useEffect(() => {
-    setOrder(pastOrder =>
-      performOrderedUpdate(pastOrder, allPlots as unknown as Items, 'id')
-    )
-  }, [allPlots])
 
   const reorderedItems = reorderObjectList(
     order,
-    allPlots as unknown as Items,
+    entries,
     'id'
-  ) as unknown as TemplatePlotEntry[]
+  ) as TemplatePlotEntry[]
+
   const plotClassName = cx(styles.plot, {
     [styles.multiViewPlot]: multiView
   })

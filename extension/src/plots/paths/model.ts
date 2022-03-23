@@ -1,6 +1,12 @@
 import { Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
-import { collectPaths, PathType, PlotPath } from './collect'
+import {
+  collectPaths,
+  collectTemplateOrder,
+  PathType,
+  PlotPath,
+  TemplateOrder
+} from './collect'
 import { PlotsOutput } from '../../cli/reader'
 import { PathSelectionModel } from '../../path/selection/model'
 import { MementoPrefix } from '../../vscode/memento'
@@ -9,6 +15,8 @@ import { getPathArray } from '../../fileSystem/util'
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
+
+  private templateOrder: TemplateOrder = []
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState, MementoPrefix.PLOT_PATH_STATUS, getPathArray)
@@ -21,11 +29,21 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
     this.data = paths
 
+    this.setTemplateOrder()
+
     this.deferred.resolve()
   }
 
   public isReady() {
     return this.initialized
+  }
+
+  public setTemplateOrder() {
+    this.templateOrder = collectTemplateOrder(
+      this.getPathsByType(PathType.TEMPLATE_SINGLE),
+      this.getPathsByType(PathType.TEMPLATE_MULTI),
+      this.templateOrder
+    )
   }
 
   public filterChildren(path: string | undefined): PlotPath[] {
@@ -37,8 +55,8 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     })
   }
 
-  public getTemplatePaths() {
-    return this.getPathsByType(PathType.TEMPLATE)
+  public getTemplateOrder(): TemplateOrder {
+    return this.templateOrder
   }
 
   public getComparisonPaths() {

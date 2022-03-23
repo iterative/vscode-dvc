@@ -3,6 +3,7 @@ import {
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import {
   ComparisonTableColumn,
@@ -10,6 +11,8 @@ import {
 } from './ComparisonTableHead'
 import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
+import { reorderObjectList } from '../../../util/objects'
+import { sendMessage } from '../../../shared/vscode'
 
 export type ComparisonTableProps = Omit<
   PlotsComparisonData,
@@ -50,14 +53,29 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     [revisions, getPinnedColumnRevision]
   )
 
+  const setColumnsOrder = (order: string[]) => {
+    const newOrder = reorderObjectList(
+      order,
+      columns,
+      'revision'
+    ) as ComparisonRevision[]
+    setColumns(newOrder)
+    sendMessage({
+      payload: newOrder.map(({ revision }) => revision),
+      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+    })
+  }
+
   const changePinnedColumn = (column: string) => {
     pinnedColumn.current = pinnedColumn.current === column ? '' : column
 
-    setColumns(
-      [
-        getPinnedColumnRevision(),
-        ...columns.filter(column => !isPinned(column))
-      ].filter(Boolean) as ComparisonTableColumn[]
+    setColumnsOrder(
+      (
+        [
+          getPinnedColumnRevision(),
+          ...columns.filter(column => !isPinned(column))
+        ].filter(Boolean) as ComparisonTableColumn[]
+      ).map(({ revision }) => revision)
     )
   }
 
@@ -69,7 +87,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
       <ComparisonTableHead
         columns={columns}
         pinnedColumn={pinnedColumn.current}
-        setColumnsOrder={setColumns}
+        setColumnsOrder={setColumnsOrder}
         setPinnedColumn={changePinnedColumn}
       />
       {plots.map(({ path, revisions: revs }) => (
