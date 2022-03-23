@@ -46,7 +46,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     setOrder(entries.map(({ id }) => id))
   }, [entries])
 
-  const setEntryOrder = (order: string[]) => {
+  const setEntriesOrder = (order: string[]) => {
     setOrder(order)
 
     setSectionEntries(
@@ -94,7 +94,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   return (
     <DragDropContainer
       order={order}
-      setOrder={setEntryOrder}
+      setOrder={setEntriesOrder}
       items={items as JSX.Element[]}
       group={groupId}
       onDrop={onDropInSection}
