@@ -38,11 +38,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.initialized
   }
 
-  public setTemplateOrder() {
+  public setTemplateOrder(templateOrder?: TemplateOrder) {
     this.templateOrder = collectTemplateOrder(
       this.getPathsByType(PathType.TEMPLATE_SINGLE),
       this.getPathsByType(PathType.TEMPLATE_MULTI),
-      this.templateOrder
+      templateOrder || this.templateOrder
     )
   }
 

@@ -219,8 +219,11 @@ export class Plots extends BaseRepository<TPlotsData> {
             )
           case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
             return this.plots?.setComparisonOrder(message.payload)
+          case MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED:
+            return this.paths?.setTemplateOrder(message.payload)
+
           default:
-            Logger.error(`Unexpected message: ${message}`)
+            Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
       })
     )

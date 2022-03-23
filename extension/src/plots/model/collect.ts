@@ -366,7 +366,7 @@ const collectTemplateGroup = (
       )
       acc.push({
         content: fillTemplate(template, datapoints, revisionColors),
-        id: `plot_${path}`,
+        id: path,
         multiView: isMultiViewPlot(template),
         revisions: selectedRevisions,
         type: PlotsType.VEGA
