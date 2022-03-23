@@ -376,7 +376,7 @@ const collectTemplateGroup = (
   return acc
 }
 
-export const collectTemplatePlots = (
+export const collectSelectedTemplatePlots = (
   order: TemplateOrder,
   selectedRevisions: string[],
   templates: Record<string, VisualizationSpec>,

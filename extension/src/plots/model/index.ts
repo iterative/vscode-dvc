@@ -5,7 +5,7 @@ import { VisualizationSpec } from 'react-vega'
 import {
   collectCheckpointPlotsData,
   collectData,
-  collectTemplatePlots as collectSelectedTemplatePlots,
+  collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
   RevisionData
