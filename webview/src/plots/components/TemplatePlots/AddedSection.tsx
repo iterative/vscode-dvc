@@ -34,6 +34,8 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
     }
   }
 
+  const isHovered = hoveredSection === id
+
   return (
     <div className={styles.singleViewPlotsGrid}>
       <div
@@ -44,8 +46,8 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
         onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
         onDrop={onDrop}
         className={cx(styles.dropSection, {
-          [styles.dropSectionMaximized]: hoveredSection === id,
-          [styles.plot]: hoveredSection === id
+          [styles.dropSectionMaximized]: isHovered,
+          [styles.plot]: isHovered
         })}
       >
         <Icon
