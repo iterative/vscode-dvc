@@ -1,12 +1,16 @@
 import omit from 'lodash.omit'
 import { VisualizationSpec } from 'react-vega'
+import { TopLevelSpec } from 'vega-lite'
 import {
   CheckpointPlotValues,
   CheckpointPlotData,
   isImagePlot,
   ImagePlot,
   TemplatePlot,
-  Plot
+  Plot,
+  TemplatePlotEntry,
+  TemplatePlotSection,
+  PlotsType
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -22,6 +26,8 @@ import {
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
+import { TemplateOrder } from '../paths/collect'
+import { ColorScale, extendVegaSpec, isMultiViewPlot } from '../vega/util'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -314,5 +320,82 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
     }
   }
 
+  return acc
+}
+
+const fillTemplate = (
+  template: VisualizationSpec,
+  datapoints: unknown[],
+  revisionColors: ColorScale | undefined
+) =>
+  extendVegaSpec(
+    {
+      ...template,
+      data: {
+        values: datapoints
+      }
+    } as TopLevelSpec,
+    revisionColors
+  )
+
+const collectDatapoints = (
+  path: string,
+  selectedRevisions: string[],
+  revisionData: RevisionData
+): unknown[] =>
+  selectedRevisions
+    .flatMap(revision => revisionData?.[revision]?.[path])
+    .filter(Boolean)
+
+const collectTemplateGroup = (
+  paths: string[],
+  selectedRevisions: string[],
+  templates: Record<string, VisualizationSpec>,
+  revisionData: RevisionData,
+  revisionColors: ColorScale | undefined
+) => {
+  const acc: TemplatePlotEntry[] = []
+  for (const path of paths) {
+    const template = templates[path]
+
+    if (template) {
+      const datapoints = collectDatapoints(
+        path,
+        selectedRevisions,
+        revisionData
+      )
+      acc.push({
+        content: fillTemplate(template, datapoints, revisionColors),
+        id: `plot_${path}`,
+        multiView: isMultiViewPlot(template),
+        revisions: selectedRevisions,
+        type: PlotsType.VEGA
+      })
+    }
+  }
+  return acc
+}
+
+export const collectSelectedTemplatePlots = (
+  order: TemplateOrder,
+  selectedRevisions: string[],
+  templates: Record<string, VisualizationSpec>,
+  revisionData: RevisionData,
+  revisionColors: ColorScale | undefined
+) => {
+  const acc: TemplatePlotSection[] = []
+  for (const templateGroup of order) {
+    const { paths, group } = templateGroup
+    acc.push({
+      entries: collectTemplateGroup(
+        paths,
+        selectedRevisions,
+        templates,
+        revisionData,
+        revisionColors
+      ),
+      group
+    })
+  }
   return acc
 }

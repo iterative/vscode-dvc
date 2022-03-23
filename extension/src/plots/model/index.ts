@@ -1,33 +1,32 @@
 import { Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
-import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import {
   collectCheckpointPlotsData,
   collectData,
+  collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
   RevisionData
 } from './collect'
 import {
   CheckpointPlotData,
-  ComparisonRevisionData,
   ComparisonPlots,
+  ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   PlotSize,
-  PlotsType,
   Section,
-  SectionCollapsed,
-  VegaPlots
+  SectionCollapsed
 } from '../../plots/webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
-import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
+import { getColorScale } from '../vega/util'
 import { definedAndNonEmpty } from '../../util/array'
+import { TemplateOrder } from '../paths/collect'
 
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
@@ -169,8 +168,8 @@ export class PlotsModel {
       )
   }
 
-  public getTemplatePlots(paths: string[] | undefined) {
-    if (!paths) {
+  public getTemplatePlots(order: TemplateOrder | undefined) {
+    if (!definedAndNonEmpty(order)) {
       return
     }
 
@@ -180,7 +179,7 @@ export class PlotsModel {
       return
     }
 
-    return this.getSelectedTemplatePlots(paths, selectedRevisions)
+    return this.getSelectedTemplatePlots(order, selectedRevisions)
   }
 
   public getComparisonPlots(paths: string[] | undefined) {
@@ -336,35 +335,16 @@ export class PlotsModel {
   }
 
   private getSelectedTemplatePlots(
-    paths: string[],
+    order: TemplateOrder,
     selectedRevisions: string[]
   ) {
-    const acc: VegaPlots = {}
-    for (const path of paths) {
-      const template = this.templates[path]
-
-      if (template) {
-        acc[path] = [
-          {
-            content: extendVegaSpec(
-              {
-                ...template,
-                data: {
-                  values: selectedRevisions
-                    .flatMap(revision => this.revisionData?.[revision]?.[path])
-                    .filter(Boolean)
-                }
-              } as TopLevelSpec,
-              this.getRevisionColors()
-            ),
-            multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: selectedRevisions,
-            type: PlotsType.VEGA
-          }
-        ]
-      }
-    }
-    return acc
+    return collectSelectedTemplatePlots(
+      order,
+      selectedRevisions,
+      this.templates,
+      this.revisionData,
+      this.getRevisionColors()
+    )
   }
 
   private persistSelectedMetrics() {

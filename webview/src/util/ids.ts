@@ -11,8 +11,5 @@ export const createIDWithPrefixAndIndex = (
 
 export const getIDWithoutIndex = (id?: string) => id?.split(ID_SEPARATOR)[0]
 
-export const getIDWithoutIndexOrPrefix = (id: string) =>
-  id.split(ID_SEPARATOR)[1]
-
 export const getIDIndex = (id: string) =>
   Number.parseInt(id.split(ID_SEPARATOR).reverse()[0], 10)
