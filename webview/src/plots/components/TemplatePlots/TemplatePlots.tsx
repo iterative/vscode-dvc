@@ -144,11 +144,11 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
             <TemplatePlotsGrid
               entries={section.entries}
               groupId={groupId}
-              isMultiView={section.group === TemplatePlotGroup.MULTI_VIEW}
+              groupIndex={i}
               onDropInSection={handleDropInSection}
               draggedRef={draggedRef}
+              multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
               setSectionEntries={setSectionEntries}
-              groupIndex={i}
             />
           </div>
         )

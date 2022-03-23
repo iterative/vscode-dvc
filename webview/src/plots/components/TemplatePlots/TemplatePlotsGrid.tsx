@@ -16,13 +16,13 @@ interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
   groupId: string
   groupIndex: number
-  isMultiView: boolean
   onDropInSection: (
     draggedId: string,
     draggedGroup: string,
     groupId: string
   ) => void
   draggedRef?: MutableRefObject<DraggedInfo | undefined>
+  multiView: boolean
   setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
 }
 
@@ -35,9 +35,9 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   entries,
   groupId,
   groupIndex,
-  isMultiView,
   onDropInSection,
   draggedRef,
+  multiView,
   setSectionEntries
 }) => {
   const [order, setOrder] = useState<string[]>([])
@@ -62,7 +62,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   ) as TemplatePlotEntry[]
 
   const plotClassName = cx(styles.plot, {
-    [styles.multiViewPlot]: isMultiView
+    [styles.multiViewPlot]: multiView
   })
 
   const items = reorderedItems.map((plot: TemplatePlotEntry) => {
