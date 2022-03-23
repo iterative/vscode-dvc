@@ -1,5 +1,4 @@
-import { TopLevelSpec } from 'vega-lite'
-import { isImagePlot, PlotsGroup } from '../webview/contract'
+import { isImagePlot, Plot, PlotsGroup } from '../webview/contract'
 import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { definedAndNonEmpty } from '../../util/array'
@@ -18,11 +17,27 @@ export type PlotPath = {
   hasChildren: boolean
 }
 
+const collectType = (plots: Plot[]) => {
+  const type = new Set<PathType>()
+
+  for (const plot of plots) {
+    if (isImagePlot(plot)) {
+      type.add(PathType.COMPARISON)
+      continue
+    }
+
+    isMultiViewPlot(plot.content)
+      ? type.add(PathType.TEMPLATE_MULTI)
+      : type.add(PathType.TEMPLATE_SINGLE)
+  }
+
+  return type
+}
+
 const getType = (
   data: PlotsOutput,
   hasChildren: boolean,
   path: string
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Set<PathType> | undefined => {
   if (hasChildren) {
     return
@@ -33,20 +48,7 @@ const getType = (
     return
   }
 
-  const type = new Set<PathType>()
-
-  for (const plot of plots) {
-    if (isImagePlot(plot)) {
-      type.add(PathType.COMPARISON)
-      continue
-    }
-
-    isMultiViewPlot(plot.content as TopLevelSpec)
-      ? type.add(PathType.TEMPLATE_MULTI)
-      : type.add(PathType.TEMPLATE_SINGLE)
-  }
-
-  return type
+  return collectType(plots)
 }
 
 type PathAccumulator = {
