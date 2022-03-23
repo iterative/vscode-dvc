@@ -73,20 +73,12 @@ describe('App', () => {
       {
         entries: [
           ...templatePlotsFixture.plots[0].entries,
-          {
-            ...templatePlot,
-            id: join('other', 'plot.tsv')
-          }
+          { ...templatePlot, id: join('other', 'plot.tsv') }
         ],
         group: TemplatePlotGroup.SINGLE_VIEW
       },
       {
-        entries: [
-          {
-            ...templatePlot,
-            id: join('other', 'multiview.tsv')
-          }
-        ],
+        entries: [{ ...templatePlot, id: join('other', 'multiview.tsv') }],
         group: TemplatePlotGroup.MULTI_VIEW
       }
     ]
