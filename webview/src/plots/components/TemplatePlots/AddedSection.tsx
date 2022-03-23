@@ -1,6 +1,6 @@
 import React, { DragEvent, MutableRefObject } from 'react'
 import cx from 'classnames'
-import { PlotSection } from 'dvc/src/plots/webview/contract'
+import { TemplatePlotSection } from 'dvc/src/plots/webview/contract'
 import styles from '../styles.module.scss'
 import { getIDWithoutIndex } from '../../../util/ids'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
@@ -10,7 +10,7 @@ interface AddedSectionProps {
   hoveredSection: string
   setHoveredSection: (section: string) => void
   onDrop: (e: DragEvent<HTMLElement>) => void
-  closestSection: PlotSection
+  closestSection: TemplatePlotSection
   draggedRef: MutableRefObject<DraggedInfo | undefined>
 }
 

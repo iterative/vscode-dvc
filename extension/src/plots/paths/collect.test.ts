@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { VisualizationSpec } from 'react-vega'
 import { collectPaths, collectTemplateOrder } from './collect'
-import { PlotsGroup, PlotsType } from '../webview/contract'
+import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 
 describe('collectPath', () => {
@@ -129,7 +129,7 @@ describe('collectTemplateOrder', () => {
     )
 
     expect(plotSections).toStrictEqual([
-      { group: PlotsGroup.SINGLE_VIEW, paths: singleViewPaths }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewPaths }
     ])
   })
 
@@ -147,7 +147,7 @@ describe('collectTemplateOrder', () => {
     )
 
     expect(plotSections).toStrictEqual([
-      { group: PlotsGroup.MULTI_VIEW, paths: multiViewPaths }
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewPaths }
     ])
   })
 
@@ -160,13 +160,13 @@ describe('collectTemplateOrder', () => {
     const multiViewPaths: string[] = []
 
     const plotSections = collectTemplateOrder(singleViewPaths, multiViewPaths, [
-      { group: PlotsGroup.SINGLE_VIEW, paths: plotOrder }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: plotOrder }
     ])
 
     expect(singleViewPaths).not.toStrictEqual(plotOrder)
 
     expect(plotSections).toStrictEqual([
-      { group: PlotsGroup.SINGLE_VIEW, paths: plotOrder }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: plotOrder }
     ])
   })
 
@@ -196,16 +196,16 @@ describe('collectTemplateOrder', () => {
     ]
 
     const plotSections = collectTemplateOrder(singleViewPaths, multiViewPaths, [
-      { group: PlotsGroup.SINGLE_VIEW, paths: singleViewOrder },
-      { group: PlotsGroup.MULTI_VIEW, paths: multiViewOrder }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
     ])
 
     expect(singleViewPaths).not.toStrictEqual(singleViewOrder)
     expect(multiViewPaths).not.toStrictEqual(multiViewOrder)
 
     expect(plotSections).toStrictEqual([
-      { group: PlotsGroup.SINGLE_VIEW, paths: singleViewOrder },
-      { group: PlotsGroup.MULTI_VIEW, paths: multiViewOrder }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
     ])
   })
 
@@ -231,16 +231,16 @@ describe('collectTemplateOrder', () => {
     const multiViewPaths: string[] = [includedMultiViewPlot]
 
     const plotSections = collectTemplateOrder(singleViewPaths, multiViewPaths, [
-      { group: PlotsGroup.SINGLE_VIEW, paths: singleViewOrder },
-      { group: PlotsGroup.MULTI_VIEW, paths: multiViewOrder }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
     ])
 
     expect(singleViewPaths).not.toStrictEqual(singleViewOrder)
     expect(multiViewPaths).not.toStrictEqual(multiViewOrder)
 
     expect(plotSections).toStrictEqual([
-      { group: PlotsGroup.SINGLE_VIEW, paths: singleViewPaths },
-      { group: PlotsGroup.MULTI_VIEW, paths: multiViewPaths }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewPaths },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewPaths }
     ])
   })
 
@@ -269,19 +269,19 @@ describe('collectTemplateOrder', () => {
     ]
 
     const plotSections = collectTemplateOrder(singleViewPaths, multiViewPaths, [
-      { group: PlotsGroup.SINGLE_VIEW, paths: singleViewOrder },
-      { group: PlotsGroup.MULTI_VIEW, paths: multiViewOrder }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
     ])
 
     expect(singleViewPaths).not.toStrictEqual(singleViewOrder)
     expect(multiViewPaths).not.toStrictEqual(multiViewOrder)
 
     expect(plotSections).toStrictEqual([
-      { group: PlotsGroup.SINGLE_VIEW, paths: singleViewOrder },
-      { group: PlotsGroup.MULTI_VIEW, paths: multiViewOrder },
-      { group: PlotsGroup.SINGLE_VIEW, paths: [newSingleViewPlot] },
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder },
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: [newSingleViewPlot] },
       {
-        group: PlotsGroup.MULTI_VIEW,
+        group: TemplatePlotGroup.MULTI_VIEW,
         paths: [firstNewMultiViewPlot, secondNewMultiViewPlot]
       }
     ])

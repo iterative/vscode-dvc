@@ -1,6 +1,9 @@
-import { PlotSection, TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
+import {
+  TemplatePlotSection,
+  TemplatePlotEntry
+} from 'dvc/src/plots/webview/contract'
 
-const remove = (section: PlotSection, entryId: string) => {
+const remove = (section: TemplatePlotSection, entryId: string) => {
   const entries = section.entries.filter(({ id }) => id !== entryId)
   return entries.length > 0
     ? {
@@ -10,13 +13,13 @@ const remove = (section: PlotSection, entryId: string) => {
     : null
 }
 
-const add = (section: PlotSection, entry: TemplatePlotEntry) => {
+const add = (section: TemplatePlotSection, entry: TemplatePlotEntry) => {
   section.entries.push(entry)
   return { entries: section.entries, group: section.group }
 }
 
 export const removeFromPreviousAndAddToNewSection = (
-  sections: PlotSection[],
+  sections: TemplatePlotSection[],
   oldSectionIndex: number,
   entryId: string,
   newGroupIndex?: number,
@@ -31,4 +34,4 @@ export const removeFromPreviousAndAddToNewSection = (
       }
       return section
     })
-    .filter(Boolean) as PlotSection[]
+    .filter(Boolean) as TemplatePlotSection[]

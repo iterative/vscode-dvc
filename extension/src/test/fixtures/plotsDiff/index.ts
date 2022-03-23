@@ -3,16 +3,16 @@ import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import { PlotsOutput } from '../../../cli/reader'
 import {
-  ComparisonRevisionData,
   ComparisonPlots,
+  ComparisonRevisionData,
   DEFAULT_SECTION_NAMES,
+  TemplatePlotSection,
   PlotSize,
   PlotsType,
   Section,
+  TemplatePlotGroup,
   TemplatePlotsData,
-  VegaPlots,
-  PlotSection,
-  PlotsGroup
+  TemplatePlots
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { getWorkspaceColor } from '../../../experiments/model/colors'
@@ -469,13 +469,13 @@ export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
 
 const expectedRevisions = ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd']
 
-const extendedSpecs = (plotsOutput: VegaPlots): PlotSection[] => {
-  const singleViewPlots: PlotSection = {
-    group: PlotsGroup.SINGLE_VIEW,
+const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
+  const singleViewPlots: TemplatePlotSection = {
+    group: TemplatePlotGroup.SINGLE_VIEW,
     entries: []
   }
-  const multiViewPlots: PlotSection = {
-    group: PlotsGroup.MULTI_VIEW,
+  const multiViewPlots: TemplatePlotSection = {
+    group: TemplatePlotGroup.MULTI_VIEW,
     entries: []
   }
 

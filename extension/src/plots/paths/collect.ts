@@ -1,4 +1,4 @@
-import { isImagePlot, Plot, PlotsGroup } from '../webview/contract'
+import { isImagePlot, Plot, TemplatePlotGroup } from '../webview/contract'
 import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { definedAndNonEmpty } from '../../util/array'
@@ -101,7 +101,7 @@ export const collectPaths = (data: PlotsOutput): PlotPath[] => {
   return acc.plotPaths
 }
 
-export type TemplateOrder = { paths: string[]; group: PlotsGroup }[]
+export type TemplateOrder = { paths: string[]; group: TemplatePlotGroup }[]
 
 const collectFromRemaining = (
   acc: string[],
@@ -128,10 +128,10 @@ const collectExistingOrder = (
   for (const templateGroup of existingTemplateOrder) {
     const acc: string[] = []
     const { group, paths } = templateGroup
-    if (group === PlotsGroup.MULTI_VIEW) {
+    if (group === TemplatePlotGroup.MULTI_VIEW) {
       remainingMultiView = collectFromRemaining(acc, paths, remainingMultiView)
     }
-    if (group === PlotsGroup.SINGLE_VIEW) {
+    if (group === TemplatePlotGroup.SINGLE_VIEW) {
       remainingSingleView = collectFromRemaining(
         acc,
         paths,
@@ -146,7 +146,7 @@ const collectExistingOrder = (
 const collectUnordered = (
   newTemplateOrder: TemplateOrder,
   remaining: string[],
-  group: PlotsGroup
+  group: TemplatePlotGroup
 ) => {
   if (definedAndNonEmpty(remaining)) {
     const acc: string[] = []
@@ -178,9 +178,13 @@ export const collectTemplateOrder = (
   collectUnordered(
     newTemplateOrder,
     remainingSingleView,
-    PlotsGroup.SINGLE_VIEW
+    TemplatePlotGroup.SINGLE_VIEW
   )
-  collectUnordered(newTemplateOrder, remainingMultiView, PlotsGroup.MULTI_VIEW)
+  collectUnordered(
+    newTemplateOrder,
+    remainingMultiView,
+    TemplatePlotGroup.MULTI_VIEW
+  )
 
   return newTemplateOrder
 }

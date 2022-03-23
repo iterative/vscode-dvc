@@ -9,7 +9,7 @@ import {
   TemplatePlot,
   Plot,
   TemplatePlotEntry,
-  PlotSection,
+  TemplatePlotSection,
   PlotsType
 } from '../webview/contract'
 import {
@@ -383,7 +383,7 @@ export const collectSelectedTemplatePlots = (
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
 ) => {
-  const acc: PlotSection[] = []
+  const acc: TemplatePlotSection[] = []
   for (const templateGroup of order) {
     const { paths, group } = templateGroup
     acc.push({

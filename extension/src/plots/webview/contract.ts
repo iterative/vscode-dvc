@@ -99,22 +99,22 @@ export const isImagePlot = (plot: Plot): plot is ImagePlot =>
 
 export type Plot = TemplatePlot | ImagePlot
 
-export type VegaPlots = { [path: string]: TemplatePlot[] }
+export type TemplatePlots = { [path: string]: TemplatePlot[] }
 
-export enum PlotsGroup {
+export enum TemplatePlotGroup {
   MULTI_VIEW = 'template-multi',
   SINGLE_VIEW = 'template-single'
 }
 
 export type TemplatePlotEntry = TemplatePlot & { id: string }
 
-export type PlotSection = {
-  group: PlotsGroup
+export type TemplatePlotSection = {
+  group: TemplatePlotGroup
   entries: TemplatePlotEntry[]
 }
 
 export interface TemplatePlotsData {
-  plots: PlotSection[]
+  plots: TemplatePlotSection[]
   sectionName: string
   size: PlotSize
 }

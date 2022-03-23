@@ -9,12 +9,12 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import {
-  DEFAULT_SECTION_COLLAPSED,
   CheckpointPlotsColors,
+  DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotsGroup,
   PlotSize,
   Section,
+  TemplatePlotGroup,
   TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
 import {
@@ -75,11 +75,11 @@ describe('App', () => {
           ...templatePlotsFixture.plots[0].entries,
           { ...templatePlot, id: join('plot_other', 'plot.tsv') }
         ],
-        group: PlotsGroup.SINGLE_VIEW
+        group: TemplatePlotGroup.SINGLE_VIEW
       },
       {
         entries: [{ ...templatePlot, id: join('plot_other', 'multiview.tsv') }],
-        group: PlotsGroup.MULTI_VIEW
+        group: TemplatePlotGroup.MULTI_VIEW
       }
     ]
   } as TemplatePlotsData
