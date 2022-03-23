@@ -499,8 +499,6 @@ describe('App', () => {
       )
 
       const testParamCell = screen.getByText(testParamStringValue)
-      fireEvent.mouseEnter(testParamCell, { bubbles: true })
-      fireEvent.focus(testParamCell, { bubbles: true })
       fireEvent.click(testParamCell, { bubbles: true })
 
       const tooltip = screen.getByRole('tooltip')
