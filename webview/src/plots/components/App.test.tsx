@@ -687,7 +687,7 @@ describe('App', () => {
 
     const topSection = screen.getByTestId(NewSectionBlock.TOP)
     const multiViewPlot = screen.getByTestId(
-      join('plot_other', 'multiview.tsv_0')
+      join('plot_other', 'multiview.tsv')
     )
     let topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
 
