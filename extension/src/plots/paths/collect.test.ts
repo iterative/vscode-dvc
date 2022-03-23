@@ -286,4 +286,44 @@ describe('collectTemplateOrder', () => {
       }
     ])
   })
+
+  it('should add a newly selected plot to the last section if the groups match', () => {
+    const existingSingleViewPlot = join('plots', 'acc.tsv')
+    const singleViewOrder = [existingSingleViewPlot]
+
+    const singleViewPaths: string[] = [existingSingleViewPlot]
+
+    const existingMultiViewPlot = join('plots', 'losses.json')
+    const newMultiViewPlot = join('plots', 'confusion-matrix.json')
+    const multiViewOrder = [existingMultiViewPlot, newMultiViewPlot]
+
+    const multiViewPaths: string[] = [newMultiViewPlot, existingMultiViewPlot]
+
+    const plotSections = collectTemplateOrder(singleViewPaths, multiViewPaths, [
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
+    ])
+
+    expect(multiViewPaths).not.toStrictEqual(multiViewOrder)
+
+    expect(plotSections).toStrictEqual([
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
+    ])
+  })
+
+  it('should remove empty groups from the existing order', () => {
+    const firstMultiViewPlot = join('plots', 'losses.json')
+    const secondMultiViewPlot = join('plots', 'confusion-matrix.json')
+    const multiViewOrder = [firstMultiViewPlot, secondMultiViewPlot]
+
+    const plotSections = collectTemplateOrder([], multiViewOrder, [
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: [] },
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
+    ])
+
+    expect(plotSections).toStrictEqual([
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
+    ])
+  })
 })
