@@ -1,11 +1,11 @@
 import { Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
-import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import {
   collectCheckpointPlotsData,
   collectData,
+  collectTemplatePlots as collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
   RevisionData
@@ -17,17 +17,14 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
-  PlotSection,
   PlotSize,
-  PlotsType,
   Section,
-  SectionCollapsed,
-  TemplatePlotEntry
+  SectionCollapsed
 } from '../../plots/webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
-import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
+import { getColorScale } from '../vega/util'
 import { definedAndNonEmpty } from '../../util/array'
 import { TemplateOrder } from '../paths/collect'
 
@@ -337,41 +334,17 @@ export class PlotsModel {
     acc.push(pathRevisions)
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   private getSelectedTemplatePlots(
     order: TemplateOrder,
     selectedRevisions: string[]
   ) {
-    const templatePlots: PlotSection[] = []
-    for (const templateGroup of order) {
-      const acc: TemplatePlotEntry[] = []
-      const { paths, group } = templateGroup
-      for (const path of paths) {
-        const template = this.templates[path]
-
-        if (template) {
-          acc.push({
-            content: extendVegaSpec(
-              {
-                ...template,
-                data: {
-                  values: selectedRevisions
-                    .flatMap(revision => this.revisionData?.[revision]?.[path])
-                    .filter(Boolean)
-                }
-              } as TopLevelSpec,
-              this.getRevisionColors()
-            ),
-            id: `plot_${path}`,
-            multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: selectedRevisions,
-            type: PlotsType.VEGA
-          })
-        }
-      }
-      templatePlots.push({ entries: acc, group })
-    }
-    return templatePlots
+    return collectSelectedTemplatePlots(
+      order,
+      selectedRevisions,
+      this.templates,
+      this.revisionData,
+      this.getRevisionColors()
+    )
   }
 
   private persistSelectedMetrics() {

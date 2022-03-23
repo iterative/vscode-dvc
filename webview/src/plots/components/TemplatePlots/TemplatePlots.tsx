@@ -108,7 +108,6 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       />
       {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
-
         return (
           <div
             key={groupId}
