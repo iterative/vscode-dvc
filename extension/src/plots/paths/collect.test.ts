@@ -170,7 +170,7 @@ describe('collectTemplateOrder', () => {
     ])
   })
 
-  it('should retain the given order on the paths', () => {
+  it('should retain the given order of the paths', () => {
     const firstSingleViewPlot = join('plots', 'acc.tsv')
     const lastSingleViewPlot = join('plots', 'loss.tsv')
     const singleViewOrder = [firstSingleViewPlot, lastSingleViewPlot]
@@ -209,7 +209,7 @@ describe('collectTemplateOrder', () => {
     ])
   })
 
-  it('should drop paths from the order that are not provided', () => {
+  it('should drop paths that are not provided from the order', () => {
     const includedSingleViewPlot = join('plots', 'acc.tsv')
     const excludedSingleViewPlot = join('plots', 'loss.tsv')
     const singleViewOrder = [includedSingleViewPlot, excludedSingleViewPlot]
