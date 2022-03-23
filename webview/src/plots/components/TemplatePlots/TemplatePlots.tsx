@@ -42,6 +42,15 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
     })
   }
 
+  const setSectionEntries = (index: number, entries: TemplatePlotEntry[]) => {
+    sections[index] = {
+      ...sections[index],
+      entries
+    }
+
+    setSectionOrder(sections)
+  }
+
   const firstSection = sections[0]
   const lastSection = sections.slice(-1)[0]
 
@@ -134,11 +143,11 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
           >
             <TemplatePlotsGrid
               entries={section.entries}
-              group={section.group}
+              groupId={groupId}
+              isMultiView={section.group === TemplatePlotGroup.MULTI_VIEW}
               onDropInSection={handleDropInSection}
               draggedRef={draggedRef}
-              sections={sections}
-              setSections={setSectionOrder}
+              setSectionEntries={setSectionEntries}
               groupIndex={i}
             />
           </div>

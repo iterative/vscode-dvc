@@ -1,8 +1,4 @@
-import {
-  TemplatePlotEntry,
-  TemplatePlotGroup,
-  TemplatePlotSection
-} from 'dvc/src/plots/webview/contract'
+import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState, MutableRefObject } from 'react'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import cx from 'classnames'
@@ -15,20 +11,19 @@ import {
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../../util/styles'
 import { reorderObjectList } from '../../../util/objects'
-import { createIDWithIndex } from '../../../util/ids'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
-  group: TemplatePlotGroup
+  groupId: string
   groupIndex: number
+  isMultiView: boolean
   onDropInSection: (
     draggedId: string,
     draggedGroup: string,
     groupId: string
   ) => void
   draggedRef?: MutableRefObject<DraggedInfo | undefined>
-  sections: TemplatePlotSection[]
-  setSections: (sections: TemplatePlotSection[]) => void
+  setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
 }
 
 const autoSize = {
@@ -38,15 +33,13 @@ const autoSize = {
 
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   entries,
-  group,
+  groupId,
   groupIndex,
+  isMultiView,
   onDropInSection,
   draggedRef,
-  sections,
-  setSections
+  setSectionEntries
 }) => {
-  const groupId = createIDWithIndex(group, groupIndex)
-
   const [order, setOrder] = useState<string[]>([])
 
   useEffect(() => {
@@ -56,12 +49,10 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   const setEntryOrder = (order: string[]) => {
     setOrder(order)
 
-    sections[groupIndex] = {
-      entries: reorderObjectList(order, entries, 'id') as TemplatePlotEntry[],
-      group
-    }
-
-    setSections(sections)
+    setSectionEntries(
+      groupIndex,
+      reorderObjectList(order, entries, 'id') as TemplatePlotEntry[]
+    )
   }
 
   const reorderedItems = reorderObjectList(
@@ -71,7 +62,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   ) as TemplatePlotEntry[]
 
   const plotClassName = cx(styles.plot, {
-    [styles.multiViewPlot]: group === TemplatePlotGroup.MULTI_VIEW
+    [styles.multiViewPlot]: isMultiView
   })
 
   const items = reorderedItems.map((plot: TemplatePlotEntry) => {
