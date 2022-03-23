@@ -272,10 +272,6 @@ $gap: 20px;
   height: 10px;
 }
 
-.dropIcon {
-  display: none;
-}
-
 .dropSectionMaximized {
   height: auto;
   opacity: 0.5;
@@ -285,7 +281,6 @@ $gap: 20px;
   align-items: center;
 
   .dropIcon {
-    display: block;
     border-radius: 100%;
     border: 3px solid var(--vscode-focusBorder);
     padding: 20px;

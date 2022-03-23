@@ -50,12 +50,15 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
           [styles.plot]: isHovered
         })}
       >
-        <Icon
-          icon={AllIcons.DOWN_ARROW}
-          className={styles.dropIcon}
-          width={50}
-          height={50}
-        />
+        {isHovered && (
+          <Icon
+            data-testid={`${id}_drop-icon`}
+            icon={AllIcons.DOWN_ARROW}
+            className={styles.dropIcon}
+            width={50}
+            height={50}
+          />
+        )}
       </div>
     </div>
   )
