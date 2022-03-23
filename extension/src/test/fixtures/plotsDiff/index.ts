@@ -480,7 +480,7 @@ const extendedSpecs = (plotsOutput: VegaPlots): PlotSection[] => {
   }
 
   for (const [path, plots] of Object.entries(plotsOutput)) {
-    plots.map(originalPlot => {
+    for (const originalPlot of plots) {
       const plot = {
         content: extendVegaSpec(
           {
@@ -514,10 +514,10 @@ const extendedSpecs = (plotsOutput: VegaPlots): PlotSection[] => {
       }
       if (plot.multiView) {
         multiViewPlots.entries.push(plot)
-        return
+        continue
       }
       singleViewPlots.entries.push(plot)
-    })
+    }
   }
 
   return [singleViewPlots, multiViewPlots]
