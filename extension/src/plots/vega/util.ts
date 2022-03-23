@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import cloneDeep from 'lodash.clonedeep'
 import merge from 'lodash.merge'
+import { VisualizationSpec } from 'react-vega'
 import { TopLevelSpec } from 'vega-lite'
 import {
   GenericHConcatSpec,
@@ -19,7 +20,9 @@ import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 
 const COMMIT_FIELD = 'rev'
 
-const getFacetField = (template: TopLevelSpec): string | null => {
+const getFacetField = (
+  template: TopLevelSpec | VisualizationSpec
+): string | null => {
   const facetSpec = template as TopLevelFacetSpec
   if (facetSpec.facet) {
     return (
@@ -41,19 +44,23 @@ const getFacetField = (template: TopLevelSpec): string | null => {
   return null
 }
 
-const isVegaFacetPlot = (template: TopLevelSpec): boolean =>
+const isVegaFacetPlot = (template: TopLevelSpec | VisualizationSpec): boolean =>
   !!getFacetField(template)
 
 type ConcatSpec = TopLevel<GenericConcatSpec<NonNormalizedSpec>>
 type VerticalConcatSpec = TopLevel<GenericVConcatSpec<NonNormalizedSpec>>
 type HorizontalConcatSpec = TopLevel<GenericHConcatSpec<NonNormalizedSpec>>
 
-const isVegaConcatPlot = (template: TopLevelSpec): boolean =>
+const isVegaConcatPlot = (
+  template: TopLevelSpec | VisualizationSpec
+): boolean =>
   (template as ConcatSpec).concat?.length > 0 ||
   (template as VerticalConcatSpec).vconcat?.length > 0 ||
   (template as HorizontalConcatSpec).hconcat?.length > 0
 
-const isVegaRepeatPlot = (template: TopLevelSpec): boolean => {
+const isVegaRepeatPlot = (
+  template: TopLevelSpec | VisualizationSpec
+): boolean => {
   const repeatSpec = template as TopLevel<NonLayerRepeatSpec>
   return (
     !!repeatSpec.repeat &&
@@ -63,14 +70,17 @@ const isVegaRepeatPlot = (template: TopLevelSpec): boolean => {
   )
 }
 
-export const isMultiViewPlot = (template?: TopLevelSpec): boolean =>
+export const isMultiViewPlot = (
+  template?: TopLevelSpec | VisualizationSpec
+): boolean =>
   !template ||
   isVegaFacetPlot(template) ||
   isVegaConcatPlot(template) ||
   isVegaRepeatPlot(template)
 
-export const isMultiViewByCommitPlot = (template?: TopLevelSpec): boolean =>
-  !template || getFacetField(template) === COMMIT_FIELD
+export const isMultiViewByCommitPlot = (
+  template?: TopLevelSpec | VisualizationSpec
+): boolean => !template || getFacetField(template) === COMMIT_FIELD
 
 export type ColorScale = { domain: string[]; range: string[] }
 

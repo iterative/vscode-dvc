@@ -11,6 +11,7 @@
     "camelcase",
     "chokidar",
     "conda",
+    "datapoints",
     "dvcignore",
     "DVCPATH",
     "execa",

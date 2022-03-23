@@ -99,6 +99,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public togglePathStatus(path: string) {
     const status = this.paths?.toggleStatus(path)
+    this.paths?.setTemplateOrder()
     this.notifyChanged()
     return status
   }
@@ -142,7 +143,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getTemplatePlots() {
-    const paths = this.paths?.getTemplatePaths()
+    const paths = this.paths?.getTemplateOrder()
     const plots = this.plots?.getTemplatePlots(paths)
 
     if (!this.plots || !plots || isEmpty(plots)) {
