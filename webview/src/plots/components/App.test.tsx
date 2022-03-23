@@ -700,4 +700,21 @@ describe('App', () => {
 
     expect(topDropIcon).toBeInTheDocument()
   })
+
+  it('should prevent default behaviour when dragging over a new section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+
+    const dragOverEvent = createBubbledEvent('dragover', {
+      preventDefault: jest.fn()
+    })
+
+    topSection.dispatchEvent(dragOverEvent)
+
+    expect(dragOverEvent.preventDefault).toHaveBeenCalled()
+  })
 })
