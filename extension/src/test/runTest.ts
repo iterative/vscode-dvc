@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { downloadAndUnzipVSCode, runTests } from 'vscode-test'
+import { downloadAndUnzipVSCode, runTests } from '@vscode/test-electron'
 import { Logger } from '../common/logger'
 
 async function main() {
