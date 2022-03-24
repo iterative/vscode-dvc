@@ -50,6 +50,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-prettier-standard": "^4.0.1",
     "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-check-file": "^1.1.0",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-jest": "^25.3.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",

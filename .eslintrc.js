@@ -71,6 +71,40 @@ module.exports = {
       rules: {
         'unicorn/filename-case': 'off'
       }
+    },
+    {
+      files: ['webview/src/**'],
+      rules: {
+        'check-file/no-index': 'error'
+      }
+    },
+    {
+      files: [
+        'webview/src/experiments/index.tsx',
+        'webview/src/plots/index.tsx',
+        'webview/src/shared/components/icons/index.tsx'
+      ],
+      rules: {
+        'check-file/no-index': 'off'
+      }
+    },
+    {
+      files: ['webview/src/**'],
+      rules: {
+        'check-file/folder-naming-convention': [
+          'error',
+          {
+            'webview/src/**/': 'CAMEL_CASE',
+            'webview/src/shared/components/**': 'CAMEL_CASE'
+          }
+        ]
+      }
+    },
+    {
+      files: ['webview/src/shared/**'],
+      rules: {
+        'check-file/folder-naming-convention': 'off'
+      }
     }
   ],
   parser: '@typescript-eslint/parser',
@@ -81,6 +115,7 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
+    'check-file',
     'jest',
     'jsx-a11y',
     'react-hooks',
