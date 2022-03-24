@@ -115,6 +115,11 @@ describe('collectPath', () => {
 })
 
 describe('collectTemplateOrder', () => {
+  it('should return an empty array if no paths are provided', () => {
+    const templateOrder = collectTemplateOrder([], [], [])
+    expect(templateOrder).toStrictEqual([])
+  })
+
   it('should collect the expected data structure when only single view paths as provided', () => {
     const singleViewPaths = [
       join('plots', 'acc.tsv'),

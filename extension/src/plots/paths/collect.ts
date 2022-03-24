@@ -199,6 +199,10 @@ export const collectTemplateOrder = (
 ): TemplateOrder => {
   const newTemplateOrder: TemplateOrder = []
 
+  if (!definedAndNonEmpty([...singleViewPaths, ...multiViewPaths])) {
+    return newTemplateOrder
+  }
+
   const { remainingSingleView, remainingMultiView } = collectExistingOrder(
     newTemplateOrder,
     singleViewPaths,
