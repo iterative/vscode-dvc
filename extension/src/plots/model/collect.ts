@@ -354,7 +354,7 @@ const collectTemplateGroup = (
   templates: Record<string, VisualizationSpec>,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
-) => {
+): TemplatePlotEntry[] => {
   const acc: TemplatePlotEntry[] = []
   for (const path of paths) {
     const template = templates[path]
