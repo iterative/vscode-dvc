@@ -1,5 +1,5 @@
 import { extensions } from 'vscode'
-import TelemetryReporter from 'vscode-extension-telemetry'
+import TelemetryReporter from '@vscode/extension-telemetry'
 import { getTelemetryReporter, sendTelemetryEvent } from '.'
 import {
   APPLICATION_INSIGHTS_KEY,
@@ -19,7 +19,7 @@ const mockedPackageJSON = {
 }
 const mockedSendTelemetryEvent = jest.fn()
 
-jest.mock('vscode-extension-telemetry')
+jest.mock('@vscode/extension-telemetry')
 jest.mock('vscode')
 
 const NODE_ENV = process.env.NODE_ENV

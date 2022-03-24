@@ -25,7 +25,7 @@ import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './TemplatePlots/TemplatePlots'
 import { vsCodeApi } from '../../shared/api'
-import { dragAndDrop } from '../../test/dragDrop'
+import { createBubbledEvent, dragAndDrop } from '../../test/dragDrop'
 
 jest.mock('../../shared/api')
 
@@ -692,5 +692,44 @@ describe('App', () => {
       'template-multi_0',
       'template-single_1'
     ])
+  })
+
+  it('should show a drop zone when hovering a new section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+    const multiViewPlot = screen.getByTestId(
+      join('plot_other', 'multiview.tsv')
+    )
+    let topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+    expect(topDropIcon).not.toBeInTheDocument()
+
+    multiViewPlot.dispatchEvent(createBubbledEvent('dragstart'))
+    topSection.dispatchEvent(createBubbledEvent('dragenter'))
+
+    topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+    expect(topDropIcon).toBeInTheDocument()
+  })
+
+  it('should prevent default behaviour when dragging over a new section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+
+    const dragOverEvent = createBubbledEvent('dragover', {
+      preventDefault: jest.fn()
+    })
+
+    topSection.dispatchEvent(dragOverEvent)
+
+    expect(dragOverEvent.preventDefault).toHaveBeenCalled()
   })
 })
