@@ -6,13 +6,13 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
-import { createBubbledEvent, dragAndDrop } from '../../../../test/dragDrop'
-import { ComparisonTable, ComparisonTableProps } from '../ComparisonTable'
-import { vsCodeApi } from '../../../../shared/api'
+import { ComparisonTable, ComparisonTableProps } from './ComparisonTable'
+import { createBubbledEvent, dragAndDrop } from '../../../test/dragDrop'
+import { vsCodeApi } from '../../../shared/api'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
-jest.mock('../../../../shared/api')
+jest.mock('../../../shared/api')
 
 const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)

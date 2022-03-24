@@ -4,7 +4,7 @@ import { TemplatePlotSection } from 'dvc/src/plots/webview/contract'
 import styles from '../styles.module.scss'
 import { getIDWithoutIndex } from '../../../util/ids'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
-import { AllIcons, Icon } from '../../../shared/components/icon/Icon'
+import { AllIcons, Icon } from '../../../shared/components/Icon'
 
 interface AddedSectionProps {
   id: string

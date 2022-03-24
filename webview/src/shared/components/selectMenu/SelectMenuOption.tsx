@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import styles from './styles.module.scss'
-import { AllIcons, Icon } from '../icon/Icon'
+import { AllIcons, Icon } from '../Icon'
 
 export interface SelectMenuOptionProps {
   id: string

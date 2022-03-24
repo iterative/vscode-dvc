@@ -1,5 +1,5 @@
 import React from 'react'
-import { AllIcons, Icon } from '../icon/Icon'
+import { AllIcons, Icon } from '../Icon'
 
 interface GripIconProps {
   className: string

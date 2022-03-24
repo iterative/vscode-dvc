@@ -9,7 +9,7 @@ import { MetricsPicker } from './MetricsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { SectionRenamer } from './SectionRenamer'
-import { AllIcons, Icon } from '../../shared/components/icon/Icon'
+import { AllIcons, Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import {
   CollapsibleSectionsActions,
