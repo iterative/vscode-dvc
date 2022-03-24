@@ -7,7 +7,7 @@ import {
   removeFromPreviousAndAddToNewSection
 } from './utils'
 import { AddedSection } from './AddedSection'
-import { DraggedInfo } from '../../../shared/components/DragDrop/DragDropContainer'
+import { DraggedInfo } from '../../../shared/components/dragDrop1/DragDropContainer'
 import {
   createIDWithIndex,
   getIDIndex,

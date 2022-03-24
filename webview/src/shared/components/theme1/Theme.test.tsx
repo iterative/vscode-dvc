@@ -3,7 +3,7 @@
  */
 import React from 'react'
 import { render, cleanup, screen } from '@testing-library/react'
-import { Theme } from '.'
+import { Theme } from './Theme'
 
 describe('Theme', () => {
   afterEach(() => {

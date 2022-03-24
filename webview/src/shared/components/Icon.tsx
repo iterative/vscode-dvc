@@ -9,7 +9,7 @@ import {
   Lines,
   Pencil,
   UpArrow
-} from './Icons'
+} from './icons'
 
 export const AllIcons = {
   CHECK: Check,

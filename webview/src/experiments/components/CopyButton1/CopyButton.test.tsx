@@ -12,7 +12,7 @@ import {
   waitFor
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import { CopyButton } from '.'
+import { CopyButton } from './CopyButton'
 
 const mockWriteText = jest.fn()
 Object.assign(navigator, {

@@ -9,11 +9,12 @@ import {
 } from 'react-table'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
-import Tooltip, { CELL_TOOLTIP_DELAY } from '../../shared/components/Tooltip'
-import styles from '../components/Table/styles.module.scss'
-import { CopyButton } from '../components/CopyButton'
-import { OverflowHoverTooltip } from '../components/OverflowHoverTooltip'
-
+import Tooltip, {
+  CELL_TOOLTIP_DELAY
+} from '../../shared/components/tooltip1/Tooltip'
+import styles from '../components/Table1/styles.module.scss'
+import { CopyButton } from '../components/CopyButton1/CopyButton'
+import { OverflowHoverTooltip } from '../components/OverflowHoverTooltip1/OverflowHoverTooltip'
 const UndefinedCell = (
   <div className={styles.innerCell}>
     <span className={styles.cellContents}>. . .</span>

@@ -51,6 +51,26 @@ module.exports = {
         'jest/valid-expect': 'off',
         'no-unused-expressions': 'off'
       }
+    },
+    {
+      files: ['**/*.tsx'],
+      rules: {
+        'unicorn/filename-case': [
+          'error',
+          {
+            cases: {
+              pascalCase: true
+            },
+            ignore: [/.*\.stories.tsx$/, /.*\.test\.tsx$/]
+          }
+        ]
+      }
+    },
+    {
+      files: ['**/util/*.tsx'],
+      rules: {
+        'unicorn/filename-case': 'off'
+      }
     }
   ],
   parser: '@typescript-eslint/parser',

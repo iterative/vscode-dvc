@@ -12,8 +12,8 @@ import {
 import {
   DragDropContainer,
   DraggedInfo
-} from '../../../shared/components/DragDrop/DragDropContainer'
-import { GripIcon } from '../../../shared/components/DragDrop/GripIcon'
+} from '../../../shared/components/dragDrop1/DragDropContainer'
+import { GripIcon } from '../../../shared/components/dragDrop1/GripIcon'
 import { withScale } from '../../../util/styles'
 
 interface TemplatePlotsGridProps {

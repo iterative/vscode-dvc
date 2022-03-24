@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
-import { ComparisonTable, ComparisonTableProps } from '.'
+import { ComparisonTable, ComparisonTableProps } from './ComparisonTable'
 import { createBubbledEvent, dragAndDrop } from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
 

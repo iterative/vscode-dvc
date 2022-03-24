@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useSingleton } from '@tippyjs/react'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
 import styles from './styles.module.scss'
-import Tooltip from '../Tooltip'
+import Tooltip from '../tooltip1/Tooltip'
 
 interface IconMenuProps {
   items: IconMenuItemProps[]

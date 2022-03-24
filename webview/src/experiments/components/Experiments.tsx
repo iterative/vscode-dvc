@@ -17,11 +17,11 @@ import {
   Cell
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { Table } from './Table'
-import styles from './Table/styles.module.scss'
+import { Table } from './Table1/Table'
+import styles from './Table1/styles.module.scss'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
-import { Theme } from '../../shared/components/Theme'
+import { Theme } from '../../shared/components/theme1/Theme'
 
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
