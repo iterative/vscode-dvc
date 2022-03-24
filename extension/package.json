@@ -854,22 +854,22 @@
         {
           "command": "dvc.views.experimentsTree.applyExperiment",
           "group": "1_do@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsTree.branchExperiment",
           "group": "1_do@2",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsTree.queueExperiment",
           "group": "1_do@3",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsTree.removeExperiment",
           "group": "7_modification@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",
@@ -890,17 +890,17 @@
       "view/title": [
         {
           "command": "dvc.runExperiment",
-          "when": "view == dvc.views.experimentsTree",
+          "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
           "group": "navigation@1"
         },
         {
           "command": "dvc.runQueuedExperiments",
-          "when": "view == dvc.views.experimentsTree",
+          "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
           "group": "navigation@2"
         },
         {
           "command": "dvc.queueExperiment",
-          "when": "view == dvc.views.experimentsTree",
+          "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
           "group": "navigation@3"
         },
         {
