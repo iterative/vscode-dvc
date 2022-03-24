@@ -108,15 +108,11 @@ type RemainingPathAccumulator = {
   remainingMultiView: string[]
 }
 
-type GroupPathAccumulator = RemainingPathAccumulator & {
-  paths: string[]
-}
-
 const collectFromRemaining = (
   remainingPaths: RemainingPathAccumulator,
   paths: string[],
   remainingType: 'remainingSingleView' | 'remainingMultiView'
-): GroupPathAccumulator => {
+): string[] => {
   const acc: string[] = []
   for (const path of paths) {
     if (remainingPaths[remainingType].includes(path)) {
@@ -126,14 +122,14 @@ const collectFromRemaining = (
       acc.push(path)
     }
   }
-  return { paths: acc, ...remainingPaths }
+  return acc
 }
 
 const collectGroupPaths = (
   acc: RemainingPathAccumulator,
   group: TemplatePlotGroup,
   existingPaths: string[]
-): GroupPathAccumulator => {
+): string[] => {
   if (group === TemplatePlotGroup.MULTI_VIEW) {
     return collectFromRemaining(acc, existingPaths, 'remainingMultiView')
   }
@@ -156,7 +152,7 @@ const collectExistingOrder = (
       continue
     }
 
-    const { paths } = collectGroupPaths(acc, group, existingPaths)
+    const paths = collectGroupPaths(acc, group, existingPaths)
 
     newTemplateOrder.push({ group, paths })
   }
