@@ -1162,7 +1162,7 @@
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "lodash.omit": "^4.5.0",
-    "vscode-extension-telemetry": "^0.4.3"
+    "@vscode/extension-telemetry": "^0.4.10"
   },
   "devDependencies": {
     "@types/chai": "^4.2.22",
