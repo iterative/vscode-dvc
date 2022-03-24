@@ -82,7 +82,7 @@ module.exports = {
       files: [
         'webview/src/experiments/index.tsx',
         'webview/src/plots/index.tsx',
-        'webview/src/shared/components/icons/index.tsx'
+        'webview/src/shared/components/icons/index.ts'
       ],
       rules: {
         'check-file/no-index': 'off'
