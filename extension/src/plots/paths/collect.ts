@@ -103,18 +103,37 @@ export const collectPaths = (data: PlotsOutput): PlotPath[] => {
 
 export type TemplateOrder = { paths: string[]; group: TemplatePlotGroup }[]
 
+type RemainingPathAccumulator = {
+  remainingSingleView: string[]
+  remainingMultiView: string[]
+}
+
 const collectFromRemaining = (
-  acc: string[],
+  remainingPaths: RemainingPathAccumulator,
   paths: string[],
-  remaining: string[]
-) => {
+  remainingType: 'remainingSingleView' | 'remainingMultiView'
+): string[] => {
+  const acc: string[] = []
   for (const path of paths) {
-    if (remaining.includes(path)) {
-      remaining = remaining.filter(remainingPath => remainingPath !== path)
+    if (remainingPaths[remainingType].includes(path)) {
+      remainingPaths[remainingType] = remainingPaths[remainingType].filter(
+        remainingPath => remainingPath !== path
+      )
       acc.push(path)
     }
   }
-  return remaining
+  return acc
+}
+
+const collectGroupPaths = (
+  acc: RemainingPathAccumulator,
+  group: TemplatePlotGroup,
+  existingPaths: string[]
+): string[] => {
+  if (group === TemplatePlotGroup.MULTI_VIEW) {
+    return collectFromRemaining(acc, existingPaths, 'remainingMultiView')
+  }
+  return collectFromRemaining(acc, existingPaths, 'remainingSingleView')
 }
 
 const collectExistingOrder = (
@@ -122,25 +141,22 @@ const collectExistingOrder = (
   singleViewPaths: string[],
   multiViewPaths: string[],
   existingTemplateOrder: TemplateOrder
-) => {
-  let remainingSingleView = [...singleViewPaths]
-  let remainingMultiView = [...multiViewPaths]
-  for (const templateGroup of existingTemplateOrder) {
-    const acc: string[] = []
-    const { group, paths } = templateGroup
-    if (group === TemplatePlotGroup.MULTI_VIEW) {
-      remainingMultiView = collectFromRemaining(acc, paths, remainingMultiView)
-    }
-    if (group === TemplatePlotGroup.SINGLE_VIEW) {
-      remainingSingleView = collectFromRemaining(
-        acc,
-        paths,
-        remainingSingleView
-      )
-    }
-    newTemplateOrder.push({ group, paths: acc })
+): RemainingPathAccumulator => {
+  const acc = {
+    remainingMultiView: [...multiViewPaths],
+    remainingSingleView: [...singleViewPaths]
   }
-  return { remainingMultiView, remainingSingleView }
+  for (const templateGroup of existingTemplateOrder) {
+    const { group, paths: existingPaths } = templateGroup
+    if (!definedAndNonEmpty(existingPaths)) {
+      continue
+    }
+
+    const paths = collectGroupPaths(acc, group, existingPaths)
+
+    newTemplateOrder.push({ group, paths })
+  }
+  return acc
 }
 
 const collectUnordered = (
@@ -148,17 +164,28 @@ const collectUnordered = (
   remaining: string[],
   group: TemplatePlotGroup
 ) => {
-  if (definedAndNonEmpty(remaining)) {
-    const acc: string[] = []
-    for (const path of remaining) {
-      acc.push(path)
-    }
-
-    newTemplateOrder.push({
-      group,
-      paths: acc
-    })
+  if (!definedAndNonEmpty(remaining)) {
+    return
   }
+
+  if (definedAndNonEmpty(newTemplateOrder)) {
+    const [lastTemplateGroup] = newTemplateOrder.slice(-1)
+    const { group: lastGroup, paths } = lastTemplateGroup
+
+    if (group === lastGroup) {
+      paths.push(...remaining)
+      newTemplateOrder[newTemplateOrder.length - 1] = {
+        group,
+        paths
+      }
+      return
+    }
+  }
+
+  newTemplateOrder.push({
+    group,
+    paths: remaining
+  })
 }
 
 export const collectTemplateOrder = (
@@ -167,6 +194,10 @@ export const collectTemplateOrder = (
   existingTemplateOrder: TemplateOrder
 ): TemplateOrder => {
   const newTemplateOrder: TemplateOrder = []
+
+  if (!definedAndNonEmpty([...singleViewPaths, ...multiViewPaths])) {
+    return newTemplateOrder
+  }
 
   const { remainingSingleView, remainingMultiView } = collectExistingOrder(
     newTemplateOrder,

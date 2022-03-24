@@ -73,12 +73,12 @@ describe('App', () => {
       {
         entries: [
           ...templatePlotsFixture.plots[0].entries,
-          { ...templatePlot, id: join('plot_other', 'plot.tsv') }
+          { ...templatePlot, id: join('other', 'plot.tsv') }
         ],
         group: TemplatePlotGroup.SINGLE_VIEW
       },
       {
-        entries: [{ ...templatePlot, id: join('plot_other', 'multiview.tsv') }],
+        entries: [{ ...templatePlot, id: join('other', 'multiview.tsv') }],
         group: TemplatePlotGroup.MULTI_VIEW
       }
     ]
@@ -535,7 +535,7 @@ describe('App', () => {
     ])
   })
 
-  it('should display the template plots in the order stored', () => {
+  it('should reorder template plots and send a message to the extension on drop', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
@@ -544,20 +544,35 @@ describe('App', () => {
     let plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('plot_logs', 'loss.tsv'),
-      join('plot_other', 'plot.tsv'),
-      join('plot_other', 'multiview.tsv')
+      join('logs', 'loss.tsv'),
+      join('other', 'plot.tsv'),
+      join('other', 'multiview.tsv')
     ])
 
+    mockPostMessage.mockClear()
     dragAndDrop(plots[1], plots[0])
 
     plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('plot_other', 'plot.tsv'),
-      join('plot_logs', 'loss.tsv'),
-      join('plot_other', 'multiview.tsv')
+      join('other', 'plot.tsv'),
+      join('logs', 'loss.tsv'),
+      join('other', 'multiview.tsv')
     ])
+    expect(mockPostMessage).toBeCalledTimes(1)
+    expect(mockPostMessage).toBeCalledWith({
+      payload: [
+        {
+          group: TemplatePlotGroup.SINGLE_VIEW,
+          paths: [join('other', 'plot.tsv'), join('logs', 'loss.tsv')]
+        },
+        {
+          group: TemplatePlotGroup.MULTI_VIEW,
+          paths: [join('other', 'multiview.tsv')]
+        }
+      ],
+      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+    })
   })
 
   it('should render two template plot sections', () => {

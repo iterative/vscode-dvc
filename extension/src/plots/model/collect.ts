@@ -28,6 +28,7 @@ import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { ColorScale, extendVegaSpec, isMultiViewPlot } from '../vega/util'
+import { definedAndNonEmpty } from '../../util/array'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -353,7 +354,7 @@ const collectTemplateGroup = (
   templates: Record<string, VisualizationSpec>,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
-) => {
+): TemplatePlotEntry[] => {
   const acc: TemplatePlotEntry[] = []
   for (const path of paths) {
     const template = templates[path]
@@ -366,7 +367,7 @@ const collectTemplateGroup = (
       )
       acc.push({
         content: fillTemplate(template, datapoints, revisionColors),
-        id: `plot_${path}`,
+        id: path,
         multiView: isMultiViewPlot(template),
         revisions: selectedRevisions,
         type: PlotsType.VEGA
@@ -382,20 +383,24 @@ export const collectSelectedTemplatePlots = (
   templates: Record<string, VisualizationSpec>,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
-) => {
+): TemplatePlotSection[] | undefined => {
   const acc: TemplatePlotSection[] = []
   for (const templateGroup of order) {
     const { paths, group } = templateGroup
+    const entries = collectTemplateGroup(
+      paths,
+      selectedRevisions,
+      templates,
+      revisionData,
+      revisionColors
+    )
+    if (!definedAndNonEmpty(entries)) {
+      continue
+    }
     acc.push({
-      entries: collectTemplateGroup(
-        paths,
-        selectedRevisions,
-        templates,
-        revisionData,
-        revisionColors
-      ),
+      entries,
       group
     })
   }
-  return acc
+  return acc.length > 0 ? acc : undefined
 }
