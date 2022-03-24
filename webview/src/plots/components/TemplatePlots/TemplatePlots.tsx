@@ -131,26 +131,28 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
         return (
-          <div
-            key={groupId}
-            id={groupId}
-            data-testid={`plots-section_${groupId}`}
-            className={
-              section.group === TemplatePlotGroup.MULTI_VIEW
-                ? styles.multiViewPlotsGrid
-                : styles.singleViewPlotsGrid
-            }
-          >
-            <TemplatePlotsGrid
-              entries={section.entries}
-              groupId={groupId}
-              groupIndex={i}
-              onDropInSection={handleDropInSection}
-              draggedRef={draggedRef}
-              multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
-              setSectionEntries={setSectionEntries}
-            />
-          </div>
+          section.entries.length > 0 && (
+            <div
+              key={groupId}
+              id={groupId}
+              data-testid={`plots-section_${groupId}`}
+              className={
+                section.group === TemplatePlotGroup.MULTI_VIEW
+                  ? styles.multiViewPlotsGrid
+                  : styles.singleViewPlotsGrid
+              }
+            >
+              <TemplatePlotsGrid
+                entries={section.entries}
+                groupId={groupId}
+                groupIndex={i}
+                onDropInSection={handleDropInSection}
+                draggedRef={draggedRef}
+                multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
+                setSectionEntries={setSectionEntries}
+              />
+            </div>
+          )
         )
       })}
       <AddedSection
