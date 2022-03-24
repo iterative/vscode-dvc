@@ -99,6 +99,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public togglePathStatus(path: string) {
     const status = this.paths?.toggleStatus(path)
+    this.paths?.setTemplateOrder()
     this.notifyChanged()
     return status
   }
@@ -142,7 +143,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getTemplatePlots() {
-    const paths = this.paths?.getTemplatePaths()
+    const paths = this.paths?.getTemplateOrder()
     const plots = this.plots?.getTemplatePlots(paths)
 
     if (!this.plots || !plots || isEmpty(plots)) {
@@ -210,7 +211,6 @@ export class Plots extends BaseRepository<TPlotsData> {
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return this.plots?.setSectionCollapsed(message.payload)
-
           case MessageFromWebviewType.SECTION_RENAMED:
             return this.plots?.setSectionName(
               message.payload.section,
@@ -218,8 +218,10 @@ export class Plots extends BaseRepository<TPlotsData> {
             )
           case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
             return this.plots?.setComparisonOrder(message.payload)
+          case MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED:
+            return this.paths?.setTemplateOrder(message.payload)
           default:
-            Logger.error(`Unexpected message: ${message}`)
+            Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
       })
     )

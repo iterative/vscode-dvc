@@ -20,6 +20,7 @@ const mockPostMessage = jest.mocked(postMessage)
 describe('ComparisonTable', () => {
   afterEach(() => {
     cleanup()
+    jest.clearAllMocks()
   })
 
   const basicProps: ComparisonTableProps = comparisonTableFixture
@@ -61,6 +62,32 @@ describe('ComparisonTable', () => {
     const [pinnedColumn] = getHeaders()
 
     expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
+  })
+
+  it('should send a reorder message when a column is pinned', () => {
+    renderTable()
+
+    const thirdExperiment = revisions[2]
+    const [originalFirstColumn] = getHeaders()
+
+    fireEvent.click(screen.getByText(thirdExperiment), {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const [currentFirstColumn, movedFirstColumn] = getHeaders()
+
+    expect(originalFirstColumn).not.toStrictEqual(currentFirstColumn)
+    expect(originalFirstColumn).toStrictEqual(movedFirstColumn)
+
+    expect(mockPostMessage).toBeCalledTimes(1)
+    expect(mockPostMessage).toBeCalledWith({
+      payload: [
+        thirdExperiment,
+        ...revisions.filter(rev => rev !== thirdExperiment)
+      ],
+      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+    })
   })
 
   it('should unpin a column with a second click', () => {

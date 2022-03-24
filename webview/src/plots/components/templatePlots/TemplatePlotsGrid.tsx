@@ -1,47 +1,29 @@
-import { TemplatePlot, VegaPlots } from 'dvc/src/plots/webview/contract'
+import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState, MutableRefObject } from 'react'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import cx from 'classnames'
 import styles from '../styles.module.scss'
 import { config } from '../constants'
 import {
-  Items,
-  performOrderedUpdate,
-  reorderObjectList
-} from '../../../util/objects'
-import {
   DragDropContainer,
   DraggedInfo
 } from '../../../shared/components/dragDrop/DragDropContainer'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../../util/styles'
+import { reorderObjectList } from '../../../util/objects'
 
 interface TemplatePlotsGridProps {
-  entries: VegaPlots
-  group: string
+  entries: TemplatePlotEntry[]
+  groupId: string
+  groupIndex: number
   onDropInSection: (
     draggedId: string,
     draggedGroup: string,
     groupId: string
   ) => void
   draggedRef?: MutableRefObject<DraggedInfo | undefined>
-  multiView?: boolean
-}
-
-interface TemplatePlotEntry extends TemplatePlot {
-  path: string
-  id: string
-}
-
-const addIdAndPath = (entries: VegaPlots) => {
-  let acc: TemplatePlotEntry[] = []
-  for (const [path, plots] of Object.entries(entries)) {
-    acc = [
-      ...acc,
-      ...plots.map((plot, i) => ({ ...plot, id: `plot_${path}_${i}`, path }))
-    ]
-  }
-  return acc
+  multiView: boolean
+  setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
 }
 
 const autoSize = {
@@ -51,30 +33,34 @@ const autoSize = {
 
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   entries,
-  group,
+  groupId,
+  groupIndex,
   onDropInSection,
   draggedRef,
-  multiView
+  multiView,
+  setSectionEntries
 }) => {
-  const [allPlots, setAllPlots] = useState<TemplatePlotEntry[]>([])
   const [order, setOrder] = useState<string[]>([])
 
   useEffect(() => {
-    const templatePlots = addIdAndPath(entries)
-    setAllPlots(templatePlots)
+    setOrder(entries.map(({ id }) => id))
   }, [entries])
 
-  useEffect(() => {
-    setOrder(pastOrder =>
-      performOrderedUpdate(pastOrder, allPlots as unknown as Items, 'id')
+  const setEntriesOrder = (order: string[]) => {
+    setOrder(order)
+
+    setSectionEntries(
+      groupIndex,
+      reorderObjectList(order, entries, 'id') as TemplatePlotEntry[]
     )
-  }, [allPlots])
+  }
 
   const reorderedItems = reorderObjectList(
     order,
-    allPlots as unknown as Items,
+    entries,
     'id'
-  ) as unknown as TemplatePlotEntry[]
+  ) as TemplatePlotEntry[]
+
   const plotClassName = cx(styles.plot, {
     [styles.multiViewPlot]: multiView
   })
@@ -85,7 +71,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       <div
         key={plot.id}
         id={plot.id}
-        data-testid={plot.id}
+        data-testid={`plot_${plot.id}`}
         className={plotClassName}
         style={withScale(nbRevisions)}
       >
@@ -108,9 +94,9 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   return (
     <DragDropContainer
       order={order}
-      setOrder={setOrder}
+      setOrder={setEntriesOrder}
       items={items as JSX.Element[]}
-      group={group}
+      group={groupId}
       onDrop={onDropInSection}
       draggedRef={draggedRef}
     />

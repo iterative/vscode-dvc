@@ -188,6 +188,18 @@ $gap: 20px;
 .plot.multiViewPlot {
   aspect-ratio: var(--scale) - 1;
   grid-column: span var(--scale);
+
+  .largePlots & {
+    width: max-content;
+  }
+  
+  .regularPlots & {
+    width: calc(300px * var(--scale));
+  }
+  
+  .smallPlots & {
+    width: calc(200px * var(--scale));
+  }
 }
 
 .sectionRenamer {
@@ -257,13 +269,25 @@ $gap: 20px;
 }
 
 .dropSection{
-  height: 5px;
-  width: 100%;
-  margin: 0 $gap;
+  height: 10px;
 }
 
 .dropSectionMaximized {
-  height: 20px;
-  margin-bottom: $gap;
-  border-left: 10px solid rgba(#6ac904, 0.5);
+  height: auto;
+  opacity: 0.5;
+  border: 3px dashed var(--vscode-focusBorder);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .dropIcon {
+    border-radius: 100%;
+    border: 3px solid var(--vscode-focusBorder);
+    padding: 20px;
+    box-sizing: content-box;
+
+    path {
+      fill: var(--vscode-focusBorder)
+    }
+  }
 }
