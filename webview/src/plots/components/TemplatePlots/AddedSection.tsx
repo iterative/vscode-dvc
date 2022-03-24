@@ -4,6 +4,7 @@ import { TemplatePlotSection } from 'dvc/src/plots/webview/contract'
 import styles from '../styles.module.scss'
 import { getIDWithoutIndex } from '../../../util/ids'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
+import { AllIcons, Icon } from '../../../shared/components/icon/Icon'
 
 interface AddedSectionProps {
   id: string
@@ -33,17 +34,32 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
     }
   }
 
+  const isHovered = hoveredSection === id
+
   return (
-    <div
-      id={id}
-      data-testid={id}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
-      onDrop={onDrop}
-      className={cx(styles.dropSection, {
-        [styles.dropSectionMaximized]: hoveredSection === id
-      })}
-    />
+    <div className={styles.singleViewPlotsGrid}>
+      <div
+        id={id}
+        data-testid={id}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
+        onDrop={onDrop}
+        className={cx(styles.dropSection, {
+          [styles.dropSectionMaximized]: isHovered,
+          [styles.plot]: isHovered
+        })}
+      >
+        {isHovered && (
+          <Icon
+            data-testid={`${id}_drop-icon`}
+            icon={AllIcons.GRAPH_LINE}
+            className={styles.dropIcon}
+            width={50}
+            height={50}
+          />
+        )}
+      </div>
+    </div>
   )
 }
