@@ -12,5 +12,6 @@ export enum MementoPrefix {
   PLOT_SECTION_COLLAPSED = 'plotSectionCollapsed:',
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOT_SIZES = 'plotSizes:',
-  PLOT_SECTION_NAMES = 'plotSectionNames:'
+  PLOT_SECTION_NAMES = 'plotSectionNames:',
+  PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:'
 }

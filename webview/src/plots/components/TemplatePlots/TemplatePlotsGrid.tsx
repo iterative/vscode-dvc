@@ -10,18 +10,20 @@ import {
 } from '../../../shared/components/dragDrop/DragDropContainer'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../../util/styles'
-import { performOrderedUpdate, reorderObjectList } from '../../../util/objects'
+import { reorderObjectList } from '../../../util/objects'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
-  group: string
+  groupId: string
+  groupIndex: number
   onDropInSection: (
     draggedId: string,
     draggedGroup: string,
     groupId: string
   ) => void
   draggedRef?: MutableRefObject<DraggedInfo | undefined>
-  multiView?: boolean
+  multiView: boolean
+  setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
 }
 
 const autoSize = {
@@ -31,16 +33,27 @@ const autoSize = {
 
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   entries,
-  group,
+  groupId,
+  groupIndex,
   onDropInSection,
   draggedRef,
-  multiView
+  multiView,
+  setSectionEntries
 }) => {
   const [order, setOrder] = useState<string[]>([])
 
   useEffect(() => {
-    setOrder(pastOrder => performOrderedUpdate(pastOrder, entries, 'id'))
+    setOrder(entries.map(({ id }) => id))
   }, [entries])
+
+  const setEntriesOrder = (order: string[]) => {
+    setOrder(order)
+
+    setSectionEntries(
+      groupIndex,
+      reorderObjectList(order, entries, 'id') as TemplatePlotEntry[]
+    )
+  }
 
   const reorderedItems = reorderObjectList(
     order,
@@ -58,7 +71,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       <div
         key={plot.id}
         id={plot.id}
-        data-testid={plot.id}
+        data-testid={`plot_${plot.id}`}
         className={plotClassName}
         style={withScale(nbRevisions)}
       >
@@ -81,9 +94,9 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   return (
     <DragDropContainer
       order={order}
-      setOrder={setOrder}
+      setOrder={setEntriesOrder}
       items={items as JSX.Element[]}
-      group={group}
+      group={groupId}
       onDrop={onDropInSection}
       draggedRef={draggedRef}
     />

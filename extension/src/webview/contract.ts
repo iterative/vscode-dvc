@@ -3,7 +3,8 @@ import {
   PlotsData,
   PlotSize,
   Section,
-  SectionCollapsed
+  SectionCollapsed,
+  TemplatePlotGroup
 } from '../plots/webview/contract'
 
 export type WebviewData = TableData | PlotsData
@@ -16,6 +17,7 @@ export enum MessageFromWebviewType {
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_COMPARISON_REORDERED = 'plots-comparison-reordered',
   PLOTS_SECTION_TOGGLED = 'plots-section-toggled',
+  PLOTS_TEMPLATES_REORDERED = 'plots-templates-reordered',
   PLOTS_RESIZED = 'plots-resized',
   SECTION_RENAMED = 'section-renamed'
 }
@@ -32,6 +34,10 @@ export type PlotSectionRenamedPayload = {
   section: Section
   name: string
 }
+export type PlotsTemplatesReordered = {
+  group: TemplatePlotGroup
+  paths: string[]
+}[]
 
 export type MessageFromWebview =
   | {
@@ -57,6 +63,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.PLOTS_RESIZED
       payload: PlotsResizedPayload
+    }
+  | {
+      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+      payload: PlotsTemplatesReordered
     }
   | {
       type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED

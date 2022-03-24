@@ -507,7 +507,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             ]
           }
         ) as VisualizationSpec,
-        id: `plot_${path}`,
+        id: path,
         multiView: isMultiViewPlot(originalPlot.content as TopLevelSpec),
         revisions: expectedRevisions,
         type: PlotsType.VEGA

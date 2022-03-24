@@ -4,12 +4,14 @@ import {
   TemplatePlotEntry
 } from 'dvc/src/plots/webview/contract'
 import React, { DragEvent, useState, useEffect, useRef } from 'react'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { removeFromPreviousAndAddToNewSection } from './utils'
 import { AddedSection } from './AddedSection'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
+import { sendMessage } from '../../../shared/vscode'
 
 interface TemplatePlotsProps {
   plots: TemplatePlotSection[]
@@ -28,6 +30,26 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
   useEffect(() => {
     setSections(plots)
   }, [plots, setSections])
+
+  const setSectionOrder = (sections: TemplatePlotSection[]): void => {
+    setSections(sections)
+    sendMessage({
+      payload: sections.map(section => ({
+        group: section.group,
+        paths: section.entries.map(({ id }) => id)
+      })),
+      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+    })
+  }
+
+  const setSectionEntries = (index: number, entries: TemplatePlotEntry[]) => {
+    sections[index] = {
+      ...sections[index],
+      entries
+    }
+
+    setSectionOrder(sections)
+  }
 
   const firstSection = sections[0]
   const lastSection = sections.slice(-1)[0]
@@ -59,12 +81,12 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
 
     if (e.currentTarget.id === NewSectionBlock.TOP) {
       if (firstSection.group !== group) {
-        setSections([newSection, ...updatedSections])
+        setSectionOrder([newSection, ...updatedSections])
       }
       return
     }
     if (lastSection.group !== group) {
-      setSections([...updatedSections, newSection])
+      setSectionOrder([...updatedSections, newSection])
     }
   }
 
@@ -89,7 +111,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       entry
     )
 
-    setSections(updatedSections)
+    setSectionOrder(updatedSections)
   }
 
   const newDropSection = {
@@ -109,24 +131,28 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
         return (
-          <div
-            key={groupId}
-            id={groupId}
-            data-testid={`plots-section_${groupId}`}
-            className={
-              section.group === TemplatePlotGroup.MULTI_VIEW
-                ? styles.multiViewPlotsGrid
-                : styles.singleViewPlotsGrid
-            }
-          >
-            <TemplatePlotsGrid
-              entries={section.entries}
-              group={groupId}
-              onDropInSection={handleDropInSection}
-              draggedRef={draggedRef}
-              multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
-            />
-          </div>
+          section.entries.length > 0 && (
+            <div
+              key={groupId}
+              id={groupId}
+              data-testid={`plots-section_${groupId}`}
+              className={
+                section.group === TemplatePlotGroup.MULTI_VIEW
+                  ? styles.multiViewPlotsGrid
+                  : styles.singleViewPlotsGrid
+              }
+            >
+              <TemplatePlotsGrid
+                entries={section.entries}
+                groupId={groupId}
+                groupIndex={i}
+                onDropInSection={handleDropInSection}
+                draggedRef={draggedRef}
+                multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
+                setSectionEntries={setSectionEntries}
+              />
+            </div>
+          )
         )
       })}
       <AddedSection
