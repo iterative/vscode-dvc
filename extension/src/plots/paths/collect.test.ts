@@ -306,7 +306,7 @@ describe('collectTemplateOrder', () => {
 
     const plotSections = collectTemplateOrder(singleViewPaths, multiViewPaths, [
       { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder },
-      { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
+      { group: TemplatePlotGroup.MULTI_VIEW, paths: [existingMultiViewPlot] }
     ])
 
     expect(multiViewPaths).not.toStrictEqual(multiViewOrder)
