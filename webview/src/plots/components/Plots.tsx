@@ -8,12 +8,12 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
 import { CheckpointPlots } from './CheckpointPlots'
-import { ComparisonTable } from './ComparisonTable1/ComparisonTable'
-import { TemplatePlots } from './TemplatePlots1/TemplatePlots'
+import { ComparisonTable } from './comparisonTable/ComparisonTable'
+import { TemplatePlots } from './templatePlots/TemplatePlots'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
 import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
-import { Theme } from '../../shared/components/theme1/Theme'
+import { Theme } from '../../shared/components/theme/Theme'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(plot => getDisplayNameFromPath(plot.title)) || []

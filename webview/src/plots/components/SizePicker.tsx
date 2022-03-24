@@ -1,7 +1,7 @@
 import { PlotSize } from 'dvc/src/plots/webview/contract'
 import React from 'react'
-import { SelectMenuOptionProps } from '../../shared/components/selectMenu1/SelectMenuOption'
-import { SingleSelect } from '../../shared/components/selectMenu1/SingleSelect'
+import { SelectMenuOptionProps } from '../../shared/components/selectMenu/SelectMenuOption'
+import { SingleSelect } from '../../shared/components/selectMenu/SingleSelect'
 import { capitalize } from '../../util/strings'
 
 export const SizePicker: React.FC<{

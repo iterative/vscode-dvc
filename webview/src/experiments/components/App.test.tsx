@@ -19,7 +19,7 @@ import {
 import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
 import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { App } from './App'
-import { useIsFullyContained } from './OverflowHoverTooltip1/useIsFullyContained'
+import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
@@ -30,11 +30,11 @@ import {
 import {
   CELL_TOOLTIP_DELAY,
   HEADER_TOOLTIP_DELAY
-} from '../../shared/components/tooltip1/Tooltip'
+} from '../../shared/components/tooltip/Tooltip'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
-jest.mock('./OverflowHoverTooltip1/useIsFullyContained', () => ({
+jest.mock('./overflowHoverTooltip/useIsFullyContained', () => ({
   useIsFullyContained: jest.fn()
 }))
 const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)

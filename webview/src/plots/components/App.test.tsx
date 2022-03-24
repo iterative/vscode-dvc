@@ -22,7 +22,7 @@ import {
 } from 'dvc/src/webview/contract'
 import { App } from './App'
 import { Plots } from './Plots'
-import { NewSectionBlock } from './TemplatePlots1/TemplatePlots'
+import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { vsCodeApi } from '../../shared/api'
 import { dragAndDrop } from '../../test/dragDrop'
 

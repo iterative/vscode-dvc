@@ -10,12 +10,12 @@ import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { SectionRenamer } from './SectionRenamer'
 import { AllIcons, Icon } from '../../shared/components/Icon'
-import { IconMenu } from '../../shared/components/iconMenu1/IconMenu'
+import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import {
   CollapsibleSectionsActions,
   PlotsReducerAction
 } from '../hooks/useAppReducer'
-import { IconMenuItemProps } from '../../shared/components/iconMenu1/IconMenuItem'
+import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 
 interface MenuProps {
   metrics: string[]
