@@ -6,7 +6,7 @@ import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 
 import { IconMenu } from '../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../shared/components/iconMenu/IconMenuItem'
-import { AllIcons } from '../shared/components/icon/Icon'
+import { AllIcons } from '../shared/components/Icon'
 import { Theme } from '../shared/components/theme/Theme'
 
 const items: IconMenuItemProps[] = [

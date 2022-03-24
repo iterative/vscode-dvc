@@ -9,7 +9,7 @@ import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import {
   ComparisonTableRow,
   ComparisonTableRowProps
-} from '../ComparisonTableRow'
+} from './ComparisonTableRow'
 import styles from '../styles.module.scss'
 
 describe('ComparisonTableRow', () => {

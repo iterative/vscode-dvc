@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/extend-expect'
 import {
   ComparisonTableHeader,
   ComparisonTableHeaderProps
-} from '../ComparisonTableHeader'
+} from './ComparisonTableHeader'
 
 describe('ComparisonTableHeader', () => {
   beforeEach(() => {
