@@ -38,7 +38,7 @@
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
-    "setup:venv": "sh ./scripts/virtualenv-install.sh",
+    "setup:venv": "ts-node ./scripts/virtualenv-install.ts",
     "create-svgs": "ts-node ./scripts/create-svgs.ts",
     "svgr": "yarn workspace dvc-vscode-webview svgr"
   },
