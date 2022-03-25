@@ -153,7 +153,9 @@ const collectExistingOrder = (
     }
 
     const paths = collectGroupPaths(acc, group, existingPaths)
-
+    if (!definedAndNonEmpty(paths)) {
+      continue
+    }
     newTemplateOrder.push({ group, paths })
   }
   return acc
@@ -188,6 +190,19 @@ const collectUnordered = (
   })
 }
 
+const mergeAdjacentMatching = (newTemplateOrder: TemplateOrder) => {
+  const mergedTemplateOrder: TemplateOrder = []
+  for (const [idx, { paths, group }] of newTemplateOrder.entries()) {
+    const nextGroup = newTemplateOrder[idx + 1]
+    if (nextGroup?.group === group) {
+      nextGroup.paths.unshift(...paths)
+      continue
+    }
+    mergedTemplateOrder.push({ group, paths })
+  }
+  return mergedTemplateOrder
+}
+
 export const collectTemplateOrder = (
   singleViewPaths: string[],
   multiViewPaths: string[],
@@ -217,5 +232,5 @@ export const collectTemplateOrder = (
     TemplatePlotGroup.MULTI_VIEW
   )
 
-  return newTemplateOrder
+  return mergeAdjacentMatching(newTemplateOrder)
 }

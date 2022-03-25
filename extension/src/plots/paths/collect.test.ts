@@ -317,6 +317,29 @@ describe('collectTemplateOrder', () => {
     ])
   })
 
+  it('should merge adjacent matching sections', () => {
+    const firstSingleViewPlot = join('plots', 'acc.tsv')
+    const secondSingleViewPlot = join('plots', 'loss.tsv')
+    const singleViewOrder = [firstSingleViewPlot, secondSingleViewPlot]
+
+    const plotSections = collectTemplateOrder(
+      singleViewOrder,
+      [],
+      [
+        { group: TemplatePlotGroup.SINGLE_VIEW, paths: [firstSingleViewPlot] },
+        {
+          group: TemplatePlotGroup.MULTI_VIEW,
+          paths: [join('plots', 'predictions.json')]
+        },
+        { group: TemplatePlotGroup.SINGLE_VIEW, paths: [secondSingleViewPlot] }
+      ]
+    )
+
+    expect(plotSections).toStrictEqual([
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: singleViewOrder }
+    ])
+  })
+
   it('should remove empty groups from the existing order', () => {
     const firstMultiViewPlot = join('plots', 'losses.json')
     const secondMultiViewPlot = join('plots', 'confusion-matrix.json')
