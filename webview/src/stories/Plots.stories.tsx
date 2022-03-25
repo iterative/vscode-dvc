@@ -8,7 +8,7 @@ import {
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import { chromaticeParameters } from './util'
+import { chromaticParameters } from './util'
 import { Plots } from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'
 
@@ -26,7 +26,6 @@ export default {
     }
   },
   component: Plots,
-  parameters: chromaticeParameters,
   title: 'Plots'
 } as Meta
 
@@ -38,6 +37,7 @@ const Template: Story<{
 }
 
 export const WithData = Template.bind({})
+WithData.parameters = chromaticParameters
 
 export const WithCheckpointOnly = Template.bind({})
 WithCheckpointOnly.args = {
@@ -84,6 +84,7 @@ AllLarge.args = {
     template: { ...templatePlotsFixture, size: PlotSize.LARGE }
   }
 }
+AllLarge.parameters = chromaticParameters
 
 export const AllSmall = Template.bind({})
 AllSmall.args = {
@@ -94,3 +95,4 @@ AllSmall.args = {
     template: { ...templatePlotsFixture, size: PlotSize.SMALL }
   }
 }
+AllSmall.parameters = chromaticParameters

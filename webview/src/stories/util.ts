@@ -52,8 +52,6 @@ const viewportsWidths = Object.values(viewports)
   })
   .filter(Boolean)
 
-export const chromaticViewports = { viewports: viewportsWidths }
-
-export const chromaticeParameters = {
-  chromatic: { viewports: [1600, 1440] }
+export const chromaticParameters = {
+  chromatic: { viewports: viewportsWidths }
 }
