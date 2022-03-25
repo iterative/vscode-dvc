@@ -2,11 +2,13 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import {
   PlotsData,
-  DEFAULT_SECTION_COLLAPSED
+  DEFAULT_SECTION_COLLAPSED,
+  PlotSize
 } from 'dvc/src/plots/webview/contract'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import { chromaticeParameters } from './util'
 import { Plots } from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'
 
@@ -24,6 +26,7 @@ export default {
     }
   },
   component: Plots,
+  parameters: chromaticeParameters,
   title: 'Plots'
 } as Meta
 
@@ -70,4 +73,24 @@ WithoutPlots.args = {
 export const WithoutData = Template.bind({})
 WithoutData.args = {
   data: undefined
+}
+
+export const AllLarge = Template.bind({})
+AllLarge.args = {
+  data: {
+    checkpoint: { ...checkpointPlotsFixture, size: PlotSize.LARGE },
+    comparison: { ...comparisonPlotsFixture, size: PlotSize.LARGE },
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    template: { ...templatePlotsFixture, size: PlotSize.LARGE }
+  }
+}
+
+export const AllSmall = Template.bind({})
+AllSmall.args = {
+  data: {
+    checkpoint: { ...checkpointPlotsFixture, size: PlotSize.SMALL },
+    comparison: { ...comparisonPlotsFixture, size: PlotSize.SMALL },
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    template: { ...templatePlotsFixture, size: PlotSize.SMALL }
+  }
 }
