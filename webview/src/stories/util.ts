@@ -43,9 +43,14 @@ export const viewports = {
   }
 }
 
-const viewportsWidths = Object.values(viewports).map(viewport =>
-  Number.parseInt(viewport.styles.width, 10)
-)
+const viewportsWidths = Object.values(viewports)
+  .map(viewport => {
+    const value = Number.parseInt(viewport.styles.width, 10)
+
+    // Chromatic only allows viewports between 320px and 1800px (https://www.chromatic.com/docs/viewports#what-viewports-can-i-choose)
+    return value <= 1800 ? value : null
+  })
+  .filter(Boolean)
 
 export const chromaticViewports = { viewports: viewportsWidths }
 
