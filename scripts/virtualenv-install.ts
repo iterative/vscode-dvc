@@ -55,7 +55,7 @@ const setupVenv = async () => {
 
   const venvPython =
     process.platform === 'win32'
-      ? join(cwd, ENV_DIR, 'Scripts', 'python')
+      ? join(cwd, ENV_DIR, 'Scripts', 'python.exe')
       : join(cwd, ENV_DIR, 'bin', 'python')
 
   await upgradePip(venvPython)
