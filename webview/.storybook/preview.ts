@@ -1,5 +1,6 @@
 import { InternalVsCodeApi } from '../src/shared/api'
 import { action } from '@storybook/addon-actions'
+import { viewports } from '../src/stories/util'
 
 declare global {
   interface Window {
@@ -16,5 +17,9 @@ window.acquireVsCodeApi = () =>
   } as unknown as InternalVsCodeApi)
 
 export const parameters = {
-  actions: { argTypesRegex: '^on[A-Z].*' }
+  actions: { argTypesRegex: '^on[A-Z].*' },
+  viewport: {
+    viewports,
+    defaultViewport: 'default'
+  }
 }
