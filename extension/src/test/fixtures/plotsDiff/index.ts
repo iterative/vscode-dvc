@@ -3,14 +3,16 @@ import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import { PlotsOutput } from '../../../cli/reader'
 import {
-  ComparisonRevisionData,
   ComparisonPlots,
+  ComparisonRevisionData,
   DEFAULT_SECTION_NAMES,
+  TemplatePlotSection,
   PlotSize,
   PlotsType,
   Section,
+  TemplatePlotGroup,
   TemplatePlotsData,
-  VegaPlots
+  TemplatePlots
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { getWorkspaceColor } from '../../../experiments/model/colors'
@@ -384,8 +386,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_acc.png')
+      revisions: ['4fb124a'],
+      url: joinFunc(baseUrl, '4fb124a_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -394,8 +396,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['4fb124a'],
-      url: joinFunc(baseUrl, '4fb124a_plots_acc.png')
+      revisions: ['1ba7bcd'],
+      url: joinFunc(baseUrl, '1ba7bcd_plots_acc.png')
     }
   ],
   [join('plots', 'heatmap.png')]: [
@@ -411,8 +413,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
+      revisions: ['4fb124a'],
+      url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -421,8 +423,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['4fb124a'],
-      url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
+      revisions: ['1ba7bcd'],
+      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
     }
   ],
   [join('plots', 'loss.png')]: [
@@ -438,8 +440,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
+      revisions: ['4fb124a'],
+      url: joinFunc(baseUrl, '4fb124a_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -448,8 +450,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['4fb124a'],
-      url: joinFunc(baseUrl, '4fb124a_plots_loss.png')
+      revisions: ['1ba7bcd'],
+      url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
     }
   ]
 })
@@ -467,57 +469,68 @@ export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
 
 const expectedRevisions = ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd']
 
-const extendedSpecs = (plotsOutput: VegaPlots): VegaPlots => {
-  const acc: VegaPlots = {}
+const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
+  const singleViewPlots: TemplatePlotSection = {
+    group: TemplatePlotGroup.SINGLE_VIEW,
+    entries: []
+  }
+  const multiViewPlots: TemplatePlotSection = {
+    group: TemplatePlotGroup.MULTI_VIEW,
+    entries: []
+  }
 
-  Object.entries(plotsOutput).forEach(([id, plots]) => {
-    acc[id] = plots.map(plot => ({
-      content: extendVegaSpec(
-        {
-          ...plot.content,
-          data: {
-            values:
-              (plot.content.data as { values: { rev: string }[] }).values.sort(
-                function ({ rev: a }, { rev: b }) {
+  for (const [path, plots] of Object.entries(plotsOutput)) {
+    for (const originalPlot of plots) {
+      const plot = {
+        content: extendVegaSpec(
+          {
+            ...originalPlot.content,
+            data: {
+              values:
+                (
+                  originalPlot.content.data as { values: { rev: string }[] }
+                ).values.sort(function ({ rev: a }, { rev: b }) {
                   return (
                     expectedRevisions.indexOf(a) - expectedRevisions.indexOf(b)
                   )
-                }
-              ) || []
+                }) || []
+            }
+          } as TopLevelSpec,
+          {
+            domain: expectedRevisions,
+            range: [
+              getWorkspaceColor(),
+              '#13adc7',
+              '#f14c4c',
+              '#3794ff',
+              '#cca700'
+            ]
           }
-        } as TopLevelSpec,
-        {
-          domain: expectedRevisions,
-          range: [
-            getWorkspaceColor(),
-            '#13adc7',
-            '#f14c4c',
-            '#3794ff',
-            '#cca700'
-          ]
-        }
-      ) as VisualizationSpec,
-      multiView: isMultiViewPlot(plot.content as TopLevelSpec),
-      revisions: expectedRevisions,
-      type: PlotsType.VEGA
-    }))
-  })
+        ) as VisualizationSpec,
+        id: path,
+        multiView: isMultiViewPlot(originalPlot.content as TopLevelSpec),
+        revisions: expectedRevisions,
+        type: PlotsType.VEGA
+      }
+      if (plot.multiView) {
+        multiViewPlots.entries.push(plot)
+        continue
+      }
+      singleViewPlots.entries.push(plot)
+    }
+  }
 
-  return acc
+  return [singleViewPlots, multiViewPlots]
 }
 
 export const getMinimalWebviewMessage = () => ({
-  plots: {
-    ...basicVega
-  },
+  plots: extendedSpecs(basicVega),
   sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
-  plots: {
-    ...extendedSpecs({ ...basicVega, ...require('./vega').default })
-  },
+  plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
   sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })

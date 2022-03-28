@@ -19,7 +19,7 @@ import {
 import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
 import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { App } from './App'
-import { useIsFullyContained } from './OverflowHoverTooltip/useIsFullyContained'
+import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
@@ -34,7 +34,7 @@ import {
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
-jest.mock('./OverflowHoverTooltip/useIsFullyContained', () => ({
+jest.mock('./overflowHoverTooltip/useIsFullyContained', () => ({
   useIsFullyContained: jest.fn()
 }))
 const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)

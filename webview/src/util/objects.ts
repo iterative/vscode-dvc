@@ -1,18 +1,8 @@
-export type Items = { [key: string]: unknown }[]
-
-export const reorderObjectList = (
-  order: string[],
-  items: Items,
-  compareKey: string
-) => {
-  return order
-    .map(orderedItem => items.find(item => item[compareKey] === orderedItem))
-    .filter(Boolean)
-}
+import { reorderObjectList } from 'dvc/src/util/array'
 
 export const performOrderedUpdate = (
   order: string[],
-  items: Items,
+  items: { [key: string]: unknown }[],
   key: string
 ): string[] => {
   const current = reorderObjectList(order, items, key)

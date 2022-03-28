@@ -78,6 +78,10 @@ $gap: 20px;
   gap: $gap;
   grid-auto-flow: row;
 
+  + .singleViewPlotsGrid, + .multiViewPlotsGrid {
+    margin-top: $gap;
+  }
+
   .largePlots & {
     grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
   }
@@ -144,7 +148,6 @@ $gap: 20px;
 }
 
 .multiViewPlotsGrid {
-  margin-top: $gap;
   width: max-content;
   padding-right: $gap;
 }
@@ -183,19 +186,19 @@ $gap: 20px;
 }
 
 .plot.multiViewPlot {
-  aspect-ratio: var(--scale);
+  aspect-ratio: calc(0.8 * var(--scale) + 0.2);
   grid-column: span var(--scale);
 
   .largePlots & {
-    min-width: calc(500px * var(--scale));
+    width: max-content;
   }
   
   .regularPlots & {
-    min-width: calc(400px * var(--scale));
+    width: calc(300px * var(--scale));
   }
   
   .smallPlots & {
-    min-width: calc(300px * var(--scale));
+    width: calc(200px * var(--scale));
   }
 }
 
@@ -261,6 +264,30 @@ $gap: 20px;
     .largePlots & {
       width: 100%;
       padding-right: 0;
+    }
+  }
+}
+
+.dropSection{
+  height: 10px;
+}
+
+.dropSectionMaximized {
+  height: auto;
+  opacity: 0.5;
+  border: 3px dashed var(--vscode-focusBorder);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .dropIcon {
+    border-radius: 100%;
+    border: 3px solid var(--vscode-focusBorder);
+    padding: 20px;
+    box-sizing: content-box;
+
+    path {
+      fill: var(--vscode-focusBorder)
     }
   }
 }

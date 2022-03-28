@@ -9,7 +9,7 @@ import { MetricsPicker } from './MetricsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { SectionRenamer } from './SectionRenamer'
-import { AllIcons, Icon } from '../../shared/components/icon/Icon'
+import { AllIcons, Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import {
   CollapsibleSectionsActions,
@@ -131,11 +131,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           )}
         </summary>
         <div className={styles.centered}>
-          {open && (
+          {
             <div className={sizeClass} data-testid="plots-wrapper">
               {children}
             </div>
-          )}
+          }
         </div>
       </details>
       <div className={styles.iconMenu}>

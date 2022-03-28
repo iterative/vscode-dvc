@@ -20,3 +20,12 @@ export const sameContents = (
   array: (null | string | number | undefined)[],
   otherArray: (null | string | number | undefined)[]
 ) => isEqual(array.sort(), otherArray.sort())
+
+export const reorderObjectList = <T extends { [key: string]: unknown }>(
+  order: string[],
+  items: T[],
+  compareKey: string
+): T[] =>
+  order
+    .map(orderedItem => items.find(item => item[compareKey] === orderedItem))
+    .filter(Boolean) as T[]

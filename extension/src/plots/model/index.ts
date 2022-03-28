@@ -1,33 +1,34 @@
 import { Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
-import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import {
   collectCheckpointPlotsData,
   collectData,
+  collectMetricOrder,
+  collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
   RevisionData
 } from './collect'
 import {
   CheckpointPlotData,
-  ComparisonRevisionData,
   ComparisonPlots,
+  ComparisonRevision,
+  ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   PlotSize,
-  PlotsType,
   Section,
-  SectionCollapsed,
-  VegaPlots
+  SectionCollapsed
 } from '../../plots/webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
-import { extendVegaSpec, getColorScale, isMultiViewPlot } from '../vega/util'
-import { definedAndNonEmpty } from '../../util/array'
+import { getColorScale } from '../vega/util'
+import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
+import { TemplateOrder } from '../paths/collect'
 
 export class PlotsModel {
   public readonly dispose = Disposable.fn()
@@ -39,16 +40,20 @@ export class PlotsModel {
   private readonly experiments: Experiments
   private readonly workspaceState: Memento
 
-  private checkpointPlots?: CheckpointPlotData[]
-  private selectedMetrics?: string[]
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private branchRevisions: Record<string, string> = {}
 
   private comparisonData: ComparisonData = {}
+  private comparisonOrder: string[]
+
   private revisionData: RevisionData = {}
   private templates: Record<string, VisualizationSpec> = {}
+
+  private checkpointPlots?: CheckpointPlotData[]
+  private selectedMetrics?: string[]
+  private metricOrder: string[]
 
   constructor(
     dvcRoot: string,
@@ -59,25 +64,21 @@ export class PlotsModel {
     this.experiments = experiments
     this.workspaceState = workspaceState
 
-    this.selectedMetrics = workspaceState.get(
-      MementoPrefix.PLOT_SELECTED_METRICS + dvcRoot,
-      undefined
-    )
+    const {
+      plotSizes,
+      sectionCollapsed,
+      sectionNames,
+      comparisonOrder,
+      selectedMetrics,
+      metricOrder
+    } = this.revive(dvcRoot, workspaceState)
 
-    this.plotSizes = workspaceState.get(
-      MementoPrefix.PLOT_SIZES + dvcRoot,
-      DEFAULT_SECTION_SIZES
-    )
-
-    this.sectionCollapsed = workspaceState.get(
-      MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
-      DEFAULT_SECTION_COLLAPSED
-    )
-
-    this.sectionNames = workspaceState.get(
-      MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
-      DEFAULT_SECTION_NAMES
-    )
+    this.plotSizes = plotSizes
+    this.sectionCollapsed = sectionCollapsed
+    this.sectionNames = sectionNames
+    this.comparisonOrder = comparisonOrder
+    this.selectedMetrics = selectedMetrics
+    this.metricOrder = metricOrder
   }
 
   public isReady() {
@@ -88,6 +89,8 @@ export class PlotsModel {
     const checkpointPlots = collectCheckpointPlotsData(data)
 
     this.checkpointPlots = checkpointPlots
+
+    this.setMetricOrder()
 
     return this.removeStaleData()
   }
@@ -101,6 +104,8 @@ export class PlotsModel {
     this.comparisonData = { ...this.comparisonData, ...comparisonData }
     this.revisionData = { ...this.revisionData, ...revisionData }
     this.templates = { ...this.templates, ...templates }
+
+    this.setComparisonOrder()
 
     this.deferred.resolve()
   }
@@ -151,13 +156,20 @@ export class PlotsModel {
   }
 
   public getSelectedRevisionDetails() {
-    return this.experiments
-      .getSelectedRevisions()
-      .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
+    return reorderObjectList<ComparisonRevision>(
+      this.comparisonOrder,
+      this.experiments
+        .getSelectedRevisions()
+        .map(({ label: revision, displayColor }) => ({
+          displayColor,
+          revision
+        })),
+      'revision'
+    )
   }
 
-  public getTemplatePlots(paths: string[] | undefined) {
-    if (!paths) {
+  public getTemplatePlots(order: TemplateOrder | undefined) {
+    if (!definedAndNonEmpty(order)) {
       return
     }
 
@@ -167,7 +179,7 @@ export class PlotsModel {
       return
     }
 
-    return this.getSelectedTemplatePlots(paths, selectedRevisions)
+    return this.getSelectedTemplatePlots(order, selectedRevisions)
   }
 
   public getComparisonPlots(paths: string[] | undefined) {
@@ -183,13 +195,39 @@ export class PlotsModel {
     return this.getSelectedComparisonPlots(paths, selectedRevisions)
   }
 
+  public setComparisonOrder(revisions: string[] = this.comparisonOrder) {
+    const currentRevisions = this.getSelectedRevisions()
+
+    this.comparisonOrder = revisions.filter(revision =>
+      currentRevisions.includes(revision)
+    )
+
+    currentRevisions.map(revision => {
+      if (!this.comparisonOrder.includes(revision)) {
+        this.comparisonOrder.push(revision)
+      }
+    })
+
+    this.persistComparisonOrder()
+  }
+
   public setSelectedMetrics(selectedMetrics: string[]) {
     this.selectedMetrics = selectedMetrics
+    this.setMetricOrder()
     this.persistSelectedMetrics()
   }
 
   public getSelectedMetrics() {
     return this.selectedMetrics
+  }
+
+  public setMetricOrder(metricOrder?: string[]) {
+    this.metricOrder = collectMetricOrder(
+      this.checkpointPlots,
+      metricOrder || this.metricOrder,
+      this.selectedMetrics
+    )
+    this.persistMetricOrder()
   }
 
   public setPlotSize(section: Section, size: PlotSize) {
@@ -262,15 +300,19 @@ export class PlotsModel {
     checkpointPlots: CheckpointPlotData[],
     selectedExperiments: string[]
   ) {
-    return checkpointPlots.map(plot => {
-      const { title, values } = plot
-      return {
-        title,
-        values: values.filter(value =>
-          selectedExperiments.includes(value.group)
-        )
-      }
-    })
+    return reorderObjectList<CheckpointPlotData>(
+      this.metricOrder,
+      checkpointPlots.map(plot => {
+        const { title, values } = plot
+        return {
+          title,
+          values: values.filter(value =>
+            selectedExperiments.includes(value.group)
+          )
+        }
+      }),
+      'title'
+    )
   }
 
   private getSelectedComparisonPlots(
@@ -307,41 +349,29 @@ export class PlotsModel {
   }
 
   private getSelectedTemplatePlots(
-    paths: string[],
+    order: TemplateOrder,
     selectedRevisions: string[]
   ) {
-    const acc: VegaPlots = {}
-    for (const path of paths) {
-      const template = this.templates[path]
-
-      if (template) {
-        acc[path] = [
-          {
-            content: extendVegaSpec(
-              {
-                ...template,
-                data: {
-                  values: selectedRevisions
-                    .flatMap(revision => this.revisionData?.[revision]?.[path])
-                    .filter(Boolean)
-                }
-              } as TopLevelSpec,
-              this.getRevisionColors()
-            ),
-            multiView: isMultiViewPlot(template as TopLevelSpec),
-            revisions: selectedRevisions,
-            type: PlotsType.VEGA
-          }
-        ]
-      }
-    }
-    return acc
+    return collectSelectedTemplatePlots(
+      order,
+      selectedRevisions,
+      this.templates,
+      this.revisionData,
+      this.getRevisionColors()
+    )
   }
 
   private persistSelectedMetrics() {
-    return this.workspaceState.update(
+    this.workspaceState.update(
       MementoPrefix.PLOT_SELECTED_METRICS + this.dvcRoot,
       this.getSelectedMetrics()
+    )
+  }
+
+  private persistMetricOrder() {
+    this.workspaceState.update(
+      MementoPrefix.PLOT_METRIC_ORDER + this.dvcRoot,
+      this.metricOrder
     )
   }
 
@@ -364,5 +394,41 @@ export class PlotsModel {
       MementoPrefix.PLOT_SECTION_NAMES + this.dvcRoot,
       this.sectionNames
     )
+  }
+
+  private persistComparisonOrder() {
+    this.workspaceState.update(
+      MementoPrefix.PLOT_COMPARISON_ORDER + this.dvcRoot,
+      this.comparisonOrder
+    )
+  }
+
+  private revive(dvcRoot: string, workspaceState: Memento) {
+    return {
+      comparisonOrder: workspaceState.get(
+        MementoPrefix.PLOT_COMPARISON_ORDER + dvcRoot,
+        []
+      ),
+      metricOrder: workspaceState.get(
+        MementoPrefix.PLOT_METRIC_ORDER + dvcRoot,
+        []
+      ),
+      plotSizes: workspaceState.get(
+        MementoPrefix.PLOT_SIZES + dvcRoot,
+        DEFAULT_SECTION_SIZES
+      ),
+      sectionCollapsed: workspaceState.get(
+        MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
+        DEFAULT_SECTION_COLLAPSED
+      ),
+      sectionNames: workspaceState.get(
+        MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
+        DEFAULT_SECTION_NAMES
+      ),
+      selectedMetrics: workspaceState.get(
+        MementoPrefix.PLOT_SELECTED_METRICS + dvcRoot,
+        undefined
+      )
+    }
   }
 }

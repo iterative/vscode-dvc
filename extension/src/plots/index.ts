@@ -99,6 +99,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public togglePathStatus(path: string) {
     const status = this.paths?.toggleStatus(path)
+    this.paths?.setTemplateOrder()
     this.notifyChanged()
     return status
   }
@@ -142,7 +143,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private getTemplatePlots() {
-    const paths = this.paths?.getTemplatePaths()
+    const paths = this.paths?.getTemplateOrder()
     const plots = this.plots?.getTemplatePlots(paths)
 
     if (!this.plots || !plots || isEmpty(plots)) {
@@ -202,32 +203,27 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
           case MessageFromWebviewType.METRIC_TOGGLED:
-            return (
-              message.payload && this.plots?.setSelectedMetrics(message.payload)
-            )
+            return this.plots?.setSelectedMetrics(message.payload)
           case MessageFromWebviewType.PLOTS_RESIZED:
-            return (
-              message.payload &&
-              this.plots?.setPlotSize(
-                message.payload.section,
-                message.payload.size
-              )
+            return this.plots?.setPlotSize(
+              message.payload.section,
+              message.payload.size
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
-            return (
-              message.payload &&
-              this.plots?.setSectionCollapsed(message.payload)
-            )
+            return this.plots?.setSectionCollapsed(message.payload)
           case MessageFromWebviewType.SECTION_RENAMED:
-            return (
-              message.payload &&
-              this.plots?.setSectionName(
-                message.payload.section,
-                message.payload.name
-              )
+            return this.plots?.setSectionName(
+              message.payload.section,
+              message.payload.name
             )
+          case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
+            return this.plots?.setComparisonOrder(message.payload)
+          case MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED:
+            return this.paths?.setTemplateOrder(message.payload)
+          case MessageFromWebviewType.PLOTS_METRICS_REORDERED:
+            return this.plots?.setMetricOrder(message.payload)
           default:
-            Logger.error(`Unexpected message: ${message}`)
+            Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
       })
     )
@@ -252,6 +248,8 @@ export class Plots extends BaseRepository<TPlotsData> {
         if (data) {
           await this.plots?.transformAndSetExperiments(data)
         }
+
+        this.plots?.setComparisonOrder()
 
         this.sendPlots()
       })

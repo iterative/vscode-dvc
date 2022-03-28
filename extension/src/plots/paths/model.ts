@@ -1,6 +1,12 @@
 import { Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
-import { collectPaths, PathType, PlotPath } from './collect'
+import {
+  collectPaths,
+  collectTemplateOrder,
+  PathType,
+  PlotPath,
+  TemplateOrder
+} from './collect'
 import { PlotsOutput } from '../../cli/reader'
 import { PathSelectionModel } from '../../path/selection/model'
 import { MementoPrefix } from '../../vscode/memento'
@@ -10,8 +16,15 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
+  private templateOrder: TemplateOrder
+
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState, MementoPrefix.PLOT_PATH_STATUS, getPathArray)
+
+    this.templateOrder = this.workspaceState.get(
+      MementoPrefix.PLOT_TEMPLATE_ORDER + this.dvcRoot,
+      []
+    )
   }
 
   public transformAndSet(data: PlotsOutput) {
@@ -21,11 +34,23 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
     this.data = paths
 
+    this.setTemplateOrder()
+
     this.deferred.resolve()
   }
 
   public isReady() {
     return this.initialized
+  }
+
+  public setTemplateOrder(templateOrder?: TemplateOrder) {
+    this.templateOrder = collectTemplateOrder(
+      this.getPathsByType(PathType.TEMPLATE_SINGLE),
+      this.getPathsByType(PathType.TEMPLATE_MULTI),
+      templateOrder || this.templateOrder
+    )
+
+    this.persistTemplateOrder()
   }
 
   public filterChildren(path: string | undefined): PlotPath[] {
@@ -37,8 +62,8 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     })
   }
 
-  public getTemplatePaths() {
-    return this.getPathsByType(PathType.TEMPLATE)
+  public getTemplateOrder(): TemplateOrder {
+    return this.templateOrder
   }
 
   public getComparisonPaths() {
@@ -51,5 +76,12 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
         plotPath => plotPath.type?.has(type) && this.status[plotPath.path]
       )
       .map(({ path }) => path)
+  }
+
+  private persistTemplateOrder() {
+    this.workspaceState.update(
+      MementoPrefix.PLOT_TEMPLATE_ORDER + this.dvcRoot,
+      this.templateOrder
+    )
   }
 }

@@ -9,11 +9,13 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import {
-  DEFAULT_SECTION_COLLAPSED,
   CheckpointPlotsColors,
+  DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSize,
-  Section
+  Section,
+  TemplatePlotGroup,
+  TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -21,8 +23,9 @@ import {
 } from 'dvc/src/webview/contract'
 import { App } from './App'
 import { Plots } from './Plots'
+import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { vsCodeApi } from '../../shared/api'
-import { dragAndDrop } from '../../test/dragDrop'
+import { createBubbledEvent, dragAndDrop } from '../../test/dragDrop'
 
 jest.mock('../../shared/api')
 
@@ -62,6 +65,24 @@ describe('App', () => {
     render(<App />)
     sendSetDataMessage(data)
   }
+
+  const templatePlot = templatePlotsFixture.plots[0].entries[0]
+  const complexTemplatePlotsFixture = {
+    ...templatePlotsFixture,
+    plots: [
+      {
+        entries: [
+          ...templatePlotsFixture.plots[0].entries,
+          { ...templatePlot, id: join('other', 'plot.tsv') }
+        ],
+        group: TemplatePlotGroup.SINGLE_VIEW
+      },
+      {
+        entries: [{ ...templatePlot, id: join('other', 'multiview.tsv') }],
+        group: TemplatePlotGroup.MULTI_VIEW
+      }
+    ]
+  } as TemplatePlotsData
 
   it('should send the initialized message on first render', () => {
     render(<App />)
@@ -183,17 +204,19 @@ describe('App', () => {
     })
 
     const summaryElement = await screen.findByText('Experiment Checkpoints')
-    const [plot] = await screen.findAllByLabelText('Vega visualization')
-    expect(plot).toBeInTheDocument()
+    const visiblePlots = await screen.findAllByLabelText('Vega visualization')
+    visiblePlots.map(visiblePlot => {
+      expect(visiblePlot).toBeInTheDocument()
+      expect(visiblePlot).toBeVisible()
+    })
 
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
     })
 
-    expect(
-      screen.queryByLabelText('Vega visualization')
-    ).not.toBeInTheDocument()
+    const hiddenPlots = await screen.findAllByLabelText('Vega visualization')
+    hiddenPlots.map(hiddenPlot => expect(hiddenPlot).not.toBeVisible())
     expect(mockPostMessage).toBeCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
@@ -226,7 +249,9 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await screen.findByText('loss')
+    const lossItem = await screen.findByText('summary.json:loss', {
+      ignore: 'text'
+    })
 
     fireEvent.click(lossItem, {
       bubbles: true,
@@ -256,7 +281,7 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await screen.findByText('loss')
+    const lossItem = await screen.findByText('summary.json:loss')
 
     fireEvent.click(lossItem, {
       bubbles: true,
@@ -264,7 +289,11 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: ['accuracy', 'val_loss', 'val_accuracy'],
+      payload: [
+        'summary.json:accuracy',
+        'summary.json:val_loss',
+        'summary.json:val_accuracy'
+      ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
 
@@ -274,7 +303,12 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: ['loss', 'accuracy', 'val_loss', 'val_accuracy'],
+      payload: [
+        'summary.json:loss',
+        'summary.json:accuracy',
+        'summary.json:val_loss',
+        'summary.json:val_accuracy'
+      ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
   })
@@ -438,6 +472,41 @@ describe('App', () => {
     ])
   })
 
+  it('should send a message to the extension when the checkpoint plots are reordered', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    const plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy'
+    ])
+
+    mockPostMessage.mockClear()
+
+    dragAndDrop(plots[2], plots[0])
+
+    const expectedOrder = [
+      'summary.json:val_loss',
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_accuracy'
+    ]
+
+    expect(mockPostMessage).toBeCalledTimes(1)
+    expect(mockPostMessage).toBeCalledWith({
+      payload: expectedOrder,
+      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+    })
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual(expectedOrder)
+  })
+
   it('should remove the checkpoint plot from the order if it is removed from the plots', () => {
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
@@ -500,7 +569,7 @@ describe('App', () => {
     })
 
     const checkpointPlots = screen.getAllByTestId(/summary\.json/)
-    const templatePlots = screen.getAllByTestId(/^plot-/)
+    const templatePlots = screen.getAllByTestId(/^plot_/)
 
     dragAndDrop(templatePlots[0], checkpointPlots[2])
 
@@ -512,34 +581,201 @@ describe('App', () => {
     ])
   })
 
-  it('should display the template plots in the order stored', () => {
+  it('should reorder template plots and send a message to the extension on drop', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-      template: {
-        ...templatePlotsFixture,
-        plots: {
-          ...templatePlotsFixture.plots,
-          [join('other', 'plot.tsv')]: [
-            ...templatePlotsFixture.plots[join('logs', 'loss.tsv')]
-          ]
-        }
-      }
+      template: complexTemplatePlotsFixture
     })
 
-    let plots = screen.getAllByTestId(/^plot-/)
+    let plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('plot-logs', 'loss.tsv-0'),
-      join('plot-other', 'plot.tsv-0')
+      join('logs', 'loss.tsv'),
+      join('other', 'plot.tsv'),
+      join('other', 'multiview.tsv')
     ])
 
+    mockPostMessage.mockClear()
     dragAndDrop(plots[1], plots[0])
 
-    plots = screen.getAllByTestId(/^plot-/)
+    plots = screen.getAllByTestId(/^plot_/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('plot-other', 'plot.tsv-0'),
-      join('plot-logs', 'loss.tsv-0')
+      join('other', 'plot.tsv'),
+      join('logs', 'loss.tsv'),
+      join('other', 'multiview.tsv')
     ])
+    expect(mockPostMessage).toBeCalledTimes(1)
+    expect(mockPostMessage).toBeCalledWith({
+      payload: [
+        {
+          group: TemplatePlotGroup.SINGLE_VIEW,
+          paths: [join('other', 'plot.tsv'), join('logs', 'loss.tsv')]
+        },
+        {
+          group: TemplatePlotGroup.MULTI_VIEW,
+          paths: [join('other', 'multiview.tsv')]
+        }
+      ],
+      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+    })
+  })
+
+  it('should render two template plot sections', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'template-single_0',
+      'template-multi_1'
+    ])
+  })
+
+  it('should create a new section above the others if the template plot type is different than the first section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+    const multiViewPlot = screen.getByTestId(
+      join('plot_other', 'multiview.tsv')
+    )
+
+    dragAndDrop(multiViewPlot, topSection)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'template-multi_0',
+      'template-single_1'
+    ])
+  })
+
+  it('should not create a new section above the others by dragging a template plot from the same type as the first section above it', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+    dragAndDrop(aSingleViewPlot, topSection)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'template-single_0',
+      'template-multi_1'
+    ])
+  })
+
+  it('should create a new section below the others if the template plot type is different than the last section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+    dragAndDrop(aSingleViewPlot, bottomSection)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'template-single_0',
+      'template-multi_1',
+      'template-single_2'
+    ])
+  })
+
+  it('should not create a new section below the others by dragging a template plot from the same type as the last section below it', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+    const multiViewPlot = screen.getByTestId(
+      join('plot_other', 'multiview.tsv')
+    )
+
+    dragAndDrop(multiViewPlot, bottomSection)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'template-single_0',
+      'template-multi_1'
+    ])
+  })
+
+  it('should move a template plot from one type in another section of the same type', async () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+    dragAndDrop(aSingleViewPlot, bottomSection)
+
+    await screen.findByTestId('plots-section_template-single_2')
+    const anotherSingleViewPlot = screen.getByTestId(
+      join('plot_logs', 'loss.tsv')
+    )
+    const movedSingleViewPlot = screen.getByTestId(
+      join('plot_other', 'plot.tsv')
+    )
+
+    dragAndDrop(anotherSingleViewPlot, movedSingleViewPlot)
+
+    const sections = screen.getAllByTestId(/^plots-section_/)
+    expect(sections.map(section => section.id)).toStrictEqual([
+      'template-multi_0',
+      'template-single_1'
+    ])
+  })
+
+  it('should show a drop zone when hovering a new section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+    const multiViewPlot = screen.getByTestId(
+      join('plot_other', 'multiview.tsv')
+    )
+    let topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+    expect(topDropIcon).not.toBeInTheDocument()
+
+    multiViewPlot.dispatchEvent(createBubbledEvent('dragstart'))
+    topSection.dispatchEvent(createBubbledEvent('dragenter'))
+
+    topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+    expect(topDropIcon).toBeInTheDocument()
+  })
+
+  it('should prevent default behaviour when dragging over a new section', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+
+    const dragOverEvent = createBubbledEvent('dragover', {
+      preventDefault: jest.fn()
+    })
+
+    topSection.dispatchEvent(dragOverEvent)
+
+    expect(dragOverEvent.preventDefault).toHaveBeenCalled()
   })
 })

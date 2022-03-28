@@ -15,15 +15,19 @@ import {
   bypassProcessManagerDebounce,
   closeAllEditors,
   getFirstArgOfLastCall,
-  getMockNow
+  getMockNow,
+  getMessageReceivedEmitter
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
   DEFAULT_SECTION_COLLAPSED,
-  PlotsData as TPlotsData
+  PlotsData as TPlotsData,
+  PlotSize,
+  Section
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
+import { MessageFromWebviewType } from '../../../webview/contract'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -144,6 +148,112 @@ suite('Plots Test Suite', () => {
         join(dvcDemoPath, TEMP_PLOTS_DIR)
       )
     })
+
+    it('should be able to handle all of the messages that can be sent from the webview', async () => {
+      const { plots, plotsModel } = await buildPlots(disposable)
+
+      const webview = await plots.showWebview()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockSelectedMetrics = ['some', 'selected', 'metrics']
+      const mockSetSelectedMetrics = stub(
+        plotsModel,
+        'setSelectedMetrics'
+      ).returns(undefined)
+
+      mockMessageReceived.fire({
+        payload: mockSelectedMetrics,
+        type: MessageFromWebviewType.METRIC_TOGGLED
+      })
+
+      expect(mockSetSelectedMetrics).to.be.calledOnce
+      expect(
+        mockSetSelectedMetrics,
+        'should correctly handle a metric toggled message'
+      ).to.be.calledWithExactly(mockSelectedMetrics)
+
+      const mockSetPlotSize = stub(plotsModel, 'setPlotSize').returns(undefined)
+
+      mockMessageReceived.fire({
+        payload: { section: Section.TEMPLATE_PLOTS, size: PlotSize.SMALL },
+        type: MessageFromWebviewType.PLOTS_RESIZED
+      })
+
+      expect(mockSetPlotSize).to.be.calledOnce
+      expect(
+        mockSetPlotSize,
+        'should correctly handle a section resized message'
+      ).to.be.calledWithExactly(Section.TEMPLATE_PLOTS, PlotSize.SMALL)
+
+      const mockSetSectionCollapsed = stub(
+        plotsModel,
+        'setSectionCollapsed'
+      ).returns(undefined)
+
+      mockMessageReceived.fire({
+        payload: DEFAULT_SECTION_COLLAPSED,
+        type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
+      })
+
+      expect(mockSetSectionCollapsed).to.be.calledOnce
+      expect(
+        mockSetSectionCollapsed,
+        'should correctly handle a section collapsed message'
+      ).to.be.calledWithExactly(DEFAULT_SECTION_COLLAPSED)
+
+      const mockSetSectionName = stub(plotsModel, 'setSectionName').returns(
+        undefined
+      )
+
+      const mockName = 'some cool section name'
+
+      mockMessageReceived.fire({
+        payload: { name: mockName, section: Section.TEMPLATE_PLOTS },
+        type: MessageFromWebviewType.SECTION_RENAMED
+      })
+
+      expect(mockSetSectionName).to.be.calledOnce
+      expect(
+        mockSetSectionName,
+        'should correctly handle a section rename message'
+      ).to.be.calledWithExactly(Section.TEMPLATE_PLOTS, mockName)
+
+      const mockSetComparisonOrder = stub(
+        plotsModel,
+        'setComparisonOrder'
+      ).returns(undefined)
+
+      const mockComparisonOrder = ['a', 'different', 'order']
+
+      mockMessageReceived.fire({
+        payload: mockComparisonOrder,
+        type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+      })
+
+      expect(mockSetComparisonOrder).to.be.calledOnce
+      expect(
+        mockSetComparisonOrder,
+        'should correctly handle a comparison revision reorder'
+      ).to.be.calledWithExactly(mockComparisonOrder)
+
+      const mockSetMetricOrder = stub(plotsModel, 'setMetricOrder').returns(
+        undefined
+      )
+
+      const mockMetricOrder = ['different', 'metric', 'order']
+
+      mockMessageReceived.fire({
+        payload: mockMetricOrder,
+        type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+      })
+
+      expect(mockSetMetricOrder).to.be.calledOnce
+      expect(
+        mockSetMetricOrder,
+        'should correctly handle a metric reorder'
+      ).to.be.calledWithExactly(mockMetricOrder)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('showWebview', () => {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
-import { Icon, IconValues } from '../icon/Icon'
+import { Icon, IconValues } from '../Icon'
 import Tooltip from '../tooltip/Tooltip'
 
 export interface IconMenuItemProps {

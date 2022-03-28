@@ -62,8 +62,11 @@ encouraged to try other DVC repositories- especially real-world cases!
 - It is recommended that you create the project's virtual environment with
   Python 3.8 as some dependencies are not yet available for Python 3.9
 
+- `yarn install` is a prerequisite for automatically setting up the demo
+  project.
+
 - Run `yarn setup:venv` from the monorepo root (not `./demo`) to automatically
-  setup the Python virtual environment in the demo project
+  setup the Python virtual environment in the demo project.
 
 - Once the environment has been setup you should navigate into the demo folder
   activate the virtual environment and run `dvc pull`.

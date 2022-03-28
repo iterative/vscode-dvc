@@ -1,11 +1,13 @@
-import { isImagePlot } from '../webview/contract'
+import { isImagePlot, Plot, TemplatePlotGroup } from '../webview/contract'
 import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { definedAndNonEmpty } from '../../util/array'
+import { isMultiViewPlot } from '../vega/util'
 
 export enum PathType {
   COMPARISON = 'comparison',
-  TEMPLATE = 'template'
+  TEMPLATE_MULTI = 'template-multi',
+  TEMPLATE_SINGLE = 'template-single'
 }
 
 export type PlotPath = {
@@ -13,6 +15,23 @@ export type PlotPath = {
   type?: Set<PathType>
   parentPath: string | undefined
   hasChildren: boolean
+}
+
+const collectType = (plots: Plot[]) => {
+  const type = new Set<PathType>()
+
+  for (const plot of plots) {
+    if (isImagePlot(plot)) {
+      type.add(PathType.COMPARISON)
+      continue
+    }
+
+    isMultiViewPlot(plot.content)
+      ? type.add(PathType.TEMPLATE_MULTI)
+      : type.add(PathType.TEMPLATE_SINGLE)
+  }
+
+  return type
 }
 
 const getType = (
@@ -29,17 +48,7 @@ const getType = (
     return
   }
 
-  const type = new Set<PathType>()
-
-  for (const plot of plots) {
-    if (isImagePlot(plot)) {
-      type.add(PathType.COMPARISON)
-      continue
-    }
-    type.add(PathType.TEMPLATE)
-  }
-
-  return type
+  return collectType(plots)
 }
 
 type PathAccumulator = {
@@ -90,4 +99,138 @@ export const collectPaths = (data: PlotsOutput): PlotPath[] => {
   }
 
   return acc.plotPaths
+}
+
+export type TemplateOrder = { paths: string[]; group: TemplatePlotGroup }[]
+
+type RemainingPathAccumulator = {
+  remainingSingleView: string[]
+  remainingMultiView: string[]
+}
+
+const collectFromRemaining = (
+  remainingPaths: RemainingPathAccumulator,
+  paths: string[],
+  remainingType: 'remainingSingleView' | 'remainingMultiView'
+): string[] => {
+  const acc: string[] = []
+  for (const path of paths) {
+    if (remainingPaths[remainingType].includes(path)) {
+      remainingPaths[remainingType] = remainingPaths[remainingType].filter(
+        remainingPath => remainingPath !== path
+      )
+      acc.push(path)
+    }
+  }
+  return acc
+}
+
+const collectGroupPaths = (
+  acc: RemainingPathAccumulator,
+  group: TemplatePlotGroup,
+  existingPaths: string[]
+): string[] => {
+  if (group === TemplatePlotGroup.MULTI_VIEW) {
+    return collectFromRemaining(acc, existingPaths, 'remainingMultiView')
+  }
+  return collectFromRemaining(acc, existingPaths, 'remainingSingleView')
+}
+
+const collectExistingOrder = (
+  newTemplateOrder: TemplateOrder,
+  singleViewPaths: string[],
+  multiViewPaths: string[],
+  existingTemplateOrder: TemplateOrder
+): RemainingPathAccumulator => {
+  const acc = {
+    remainingMultiView: [...multiViewPaths],
+    remainingSingleView: [...singleViewPaths]
+  }
+  for (const templateGroup of existingTemplateOrder) {
+    const { group, paths: existingPaths } = templateGroup
+    if (!definedAndNonEmpty(existingPaths)) {
+      continue
+    }
+
+    const paths = collectGroupPaths(acc, group, existingPaths)
+    if (!definedAndNonEmpty(paths)) {
+      continue
+    }
+    newTemplateOrder.push({ group, paths })
+  }
+  return acc
+}
+
+const collectUnordered = (
+  newTemplateOrder: TemplateOrder,
+  remaining: string[],
+  group: TemplatePlotGroup
+) => {
+  if (!definedAndNonEmpty(remaining)) {
+    return
+  }
+
+  if (definedAndNonEmpty(newTemplateOrder)) {
+    const [lastTemplateGroup] = newTemplateOrder.slice(-1)
+    const { group: lastGroup, paths } = lastTemplateGroup
+
+    if (group === lastGroup) {
+      paths.push(...remaining)
+      newTemplateOrder[newTemplateOrder.length - 1] = {
+        group,
+        paths
+      }
+      return
+    }
+  }
+
+  newTemplateOrder.push({
+    group,
+    paths: remaining
+  })
+}
+
+const mergeAdjacentMatching = (newTemplateOrder: TemplateOrder) => {
+  const mergedTemplateOrder: TemplateOrder = []
+  for (const [idx, { paths, group }] of newTemplateOrder.entries()) {
+    const nextGroup = newTemplateOrder[idx + 1]
+    if (nextGroup?.group === group) {
+      nextGroup.paths.unshift(...paths)
+      continue
+    }
+    mergedTemplateOrder.push({ group, paths })
+  }
+  return mergedTemplateOrder
+}
+
+export const collectTemplateOrder = (
+  singleViewPaths: string[],
+  multiViewPaths: string[],
+  existingTemplateOrder: TemplateOrder
+): TemplateOrder => {
+  const newTemplateOrder: TemplateOrder = []
+
+  if (!definedAndNonEmpty([...singleViewPaths, ...multiViewPaths])) {
+    return newTemplateOrder
+  }
+
+  const { remainingSingleView, remainingMultiView } = collectExistingOrder(
+    newTemplateOrder,
+    singleViewPaths,
+    multiViewPaths,
+    existingTemplateOrder
+  )
+
+  collectUnordered(
+    newTemplateOrder,
+    remainingSingleView,
+    TemplatePlotGroup.SINGLE_VIEW
+  )
+  collectUnordered(
+    newTemplateOrder,
+    remainingMultiView,
+    TemplatePlotGroup.MULTI_VIEW
+  )
+
+  return mergeAdjacentMatching(newTemplateOrder)
 }

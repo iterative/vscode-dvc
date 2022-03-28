@@ -5,11 +5,12 @@ import {
   ChevronRight,
   Dots,
   DownArrow,
+  GraphLine,
   Gripper,
   Lines,
   Pencil,
   UpArrow
-} from '../icons'
+} from './icons'
 
 export const AllIcons = {
   CHECK: Check,
@@ -17,6 +18,7 @@ export const AllIcons = {
   CHEVRON_RIGHT: ChevronRight,
   DOTS: Dots,
   DOWN_ARROW: DownArrow,
+  GRAPH_LINE: GraphLine,
   GRIPPER: Gripper,
   LINES: Lines,
   PENCIL: Pencil,

@@ -2,7 +2,9 @@ import {
   ComparisonRevision,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
+import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import {
   ComparisonTableColumn,
@@ -10,16 +12,12 @@ import {
 } from './ComparisonTableHead'
 import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
+import { sendMessage } from '../../../shared/vscode'
 
 export type ComparisonTableProps = Omit<
   PlotsComparisonData,
   'sectionName' | 'size'
 >
-
-type ColumnAccumulator = {
-  filteredColumns: ComparisonRevision[]
-  newColumns: ComparisonRevision[]
-}
 
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   plots,
@@ -36,59 +34,48 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     [revisions]
   )
 
-  const retainOrder = (
-    originalOrder: string[],
-    revisions: ComparisonTableColumn[]
-  ) =>
-    revisions.sort(
-      ({ revision: a }, { revision: b }) =>
-        originalOrder.indexOf(a) - originalOrder.indexOf(b)
-    )
-
-  const splitColumns = (
-    acc: ColumnAccumulator,
-    column: ComparisonRevision,
-    prevColumnKeys: string[]
-  ) => {
-    prevColumnKeys.includes(column.revision)
-      ? acc.filteredColumns.push(column)
-      : acc.newColumns.push(column)
-  }
-
   useEffect(
     () =>
-      setColumns(prevColumns => {
-        const prevColumnKeys = prevColumns.map(col => col.revision)
-
-        const acc: ColumnAccumulator = {
-          filteredColumns: [],
-          newColumns: []
-        }
+      setColumns(() => {
+        const acc: ComparisonRevision[] = []
 
         for (const column of revisions) {
           if (isPinned(column)) {
             continue
           }
-          splitColumns(acc, column, prevColumnKeys)
+          acc.push(column)
         }
 
-        return [
-          getPinnedColumnRevision(),
-          ...retainOrder(prevColumnKeys, acc.filteredColumns),
-          ...acc.newColumns
-        ].filter(Boolean) as ComparisonTableColumn[]
+        return [getPinnedColumnRevision(), ...acc].filter(
+          Boolean
+        ) as ComparisonTableColumn[]
       }),
     [revisions, getPinnedColumnRevision]
   )
 
+  const setColumnsOrder = (order: string[]) => {
+    const newOrder = reorderObjectList<ComparisonRevision>(
+      order,
+      columns,
+      'revision'
+    )
+    setColumns(newOrder)
+    sendMessage({
+      payload: newOrder.map(({ revision }) => revision),
+      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+    })
+  }
+
   const changePinnedColumn = (column: string) => {
     pinnedColumn.current = pinnedColumn.current === column ? '' : column
 
-    setColumns(
-      [
-        getPinnedColumnRevision(),
-        ...columns.filter(column => !isPinned(column))
-      ].filter(Boolean) as ComparisonTableColumn[]
+    setColumnsOrder(
+      (
+        [
+          getPinnedColumnRevision(),
+          ...columns.filter(column => !isPinned(column))
+        ].filter(Boolean) as ComparisonTableColumn[]
+      ).map(({ revision }) => revision)
     )
   }
 
@@ -100,7 +87,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
       <ComparisonTableHead
         columns={columns}
         pinnedColumn={pinnedColumn.current}
-        setColumnsOrder={setColumns}
+        setColumnsOrder={setColumnsOrder}
         setPinnedColumn={changePinnedColumn}
       />
       {plots.map(({ path, revisions: revs }) => (

@@ -4,14 +4,13 @@ import cx from 'classnames'
 import styles from './styles.module.scss'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
-import { reorderObjectList } from '../../../util/objects'
 
 export type ComparisonTableColumn = ComparisonRevision
 
 interface ComparisonTableHeadProps {
   columns: ComparisonTableColumn[]
   pinnedColumn: string
-  setColumnsOrder: (columns: ComparisonTableColumn[]) => void
+  setColumnsOrder: (columns: string[]) => void
   setPinnedColumn: (column: string) => void
 }
 
@@ -21,11 +20,6 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
-  const setOrder = (order: string[]) => {
-    const newOrder = reorderObjectList(order, columns, 'revision')
-    setColumnsOrder(newOrder as ComparisonRevision[])
-  }
-
   const items = columns.map(({ revision, displayColor }) => {
     const isPinned = revision === pinnedColumn
     return (
@@ -52,7 +46,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
       <tr>
         <DragDropContainer
           order={columns.map(col => col.revision)}
-          setOrder={setOrder}
+          setOrder={setColumnsOrder}
           disabledDropIds={[pinnedColumn]}
           items={items}
           group="comparison"

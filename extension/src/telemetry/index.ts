@@ -1,4 +1,4 @@
-import TelemetryReporter from 'vscode-extension-telemetry'
+import TelemetryReporter from '@vscode/extension-telemetry'
 import {
   EXTENSION_ID,
   APPLICATION_INSIGHTS_KEY,

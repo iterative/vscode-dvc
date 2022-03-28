@@ -51,6 +51,60 @@ module.exports = {
         'jest/valid-expect': 'off',
         'no-unused-expressions': 'off'
       }
+    },
+    {
+      files: ['**/*.tsx'],
+      rules: {
+        'unicorn/filename-case': [
+          'error',
+          {
+            cases: {
+              pascalCase: true
+            },
+            ignore: [/.*\.stories.tsx$/, /.*\.test\.tsx$/]
+          }
+        ]
+      }
+    },
+    {
+      files: ['**/util/*.tsx'],
+      rules: {
+        'unicorn/filename-case': 'off'
+      }
+    },
+    {
+      files: ['webview/src/**'],
+      rules: {
+        'check-file/no-index': 'error'
+      }
+    },
+    {
+      files: [
+        'webview/src/experiments/index.tsx',
+        'webview/src/plots/index.tsx',
+        'webview/src/shared/components/icons/index.ts'
+      ],
+      rules: {
+        'check-file/no-index': 'off'
+      }
+    },
+    {
+      files: ['webview/src/**'],
+      rules: {
+        'check-file/folder-naming-convention': [
+          'error',
+          {
+            'webview/src/**/': 'CAMEL_CASE',
+            'webview/src/shared/components/**': 'CAMEL_CASE'
+          }
+        ]
+      }
+    },
+    {
+      files: ['webview/src/shared/**'],
+      rules: {
+        'check-file/folder-naming-convention': 'off'
+      }
     }
   ],
   parser: '@typescript-eslint/parser',
@@ -61,6 +115,7 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
+    'check-file',
     'jest',
     'jsx-a11y',
     'react-hooks',
