@@ -64,35 +64,21 @@ export class PlotsModel {
     this.experiments = experiments
     this.workspaceState = workspaceState
 
-    this.selectedMetrics = workspaceState.get(
-      MementoPrefix.PLOT_SELECTED_METRICS + dvcRoot,
-      undefined
-    )
+    const {
+      plotSizes,
+      sectionCollapsed,
+      sectionNames,
+      comparisonOrder,
+      selectedMetrics,
+      metricOrder
+    } = this.revive(dvcRoot, workspaceState)
 
-    this.plotSizes = workspaceState.get(
-      MementoPrefix.PLOT_SIZES + dvcRoot,
-      DEFAULT_SECTION_SIZES
-    )
-
-    this.sectionCollapsed = workspaceState.get(
-      MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
-      DEFAULT_SECTION_COLLAPSED
-    )
-
-    this.sectionNames = workspaceState.get(
-      MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
-      DEFAULT_SECTION_NAMES
-    )
-
-    this.comparisonOrder = workspaceState.get(
-      MementoPrefix.PLOT_COMPARISON_ORDER + dvcRoot,
-      []
-    )
-
-    this.metricOrder = workspaceState.get(
-      MementoPrefix.PLOT_METRIC_ORDER + dvcRoot,
-      []
-    )
+    this.plotSizes = plotSizes
+    this.sectionCollapsed = sectionCollapsed
+    this.sectionNames = sectionNames
+    this.comparisonOrder = comparisonOrder
+    this.selectedMetrics = selectedMetrics
+    this.metricOrder = metricOrder
   }
 
   public isReady() {
@@ -415,5 +401,34 @@ export class PlotsModel {
       MementoPrefix.PLOT_COMPARISON_ORDER + this.dvcRoot,
       this.comparisonOrder
     )
+  }
+
+  private revive(dvcRoot: string, workspaceState: Memento) {
+    return {
+      comparisonOrder: workspaceState.get(
+        MementoPrefix.PLOT_COMPARISON_ORDER + dvcRoot,
+        []
+      ),
+      metricOrder: workspaceState.get(
+        MementoPrefix.PLOT_METRIC_ORDER + dvcRoot,
+        []
+      ),
+      plotSizes: workspaceState.get(
+        MementoPrefix.PLOT_SIZES + dvcRoot,
+        DEFAULT_SECTION_SIZES
+      ),
+      sectionCollapsed: workspaceState.get(
+        MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
+        DEFAULT_SECTION_COLLAPSED
+      ),
+      sectionNames: workspaceState.get(
+        MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
+        DEFAULT_SECTION_NAMES
+      ),
+      selectedMetrics: workspaceState.get(
+        MementoPrefix.PLOT_SELECTED_METRICS + dvcRoot,
+        undefined
+      )
+    }
   }
 }
