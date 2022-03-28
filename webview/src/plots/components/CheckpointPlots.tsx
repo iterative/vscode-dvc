@@ -1,3 +1,4 @@
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   CheckpointPlotData,
   CheckpointPlotsColors
@@ -7,9 +8,9 @@ import { EmptyState } from './EmptyState'
 import { Plot } from './Plot'
 import styles from './styles.module.scss'
 import { DragDropContainer } from '../../shared/components/dragDrop/DragDropContainer'
-import { performOrderedUpdate } from '../../util/objects'
 import { withScale } from '../../util/styles'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
+import { sendMessage } from '../../shared/vscode'
 
 interface CheckpointPlotsProps {
   plots: CheckpointPlotData[]
@@ -20,11 +21,19 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   plots,
   colors
 }) => {
-  const [order, setOrder] = useState(plots.map(plot => plot.title))
+  const [order, setOrder] = useState<string[]>([])
 
   useEffect(() => {
-    setOrder(pastOrder => performOrderedUpdate(pastOrder, plots, 'title'))
+    setOrder(plots.map(({ title }) => title))
   }, [plots])
+
+  const setMetricOrder = (order: string[]): void => {
+    setOrder(order)
+    sendMessage({
+      payload: order,
+      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+    })
+  }
 
   const items = order
     .map(plot => {
@@ -53,7 +62,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     <div className={styles.singleViewPlotsGrid}>
       <DragDropContainer
         order={order}
-        setOrder={setOrder}
+        setOrder={setMetricOrder}
         disabledDropIds={[]}
         items={items as JSX.Element[]}
         group="live-plots"

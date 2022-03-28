@@ -5,6 +5,7 @@ import { VisualizationSpec } from 'react-vega'
 import {
   collectCheckpointPlotsData,
   collectData,
+  collectMetricOrder,
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
@@ -38,18 +39,20 @@ export class PlotsModel {
   private readonly experiments: Experiments
   private readonly workspaceState: Memento
 
-  private checkpointPlots?: CheckpointPlotData[]
-  private selectedMetrics?: string[]
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private branchRevisions: Record<string, string> = {}
 
   private comparisonData: ComparisonData = {}
+  private comparisonOrder: string[]
+
   private revisionData: RevisionData = {}
   private templates: Record<string, VisualizationSpec> = {}
 
-  private comparisonOrder: string[]
+  private checkpointPlots?: CheckpointPlotData[]
+  private selectedMetrics?: string[]
+  private metricOrder: string[]
 
   constructor(
     dvcRoot: string,
@@ -84,6 +87,11 @@ export class PlotsModel {
       MementoPrefix.PLOT_COMPARISON_ORDER + dvcRoot,
       []
     )
+
+    this.metricOrder = workspaceState.get(
+      MementoPrefix.PLOT_METRIC_ORDER + dvcRoot,
+      []
+    )
   }
 
   public isReady() {
@@ -94,6 +102,8 @@ export class PlotsModel {
     const checkpointPlots = collectCheckpointPlotsData(data)
 
     this.checkpointPlots = checkpointPlots
+
+    this.setMetricOrder()
 
     return this.removeStaleData()
   }
@@ -213,11 +223,21 @@ export class PlotsModel {
 
   public setSelectedMetrics(selectedMetrics: string[]) {
     this.selectedMetrics = selectedMetrics
+    this.setMetricOrder()
     this.persistSelectedMetrics()
   }
 
   public getSelectedMetrics() {
     return this.selectedMetrics
+  }
+
+  public setMetricOrder(metricOrder?: string[]) {
+    this.metricOrder = collectMetricOrder(
+      this.checkpointPlots,
+      metricOrder || this.metricOrder,
+      this.selectedMetrics
+    )
+    this.persistMetricOrder()
   }
 
   public setPlotSize(section: Section, size: PlotSize) {
@@ -290,15 +310,20 @@ export class PlotsModel {
     checkpointPlots: CheckpointPlotData[],
     selectedExperiments: string[]
   ) {
-    return checkpointPlots.map(plot => {
-      const { title, values } = plot
-      return {
-        title,
-        values: values.filter(value =>
-          selectedExperiments.includes(value.group)
-        )
-      }
-    })
+    return checkpointPlots
+      .map(plot => {
+        const { title, values } = plot
+        return {
+          title,
+          values: values.filter(value =>
+            selectedExperiments.includes(value.group)
+          )
+        }
+      })
+      .sort(
+        ({ title: a }, { title: b }) =>
+          this.metricOrder.indexOf(a) - this.metricOrder.indexOf(b)
+      )
   }
 
   private getSelectedComparisonPlots(
@@ -348,9 +373,16 @@ export class PlotsModel {
   }
 
   private persistSelectedMetrics() {
-    return this.workspaceState.update(
+    this.workspaceState.update(
       MementoPrefix.PLOT_SELECTED_METRICS + this.dvcRoot,
       this.getSelectedMetrics()
+    )
+  }
+
+  private persistMetricOrder() {
+    this.workspaceState.update(
+      MementoPrefix.PLOT_METRIC_ORDER + this.dvcRoot,
+      this.metricOrder
     )
   }
 

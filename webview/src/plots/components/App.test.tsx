@@ -461,6 +461,41 @@ describe('App', () => {
     ])
   })
 
+  it('should send a message to the extension when the checkpoint plots are reordered', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    const plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy'
+    ])
+
+    mockPostMessage.mockClear()
+
+    dragAndDrop(plots[2], plots[0])
+
+    const expectedOrder = [
+      'summary.json:val_loss',
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_accuracy'
+    ]
+
+    expect(mockPostMessage).toBeCalledTimes(1)
+    expect(mockPostMessage).toBeCalledWith({
+      payload: expectedOrder,
+      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+    })
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual(expectedOrder)
+  })
+
   it('should remove the checkpoint plot from the order if it is removed from the plots', () => {
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
@@ -481,37 +516,6 @@ describe('App', () => {
       'summary.json:accuracy',
       'summary.json:val_loss',
       'summary.json:val_accuracy'
-    ])
-  })
-
-  it('should add the new plot at the end of the set order', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-
-    let plots = screen.getAllByTestId(/summary\.json/)
-    dragAndDrop(plots[3], plots[0])
-
-    sendSetDataMessage({
-      checkpoint: {
-        ...checkpointPlotsFixture,
-        plots: [
-          {
-            title: 'summary.json:new-plot',
-            values: checkpointPlotsFixture.plots[0].values
-          },
-          ...checkpointPlotsFixture.plots
-        ]
-      }
-    })
-    plots = screen.getAllByTestId(/summary\.json/)
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'summary.json:val_accuracy',
-      'summary.json:loss',
-      'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:new-plot'
     ])
   })
 

@@ -236,6 +236,23 @@ suite('Plots Test Suite', () => {
         mockSetComparisonOrder,
         'should correctly handle a comparison revision reorder'
       ).to.be.calledWithExactly(mockComparisonOrder)
+
+      const mockSetMetricOrder = stub(plotsModel, 'setMetricOrder').returns(
+        undefined
+      )
+
+      const mockMetricOrder = ['different', 'metric', 'order']
+
+      mockMessageReceived.fire({
+        payload: mockMetricOrder,
+        type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+      })
+
+      expect(mockSetMetricOrder).to.be.calledOnce
+      expect(
+        mockSetMetricOrder,
+        'should correctly handle a metric reorder'
+      ).to.be.calledWithExactly(mockMetricOrder)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

@@ -19,6 +19,7 @@
     "hardlinks",
     "Interactors",
     "isdir",
+    "isempty",
     "isequal",
     "isexec",
     "isout",
