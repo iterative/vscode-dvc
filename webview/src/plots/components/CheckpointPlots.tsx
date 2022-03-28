@@ -8,6 +8,7 @@ import { EmptyState } from './EmptyState'
 import { Plot } from './Plot'
 import styles from './styles.module.scss'
 import { DragDropContainer } from '../../shared/components/dragDrop/DragDropContainer'
+import { performOrderedUpdate } from '../../util/objects'
 import { withScale } from '../../util/styles'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { sendMessage } from '../../shared/vscode'
@@ -21,10 +22,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   plots,
   colors
 }) => {
-  const [order, setOrder] = useState<string[]>([])
+  const [order, setOrder] = useState(plots.map(plot => plot.title))
 
   useEffect(() => {
-    setOrder(plots.map(({ title }) => title))
+    setOrder(pastOrder => performOrderedUpdate(pastOrder, plots, 'title'))
   }, [plots])
 
   const setMetricOrder = (order: string[]): void => {

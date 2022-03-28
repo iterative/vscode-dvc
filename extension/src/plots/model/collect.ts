@@ -238,7 +238,7 @@ const collectExistingOrder = (
       acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
         title => title !== metric
       )
-      acc.remainingSelectedMetrics = acc.remainingSelectedMetrics?.filter(
+      acc.remainingSelectedMetrics = acc.remainingSelectedMetrics.filter(
         title => title !== metric
       )
       acc.newOrder.push(metric)
@@ -272,7 +272,7 @@ export const collectMetricOrder = (
     uncollectedMetrics: checkpointPlotData.map(({ title }) => title)
   }
 
-  if (!definedAndNonEmpty(selectedMetrics)) {
+  if (!definedAndNonEmpty(acc.remainingSelectedMetrics)) {
     return acc.uncollectedMetrics
   }
 

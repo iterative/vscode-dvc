@@ -249,7 +249,9 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await screen.findByText('loss')
+    const lossItem = await screen.findByText('summary.json:loss', {
+      ignore: 'text'
+    })
 
     fireEvent.click(lossItem, {
       bubbles: true,
@@ -279,7 +281,7 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await screen.findByText('loss')
+    const lossItem = await screen.findByText('summary.json:loss')
 
     fireEvent.click(lossItem, {
       bubbles: true,
@@ -287,7 +289,11 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: ['accuracy', 'val_loss', 'val_accuracy'],
+      payload: [
+        'summary.json:accuracy',
+        'summary.json:val_loss',
+        'summary.json:val_accuracy'
+      ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
 
@@ -297,7 +303,12 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: ['loss', 'accuracy', 'val_loss', 'val_accuracy'],
+      payload: [
+        'summary.json:loss',
+        'summary.json:accuracy',
+        'summary.json:val_loss',
+        'summary.json:val_accuracy'
+      ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
   })
@@ -516,6 +527,37 @@ describe('App', () => {
       'summary.json:accuracy',
       'summary.json:val_loss',
       'summary.json:val_accuracy'
+    ])
+  })
+
+  it('should add the new plot at the end of the set order', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    let plots = screen.getAllByTestId(/summary\.json/)
+    dragAndDrop(plots[3], plots[0])
+
+    sendSetDataMessage({
+      checkpoint: {
+        ...checkpointPlotsFixture,
+        plots: [
+          {
+            title: 'summary.json:new-plot',
+            values: checkpointPlotsFixture.plots[0].values
+          },
+          ...checkpointPlotsFixture.plots
+        ]
+      }
+    })
+    plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:val_accuracy',
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:new-plot'
     ])
   })
 
