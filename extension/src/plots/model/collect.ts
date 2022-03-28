@@ -222,8 +222,8 @@ export const collectCheckpointPlotsData = (
 
 type MetricOrderAccumulator = {
   newOrder: string[]
-  remainingMetrics: string[]
-  selectedMetrics: string[]
+  uncollectedMetrics: string[]
+  remainingSelectedMetrics: string[]
 }
 
 const collectExistingOrder = (
@@ -232,13 +232,13 @@ const collectExistingOrder = (
 ) => {
   for (const metric of existingMetricOrder) {
     if (
-      acc.remainingMetrics.includes(metric) &&
-      acc.selectedMetrics.includes(metric)
+      acc.uncollectedMetrics.includes(metric) &&
+      acc.remainingSelectedMetrics.includes(metric)
     ) {
-      acc.remainingMetrics = acc.remainingMetrics.filter(
+      acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
         title => title !== metric
       )
-      acc.selectedMetrics = acc.selectedMetrics?.filter(
+      acc.remainingSelectedMetrics = acc.remainingSelectedMetrics?.filter(
         title => title !== metric
       )
       acc.newOrder.push(metric)
@@ -247,9 +247,9 @@ const collectExistingOrder = (
 }
 
 const collectRemainingSelected = (acc: MetricOrderAccumulator) => {
-  for (const metric of acc.selectedMetrics) {
-    if (acc.remainingMetrics.includes(metric)) {
-      acc.remainingMetrics = acc.remainingMetrics.filter(
+  for (const metric of acc.remainingSelectedMetrics) {
+    if (acc.uncollectedMetrics.includes(metric)) {
+      acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
         title => title !== metric
       )
       acc.newOrder.push(metric)
@@ -268,18 +268,18 @@ export const collectMetricOrder = (
 
   const acc: MetricOrderAccumulator = {
     newOrder: [],
-    remainingMetrics: checkpointPlotData.map(({ title }) => title),
-    selectedMetrics: [...selectedMetrics]
+    remainingSelectedMetrics: [...selectedMetrics],
+    uncollectedMetrics: checkpointPlotData.map(({ title }) => title)
   }
 
   if (!definedAndNonEmpty(selectedMetrics)) {
-    return acc.remainingMetrics
+    return acc.uncollectedMetrics
   }
 
   collectExistingOrder(acc, existingMetricOrder)
   collectRemainingSelected(acc)
 
-  return [...acc.newOrder, ...acc.remainingMetrics]
+  return [...acc.newOrder, ...acc.uncollectedMetrics]
 }
 
 export type RevisionData = {
