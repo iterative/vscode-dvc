@@ -14,6 +14,7 @@ import {
 import {
   CheckpointPlotData,
   ComparisonPlots,
+  ComparisonRevision,
   ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
@@ -26,7 +27,7 @@ import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { getColorScale } from '../vega/util'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { TemplateOrder } from '../paths/collect'
 
 export class PlotsModel {
@@ -169,13 +170,16 @@ export class PlotsModel {
   }
 
   public getSelectedRevisionDetails() {
-    return this.experiments
-      .getSelectedRevisions()
-      .map(({ label: revision, displayColor }) => ({ displayColor, revision }))
-      .sort(
-        ({ revision: a }, { revision: b }) =>
-          this.comparisonOrder.indexOf(a) - this.comparisonOrder.indexOf(b)
-      )
+    return reorderObjectList<ComparisonRevision>(
+      this.comparisonOrder,
+      this.experiments
+        .getSelectedRevisions()
+        .map(({ label: revision, displayColor }) => ({
+          displayColor,
+          revision
+        })),
+      'revision'
+    )
   }
 
   public getTemplatePlots(order: TemplateOrder | undefined) {
@@ -310,8 +314,9 @@ export class PlotsModel {
     checkpointPlots: CheckpointPlotData[],
     selectedExperiments: string[]
   ) {
-    return checkpointPlots
-      .map(plot => {
+    return reorderObjectList<CheckpointPlotData>(
+      this.metricOrder,
+      checkpointPlots.map(plot => {
         const { title, values } = plot
         return {
           title,
@@ -319,11 +324,9 @@ export class PlotsModel {
             selectedExperiments.includes(value.group)
           )
         }
-      })
-      .sort(
-        ({ title: a }, { title: b }) =>
-          this.metricOrder.indexOf(a) - this.metricOrder.indexOf(b)
-      )
+      }),
+      'title'
+    )
   }
 
   private getSelectedComparisonPlots(
