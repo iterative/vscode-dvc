@@ -220,6 +220,68 @@ export const collectCheckpointPlotsData = (
   return plotsData
 }
 
+type MetricOrderAccumulator = {
+  newOrder: string[]
+  uncollectedMetrics: string[]
+  remainingSelectedMetrics: string[]
+}
+
+const collectExistingOrder = (
+  acc: MetricOrderAccumulator,
+  existingMetricOrder: string[]
+) => {
+  for (const metric of existingMetricOrder) {
+    if (
+      acc.uncollectedMetrics.includes(metric) &&
+      acc.remainingSelectedMetrics.includes(metric)
+    ) {
+      acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
+        title => title !== metric
+      )
+      acc.remainingSelectedMetrics = acc.remainingSelectedMetrics.filter(
+        title => title !== metric
+      )
+      acc.newOrder.push(metric)
+    }
+  }
+}
+
+const collectRemainingSelected = (acc: MetricOrderAccumulator) => {
+  for (const metric of acc.remainingSelectedMetrics) {
+    if (acc.uncollectedMetrics.includes(metric)) {
+      acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
+        title => title !== metric
+      )
+      acc.newOrder.push(metric)
+    }
+  }
+}
+
+export const collectMetricOrder = (
+  checkpointPlotData: CheckpointPlotData[] | undefined,
+  existingMetricOrder: string[],
+  selectedMetrics: string[] = []
+): string[] => {
+  if (!definedAndNonEmpty(checkpointPlotData)) {
+    return []
+  }
+
+  const acc: MetricOrderAccumulator = {
+    newOrder: [],
+    remainingSelectedMetrics: [...selectedMetrics],
+    uncollectedMetrics: checkpointPlotData.map(({ title }) => title)
+  }
+
+  if (!definedAndNonEmpty(acc.remainingSelectedMetrics)) {
+    return acc.uncollectedMetrics
+  }
+
+  collectExistingOrder(acc, existingMetricOrder)
+  collectRemainingSelected(acc)
+
+  return [...acc.newOrder, ...acc.uncollectedMetrics]
+}
+
 export type RevisionData = {
   [revision: string]: {
     [path: string]: unknown[]

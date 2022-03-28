@@ -4,7 +4,8 @@ import isEmpty from 'lodash.isempty'
 import {
   collectData,
   collectCheckpointPlotsData,
-  collectTemplates
+  collectTemplates,
+  collectMetricOrder
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
@@ -65,6 +66,125 @@ describe('collectCheckpointPlotsData', () => {
   it('should return undefined given no input', () => {
     const data = collectCheckpointPlotsData({} as ExperimentsOutput)
     expect(data).toBeUndefined()
+  })
+})
+
+describe('collectMetricOrder', () => {
+  it('should return an empty array if there is no checkpoints data', () => {
+    const metricOrder = collectMetricOrder(
+      undefined,
+      ['metric:A', 'metric:B'],
+      []
+    )
+    expect(metricOrder).toStrictEqual([])
+  })
+
+  it('should return an empty array if the checkpoints data is an empty array', () => {
+    const metricOrder = collectMetricOrder([], ['metric:A', 'metric:B'], [])
+    expect(metricOrder).toStrictEqual([])
+  })
+
+  it('should maintain the existing order if all metrics are selected', () => {
+    const expectedOrder = [
+      'metric:F',
+      'metric:A',
+      'metric:B',
+      'metric:E',
+      'metric:D',
+      'metric:C'
+    ]
+
+    const metricOrder = collectMetricOrder(
+      [
+        { title: 'metric:A', values: [] },
+        { title: 'metric:B', values: [] },
+        { title: 'metric:C', values: [] },
+        { title: 'metric:D', values: [] },
+        { title: 'metric:E', values: [] },
+        { title: 'metric:F', values: [] }
+      ],
+      expectedOrder,
+      expectedOrder
+    )
+    expect(metricOrder).toStrictEqual(expectedOrder)
+  })
+
+  it('should push unselected metrics to the end', () => {
+    const existingOrder = [
+      'metric:F',
+      'metric:A',
+      'metric:B',
+      'metric:E',
+      'metric:D',
+      'metric:C'
+    ]
+
+    const metricOrder = collectMetricOrder(
+      [
+        { title: 'metric:A', values: [] },
+        { title: 'metric:B', values: [] },
+        { title: 'metric:C', values: [] },
+        { title: 'metric:D', values: [] },
+        { title: 'metric:E', values: [] },
+        { title: 'metric:F', values: [] }
+      ],
+      existingOrder,
+      existingOrder.filter(metric => !['metric:A', 'metric:B'].includes(metric))
+    )
+    expect(metricOrder).toStrictEqual([
+      'metric:F',
+      'metric:E',
+      'metric:D',
+      'metric:C',
+      'metric:A',
+      'metric:B'
+    ])
+  })
+
+  it('should add new metrics in the given order', () => {
+    const metricOrder = collectMetricOrder(
+      [
+        { title: 'metric:C', values: [] },
+        { title: 'metric:D', values: [] },
+        { title: 'metric:A', values: [] },
+        { title: 'metric:B', values: [] },
+        { title: 'metric:E', values: [] },
+        { title: 'metric:F', values: [] }
+      ],
+      ['metric:B', 'metric:A'],
+      ['metric:B', 'metric:A']
+    )
+    expect(metricOrder).toStrictEqual([
+      'metric:B',
+      'metric:A',
+      'metric:C',
+      'metric:D',
+      'metric:E',
+      'metric:F'
+    ])
+  })
+
+  it('should give selected metrics precedence', () => {
+    const metricOrder = collectMetricOrder(
+      [
+        { title: 'metric:C', values: [] },
+        { title: 'metric:D', values: [] },
+        { title: 'metric:A', values: [] },
+        { title: 'metric:B', values: [] },
+        { title: 'metric:E', values: [] },
+        { title: 'metric:F', values: [] }
+      ],
+      ['metric:B', 'metric:A'],
+      ['metric:B', 'metric:A', 'metric:F']
+    )
+    expect(metricOrder).toStrictEqual([
+      'metric:B',
+      'metric:A',
+      'metric:F',
+      'metric:C',
+      'metric:D',
+      'metric:E'
+    ])
   })
 })
 

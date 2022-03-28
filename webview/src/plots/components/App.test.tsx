@@ -249,7 +249,9 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await screen.findByText('loss')
+    const lossItem = await screen.findByText('summary.json:loss', {
+      ignore: 'text'
+    })
 
     fireEvent.click(lossItem, {
       bubbles: true,
@@ -279,7 +281,7 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await screen.findByText('loss')
+    const lossItem = await screen.findByText('summary.json:loss')
 
     fireEvent.click(lossItem, {
       bubbles: true,
@@ -287,7 +289,11 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: ['accuracy', 'val_loss', 'val_accuracy'],
+      payload: [
+        'summary.json:accuracy',
+        'summary.json:val_loss',
+        'summary.json:val_accuracy'
+      ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
 
@@ -297,7 +303,12 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: ['loss', 'accuracy', 'val_loss', 'val_accuracy'],
+      payload: [
+        'summary.json:loss',
+        'summary.json:accuracy',
+        'summary.json:val_loss',
+        'summary.json:val_accuracy'
+      ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
   })
@@ -459,6 +470,41 @@ describe('App', () => {
       'summary.json:val_loss',
       'summary.json:val_accuracy'
     ])
+  })
+
+  it('should send a message to the extension when the checkpoint plots are reordered', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    const plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy'
+    ])
+
+    mockPostMessage.mockClear()
+
+    dragAndDrop(plots[2], plots[0])
+
+    const expectedOrder = [
+      'summary.json:val_loss',
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_accuracy'
+    ]
+
+    expect(mockPostMessage).toBeCalledTimes(1)
+    expect(mockPostMessage).toBeCalledWith({
+      payload: expectedOrder,
+      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+    })
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual(expectedOrder)
   })
 
   it('should remove the checkpoint plot from the order if it is removed from the plots', () => {

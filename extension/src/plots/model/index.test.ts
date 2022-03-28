@@ -56,7 +56,7 @@ describe('plotsModel', () => {
 
     model.setSelectedMetrics(newSelectedMetrics)
 
-    expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
+    expect(mementoUpdateSpy).toHaveBeenCalledTimes(2)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot,
       newSelectedMetrics

@@ -220,6 +220,8 @@ export class Plots extends BaseRepository<TPlotsData> {
             return this.plots?.setComparisonOrder(message.payload)
           case MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED:
             return this.paths?.setTemplateOrder(message.payload)
+          case MessageFromWebviewType.PLOTS_METRICS_REORDERED:
+            return this.plots?.setMetricOrder(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }

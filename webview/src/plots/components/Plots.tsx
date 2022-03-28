@@ -11,12 +11,11 @@ import { CheckpointPlots } from './CheckpointPlots'
 import { ComparisonTable } from './comparisonTable/ComparisonTable'
 import { TemplatePlots } from './templatePlots/TemplatePlots'
 import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
-import { getDisplayNameFromPath } from '../../util/paths'
 import { sendMessage } from '../../shared/vscode'
 import { Theme } from '../../shared/components/theme/Theme'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
-  plots?.map(plot => getDisplayNameFromPath(plot.title)) || []
+  plots?.map(({ title }) => title) || []
 
 export const Plots = ({
   state,
@@ -120,7 +119,7 @@ export const Plots = ({
         >
           <CheckpointPlots
             plots={checkpointPlots.plots.filter(plot =>
-              selectedPlots?.includes(getDisplayNameFromPath(plot.title))
+              selectedPlots?.includes(plot.title)
             )}
             colors={checkpointPlots.colors}
           />
