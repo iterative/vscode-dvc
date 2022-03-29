@@ -1,4 +1,4 @@
-import { join } from '../../../test/util/path'
+import { join } from '../../util/path'
 import { MetricOrParam } from '../../../experiments/webview/contract'
 import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
 
