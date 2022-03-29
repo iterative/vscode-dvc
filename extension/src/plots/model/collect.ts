@@ -28,7 +28,7 @@ import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { ColorScale, extendVegaSpec, isMultiViewPlot } from '../vega/util'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -247,14 +247,13 @@ const collectExistingOrder = (
 }
 
 const collectRemainingSelected = (acc: MetricOrderAccumulator) => {
-  for (const metric of acc.remainingSelectedMetrics) {
-    if (acc.uncollectedMetrics.includes(metric)) {
-      acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
-        title => title !== metric
-      )
-      acc.newOrder.push(metric)
-    }
-  }
+  const [newOrder, uncollectedMetrics] = splitMatchedOrdered(
+    acc.uncollectedMetrics,
+    acc.remainingSelectedMetrics
+  )
+
+  acc.newOrder.push(...newOrder)
+  acc.uncollectedMetrics = uncollectedMetrics
 }
 
 export const collectMetricOrder = (
