@@ -158,7 +158,6 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
-      await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -185,16 +184,12 @@ suite('Plots Test Suite', () => {
           selectedMetrics: mockSelectedMetrics
         }
       })
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section resized message from the webview', async () => {
-      const { plots, plotsModel } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, plotsModel } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
-      await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -210,16 +205,12 @@ suite('Plots Test Suite', () => {
         Section.TEMPLATE_PLOTS,
         PlotSize.SMALL
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section collapsed message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
-      await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -246,16 +237,12 @@ suite('Plots Test Suite', () => {
           ...mockSectionCollapsed
         }
       })
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section rename message from the webview', async () => {
-      const { plots, plotsModel } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, plotsModel } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
-      await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -275,7 +262,7 @@ suite('Plots Test Suite', () => {
         Section.TEMPLATE_PLOTS,
         mockName
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a comparison revisions reordered message from the webview', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(
@@ -284,7 +271,6 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
-      await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -322,7 +308,7 @@ suite('Plots Test Suite', () => {
           )
         }
       })
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a template plots reordered message from the webview', async () => {
       const { pathsModel, plots, messageSpy } = await buildPlots(
@@ -331,7 +317,6 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
-      await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -366,7 +351,7 @@ suite('Plots Test Suite', () => {
           )
         }
       })
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a metric reordered message from the webview', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(
@@ -375,7 +360,6 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
-      await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
