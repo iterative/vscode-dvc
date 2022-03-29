@@ -5,7 +5,8 @@ import {
   ComparisonPlot,
   ComparisonRevisionData,
   PlotsData as TPlotsData,
-  Section
+  Section,
+  SectionCollapsed
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
@@ -16,7 +17,10 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import { MessageFromWebviewType } from '../webview/contract'
+import {
+  MessageFromWebviewType,
+  PlotsTemplatesReordered
+} from '../webview/contract'
 import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
 import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
@@ -142,6 +146,12 @@ export class Plots extends BaseRepository<TPlotsData> {
     })
   }
 
+  private sendTemplatePlotsData() {
+    this.webview?.show({
+      template: this.getTemplatePlots()
+    })
+  }
+
   private getTemplatePlots() {
     const paths = this.paths?.getTemplateOrder()
     const plots = this.plots?.getTemplatePlots(paths)
@@ -155,6 +165,12 @@ export class Plots extends BaseRepository<TPlotsData> {
       sectionName: this.plots.getSectionName(Section.TEMPLATE_PLOTS),
       size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
     }
+  }
+
+  private sendComparisonPlotsData() {
+    this.webview?.show({
+      comparison: this.getComparisonPlots()
+    })
   }
 
   private getComparisonPlots() {
@@ -203,30 +219,57 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
           case MessageFromWebviewType.METRIC_TOGGLED:
-            return this.plots?.setSelectedMetrics(message.payload)
+            return this.setSelectedMetrics(message.payload)
           case MessageFromWebviewType.PLOTS_RESIZED:
             return this.plots?.setPlotSize(
               message.payload.section,
               message.payload.size
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
-            return this.plots?.setSectionCollapsed(message.payload)
+            return this.setSectionCollapsed(message.payload)
           case MessageFromWebviewType.SECTION_RENAMED:
             return this.plots?.setSectionName(
               message.payload.section,
               message.payload.name
             )
           case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
-            return this.plots?.setComparisonOrder(message.payload)
+            return this.setComparisonOrder(message.payload)
           case MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED:
-            return this.paths?.setTemplateOrder(message.payload)
+            return this.setTemplateOrder(message.payload)
           case MessageFromWebviewType.PLOTS_METRICS_REORDERED:
-            return this.plots?.setMetricOrder(message.payload)
+            return this.setMetricOrder(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
       })
     )
+  }
+
+  private setSelectedMetrics(order: string[]) {
+    this.plots?.setSelectedMetrics(order)
+    this.sendCheckpointPlotsData()
+  }
+
+  private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {
+    this.plots?.setSectionCollapsed(collapsed)
+    this.webview?.show({
+      sectionCollapsed: this.plots?.getSectionCollapsed()
+    })
+  }
+
+  private setComparisonOrder(order: string[]) {
+    this.plots?.setComparisonOrder(order)
+    this.sendComparisonPlotsData()
+  }
+
+  private setTemplateOrder(order: PlotsTemplatesReordered) {
+    this.paths?.setTemplateOrder(order)
+    this.sendTemplatePlotsData()
+  }
+
+  private setMetricOrder(order: string[]) {
+    this.plots?.setMetricOrder(order)
+    this.sendCheckpointPlotsData()
   }
 
   private waitForInitialData(experiments: Experiments) {
