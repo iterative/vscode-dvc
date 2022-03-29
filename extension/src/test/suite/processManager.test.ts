@@ -119,46 +119,46 @@ suite('Process Manager Test Suite', () => {
       expect(await updatesRestartedEvent).to.be.false
       expect(mockUpdate, 'the queue is flushed on restart').to.be.calledOnce
     })
-  })
 
-  it('should empty the queue with forceRunQueued even if all processes are paused', async () => {
-    const mockPartialUpdate = stub()
-    const mockFullUpdate = stub()
-    const processesPaused = disposable.track(new EventEmitter<boolean>())
-    const processManager = disposable.track(
-      new ProcessManager(
-        processesPaused,
-        {
-          name: 'partialUpdate',
-          process: mockPartialUpdate
-        },
-        {
-          name: 'fullUpdate',
-          process: mockFullUpdate
-        }
+    it('should empty the queue with forceRunQueued even if all processes are paused', async () => {
+      const mockPartialUpdate = stub()
+      const mockFullUpdate = stub()
+      const processesPaused = disposable.track(new EventEmitter<boolean>())
+      const processManager = disposable.track(
+        new ProcessManager(
+          processesPaused,
+          {
+            name: 'partialUpdate',
+            process: mockPartialUpdate
+          },
+          {
+            name: 'fullUpdate',
+            process: mockFullUpdate
+          }
+        )
       )
-    )
-    processesPaused.fire(true)
+      processesPaused.fire(true)
 
-    await Promise.all([
-      processManager.run('partialUpdate'),
-      processManager.run('fullUpdate'),
-      processManager.run('partialUpdate'),
-      processManager.run('fullUpdate'),
-      processManager.run('partialUpdate'),
-      processManager.run('fullUpdate')
-    ])
+      await Promise.all([
+        processManager.run('partialUpdate'),
+        processManager.run('fullUpdate'),
+        processManager.run('partialUpdate'),
+        processManager.run('fullUpdate'),
+        processManager.run('partialUpdate'),
+        processManager.run('fullUpdate')
+      ])
 
-    expect(mockPartialUpdate, 'all calls are sent to the queue').not.to.be
-      .called
-    expect(mockFullUpdate).not.to.be.called
+      expect(mockPartialUpdate, 'all calls are sent to the queue').not.to.be
+        .called
+      expect(mockFullUpdate).not.to.be.called
 
-    await processManager.forceRunQueued()
+      await processManager.forceRunQueued()
 
-    expect(
-      mockPartialUpdate,
-      'the queue is flushed when forceRunQueued is called'
-    ).to.be.calledOnce
-    expect(mockFullUpdate).to.be.calledOnce
+      expect(
+        mockPartialUpdate,
+        'the queue is flushed when forceRunQueued is called'
+      ).to.be.calledOnce
+      expect(mockFullUpdate).to.be.calledOnce
+    })
   })
 })
