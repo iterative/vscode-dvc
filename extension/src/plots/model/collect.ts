@@ -28,7 +28,7 @@ import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { ColorScale, extendVegaSpec, isMultiViewPlot } from '../vega/util'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -231,30 +231,25 @@ const collectExistingOrder = (
   existingMetricOrder: string[]
 ) => {
   for (const metric of existingMetricOrder) {
-    if (
-      acc.uncollectedMetrics.includes(metric) &&
-      acc.remainingSelectedMetrics.includes(metric)
-    ) {
-      acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
-        title => title !== metric
-      )
-      acc.remainingSelectedMetrics = acc.remainingSelectedMetrics.filter(
-        title => title !== metric
-      )
-      acc.newOrder.push(metric)
+    const uncollectedIndex = acc.uncollectedMetrics.indexOf(metric)
+    const remainingIndex = acc.remainingSelectedMetrics.indexOf(metric)
+    if (uncollectedIndex === -1 || remainingIndex === -1) {
+      continue
     }
+    acc.uncollectedMetrics.splice(uncollectedIndex, 1)
+    acc.remainingSelectedMetrics.splice(remainingIndex, 1)
+    acc.newOrder.push(metric)
   }
 }
 
 const collectRemainingSelected = (acc: MetricOrderAccumulator) => {
-  for (const metric of acc.remainingSelectedMetrics) {
-    if (acc.uncollectedMetrics.includes(metric)) {
-      acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
-        title => title !== metric
-      )
-      acc.newOrder.push(metric)
-    }
-  }
+  const [newOrder, uncollectedMetrics] = splitMatchedOrdered(
+    acc.uncollectedMetrics,
+    acc.remainingSelectedMetrics
+  )
+
+  acc.newOrder.push(...newOrder)
+  acc.uncollectedMetrics = uncollectedMetrics
 }
 
 export const collectMetricOrder = (

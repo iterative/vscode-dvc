@@ -1,7 +1,7 @@
 import { isImagePlot, Plot, TemplatePlotGroup } from '../webview/contract'
 import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
-import { definedAndNonEmpty } from '../../util/array'
+import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
 
 export enum PathType {
@@ -113,15 +113,13 @@ const collectFromRemaining = (
   paths: string[],
   remainingType: 'remainingSingleView' | 'remainingMultiView'
 ): string[] => {
-  const acc: string[] = []
-  for (const path of paths) {
-    if (remainingPaths[remainingType].includes(path)) {
-      remainingPaths[remainingType] = remainingPaths[remainingType].filter(
-        remainingPath => remainingPath !== path
-      )
-      acc.push(path)
-    }
-  }
+  const [acc, remaining] = splitMatchedOrdered(
+    remainingPaths[remainingType],
+    paths
+  )
+
+  remainingPaths[remainingType] = remaining
+
   return acc
 }
 
