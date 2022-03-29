@@ -231,18 +231,14 @@ const collectExistingOrder = (
   existingMetricOrder: string[]
 ) => {
   for (const metric of existingMetricOrder) {
-    if (
-      acc.uncollectedMetrics.includes(metric) &&
-      acc.remainingSelectedMetrics.includes(metric)
-    ) {
-      acc.uncollectedMetrics = acc.uncollectedMetrics.filter(
-        title => title !== metric
-      )
-      acc.remainingSelectedMetrics = acc.remainingSelectedMetrics.filter(
-        title => title !== metric
-      )
-      acc.newOrder.push(metric)
+    const uncollectedIndex = acc.uncollectedMetrics.indexOf(metric)
+    const remainingIndex = acc.remainingSelectedMetrics.indexOf(metric)
+    if (uncollectedIndex === -1 || remainingIndex === -1) {
+      continue
     }
+    acc.uncollectedMetrics.splice(uncollectedIndex, 1)
+    acc.remainingSelectedMetrics.splice(remainingIndex, 1)
+    acc.newOrder.push(metric)
   }
 }
 
