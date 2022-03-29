@@ -354,14 +354,6 @@ suite('Plots Test Suite', () => {
       expect(mockSetTemplateOrder).to.be.calledOnce
       expect(mockSetTemplateOrder).to.be.calledWithExactly(mockTemplateOrder)
       expect(messageSpy).to.be.calledOnce
-      expect(messageSpy.lastCall.args[0].template.plots).to.deep.equal(
-        reorderObjectList(
-          [TemplatePlotGroup.MULTI_VIEW, TemplatePlotGroup.SINGLE_VIEW],
-          templatePlotsFixture.plots,
-          'group'
-        )
-      )
-
       expect(
         messageSpy,
         "should update the webview's template plot state"
