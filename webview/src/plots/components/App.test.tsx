@@ -215,12 +215,21 @@ describe('App', () => {
       cancelable: true
     })
 
-    const hiddenPlots = await screen.findAllByLabelText('Vega visualization')
-    hiddenPlots.map(hiddenPlot => expect(hiddenPlot).not.toBeVisible())
     expect(mockPostMessage).toBeCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
     })
+
+    sendSetDataMessage({
+      sectionCollapsed: {
+        ...DEFAULT_SECTION_COLLAPSED,
+        [Section.CHECKPOINT_PLOTS]: true
+      }
+    })
+
+    expect(
+      screen.queryByLabelText('Vega visualization')
+    ).not.toBeInTheDocument()
   })
 
   it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {
@@ -233,7 +242,6 @@ describe('App', () => {
             template: null
           }
         }}
-        dispatch={jest.fn}
       />
     )
 

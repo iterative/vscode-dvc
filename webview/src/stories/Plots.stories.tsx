@@ -32,8 +32,8 @@ export default {
 const Template: Story<{
   data?: PlotsData
 }> = ({ data }) => {
-  const [state, dispatch] = useAppReducer({ data })
-  return <Plots state={state} dispatch={dispatch} />
+  const [state] = useAppReducer({ data })
+  return <Plots state={state} />
 }
 
 export const WithData = Template.bind({})

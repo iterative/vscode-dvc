@@ -1,4 +1,4 @@
-import React, { Dispatch, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CheckpointPlotData,
   PlotSize,
@@ -10,7 +10,7 @@ import { PlotsContainer } from './PlotsContainer'
 import { CheckpointPlots } from './CheckpointPlots'
 import { ComparisonTable } from './comparisonTable/ComparisonTable'
 import { TemplatePlots } from './templatePlots/TemplatePlots'
-import { PlotsReducerAction, PlotsWebviewState } from '../hooks/useAppReducer'
+import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { sendMessage } from '../../shared/vscode'
 import { Theme } from '../../shared/components/theme/Theme'
 
@@ -18,11 +18,9 @@ const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(({ title }) => title) || []
 
 export const Plots = ({
-  state,
-  dispatch
+  state
 }: {
   state: PlotsWebviewState
-  dispatch: Dispatch<PlotsReducerAction>
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const { data } = state
@@ -74,7 +72,6 @@ export const Plots = ({
   }
 
   const basicContainerProps = {
-    dispatch,
     onRename: setSectionName,
     onResize: changeSize,
     sectionCollapsed
