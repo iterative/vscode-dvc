@@ -17,5 +17,5 @@ export const App = () => {
     )
   )
 
-  return <Plots state={state} dispatch={dispatch} />
+  return <Plots state={state} />
 }

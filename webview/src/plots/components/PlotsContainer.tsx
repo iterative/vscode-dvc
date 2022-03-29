@@ -1,21 +1,19 @@
 import cx from 'classnames'
-import React, { Dispatch, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   PlotSize,
   Section,
   SectionCollapsed
 } from 'dvc/src/plots/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { MetricsPicker } from './MetricsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { SectionRenamer } from './SectionRenamer'
 import { AllIcons, Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
-import {
-  CollapsibleSectionsActions,
-  PlotsReducerAction
-} from '../hooks/useAppReducer'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
+import { sendMessage } from '../../shared/vscode'
 
 interface MenuProps {
   metrics: string[]
@@ -26,7 +24,6 @@ interface MenuProps {
 export interface PlotsContainerProps {
   sectionCollapsed: SectionCollapsed
   sectionKey: Section
-  dispatch: Dispatch<PlotsReducerAction>
   title: string
   onRename: (section: Section, name: string) => void
   onResize: (size: PlotSize, section: Section) => void
@@ -37,7 +34,6 @@ export interface PlotsContainerProps {
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
   sectionKey,
-  dispatch,
   title,
   children,
   onRename,
@@ -107,9 +103,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         <summary
           onClick={e => {
             e.preventDefault()
-            dispatch({
-              sectionKey,
-              type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
+            sendMessage({
+              payload: {
+                [sectionKey]: !sectionCollapsed[sectionKey]
+              },
+              type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
             })
           }}
         >
@@ -131,11 +129,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           )}
         </summary>
         <div className={styles.centered}>
-          {
+          {open && (
             <div className={sizeClass} data-testid="plots-wrapper">
               {children}
             </div>
-          }
+          )}
         </div>
       </details>
       <div className={styles.iconMenu}>
