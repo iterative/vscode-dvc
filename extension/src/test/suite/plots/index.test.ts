@@ -20,7 +20,6 @@ import {
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
-  ComparisonRevision,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
   PlotSize,
@@ -316,7 +315,7 @@ suite('Plots Test Suite', () => {
       ).to.be.calledWithExactly({
         comparison: {
           ...comparisonPlotsFixture,
-          revisions: reorderObjectList<ComparisonRevision>(
+          revisions: reorderObjectList(
             mockComparisonOrder,
             comparisonPlotsFixture.revisions,
             'revision'
