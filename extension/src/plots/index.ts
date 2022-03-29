@@ -146,6 +146,12 @@ export class Plots extends BaseRepository<TPlotsData> {
     })
   }
 
+  private sendTemplatePlotsData() {
+    this.webview?.show({
+      template: this.getTemplatePlots()
+    })
+  }
+
   private getTemplatePlots() {
     const paths = this.paths?.getTemplateOrder()
     const plots = this.plots?.getTemplatePlots(paths)
@@ -159,6 +165,12 @@ export class Plots extends BaseRepository<TPlotsData> {
       sectionName: this.plots.getSectionName(Section.TEMPLATE_PLOTS),
       size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
     }
+  }
+
+  private sendComparisonPlotsData() {
+    this.webview?.show({
+      comparison: this.getComparisonPlots()
+    })
   }
 
   private getComparisonPlots() {
@@ -247,16 +259,12 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setComparisonOrder(order: string[]) {
     this.plots?.setComparisonOrder(order)
-    this.webview?.show({
-      comparison: this.getComparisonPlots()
-    })
+    this.sendComparisonPlotsData()
   }
 
   private setTemplateOrder(order: PlotsTemplatesReordered) {
     this.paths?.setTemplateOrder(order)
-    this.webview?.show({
-      template: this.getTemplatePlots()
-    })
+    this.sendTemplatePlotsData()
   }
 
   private setMetricOrder(order: string[]) {
