@@ -15,6 +15,7 @@ import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
 import { mockHasCheckpoints } from '../experiments/util'
 import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
+import { PathsModel } from '../../../plots/paths/model'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -72,6 +73,9 @@ export const buildPlots = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const plotsModel: PlotsModel = (plots as any).plots
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pathsModel: PathsModel = (plots as any).paths
+
   return {
     data,
     experiments,
@@ -79,6 +83,7 @@ export const buildPlots = async (
     mockGetModifiedTime,
     mockPlotsDiff,
     mockRemoveDir,
+    pathsModel,
     plots,
     plotsModel
   }
