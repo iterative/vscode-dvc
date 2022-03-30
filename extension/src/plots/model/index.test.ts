@@ -8,7 +8,7 @@ import {
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
-import { MementoPrefix } from '../../vscode/memento'
+import { PersistenceKey } from '../../persistence/constant'
 
 const mockedRevisions = [
   { displayColor: 'white', label: 'workspace' },
@@ -23,9 +23,9 @@ describe('plotsModel', () => {
   const exampleDvcRoot = 'test'
   const persistedSelectedMetrics = ['loss', 'accuracy']
   const memento = buildMockMemento({
-    [MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot]:
+    [PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [MementoPrefix.PLOT_SIZES + exampleDvcRoot]: DEFAULT_SECTION_SIZES
+    [PersistenceKey.PLOT_SIZES + exampleDvcRoot]: DEFAULT_SECTION_SIZES
   })
   const mockedGetSelectedRevisions = jest.fn()
 
@@ -58,7 +58,7 @@ describe('plotsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(2)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefix.PLOT_SELECTED_METRICS + exampleDvcRoot,
+      PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot,
       newSelectedMetrics
     )
   })
@@ -82,7 +82,7 @@ describe('plotsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefix.PLOT_SIZES + exampleDvcRoot,
+      PersistenceKey.PLOT_SIZES + exampleDvcRoot,
       { ...DEFAULT_SECTION_SIZES, [Section.CHECKPOINT_PLOTS]: PlotSize.SMALL }
     )
   })
@@ -120,7 +120,7 @@ describe('plotsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefix.PLOT_SECTION_NAMES + exampleDvcRoot,
+      PersistenceKey.PLOT_SECTION_NAMES + exampleDvcRoot,
       {
         [Section.CHECKPOINT_PLOTS]: newName,
         [Section.TEMPLATE_PLOTS]: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
@@ -145,7 +145,7 @@ describe('plotsModel', () => {
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefix.PLOT_SECTION_COLLAPSED + exampleDvcRoot,
+      PersistenceKey.PLOT_SECTION_COLLAPSED + exampleDvcRoot,
       expectedSectionCollapsed
     )
 
@@ -161,7 +161,7 @@ describe('plotsModel', () => {
 
     expect(mementoUpdateSpy).toBeCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      MementoPrefix.PLOT_COMPARISON_ORDER + exampleDvcRoot,
+      PersistenceKey.PLOT_COMPARISON_ORDER + exampleDvcRoot,
       newOrder
     )
 

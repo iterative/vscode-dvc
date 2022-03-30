@@ -9,8 +9,8 @@ import {
 } from './collect'
 import { PlotsOutput } from '../../cli/reader'
 import { PathSelectionModel } from '../../path/selection/model'
-import { MementoPrefix } from '../../vscode/memento'
 import { getPathArray } from '../../fileSystem/util'
+import { PersistenceKey } from '../../persistence/constant'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly deferred = new Deferred()
@@ -19,12 +19,14 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   private templateOrder: TemplateOrder
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    super(dvcRoot, workspaceState, MementoPrefix.PLOT_PATH_STATUS, getPathArray)
-
-    this.templateOrder = this.workspaceState.get(
-      MementoPrefix.PLOT_TEMPLATE_ORDER + this.dvcRoot,
-      []
+    super(
+      dvcRoot,
+      workspaceState,
+      PersistenceKey.PLOT_PATH_STATUS,
+      getPathArray
     )
+
+    this.templateOrder = this.revive(PersistenceKey.PLOT_TEMPLATE_ORDER, [])
   }
 
   public transformAndSet(data: PlotsOutput) {
@@ -79,9 +81,6 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   private persistTemplateOrder() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_TEMPLATE_ORDER + this.dvcRoot,
-      this.templateOrder
-    )
+    this.persist(PersistenceKey.PLOT_TEMPLATE_ORDER, this.templateOrder)
   }
 }

@@ -25,14 +25,14 @@ import {
   tooManySelected
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
-import { revive } from './workspaceState'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
-import { MementoPrefix } from '../../vscode/memento'
 import { hasKey } from '../../util/object'
 import { flattenMapValues } from '../../util/map'
+import { ModelWithPersistence } from '../../persistence/model'
+import { PersistenceKey } from '../../persistence/constant'
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: string
@@ -51,7 +51,7 @@ export enum ExperimentType {
   QUEUED = 'queued'
 }
 
-export class ExperimentsModel {
+export class ExperimentsModel extends ModelWithPersistence {
   public readonly dispose = Disposable.fn()
 
   private workspace = {} as Experiment
@@ -67,21 +67,28 @@ export class ExperimentsModel {
 
   private currentSorts: SortDefinition[]
 
-  private readonly dvcRoot: string
-  private readonly workspaceState: Memento
-
   constructor(dvcRoot: string, workspaceState: Memento) {
-    const { branchColors, currentSorts, experimentColors, filters, status } =
-      revive(dvcRoot, workspaceState)
-    this.branchColors = branchColors
-    this.currentSorts = currentSorts
-    this.experimentColors = experimentColors
-    this.status = status
-    this.filters = filters
+    super(dvcRoot, workspaceState)
 
-    this.dvcRoot = dvcRoot
-
-    this.workspaceState = workspaceState
+    this.branchColors = this.reviveColors(
+      PersistenceKey.BRANCH_COLORS,
+      copyOriginalBranchColors
+    )
+    this.currentSorts = this.revive<SortDefinition[]>(
+      PersistenceKey.EXPERIMENTS_SORT_BY,
+      []
+    )
+    this.experimentColors = this.reviveColors(
+      PersistenceKey.EXPERIMENTS_COLORS,
+      copyOriginalExperimentColors
+    )
+    this.filters = new Map(
+      this.revive<[string, FilterDefinition][]>(
+        PersistenceKey.EXPERIMENTS_FILTER_BY,
+        []
+      )
+    )
+    this.status = this.revive<Statuses>(PersistenceKey.EXPERIMENTS_STATUS, {})
   }
 
   public async transformAndSet(
@@ -457,42 +464,51 @@ export class ExperimentsModel {
 
     Promise.all([
       this.persistColors(
-        MementoPrefix.EXPERIMENTS_COLORS,
+        PersistenceKey.EXPERIMENTS_COLORS,
         this.experimentColors
       ),
-      this.persistColors(MementoPrefix.BRANCH_COLORS, this.branchColors)
+      this.persistColors(PersistenceKey.BRANCH_COLORS, this.branchColors)
     ])
   }
 
   private persistSorts() {
-    return this.workspaceState.update(
-      MementoPrefix.EXPERIMENTS_SORT_BY + this.dvcRoot,
-      this.currentSorts
-    )
+    return this.persist(PersistenceKey.EXPERIMENTS_SORT_BY, this.currentSorts)
   }
 
   private applyAndPersistFilters() {
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
     }
-    return this.workspaceState.update(
-      MementoPrefix.EXPERIMENTS_FILTER_BY + this.dvcRoot,
-      [...this.filters]
-    )
+    return this.persist(PersistenceKey.EXPERIMENTS_FILTER_BY, [...this.filters])
   }
 
-  private persistColors(prefix: MementoPrefix, colors: Colors) {
-    this.workspaceState.update(prefix + this.dvcRoot, {
+  private persistColors(prefix: PersistenceKey, colors: Colors) {
+    this.persist(prefix, {
       assigned: [...colors.assigned],
       available: colors.available
     })
   }
 
   private persistStatus() {
-    return this.workspaceState.update(
-      MementoPrefix.EXPERIMENTS_STATUS + this.dvcRoot,
-      this.status
-    )
+    return this.persist(PersistenceKey.EXPERIMENTS_STATUS, this.status)
+  }
+
+  private reviveColors(
+    key: PersistenceKey,
+    copyOriginalColors: () => string[]
+  ) {
+    const { assigned, available } = this.revive<{
+      assigned: [string, string][]
+      available: string[]
+    }>(key, {
+      assigned: [],
+      available: copyOriginalColors()
+    })
+
+    return {
+      assigned: new Map(assigned),
+      available: available
+    }
   }
 
   private addSelected(experiment: Experiment) {

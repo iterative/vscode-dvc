@@ -11,34 +11,34 @@ import {
   ComparisonData,
   RevisionData
 } from './collect'
-import { revive } from './workspaceState'
 import {
   CheckpointPlotData,
   ComparisonPlots,
   ComparisonRevision,
   ComparisonRevisionData,
+  DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
+  DEFAULT_SECTION_SIZES,
   PlotSize,
   Section,
   SectionCollapsed
 } from '../webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
-import { MementoPrefix } from '../../vscode/memento'
 import { getColorScale } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
+import { PersistenceKey } from '../../persistence/constant'
+import { ModelWithPersistence } from '../../persistence/model'
 
-export class PlotsModel {
+export class PlotsModel extends ModelWithPersistence {
   public readonly dispose = Disposable.fn()
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private readonly dvcRoot: string
   private readonly experiments: Experiments
-  private readonly workspaceState: Memento
 
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
@@ -60,25 +60,27 @@ export class PlotsModel {
     experiments: Experiments,
     workspaceState: Memento
   ) {
-    this.dvcRoot = dvcRoot
+    super(dvcRoot, workspaceState)
     this.experiments = experiments
-    this.workspaceState = workspaceState
 
-    const {
-      plotSizes,
-      sectionCollapsed,
-      sectionNames,
-      comparisonOrder,
-      selectedMetrics,
-      metricOrder
-    } = revive(dvcRoot, workspaceState)
-
-    this.plotSizes = plotSizes
-    this.sectionCollapsed = sectionCollapsed
-    this.sectionNames = sectionNames
-    this.comparisonOrder = comparisonOrder
-    this.selectedMetrics = selectedMetrics
-    this.metricOrder = metricOrder
+    this.plotSizes = this.revive(
+      PersistenceKey.PLOT_SIZES,
+      DEFAULT_SECTION_SIZES
+    )
+    this.sectionCollapsed = this.revive(
+      PersistenceKey.PLOT_SECTION_COLLAPSED,
+      DEFAULT_SECTION_COLLAPSED
+    )
+    this.sectionNames = this.revive(
+      PersistenceKey.PLOT_SECTION_NAMES,
+      DEFAULT_SECTION_NAMES
+    )
+    this.comparisonOrder = this.revive(PersistenceKey.PLOT_COMPARISON_ORDER, [])
+    this.selectedMetrics = this.revive(
+      PersistenceKey.PLOT_SELECTED_METRICS,
+      undefined
+    )
+    this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
   }
 
   public isReady() {
@@ -208,13 +210,16 @@ export class PlotsModel {
       }
     })
 
-    this.persistComparisonOrder()
+    this.persist(PersistenceKey.PLOT_COMPARISON_ORDER, this.comparisonOrder)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {
     this.selectedMetrics = selectedMetrics
     this.setMetricOrder()
-    this.persistSelectedMetrics()
+    this.persist(
+      PersistenceKey.PLOT_SELECTED_METRICS,
+      this.getSelectedMetrics()
+    )
   }
 
   public getSelectedMetrics() {
@@ -227,12 +232,12 @@ export class PlotsModel {
       metricOrder || this.metricOrder,
       this.selectedMetrics
     )
-    this.persistMetricOrder()
+    this.persist(PersistenceKey.PLOT_METRIC_ORDER, this.metricOrder)
   }
 
   public setPlotSize(section: Section, size: PlotSize) {
     this.plotSizes[section] = size
-    this.persistPlotSize()
+    this.persist(PersistenceKey.PLOT_SIZES, this.plotSizes)
   }
 
   public getPlotSize(section: Section) {
@@ -244,7 +249,7 @@ export class PlotsModel {
       ...this.sectionCollapsed,
       ...newState
     }
-    this.persistCollapsibleState()
+    this.persist(PersistenceKey.PLOT_SECTION_COLLAPSED, this.sectionCollapsed)
   }
 
   public getSectionCollapsed() {
@@ -253,7 +258,7 @@ export class PlotsModel {
 
   public setSectionName(section: Section, name: string) {
     this.sectionNames[section] = name
-    this.persistSectionNames()
+    this.persist(PersistenceKey.PLOT_SECTION_NAMES, this.sectionNames)
   }
 
   public getSectionName(section: Section): string {
@@ -357,48 +362,6 @@ export class PlotsModel {
       this.templates,
       this.revisionData,
       this.getRevisionColors()
-    )
-  }
-
-  private persistSelectedMetrics() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_SELECTED_METRICS + this.dvcRoot,
-      this.getSelectedMetrics()
-    )
-  }
-
-  private persistMetricOrder() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_METRIC_ORDER + this.dvcRoot,
-      this.metricOrder
-    )
-  }
-
-  private persistPlotSize() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_SIZES + this.dvcRoot,
-      this.plotSizes
-    )
-  }
-
-  private persistCollapsibleState() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_SECTION_COLLAPSED + this.dvcRoot,
-      this.sectionCollapsed
-    )
-  }
-
-  private persistSectionNames() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_SECTION_NAMES + this.dvcRoot,
-      this.sectionNames
-    )
-  }
-
-  private persistComparisonOrder() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_COMPARISON_ORDER + this.dvcRoot,
-      this.comparisonOrder
     )
   }
 }
