@@ -52,7 +52,7 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       templateOrder || this.templateOrder
     )
 
-    this.persistTemplateOrder()
+    this.persist(PersistenceKey.PLOT_TEMPLATE_ORDER, this.templateOrder)
   }
 
   public filterChildren(path: string | undefined): PlotPath[] {
@@ -78,9 +78,5 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
         plotPath => plotPath.type?.has(type) && this.status[plotPath.path]
       )
       .map(({ path }) => path)
-  }
-
-  private persistTemplateOrder() {
-    this.persist(PersistenceKey.PLOT_TEMPLATE_ORDER, this.templateOrder)
   }
 }
