@@ -538,37 +538,6 @@ describe('App', () => {
     ])
   })
 
-  it('should add the new plot at the end of the set order', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-
-    let plots = screen.getAllByTestId(/summary\.json/)
-    dragAndDrop(plots[3], plots[0])
-
-    sendSetDataMessage({
-      checkpoint: {
-        ...checkpointPlotsFixture,
-        plots: [
-          {
-            title: 'summary.json:new-plot',
-            values: checkpointPlotsFixture.plots[0].values
-          },
-          ...checkpointPlotsFixture.plots
-        ]
-      }
-    })
-    plots = screen.getAllByTestId(/summary\.json/)
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'summary.json:val_accuracy',
-      'summary.json:loss',
-      'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:new-plot'
-    ])
-  })
-
   it('should not be possible to drag a plot from a section to another', () => {
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,

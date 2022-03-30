@@ -29,9 +29,9 @@ export const Plots = ({
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
   useEffect(() => {
-    const newMetrics = getMetricsFromPlots(data?.checkpoint?.plots)
-    setMetrics(newMetrics)
-    setSelectedPlots(data?.checkpoint?.selectedMetrics || newMetrics)
+    const metrics = getMetricsFromPlots(data?.checkpoint?.plots)
+    setMetrics(metrics)
+    setSelectedPlots(data?.checkpoint?.selectedMetrics || [])
   }, [data, setSelectedPlots, setMetrics])
 
   if (!data || !data.sectionCollapsed) {
