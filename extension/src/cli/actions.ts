@@ -1,4 +1,4 @@
-import { Args, Flag } from './args'
+import { Args, Flag } from './constants'
 import { Prompt } from './output'
 import { MaybeConsoleError } from './error'
 import { warnOfConsequences } from '../vscode/modal'
