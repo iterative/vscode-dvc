@@ -273,7 +273,7 @@ describe('App', () => {
   })
 
   describe('Toggle experiment status', () => {
-    it('should send a message to the extension to toggle an experiment when the bullet is clicked', () => {
+    it('should send a message to the extension to toggle an experiment when the row is clicked', () => {
       render(<App />)
 
       fireEvent(
@@ -302,6 +302,57 @@ describe('App', () => {
       testClick('[exp-e7a67]', 'exp-e7a67')
       testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
       testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+    })
+
+    it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      mockPostMessage.mockClear()
+
+      const testRowLabel = screen.getByText('main')
+
+      testRowLabel.focus()
+
+      fireEvent.keyPress(testRowLabel, {
+        bubbles: true,
+        code: 'Enter',
+        key: 'Enter',
+        keyCode: 13
+      })
+      expect(mockPostMessage).toBeCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      })
+      mockPostMessage.mockClear()
+
+      fireEvent.keyPress(testRowLabel, {
+        bubbles: true,
+        charCode: 32,
+        code: 'Space',
+        key: ' ',
+        keyCode: 32
+      })
+      expect(mockPostMessage).toBeCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      })
+      mockPostMessage.mockClear()
+
+      fireEvent.keyPress(testRowLabel, {
+        bubbles: true,
+        code: 'keyA',
+        key: 'a'
+      })
+      expect(mockPostMessage).not.toBeCalled()
     })
   })
 

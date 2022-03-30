@@ -147,7 +147,7 @@ export const RowContent: React.FC<
       role="row"
       onClick={toggleExperiment}
       onKeyPress={e => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' || e.key === ' ') {
           toggleExperiment()
         }
       }}
