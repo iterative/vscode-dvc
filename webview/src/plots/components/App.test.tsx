@@ -299,8 +299,8 @@ describe('App', () => {
     expect(mockPostMessage).toBeCalledWith({
       payload: [
         'summary.json:accuracy',
-        'summary.json:val_loss',
-        'summary.json:val_accuracy'
+        'summary.json:val_accuracy',
+        'summary.json:val_loss'
       ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
@@ -312,10 +312,10 @@ describe('App', () => {
 
     expect(mockPostMessage).toBeCalledWith({
       payload: [
-        'summary.json:loss',
         'summary.json:accuracy',
-        'summary.json:val_loss',
-        'summary.json:val_accuracy'
+        'summary.json:loss',
+        'summary.json:val_accuracy',
+        'summary.json:val_loss'
       ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })

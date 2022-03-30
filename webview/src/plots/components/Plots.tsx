@@ -15,7 +15,7 @@ import { sendMessage } from '../../shared/vscode'
 import { Theme } from '../../shared/components/theme/Theme'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
-  plots?.map(({ title }) => title) || []
+  plots?.map(({ title }) => title).sort() || []
 
 export const Plots = ({
   state
