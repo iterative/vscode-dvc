@@ -11,14 +11,13 @@ import {
   ComparisonData,
   RevisionData
 } from './collect'
+import { revive } from './workspaceState'
 import {
   CheckpointPlotData,
   ComparisonPlots,
   ComparisonRevision,
   ComparisonRevisionData,
-  DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
-  DEFAULT_SECTION_SIZES,
   PlotSize,
   Section,
   SectionCollapsed
@@ -72,7 +71,7 @@ export class PlotsModel {
       comparisonOrder,
       selectedMetrics,
       metricOrder
-    } = this.revive(dvcRoot, workspaceState)
+    } = revive(dvcRoot, workspaceState)
 
     this.plotSizes = plotSizes
     this.sectionCollapsed = sectionCollapsed
@@ -401,34 +400,5 @@ export class PlotsModel {
       MementoPrefix.PLOT_COMPARISON_ORDER + this.dvcRoot,
       this.comparisonOrder
     )
-  }
-
-  private revive(dvcRoot: string, workspaceState: Memento) {
-    return {
-      comparisonOrder: workspaceState.get(
-        MementoPrefix.PLOT_COMPARISON_ORDER + dvcRoot,
-        []
-      ),
-      metricOrder: workspaceState.get(
-        MementoPrefix.PLOT_METRIC_ORDER + dvcRoot,
-        []
-      ),
-      plotSizes: workspaceState.get(
-        MementoPrefix.PLOT_SIZES + dvcRoot,
-        DEFAULT_SECTION_SIZES
-      ),
-      sectionCollapsed: workspaceState.get(
-        MementoPrefix.PLOT_SECTION_COLLAPSED + dvcRoot,
-        DEFAULT_SECTION_COLLAPSED
-      ),
-      sectionNames: workspaceState.get(
-        MementoPrefix.PLOT_SECTION_NAMES + dvcRoot,
-        DEFAULT_SECTION_NAMES
-      ),
-      selectedMetrics: workspaceState.get(
-        MementoPrefix.PLOT_SELECTED_METRICS + dvcRoot,
-        undefined
-      )
-    }
   }
 }

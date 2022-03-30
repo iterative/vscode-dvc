@@ -25,6 +25,7 @@ import {
   tooManySelected
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
+import { revive } from './workspaceState'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
@@ -71,7 +72,7 @@ export class ExperimentsModel {
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     const { branchColors, currentSorts, experimentColors, filters, status } =
-      this.revive(dvcRoot, workspaceState)
+      revive(dvcRoot, workspaceState)
     this.branchColors = branchColors
     this.currentSorts = currentSorts
     this.experimentColors = experimentColors
@@ -492,63 +493,6 @@ export class ExperimentsModel {
       MementoPrefix.EXPERIMENTS_STATUS + this.dvcRoot,
       this.status
     )
-  }
-
-  private revive(
-    dvcRoot: string,
-    workspaceState: Memento
-  ): {
-    branchColors: Colors
-    experimentColors: Colors
-    currentSorts: SortDefinition[]
-    filters: Map<string, FilterDefinition>
-    status: Statuses
-  } {
-    return {
-      branchColors: this.reviveColors(
-        workspaceState,
-        MementoPrefix.BRANCH_COLORS + dvcRoot,
-        copyOriginalBranchColors
-      ),
-      currentSorts: workspaceState.get<SortDefinition[]>(
-        MementoPrefix.EXPERIMENTS_SORT_BY + dvcRoot,
-        []
-      ),
-      experimentColors: this.reviveColors(
-        workspaceState,
-        MementoPrefix.EXPERIMENTS_COLORS + dvcRoot,
-        copyOriginalExperimentColors
-      ),
-      filters: new Map(
-        workspaceState.get<[string, FilterDefinition][]>(
-          MementoPrefix.EXPERIMENTS_FILTER_BY + dvcRoot,
-          []
-        )
-      ),
-      status: workspaceState.get<Statuses>(
-        MementoPrefix.EXPERIMENTS_STATUS + dvcRoot,
-        {}
-      )
-    }
-  }
-
-  private reviveColors(
-    workspaceState: Memento,
-    key: string,
-    copyOriginalColors: () => string[]
-  ) {
-    const { assigned, available } = workspaceState.get<{
-      assigned: [string, string][]
-      available: string[]
-    }>(key, {
-      assigned: [],
-      available: copyOriginalColors()
-    })
-
-    return {
-      assigned: new Map(assigned),
-      available: available
-    }
   }
 
   private addSelected(experiment: Experiment) {
