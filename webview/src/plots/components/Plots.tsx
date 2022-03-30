@@ -15,7 +15,7 @@ import { sendMessage } from '../../shared/vscode'
 import { Theme } from '../../shared/components/theme/Theme'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
-  plots?.map(({ title }) => title) || []
+  plots?.map(({ title }) => title).sort() || []
 
 export const Plots = ({
   state
@@ -29,9 +29,9 @@ export const Plots = ({
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
   useEffect(() => {
-    const newMetrics = getMetricsFromPlots(data?.checkpoint?.plots)
-    setMetrics(newMetrics)
-    setSelectedPlots(data?.checkpoint?.selectedMetrics || newMetrics)
+    const metrics = getMetricsFromPlots(data?.checkpoint?.plots)
+    setMetrics(metrics)
+    setSelectedPlots(data?.checkpoint?.selectedMetrics || [])
   }, [data, setSelectedPlots, setMetrics])
 
   if (!data || !data.sectionCollapsed) {

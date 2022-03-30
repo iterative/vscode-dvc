@@ -9,8 +9,8 @@ import {
 } from './collect'
 import { PlotsOutput } from '../../cli/reader'
 import { PathSelectionModel } from '../../path/selection/model'
-import { MementoPrefix } from '../../vscode/memento'
 import { getPathArray } from '../../fileSystem/util'
+import { PersistenceKey } from '../../persistence/constants'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly deferred = new Deferred()
@@ -19,12 +19,14 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   private templateOrder: TemplateOrder
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    super(dvcRoot, workspaceState, MementoPrefix.PLOT_PATH_STATUS, getPathArray)
-
-    this.templateOrder = this.workspaceState.get(
-      MementoPrefix.PLOT_TEMPLATE_ORDER + this.dvcRoot,
-      []
+    super(
+      dvcRoot,
+      workspaceState,
+      PersistenceKey.PLOT_PATH_STATUS,
+      getPathArray
     )
+
+    this.templateOrder = this.revive(PersistenceKey.PLOT_TEMPLATE_ORDER, [])
   }
 
   public transformAndSet(data: PlotsOutput) {
@@ -50,7 +52,7 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       templateOrder || this.templateOrder
     )
 
-    this.persistTemplateOrder()
+    this.persist(PersistenceKey.PLOT_TEMPLATE_ORDER, this.templateOrder)
   }
 
   public filterChildren(path: string | undefined): PlotPath[] {
@@ -76,12 +78,5 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
         plotPath => plotPath.type?.has(type) && this.status[plotPath.path]
       )
       .map(({ path }) => path)
-  }
-
-  private persistTemplateOrder() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_TEMPLATE_ORDER + this.dvcRoot,
-      this.templateOrder
-    )
   }
 }
