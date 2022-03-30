@@ -10,9 +10,14 @@ $gap: 20px;
   flex-wrap: wrap;
 }
 
-.fullScreen {
+.emptyScreen {
   width: 100vw;
   height: 100vh;
+}
+
+.emptySection {
+  width: 100vw;
+  height: 33vh;
 }
 
 .emptyStateText {
