@@ -8,6 +8,17 @@ interface IconMenuProps {
   items: IconMenuItemProps[]
 }
 
+const popperOptions = {
+  modifiers: [
+    {
+      name: 'computeStyles',
+      options: {
+        adaptive: false
+      }
+    }
+  ]
+}
+
 export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
   const [tooltipDisabled, setTooltipDisabled] = useState<boolean>(false)
   const [menuSource, menuTarget] = useSingleton()
@@ -19,6 +30,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
     <Tooltip
       singleton={tooltipSource}
       placement="bottom-end"
+      popperOptions={popperOptions}
       disabled={tooltipDisabled}
     >
       <Tooltip
@@ -26,6 +38,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
         interactive
         singleton={menuSource}
         placement="bottom"
+        popperOptions={popperOptions}
         onShow={() => {
           setTooltipDisabled(true)
         }}
