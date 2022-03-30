@@ -4,6 +4,7 @@
     "**/*.stories.*",
     "**/*.test.*",
     "**/constants.ts",
+    "**/contract.ts",
     "extension/src/test/**",
     "webview/src/react-table-config.d.ts",
     "webview/src/shared/components/icons/**"
