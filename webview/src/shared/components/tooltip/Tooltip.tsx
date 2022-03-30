@@ -6,21 +6,6 @@ import 'tippy.js/dist/tippy.css'
 export const HEADER_TOOLTIP_DELAY = 100
 export const CELL_TOOLTIP_DELAY = 1000
 
-const defaultModifiers = {
-  modifiers: [
-    {
-      enabled: false,
-      name: 'flip'
-    },
-    {
-      name: 'computeStyles',
-      options: {
-        adaptive: false
-      }
-    }
-  ]
-}
-
 const TooltipRenderFunction: React.ForwardRefRenderFunction<
   unknown,
   TippyProps
@@ -36,10 +21,10 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onShow,
     onHide,
     placement,
+    popperOptions,
     animation = false,
     className = styles.menu,
-    arrow = false,
-    popperOptions = defaultModifiers
+    arrow = false
   },
   ref
 ) => (
