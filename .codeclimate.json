@@ -1,8 +1,9 @@
 {
   "version": "2",
   "exclude_patterns": [
-    "**/*.test.*",
     "**/*.stories.*",
+    "**/*.test.*",
+    "**/constants.ts",
     "extension/src/test/**",
     "webview/src/react-table-config.d.ts",
     "webview/src/shared/components/icons/**"
