@@ -1,7 +1,7 @@
+import { join } from 'path'
 import { collectFlatExperimentParams } from './collect'
 import rowsFixture from '../../../test/fixtures/expShow/rows'
 import { joinMetricOrParamFilePath } from '../../metricsAndParams/paths'
-import { join } from '../../../test/util/path'
 
 describe('collectFlatExperimentParams', () => {
   it('should flatten the params into an array', () => {

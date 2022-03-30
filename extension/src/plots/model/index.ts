@@ -22,7 +22,7 @@ import {
   PlotSize,
   Section,
   SectionCollapsed
-} from '../../plots/webview/contract'
+} from '../webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
