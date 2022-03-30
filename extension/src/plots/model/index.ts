@@ -22,12 +22,13 @@ import {
   PlotSize,
   Section,
   SectionCollapsed
-} from '../../plots/webview/contract'
+} from '../webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
 import { Experiments } from '../../experiments'
 import { MementoPrefix } from '../../vscode/memento'
 import { getColorScale } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
+import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
 
 export class PlotsModel {
@@ -274,16 +275,15 @@ export class PlotsModel {
   private removeStaleRevisions() {
     const revisions = this.experiments.getRevisions()
 
-    Object.keys(this.comparisonData).map(revision => {
-      if (!revisions.includes(revision)) {
-        delete this.comparisonData[revision]
-      }
-    })
-    Object.keys(this.revisionData).map(revision => {
-      if (!revisions.includes(revision)) {
-        delete this.revisionData[revision]
-      }
-    })
+    this.comparisonData = removeMissingKeysFromObject(
+      revisions,
+      this.comparisonData
+    )
+
+    this.revisionData = removeMissingKeysFromObject(
+      revisions,
+      this.revisionData
+    )
   }
 
   private removeStaleBranches() {

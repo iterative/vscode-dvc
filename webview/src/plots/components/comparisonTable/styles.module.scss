@@ -70,7 +70,8 @@ $gap: 4px;
   }
 }
 
-.pinnedColumnCell, .pinnedColumnHeader {
+.pinnedColumnCell,
+.pinnedColumnHeader {
   position: sticky;
   left: 0;
   z-index: 1;

@@ -542,21 +542,18 @@ export const getComparisonWebviewMessage = (
   joinFunc?: (...args: string[]) => string
 ) => {
   const plotAcc = [] as ComparisonPlots
-  Object.entries({
-    ...getImageData(baseUrl, joinFunc)
-  }).forEach(([path, plots]) => {
+  for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const revisionsAcc: ComparisonRevisionData = {}
-    plots.forEach(({ url, revisions }) => {
+    for (const { url, revisions } of plots) {
       const revision = revisions?.[0]
       if (!revision) {
-        return
+        continue
       }
       revisionsAcc[revision] = { url: `${url}?${MOCK_IMAGE_MTIME}`, revision }
-    })
+    }
 
     plotAcc.push({ path, revisions: revisionsAcc })
-    return plotAcc
-  })
+  }
 
   return {
     plots: plotAcc,

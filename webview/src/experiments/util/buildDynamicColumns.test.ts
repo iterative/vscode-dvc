@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { join } from 'path'
+import { join } from 'dvc/src/test/util/path'
 import { ColumnGroup } from 'react-table'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { collectMetricsAndParams } from 'dvc/src/experiments/metricsAndParams/collect'

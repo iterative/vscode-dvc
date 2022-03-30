@@ -1,9 +1,9 @@
+import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { isSameOrChild, loadYaml, PartialDvcYaml } from '..'
 import { findFiles } from '../workspace'
-import { join } from '../../test/util/path'
 import { createFileSystemWatcher } from '../watcher'
 
 export class FileSystemData {
