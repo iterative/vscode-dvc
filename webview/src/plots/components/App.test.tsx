@@ -21,6 +21,7 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
+import { reorderObjectList } from 'dvc/src/util/array'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
@@ -536,6 +537,62 @@ describe('App', () => {
       'summary.json:val_loss',
       'summary.json:val_accuracy'
     ])
+  })
+
+  it('should not change the metric order in the hover menu by reordering the plots', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    let options = screen.getAllByTestId('select-menu-option-label')
+    const optionsOrder = [
+      'summary.json:accuracy',
+      'summary.json:loss',
+      'summary.json:val_accuracy',
+      'summary.json:val_loss'
+    ]
+    expect(options.map(({ textContent }) => textContent)).toStrictEqual(
+      optionsOrder
+    )
+
+    fireEvent.click(pickerButton)
+
+    let plots = screen.getAllByTestId(/summary\.json/)
+    const newPlotOrder = [
+      'summary.json:val_accuracy',
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss'
+    ]
+    expect(plots.map(plot => plot.id)).not.toStrictEqual(newPlotOrder)
+
+    dragAndDrop(plots[3], plots[0])
+    sendSetDataMessage({
+      checkpoint: {
+        ...checkpointPlotsFixture,
+        plots: reorderObjectList(
+          newPlotOrder,
+          checkpointPlotsFixture.plots,
+          'title'
+        )
+      }
+    })
+
+    plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual(newPlotOrder)
+
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    options = screen.getAllByTestId('select-menu-option-label')
+    expect(options.map(({ textContent }) => textContent)).toStrictEqual(
+      optionsOrder
+    )
   })
 
   it('should not be possible to drag a plot from a section to another', () => {
