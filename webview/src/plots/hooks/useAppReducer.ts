@@ -1,4 +1,4 @@
-import { PlotsData, Section } from 'dvc/src/plots/webview/contract'
+import { PlotsData } from 'dvc/src/plots/webview/contract'
 import {
   MessageToWebview,
   MessageToWebviewType
@@ -11,16 +11,7 @@ export interface PlotsWebviewState {
   dvcRoot?: string
 }
 
-export enum CollapsibleSectionsActions {
-  TOGGLE_COLLAPSED = 'toggleCollapsed'
-}
-
-export type PlotsReducerAction =
-  | MessageToWebview<PlotsData>
-  | {
-      type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
-      sectionKey: Section
-    }
+export type PlotsReducerAction = MessageToWebview<PlotsData>
 
 const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
   state,

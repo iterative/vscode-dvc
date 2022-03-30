@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
@@ -11,7 +12,6 @@ import {
   ignoredDotDirectories,
   getRelativePattern
 } from '../../fileSystem/watcher'
-import { join } from '../../test/util/path'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
   EXPERIMENTS_GIT_REFS

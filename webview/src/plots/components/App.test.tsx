@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { join } from 'path'
+import { join } from 'dvc/src/test/util/path'
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
@@ -21,6 +21,7 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
+import { reorderObjectList } from 'dvc/src/util/array'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
@@ -299,8 +300,8 @@ describe('App', () => {
     expect(mockPostMessage).toBeCalledWith({
       payload: [
         'summary.json:accuracy',
-        'summary.json:val_loss',
-        'summary.json:val_accuracy'
+        'summary.json:val_accuracy',
+        'summary.json:val_loss'
       ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
@@ -312,10 +313,10 @@ describe('App', () => {
 
     expect(mockPostMessage).toBeCalledWith({
       payload: [
-        'summary.json:loss',
         'summary.json:accuracy',
-        'summary.json:val_loss',
-        'summary.json:val_accuracy'
+        'summary.json:loss',
+        'summary.json:val_accuracy',
+        'summary.json:val_loss'
       ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
@@ -538,35 +539,60 @@ describe('App', () => {
     ])
   })
 
-  it('should add the new plot at the end of the set order', () => {
+  it('should not change the metric order in the hover menu by reordering the plots', () => {
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    let plots = screen.getAllByTestId(/summary\.json/)
-    dragAndDrop(plots[3], plots[0])
+    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
 
-    sendSetDataMessage({
-      checkpoint: {
-        ...checkpointPlotsFixture,
-        plots: [
-          {
-            title: 'summary.json:new-plot',
-            values: checkpointPlotsFixture.plots[0].values
-          },
-          ...checkpointPlotsFixture.plots
-        ]
-      }
-    })
-    plots = screen.getAllByTestId(/summary\.json/)
-    expect(plots.map(plot => plot.id)).toStrictEqual([
+    let options = screen.getAllByTestId('select-menu-option-label')
+    const optionsOrder = [
+      'summary.json:accuracy',
+      'summary.json:loss',
+      'summary.json:val_accuracy',
+      'summary.json:val_loss'
+    ]
+    expect(options.map(({ textContent }) => textContent)).toStrictEqual(
+      optionsOrder
+    )
+
+    fireEvent.click(pickerButton)
+
+    let plots = screen.getAllByTestId(/summary\.json/)
+    const newPlotOrder = [
       'summary.json:val_accuracy',
       'summary.json:loss',
       'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:new-plot'
-    ])
+      'summary.json:val_loss'
+    ]
+    expect(plots.map(plot => plot.id)).not.toStrictEqual(newPlotOrder)
+
+    dragAndDrop(plots[3], plots[0])
+    sendSetDataMessage({
+      checkpoint: {
+        ...checkpointPlotsFixture,
+        plots: reorderObjectList(
+          newPlotOrder,
+          checkpointPlotsFixture.plots,
+          'title'
+        )
+      }
+    })
+
+    plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual(newPlotOrder)
+
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    options = screen.getAllByTestId('select-menu-option-label')
+    expect(options.map(({ textContent }) => textContent)).toStrictEqual(
+      optionsOrder
+    )
   })
 
   it('should not be possible to drag a plot from a section to another', () => {
