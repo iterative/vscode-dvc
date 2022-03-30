@@ -71,14 +71,16 @@ $gap: 20px;
   }
 }
 
-.singleViewPlotsGrid, .multiViewPlotsGrid {
+.singleViewPlotsGrid,
+.multiViewPlotsGrid {
   width: calc(100% - $gap * 2);
   margin-left: $gap;
   display: grid;
   gap: $gap;
   grid-auto-flow: row;
 
-  + .singleViewPlotsGrid, + .multiViewPlotsGrid {
+  + .singleViewPlotsGrid,
+  + .multiViewPlotsGrid {
     margin-top: $gap;
   }
 
@@ -112,7 +114,7 @@ $gap: 20px;
     .regularPlots & {
       grid-template-columns: 1fr 1fr 1fr;
     }
-  
+
     .smallPlots & {
       grid-template-columns: 1fr 1fr 1fr 1fr;
     }
@@ -122,11 +124,11 @@ $gap: 20px;
     .largePlots & {
       grid-template-columns: 1fr 1fr 1fr;
     }
-  
+
     .regularPlots & {
       grid-template-columns: 1fr 1fr 1fr 1fr;
     }
-  
+
     .smallPlots & {
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
     }
@@ -136,11 +138,11 @@ $gap: 20px;
     .largePlots & {
       grid-template-columns: repeat(auto-fill, minmax(1fr, 1000px));
     }
-  
+
     .regularPlots & {
       grid-template-columns: repeat(auto-fill, minmax(1fr, 800px));
     }
-  
+
     .smallPlots & {
       grid-template-columns: repeat(auto-fill, minmax(1fr, 500px));
     }
@@ -192,11 +194,11 @@ $gap: 20px;
   .largePlots & {
     width: max-content;
   }
-  
+
   .regularPlots & {
     width: calc(300px * var(--scale));
   }
-  
+
   .smallPlots & {
     width: calc(200px * var(--scale));
   }
@@ -239,28 +241,28 @@ $gap: 20px;
     .smallPlots & {
       width: 75%;
     }
-  
+
     .regularPlots & {
       width: 100%;
     }
-  
+
     .largePlots & {
       min-width: 100%;
       width: calc(33% * var(--scale));
     }
   }
-  
+
   @media (min-width: 2000px) {
     min-width: 100%;
 
     .smallPlots & {
       width: 50%;
     }
-  
+
     .regularPlots & {
       width: 75%;
     }
-  
+
     .largePlots & {
       width: 100%;
       padding-right: 0;
@@ -268,7 +270,7 @@ $gap: 20px;
   }
 }
 
-.dropSection{
+.dropSection {
   height: 10px;
 }
 
@@ -287,7 +289,7 @@ $gap: 20px;
     box-sizing: content-box;
 
     path {
-      fill: var(--vscode-focusBorder)
+      fill: var(--vscode-focusBorder);
     }
   }
 }
