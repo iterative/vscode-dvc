@@ -27,6 +27,26 @@ export interface RowProp {
   row: Row<Experiment>
 }
 
+const RowExpansionButton: React.FC<{ row: Row<Experiment> }> = ({ row }) =>
+  row.canExpand ? (
+    <button
+      title={`${row.isExpanded ? 'Contract' : 'Expand'} Row`}
+      className={styles.rowArrowContainer}
+      onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
+        e.stopPropagation()
+        row.toggleRowExpanded()
+      }}
+    >
+      <span
+        className={
+          row.isExpanded ? styles.expandedRowArrow : styles.contractedRowArrow
+        }
+      />
+    </button>
+  ) : (
+    <span className={styles.rowArrowContainer} />
+  )
+
 const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
   bulletColor?: string
@@ -45,23 +65,7 @@ const FirstCell: React.FC<{
       })}
     >
       <div className={styles.innerCell}>
-        <span className={styles.rowArrowPlaceholder}>
-          {row.canExpand && (
-            <span
-              className={
-                row.isExpanded
-                  ? styles.expandedRowArrow
-                  : styles.contractedRowArrow
-              }
-              onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
-                e.stopPropagation()
-                row.toggleRowExpanded()
-              }}
-              aria-hidden="true"
-              data-testid={`${row.original.label}-chevron`}
-            />
-          )}
-        </span>
+        <RowExpansionButton row={row} />
         <span className={styles.bullet} style={{ color: bulletColor }}>
           {row.original.queued && <ClockIcon />}
         </span>
@@ -139,8 +143,14 @@ export const RowContent: React.FC<
           isWorkspace && changes?.length && styles.workspaceWithChanges
         )
       })}
+      tabIndex={0}
+      role="row"
       onClick={toggleExperiment}
-      aria-hidden="true"
+      onKeyPress={e => {
+        if (e.key === 'Enter') {
+          toggleExperiment()
+        }
+      }}
       data-testid={isWorkspace && 'workspace-row'}
     >
       <FirstCell cell={firstCell} bulletColor={original.displayColor} />

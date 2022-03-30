@@ -182,13 +182,15 @@ $spinner-color-light: #000;
   }
 }
 
-.rowArrowPlaceholder {
+.rowArrowContainer {
   width: 8px;
   height: 8px;
-  margin: 0 6px;
+  padding: 0 6px;
   flex: 0 0 8px;
   display: inline-block;
   position: relative;
+  border: none;
+  background: none;
 }
 
 .expandedRowArrow {

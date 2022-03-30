@@ -3,7 +3,13 @@
  */
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import React from 'react'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within
+} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
 import {
@@ -174,7 +180,11 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
 
-      fireEvent.click(screen.getByTestId(`${experimentLabel}-chevron`))
+      const testRow = screen
+        .getAllByRole('row')
+        .find(row => within(row).queryByText(experimentLabel)) as HTMLElement
+      const expandButton = within(testRow).getByTitle('Contract Row')
+      fireEvent.click(expandButton)
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
@@ -222,7 +232,11 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
 
-      fireEvent.click(screen.getByTestId(`${experimentLabel}-chevron`))
+      const testRow = screen
+        .getAllByRole('row')
+        .find(row => within(row).queryByText(experimentLabel)) as HTMLElement
+      const expandButton = within(testRow).getByTitle('Contract Row')
+      fireEvent.click(expandButton)
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
