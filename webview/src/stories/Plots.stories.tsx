@@ -39,6 +39,16 @@ const Template: Story<{
 export const WithData = Template.bind({})
 WithData.parameters = chromaticParameters
 
+export const WithEmptyCheckpoints = Template.bind({})
+WithEmptyCheckpoints.args = {
+  data: {
+    checkpoint: { ...checkpointPlotsFixture, selectedMetrics: [] },
+    comparison: comparisonPlotsFixture,
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    template: templatePlotsFixture
+  }
+}
+
 export const WithCheckpointOnly = Template.bind({})
 WithCheckpointOnly.args = {
   data: {
