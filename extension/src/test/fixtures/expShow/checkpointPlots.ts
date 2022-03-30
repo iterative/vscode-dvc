@@ -80,7 +80,12 @@ const data: CheckpointPlotsData = {
       ]
     }
   ],
-  selectedMetrics: undefined,
+  selectedMetrics: [
+    'summary.json:loss',
+    'summary.json:accuracy',
+    'summary.json:val_loss',
+    'summary.json:val_accuracy'
+  ],
   size: PlotSize.REGULAR,
   sectionName: DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS]
 }

@@ -90,6 +90,10 @@ export class PlotsModel extends ModelWithPersistence {
   public transformAndSetExperiments(data: ExperimentsOutput) {
     const checkpointPlots = collectCheckpointPlotsData(data)
 
+    if (!this.selectedMetrics && checkpointPlots) {
+      this.selectedMetrics = checkpointPlots.map(({ title }) => title)
+    }
+
     this.checkpointPlots = checkpointPlots
 
     this.setMetricOrder()
