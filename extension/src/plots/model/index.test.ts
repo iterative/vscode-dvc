@@ -8,7 +8,7 @@ import {
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
-import { PersistenceKey } from '../../persistence/constant'
+import { PersistenceKey } from '../../persistence/constants'
 
 const mockedRevisions = [
   { displayColor: 'white', label: 'workspace' },

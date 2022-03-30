@@ -32,7 +32,7 @@ import { setContextValue } from '../../vscode/context'
 import { hasKey } from '../../util/object'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
-import { PersistenceKey } from '../../persistence/constant'
+import { PersistenceKey } from '../../persistence/constants'
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: string

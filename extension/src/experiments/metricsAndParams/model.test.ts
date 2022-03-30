@@ -2,7 +2,7 @@ import { MetricsAndParamsModel } from './model'
 import { joinMetricOrParamPath } from './paths'
 import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
-import { PersistenceKey } from '../../persistence/constant'
+import { PersistenceKey } from '../../persistence/constants'
 
 describe('MetricsAndParamsModel', () => {
   const exampleDvcRoot = 'test'

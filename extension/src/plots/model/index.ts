@@ -29,7 +29,7 @@ import { getColorScale } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
-import { PersistenceKey } from '../../persistence/constant'
+import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
 
 export class PlotsModel extends ModelWithPersistence {

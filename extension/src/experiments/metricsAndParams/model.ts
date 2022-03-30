@@ -3,7 +3,7 @@ import { collectChanges, collectMetricsAndParams } from './collect'
 import { splitMetricOrParamPath } from './paths'
 import { MetricOrParam } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
-import { PersistenceKey } from '../../persistence/constant'
+import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel } from '../../path/selection/model'
 
 export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {

@@ -1,5 +1,5 @@
 import { Memento } from 'vscode'
-import { PersistenceKey } from './constant'
+import { PersistenceKey } from './constants'
 
 export class ModelWithPersistence {
   private readonly dvcRoot: string

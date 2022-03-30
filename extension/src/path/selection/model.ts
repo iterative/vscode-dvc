@@ -1,6 +1,6 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { PersistenceKey } from '../../persistence/constant'
+import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
 import { MetricOrParam } from '../../experiments/webview/contract'
 import { PlotPath } from '../../plots/paths/collect'

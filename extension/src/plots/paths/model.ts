@@ -10,7 +10,7 @@ import {
 import { PlotsOutput } from '../../cli/reader'
 import { PathSelectionModel } from '../../path/selection/model'
 import { getPathArray } from '../../fileSystem/util'
-import { PersistenceKey } from '../../persistence/constant'
+import { PersistenceKey } from '../../persistence/constants'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly deferred = new Deferred()
