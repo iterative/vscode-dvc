@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { EventHandler, SyntheticEvent } from 'react'
 import { Cell, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import {
@@ -32,9 +32,13 @@ const RowExpansionButton: React.FC<{ row: Row<Experiment> }> = ({ row }) =>
     <button
       title={`${row.isExpanded ? 'Contract' : 'Expand'} Row`}
       className={styles.rowArrowContainer}
-      onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
+      onClick={e => {
+        e.preventDefault()
         e.stopPropagation()
         row.toggleRowExpanded()
+      }}
+      onKeyUp={e => {
+        e.stopPropagation()
       }}
     >
       <span
@@ -124,7 +128,9 @@ export const RowContent: React.FC<
 }): JSX.Element => {
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
-  const toggleExperiment = () => {
+  const toggleExperiment: EventHandler<SyntheticEvent> = e => {
+    e.preventDefault()
+    e.stopPropagation()
     sendMessage({
       payload: id,
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
@@ -146,9 +152,9 @@ export const RowContent: React.FC<
       tabIndex={0}
       role="row"
       onClick={toggleExperiment}
-      onKeyPress={e => {
+      onKeyUp={e => {
         if (e.key === 'Enter' || e.key === ' ') {
-          toggleExperiment()
+          toggleExperiment(e)
         }
       }}
       data-testid={isWorkspace && 'workspace-row'}

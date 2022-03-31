@@ -270,6 +270,36 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
     })
+
+    it('should not toggle an experiment when using the row expansion button', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      const testRow = screen
+        .getAllByRole('row')
+        .find(row => within(row).queryByText(experimentLabel)) as HTMLElement
+      const expandButton = within(testRow).getByTitle('Contract Row')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(expandButton)
+      expect(mockPostMessage).not.toBeCalled()
+
+      fireEvent.keyUp(expandButton, {
+        bubbles: true,
+        code: 'Enter',
+        key: 'Enter',
+        keyCode: 13
+      })
+      expect(mockPostMessage).not.toBeCalled()
+    })
   })
 
   describe('Toggle experiment status', () => {
@@ -322,7 +352,7 @@ describe('App', () => {
 
       testRowLabel.focus()
 
-      fireEvent.keyPress(testRowLabel, {
+      fireEvent.keyUp(testRowLabel, {
         bubbles: true,
         code: 'Enter',
         key: 'Enter',
@@ -334,7 +364,7 @@ describe('App', () => {
       })
       mockPostMessage.mockClear()
 
-      fireEvent.keyPress(testRowLabel, {
+      fireEvent.keyUp(testRowLabel, {
         bubbles: true,
         charCode: 32,
         code: 'Space',
@@ -347,7 +377,7 @@ describe('App', () => {
       })
       mockPostMessage.mockClear()
 
-      fireEvent.keyPress(testRowLabel, {
+      fireEvent.keyUp(testRowLabel, {
         bubbles: true,
         code: 'keyA',
         key: 'a'
