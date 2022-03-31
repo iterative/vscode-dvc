@@ -6,7 +6,7 @@ import {
 import React, { DragEvent, useState, useEffect, useRef } from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
-import { removeFromPreviousAndAddToNewSection } from './utils'
+import { removeFromPreviousAndAddToNewSection } from './util'
 import { AddedSection } from './AddedSection'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
