@@ -381,10 +381,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     if (hasUnfilteredCheckpoints) {
       return true
     }
-    if (filterExperiment(filters, row)) {
-      return true
-    }
-    return false
+    return !!filterExperiment(filters, row)
   }
 
   private getFilteredCheckpointsByTip(
