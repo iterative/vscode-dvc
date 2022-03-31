@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { Cli, typeCheckCommands } from '.'
-import { Args, Command, Flag, ListFlag, SubCommand } from './args'
+import { Args, Command, Flag, ListFlag, SubCommand } from './constants'
 import { retry } from './retry'
 import { trim, trimAndSplit } from '../util/stdout'
 import { Plot } from '../plots/webview/contract'

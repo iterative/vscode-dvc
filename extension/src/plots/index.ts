@@ -5,6 +5,7 @@ import {
   ComparisonPlot,
   ComparisonRevisionData,
   PlotsData as TPlotsData,
+  PlotSize,
   Section,
   SectionCollapsed
 } from './webview/contract'
@@ -25,6 +26,8 @@ import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
 import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
 import { getModifiedTime, removeDir } from '../fileSystem'
+import { sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -146,12 +149,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     })
   }
 
-  private sendTemplatePlotsData() {
-    this.webview?.show({
-      template: this.getTemplatePlots()
-    })
-  }
-
   private getTemplatePlots() {
     const paths = this.paths?.getTemplateOrder()
     const plots = this.plots?.getTemplatePlots(paths)
@@ -165,12 +162,6 @@ export class Plots extends BaseRepository<TPlotsData> {
       sectionName: this.plots.getSectionName(Section.TEMPLATE_PLOTS),
       size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
     }
-  }
-
-  private sendComparisonPlotsData() {
-    this.webview?.show({
-      comparison: this.getComparisonPlots()
-    })
   }
 
   private getComparisonPlots() {
@@ -221,14 +212,14 @@ export class Plots extends BaseRepository<TPlotsData> {
           case MessageFromWebviewType.METRIC_TOGGLED:
             return this.setSelectedMetrics(message.payload)
           case MessageFromWebviewType.PLOTS_RESIZED:
-            return this.plots?.setPlotSize(
+            return this.setPlotSize(
               message.payload.section,
               message.payload.size
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return this.setSectionCollapsed(message.payload)
           case MessageFromWebviewType.SECTION_RENAMED:
-            return this.plots?.setSectionName(
+            return this.setSectionName(
               message.payload.section,
               message.payload.name
             )
@@ -245,9 +236,18 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
   }
 
-  private setSelectedMetrics(order: string[]) {
-    this.plots?.setSelectedMetrics(order)
-    this.sendCheckpointPlotsData()
+  private setSelectedMetrics(metrics: string[]) {
+    this.plots?.setSelectedMetrics(metrics)
+    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
+  }
+
+  private setPlotSize(section: Section, size: PlotSize) {
+    this.plots?.setPlotSize(section, size)
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_RESIZED,
+      { section, size },
+      undefined
+    )
   }
 
   private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {
@@ -255,21 +255,58 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webview?.show({
       sectionCollapsed: this.plots?.getSectionCollapsed()
     })
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_TOGGLE,
+      collapsed,
+      undefined
+    )
+  }
+
+  private setSectionName(section: Section, name: string) {
+    this.plots?.setSectionName(section, name)
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_RENAMED,
+      { section },
+      undefined
+    )
   }
 
   private setComparisonOrder(order: string[]) {
     this.plots?.setComparisonOrder(order)
-    this.sendComparisonPlotsData()
+    this.webview?.show({
+      comparison: this.getComparisonPlots()
+    })
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
+      undefined,
+      undefined
+    )
   }
 
   private setTemplateOrder(order: PlotsTemplatesReordered) {
     this.paths?.setTemplateOrder(order)
-    this.sendTemplatePlotsData()
+    this.webview?.show({
+      template: this.getTemplatePlots()
+    })
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
+      undefined,
+      undefined
+    )
   }
 
   private setMetricOrder(order: string[]) {
     this.plots?.setMetricOrder(order)
+    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_REORDERED)
+  }
+
+  private sendCheckpointPlotsAndEvent(
+    event:
+      | typeof EventName.VIEWS_PLOTS_METRICS_REORDERED
+      | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
+  ) {
     this.sendCheckpointPlotsData()
+    sendTelemetryEvent(event, undefined, undefined)
   }
 
   private waitForInitialData(experiments: Experiments) {

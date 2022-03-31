@@ -4,14 +4,14 @@ import {
   CheckpointPlotsColors
 } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState } from 'react'
-import { EmptyState } from './EmptyState'
 import { Plot } from './Plot'
-import styles from './styles.module.scss'
-import { DragDropContainer } from '../../shared/components/dragDrop/DragDropContainer'
-import { performOrderedUpdate } from '../../util/objects'
-import { withScale } from '../../util/styles'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
-import { sendMessage } from '../../shared/vscode'
+import styles from '../styles.module.scss'
+import { EmptyState } from '../EmptyState'
+import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import { performOrderedUpdate } from '../../../util/objects'
+import { withScale } from '../../../util/styles'
+import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
+import { sendMessage } from '../../../shared/vscode'
 
 interface CheckpointPlotsProps {
   plots: CheckpointPlotData[]

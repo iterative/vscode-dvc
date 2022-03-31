@@ -1,7 +1,7 @@
 import { Param } from './collect'
 import { quickPickManyValues } from '../../../vscode/quickPick'
 import { getInput } from '../../../vscode/inputBox'
-import { Flag } from '../../../cli/args'
+import { Flag } from '../../../cli/constants'
 import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
 
