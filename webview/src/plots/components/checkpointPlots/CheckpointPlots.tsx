@@ -5,7 +5,7 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { Plot } from './Plot'
-import styles from './styles.module.scss'
+import styles from '../styles.module.scss'
 import { EmptyState } from '../EmptyState'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 import { performOrderedUpdate } from '../../../util/objects'
