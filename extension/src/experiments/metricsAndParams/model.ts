@@ -50,12 +50,18 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
 
   public setColumnOrder(columnOrder: string[]) {
     this.columnOrderState = columnOrder
-    this.persistColumnOrder()
+    this.persist(
+      PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,
+      this.getColumnOrder()
+    )
   }
 
   public setColumnWidth(id: string, width: number) {
     this.columnWidthsState[id] = width
-    this.persistColumnWidths()
+    this.persist(
+      PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
+      this.columnWidthsState
+    )
   }
 
   public filterChildren(path?: string) {
@@ -63,20 +69,6 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
       path
         ? element.parentPath === path
         : ['metrics', 'params'].includes(element.parentPath)
-    )
-  }
-
-  private persistColumnOrder() {
-    this.persist(
-      PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,
-      this.getColumnOrder()
-    )
-  }
-
-  private persistColumnWidths() {
-    this.persist(
-      PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
-      this.columnWidthsState
     )
   }
 

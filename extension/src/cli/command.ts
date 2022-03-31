@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { Args } from './args'
+import { Args } from './constants'
 import { joinTruthyItems } from '../util/array'
 
 export const getCommandString = (
