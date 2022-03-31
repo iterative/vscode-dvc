@@ -19,7 +19,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { tryThenMaybeForce } from '../cli/actions'
-import { Flag } from '../cli/args'
+import { Flag } from '../cli/constants'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'

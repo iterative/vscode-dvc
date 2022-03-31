@@ -1,7 +1,7 @@
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Cli, CliResult, CliStarted, typeCheckCommands } from '.'
-import { Command } from './args'
+import { Command } from './constants'
 import { getProcessEnv } from '../env'
 import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
