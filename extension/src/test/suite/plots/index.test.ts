@@ -30,6 +30,8 @@ import { TEMP_PLOTS_DIR } from '../../../cli/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList } from '../../../util/array'
+import * as Telemetry from '../../../telemetry'
+import { EventName } from '../../../telemetry/constants'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -158,6 +160,7 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -184,12 +187,23 @@ suite('Plots Test Suite', () => {
           selectedMetrics: mockSelectedMetrics
         }
       })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_METRICS_SELECTED,
+        {
+          plotCount: 4,
+          plotVisibleCount: 1,
+          revisionCount: 3
+        },
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section resized message from the webview', async () => {
       const { plots, plotsModel } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -205,12 +219,22 @@ suite('Plots Test Suite', () => {
         Section.TEMPLATE_PLOTS,
         PlotSize.SMALL
       )
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SECTION_RESIZED,
+        {
+          section: Section.TEMPLATE_PLOTS,
+          size: PlotSize.SMALL
+        },
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section collapsed message from the webview', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -237,12 +261,19 @@ suite('Plots Test Suite', () => {
           ...mockSectionCollapsed
         }
       })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SECTION_TOGGLE,
+        mockSectionCollapsed,
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section rename message from the webview', async () => {
       const { plots, plotsModel } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -262,6 +293,12 @@ suite('Plots Test Suite', () => {
         Section.TEMPLATE_PLOTS,
         mockName
       )
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SECTION_TOGGLE,
+        { section: Section.TEMPLATE_PLOTS },
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a comparison revisions reordered message from the webview', async () => {
@@ -271,6 +308,7 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -308,6 +346,12 @@ suite('Plots Test Suite', () => {
           )
         }
       })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
+        { plotCount: 15, plotVisibleCount: 15, revisionCount: 5 },
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a template plots reordered message from the webview', async () => {
@@ -317,6 +361,7 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -351,6 +396,12 @@ suite('Plots Test Suite', () => {
           )
         }
       })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
+        { plotCount: 0, plotVisibleCount: 0, revisionCount: 0 },
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a metric reordered message from the webview', async () => {
@@ -360,6 +411,7 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -394,6 +446,19 @@ suite('Plots Test Suite', () => {
           )
         }
       })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(
+        mockSendTelemetryEvent,
+        'should send the correct telemetry event'
+      ).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_METRICS_REORDERED,
+        {
+          plotCount: 4,
+          plotVisibleCount: 4,
+          revisionCount: 3
+        },
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

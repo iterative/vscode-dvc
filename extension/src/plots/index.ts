@@ -5,6 +5,7 @@ import {
   ComparisonPlot,
   ComparisonRevisionData,
   PlotsData as TPlotsData,
+  PlotSize,
   Section,
   SectionCollapsed
 } from './webview/contract'
@@ -25,6 +26,8 @@ import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
 import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
 import { getModifiedTime, removeDir } from '../fileSystem'
+import { sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -167,12 +170,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
   }
 
-  private sendComparisonPlotsData() {
-    this.webview?.show({
-      comparison: this.getComparisonPlots()
-    })
-  }
-
   private getComparisonPlots() {
     const paths = this.paths?.getComparisonPaths()
     const comparison = this.plots?.getComparisonPlots(paths)
@@ -221,14 +218,14 @@ export class Plots extends BaseRepository<TPlotsData> {
           case MessageFromWebviewType.METRIC_TOGGLED:
             return this.setSelectedMetrics(message.payload)
           case MessageFromWebviewType.PLOTS_RESIZED:
-            return this.plots?.setPlotSize(
+            return this.setPlotSize(
               message.payload.section,
               message.payload.size
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
             return this.setSectionCollapsed(message.payload)
           case MessageFromWebviewType.SECTION_RENAMED:
-            return this.plots?.setSectionName(
+            return this.setSectionName(
               message.payload.section,
               message.payload.name
             )
@@ -248,6 +245,20 @@ export class Plots extends BaseRepository<TPlotsData> {
   private setSelectedMetrics(order: string[]) {
     this.plots?.setSelectedMetrics(order)
     this.sendCheckpointPlotsData()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_METRICS_SELECTED,
+      this.getCheckpointTelemetry(),
+      undefined
+    )
+  }
+
+  private setPlotSize(section: Section, size: PlotSize) {
+    this.plots?.setPlotSize(section, size)
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_RESIZED,
+      { section, size },
+      undefined
+    )
   }
 
   private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {
@@ -255,21 +266,70 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webview?.show({
       sectionCollapsed: this.plots?.getSectionCollapsed()
     })
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_TOGGLE,
+      collapsed,
+      undefined
+    )
+  }
+
+  private setSectionName(section: Section, name: string) {
+    this.plots?.setSectionName(section, name)
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_RENAMED,
+      { section },
+      undefined
+    )
   }
 
   private setComparisonOrder(order: string[]) {
     this.plots?.setComparisonOrder(order)
-    this.sendComparisonPlotsData()
+    const comparisonPlots = this.getComparisonPlots()
+
+    this.webview?.show({
+      comparison: comparisonPlots
+    })
+    const revisions = comparisonPlots?.revisions.length || 0
+    const plots = comparisonPlots?.plots.length || 0
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
+      {
+        plotCount: revisions * (this.paths?.getComparisonCount() || 0),
+        plotVisibleCount: revisions * plots,
+        revisionCount: revisions
+      },
+      undefined
+    )
   }
 
   private setTemplateOrder(order: PlotsTemplatesReordered) {
     this.paths?.setTemplateOrder(order)
     this.sendTemplatePlotsData()
+
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
+      { plotCount: 0, plotVisibleCount: 0, revisionCount: 0 },
+      undefined
+    )
   }
 
   private setMetricOrder(order: string[]) {
     this.plots?.setMetricOrder(order)
     this.sendCheckpointPlotsData()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_METRICS_REORDERED,
+      this.getCheckpointTelemetry(),
+      undefined
+    )
+  }
+
+  private getCheckpointTelemetry() {
+    const checkpointPlots = this.getCheckpointPlots()
+    return {
+      plotCount: checkpointPlots?.plots.length || 0,
+      plotVisibleCount: checkpointPlots?.selectedMetrics?.length || 0,
+      revisionCount: checkpointPlots?.colors.domain.length || 0
+    }
   }
 
   private waitForInitialData(experiments: Experiments) {

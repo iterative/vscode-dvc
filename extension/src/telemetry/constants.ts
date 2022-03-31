@@ -1,5 +1,6 @@
 import { ViewColumn } from 'vscode'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
+import { PlotSize, Section, SectionCollapsed } from '../plots/webview/contract'
 
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
 export const EXTENSION_ID = 'iterative.dvc'
@@ -39,6 +40,13 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
+    VIEWS_PLOTS_METRICS_REORDERED: 'views.plots.metricsReordered',
+    VIEWS_PLOTS_METRICS_SELECTED: 'views.plots.metricsSelected',
+    VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
+    VIEWS_PLOTS_SECTION_RENAMED: 'views.plots.sectionRenamed',
+    VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
+    VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
+    VIEWS_PLOTS_TEMPLATES_REORDERED: 'views.plots.templatesReordered',
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
     VIEWS_TERMINAL_CREATED: 'views.terminal.created',
@@ -53,6 +61,11 @@ type DvcRootCount = { dvcRootCount: number }
 type ColumnCounts = {
   columnCount: number
   columnVisibleCount: number
+}
+type PlotCounts = {
+  plotCount: number
+  plotVisibleCount: number
+  revisionCount: number
 }
 
 type ExtensionProperties = {
@@ -163,6 +176,14 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
+  [EventName.VIEWS_PLOTS_METRICS_REORDERED]: PlotCounts
+  [EventName.VIEWS_PLOTS_METRICS_SELECTED]: PlotCounts
+  [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: PlotCounts
+  [EventName.VIEWS_PLOTS_SECTION_RENAMED]: { section: Section }
+  [EventName.VIEWS_PLOTS_SECTION_RESIZED]: { section: Section; size: PlotSize }
+  [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
+  [EventName.VIEWS_PLOTS_TEMPLATES_REORDERED]: PlotCounts
+
   [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount
 
   [EventName.VIEWS_TERMINAL_CLOSED]: undefined

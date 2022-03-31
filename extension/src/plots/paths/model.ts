@@ -72,6 +72,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.getPathsByType(PathType.COMPARISON)
   }
 
+  public getComparisonCount() {
+    return this.data.filter(plotPath => plotPath.type?.has(PathType.COMPARISON))
+      .length
+  }
+
   private getPathsByType(type: PathType) {
     return this.data
       .filter(
