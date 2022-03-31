@@ -265,7 +265,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a section rename message from the webview', async () => {
+    it('should handle a section renamed message from the webview', async () => {
       const { plots, plotsModel } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()

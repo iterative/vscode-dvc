@@ -149,7 +149,7 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should be able to handle a column reordered message from the webview', async () => {
+    it('should handle a column reordered message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const webview = await experiments.showWebview()
@@ -191,7 +191,7 @@ suite('Experiments Test Suite', () => {
       )
     })
 
-    it('should be able to handle a column resized message from the webview', async () => {
+    it('should handle a column resized message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const webview = await experiments.showWebview()
@@ -225,7 +225,7 @@ suite('Experiments Test Suite', () => {
       )
     })
 
-    it('should be able to handle a toggle experiment messages from the webview', async () => {
+    it('should handle a toggle experiment message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const webview = await experiments.showWebview()
