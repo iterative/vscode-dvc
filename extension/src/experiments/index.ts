@@ -24,6 +24,8 @@ import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
+import { sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -328,17 +330,55 @@ export class Experiments extends BaseRepository<TableData> {
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
           case MessageFromWebviewType.COLUMN_REORDERED:
-            return this.metricsAndParams.setColumnOrder(message.payload)
-          case MessageFromWebviewType.COLUMN_RESIZED: {
-            const { id, width } = message.payload
-            return this.metricsAndParams.setColumnWidth(id, width)
-          }
+            return this.setColumnOrder(message.payload)
+          case MessageFromWebviewType.COLUMN_RESIZED:
+            return this.setColumnWidth(
+              message.payload.id,
+              message.payload.width
+            )
           case MessageFromWebviewType.EXPERIMENT_TOGGLED:
-            return this.toggleExperimentStatus(message.payload)
+            return this.setExperimentStatus(message.payload)
           default:
-            Logger.error(`Unexpected message: ${message}`)
+            Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
       })
+    )
+  }
+
+  private setColumnOrder(order: string[]) {
+    this.metricsAndParams.setColumnOrder(order)
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED,
+      this.getColumnTelemetry(),
+      undefined
+    )
+  }
+
+  private setColumnWidth(id: string, width: number) {
+    this.metricsAndParams.setColumnWidth(id, width)
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED,
+      {
+        ...this.getColumnTelemetry(),
+        width
+      },
+      undefined
+    )
+  }
+
+  private getColumnTelemetry() {
+    return {
+      columnCount: this.metricsAndParams.getTerminalNodes().length,
+      columnVisibleCount: this.metricsAndParams.getSelected().length
+    }
+  }
+
+  private setExperimentStatus(id: string) {
+    this.toggleExperimentStatus(id)
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE,
+      undefined,
+      undefined
     )
   }
 
