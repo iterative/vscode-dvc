@@ -1,7 +1,12 @@
 import { EventEmitter, Event } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { CliResult, CliStarted, ICli, typeCheckCommands } from '.'
-import { Args, Command, ExperimentFlag, ExperimentSubCommand } from './args'
+import {
+  Args,
+  Command,
+  ExperimentFlag,
+  ExperimentSubCommand
+} from './constants'
 import { getOptions } from './options'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
