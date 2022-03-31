@@ -6,7 +6,7 @@ import {
   ExperimentSubCommand,
   Flag,
   GcPreserveFlag
-} from './args'
+} from './constants'
 
 export const autoRegisteredCommands = {
   ADD: 'add',

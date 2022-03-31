@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { getCommandString } from './command'
-import { Command, Flag } from './args'
+import { Command, Flag } from './constants'
 
 describe('getCommandString', () => {
   it('should give the correct command string given a basic environment', () => {
