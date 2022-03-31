@@ -185,7 +185,8 @@ $spinner-color-light: #000;
 .rowArrowContainer {
   width: 8px;
   height: 8px;
-  padding: 0 6px;
+  margin: 0 6px;
+  padding: 0;
   flex: 0 0 8px;
   display: inline-block;
   position: relative;
