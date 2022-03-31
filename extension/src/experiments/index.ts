@@ -349,7 +349,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.metricsAndParams.setColumnOrder(order)
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED,
-      this.getColumnTelemetry(),
+      undefined,
       undefined
     )
   }
@@ -358,19 +358,9 @@ export class Experiments extends BaseRepository<TableData> {
     this.metricsAndParams.setColumnWidth(id, width)
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED,
-      {
-        ...this.getColumnTelemetry(),
-        width
-      },
+      { width },
       undefined
     )
-  }
-
-  private getColumnTelemetry() {
-    return {
-      columnCount: this.metricsAndParams.getTerminalNodes().length,
-      columnVisibleCount: this.metricsAndParams.getSelected().length
-    }
   }
 
   private setExperimentStatus(id: string) {

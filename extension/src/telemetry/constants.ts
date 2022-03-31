@@ -58,15 +58,6 @@ export const EventName = Object.assign(
 )
 
 type DvcRootCount = { dvcRootCount: number }
-type ColumnCounts = {
-  columnCount: number
-  columnVisibleCount: number
-}
-type PlotCounts = {
-  plotCount: number
-  plotVisibleCount: number
-  revisionCount: number
-}
 
 type ExtensionProperties = {
   cliAccessible: boolean
@@ -166,8 +157,8 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
-  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED]: ColumnCounts
-  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED]: ColumnCounts & {
+  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED]: {
     width: number
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
@@ -176,13 +167,13 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
-  [EventName.VIEWS_PLOTS_METRICS_REORDERED]: PlotCounts
-  [EventName.VIEWS_PLOTS_METRICS_SELECTED]: PlotCounts
-  [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: PlotCounts
+  [EventName.VIEWS_PLOTS_METRICS_REORDERED]: undefined
+  [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
+  [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_SECTION_RENAMED]: { section: Section }
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: { section: Section; size: PlotSize }
   [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
-  [EventName.VIEWS_PLOTS_TEMPLATES_REORDERED]: PlotCounts
+  [EventName.VIEWS_PLOTS_TEMPLATES_REORDERED]: undefined
 
   [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount
 

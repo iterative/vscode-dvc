@@ -190,11 +190,7 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_METRICS_SELECTED,
-        {
-          plotCount: 4,
-          plotVisibleCount: 1,
-          revisionCount: 3
-        },
+        undefined,
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -295,7 +291,7 @@ suite('Plots Test Suite', () => {
       )
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_SECTION_TOGGLE,
+        EventName.VIEWS_PLOTS_SECTION_RENAMED,
         { section: Section.TEMPLATE_PLOTS },
         undefined
       )
@@ -349,7 +345,7 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
-        { plotCount: 15, plotVisibleCount: 15, revisionCount: 5 },
+        undefined,
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -399,7 +395,7 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
-        { plotCount: 0, plotVisibleCount: 0, revisionCount: 0 },
+        undefined,
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -452,11 +448,7 @@ suite('Plots Test Suite', () => {
         'should send the correct telemetry event'
       ).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_METRICS_REORDERED,
-        {
-          plotCount: 4,
-          plotVisibleCount: 4,
-          revisionCount: 3
-        },
+        undefined,
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)

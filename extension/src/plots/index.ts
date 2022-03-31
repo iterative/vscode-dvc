@@ -247,7 +247,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.sendCheckpointPlotsData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_METRICS_SELECTED,
-      this.getCheckpointTelemetry(),
+      undefined,
       undefined
     )
   }
@@ -289,15 +289,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webview?.show({
       comparison: comparisonPlots
     })
-    const revisions = comparisonPlots?.revisions.length || 0
-    const plots = comparisonPlots?.plots.length || 0
+
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
-      {
-        plotCount: revisions * (this.paths?.getComparisonCount() || 0),
-        plotVisibleCount: revisions * plots,
-        revisionCount: revisions
-      },
+      undefined,
       undefined
     )
   }
@@ -308,7 +303,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
-      { plotCount: 0, plotVisibleCount: 0, revisionCount: 0 },
+      undefined,
       undefined
     )
   }
@@ -318,18 +313,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.sendCheckpointPlotsData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_METRICS_REORDERED,
-      this.getCheckpointTelemetry(),
+      undefined,
       undefined
     )
-  }
-
-  private getCheckpointTelemetry() {
-    const checkpointPlots = this.getCheckpointPlots()
-    return {
-      plotCount: checkpointPlots?.plots.length || 0,
-      plotVisibleCount: checkpointPlots?.selectedMetrics?.length || 0,
-      revisionCount: checkpointPlots?.colors.domain.length || 0
-    }
   }
 
   private waitForInitialData(experiments: Experiments) {
