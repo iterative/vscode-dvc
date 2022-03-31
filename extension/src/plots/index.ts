@@ -149,12 +149,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     })
   }
 
-  private sendTemplatePlotsData() {
-    this.webview?.show({
-      template: this.getTemplatePlots()
-    })
-  }
-
   private getTemplatePlots() {
     const paths = this.paths?.getTemplateOrder()
     const plots = this.plots?.getTemplatePlots(paths)
@@ -244,12 +238,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setSelectedMetrics(order: string[]) {
     this.plots?.setSelectedMetrics(order)
-    this.sendCheckpointPlotsData()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_METRICS_SELECTED,
-      undefined,
-      undefined
-    )
+    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
   }
 
   private setPlotSize(section: Section, size: PlotSize) {
@@ -284,12 +273,9 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setComparisonOrder(order: string[]) {
     this.plots?.setComparisonOrder(order)
-    const comparisonPlots = this.getComparisonPlots()
-
     this.webview?.show({
-      comparison: comparisonPlots
+      comparison: this.getComparisonPlots()
     })
-
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
       undefined,
@@ -299,8 +285,9 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setTemplateOrder(order: PlotsTemplatesReordered) {
     this.paths?.setTemplateOrder(order)
-    this.sendTemplatePlotsData()
-
+    this.webview?.show({
+      template: this.getTemplatePlots()
+    })
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
       undefined,
@@ -310,12 +297,16 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setMetricOrder(order: string[]) {
     this.plots?.setMetricOrder(order)
+    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_REORDERED)
+  }
+
+  private sendCheckpointPlotsAndEvent(
+    event:
+      | typeof EventName.VIEWS_PLOTS_METRICS_REORDERED
+      | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
+  ) {
     this.sendCheckpointPlotsData()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_METRICS_REORDERED,
-      undefined,
-      undefined
-    )
+    sendTelemetryEvent(event, undefined, undefined)
   }
 
   private waitForInitialData(experiments: Experiments) {
