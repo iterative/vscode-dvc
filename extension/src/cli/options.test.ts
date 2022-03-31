@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { getOptions } from './options'
-import { Command, Flag } from './args'
+import { Command, Flag } from './constants'
 import { getProcessEnv } from '../env'
 import { joinEnvPath } from '../util/env'
 
