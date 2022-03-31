@@ -30,14 +30,15 @@ import { createBubbledEvent, dragAndDrop } from '../../test/dragDrop'
 
 jest.mock('../../shared/api')
 
-jest.mock('./constants', () => ({
-  ...jest.requireActual('./constants'),
+jest.mock('./checkpointPlots/util', () => ({
+  ...jest.requireActual('./checkpointPlots/util'),
   createSpec: (title: string, scale?: CheckpointPlotsColors) => ({
-    ...jest.requireActual('./constants').createSpec(title, scale),
+    ...jest.requireActual('./checkpointPlots/util').createSpec(title, scale),
     height: 100,
     width: 100
   })
 }))
+jest.spyOn(console, 'warn').mockImplementation(() => {})
 
 const { postMessage, setState } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
@@ -138,7 +139,6 @@ describe('App', () => {
   })
 
   it('should render only checkpoint plots when given a message with only checkpoint plots data', () => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {})
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
