@@ -160,12 +160,12 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockSelectedMetrics = ['summary.json:loss']
       const mockSetSelectedMetrics = spy(plotsModel, 'setSelectedMetrics')
+      const mockSelectedMetrics = ['summary.json:loss']
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -199,8 +199,8 @@ suite('Plots Test Suite', () => {
       const { plots, plotsModel } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetPlotSize = stub(plotsModel, 'setPlotSize').returns(undefined)
@@ -230,8 +230,8 @@ suite('Plots Test Suite', () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetSectionCollapsed = spy(plotsModel, 'setSectionCollapsed')
@@ -269,14 +269,13 @@ suite('Plots Test Suite', () => {
       const { plots, plotsModel } = await buildPlots(disposable)
 
       const webview = await plots.showWebview()
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetSectionName = stub(plotsModel, 'setSectionName').returns(
         undefined
       )
-
       const mockName = 'some cool section name'
 
       mockMessageReceived.fire({
@@ -304,12 +303,11 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetComparisonOrder = spy(plotsModel, 'setComparisonOrder')
-
       const mockComparisonOrder = [
         '1ba7bcd',
         'workspace',
@@ -357,8 +355,8 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetTemplateOrder = spy(pathsModel, 'setTemplateOrder')
@@ -407,12 +405,11 @@ suite('Plots Test Suite', () => {
       )
 
       const webview = await plots.showWebview()
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetMetricOrder = spy(plotsModel, 'setMetricOrder')
-
       const mockMetricOrder = [
         'summary.json:loss',
         'summary.json:accuracy',
@@ -443,10 +440,7 @@ suite('Plots Test Suite', () => {
         }
       })
       expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(
-        mockSendTelemetryEvent,
-        'should send the correct telemetry event'
-      ).to.be.calledWithExactly(
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_METRICS_REORDERED,
         undefined,
         undefined
