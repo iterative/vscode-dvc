@@ -236,8 +236,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
   }
 
-  private setSelectedMetrics(order: string[]) {
-    this.plots?.setSelectedMetrics(order)
+  private setSelectedMetrics(metrics: string[]) {
+    this.plots?.setSelectedMetrics(metrics)
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
   }
 
