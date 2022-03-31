@@ -376,6 +376,34 @@ describe('App', () => {
     })
   })
 
+  it('should not send a message to the extension with the selected size when the size has not changed', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    const sizeButton = screen.getAllByTestId('icon-menu-item')[2]
+    fireEvent.mouseEnter(sizeButton)
+    fireEvent.click(sizeButton)
+
+    const largeButton = screen.getByText('Large')
+    fireEvent.click(largeButton)
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
+      type: MessageFromWebviewType.PLOTS_RESIZED
+    })
+
+    mockPostMessage.mockClear()
+
+    sendSetDataMessage({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    expect(mockPostMessage).not.toBeCalled()
+  })
+
   it('should show an input to rename the section when clicking the rename icon button', () => {
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,

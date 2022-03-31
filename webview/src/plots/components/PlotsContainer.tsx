@@ -66,9 +66,12 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     }
   ]
 
-  const changeSize = (size: PlotSize) => {
-    onResize(size, sectionKey)
-    setSize(size)
+  const changeSize = (newSize: PlotSize) => {
+    if (size === newSize) {
+      return
+    }
+    onResize(newSize, sectionKey)
+    setSize(newSize)
   }
 
   if (menu) {
