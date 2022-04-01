@@ -1,11 +1,9 @@
-import { Disposable } from '@hediet/std/disposable'
 import { collectHasCheckpoints } from './collect'
 import { PartialDvcYaml } from '../../fileSystem'
 import { definedAndNonEmpty, uniqueValues } from '../../util/array'
+import { Disposable } from '../../class/dispose'
 
-export class CheckpointsModel {
-  public dispose = Disposable.fn()
-
+export class CheckpointsModel extends Disposable {
   private yamlWithCheckpoints: string[] = []
 
   public hasCheckpoints() {

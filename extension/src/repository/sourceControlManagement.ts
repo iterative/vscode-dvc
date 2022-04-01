@@ -1,6 +1,6 @@
 import { basename, extname } from 'path'
-import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControl, SourceControlResourceGroup, Uri } from 'vscode'
+import { Disposable } from '../class/dispose'
 
 export type SourceControlManagementState = Record<Status, Set<string>>
 
@@ -22,9 +22,7 @@ const gitCommitReady = [Status.ADDED, Status.GIT_MODIFIED, Status.RENAMED]
 
 type ResourceState = { resourceUri: Uri; contextValue: Status; dvcRoot: string }
 
-export class SourceControlManagement {
-  public readonly dispose = Disposable.fn()
-
+export class SourceControlManagement extends Disposable {
   private readonly dvcRoot: string
 
   private changedResourceGroup: SourceControlResourceGroup
@@ -32,6 +30,8 @@ export class SourceControlManagement {
   private notInCacheResourceGroup: SourceControlResourceGroup
 
   constructor(dvcRoot: string, state: SourceControlManagementState) {
+    super()
+
     this.dvcRoot = dvcRoot
 
     const scmView = this.dispose.track(

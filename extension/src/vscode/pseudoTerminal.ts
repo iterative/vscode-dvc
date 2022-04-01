@@ -1,11 +1,9 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { Disposable } from '../class/dispose'
 
-export class PseudoTerminal {
-  public readonly dispose = Disposable.fn()
-
+export class PseudoTerminal extends Disposable {
   private readonly termName: string
   private instance: Terminal | undefined
 
@@ -21,6 +19,8 @@ export class PseudoTerminal {
     processTerminated: EventEmitter<void>,
     termName = 'DVC'
   ) {
+    super()
+
     this.termName = termName
     this.processOutput = processOutput
     this.processTerminated = processTerminated

@@ -1,6 +1,4 @@
 import { Memento } from 'vscode'
-import { Deferred } from '@hediet/std/synchronization'
-import { Disposable } from '@hediet/std/disposable'
 import {
   collectCheckpointPlotsData,
   collectData,
@@ -33,11 +31,6 @@ import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
 
 export class PlotsModel extends ModelWithPersistence {
-  public readonly dispose = Disposable.fn()
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
   private readonly experiments: Experiments
 
   private plotSizes: Record<Section, PlotSize>
@@ -81,10 +74,6 @@ export class PlotsModel extends ModelWithPersistence {
       undefined
     )
     this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   public transformAndSetExperiments(data: ExperimentsOutput) {
