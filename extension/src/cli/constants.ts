@@ -1,3 +1,6 @@
+export const MIN_CLI_VERSION = '2.10.0'
+export const MAX_CLI_VERSION = '3'
+
 export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',

@@ -23,7 +23,7 @@ import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
-import { MIN_VERSION } from '../../cli/version'
+import { MIN_CLI_VERSION } from '../../cli/constants'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -188,7 +188,7 @@ suite('Extension Test Suite', () => {
 
       const mockCanRunCli = stub(CliReader.prototype, 'version')
         .onFirstCall()
-        .resolves(MIN_VERSION)
+        .resolves(MIN_CLI_VERSION)
         .onSecondCall()
         .rejects('CLI is gone, dispose of everything')
 
