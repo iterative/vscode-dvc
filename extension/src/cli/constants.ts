@@ -1,3 +1,6 @@
+export const MIN_CLI_VERSION = '2.10.0'
+export const MAX_CLI_VERSION = '3'
+
 export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',
@@ -23,10 +26,12 @@ export enum SubCommand {
 
 export enum Flag {
   FORCE = '-f',
+  OUTPUT_PATH = '-o',
   RECURSIVE = '-R',
   SHOW_JSON = '--show-json',
   SUBDIRECTORY = '--subdir',
   SET_PARAM = '-S',
+  SPLIT = '--split',
   VERSION = '--version'
 }
 

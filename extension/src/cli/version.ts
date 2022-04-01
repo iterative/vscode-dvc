@@ -1,7 +1,5 @@
+import { MAX_CLI_VERSION, MIN_CLI_VERSION } from './constants'
 import { Toast } from '../vscode/toast'
-
-export const MIN_VERSION = '2.9.5'
-const MAX_VERSION = '3'
 
 export const extractSemver = (
   stdout: string
@@ -18,7 +16,7 @@ const getWarningText = (
   currentVersion: string,
   update: 'CLI' | 'extension'
 ): string => `The extension cannot initialize because you are using version ${currentVersion} of the DVC CLI.
-The expected version is ${MIN_VERSION} <= DVC < ${MAX_VERSION}. Please upgrade to the most recent version of the ${update} and reload this window.`
+The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the ${update} and reload this window.`
 
 const getTextAndSend = (version: string, update: 'CLI' | 'extension'): void => {
   const text = getWarningText(version, update)
@@ -35,17 +33,17 @@ const checkCLIVersion = (
     patch: currentPatch
   } = currentSemVer
 
-  if (currentMajor >= Number(MAX_VERSION)) {
+  if (currentMajor >= Number(MAX_CLI_VERSION)) {
     getTextAndSend(version, 'extension')
     return false
   }
 
-  const [minMajor, minMinor, minPatch] = MIN_VERSION.split('.')
+  const [minMajor, minMinor, minPatch] = MIN_CLI_VERSION.split('.')
 
   if (
     currentMajor < Number(minMajor) ||
     currentMinor < Number(minMinor) ||
-    currentPatch < Number(minPatch)
+    (currentMinor === Number(minMinor) && currentPatch < Number(minPatch))
   ) {
     getTextAndSend(version, 'CLI')
     return false

@@ -1,7 +1,6 @@
 import { Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
-import { VisualizationSpec } from 'react-vega'
 import {
   collectCheckpointPlotsData,
   collectData,
@@ -9,7 +8,8 @@ import {
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
-  RevisionData
+  RevisionData,
+  TemplateAccumulator
 } from './collect'
 import {
   CheckpointPlotData,
@@ -49,7 +49,7 @@ export class PlotsModel extends ModelWithPersistence {
   private comparisonOrder: string[]
 
   private revisionData: RevisionData = {}
-  private templates: Record<string, VisualizationSpec> = {}
+  private templates: TemplateAccumulator = {}
 
   private checkpointPlots?: CheckpointPlotData[]
   private selectedMetrics?: string[]

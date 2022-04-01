@@ -220,6 +220,7 @@ describe('CliReader', () => {
           'HEAD',
           '-o',
           join('.dvc', 'tmp', 'plots'),
+          '--split',
           SHOW_JSON
         ],
         cwd,

@@ -1,6 +1,11 @@
-import { isVersionCompatible, MIN_VERSION, extractSemver } from './version'
+import { isVersionCompatible, extractSemver } from './version'
+import { MIN_CLI_VERSION } from './constants'
 import { Toast } from '../vscode/toast'
 
+jest.mock('./constants', () => ({
+  ...jest.requireActual('./constants'),
+  MIN_CLI_VERSION: '2.9.4'
+}))
 jest.mock('../vscode/config')
 jest.mock('../vscode/toast')
 
@@ -39,7 +44,16 @@ describe('extractSemver', () => {
 })
 
 describe('isVersionCompatible', () => {
-  const [minMajor, minMinor, minPatch] = MIN_VERSION.split('.')
+  const [minMajor, minMinor, minPatch] = MIN_CLI_VERSION.split('.')
+  it('should not send a toast for a version with a higher minor but lower patch', () => {
+    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+
+    const isCompatible = isVersionCompatible('2.10.0')
+
+    expect(isCompatible).toBe(true)
+    expect(mockedWarnWithOptions).not.toBeCalled()
+  })
+
   it('should send a toast message if the provided version is a patch version before the minimum expected version', () => {
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
@@ -96,7 +110,7 @@ describe('isVersionCompatible', () => {
   })
 
   it('should not send a toast message if the provided version matches the min version', () => {
-    const isCompatible = isVersionCompatible(MIN_VERSION)
+    const isCompatible = isVersionCompatible(MIN_CLI_VERSION)
 
     expect(isCompatible).toBe(true)
     expect(mockedWarnWithOptions).not.toBeCalled()

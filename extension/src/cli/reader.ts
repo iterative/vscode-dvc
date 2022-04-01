@@ -135,8 +135,9 @@ export class CliReader extends Cli {
       Command.PLOTS,
       'diff',
       ...revisions,
-      '-o',
-      TEMP_PLOTS_DIR
+      Flag.OUTPUT_PATH,
+      TEMP_PLOTS_DIR,
+      Flag.SPLIT
     )
   }
 
