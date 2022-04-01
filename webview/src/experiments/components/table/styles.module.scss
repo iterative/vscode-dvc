@@ -45,6 +45,7 @@ $spinner-color-light: #000;
   border-top: unset;
   border-left: unset;
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
+  margin: 12px 6px;
 
   :global(.vscode-light) & {
     border-color: $toggle-color-light;
@@ -182,13 +183,15 @@ $spinner-color-light: #000;
   }
 }
 
-.rowArrowPlaceholder {
-  width: 8px;
-  height: 8px;
-  margin: 0 6px;
-  flex: 0 0 8px;
+.rowArrowContainer {
+  width: 20px;
+  height: 32px;
+  padding: 0;
+  flex: 0 0 20px;
   display: inline-block;
   position: relative;
+  border: none;
+  background: none;
 }
 
 .expandedRowArrow {
