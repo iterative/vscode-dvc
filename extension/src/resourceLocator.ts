@@ -22,6 +22,7 @@ export class ResourceLocator extends Disposable {
 
   constructor(extensionUri: Uri) {
     super()
+
     this.extensionUri = extensionUri
 
     this.dvcIcon = this.getResourceLocations('dvc-color.svg')

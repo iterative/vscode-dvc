@@ -76,6 +76,7 @@ export class Extension extends Disposable implements IExtension {
 
   constructor(context: ExtensionContext) {
     super()
+
     const stopWatch = new StopWatch()
 
     this.dispose.track(getTelemetryReporter())

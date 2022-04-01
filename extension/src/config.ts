@@ -20,6 +20,7 @@ export class Config extends DeferredDisposable {
 
   constructor() {
     super()
+
     this.executionDetailsChanged = this.dispose.track(new EventEmitter())
     this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
 

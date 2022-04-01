@@ -40,6 +40,7 @@ export abstract class BaseData<
     staticFiles: string[] = []
   ) {
     super()
+
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
       new ProcessManager(updatesPaused, {
