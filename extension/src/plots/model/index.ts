@@ -8,7 +8,8 @@ import {
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
-  RevisionData
+  RevisionData,
+  TemplateAccumulator
 } from './collect'
 import {
   CheckpointPlotData,
@@ -48,7 +49,7 @@ export class PlotsModel extends ModelWithPersistence {
   private comparisonOrder: string[]
 
   private revisionData: RevisionData = {}
-  private templates: Record<string, string> = {}
+  private templates: TemplateAccumulator = {}
 
   private checkpointPlots?: CheckpointPlotData[]
   private selectedMetrics?: string[]

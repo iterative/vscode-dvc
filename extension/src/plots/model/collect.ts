@@ -363,7 +363,7 @@ export const collectData = (data: PlotsOutput): DataAccumulator => {
   return acc
 }
 
-type TemplateAccumulator = Record<string, string>
+export type TemplateAccumulator = { [path: string]: string }
 
 const collectTemplate = (
   acc: TemplateAccumulator,
@@ -389,22 +389,15 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
   return acc
 }
 
-const fillTemplate = (
-  template: string,
-  datapoints: unknown[],
-  revisionColors: ColorScale | undefined
-) =>
-  extendVegaSpec(
-    JSON.parse(
-      template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
-    ) as TopLevelSpec,
-    revisionColors
-  )
+const fillTemplate = (template: string, datapoints: unknown[]) =>
+  JSON.parse(
+    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+  ) as TopLevelSpec
 
 const collectTemplateGroup = (
   paths: string[],
   selectedRevisions: string[],
-  templates: Record<string, string>,
+  templates: TemplateAccumulator,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
 ): TemplatePlotEntry[] => {
@@ -417,7 +410,10 @@ const collectTemplateGroup = (
         .flatMap(revision => revisionData?.[revision]?.[path])
         .filter(Boolean)
 
-      const content = fillTemplate(template, datapoints, revisionColors)
+      const content = extendVegaSpec(
+        fillTemplate(template, datapoints),
+        revisionColors
+      )
 
       acc.push({
         content,
@@ -434,7 +430,7 @@ const collectTemplateGroup = (
 export const collectSelectedTemplatePlots = (
   order: TemplateOrder,
   selectedRevisions: string[],
-  templates: Record<string, string>,
+  templates: TemplateAccumulator,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
 ): TemplatePlotSection[] | undefined => {
