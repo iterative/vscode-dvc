@@ -1,72 +1,10 @@
 import React from 'react'
 import get from 'lodash/get'
-import {
-  Column,
-  Accessor,
-  ColumnGroup,
-  ColumnInstance,
-  Cell
-} from 'react-table'
+import { Column, Accessor, ColumnGroup, ColumnInstance } from 'react-table'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
-import { formatFloat } from './numberFormatting'
-import Tooltip, {
-  CELL_TOOLTIP_DELAY
-} from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/table/styles.module.scss'
-import { CopyButton } from '../components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
-const UndefinedCell = (
-  <div className={styles.innerCell}>
-    <span className={styles.cellContents}>. . .</span>
-  </div>
-)
-
-const groupLabels: Record<string, string> = {
-  metrics: 'Metric',
-  params: 'Parameter'
-}
-
-const CellTooltip: React.FC<{
-  cell: Cell<Experiment, string | number>
-}> = ({ cell }) => {
-  const {
-    column: { group },
-    value
-  } = cell
-  return (
-    <>
-      {groupLabels[group as string]}: {value}
-    </>
-  )
-}
-
-const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
-  const { value } = cell
-  if (value === undefined) {
-    return UndefinedCell
-  }
-
-  const stringValue = String(value)
-
-  const displayValue =
-    typeof value === 'number' && !Number.isInteger(value)
-      ? formatFloat(value as number)
-      : stringValue
-
-  return (
-    <Tooltip
-      content={<CellTooltip cell={cell} />}
-      placement="bottom"
-      arrow={true}
-      delay={[CELL_TOOLTIP_DELAY, 0]}
-    >
-      <div className={styles.innerCell}>
-        <CopyButton value={stringValue} />
-        <span className={styles.cellContents}>{displayValue}</span>
-      </div>
-    </Tooltip>
-  )
-}
+import { CellComponent } from '../components/cell/Cell'
 
 const Header: React.FC<{ column: Column<Experiment> }> = ({
   column: { name }
@@ -96,7 +34,7 @@ const buildDynamicColumns = (
       const childColumns = buildDynamicColumns(properties, path)
 
       const column: ColumnGroup<Experiment> | Column<Experiment> = {
-        Cell,
+        Cell: CellComponent,
         Header,
         accessor: pathArray && buildAccessor(pathArray),
         columns: childColumns.length > 0 ? childColumns : undefined,
