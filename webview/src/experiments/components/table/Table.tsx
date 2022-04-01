@@ -37,7 +37,7 @@ const RowExpansionButton: React.FC<{ row: Row<Experiment> }> = ({ row }) =>
         e.stopPropagation()
         row.toggleRowExpanded()
       }}
-      onKeyUp={e => {
+      onKeyDown={e => {
         e.stopPropagation()
       }}
     >
@@ -152,7 +152,7 @@ export const RowContent: React.FC<
       tabIndex={0}
       role="row"
       onClick={toggleExperiment}
-      onKeyUp={e => {
+      onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           toggleExperiment(e)
         }

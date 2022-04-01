@@ -292,7 +292,7 @@ describe('App', () => {
       fireEvent.click(expandButton)
       expect(mockPostMessage).not.toBeCalled()
 
-      fireEvent.keyUp(expandButton, {
+      fireEvent.keyDown(expandButton, {
         bubbles: true,
         code: 'Enter',
         key: 'Enter',
@@ -352,7 +352,7 @@ describe('App', () => {
 
       testRowLabel.focus()
 
-      fireEvent.keyUp(testRowLabel, {
+      fireEvent.keyDown(testRowLabel, {
         bubbles: true,
         code: 'Enter',
         key: 'Enter',
@@ -364,7 +364,7 @@ describe('App', () => {
       })
       mockPostMessage.mockClear()
 
-      fireEvent.keyUp(testRowLabel, {
+      fireEvent.keyDown(testRowLabel, {
         bubbles: true,
         charCode: 32,
         code: 'Space',
@@ -377,7 +377,7 @@ describe('App', () => {
       })
       mockPostMessage.mockClear()
 
-      fireEvent.keyUp(testRowLabel, {
+      fireEvent.keyDown(testRowLabel, {
         bubbles: true,
         code: 'keyA',
         key: 'a'
