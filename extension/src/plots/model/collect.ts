@@ -293,7 +293,10 @@ const collectImageData = (
   path: string,
   plot: ImagePlot
 ) => {
-  const rev = plot.revisions?.[0]
+  const rev = Array.isArray(plot.revisions)
+    ? plot.revisions?.[0]
+    : plot.revisions
+
   if (!rev) {
     return
   }

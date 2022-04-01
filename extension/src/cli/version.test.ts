@@ -43,12 +43,17 @@ describe('isVersionCompatible', () => {
   it('should send a toast message if the provided version is a patch version before the minimum expected version', () => {
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
-    const isCompatible = isVersionCompatible(
-      [minMajor, minMinor, Number(minPatch) - 1].join('.')
-    )
+    const mockVersion = [
+      minMajor,
+      minMinor,
+      Math.max(Number(minPatch) - 1, 0)
+    ].join('.')
 
-    expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    const isSame = mockVersion === MIN_VERSION
+    const isCompatible = isVersionCompatible(mockVersion)
+
+    expect(isCompatible).toBe(isSame)
+    expect(mockedWarnWithOptions).toBeCalledTimes(isSame ? 0 : 1)
   })
 
   it('should send a toast message if the provided minor version is before the minimum expected version', () => {

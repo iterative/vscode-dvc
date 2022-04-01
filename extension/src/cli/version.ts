@@ -1,6 +1,6 @@
 import { Toast } from '../vscode/toast'
 
-export const MIN_VERSION = '2.9.5'
+export const MIN_VERSION = '2.10.0'
 const MAX_VERSION = '3'
 
 export const extractSemver = (
