@@ -1,18 +1,13 @@
 import { EventEmitter } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import { DecorationProvider } from './decorationProvider'
 import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
 import { SourceControlManagement } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
+import { BaseDeferredClass } from '../class'
 
-export class Repository {
-  public readonly dispose = Disposable.fn()
-
+export class Repository extends BaseDeferredClass {
   private readonly model: RepositoryModel
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
   private readonly treeDataChanged: EventEmitter<void>
 
   private readonly dvcRoot: string
@@ -26,6 +21,8 @@ export class Repository {
     updatesPaused: EventEmitter<boolean>,
     treeDataChanged: EventEmitter<void>
   ) {
+    super()
+
     this.dvcRoot = dvcRoot
     this.model = this.dispose.track(new RepositoryModel(dvcRoot))
     this.data = this.dispose.track(
@@ -40,10 +37,6 @@ export class Repository {
     this.treeDataChanged = treeDataChanged
 
     this.initialize()
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   public getState() {

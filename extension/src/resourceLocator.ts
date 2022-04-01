@@ -1,5 +1,5 @@
-import { Disposable } from '@hediet/std/disposable'
 import { Uri } from 'vscode'
+import { BaseClass } from './class'
 
 export type Resource = { dark: Uri; light: Uri }
 
@@ -9,9 +9,7 @@ export enum IconName {
   LOADING_SPIN = 'loading-spin'
 }
 
-export class ResourceLocator {
-  public dispose = Disposable.fn()
-
+export class ResourceLocator extends BaseClass {
   public readonly dvcIcon: Resource
   public readonly beaker: Resource
   public readonly checkedCheckbox: Resource
@@ -23,6 +21,7 @@ export class ResourceLocator {
   private readonly extensionUri: Uri
 
   constructor(extensionUri: Uri) {
+    super()
     this.extensionUri = extensionUri
 
     this.dvcIcon = this.getResourceLocations('dvc-color.svg')

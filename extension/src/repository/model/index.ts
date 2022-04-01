@@ -1,6 +1,5 @@
 import { dirname, resolve } from 'path'
 import isEqual from 'lodash.isequal'
-import { Disposable } from '@hediet/std/disposable'
 import {
   collectModifiedAgainstHead,
   collectTracked,
@@ -20,6 +19,7 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../../cli/reader'
+import { BaseClass } from '../../class'
 
 type OutputData = {
   diffFromCache: StatusOutput
@@ -34,10 +34,9 @@ type ModifiedAndNotInCache = {
 }
 
 export class RepositoryModel
+  extends BaseClass
   implements DecorationModel, SourceControlManagementModel
 {
-  public readonly dispose = Disposable.fn()
-
   private readonly dvcRoot: string
 
   private state = {
@@ -54,6 +53,8 @@ export class RepositoryModel
   private tree = new Map<string, PathItem[]>()
 
   constructor(dvcRoot: string) {
+    super()
+
     this.dvcRoot = dvcRoot
   }
 

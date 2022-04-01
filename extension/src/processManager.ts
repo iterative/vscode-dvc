@@ -1,12 +1,10 @@
 import { EventEmitter } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { getCurrentEpoch } from './util/time'
+import { BaseClass } from './class'
 
 export const DEFAULT_DEBOUNCE_WINDOW_MS = 200
 
-export class ProcessManager {
-  public readonly dispose = Disposable.fn()
-
+export class ProcessManager extends BaseClass {
   private processes: Record<
     string,
     { process: () => Promise<unknown>; lastStarted?: number }
@@ -20,6 +18,8 @@ export class ProcessManager {
     processesPaused: EventEmitter<boolean>,
     ...processes: { name: string; process: () => Promise<unknown> }[]
   ) {
+    super()
+
     processes.map(({ name, process }) => {
       this.processes[name] = { process }
     })

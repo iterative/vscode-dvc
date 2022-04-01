@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { Deferred } from '@hediet/std/synchronization'
 import {
   collectPaths,
   collectTemplateOrder,
@@ -13,9 +12,6 @@ import { getPathArray } from '../../fileSystem/util'
 import { PersistenceKey } from '../../persistence/constants'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
   private templateOrder: TemplateOrder
 
   constructor(dvcRoot: string, workspaceState: Memento) {
@@ -39,10 +35,6 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     this.setTemplateOrder()
 
     this.deferred.resolve()
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   public setTemplateOrder(templateOrder?: TemplateOrder) {

@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { SortDefinition, sortExperiments } from './sortBy'
 import {
   FilterDefinition,
@@ -52,8 +51,6 @@ export enum ExperimentType {
 }
 
 export class ExperimentsModel extends ModelWithPersistence {
-  public readonly dispose = Disposable.fn()
-
   private workspace = {} as Experiment
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()

@@ -1,5 +1,4 @@
 import { commands, Event, EventEmitter, ExtensionContext } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
@@ -46,10 +45,9 @@ import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WebviewSerializer } from './webview/serializer'
 import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
+import { BaseClass } from './class'
 
-export class Extension implements IExtension {
-  public readonly dispose = Disposable.fn()
-
+export class Extension extends BaseClass implements IExtension {
   protected readonly internalCommands: InternalCommands
 
   private readonly resourceLocator: ResourceLocator
@@ -77,6 +75,7 @@ export class Extension implements IExtension {
     this.workspaceChanged.event
 
   constructor(context: ExtensionContext) {
+    super()
     const stopWatch = new StopWatch()
 
     this.dispose.track(getTelemetryReporter())

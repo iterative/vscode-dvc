@@ -1,12 +1,10 @@
-import { Disposable } from '@hediet/std/disposable'
 import { StatusBarItem, window } from 'vscode'
+import { BaseClass } from './class'
 import { ICli } from './cli'
 import { RegisteredCommands } from './commands/external'
 import { Title } from './vscode/title'
 
-export class Status {
-  public readonly dispose = Disposable.fn()
-
+export class Status extends BaseClass {
   private readonly statusBarItem: StatusBarItem = this.dispose.track(
     window.createStatusBarItem()
   )
@@ -15,6 +13,8 @@ export class Status {
   private available = false
 
   constructor(cliInteractors: ICli[]) {
+    super()
+
     this.statusBarItem.text = this.getText(false)
     this.statusBarItem.show()
     this.statusBarItem.tooltip = 'DVC Extension Status'

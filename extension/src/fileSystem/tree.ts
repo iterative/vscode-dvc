@@ -8,7 +8,6 @@ import {
   Uri,
   window
 } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { exists, relativeWithUri } from '.'
 import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
@@ -32,10 +31,12 @@ import { Resource } from '../repository/commands'
 import { WorkspaceRepositories } from '../repository/workspace'
 import { PathItem } from '../repository/model/collect'
 import { Title } from '../vscode/title'
+import { BaseClass } from '../class'
 
-export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
-  public readonly dispose = Disposable.fn()
-
+export class TrackedExplorerTree
+  extends BaseClass
+  implements TreeDataProvider<PathItem>
+{
   public readonly onDidChangeTreeData: Event<void>
 
   private readonly internalCommands: InternalCommands
@@ -50,6 +51,8 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     workspaceChanged: EventEmitter<void>,
     repositories: WorkspaceRepositories
   ) {
+    super()
+
     this.internalCommands = internalCommands
 
     this.registerCommands(workspaceChanged)

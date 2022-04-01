@@ -1,15 +1,16 @@
 import { join } from 'path'
 import { EventEmitter, Event } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
+import { BaseDeferredClass } from '../class'
 
-export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
-  public readonly dispose = Disposable.fn()
+export abstract class BaseData<
+  T extends PlotsOutput | ExperimentsOutput
+> extends BaseDeferredClass {
   public readonly onDidUpdate: Event<T>
 
   protected readonly dvcRoot: string
@@ -18,9 +19,6 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
 
   private collectedFiles: string[] = []
   private readonly staticFiles: string[]
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
 
   private readonly updated: EventEmitter<T> = this.dispose.track(
     new EventEmitter()
@@ -41,6 +39,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     updatesPaused: EventEmitter<boolean>,
     staticFiles: string[] = []
   ) {
+    super()
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
       new ProcessManager(updatesPaused, {
@@ -53,10 +52,6 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     this.staticFiles = staticFiles
 
     this.waitForInitialData()
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   public managedUpdate() {

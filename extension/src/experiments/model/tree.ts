@@ -1,4 +1,3 @@
-import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
   ThemeIcon,
@@ -20,6 +19,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
 import { Title } from '../../vscode/title'
+import { BaseClass } from '../../class'
 
 export type ExperimentItem = {
   command?: {
@@ -37,10 +37,9 @@ export type ExperimentItem = {
 }
 
 export class ExperimentsTree
+  extends BaseClass
   implements TreeDataProvider<string | ExperimentItem>
 {
-  public readonly dispose = Disposable.fn()
-
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
@@ -56,6 +55,8 @@ export class ExperimentsTree
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {
+    super()
+
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(

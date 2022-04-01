@@ -1,15 +1,12 @@
 import { EventEmitter, Event, workspace } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
 } from './extensions/python'
 import { getConfigValue } from './vscode/config'
+import { BaseDeferredClass } from './class'
 
-export class Config {
-  public readonly dispose = Disposable.fn()
-
+export class Config extends BaseDeferredClass {
   public readonly onDidChangeExecutionDetails: Event<void>
 
   public pythonBinPath: string | undefined
@@ -18,13 +15,11 @@ export class Config {
 
   private readonly executionDetailsChanged: EventEmitter<void>
 
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
   private readonly dvcPathOption = 'dvc.dvcPath'
   private readonly pythonPathOption = 'dvc.pythonPath'
 
   constructor() {
+    super()
     this.executionDetailsChanged = this.dispose.track(new EventEmitter())
     this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
 
@@ -33,10 +28,6 @@ export class Config {
     this.onDidChangePythonExecutionDetails()
 
     this.onDidConfigurationChange()
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   public getCliPath(): string {

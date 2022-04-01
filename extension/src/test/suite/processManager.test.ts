@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, stub } from 'sinon'
 import { EventEmitter } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
+import { Disposable } from '../../extension'
 import { ProcessManager } from '../../processManager'
 import { delay } from '../../util/time'
 

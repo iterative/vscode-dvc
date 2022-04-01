@@ -1,14 +1,11 @@
 import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import { isSameOrChild, loadYaml, PartialDvcYaml } from '..'
 import { findFiles } from '../workspace'
 import { createFileSystemWatcher } from '../watcher'
+import { BaseDeferredClass } from '../../class'
 
-export class FileSystemData {
-  public readonly dispose = Disposable.fn()
-
+export class FileSystemData extends BaseDeferredClass {
   public readonly onDidUpdate: Event<{ path: string; yaml: PartialDvcYaml }>
 
   private readonly dvcRoot: string
@@ -17,19 +14,14 @@ export class FileSystemData {
     new EventEmitter<{ path: string; yaml: PartialDvcYaml }>()
   )
 
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
   constructor(dvcRoot: string) {
+    super()
+
     this.dvcRoot = dvcRoot
     this.onDidUpdate = this.updated.event
 
     this.watchDvcYaml()
     this.initialize()
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   private async initialize() {

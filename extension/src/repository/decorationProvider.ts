@@ -1,4 +1,3 @@
-import { Disposable } from '@hediet/std/disposable'
 import {
   window,
   Event,
@@ -8,6 +7,7 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
+import { BaseClass } from '../class'
 import { flattenUnique } from '../util/array'
 
 export type DecorationState = Record<Status, Set<string>>
@@ -26,7 +26,10 @@ enum Status {
   TRACKED = 'tracked'
 }
 
-export class DecorationProvider implements FileDecorationProvider {
+export class DecorationProvider
+  extends BaseClass
+  implements FileDecorationProvider
+{
   private static DecorationAdded: FileDecoration = {
     badge: 'A',
     color: new ThemeColor('gitDecoration.addedResourceForeground'),
@@ -67,8 +70,6 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC tracked'
   }
 
-  public readonly dispose = Disposable.fn()
-
   public readonly onDidChangeFileDecorations: Event<Uri[]>
   private readonly decorationsChanged: EventEmitter<Uri[]>
 
@@ -85,6 +86,8 @@ export class DecorationProvider implements FileDecorationProvider {
     }
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
+    super()
+
     this.state = {} as DecorationState
 
     this.decorationsChanged = this.dispose.track(

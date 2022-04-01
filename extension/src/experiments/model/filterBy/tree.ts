@@ -1,4 +1,3 @@
-import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
   ThemeIcon,
@@ -14,6 +13,7 @@ import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { definedAndNonEmpty } from '../../../util/array'
 import { createTreeView, getRootItem } from '../../../vscode/tree'
+import { BaseClass } from '../../../class'
 
 type FilterItem = {
   description: string
@@ -23,10 +23,9 @@ type FilterItem = {
 }
 
 export class ExperimentsFilterByTree
+  extends BaseClass
   implements TreeDataProvider<string | FilterItem>
 {
-  public readonly dispose = Disposable.fn()
-
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
@@ -36,6 +35,8 @@ export class ExperimentsFilterByTree
     experiments: WorkspaceExperiments,
     internalCommands: InternalCommands
   ) {
+    super()
+
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(

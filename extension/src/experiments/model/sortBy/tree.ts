@@ -1,4 +1,3 @@
-import { Disposable } from '@hediet/std/disposable'
 import { Event, ThemeIcon, TreeDataProvider, TreeItem } from 'vscode'
 import { SortDefinition } from './'
 import { WorkspaceExperiments } from '../../workspace'
@@ -7,6 +6,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { InternalCommands } from '../../../commands/internal'
+import { BaseClass } from '../../../class'
 
 export type SortItem = {
   dvcRoot: string
@@ -14,10 +14,9 @@ export type SortItem = {
 }
 
 export class ExperimentsSortByTree
+  extends BaseClass
   implements TreeDataProvider<string | SortItem>
 {
-  public readonly dispose = Disposable.fn()
-
   public readonly onDidChangeTreeData: Event<void>
 
   private readonly experiments: WorkspaceExperiments
@@ -27,6 +26,8 @@ export class ExperimentsSortByTree
     experiments: WorkspaceExperiments,
     internalCommands: InternalCommands
   ) {
+    super()
+
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(

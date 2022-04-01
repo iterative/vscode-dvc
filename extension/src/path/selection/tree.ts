@@ -6,7 +6,6 @@ import {
   TreeView,
   Uri
 } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { Status } from './model'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { WorkspacePlots } from '../../plots/workspace'
@@ -16,6 +15,7 @@ import { createTreeView } from '../../vscode/tree'
 import { definedAndNonEmpty } from '../../util/array'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { ViewOpenedEventName } from '../../telemetry/constants'
+import { BaseClass } from '../../class'
 
 export type PathSelectionItem = {
   description: string | undefined
@@ -27,11 +27,11 @@ export type PathSelectionItem = {
 }
 
 export abstract class BasePathSelectionTree<
-  T extends WorkspaceExperiments | WorkspacePlots
-> implements TreeDataProvider<string | PathSelectionItem>
+    T extends WorkspaceExperiments | WorkspacePlots
+  >
+  extends BaseClass
+  implements TreeDataProvider<string | PathSelectionItem>
 {
-  public readonly dispose = Disposable.fn()
-
   public readonly onDidChangeTreeData: Event<PathSelectionItem | void>
 
   protected readonly workspace: T
@@ -53,6 +53,8 @@ export abstract class BasePathSelectionTree<
     toggleCommand: RegisteredCommands,
     openEventName: ViewOpenedEventName
   ) {
+    super()
+
     this.workspace = workspace
     this.resourceLocator = resourceLocator
 

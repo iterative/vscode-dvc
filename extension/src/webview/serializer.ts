@@ -1,5 +1,4 @@
 import { window, WebviewPanel } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { ViewKey } from './constants'
 import { WebviewData, WebviewState } from './contract'
 import { restoreWebview } from './factory'
@@ -9,11 +8,12 @@ import { WorkspaceExperiments } from '../experiments/workspace'
 import { TableData } from '../experiments/webview/contract'
 import { WorkspacePlots } from '../plots/workspace'
 import { PlotsData } from '../plots/webview/contract'
+import { BaseClass } from '../class'
 
-export class WebviewSerializer {
-  public readonly dispose = Disposable.fn()
-
+export class WebviewSerializer extends BaseClass {
   constructor(experiments: WorkspaceExperiments, plots: WorkspacePlots) {
+    super()
+
     this.registerSerializer<TableData>(ViewKey.EXPERIMENTS, experiments)
 
     this.registerSerializer<PlotsData>(ViewKey.PLOTS, plots)

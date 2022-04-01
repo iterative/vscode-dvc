@@ -1,11 +1,14 @@
 import { Memento } from 'vscode'
 import { PersistenceKey } from './constants'
+import { BaseDeferredClass } from '../class'
 
-export class ModelWithPersistence {
+export class ModelWithPersistence extends BaseDeferredClass {
   private readonly dvcRoot: string
   private readonly workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {
+    super()
+
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
   }
