@@ -37,6 +37,7 @@ import {
   CELL_TOOLTIP_DELAY,
   HEADER_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
+import { getRow } from '../../test/queries'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -180,9 +181,7 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
 
-      const testRow = screen
-        .getAllByRole('row')
-        .find(row => within(row).queryByText(experimentLabel)) as HTMLElement
+      const testRow = getRow(experimentLabel)
       const expandButton = within(testRow).getByTitle('Contract Row')
       fireEvent.click(expandButton)
 
@@ -232,9 +231,7 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
 
-      const testRow = screen
-        .getAllByRole('row')
-        .find(row => within(row).queryByText(experimentLabel)) as HTMLElement
+      const testRow = getRow(experimentLabel)
       const expandButton = within(testRow).getByTitle('Contract Row')
       fireEvent.click(expandButton)
 
@@ -282,9 +279,7 @@ describe('App', () => {
           }
         })
       )
-      const testRow = screen
-        .getAllByRole('row')
-        .find(row => within(row).queryByText(experimentLabel)) as HTMLElement
+      const testRow = getRow(experimentLabel)
       const expandButton = within(testRow).getByTitle('Contract Row')
 
       mockPostMessage.mockClear()
