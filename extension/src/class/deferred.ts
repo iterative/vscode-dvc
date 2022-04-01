@@ -1,11 +1,7 @@
-import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
+import { Disposable } from './dispose'
 
-export abstract class BaseClass {
-  public readonly dispose = Disposable.fn()
-}
-
-export abstract class BaseDeferredClass extends BaseClass {
+export abstract class DeferredDisposable extends Disposable {
   protected readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 

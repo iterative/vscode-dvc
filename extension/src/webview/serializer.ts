@@ -8,9 +8,9 @@ import { WorkspaceExperiments } from '../experiments/workspace'
 import { TableData } from '../experiments/webview/contract'
 import { WorkspacePlots } from '../plots/workspace'
 import { PlotsData } from '../plots/webview/contract'
-import { BaseClass } from '../class'
+import { Disposable } from '../class/dispose'
 
-export class WebviewSerializer extends BaseClass {
+export class WebviewSerializer extends Disposable {
   constructor(experiments: WorkspaceExperiments, plots: WorkspacePlots) {
     super()
 

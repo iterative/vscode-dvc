@@ -7,7 +7,7 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
-import { BaseClass } from '../class'
+import { Disposable } from '../class/dispose'
 import { flattenUnique } from '../util/array'
 
 export type DecorationState = Record<Status, Set<string>>
@@ -27,7 +27,7 @@ enum Status {
 }
 
 export class DecorationProvider
-  extends BaseClass
+  extends Disposable
   implements FileDecorationProvider
 {
   private static DecorationAdded: FileDecoration = {

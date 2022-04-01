@@ -5,7 +5,7 @@ import { CliError, MaybeConsoleError } from './error'
 import { createProcess } from '../processExecution'
 import { Config } from '../config'
 import { StopWatch } from '../util/time'
-import { BaseClass } from '../class'
+import { Disposable } from '../class/dispose'
 
 type CliEvent = {
   command: string
@@ -45,7 +45,7 @@ export const typeCheckCommands = (
     return value
   })
 
-export class Cli extends BaseClass implements ICli {
+export class Cli extends Disposable implements ICli {
   public autoRegisteredCommands: string[] = []
 
   public readonly processCompleted: EventEmitter<CliResult>

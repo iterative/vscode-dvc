@@ -6,7 +6,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { InternalCommands } from '../../../commands/internal'
-import { BaseClass } from '../../../class'
+import { Disposable } from '../../../class/dispose'
 
 export type SortItem = {
   dvcRoot: string
@@ -14,7 +14,7 @@ export type SortItem = {
 }
 
 export class ExperimentsSortByTree
-  extends BaseClass
+  extends Disposable
   implements TreeDataProvider<string | SortItem>
 {
   public readonly onDidChangeTreeData: Event<void>

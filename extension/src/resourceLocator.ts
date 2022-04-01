@@ -1,5 +1,5 @@
 import { Uri } from 'vscode'
-import { BaseClass } from './class'
+import { Disposable } from './class/dispose'
 
 export type Resource = { dark: Uri; light: Uri }
 
@@ -9,7 +9,7 @@ export enum IconName {
   LOADING_SPIN = 'loading-spin'
 }
 
-export class ResourceLocator extends BaseClass {
+export class ResourceLocator extends Disposable {
   public readonly dvcIcon: Resource
   public readonly beaker: Resource
   public readonly checkedCheckbox: Resource

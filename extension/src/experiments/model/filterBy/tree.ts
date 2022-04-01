@@ -13,7 +13,7 @@ import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { definedAndNonEmpty } from '../../../util/array'
 import { createTreeView, getRootItem } from '../../../vscode/tree'
-import { BaseClass } from '../../../class'
+import { Disposable } from '../../../class/dispose'
 
 type FilterItem = {
   description: string
@@ -23,7 +23,7 @@ type FilterItem = {
 }
 
 export class ExperimentsFilterByTree
-  extends BaseClass
+  extends Disposable
   implements TreeDataProvider<string | FilterItem>
 {
   public readonly onDidChangeTreeData: Event<string | void>

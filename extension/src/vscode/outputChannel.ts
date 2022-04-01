@@ -1,5 +1,5 @@
 import { OutputChannel as VSOutputChannel, window } from 'vscode'
-import { BaseClass } from '../class'
+import { Disposable } from '../class/dispose'
 import { ICli } from '../cli'
 
 enum ProcessStatus {
@@ -8,7 +8,7 @@ enum ProcessStatus {
   FAILED = 'FAILED'
 }
 
-export class OutputChannel extends BaseClass {
+export class OutputChannel extends Disposable {
   private readonly outputChannel: VSOutputChannel
   private readonly version: string
 

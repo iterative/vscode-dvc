@@ -10,7 +10,7 @@ import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
-import { BaseClass } from '../class'
+import { Disposable } from '../class/dispose'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -22,7 +22,7 @@ export const AvailableCommands = Object.assign(
 )
 export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
 
-export class InternalCommands extends BaseClass {
+export class InternalCommands extends Disposable {
   private readonly commands = new Map<string, Command>()
   private readonly outputChannel: OutputChannel
 

@@ -3,9 +3,9 @@ import { Event, EventEmitter } from 'vscode'
 import { isSameOrChild, loadYaml, PartialDvcYaml } from '..'
 import { findFiles } from '../workspace'
 import { createFileSystemWatcher } from '../watcher'
-import { BaseDeferredClass } from '../../class'
+import { DeferredDisposable } from '../../class/deferred'
 
-export class FileSystemData extends BaseDeferredClass {
+export class FileSystemData extends DeferredDisposable {
   public readonly onDidUpdate: Event<{ path: string; yaml: PartialDvcYaml }>
 
   private readonly dvcRoot: string

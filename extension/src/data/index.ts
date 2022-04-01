@@ -6,11 +6,11 @@ import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
-import { BaseDeferredClass } from '../class'
+import { DeferredDisposable } from '../class/deferred'
 
 export abstract class BaseData<
   T extends PlotsOutput | ExperimentsOutput
-> extends BaseDeferredClass {
+> extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
 
   protected readonly dvcRoot: string

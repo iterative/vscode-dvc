@@ -1,10 +1,10 @@
 import { StatusBarItem, window } from 'vscode'
-import { BaseClass } from './class'
+import { Disposable } from './class/dispose'
 import { ICli } from './cli'
 import { RegisteredCommands } from './commands/external'
 import { Title } from './vscode/title'
 
-export class Status extends BaseClass {
+export class Status extends Disposable {
   private readonly statusBarItem: StatusBarItem = this.dispose.track(
     window.createStatusBarItem()
   )

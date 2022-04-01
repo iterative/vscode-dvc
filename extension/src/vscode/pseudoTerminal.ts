@@ -1,9 +1,9 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
-import { BaseClass } from '../class'
+import { Disposable } from '../class/dispose'
 
-export class PseudoTerminal extends BaseClass {
+export class PseudoTerminal extends Disposable {
   private readonly termName: string
   private instance: Terminal | undefined
 

@@ -45,9 +45,9 @@ import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WebviewSerializer } from './webview/serializer'
 import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
-import { BaseClass } from './class'
+import { Disposable } from './class/dispose'
 
-export class Extension extends BaseClass implements IExtension {
+export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
 
   private readonly resourceLocator: ResourceLocator

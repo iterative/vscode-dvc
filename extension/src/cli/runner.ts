@@ -15,7 +15,7 @@ import { StopWatch } from '../util/time'
 import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { Toast } from '../vscode/toast'
-import { BaseClass } from '../class'
+import { Disposable } from '../class/dispose'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',
@@ -24,7 +24,7 @@ export const autoRegisteredCommands = {
   IS_EXPERIMENT_RUNNING: 'isExperimentRunning'
 } as const
 
-export class CliRunner extends BaseClass implements ICli {
+export class CliRunner extends Disposable implements ICli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this

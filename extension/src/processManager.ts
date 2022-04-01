@@ -1,10 +1,10 @@
 import { EventEmitter } from 'vscode'
 import { getCurrentEpoch } from './util/time'
-import { BaseClass } from './class'
+import { Disposable } from './class/dispose'
 
 export const DEFAULT_DEBOUNCE_WINDOW_MS = 200
 
-export class ProcessManager extends BaseClass {
+export class ProcessManager extends Disposable {
   private processes: Record<
     string,
     { process: () => Promise<unknown>; lastStarted?: number }

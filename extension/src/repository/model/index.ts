@@ -19,7 +19,7 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../../cli/reader'
-import { BaseClass } from '../../class'
+import { Disposable } from '../../class/dispose'
 
 type OutputData = {
   diffFromCache: StatusOutput
@@ -34,7 +34,7 @@ type ModifiedAndNotInCache = {
 }
 
 export class RepositoryModel
-  extends BaseClass
+  extends Disposable
   implements DecorationModel, SourceControlManagementModel
 {
   private readonly dvcRoot: string

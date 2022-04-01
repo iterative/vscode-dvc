@@ -1,9 +1,9 @@
 import { collectHasCheckpoints } from './collect'
 import { PartialDvcYaml } from '../../fileSystem'
 import { definedAndNonEmpty, uniqueValues } from '../../util/array'
-import { BaseClass } from '../../class'
+import { Disposable } from '../../class/dispose'
 
-export class CheckpointsModel extends BaseClass {
+export class CheckpointsModel extends Disposable {
   private yamlWithCheckpoints: string[] = []
 
   public hasCheckpoints() {

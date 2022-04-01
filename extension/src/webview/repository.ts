@@ -4,11 +4,11 @@ import { ViewKey } from './constants'
 import { MessageFromWebview, WebviewData } from './contract'
 import { createWebview } from './factory'
 import { Resource } from '../resourceLocator'
-import { BaseDeferredClass } from '../class'
+import { DeferredDisposable } from '../class/deferred'
 
 export abstract class BaseRepository<
   T extends WebviewData
-> extends BaseDeferredClass {
+> extends DeferredDisposable {
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
 
   protected readonly onDidReceivedWebviewMessage: Event<MessageFromWebview>

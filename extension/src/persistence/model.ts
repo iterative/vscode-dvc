@@ -1,8 +1,8 @@
 import { Memento } from 'vscode'
 import { PersistenceKey } from './constants'
-import { BaseDeferredClass } from '../class'
+import { DeferredDisposable } from '../class/deferred'
 
-export class ModelWithPersistence extends BaseDeferredClass {
+export class ModelWithPersistence extends DeferredDisposable {
   private readonly dvcRoot: string
   private readonly workspaceState: Memento
 

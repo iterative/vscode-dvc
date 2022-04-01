@@ -19,7 +19,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
 import { Title } from '../../vscode/title'
-import { BaseClass } from '../../class'
+import { Disposable } from '../../class/dispose'
 
 export type ExperimentItem = {
   command?: {
@@ -37,7 +37,7 @@ export type ExperimentItem = {
 }
 
 export class ExperimentsTree
-  extends BaseClass
+  extends Disposable
   implements TreeDataProvider<string | ExperimentItem>
 {
   public readonly onDidChangeTreeData: Event<string | void>

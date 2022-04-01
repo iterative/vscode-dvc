@@ -1,15 +1,14 @@
 import { EventEmitter } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Disposables, reset } from '../util/disposable'
 import { quickPickOne } from '../vscode/quickPick'
-import { BaseDeferredClass } from '../class'
+import { DeferredDisposable } from '../class/deferred'
 
 export abstract class BaseWorkspace<
-  T extends Disposable & { isReady: () => Promise<void> },
+  T extends DeferredDisposable,
   U extends ResourceLocator | undefined = undefined
-> extends BaseDeferredClass {
+> extends DeferredDisposable {
   protected repositories: Disposables<T> = {}
   protected readonly internalCommands: InternalCommands
 

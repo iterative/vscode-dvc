@@ -4,9 +4,9 @@ import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
 import { SourceControlManagement } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
-import { BaseDeferredClass } from '../class'
+import { DeferredDisposable } from '../class/deferred'
 
-export class Repository extends BaseDeferredClass {
+export class Repository extends DeferredDisposable {
   private readonly model: RepositoryModel
   private readonly treeDataChanged: EventEmitter<void>
 

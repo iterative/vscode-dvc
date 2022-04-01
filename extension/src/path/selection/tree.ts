@@ -15,7 +15,7 @@ import { createTreeView } from '../../vscode/tree'
 import { definedAndNonEmpty } from '../../util/array'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { ViewOpenedEventName } from '../../telemetry/constants'
-import { BaseClass } from '../../class'
+import { Disposable } from '../../class/dispose'
 
 export type PathSelectionItem = {
   description: string | undefined
@@ -29,7 +29,7 @@ export type PathSelectionItem = {
 export abstract class BasePathSelectionTree<
     T extends WorkspaceExperiments | WorkspacePlots
   >
-  extends BaseClass
+  extends Disposable
   implements TreeDataProvider<string | PathSelectionItem>
 {
   public readonly onDidChangeTreeData: Event<PathSelectionItem | void>

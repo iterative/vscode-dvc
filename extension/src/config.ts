@@ -4,9 +4,9 @@ import {
   getPythonBinPath
 } from './extensions/python'
 import { getConfigValue } from './vscode/config'
-import { BaseDeferredClass } from './class'
+import { DeferredDisposable } from './class/deferred'
 
-export class Config extends BaseDeferredClass {
+export class Config extends DeferredDisposable {
   public readonly onDidChangeExecutionDetails: Event<void>
 
   public pythonBinPath: string | undefined

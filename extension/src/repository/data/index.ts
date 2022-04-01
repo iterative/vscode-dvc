@@ -14,7 +14,7 @@ import {
   EXPERIMENTS_GIT_LOGS_REFS,
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
-import { BaseDeferredClass } from '../../class'
+import { DeferredDisposable } from '../../class/deferred'
 
 export type Data = {
   diffFromHead: DiffOutput
@@ -33,7 +33,7 @@ export const isExcluded = (dvcRoot: string, path: string) =>
   path.includes(EXPERIMENTS_GIT_LOGS_REFS) ||
   ignoredDotDirectories.test(path)
 
-export class RepositoryData extends BaseDeferredClass {
+export class RepositoryData extends DeferredDisposable {
   public readonly onDidUpdate: Event<Data>
 
   private readonly dvcRoot: string

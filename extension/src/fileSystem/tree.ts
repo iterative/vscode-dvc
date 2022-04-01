@@ -31,10 +31,10 @@ import { Resource } from '../repository/commands'
 import { WorkspaceRepositories } from '../repository/workspace'
 import { PathItem } from '../repository/model/collect'
 import { Title } from '../vscode/title'
-import { BaseClass } from '../class'
+import { Disposable } from '../class/dispose'
 
 export class TrackedExplorerTree
-  extends BaseClass
+  extends Disposable
   implements TreeDataProvider<PathItem>
 {
   public readonly onDidChangeTreeData: Event<void>
