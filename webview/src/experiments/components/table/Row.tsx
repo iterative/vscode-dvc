@@ -1,4 +1,4 @@
-import React, { EventHandler, SyntheticEvent, useRef } from 'react'
+import React, { EventHandler, SyntheticEvent } from 'react'
 import { Row } from 'react-table'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
@@ -50,10 +50,8 @@ export const ExperimentRow: React.FC<
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
     })
   }
-  const tippyRef = useRef<HTMLElement>()
   return (
     <Tooltip
-      ref={tippyRef}
       arrow={true}
       trigger="contextmenu"
       content={
@@ -70,14 +68,14 @@ export const ExperimentRow: React.FC<
         event.preventDefault()
         instance.setProps({
           getReferenceClientRect() {
+            const { top, bottom, height } =
+              instance.reference.getBoundingClientRect()
             return {
-              bottom:
-                (instance.reference as HTMLElement).offsetTop +
-                instance.reference.clientHeight,
-              height: instance.reference.clientHeight,
+              bottom,
+              height,
               left: event.clientX,
               right: event.clientX,
-              top: (instance.reference as HTMLElement).offsetTop,
+              top,
               width: 0
             } as DOMRect
           }

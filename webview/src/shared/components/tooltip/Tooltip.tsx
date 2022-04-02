@@ -25,7 +25,6 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onTrigger,
     onClickOutside,
     onUntrigger,
-    followCursor,
     plugins,
     animation = false,
     className = styles.menu,
@@ -50,7 +49,6 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onClickOutside={onClickOutside}
     onShow={onShow}
     onHide={onHide}
-    followCursor={followCursor}
     plugins={plugins}
     ref={ref as Ref<Element>}
   >
