@@ -1,7 +1,5 @@
 import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
@@ -16,6 +14,7 @@ import {
   EXPERIMENTS_GIT_LOGS_REFS,
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
+import { DeferredDisposable } from '../../class/deferred'
 
 export type Data = {
   diffFromHead: DiffOutput
@@ -34,14 +33,10 @@ export const isExcluded = (dvcRoot: string, path: string) =>
   path.includes(EXPERIMENTS_GIT_LOGS_REFS) ||
   ignoredDotDirectories.test(path)
 
-export class RepositoryData {
-  public readonly dispose = Disposable.fn()
+export class RepositoryData extends DeferredDisposable {
   public readonly onDidUpdate: Event<Data>
 
   private readonly dvcRoot: string
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
 
   private readonly processManager: ProcessManager
   private readonly internalCommands: InternalCommands
@@ -55,6 +50,8 @@ export class RepositoryData {
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>
   ) {
+    super()
+
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
       new ProcessManager(
@@ -69,10 +66,6 @@ export class RepositoryData {
     this.watchWorkspace()
 
     this.initialize()
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   public async managedUpdate(path?: string) {

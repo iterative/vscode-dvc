@@ -1,5 +1,4 @@
 import { commands } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { RegisteredCliCommands, RegisteredCommands } from './external'
 import { ICli } from '../cli'
 import { Args } from '../cli/constants'
@@ -11,6 +10,7 @@ import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
+import { Disposable } from '../class/dispose'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -22,13 +22,13 @@ export const AvailableCommands = Object.assign(
 )
 export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
 
-export class InternalCommands {
-  public readonly dispose = Disposable.fn()
-
+export class InternalCommands extends Disposable {
   private readonly commands = new Map<string, Command>()
   private readonly outputChannel: OutputChannel
 
   constructor(outputChannel: OutputChannel, ...cliInteractors: ICli[]) {
+    super()
+
     for (const cli of cliInteractors) {
       this.autoRegisterCommands(cli)
     }

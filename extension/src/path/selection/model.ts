@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
 import { MetricOrParam } from '../../experiments/webview/contract'
@@ -14,8 +13,6 @@ export enum Status {
 export abstract class PathSelectionModel<
   T extends MetricOrParam | PlotPath
 > extends ModelWithPersistence {
-  public readonly dispose = Disposable.fn()
-
   protected status: Record<string, Status>
 
   protected data: T[] = []

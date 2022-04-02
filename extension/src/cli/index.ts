@@ -1,11 +1,11 @@
 import { Event, EventEmitter } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { Args } from './constants'
 import { ExecutionOptions, getOptions } from './options'
 import { CliError, MaybeConsoleError } from './error'
 import { createProcess } from '../processExecution'
 import { Config } from '../config'
 import { StopWatch } from '../util/time'
+import { Disposable } from '../class/dispose'
 
 type CliEvent = {
   command: string
@@ -45,9 +45,7 @@ export const typeCheckCommands = (
     return value
   })
 
-export class Cli implements ICli {
-  public readonly dispose = Disposable.fn()
-
+export class Cli extends Disposable implements ICli {
   public autoRegisteredCommands: string[] = []
 
   public readonly processCompleted: EventEmitter<CliResult>
@@ -65,6 +63,8 @@ export class Cli implements ICli {
       processCompleted: EventEmitter<CliResult>
     }
   ) {
+    super()
+
     this.config = config
 
     this.processCompleted =
