@@ -4,7 +4,7 @@ import { Column, Accessor, ColumnGroup, ColumnInstance } from 'react-table'
 import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
 import styles from '../components/table/styles.module.scss'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
-import { CellComponent } from '../components/cell/Cell'
+import { CellComponent } from '../components/table/Cell'
 
 const Header: React.FC<{ column: Column<Experiment> }> = ({
   column: { name }

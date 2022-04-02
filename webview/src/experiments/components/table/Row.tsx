@@ -1,84 +1,19 @@
 import React, { EventHandler, SyntheticEvent } from 'react'
-import { Cell } from 'react-table'
+import { Row } from 'react-table'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { RowProp, WithChanges } from './Row'
-import ClockIcon from '../../../shared/components/icons/Clock'
+import { CellWrapper, FirstCell } from './Cell'
+import styles from './styles.module.scss'
 import { sendMessage } from '../../../shared/vscode'
-import styles from '../table/styles.module.scss'
 
-const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
-  row.canExpand ? (
-    <button
-      title={`${row.isExpanded ? 'Contract' : 'Expand'} Row`}
-      className={styles.rowArrowContainer}
-      onClick={e => {
-        e.preventDefault()
-        e.stopPropagation()
-        row.toggleRowExpanded()
-      }}
-      onKeyDown={e => {
-        e.stopPropagation()
-      }}
-    >
-      <span
-        className={
-          row.isExpanded ? styles.expandedRowArrow : styles.contractedRowArrow
-        }
-      />
-    </button>
-  ) : (
-    <span className={styles.rowArrowContainer} />
-  )
-
-const FirstCell: React.FC<{
-  cell: Cell<Experiment, unknown>
-  bulletColor?: string
-}> = ({ cell, bulletColor }) => {
-  const { row, isPlaceholder } = cell
-
-  return (
-    <div
-      {...cell.getCellProps({
-        className: cx(
-          styles.firstCell,
-          styles.td,
-          styles.experimentCell,
-          isPlaceholder && styles.groupPlaceholder
-        )
-      })}
-    >
-      <div className={styles.innerCell}>
-        <RowExpansionButton row={row} />
-        <span className={styles.bullet} style={{ color: bulletColor }}>
-          {row.original.queued && <ClockIcon />}
-        </span>
-        {isPlaceholder ? null : (
-          <div className={styles.cellContents}>{cell.render('Cell')}</div>
-        )}
-      </div>
-    </div>
-  )
+export interface WithChanges {
+  changes?: string[]
 }
 
-const CellWrapper: React.FC<{
-  cell: Cell<Experiment, unknown>
-  changes?: string[]
-  cellId: string
-}> = ({ cell, cellId, changes }) => (
-  <div
-    {...cell.getCellProps({
-      className: cx(styles.td, cell.isPlaceholder && styles.groupPlaceholder, {
-        [styles.metaCell]: !cell.column.group,
-        [styles.workspaceChange]: changes?.includes(cell.column.id)
-      })
-    })}
-    data-testid={cellId}
-  >
-    {cell.render('Cell')}
-  </div>
-)
+export interface RowProp {
+  row: Row<Experiment>
+}
 
 const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   if (running) {
@@ -94,7 +29,7 @@ const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   return styles.normalExperiment
 }
 
-export const RowContent: React.FC<
+export const ExperimentRow: React.FC<
   RowProp & { className?: string } & WithChanges
 > = ({
   row: {
