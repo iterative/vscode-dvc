@@ -1,4 +1,4 @@
-import React, { EventHandler, SyntheticEvent } from 'react'
+import React, { EventHandler, SyntheticEvent, useRef } from 'react'
 import { Row } from 'react-table'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
@@ -6,6 +6,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { CellWrapper, FirstCell } from './Cell'
 import styles from './styles.module.scss'
 import { sendMessage } from '../../../shared/vscode'
+import Tooltip from '../../../shared/components/tooltip/Tooltip'
 
 export interface WithChanges {
   changes?: string[]
@@ -31,17 +32,14 @@ const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
 
 export const ExperimentRow: React.FC<
   RowProp & { className?: string } & WithChanges
-> = ({
-  row: {
+> = ({ row, className, changes }): JSX.Element => {
+  const {
     getRowProps,
     cells: [firstCell, ...cells],
     original,
     flatIndex,
     values: { id }
-  },
-  className,
-  changes
-}): JSX.Element => {
+  } = row
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
   const toggleExperiment: EventHandler<SyntheticEvent> = e => {
@@ -52,41 +50,75 @@ export const ExperimentRow: React.FC<
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
     })
   }
+  const tippyRef = useRef<HTMLElement>()
   return (
-    <div
-      {...getRowProps({
-        className: cx(
-          className,
-          styles.tr,
-          getExperimentTypeClass(original),
-          flatIndex % 2 === 0 || styles.oddRow,
-          isWorkspace ? styles.workspaceRow : styles.normalRow,
-          styles.row,
-          isWorkspace && changes?.length && styles.workspaceWithChanges
-        )
-      })}
-      tabIndex={0}
-      role="row"
-      onClick={toggleExperiment}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          toggleExperiment(e)
-        }
+    <Tooltip
+      ref={tippyRef}
+      arrow={true}
+      trigger="contextmenu"
+      content={
+        <ul className={styles.contextMenu}>
+          <li>Apply Experiment</li>
+          <li>Branch Experiment</li>
+          <li>Remove Experiment</li>
+          <li>Queue Experiment with Params</li>
+        </ul>
+      }
+      placement="bottom"
+      interactive={true}
+      onTrigger={(instance, event: PointerEvent) => {
+        event.preventDefault()
+        instance.setProps({
+          getReferenceClientRect() {
+            return {
+              bottom:
+                (instance.reference as HTMLElement).offsetTop +
+                instance.reference.clientHeight,
+              height: instance.reference.clientHeight,
+              left: event.clientX,
+              right: event.clientX,
+              top: (instance.reference as HTMLElement).offsetTop,
+              width: 0
+            } as DOMRect
+          }
+        })
       }}
-      data-testid={isWorkspace && 'workspace-row'}
     >
-      <FirstCell cell={firstCell} bulletColor={original.displayColor} />
-      {cells.map(cell => {
-        const cellId = `${cell.column.id}___${cell.row.id}`
-        return (
-          <CellWrapper
-            cell={cell}
-            changes={changesIfWorkspace}
-            key={cellId}
-            cellId={cellId}
-          />
-        )
-      })}
-    </div>
+      <div
+        {...getRowProps({
+          className: cx(
+            className,
+            styles.tr,
+            getExperimentTypeClass(original),
+            flatIndex % 2 === 0 || styles.oddRow,
+            isWorkspace ? styles.workspaceRow : styles.normalRow,
+            styles.row,
+            isWorkspace && changes?.length && styles.workspaceWithChanges
+          )
+        })}
+        tabIndex={0}
+        role="row"
+        onClick={toggleExperiment}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            toggleExperiment(e)
+          }
+        }}
+        data-testid={isWorkspace && 'workspace-row'}
+      >
+        <FirstCell cell={firstCell} bulletColor={original.displayColor} />
+        {cells.map(cell => {
+          const cellId = `${cell.column.id}___${cell.row.id}`
+          return (
+            <CellWrapper
+              cell={cell}
+              changes={changesIfWorkspace}
+              key={cellId}
+              cellId={cellId}
+            />
+          )
+        })}
+      </div>
+    </Tooltip>
   )
 }

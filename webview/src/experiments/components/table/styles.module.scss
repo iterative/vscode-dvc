@@ -249,9 +249,6 @@ $spinner-color-light: #000;
       }
     }
   }
-  ul {
-    padding-left: 1rem;
-  }
   .tableContainer {
     overflow: auto;
     flex: 1;
@@ -581,4 +578,10 @@ $spinner-color-light: #000;
   @extend %headerCellPadding;
   overflow-x: hidden;
   text-overflow: ellipsis;
+}
+
+.contextMenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
