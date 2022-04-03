@@ -151,15 +151,22 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return Toast.showOutput(stdout)
   }
 
-  public getExpNameThenRun(commandId: CommandId) {
-    return this.pickExpThenRun(commandId, cwd =>
-      this.pickCurrentExperiment(cwd)
+  public getExpNameThenRun(commandId: CommandId, providedExperiment?: string) {
+    return this.pickExpThenRun(
+      commandId,
+      cwd => this.pickCurrentExperiment(cwd),
+      providedExperiment
     )
   }
 
-  public getQueuedExpThenRun(commandId: CommandId) {
-    return this.pickExpThenRun(commandId, cwd =>
-      this.getRepository(cwd).pickQueuedExperiment()
+  public getQueuedExpThenRun(
+    commandId: CommandId,
+    providedExperiment?: string
+  ) {
+    return this.pickExpThenRun(
+      commandId,
+      cwd => this.getRepository(cwd).pickQueuedExperiment(),
+      providedExperiment
     )
   }
 
@@ -254,19 +261,26 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     commandId: CommandId,
     pickFunc: (
       cwd: string
-    ) => Thenable<{ id: string; name: string } | undefined> | undefined
+    ) => Thenable<{ id: string; name: string } | undefined> | undefined,
+    providedExperiment?: string
   ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
 
-    const experiment = await pickFunc(cwd)
-
-    if (!experiment) {
-      return
+    let experimentName
+    if (providedExperiment) {
+      experimentName = providedExperiment
+    } else {
+      const experiment = await pickFunc(cwd)
+      if (!experiment) {
+        return
+      }
+      experimentName = experiment.name
     }
-    return this.runCommand(commandId, cwd, experiment.name)
+
+    return this.runCommand(commandId, cwd, experimentName)
   }
 
   private async getDvcRoot(overrideRoot?: string) {

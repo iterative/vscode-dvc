@@ -40,17 +40,29 @@ const registerExperimentNameCommands = (
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_APPLY,
-    () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
+    (providedExperiment?: string) =>
+      experiments.getExpNameThenRun(
+        AvailableCommands.EXPERIMENT_APPLY,
+        providedExperiment
+      )
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_REMOVE,
-    () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
+    (providedExperiment?: string) =>
+      experiments.getExpNameThenRun(
+        AvailableCommands.EXPERIMENT_REMOVE,
+        providedExperiment
+      )
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUED,
-    () => experiments.getQueuedExpThenRun(AvailableCommands.EXPERIMENT_REMOVE)
+    (providedExperiment?: string) =>
+      experiments.getQueuedExpThenRun(
+        AvailableCommands.EXPERIMENT_REMOVE,
+        providedExperiment
+      )
   )
 }
 
