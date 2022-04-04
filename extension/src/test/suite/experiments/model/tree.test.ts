@@ -63,23 +63,13 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experimentsTree.toggleStatus', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
+      const { plots, messageSpy } = await buildPlots(disposable)
 
       const expectedDomain = [...domain]
       const expectedRange = [...range]
 
-      const mockGetCheckpointPlots = stub(plotsModel, 'getCheckpointPlots')
-      const getCheckpointPlotsEvent = new Promise(resolve =>
-        mockGetCheckpointPlots.callsFake(() => {
-          resolve(undefined)
-          return mockGetCheckpointPlots.wrappedMethod.bind(plotsModel)()
-        })
-      )
-
-      await plots.showWebview()
-      await getCheckpointPlotsEvent
-
-      mockGetCheckpointPlots.restore()
+      const webview = await plots.showWebview()
+      await webview.isReady()
 
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,

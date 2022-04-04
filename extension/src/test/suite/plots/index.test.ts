@@ -468,21 +468,13 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { plots, plotsModel, messageSpy, mockPlotsDiff } = await buildPlots(
+      const { plots, messageSpy, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
 
-      const mockGetCheckpointPlots = stub(plotsModel, 'getCheckpointPlots')
-      const getCheckpointPlotsEvent = new Promise(resolve =>
-        mockGetCheckpointPlots.callsFake(() => {
-          resolve(undefined)
-          return mockGetCheckpointPlots.wrappedMethod.bind(plotsModel)()
-        })
-      )
-
       const webview = await plots.showWebview()
-      await getCheckpointPlotsEvent
+      await webview.isReady()
 
       expect(mockPlotsDiff).to.be.called
 
