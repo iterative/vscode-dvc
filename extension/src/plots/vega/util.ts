@@ -17,6 +17,7 @@ import {
   RepeatMapping
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
+import { ComparisonRevision } from '../webview/contract'
 
 const COMMIT_FIELD = 'rev'
 
@@ -85,7 +86,7 @@ export const isMultiViewByCommitPlot = (
 export type ColorScale = { domain: string[]; range: string[] }
 
 export const getColorScale = (
-  revisions: { revision: string; displayColor: string }[]
+  revisions: ComparisonRevision[]
 ): ColorScale | undefined => {
   const acc: ColorScale = { domain: [], range: [] }
 

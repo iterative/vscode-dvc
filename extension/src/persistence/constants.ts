@@ -1,4 +1,4 @@
-export enum MementoPrefix {
+export enum PersistenceKey {
   BRANCH_COLORS = 'branchColors:',
   EXPERIMENTS_COLORS = 'experimentsColors:',
   EXPERIMENTS_FILTER_BY = 'experimentsFilterBy:',
@@ -9,6 +9,7 @@ export enum MementoPrefix {
   METRICS_AND_PARAMS_STATUS = 'metricsAndParamsStatus:',
   PLOT_PATH_STATUS = 'plotPathStatus:',
   PLOT_COMPARISON_ORDER = 'plotComparisonOrder:',
+  PLOT_METRIC_ORDER = 'plotMetricOrder:',
   PLOT_SECTION_COLLAPSED = 'plotSectionCollapsed:',
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOT_SIZES = 'plotSizes:',

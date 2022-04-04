@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { Deferred } from '@hediet/std/synchronization'
 import {
   collectPaths,
   collectTemplateOrder,
@@ -9,22 +8,21 @@ import {
 } from './collect'
 import { PlotsOutput } from '../../cli/reader'
 import { PathSelectionModel } from '../../path/selection/model'
-import { MementoPrefix } from '../../vscode/memento'
 import { getPathArray } from '../../fileSystem/util'
+import { PersistenceKey } from '../../persistence/constants'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
   private templateOrder: TemplateOrder
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    super(dvcRoot, workspaceState, MementoPrefix.PLOT_PATH_STATUS, getPathArray)
-
-    this.templateOrder = this.workspaceState.get(
-      MementoPrefix.PLOT_TEMPLATE_ORDER + this.dvcRoot,
-      []
+    super(
+      dvcRoot,
+      workspaceState,
+      PersistenceKey.PLOT_PATH_STATUS,
+      getPathArray
     )
+
+    this.templateOrder = this.revive(PersistenceKey.PLOT_TEMPLATE_ORDER, [])
   }
 
   public transformAndSet(data: PlotsOutput) {
@@ -39,10 +37,6 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     this.deferred.resolve()
   }
 
-  public isReady() {
-    return this.initialized
-  }
-
   public setTemplateOrder(templateOrder?: TemplateOrder) {
     this.templateOrder = collectTemplateOrder(
       this.getPathsByType(PathType.TEMPLATE_SINGLE),
@@ -50,7 +44,7 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       templateOrder || this.templateOrder
     )
 
-    this.persistTemplateOrder()
+    this.persist(PersistenceKey.PLOT_TEMPLATE_ORDER, this.templateOrder)
   }
 
   public filterChildren(path: string | undefined): PlotPath[] {
@@ -70,18 +64,15 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.getPathsByType(PathType.COMPARISON)
   }
 
+  public hasPaths() {
+    return this.data.length > 0
+  }
+
   private getPathsByType(type: PathType) {
     return this.data
       .filter(
         plotPath => plotPath.type?.has(type) && this.status[plotPath.path]
       )
       .map(({ path }) => path)
-  }
-
-  private persistTemplateOrder() {
-    this.workspaceState.update(
-      MementoPrefix.PLOT_TEMPLATE_ORDER + this.dvcRoot,
-      this.templateOrder
-    )
   }
 }

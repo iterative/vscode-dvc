@@ -1,32 +1,17 @@
+import { PlotsData } from 'dvc/src/plots/webview/contract'
 import {
-  DEFAULT_SECTION_COLLAPSED,
-  PlotsData,
-  Section
-} from 'dvc/src/plots/webview/contract'
-import {
-  MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { Reducer, useReducer } from 'react'
 import { vsCodeApi } from '../../shared/api'
-import { sendMessage } from '../../shared/vscode'
 
 export interface PlotsWebviewState {
   data?: PlotsData
   dvcRoot?: string
 }
 
-export enum CollapsibleSectionsActions {
-  TOGGLE_COLLAPSED = 'toggleCollapsed'
-}
-
-export type PlotsReducerAction =
-  | MessageToWebview<PlotsData>
-  | {
-      type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
-      sectionKey: Section
-    }
+export type PlotsReducerAction = MessageToWebview<PlotsData>
 
 const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
   state,
@@ -42,26 +27,6 @@ const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
     case MessageToWebviewType.SET_DVC_ROOT:
       vsCodeApi.setState({ dvcRoot: action.dvcRoot })
       return state
-
-    case CollapsibleSectionsActions.TOGGLE_COLLAPSED:
-      sendMessage({
-        payload: {
-          [action.sectionKey]:
-            !state.data?.sectionCollapsed?.[action.sectionKey]
-        },
-        type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
-      })
-      return {
-        ...state,
-        data: {
-          ...state.data,
-          sectionCollapsed: {
-            ...(state.data?.sectionCollapsed || DEFAULT_SECTION_COLLAPSED),
-            [action.sectionKey]:
-              !state.data?.sectionCollapsed?.[action.sectionKey]
-          }
-        }
-      }
 
     default:
       return state

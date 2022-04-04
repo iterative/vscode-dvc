@@ -1,8 +1,8 @@
 import { Memento } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
+import { PersistenceKey } from '../../persistence/constants'
+import { ModelWithPersistence } from '../../persistence/model'
 import { MetricOrParam } from '../../experiments/webview/contract'
 import { PlotPath } from '../../plots/paths/collect'
-import { MementoPrefix } from '../../vscode/memento'
 
 export enum Status {
   SELECTED = 2,
@@ -10,28 +10,25 @@ export enum Status {
   UNSELECTED = 0
 }
 
-export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
-  public readonly dispose = Disposable.fn()
-
+export abstract class PathSelectionModel<
+  T extends MetricOrParam | PlotPath
+> extends ModelWithPersistence {
   protected status: Record<string, Status>
 
   protected data: T[] = []
 
-  protected readonly dvcRoot: string
-  protected readonly workspaceState: Memento
-
-  private readonly statusKey: MementoPrefix
+  private readonly statusKey: PersistenceKey
 
   private readonly splitFunc: (path: string) => string[]
 
   constructor(
     dvcRoot: string,
     workspaceState: Memento,
-    statusKey: MementoPrefix,
+    statusKey: PersistenceKey,
     splitFunc: (path: string) => string[]
   ) {
-    this.dvcRoot = dvcRoot
-    this.workspaceState = workspaceState
+    super(dvcRoot, workspaceState)
+
     this.statusKey = statusKey
     this.status = workspaceState.get(this.statusKey + dvcRoot, {})
     this.splitFunc = splitFunc
@@ -142,10 +139,7 @@ export abstract class PathSelectionModel<T extends MetricOrParam | PlotPath> {
   }
 
   private persistStatus() {
-    return this.workspaceState.update(
-      this.statusKey + this.dvcRoot,
-      this.status
-    )
+    return this.persist(this.statusKey, this.status)
   }
 
   private getLabel(path: string) {

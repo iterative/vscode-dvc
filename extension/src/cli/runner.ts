@@ -1,7 +1,11 @@
 import { EventEmitter, Event } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { CliResult, CliStarted, ICli, typeCheckCommands } from '.'
-import { Args, Command, ExperimentFlag, ExperimentSubCommand } from './args'
+import {
+  Args,
+  Command,
+  ExperimentFlag,
+  ExperimentSubCommand
+} from './constants'
 import { getOptions } from './options'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
@@ -11,6 +15,7 @@ import { StopWatch } from '../util/time'
 import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { Toast } from '../vscode/toast'
+import { Disposable } from '../class/dispose'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',
@@ -19,9 +24,7 @@ export const autoRegisteredCommands = {
   IS_EXPERIMENT_RUNNING: 'isExperimentRunning'
 } as const
 
-export class CliRunner implements ICli {
-  public readonly dispose = Disposable.fn()
-
+export class CliRunner extends Disposable implements ICli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this
@@ -54,6 +57,8 @@ export class CliRunner implements ICli {
       processTerminated?: EventEmitter<void>
     }
   ) {
+    super()
+
     this.config = config
 
     this.executable = executable

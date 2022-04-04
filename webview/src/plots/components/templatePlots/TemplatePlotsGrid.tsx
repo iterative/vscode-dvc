@@ -1,4 +1,5 @@
 import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
+import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useEffect, useState, MutableRefObject } from 'react'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import cx from 'classnames'
@@ -10,7 +11,6 @@ import {
 } from '../../../shared/components/dragDrop/DragDropContainer'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../../util/styles'
-import { reorderObjectList } from '../../../util/objects'
 import { DropTarget } from '../DropTarget'
 
 interface TemplatePlotsGridProps {
@@ -52,15 +52,15 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 
     setSectionEntries(
       groupIndex,
-      reorderObjectList(order, entries, 'id') as TemplatePlotEntry[]
+      reorderObjectList<TemplatePlotEntry>(order, entries, 'id')
     )
   }
 
-  const reorderedItems = reorderObjectList(
+  const reorderedItems = reorderObjectList<TemplatePlotEntry>(
     order,
     entries,
     'id'
-  ) as TemplatePlotEntry[]
+  )
 
   const plotClassName = cx(styles.plot, {
     [styles.multiViewPlot]: multiView

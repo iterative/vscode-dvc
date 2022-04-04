@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { join } from 'path'
+import { join } from 'dvc/src/test/util/path'
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
@@ -21,6 +21,7 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
+import { reorderObjectList } from 'dvc/src/util/array'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
@@ -29,14 +30,15 @@ import { createBubbledEvent, dragAndDrop } from '../../test/dragDrop'
 
 jest.mock('../../shared/api')
 
-jest.mock('./constants', () => ({
-  ...jest.requireActual('./constants'),
+jest.mock('./checkpointPlots/util', () => ({
+  ...jest.requireActual('./checkpointPlots/util'),
   createSpec: (title: string, scale?: CheckpointPlotsColors) => ({
-    ...jest.requireActual('./constants').createSpec(title, scale),
+    ...jest.requireActual('./checkpointPlots/util').createSpec(title, scale),
     height: 100,
     width: 100
   })
 }))
+jest.spyOn(console, 'warn').mockImplementation(() => {})
 
 const { postMessage, setState } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
@@ -137,7 +139,6 @@ describe('App', () => {
   })
 
   it('should render only checkpoint plots when given a message with only checkpoint plots data', () => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {})
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
@@ -215,12 +216,21 @@ describe('App', () => {
       cancelable: true
     })
 
-    const hiddenPlots = await screen.findAllByLabelText('Vega visualization')
-    hiddenPlots.map(hiddenPlot => expect(hiddenPlot).not.toBeVisible())
     expect(mockPostMessage).toBeCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
     })
+
+    sendSetDataMessage({
+      sectionCollapsed: {
+        ...DEFAULT_SECTION_COLLAPSED,
+        [Section.CHECKPOINT_PLOTS]: true
+      }
+    })
+
+    expect(
+      screen.queryByLabelText('Vega visualization')
+    ).not.toBeInTheDocument()
   })
 
   it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {
@@ -233,7 +243,6 @@ describe('App', () => {
             template: null
           }
         }}
-        dispatch={jest.fn}
       />
     )
 
@@ -249,7 +258,9 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await screen.findByText('loss')
+    const lossItem = await screen.findByText('summary.json:loss', {
+      ignore: 'text'
+    })
 
     fireEvent.click(lossItem, {
       bubbles: true,
@@ -279,7 +290,7 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await screen.findByText('loss')
+    const lossItem = await screen.findByText('summary.json:loss')
 
     fireEvent.click(lossItem, {
       bubbles: true,
@@ -287,7 +298,11 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: ['accuracy', 'val_loss', 'val_accuracy'],
+      payload: [
+        'summary.json:accuracy',
+        'summary.json:val_accuracy',
+        'summary.json:val_loss'
+      ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
 
@@ -297,7 +312,12 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toBeCalledWith({
-      payload: ['loss', 'accuracy', 'val_loss', 'val_accuracy'],
+      payload: [
+        'summary.json:accuracy',
+        'summary.json:loss',
+        'summary.json:val_accuracy',
+        'summary.json:val_loss'
+      ],
       type: MessageFromWebviewType.METRIC_TOGGLED
     })
   })
@@ -354,6 +374,34 @@ describe('App', () => {
       payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.SMALL },
       type: MessageFromWebviewType.PLOTS_RESIZED
     })
+  })
+
+  it('should not send a message to the extension with the selected size when the size has not changed', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    const sizeButton = screen.getAllByTestId('icon-menu-item')[2]
+    fireEvent.mouseEnter(sizeButton)
+    fireEvent.click(sizeButton)
+
+    const largeButton = screen.getByText('Large')
+    fireEvent.click(largeButton)
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
+      type: MessageFromWebviewType.PLOTS_RESIZED
+    })
+
+    mockPostMessage.mockClear()
+
+    sendSetDataMessage({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    expect(mockPostMessage).not.toBeCalled()
   })
 
   it('should show an input to rename the section when clicking the rename icon button', () => {
@@ -461,6 +509,41 @@ describe('App', () => {
     ])
   })
 
+  it('should send a message to the extension when the checkpoint plots are reordered', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    const plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy'
+    ])
+
+    mockPostMessage.mockClear()
+
+    dragAndDrop(plots[2], plots[0])
+
+    const expectedOrder = [
+      'summary.json:val_loss',
+      'summary.json:loss',
+      'summary.json:accuracy',
+      'summary.json:val_accuracy'
+    ]
+
+    expect(mockPostMessage).toBeCalledTimes(1)
+    expect(mockPostMessage).toBeCalledWith({
+      payload: expectedOrder,
+      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+    })
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual(expectedOrder)
+  })
+
   it('should remove the checkpoint plot from the order if it is removed from the plots', () => {
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
@@ -484,35 +567,60 @@ describe('App', () => {
     ])
   })
 
-  it('should add the new plot at the end of the set order', () => {
+  it('should not change the metric order in the hover menu by reordering the plots', () => {
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    let plots = screen.getAllByTestId(/summary\.json/)
-    dragAndDrop(plots[3], plots[0])
+    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
 
-    sendSetDataMessage({
-      checkpoint: {
-        ...checkpointPlotsFixture,
-        plots: [
-          {
-            title: 'summary.json:new-plot',
-            values: checkpointPlotsFixture.plots[0].values
-          },
-          ...checkpointPlotsFixture.plots
-        ]
-      }
-    })
-    plots = screen.getAllByTestId(/summary\.json/)
-    expect(plots.map(plot => plot.id)).toStrictEqual([
+    let options = screen.getAllByTestId('select-menu-option-label')
+    const optionsOrder = [
+      'summary.json:accuracy',
+      'summary.json:loss',
+      'summary.json:val_accuracy',
+      'summary.json:val_loss'
+    ]
+    expect(options.map(({ textContent }) => textContent)).toStrictEqual(
+      optionsOrder
+    )
+
+    fireEvent.click(pickerButton)
+
+    let plots = screen.getAllByTestId(/summary\.json/)
+    const newPlotOrder = [
       'summary.json:val_accuracy',
       'summary.json:loss',
       'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:new-plot'
-    ])
+      'summary.json:val_loss'
+    ]
+    expect(plots.map(plot => plot.id)).not.toStrictEqual(newPlotOrder)
+
+    dragAndDrop(plots[3], plots[0])
+    sendSetDataMessage({
+      checkpoint: {
+        ...checkpointPlotsFixture,
+        plots: reorderObjectList(
+          newPlotOrder,
+          checkpointPlotsFixture.plots,
+          'title'
+        )
+      }
+    })
+
+    plots = screen.getAllByTestId(/summary\.json/)
+    expect(plots.map(plot => plot.id)).toStrictEqual(newPlotOrder)
+
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    options = screen.getAllByTestId('select-menu-option-label')
+    expect(options.map(({ textContent }) => textContent)).toStrictEqual(
+      optionsOrder
+    )
   })
 
   it('should not be possible to drag a plot from a section to another', () => {

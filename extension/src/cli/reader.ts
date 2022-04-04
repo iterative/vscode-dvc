@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { Cli, typeCheckCommands } from '.'
-import { Args, Command, Flag, ListFlag, SubCommand } from './args'
+import { Args, Command, Flag, ListFlag, SubCommand } from './constants'
 import { retry } from './retry'
 import { trim, trimAndSplit } from '../util/stdout'
 import { Plot } from '../plots/webview/contract'
@@ -135,8 +135,9 @@ export class CliReader extends Cli {
       Command.PLOTS,
       'diff',
       ...revisions,
-      '-o',
-      TEMP_PLOTS_DIR
+      Flag.OUTPUT_PATH,
+      TEMP_PLOTS_DIR,
+      Flag.SPLIT
     )
   }
 
@@ -151,18 +152,18 @@ export class CliReader extends Cli {
   }
 
   public version(cwd: string): Promise<string> {
-    return this.readProcess(cwd, trim, Flag.VERSION)
+    return this.readProcess(cwd, trim, '', Flag.VERSION)
   }
 
   private async readProcess<T = string>(
     cwd: string,
     formatter: typeof trimAndSplit | typeof JSON.parse | typeof trim,
+    defaultValue: string,
     ...args: Args
   ): Promise<T> {
-    const output = await retry(
-      () => this.executeProcess(cwd, ...args),
-      args.join(' ')
-    )
+    const output =
+      (await retry(() => this.executeProcess(cwd, ...args), args.join(' '))) ||
+      defaultValue
     if (!formatter) {
       return output as unknown as T
     }
@@ -173,6 +174,7 @@ export class CliReader extends Cli {
     return this.readProcess<T>(
       cwd,
       JSON.parse,
+      '{}',
       command,
       ...args,
       Flag.SHOW_JSON

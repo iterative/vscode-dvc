@@ -82,13 +82,14 @@ export const isVegaPlot = (plot: Plot): plot is TemplatePlot =>
 
 export type TemplatePlot = {
   content: VisualizationSpec
+  datapoints?: { [revision: string]: Record<string, unknown>[] }
   revisions?: string[]
   type: PlotsType
   multiView?: boolean
 }
 
 export type ImagePlot = {
-  revisions?: string[]
+  revisions?: string[] | string
   type: PlotsType
   url: string
   multiView?: boolean

@@ -4,7 +4,8 @@ import isEmpty from 'lodash.isempty'
 import {
   collectData,
   collectCheckpointPlotsData,
-  collectTemplates
+  collectTemplates,
+  collectMetricOrder
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
@@ -68,19 +69,142 @@ describe('collectCheckpointPlotsData', () => {
   })
 })
 
+describe('collectMetricOrder', () => {
+  it('should return an empty array if there is no checkpoints data', () => {
+    const metricOrder = collectMetricOrder(
+      undefined,
+      ['metric:A', 'metric:B'],
+      []
+    )
+    expect(metricOrder).toStrictEqual([])
+  })
+
+  it('should return an empty array if the checkpoints data is an empty array', () => {
+    const metricOrder = collectMetricOrder([], ['metric:A', 'metric:B'], [])
+    expect(metricOrder).toStrictEqual([])
+  })
+
+  it('should maintain the existing order if all metrics are selected', () => {
+    const expectedOrder = [
+      'metric:F',
+      'metric:A',
+      'metric:B',
+      'metric:E',
+      'metric:D',
+      'metric:C'
+    ]
+
+    const metricOrder = collectMetricOrder(
+      [
+        { title: 'metric:A', values: [] },
+        { title: 'metric:B', values: [] },
+        { title: 'metric:C', values: [] },
+        { title: 'metric:D', values: [] },
+        { title: 'metric:E', values: [] },
+        { title: 'metric:F', values: [] }
+      ],
+      expectedOrder,
+      expectedOrder
+    )
+    expect(metricOrder).toStrictEqual(expectedOrder)
+  })
+
+  it('should push unselected metrics to the end', () => {
+    const existingOrder = [
+      'metric:F',
+      'metric:A',
+      'metric:B',
+      'metric:E',
+      'metric:D',
+      'metric:C'
+    ]
+
+    const metricOrder = collectMetricOrder(
+      [
+        { title: 'metric:A', values: [] },
+        { title: 'metric:B', values: [] },
+        { title: 'metric:C', values: [] },
+        { title: 'metric:D', values: [] },
+        { title: 'metric:E', values: [] },
+        { title: 'metric:F', values: [] }
+      ],
+      existingOrder,
+      existingOrder.filter(metric => !['metric:A', 'metric:B'].includes(metric))
+    )
+    expect(metricOrder).toStrictEqual([
+      'metric:F',
+      'metric:E',
+      'metric:D',
+      'metric:C',
+      'metric:A',
+      'metric:B'
+    ])
+  })
+
+  it('should add new metrics in the given order', () => {
+    const metricOrder = collectMetricOrder(
+      [
+        { title: 'metric:C', values: [] },
+        { title: 'metric:D', values: [] },
+        { title: 'metric:A', values: [] },
+        { title: 'metric:B', values: [] },
+        { title: 'metric:E', values: [] },
+        { title: 'metric:F', values: [] }
+      ],
+      ['metric:B', 'metric:A'],
+      ['metric:B', 'metric:A']
+    )
+    expect(metricOrder).toStrictEqual([
+      'metric:B',
+      'metric:A',
+      'metric:C',
+      'metric:D',
+      'metric:E',
+      'metric:F'
+    ])
+  })
+
+  it('should give selected metrics precedence', () => {
+    const metricOrder = collectMetricOrder(
+      [
+        { title: 'metric:C', values: [] },
+        { title: 'metric:D', values: [] },
+        { title: 'metric:A', values: [] },
+        { title: 'metric:B', values: [] },
+        { title: 'metric:E', values: [] },
+        { title: 'metric:F', values: [] }
+      ],
+      ['metric:B', 'metric:A'],
+      ['metric:B', 'metric:A', 'metric:F']
+    )
+    expect(metricOrder).toStrictEqual([
+      'metric:B',
+      'metric:A',
+      'metric:F',
+      'metric:C',
+      'metric:D',
+      'metric:E'
+    ])
+  })
+})
+
 describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
     const { revisionData, comparisonData } = collectData(plotsDiffFixture)
     const revisions = ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a']
 
     const values =
-      (logsLossPlot?.content?.data as { values: { rev: string }[] }).values ||
-      []
+      (logsLossPlot?.datapoints as {
+        [revision: string]: Record<string, unknown>[]
+      }) || {}
 
     expect(isEmpty(values)).toBeFalsy()
 
     for (const revision of revisions) {
-      const expectedValues = values.filter(value => value.rev === revision)
+      const expectedValues = values[revision].map(value => ({
+        ...value,
+        rev: revision
+      }))
       expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
     }
 
@@ -114,7 +238,6 @@ describe('collectData', () => {
 describe('collectTemplates', () => {
   it('should return the expected output from the test fixture', () => {
     const { content } = logsLossPlot
-    const expectedTemplate = omit(content, 'data')
 
     const templates = collectTemplates(plotsDiffFixture)
     expect(Object.keys(templates)).toStrictEqual([
@@ -123,8 +246,6 @@ describe('collectTemplates', () => {
       'predictions.json'
     ])
 
-    expect(templates[logsLossPath]).not.toStrictEqual(content)
-
-    expect(templates[logsLossPath]).toStrictEqual(expectedTemplate)
+    expect(JSON.parse(templates[logsLossPath])).toStrictEqual(content)
   })
 })

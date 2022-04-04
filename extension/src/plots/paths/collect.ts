@@ -1,7 +1,7 @@
 import { isImagePlot, Plot, TemplatePlotGroup } from '../webview/contract'
 import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
-import { definedAndNonEmpty } from '../../util/array'
+import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
 
 export enum PathType {
@@ -113,15 +113,13 @@ const collectFromRemaining = (
   paths: string[],
   remainingType: 'remainingSingleView' | 'remainingMultiView'
 ): string[] => {
-  const acc: string[] = []
-  for (const path of paths) {
-    if (remainingPaths[remainingType].includes(path)) {
-      remainingPaths[remainingType] = remainingPaths[remainingType].filter(
-        remainingPath => remainingPath !== path
-      )
-      acc.push(path)
-    }
-  }
+  const [acc, remaining] = splitMatchedOrdered(
+    remainingPaths[remainingType],
+    paths
+  )
+
+  remainingPaths[remainingType] = remaining
+
   return acc
 }
 
@@ -153,7 +151,9 @@ const collectExistingOrder = (
     }
 
     const paths = collectGroupPaths(acc, group, existingPaths)
-
+    if (!definedAndNonEmpty(paths)) {
+      continue
+    }
     newTemplateOrder.push({ group, paths })
   }
   return acc
@@ -188,6 +188,19 @@ const collectUnordered = (
   })
 }
 
+const mergeAdjacentMatching = (newTemplateOrder: TemplateOrder) => {
+  const mergedTemplateOrder: TemplateOrder = []
+  for (const [idx, { paths, group }] of newTemplateOrder.entries()) {
+    const nextGroup = newTemplateOrder[idx + 1]
+    if (nextGroup?.group === group) {
+      nextGroup.paths.unshift(...paths)
+      continue
+    }
+    mergedTemplateOrder.push({ group, paths })
+  }
+  return mergedTemplateOrder
+}
+
 export const collectTemplateOrder = (
   singleViewPaths: string[],
   multiViewPaths: string[],
@@ -217,5 +230,5 @@ export const collectTemplateOrder = (
     TemplatePlotGroup.MULTI_VIEW
   )
 
-  return newTemplateOrder
+  return mergeAdjacentMatching(newTemplateOrder)
 }

@@ -5,7 +5,9 @@ import {
   ComparisonPlot,
   ComparisonRevisionData,
   PlotsData as TPlotsData,
-  Section
+  PlotSize,
+  Section,
+  SectionCollapsed
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
@@ -16,11 +18,16 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import { MessageFromWebviewType } from '../webview/contract'
+import {
+  MessageFromWebviewType,
+  PlotsTemplatesReordered
+} from '../webview/contract'
 import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
 import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
 import { getModifiedTime, removeDir } from '../fileSystem'
+import { sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -87,14 +94,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
   }
 
-  public async sendInitialWebviewData() {
-    await this.isReady()
-    this.webview?.show({
-      checkpoint: this.getCheckpointPlots(),
-      comparison: this.getComparisonPlots(),
-      sectionCollapsed: this.plots?.getSectionCollapsed(),
-      template: this.getTemplatePlots()
-    })
+  public sendInitialWebviewData() {
+    return this.fetchMissingOrSendPlots()
   }
 
   public togglePathStatus(path: string) {
@@ -114,7 +115,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private notifyChanged() {
     this.pathsChanged.fire()
-    this.sendPlots()
+    this.fetchMissingOrSendPlots()
   }
 
   private sendCheckpointPlotsData() {
@@ -127,17 +128,25 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.plots?.getCheckpointPlots() || null
   }
 
-  private async sendPlots() {
-    if (definedAndNonEmpty(this.plots?.getMissingRevisions())) {
+  private async fetchMissingOrSendPlots() {
+    await this.isReady()
+
+    if (
+      this.paths?.hasPaths() &&
+      definedAndNonEmpty(this.plots?.getMissingRevisions())
+    ) {
       this.sendCheckpointPlotsData()
       return this.data.managedUpdate()
     }
 
-    await this.isReady()
+    return this.sendPlots()
+  }
 
+  private sendPlots() {
     this.webview?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
+      sectionCollapsed: this.plots?.getSectionCollapsed(),
       template: this.getTemplatePlots()
     })
   }
@@ -203,28 +212,103 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
           case MessageFromWebviewType.METRIC_TOGGLED:
-            return this.plots?.setSelectedMetrics(message.payload)
+            return this.setSelectedMetrics(message.payload)
           case MessageFromWebviewType.PLOTS_RESIZED:
-            return this.plots?.setPlotSize(
+            return this.setPlotSize(
               message.payload.section,
               message.payload.size
             )
           case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
-            return this.plots?.setSectionCollapsed(message.payload)
+            return this.setSectionCollapsed(message.payload)
           case MessageFromWebviewType.SECTION_RENAMED:
-            return this.plots?.setSectionName(
+            return this.setSectionName(
               message.payload.section,
               message.payload.name
             )
           case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
-            return this.plots?.setComparisonOrder(message.payload)
+            return this.setComparisonOrder(message.payload)
           case MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED:
-            return this.paths?.setTemplateOrder(message.payload)
+            return this.setTemplateOrder(message.payload)
+          case MessageFromWebviewType.PLOTS_METRICS_REORDERED:
+            return this.setMetricOrder(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
       })
     )
+  }
+
+  private setSelectedMetrics(metrics: string[]) {
+    this.plots?.setSelectedMetrics(metrics)
+    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
+  }
+
+  private setPlotSize(section: Section, size: PlotSize) {
+    this.plots?.setPlotSize(section, size)
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_RESIZED,
+      { section, size },
+      undefined
+    )
+  }
+
+  private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {
+    this.plots?.setSectionCollapsed(collapsed)
+    this.webview?.show({
+      sectionCollapsed: this.plots?.getSectionCollapsed()
+    })
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_TOGGLE,
+      collapsed,
+      undefined
+    )
+  }
+
+  private setSectionName(section: Section, name: string) {
+    this.plots?.setSectionName(section, name)
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SECTION_RENAMED,
+      { section },
+      undefined
+    )
+  }
+
+  private setComparisonOrder(order: string[]) {
+    this.plots?.setComparisonOrder(order)
+    this.webview?.show({
+      comparison: this.getComparisonPlots()
+    })
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
+      undefined,
+      undefined
+    )
+  }
+
+  private setTemplateOrder(order: PlotsTemplatesReordered) {
+    this.paths?.setTemplateOrder(order)
+    this.webview?.show({
+      template: this.getTemplatePlots()
+    })
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
+      undefined,
+      undefined
+    )
+  }
+
+  private setMetricOrder(order: string[]) {
+    this.plots?.setMetricOrder(order)
+    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_REORDERED)
+  }
+
+  private sendCheckpointPlotsAndEvent(
+    event:
+      | typeof EventName.VIEWS_PLOTS_METRICS_REORDERED
+      | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
+  ) {
+    this.sendCheckpointPlotsData()
+    sendTelemetryEvent(event, undefined, undefined)
   }
 
   private waitForInitialData(experiments: Experiments) {
@@ -249,7 +333,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
         this.plots?.setComparisonOrder()
 
-        this.sendPlots()
+        this.fetchMissingOrSendPlots()
       })
     )
   }

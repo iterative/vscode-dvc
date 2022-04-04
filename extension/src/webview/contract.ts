@@ -16,19 +16,17 @@ export enum MessageFromWebviewType {
   EXPERIMENT_TOGGLED = 'experiment-toggled',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_COMPARISON_REORDERED = 'plots-comparison-reordered',
+  PLOTS_METRICS_REORDERED = 'plots-metrics-reordered',
   PLOTS_SECTION_TOGGLED = 'plots-section-toggled',
   PLOTS_TEMPLATES_REORDERED = 'plots-templates-reordered',
   PLOTS_RESIZED = 'plots-resized',
   SECTION_RENAMED = 'section-renamed'
 }
 
-export type ColumnReorderPayload = string[]
-
 export type ColumnResizePayload = {
   id: string
   width: number
 }
-export type MetricToggledPayload = string[]
 export type PlotsResizedPayload = { section: Section; size: PlotSize }
 export type PlotSectionRenamedPayload = {
   section: Section
@@ -42,7 +40,7 @@ export type PlotsTemplatesReordered = {
 export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.COLUMN_REORDERED
-      payload: ColumnReorderPayload
+      payload: string[]
     }
   | {
       type: MessageFromWebviewType.COLUMN_RESIZED
@@ -54,10 +52,14 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.METRIC_TOGGLED
-      payload: MetricToggledPayload
+      payload: string[]
     }
   | {
       type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+      payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
       payload: string[]
     }
   | {
@@ -65,12 +67,12 @@ export type MessageFromWebview =
       payload: PlotsResizedPayload
     }
   | {
-      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
-      payload: PlotsTemplatesReordered
+      type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
+      payload: Partial<SectionCollapsed>
     }
   | {
-      type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
-      payload: SectionCollapsed
+      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+      payload: PlotsTemplatesReordered
     }
   | {
       type: MessageFromWebviewType.SECTION_RENAMED

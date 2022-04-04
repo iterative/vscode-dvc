@@ -2,6 +2,7 @@ import {
   ComparisonRevision,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
+import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { ComparisonTableRow } from './ComparisonTableRow'
@@ -11,7 +12,6 @@ import {
 } from './ComparisonTableHead'
 import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
-import { reorderObjectList } from '../../../util/objects'
 import { sendMessage } from '../../../shared/vscode'
 
 export type ComparisonTableProps = Omit<
@@ -54,11 +54,11 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   )
 
   const setColumnsOrder = (order: string[]) => {
-    const newOrder = reorderObjectList(
+    const newOrder = reorderObjectList<ComparisonRevision>(
       order,
       columns,
       'revision'
-    ) as ComparisonRevision[]
+    )
     setColumns(newOrder)
     sendMessage({
       payload: newOrder.map(({ revision }) => revision),

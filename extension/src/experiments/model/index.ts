@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { SortDefinition, sortExperiments } from './sortBy'
 import {
   FilterDefinition,
@@ -29,9 +28,10 @@ import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
-import { MementoPrefix } from '../../vscode/memento'
 import { hasKey } from '../../util/object'
 import { flattenMapValues } from '../../util/map'
+import { ModelWithPersistence } from '../../persistence/model'
+import { PersistenceKey } from '../../persistence/constants'
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: string
@@ -50,9 +50,7 @@ export enum ExperimentType {
   QUEUED = 'queued'
 }
 
-export class ExperimentsModel {
-  public readonly dispose = Disposable.fn()
-
+export class ExperimentsModel extends ModelWithPersistence {
   private workspace = {} as Experiment
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
@@ -66,21 +64,28 @@ export class ExperimentsModel {
 
   private currentSorts: SortDefinition[]
 
-  private readonly dvcRoot: string
-  private readonly workspaceState: Memento
-
   constructor(dvcRoot: string, workspaceState: Memento) {
-    const { branchColors, currentSorts, experimentColors, filters, status } =
-      this.revive(dvcRoot, workspaceState)
-    this.branchColors = branchColors
-    this.currentSorts = currentSorts
-    this.experimentColors = experimentColors
-    this.status = status
-    this.filters = filters
+    super(dvcRoot, workspaceState)
 
-    this.dvcRoot = dvcRoot
-
-    this.workspaceState = workspaceState
+    this.branchColors = this.reviveColors(
+      PersistenceKey.BRANCH_COLORS,
+      copyOriginalBranchColors
+    )
+    this.currentSorts = this.revive<SortDefinition[]>(
+      PersistenceKey.EXPERIMENTS_SORT_BY,
+      []
+    )
+    this.experimentColors = this.reviveColors(
+      PersistenceKey.EXPERIMENTS_COLORS,
+      copyOriginalExperimentColors
+    )
+    this.filters = new Map(
+      this.revive<[string, FilterDefinition][]>(
+        PersistenceKey.EXPERIMENTS_FILTER_BY,
+        []
+      )
+    )
+    this.status = this.revive<Statuses>(PersistenceKey.EXPERIMENTS_STATUS, {})
   }
 
   public async transformAndSet(
@@ -373,10 +378,7 @@ export class ExperimentsModel {
     if (hasUnfilteredCheckpoints) {
       return true
     }
-    if (filterExperiment(filters, row)) {
-      return true
-    }
-    return false
+    return !!filterExperiment(filters, row)
   }
 
   private getFilteredCheckpointsByTip(
@@ -456,88 +458,40 @@ export class ExperimentsModel {
 
     Promise.all([
       this.persistColors(
-        MementoPrefix.EXPERIMENTS_COLORS,
+        PersistenceKey.EXPERIMENTS_COLORS,
         this.experimentColors
       ),
-      this.persistColors(MementoPrefix.BRANCH_COLORS, this.branchColors)
+      this.persistColors(PersistenceKey.BRANCH_COLORS, this.branchColors)
     ])
   }
 
   private persistSorts() {
-    return this.workspaceState.update(
-      MementoPrefix.EXPERIMENTS_SORT_BY + this.dvcRoot,
-      this.currentSorts
-    )
+    return this.persist(PersistenceKey.EXPERIMENTS_SORT_BY, this.currentSorts)
   }
 
   private applyAndPersistFilters() {
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
     }
-    return this.workspaceState.update(
-      MementoPrefix.EXPERIMENTS_FILTER_BY + this.dvcRoot,
-      [...this.filters]
-    )
+    return this.persist(PersistenceKey.EXPERIMENTS_FILTER_BY, [...this.filters])
   }
 
-  private persistColors(prefix: MementoPrefix, colors: Colors) {
-    this.workspaceState.update(prefix + this.dvcRoot, {
+  private persistColors(prefix: PersistenceKey, colors: Colors) {
+    this.persist(prefix, {
       assigned: [...colors.assigned],
       available: colors.available
     })
   }
 
   private persistStatus() {
-    return this.workspaceState.update(
-      MementoPrefix.EXPERIMENTS_STATUS + this.dvcRoot,
-      this.status
-    )
-  }
-
-  private revive(
-    dvcRoot: string,
-    workspaceState: Memento
-  ): {
-    branchColors: Colors
-    experimentColors: Colors
-    currentSorts: SortDefinition[]
-    filters: Map<string, FilterDefinition>
-    status: Statuses
-  } {
-    return {
-      branchColors: this.reviveColors(
-        workspaceState,
-        MementoPrefix.BRANCH_COLORS + dvcRoot,
-        copyOriginalBranchColors
-      ),
-      currentSorts: workspaceState.get<SortDefinition[]>(
-        MementoPrefix.EXPERIMENTS_SORT_BY + dvcRoot,
-        []
-      ),
-      experimentColors: this.reviveColors(
-        workspaceState,
-        MementoPrefix.EXPERIMENTS_COLORS + dvcRoot,
-        copyOriginalExperimentColors
-      ),
-      filters: new Map(
-        workspaceState.get<[string, FilterDefinition][]>(
-          MementoPrefix.EXPERIMENTS_FILTER_BY + dvcRoot,
-          []
-        )
-      ),
-      status: workspaceState.get<Statuses>(
-        MementoPrefix.EXPERIMENTS_STATUS + dvcRoot,
-        {}
-      )
-    }
+    return this.persist(PersistenceKey.EXPERIMENTS_STATUS, this.status)
   }
 
   private reviveColors(
-    workspaceState: Memento,
-    key: string,
+    key: PersistenceKey,
     copyOriginalColors: () => string[]
   ) {
-    const { assigned, available } = workspaceState.get<{
+    const { assigned, available } = this.revive<{
       assigned: [string, string][]
       available: string[]
     }>(key, {

@@ -20,3 +20,30 @@ export const sameContents = (
   array: (null | string | number | undefined)[],
   otherArray: (null | string | number | undefined)[]
 ) => isEqual(array.sort(), otherArray.sort())
+
+export const reorderObjectList = <T extends { [key: string]: unknown }>(
+  order: string[],
+  items: T[],
+  compareKey: string
+): T[] =>
+  order
+    .map(orderedItem => items.find(item => item[compareKey] === orderedItem))
+    .filter(Boolean) as T[]
+
+export const splitMatchedOrdered = (
+  values: string[],
+  existingOrder: string[]
+) => {
+  const orderedMatches: string[] = []
+  const unmatched = [...values]
+  for (const existingValue of existingOrder) {
+    const index = unmatched.indexOf(existingValue)
+    if (index === -1) {
+      continue
+    }
+    unmatched.splice(index, 1)
+    orderedMatches.push(existingValue)
+  }
+
+  return [orderedMatches, unmatched]
+}

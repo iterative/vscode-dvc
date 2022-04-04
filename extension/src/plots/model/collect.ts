@@ -1,5 +1,4 @@
 import omit from 'lodash.omit'
-import { VisualizationSpec } from 'react-vega'
 import { TopLevelSpec } from 'vega-lite'
 import {
   CheckpointPlotValues,
@@ -28,7 +27,7 @@ import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { ColorScale, extendVegaSpec, isMultiViewPlot } from '../vega/util'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -220,6 +219,63 @@ export const collectCheckpointPlotsData = (
   return plotsData
 }
 
+type MetricOrderAccumulator = {
+  newOrder: string[]
+  uncollectedMetrics: string[]
+  remainingSelectedMetrics: string[]
+}
+
+const collectExistingOrder = (
+  acc: MetricOrderAccumulator,
+  existingMetricOrder: string[]
+) => {
+  for (const metric of existingMetricOrder) {
+    const uncollectedIndex = acc.uncollectedMetrics.indexOf(metric)
+    const remainingIndex = acc.remainingSelectedMetrics.indexOf(metric)
+    if (uncollectedIndex === -1 || remainingIndex === -1) {
+      continue
+    }
+    acc.uncollectedMetrics.splice(uncollectedIndex, 1)
+    acc.remainingSelectedMetrics.splice(remainingIndex, 1)
+    acc.newOrder.push(metric)
+  }
+}
+
+const collectRemainingSelected = (acc: MetricOrderAccumulator) => {
+  const [newOrder, uncollectedMetrics] = splitMatchedOrdered(
+    acc.uncollectedMetrics,
+    acc.remainingSelectedMetrics
+  )
+
+  acc.newOrder.push(...newOrder)
+  acc.uncollectedMetrics = uncollectedMetrics
+}
+
+export const collectMetricOrder = (
+  checkpointPlotData: CheckpointPlotData[] | undefined,
+  existingMetricOrder: string[],
+  selectedMetrics: string[] = []
+): string[] => {
+  if (!definedAndNonEmpty(checkpointPlotData)) {
+    return []
+  }
+
+  const acc: MetricOrderAccumulator = {
+    newOrder: [],
+    remainingSelectedMetrics: [...selectedMetrics],
+    uncollectedMetrics: checkpointPlotData.map(({ title }) => title)
+  }
+
+  if (!definedAndNonEmpty(acc.remainingSelectedMetrics)) {
+    return acc.uncollectedMetrics
+  }
+
+  collectExistingOrder(acc, existingMetricOrder)
+  collectRemainingSelected(acc)
+
+  return [...acc.newOrder, ...acc.uncollectedMetrics]
+}
+
 export type RevisionData = {
   [revision: string]: {
     [path: string]: unknown[]
@@ -237,7 +293,10 @@ const collectImageData = (
   path: string,
   plot: ImagePlot
 ) => {
-  const rev = plot.revisions?.[0]
+  const rev = Array.isArray(plot.revisions)
+    ? plot.revisions?.[0]
+    : plot.revisions
+
   if (!rev) {
     return
   }
@@ -247,6 +306,17 @@ const collectImageData = (
   }
 
   acc[rev][path] = plot
+}
+
+const collectDatapoints = (
+  acc: RevisionData,
+  path: string,
+  rev: string,
+  values: Record<string, unknown>[] = []
+) => {
+  for (const value of values) {
+    ;(acc[rev][path] as unknown[]).push({ ...value, rev })
+  }
 }
 
 const collectPlotData = (
@@ -259,10 +329,8 @@ const collectPlotData = (
       acc[rev] = {}
     }
     acc[rev][path] = []
-  }
-  for (const value of (plot.content.data as { values: { rev: string }[] })
-    .values) {
-    ;(acc[value.rev][path] as unknown[]).push(value)
+
+    collectDatapoints(acc, path, rev, plot.datapoints?.[rev])
   }
 }
 
@@ -295,7 +363,7 @@ export const collectData = (data: PlotsOutput): DataAccumulator => {
   return acc
 }
 
-type TemplateAccumulator = Record<string, VisualizationSpec>
+export type TemplateAccumulator = { [path: string]: string }
 
 const collectTemplate = (
   acc: TemplateAccumulator,
@@ -305,10 +373,7 @@ const collectTemplate = (
   if (isImagePlot(plot) || acc[path]) {
     return
   }
-  const template = {
-    ...plot.content
-  }
-  delete template.data
+  const template = JSON.stringify(plot.content)
   acc[path] = template
 }
 
@@ -324,34 +389,15 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
   return acc
 }
 
-const fillTemplate = (
-  template: VisualizationSpec,
-  datapoints: unknown[],
-  revisionColors: ColorScale | undefined
-) =>
-  extendVegaSpec(
-    {
-      ...template,
-      data: {
-        values: datapoints
-      }
-    } as TopLevelSpec,
-    revisionColors
-  )
-
-const collectDatapoints = (
-  path: string,
-  selectedRevisions: string[],
-  revisionData: RevisionData
-): unknown[] =>
-  selectedRevisions
-    .flatMap(revision => revisionData?.[revision]?.[path])
-    .filter(Boolean)
+const fillTemplate = (template: string, datapoints: unknown[]) =>
+  JSON.parse(
+    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+  ) as TopLevelSpec
 
 const collectTemplateGroup = (
   paths: string[],
   selectedRevisions: string[],
-  templates: Record<string, VisualizationSpec>,
+  templates: TemplateAccumulator,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
 ): TemplatePlotEntry[] => {
@@ -360,15 +406,19 @@ const collectTemplateGroup = (
     const template = templates[path]
 
     if (template) {
-      const datapoints = collectDatapoints(
-        path,
-        selectedRevisions,
-        revisionData
+      const datapoints = selectedRevisions
+        .flatMap(revision => revisionData?.[revision]?.[path])
+        .filter(Boolean)
+
+      const content = extendVegaSpec(
+        fillTemplate(template, datapoints),
+        revisionColors
       )
+
       acc.push({
-        content: fillTemplate(template, datapoints, revisionColors),
+        content,
         id: path,
-        multiView: isMultiViewPlot(template),
+        multiView: isMultiViewPlot(content),
         revisions: selectedRevisions,
         type: PlotsType.VEGA
       })
@@ -380,7 +430,7 @@ const collectTemplateGroup = (
 export const collectSelectedTemplatePlots = (
   order: TemplateOrder,
   selectedRevisions: string[],
-  templates: Record<string, VisualizationSpec>,
+  templates: TemplateAccumulator,
   revisionData: RevisionData,
   revisionColors: ColorScale | undefined
 ): TemplatePlotSection[] | undefined => {

@@ -1,6 +1,8 @@
+import { MessageFromWebview } from 'dvc/src/webview/contract'
+
 export interface InternalVsCodeApi {
   setState<T>(state: T): void
-  postMessage<T>(message: T): void
+  postMessage(message: MessageFromWebview): void
 }
 
 declare global {

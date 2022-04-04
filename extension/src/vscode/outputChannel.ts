@@ -1,5 +1,5 @@
-import { Disposable } from '@hediet/std/disposable'
 import { OutputChannel as VSOutputChannel, window } from 'vscode'
+import { Disposable } from '../class/dispose'
 import { ICli } from '../cli'
 
 enum ProcessStatus {
@@ -8,12 +8,13 @@ enum ProcessStatus {
   FAILED = 'FAILED'
 }
 
-export class OutputChannel {
-  public readonly dispose = Disposable.fn()
+export class OutputChannel extends Disposable {
   private readonly outputChannel: VSOutputChannel
   private readonly version: string
 
   constructor(cliInteractors: ICli[], version: string, name = 'DVC') {
+    super()
+
     this.outputChannel = this.dispose.track(window.createOutputChannel(name))
     this.version = version
 

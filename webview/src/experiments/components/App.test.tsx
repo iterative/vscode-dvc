@@ -3,7 +3,13 @@
  */
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import React from 'react'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within
+} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
 import {
@@ -31,6 +37,7 @@ import {
   CELL_TOOLTIP_DELAY,
   HEADER_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
+import { getRow } from '../../test/queries'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -174,7 +181,9 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
 
-      fireEvent.click(screen.getByTestId(`${experimentLabel}-chevron`))
+      const testRow = getRow(experimentLabel)
+      const expandButton = within(testRow).getByTitle('Contract Row')
+      fireEvent.click(expandButton)
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
@@ -222,7 +231,9 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
 
-      fireEvent.click(screen.getByTestId(`${experimentLabel}-chevron`))
+      const testRow = getRow(experimentLabel)
+      const expandButton = within(testRow).getByTitle('Contract Row')
+      fireEvent.click(expandButton)
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
@@ -256,10 +267,38 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
     })
+
+    it('should not toggle an experiment when using the row expansion button', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      const testRow = getRow(experimentLabel)
+      const expandButton = within(testRow).getByTitle('Contract Row')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(expandButton)
+      expect(mockPostMessage).not.toBeCalled()
+
+      fireEvent.keyDown(expandButton, {
+        bubbles: true,
+        code: 'Enter',
+        key: 'Enter',
+        keyCode: 13
+      })
+      expect(mockPostMessage).not.toBeCalled()
+    })
   })
 
   describe('Toggle experiment status', () => {
-    it('should send a message to the extension to toggle an experiment when the bullet is clicked', () => {
+    it('should send a message to the extension to toggle an experiment when the row is clicked', () => {
       render(<App />)
 
       fireEvent(
@@ -288,6 +327,57 @@ describe('App', () => {
       testClick('[exp-e7a67]', 'exp-e7a67')
       testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
       testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+    })
+
+    it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      mockPostMessage.mockClear()
+
+      const testRowLabel = screen.getByText('main')
+
+      testRowLabel.focus()
+
+      fireEvent.keyDown(testRowLabel, {
+        bubbles: true,
+        code: 'Enter',
+        key: 'Enter',
+        keyCode: 13
+      })
+      expect(mockPostMessage).toBeCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      })
+      mockPostMessage.mockClear()
+
+      fireEvent.keyDown(testRowLabel, {
+        bubbles: true,
+        charCode: 32,
+        code: 'Space',
+        key: ' ',
+        keyCode: 32
+      })
+      expect(mockPostMessage).toBeCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      })
+      mockPostMessage.mockClear()
+
+      fireEvent.keyDown(testRowLabel, {
+        bubbles: true,
+        code: 'keyA',
+        key: 'a'
+      })
+      expect(mockPostMessage).not.toBeCalled()
     })
   })
 

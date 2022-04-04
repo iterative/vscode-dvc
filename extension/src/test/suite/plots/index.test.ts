@@ -3,7 +3,7 @@ import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore, stub } from 'sinon'
+import { restore, spy, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
@@ -23,11 +23,15 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
   PlotSize,
-  Section
+  Section,
+  TemplatePlotGroup
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
+import { reorderObjectList } from '../../../util/array'
+import * as Telemetry from '../../../telemetry'
+import { EventName } from '../../../telemetry/constants'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -43,8 +47,12 @@ suite('Plots Test Suite', () => {
   })
 
   describe('Plots', () => {
-    it('should call plots diff on instantiation with missing revisions', async () => {
-      const { mockPlotsDiff } = await buildPlots(disposable)
+    it('should call plots diff once on instantiation with missing revisions if there are no plots', async () => {
+      const { mockPlotsDiff, messageSpy, plots, data } = await buildPlots(
+        disposable
+      )
+
+      const managedUpdateSpy = spy(data, 'managedUpdate')
 
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
@@ -55,7 +63,21 @@ suite('Plots Test Suite', () => {
         'main',
         'workspace'
       )
-    })
+      mockPlotsDiff.resetHistory()
+
+      const webview = await plots.showWebview()
+      await webview.isReady()
+
+      expect(mockPlotsDiff).not.to.be.called
+      expect(managedUpdateSpy).not.to.be.called
+
+      expect(messageSpy).to.be.calledOnce
+      expect(messageSpy).to.be.calledWithMatch({
+        comparison: null,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        template: null
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should call plots diff with new experiment revisions but not checkpoints', async () => {
       const mockNow = getMockNow()
@@ -149,29 +171,55 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should be able to handle all of the messages that can be sent from the webview', async () => {
-      const { plots, plotsModel } = await buildPlots(disposable)
+    it('should handle a set selected metrics message from the webview', async () => {
+      const { plots, plotsModel, messageSpy } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
 
       const webview = await plots.showWebview()
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockSelectedMetrics = ['some', 'selected', 'metrics']
-      const mockSetSelectedMetrics = stub(
-        plotsModel,
-        'setSelectedMetrics'
-      ).returns(undefined)
+      const mockSetSelectedMetrics = spy(plotsModel, 'setSelectedMetrics')
+      const mockSelectedMetrics = ['summary.json:loss']
 
+      messageSpy.resetHistory()
       mockMessageReceived.fire({
         payload: mockSelectedMetrics,
         type: MessageFromWebviewType.METRIC_TOGGLED
       })
 
       expect(mockSetSelectedMetrics).to.be.calledOnce
+      expect(mockSetSelectedMetrics).to.be.calledWithExactly(
+        mockSelectedMetrics
+      )
+      expect(messageSpy).to.be.calledOnce
       expect(
-        mockSetSelectedMetrics,
-        'should correctly handle a metric toggled message'
-      ).to.be.calledWithExactly(mockSelectedMetrics)
+        messageSpy,
+        "should update the webview's checkpoint plot state"
+      ).to.be.calledWithExactly({
+        checkpoint: {
+          ...checkpointPlotsFixture,
+          selectedMetrics: mockSelectedMetrics
+        }
+      })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_METRICS_SELECTED,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a section resized message from the webview', async () => {
+      const { plots, plotsModel } = await buildPlots(disposable)
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetPlotSize = stub(plotsModel, 'setPlotSize').returns(undefined)
 
@@ -181,31 +229,71 @@ suite('Plots Test Suite', () => {
       })
 
       expect(mockSetPlotSize).to.be.calledOnce
-      expect(
-        mockSetPlotSize,
-        'should correctly handle a section resized message'
-      ).to.be.calledWithExactly(Section.TEMPLATE_PLOTS, PlotSize.SMALL)
+      expect(mockSetPlotSize).to.be.calledWithExactly(
+        Section.TEMPLATE_PLOTS,
+        PlotSize.SMALL
+      )
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SECTION_RESIZED,
+        {
+          section: Section.TEMPLATE_PLOTS,
+          size: PlotSize.SMALL
+        },
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-      const mockSetSectionCollapsed = stub(
-        plotsModel,
-        'setSectionCollapsed'
-      ).returns(undefined)
+    it('should handle a section collapsed message from the webview', async () => {
+      const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
 
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockSetSectionCollapsed = spy(plotsModel, 'setSectionCollapsed')
+      const mockSectionCollapsed = { [Section.CHECKPOINT_PLOTS]: true }
+
+      messageSpy.resetHistory()
       mockMessageReceived.fire({
-        payload: DEFAULT_SECTION_COLLAPSED,
+        payload: mockSectionCollapsed,
         type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
       })
 
       expect(mockSetSectionCollapsed).to.be.calledOnce
+      expect(mockSetSectionCollapsed).to.be.calledWithExactly(
+        mockSectionCollapsed
+      )
+      expect(messageSpy).to.be.calledOnce
       expect(
-        mockSetSectionCollapsed,
-        'should correctly handle a section collapsed message'
-      ).to.be.calledWithExactly(DEFAULT_SECTION_COLLAPSED)
+        messageSpy,
+        "should update the webview's section collapsed state"
+      ).to.be.calledWithExactly({
+        sectionCollapsed: {
+          ...DEFAULT_SECTION_COLLAPSED,
+          ...mockSectionCollapsed
+        }
+      })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SECTION_TOGGLE,
+        mockSectionCollapsed,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a section renamed message from the webview', async () => {
+      const { plots, plotsModel } = await buildPlots(disposable)
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetSectionName = stub(plotsModel, 'setSectionName').returns(
         undefined
       )
-
       const mockName = 'some cool section name'
 
       mockMessageReceived.fire({
@@ -214,48 +302,179 @@ suite('Plots Test Suite', () => {
       })
 
       expect(mockSetSectionName).to.be.calledOnce
-      expect(
-        mockSetSectionName,
-        'should correctly handle a section rename message'
-      ).to.be.calledWithExactly(Section.TEMPLATE_PLOTS, mockName)
+      expect(mockSetSectionName).to.be.calledWithExactly(
+        Section.TEMPLATE_PLOTS,
+        mockName
+      )
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SECTION_RENAMED,
+        { section: Section.TEMPLATE_PLOTS },
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-      const mockSetComparisonOrder = stub(
-        plotsModel,
-        'setComparisonOrder'
-      ).returns(undefined)
+    it('should handle a comparison revisions reordered message from the webview', async () => {
+      const { plots, plotsModel, messageSpy } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
 
-      const mockComparisonOrder = ['a', 'different', 'order']
+      const webview = await plots.showWebview()
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockSetComparisonOrder = spy(plotsModel, 'setComparisonOrder')
+      const mockComparisonOrder = [
+        '1ba7bcd',
+        'workspace',
+        'main',
+        '4fb124a',
+        '42b8736'
+      ]
+
+      messageSpy.resetHistory()
       mockMessageReceived.fire({
         payload: mockComparisonOrder,
         type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
       })
 
       expect(mockSetComparisonOrder).to.be.calledOnce
+      expect(mockSetComparisonOrder).to.be.calledWithExactly(
+        mockComparisonOrder
+      )
+      expect(messageSpy).to.be.calledOnce
       expect(
-        mockSetComparisonOrder,
-        'should correctly handle a comparison revision reorder'
-      ).to.be.calledWithExactly(mockComparisonOrder)
+        messageSpy,
+        "should update the webview's comparison revision state"
+      ).to.be.calledWithExactly({
+        comparison: {
+          ...comparisonPlotsFixture,
+          revisions: reorderObjectList(
+            mockComparisonOrder,
+            comparisonPlotsFixture.revisions,
+            'revision'
+          )
+        }
+      })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a template plots reordered message from the webview', async () => {
+      const { pathsModel, plots, messageSpy } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockSetTemplateOrder = spy(pathsModel, 'setTemplateOrder')
+      const mockTemplateOrder = [
+        { group: TemplatePlotGroup.MULTI_VIEW, paths: ['predictions.json'] },
+        {
+          group: TemplatePlotGroup.SINGLE_VIEW,
+          paths: [join('logs', 'loss.tsv'), join('logs', 'acc.tsv')]
+        }
+      ]
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        payload: mockTemplateOrder,
+        type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+      })
+
+      expect(mockSetTemplateOrder).to.be.calledOnce
+      expect(mockSetTemplateOrder).to.be.calledWithExactly(mockTemplateOrder)
+      expect(messageSpy).to.be.calledOnce
+      expect(
+        messageSpy,
+        "should update the webview's template plot state"
+      ).to.be.calledWithExactly({
+        template: {
+          ...templatePlotsFixture,
+          plots: reorderObjectList(
+            [TemplatePlotGroup.MULTI_VIEW, TemplatePlotGroup.SINGLE_VIEW],
+            templatePlotsFixture.plots,
+            'group'
+          )
+        }
+      })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a metric reordered message from the webview', async () => {
+      const { plots, plotsModel, messageSpy } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockSetMetricOrder = spy(plotsModel, 'setMetricOrder')
+      const mockMetricOrder = [
+        'summary.json:loss',
+        'summary.json:accuracy',
+        'summary.json:val_loss',
+        'summary.json:val_accuracy'
+      ]
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        payload: mockMetricOrder,
+        type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+      })
+
+      expect(mockSetMetricOrder).to.be.calledOnce
+      expect(mockSetMetricOrder).to.be.calledWithExactly(mockMetricOrder)
+      expect(messageSpy).to.be.calledOnce
+      expect(
+        messageSpy,
+        "should update the webview's checkpoint plot order state"
+      ).to.be.calledWithExactly({
+        checkpoint: {
+          ...checkpointPlotsFixture,
+          plots: reorderObjectList(
+            mockMetricOrder,
+            checkpointPlotsFixture.plots,
+            'title'
+          )
+        }
+      })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_METRICS_REORDERED,
+        undefined,
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { plots, plotsModel, messageSpy, mockPlotsDiff } = await buildPlots(
+      const { plots, messageSpy, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
 
-      const mockGetCheckpointPlots = stub(plotsModel, 'getCheckpointPlots')
-      const getCheckpointPlotsEvent = new Promise(resolve =>
-        mockGetCheckpointPlots.callsFake(() => {
-          resolve(undefined)
-          return mockGetCheckpointPlots.wrappedMethod.bind(plotsModel)()
-        })
-      )
-
       const webview = await plots.showWebview()
-      await getCheckpointPlotsEvent
+      await webview.isReady()
 
       expect(mockPlotsDiff).to.be.called
 

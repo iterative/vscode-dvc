@@ -4,7 +4,8 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { VegaLite } from 'react-vega'
-import { config, createSpec } from './constants'
+import { createSpec } from './util'
+import { config } from '../constants'
 
 interface PlotProps {
   values: CheckpointPlotValues

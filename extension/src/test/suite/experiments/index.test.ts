@@ -45,6 +45,8 @@ import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
 import { Status } from '../../../experiments/model/status'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
+import * as Telemetry from '../../../telemetry'
+import { EventName } from '../../../telemetry/constants'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -147,11 +149,12 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should be able to handle all of the messages that can be sent from the webview', async () => {
+    it('should handle a column reordered message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const webview = await experiments.showWebview()
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockColumnOrder = [
@@ -180,13 +183,28 @@ suite('Experiments Test Suite', () => {
         mockSetColumnReordered,
         'should correctly handle a columns reordered message'
       ).to.be.calledWithExactly(mockColumnOrder)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED,
+        undefined,
+        undefined
+      )
+    })
+
+    it('should handle a column resized message from the webview', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetColumnWidth = stub(
         MetricsAndParamsModel.prototype,
         'setColumnWidth'
       ).returns(undefined)
 
-      const mockColumnId = mockColumnOrder[2]
+      const mockColumnId = 'params:params.yaml:lr'
       const mockWidth = 400
 
       mockMessageReceived.fire({
@@ -199,6 +217,21 @@ suite('Experiments Test Suite', () => {
         mockSetColumnWidth,
         'should correctly handle a column resized message'
       ).to.be.calledWithExactly(mockColumnId, mockWidth)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED,
+        { width: mockWidth },
+        undefined
+      )
+    })
+
+    it('should handle a toggle experiment message from the webview', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockToggleExperimentStatus = stub(
         experiments,
@@ -217,6 +250,12 @@ suite('Experiments Test Suite', () => {
         mockToggleExperimentStatus,
         'should correctly handle an experiment toggled message'
       ).to.be.calledWithExactly(mockExperimentId)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE,
+        undefined,
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to sort', async () => {

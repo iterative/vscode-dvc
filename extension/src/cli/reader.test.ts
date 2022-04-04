@@ -204,6 +204,14 @@ describe('CliReader', () => {
   })
 
   describe('plotsDiff', () => {
+    it('should handle empty output being returned', async () => {
+      const cwd = __dirname
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(''))
+
+      const plots = await cliReader.plotsDiff(cwd, 'HEAD')
+      expect(plots).toStrictEqual({})
+    })
+
     it('should match the expected output', async () => {
       const cwd = __dirname
 
@@ -220,6 +228,7 @@ describe('CliReader', () => {
           'HEAD',
           '-o',
           join('.dvc', 'tmp', 'plots'),
+          '--split',
           SHOW_JSON
         ],
         cwd,

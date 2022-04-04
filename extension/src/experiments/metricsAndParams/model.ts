@@ -3,7 +3,7 @@ import { collectChanges, collectMetricsAndParams } from './collect'
 import { splitMetricOrParamPath } from './paths'
 import { MetricOrParam } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
-import { MementoPrefix } from '../../vscode/memento'
+import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel } from '../../path/selection/model'
 
 export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
@@ -15,16 +15,16 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
     super(
       dvcRoot,
       workspaceState,
-      MementoPrefix.METRICS_AND_PARAMS_STATUS,
+      PersistenceKey.METRICS_AND_PARAMS_STATUS,
       splitMetricOrParamPath
     )
 
-    this.columnOrderState = workspaceState.get(
-      MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + dvcRoot,
+    this.columnOrderState = this.revive(
+      PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,
       []
     )
-    this.columnWidthsState = workspaceState.get(
-      MementoPrefix.METRICS_AND_PARAMS_COLUMN_WIDTHS + dvcRoot,
+    this.columnWidthsState = this.revive(
+      PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       {}
     )
   }
@@ -50,12 +50,18 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
 
   public setColumnOrder(columnOrder: string[]) {
     this.columnOrderState = columnOrder
-    this.persistColumnOrder()
+    this.persist(
+      PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,
+      this.getColumnOrder()
+    )
   }
 
   public setColumnWidth(id: string, width: number) {
     this.columnWidthsState[id] = width
-    this.persistColumnWidths()
+    this.persist(
+      PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
+      this.columnWidthsState
+    )
   }
 
   public filterChildren(path?: string) {
@@ -63,20 +69,6 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
       path
         ? element.parentPath === path
         : ['metrics', 'params'].includes(element.parentPath)
-    )
-  }
-
-  private persistColumnOrder() {
-    this.workspaceState.update(
-      MementoPrefix.METRICS_AND_PARAMS_COLUMN_ORDER + this.dvcRoot,
-      this.getColumnOrder()
-    )
-  }
-
-  private persistColumnWidths() {
-    this.workspaceState.update(
-      MementoPrefix.METRICS_AND_PARAMS_COLUMN_WIDTHS + this.dvcRoot,
-      this.columnWidthsState
     )
   }
 
