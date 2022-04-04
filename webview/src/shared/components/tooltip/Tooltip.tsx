@@ -1,10 +1,21 @@
 import React, { forwardRef, Ref } from 'react'
-import Tippy, { TippyProps } from '@tippyjs/react'
+import cn from 'classnames'
+import Tippy, { TippyProps } from '@tippyjs/react/headless'
 import styles from './styles.module.scss'
 import 'tippy.js/dist/tippy.css'
 
 export const HEADER_TOOLTIP_DELAY = 100
 export const CELL_TOOLTIP_DELAY = 1000
+
+export const TooltipBox: React.FC = ({ children, ...attrs }) => (
+  <div role="tooltip" className={cn('tippy-box', styles.menu)} {...attrs}>
+    {children}
+  </div>
+)
+
+export const TooltipArrow: React.FC = () => (
+  <div className="tippy-arrow" data-popper-arrow="" />
+)
 
 const TooltipRenderFunction: React.ForwardRefRenderFunction<
   unknown,
@@ -26,8 +37,8 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onClickOutside,
     onUntrigger,
     plugins,
+    render,
     animation = false,
-    className = styles.menu,
     arrow = false
   },
   ref
@@ -35,7 +46,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
   <Tippy
     animation={animation}
     content={content}
-    className={className}
+    render={render}
     placement={placement}
     arrow={arrow}
     delay={delay}

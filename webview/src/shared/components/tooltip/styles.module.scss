@@ -6,10 +6,8 @@
   font-size: 0.8rem;
   transition: none;
   white-space: nowrap;
+  padding: 8px 12px;
   & > :global(.tippy-arrow) {
     color: var(--vscode-editor-foreground);
-  }
-  & > :global(.tippy-content) {
-    padding: 8px 12px;
   }
 }

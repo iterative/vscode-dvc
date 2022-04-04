@@ -1,6 +1,7 @@
 import React from 'react'
 import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
+import { SingletonRender } from './IconMenu'
 import { Icon, IconValues } from '../Icon'
 import Tooltip from '../tooltip/Tooltip'
 
@@ -25,7 +26,11 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
   menuTarget
 }) => {
   let button = (
-    <Tooltip content={tooltip} singleton={tooltipTarget}>
+    <Tooltip
+      content={tooltip}
+      singleton={tooltipTarget}
+      render={SingletonRender}
+    >
       <button
         aria-label={tooltip}
         className={styles.item}
@@ -38,7 +43,11 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
   )
   if (onClickNode) {
     button = (
-      <Tooltip content={onClickNode} singleton={menuTarget}>
+      <Tooltip
+        content={onClickNode}
+        singleton={menuTarget}
+        render={SingletonRender}
+      >
         {button}
       </Tooltip>
     )

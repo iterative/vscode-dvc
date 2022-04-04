@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { useSingleton } from '@tippyjs/react'
+import { TippyProps, useSingleton } from '@tippyjs/react'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
 import styles from './styles.module.scss'
-import Tooltip from '../tooltip/Tooltip'
+import Tooltip, { TooltipBox } from '../tooltip/Tooltip'
 
 interface IconMenuProps {
   items: IconMenuItemProps[]
@@ -19,6 +19,10 @@ const popperOptions = {
   ]
 }
 
+export const SingletonRender: TippyProps['render'] = (_attrs, content) => {
+  return <TooltipBox>{content}</TooltipBox>
+}
+
 export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
   const [tooltipDisabled, setTooltipDisabled] = useState<boolean>(false)
   const [menuSource, menuTarget] = useSingleton()
@@ -28,12 +32,14 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
 
   return (
     <Tooltip
+      render={SingletonRender}
       singleton={tooltipSource}
       placement="bottom-end"
       popperOptions={popperOptions}
       disabled={tooltipDisabled}
     >
       <Tooltip
+        render={SingletonRender}
         trigger="click"
         interactive
         singleton={menuSource}

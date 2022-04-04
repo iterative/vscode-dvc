@@ -7,7 +7,9 @@ import styles from './styles.module.scss'
 import { CellTooltip } from '../cell/CellTooltip'
 import { CopyButton } from '../copyButton/CopyButton'
 import Tooltip, {
-  CELL_TOOLTIP_DELAY
+  CELL_TOOLTIP_DELAY,
+  TooltipArrow,
+  TooltipBox
 } from '../../../shared/components/tooltip/Tooltip'
 import { formatFloat } from '../../util/numberFormatting'
 import ClockIcon from '../../../shared/components/icons/Clock'
@@ -35,7 +37,12 @@ export const CellComponent: React.FC<
 
   return (
     <Tooltip
-      content={<CellTooltip cell={cell} />}
+      render={attrs => (
+        <TooltipBox {...attrs}>
+          <CellTooltip cell={cell} />
+          <TooltipArrow />
+        </TooltipBox>
+      )}
       placement="bottom"
       arrow={true}
       delay={[CELL_TOOLTIP_DELAY, 0]}
