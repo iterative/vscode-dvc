@@ -118,7 +118,7 @@ suite('Plots Test Suite', () => {
 
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'experim')
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
+    })
 
     it('should call plots diff with the branch name whenever the current branch commit changes', async () => {
       const mockNow = getMockNow()
@@ -169,7 +169,7 @@ suite('Plots Test Suite', () => {
       expect(mockRemoveDir).to.be.calledWithExactly(
         join(dvcDemoPath, TEMP_PLOTS_DIR)
       )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
+    })
 
     it('should handle a set selected metrics message from the webview', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(
