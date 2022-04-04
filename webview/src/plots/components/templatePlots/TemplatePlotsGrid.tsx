@@ -11,6 +11,7 @@ import {
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../../util/styles'
 import { reorderObjectList } from '../../../util/objects'
+import { DropTarget } from '../DropTarget'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
@@ -99,6 +100,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       group={groupId}
       onDrop={onDropInSection}
       draggedRef={draggedRef}
+      dropTarget={<DropTarget />}
     />
   )
 }

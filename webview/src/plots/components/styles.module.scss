@@ -272,7 +272,7 @@ $gap: 20px;
   height: 10px;
 }
 
-.dropSectionMaximized {
+.dropSectionMaximized, .dropTarget {
   height: auto;
   opacity: 0.5;
   border: 3px dashed var(--vscode-focusBorder);
