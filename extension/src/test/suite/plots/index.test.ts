@@ -63,8 +63,8 @@ suite('Plots Test Suite', () => {
         'main',
         'workspace'
       )
-
       mockPlotsDiff.resetHistory()
+
       const webview = await plots.showWebview()
       await webview.isReady()
 
