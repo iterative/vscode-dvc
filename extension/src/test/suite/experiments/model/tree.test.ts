@@ -63,23 +63,13 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experimentsTree.toggleStatus', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
+      const { plots, messageSpy } = await buildPlots(disposable)
 
       const expectedDomain = [...domain]
       const expectedRange = [...range]
 
-      const mockGetCheckpointPlots = stub(plotsModel, 'getCheckpointPlots')
-      const getCheckpointPlotsEvent = new Promise(resolve =>
-        mockGetCheckpointPlots.callsFake(() => {
-          resolve(undefined)
-          return mockGetCheckpointPlots.wrappedMethod.bind(plotsModel)()
-        })
-      )
-
-      await plots.showWebview()
-      await getCheckpointPlotsEvent
-
-      mockGetCheckpointPlots.restore()
+      const webview = await plots.showWebview()
+      await webview.isReady()
 
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,
@@ -121,8 +111,8 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         messageSpy,
-        'when there are no experiments selected we send undefined (show empty state)'
-      ).to.be.calledWith({
+        'when there are no experiments selected we send null (show empty state)'
+      ).to.be.calledWithMatch({
         checkpoint: null
       })
       messageSpy.resetHistory()
@@ -142,7 +132,7 @@ suite('Experiments Tree Test Suite', () => {
         Status.SELECTED
       )
 
-      expect(messageSpy, 'we no longer send undefined').to.be.calledWith(
+      expect(messageSpy, 'we no longer send null').to.be.calledWithMatch(
         getExpectedCheckpointPlotsData(expectedDomain, expectedRange)
       )
       expect(
@@ -204,7 +194,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(
         messageSpy,
         'a message is sent with colors for the currently selected experiments'
-      ).to.be.calledWith(
+      ).to.be.calledWithMatch(
         getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
       )
       expect(
@@ -246,7 +236,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(
         messageSpy,
         'the filter is applied and one experiment remains because of a single checkpoint'
-      ).to.be.calledWith(
+      ).to.be.calledWithMatch(
         getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
       )
       expect(
@@ -367,7 +357,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(
         messageSpy,
         'the filter is automatically applied and no experiment remains because every record has a loss'
-      ).to.be.calledWith(expectedMessage)
+      ).to.be.calledWithMatch(expectedMessage)
       messageSpy.resetHistory()
 
       const tableFilterRemoved = experimentsUpdatedEvent(experiments)
@@ -385,7 +375,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(
         messageSpy,
         'the old filters are still applied to the message'
-      ).to.be.calledWith(expectedMessage)
+      ).to.be.calledWithMatch(expectedMessage)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should retain the expanded state of experiment tree items', () => {

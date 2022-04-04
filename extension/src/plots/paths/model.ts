@@ -64,6 +64,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.getPathsByType(PathType.COMPARISON)
   }
 
+  public hasPaths() {
+    return this.data.length > 0
+  }
+
   private getPathsByType(type: PathType) {
     return this.data
       .filter(

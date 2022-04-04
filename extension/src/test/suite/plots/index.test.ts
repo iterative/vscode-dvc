@@ -47,8 +47,12 @@ suite('Plots Test Suite', () => {
   })
 
   describe('Plots', () => {
-    it('should call plots diff on instantiation with missing revisions', async () => {
-      const { mockPlotsDiff } = await buildPlots(disposable)
+    it('should call plots diff once on instantiation with missing revisions if there are no plots', async () => {
+      const { mockPlotsDiff, messageSpy, plots, data } = await buildPlots(
+        disposable
+      )
+
+      const managedUpdateSpy = spy(data, 'managedUpdate')
 
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
@@ -59,7 +63,21 @@ suite('Plots Test Suite', () => {
         'main',
         'workspace'
       )
-    })
+      mockPlotsDiff.resetHistory()
+
+      const webview = await plots.showWebview()
+      await webview.isReady()
+
+      expect(mockPlotsDiff).not.to.be.called
+      expect(managedUpdateSpy).not.to.be.called
+
+      expect(messageSpy).to.be.calledOnce
+      expect(messageSpy).to.be.calledWithMatch({
+        comparison: null,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        template: null
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should call plots diff with new experiment revisions but not checkpoints', async () => {
       const mockNow = getMockNow()
@@ -450,21 +468,13 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { plots, plotsModel, messageSpy, mockPlotsDiff } = await buildPlots(
+      const { plots, messageSpy, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
 
-      const mockGetCheckpointPlots = stub(plotsModel, 'getCheckpointPlots')
-      const getCheckpointPlotsEvent = new Promise(resolve =>
-        mockGetCheckpointPlots.callsFake(() => {
-          resolve(undefined)
-          return mockGetCheckpointPlots.wrappedMethod.bind(plotsModel)()
-        })
-      )
-
       const webview = await plots.showWebview()
-      await getCheckpointPlotsEvent
+      await webview.isReady()
 
       expect(mockPlotsDiff).to.be.called
 
