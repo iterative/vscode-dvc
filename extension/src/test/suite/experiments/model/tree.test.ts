@@ -121,8 +121,8 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         messageSpy,
-        'when there are no experiments selected we send undefined (show empty state)'
-      ).to.be.calledWith({
+        'when there are no experiments selected we send null (show empty state)'
+      ).to.be.calledWithMatch({
         checkpoint: null
       })
       messageSpy.resetHistory()
@@ -142,7 +142,7 @@ suite('Experiments Tree Test Suite', () => {
         Status.SELECTED
       )
 
-      expect(messageSpy, 'we no longer send undefined').to.be.calledWith(
+      expect(messageSpy, 'we no longer send null').to.be.calledWithMatch(
         getExpectedCheckpointPlotsData(expectedDomain, expectedRange)
       )
       expect(
@@ -204,7 +204,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(
         messageSpy,
         'a message is sent with colors for the currently selected experiments'
-      ).to.be.calledWith(
+      ).to.be.calledWithMatch(
         getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
       )
       expect(
@@ -246,7 +246,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(
         messageSpy,
         'the filter is applied and one experiment remains because of a single checkpoint'
-      ).to.be.calledWith(
+      ).to.be.calledWithMatch(
         getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
       )
       expect(

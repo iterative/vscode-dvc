@@ -94,14 +94,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
   }
 
-  public async sendInitialWebviewData() {
-    await this.isReady()
-    this.webview?.show({
-      checkpoint: this.getCheckpointPlots(),
-      comparison: this.getComparisonPlots(),
-      sectionCollapsed: this.plots?.getSectionCollapsed(),
-      template: this.getTemplatePlots()
-    })
+  public sendInitialWebviewData() {
+    return this.fetchMissingOrSendPlots()
   }
 
   public togglePathStatus(path: string) {
@@ -121,7 +115,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private notifyChanged() {
     this.pathsChanged.fire()
-    this.sendPlots()
+    this.fetchMissingOrSendPlots()
   }
 
   private sendCheckpointPlotsData() {
@@ -134,14 +128,21 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.plots?.getCheckpointPlots() || null
   }
 
-  private async sendPlots() {
-    if (definedAndNonEmpty(this.plots?.getMissingRevisions())) {
+  private async fetchMissingOrSendPlots() {
+    await this.isReady()
+
+    if (
+      this.paths?.hasPaths() &&
+      definedAndNonEmpty(this.plots?.getMissingRevisions())
+    ) {
       this.sendCheckpointPlotsData()
       return this.data.managedUpdate()
     }
 
-    await this.isReady()
+    return this.sendPlots()
+  }
 
+  private sendPlots() {
     this.webview?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
@@ -331,7 +332,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
         this.plots?.setComparisonOrder()
 
-        this.sendPlots()
+        this.fetchMissingOrSendPlots()
       })
     )
   }
