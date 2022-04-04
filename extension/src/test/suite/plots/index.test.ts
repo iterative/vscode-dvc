@@ -47,7 +47,7 @@ suite('Plots Test Suite', () => {
   })
 
   describe('Plots', () => {
-    it('should call plots diff once on instantiation with missing revisions', async () => {
+    it('should call plots diff once on instantiation with missing revisions if there are no plots', async () => {
       const { mockPlotsDiff, messageSpy, plots, data } = await buildPlots(
         disposable
       )
