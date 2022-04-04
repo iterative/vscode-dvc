@@ -96,31 +96,35 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     id !== draggedId && setDraggedOverId(id)
   }
 
+  const handleDragOver = (e: DragEvent<HTMLElement>) => e.preventDefault()
+
+  const isAfter = order.indexOf(draggedId) < order.indexOf(draggedOverId)
+
+  const buildItem = (id: string, draggable: JSX.Element) => (
+    <draggable.type
+      key={draggable.key}
+      {...draggable.props}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDrop={handleOnDrop}
+      draggable={!disabledDropIds.includes(id)}
+      style={(id === draggedId && { display: 'none' }) || null}
+    />
+  )
+
   return (
     <>
       {items.flatMap(draggable => {
         const { id } = draggable.props
-        const item = id && (
-          <draggable.type
-            key={draggable.key}
-            {...draggable.props}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
-            onDragEnter={handleDragEnter}
-            onDrop={handleOnDrop}
-            draggable={!disabledDropIds.includes(id)}
-            style={(id === draggedId && { display: 'none' }) || null}
-          />
-        )
+        const item = id && buildItem(id, draggable)
 
         if (id === draggedOverId && dropTarget) {
-          const isAfter =
-            order.indexOf(draggedId) < order.indexOf(draggedOverId)
           const target = (
             <div
               key="drop-target"
-              onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
+              onDragOver={handleDragOver}
               onDrop={handleOnDrop}
               id={`${id}_drop`}
             >
