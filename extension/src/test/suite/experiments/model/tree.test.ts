@@ -367,7 +367,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(
         messageSpy,
         'the filter is automatically applied and no experiment remains because every record has a loss'
-      ).to.be.calledWith(expectedMessage)
+      ).to.be.calledWithMatch(expectedMessage)
       messageSpy.resetHistory()
 
       const tableFilterRemoved = experimentsUpdatedEvent(experiments)
@@ -385,7 +385,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(
         messageSpy,
         'the old filters are still applied to the message'
-      ).to.be.calledWith(expectedMessage)
+      ).to.be.calledWithMatch(expectedMessage)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should retain the expanded state of experiment tree items', () => {

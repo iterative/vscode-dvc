@@ -146,6 +146,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webview?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
+      sectionCollapsed: this.plots?.getSectionCollapsed(),
       template: this.getTemplatePlots()
     })
   }

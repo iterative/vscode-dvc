@@ -74,6 +74,7 @@ suite('Plots Test Suite', () => {
       expect(messageSpy).to.be.calledOnce
       expect(messageSpy).to.be.calledWithMatch({
         comparison: null,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
         template: null
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
