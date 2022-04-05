@@ -45,7 +45,7 @@ module.exports = {
       }
     },
     {
-      files: ['extension/src/test/suite/**/*'],
+      files: ['extension/src/test/suite/**/*', 'extension/src/test/cli/**/*'],
       rules: {
         // These aren't jest tests, but still use `expect`
         'jest/valid-expect': 'off',
