@@ -1,4 +1,4 @@
-import React, { DragEvent, MutableRefObject, useState } from 'react'
+import React, { DragEvent, MutableRefObject, useEffect, useState } from 'react'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 
 export type DraggedInfo = {
@@ -30,6 +30,11 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
+  let dragIdTimeout = 0
+
+  useEffect(() => {
+    return () => clearTimeout(dragIdTimeout)
+  })
 
   const setDraggedRef = (draggedInfo?: DraggedInfo) => {
     if (draggedRef) {
@@ -51,7 +56,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       itemIndex: idx
     })
     setDraggedOverId(id)
-    setTimeout(() => setDraggedId(id), 0)
+    dragIdTimeout = window.setTimeout(() => setDraggedId(id), 0)
   }
 
   const handleDragEnd = () => {
@@ -123,6 +128,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         if (id === draggedOverId && dropTarget) {
           const target = (
             <div
+              data-testid="drop-target"
               key="drop-target"
               onDragOver={handleDragOver}
               onDrop={handleOnDrop}

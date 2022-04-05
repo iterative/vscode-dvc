@@ -21,4 +21,13 @@ export const dragAndDrop = (
   startingNode.dispatchEvent(createBubbledEvent('dragstart'))
 
   endingNode.dispatchEvent(createBubbledEvent('drop'))
+
+  startingNode.dispatchEvent(createBubbledEvent('dragend'))
+}
+
+export const dragEnter = (startingNode: HTMLElement, overNode: HTMLElement) => {
+  startingNode.dispatchEvent(createBubbledEvent('dragstart'))
+  jest.advanceTimersByTime(1)
+
+  overNode.dispatchEvent(createBubbledEvent('dragenter'))
 }
