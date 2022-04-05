@@ -880,8 +880,6 @@ describe('App', () => {
   })
 
   it('should hide the plot being dragged from the list', () => {
-    jest.useFakeTimers()
-
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
@@ -898,6 +896,5 @@ describe('App', () => {
     jest.advanceTimersByTime(1)
 
     expect(plots[0].style.display).toBe('none')
-    jest.useRealTimers()
   })
 })
