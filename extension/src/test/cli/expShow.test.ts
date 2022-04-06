@@ -1,4 +1,3 @@
-/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectOutput"] }] */
 import { describe, it, suite } from 'mocha'
 import isEmpty from 'lodash.isempty'
 import omit from 'lodash.omit'
