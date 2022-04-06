@@ -72,7 +72,7 @@ suite('exp show --show-json', () => {
           ).to.be.an(file.nfiles ? 'number' : 'null')
         }
       }
-    }).timeout(6000)
+    })
   })
 
   describe('Empty Repository', () => {
@@ -121,6 +121,6 @@ suite('exp show --show-json', () => {
         expect(obj, 'should have a child object').to.be.an('object')
         expect(obj.baseline, 'should have a baseline entry').to.be.an('object')
       }
-    }).timeout(6000)
+    })
   })
 })

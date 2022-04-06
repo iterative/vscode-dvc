@@ -10,7 +10,8 @@ export const runMocha = async (
   cwd: string,
   ext: 'ts' | 'js',
   setup: () => Promise<void> | void,
-  teardown: () => Promise<void> | void
+  teardown: () => Promise<void> | void,
+  timeout = 4000
 ) => {
   await setup()
 
@@ -18,7 +19,7 @@ export const runMocha = async (
     checkLeaks: true,
     color: true,
     reporterOptions: { maxDiffSize: 0 },
-    timeout: 4000,
+    timeout,
     ui: 'tdd'
   })
 
