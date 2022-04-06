@@ -12,6 +12,7 @@ import { performOrderedUpdate } from '../../../util/objects'
 import { withScale } from '../../../util/styles'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { sendMessage } from '../../../shared/vscode'
+import { DropTarget } from '../DropTarget'
 
 interface CheckpointPlotsProps {
   plots: CheckpointPlotData[]
@@ -67,6 +68,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
         disabledDropIds={[]}
         items={items as JSX.Element[]}
         group="live-plots"
+        dropTarget={<DropTarget />}
       />
     </div>
   ) : (

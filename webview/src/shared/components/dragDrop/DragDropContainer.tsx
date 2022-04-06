@@ -1,4 +1,4 @@
-import React, { DragEvent, MutableRefObject } from 'react'
+import React, { DragEvent, MutableRefObject, useEffect, useState } from 'react'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 
 export type DraggedInfo = {
@@ -15,6 +15,7 @@ interface DragDropContainerProps {
   group: string
   onDrop?: (draggedId: string, draggedGroup: string, groupId: string) => void
   draggedRef?: MutableRefObject<DraggedInfo | undefined>
+  dropTarget?: JSX.Element
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -24,8 +25,17 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   items,
   group,
   onDrop,
-  draggedRef
+  draggedRef,
+  dropTarget
 }) => {
+  const [draggedOverId, setDraggedOverId] = useState('')
+  const [draggedId, setDraggedId] = useState('')
+  let dragIdTimeout = 0
+
+  useEffect(() => {
+    return () => clearTimeout(dragIdTimeout)
+  })
+
   const setDraggedRef = (draggedInfo?: DraggedInfo) => {
     if (draggedRef) {
       draggedRef.current = draggedInfo
@@ -33,17 +43,25 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
-    const idx = order.indexOf(e.currentTarget.id).toString()
+    const { id } = e.currentTarget
+    const idx = order.indexOf(id).toString()
     e.dataTransfer.setData('itemIndex', idx)
-    e.dataTransfer.setData('itemId', e.currentTarget.id)
+    e.dataTransfer.setData('itemId', id)
     e.dataTransfer.setData('group', group)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
     setDraggedRef({
       group,
-      itemId: e.currentTarget.id,
+      itemId: id,
       itemIndex: idx
     })
+    setDraggedOverId(id)
+    dragIdTimeout = window.setTimeout(() => setDraggedId(id), 0)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedOverId('')
+    setDraggedId('')
   }
 
   const applyDrop = (e: DragEvent<HTMLElement>, droppedIndex: number) => {
@@ -67,7 +85,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
-    const droppedIndex = order.indexOf(e.currentTarget.id)
+    const id = e.currentTarget.id.split('_')[0]
+    const droppedIndex = order.indexOf(id)
     const draggedGroup = getIDWithoutIndex(e.dataTransfer.getData('group'))
     const isSameGroup = draggedGroup === getIDWithoutIndex(group)
     const isEnabled = !disabledDropIds.includes(order[droppedIndex])
@@ -77,21 +96,52 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }
   }
 
+  const handleDragEnter = (e: DragEvent<HTMLElement>) => {
+    const { id } = e.currentTarget
+    id !== draggedId && setDraggedOverId(id)
+  }
+
+  const handleDragOver = (e: DragEvent<HTMLElement>) => e.preventDefault()
+
+  const isAfter = order.indexOf(draggedId) < order.indexOf(draggedOverId)
+
+  const buildItem = (id: string, draggable: JSX.Element) => (
+    <draggable.type
+      key={draggable.key}
+      {...draggable.props}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDrop={handleOnDrop}
+      draggable={!disabledDropIds.includes(id)}
+      style={(id === draggedId && { display: 'none' }) || draggable.props.style}
+    />
+  )
+
   return (
     <>
-      {items.map(
-        item =>
-          item.props.id && (
-            <item.type
-              key={item.key}
-              {...item.props}
-              onDragStart={handleDragStart}
-              onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
+      {items.flatMap(draggable => {
+        const { id } = draggable.props
+        const item = id && buildItem(id, draggable)
+
+        if (id === draggedOverId && dropTarget) {
+          const target = (
+            <div
+              data-testid="drop-target"
+              key="drop-target"
+              onDragOver={handleDragOver}
               onDrop={handleOnDrop}
-              draggable={!disabledDropIds.includes(item.props.id)}
-            />
+              id={`${id}_drop`}
+            >
+              {dropTarget}
+            </div>
           )
-      )}
+          return isAfter ? [item, target] : [target, item]
+        }
+
+        return item
+      })}
     </>
   )
 }
