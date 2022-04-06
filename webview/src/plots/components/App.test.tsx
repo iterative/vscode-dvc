@@ -46,12 +46,10 @@ const mockSetState = jest.mocked(setState)
 
 beforeEach(() => {
   jest.clearAllMocks()
-  jest.useFakeTimers()
 })
 
 afterEach(() => {
   cleanup()
-  jest.useRealTimers()
 })
 
 describe('App', () => {
@@ -844,6 +842,8 @@ describe('App', () => {
   })
 
   it('should show a drop target before a plot on drag enter from the left', () => {
+    jest.useFakeTimers()
+
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
@@ -851,17 +851,21 @@ describe('App', () => {
 
     const plots = screen.getAllByTestId(/^plot_/)
 
-    dragEnter(plots[1], plots[0])
+    dragEnter(plots[1], plots[0], true)
 
-    const dropTarget = screen.getByTestId('drop-target')
-
-    expect(dropTarget).toBeInTheDocument()
-
-    // eslint-disable-next-line testing-library/no-node-access
-    expect(dropTarget.nextSibling?.isSameNode(plots[0])).toBe(true)
+    const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
+    expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
+      'plot-drop-target',
+      plots[0].id,
+      plots[1].id,
+      plots[2].id
+    ])
+    jest.useRealTimers()
   })
 
   it('should show a drop target after a plot on drag enter from the right', () => {
+    jest.useFakeTimers()
+
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
@@ -869,32 +873,33 @@ describe('App', () => {
 
     const plots = screen.getAllByTestId(/^plot_/)
 
-    dragEnter(plots[0], plots[1])
+    dragEnter(plots[0], plots[1], true)
 
-    const dropTarget = screen.getByTestId('drop-target')
+    const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
 
-    expect(dropTarget).toBeInTheDocument()
-
-    // eslint-disable-next-line testing-library/no-node-access
-    expect(dropTarget.previousSibling?.isSameNode(plots[1])).toBe(true)
+    expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
+      plots[0].id,
+      plots[1].id,
+      'plot-drop-target',
+      plots[2].id
+    ])
+    jest.useRealTimers()
   })
 
   it('should hide the plot being dragged from the list', () => {
+    jest.useFakeTimers()
+
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
     const plots = screen.getAllByTestId(/^plot_/)
-    expect(plots[0].style.display).not.toBe('none')
+    expect(plots[1].style.display).not.toBe('none')
 
-    plots[0].dispatchEvent(
-      createBubbledEvent('dragstart', {
-        preventDefault: jest.fn()
-      })
-    )
-    jest.advanceTimersByTime(1)
+    dragEnter(plots[1], plots[1], true)
 
-    expect(plots[0].style.display).toBe('none')
+    expect(plots[1].style.display).toBe('none')
+    jest.useRealTimers()
   })
 })
