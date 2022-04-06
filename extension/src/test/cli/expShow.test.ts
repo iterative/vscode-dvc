@@ -41,6 +41,7 @@ suite('exp show --show-json', () => {
         expect(obj.baseline.data?.metrics, 'should have metrics').to.be.an(
           'object'
         )
+
         // each metric or param file
         for (const file of Object.values({
           ...obj.baseline.data?.params,
@@ -57,7 +58,8 @@ suite('exp show --show-json', () => {
 
         expect(obj.baseline.data?.deps, 'should have deps').to.be.an('object')
         expect(obj.baseline.data?.outs, 'should have outs').to.be.an('object')
-        // each deps file
+
+        // each deps or outs file
         for (const file of Object.values({
           ...obj.baseline.data?.deps,
           ...obj.baseline.data?.outs
