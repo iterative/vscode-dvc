@@ -26,7 +26,7 @@ import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { vsCodeApi } from '../../shared/api'
-import { createBubbledEvent, dragAndDrop } from '../../test/dragDrop'
+import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 
 jest.mock('../../shared/api')
 
@@ -839,5 +839,67 @@ describe('App', () => {
     topSection.dispatchEvent(dragOverEvent)
 
     expect(dragOverEvent.preventDefault).toHaveBeenCalled()
+  })
+
+  it('should show a drop target before a plot on drag enter from the left', () => {
+    jest.useFakeTimers()
+
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const plots = screen.getAllByTestId(/^plot_/)
+
+    dragEnter(plots[1], plots[0], true)
+
+    const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
+    expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
+      'plot-drop-target',
+      plots[0].id,
+      plots[1].id,
+      plots[2].id
+    ])
+    jest.useRealTimers()
+  })
+
+  it('should show a drop target after a plot on drag enter from the right', () => {
+    jest.useFakeTimers()
+
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const plots = screen.getAllByTestId(/^plot_/)
+
+    dragEnter(plots[0], plots[1], true)
+
+    const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
+
+    expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
+      plots[0].id,
+      plots[1].id,
+      'plot-drop-target',
+      plots[2].id
+    ])
+    jest.useRealTimers()
+  })
+
+  it('should hide the plot being dragged from the list', () => {
+    jest.useFakeTimers()
+
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const plots = screen.getAllByTestId(/^plot_/)
+    expect(plots[1].style.display).not.toBe('none')
+
+    dragEnter(plots[1], plots[1], true)
+
+    expect(plots[1].style.display).toBe('none')
+    jest.useRealTimers()
   })
 })
