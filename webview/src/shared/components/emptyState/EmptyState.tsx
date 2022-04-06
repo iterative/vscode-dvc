@@ -6,7 +6,7 @@ export const EmptyState = (text: string, isFullScreen = true) => {
   return (
     <div
       className={cx(
-        styles.centered,
+        'centered',
         isFullScreen ? styles.emptyScreen : styles.emptySection
       )}
     >

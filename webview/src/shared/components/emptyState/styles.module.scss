@@ -1,0 +1,26 @@
+@import '../../variables.scss';
+
+.emptyScreen {
+  width: 100vw;
+  height: 100vh;
+}
+
+.emptySection {
+  width: 100vw;
+  height: 33vh;
+}
+
+.emptyStateText {
+  white-space: nowrap;
+  text-align: center;
+  overflow: hidden;
+  opacity: 0.8;
+  letter-spacing: 0.04em;
+  color: $watermark-color;
+
+  @at-root {
+    :global(.vscode-light) & {
+      color: $watermark-color-light;
+    }
+  }
+}
