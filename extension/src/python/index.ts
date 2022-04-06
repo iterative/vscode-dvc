@@ -1,4 +1,5 @@
 import { join } from 'path'
+import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { createProcessWithOutput } from '../processExecution'
 
@@ -11,7 +12,7 @@ const installPackages = (cwd: string, pythonBin: string, ...args: string[]) => {
 }
 
 export const getVenvBinPath = (cwd: string, envDir: string, name: string) =>
-  process.platform === 'win32'
+  getProcessPlatform() === 'win32'
     ? join(cwd, envDir, 'Scripts', `${name}.exe`)
     : join(cwd, envDir, 'bin', name)
 
@@ -24,7 +25,7 @@ export const setupVenv = async (
     await createProcessWithOutput({
       args: ['-m', 'venv', envDir],
       cwd,
-      executable: process.platform === 'win32' ? 'python' : 'python3'
+      executable: getProcessPlatform() === 'win32' ? 'python' : 'python3'
     })
   }
 
