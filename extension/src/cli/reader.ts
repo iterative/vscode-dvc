@@ -72,6 +72,7 @@ export interface BaseExperimentFields {
 interface OutsOrDepsDetails {
   [filename: string]: { hash: string; size: number; nfiles: null | number }
 }
+
 export interface ExperimentFields extends BaseExperimentFields {
   params?: ValueTreeRoot
   metrics?: ValueTreeRoot
