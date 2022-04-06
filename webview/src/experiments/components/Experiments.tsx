@@ -22,6 +22,7 @@ import styles from './table/styles.module.scss'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
 import { Theme } from '../../shared/components/theme/Theme'
+import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
@@ -207,7 +208,7 @@ const Experiments: React.FC<{
         {tableData ? (
           <ExperimentsTable tableData={tableData} />
         ) : (
-          <p>Loading experiments...</p>
+          <EmptyState>Loading Experiments...</EmptyState>
         )}
       </div>
     </Theme>

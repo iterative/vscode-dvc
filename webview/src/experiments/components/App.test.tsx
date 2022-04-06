@@ -72,7 +72,7 @@ describe('App', () => {
 
       it('Then the empty state should be displayed', async () => {
         render(<App />)
-        const emptyState = await screen.findByText('Loading experiments...')
+        const emptyState = await screen.findByText('Loading Experiments...')
 
         expect(emptyState).toBeInTheDocument()
       })
