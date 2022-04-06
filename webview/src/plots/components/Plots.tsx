@@ -35,7 +35,7 @@ export const Plots = ({
   }, [data, setSelectedPlots, setMetrics])
 
   if (!data || !data.sectionCollapsed) {
-    return EmptyState('Loading Plots...')
+    return <EmptyState>Loading Plots...</EmptyState>
   }
 
   const {
@@ -46,7 +46,7 @@ export const Plots = ({
   } = data
 
   if (!checkpointPlots && !templatePlots && !comparisonTable) {
-    return EmptyState('No Plots to Display')
+    return <EmptyState>No Plots to Display</EmptyState>
   }
 
   const setSelectedMetrics = (metrics: string[]) => {
