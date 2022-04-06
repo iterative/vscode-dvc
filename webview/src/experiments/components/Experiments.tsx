@@ -196,6 +196,16 @@ export const ExperimentsTable: React.FC<{
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
 
+  const hasOnlyDefaultColumns = columns.length <= 2
+  if (hasOnlyDefaultColumns) {
+    return <EmptyState>No Columns Selected</EmptyState>
+  }
+
+  const hasOnlyWorkspace = data.length <= 1
+  if (hasOnlyWorkspace) {
+    return <EmptyState>No Experiments to Display</EmptyState>
+  }
+
   return <Table instance={instance} tableData={tableData} />
 }
 

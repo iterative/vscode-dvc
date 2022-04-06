@@ -453,6 +453,21 @@ describe('App', () => {
               [testParamName]: testParamStringValue
             }
           }
+        },
+        {
+          id: 'main',
+          label: 'main',
+          metrics: {
+            'summary.json': {
+              loss: testMetricNumberValue + 1
+            }
+          },
+          mutable: false,
+          params: {
+            'params.yaml': {
+              [testParamName]: 'Other Value'
+            }
+          }
         }
       ]
     }

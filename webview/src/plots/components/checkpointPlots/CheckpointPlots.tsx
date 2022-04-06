@@ -72,6 +72,6 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       />
     </div>
   ) : (
-    <EmptyState isFullScreen={false}>No metrics selected</EmptyState>
+    <EmptyState isFullScreen={false}>No Metrics Selected</EmptyState>
   )
 }
