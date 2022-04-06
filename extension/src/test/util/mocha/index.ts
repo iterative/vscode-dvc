@@ -33,13 +33,11 @@ export const runMocha = async (
           return reject(err)
         }
 
-        // Add files to the test suite
         for (const f of files) {
           mocha.addFile(resolvePath(cwd, f))
         }
 
         try {
-          // Run the mocha test
           mocha.run(failures => {
             if (failures > 0) {
               reject(new Error(`${failures} tests failed.`))

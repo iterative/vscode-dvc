@@ -1,20 +1,29 @@
-import { join } from 'path'
+import { mkdirp } from 'fs-extra'
 import { URI } from 'vscode-uri'
 import { stub } from 'sinon'
 import mock from 'mock-require'
+import { TEMP_DIR, ENV_DIR } from './constants'
 import { removeDir } from '../../fileSystem'
 import { setupVenv } from '../../python'
 import { runMocha } from '../util/mocha'
 
-const envDir = '.env'
-const cwd = __dirname
+class MockEventEmitter {
+  public fire() {
+    return stub()
+  }
+
+  public event() {
+    return stub()
+  }
+}
 
 mock('vscode', {
-  EventEmitter: stub(),
+  EventEmitter: MockEventEmitter,
   Uri: {
     file: URI.file
   }
 })
+
 mock('@hediet/std/disposable', {
   Disposable: {
     fn: () => ({
@@ -28,9 +37,10 @@ runMocha(
   __dirname,
   'ts',
   async () => {
-    await setupVenv(cwd, envDir, 'git+https://github.com/iterative/dvc')
+    await mkdirp(TEMP_DIR)
+    await setupVenv(TEMP_DIR, ENV_DIR, 'git+https://github.com/iterative/dvc')
   },
   () => {
-    removeDir(join(cwd, envDir))
+    removeDir(TEMP_DIR)
   }
 )
