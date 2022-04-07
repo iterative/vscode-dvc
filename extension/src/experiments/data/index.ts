@@ -1,7 +1,11 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
-import { EXPERIMENTS_GIT_LOGS_REFS, EXPERIMENTS_GIT_REFS } from './constants'
+import {
+  EXPERIMENTS_GIT_LOGS_REFS,
+  EXPERIMENTS_GIT_REFS,
+  EXPERIMENTS_GIT_REFS_EXEC
+} from './constants'
 import {
   createFileSystemWatcher,
   getRelativePattern
@@ -66,6 +70,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       createFileSystemWatcher(
         getRelativePattern(join(gitRoot, DOT_GIT), '**'),
         (path: string) => {
+          if (path.includes(EXPERIMENTS_GIT_REFS_EXEC)) {
+            return
+          }
+
           if (
             watchedRelPaths.some(watchedRelPath =>
               path.includes(watchedRelPath)
