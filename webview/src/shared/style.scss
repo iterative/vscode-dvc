@@ -28,3 +28,11 @@ body {
   background-color: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
 }
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  flex-wrap: wrap;
+}
