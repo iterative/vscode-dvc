@@ -1,11 +1,5 @@
-/* eslint-disable sonarjs/cognitive-complexity */
-import { join, resolve as resolvePath } from 'path'
-import Mocha from 'mocha'
-import glob from 'glob'
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-import sinonChai from 'sinon-chai'
-import { Logger } from '../../common/logger'
+import { join } from 'path'
+import { runMocha } from '../util/mocha'
 
 function setupNyc() {
   const NYC = require('nyc')
@@ -32,53 +26,20 @@ function setupNyc() {
   return nyc
 }
 
-export async function run() {
-  const nyc = setupNyc()
+export function run() {
+  let nyc: { writeCoverageFile: () => void; report: () => void }
 
-  const mocha = new Mocha({
-    checkLeaks: true,
-    color: true,
-    reporterOptions: { maxDiffSize: 0 },
-    timeout: 4000,
-    ui: 'tdd'
-  })
-
-  chai.use(sinonChai)
-  chai.use(chaiAsPromised)
-
-  const testsRoot = resolvePath(__dirname, '..')
-
-  try {
-    await new Promise<void>((resolve, reject) => {
-      glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
-        if (err) {
-          return reject(err)
-        }
-
-        // Add files to the test suite
-        for (const f of files) {
-          mocha.addFile(resolvePath(testsRoot, f))
-        }
-
-        try {
-          // Run the mocha test
-          mocha.run(failures => {
-            if (failures > 0) {
-              reject(new Error(`${failures} tests failed.`))
-            } else {
-              resolve()
-            }
-          })
-        } catch (error: unknown) {
-          Logger.error((error as Error).toString())
-          throw error
-        }
-      })
-    })
-  } finally {
-    if (nyc) {
-      nyc.writeCoverageFile()
-      nyc.report()
+  return runMocha(
+    __dirname,
+    'js',
+    () => {
+      nyc = setupNyc()
+    },
+    () => {
+      if (nyc) {
+        nyc.writeCoverageFile()
+        nyc.report()
+      }
     }
-  }
+  )
 }
