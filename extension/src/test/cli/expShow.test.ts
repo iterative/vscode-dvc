@@ -84,7 +84,7 @@ suite('exp show --show-json', () => {
       expect(
         Object.keys(output),
         'should have at least two entries'
-      ).to.have.lengthOf.greaterThanOrEqual(2)
+      ).to.have.lengthOf(2)
 
       const { workspace } = output
 
