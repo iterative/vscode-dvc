@@ -69,9 +69,15 @@ export interface BaseExperimentFields {
   checkpoint_parent?: string
 }
 
+interface OutsOrDepsDetails {
+  [filename: string]: { hash: string; size: number; nfiles: null | number }
+}
+
 export interface ExperimentFields extends BaseExperimentFields {
   params?: ValueTreeRoot
   metrics?: ValueTreeRoot
+  deps?: OutsOrDepsDetails
+  outs?: OutsOrDepsDetails
 }
 
 export interface ExperimentFieldsOrError {
