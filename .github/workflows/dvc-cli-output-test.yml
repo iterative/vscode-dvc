@@ -1,0 +1,26 @@
+name: DVC CLI Output Test
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: yarn
+
+      - run: yarn install
+      - run: yarn scheduled:cli:test
