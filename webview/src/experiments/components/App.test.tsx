@@ -59,44 +59,76 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  describe('Given an initial empty state', () => {
-    describe('When we render the App', () => {
-      it('Then a message should be sent to the extension on the first render', () => {
-        render(<App />)
-        expect(mockPostMessage).toHaveBeenCalledWith({
-          type: MessageFromWebviewType.INITIALIZED
-        })
-
-        expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      })
-
-      it('Then the empty state should be displayed', async () => {
-        render(<App />)
-        const emptyState = await screen.findByText('Loading Experiments...')
-
-        expect(emptyState).toBeInTheDocument()
-      })
+  it('should send a message to the extension on the first render', () => {
+    render(<App />)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.INITIALIZED
     })
+
+    expect(mockPostMessage).toHaveBeenCalledTimes(1)
   })
 
-  describe('Given a message to add experiments to the state', () => {
-    const messageToChangeState = new MessageEvent('message', {
-      data: {
-        data: tableDataFixture,
-        type: MessageToWebviewType.SET_DATA
-      }
-    })
+  it('should display the loading state before the experiments are shown', async () => {
+    render(<App />)
 
-    describe('When we render the App and send the message', () => {
-      it('Then the experiments table should be shown', () => {
-        render(<App />)
-        fireEvent(window, messageToChangeState)
+    const loadingState = await screen.findByText('Loading Experiments...')
+    expect(loadingState).toBeInTheDocument()
+  })
 
-        screen.queryAllByText('Experiment')
-        const emptyState = screen.queryByText('Loading experiments...')
-        expect(emptyState).not.toBeInTheDocument()
+  it('should show the no columns selected empty state when there are no columns provided', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: { ...tableDataFixture, columns: [] },
+          type: MessageToWebviewType.SET_DATA
+        }
       })
-    })
+    )
+
+    const noColumnsState = screen.queryByText('No Columns Selected')
+    expect(noColumnsState).toBeInTheDocument()
+  })
+
+  it('should show the no experiments empty state when only the workspace is provided', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: { ...tableDataFixture, rows: [tableDataFixture.rows[0]] },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+
+    const noExperimentsState = screen.queryByText('No Experiments to Display')
+    expect(noExperimentsState).toBeInTheDocument()
+  })
+
+  it('should show the experiments table', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: tableDataFixture,
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+
+    screen.queryAllByText('Experiment')
+
+    const loadingState = screen.queryByText('Loading experiments...')
+    expect(loadingState).not.toBeInTheDocument()
+
+    const noExperimentsState = screen.queryByText('No Experiments to Display')
+    expect(noExperimentsState).not.toBeInTheDocument()
+
+    const noColumnsState = screen.queryByText('No Columns Selected')
+    expect(noColumnsState).not.toBeInTheDocument()
   })
 
   it('Should persist dvcRoot when the message to update it is given', () => {
