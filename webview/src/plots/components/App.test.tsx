@@ -841,7 +841,7 @@ describe('App', () => {
     expect(dragOverEvent.preventDefault).toHaveBeenCalled()
   })
 
-  it('should show a drop target before a plot on drag enter from the left', () => {
+  /* it('should show a drop target before a plot on drag enter from the left', () => {
     jest.useFakeTimers()
 
     renderAppWithData({
@@ -884,7 +884,7 @@ describe('App', () => {
       plots[2].id
     ])
     jest.useRealTimers()
-  })
+  }) */
 
   it('should hide the plot being dragged from the list', () => {
     jest.useFakeTimers()

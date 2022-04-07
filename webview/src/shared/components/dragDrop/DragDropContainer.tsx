@@ -1,4 +1,5 @@
-import React, { DragEvent, MutableRefObject, useEffect, useState } from 'react'
+import React, { DragEvent, MutableRefObject, useState } from 'react'
+import { DragEnterDirection, getDragEnterDirection } from './util'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 
 export type DraggedInfo = {
@@ -30,11 +31,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
-  let dragIdTimeout = 0
-
-  useEffect(() => {
-    return () => clearTimeout(dragIdTimeout)
-  })
+  const [direction, setDirection] = useState(DragEnterDirection.RIGHT)
 
   const setDraggedRef = (draggedInfo?: DraggedInfo) => {
     if (draggedRef) {
@@ -56,12 +53,13 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       itemIndex: idx
     })
     setDraggedOverId(id)
-    dragIdTimeout = window.setTimeout(() => setDraggedId(id), 0)
+    setTimeout(() => setDraggedId(id), 0)
   }
 
   const handleDragEnd = () => {
     setDraggedOverId('')
     setDraggedId('')
+    setDirection(DragEnterDirection.RIGHT)
   }
 
   const applyDrop = (e: DragEvent<HTMLElement>, droppedIndex: number) => {
@@ -97,13 +95,17 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    const { id } = e.currentTarget
-    id !== draggedId && setDraggedOverId(id)
+    if (draggedId) {
+      const { id } = e.currentTarget
+      id !== draggedId && setDraggedOverId(id)
+    }
   }
 
-  const handleDragOver = (e: DragEvent<HTMLElement>) => e.preventDefault()
-
-  const isAfter = order.indexOf(draggedId) < order.indexOf(draggedOverId)
+  const handleDragOver = (e: DragEvent<HTMLElement>) => {
+    e.preventDefault()
+    !e.currentTarget.id.includes('_drop') &&
+      setDirection(getDragEnterDirection(e))
+  }
 
   const buildItem = (id: string, draggable: JSX.Element) => (
     <draggable.type
@@ -137,7 +139,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
               {dropTarget}
             </div>
           )
-          return isAfter ? [item, target] : [target, item]
+
+          return direction === DragEnterDirection.RIGHT
+            ? [item, target]
+            : [target, item]
         }
 
         return item
