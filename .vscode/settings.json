@@ -25,6 +25,7 @@
     "isout",
     "lintstagedrc",
     "MNIST",
+    "nfiles",
     "pseudoterminal",
     "rwlock",
     "sonarjs",
