@@ -1,3 +1,5 @@
+import { act } from '@testing-library/react'
+
 const testStorage = new Map()
 
 export const createBubbledEvent = (type: string, props = {}) => {
@@ -30,8 +32,10 @@ export const dragEnter = (
   overNode: HTMLElement,
   advanceTimers?: boolean
 ) => {
-  startingNode.dispatchEvent(createBubbledEvent('dragstart'))
-  advanceTimers && jest.advanceTimersByTime(1)
+  act(() => {
+    startingNode.dispatchEvent(createBubbledEvent('dragstart'))
+    advanceTimers && jest.advanceTimersByTime(1)
 
-  overNode.dispatchEvent(createBubbledEvent('dragenter'))
+    overNode.dispatchEvent(createBubbledEvent('dragenter'))
+  })
 }
