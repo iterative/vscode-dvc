@@ -35,7 +35,16 @@ export const tableData = {
   columnOrder: [],
   columnWidths: {},
   columns,
-  rows: [],
+  rows: [
+    {
+      id: 'workspace',
+      label: 'workspace'
+    },
+    {
+      id: 'main',
+      label: 'main'
+    }
+  ],
   sorts: []
 }
 

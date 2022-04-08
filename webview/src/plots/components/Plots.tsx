@@ -5,13 +5,13 @@ import {
   Section
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { EmptyState } from './EmptyState'
 import { PlotsContainer } from './PlotsContainer'
 import { CheckpointPlots } from './checkpointPlots/CheckpointPlots'
 import { ComparisonTable } from './comparisonTable/ComparisonTable'
 import { TemplatePlots } from './templatePlots/TemplatePlots'
 import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { sendMessage } from '../../shared/vscode'
+import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Theme } from '../../shared/components/theme/Theme'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
@@ -35,7 +35,7 @@ export const Plots = ({
   }, [data, setSelectedPlots, setMetrics])
 
   if (!data || !data.sectionCollapsed) {
-    return EmptyState('Loading Plots...')
+    return <EmptyState>Loading Plots...</EmptyState>
   }
 
   const {
@@ -46,7 +46,7 @@ export const Plots = ({
   } = data
 
   if (!checkpointPlots && !templatePlots && !comparisonTable) {
-    return EmptyState('No Plots to Display')
+    return <EmptyState>No Plots to Display</EmptyState>
   }
 
   const setSelectedMetrics = (metrics: string[]) => {

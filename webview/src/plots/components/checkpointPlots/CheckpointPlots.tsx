@@ -6,7 +6,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import { Plot } from './Plot'
 import styles from '../styles.module.scss'
-import { EmptyState } from '../EmptyState'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 import { performOrderedUpdate } from '../../../util/objects'
 import { withScale } from '../../../util/styles'
@@ -72,6 +72,6 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       />
     </div>
   ) : (
-    EmptyState('No metrics selected', false)
+    <EmptyState isFullScreen={false}>No Metrics Selected</EmptyState>
   )
 }
