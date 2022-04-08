@@ -15,10 +15,7 @@ suite('exp show --show-json', () => {
       expect(output.workspace, 'should have a workspace key').not.to.be
         .undefined
 
-      expect(
-        Object.keys(output),
-        'should have at least two entries'
-      ).to.have.lengthOf.greaterThanOrEqual(2)
+      expect(Object.keys(output), 'should have two entries').to.have.lengthOf(2)
 
       // each entry under output
       for (const [key, obj] of Object.entries(output)) {
