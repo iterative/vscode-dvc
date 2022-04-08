@@ -50,5 +50,15 @@ export const WithData = Template.bind({})
 export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = { tableData: deeplyNestedTableData }
 
-export const WithoutData = Template.bind({})
-WithoutData.args = { tableData: undefined }
+export const LoadingData = Template.bind({})
+LoadingData.args = { tableData: undefined }
+
+export const WithNoExperiments = Template.bind({})
+WithNoExperiments.args = {
+  tableData: { ...tableData, rows: [rowsFixture[0]] }
+}
+
+export const WithNoColumns = Template.bind({})
+WithNoColumns.args = {
+  tableData: { ...tableData, columns: [] }
+}

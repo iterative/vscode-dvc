@@ -39,6 +39,7 @@
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
     "setup:venv": "ts-node ./scripts/virtualenv-install.ts",
+    "scheduled:cli:test": "ts-node ./extension/src/test/cli/index.ts",
     "create-svgs": "ts-node ./scripts/create-svgs.ts",
     "svgr": "yarn workspace dvc-vscode-webview svgr"
   },
