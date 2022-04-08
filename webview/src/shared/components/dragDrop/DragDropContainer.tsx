@@ -112,16 +112,18 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
     if (draggedId) {
       const { id } = e.currentTarget
-      id !== draggedId && setDraggedOverId(id)
+      if (id !== draggedId && !id.includes('_drop')) {
+        setDraggedOverId(id)
+        setDirection(getDragEnterDirection(e))
+      }
     }
   }
 
   const handleDragOver = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
-    !e.currentTarget.id.includes('_drop') &&
+    e.currentTarget.id === draggedOverId &&
       setDirection(getDragEnterDirection(e))
   }
-
   const buildItem = (id: string, draggable: JSX.Element) => (
     <draggable.type
       key={draggable.key}
@@ -142,7 +144,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         const { id } = draggable.props
         const item = id && buildItem(id, draggable)
 
-        if (id === draggedOverId && dropTarget) {
+        if (id === draggedOverId && dropTarget && direction) {
           const target = (
             <div
               data-testid="drop-target"
