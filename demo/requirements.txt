@@ -1,5 +1,5 @@
 dvc[s3]>=2.10.1
-dvclive
+dvclive==0.7.2
 torch
 torchvision
 ruamel.yaml
