@@ -38,10 +38,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(DragEnterDirection.RIGHT)
-  const setDraggedOverIdTimeout = useRef<number>(0)
+  const draggedOverIdTimeout = useRef<number>(0)
 
   useEffect(() => {
-    return () => clearTimeout(setDraggedOverIdTimeout.current)
+    return () => clearTimeout(draggedOverIdTimeout.current)
   }, [])
 
   const setDraggedRef = (draggedInfo?: DraggedInfo) => {
@@ -64,10 +64,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       itemIndex: idx
     })
     setDraggedOverId(id)
-    setDraggedOverIdTimeout.current = window.setTimeout(
-      () => setDraggedId(id),
-      0
-    )
+    draggedOverIdTimeout.current = window.setTimeout(() => setDraggedId(id), 0)
   }
 
   const handleDragEnd = () => {

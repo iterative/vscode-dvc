@@ -36,7 +36,7 @@ export const dragEnter = (
   const right = left + 100
   const dragOverEvent = createBubbledEvent('dragover', { clientX })
   jest
-    .spyOn(DragDropUtils, 'getDistances')
+    .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
     .mockImplementationOnce(() => ({ left, right }))
   draggedOver.dispatchEvent(dragOverEvent)
   jest.useRealTimers()
