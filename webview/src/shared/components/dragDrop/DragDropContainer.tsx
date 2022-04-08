@@ -97,7 +97,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const id = e.currentTarget.id.split('_')[0]
     const droppedIndex =
       order.indexOf(id) +
-      (draggedOverId !== draggedId && direction === DragEnterDirection.RIGHT
+      (draggedOverId !== draggedId &&
+      direction === DragEnterDirection.RIGHT &&
+      dropTarget
         ? 1
         : 0)
     const draggedGroup = getIDWithoutIndex(e.dataTransfer.getData('group'))
@@ -124,6 +126,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     e.currentTarget.id === draggedOverId &&
       setDirection(getDragEnterDirection(e))
   }
+
   const buildItem = (id: string, draggable: JSX.Element) => (
     <draggable.type
       key={draggable.key}
@@ -134,7 +137,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
-      style={(id === draggedId && { display: 'none' }) || draggable.props.style}
+      style={
+        (id === draggedId && dropTarget && { display: 'none' }) ||
+        draggable.props.style
+      }
     />
   )
 
