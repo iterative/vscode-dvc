@@ -1,4 +1,10 @@
-import React, { DragEvent, MutableRefObject, useState } from 'react'
+import React, {
+  DragEvent,
+  MutableRefObject,
+  useEffect,
+  useState,
+  useRef
+} from 'react'
 import { DragEnterDirection, getDragEnterDirection } from './util'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 
@@ -32,6 +38,11 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(DragEnterDirection.RIGHT)
+  const setDraggedOverIdTimeout = useRef<number>(0)
+
+  useEffect(() => {
+    return () => clearTimeout(setDraggedOverIdTimeout.current)
+  }, [])
 
   const setDraggedRef = (draggedInfo?: DraggedInfo) => {
     if (draggedRef) {
@@ -53,7 +64,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       itemIndex: idx
     })
     setDraggedOverId(id)
-    setTimeout(() => setDraggedId(id), 0)
+    setDraggedOverIdTimeout.current = window.setTimeout(
+      () => setDraggedId(id),
+      0
+    )
   }
 
   const handleDragEnd = () => {
@@ -84,7 +98,11 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
     const id = e.currentTarget.id.split('_')[0]
-    const droppedIndex = order.indexOf(id)
+    const droppedIndex =
+      order.indexOf(id) +
+      (draggedOverId !== draggedId && direction === DragEnterDirection.RIGHT
+        ? 1
+        : 0)
     const draggedGroup = getIDWithoutIndex(e.dataTransfer.getData('group'))
     const isSameGroup = draggedGroup === getIDWithoutIndex(group)
     const isEnabled = !disabledDropIds.includes(order[droppedIndex])

@@ -5,15 +5,20 @@ export enum DragEnterDirection {
   LEFT = 'LEFT'
 }
 
+export const getDistances = (e: DragEvent<HTMLElement>) => {
+  const itemClientRect = e.currentTarget.getBoundingClientRect()
+  return {
+    left: itemClientRect.left,
+    right: itemClientRect.right
+  }
+}
+
 export const getDragEnterDirection = (e: DragEvent<HTMLElement>) => {
   const cursorLocationX = e.clientX
-  const itemClientRect = e.currentTarget.getBoundingClientRect()
-  const itemLeftPosition = itemClientRect.left
-  const itemRightPosition = itemClientRect.right
+  const { left, right } = getDistances(e)
 
-  const distanceFromLeft = Math.abs(cursorLocationX - itemLeftPosition)
-  const distanceFromRight = Math.abs(cursorLocationX - itemRightPosition)
-
+  const distanceFromLeft = Math.abs(cursorLocationX - left)
+  const distanceFromRight = Math.abs(cursorLocationX - right)
   const closestDistanceToBorder = Math.min(distanceFromLeft, distanceFromRight)
 
   return closestDistanceToBorder === distanceFromLeft
