@@ -13,6 +13,10 @@
     "package": {
       "dependsOn": ["dvc#build"]
     },
+    "build-storybook": {
+      "dependsOn": ["^build-storybook"],
+      "outputs": ["storybook-static/**"]
+    },
     "test": {
       "dependsOn": ["^test"],
       "outputs": []
