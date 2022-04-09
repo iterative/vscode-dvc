@@ -7,7 +7,7 @@
   "scripts": {
     "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint": "yarn turbo run lint",
-    "test:vscode": "yarn turbo run test-vscode-build test-vscode-run",
+    "test:vscode": "yarn turbo run test:vscode:run",
     "test:jest": "yarn turbo run test",
     "test": "run-p test:*",
     "cover:clean": "rm -rf ./coverage/combined && rm -rf ./extension/coverage rm -rf ./webview/coverage",
