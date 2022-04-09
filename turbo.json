@@ -9,6 +9,14 @@
     "test": {
       "outputs": []
     },
+    "test-vscode-run": {
+      "dependsOn": ["^test-vscode-build"],
+      "outputs": []
+    },
+    "test-vscode-build": {
+      "dependsOn": ["^test-vscode-build"],
+      "outputs": ["dist/**"]
+    },
     "lint": {
       "outputs": []
     },
