@@ -33,7 +33,7 @@ jobs:
 
       - run: yarn run install-frozen-lockfile
 
-      - run: yarn turbo run lint
+      - run: yarn lint
 
       - uses: paambaati/codeclimate-action@v2.7.5
         env:

@@ -2,15 +2,12 @@
   "$schema": "https://turborepo.org/schema.json",
   "baseBranch": "origin/main",
   "pipeline": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**"]
-    },
     "test": {
+      "dependsOn": ["^test"],
       "outputs": []
     },
-    "test-vscode-run": {
-      "dependsOn": ["^test-vscode-build"],
+    "test:vscode": {
+      "dependsOn": ["test-vscode-build"],
       "outputs": []
     },
     "test-vscode-build": {
