@@ -1163,8 +1163,8 @@
     "build": "yarn build-webpack && yarn package",
     "build-webpack": "webpack --mode production",
     "package": "vsce package --yarn -o ./dvc.vsix",
-    "test:vscode:build": "tsc -p .",
-    "test:vscode:run": "node ./dist/test/runTest.js",
+    "test-vscode-build": "tsc -p .",
+    "test-vscode-run": "node ./dist/test/runTest.js",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "vscode:prepublish": ""

@@ -17,11 +17,11 @@
       "dependsOn": ["^test"],
       "outputs": []
     },
-    "test:vscode:build": {
+    "test-vscode-build": {
       "outputs": ["dist/**"]
     },
-    "test:vscode:run": {
-      "dependsOn": ["dvc-vscode-webview#build", "dvc#test:vscode:build"]
+    "test-vscode-run": {
+      "dependsOn": ["dvc-vscode-webview#build", "dvc#test-vscode-build"]
     },
     "lint": {
       "outputs": []
