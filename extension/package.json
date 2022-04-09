@@ -1155,6 +1155,10 @@
     ]
   },
   "scripts": {
+    "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
+    "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
+    "lint:tsc": "tsc --noEmit",
+    "lint": "run-p 'lint:*'",
     "dev": "shx rm -rf dist && tsc -watch -p ./",
     "build": "yarn build-webpack && yarn package",
     "build-webpack": "webpack --mode production",

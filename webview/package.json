@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "license": "Apache-2.0",
   "scripts": {
+    "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
+    "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
+    "lint:tsc": "tsc --noEmit",
+    "lint": "run-p 'lint:*'",
     "dev": "webpack watch --mode development",
     "build": "webpack --mode production",
     "test": "jest",
