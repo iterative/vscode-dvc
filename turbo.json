@@ -17,9 +17,8 @@
       "dependsOn": ["^test"],
       "outputs": []
     },
-    "test:vscode": {
-      "dependsOn": ["test-vscode-build"],
-      "outputs": []
+    "test-vscode-run": {
+      "dependsOn": ["test-vscode-build"]
     },
     "test-vscode-build": {
       "dependsOn": ["^test-vscode-build"],
