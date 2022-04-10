@@ -1,4 +1,5 @@
-import { act } from '@testing-library/react'
+import { act } from 'react-dom/test-utils'
+import * as DragDropUtils from '../shared/components/dragDrop/util'
 
 const testStorage = new Map()
 
@@ -16,26 +17,41 @@ export const createBubbledEvent = (type: string, props = {}) => {
   return event
 }
 
+export const dragEnter = (
+  dragged: HTMLElement,
+  draggedOver: HTMLElement,
+  direction: DragDropUtils.DragEnterDirection
+) => {
+  jest.useFakeTimers()
+  dragged.dispatchEvent(createBubbledEvent('dragstart'))
+  act(() => {
+    jest.advanceTimersByTime(1)
+  })
+
+  draggedOver.dispatchEvent(createBubbledEvent('dragenter'))
+
+  const clientX =
+    100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
+  const left = 100
+  const right = left + 100
+  const dragOverEvent = createBubbledEvent('dragover', { clientX })
+  jest
+    .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
+    .mockImplementationOnce(() => ({ left, right }))
+  draggedOver.dispatchEvent(dragOverEvent)
+  jest.useRealTimers()
+}
+
 export const dragAndDrop = (
   startingNode: HTMLElement,
-  endingNode: HTMLElement
+  endingNode: HTMLElement,
+  direction: DragDropUtils.DragEnterDirection = DragDropUtils.DragEnterDirection
+    .LEFT
 ) => {
   startingNode.dispatchEvent(createBubbledEvent('dragstart'))
+  dragEnter(startingNode, endingNode, direction)
 
   endingNode.dispatchEvent(createBubbledEvent('drop'))
 
   startingNode.dispatchEvent(createBubbledEvent('dragend'))
-}
-
-export const dragEnter = (
-  startingNode: HTMLElement,
-  overNode: HTMLElement,
-  advanceTimers?: boolean
-) => {
-  act(() => {
-    startingNode.dispatchEvent(createBubbledEvent('dragstart'))
-    advanceTimers && jest.advanceTimersByTime(1)
-
-    overNode.dispatchEvent(createBubbledEvent('dragenter'))
-  })
 }

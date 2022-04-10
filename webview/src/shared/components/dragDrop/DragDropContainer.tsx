@@ -1,4 +1,11 @@
-import React, { DragEvent, MutableRefObject, useEffect, useState } from 'react'
+import React, {
+  DragEvent,
+  MutableRefObject,
+  useEffect,
+  useState,
+  useRef
+} from 'react'
+import { DragEnterDirection, getDragEnterDirection } from './util'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 
 export type DraggedInfo = {
@@ -30,11 +37,12 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
-  let dragIdTimeout = 0
+  const [direction, setDirection] = useState(DragEnterDirection.RIGHT)
+  const draggedOverIdTimeout = useRef<number>(0)
 
   useEffect(() => {
-    return () => clearTimeout(dragIdTimeout)
-  })
+    return () => clearTimeout(draggedOverIdTimeout.current)
+  }, [])
 
   const setDraggedRef = (draggedInfo?: DraggedInfo) => {
     if (draggedRef) {
@@ -56,12 +64,13 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       itemIndex: idx
     })
     setDraggedOverId(id)
-    dragIdTimeout = window.setTimeout(() => setDraggedId(id), 0)
+    draggedOverIdTimeout.current = window.setTimeout(() => setDraggedId(id), 0)
   }
 
   const handleDragEnd = () => {
     setDraggedOverId('')
     setDraggedId('')
+    setDirection(DragEnterDirection.RIGHT)
   }
 
   const applyDrop = (e: DragEvent<HTMLElement>, droppedIndex: number) => {
@@ -86,7 +95,13 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
     const id = e.currentTarget.id.split('_')[0]
-    const droppedIndex = order.indexOf(id)
+    const droppedIndex =
+      order.indexOf(id) +
+      (draggedOverId !== draggedId &&
+      direction === DragEnterDirection.RIGHT &&
+      dropTarget
+        ? 1
+        : 0)
     const draggedGroup = getIDWithoutIndex(e.dataTransfer.getData('group'))
     const isSameGroup = draggedGroup === getIDWithoutIndex(group)
     const isEnabled = !disabledDropIds.includes(order[droppedIndex])
@@ -97,13 +112,20 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    const { id } = e.currentTarget
-    id !== draggedId && setDraggedOverId(id)
+    if (draggedId) {
+      const { id } = e.currentTarget
+      if (id !== draggedId && !id.includes('_drop')) {
+        setDraggedOverId(id)
+        setDirection(getDragEnterDirection(e))
+      }
+    }
   }
 
-  const handleDragOver = (e: DragEvent<HTMLElement>) => e.preventDefault()
-
-  const isAfter = order.indexOf(draggedId) < order.indexOf(draggedOverId)
+  const handleDragOver = (e: DragEvent<HTMLElement>) => {
+    e.preventDefault()
+    e.currentTarget.id === draggedOverId &&
+      setDirection(getDragEnterDirection(e))
+  }
 
   const buildItem = (id: string, draggable: JSX.Element) => (
     <draggable.type
@@ -115,7 +137,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
-      style={(id === draggedId && { display: 'none' }) || draggable.props.style}
+      style={
+        (id === draggedId && dropTarget && { display: 'none' }) ||
+        draggable.props.style
+      }
     />
   )
 
@@ -125,7 +150,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         const { id } = draggable.props
         const item = id && buildItem(id, draggable)
 
-        if (id === draggedOverId && dropTarget) {
+        if (id === draggedOverId && dropTarget && direction) {
           const target = (
             <div
               data-testid="drop-target"
@@ -137,7 +162,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
               {dropTarget}
             </div>
           )
-          return isAfter ? [item, target] : [target, item]
+
+          return direction === DragEnterDirection.RIGHT
+            ? [item, target]
+            : [target, item]
         }
 
         return item
