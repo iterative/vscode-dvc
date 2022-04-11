@@ -3,7 +3,6 @@ name: DVC CLI Output Test
 on:
   schedule:
     - cron: '0 1 * * *'
-  pull_request:
 
 jobs:
   test:
