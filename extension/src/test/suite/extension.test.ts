@@ -404,7 +404,7 @@ suite('Extension Test Suite', () => {
       expect(mockSetup).to.have.been.calledOnce
     })
 
-    it('should set the dvc.cli.incompatible context value when the CLI can be found', async () => {
+    it('should set the dvc.cli.incompatible context value', async () => {
       stub(CliReader.prototype, 'experimentShow').resolves({
         workspace: { baseline: {} }
       })
@@ -428,11 +428,10 @@ suite('Extension Test Suite', () => {
       )
 
       expect(mockVersion).to.be.calledOnce
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        'setContext',
-        'dvc.cli.incompatible',
-        true
-      )
+      expect(
+        executeCommandSpy,
+        'should set dvc.cli.incompatible to true if the version is incompatible'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', true)
       executeCommandSpy.resetHistory()
 
       await commands.executeCommand(
@@ -440,11 +439,10 @@ suite('Extension Test Suite', () => {
       )
 
       expect(mockVersion).to.be.calledTwice
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        'setContext',
-        'dvc.cli.incompatible',
-        false
-      )
+      expect(
+        executeCommandSpy,
+        'should set dvc.cli.incompatible to false if the version is compatible'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
 
       const mockShowWarningMessage = stub(
         window,
@@ -456,12 +454,14 @@ suite('Extension Test Suite', () => {
       )
 
       expect(mockVersion).to.be.calledThrice
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        'setContext',
-        'dvc.cli.incompatible',
-        undefined
-      )
-      expect(mockShowWarningMessage).to.be.calledOnce
+      expect(
+        executeCommandSpy,
+        'should unset dvc.cli.incompatible if the CLI throws an error'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', undefined)
+      expect(
+        mockShowWarningMessage,
+        'should warn the user if the CLI throws an error'
+      ).to.be.calledOnce
     })
   })
 
