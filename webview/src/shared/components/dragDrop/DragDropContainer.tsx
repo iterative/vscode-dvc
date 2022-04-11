@@ -22,7 +22,10 @@ interface DragDropContainerProps {
   group: string
   onDrop?: (draggedId: string, draggedGroup: string, groupId: string) => void
   draggedRef?: MutableRefObject<DraggedInfo | undefined>
-  dropTarget?: JSX.Element
+  dropTarget?: {
+    element: JSX.Element
+    wrapperTag: 'div' | 'th'
+  }
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -63,8 +66,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       itemId: id,
       itemIndex: idx
     })
-    setDraggedOverId(id)
-    draggedOverIdTimeout.current = window.setTimeout(() => setDraggedId(id), 0)
+    draggedOverIdTimeout.current = window.setTimeout(() => {
+      setDraggedId(id)
+      setDraggedOverId(id)
+    }, 0)
   }
 
   const handleDragEnd = () => {
@@ -152,17 +157,16 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
         if (id === draggedOverId && dropTarget && direction) {
           const target = (
-            <div
+            <dropTarget.wrapperTag
               data-testid="drop-target"
               key="drop-target"
               onDragOver={handleDragOver}
               onDrop={handleOnDrop}
               id={`${id}_drop`}
             >
-              {dropTarget}
-            </div>
+              {dropTarget.element}
+            </dropTarget.wrapperTag>
           )
-
           return direction === DragEnterDirection.RIGHT
             ? [item, target]
             : [target, item]
