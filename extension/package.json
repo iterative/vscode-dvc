@@ -85,6 +85,11 @@
         "icon": "$(discard)"
       },
       {
+        "title": "%command.checkCLICompatible%",
+        "command": "dvc.checkCLICompatible",
+        "category": "DVC"
+      },
+      {
         "title": "%command.checkoutTarget%",
         "command": "dvc.checkoutTarget",
         "category": "DVC",
@@ -446,6 +451,10 @@
         {
           "command": "dvc.checkout",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.checkCLICompatible",
+          "when": "dvc.cli.incompatible"
         },
         {
           "command": "dvc.checkoutTarget",
