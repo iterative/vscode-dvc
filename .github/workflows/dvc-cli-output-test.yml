@@ -1,15 +1,14 @@
 name: DVC CLI Output Test
 
 on:
-  schedule:
-    - cron: '0 1 * * *'
+  pull_request:
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
