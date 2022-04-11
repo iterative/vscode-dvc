@@ -5,11 +5,7 @@ import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { Draggable } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
-import {
-  countUpperLevels,
-  getPlaceholders,
-  isFirstLevelHeader
-} from '../../util/columns'
+import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
@@ -19,6 +15,14 @@ interface TableHeaderProps {
   orderedColumns: MetricOrParam[]
 }
 
+const isTopLevelPlaceholder = (
+  column: HeaderGroup<Experiment>,
+  baseColumn: HeaderGroup<Experiment>
+) =>
+  column.placeholderOf &&
+  (!column.parent ||
+    (column.parent.placeholderOf || column.parent).id !== baseColumn.id)
+
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
@@ -26,11 +30,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   index,
   orderedColumns
 }) => {
-  const nbPlaceholder = getPlaceholders(column, columns).length
-  const hasPlaceholder = nbPlaceholder > 0
-  const isSortedWithPlaceholder = (sort: SortDefinition) =>
-    sort.path === column.placeholderOf?.id ||
-    (!column.placeholderOf && !hasPlaceholder && sort.path === column.id)
+  const baseColumn = column.placeholderOf || column
+  const sort = sorts.find(sort => sort.path === baseColumn.id)
   const isDraggable =
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
@@ -61,12 +62,12 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 [styles.paramHeaderCell]: column.group === 'params',
                 [styles.metricHeaderCell]: column.group === 'metrics',
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-                [styles.sortingHeaderCellAsc]: sorts.filter(
-                  sort => !sort.descending && isSortedWithPlaceholder(sort)
-                ).length,
-                [styles.sortingHeaderCellDesc]: sorts.filter(
-                  sort => sort.descending && sort.path === column.id
-                ).length
+                [styles.topLevelPlaceholder]: isTopLevelPlaceholder(
+                  column,
+                  baseColumn as HeaderGroup<Experiment>
+                ),
+                [styles.sortingHeaderCellAsc]: sort && !sort.descending,
+                [styles.sortingHeaderCellDesc]: sort?.descending
               }
             )
           })}

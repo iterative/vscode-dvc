@@ -6,7 +6,7 @@ import '@testing-library/jest-dom/extend-expect'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
-import { HeaderGroup, TableInstance } from 'react-table'
+import { TableInstance } from 'react-table'
 import {
   mockGetComputedSpacing,
   mockDndElSpacing,
@@ -129,33 +129,6 @@ describe('Table', () => {
   })
 
   describe('Sorting', () => {
-    const placeholderId = 'placeholder_timestamp'
-    const renderTableWithPlaceholder = (descending: boolean) => {
-      const newInstance = { ...instance }
-
-      const placeholderHeaderTimestamp = {
-        ...headerBasicProps,
-        id: placeholderId,
-        placeholderOf: newInstance.headerGroups[0].headers[1],
-        render: () => ''
-      }
-      const placeHolderHeaderExp = {
-        ...headerBasicProps,
-        id: 'exp_placeholder',
-        placeholderOf: newInstance.headerGroups[0].headers[0],
-        render: () => ''
-      }
-      newInstance.headerGroups = [
-        {
-          getHeaderGroupProps: getHeaderGroupProps('headerGroup_2'),
-          headers: [placeHolderHeaderExp, placeholderHeaderTimestamp]
-        } as unknown as HeaderGroup<Experiment>,
-        ...newInstance.headerGroups
-      ]
-
-      renderTable({ sorts: [{ descending, path: 'timestamp' }] }, newInstance)
-    }
-
     it('should not have any sorting classes if the sorts property is empty', async () => {
       renderTable()
       const column = await screen.findByText('Timestamp')
@@ -164,7 +137,7 @@ describe('Table', () => {
       expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
     })
 
-    it('should apply the sortingHeaderCellAsc on the timestamp column if it is not descending in the sorts property', async () => {
+    it('should apply the sortingHeaderCellAsc class on the timestamp column if its column has an ascending sort', async () => {
       renderTable({
         sorts: [{ descending: false, path: 'timestamp' }]
       })
@@ -175,7 +148,7 @@ describe('Table', () => {
       expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeTruthy()
     })
 
-    it('should apply the sortingHeaderCellDesc on the timestamp column if it is descending in the sorts property', async () => {
+    it('should apply the sortingHeaderCellDesc class on the timestamp column if its column has a descending sort', async () => {
       renderTable({
         sorts: [{ descending: true, path: 'timestamp' }]
       })
@@ -184,40 +157,6 @@ describe('Table', () => {
 
       expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeTruthy()
       expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
-    })
-
-    it('should apply the sorting class if the cell is a placeholder above the column header when the sort is ascending', async () => {
-      renderTableWithPlaceholder(false)
-
-      const header = await screen.findByTestId(`header-${placeholderId}`)
-
-      expect(header?.className.includes(styles.sortingHeaderCellAsc)).toBe(true)
-    })
-
-    it('should not apply the sorting class if there is a placeholder above the column header when the sort is ascending', async () => {
-      renderTableWithPlaceholder(false)
-
-      const column = await screen.findByText('Timestamp')
-
-      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
-    })
-
-    it('should not apply the sorting class if the cell is a placeholder above the column header when the sort is descending', async () => {
-      renderTableWithPlaceholder(true)
-
-      const header = await screen.findByTestId(`header-${placeholderId}`)
-
-      expect(header?.className.includes(styles.sortingHeaderCellDesc)).toBe(
-        false
-      )
-    })
-
-    it('should apply the sorting class if there is a placeholder above the column header when the sort is descending', async () => {
-      renderTableWithPlaceholder(true)
-
-      const column = await screen.findByText('Timestamp')
-
-      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeTruthy()
     })
   })
 

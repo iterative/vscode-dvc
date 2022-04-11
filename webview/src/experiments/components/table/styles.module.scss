@@ -437,11 +437,11 @@ $spinner-color-light: #000;
     padding: 0.31rem $cell-padding;
   }
 
-  .sortingHeaderCellAsc {
+  .sortingHeaderCellAsc.topLevelPlaceholder {
     border-top: 1px solid white;
   }
 
-  .sortingHeaderCellDesc {
+  .sortingHeaderCellDesc.headerCell {
     border-bottom: 1px solid white;
   }
 
