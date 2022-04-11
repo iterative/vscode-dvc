@@ -85,6 +85,11 @@
         "icon": "$(discard)"
       },
       {
+        "title": "%command.checkCLICompatible%",
+        "command": "dvc.checkCLICompatible",
+        "category": "DVC"
+      },
+      {
         "title": "%command.checkoutTarget%",
         "command": "dvc.checkoutTarget",
         "category": "DVC",
@@ -446,6 +451,10 @@
         {
           "command": "dvc.checkout",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.checkCLICompatible",
+          "when": "dvc.cli.incompatible"
         },
         {
           "command": "dvc.checkoutTarget",
@@ -988,7 +997,12 @@
       {
         "view": "dvc.views.trackedExplorerTree",
         "contents": "DVC is currently unavailable, [learn more](https://www.dvc.org/).\n[Setup the workspace](command:dvc.setupWorkspace)",
-        "when": "!dvc.commands.available"
+        "when": "!dvc.commands.available && !dvc.cli.incompatible"
+      },
+      {
+        "view": "dvc.views.trackedExplorerTree",
+        "contents": "The located version of DVC is incompatible with the extension.\n[Find another](command:dvc.setupWorkspace)\nUpgrade DVC then...\n[Check Compatibility](command:dvc.checkCLICompatible)",
+        "when": "dvc.cli.incompatible"
       },
       {
         "view": "dvc.views.trackedExplorerTree",
