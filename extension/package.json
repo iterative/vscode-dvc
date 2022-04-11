@@ -1047,17 +1047,6 @@
             ]
           },
           {
-            "id": "dvc.checkCLICompatible",
-            "title": "Check CLI Compatibility",
-            "description": "The extension requires a compatible version of DVC to be installed.\n\n[Check Compatibility](dvc.checkCLICompatible)\n",
-            "media": {
-              "markdown": "resources/walkthrough/is-cli-compatible.md"
-            },
-            "completionEvents": [
-              "onCommand:dvc.checkCLICompatible"
-            ]
-          },
-          {
             "id": "dvc.showCommands",
             "title": "Available Commands",
             "description": "View all of the available commands.\n[View Commands](command:dvc.showCommands)",
