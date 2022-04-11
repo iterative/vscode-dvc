@@ -46,6 +46,7 @@ runMocha(
   },
   () => {
     removeDir(TEMP_DIR)
+    process.exit()
   },
   6000
 )
