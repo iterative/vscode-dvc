@@ -3,3 +3,4 @@ demo
 .vscode-test
 storybook-static
 coverage
+extension/src/test/fixtures/plotsDiff/vega.ts
