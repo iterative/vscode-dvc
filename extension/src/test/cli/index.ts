@@ -47,5 +47,5 @@ runMocha(
   () => {
     removeDir(TEMP_DIR)
   },
-  6000
+  20000
 )
