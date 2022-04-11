@@ -252,7 +252,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.internalCommands.registerExternalCommand(
-      RegisteredCommands.CHECK_CLI_COMPATIBLE,
+      RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE,
       () => setup(this)
     )
 
