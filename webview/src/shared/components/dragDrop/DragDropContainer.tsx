@@ -41,10 +41,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const draggedOverIdTimeout = useRef<number>(0)
 
   useEffect(() => {
-    return () => {
-      clearTimeout(draggedOverIdTimeout.current)
-      setDraggedId('')
-    }
+    return () => clearTimeout(draggedOverIdTimeout.current)
   }, [])
 
   const setDraggedRef = (draggedInfo?: DraggedInfo) => {
