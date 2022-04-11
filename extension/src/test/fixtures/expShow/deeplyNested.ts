@@ -78,7 +78,16 @@ const deeplyNestedTableData: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
-  sorts: [],
+  sorts: [
+    {
+      path: 'params:params.yaml:nested1.doubled',
+      descending: true
+    },
+    {
+      path: 'params:params.yaml:outlier',
+      descending: false
+    }
+  ],
   columns,
   rows
 }
