@@ -54,6 +54,8 @@ export enum RegisteredCommands {
   EXTENSION_SHOW_COMMANDS = 'dvc.showCommands',
   EXTENSION_SHOW_OUTPUT = 'dvc.showOutput',
 
+  CHECK_CLI_COMPATIBLE = 'dvc.checkCLICompatible',
+
   DELETE_TARGET = 'dvc.deleteTarget',
   MOVE_TARGETS = 'dvc.moveTargets',
 
