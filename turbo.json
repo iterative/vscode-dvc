@@ -19,7 +19,11 @@
     },
     "test": {
       "dependsOn": ["^test"],
-      "outputs": []
+      "outputs": ["coverage/jest/**"]
+    },
+    "cover-vscode-run": {
+      "dependsOn": ["test", "dvc-vscode-webview#build"],
+      "outputs": ["coverage/integration/**"]
     },
     "test-vscode-build": {
       "outputs": ["dist/**"]
