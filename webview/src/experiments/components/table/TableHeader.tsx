@@ -5,11 +5,7 @@ import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { Draggable } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
-import {
-  countUpperLevels,
-  isFirstLevelHeader,
-  isTopOfStack
-} from '../../util/columns'
+import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
@@ -58,10 +54,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 [styles.paramHeaderCell]: column.group === 'params',
                 [styles.metricHeaderCell]: column.group === 'metrics',
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-                [styles.topOfStack]: isTopOfStack(
-                  column,
-                  baseColumn as HeaderGroup<Experiment>
-                ),
+                [styles.topOfStack]: !column?.parent?.placeholderOf,
                 [styles.sortingHeaderCellAsc]: sort && !sort.descending,
                 [styles.sortingHeaderCellDesc]: sort?.descending
               }
