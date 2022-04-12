@@ -5,7 +5,11 @@ import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { Draggable } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
-import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
+import {
+  countUpperLevels,
+  isFirstLevelHeader,
+  isTopLevelPlaceholder
+} from '../../util/columns'
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
@@ -14,14 +18,6 @@ interface TableHeaderProps {
   index: number
   orderedColumns: MetricOrParam[]
 }
-
-const isTopLevelPlaceholder = (
-  column: HeaderGroup<Experiment>,
-  baseColumn: HeaderGroup<Experiment>
-) =>
-  column.placeholderOf &&
-  (!column.parent ||
-    (column.parent.placeholderOf || column.parent).id !== baseColumn.id)
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
