@@ -61,7 +61,7 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  describe('Placeholders', () => {
+  describe('Cell Stacking', () => {
     const renderTableWithPlaceholder = () => {
       render(<App />)
       fireEvent(
@@ -75,7 +75,7 @@ describe('App', () => {
       )
     }
 
-    it('should apply the top level placeholder class to only a top level placeholder', () => {
+    it('should apply the topOfStack class to only a top level placeholder', () => {
       renderTableWithPlaceholder()
 
       const topPlaceholder = screen.getByTestId(
@@ -89,6 +89,16 @@ describe('App', () => {
       expect(topPlaceholder.classList.contains(styles.topOfStack)).toBeTruthy()
       expect(midPlaceholder.classList.contains(styles.topOfStack)).toBeFalsy()
       expect(headerCell.classList.contains(styles.topOfStack)).toBeFalsy()
+    })
+
+    it('should apply the topOfStack class to a header cell with no placeholders', () => {
+      renderTableWithPlaceholder()
+
+      const headerCell = screen.getByTestId(
+        'header-params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6'
+      )
+
+      expect(headerCell.classList.contains(styles.topOfStack)).toBeTruthy()
     })
   })
 
