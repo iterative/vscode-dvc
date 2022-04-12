@@ -6,6 +6,7 @@
     "**/constants.ts",
     "**/contract.ts",
     "extension/src/test/**",
+    "fixtures/**",
     "webview/src/react-table-config.d.ts",
     "webview/src/shared/components/icons/**"
   ],
