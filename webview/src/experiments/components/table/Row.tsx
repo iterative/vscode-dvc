@@ -44,6 +44,14 @@ export const RowContent: React.FC<
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
     })
   }
+  const invokeContextMenu: EventHandler<SyntheticEvent> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    sendMessage({
+      payload: id,
+      type: MessageFromWebviewType.CONTEXT_MENU_INVOKED
+    })
+  }
   return (
     <div
       {...getRowProps({
@@ -65,6 +73,7 @@ export const RowContent: React.FC<
           toggleExperiment(e)
         }
       }}
+      onContextMenu={invokeContextMenu}
       data-testid={isWorkspace && 'workspace-row'}
     >
       <FirstCell cell={firstCell} bulletColor={original.displayColor} />

@@ -412,6 +412,37 @@ describe('App', () => {
       testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
     })
 
+    it('should send a message to the extension to invoke a context menu when a row is right-clicked', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      const testClick = (label: string, id = label) => {
+        mockPostMessage.mockReset()
+
+        fireEvent.contextMenu(screen.getByText(label))
+
+        expect(mockPostMessage).toBeCalledTimes(1)
+        expect(mockPostMessage).toBeCalledWith({
+          payload: id,
+          type: MessageFromWebviewType.CONTEXT_MENU_INVOKED
+        })
+      }
+
+      testClick('workspace')
+      testClick('main')
+      testClick('[exp-e7a67]', 'exp-e7a67')
+      testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
+      testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+    })
+
     it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
       render(<App />)
 

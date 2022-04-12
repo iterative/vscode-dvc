@@ -16,6 +16,7 @@ export enum MessageFromWebviewType {
   COLUMN_RESIZED = 'column-resized',
   COLUMN_SORTED = 'column-sorted',
   COLUMN_SORT_REMOVED = 'column-sort-removed',
+  CONTEXT_MENU_INVOKED = 'context-menu-invoked',
   EXPERIMENT_TOGGLED = 'experiment-toggled',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_COMPARISON_REORDERED = 'plots-comparison-reordered',
@@ -48,6 +49,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.COLUMN_RESIZED
       payload: ColumnResizePayload
+    }
+  | {
+      type: MessageFromWebviewType.CONTEXT_MENU_INVOKED
+      payload: string
     }
   | {
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
