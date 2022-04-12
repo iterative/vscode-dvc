@@ -15,6 +15,7 @@ import { sendMessage } from '../../../shared/vscode'
 
 interface TemplatePlotsProps {
   plots: TemplatePlotSection[]
+  onPlotClick: (plot: JSX.Element) => void
 }
 
 export enum NewSectionBlock {
@@ -22,7 +23,7 @@ export enum NewSectionBlock {
   BOTTOM = 'drop-section-bottom'
 }
 
-export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
+export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots, onPlotClick }) => {
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
   const draggedRef = useRef<DraggedInfo>()
@@ -150,6 +151,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
                 draggedRef={draggedRef}
                 multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
                 setSectionEntries={setSectionEntries}
+                onPlotClick={onPlotClick}
               />
             </div>
           )

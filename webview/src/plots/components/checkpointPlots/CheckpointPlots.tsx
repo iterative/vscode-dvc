@@ -17,11 +17,13 @@ import { DropTarget } from '../DropTarget'
 interface CheckpointPlotsProps {
   plots: CheckpointPlotData[]
   colors: CheckpointPlotsColors
+  onPlotClick: (plot: JSX.Element) => void
 }
 
 export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   plots,
-  colors
+  colors,
+  onPlotClick
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
 
@@ -45,6 +47,8 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       }
       const { title, values } = plotData
       const key = `plot-${title}`
+      const plotJSX = <Plot values={values} scale={colors} title={title} />
+
       return (
         <div
           className={styles.plot}
@@ -52,9 +56,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
           id={title}
           key={key}
           data-testid={key}
+          onClick={() => onPlotClick(plotJSX)}
         >
           <GripIcon className={styles.plotGripIcon} />
-          <Plot values={values} scale={colors} title={title} />
+          {plotJSX}
         </div>
       )
     })

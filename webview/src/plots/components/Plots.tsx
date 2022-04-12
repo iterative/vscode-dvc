@@ -13,6 +13,8 @@ import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Theme } from '../../shared/components/theme/Theme'
+import { Modal } from '../../shared/components/modal/Modal'
+import styles from './styles.module.scss'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(({ title }) => title).sort() || []
@@ -27,12 +29,22 @@ export const Plots = ({
 
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
+  const [zoomedInPlot, setZoomedInPlot] = useState<JSX.Element | undefined>(undefined)
 
   useEffect(() => {
     const metrics = getMetricsFromPlots(data?.checkpoint?.plots)
     setMetrics(metrics)
     setSelectedPlots(data?.checkpoint?.selectedMetrics || [])
   }, [data, setSelectedPlots, setMetrics])
+
+  useEffect(() => {
+    const modalOpenClass = 'modal-open'
+    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot);
+
+    () => {
+      document.body.classList.remove(modalOpenClass)
+    }
+  },[zoomedInPlot])
 
   if (!data || !data.sectionCollapsed) {
     return <EmptyState>Loading Plots...</EmptyState>
@@ -77,6 +89,8 @@ export const Plots = ({
     sectionCollapsed
   }
 
+  const handlePlotClick = (plot: JSX.Element) => setZoomedInPlot(plot)
+
   return (
     <Theme>
       {templatePlots && (
@@ -86,7 +100,7 @@ export const Plots = ({
           currentSize={templatePlots.size}
           {...basicContainerProps}
         >
-          <TemplatePlots plots={templatePlots.plots} />
+          <TemplatePlots plots={templatePlots.plots} onPlotClick={handlePlotClick} />
         </PlotsContainer>
       )}
       {comparisonTable && (
@@ -119,8 +133,16 @@ export const Plots = ({
               selectedPlots?.includes(plot.title)
             )}
             colors={checkpointPlots.colors}
+            onPlotClick={handlePlotClick}
           />
         </PlotsContainer>
+      )}
+      {zoomedInPlot && (
+        <Modal onClose={() => setZoomedInPlot(undefined)} onOpen={() => window.dispatchEvent(new Event('resize')) }>
+          <div className={styles.zoomedInPlot}>
+            {zoomedInPlot}
+          </div>
+        </Modal>
       )}
     </Theme>
   )

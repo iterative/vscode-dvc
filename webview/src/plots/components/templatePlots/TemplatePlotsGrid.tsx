@@ -25,6 +25,7 @@ interface TemplatePlotsGridProps {
   draggedRef?: MutableRefObject<DraggedInfo | undefined>
   multiView: boolean
   setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
+  onPlotClick: (plot: JSX.Element) => void
 }
 
 const autoSize = {
@@ -39,7 +40,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   onDropInSection,
   draggedRef,
   multiView,
-  setSectionEntries
+  setSectionEntries,
+  onPlotClick
 }) => {
   const [order, setOrder] = useState<string[]>([])
 
@@ -68,16 +70,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 
   const items = reorderedItems.map((plot: TemplatePlotEntry) => {
     const nbRevisions = (plot.multiView && plot.revisions?.length) || 1
-    return (
-      <div
-        key={plot.id}
-        id={plot.id}
-        data-testid={`plot_${plot.id}`}
-        className={plotClassName}
-        style={withScale(nbRevisions)}
-      >
-        <GripIcon className={styles.plotGripIcon} />
-        <VegaLite
+    const plotJSX = (
+      <VegaLite
           actions={false}
           config={config}
           spec={
@@ -88,6 +82,18 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           }
           renderer="svg"
         />
+    )
+    return (
+      <div
+        key={plot.id}
+        id={plot.id}
+        data-testid={`plot_${plot.id}`}
+        className={plotClassName}
+        style={withScale(nbRevisions)}
+        onClick={() => onPlotClick(plotJSX)}
+      >
+        <GripIcon className={styles.plotGripIcon} />
+        {plotJSX}
       </div>
     )
   })
