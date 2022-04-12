@@ -12,6 +12,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
+import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -26,6 +27,7 @@ import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
 import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { App } from './App'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
+import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
@@ -59,6 +61,67 @@ afterEach(() => {
 })
 
 describe('App', () => {
+  describe('Sorting Classes', () => {
+    const renderTableWithPlaceholder = () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: deeplyNestedTableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+    }
+
+    it('should apply the sortingHeaderCellAsc class to only a top level placeholder', () => {
+      renderTableWithPlaceholder()
+
+      const topPlaceholder = screen.getByTestId(
+        'header-params:params.yaml:outlier_previous_placeholder_18'
+      )
+      const midPlaceholder = screen.getByTestId(
+        'header-params:params.yaml:outlier_previous_placeholder_12'
+      )
+      const headerCell = screen.getByTestId('header-params:params.yaml:outlier')
+
+      expect(
+        topPlaceholder.classList.contains(styles.sortingHeaderCellAsc)
+      ).toBeTruthy()
+      expect(
+        midPlaceholder.classList.contains(styles.sortingHeaderCellAsc)
+      ).toBeFalsy()
+      expect(
+        headerCell.classList.contains(styles.sortingHeaderCellAsc)
+      ).toBeFalsy()
+    })
+
+    it('should apply the sortingHeaderCellAsc class to a header cell with no placeholders', () => {
+      renderTableWithPlaceholder()
+
+      const headerCell = screen.getByTestId(
+        'header-params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6'
+      )
+
+      expect(
+        headerCell.classList.contains(styles.sortingHeaderCellAsc)
+      ).toBeTruthy()
+    })
+
+    it('should apply the sortingHeaderCellDesc class to a header cell of a column sorted descending', () => {
+      renderTableWithPlaceholder()
+
+      const headerCell = screen.getByTestId(
+        'header-params:params.yaml:nested1.doubled'
+      )
+
+      expect(
+        headerCell.classList.contains(styles.sortingHeaderCellDesc)
+      ).toBeTruthy()
+    })
+  })
+
   it('should send a message to the extension on the first render', () => {
     render(<App />)
     expect(mockPostMessage).toHaveBeenCalledWith({
