@@ -8,7 +8,7 @@ import styles from './styles.module.scss'
 import {
   countUpperLevels,
   isFirstLevelHeader,
-  isTopLevelPlaceholder
+  isTopOfStack
 } from '../../util/columns'
 
 interface TableHeaderProps {
@@ -58,7 +58,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 [styles.paramHeaderCell]: column.group === 'params',
                 [styles.metricHeaderCell]: column.group === 'metrics',
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-                [styles.topLevelPlaceholder]: isTopLevelPlaceholder(
+                [styles.topLevelPlaceholder]: isTopOfStack(
                   column,
                   baseColumn as HeaderGroup<Experiment>
                 ),

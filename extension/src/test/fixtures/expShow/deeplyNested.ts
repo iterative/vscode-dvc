@@ -86,6 +86,14 @@ const deeplyNestedTableData: TableData = {
     {
       path: 'params:params.yaml:outlier',
       descending: false
+    },
+    {
+      path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6',
+      descending: false
+    },
+    {
+      path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled',
+      descending: true
     }
   ],
   columns,

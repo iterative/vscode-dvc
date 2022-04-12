@@ -76,12 +76,11 @@ export const countUpperLevels = (
   return nbLevels
 }
 
-export const isTopLevelPlaceholder = (
+export const isTopOfStack = (
   column: HeaderGroup<Experiment>,
   baseColumn: HeaderGroup<Experiment>
 ) =>
-  column.placeholderOf &&
-  (!column.parent ||
-    (column.parent.placeholderOf || column.parent).id !== baseColumn.id)
+  !column.parent ||
+  (column.parent.placeholderOf || column.parent).id !== baseColumn.id
 
 export const isFirstLevelHeader = (id: string) => id.split(':').length - 1 === 1
