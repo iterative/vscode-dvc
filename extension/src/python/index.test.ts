@@ -33,7 +33,7 @@ describe('setupVenv', () => {
     })
 
     expect(createProcessSpy).toBeCalledWith({
-      args: ['-m', 'pip', 'install', '--upgrade', 'pip'],
+      args: ['-m', 'pip', 'install', '--upgrade', 'pip', 'wheel'],
       cwd,
       executable: join(cwd, envDir, 'bin', 'python')
     })
@@ -62,7 +62,7 @@ describe('setupVenv', () => {
     })
 
     expect(createProcessSpy).toBeCalledWith({
-      args: ['-m', 'pip', 'install', '--upgrade', 'pip'],
+      args: ['-m', 'pip', 'install', '--upgrade', 'pip', 'wheel'],
       cwd,
       executable: join(cwd, envDir, 'Scripts', 'python.exe')
     })

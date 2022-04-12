@@ -31,7 +31,7 @@ export const setupVenv = async (
 
   const venvPython = getVenvBinPath(cwd, envDir, 'python')
 
-  await installPackages(cwd, venvPython, 'pip')
+  await installPackages(cwd, venvPython, 'pip', 'wheel')
 
   return installPackages(cwd, venvPython, ...installArgs)
 }

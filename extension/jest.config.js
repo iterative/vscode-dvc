@@ -1,7 +1,7 @@
 /* global module */
 
 module.exports = {
-  coverageDirectory: 'coverage/unit',
+  coverageDirectory: 'coverage/jest',
   coveragePathIgnorePatterns: ['<rootDir>/src/test/'],
   preset: 'ts-jest',
   testEnvironment: 'node',
