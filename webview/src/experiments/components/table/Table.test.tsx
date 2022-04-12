@@ -30,10 +30,6 @@ jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
 const mockedPostMessage = jest.mocked(postMessage)
 
-const queryClosest = (textElement: Element, matcher: string) =>
-  // eslint-disable-next-line testing-library/no-node-access
-  textElement.closest(`.${matcher}`)
-
 describe('Table', () => {
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
   const getHeaderGroupProps = (key: string) => () => ({ key })
@@ -126,38 +122,6 @@ describe('Table', () => {
 
   afterEach(() => {
     cleanup()
-  })
-
-  describe('Sorting', () => {
-    it('should not have any sorting classes if the sorts property is empty', async () => {
-      renderTable()
-      const column = await screen.findByText('Timestamp')
-
-      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeNull()
-      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
-    })
-
-    it('should apply the sortingHeaderCellAsc class on the timestamp column if its column has an ascending sort', async () => {
-      renderTable({
-        sorts: [{ descending: false, path: 'timestamp' }]
-      })
-
-      const column = await screen.findByText('Timestamp')
-
-      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeNull()
-      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeTruthy()
-    })
-
-    it('should apply the sortingHeaderCellDesc class on the timestamp column if its column has a descending sort', async () => {
-      renderTable({
-        sorts: [{ descending: true, path: 'timestamp' }]
-      })
-
-      const column = await screen.findByText('Timestamp')
-
-      expect(queryClosest(column, styles.sortingHeaderCellDesc)).toBeTruthy()
-      expect(queryClosest(column, styles.sortingHeaderCellAsc)).toBeNull()
-    })
   })
 
   describe('Changes', () => {

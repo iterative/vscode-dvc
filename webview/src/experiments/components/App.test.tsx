@@ -61,7 +61,7 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  describe('Cell Stacking', () => {
+  describe('Sorting Classes', () => {
     const renderTableWithPlaceholder = () => {
       render(<App />)
       fireEvent(
@@ -75,7 +75,7 @@ describe('App', () => {
       )
     }
 
-    it('should apply the topOfStack class to only a top level placeholder', () => {
+    it('should apply the sortingHeaderCellAsc class to only a top level placeholder', () => {
       renderTableWithPlaceholder()
 
       const topPlaceholder = screen.getByTestId(
@@ -86,19 +86,39 @@ describe('App', () => {
       )
       const headerCell = screen.getByTestId('header-params:params.yaml:outlier')
 
-      expect(topPlaceholder.classList.contains(styles.topOfStack)).toBeTruthy()
-      expect(midPlaceholder.classList.contains(styles.topOfStack)).toBeFalsy()
-      expect(headerCell.classList.contains(styles.topOfStack)).toBeFalsy()
+      expect(
+        topPlaceholder.classList.contains(styles.sortingHeaderCellAsc)
+      ).toBeTruthy()
+      expect(
+        midPlaceholder.classList.contains(styles.sortingHeaderCellAsc)
+      ).toBeFalsy()
+      expect(
+        headerCell.classList.contains(styles.sortingHeaderCellAsc)
+      ).toBeFalsy()
     })
 
-    it('should apply the topOfStack class to a header cell with no placeholders', () => {
+    it('should apply the sortingHeaderCellAsc class to a header cell with no placeholders', () => {
       renderTableWithPlaceholder()
 
       const headerCell = screen.getByTestId(
         'header-params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6'
       )
 
-      expect(headerCell.classList.contains(styles.topOfStack)).toBeTruthy()
+      expect(
+        headerCell.classList.contains(styles.sortingHeaderCellAsc)
+      ).toBeTruthy()
+    })
+
+    it('should apply the sortingHeaderCellDesc class to a header cell of a column sorted descending', () => {
+      renderTableWithPlaceholder()
+
+      const headerCell = screen.getByTestId(
+        'header-params:params.yaml:nested1.doubled'
+      )
+
+      expect(
+        headerCell.classList.contains(styles.sortingHeaderCellDesc)
+      ).toBeTruthy()
     })
   })
 
