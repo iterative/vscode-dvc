@@ -316,5 +316,14 @@ describe('CliReader', () => {
         executable: 'dvc'
       })
     })
+
+    it('should not retry if the process fails (cannot find cli - extension should reset)', async () => {
+      const cwd = __dirname
+      mockedCreateProcess.mockImplementationOnce(() => {
+        throw new Error('spawn dvc ENOENT retrying...')
+      })
+
+      await expect(cliReader.version(cwd)).rejects.toBeTruthy()
+    })
   })
 })

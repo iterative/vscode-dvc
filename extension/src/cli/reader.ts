@@ -158,7 +158,7 @@ export class CliReader extends Cli {
   }
 
   public version(cwd: string): Promise<string> {
-    return this.readProcess(cwd, trim, '', Flag.VERSION)
+    return this.executeProcess(cwd, Flag.VERSION)
   }
 
   private async readProcess<T = string>(
