@@ -81,12 +81,12 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
 
     if (e.currentTarget.id === NewSectionBlock.TOP) {
       if (firstSection.group !== group) {
-        setSectionOrder([newSection, ...updatedSections])
+        setTimeout(() => setSectionOrder([newSection, ...updatedSections]), 0)
       }
       return
     }
     if (lastSection.group !== group) {
-      setSectionOrder([...updatedSections, newSection])
+      setTimeout(() => setSectionOrder([...updatedSections, newSection]), 0)
     }
   }
 
