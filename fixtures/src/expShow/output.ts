@@ -1,5 +1,5 @@
-import { join } from '../../util/path'
-import { ExperimentsOutput } from '../../../cli/reader'
+import { join } from 'dvc/src/test/util/path'
+import { ExperimentsOutput } from 'dvc/src/cli/reader'
 
 const data: ExperimentsOutput = {
   workspace: {

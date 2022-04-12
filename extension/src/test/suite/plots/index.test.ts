@@ -4,13 +4,13 @@ import cloneDeep from 'lodash.clonedeep'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
+import checkpointPlotsFixture from 'dvc-fixtures/src/expShow/checkpointPlots'
+import plotsDiffFixture from 'dvc-fixtures/src/plotsDiff/output'
+import templatePlotsFixture from 'dvc-fixtures/src/plotsDiff/template'
+import comparisonPlotsFixture from 'dvc-fixtures/src/plotsDiff/comparison/vscode'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
-import expShowFixture from '../../fixtures/expShow/output'
-import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
-import plotsDiffFixture from '../../fixtures/plotsDiff/output'
-import templatePlotsFixture from '../../fixtures/plotsDiff/template'
-import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
 import {
   bypassProcessManagerDebounce,
   closeAllEditors,

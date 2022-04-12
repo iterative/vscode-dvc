@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "dvc-fixtures",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc -p .",
+    "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
+    "lint:tsc": "tsc --noEmit",
+    "lint": "run-p 'lint:*'"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.64.0"
+  },
+  "peerDependencies": {
+    "typescript": "*"
+  }
+}

@@ -1,6 +1,6 @@
-import { join } from '../../util/path'
-import { MetricOrParam } from '../../../experiments/webview/contract'
-import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
+import { join } from 'dvc/src/test/util/path'
+import { MetricOrParam } from 'dvc/src/experiments/webview/contract'
+import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 
 const nestedParamsFile = join('nested', 'params.yaml')
 

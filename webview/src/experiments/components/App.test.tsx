@@ -11,7 +11,7 @@ import {
   within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
+import tableDataFixture from 'dvc-fixtures/src/expShow/tableData'
 import {
   MessageFromWebviewType,
   MessageToWebviewType

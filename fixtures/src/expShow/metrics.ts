@@ -1,4 +1,4 @@
-import { MetricOrParam } from '../../../experiments/webview/contract'
+import { MetricOrParam } from 'dvc/src/experiments/webview/contract'
 
 export const metrics = [
   {

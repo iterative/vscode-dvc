@@ -1,11 +1,11 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
 import omit from 'lodash.omit'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
-import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,

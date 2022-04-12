@@ -3,7 +3,7 @@ import {
   CheckpointPlotsData,
   PlotSize,
   Section
-} from '../../../plots/webview/contract'
+} from 'dvc/src/plots/webview/contract'
 
 const data: CheckpointPlotsData = {
   colors: {

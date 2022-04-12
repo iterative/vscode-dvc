@@ -1,7 +1,7 @@
 import { join } from 'path'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
 import { collectFiles } from './collect'
 import { ExperimentsOutput } from '../../cli/reader'
-import expShowFixture from '../../test/fixtures/expShow/output'
 
 describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {

@@ -1,4 +1,4 @@
-import { join } from '../../util/path'
+import { join } from 'dvc/src/test/util/path'
 
 const data = {
   [join('logs', 'acc.tsv')]: [

@@ -9,6 +9,8 @@ import {
   window,
   workspace
 } from 'vscode'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
+import plotsDiffFixture from 'dvc-fixtures/src/plotsDiff/output'
 import { CliReader } from '../../cli/reader'
 import { CliRunner } from '../../cli/runner'
 import { InternalCommands } from '../../commands/internal'
@@ -18,8 +20,6 @@ import { Disposable, Disposer } from '../../extension'
 import { definedAndNonEmpty } from '../../util/array'
 import * as Time from '../../util/time'
 import { OutputChannel } from '../../vscode/outputChannel'
-import expShowFixture from '../fixtures/expShow/output'
-import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import { BaseWebview } from '../../webview'
 import { ExperimentsData } from '../../experiments/data'
 import { ResourceLocator } from '../../resourceLocator'

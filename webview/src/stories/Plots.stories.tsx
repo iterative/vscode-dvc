@@ -5,9 +5,9 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotSize
 } from 'dvc/src/plots/webview/contract'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
-import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
-import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import checkpointPlotsFixture from 'dvc-fixtures/src/expShow/checkpointPlots'
+import templatePlotsFixture from 'dvc-fixtures/src/plotsDiff/template'
+import comparisonPlotsFixture from 'dvc-fixtures/src/plotsDiff/comparison'
 import { chromaticParameters } from './util'
 import { Plots } from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'

@@ -1,6 +1,6 @@
-import { join } from '../../util/path'
-import { RowData } from '../../../experiments/webview/contract'
-import { copyOriginalExperimentColors } from '../../../experiments/model/colors'
+import { join } from 'dvc/src/test/util/path'
+import { RowData } from 'dvc/src/experiments/webview/contract'
+import { copyOriginalExperimentColors } from 'dvc/src/experiments/model/colors'
 
 const colorsList = copyOriginalExperimentColors()
 

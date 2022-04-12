@@ -1,7 +1,7 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
-import { PlotsOutput } from '../../../cli/reader'
+import { extendVegaSpec, isMultiViewPlot } from 'dvc/src/plots/vega/util'
+import { PlotsOutput } from 'dvc/src/cli/reader'
 import {
   ComparisonPlots,
   ComparisonRevisionData,
@@ -13,9 +13,9 @@ import {
   TemplatePlotGroup,
   TemplatePlotsData,
   TemplatePlots
-} from '../../../plots/webview/contract'
-import { join } from '../../util/path'
-import { getWorkspaceColor } from '../../../experiments/model/colors'
+} from 'dvc/src/plots/webview/contract'
+import { join } from 'dvc/src/test/util/path'
+import { getWorkspaceColor } from 'dvc/src/experiments/model/colors'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [

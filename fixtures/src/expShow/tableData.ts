@@ -1,4 +1,4 @@
-import { TableData } from '../../../experiments/webview/contract'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import rowsFixture from './rows'
 import columnsFixture from './columns'
 

@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
 import { Disposable } from '../../../../extension'
-import expShowFixture from '../../../fixtures/expShow/output'
 import {
   bypassProcessManagerDebounce,
   getFirstArgOfCall,

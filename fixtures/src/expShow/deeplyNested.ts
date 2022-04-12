@@ -1,8 +1,7 @@
-import { ExperimentsOutput } from '../../../cli/reader'
-import { collectMetricsAndParams } from '../../../experiments/metricsAndParams/collect'
-import { collectExperiments } from '../../../experiments/model/collect'
-import { copyOriginalBranchColors } from '../../../experiments/model/colors'
-import { TableData } from '../../../experiments/webview/contract'
+import { ExperimentsOutput } from 'dvc/src/cli/reader'
+import { collectMetricsAndParams } from 'dvc/src/experiments/metricsAndParams/collect'
+import { collectExperiments } from 'dvc/src/experiments/model/collect'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 
 export const deeplyNestedOutput: ExperimentsOutput = {
   workspace: {
@@ -72,10 +71,7 @@ export const deeplyNestedOutput: ExperimentsOutput = {
 
 export const columns = collectMetricsAndParams(deeplyNestedOutput)
 
-const { workspace, branches } = collectExperiments(
-  deeplyNestedOutput,
-  new Map([['main', copyOriginalBranchColors()[0]]])
-)
+const { workspace, branches } = collectExperiments(deeplyNestedOutput)
 export const rows = [workspace, ...branches]
 
 const deeplyNestedTableData: TableData = {

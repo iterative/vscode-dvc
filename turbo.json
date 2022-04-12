@@ -14,11 +14,11 @@
       "dependsOn": ["dvc#build"]
     },
     "build-storybook": {
-      "dependsOn": ["^build-storybook"],
+      "dependsOn": ["^build-storybook", "dvc-fixtures#build"],
       "outputs": ["storybook-static/**"]
     },
     "test": {
-      "dependsOn": ["^test"],
+      "dependsOn": ["^test", "dvc-fixtures#build"],
       "outputs": ["coverage/jest/**"]
     },
     "cover-vscode-run": {
@@ -29,7 +29,11 @@
       "outputs": ["dist/**"]
     },
     "test-vscode-run": {
-      "dependsOn": ["dvc-vscode-webview#build", "dvc#test-vscode-build"]
+      "dependsOn": [
+        "dvc#test-vscode-build",
+        "dvc-vscode-webview#build",
+        "dvc-fixtures#build"
+      ]
     },
     "lint": {
       "outputs": []

@@ -11,6 +11,9 @@ import {
   TreeViewExpansionEvent,
   window
 } from 'vscode'
+import checkpointPlotsFixture from 'dvc-fixtures/src/expShow/checkpointPlots'
+import plotsDiffFixture from 'dvc-fixtures/src/plotsDiff/output'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
 import { addFilterViaQuickInput } from './filterBy/util'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
@@ -19,9 +22,6 @@ import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
 import { buildPlots, getExpectedCheckpointPlotsData } from '../../plots/util'
-import checkpointPlotsFixture from '../../../fixtures/expShow/checkpointPlots'
-import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
-import expShowFixture from '../../../fixtures/expShow/output'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
 import {

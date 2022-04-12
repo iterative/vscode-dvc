@@ -1,4 +1,6 @@
 import { commands } from 'vscode'
+import outputFixture from 'dvc-fixtures/src/expShow/output'
+import rowsFixture from 'dvc-fixtures/src/expShow/rows'
 import { ExperimentsModel } from '.'
 import { Operator } from './filterBy'
 import {
@@ -6,8 +8,6 @@ import {
   copyOriginalExperimentColors,
   getWorkspaceColor
 } from './colors'
-import outputFixture from '../../test/fixtures/expShow/output'
-import rowsFixture from '../../test/fixtures/expShow/rows'
 import { buildMockMemento } from '../../test/util'
 import { joinMetricOrParamPath } from '../metricsAndParams/paths'
 import { Experiment } from '../webview/contract'

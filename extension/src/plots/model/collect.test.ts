@@ -1,16 +1,16 @@
 import { join } from 'path'
 import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
+import plotsDiffFixture from 'dvc-fixtures/src/plotsDiff/output'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
+import modifiedFixture from 'dvc-fixtures/src/expShow/modified'
+import checkpointPlotsFixture from 'dvc-fixtures/src/expShow/checkpointPlots'
 import {
   collectData,
   collectCheckpointPlotsData,
   collectTemplates,
   collectMetricOrder
 } from './collect'
-import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import expShowFixture from '../../test/fixtures/expShow/output'
-import modifiedFixture from '../../test/fixtures/expShow/modified'
-import checkpointPlotsFixture from '../../test/fixtures/expShow/checkpointPlots'
 import { ExperimentsOutput } from '../../cli/reader'
 import { definedAndNonEmpty, sameContents } from '../../util/array'
 import { TemplatePlot } from '../webview/contract'

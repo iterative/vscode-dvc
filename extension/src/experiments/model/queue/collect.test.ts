@@ -1,6 +1,6 @@
 import { join } from 'path'
+import rowsFixture from 'dvc-fixtures/src/expShow/rows'
 import { collectFlatExperimentParams } from './collect'
-import rowsFixture from '../../../test/fixtures/expShow/rows'
 import { joinMetricOrParamFilePath } from '../../metricsAndParams/paths'
 
 describe('collectFlatExperimentParams', () => {

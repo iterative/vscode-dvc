@@ -1,9 +1,9 @@
 import { join } from 'path'
+import outputFixture from 'dvc-fixtures/src/expShow/output'
+import columnsFixture from 'dvc-fixtures/src/expShow/columns'
 import { collectChanges, collectMetricsAndParams } from './collect'
 import { joinMetricOrParamPath } from './paths'
 import { MetricOrParam } from '../webview/contract'
-import outputFixture from '../../test/fixtures/expShow/output'
-import columnsFixture from '../../test/fixtures/expShow/columns'
 import { ExperimentsOutput } from '../../cli/reader'
 
 describe('collectMetricsAndParams', () => {

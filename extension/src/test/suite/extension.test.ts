@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy, match } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
+import plotsDiffFixture from 'dvc-fixtures/src/plotsDiff/output'
 import {
   closeAllEditors,
   configurationChangeEvent,
@@ -13,8 +15,6 @@ import {
 import { WEBVIEW_TEST_TIMEOUT } from './timeouts'
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
-import expShowFixture from '../fixtures/expShow/output'
-import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
 import { RegisteredCommands } from '../../commands/external'
 import * as Setup from '../../setup'

@@ -2,7 +2,8 @@
   "private": true,
   "workspaces": [
     "./extension",
-    "./webview"
+    "./webview",
+    "./fixtures"
   ],
   "scripts": {
     "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",

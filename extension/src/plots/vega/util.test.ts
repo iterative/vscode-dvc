@@ -1,15 +1,15 @@
+import confusionTemplate from 'dvc-fixtures/src/plotsDiff/templates/confusion'
+import confusionNormalizedTemplate from 'dvc-fixtures/src/plotsDiff/templates/confusionNormalized'
+import defaultTemplate from 'dvc-fixtures/src/plotsDiff/templates/default'
+import linearTemplate from 'dvc-fixtures/src/plotsDiff/templates/linear'
+import scatterTemplate from 'dvc-fixtures/src/plotsDiff/templates/scatter'
+import smoothTemplate from 'dvc-fixtures/src/plotsDiff/templates/smooth'
 import {
   isMultiViewPlot,
   isMultiViewByCommitPlot,
   extendVegaSpec,
   getColorScale
 } from './util'
-import confusionTemplate from '../../test/fixtures/plotsDiff/templates/confusion'
-import confusionNormalizedTemplate from '../../test/fixtures/plotsDiff/templates/confusionNormalized'
-import defaultTemplate from '../../test/fixtures/plotsDiff/templates/default'
-import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
-import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
-import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {

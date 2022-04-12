@@ -1,6 +1,6 @@
+import modifiedFixture from 'dvc-fixtures/src/expShow/modified'
 import { collectExperiments, collectStatuses } from './collect'
 import { Experiment } from '../webview/contract'
-import modifiedFixture from '../../test/fixtures/expShow/modified'
 
 describe('collectExperiments', () => {
   it('should return an empty array if no branches are present', () => {

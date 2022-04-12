@@ -5,9 +5,9 @@ import { join } from 'dvc/src/test/util/path'
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
-import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
+import comparisonTableFixture from 'dvc-fixtures/src/plotsDiff/comparison'
+import checkpointPlotsFixture from 'dvc-fixtures/src/expShow/checkpointPlots'
+import templatePlotsFixture from 'dvc-fixtures/src/plotsDiff/template/webview'
 import {
   CheckpointPlotsColors,
   DEFAULT_SECTION_COLLAPSED,

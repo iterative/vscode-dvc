@@ -1,8 +1,8 @@
 import { join } from 'path'
 import { VisualizationSpec } from 'react-vega'
+import plotsDiffFixture from 'dvc-fixtures/src/plotsDiff/output'
 import { collectPaths, collectTemplateOrder } from './collect'
 import { TemplatePlotGroup, PlotsType } from '../webview/contract'
-import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 
 describe('collectPath', () => {
   it('should return the expected data from the test fixture', () => {

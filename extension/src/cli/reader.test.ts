@@ -1,13 +1,13 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
+import expShowFixture from 'dvc-fixtures/src/expShow/output'
+import plotsDiffFixture from 'dvc-fixtures/src/plotsDiff/output/minimal'
 import { CliResult, CliStarted } from '.'
 import { CliReader } from './reader'
 import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
 import { getProcessEnv } from '../env'
-import expShowFixture from '../test/fixtures/expShow/output'
-import plotsDiffFixture from '../test/fixtures/plotsDiff/output/minimal'
 import { Config } from '../config'
 
 jest.mock('vscode')

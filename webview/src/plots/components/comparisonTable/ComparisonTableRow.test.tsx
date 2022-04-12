@@ -5,7 +5,7 @@ import { join } from 'dvc/src/test/util/path'
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import comparisonPlotsFixture from 'dvc-fixtures/src/plotsDiff/comparison'
 import {
   ComparisonTableRow,
   ComparisonTableRowProps

@@ -1,7 +1,7 @@
 import { getComparisonWebviewMessage } from '..'
 import { Uri, ViewColumn, window } from 'vscode'
-import { ViewKey } from '../../../../webview/constants'
-import { basePlotsUrl } from '../../../util'
+import { ViewKey } from 'dvc/src/webview/constants'
+import { basePlotsUrl } from 'dvc/src/test/util'
 
 const webviewPanel = window.createWebviewPanel(
   ViewKey.PLOTS,
