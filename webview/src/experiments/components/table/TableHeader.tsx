@@ -54,7 +54,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 [styles.paramHeaderCell]: column.group === 'params',
                 [styles.metricHeaderCell]: column.group === 'metrics',
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-                [styles.topOfStack]: !column?.parent?.placeholderOf,
+                [styles.topOfStack]: !column.parent?.placeholderOf,
                 [styles.sortingHeaderCellAsc]: sort && !sort.descending,
                 [styles.sortingHeaderCellDesc]: sort?.descending
               }
