@@ -58,7 +58,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 [styles.paramHeaderCell]: column.group === 'params',
                 [styles.metricHeaderCell]: column.group === 'metrics',
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-                [styles.topLevelPlaceholder]: isTopOfStack(
+                [styles.topOfStack]: isTopOfStack(
                   column,
                   baseColumn as HeaderGroup<Experiment>
                 ),
