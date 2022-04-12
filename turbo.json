@@ -1,0 +1,42 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "baseBranch": "origin/main",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "dvc#build": {
+      "dependsOn": ["dvc-vscode-webview#build"],
+      "outputs": ["dist/**", "./dvc.vsix"]
+    },
+    "package": {
+      "dependsOn": ["dvc#build"]
+    },
+    "build-storybook": {
+      "dependsOn": ["^build-storybook"],
+      "outputs": ["storybook-static/**"]
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": ["coverage/jest/**"]
+    },
+    "cover-vscode-run": {
+      "dependsOn": ["test", "dvc-vscode-webview#build"],
+      "outputs": ["coverage/integration/**"]
+    },
+    "test-vscode-build": {
+      "outputs": ["dist/**"]
+    },
+    "test-vscode-run": {
+      "dependsOn": ["dvc-vscode-webview#build", "dvc#test-vscode-build"]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false
+    }
+  },
+  "globalDependencies": ["extension/src/test/fixtures/**"]
+}
