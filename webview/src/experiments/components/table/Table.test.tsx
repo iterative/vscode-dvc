@@ -15,7 +15,7 @@ import {
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
 import { Table } from './Table'
-import styles from './Table/styles.module.scss'
+import styles from './styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnOrder'
 
