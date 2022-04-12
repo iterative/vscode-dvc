@@ -1,12 +1,11 @@
-#!/usr/bin/node
-
 const { resolve, join } = require('path')
 const { writeFileSync } = require('fs-extra')
 const execa = require('execa')
 
 let activationEvents = []
 let failed
-const cwd = resolve(__dirname, '..', 'extension')
+
+const cwd = resolve(__dirname, '..')
 const packageJsonPath = join(cwd, 'package.json')
 
 const pipe = childProcess => {
@@ -37,6 +36,7 @@ tsc.then(() => {
     })
     .finally(() => {
       packageJson.activationEvents = activationEvents
+
       writeFileSync(packageJsonPath, JSON.stringify(packageJson))
 
       const prettier = execa('prettier', ['--write', 'package.json'], { cwd })
