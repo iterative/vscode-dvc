@@ -25,6 +25,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     visible,
     onClickOutside,
     hideOnClick,
+    onTrigger,
     animation = false,
     className = typeof content === 'string' ? styles.padded : undefined,
     arrow = false
@@ -47,6 +48,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     visible={visible}
     onClickOutside={onClickOutside}
     hideOnClick={hideOnClick}
+    onTrigger={onTrigger}
     onShow={onShow}
     onHide={onHide}
     ref={ref as Ref<Element>}

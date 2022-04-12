@@ -2,8 +2,8 @@ import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
 import { TableData } from './webview/contract'
 import {
-  CommandId,
   AvailableCommands,
+  CommandId,
   InternalCommands
 } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'

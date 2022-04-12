@@ -6,6 +6,9 @@ import { RowProp, WithChanges } from './interfaces'
 import styles from './styles.module.scss'
 import { FirstCell, CellWrapper } from './Cell'
 import { sendMessage } from '../../../shared/vscode'
+import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
+import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
+import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
 
 const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   if (running) {
@@ -21,19 +24,82 @@ const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   return styles.normalExperiment
 }
 
+const experimentMenuOption = (
+  id: string,
+  label: string,
+  type: MessageFromWebviewType
+) => {
+  return {
+    id: type,
+    label,
+    message: {
+      payload: id,
+      type
+    }
+  } as MessagesMenuOptionProps
+}
+
+export const RowContextMenu: React.FC<RowProp> = ({
+  row: {
+    original: { queued },
+    depth,
+    values: { id }
+  }
+}) => {
+  const isWorkspace = id === 'workspace'
+
+  const contextMenuOptions = React.useMemo(() => {
+    const menuOptions: MessagesMenuOptionProps[] = []
+
+    const pushIf = (condition: boolean, options: MessagesMenuOptionProps[]) =>
+      condition && menuOptions.push(...options)
+
+    pushIf(!queued && !isWorkspace && depth > 0, [
+      experimentMenuOption(
+        id,
+        'Apply to Workspace',
+        MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE
+      ),
+      experimentMenuOption(
+        id,
+        'Create new Branch',
+        MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT
+      )
+    ])
+
+    pushIf(depth <= 1 || isWorkspace, [
+      experimentMenuOption(
+        id,
+        'Modify and Queue',
+        MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED
+      )
+    ])
+
+    pushIf(depth === 1, [
+      experimentMenuOption(
+        id,
+        'Remove',
+        MessageFromWebviewType.EXPERIMENT_REMOVED
+      )
+    ])
+
+    return menuOptions
+  }, [queued, isWorkspace, depth, id])
+
+  return <MessagesMenu options={contextMenuOptions} />
+}
+
 export const RowContent: React.FC<
   RowProp & { className?: string } & WithChanges
-> = ({
-  row: {
+> = ({ row, className, changes, contextMenuDisabled }): JSX.Element => {
+  const {
     getRowProps,
     cells: [firstCell, ...cells],
     original,
     flatIndex,
     values: { id }
-  },
-  className,
-  changes
-}): JSX.Element => {
+  } = row
+  const { displayColor } = original
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
   const toggleExperiment: EventHandler<SyntheticEvent> = e => {
@@ -44,41 +110,47 @@ export const RowContent: React.FC<
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
     })
   }
+
   return (
-    <div
-      {...getRowProps({
-        className: cx(
-          className,
-          styles.tr,
-          getExperimentTypeClass(original),
-          flatIndex % 2 === 0 || styles.oddRow,
-          isWorkspace ? styles.workspaceRow : styles.normalRow,
-          styles.row,
-          isWorkspace && changes?.length && styles.workspaceWithChanges
-        )
-      })}
-      tabIndex={0}
-      role="row"
-      onClick={toggleExperiment}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          toggleExperiment(e)
-        }
-      }}
-      data-testid={isWorkspace && 'workspace-row'}
+    <ContextMenu
+      disabled={contextMenuDisabled}
+      content={<RowContextMenu row={row} />}
     >
-      <FirstCell cell={firstCell} bulletColor={original.displayColor} />
-      {cells.map(cell => {
-        const cellId = `${cell.column.id}___${cell.row.id}`
-        return (
-          <CellWrapper
-            cell={cell}
-            changes={changesIfWorkspace}
-            key={cellId}
-            cellId={cellId}
-          />
-        )
-      })}
-    </div>
+      <div
+        {...getRowProps({
+          className: cx(
+            className,
+            styles.tr,
+            getExperimentTypeClass(original),
+            flatIndex % 2 === 0 || styles.oddRow,
+            isWorkspace ? styles.workspaceRow : styles.normalRow,
+            styles.row,
+            isWorkspace && changes?.length && styles.workspaceWithChanges
+          )
+        })}
+        tabIndex={0}
+        role="row"
+        onClick={toggleExperiment}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            toggleExperiment(e)
+          }
+        }}
+        data-testid={isWorkspace && 'workspace-row'}
+      >
+        <FirstCell cell={firstCell} bulletColor={displayColor} />
+        {cells.map(cell => {
+          const cellId = `${cell.column.id}___${cell.row.id}`
+          return (
+            <CellWrapper
+              cell={cell}
+              changes={changesIfWorkspace}
+              key={cellId}
+              cellId={cellId}
+            />
+          )
+        })}
+      </div>
+    </ContextMenu>
   )
 }
