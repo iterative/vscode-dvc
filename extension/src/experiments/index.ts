@@ -15,7 +15,11 @@ import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
-import { InternalCommands } from '../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -27,6 +31,8 @@ import { Title } from '../vscode/title'
 import { QuickPickItemWithValue, quickPickValue } from '../vscode/quickPick'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { Toast } from '../vscode/toast'
+import { getInput } from '../vscode/inputBox'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -48,6 +54,8 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly metricsOrParamsChanged = this.dispose.track(
     new EventEmitter<void>()
   )
+
+  private readonly internalCommands: InternalCommands
 
   constructor(
     dvcRoot: string,
@@ -80,6 +88,8 @@ export class Experiments extends BaseRepository<TableData> {
     this.fileSystemData = this.dispose.track(
       fileSystemData || new FileSystemData(dvcRoot)
     )
+
+    this.internalCommands = internalCommands
 
     this.dispose.track(this.cliData.onDidUpdate(data => this.setState(data)))
     this.dispose.track(
@@ -301,6 +311,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelectedExperiments()
   }
 
+  public runCommand(commandId: CommandId, ...args: string[]) {
+    return Toast.showOutput(
+      this.internalCommands.executeCommand(commandId, this.dvcRoot, ...args)
+    )
+  }
+
   private notifyChanged(data?: ExperimentsOutput) {
     this.experimentsChanged.fire(data)
     this.notifyMetricsOrParamsChanged()
@@ -375,8 +391,14 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private invokeContextMenu({ depth, queued }: ContextMenuPayload) {
-    const items: QuickPickItemWithValue<string>[] = []
+  private async invokeContextMenu({
+    depth,
+    queued,
+    id
+  }: ContextMenuPayload): Promise<void | unknown> {
+    const items: QuickPickItemWithValue<
+      () => void | Thenable<void | unknown>
+    >[] = []
     if (depth === 0) {
       return
     }
@@ -384,11 +406,20 @@ export class Experiments extends BaseRepository<TableData> {
       items.push(
         {
           label: 'Apply to Workspace',
-          value: 'apply'
+          value: () => this.runCommand(AvailableCommands.EXPERIMENT_APPLY, id)
         },
         {
           label: 'Create New Branch',
-          value: 'branch'
+          value: async () => {
+            const input = await getInput(Title.ENTER_BRANCH_NAME)
+            if (input) {
+              return this.runCommand(
+                AvailableCommands.EXPERIMENT_BRANCH,
+                id,
+                input
+              )
+            }
+          }
         }
       )
     }
@@ -396,16 +427,27 @@ export class Experiments extends BaseRepository<TableData> {
       items.push(
         {
           label: 'Vary Param(s) and Queue',
-          value: 'vary'
+          value: async () => {
+            const paramsToQueue = await this.pickParamsToQueue(id)
+            if (paramsToQueue) {
+              return this.runCommand(
+                AvailableCommands.EXPERIMENT_QUEUE,
+                ...paramsToQueue
+              )
+            }
+          }
         },
         {
           label: 'Remove Experiment',
-          value: 'remove'
+          value: () => this.runCommand(AvailableCommands.EXPERIMENT_REMOVE, id)
         }
       )
     }
     if (items.length > 0) {
-      return quickPickValue(items, {})
+      const callback = await quickPickValue(items, {})
+      if (callback) {
+        return callback()
+      }
     }
   }
 
