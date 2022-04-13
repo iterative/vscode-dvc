@@ -42,7 +42,6 @@ import {
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
 import { recommendRedHatExtensionOnce } from './vscode/recommend'
-import { WebviewSerializer } from './webview/serializer'
 import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
@@ -221,8 +220,6 @@ export class Extension extends Disposable implements IExtension {
         }
       })
     )
-
-    this.dispose.track(new WebviewSerializer(this.experiments, this.plots))
 
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots)

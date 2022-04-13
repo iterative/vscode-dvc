@@ -41,9 +41,8 @@ jest.mock('./checkpointPlots/util', () => ({
 }))
 jest.spyOn(console, 'warn').mockImplementation(() => {})
 
-const { postMessage, setState } = vsCodeApi
+const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
-const mockSetState = jest.mocked(setState)
 
 const heightToSuppressVegaError = 1000
 
@@ -98,23 +97,6 @@ describe('App', () => {
       type: MessageFromWebviewType.INITIALIZED
     })
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
-  })
-
-  it('should set dvcRoot when the setDvcRoot message comes in', () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          dvcRoot: 'root',
-          type: MessageToWebviewType.SET_DVC_ROOT
-        }
-      })
-    )
-    expect(mockSetState).toBeCalledWith({
-      dvcRoot: 'root'
-    })
-    expect(mockSetState).toBeCalledTimes(1)
   })
 
   it('should render the loading state when given no data', async () => {
