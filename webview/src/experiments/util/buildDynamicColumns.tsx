@@ -91,7 +91,7 @@ const buildDynamicColumns = (
   properties
     .filter(column => column.parentPath === parentPath)
     .map(data => {
-      const { path, group, pathArray, name } = data
+      const { path, type, pathArray, name } = data
 
       const childColumns = buildDynamicColumns(properties, path)
 
@@ -100,7 +100,7 @@ const buildDynamicColumns = (
         Header,
         accessor: pathArray && buildAccessor(pathArray),
         columns: childColumns.length > 0 ? childColumns : undefined,
-        group,
+        group: type,
         id: path,
         name
       }

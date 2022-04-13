@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { collectChanges, collectMetricsAndParams } from './collect'
 import { splitMetricOrParamPath } from './paths'
-import { MetricOrParam } from '../webview/contract'
+import { MetricOrParam, MetricOrParamType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel } from '../../path/selection/model'
@@ -68,7 +68,7 @@ export class MetricsAndParamsModel extends PathSelectionModel<MetricOrParam> {
     return this.data.filter(element =>
       path
         ? element.parentPath === path
-        : ['metrics', 'params'].includes(element.parentPath)
+        : Object.values<string>(MetricOrParamType).includes(element.parentPath)
     )
   }
 

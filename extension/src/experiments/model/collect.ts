@@ -3,7 +3,7 @@ import { ExperimentsAccumulator } from './accumulator'
 import { getWorkspaceColor } from './colors'
 import { canSelect, Status, Statuses } from './status'
 import { extractMetricsAndParams } from '../metricsAndParams/extract'
-import { Experiment } from '../webview/contract'
+import { Experiment, MetricOrParamType } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
@@ -104,7 +104,7 @@ const transformExperimentData = (
   const experiment = {
     id,
     label,
-    ...omit(experimentFields, ['metrics', 'params']),
+    ...omit(experimentFields, Object.values(MetricOrParamType)),
     mutable: !!(!hasCheckpoints && experimentFields.running)
   } as Experiment
 

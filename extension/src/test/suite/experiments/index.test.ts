@@ -12,7 +12,11 @@ import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
 import { Experiments } from '../../../experiments'
 import { ResourceLocator } from '../../../resourceLocator'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
-import { MetricOrParam, TableData } from '../../../experiments/webview/contract'
+import {
+  MetricOrParam,
+  MetricOrParamType,
+  TableData
+} from '../../../experiments/webview/contract'
 import {
   buildInternalCommands,
   buildMockData,
@@ -365,7 +369,11 @@ suite('Experiments Test Suite', () => {
       })
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      const sortPath = joinMetricOrParamPath('params', 'params.yaml', 'test')
+      const sortPath = joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'test'
+      )
 
       mockShowQuickPick.onFirstCall().resolves({
         label: 'test',
@@ -442,11 +450,19 @@ suite('Experiments Test Suite', () => {
   describe('persisted state', () => {
     const firstSortDefinition = {
       descending: false,
-      path: joinMetricOrParamPath('params', 'params.yaml', 'test')
+      path: joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'test'
+      )
     }
     const secondSortDefinition = {
       descending: true,
-      path: joinMetricOrParamPath('params', 'params.yaml', 'other')
+      path: joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'other'
+      )
     }
     const sortDefinitions: SortDefinition[] = [
       firstSortDefinition,
@@ -454,23 +470,31 @@ suite('Experiments Test Suite', () => {
     ]
 
     const firstFilterId = joinMetricOrParamPath(
-      'params',
+      MetricOrParamType.PARAMS,
       'params.yaml',
       'test==1'
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: joinMetricOrParamPath('params', 'params.yaml', 'test'),
+      path: joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'test'
+      ),
       value: 1
     }
     const secondFilterId = joinMetricOrParamPath(
-      'params',
+      MetricOrParamType.PARAMS,
       'params.yaml',
       'other∈testcontains'
     )
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: joinMetricOrParamPath('params', 'params.yaml', 'other'),
+      path: joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'other'
+      ),
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [

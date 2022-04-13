@@ -21,7 +21,7 @@ import {
 import { extractMetricsAndParams } from '../../experiments/metricsAndParams/extract'
 import {
   decodeMetricOrParam,
-  joinMetricOrParamFilePath
+  appendMetricOrParamToPath
 } from '../../experiments/metricsAndParams/paths'
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
@@ -58,7 +58,7 @@ const collectFromMetricsFile = (
     return
   }
 
-  const path = joinMetricOrParamFilePath(...pathArray)
+  const path = appendMetricOrParamToPath(...pathArray)
 
   addToMapArray(acc.plots, path, { group: name, iteration, y: value })
 }

@@ -5,6 +5,7 @@ import { ExperimentsFilterByTree } from './tree'
 import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { InternalCommands } from '../../../commands/internal'
 import { buildMockedExperiments } from '../../../test/util/jest'
+import { MetricOrParamType } from '../../webview/contract'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -72,7 +73,11 @@ describe('ExperimentsFilterByTree', () => {
     const mockedFilters = [
       {
         operator: Operator.EQUAL,
-        path: joinMetricOrParamPath('params', 'params.yaml', 'param'),
+        path: joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yaml',
+          'param'
+        ),
         value: '90000'
       }
     ]
@@ -86,8 +91,16 @@ describe('ExperimentsFilterByTree', () => {
       {
         description: '== 90000',
         dvcRoot: 'demo',
-        id: joinMetricOrParamPath('params', 'params.yaml', 'param==90000'),
-        label: joinMetricOrParamPath('params', 'params.yaml', 'param')
+        id: joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yaml',
+          'param==90000'
+        ),
+        label: joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yaml',
+          'param'
+        )
       }
     ])
   })
@@ -102,7 +115,11 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetFilters.mockReturnValueOnce([
       {
         operator: Operator.EQUAL,
-        path: joinMetricOrParamPath('params', 'params.yaml', 'param'),
+        path: joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yaml',
+          'param'
+        ),
         value: '90000'
       }
     ])
@@ -115,12 +132,20 @@ describe('ExperimentsFilterByTree', () => {
     const mockedFilters = [
       {
         operator: '==',
-        path: joinMetricOrParamPath('params', 'params.yml', 'param'),
+        path: joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yml',
+          'param'
+        ),
         value: 90000
       },
       {
         operator: '<',
-        path: joinMetricOrParamPath('metrics', 'logs.json', 'metric'),
+        path: joinMetricOrParamPath(
+          MetricOrParamType.METRICS,
+          'logs.json',
+          'metric'
+        ),
         value: '1'
       }
     ]
@@ -143,14 +168,30 @@ describe('ExperimentsFilterByTree', () => {
       {
         description: '== 90000',
         dvcRoot: 'demo',
-        id: joinMetricOrParamPath('params', 'params.yml', 'param==90000'),
-        label: joinMetricOrParamPath('params', 'params.yml', 'param')
+        id: joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yml',
+          'param==90000'
+        ),
+        label: joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yml',
+          'param'
+        )
       },
       {
         description: '< 1',
         dvcRoot: 'demo',
-        id: joinMetricOrParamPath('metrics', 'logs.json', 'metric<1'),
-        label: joinMetricOrParamPath('metrics', 'logs.json', 'metric')
+        id: joinMetricOrParamPath(
+          MetricOrParamType.METRICS,
+          'logs.json',
+          'metric<1'
+        ),
+        label: joinMetricOrParamPath(
+          MetricOrParamType.METRICS,
+          'logs.json',
+          'metric'
+        )
       }
     ])
   })
@@ -180,7 +221,7 @@ describe('ExperimentsFilterByTree', () => {
       const mockedFilter = {
         operator: '>=',
         path: joinMetricOrParamPath(
-          'metrics',
+          MetricOrParamType.METRICS,
           'summary.json',
           'success_metric'
         ),
@@ -211,12 +252,12 @@ describe('ExperimentsFilterByTree', () => {
         description: '>= 100',
         dvcRoot,
         id: joinMetricOrParamPath(
-          'metrics',
+          MetricOrParamType.METRICS,
           'summary.json',
           'success_metric>=100'
         ),
         label: joinMetricOrParamPath(
-          'metrics',
+          MetricOrParamType.METRICS,
           'summary.json',
           'success_metric'
         )
