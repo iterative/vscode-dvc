@@ -12,6 +12,7 @@ concurrency:
 jobs:
   suite:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
       matrix:
         os: [macOS-latest, windows-latest]
