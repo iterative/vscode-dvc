@@ -100,7 +100,10 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       group={groupId}
       onDrop={onDropInSection}
       draggedRef={draggedRef}
-      dropTarget={<DropTarget />}
+      dropTarget={{
+        element: <DropTarget />,
+        wrapperTag: 'div'
+      }}
     />
   )
 }
