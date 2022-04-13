@@ -7,7 +7,8 @@ import { exists } from '../../fileSystem'
 import { getVenvBinPath } from '../../python'
 
 const config = {
-  getCliPath: () => getVenvBinPath(TEMP_DIR, ENV_DIR, 'dvc')
+  getCliPath: () => '',
+  pythonBinPath: getVenvBinPath(TEMP_DIR, ENV_DIR, 'python')
 } as Config
 
 export const cliReader = new CliReader(config)

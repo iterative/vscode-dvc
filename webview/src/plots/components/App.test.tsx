@@ -45,8 +45,13 @@ const { postMessage, setState } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
 const mockSetState = jest.mocked(setState)
 
+const heightToSuppressVegaError = 1000
+
 beforeEach(() => {
   jest.clearAllMocks()
+  jest
+    .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+    .mockImplementation(() => heightToSuppressVegaError)
 })
 
 afterEach(() => {
@@ -157,10 +162,6 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const heightToSuppressVegaError = 1000
-    jest
-      .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
-      .mockImplementation(() => heightToSuppressVegaError)
     sendSetDataMessage({
       template: templatePlotsFixture
     })

@@ -8,6 +8,7 @@ module.exports = {
     '!src/test/*',
     '!src/shared/components/icons/*'
   ],
+  coverageDirectory: 'coverage/jest',
   globals: {
     __webpack_public_path__: true
   },

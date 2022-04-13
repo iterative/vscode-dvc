@@ -46,6 +46,7 @@ import { WebviewSerializer } from './webview/serializer'
 import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
+import { Toast } from './vscode/toast'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -251,6 +252,11 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.internalCommands.registerExternalCommand(
+      RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE,
+      () => setup(this)
+    )
+
+    this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXTENSION_SHOW_OUTPUT,
       () => outputChannel.show()
     )
@@ -298,8 +304,14 @@ export class Extension extends Disposable implements IExtension {
     try {
       await this.config.isReady()
       const version = await this.cliReader.version(cwd)
-      return this.setAvailable(isVersionCompatible(version))
+      const compatible = isVersionCompatible(version)
+      setContextValue('dvc.cli.incompatible', !compatible)
+      return this.setAvailable(compatible)
     } catch {
+      Toast.warnWithOptions(
+        'An error was thrown when trying to access the CLI.'
+      )
+      setContextValue('dvc.cli.incompatible', undefined)
       return this.setAvailable(false)
     }
   }

@@ -1,0 +1,4 @@
+dist
+.vscode-test
+coverage
+src/test/fixtures/plotsDiff/vega.ts

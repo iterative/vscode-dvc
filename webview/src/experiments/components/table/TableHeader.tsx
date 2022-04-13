@@ -5,11 +5,7 @@ import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { Draggable } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
-import {
-  countUpperLevels,
-  getPlaceholders,
-  isFirstLevelHeader
-} from '../../util/columns'
+import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
@@ -26,11 +22,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   index,
   orderedColumns
 }) => {
-  const nbPlaceholder = getPlaceholders(column, columns).length
-  const hasPlaceholder = nbPlaceholder > 0
-  const isSortedWithPlaceholder = (sort: SortDefinition) =>
-    sort.path === column.placeholderOf?.id ||
-    (!column.placeholderOf && !hasPlaceholder && sort.path === column.id)
+  const baseColumn = column.placeholderOf || column
+  const sort = sorts.find(sort => sort.path === baseColumn.id)
   const isDraggable =
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
@@ -61,12 +54,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 [styles.paramHeaderCell]: column.group === 'params',
                 [styles.metricHeaderCell]: column.group === 'metrics',
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-                [styles.sortingHeaderCellAsc]: sorts.filter(
-                  sort => !sort.descending && isSortedWithPlaceholder(sort)
-                ).length,
-                [styles.sortingHeaderCellDesc]: sorts.filter(
-                  sort => sort.descending && sort.path === column.id
-                ).length
+                [styles.sortingHeaderCellAsc]:
+                  sort && !sort.descending && !column.parent?.placeholderOf,
+                [styles.sortingHeaderCellDesc]:
+                  sort?.descending && !column.placeholderOf
               }
             )
           })}
