@@ -29,11 +29,13 @@ export const RowContent: React.FC<
     cells: [firstCell, ...cells],
     original,
     flatIndex,
+    depth,
     values: { id }
   },
   className,
   changes
 }): JSX.Element => {
+  const { queued, running, displayColor } = original
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
   const toggleExperiment: EventHandler<SyntheticEvent> = e => {
@@ -48,7 +50,7 @@ export const RowContent: React.FC<
     e.preventDefault()
     e.stopPropagation()
     sendMessage({
-      payload: id,
+      payload: { depth, id, queued, running },
       type: MessageFromWebviewType.CONTEXT_MENU_INVOKED
     })
   }
@@ -76,7 +78,7 @@ export const RowContent: React.FC<
       onContextMenu={invokeContextMenu}
       data-testid={isWorkspace && 'workspace-row'}
     >
-      <FirstCell cell={firstCell} bulletColor={original.displayColor} />
+      <FirstCell cell={firstCell} bulletColor={displayColor} />
       {cells.map(cell => {
         const cellId = `${cell.column.id}___${cell.row.id}`
         return (

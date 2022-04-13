@@ -14,6 +14,7 @@ import '@testing-library/jest-dom/extend-expect'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
 import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import {
+  ContextMenuPayload,
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
@@ -436,23 +437,41 @@ describe('App', () => {
           }
         })
       )
-      const testClick = (label: string, id = label) => {
+      const testClick = (
+        label: string,
+        {
+          depth = 1,
+          id = label,
+          queued = false,
+          running = false
+        }: Partial<ContextMenuPayload> = {}
+      ) => {
         mockPostMessage.mockReset()
 
         fireEvent.contextMenu(screen.getByText(label))
 
         expect(mockPostMessage).toBeCalledTimes(1)
         expect(mockPostMessage).toBeCalledWith({
-          payload: id,
+          payload: { depth, id, queued, running },
           type: MessageFromWebviewType.CONTEXT_MENU_INVOKED
         })
       }
 
-      testClick('workspace')
-      testClick('main')
-      testClick('[exp-e7a67]', 'exp-e7a67')
-      testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
-      testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+      testClick('workspace', { depth: 0, running: true })
+      testClick('main', { depth: 0 })
+      testClick('[exp-e7a67]', {
+        depth: 1,
+        id: 'exp-e7a67',
+        running: true
+      })
+      testClick('22e40e1', {
+        depth: 2,
+        id: '22e40e1fa3c916ac567f69b85969e3066a91dda4'
+      })
+      testClick('e821416', {
+        depth: 2,
+        id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361'
+      })
     })
 
     it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
