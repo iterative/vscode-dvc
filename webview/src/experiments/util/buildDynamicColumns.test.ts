@@ -1,7 +1,10 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join } from 'dvc/src/test/util/path'
 import { ColumnGroup } from 'react-table'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  MetricOrParamType
+} from 'dvc/src/experiments/webview/contract'
 import { collectMetricsAndParams } from 'dvc/src/experiments/metricsAndParams/collect'
 import { columns as deeplyNestedColumnsFixture } from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
@@ -28,29 +31,57 @@ describe('buildDynamicColumns', () => {
   it('Correctly parses the standard fixture', () => {
     expect(
       simplifyColumns([
-        ...buildDynamicColumns(columnsFixture, 'metrics'),
-        ...buildDynamicColumns(columnsFixture, 'params')
+        ...buildDynamicColumns(columnsFixture, MetricOrParamType.METRICS),
+        ...buildDynamicColumns(columnsFixture, MetricOrParamType.PARAMS)
       ])
     ).toStrictEqual([
       {
         columns: [
-          { id: joinMetricOrParamPath('metrics', 'summary.json', 'loss') },
-          { id: joinMetricOrParamPath('metrics', 'summary.json', 'accuracy') },
-          { id: joinMetricOrParamPath('metrics', 'summary.json', 'val_loss') },
           {
-            id: joinMetricOrParamPath('metrics', 'summary.json', 'val_accuracy')
+            id: joinMetricOrParamPath(
+              MetricOrParamType.METRICS,
+              'summary.json',
+              'loss'
+            )
+          },
+          {
+            id: joinMetricOrParamPath(
+              MetricOrParamType.METRICS,
+              'summary.json',
+              'accuracy'
+            )
+          },
+          {
+            id: joinMetricOrParamPath(
+              MetricOrParamType.METRICS,
+              'summary.json',
+              'val_loss'
+            )
+          },
+          {
+            id: joinMetricOrParamPath(
+              MetricOrParamType.METRICS,
+              'summary.json',
+              'val_accuracy'
+            )
           }
         ],
-        id: joinMetricOrParamPath('metrics', 'summary.json')
+        id: joinMetricOrParamPath(MetricOrParamType.METRICS, 'summary.json')
       },
       {
         columns: [
           {
             columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', 'epochs') }
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  'epochs'
+                )
+              }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'epochs_previous_placeholder'
             )
@@ -59,14 +90,14 @@ describe('buildDynamicColumns', () => {
             columns: [
               {
                 id: joinMetricOrParamPath(
-                  'params',
+                  MetricOrParamType.PARAMS,
                   'params.yaml',
                   'learning_rate'
                 )
               }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'learning_rate_previous_placeholder'
             )
@@ -75,34 +106,46 @@ describe('buildDynamicColumns', () => {
             columns: [
               {
                 id: joinMetricOrParamPath(
-                  'params',
+                  MetricOrParamType.PARAMS,
                   'params.yaml',
                   'dvc_logs_dir'
                 )
               }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'dvc_logs_dir_previous_placeholder'
             )
           },
           {
             columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', 'log_file') }
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  'log_file'
+                )
+              }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'log_file_previous_placeholder'
             )
           },
           {
             columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', 'dropout') }
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  'dropout'
+                )
+              }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'dropout_previous_placeholder'
             )
@@ -111,7 +154,7 @@ describe('buildDynamicColumns', () => {
             columns: [
               {
                 id: joinMetricOrParamPath(
-                  'params',
+                  MetricOrParamType.PARAMS,
                   'params.yaml',
                   'process',
                   'threshold'
@@ -119,30 +162,45 @@ describe('buildDynamicColumns', () => {
               },
               {
                 id: joinMetricOrParamPath(
-                  'params',
+                  MetricOrParamType.PARAMS,
                   'params.yaml',
                   'process',
                   'test_arg'
                 )
               }
             ],
-            id: joinMetricOrParamPath('params', 'params.yaml', 'process')
+            id: joinMetricOrParamPath(
+              MetricOrParamType.PARAMS,
+              'params.yaml',
+              'process'
+            )
           }
         ],
-        id: joinMetricOrParamPath('params', 'params.yaml')
+        id: joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
       },
       {
         columns: [
-          { id: joinMetricOrParamPath('params', nestedParamsFile, 'test') }
+          {
+            id: joinMetricOrParamPath(
+              MetricOrParamType.PARAMS,
+              nestedParamsFile,
+              'test'
+            )
+          }
         ],
-        id: joinMetricOrParamPath('params', nestedParamsFile)
+        id: joinMetricOrParamPath(MetricOrParamType.PARAMS, nestedParamsFile)
       }
     ])
   })
 
   it('Correctly parses the deeply nested fixture', () => {
     expect(
-      simplifyColumns(buildDynamicColumns(deeplyNestedColumnsFixture, 'params'))
+      simplifyColumns(
+        buildDynamicColumns(
+          deeplyNestedColumnsFixture,
+          MetricOrParamType.PARAMS
+        )
+      )
     ).toStrictEqual([
       {
         columns: [
@@ -154,7 +212,7 @@ describe('buildDynamicColumns', () => {
                     columns: [
                       {
                         id: joinMetricOrParamPath(
-                          'params',
+                          MetricOrParamType.PARAMS,
                           'params.yaml',
                           'nested1',
                           'doubled'
@@ -162,7 +220,7 @@ describe('buildDynamicColumns', () => {
                       }
                     ],
                     id: joinMetricOrParamPath(
-                      'params',
+                      MetricOrParamType.PARAMS,
                       'params.yaml',
                       'nested1',
                       'doubled_previous_placeholder'
@@ -170,14 +228,18 @@ describe('buildDynamicColumns', () => {
                   }
                 ],
                 id: joinMetricOrParamPath(
-                  'params',
+                  MetricOrParamType.PARAMS,
                   'params.yaml',
                   'nested1',
                   'doubled_previous_placeholder'
                 )
               }
             ],
-            id: joinMetricOrParamPath('params', 'params.yaml', 'nested1')
+            id: joinMetricOrParamPath(
+              MetricOrParamType.PARAMS,
+              'params.yaml',
+              'nested1'
+            )
           },
           {
             columns: [
@@ -187,7 +249,7 @@ describe('buildDynamicColumns', () => {
                     columns: [
                       {
                         id: joinMetricOrParamPath(
-                          'params',
+                          MetricOrParamType.PARAMS,
                           'params.yaml',
                           'nested1%2Enested2%2Enested3%2Enested4',
                           'nested5',
@@ -197,7 +259,7 @@ describe('buildDynamicColumns', () => {
                       }
                     ],
                     id: joinMetricOrParamPath(
-                      'params',
+                      MetricOrParamType.PARAMS,
                       'params.yaml',
                       'nested1%2Enested2%2Enested3%2Enested4',
                       'nested5',
@@ -206,7 +268,7 @@ describe('buildDynamicColumns', () => {
                   }
                 ],
                 id: joinMetricOrParamPath(
-                  'params',
+                  MetricOrParamType.PARAMS,
                   'params.yaml',
                   'nested1%2Enested2%2Enested3%2Enested4',
                   'nested5'
@@ -214,7 +276,7 @@ describe('buildDynamicColumns', () => {
               }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'nested1%2Enested2%2Enested3%2Enested4'
             )
@@ -227,7 +289,7 @@ describe('buildDynamicColumns', () => {
                     columns: [
                       {
                         id: joinMetricOrParamPath(
-                          'params',
+                          MetricOrParamType.PARAMS,
                           'params.yaml',
                           'nested1%2Enested2%2Enested3',
                           'nested4',
@@ -237,7 +299,7 @@ describe('buildDynamicColumns', () => {
                       },
                       {
                         id: joinMetricOrParamPath(
-                          'params',
+                          MetricOrParamType.PARAMS,
                           'params.yaml',
                           'nested1%2Enested2%2Enested3',
                           'nested4',
@@ -247,7 +309,7 @@ describe('buildDynamicColumns', () => {
                       }
                     ],
                     id: joinMetricOrParamPath(
-                      'params',
+                      MetricOrParamType.PARAMS,
                       'params.yaml',
                       'nested1%2Enested2%2Enested3',
                       'nested4',
@@ -256,7 +318,7 @@ describe('buildDynamicColumns', () => {
                   }
                 ],
                 id: joinMetricOrParamPath(
-                  'params',
+                  MetricOrParamType.PARAMS,
                   'params.yaml',
                   'nested1%2Enested2%2Enested3',
                   'nested4'
@@ -264,7 +326,7 @@ describe('buildDynamicColumns', () => {
               }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'nested1%2Enested2%2Enested3'
             )
@@ -277,34 +339,34 @@ describe('buildDynamicColumns', () => {
                     columns: [
                       {
                         id: joinMetricOrParamPath(
-                          'params',
+                          MetricOrParamType.PARAMS,
                           'params.yaml',
                           'outlier'
                         )
                       }
                     ],
                     id: joinMetricOrParamPath(
-                      'params',
+                      MetricOrParamType.PARAMS,
                       'params.yaml',
                       'outlier_previous_placeholder'
                     )
                   }
                 ],
                 id: joinMetricOrParamPath(
-                  'params',
+                  MetricOrParamType.PARAMS,
                   'params.yaml',
                   'outlier_previous_placeholder'
                 )
               }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'outlier_previous_placeholder'
             )
           }
         ],
-        id: joinMetricOrParamPath('params', 'params.yaml')
+        id: joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
       }
     ])
   })
@@ -328,31 +390,48 @@ describe('buildDynamicColumns', () => {
         }
       }
     })
-    expect(simplifyColumns(buildDynamicColumns(input, 'params'))).toStrictEqual(
-      [
-        {
-          columns: [
-            {
-              columns: [
-                { id: joinMetricOrParamPath('params', 'params.yaml', 'a') }
-              ],
-              id: joinMetricOrParamPath(
-                'params',
-                'params.yaml',
-                'a_previous_placeholder'
-              )
-            },
-            {
-              columns: [
-                { id: joinMetricOrParamPath('params', 'params.yaml', 'c', 'd') }
-              ],
-              id: joinMetricOrParamPath('params', 'params.yaml', 'c')
-            }
-          ],
-          id: joinMetricOrParamPath('params', 'params.yaml')
-        }
-      ]
-    )
+    expect(
+      simplifyColumns(buildDynamicColumns(input, MetricOrParamType.PARAMS))
+    ).toStrictEqual([
+      {
+        columns: [
+          {
+            columns: [
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  'a'
+                )
+              }
+            ],
+            id: joinMetricOrParamPath(
+              MetricOrParamType.PARAMS,
+              'params.yaml',
+              'a_previous_placeholder'
+            )
+          },
+          {
+            columns: [
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  'c',
+                  'd'
+                )
+              }
+            ],
+            id: joinMetricOrParamPath(
+              MetricOrParamType.PARAMS,
+              'params.yaml',
+              'c'
+            )
+          }
+        ],
+        id: joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
+      }
+    ])
   })
 
   it('Correctly parses a minimal input with a single-depth number-keyed column at the end', () => {
@@ -374,31 +453,48 @@ describe('buildDynamicColumns', () => {
         }
       }
     })
-    expect(simplifyColumns(buildDynamicColumns(input, 'params'))).toStrictEqual(
-      [
-        {
-          columns: [
-            {
-              columns: [
-                { id: joinMetricOrParamPath('params', 'params.yaml', '1') }
-              ],
-              id: joinMetricOrParamPath(
-                'params',
-                'params.yaml',
-                '1_previous_placeholder'
-              )
-            },
-            {
-              columns: [
-                { id: joinMetricOrParamPath('params', 'params.yaml', 'c', 'd') }
-              ],
-              id: joinMetricOrParamPath('params', 'params.yaml', 'c')
-            }
-          ],
-          id: joinMetricOrParamPath('params', 'params.yaml')
-        }
-      ]
-    )
+    expect(
+      simplifyColumns(buildDynamicColumns(input, MetricOrParamType.PARAMS))
+    ).toStrictEqual([
+      {
+        columns: [
+          {
+            columns: [
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  '1'
+                )
+              }
+            ],
+            id: joinMetricOrParamPath(
+              MetricOrParamType.PARAMS,
+              'params.yaml',
+              '1_previous_placeholder'
+            )
+          },
+          {
+            columns: [
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  'c',
+                  'd'
+                )
+              }
+            ],
+            id: joinMetricOrParamPath(
+              MetricOrParamType.PARAMS,
+              'params.yaml',
+              'c'
+            )
+          }
+        ],
+        id: joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
+      }
+    ])
   })
 
   it('Correctly parses a minimal input with a single-depth string-keyed column at the end', () => {
@@ -421,30 +517,45 @@ describe('buildDynamicColumns', () => {
       }
     })
     expect(
-      simplifyColumns(
-        buildDynamicColumns(input, joinMetricOrParamPath('params'))
-      )
+      simplifyColumns(buildDynamicColumns(input, MetricOrParamType.PARAMS))
     ).toStrictEqual([
       {
         columns: [
           {
             columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', 'c', 'd') }
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  'c',
+                  'd'
+                )
+              }
             ],
-            id: joinMetricOrParamPath('params', 'params.yaml', 'c')
+            id: joinMetricOrParamPath(
+              MetricOrParamType.PARAMS,
+              'params.yaml',
+              'c'
+            )
           },
           {
             columns: [
-              { id: joinMetricOrParamPath('params', 'params.yaml', 'f') }
+              {
+                id: joinMetricOrParamPath(
+                  MetricOrParamType.PARAMS,
+                  'params.yaml',
+                  'f'
+                )
+              }
             ],
             id: joinMetricOrParamPath(
-              'params',
+              MetricOrParamType.PARAMS,
               'params.yaml',
               'f_previous_placeholder'
             )
           }
         ],
-        id: joinMetricOrParamPath('params', 'params.yaml')
+        id: joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
       }
     ])
   })
