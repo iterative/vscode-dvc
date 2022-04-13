@@ -390,6 +390,7 @@ export class Extension extends Disposable implements IExtension {
   }
 
   private getEventProperties() {
+    // add all properties here - all have to be string
     return {
       cliAccessible: this.cliAccessible,
       dvcPathUsed: !!this.config.getCliPath(),

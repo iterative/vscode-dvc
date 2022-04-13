@@ -27,6 +27,11 @@ import { Title } from '../vscode/title'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 
+export const ExperimentsCounts = {
+  METRICS: 'metrics',
+  PARAMS: 'params'
+} as const
+
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
   public readonly onDidChangeMetricsOrParams: Event<void>
@@ -147,6 +152,15 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getSorts() {
     return this.experiments.getSorts()
+  }
+
+  public getCounts() {
+    const acc = { metrics: 0, params: 0 }
+
+    for (const { type } of this.metricsAndParams.getTerminalNodes()) {
+      acc[type] = acc[type] + 1
+    }
+    return acc
   }
 
   public async addSort() {
