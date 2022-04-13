@@ -17,7 +17,10 @@ import { experimentsUpdatedEvent } from '../../../util'
 import { joinMetricOrParamPath } from '../../../../../experiments/metricsAndParams/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
-import { TableData } from '../../../../../experiments/webview/contract'
+import {
+  MetricOrParamType,
+  TableData
+} from '../../../../../experiments/webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { Response } from '../../../../../vscode/response'
 import { ExperimentsModel } from '../../../../../experiments/model'
@@ -55,7 +58,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       ).returns(dvcDemoPath)
 
       const accuracyPath = joinMetricOrParamPath(
-        'metrics',
+        MetricOrParamType.METRICS,
         'summary.json',
         'accuracy'
       )
@@ -140,7 +143,11 @@ suite('Experiments Filter By Tree Test Suite', () => {
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      const lossPath = joinMetricOrParamPath('metrics', 'summary.json', 'loss')
+      const lossPath = joinMetricOrParamPath(
+        MetricOrParamType.METRICS,
+        'summary.json',
+        'loss'
+      )
 
       await addFilterViaQuickInput(
         experiments,
@@ -221,7 +228,11 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const filter = {
         operator: Operator.EQUAL,
-        path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
+        path: joinMetricOrParamPath(
+          MetricOrParamType.METRICS,
+          'summary.json',
+          'loss'
+        ),
         value: '0'
       }
       const filterId = getFilterId(filter)

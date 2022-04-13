@@ -6,9 +6,13 @@ import { Disposable } from '../../../../extension'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
-import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
+import {
+  appendMetricOrParamToPath,
+  joinMetricOrParamPath
+} from '../../../../experiments/metricsAndParams/paths'
 import { buildExperiments } from '../util'
 import { Status } from '../../../../path/selection/model'
+import { MetricOrParamType } from '../../../../experiments/webview/contract'
 
 suite('Experiments Metrics And Params Tree Test Suite', () => {
   const paramsFile = 'params.yaml'
@@ -33,7 +37,11 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsMetricsAndParamsTree.toggleStatus', async () => {
-      const path = joinMetricOrParamPath('params', paramsFile, 'learning_rate')
+      const path = joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        paramsFile,
+        'learning_rate'
+      )
 
       const { experiments } = buildExperiments(disposable)
 
@@ -73,7 +81,7 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsMetricsAndParamsTree.toggleStatus', async () => {
-      const path = joinMetricOrParamPath('params', paramsFile)
+      const path = joinMetricOrParamPath(MetricOrParamType.PARAMS, paramsFile)
 
       const { experiments } = buildExperiments(disposable)
 
@@ -86,7 +94,7 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
 
       const selectedGrandChildren =
         experiments.getChildMetricsOrParams(
-          joinMetricOrParamPath(path, 'process')
+          appendMetricOrParamToPath(path, 'process')
         ) || []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
@@ -114,7 +122,7 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
 
       const unselectedGrandChildren =
         experiments.getChildMetricsOrParams(
-          joinMetricOrParamPath(path, 'process')
+          appendMetricOrParamToPath(path, 'process')
         ) || []
 
       const allUnselectedChildren = [
@@ -128,8 +136,11 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it("should be able to select a child and set all of the ancestors' statuses to indeterminate with dvc.views.experimentsMetricsAndParamsTree.toggleStatus", async () => {
-      const grandParentPath = joinMetricOrParamPath('params', paramsFile)
-      const parentPath = joinMetricOrParamPath(grandParentPath, 'process')
+      const grandParentPath = joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        paramsFile
+      )
+      const parentPath = appendMetricOrParamToPath(grandParentPath, 'process')
 
       const { experiments } = buildExperiments(disposable)
 
@@ -195,8 +206,11 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsMetricsAndParamsTree.toggleStatus", async () => {
-      const grandParentPath = joinMetricOrParamPath('params', paramsFile)
-      const parentPath = joinMetricOrParamPath(grandParentPath, 'process')
+      const grandParentPath = joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        paramsFile
+      )
+      const parentPath = appendMetricOrParamToPath(grandParentPath, 'process')
 
       const { experiments } = buildExperiments(disposable)
 
@@ -266,8 +280,11 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it("should be able to unselect the last selected child and set it's children and ancestors to unselected with dvc.views.experimentsMetricsAndParamsTree.toggleStatus", async () => {
-      const grandParentPath = joinMetricOrParamPath('params', paramsFile)
-      const parentPath = joinMetricOrParamPath(grandParentPath, 'process')
+      const grandParentPath = joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        paramsFile
+      )
+      const parentPath = appendMetricOrParamToPath(grandParentPath, 'process')
 
       const { experiments } = buildExperiments(disposable)
 

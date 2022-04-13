@@ -5,7 +5,6 @@ import {
 } from 'dvc/src/webview/contract'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import Experiments from './Experiments'
-import { vsCodeApi } from '../../shared/api'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
 export const App: React.FC<Record<string, unknown>> = () => {
@@ -13,12 +12,8 @@ export const App: React.FC<Record<string, unknown>> = () => {
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<TableData> }) => {
-        switch (data.type) {
-          case MessageToWebviewType.SET_DATA:
-            setTableData(data.data)
-            return
-          case MessageToWebviewType.SET_DVC_ROOT:
-            vsCodeApi.setState({ dvcRoot: data.dvcRoot })
+        if (data.type === MessageToWebviewType.SET_DATA) {
+          setTableData(data.data)
         }
       },
       [setTableData]

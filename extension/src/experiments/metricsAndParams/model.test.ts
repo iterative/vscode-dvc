@@ -1,15 +1,22 @@
 import { MetricsAndParamsModel } from './model'
-import { joinMetricOrParamPath } from './paths'
+import { appendMetricOrParamToPath, joinMetricOrParamPath } from './paths'
 import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
+import { MetricOrParamType } from '../webview/contract'
 
 describe('MetricsAndParamsModel', () => {
   const exampleDvcRoot = 'test'
 
   describe('persistence', () => {
-    const paramsDotYamlPath = joinMetricOrParamPath('params', 'params.yaml')
-    const testParamPath = joinMetricOrParamPath(paramsDotYamlPath, 'testparam')
+    const paramsDotYamlPath = joinMetricOrParamPath(
+      MetricOrParamType.PARAMS,
+      'params.yaml'
+    )
+    const testParamPath = appendMetricOrParamToPath(
+      paramsDotYamlPath,
+      'testparam'
+    )
     const exampleData = {
       workspace: {
         baseline: {
@@ -33,20 +40,20 @@ describe('MetricsAndParamsModel', () => {
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
         {
-          group: 'params',
           hasChildren: true,
           name: 'params.yaml',
-          parentPath: 'params',
-          path: paramsDotYamlPath
+          parentPath: MetricOrParamType.PARAMS,
+          path: paramsDotYamlPath,
+          type: MetricOrParamType.PARAMS
         },
         {
-          group: 'params',
           hasChildren: false,
           maxStringLength: 4,
           name: 'testparam',
           parentPath: paramsDotYamlPath,
           path: testParamPath,
-          pathArray: ['params', 'params.yaml', 'testparam'],
+          pathArray: [MetricOrParamType.PARAMS, 'params.yaml', 'testparam'],
+          type: MetricOrParamType.PARAMS,
           types: ['boolean']
         }
       ])
@@ -65,11 +72,11 @@ describe('MetricsAndParamsModel', () => {
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
         {
-          group: 'params',
           hasChildren: true,
           name: 'params.yaml',
-          parentPath: 'params',
-          path: paramsDotYamlPath
+          parentPath: MetricOrParamType.PARAMS,
+          path: paramsDotYamlPath,
+          type: MetricOrParamType.PARAMS
         }
       ])
     })

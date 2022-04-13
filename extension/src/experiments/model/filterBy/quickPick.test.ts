@@ -1,9 +1,13 @@
 import { FilterDefinition, getFilterId, Operator } from '.'
 import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
-import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
+import {
+  appendMetricOrParamToPath,
+  joinMetricOrParamPath
+} from '../../metricsAndParams/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
+import { MetricOrParamType } from '../../webview/contract'
 
 jest.mock('../../../vscode/inputBox')
 jest.mock('../../../vscode/quickPick')
@@ -16,12 +20,14 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const params = 'params'
 const paramsYaml = 'params.yaml'
-const paramsYamlPath = joinMetricOrParamPath(params, paramsYaml)
-const epochsParamPath = joinMetricOrParamPath(paramsYamlPath, 'epochs')
+const paramsYamlPath = joinMetricOrParamPath(
+  MetricOrParamType.PARAMS,
+  paramsYaml
+)
+const epochsParamPath = appendMetricOrParamToPath(paramsYamlPath, 'epoch')
+
 const epochsParam = {
-  group: params,
   hasChildren: false,
   maxNumber: 5,
   maxStringLength: 1,
@@ -29,28 +35,29 @@ const epochsParam = {
   name: 'epochs',
   parentPath: paramsYamlPath,
   path: epochsParamPath,
+  type: MetricOrParamType.PARAMS,
   types: ['number']
 }
 const boolParam = {
-  group: params,
   hasChildren: false,
   maxNumber: 1,
   maxStringLength: 1,
   minNumber: 0,
   name: 'bool',
   parentPath: paramsYamlPath,
-  path: joinMetricOrParamPath(paramsYamlPath, 'bool'),
+  path: appendMetricOrParamToPath(paramsYamlPath, 'bool'),
+  type: MetricOrParamType.PARAMS,
   types: ['boolean']
 }
 const mixedParam = {
-  group: params,
   hasChildren: false,
   maxNumber: 5,
   maxStringLength: 44,
   minNumber: 2,
   name: 'mixed',
   parentPath: paramsYamlPath,
-  path: joinMetricOrParamPath(paramsYamlPath, 'mixed'),
+  path: appendMetricOrParamToPath(paramsYamlPath, 'mixed'),
+  type: MetricOrParamType.PARAMS,
   types: ['number', 'string', 'boolean']
 }
 
