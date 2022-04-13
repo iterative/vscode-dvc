@@ -1,4 +1,7 @@
-import { MetricOrParam } from 'dvc/src/experiments/webview/contract'
+import {
+  MetricOrParam,
+  MetricOrParamGroup
+} from 'dvc/src/experiments/webview/contract'
 import { useColumnOrder } from './useColumnOrder'
 
 jest.mock('react', () => ({
@@ -8,38 +11,42 @@ jest.mock('../../shared/api')
 
 describe('useColumnOrder', () => {
   it('should return re-sorted columns with groups and generated parents', () => {
-    const params: MetricOrParam[] = [
+    const metricsAndParams: MetricOrParam[] = [
       {
-        group: 'group1',
+        group: MetricOrParamGroup.METRICS,
         hasChildren: false,
         name: 'A',
-        parentPath: 'g1',
-        path: 'g1:A'
+        parentPath: MetricOrParamGroup.METRICS,
+        path: `${MetricOrParamGroup.METRICS}:A`
       },
       {
-        group: 'group1',
+        group: MetricOrParamGroup.METRICS,
         hasChildren: false,
         name: 'B',
-        parentPath: 'g1',
-        path: 'g1:B'
+        parentPath: MetricOrParamGroup.METRICS,
+        path: `${MetricOrParamGroup.METRICS}:B`
       },
       {
-        group: 'group2',
+        group: MetricOrParamGroup.PARAMS,
         hasChildren: false,
         name: 'C',
-        parentPath: 'g2',
-        path: 'g2:C'
+        parentPath: MetricOrParamGroup.PARAMS,
+        path: `${MetricOrParamGroup.PARAMS}:C`
       }
     ]
-    const columnOrder: string[] = ['g2:C', 'g1:A', 'g1:B']
-    const groupedParams = useColumnOrder(params, columnOrder)
+    const columnOrder: string[] = [
+      `${MetricOrParamGroup.PARAMS}:C`,
+      `${MetricOrParamGroup.METRICS}:A`,
+      `${MetricOrParamGroup.METRICS}:B`
+    ]
+    const groupedParams = useColumnOrder(metricsAndParams, columnOrder)
 
     expect(groupedParams.map(col => col.path)).toStrictEqual([
-      '0/g2:C',
-      '1/g1:A',
-      '1/g1:B',
-      '0/g2',
-      '1/g1'
+      `0/${MetricOrParamGroup.PARAMS}:C`,
+      `1/${MetricOrParamGroup.METRICS}:A`,
+      `1/${MetricOrParamGroup.METRICS}:B`,
+      `0/${MetricOrParamGroup.PARAMS}`,
+      `1/${MetricOrParamGroup.METRICS}`
     ])
   })
 })

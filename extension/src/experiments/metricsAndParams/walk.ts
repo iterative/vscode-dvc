@@ -6,6 +6,7 @@ import {
   ValueTree,
   ValueTreeRoot
 } from '../../cli/reader'
+import { MetricOrParamGroup } from '../webview/contract'
 
 export type OnValueCallback = (
   key: string,
@@ -15,7 +16,7 @@ export type OnValueCallback = (
 ) => void
 
 export interface ValueWalkMeta {
-  group: string
+  group: MetricOrParamGroup
   file: string
 }
 
@@ -36,7 +37,7 @@ const walkValueTree = (
 
 const walkValueFileRoot = (
   root: ValueTreeRoot,
-  group: string,
+  group: MetricOrParamGroup,
   onValue: OnValueCallback
 ) => {
   for (const [file, value] of Object.entries(root)) {
@@ -59,10 +60,10 @@ const walkExperiment = (
   if (data) {
     const { params, metrics } = data
     if (metrics) {
-      walkValueFileRoot(metrics, 'metrics', onValue)
+      walkValueFileRoot(metrics, MetricOrParamGroup.METRICS, onValue)
     }
     if (params) {
-      walkValueFileRoot(params, 'params', onValue)
+      walkValueFileRoot(params, MetricOrParamGroup.PARAMS, onValue)
     }
   }
 }

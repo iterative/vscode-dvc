@@ -1,19 +1,22 @@
 import { join } from '../../util/path'
-import { MetricOrParam } from '../../../experiments/webview/contract'
+import {
+  MetricOrParam,
+  MetricOrParamGroup
+} from '../../../experiments/webview/contract'
 import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
 
 const nestedParamsFile = join('nested', 'params.yaml')
 
 const data: MetricOrParam[] = [
   {
-    group: 'metrics',
+    group: MetricOrParamGroup.METRICS,
     hasChildren: true,
     name: 'summary.json',
     parentPath: joinMetricOrParamPath('metrics'),
     path: joinMetricOrParamPath('metrics', 'summary.json')
   },
   {
-    group: 'metrics',
+    group: MetricOrParamGroup.METRICS,
     hasChildren: false,
     maxStringLength: 18,
     name: 'loss',
@@ -25,7 +28,7 @@ const data: MetricOrParam[] = [
     minNumber: 1.775016188621521
   },
   {
-    group: 'metrics',
+    group: MetricOrParamGroup.METRICS,
     hasChildren: false,
     maxStringLength: 19,
     name: 'accuracy',
@@ -37,7 +40,7 @@ const data: MetricOrParam[] = [
     minNumber: 0.3484833240509033
   },
   {
-    group: 'metrics',
+    group: MetricOrParamGroup.METRICS,
     hasChildren: false,
     maxStringLength: 18,
     name: 'val_loss',
@@ -49,7 +52,7 @@ const data: MetricOrParam[] = [
     minNumber: 1.7233840227127075
   },
   {
-    group: 'metrics',
+    group: MetricOrParamGroup.METRICS,
     hasChildren: false,
     maxStringLength: 19,
     name: 'val_accuracy',
@@ -61,14 +64,14 @@ const data: MetricOrParam[] = [
     minNumber: 0.4277999997138977
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: true,
     name: 'params.yaml',
     parentPath: joinMetricOrParamPath('params'),
     path: joinMetricOrParamPath('params', 'params.yaml')
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxStringLength: 1,
     name: 'epochs',
@@ -80,7 +83,7 @@ const data: MetricOrParam[] = [
     minNumber: 2
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxStringLength: 6,
     name: 'learning_rate',
@@ -92,7 +95,7 @@ const data: MetricOrParam[] = [
     minNumber: 2e-12
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxStringLength: 8,
     name: 'dvc_logs_dir',
@@ -102,7 +105,7 @@ const data: MetricOrParam[] = [
     types: ['string']
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxStringLength: 8,
     name: 'log_file',
@@ -112,7 +115,7 @@ const data: MetricOrParam[] = [
     types: ['string']
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxStringLength: 5,
     name: 'dropout',
@@ -124,14 +127,14 @@ const data: MetricOrParam[] = [
     minNumber: 0.122
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: true,
     name: 'process',
     parentPath: joinMetricOrParamPath('params', 'params.yaml'),
     path: joinMetricOrParamPath('params', 'params.yaml', 'process')
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxStringLength: 4,
     name: 'threshold',
@@ -148,7 +151,7 @@ const data: MetricOrParam[] = [
     minNumber: 0.85
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxStringLength: 6,
     name: 'test_arg',
@@ -160,14 +163,14 @@ const data: MetricOrParam[] = [
     minNumber: 3
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: true,
     name: nestedParamsFile,
     parentPath: joinMetricOrParamPath('params'),
     path: joinMetricOrParamPath('params', nestedParamsFile)
   },
   {
-    group: 'params',
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxStringLength: 4,
     name: 'test',

@@ -1,7 +1,7 @@
 import get from 'lodash/get'
 import { ValueWalkMeta, walkRepo } from './walk'
 import { joinMetricOrParamPath } from './paths'
-import { MetricOrParam } from '../webview/contract'
+import { MetricOrParam, MetricOrParamGroup } from '../webview/contract'
 import {
   ExperimentFields,
   ExperimentFieldsOrError,
@@ -72,7 +72,10 @@ export const collectMetricsAndParams = (
 ): MetricOrParam[] => {
   const collectedColumns: Record<string, MetricOrParam> = {}
 
-  const mergeParentColumnByPath = (path: string[], group: string) => {
+  const mergeParentColumnByPath = (
+    path: string[],
+    group: MetricOrParamGroup
+  ) => {
     const name = path[path.length - 1]
     const columnPath = joinMetricOrParamPath(group, ...path)
     const parentPath = joinMetricOrParamPath(group, ...path.slice(0, -1))

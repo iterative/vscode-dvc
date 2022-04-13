@@ -4,6 +4,7 @@ import { getInput } from '../../../vscode/inputBox'
 import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
+import { MetricOrParamGroup } from '../../webview/contract'
 
 jest.mock('../../../vscode/inputBox')
 jest.mock('../../../vscode/quickPick')
@@ -21,7 +22,7 @@ const paramsYaml = 'params.yaml'
 const paramsYamlPath = joinMetricOrParamPath(params, paramsYaml)
 const epochsParamPath = joinMetricOrParamPath(paramsYamlPath, 'epochs')
 const epochsParam = {
-  group: params,
+  group: MetricOrParamGroup.PARAMS,
   hasChildren: false,
   maxNumber: 5,
   maxStringLength: 1,
@@ -32,7 +33,7 @@ const epochsParam = {
   types: ['number']
 }
 const boolParam = {
-  group: params,
+  group: MetricOrParamGroup.PARAMS,
   hasChildren: false,
   maxNumber: 1,
   maxStringLength: 1,
@@ -43,7 +44,7 @@ const boolParam = {
   types: ['boolean']
 }
 const mixedParam = {
-  group: params,
+  group: MetricOrParamGroup.PARAMS,
   hasChildren: false,
   maxNumber: 5,
   maxStringLength: 44,

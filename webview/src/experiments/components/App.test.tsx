@@ -23,7 +23,11 @@ import {
   makeDnd,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
-import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  MetricOrParamGroup,
+  RowData,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { App } from './App'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
@@ -497,14 +501,14 @@ describe('App', () => {
       ...tableDataFixture,
       columns: [
         {
-          group: 'metrics',
+          group: MetricOrParamGroup.METRICS,
           hasChildren: true,
           name: 'summary.json',
           parentPath: joinMetricOrParamPath('metrics'),
           path: joinMetricOrParamPath('metrics', 'summary.json')
         },
         {
-          group: 'metrics',
+          group: MetricOrParamGroup.METRICS,
           hasChildren: false,
           maxNumber: testMetricNumberValue,
           maxStringLength: 18,
@@ -516,14 +520,14 @@ describe('App', () => {
           types: ['number']
         },
         {
-          group: 'params',
+          group: MetricOrParamGroup.PARAMS,
           hasChildren: true,
           name: 'params.yaml',
           parentPath: joinMetricOrParamPath('params'),
           path: joinMetricOrParamPath('params', 'params.yaml')
         },
         {
-          group: 'params',
+          group: MetricOrParamGroup.PARAMS,
           hasChildren: false,
           maxStringLength: 10,
           name: testParamName,

@@ -3,6 +3,7 @@ import { joinMetricOrParamPath } from './paths'
 import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
+import { MetricOrParamGroup } from '../webview/contract'
 
 describe('MetricsAndParamsModel', () => {
   const exampleDvcRoot = 'test'
@@ -33,14 +34,14 @@ describe('MetricsAndParamsModel', () => {
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
         {
-          group: 'params',
+          group: MetricOrParamGroup.PARAMS,
           hasChildren: true,
           name: 'params.yaml',
           parentPath: 'params',
           path: paramsDotYamlPath
         },
         {
-          group: 'params',
+          group: MetricOrParamGroup.PARAMS,
           hasChildren: false,
           maxStringLength: 4,
           name: 'testparam',
@@ -65,7 +66,7 @@ describe('MetricsAndParamsModel', () => {
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
         {
-          group: 'params',
+          group: MetricOrParamGroup.PARAMS,
           hasChildren: true,
           name: 'params.yaml',
           parentPath: 'params',

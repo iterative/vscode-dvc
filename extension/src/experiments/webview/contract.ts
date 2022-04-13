@@ -27,8 +27,13 @@ export interface MetricOrParamAggregateData {
   minNumber?: number
 }
 
+export enum MetricOrParamGroup {
+  METRICS = 'metrics',
+  PARAMS = 'params'
+}
+
 export interface MetricOrParam extends MetricOrParamAggregateData {
-  group: string
+  group: MetricOrParamGroup
   hasChildren: boolean
   name: string
   path: string

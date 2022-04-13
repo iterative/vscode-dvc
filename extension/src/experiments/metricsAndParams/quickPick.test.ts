@@ -3,6 +3,7 @@ import { joinMetricOrParamPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Title } from '../../vscode/title'
+import { MetricOrParamGroup } from '../webview/contract'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -22,7 +23,7 @@ describe('pickFromMetricsAndParams', () => {
   const paramsYamlPath = joinMetricOrParamPath(params, paramsYaml)
   const epochsParamPath = joinMetricOrParamPath(paramsYamlPath, 'epochs')
   const epochsParam = {
-    group: params,
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: false,
     maxNumber: 5,
     maxStringLength: 1,
@@ -34,7 +35,7 @@ describe('pickFromMetricsAndParams', () => {
   }
 
   const paramsYamlParam = {
-    group: params,
+    group: MetricOrParamGroup.PARAMS,
     hasChildren: true,
     name: paramsYaml,
     parentPath: params,
