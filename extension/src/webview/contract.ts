@@ -41,6 +41,13 @@ export type PlotsTemplatesReordered = {
   paths: string[]
 }[]
 
+export interface ContextMenuPayload {
+  id: string
+  depth: number
+  running?: boolean
+  queued?: boolean
+}
+
 export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.COLUMN_REORDERED
@@ -52,7 +59,7 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.CONTEXT_MENU_INVOKED
-      payload: string
+      payload: ContextMenuPayload
     }
   | {
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
