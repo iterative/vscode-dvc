@@ -15,11 +15,11 @@ export type DraggedInfo = {
 }
 
 const orderIdxTune = (
-  hasDropTargetOrIsNew: boolean,
+  hasDropTarget: boolean,
   direction: DragEnterDirection,
   isAfter: boolean
 ) => {
-  if (!hasDropTargetOrIsNew) {
+  if (!hasDropTarget) {
     return 0
   }
 
@@ -30,17 +30,23 @@ const orderIdxTune = (
   return isAfter ? -1 : 0
 }
 
-const isSameGroup = (group1: string, group2: string) =>
+const isSameGroup = (group1?: string, group2?: string) =>
   getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
 
+export type OnDrop = (
+  draggedId: string,
+  draggedGroup: string,
+  groupId: string,
+  position: number
+) => void
 interface DragDropContainerProps {
   order: string[]
   setOrder: (order: string[]) => void
   disabledDropIds?: string[]
   items: JSX.Element[] // Every item must have a id prop for drag and drop to work
   group: string
-  onDrop?: (draggedId: string, draggedGroup: string, groupId: string) => void
-  draggedRef?: MutableRefObject<DraggedInfo | undefined>
+  onDrop?: OnDrop
+  draggedRef: MutableRefObject<DraggedInfo | undefined>
   dropTarget?: {
     element: JSX.Element
     wrapperTag: 'div' | 'th'
@@ -62,15 +68,19 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const [direction, setDirection] = useState(DragEnterDirection.RIGHT)
   const draggedOverIdTimeout = useRef<number>(0)
 
+  const cleanup = () => {
+    setDraggedOverId('')
+    setDraggedId('')
+    setDirection(DragEnterDirection.RIGHT)
+  }
+
   useEffect(() => {
     return () => clearTimeout(draggedOverIdTimeout.current)
   }, [])
 
-  const setDraggedRef = (draggedInfo?: DraggedInfo) => {
-    if (draggedRef) {
-      draggedRef.current = draggedInfo
-    }
-  }
+  useEffect(() => {
+    cleanup()
+  }, [items])
 
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
@@ -89,21 +99,15 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     e.dataTransfer.setData('group', group)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
-    setDraggedRef({
+    draggedRef.current = {
       group,
       itemId: id,
       itemIndex
-    })
+    }
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId(id)
       setDraggedOverId(order[toIdx])
     }, 0)
-  }
-
-  const handleDragEnd = () => {
-    setDraggedOverId('')
-    setDraggedId('')
-    setDirection(DragEnterDirection.RIGHT)
   }
 
   const applyDrop = (
@@ -119,9 +123,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     newOrder.splice(droppedIndex, 0, dragged)
 
     setOrder(newOrder)
-    setDraggedRef(undefined)
+    draggedRef.current = undefined
 
-    onDrop?.(oldDraggedId, e.dataTransfer.getData('group'), group)
+    onDrop?.(oldDraggedId, e.dataTransfer.getData('group'), group, droppedIndex)
   }
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
@@ -137,7 +141,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
     const droppedIndex = order.indexOf(e.currentTarget.id.split('__')[0])
     const orderIdxChange = orderIdxTune(
-      !!dropTarget && !isNew,
+      !!dropTarget,
       direction,
       droppedIndex > draggedIndex
     )
@@ -150,7 +154,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    if (draggedId) {
+    if (isSameGroup(draggedRef.current?.group, group)) {
       const { id } = e.currentTarget
       if (id !== draggedId && !id.includes('__drop')) {
         setDraggedOverId(id)
@@ -170,7 +174,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       key={draggable.key}
       {...draggable.props}
       onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      onDragEnd={cleanup}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
@@ -188,7 +192,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         const { id } = draggable.props
         const item = id && buildItem(id, draggable)
 
-        if (id === draggedOverId && dropTarget && direction) {
+        if (id === draggedOverId && dropTarget) {
           const target = (
             <dropTarget.wrapperTag
               data-testid="drop-target"
