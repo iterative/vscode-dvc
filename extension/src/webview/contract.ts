@@ -85,12 +85,7 @@ export interface setData<T extends WebviewData> {
   data: T
 }
 
-export type MessageToWebview<T extends WebviewData> =
-  | {
-      type: MessageToWebviewType.SET_DVC_ROOT
-      dvcRoot: string
-    }
-  | setData<T>
+export type MessageToWebview<T extends WebviewData> = setData<T>
 
 export enum MessageToWebviewType {
   SET_DVC_ROOT = 'setDvcRoot',

@@ -1,7 +1,6 @@
 import { MessageFromWebview } from 'dvc/src/webview/contract'
 
 export interface InternalVsCodeApi {
-  setState<T>(state: T): void
   postMessage(message: MessageFromWebview): void
 }
 
