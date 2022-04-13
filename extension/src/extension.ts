@@ -58,6 +58,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
   private readonly trackedExplorerTree: TrackedExplorerTree
+  private readonly webviewSerializer: WebviewSerializer
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
   private readonly cliRunner: CliRunner
@@ -222,7 +223,9 @@ export class Extension extends Disposable implements IExtension {
       })
     )
 
-    this.dispose.track(new WebviewSerializer(this.experiments, this.plots))
+    this.webviewSerializer = this.dispose.track(
+      new WebviewSerializer(this.experiments, this.plots)
+    )
 
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots)
@@ -360,6 +363,7 @@ export class Extension extends Disposable implements IExtension {
   }
 
   private resetMembers() {
+    this.webviewSerializer.reset()
     this.repositories.reset()
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()

@@ -39,7 +39,9 @@
   },
   "activationEvents": [
     "onStartupFinished",
-    "workspaceContains:**/*dvc*"
+    "workspaceContains:**/*dvc*",
+    "onWebviewPanel:dvc-experiments",
+    "onWebviewPanel:dvc-plots"
   ],
   "main": "./dist/extension.js",
   "capabilities": {

@@ -41,6 +41,7 @@ export abstract class BaseWorkspaceWebviews<
     const repository = this.getRepository(dvcRoot)
     if (!repository) {
       webview.dispose()
+      return
     }
 
     repository.setWebview(webview)
