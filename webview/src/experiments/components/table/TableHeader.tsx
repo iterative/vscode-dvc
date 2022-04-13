@@ -1,5 +1,9 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  MetricOrParam,
+  MetricOrParamType
+} from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
@@ -51,8 +55,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 ? styles.placeholderHeaderCell
                 : styles.headerCell,
               {
-                [styles.paramHeaderCell]: column.group === 'params',
-                [styles.metricHeaderCell]: column.group === 'metrics',
+                [styles.paramHeaderCell]:
+                  column.group === MetricOrParamType.PARAMS,
+                [styles.metricHeaderCell]:
+                  column.group === MetricOrParamType.METRICS,
                 [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
                 [styles.sortingHeaderCellAsc]:
                   sort && !sort.descending && !column.parent?.placeholderOf,

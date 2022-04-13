@@ -14,6 +14,7 @@ import { ExperimentsSortByTree, SortItem } from './tree'
 import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
 import { InternalCommands } from '../../../commands/internal'
 import { buildMockedExperiments } from '../../../test/util/jest'
+import { MetricOrParamType } from '../../webview/contract'
 
 function buildMockedTreeItem(
   arg1: string | TreeItemLabel | Uri,
@@ -58,7 +59,7 @@ beforeEach(() => {
 
 describe('ExperimentsSortByTree', () => {
   const dvcRoot = 'demo'
-  const examplePath = joinMetricOrParamPath('params', 'test')
+  const examplePath = joinMetricOrParamPath(MetricOrParamType.PARAMS, 'test')
   const exampleSortDefinition: SortDefinition = {
     descending: true,
     path: examplePath

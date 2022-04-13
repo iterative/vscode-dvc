@@ -7,7 +7,8 @@ import { Disposable } from '../../../../../extension'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   Experiment,
-  MetricOrParam
+  MetricOrParam,
+  MetricOrParamType
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import { buildExperiments } from '../../util'
@@ -132,9 +133,15 @@ suite('Experiments Sort By Tree Test Suite', () => {
         mockShowQuickPick.reset()
       }
 
-      const testParamParentPathArray = ['params', 'params.yaml']
-      const testParamPathArray = [...testParamParentPathArray, 'testparam']
-      const otherTestParamPathArray = [
+      const testParamParentPathArray: [MetricOrParamType, string] = [
+        MetricOrParamType.PARAMS,
+        'params.yaml'
+      ]
+      const testParamPathArray: [MetricOrParamType, ...string[]] = [
+        ...testParamParentPathArray,
+        'testparam'
+      ]
+      const otherTestParamPathArray: [MetricOrParamType, ...string[]] = [
         ...testParamParentPathArray,
         'testparam2'
       ]
