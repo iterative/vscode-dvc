@@ -52,9 +52,8 @@ jest.mock('./overflowHoverTooltip/useIsFullyContained', () => ({
 }))
 const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)
 
-const { postMessage, setState } = vsCodeApi
+const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
-const mockSetState = jest.mocked(setState)
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -196,21 +195,6 @@ describe('App', () => {
 
     const noColumnsState = screen.queryByText('No Columns Selected')
     expect(noColumnsState).not.toBeInTheDocument()
-  })
-
-  it('Should persist dvcRoot when the message to update it is given', () => {
-    render(<App />)
-    const dvcRoot = 'testDvcRoot'
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          dvcRoot,
-          type: MessageToWebviewType.SET_DVC_ROOT
-        }
-      })
-    )
-    expect(mockSetState).toBeCalledWith({ dvcRoot })
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {

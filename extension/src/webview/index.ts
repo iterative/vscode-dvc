@@ -76,13 +76,6 @@ export class BaseWebview<T extends WebviewData> {
 
     this.notifyActiveStatus(webviewPanel)
 
-    this.isReady().then(() => {
-      this.sendMessage({
-        dvcRoot: this.dvcRoot,
-        type: MessageToWebviewType.SET_DVC_ROOT
-      })
-    })
-
     this.setupTelemetryEvents(webviewPanel, eventsNames)
   }
 
