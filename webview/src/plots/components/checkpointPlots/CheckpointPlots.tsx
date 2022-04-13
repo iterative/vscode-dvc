@@ -68,7 +68,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
         disabledDropIds={[]}
         items={items as JSX.Element[]}
         group="live-plots"
-        dropTarget={<DropTarget />}
+        dropTarget={{
+          element: <DropTarget />,
+          wrapperTag: 'div'
+        }}
       />
     </div>
   ) : (

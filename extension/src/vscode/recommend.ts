@@ -26,18 +26,20 @@ export const recommendRedHatExtension = async () => {
 }
 
 export const recommendRedHatExtensionOnce = (): Disposable => {
-  const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
-    if (
-      isInstalled(RED_HAT_EXTENSION_ID) ||
-      getConfigValue(DO_NOT_RECOMMEND_RED_HAT)
-    ) {
-      return singleUseListener.dispose()
-    }
+  const singleUseListener: Disposable = window.onDidChangeActiveTextEditor(
+    editor => {
+      if (
+        isInstalled(RED_HAT_EXTENSION_ID) ||
+        getConfigValue(DO_NOT_RECOMMEND_RED_HAT)
+      ) {
+        return singleUseListener.dispose()
+      }
 
-    if (isAnyDvcYaml(editor?.document.fileName)) {
-      recommendRedHatExtension()
-      return singleUseListener.dispose()
+      if (isAnyDvcYaml(editor?.document.fileName)) {
+        recommendRedHatExtension()
+        return singleUseListener.dispose()
+      }
     }
-  })
+  )
   return singleUseListener
 }

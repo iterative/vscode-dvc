@@ -255,15 +255,23 @@ $gap: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
 
-  .dropIcon {
-    border-radius: 100%;
-    border: 3px solid var(--vscode-focusBorder);
-    padding: 20px;
-    box-sizing: content-box;
+.dropIcon {
+  border-radius: 100%;
+  border: 3px solid var(--vscode-focusBorder);
+  padding: 20px;
+}
 
-    path {
-      fill: var(--vscode-focusBorder);
-    }
+.smallDropIcon {
+  padding: 5px;
+}
+
+.smallDropIcon,
+.dropIcon {
+  box-sizing: content-box;
+
+  path {
+    fill: var(--vscode-focusBorder);
   }
 }
