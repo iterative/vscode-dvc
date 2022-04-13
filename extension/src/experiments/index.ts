@@ -437,7 +437,7 @@ export class Experiments extends BaseRepository<TableData> {
     if (depth === 1) {
       items.push(
         {
-          label: '%command.views.experimentsTree.queueExperiment%',
+          label: 'Vary Param(s) and Queue',
           value: 'vary'
         },
         {
