@@ -80,15 +80,12 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.INITIALIZED }
 
-export interface setData<T extends WebviewData> {
+export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA
   data: T
 }
 
-export type MessageToWebview<T extends WebviewData> = setData<T>
-
 export enum MessageToWebviewType {
-  SET_DVC_ROOT = 'setDvcRoot',
   SET_DATA = 'setData'
 }
 
