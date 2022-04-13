@@ -20,11 +20,12 @@ import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
-import { MessageFromWebviewType } from '../webview/contract'
+import { ContextMenuPayload, MessageFromWebviewType } from '../webview/contract'
 import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
+import { QuickPickItemWithValue, quickPickValue } from '../vscode/quickPick'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { createTypedAccumulator } from '../util/object'
@@ -360,6 +361,8 @@ export class Experiments extends BaseRepository<TableData> {
             return this.addColumnSort(message.payload)
           case MessageFromWebviewType.COLUMN_SORT_REMOVED:
             return this.removeColumnSort(message.payload)
+          case MessageFromWebviewType.CONTEXT_MENU_INVOKED:
+            return this.invokeContextMenu(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -412,6 +415,40 @@ export class Experiments extends BaseRepository<TableData> {
       undefined
     )
     return this.notifyChanged()
+  }
+
+  private invokeContextMenu({ depth, queued }: ContextMenuPayload) {
+    const items: QuickPickItemWithValue<string>[] = []
+    if (depth === 0) {
+      return
+    }
+    if (!queued) {
+      items.push(
+        {
+          label: 'Apply to Workspace',
+          value: 'apply'
+        },
+        {
+          label: 'Create New Branch',
+          value: 'branch'
+        }
+      )
+    }
+    if (depth === 1) {
+      items.push(
+        {
+          label: '%command.views.experimentsTree.queueExperiment%',
+          value: 'vary'
+        },
+        {
+          label: 'Remove Experiment',
+          value: 'remove'
+        }
+      )
+    }
+    if (items.length > 0) {
+      return quickPickValue(items, {})
+    }
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
