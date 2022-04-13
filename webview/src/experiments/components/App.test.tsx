@@ -437,7 +437,7 @@ describe('App', () => {
           }
         })
       )
-      const testClick = (
+      const testContextMenu = (
         label: string,
         {
           depth = 1,
@@ -457,18 +457,18 @@ describe('App', () => {
         })
       }
 
-      testClick('workspace', { depth: 0, running: true })
-      testClick('main', { depth: 0 })
-      testClick('[exp-e7a67]', {
+      testContextMenu('workspace', { depth: 0, running: true })
+      testContextMenu('main', { depth: 0 })
+      testContextMenu('[exp-e7a67]', {
         depth: 1,
         id: 'exp-e7a67',
         running: true
       })
-      testClick('22e40e1', {
+      testContextMenu('22e40e1', {
         depth: 2,
         id: '22e40e1fa3c916ac567f69b85969e3066a91dda4'
       })
-      testClick('e821416', {
+      testContextMenu('e821416', {
         depth: 2,
         id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361'
       })
