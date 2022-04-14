@@ -24,7 +24,7 @@
     "dev-server": "yarn turbo run dev --parallel",
     "postinstall": "husky install",
     "storybook": "yarn workspace dvc-vscode-webview storybook",
-    "build-storybook": "yarn turbo run build-storybook",
+    "build-storybook": "yarn turbo run build-storybook --filter=dvc-vscode-webview",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
     "setup:venv": "ts-node ./scripts/virtualenv-install.ts",
     "scheduled:cli:test": "ts-node ./extension/src/test/cli/index.ts",
