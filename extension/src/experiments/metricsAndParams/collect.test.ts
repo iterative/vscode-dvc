@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { collectChanges, collectMetricsAndParams } from './collect'
 import { joinMetricOrParamPath } from './paths'
-import { MetricOrParam } from '../webview/contract'
+import { MetricOrParam, MetricOrParamType } from '../webview/contract'
 import outputFixture from '../../test/fixtures/expShow/output'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { ExperimentsOutput } from '../../cli/reader'
@@ -34,10 +34,10 @@ describe('collectMetricsAndParams', () => {
       }
     })
     const params = metricsAndParams.find(
-      metricOrParam => metricOrParam.group === 'params'
+      metricOrParam => metricOrParam.type === MetricOrParamType.PARAMS
     )
     const metrics = metricsAndParams.find(
-      metricOrParam => metricOrParam.group === 'metrics'
+      metricOrParam => metricOrParam.type === MetricOrParamType.METRICS
     )
     expect(params).toBeDefined()
     expect(metrics).toBeDefined()
@@ -58,10 +58,10 @@ describe('collectMetricsAndParams', () => {
       }
     })
     const params = metricsAndParams.find(
-      metricOrParam => metricOrParam.group === 'params'
+      metricOrParam => metricOrParam.type === MetricOrParamType.PARAMS
     )
     const metrics = metricsAndParams.find(
-      metricOrParam => metricOrParam.group === 'metrics'
+      metricOrParam => metricOrParam.type === MetricOrParamType.METRICS
     )
     expect(params).toBeUndefined()
     expect(metrics).toBeDefined()
@@ -125,7 +125,7 @@ describe('collectMetricsAndParams', () => {
   const exampleMixedParam = metricsAndParams.find(
     metricOrParam =>
       metricOrParam.parentPath ===
-      joinMetricOrParamPath('params', 'params.yaml')
+      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
   ) as MetricOrParam
 
   it('should correctly identify mixed type params', () => {
@@ -193,7 +193,11 @@ describe('collectMetricsAndParams', () => {
     const mixedParam = metricsAndParams.find(
       metricOrParam =>
         metricOrParam.path ===
-        joinMetricOrParamPath('params', 'params.yaml', 'mixedNumber')
+        joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yaml',
+          'mixedNumber'
+        )
     ) as MetricOrParam
 
     expect(mixedParam.minNumber).toStrictEqual(-1)
@@ -235,7 +239,7 @@ describe('collectMetricsAndParams', () => {
     }
   })
   const param = numericMetricsAndParams.filter(
-    metricOrParam => metricOrParam.group === 'params'
+    metricOrParam => metricOrParam.type === MetricOrParamType.PARAMS
   ) as MetricOrParam[]
   const paramWithNumbers = param.find(
     p => p.name === 'withNumbers'
@@ -310,7 +314,7 @@ describe('collectMetricsAndParams', () => {
     const params = metricsAndParams.filter(
       metricOrParam =>
         metricOrParam.parentPath ===
-        joinMetricOrParamPath('params', 'params.yaml')
+        joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
     ) as MetricOrParam[]
 
     expect(params?.map(({ name }) => name)).toStrictEqual([
@@ -343,23 +347,27 @@ describe('collectMetricsAndParams', () => {
     })
 
     expect(metricsAndParams.map(({ path }) => path)).toStrictEqual([
-      joinMetricOrParamPath('params', 'params.yaml'),
-      joinMetricOrParamPath('params', 'params.yaml', 'one.two.three.four'),
+      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml'),
       joinMetricOrParamPath(
-        'params',
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'one.two.three.four'
+      ),
+      joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
         'params.yaml',
         'one.two.three.four',
         'five'
       ),
       joinMetricOrParamPath(
-        'params',
+        MetricOrParamType.PARAMS,
         'params.yaml',
         'one.two.three.four',
         'five',
         'six'
       ),
       joinMetricOrParamPath(
-        'params',
+        MetricOrParamType.PARAMS,
         'params.yaml',
         'one.two.three.four',
         'five',
@@ -391,7 +399,7 @@ describe('collectMetricsAndParams', () => {
     const objectParam = metricsAndParams.find(
       metricOrParam =>
         metricOrParam.parentPath ===
-        joinMetricOrParamPath('params', 'params.yaml')
+        joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
     ) as MetricOrParam
 
     expect(objectParam.name).toStrictEqual('onlyHasChild')
@@ -400,7 +408,11 @@ describe('collectMetricsAndParams', () => {
     const primitiveParam = metricsAndParams.find(
       metricOrParam =>
         metricOrParam.parentPath ===
-        joinMetricOrParamPath('params', 'params.yaml', 'onlyHasChild')
+        joinMetricOrParamPath(
+          MetricOrParamType.PARAMS,
+          'params.yaml',
+          'onlyHasChild'
+        )
     ) as MetricOrParam
 
     expect(primitiveParam.name).toStrictEqual('onlyHasPrimitive')
@@ -410,7 +422,7 @@ describe('collectMetricsAndParams', () => {
       metricOrParam =>
         metricOrParam.parentPath ===
         joinMetricOrParamPath(
-          'params',
+          MetricOrParamType.PARAMS,
           'params.yaml',
           'onlyHasChild',
           'onlyHasPrimitive'
@@ -424,22 +436,63 @@ describe('collectMetricsAndParams', () => {
     expect(
       collectMetricsAndParams(outputFixture).map(({ path }) => path)
     ).toStrictEqual([
-      joinMetricOrParamPath('metrics', 'summary.json'),
-      joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
-      joinMetricOrParamPath('metrics', 'summary.json', 'accuracy'),
-      joinMetricOrParamPath('metrics', 'summary.json', 'val_loss'),
-      joinMetricOrParamPath('metrics', 'summary.json', 'val_accuracy'),
-      joinMetricOrParamPath('params', 'params.yaml'),
-      joinMetricOrParamPath('params', 'params.yaml', 'epochs'),
-      joinMetricOrParamPath('params', 'params.yaml', 'learning_rate'),
-      joinMetricOrParamPath('params', 'params.yaml', 'dvc_logs_dir'),
-      joinMetricOrParamPath('params', 'params.yaml', 'log_file'),
-      joinMetricOrParamPath('params', 'params.yaml', 'dropout'),
-      joinMetricOrParamPath('params', 'params.yaml', 'process'),
-      joinMetricOrParamPath('params', 'params.yaml', 'process', 'threshold'),
-      joinMetricOrParamPath('params', 'params.yaml', 'process', 'test_arg'),
-      joinMetricOrParamPath('params', join('nested', 'params.yaml')),
-      joinMetricOrParamPath('params', join('nested', 'params.yaml'), 'test')
+      joinMetricOrParamPath(MetricOrParamType.METRICS, 'summary.json'),
+      joinMetricOrParamPath(MetricOrParamType.METRICS, 'summary.json', 'loss'),
+      joinMetricOrParamPath(
+        MetricOrParamType.METRICS,
+        'summary.json',
+        'accuracy'
+      ),
+      joinMetricOrParamPath(
+        MetricOrParamType.METRICS,
+        'summary.json',
+        'val_loss'
+      ),
+      joinMetricOrParamPath(
+        MetricOrParamType.METRICS,
+        'summary.json',
+        'val_accuracy'
+      ),
+      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml'),
+      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml', 'epochs'),
+      joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'learning_rate'
+      ),
+      joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'dvc_logs_dir'
+      ),
+      joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'log_file'
+      ),
+      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml', 'dropout'),
+      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml', 'process'),
+      joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'process',
+        'threshold'
+      ),
+      joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        'params.yaml',
+        'process',
+        'test_arg'
+      ),
+      joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        join('nested', 'params.yaml')
+      ),
+      joinMetricOrParamPath(
+        MetricOrParamType.PARAMS,
+        join('nested', 'params.yaml'),
+        'test'
+      )
     ])
   })
 })
@@ -543,7 +596,7 @@ describe('collectChanges', () => {
 
     expect(collectChanges(data)).toStrictEqual([
       joinMetricOrParamPath(
-        'params',
+        MetricOrParamType.PARAMS,
         'params.yaml',
         'dropout',
         'lower',
@@ -551,7 +604,7 @@ describe('collectChanges', () => {
         '0.05'
       ),
       joinMetricOrParamPath(
-        'params',
+        MetricOrParamType.PARAMS,
         'params.yaml',
         'dropout',
         'upper',

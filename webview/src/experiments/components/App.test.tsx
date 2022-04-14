@@ -24,7 +24,11 @@ import {
   makeDnd,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
-import { RowData, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  MetricOrParamType,
+  RowData,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
 import { App } from './App'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
@@ -49,9 +53,8 @@ jest.mock('./overflowHoverTooltip/useIsFullyContained', () => ({
 }))
 const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)
 
-const { postMessage, setState } = vsCodeApi
+const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
-const mockSetState = jest.mocked(setState)
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -193,21 +196,6 @@ describe('App', () => {
 
     const noColumnsState = screen.queryByText('No Columns Selected')
     expect(noColumnsState).not.toBeInTheDocument()
-  })
-
-  it('Should persist dvcRoot when the message to update it is given', () => {
-    render(<App />)
-    const dvcRoot = 'testDvcRoot'
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          dvcRoot,
-          type: MessageToWebviewType.SET_DVC_ROOT
-        }
-      })
-    )
-    expect(mockSetState).toBeCalledWith({ dvcRoot })
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {
@@ -536,7 +524,7 @@ describe('App', () => {
 
     const testParamName = 'test_param_with_long_name'
     const testParamPath = joinMetricOrParamPath(
-      'params',
+      MetricOrParamType.PARAMS,
       'params.yaml',
       testParamName
     )
@@ -547,39 +535,52 @@ describe('App', () => {
       ...tableDataFixture,
       columns: [
         {
-          group: 'metrics',
           hasChildren: true,
           name: 'summary.json',
-          parentPath: joinMetricOrParamPath('metrics'),
-          path: joinMetricOrParamPath('metrics', 'summary.json')
+          parentPath: joinMetricOrParamPath(MetricOrParamType.METRICS),
+          path: joinMetricOrParamPath(
+            MetricOrParamType.METRICS,
+            'summary.json'
+          ),
+          type: MetricOrParamType.METRICS
         },
         {
-          group: 'metrics',
           hasChildren: false,
           maxNumber: testMetricNumberValue,
           maxStringLength: 18,
           minNumber: testMetricNumberValue,
           name: 'loss',
-          parentPath: joinMetricOrParamPath('metrics', 'summary.json'),
-          path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
-          pathArray: ['metrics', 'summary.json', 'loss'],
+          parentPath: joinMetricOrParamPath(
+            MetricOrParamType.METRICS,
+            'summary.json'
+          ),
+          path: joinMetricOrParamPath(
+            MetricOrParamType.METRICS,
+            'summary.json',
+            'loss'
+          ),
+          pathArray: [MetricOrParamType.METRICS, 'summary.json', 'loss'],
+          type: MetricOrParamType.METRICS,
           types: ['number']
         },
         {
-          group: 'params',
           hasChildren: true,
           name: 'params.yaml',
-          parentPath: joinMetricOrParamPath('params'),
-          path: joinMetricOrParamPath('params', 'params.yaml')
+          parentPath: MetricOrParamType.PARAMS,
+          path: joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml'),
+          type: MetricOrParamType.PARAMS
         },
         {
-          group: 'params',
           hasChildren: false,
           maxStringLength: 10,
           name: testParamName,
-          parentPath: joinMetricOrParamPath('params', 'params.yaml'),
+          parentPath: joinMetricOrParamPath(
+            MetricOrParamType.PARAMS,
+            'params.yaml'
+          ),
           path: testParamPath,
-          pathArray: ['params', 'params.yaml', testParamName],
+          pathArray: [MetricOrParamType.PARAMS, 'params.yaml', testParamName],
+          type: MetricOrParamType.PARAMS,
           types: ['string']
         }
       ],

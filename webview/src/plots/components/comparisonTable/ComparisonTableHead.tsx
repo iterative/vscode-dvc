@@ -2,6 +2,7 @@ import React from 'react'
 import { ComparisonRevision } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
 import styles from './styles.module.scss'
+import { DropTarget } from './DropTarget'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 
@@ -50,6 +51,10 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           disabledDropIds={[pinnedColumn]}
           items={items}
           group="comparison"
+          dropTarget={{
+            element: <DropTarget />,
+            wrapperTag: 'th'
+          }}
         />
       </tr>
     </thead>

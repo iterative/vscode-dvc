@@ -3,7 +3,8 @@ import {
   MetricOrParam,
   RowData as Experiment,
   TableData,
-  InitiallyUndefinedTableData
+  InitiallyUndefinedTableData,
+  MetricOrParamType
 } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
@@ -103,8 +104,8 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
       accessor: 'timestamp',
       width: 100
     },
-    ...buildDynamicColumns(columns, 'metrics'),
-    ...buildDynamicColumns(columns, 'params')
+    ...buildDynamicColumns(columns, MetricOrParamType.METRICS),
+    ...buildDynamicColumns(columns, MetricOrParamType.PARAMS)
   ] as Column<Experiment>[]
 
 const reportResizedColumn = (state: TableState<Experiment>) => {
