@@ -14,15 +14,7 @@ export type DraggedInfo = {
   group: string
 }
 
-const orderIdxTune = (
-  hasDropTarget: boolean,
-  direction: DragEnterDirection,
-  isAfter: boolean
-) => {
-  if (!hasDropTarget) {
-    return 0
-  }
-
+const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
   if (direction === DragEnterDirection.RIGHT) {
     return isAfter ? 0 : 1
   }
@@ -47,7 +39,7 @@ interface DragDropContainerProps {
   group: string
   onDrop?: OnDrop
   draggedRef: MutableRefObject<DraggedInfo | undefined>
-  dropTarget?: {
+  dropTarget: {
     element: JSX.Element
     wrapperTag: 'div' | 'th'
   }
@@ -140,11 +132,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       : getIDIndex(e.dataTransfer.getData('itemIndex'))
 
     const droppedIndex = order.indexOf(e.currentTarget.id.split('__')[0])
-    const orderIdxChange = orderIdxTune(
-      !!dropTarget,
-      direction,
-      droppedIndex > draggedIndex
-    )
+    const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
     const orderIdxChanged = droppedIndex + orderIdxChange
     const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
 
@@ -179,10 +167,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
-      style={
-        (id === draggedId && dropTarget && { display: 'none' }) ||
-        draggable.props.style
-      }
+      style={(id === draggedId && { display: 'none' }) || draggable.props.style}
     />
   )
 
@@ -192,7 +177,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         const { id } = draggable.props
         const item = id && buildItem(id, draggable)
 
-        if (id === draggedOverId && dropTarget) {
+        if (id === draggedOverId) {
           const target = (
             <dropTarget.wrapperTag
               data-testid="drop-target"
