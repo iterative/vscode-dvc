@@ -72,7 +72,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   useEffect(() => {
     cleanup()
-  }, [items])
+  }, [order])
 
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
