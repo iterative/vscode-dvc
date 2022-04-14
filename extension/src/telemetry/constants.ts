@@ -1,4 +1,5 @@
 import { ViewColumn } from 'vscode'
+import { WorkspaceScale } from './collect'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { PlotSize, Section, SectionCollapsed } from '../plots/webview/contract'
 
@@ -65,8 +66,10 @@ type ExtensionProperties = {
   msPythonInstalled: boolean
   msPythonUsed: boolean
   pythonPathUsed: boolean
+  templates?: number
   workspaceFolderCount: number
-} & DvcRootCount
+} & DvcRootCount &
+  Partial<WorkspaceScale>
 
 type WebviewFocusChangedProperties = {
   active: boolean
