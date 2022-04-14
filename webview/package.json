@@ -7,7 +7,6 @@
     "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
     "lint:tsc": "tsc --noEmit",
     "lint": "run-p 'lint:*'",
-    "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "dev": "webpack watch --mode development",
     "build": "webpack --mode production",
     "test": "jest --collect-coverage",

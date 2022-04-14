@@ -5,7 +5,7 @@
     "./webview"
   ],
   "scripts": {
-    "format": "yarn turbo run format",
+    "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint": "yarn turbo run lint",
     "test:vscode": "yarn turbo run test-vscode-run",
     "test:jest": "yarn turbo run test",
