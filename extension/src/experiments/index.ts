@@ -433,62 +433,80 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  private async invokeContextMenu({
+  private async createBranchFromExperiment(experimentId: string) {
+    const input = await getInput(Title.ENTER_BRANCH_NAME)
+    if (input) {
+      return this.runCommand(
+        AvailableCommands.EXPERIMENT_BRANCH,
+        experimentId,
+        input
+      )
+    }
+  }
+
+  private applyExperimentToWorkspace(experimentId: string) {
+    return this.runCommand(AvailableCommands.EXPERIMENT_APPLY, experimentId)
+  }
+
+  private async varyParamsAndQueue(experimentId: string) {
+    const paramsToQueue = await this.pickParamsToQueue(experimentId)
+    if (paramsToQueue) {
+      return this.runCommand(
+        AvailableCommands.EXPERIMENT_QUEUE,
+        ...paramsToQueue
+      )
+    }
+  }
+
+  private removeExperiment(experimentId: string) {
+    return this.runCommand(AvailableCommands.EXPERIMENT_REMOVE, experimentId)
+  }
+
+  private getContextMenuItems({
     depth,
-    queued,
-    id
-  }: ContextMenuPayload): Promise<void | unknown> {
-    const items: QuickPickItemWithValue<
-      () => void | Thenable<void | unknown>
-    >[] = []
-    if (depth === 0) {
-      return
-    }
-    if (!queued) {
-      items.push(
-        {
-          label: 'Apply to Workspace',
-          value: () => this.runCommand(AvailableCommands.EXPERIMENT_APPLY, id)
-        },
-        {
-          label: 'Create New Branch',
-          value: async () => {
-            const input = await getInput(Title.ENTER_BRANCH_NAME)
-            if (input) {
-              return this.runCommand(
-                AvailableCommands.EXPERIMENT_BRANCH,
-                id,
-                input
-              )
-            }
+    queued
+  }: ContextMenuPayload): QuickPickItemWithValue<
+    (experimentId: string) => Promise<void>
+  >[] {
+    const items = []
+    if (depth > 0) {
+      if (!queued) {
+        items.push(
+          {
+            label: 'Apply to Workspace',
+            value: this.applyExperimentToWorkspace
+          },
+          {
+            label: 'Create New Branch',
+            value: this.createBranchFromExperiment
           }
-        }
-      )
-    }
-    if (depth === 1) {
-      items.push(
-        {
-          label: 'Vary Param(s) and Queue',
-          value: async () => {
-            const paramsToQueue = await this.pickParamsToQueue(id)
-            if (paramsToQueue) {
-              return this.runCommand(
-                AvailableCommands.EXPERIMENT_QUEUE,
-                ...paramsToQueue
-              )
-            }
+        )
+      }
+      if (depth === 1) {
+        items.push(
+          {
+            label: 'Vary Param(s) and Queue',
+            value: this.varyParamsAndQueue
+          },
+          {
+            label: 'Remove Experiment',
+            value: this.removeExperiment
           }
-        },
-        {
-          label: 'Remove Experiment',
-          value: () => this.runCommand(AvailableCommands.EXPERIMENT_REMOVE, id)
-        }
-      )
+        )
+      }
     }
+    return items
+  }
+
+  private async invokeContextMenu(
+    payload: ContextMenuPayload
+  ): Promise<void | unknown> {
+    const items = this.getContextMenuItems(payload)
     if (items.length > 0) {
       const callback = await quickPickValue(items, {})
       if (callback) {
-        return callback()
+        const { id } = payload
+        return callback(id)
       }
     }
   }
