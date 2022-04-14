@@ -1155,6 +1155,7 @@
     ]
   },
   "scripts": {
+    "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
     "lint:tsc": "tsc --noEmit",
