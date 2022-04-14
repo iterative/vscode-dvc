@@ -1,4 +1,4 @@
-import { removeMissingKeysFromObject } from './object'
+import { createTypedAccumulator, removeMissingKeysFromObject } from './object'
 
 describe('removeMissingKeysFromObject', () => {
   it('should remove any keys that exist in the object but not the provided array', () => {
@@ -44,5 +44,15 @@ describe('removeMissingKeysFromObject', () => {
     expect(emptyObject).toStrictEqual({})
     expect(extendedObject).not.toStrictEqual({})
     expect(extendedObject).toStrictEqual(copyExtendedObject)
+  })
+})
+
+describe('createTypedAccumulator', () => {
+  it('should create a typed accumulator from an enum like object', () => {
+    const obj = { A: 'a', B: 'b' } as const
+    const typedAccumulator: Record<'a' | 'b', number> =
+      createTypedAccumulator(obj)
+
+    expect(typedAccumulator).toStrictEqual({ a: 0, b: 0 })
   })
 })

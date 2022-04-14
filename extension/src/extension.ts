@@ -46,6 +46,7 @@ import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { Toast } from './vscode/toast'
+import { collectWorkspaceScale } from './telemetry/collect'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -177,19 +178,19 @@ export class Extension extends Disposable implements IExtension {
     )
 
     setup(this)
-      .then(() =>
+      .then(async () =>
         sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
-          this.getEventProperties(),
+          await this.getEventProperties(),
           { duration: stopWatch.getElapsedTime() }
         )
       )
-      .catch(error =>
+      .catch(async error =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
           error,
           stopWatch.getElapsedTime(),
-          this.getEventProperties()
+          await this.getEventProperties()
         )
       )
 
@@ -207,7 +208,7 @@ export class Extension extends Disposable implements IExtension {
 
           return sendTelemetryEvent(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
-            this.getEventProperties(),
+            await this.getEventProperties(),
             { duration: stopWatch.getElapsedTime() }
           )
         } catch (error: unknown) {
@@ -215,7 +216,7 @@ export class Extension extends Disposable implements IExtension {
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
             error as Error,
             stopWatch.getElapsedTime(),
-            this.getEventProperties()
+            await this.getEventProperties()
           )
         }
       })
@@ -389,8 +390,16 @@ export class Extension extends Disposable implements IExtension {
     return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
   }
 
-  private getEventProperties() {
+  private async getEventProperties() {
     return {
+      ...(this.cliAccessible
+        ? await collectWorkspaceScale(
+            this.dvcRoots,
+            this.experiments,
+            this.plots,
+            this.repositories
+          )
+        : {}),
       cliAccessible: this.cliAccessible,
       dvcPathUsed: !!this.config.getCliPath(),
       dvcRootCount: this.dvcRoots.length,

@@ -11,6 +11,7 @@ import {
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
+import { collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -111,6 +112,10 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public getPathStatuses() {
     return this.paths?.getTerminalNodeStatuses() || []
+  }
+
+  public getScale() {
+    return collectScale(this.paths?.getTerminalNodes())
   }
 
   private notifyChanged() {
