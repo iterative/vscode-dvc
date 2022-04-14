@@ -13,7 +13,7 @@ import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
-import { Experiment, TableData } from './webview/contract'
+import { Experiment, MetricOrParamType, TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
@@ -28,10 +28,7 @@ import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { createTypedAccumulator } from '../util/object'
 
-export const ExperimentsScale = {
-  METRICS: 'metrics',
-  PARAMS: 'params'
-} as const
+export const ExperimentsScale = MetricOrParamType
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>

@@ -62,9 +62,14 @@ type DvcRootCount = { dvcRootCount: number }
 type ExtensionProperties = {
   cliAccessible: boolean
   dvcPathUsed: boolean
+  images?: number
+  metrics?: number
   msPythonInstalled: boolean
   msPythonUsed: boolean
+  params?: number
   pythonPathUsed: boolean
+  templates?: number
+  tracked?: number
   workspaceFolderCount: number
 } & DvcRootCount
 
