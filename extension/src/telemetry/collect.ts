@@ -11,11 +11,13 @@ const WorkspaceScale = Object.assign(
   PlotsScale,
   RepositoryScale
 )
-type WorkspaceScale = typeof WorkspaceScale[keyof typeof WorkspaceScale]
-type WorkspaceScaleAccumulator = Record<WorkspaceScale, number>
+
+type ScaleType = typeof WorkspaceScale[keyof typeof WorkspaceScale]
+
+export type WorkspaceScale = Record<ScaleType, number>
 
 const aggregateRepositoriesScale = async (
-  acc: WorkspaceScaleAccumulator,
+  acc: WorkspaceScale,
   dvcRoots: string[],
   workspace: WorkspaceExperiments | WorkspacePlots | WorkspaceRepositories
 ) => {
@@ -27,11 +29,11 @@ const aggregateRepositoriesScale = async (
       continue
     }
     const counts = repository.getScale()
-    for (const [key, value] of Object.entries(counts) as [
-      WorkspaceScale,
+    for (const [type, value] of Object.entries(counts) as [
+      ScaleType,
       number
     ][]) {
-      acc[key] = acc[key] + value
+      acc[type] = acc[type] + value
     }
   }
 }
@@ -41,7 +43,7 @@ export const collectWorkspaceScale = async (
   workspaceExperiments: WorkspaceExperiments,
   workspacePlots: WorkspacePlots,
   workspaceRepositories: WorkspaceRepositories
-): Promise<WorkspaceScaleAccumulator> => {
+): Promise<WorkspaceScale> => {
   const acc = createTypedAccumulator(WorkspaceScale)
 
   for (const workspace of [
