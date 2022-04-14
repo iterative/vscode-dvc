@@ -6,7 +6,7 @@ import { SourceControlManagement } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
 
-export const RepositoryCounts = {
+export const RepositoryScale = {
   TRACKED: 'tracked'
 } as const
 
@@ -59,7 +59,7 @@ export class Repository extends DeferredDisposable {
     return this.model.hasChanges()
   }
 
-  public getCounts() {
+  public getScale() {
     return { tracked: this.getState().tracked.size }
   }
 

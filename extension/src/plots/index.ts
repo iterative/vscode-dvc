@@ -11,7 +11,7 @@ import {
 } from './webview/contract'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
-import { PathType } from './paths/collect'
+import { collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -31,11 +31,6 @@ import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
-
-export const PlotsCounts = {
-  IMAGES: 'images',
-  TEMPLATES: 'templates'
-} as const
 
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
@@ -119,26 +114,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.paths?.getTerminalNodeStatuses() || []
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  public getCounts() {
-    const acc = { images: 0, templates: 0 }
-
-    for (const { type } of this.paths?.getTerminalNodes() || []) {
-      if (!type) {
-        continue
-      }
-      if (
-        type.has(PathType.TEMPLATE_MULTI) ||
-        type.has(PathType.TEMPLATE_SINGLE)
-      ) {
-        acc.templates = acc.templates + 1
-      }
-      if (type.has(PathType.COMPARISON)) {
-        acc.images = acc.images + 1
-      }
-    }
-
-    return acc
+  public getScale() {
+    return collectScale(this.paths?.getTerminalNodes())
   }
 
   private notifyChanged() {

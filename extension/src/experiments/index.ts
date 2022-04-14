@@ -26,8 +26,9 @@ import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { createTypedAccumulator } from '../util/object'
 
-export const ExperimentsCounts = {
+export const ExperimentsScale = {
   METRICS: 'metrics',
   PARAMS: 'params'
 } as const
@@ -154,8 +155,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSorts()
   }
 
-  public getCounts() {
-    const acc = { metrics: 0, params: 0 }
+  public getScale() {
+    const acc = createTypedAccumulator(ExperimentsScale)
 
     for (const { type } of this.metricsAndParams.getTerminalNodes()) {
       acc[type] = acc[type] + 1

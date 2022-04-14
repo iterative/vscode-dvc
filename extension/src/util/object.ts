@@ -16,3 +16,13 @@ export const removeMissingKeysFromObject = <
   }
   return copy
 }
+
+export const createTypedAccumulator = <T extends string>(
+  enumLike: Record<string, T>
+) => {
+  const acc = {} as Record<T, number>
+  for (const count of Object.values(enumLike)) {
+    acc[count] = 0
+  }
+  return acc
+}

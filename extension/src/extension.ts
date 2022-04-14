@@ -46,7 +46,7 @@ import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { Toast } from './vscode/toast'
-import { collectCounts } from './telemetry/collect'
+import { collectWorkspaceScale } from './telemetry/collect'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -393,7 +393,7 @@ export class Extension extends Disposable implements IExtension {
   private async getEventProperties() {
     return {
       ...(this.cliAccessible
-        ? await collectCounts(
+        ? await collectWorkspaceScale(
             this.dvcRoots,
             this.experiments,
             this.plots,
