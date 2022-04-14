@@ -13,7 +13,7 @@ import { MetricsAndParamsModel } from './metricsAndParams/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
-import { Experiment, TableData } from './webview/contract'
+import { Experiment, MetricOrParamType, TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
@@ -26,6 +26,9 @@ import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { createTypedAccumulator } from '../util/object'
+
+export const ExperimentsScale = MetricOrParamType
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -147,6 +150,15 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getSorts() {
     return this.experiments.getSorts()
+  }
+
+  public getScale() {
+    const acc = createTypedAccumulator(ExperimentsScale)
+
+    for (const { type } of this.metricsAndParams.getTerminalNodes()) {
+      acc[type] = acc[type] + 1
+    }
+    return acc
   }
 
   public async addSort() {
