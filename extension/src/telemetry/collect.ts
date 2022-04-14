@@ -10,13 +10,13 @@ type Counts = typeof Counts[keyof typeof Counts]
 
 export type WorkspaceCountAccumulator = Record<Counts, number>
 
-export const collectCounts = (
+export const collectCounts = async (
   dvcRoots: string[],
   workspaceExperiments: WorkspaceExperiments,
   workspacePlots: WorkspacePlots,
   workspaceRepositories: WorkspaceRepositories
   // eslint-disable-next-line sonarjs/cognitive-complexity
-): WorkspaceCountAccumulator => {
+): Promise<WorkspaceCountAccumulator> => {
   const acc = {} as WorkspaceCountAccumulator
   for (const count of Object.values(Counts)) {
     acc[count] = 0
@@ -27,6 +27,8 @@ export const collectCounts = (
     workspacePlots,
     workspaceRepositories
   ]) {
+    await workspace.isReady()
+
     for (const dvcRoot of dvcRoots) {
       const repository = workspace.getRepository(dvcRoot)
       if (!repository) {
