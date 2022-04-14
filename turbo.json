@@ -22,7 +22,12 @@
       "outputs": ["coverage/jest/**"]
     },
     "cover-vscode-run": {
-      "dependsOn": ["test", "dvc-vscode-webview#build"],
+      "dependsOn": [
+        "dvc#test-vscode-build",
+        "dvc#test",
+        "dvc-vscode-webview#build",
+        "dvc-vscode-webview#test"
+      ],
       "outputs": ["coverage/integration/**"]
     },
     "test-vscode-build": {
@@ -30,6 +35,10 @@
     },
     "test-vscode-run": {
       "dependsOn": ["dvc-vscode-webview#build", "dvc#test-vscode-build"]
+    },
+    "format": {
+      "dependsOn": ["^format"],
+      "outputs": []
     },
     "lint": {
       "outputs": []
