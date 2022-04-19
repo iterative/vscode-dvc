@@ -8,10 +8,12 @@ import {
   quickPickYesOrNo
 } from './vscode/quickPick'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
+import { Toast } from './vscode/toast'
 
 jest.mock('./vscode/config')
 jest.mock('./vscode/resourcePicker')
 jest.mock('./vscode/quickPick')
+jest.mock('./vscode/toast')
 jest.mock('./vscode/workspaceFolders')
 
 const mockedCanRunCli = jest.fn()
@@ -27,6 +29,10 @@ const mockedQuickPickValue = jest.mocked(quickPickValue)
 const mockedSetConfigValue = jest.mocked(setConfigValue)
 const mockedQuickPickOneOrInput = jest.mocked(quickPickOneOrInput)
 const mockedPickFile = jest.mocked(pickFile)
+
+const mockedToast = jest.mocked(Toast)
+const mockedWarnWithOptions = jest.fn()
+mockedToast.warnWithOptions = mockedWarnWithOptions
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -192,6 +198,30 @@ describe('setup', () => {
     await setup(extension)
 
     expect(mockedSetRoots).toBeCalledTimes(1)
+  })
+
+  it('should not alert the user if the workspace has no DVC project and the cli cannot be found', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(false)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+
+    await setup(extension)
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).not.toBeCalled()
+    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
+  })
+
+  it('should alert the user if the workspace contains a DVC project and the cli cannot be found', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+
+    await setup(extension)
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
   })
 
   it('should not run initialization if roots have not been found but the cli can be run', async () => {

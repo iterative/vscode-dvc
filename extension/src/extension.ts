@@ -45,7 +45,6 @@ import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
-import { Toast } from './vscode/toast'
 import { collectWorkspaceScale } from './telemetry/collect'
 
 export class Extension extends Disposable implements IExtension {
@@ -299,19 +298,12 @@ export class Extension extends Disposable implements IExtension {
   }
 
   public async canRunCli(cwd: string) {
-    try {
-      await this.config.isReady()
-      const version = await this.cliReader.version(cwd)
-      const compatible = isVersionCompatible(version)
-      setContextValue('dvc.cli.incompatible', !compatible)
-      return this.setAvailable(compatible)
-    } catch {
-      Toast.warnWithOptions(
-        'An error was thrown when trying to access the CLI.'
-      )
-      setContextValue('dvc.cli.incompatible', undefined)
-      return this.setAvailable(false)
-    }
+    await this.config.isReady()
+    setContextValue('dvc.cli.incompatible', undefined)
+    const version = await this.cliReader.version(cwd)
+    const compatible = isVersionCompatible(version)
+    setContextValue('dvc.cli.incompatible', !compatible)
+    return this.setAvailable(compatible)
   }
 
   public async setRoots() {
