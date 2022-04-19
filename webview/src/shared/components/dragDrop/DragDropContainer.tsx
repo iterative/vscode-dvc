@@ -14,15 +14,35 @@ export type DraggedInfo = {
   group: string
 }
 
+const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
+  if (direction === DragEnterDirection.RIGHT) {
+    return isAfter ? 0 : 1
+  }
+
+  return isAfter ? -1 : 0
+}
+
+const isSameGroup = (group1?: string, group2?: string) =>
+  getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
+
+export type OnDrop = (
+  draggedId: string,
+  draggedGroup: string,
+  groupId: string,
+  position: number
+) => void
 interface DragDropContainerProps {
   order: string[]
   setOrder: (order: string[]) => void
   disabledDropIds?: string[]
   items: JSX.Element[] // Every item must have a id prop for drag and drop to work
   group: string
-  onDrop?: (draggedId: string, draggedGroup: string, groupId: string) => void
-  draggedRef?: MutableRefObject<DraggedInfo | undefined>
-  dropTarget?: JSX.Element
+  onDrop?: OnDrop
+  draggedRef: MutableRefObject<DraggedInfo | undefined>
+  dropTarget: {
+    element: JSX.Element
+    wrapperTag: 'div' | 'th'
+  }
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -40,42 +60,69 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const [direction, setDirection] = useState(DragEnterDirection.RIGHT)
   const draggedOverIdTimeout = useRef<number>(0)
 
-  useEffect(() => {
-    return () => clearTimeout(draggedOverIdTimeout.current)
-  }, [])
-
-  const setDraggedRef = (draggedInfo?: DraggedInfo) => {
-    if (draggedRef) {
-      draggedRef.current = draggedInfo
-    }
-  }
-
-  const handleDragStart = (e: DragEvent<HTMLElement>) => {
-    const { id } = e.currentTarget
-    const idx = order.indexOf(id).toString()
-    e.dataTransfer.setData('itemIndex', idx)
-    e.dataTransfer.setData('itemId', id)
-    e.dataTransfer.setData('group', group)
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.dropEffect = 'move'
-    setDraggedRef({
-      group,
-      itemId: id,
-      itemIndex: idx
-    })
-    setDraggedOverId(id)
-    draggedOverIdTimeout.current = window.setTimeout(() => setDraggedId(id), 0)
-  }
-
-  const handleDragEnd = () => {
+  const cleanup = () => {
     setDraggedOverId('')
     setDraggedId('')
     setDirection(DragEnterDirection.RIGHT)
   }
 
-  const applyDrop = (e: DragEvent<HTMLElement>, droppedIndex: number) => {
+  useEffect(() => {
+    return () => clearTimeout(draggedOverIdTimeout.current)
+  }, [])
+
+  useEffect(() => {
+    cleanup()
+  }, [order])
+
+  const handleDragStart = (e: DragEvent<HTMLElement>) => {
+    const { id } = e.currentTarget
+    const idx = order.indexOf(id)
+    let toIdx = idx + 1
+    if (toIdx === order.length) {
+      toIdx = idx - 1
+
+      if (toIdx === -1) {
+        toIdx = 0
+      }
+    }
+    const itemIndex = idx.toString()
+    e.dataTransfer.setData('itemIndex', itemIndex)
+    e.dataTransfer.setData('itemId', id)
+    e.dataTransfer.setData('group', group)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.dropEffect = 'move'
+    draggedRef.current = {
+      group,
+      itemId: id,
+      itemIndex
+    }
+    draggedOverIdTimeout.current = window.setTimeout(() => {
+      setDraggedId(id)
+      setDraggedOverId(order[toIdx])
+    }, 0)
+  }
+
+  const applyDrop = (
+    e: DragEvent<HTMLElement>,
+    droppedIndex: number,
+    draggedIndex: number,
+    newOrder: string[],
+    oldDraggedId: string
+  ) => {
+    const dragged = newOrder[draggedIndex]
+
+    newOrder.splice(draggedIndex, 1)
+    newOrder.splice(droppedIndex, 0, dragged)
+
+    setOrder(newOrder)
+    draggedRef.current = undefined
+
+    onDrop?.(oldDraggedId, e.dataTransfer.getData('group'), group, droppedIndex)
+  }
+
+  const handleOnDrop = (e: DragEvent<HTMLElement>) => {
     const newOrder = [...order]
-    const draggedId = e.dataTransfer.getData('itemId')
+    const oldDraggedId = e.dataTransfer.getData('itemId')
     const isNew = !order.includes(draggedId)
     if (isNew) {
       newOrder.push(draggedId)
@@ -83,38 +130,21 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const draggedIndex = isNew
       ? newOrder.length - 1
       : getIDIndex(e.dataTransfer.getData('itemIndex'))
-    const dragged = newOrder[draggedIndex]
 
-    newOrder.splice(draggedIndex, 1)
-    newOrder.splice(droppedIndex, 0, dragged)
+    const droppedIndex = order.indexOf(e.currentTarget.id.split('__')[0])
+    const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
+    const orderIdxChanged = droppedIndex + orderIdxChange
+    const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
 
-    setOrder(newOrder)
-    setDraggedRef(undefined)
-    onDrop?.(draggedId, e.dataTransfer.getData('group'), group)
-  }
-
-  const handleOnDrop = (e: DragEvent<HTMLElement>) => {
-    const id = e.currentTarget.id.split('_')[0]
-    const droppedIndex =
-      order.indexOf(id) +
-      (draggedOverId !== draggedId &&
-      direction === DragEnterDirection.RIGHT &&
-      dropTarget
-        ? 1
-        : 0)
-    const draggedGroup = getIDWithoutIndex(e.dataTransfer.getData('group'))
-    const isSameGroup = draggedGroup === getIDWithoutIndex(group)
-    const isEnabled = !disabledDropIds.includes(order[droppedIndex])
-
-    if (isEnabled && isSameGroup) {
-      applyDrop(e, droppedIndex)
+    if (isEnabled && isSameGroup(e.dataTransfer.getData('group'), group)) {
+      applyDrop(e, orderIdxChanged, draggedIndex, newOrder, oldDraggedId)
     }
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    if (draggedId) {
+    if (isSameGroup(draggedRef.current?.group, group)) {
       const { id } = e.currentTarget
-      if (id !== draggedId && !id.includes('_drop')) {
+      if (id !== draggedId && !id.includes('__drop')) {
         setDraggedOverId(id)
         setDirection(getDragEnterDirection(e))
       }
@@ -132,15 +162,12 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       key={draggable.key}
       {...draggable.props}
       onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      onDragEnd={cleanup}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
-      style={
-        (id === draggedId && dropTarget && { display: 'none' }) ||
-        draggable.props.style
-      }
+      style={(id === draggedId && { display: 'none' }) || draggable.props.style}
     />
   )
 
@@ -150,19 +177,18 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         const { id } = draggable.props
         const item = id && buildItem(id, draggable)
 
-        if (id === draggedOverId && dropTarget && direction) {
+        if (id === draggedOverId) {
           const target = (
-            <div
+            <dropTarget.wrapperTag
               data-testid="drop-target"
               key="drop-target"
               onDragOver={handleDragOver}
               onDrop={handleOnDrop}
-              id={`${id}_drop`}
+              id={`${id}__drop`}
             >
-              {dropTarget}
-            </div>
+              {dropTarget.element}
+            </dropTarget.wrapperTag>
           )
-
           return direction === DragEnterDirection.RIGHT
             ? [item, target]
             : [target, item]

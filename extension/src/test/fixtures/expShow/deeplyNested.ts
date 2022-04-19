@@ -1,6 +1,7 @@
 import { ExperimentsOutput } from '../../../cli/reader'
 import { collectMetricsAndParams } from '../../../experiments/metricsAndParams/collect'
 import { collectExperiments } from '../../../experiments/model/collect'
+import { copyOriginalBranchColors } from '../../../experiments/model/colors'
 import { TableData } from '../../../experiments/webview/contract'
 
 export const deeplyNestedOutput: ExperimentsOutput = {
@@ -34,19 +35,71 @@ export const deeplyNestedOutput: ExperimentsOutput = {
         executor: null
       }
     }
+  },
+  '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
+    baseline: {
+      data: {
+        timestamp: '2020-11-21T19:58:22',
+        params: {
+          'params.yaml': {
+            data: {
+              nested1: {
+                doubled: 'first instance!',
+                nested2: {
+                  nested3: {
+                    nested4: {
+                      nested5: { nested6: { nested7: 'Lucky!' } },
+                      nested5b: {
+                        nested6: 'Wow!!!!!!!!!!!!!!!!!!!!',
+                        doubled: 'second instance!'
+                      }
+                    }
+                  }
+                }
+              },
+              outlier: 1
+            }
+          }
+        },
+        queued: false,
+        running: false,
+        executor: null,
+        name: 'main'
+      }
+    }
   }
 }
 
 export const columns = collectMetricsAndParams(deeplyNestedOutput)
 
-const { workspace, branches } = collectExperiments(deeplyNestedOutput)
+const { workspace, branches } = collectExperiments(
+  deeplyNestedOutput,
+  new Map([['main', copyOriginalBranchColors()[0]]])
+)
 export const rows = [workspace, ...branches]
 
 const deeplyNestedTableData: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
-  sorts: [],
+  sorts: [
+    {
+      path: 'params:params.yaml:nested1.doubled',
+      descending: true
+    },
+    {
+      path: 'params:params.yaml:outlier',
+      descending: false
+    },
+    {
+      path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6',
+      descending: false
+    },
+    {
+      path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled',
+      descending: true
+    }
+  ],
   columns,
   rows
 }

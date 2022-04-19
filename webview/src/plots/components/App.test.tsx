@@ -41,12 +41,16 @@ jest.mock('./checkpointPlots/util', () => ({
 }))
 jest.spyOn(console, 'warn').mockImplementation(() => {})
 
-const { postMessage, setState } = vsCodeApi
+const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
-const mockSetState = jest.mocked(setState)
+
+const heightToSuppressVegaError = 1000
 
 beforeEach(() => {
   jest.clearAllMocks()
+  jest
+    .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+    .mockImplementation(() => heightToSuppressVegaError)
 })
 
 afterEach(() => {
@@ -95,23 +99,6 @@ describe('App', () => {
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
   })
 
-  it('should set dvcRoot when the setDvcRoot message comes in', () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          dvcRoot: 'root',
-          type: MessageToWebviewType.SET_DVC_ROOT
-        }
-      })
-    )
-    expect(mockSetState).toBeCalledWith({
-      dvcRoot: 'root'
-    })
-    expect(mockSetState).toBeCalledTimes(1)
-  })
-
   it('should render the loading state when given no data', async () => {
     render(<App />)
     const loadingState = await screen.findByText('Loading Plots...')
@@ -157,10 +144,6 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const heightToSuppressVegaError = 1000
-    jest
-      .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
-      .mockImplementation(() => heightToSuppressVegaError)
     sendSetDataMessage({
       template: templatePlotsFixture
     })
@@ -775,7 +758,7 @@ describe('App', () => {
     ])
   })
 
-  it('should move a template plot from one type in another section of the same type', async () => {
+  it('should move a template plot from one type in another section of the same type and show two drop targets', async () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
@@ -793,6 +776,14 @@ describe('App', () => {
     const movedSingleViewPlot = screen.getByTestId(
       join('plot_other', 'plot.tsv')
     )
+
+    dragEnter(
+      anotherSingleViewPlot,
+      movedSingleViewPlot,
+      DragEnterDirection.LEFT
+    )
+
+    expect(screen.getAllByTestId('drop-target').length).toBe(2) // One in the old section and one in the new one
 
     dragAndDrop(anotherSingleViewPlot, movedSingleViewPlot)
 

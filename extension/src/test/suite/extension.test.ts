@@ -304,15 +304,20 @@ suite('Extension Test Suite', () => {
       expect(
         mockSendTelemetryEvent,
         'should send the correct event details'
-      ).to.be.calledWith(
+      ).to.be.calledWithExactly(
         EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
         {
           cliAccessible: true,
           dvcPathUsed: true,
           dvcRootCount: 1,
+          images: 3,
+          metrics: 4,
           msPythonInstalled: false,
           msPythonUsed: false,
+          params: 8,
           pythonPathUsed: false,
+          templates: 3,
+          tracked: 15,
           workspaceFolderCount: 1
         },
         match.has('duration')
@@ -349,7 +354,7 @@ suite('Extension Test Suite', () => {
         commands.executeCommand(RegisteredCommands.EXTENSION_SETUP_WORKSPACE)
       ).to.be.eventually.rejectedWith(Error)
 
-      expect(mockSendTelemetryEvent).to.be.calledWith(
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         `errors.${RegisteredCommands.EXTENSION_SETUP_WORKSPACE}`,
         { error: mockErrorMessage },
         { duration: 0 }
@@ -392,6 +397,76 @@ suite('Extension Test Suite', () => {
       const showOutputSpy = spy(OutputChannel.prototype, 'show')
       await commands.executeCommand(RegisteredCommands.EXTENSION_SHOW_OUTPUT)
       expect(showOutputSpy).to.have.been.calledOnce
+    })
+  })
+
+  describe('dvc.checkCLICompatible', () => {
+    it('should call setup', async () => {
+      const mockSetup = stub(Setup, 'setup').resolves(undefined)
+      await commands.executeCommand(
+        RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
+      )
+      expect(mockSetup).to.have.been.calledOnce
+    })
+
+    it('should set the dvc.cli.incompatible context value', async () => {
+      stub(CliReader.prototype, 'experimentShow').resolves({
+        workspace: { baseline: {} }
+      })
+      stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([])
+      stub(CliReader.prototype, 'root').resolves('.')
+      stub(CliReader.prototype, 'diff').resolves({})
+      stub(CliReader.prototype, 'plotsDiff').resolves({})
+      stub(CliReader.prototype, 'status').resolves({})
+
+      const mockVersion = stub(CliReader.prototype, 'version')
+        .onFirstCall()
+        .resolves('2.9.3')
+        .onSecondCall()
+        .resolves(MIN_CLI_VERSION)
+        .onThirdCall()
+        .rejects(new Error('NO CLI HERE'))
+
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      await commands.executeCommand(
+        RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
+      )
+
+      expect(mockVersion).to.be.calledOnce
+      expect(
+        executeCommandSpy,
+        'should set dvc.cli.incompatible to true if the version is incompatible'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', true)
+      executeCommandSpy.resetHistory()
+
+      await commands.executeCommand(
+        RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
+      )
+
+      expect(mockVersion).to.be.calledTwice
+      expect(
+        executeCommandSpy,
+        'should set dvc.cli.incompatible to false if the version is compatible'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
+
+      const mockShowWarningMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves(undefined)
+
+      await commands.executeCommand(
+        RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
+      )
+
+      expect(mockVersion).to.be.calledThrice
+      expect(
+        executeCommandSpy,
+        'should unset dvc.cli.incompatible if the CLI throws an error'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', undefined)
+      expect(
+        mockShowWarningMessage,
+        'should warn the user if the CLI throws an error'
+      ).to.be.calledOnce
     })
   })
 

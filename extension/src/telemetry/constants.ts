@@ -1,4 +1,5 @@
 import { ViewColumn } from 'vscode'
+import { WorkspaceScale } from './collect'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { PlotSize, Section, SectionCollapsed } from '../plots/webview/contract'
 
@@ -65,8 +66,10 @@ type ExtensionProperties = {
   msPythonInstalled: boolean
   msPythonUsed: boolean
   pythonPathUsed: boolean
+  templates?: number
   workspaceFolderCount: number
-} & DvcRootCount
+} & DvcRootCount &
+  Partial<WorkspaceScale>
 
 type WebviewFocusChangedProperties = {
   active: boolean
@@ -145,6 +148,7 @@ export interface IEventNamePropertyMapping {
   [EventName.TRACKED_EXPLORER_OPEN_TO_THE_SIDE]: undefined
   [EventName.TRACKED_EXPLORER_SELECT_FOR_COMPARE]: undefined
 
+  [EventName.EXTENSION_CHECK_CLI_COMPATIBLE]: undefined
   [EventName.EXTENSION_GET_STARTED]: undefined
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined

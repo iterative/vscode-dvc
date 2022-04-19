@@ -4,6 +4,7 @@ import {
   TemplatePlotEntry
 } from 'dvc/src/plots/webview/contract'
 import React, { DragEvent, useState, useEffect, useRef } from 'react'
+import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { removeFromPreviousAndAddToNewSection } from './util'
@@ -15,7 +16,7 @@ import { sendMessage } from '../../../shared/vscode'
 
 interface TemplatePlotsProps {
   plots: TemplatePlotSection[]
-  onPlotClick: (plot: JSX.Element) => void
+  onPlotClick: (plot: VegaLiteProps) => void
 }
 
 export enum NewSectionBlock {
@@ -23,7 +24,10 @@ export enum NewSectionBlock {
   BOTTOM = 'drop-section-bottom'
 }
 
-export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots, onPlotClick }) => {
+export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
+  plots,
+  onPlotClick
+}) => {
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
   const draggedRef = useRef<DraggedInfo>()
@@ -82,19 +86,20 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots, onPlotClick
 
     if (e.currentTarget.id === NewSectionBlock.TOP) {
       if (firstSection.group !== group) {
-        setSectionOrder([newSection, ...updatedSections])
+        setTimeout(() => setSectionOrder([newSection, ...updatedSections]), 1)
       }
       return
     }
     if (lastSection.group !== group) {
-      setSectionOrder([...updatedSections, newSection])
+      setTimeout(() => setSectionOrder([...updatedSections, newSection]), 1)
     }
   }
 
   const handleDropInSection = (
     draggedId: string,
     draggedGroup: string,
-    groupId: string
+    groupId: string,
+    position: number
   ) => {
     if (draggedGroup === groupId) {
       return
@@ -109,7 +114,8 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots, onPlotClick
       oldGroupId,
       draggedId,
       newGroupId,
-      entry
+      entry,
+      position
     )
 
     setSectionOrder(updatedSections)

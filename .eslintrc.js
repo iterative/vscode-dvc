@@ -1,5 +1,4 @@
 /* global module */
-
 module.exports = {
   env: {
     'jest/globals': true
@@ -16,12 +15,7 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:unicorn/recommended'
   ],
-  ignorePatterns: [
-    '**/coverage/**',
-    '**/dist/**',
-    'extension/src/test/fixtures/**',
-    'webview/storybook-static/**'
-  ],
+  ignorePatterns: ['**/coverage/**', '**/dist/**'],
   overrides: [
     {
       extends: ['plugin:testing-library/react'],
@@ -45,14 +39,6 @@ module.exports = {
       }
     },
     {
-      files: ['extension/src/test/**/*.test.ts'],
-      rules: {
-        // These aren't jest tests, but still use `expect`
-        'jest/valid-expect': 'off',
-        'no-unused-expressions': 'off'
-      }
-    },
-    {
       files: ['**/*.tsx'],
       rules: {
         'unicorn/filename-case': [
@@ -70,40 +56,6 @@ module.exports = {
       files: ['**/util/*.tsx'],
       rules: {
         'unicorn/filename-case': 'off'
-      }
-    },
-    {
-      files: ['webview/src/**'],
-      rules: {
-        'check-file/no-index': 'error'
-      }
-    },
-    {
-      files: [
-        'webview/src/experiments/index.tsx',
-        'webview/src/plots/index.tsx',
-        'webview/src/shared/components/icons/index.ts'
-      ],
-      rules: {
-        'check-file/no-index': 'off'
-      }
-    },
-    {
-      files: ['webview/src/**'],
-      rules: {
-        'check-file/folder-naming-convention': [
-          'error',
-          {
-            'webview/src/**/': 'CAMEL_CASE',
-            'webview/src/shared/components/**': 'CAMEL_CASE'
-          }
-        ]
-      }
-    },
-    {
-      files: ['webview/src/shared/**'],
-      rules: {
-        'check-file/folder-naming-convention': 'off'
       }
     }
   ],

@@ -10,7 +10,7 @@ import outputFixture from '../../test/fixtures/expShow/output'
 import rowsFixture from '../../test/fixtures/expShow/rows'
 import { buildMockMemento } from '../../test/util'
 import { joinMetricOrParamPath } from '../metricsAndParams/paths'
-import { Experiment } from '../webview/contract'
+import { Experiment, MetricOrParamType } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 
 jest.mock('vscode')
@@ -65,7 +65,11 @@ describe('ExperimentsModel', () => {
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', async () => {
-    const testPath = joinMetricOrParamPath('params', 'params.yaml', 'test')
+    const testPath = joinMetricOrParamPath(
+      MetricOrParamType.PARAMS,
+      'params.yaml',
+      'test'
+    )
 
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
     experimentsModel.addFilter({
@@ -130,7 +134,11 @@ describe('ExperimentsModel', () => {
   })
 
   it('should apply filters to checkpoints and experiments if selection mode is set to use filters', async () => {
-    const testPath = joinMetricOrParamPath('params', 'params.yaml', 'test')
+    const testPath = joinMetricOrParamPath(
+      MetricOrParamType.PARAMS,
+      'params.yaml',
+      'test'
+    )
 
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
     experimentsModel.addFilter({

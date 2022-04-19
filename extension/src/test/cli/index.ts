@@ -33,19 +33,27 @@ mock('@hediet/std/disposable', {
   }
 })
 
-runMocha(
-  __dirname,
-  'ts',
-  async () => {
-    await mkdirp(TEMP_DIR)
-    await setupVenv(
-      TEMP_DIR,
-      ENV_DIR,
-      'git+https://github.com/iterative/dvc#egg=dvc[s3]'
+async function main() {
+  try {
+    await runMocha(
+      __dirname,
+      'ts',
+      async () => {
+        await mkdirp(TEMP_DIR)
+        await setupVenv(
+          TEMP_DIR,
+          ENV_DIR,
+          'git+https://github.com/iterative/dvc#egg=dvc[s3]'
+        )
+      },
+      () => {
+        removeDir(TEMP_DIR)
+      },
+      20000
     )
-  },
-  () => {
-    removeDir(TEMP_DIR)
-  },
-  6000
-)
+  } catch {
+    process.exit(1)
+  }
+}
+
+main()

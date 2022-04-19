@@ -48,10 +48,16 @@ export const dragAndDrop = (
   direction: DragDropUtils.DragEnterDirection = DragDropUtils.DragEnterDirection
     .LEFT
 ) => {
-  startingNode.dispatchEvent(createBubbledEvent('dragstart'))
   dragEnter(startingNode, endingNode, direction)
 
+  jest.useFakeTimers()
+
   endingNode.dispatchEvent(createBubbledEvent('drop'))
+
+  act(() => {
+    jest.advanceTimersByTime(1)
+  })
+  jest.useRealTimers()
 
   startingNode.dispatchEvent(createBubbledEvent('dragend'))
 }

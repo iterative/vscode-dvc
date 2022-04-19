@@ -3,21 +3,27 @@ import {
   CheckpointPlotData,
   CheckpointPlotsColors
 } from 'dvc/src/plots/webview/contract'
-import React, { useEffect, useState } from 'react'
-import { Plot } from './Plot'
+import React, { useEffect, useRef, useState } from 'react'
+import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { Renderers } from 'vega'
+import { createSpec } from './util'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import {
+  DragDropContainer,
+  DraggedInfo
+} from '../../../shared/components/dragDrop/DragDropContainer'
 import { performOrderedUpdate } from '../../../util/objects'
-import { withScale } from '../../../util/styles'
-import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { sendMessage } from '../../../shared/vscode'
 import { DropTarget } from '../DropTarget'
+import { withScale } from '../../../util/styles'
+import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
+import { config } from '../constants'
 
 interface CheckpointPlotsProps {
   plots: CheckpointPlotData[]
   colors: CheckpointPlotsColors
-  onPlotClick: (plot: JSX.Element) => void
+  onPlotClick: (plot: VegaLiteProps) => void
 }
 
 export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
@@ -26,6 +32,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   onPlotClick
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
+  const draggedRef = useRef<DraggedInfo>()
 
   useEffect(() => {
     setOrder(pastOrder => performOrderedUpdate(pastOrder, plots, 'title'))
@@ -47,20 +54,27 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       }
       const { title, values } = plotData
       const key = `plot-${title}`
-      const plotJSX = <Plot values={values} scale={colors} title={title} />
+      const spec = createSpec(title, colors)
+      const plotProps = {
+        actions: false,
+        config,
+        data: { values },
+        renderer: 'svg' as Renderers,
+        spec
+      }
 
       return (
-        <div
+        <button
+          key={key}
           className={styles.plot}
           style={withScale(1)}
           id={title}
-          key={key}
           data-testid={key}
-          onClick={() => onPlotClick(plotJSX)}
+          onClick={() => onPlotClick(plotProps)}
         >
           <GripIcon className={styles.plotGripIcon} />
-          {plotJSX}
-        </div>
+          <VegaLite {...plotProps} />
+        </button>
       )
     })
     .filter(Boolean)
@@ -73,7 +87,11 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
         disabledDropIds={[]}
         items={items as JSX.Element[]}
         group="live-plots"
-        dropTarget={<DropTarget />}
+        draggedRef={draggedRef}
+        dropTarget={{
+          element: <DropTarget />,
+          wrapperTag: 'div'
+        }}
       />
     </div>
   ) : (

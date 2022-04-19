@@ -12,24 +12,27 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Update package.json version
-        uses: rogermparent/action-set-json-field@v1
-        with:
-          file: extension/package.json
-          field: version
-          value: '{{ original }}-${{ github.sha }}'
-
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
           node-version: '14'
           cache: 'yarn'
+
+      - name: Turbo cache
+        id: turbo-cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules/.cache/turbo
+          key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ github.job }}-${{ github.ref_name }}-
 
       - run: yarn run install-frozen-lockfile
 
@@ -42,7 +45,7 @@ jobs:
           coverageCommand: xvfb-run -a yarn run cover
           coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
 
-      - run: yarn run-p build-extension build-storybook
+      - run: yarn build-storybook
 
       - name: Publish to Chromatic
         uses: chromaui/action@v1
@@ -52,9 +55,3 @@ jobs:
           storybookBuildDir: 'webview/storybook-static'
           exitOnceUploaded: true
           autoAcceptChanges: 'main'
-
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: Built package
-          path: ./extension/dvc.vsix

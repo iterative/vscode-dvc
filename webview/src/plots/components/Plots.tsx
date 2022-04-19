@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { VegaLite } from 'react-vega'
+import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import {
   CheckpointPlotData,
   PlotSize,
@@ -9,12 +11,12 @@ import { PlotsContainer } from './PlotsContainer'
 import { CheckpointPlots } from './checkpointPlots/CheckpointPlots'
 import { ComparisonTable } from './comparisonTable/ComparisonTable'
 import { TemplatePlots } from './templatePlots/TemplatePlots'
+import styles from './styles.module.scss'
 import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Theme } from '../../shared/components/theme/Theme'
 import { Modal } from '../../shared/components/modal/Modal'
-import styles from './styles.module.scss'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(({ title }) => title).sort() || []
@@ -29,7 +31,9 @@ export const Plots = ({
 
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
-  const [zoomedInPlot, setZoomedInPlot] = useState<JSX.Element | undefined>(undefined)
+  const [zoomedInPlot, setZoomedInPlot] = useState<VegaLiteProps | undefined>(
+    undefined
+  )
 
   useEffect(() => {
     const metrics = getMetricsFromPlots(data?.checkpoint?.plots)
@@ -39,12 +43,12 @@ export const Plots = ({
 
   useEffect(() => {
     const modalOpenClass = 'modal-open'
-    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot);
+    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot)
 
-    () => {
+    return () => {
       document.body.classList.remove(modalOpenClass)
     }
-  },[zoomedInPlot])
+  }, [zoomedInPlot])
 
   if (!data || !data.sectionCollapsed) {
     return <EmptyState>Loading Plots...</EmptyState>
@@ -89,7 +93,7 @@ export const Plots = ({
     sectionCollapsed
   }
 
-  const handlePlotClick = (plot: JSX.Element) => setZoomedInPlot(plot)
+  const handlePlotClick = (plot: VegaLiteProps) => setZoomedInPlot(plot)
 
   return (
     <Theme>
@@ -100,7 +104,10 @@ export const Plots = ({
           currentSize={templatePlots.size}
           {...basicContainerProps}
         >
-          <TemplatePlots plots={templatePlots.plots} onPlotClick={handlePlotClick} />
+          <TemplatePlots
+            plots={templatePlots.plots}
+            onPlotClick={handlePlotClick}
+          />
         </PlotsContainer>
       )}
       {comparisonTable && (
@@ -138,9 +145,9 @@ export const Plots = ({
         </PlotsContainer>
       )}
       {zoomedInPlot && (
-        <Modal onClose={() => setZoomedInPlot(undefined)} onOpen={() => window.dispatchEvent(new Event('resize')) }>
+        <Modal onClose={() => setZoomedInPlot(undefined)}>
           <div className={styles.zoomedInPlot}>
-            {zoomedInPlot}
+            <VegaLite {...zoomedInPlot} />
           </div>
         </Modal>
       )}

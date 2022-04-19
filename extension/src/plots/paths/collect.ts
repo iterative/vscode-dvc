@@ -3,6 +3,7 @@ import { PlotsOutput } from '../../cli/reader'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
+import { createTypedAccumulator } from '../../util/object'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -231,4 +232,32 @@ export const collectTemplateOrder = (
   )
 
   return mergeAdjacentMatching(newTemplateOrder)
+}
+
+export const PlotsScale = {
+  IMAGES: 'images',
+  TEMPLATES: 'templates'
+} as const
+type PlotsScale = typeof PlotsScale[keyof typeof PlotsScale]
+type PlotsScaleAccumulator = Record<PlotsScale, number>
+
+const addToScale = (acc: PlotsScaleAccumulator, type?: Set<PathType>) => {
+  if (!type) {
+    return
+  }
+  if (type.has(PathType.TEMPLATE_MULTI) || type.has(PathType.TEMPLATE_SINGLE)) {
+    acc.templates = acc.templates + 1
+  }
+  if (type.has(PathType.COMPARISON)) {
+    acc.images = acc.images + 1
+  }
+}
+
+export const collectScale = (paths: PlotPath[] = []) => {
+  const acc = createTypedAccumulator(PlotsScale)
+
+  for (const { type } of paths) {
+    addToScale(acc, type)
+  }
+  return acc
 }

@@ -1,27 +1,20 @@
-import React, {useEffect} from 'react'
-import { AllIcons, Icon } from '../Icon'
+import React from 'react'
 import styles from './styles.module.scss'
+import { AllIcons, Icon } from '../Icon'
 
 interface ModalProps {
   onClose: () => void
-  onOpen?: () => void
 }
 
-export const Modal: React.FC<ModalProps> = ({onClose, onOpen, children}) => {
-  useEffect(() => {
-    onOpen?.()
-  }, [])
-
+export const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
   return (
-    <div className={styles.backdrop} onClick={onClose}>
+    <button className={styles.backdrop} onClick={onClose}>
       <div className={styles.modal}>
         <button onClick={onClose}>
           <Icon icon={AllIcons.CLOSE} />
         </button>
-        <div className='content'>
-          {children}
-        </div>
+        <div className="content">{children}</div>
       </div>
-    </div>
+    </button>
   )
 }

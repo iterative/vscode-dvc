@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { ComparisonRevision } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
 import styles from './styles.module.scss'
+import { DropTarget } from './DropTarget'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
-import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import {
+  DragDropContainer,
+  DraggedInfo
+} from '../../../shared/components/dragDrop/DragDropContainer'
 
 export type ComparisonTableColumn = ComparisonRevision
 
@@ -20,6 +24,8 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
+  const draggedRef = useRef<DraggedInfo>()
+
   const items = columns.map(({ revision, displayColor }) => {
     const isPinned = revision === pinnedColumn
     return (
@@ -50,6 +56,11 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           disabledDropIds={[pinnedColumn]}
           items={items}
           group="comparison"
+          draggedRef={draggedRef}
+          dropTarget={{
+            element: <DropTarget />,
+            wrapperTag: 'th'
+          }}
         />
       </tr>
     </thead>

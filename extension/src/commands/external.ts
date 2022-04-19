@@ -49,6 +49,7 @@ export enum RegisteredCommands {
   PLOTS_PATH_TOGGLE = 'dvc.views.plotsPathsTree.toggleStatus',
   PLOTS_SHOW = 'dvc.showPlots',
 
+  EXTENSION_CHECK_CLI_COMPATIBLE = 'dvc.checkCLICompatible',
   EXTENSION_GET_STARTED = 'dvc.getStarted',
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',
   EXTENSION_SHOW_COMMANDS = 'dvc.showCommands',

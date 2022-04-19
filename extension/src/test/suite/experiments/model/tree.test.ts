@@ -40,6 +40,7 @@ import { Response } from '../../../../vscode/response'
 import { CliExecutor } from '../../../../cli/executor'
 import { Param } from '../../../../experiments/model/queue/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
+import { MetricOrParamType } from '../../../../experiments/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -220,7 +221,11 @@ suite('Experiments Tree Test Suite', () => {
       stub(ExperimentsModel.prototype, 'getFilters').returns([
         {
           operator: Operator.EQUAL,
-          path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
+          path: joinMetricOrParamPath(
+            MetricOrParamType.METRICS,
+            'summary.json',
+            'loss'
+          ),
           value: unfilteredCheckpointValue
         }
       ])
@@ -338,7 +343,11 @@ suite('Experiments Tree Test Suite', () => {
 
       await addFilterViaQuickInput(experiments, {
         operator: Operator.EQUAL,
-        path: joinMetricOrParamPath('metrics', 'summary.json', 'loss'),
+        path: joinMetricOrParamPath(
+          MetricOrParamType.METRICS,
+          'summary.json',
+          'loss'
+        ),
         value: '0'
       })
 

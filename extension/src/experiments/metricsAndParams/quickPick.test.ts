@@ -1,8 +1,9 @@
 import { pickFromMetricsAndParams } from './quickPick'
-import { joinMetricOrParamPath } from './paths'
+import { appendMetricOrParamToPath, joinMetricOrParamPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Title } from '../../vscode/title'
+import { MetricOrParamType } from '../webview/contract'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -17,12 +18,11 @@ beforeEach(() => {
 })
 
 describe('pickFromMetricsAndParams', () => {
-  const params = 'params'
+  const params = MetricOrParamType.PARAMS
   const paramsYaml = 'params.yaml'
   const paramsYamlPath = joinMetricOrParamPath(params, paramsYaml)
-  const epochsParamPath = joinMetricOrParamPath(paramsYamlPath, 'epochs')
+  const epochsParamPath = appendMetricOrParamToPath(paramsYamlPath, 'epochs')
   const epochsParam = {
-    group: params,
     hasChildren: false,
     maxNumber: 5,
     maxStringLength: 1,
@@ -30,15 +30,16 @@ describe('pickFromMetricsAndParams', () => {
     name: 'epochs',
     parentPath: paramsYamlPath,
     path: epochsParamPath,
+    type: MetricOrParamType.PARAMS,
     types: ['number']
   }
 
   const paramsYamlParam = {
-    group: params,
     hasChildren: true,
     name: paramsYaml,
     parentPath: params,
-    path: paramsYamlPath
+    path: paramsYamlPath,
+    type: MetricOrParamType.PARAMS
   }
   const exampleMetricsAndParams = [epochsParam, paramsYamlParam]
 

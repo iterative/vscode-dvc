@@ -6,6 +6,10 @@ import { SourceControlManagement } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
 
+export const RepositoryScale = {
+  TRACKED: 'tracked'
+} as const
+
 export class Repository extends DeferredDisposable {
   private readonly model: RepositoryModel
   private readonly treeDataChanged: EventEmitter<void>
@@ -53,6 +57,10 @@ export class Repository extends DeferredDisposable {
 
   public hasChanges(): boolean {
     return this.model.hasChanges()
+  }
+
+  public getScale() {
+    return { tracked: this.getState().tracked.size }
   }
 
   private async initialize() {
