@@ -159,7 +159,7 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
-export const DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCLIUnavailable'
+export const DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCliUnavailable'
 
 const warnUserCLIInaccessible = async (
   extension: IExtension

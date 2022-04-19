@@ -395,9 +395,9 @@
           "type": "boolean",
           "default": null
         },
-        "dvc.doNotShowCLIUnavailable": {
-          "title": "%config.doNotShowCLIUnavailable.title%",
-          "description": "%config.doNotShowCLIUnavailable.description%",
+        "dvc.doNotShowCliUnavailable": {
+          "title": "%config.doNotShowCliUnavailable.title%",
+          "description": "%config.doNotShowCliUnavailable.description%",
           "type": "boolean",
           "default": null
         },
