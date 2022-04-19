@@ -1,4 +1,4 @@
-import { commands, Event, EventEmitter, ExtensionContext } from 'vscode'
+import { commands, env, Event, EventEmitter, ExtensionContext } from 'vscode'
 import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
@@ -274,7 +274,7 @@ export class Extension extends Disposable implements IExtension {
       )
     )
 
-    showWalkthroughOnFirstUse(context.globalState)
+    showWalkthroughOnFirstUse(context.globalState, env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
   }
 

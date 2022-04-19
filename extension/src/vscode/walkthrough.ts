@@ -24,9 +24,22 @@ export const registerWalkthroughCommands = (
   )
 }
 
-export const showWalkthroughOnFirstUse = (globalState: Memento) => {
-  if (!globalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)) {
+export const showWalkthroughOnFirstUse = (
+  globalState: Memento,
+  isNewAppInstall: boolean
+) => {
+  if (
+    isNewAppInstall &&
+    !globalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+  ) {
     commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
     globalState.update(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL, true)
+  }
+
+  if (!isNewAppInstall) {
+    globalState.update(
+      PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL,
+      undefined
+    )
   }
 }

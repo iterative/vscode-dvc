@@ -34,7 +34,7 @@ suite('Walkthrough Test Suite', () => {
   })
 
   describe('showWalkthroughOnFirstUse', () => {
-    it('should only show the walkthrough once', () => {
+    it('should only show the walkthrough once after a new install', () => {
       const mockGlobalState = buildMockMemento()
 
       const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
@@ -45,7 +45,7 @@ suite('Walkthrough Test Suite', () => {
         mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
       ).to.equal(undefined)
 
-      showWalkthroughOnFirstUse(mockGlobalState)
+      showWalkthroughOnFirstUse(mockGlobalState, true)
 
       expect(mockExecuteCommand).to.be.calledOnce
       expect(
@@ -54,9 +54,43 @@ suite('Walkthrough Test Suite', () => {
 
       mockExecuteCommand.resetHistory()
 
-      showWalkthroughOnFirstUse(mockGlobalState)
+      showWalkthroughOnFirstUse(mockGlobalState, true)
 
       expect(mockExecuteCommand).not.to.be.called
+      expect(
+        mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+      ).to.equal(true)
+    })
+
+    it('should reset the walkthrough state when the install is no longer new', () => {
+      const mockGlobalState = buildMockMemento()
+
+      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
+        undefined
+      )
+
+      expect(
+        mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+      ).to.equal(undefined)
+
+      showWalkthroughOnFirstUse(mockGlobalState, true)
+
+      expect(mockExecuteCommand).to.be.calledOnce
+      expect(
+        mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+      ).to.equal(true)
+
+      mockExecuteCommand.resetHistory()
+
+      showWalkthroughOnFirstUse(mockGlobalState, false)
+      expect(mockExecuteCommand).not.to.be.called
+      expect(
+        mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+      ).to.be.undefined
+
+      showWalkthroughOnFirstUse(mockGlobalState, true)
+
+      expect(mockExecuteCommand).to.be.calledOnce
       expect(
         mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
       ).to.equal(true)
