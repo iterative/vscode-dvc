@@ -395,6 +395,12 @@
           "type": "boolean",
           "default": null
         },
+        "dvc.doNotShowCLIUnavailable": {
+          "title": "%config.doNotShowCLIUnavailable.title%",
+          "description": "%config.doNotShowCLIUnavailable.description%",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.doNotShowUnableToFilter": {
           "title": "%config.doNotShowUnableToFilter.title%",
           "description": "%config.doNotShowUnableToFilter.description%",

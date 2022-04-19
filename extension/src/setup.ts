@@ -4,7 +4,11 @@ import {
   quickPickValue,
   quickPickYesOrNo
 } from './vscode/quickPick'
-import { setConfigValue } from './vscode/config'
+import {
+  getConfigValue,
+  setConfigValue,
+  setUserConfigValue
+} from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { Response } from './vscode/response'
@@ -155,6 +159,27 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
+export const DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCLIUnavailable'
+
+const warnUserCLIInaccessible = async (
+  extension: IExtension
+): Promise<void> => {
+  if (getConfigValue<boolean>(DO_NOT_SHOW_CLI_UNAVAILABLE)) {
+    return
+  }
+  const response = await Toast.warnWithOptions(
+    'An error was thrown when trying to access the CLI.',
+    Response.SETUP_WORKSPACE,
+    Response.NEVER
+  )
+  if (response === Response.SETUP_WORKSPACE) {
+    extension.setupWorkspace()
+  }
+  if (response === Response.NEVER) {
+    setUserConfigValue(DO_NOT_SHOW_CLI_UNAVAILABLE, true)
+  }
+}
+
 const extensionCanRunCli = async (
   extension: IExtension,
   cwd: string
@@ -164,9 +189,7 @@ const extensionCanRunCli = async (
     canRunCli = await extension.canRunCli(cwd)
   } catch {
     if (extension.hasRoots()) {
-      Toast.warnWithOptions(
-        'An error was thrown when trying to access the CLI.'
-      )
+      warnUserCLIInaccessible(extension)
     }
   }
   return canRunCli

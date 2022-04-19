@@ -270,31 +270,33 @@ export class Extension extends Disposable implements IExtension {
     this.dispose.track(
       commands.registerCommand(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        async () => {
-          const stopWatch = new StopWatch()
-          try {
-            const completed = await setupWorkspace()
-            sendTelemetryEvent(
-              RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-              { completed },
-              {
-                duration: stopWatch.getElapsedTime()
-              }
-            )
-            return completed
-          } catch (error: unknown) {
-            return sendTelemetryEventAndThrow(
-              RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-              error as Error,
-              stopWatch.getElapsedTime()
-            )
-          }
-        }
+        this.setupWorkspace
       )
     )
 
     showWalkthroughOnFirstUse(context.globalState)
     this.dispose.track(recommendRedHatExtensionOnce())
+  }
+
+  public async setupWorkspace() {
+    const stopWatch = new StopWatch()
+    try {
+      const completed = await setupWorkspace()
+      sendTelemetryEvent(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        { completed },
+        {
+          duration: stopWatch.getElapsedTime()
+        }
+      )
+      return completed
+    } catch (error: unknown) {
+      return sendTelemetryEventAndThrow(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        error as Error,
+        stopWatch.getElapsedTime()
+      )
+    }
   }
 
   public async canRunCli(cwd: string) {

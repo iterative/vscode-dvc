@@ -61,6 +61,8 @@
   "command.views.experimentsTree.selectExperiments": "Select Experiments",
   "config.doNotRecommendRedHatExtension.description": "Do not prompt to install the Red Hat YAML extension to assist with DVC YAML schema validation.",
   "config.doNotRecommendRedHatExtension.title": "Do not prompt to install the Red Hat YAML extension.",
+  "config.doNotShowCLIUnavailable.description": "Do not warn when the workspace contains a DVC project but the CLI is inaccessible.",
+  "config.doNotShowCLIUnavailable.title": "Do not warn when the CLI is inaccessible.",
   "config.doNotShowUnableToFilter.description": "Do not warn before disabling auto-apply filters when applying the selected filters would result in too many experiments being selected.",
   "config.doNotShowUnableToFilter.title": "Do not warn before disabling auto-apply filters to experiment selection.",
   "config.dvcPath.description": "Call DVC from this path. Follows Python extension when blank.",
