@@ -152,7 +152,11 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
     if (draggedId) {
       const { id } = e.currentTarget
-      if (id !== draggedId && !id.includes('__drop')) {
+      if (
+        !disabledDropIds.includes(id) &&
+        id !== draggedId &&
+        !id.includes('__drop')
+      ) {
         setDraggedOverId(id)
         setDirection(getDragEnterDirection(e))
       }
