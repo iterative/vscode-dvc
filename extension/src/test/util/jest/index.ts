@@ -67,3 +67,5 @@ export const buildMockedExperiments = () => {
     mockedMetricsOrParamsChanged
   }
 }
+
+export const flushPromises = () => new Promise(process.nextTick)
