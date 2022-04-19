@@ -758,7 +758,7 @@ describe('App', () => {
     ])
   })
 
-  it('should move a template plot from one type in another section of the same type and show a drop targets', async () => {
+  it('should move a template plot from one type in another section of the same type and show two drop targets', async () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
@@ -783,7 +783,7 @@ describe('App', () => {
       DragEnterDirection.LEFT
     )
 
-    expect(screen.getAllByTestId('drop-target').length).toBe(2) // One in the old section and on in the newest one
+    expect(screen.getAllByTestId('drop-target').length).toBe(2) // One in the old section and one in the new one
 
     dragAndDrop(anotherSingleViewPlot, movedSingleViewPlot)
 
