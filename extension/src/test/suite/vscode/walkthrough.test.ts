@@ -5,10 +5,8 @@ import { restore, spy, stub } from 'sinon'
 import { closeAllEditors } from '../util'
 import { RegisteredCommands } from '../../../commands/external'
 import { buildMockMemento } from '../../util'
-import {
-  MementoKey,
-  showWalkthroughOnFirstUse
-} from '../../../vscode/walkthrough'
+import { showWalkthroughOnFirstUse } from '../../../vscode/walkthrough'
+import { PersistenceKey } from '../../../persistence/constants'
 
 suite('Walkthrough Test Suite', () => {
   beforeEach(() => {
@@ -43,19 +41,25 @@ suite('Walkthrough Test Suite', () => {
         undefined
       )
 
-      expect(mockGlobalState.get(MementoKey)).to.equal(undefined)
+      expect(
+        mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+      ).to.equal(undefined)
 
       showWalkthroughOnFirstUse(mockGlobalState)
 
       expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockGlobalState.get(MementoKey)).to.equal(true)
+      expect(
+        mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+      ).to.equal(true)
 
       mockExecuteCommand.resetHistory()
 
       showWalkthroughOnFirstUse(mockGlobalState)
 
       expect(mockExecuteCommand).not.to.be.called
-      expect(mockGlobalState.get(MementoKey)).to.equal(true)
+      expect(
+        mockGlobalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+      ).to.equal(true)
     })
   })
 })
