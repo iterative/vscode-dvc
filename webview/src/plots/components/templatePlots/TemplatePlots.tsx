@@ -81,19 +81,20 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
 
     if (e.currentTarget.id === NewSectionBlock.TOP) {
       if (firstSection.group !== group) {
-        setTimeout(() => setSectionOrder([newSection, ...updatedSections]), 0)
+        setTimeout(() => setSectionOrder([newSection, ...updatedSections]), 1)
       }
       return
     }
     if (lastSection.group !== group) {
-      setTimeout(() => setSectionOrder([...updatedSections, newSection]), 0)
+      setTimeout(() => setSectionOrder([...updatedSections, newSection]), 1)
     }
   }
 
   const handleDropInSection = (
     draggedId: string,
     draggedGroup: string,
-    groupId: string
+    groupId: string,
+    position: number
   ) => {
     if (draggedGroup === groupId) {
       return
@@ -108,7 +109,8 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
       oldGroupId,
       draggedId,
       newGroupId,
-      entry
+      entry,
+      position
     )
 
     setSectionOrder(updatedSections)
