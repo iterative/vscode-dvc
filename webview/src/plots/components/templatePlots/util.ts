@@ -13,9 +13,18 @@ const remove = (section: TemplatePlotSection, entryId: string) => {
     : null
 }
 
-const add = (section: TemplatePlotSection, entry: TemplatePlotEntry) => {
-  section.entries.push(entry)
-  return { entries: section.entries, group: section.group }
+const add = (
+  section: TemplatePlotSection,
+  entry: TemplatePlotEntry,
+  position?: number
+) => {
+  const entries = [...section.entries]
+  entries.splice(
+    position !== undefined ? position : entries.length - 1,
+    0,
+    entry
+  )
+  return { entries, group: section.group }
 }
 
 export const removeFromPreviousAndAddToNewSection = (
@@ -23,14 +32,15 @@ export const removeFromPreviousAndAddToNewSection = (
   oldSectionIndex: number,
   entryId: string,
   newGroupIndex?: number,
-  entry?: TemplatePlotEntry
+  entry?: TemplatePlotEntry,
+  position?: number
 ) =>
   sections
     .map((section, i) => {
       if (i === oldSectionIndex) {
         return remove(section, entryId)
       } else if (i === newGroupIndex && entry) {
-        return add(section, entry)
+        return add(section, entry, position)
       }
       return section
     })
