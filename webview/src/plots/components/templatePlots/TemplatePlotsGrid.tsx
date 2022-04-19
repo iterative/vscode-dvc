@@ -7,7 +7,8 @@ import styles from '../styles.module.scss'
 import { config } from '../constants'
 import {
   DragDropContainer,
-  DraggedInfo
+  DraggedInfo,
+  OnDrop
 } from '../../../shared/components/dragDrop/DragDropContainer'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { withScale } from '../../../util/styles'
@@ -17,12 +18,8 @@ interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
   groupId: string
   groupIndex: number
-  onDropInSection: (
-    draggedId: string,
-    draggedGroup: string,
-    groupId: string
-  ) => void
-  draggedRef?: MutableRefObject<DraggedInfo | undefined>
+  onDropInSection: OnDrop
+  draggedRef: MutableRefObject<DraggedInfo | undefined>
   multiView: boolean
   setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
 }

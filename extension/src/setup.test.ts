@@ -1,6 +1,11 @@
 import { resolve } from 'path'
 import { setup, setupWorkspace } from './setup'
-import { setConfigValue } from './vscode/config'
+import { flushPromises } from './test/util/jest'
+import {
+  getConfigValue,
+  setConfigValue,
+  setUserConfigValue
+} from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import {
   quickPickOneOrInput,
@@ -8,10 +13,13 @@ import {
   quickPickYesOrNo
 } from './vscode/quickPick'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
+import { Toast } from './vscode/toast'
+import { Response } from './vscode/response'
 
 jest.mock('./vscode/config')
 jest.mock('./vscode/resourcePicker')
 jest.mock('./vscode/quickPick')
+jest.mock('./vscode/toast')
 jest.mock('./vscode/workspaceFolders')
 
 const mockedCanRunCli = jest.fn()
@@ -21,12 +29,20 @@ const mockedCwd = __dirname
 const mockedInitialize = jest.fn()
 const mockedReset = jest.fn()
 const mockedSetRoots = jest.fn()
+const mockedSetupWorkspace = jest.fn()
 
 const mockedQuickPickYesOrNo = jest.mocked(quickPickYesOrNo)
 const mockedQuickPickValue = jest.mocked(quickPickValue)
 const mockedSetConfigValue = jest.mocked(setConfigValue)
 const mockedQuickPickOneOrInput = jest.mocked(quickPickOneOrInput)
 const mockedPickFile = jest.mocked(pickFile)
+
+const mockedToast = jest.mocked(Toast)
+const mockedWarnWithOptions = jest.fn()
+mockedToast.warnWithOptions = mockedWarnWithOptions
+
+const mockedGetConfigValue = jest.mocked(getConfigValue)
+const mockedSetUserConfigValue = jest.mocked(setUserConfigValue)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -173,7 +189,8 @@ describe('setup', () => {
     hasRoots: mockedHasRoots,
     initialize: mockedInitialize,
     reset: mockedReset,
-    setRoots: mockedSetRoots
+    setRoots: mockedSetRoots,
+    setupWorkspace: mockedSetupWorkspace
   }
 
   it('should do nothing if there is no workspace folder', async () => {
@@ -192,6 +209,85 @@ describe('setup', () => {
     await setup(extension)
 
     expect(mockedSetRoots).toBeCalledTimes(1)
+  })
+
+  it('should not alert the user if the workspace has no DVC project and the cli cannot be found', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(false)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+
+    await setup(extension)
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedGetConfigValue).not.toBeCalled()
+    expect(mockedWarnWithOptions).not.toBeCalled()
+    expect(mockedSetupWorkspace).not.toBeCalled()
+    expect(mockedSetUserConfigValue).not.toBeCalled()
+    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
+  })
+
+  it('should not alert the user if the workspace contains a DVC project, the cli cannot be found and the do not show option is set', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedGetConfigValue.mockReturnValueOnce(true)
+
+    await setup(extension)
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedGetConfigValue).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).not.toBeCalled()
+    expect(mockedSetupWorkspace).not.toBeCalled()
+    expect(mockedSetUserConfigValue).not.toBeCalled()
+    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
+  })
+
+  it('should alert the user if the workspace contains a DVC project and the cli cannot be found', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+
+    await setup(extension)
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedGetConfigValue).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
+  })
+
+  it('should try to setup the workspace if the workspace contains a DVC project, the cli cannot be found and the user selects setup the workspace', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedWarnWithOptions.mockResolvedValueOnce(Response.SETUP_WORKSPACE)
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedGetConfigValue).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedSetupWorkspace).toBeCalledTimes(1)
+    expect(mockedSetUserConfigValue).not.toBeCalled()
+    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
+  })
+
+  it('should set a user config option if the workspace contains a DVC project, the cli cannot be found and the user selects never', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedWarnWithOptions.mockResolvedValueOnce(Response.NEVER)
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedGetConfigValue).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedSetupWorkspace).not.toBeCalled()
+    expect(mockedSetUserConfigValue).toBeCalledTimes(1)
+    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
   })
 
   it('should not run initialization if roots have not been found but the cli can be run', async () => {

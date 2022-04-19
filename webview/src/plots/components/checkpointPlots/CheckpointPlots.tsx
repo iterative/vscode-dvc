@@ -3,11 +3,14 @@ import {
   CheckpointPlotData,
   CheckpointPlotsColors
 } from 'dvc/src/plots/webview/contract'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Plot } from './Plot'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import {
+  DragDropContainer,
+  DraggedInfo
+} from '../../../shared/components/dragDrop/DragDropContainer'
 import { performOrderedUpdate } from '../../../util/objects'
 import { withScale } from '../../../util/styles'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
@@ -24,6 +27,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   colors
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
+  const draggedRef = useRef<DraggedInfo>()
 
   useEffect(() => {
     setOrder(pastOrder => performOrderedUpdate(pastOrder, plots, 'title'))
@@ -68,6 +72,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
         disabledDropIds={[]}
         items={items as JSX.Element[]}
         group="live-plots"
+        draggedRef={draggedRef}
         dropTarget={{
           element: <DropTarget />,
           wrapperTag: 'div'

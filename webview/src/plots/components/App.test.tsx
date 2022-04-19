@@ -758,7 +758,7 @@ describe('App', () => {
     ])
   })
 
-  it('should move a template plot from one type in another section of the same type', async () => {
+  it('should move a template plot from one type in another section of the same type and show two drop targets', async () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
@@ -776,6 +776,14 @@ describe('App', () => {
     const movedSingleViewPlot = screen.getByTestId(
       join('plot_other', 'plot.tsv')
     )
+
+    dragEnter(
+      anotherSingleViewPlot,
+      movedSingleViewPlot,
+      DragEnterDirection.LEFT
+    )
+
+    expect(screen.getAllByTestId('drop-target').length).toBe(2) // One in the old section and one in the new one
 
     dragAndDrop(anotherSingleViewPlot, movedSingleViewPlot)
 
