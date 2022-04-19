@@ -4,11 +4,16 @@ import {
   quickPickValue,
   quickPickYesOrNo
 } from './vscode/quickPick'
-import { setConfigValue } from './vscode/config'
+import {
+  getConfigValue,
+  setConfigValue,
+  setUserConfigValue
+} from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { Response } from './vscode/response'
 import { getSelectTitle, Title } from './vscode/title'
+import { Toast } from './vscode/toast'
 
 const setConfigPath = async (
   option: string,
@@ -154,18 +159,53 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
+export const DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCliUnavailable'
+
+const warnUserCLIInaccessible = async (
+  extension: IExtension
+): Promise<void> => {
+  if (getConfigValue<boolean>(DO_NOT_SHOW_CLI_UNAVAILABLE)) {
+    return
+  }
+  const response = await Toast.warnWithOptions(
+    'An error was thrown when trying to access the CLI.',
+    Response.SETUP_WORKSPACE,
+    Response.NEVER
+  )
+  if (response === Response.SETUP_WORKSPACE) {
+    extension.setupWorkspace()
+  }
+  if (response === Response.NEVER) {
+    setUserConfigValue(DO_NOT_SHOW_CLI_UNAVAILABLE, true)
+  }
+}
+
+const extensionCanRunCli = async (
+  extension: IExtension,
+  cwd: string
+): Promise<boolean> => {
+  let canRunCli = false
+  try {
+    canRunCli = await extension.canRunCli(cwd)
+  } catch {
+    if (extension.hasRoots()) {
+      warnUserCLIInaccessible(extension)
+    }
+  }
+  return canRunCli
+}
+
 export const setup = async (extension: IExtension) => {
   const cwd = getFirstWorkspaceFolder()
   if (!cwd) {
     return
   }
 
-  const [canRunCli] = await Promise.all([
-    extension.canRunCli(cwd),
-    extension.setRoots()
-  ])
+  extension.setRoots()
 
-  if (extension.hasRoots() && canRunCli) {
+  const isCliAvailable = await extensionCanRunCli(extension, cwd)
+
+  if (extension.hasRoots() && isCliAvailable) {
     return extension.initialize()
   }
 

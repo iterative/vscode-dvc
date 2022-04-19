@@ -45,7 +45,6 @@ import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
-import { Toast } from './vscode/toast'
 import { collectWorkspaceScale } from './telemetry/collect'
 
 export class Extension extends Disposable implements IExtension {
@@ -271,26 +270,7 @@ export class Extension extends Disposable implements IExtension {
     this.dispose.track(
       commands.registerCommand(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        async () => {
-          const stopWatch = new StopWatch()
-          try {
-            const completed = await setupWorkspace()
-            sendTelemetryEvent(
-              RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-              { completed },
-              {
-                duration: stopWatch.getElapsedTime()
-              }
-            )
-            return completed
-          } catch (error: unknown) {
-            return sendTelemetryEventAndThrow(
-              RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-              error as Error,
-              stopWatch.getElapsedTime()
-            )
-          }
-        }
+        this.setupWorkspace
       )
     )
 
@@ -298,20 +278,34 @@ export class Extension extends Disposable implements IExtension {
     this.dispose.track(recommendRedHatExtensionOnce())
   }
 
-  public async canRunCli(cwd: string) {
+  public async setupWorkspace() {
+    const stopWatch = new StopWatch()
     try {
-      await this.config.isReady()
-      const version = await this.cliReader.version(cwd)
-      const compatible = isVersionCompatible(version)
-      setContextValue('dvc.cli.incompatible', !compatible)
-      return this.setAvailable(compatible)
-    } catch {
-      Toast.warnWithOptions(
-        'An error was thrown when trying to access the CLI.'
+      const completed = await setupWorkspace()
+      sendTelemetryEvent(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        { completed },
+        {
+          duration: stopWatch.getElapsedTime()
+        }
       )
-      setContextValue('dvc.cli.incompatible', undefined)
-      return this.setAvailable(false)
+      return completed
+    } catch (error: unknown) {
+      return sendTelemetryEventAndThrow(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        error as Error,
+        stopWatch.getElapsedTime()
+      )
     }
+  }
+
+  public async canRunCli(cwd: string) {
+    await this.config.isReady()
+    setContextValue('dvc.cli.incompatible', undefined)
+    const version = await this.cliReader.version(cwd)
+    const compatible = isVersionCompatible(version)
+    setContextValue('dvc.cli.incompatible', !compatible)
+    return this.setAvailable(compatible)
   }
 
   public async setRoots() {
