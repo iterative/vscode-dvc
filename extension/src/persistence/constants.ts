@@ -14,5 +14,6 @@ export enum PersistenceKey {
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOT_SIZES = 'plotSizes:',
   PLOT_SECTION_NAMES = 'plotSectionNames:',
-  PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:'
+  PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:',
+  WALKTHROUGH_SHOWN_AFTER_INSTALL = 'walkthroughShownAfterInstall'
 }
