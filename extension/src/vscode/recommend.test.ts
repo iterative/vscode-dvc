@@ -1,5 +1,5 @@
 import { commands, window } from 'vscode'
-import { setUserConfigValue } from './config'
+import { ConfigKey, setUserConfigValue } from './config'
 import { recommendRedHatExtension } from './recommend'
 import { Response } from './response'
 
@@ -26,7 +26,7 @@ describe('recommendRedHatExtension', () => {
 
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).toBeCalledWith(
-      'dvc.doNotRecommendRedHatExtension',
+      ConfigKey.DO_NOT_RECOMMEND_RED_HAT,
       true
     )
   })

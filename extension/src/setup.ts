@@ -5,6 +5,7 @@ import {
   quickPickYesOrNo
 } from './vscode/quickPick'
 import {
+  ConfigKey,
   getConfigValue,
   setConfigValue,
   setUserConfigValue
@@ -16,7 +17,7 @@ import { getSelectTitle, Title } from './vscode/title'
 import { Toast } from './vscode/toast'
 
 const setConfigPath = async (
-  option: string,
+  option: ConfigKey,
   path: string | undefined
 ): Promise<true> => {
   await setConfigValue(option, path)
@@ -24,10 +25,7 @@ const setConfigPath = async (
 }
 
 const setDvcPath = (path: string | undefined) =>
-  setConfigPath('dvc.dvcPath', path)
-
-const setPythonPath = (path: string | undefined) =>
-  setConfigPath('dvc.pythonPath', path)
+  setConfigPath(ConfigKey.DVC_PATH, path)
 
 const enterPathOrFind = (text: string): Promise<string | undefined> =>
   quickPickOneOrInput(
@@ -45,7 +43,7 @@ const enterPathOrFind = (text: string): Promise<string | undefined> =>
     }
   )
 
-const findPath = async (option: string, text: string) => {
+const findPath = async (option: ConfigKey, text: string) => {
   const title = getSelectTitle(text)
   const path = await pickFile(title)
   if (!path) {
@@ -54,7 +52,7 @@ const findPath = async (option: string, text: string) => {
   return setConfigPath(option, path)
 }
 
-const enterPathOrPickFile = async (option: string, description: string) => {
+const enterPathOrPickFile = async (option: ConfigKey, description: string) => {
   const pickOrPath = await enterPathOrFind(description)
 
   if (pickOrPath === undefined) {
@@ -83,7 +81,7 @@ const pickCliPath = async () => {
     return setDvcPath('dvc')
   }
 
-  return enterPathOrPickFile('dvc.dvcPath', 'DVC CLI')
+  return enterPathOrPickFile(ConfigKey.DVC_PATH, 'DVC CLI')
 }
 
 const pickVenvOptions = async () => {
@@ -135,10 +133,10 @@ const quickPickVenvOption = () =>
 
 const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {
   if (usesVenv === 1) {
-    return enterPathOrPickFile('dvc.pythonPath', 'Python Interpreter')
+    return enterPathOrPickFile(ConfigKey.PYTHON_PATH, 'Python Interpreter')
   }
 
-  return setPythonPath(undefined)
+  return setConfigPath(ConfigKey.PYTHON_PATH, undefined)
 }
 
 export const setupWorkspace = async (): Promise<boolean> => {
@@ -159,12 +157,10 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
-export const DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCliUnavailable'
-
 const warnUserCLIInaccessible = async (
   extension: IExtension
 ): Promise<void> => {
-  if (getConfigValue<boolean>(DO_NOT_SHOW_CLI_UNAVAILABLE)) {
+  if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
     return
   }
   const response = await Toast.warnWithOptions(
@@ -176,7 +172,7 @@ const warnUserCLIInaccessible = async (
     extension.setupWorkspace()
   }
   if (response === Response.NEVER) {
-    setUserConfigValue(DO_NOT_SHOW_CLI_UNAVAILABLE, true)
+    setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
   }
 }
 

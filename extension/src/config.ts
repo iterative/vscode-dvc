@@ -3,7 +3,7 @@ import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
 } from './extensions/python'
-import { getConfigValue } from './vscode/config'
+import { ConfigKey, getConfigValue } from './vscode/config'
 import { DeferredDisposable } from './class/deferred'
 
 export class Config extends DeferredDisposable {
@@ -14,9 +14,6 @@ export class Config extends DeferredDisposable {
   private dvcPath = this.getCliPath()
 
   private readonly executionDetailsChanged: EventEmitter<void>
-
-  private readonly dvcPathOption = 'dvc.dvcPath'
-  private readonly pythonPathOption = 'dvc.pythonPath'
 
   constructor() {
     super()
@@ -32,15 +29,15 @@ export class Config extends DeferredDisposable {
   }
 
   public getCliPath(): string {
-    return getConfigValue(this.dvcPathOption)
+    return getConfigValue(ConfigKey.DVC_PATH)
   }
 
   public isPythonExtensionUsed() {
-    return !getConfigValue(this.pythonPathOption) && !!this.pythonBinPath
+    return !getConfigValue(ConfigKey.PYTHON_PATH) && !!this.pythonBinPath
   }
 
   private async getPythonBinPath() {
-    return getConfigValue(this.pythonPathOption) || (await getPythonBinPath())
+    return getConfigValue(ConfigKey.PYTHON_PATH) || (await getPythonBinPath())
   }
 
   private async setPythonBinPath() {
@@ -61,12 +58,12 @@ export class Config extends DeferredDisposable {
   private onDidConfigurationChange() {
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration(this.dvcPathOption)) {
+        if (e.affectsConfiguration(ConfigKey.DVC_PATH)) {
           const oldPath = this.dvcPath
           this.dvcPath = this.getCliPath()
           this.notifyIfChanged(oldPath, this.dvcPath)
         }
-        if (e.affectsConfiguration(this.pythonPathOption)) {
+        if (e.affectsConfiguration(ConfigKey.PYTHON_PATH)) {
           this.setPythonAndNotifyIfChanged()
         }
       })
