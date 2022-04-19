@@ -1,22 +1,20 @@
-import React, { useState, useEffect } from 'react'
-import { VegaLite } from 'react-vega'
-import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import {
   CheckpointPlotData,
   PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { PlotsContainer } from './PlotsContainer'
+import React, { useEffect, useState } from 'react'
 import { CheckpointPlots } from './checkpointPlots/CheckpointPlots'
 import { ComparisonTable } from './comparisonTable/ComparisonTable'
-import { TemplatePlots } from './templatePlots/TemplatePlots'
+import { PlotsContainer } from './PlotsContainer'
 import styles from './styles.module.scss'
-import { PlotsWebviewState } from '../hooks/useAppReducer'
-import { sendMessage } from '../../shared/vscode'
+import { TemplatePlots } from './templatePlots/TemplatePlots'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
-import { Theme } from '../../shared/components/theme/Theme'
 import { Modal } from '../../shared/components/modal/Modal'
+import { Theme } from '../../shared/components/theme/Theme'
+import { sendMessage } from '../../shared/vscode'
+import { PlotsWebviewState } from '../hooks/useAppReducer'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(({ title }) => title).sort() || []
@@ -31,7 +29,7 @@ export const Plots = ({
 
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
-  const [zoomedInPlot, setZoomedInPlot] = useState<VegaLiteProps | undefined>(
+  const [zoomedInPlot, setZoomedInPlot] = useState<JSX.Element | undefined>(
     undefined
   )
 
@@ -93,7 +91,7 @@ export const Plots = ({
     sectionCollapsed
   }
 
-  const handlePlotClick = (plot: VegaLiteProps) => setZoomedInPlot(plot)
+  const handlePlotClick = (plot: JSX.Element) => setZoomedInPlot(plot)
 
   return (
     <Theme>
@@ -146,9 +144,7 @@ export const Plots = ({
       )}
       {zoomedInPlot && (
         <Modal onClose={() => setZoomedInPlot(undefined)}>
-          <div className={styles.zoomedInPlot}>
-            <VegaLite {...zoomedInPlot} />
-          </div>
+          <div className={styles.zoomedInPlot}>{zoomedInPlot}</div>
         </Modal>
       )}
     </Theme>

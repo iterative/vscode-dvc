@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { MouseEvent } from 'react'
 import styles from './styles.module.scss'
 import { AllIcons, Icon } from '../Icon'
 
@@ -8,13 +8,15 @@ interface ModalProps {
 
 export const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
   return (
-    <button className={styles.backdrop} onClick={onClose}>
+    <div className={styles.backdrop} onClick={onClose} role="none">
       <div className={styles.modal}>
-        <button onClick={onClose}>
-          <Icon icon={AllIcons.CLOSE} />
+        <button className={styles.closeButton} onClick={onClose}>
+          <Icon icon={AllIcons.CLOSE} width={30} height={30} />
         </button>
-        <div className="content">{children}</div>
+        <div role="none" onClick={(e: MouseEvent) => e.stopPropagation()}>
+          {children}
+        </div>
       </div>
-    </button>
+    </div>
   )
 }

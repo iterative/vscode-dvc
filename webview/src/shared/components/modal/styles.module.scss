@@ -15,5 +15,20 @@
 }
 
 .modal {
-  background-color: $fg-color;
+  background-color: $bg-color;
+  position: relative;
+  border: 1px solid $fg-color;
+  padding: 2rem;
+}
+
+.closeButton {
+  position: absolute;
+  right: -12px;
+  top: -40px;
+  border: none;
+  background: none;
+
+  svg {
+    fill: $fg-color;
+  }
 }

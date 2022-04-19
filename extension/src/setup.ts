@@ -4,14 +4,20 @@ import {
   quickPickValue,
   quickPickYesOrNo
 } from './vscode/quickPick'
-import { setConfigValue } from './vscode/config'
+import {
+  ConfigKey,
+  getConfigValue,
+  setConfigValue,
+  setUserConfigValue
+} from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { Response } from './vscode/response'
 import { getSelectTitle, Title } from './vscode/title'
+import { Toast } from './vscode/toast'
 
 const setConfigPath = async (
-  option: string,
+  option: ConfigKey,
   path: string | undefined
 ): Promise<true> => {
   await setConfigValue(option, path)
@@ -19,10 +25,7 @@ const setConfigPath = async (
 }
 
 const setDvcPath = (path: string | undefined) =>
-  setConfigPath('dvc.dvcPath', path)
-
-const setPythonPath = (path: string | undefined) =>
-  setConfigPath('dvc.pythonPath', path)
+  setConfigPath(ConfigKey.DVC_PATH, path)
 
 const enterPathOrFind = (text: string): Promise<string | undefined> =>
   quickPickOneOrInput(
@@ -40,7 +43,7 @@ const enterPathOrFind = (text: string): Promise<string | undefined> =>
     }
   )
 
-const findPath = async (option: string, text: string) => {
+const findPath = async (option: ConfigKey, text: string) => {
   const title = getSelectTitle(text)
   const path = await pickFile(title)
   if (!path) {
@@ -49,7 +52,7 @@ const findPath = async (option: string, text: string) => {
   return setConfigPath(option, path)
 }
 
-const enterPathOrPickFile = async (option: string, description: string) => {
+const enterPathOrPickFile = async (option: ConfigKey, description: string) => {
   const pickOrPath = await enterPathOrFind(description)
 
   if (pickOrPath === undefined) {
@@ -78,7 +81,7 @@ const pickCliPath = async () => {
     return setDvcPath('dvc')
   }
 
-  return enterPathOrPickFile('dvc.dvcPath', 'DVC CLI')
+  return enterPathOrPickFile(ConfigKey.DVC_PATH, 'DVC CLI')
 }
 
 const pickVenvOptions = async () => {
@@ -130,10 +133,10 @@ const quickPickVenvOption = () =>
 
 const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {
   if (usesVenv === 1) {
-    return enterPathOrPickFile('dvc.pythonPath', 'Python Interpreter')
+    return enterPathOrPickFile(ConfigKey.PYTHON_PATH, 'Python Interpreter')
   }
 
-  return setPythonPath(undefined)
+  return setConfigPath(ConfigKey.PYTHON_PATH, undefined)
 }
 
 export const setupWorkspace = async (): Promise<boolean> => {
@@ -154,18 +157,51 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
+const warnUserCLIInaccessible = async (
+  extension: IExtension
+): Promise<void> => {
+  if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
+    return
+  }
+  const response = await Toast.warnWithOptions(
+    'An error was thrown when trying to access the CLI.',
+    Response.SETUP_WORKSPACE,
+    Response.NEVER
+  )
+  if (response === Response.SETUP_WORKSPACE) {
+    extension.setupWorkspace()
+  }
+  if (response === Response.NEVER) {
+    setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
+  }
+}
+
+const extensionCanRunCli = async (
+  extension: IExtension,
+  cwd: string
+): Promise<boolean> => {
+  let canRunCli = false
+  try {
+    canRunCli = await extension.canRunCli(cwd)
+  } catch {
+    if (extension.hasRoots()) {
+      warnUserCLIInaccessible(extension)
+    }
+  }
+  return canRunCli
+}
+
 export const setup = async (extension: IExtension) => {
   const cwd = getFirstWorkspaceFolder()
   if (!cwd) {
     return
   }
 
-  const [canRunCli] = await Promise.all([
-    extension.canRunCli(cwd),
-    extension.setRoots()
-  ])
+  extension.setRoots()
 
-  if (extension.hasRoots() && canRunCli) {
+  const isCliAvailable = await extensionCanRunCli(extension, cwd)
+
+  if (extension.hasRoots() && isCliAvailable) {
     return extension.initialize()
   }
 

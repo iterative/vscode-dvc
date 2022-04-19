@@ -28,7 +28,11 @@ import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { createTypedAccumulator } from '../util/object'
 
-export const ExperimentsScale = MetricOrParamType
+export const ExperimentsScale = {
+  ...MetricOrParamType,
+  HAS_CHECKPOINTS: 'hasCheckpoints',
+  NO_CHECKPOINTS: 'noCheckpoints'
+} as const
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -112,7 +116,7 @@ export class Experiments extends BaseRepository<TableData> {
   public async setState(data: ExperimentsOutput) {
     await Promise.all([
       this.metricsAndParams.transformAndSet(data),
-      this.experiments.transformAndSet(data, this.checkpoints.hasCheckpoints())
+      this.experiments.transformAndSet(data, this.hasCheckpoints())
     ])
 
     return this.notifyChanged(data)
@@ -158,6 +162,10 @@ export class Experiments extends BaseRepository<TableData> {
     for (const { type } of this.metricsAndParams.getTerminalNodes()) {
       acc[type] = acc[type] + 1
     }
+    const checkpointType = this.hasCheckpoints()
+      ? ExperimentsScale.HAS_CHECKPOINTS
+      : ExperimentsScale.NO_CHECKPOINTS
+    acc[checkpointType] = acc[checkpointType] + 1
     return acc
   }
 
@@ -230,10 +238,7 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 
-    const selected = await pickExperiments(
-      experiments,
-      this.checkpoints.hasCheckpoints()
-    )
+    const selected = await pickExperiments(experiments, this.hasCheckpoints())
     if (!selected) {
       return
     }

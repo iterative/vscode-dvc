@@ -1,6 +1,7 @@
 import { commands, Memento } from 'vscode'
 import { RegisteredCommands } from '../commands/external'
 import { InternalCommands } from '../commands/internal'
+import { PersistenceKey } from '../persistence/constants'
 import { joinTruthyItems } from '../util/array'
 
 export const registerWalkthroughCommands = (
@@ -23,11 +24,9 @@ export const registerWalkthroughCommands = (
   )
 }
 
-export const MementoKey = 'walkthroughShownAfterInstall'
-
 export const showWalkthroughOnFirstUse = (globalState: Memento) => {
-  if (!globalState.get(MementoKey)) {
+  if (!globalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)) {
     commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
-    globalState.update(MementoKey, true)
+    globalState.update(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL, true)
   }
 }

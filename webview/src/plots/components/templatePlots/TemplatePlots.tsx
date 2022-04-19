@@ -1,22 +1,21 @@
+import React, { DragEvent, useEffect, useRef, useState } from 'react'
 import {
+  TemplatePlotEntry,
   TemplatePlotGroup,
-  TemplatePlotSection,
-  TemplatePlotEntry
+  TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
-import React, { DragEvent, useState, useEffect, useRef } from 'react'
-import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { removeFromPreviousAndAddToNewSection } from './util'
-import { AddedSection } from './AddedSection'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
+import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
-import { sendMessage } from '../../../shared/vscode'
 
 interface TemplatePlotsProps {
   plots: TemplatePlotSection[]
-  onPlotClick: (plot: VegaLiteProps) => void
+  onPlotClick: (plot: JSX.Element) => void
 }
 
 export enum NewSectionBlock {
