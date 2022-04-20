@@ -262,6 +262,76 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a column sorted message from the webview', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockAddSort = stub(ExperimentsModel.prototype, 'addSort').returns(
+        undefined
+      )
+
+      const mockSortDefinition: SortDefinition = {
+        descending: false,
+        path: 'params:params.yaml:lr'
+      }
+
+      mockMessageReceived.fire({
+        payload: mockSortDefinition,
+        type: MessageFromWebviewType.COLUMN_SORTED
+      })
+
+      expect(mockAddSort).to.be.calledOnce
+      expect(
+        mockAddSort,
+        'should correctly handle a column sorted message'
+      ).to.be.calledWithExactly(mockSortDefinition)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED,
+        mockSortDefinition,
+        undefined
+      )
+    })
+
+    it('should handle a column sort removed from the webview', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockRemoveSort = stub(
+        ExperimentsModel.prototype,
+        'removeSort'
+      ).returns(undefined)
+
+      const mockSortPath = 'params:params.yaml:lr'
+
+      mockMessageReceived.fire({
+        payload: mockSortPath,
+        type: MessageFromWebviewType.COLUMN_SORT_REMOVED
+      })
+
+      expect(mockRemoveSort).to.be.calledOnce
+      expect(
+        mockRemoveSort,
+        'should correctly handle a column sort removed message'
+      ).to.be.calledWithExactly(mockSortPath)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED,
+        {
+          path: mockSortPath
+        },
+        undefined
+      )
+    })
+
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
 
