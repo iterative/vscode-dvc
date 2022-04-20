@@ -1,3 +1,4 @@
+import { SortDefinition } from '../experiments/model/sortBy'
 import { TableData } from '../experiments/webview/contract'
 import {
   PlotsData,
@@ -13,6 +14,8 @@ export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   COLUMN_REORDERED = 'column-reordered',
   COLUMN_RESIZED = 'column-resized',
+  COLUMN_SORTED = 'column-sorted',
+  COLUMN_SORT_REMOVED = 'column-sort-removed',
   EXPERIMENT_TOGGLED = 'experiment-toggled',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_COMPARISON_REORDERED = 'plots-comparison-reordered',
@@ -48,6 +51,14 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.COLUMN_SORTED
+      payload: SortDefinition
+    }
+  | {
+      type: MessageFromWebviewType.COLUMN_SORT_REMOVED
       payload: string
     }
   | {
