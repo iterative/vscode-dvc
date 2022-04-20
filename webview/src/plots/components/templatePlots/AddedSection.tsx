@@ -13,6 +13,7 @@ interface AddedSectionProps {
   onDrop: (e: DragEvent<HTMLElement>) => void
   closestSection: TemplatePlotSection
   draggedRef: MutableRefObject<DraggedInfo | undefined>
+  acceptedGroups: string[]
 }
 
 export const AddedSection: React.FC<AddedSectionProps> = ({
@@ -21,15 +22,19 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   hoveredSection,
   setHoveredSection,
   closestSection,
-  draggedRef
+  draggedRef,
+  acceptedGroups
 }) => {
   const handleDragLeave = () => {
     setHoveredSection('')
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    const draggedGroup = getIDWithoutIndex(draggedRef.current?.group)
-    if (draggedGroup !== closestSection.group) {
+    const draggedGroup = getIDWithoutIndex(draggedRef.current?.group) || ''
+    if (
+      acceptedGroups.includes(draggedGroup) &&
+      draggedGroup !== closestSection.group
+    ) {
       setHoveredSection(e.currentTarget.id)
     }
   }

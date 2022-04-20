@@ -117,6 +117,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({ plots }) => {
   }
 
   const newDropSection = {
+    acceptedGroups: Object.values(TemplatePlotGroup),
     draggedRef,
     hoveredSection,
     onDrop: handleDropInNewSection,
