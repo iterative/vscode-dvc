@@ -1,13 +1,12 @@
 import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
-import React, { useEffect, useState, MutableRefObject } from 'react'
+import React, { useEffect, useState } from 'react'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import cx from 'classnames'
 import styles from '../styles.module.scss'
 import { config } from '../constants'
 import {
   DragDropContainer,
-  DraggedInfo,
   OnDrop
 } from '../../../shared/components/dragDrop/DragDropContainer'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
@@ -19,7 +18,6 @@ interface TemplatePlotsGridProps {
   groupId: string
   groupIndex: number
   onDropInSection: OnDrop
-  draggedRef: MutableRefObject<DraggedInfo | undefined>
   multiView: boolean
   setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
 }
@@ -34,7 +32,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   groupId,
   groupIndex,
   onDropInSection,
-  draggedRef,
   multiView,
   setSectionEntries
 }) => {
@@ -96,7 +93,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       items={items as JSX.Element[]}
       group={groupId}
       onDrop={onDropInSection}
-      draggedRef={draggedRef}
       dropTarget={{
         element: <DropTarget />,
         wrapperTag: 'div'

@@ -13,6 +13,7 @@ import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Theme } from '../../shared/components/theme/Theme'
+import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(({ title }) => title).sort() || []
@@ -79,49 +80,51 @@ export const Plots = ({
 
   return (
     <Theme>
-      {templatePlots && (
-        <PlotsContainer
-          title={templatePlots.sectionName}
-          sectionKey={Section.TEMPLATE_PLOTS}
-          currentSize={templatePlots.size}
-          {...basicContainerProps}
-        >
-          <TemplatePlots plots={templatePlots.plots} />
-        </PlotsContainer>
-      )}
-      {comparisonTable && (
-        <PlotsContainer
-          title={comparisonTable.sectionName}
-          sectionKey={Section.COMPARISON_TABLE}
-          currentSize={comparisonTable.size}
-          {...basicContainerProps}
-        >
-          <ComparisonTable
-            plots={comparisonTable.plots}
-            revisions={comparisonTable.revisions}
-          />
-        </PlotsContainer>
-      )}
-      {checkpointPlots && (
-        <PlotsContainer
-          title={checkpointPlots.sectionName}
-          sectionKey={Section.CHECKPOINT_PLOTS}
-          menu={{
-            metrics,
-            selectedMetrics: selectedPlots,
-            setSelectedPlots: setSelectedMetrics
-          }}
-          currentSize={checkpointPlots.size}
-          {...basicContainerProps}
-        >
-          <CheckpointPlots
-            plots={checkpointPlots.plots.filter(plot =>
-              selectedPlots?.includes(plot.title)
-            )}
-            colors={checkpointPlots.colors}
-          />
-        </PlotsContainer>
-      )}
+      <DragDropProvider>
+        {templatePlots && (
+          <PlotsContainer
+            title={templatePlots.sectionName}
+            sectionKey={Section.TEMPLATE_PLOTS}
+            currentSize={templatePlots.size}
+            {...basicContainerProps}
+          >
+            <TemplatePlots plots={templatePlots.plots} />
+          </PlotsContainer>
+        )}
+        {comparisonTable && (
+          <PlotsContainer
+            title={comparisonTable.sectionName}
+            sectionKey={Section.COMPARISON_TABLE}
+            currentSize={comparisonTable.size}
+            {...basicContainerProps}
+          >
+            <ComparisonTable
+              plots={comparisonTable.plots}
+              revisions={comparisonTable.revisions}
+            />
+          </PlotsContainer>
+        )}
+        {checkpointPlots && (
+          <PlotsContainer
+            title={checkpointPlots.sectionName}
+            sectionKey={Section.CHECKPOINT_PLOTS}
+            menu={{
+              metrics,
+              selectedMetrics: selectedPlots,
+              setSelectedPlots: setSelectedMetrics
+            }}
+            currentSize={checkpointPlots.size}
+            {...basicContainerProps}
+          >
+            <CheckpointPlots
+              plots={checkpointPlots.plots.filter(plot =>
+                selectedPlots?.includes(plot.title)
+              )}
+              colors={checkpointPlots.colors}
+            />
+          </PlotsContainer>
+        )}
+      </DragDropProvider>
     </Theme>
   )
 }

@@ -14,6 +14,7 @@ import {
 } from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
+import { DragDropProvider } from '../../../shared/components/dragDrop/DragDropContext'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
@@ -31,7 +32,11 @@ describe('ComparisonTable', () => {
   const basicProps: ComparisonTableProps = comparisonTableFixture
   const revisions = basicProps.revisions.map(({ revision }) => revision)
   const renderTable = (props = basicProps) =>
-    render(<ComparisonTable {...props} />)
+    render(
+      <DragDropProvider>
+        <ComparisonTable {...props} />
+      </DragDropProvider>
+    )
 
   it('should render a table', () => {
     renderTable()
