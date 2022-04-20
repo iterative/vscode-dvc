@@ -45,7 +45,7 @@ import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
-import { Toast } from './vscode/toast'
+import { collectWorkspaceScale } from './telemetry/collect'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -177,19 +177,19 @@ export class Extension extends Disposable implements IExtension {
     )
 
     setup(this)
-      .then(() =>
+      .then(async () =>
         sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
-          this.getEventProperties(),
+          await this.getEventProperties(),
           { duration: stopWatch.getElapsedTime() }
         )
       )
-      .catch(error =>
+      .catch(async error =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
           error,
           stopWatch.getElapsedTime(),
-          this.getEventProperties()
+          await this.getEventProperties()
         )
       )
 
@@ -207,7 +207,7 @@ export class Extension extends Disposable implements IExtension {
 
           return sendTelemetryEvent(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
-            this.getEventProperties(),
+            await this.getEventProperties(),
             { duration: stopWatch.getElapsedTime() }
           )
         } catch (error: unknown) {
@@ -215,7 +215,7 @@ export class Extension extends Disposable implements IExtension {
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
             error as Error,
             stopWatch.getElapsedTime(),
-            this.getEventProperties()
+            await this.getEventProperties()
           )
         }
       })
@@ -270,26 +270,7 @@ export class Extension extends Disposable implements IExtension {
     this.dispose.track(
       commands.registerCommand(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        async () => {
-          const stopWatch = new StopWatch()
-          try {
-            const completed = await setupWorkspace()
-            sendTelemetryEvent(
-              RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-              { completed },
-              {
-                duration: stopWatch.getElapsedTime()
-              }
-            )
-            return completed
-          } catch (error: unknown) {
-            return sendTelemetryEventAndThrow(
-              RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-              error as Error,
-              stopWatch.getElapsedTime()
-            )
-          }
-        }
+        this.setupWorkspace
       )
     )
 
@@ -297,20 +278,34 @@ export class Extension extends Disposable implements IExtension {
     this.dispose.track(recommendRedHatExtensionOnce())
   }
 
-  public async canRunCli(cwd: string) {
+  public async setupWorkspace() {
+    const stopWatch = new StopWatch()
     try {
-      await this.config.isReady()
-      const version = await this.cliReader.version(cwd)
-      const compatible = isVersionCompatible(version)
-      setContextValue('dvc.cli.incompatible', !compatible)
-      return this.setAvailable(compatible)
-    } catch {
-      Toast.warnWithOptions(
-        'An error was thrown when trying to access the CLI.'
+      const completed = await setupWorkspace()
+      sendTelemetryEvent(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        { completed },
+        {
+          duration: stopWatch.getElapsedTime()
+        }
       )
-      setContextValue('dvc.cli.incompatible', undefined)
-      return this.setAvailable(false)
+      return completed
+    } catch (error: unknown) {
+      return sendTelemetryEventAndThrow(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        error as Error,
+        stopWatch.getElapsedTime()
+      )
     }
+  }
+
+  public async canRunCli(cwd: string) {
+    await this.config.isReady()
+    setContextValue('dvc.cli.incompatible', undefined)
+    const version = await this.cliReader.version(cwd)
+    const compatible = isVersionCompatible(version)
+    setContextValue('dvc.cli.incompatible', !compatible)
+    return this.setAvailable(compatible)
   }
 
   public async setRoots() {
@@ -389,8 +384,16 @@ export class Extension extends Disposable implements IExtension {
     return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
   }
 
-  private getEventProperties() {
+  private async getEventProperties() {
     return {
+      ...(this.cliAccessible
+        ? await collectWorkspaceScale(
+            this.dvcRoots,
+            this.experiments,
+            this.plots,
+            this.repositories
+          )
+        : {}),
       cliAccessible: this.cliAccessible,
       dvcPathUsed: !!this.config.getCliPath(),
       dvcRootCount: this.dvcRoots.length,

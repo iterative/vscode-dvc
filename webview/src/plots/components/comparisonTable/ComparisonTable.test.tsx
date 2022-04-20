@@ -7,8 +7,13 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
 import { ComparisonTable, ComparisonTableProps } from './ComparisonTable'
-import { createBubbledEvent, dragAndDrop } from '../../../test/dragDrop'
+import {
+  createBubbledEvent,
+  dragAndDrop,
+  dragEnter
+} from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
+import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
@@ -268,6 +273,19 @@ describe('ComparisonTable', () => {
       dragAndDrop(startingNode, endingNode)
 
       expect(headers).toStrictEqual(expectedOrder)
+    })
+
+    it('should not show a drop placeholder to replace a pinned column', () => {
+      renderTable()
+
+      pinSecondColumn()
+      const [endingNode, startingNode] = getHeaders()
+
+      dragEnter(startingNode, endingNode, DragEnterDirection.LEFT)
+
+      const headers = getHeaders()
+
+      expect(headers[0].id.includes('__drop')).toBe(false)
     })
 
     it('should prevent default behaviour when dragging over', () => {

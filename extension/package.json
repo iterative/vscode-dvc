@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.8",
+  "version": "0.2.9",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -392,6 +392,12 @@
         "dvc.doNotRecommendRedHatExtension": {
           "title": "%config.doNotRecommendRedHatExtension.title%",
           "description": "%config.doNotRecommendRedHatExtension.description%",
+          "type": "boolean",
+          "default": null
+        },
+        "dvc.doNotShowCliUnavailable": {
+          "title": "%config.doNotShowCliUnavailable.title%",
+          "description": "%config.doNotShowCliUnavailable.description%",
           "type": "boolean",
           "default": null
         },
@@ -1155,6 +1161,7 @@
     ]
   },
   "scripts": {
+    "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
     "lint:tsc": "tsc --noEmit",

@@ -304,15 +304,22 @@ suite('Extension Test Suite', () => {
       expect(
         mockSendTelemetryEvent,
         'should send the correct event details'
-      ).to.be.calledWith(
+      ).to.be.calledWithExactly(
         EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
         {
           cliAccessible: true,
           dvcPathUsed: true,
           dvcRootCount: 1,
+          hasCheckpoints: 0,
+          images: 3,
+          metrics: 4,
           msPythonInstalled: false,
           msPythonUsed: false,
+          noCheckpoints: 1,
+          params: 8,
           pythonPathUsed: false,
+          templates: 3,
+          tracked: 15,
           workspaceFolderCount: 1
         },
         match.has('duration')
@@ -349,7 +356,7 @@ suite('Extension Test Suite', () => {
         commands.executeCommand(RegisteredCommands.EXTENSION_SETUP_WORKSPACE)
       ).to.be.eventually.rejectedWith(Error)
 
-      expect(mockSendTelemetryEvent).to.be.calledWith(
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         `errors.${RegisteredCommands.EXTENSION_SETUP_WORKSPACE}`,
         { error: mockErrorMessage },
         { duration: 0 }
