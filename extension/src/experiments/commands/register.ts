@@ -20,10 +20,10 @@ const registerExperimentCwdCommands = (
   )
 
   internalCommands.registerExternalCommand(
-    RegisteredCommands.QUEUE_EXPERIMENT_FROM_EXISTING,
+    RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
     () =>
       experiments.pauseUpdatesThenRun(() =>
-        experiments.queueExperimentFromExisting()
+        experiments.modifyExperimentParamsAndQueue()
       )
   )
 

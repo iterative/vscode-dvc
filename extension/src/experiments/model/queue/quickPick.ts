@@ -5,7 +5,7 @@ import { Flag } from '../../../cli/constants'
 import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
 
-const pickParamsToVary = (params: Param[]): Thenable<Param[] | undefined> =>
+const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
   quickPickManyValues<Param>(
     params.map(param => ({
       description: `${param.value}`,
@@ -13,14 +13,14 @@ const pickParamsToVary = (params: Param[]): Thenable<Param[] | undefined> =>
       picked: true,
       value: param
     })),
-    { title: Title.SELECT_PARAM_TO_VARY }
+    { title: Title.SELECT_PARAM_TO_MODIFY }
   )
 
 const pickNewParamValues = async (
-  paramsToVary: Param[]
+  paramsToModify: Param[]
 ): Promise<string[] | undefined> => {
   const args: string[] = []
-  for (const { path, value } of paramsToVary) {
+  for (const { path, value } of paramsToModify) {
     const input = await getInput(getEnterValueTitle(path), `${value}`)
     if (input === undefined) {
       return
@@ -41,20 +41,20 @@ const addUnchanged = (args: string[], unchanged: Param[]) => {
 export const pickParamsToQueue = async (
   params: Param[]
 ): Promise<string[] | undefined> => {
-  const paramsToVary = await pickParamsToVary(params)
+  const paramsToModify = await pickParamsToModify(params)
 
-  if (!definedAndNonEmpty(paramsToVary)) {
+  if (!definedAndNonEmpty(paramsToModify)) {
     return
   }
 
-  const args = await pickNewParamValues(paramsToVary)
+  const args = await pickNewParamValues(paramsToModify)
 
   if (!args) {
     return
   }
 
-  const paramPathsToVary = new Set(paramsToVary.map(param => param.path))
-  const unchanged = params.filter(param => !paramPathsToVary.has(param.path))
+  const paramPathsToModify = new Set(paramsToModify.map(param => param.path))
+  const unchanged = params.filter(param => !paramPathsToModify.has(param.path))
 
   return addUnchanged(args, unchanged)
 }
