@@ -63,6 +63,8 @@
   "config.doNotRecommendRedHatExtension.title": "Do not prompt to install the Red Hat YAML extension.",
   "config.doNotShowCliUnavailable.description": "Do not warn when the workspace contains a DVC project but the CLI is inaccessible.",
   "config.doNotShowCliUnavailable.title": "Do not warn when the CLI is inaccessible.",
+  "config.doNotShowWalkthroughAfterInstall.description": "Do not prompt to show the extension walkthrough after installing.",
+  "config.doNotShowWalkthroughAfterInstall.title": "Do not prompt to show the extension walkthrough.",
   "config.doNotShowUnableToFilter.description": "Do not warn before disabling auto-apply filters when applying the selected filters would result in too many experiments being selected.",
   "config.doNotShowUnableToFilter.title": "Do not warn before disabling auto-apply filters to experiment selection.",
   "config.dvcPath.description": "Call DVC from this path. Follows Python extension when blank.",
