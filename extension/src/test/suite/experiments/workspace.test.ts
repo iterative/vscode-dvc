@@ -140,7 +140,7 @@ suite('Workspace Experiments Test Suite', () => {
         .resolves('0.16')
 
       await commands.executeCommand(
-        RegisteredCommands.QUEUE_EXPERIMENT_FROM_EXISTING
+        RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
       )
 
       expect(mockExperimentRunQueue).to.be.calledOnce
