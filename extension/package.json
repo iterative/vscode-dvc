@@ -401,6 +401,12 @@
           "type": "boolean",
           "default": null
         },
+        "dvc.doNotShowWalkthroughAfterInstall": {
+          "title": "%config.doNotShowWalkthroughAfterInstall.title%",
+          "description": "%config.doNotShowWalkthroughAfterInstall.description%",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.doNotShowUnableToFilter": {
           "title": "%config.doNotShowUnableToFilter.title%",
           "description": "%config.doNotShowUnableToFilter.description%",

@@ -1,7 +1,9 @@
-import { commands, Memento } from 'vscode'
+import { commands } from 'vscode'
+import { ConfigKey, getConfigValue, setUserConfigValue } from './config'
+import { Response } from './response'
+import { Toast } from './toast'
 import { RegisteredCommands } from '../commands/external'
 import { InternalCommands } from '../commands/internal'
-import { PersistenceKey } from '../persistence/constants'
 import { joinTruthyItems } from '../util/array'
 
 export const registerWalkthroughCommands = (
@@ -24,22 +26,24 @@ export const registerWalkthroughCommands = (
   )
 }
 
-export const showWalkthroughOnFirstUse = (
-  globalState: Memento,
+export const showWalkthroughOnFirstUse = async (
   isNewAppInstall: boolean
-) => {
+): Promise<void> => {
   if (
-    isNewAppInstall &&
-    !globalState.get(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL)
+    !isNewAppInstall ||
+    getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL)
   ) {
-    commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
-    globalState.update(PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL, true)
+    return
   }
 
-  if (!isNewAppInstall) {
-    globalState.update(
-      PersistenceKey.WALKTHROUGH_SHOWN_AFTER_INSTALL,
-      undefined
-    )
+  const response = await Toast.askShowOrCloseOrNever(
+    'Need help? There is a walkthrough.'
+  )
+
+  if (response === Response.SHOW) {
+    commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
+  }
+  if (response === Response.NEVER) {
+    setUserConfigValue(ConfigKey.DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL, true)
   }
 }

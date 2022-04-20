@@ -274,7 +274,7 @@ export class Extension extends Disposable implements IExtension {
       )
     )
 
-    showWalkthroughOnFirstUse(context.globalState, env.isNewAppInstall)
+    showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
   }
 

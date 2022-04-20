@@ -3,6 +3,7 @@ import { ConfigurationTarget, workspace } from 'vscode'
 export enum ConfigKey {
   DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHatExtension',
   DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCliUnavailable',
+  DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL = 'dvc.doNotShowWalkthroughAfterInstall',
   DO_NOT_SHOW_UNABLE_TO_FILTER = 'dvc.doNotShowUnableToFilter',
   DVC_PATH = 'dvc.dvcPath',
   PYTHON_PATH = 'dvc.pythonPath'
