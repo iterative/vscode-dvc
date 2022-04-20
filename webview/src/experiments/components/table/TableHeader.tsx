@@ -76,10 +76,17 @@ const TableHeaderCell: React.FC<{
 }) => {
   const isPlaceholder = !!column.placeholderOf
   const canResize = column.canResize && !isPlaceholder
-  const nbUpperLevels =
-    (!isPlaceholder && countUpperLevels(orderedColumns, column, columns, 0)) ||
-    0
+  const nbUpperLevels = isPlaceholder
+    ? 0
+    : countUpperLevels(orderedColumns, column, columns, 0)
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
+
+  const sortingClasses = () => ({
+    [styles.sortingHeaderCellAsc]:
+      sortOrder === 'ascending' && !column.parent?.placeholderOf,
+    [styles.sortingHeaderCellDesc]:
+      sortOrder === 'descending' && !column.placeholderOf
+  })
 
   const headerPropsArgs = () => {
     return {
@@ -90,10 +97,7 @@ const TableHeaderCell: React.FC<{
           [styles.paramHeaderCell]: column.group === MetricOrParamType.PARAMS,
           [styles.metricHeaderCell]: column.group === MetricOrParamType.METRICS,
           [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-          [styles.sortingHeaderCellAsc]:
-            sortOrder === 'ascending' && !column.parent?.placeholderOf,
-          [styles.sortingHeaderCellDesc]:
-            sortOrder === 'descending' && !column.placeholderOf
+          ...sortingClasses()
         }
       )
     }
