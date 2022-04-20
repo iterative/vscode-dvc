@@ -147,7 +147,7 @@ export class ExperimentsTree
     internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_QUEUE,
       ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.modifyParamsAndQueue(dvcRoot, id)
+        this.experiments.modifyExperimentParamsAndQueue(dvcRoot, id)
     )
 
     internalCommands.registerExternalCommand<ExperimentItem>(

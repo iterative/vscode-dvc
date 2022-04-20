@@ -115,7 +115,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_TREE_REMOVE]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
-  [EventName.MODIFY_PARAMS_AND_QUEUE]: undefined
+  [EventName.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined

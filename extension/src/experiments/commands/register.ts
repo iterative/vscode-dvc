@@ -20,9 +20,11 @@ const registerExperimentCwdCommands = (
   )
 
   internalCommands.registerExternalCommand(
-    RegisteredCommands.MODIFY_PARAMS_AND_QUEUE,
+    RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
     () =>
-      experiments.pauseUpdatesThenRun(() => experiments.modifyParamsAndQueue())
+      experiments.pauseUpdatesThenRun(() =>
+        experiments.modifyExperimentParamsAndQueue()
+      )
   )
 
   internalCommands.registerExternalCliCommand(

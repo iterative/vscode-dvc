@@ -102,7 +102,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).autoApplyFilters(enable)
   }
 
-  public async modifyParamsAndQueue(
+  public async modifyExperimentParamsAndQueue(
     overrideRoot?: string,
     overrideId?: string
   ) {

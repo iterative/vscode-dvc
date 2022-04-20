@@ -195,8 +195,8 @@
         "icon": "$(cloud-upload)"
       },
       {
-        "title": "%command.modifyParamsAndQueue%",
-        "command": "dvc.modifyParamsAndQueue",
+        "title": "%command.modifyExperimentParamsAndQueue%",
+        "command": "dvc.modifyExperimentParamsAndQueue",
         "category": "DVC",
         "icon": {
           "dark": "resources/dark/queue-experiment.svg",
@@ -535,7 +535,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.modifyParamsAndQueue",
+          "command": "dvc.modifyExperimentParamsAndQueue",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
