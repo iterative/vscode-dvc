@@ -28,7 +28,7 @@
   "command.pullTarget": "Pull",
   "command.push": "Push",
   "command.pushTarget": "Push",
-  "command.queueExperimentFromExisting": "Set Experiment Params and Queue",
+  "command.queueExperimentFromExisting": "Modify Experiment Params and Queue",
   "command.queueExperiment": "Queue Experiment",
   "command.removeExperiment": "Remove Experiment",
   "command.removeExperimentQueue": "Remove All Queued Experiments",
