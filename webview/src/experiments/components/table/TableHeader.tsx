@@ -164,14 +164,28 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   const hideSortMenu = () => setSortMenuVisible(false)
 
   const sortOrder: SortOrder = (() => {
-    if (!sort) {
-      return SortOrder.NONE
+    const possibleOrders = {
+      false: SortOrder.ASCENDING,
+      true: SortOrder.DESCENDING,
+      undefined: SortOrder.NONE
     }
 
-    return sort.descending ? SortOrder.DESCENDING : SortOrder.ASCENDING
+    return possibleOrders[`${sort?.descending}`]
   })()
 
+  const removeColumnSort = () => {
+    sendMessage({
+      payload: column.id,
+      type: MessageFromWebviewType.COLUMN_SORT_REMOVED
+    })
+  }
+
   const setColumnSort = (selectedSort: SortOrder) => {
+    if (selectedSort === SortOrder.NONE) {
+      removeColumnSort()
+      return
+    }
+
     const payload: SortDefinition = {
       descending: selectedSort === SortOrder.DESCENDING,
       path: column.id
@@ -180,13 +194,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     sendMessage({
       payload,
       type: MessageFromWebviewType.COLUMN_SORTED
-    })
-  }
-
-  const removeColumnSort = () => {
-    sendMessage({
-      payload: column.id,
-      type: MessageFromWebviewType.COLUMN_SORT_REMOVED
     })
   }
 
@@ -217,12 +224,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             <SortPicker
               sortOrder={sortOrder}
               setSelectedOrder={order => {
-                if (order === SortOrder.NONE) {
-                  removeColumnSort()
-                } else {
-                  setColumnSort(order)
-                }
-
+                setColumnSort(order)
                 hideSortMenu()
               }}
             />
