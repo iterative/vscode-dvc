@@ -144,7 +144,9 @@ export const Plots = ({
       )}
       {zoomedInPlot && (
         <Modal onClose={() => setZoomedInPlot(undefined)}>
-          <div className={styles.zoomedInPlot}>{zoomedInPlot}</div>
+          <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
+            {zoomedInPlot}
+          </div>
         </Modal>
       )}
     </Theme>

@@ -884,4 +884,52 @@ describe('App', () => {
 
     expect(plots[1].style.display).toBe('none')
   })
+
+  it('should open a modal with the plot zoomed in when clicking a plot', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plots = screen.getAllByTestId(/^plot_/)
+
+    fireEvent.click(plots[0])
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  it('should close the zoomed plot modal when clicking the backdrop or the close button', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const plots = screen.getAllByTestId(/^plot_/)
+
+    fireEvent.click(plots[0])
+    fireEvent.click(screen.getByTestId('modal'))
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    fireEvent.click(plots[0])
+    fireEvent.click(screen.getByTestId('modal-close'))
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+  })
+
+  it('should not close the zoomed in plot modal when interacting with the plot inside (modal content)', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const plots = screen.getAllByTestId(/^plot_/)
+
+    fireEvent.click(plots[0])
+    fireEvent.click(screen.getByTestId('modal-content'))
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
 })

@@ -61,6 +61,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
           renderer="svg"
           spec={spec}
           data={{ values }}
+          data-testid={`${key}-vega`}
         />
       )
 
