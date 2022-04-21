@@ -231,7 +231,7 @@ $spinner-color-light: #000;
           content: '';
           height: 100%;
           top: 0;
-          right: 50%;
+          right: calc(50% - 0.5px);
           position: absolute;
           border-right: 1px dotted rgb(127, 127, 127);
           clip-path: inset(0.8px 0 0 0);
