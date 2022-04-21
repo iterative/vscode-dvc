@@ -346,19 +346,14 @@ export class Extension extends Disposable implements IExtension {
     return definedAndNonEmpty(this.dvcRoots)
   }
 
-  public reset() {
-    this.resetMembers()
-    return this.setAvailable(false)
-  }
-
-  private resetMembers() {
+  public resetMembers() {
     this.repositories.reset()
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
     this.plots.reset()
   }
 
-  private setAvailable(available: boolean) {
+  public setAvailable(available: boolean) {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available

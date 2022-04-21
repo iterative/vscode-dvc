@@ -27,7 +27,8 @@ const mockedHasRoots = jest.fn()
 const mockedGetFirstWorkspaceFolder = jest.mocked(getFirstWorkspaceFolder)
 const mockedCwd = __dirname
 const mockedInitialize = jest.fn()
-const mockedReset = jest.fn()
+const mockedResetMembers = jest.fn()
+const mockedSetAvailable = jest.fn()
 const mockedSetRoots = jest.fn()
 const mockedSetupWorkspace = jest.fn()
 
@@ -188,7 +189,8 @@ describe('setup', () => {
     canRunCli: mockedCanRunCli,
     hasRoots: mockedHasRoots,
     initialize: mockedInitialize,
-    reset: mockedReset,
+    resetMembers: mockedResetMembers,
+    setAvailable: mockedSetAvailable,
     setRoots: mockedSetRoots,
     setupWorkspace: mockedSetupWorkspace
   }
@@ -222,7 +224,7 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).not.toBeCalled()
     expect(mockedSetupWorkspace).not.toBeCalled()
     expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })
 
@@ -238,7 +240,7 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).not.toBeCalled()
     expect(mockedSetupWorkspace).not.toBeCalled()
     expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })
 
@@ -252,7 +254,7 @@ describe('setup', () => {
     expect(mockedSetRoots).toBeCalledTimes(1)
     expect(mockedGetConfigValue).toBeCalledTimes(1)
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
-    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })
 
@@ -269,7 +271,7 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
     expect(mockedSetupWorkspace).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })
 
@@ -286,18 +288,19 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
     expect(mockedSetupWorkspace).not.toBeCalled()
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
-    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })
 
-  it('should not run initialization if roots have not been found but the cli can be run', async () => {
+  it('should not send telemetry or set the cli as unavailable or run initialization if roots have not been found but the cli can be run', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(false)
     mockedCanRunCli.mockResolvedValueOnce(true)
 
     await setup(extension)
     expect(mockedSetRoots).toBeCalledTimes(1)
-    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedResetMembers).toBeCalledTimes(1)
+    expect(mockedSetAvailable).not.toBeCalled()
     expect(mockedInitialize).not.toBeCalled()
   })
 
@@ -307,7 +310,7 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(true)
 
     await setup(extension)
-    expect(mockedReset).not.toBeCalled()
+    expect(mockedResetMembers).not.toBeCalled()
     expect(mockedInitialize).toBeCalledTimes(1)
   })
 
@@ -317,7 +320,7 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(false)
 
     await setup(extension)
-    expect(mockedReset).toBeCalledTimes(1)
+    expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })
 })
