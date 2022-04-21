@@ -13,6 +13,7 @@ import { TemplatePlots } from './templatePlots/TemplatePlots'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { Theme } from '../../shared/components/theme/Theme'
+import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { sendMessage } from '../../shared/vscode'
 import { PlotsWebviewState } from '../hooks/useAppReducer'
 
@@ -95,60 +96,62 @@ export const Plots = ({
 
   return (
     <Theme>
-      {templatePlots && (
-        <PlotsContainer
-          title={templatePlots.sectionName}
-          sectionKey={Section.TEMPLATE_PLOTS}
-          currentSize={templatePlots.size}
-          {...basicContainerProps}
-        >
-          <TemplatePlots
-            plots={templatePlots.plots}
-            onPlotClick={handlePlotClick}
-          />
-        </PlotsContainer>
-      )}
-      {comparisonTable && (
-        <PlotsContainer
-          title={comparisonTable.sectionName}
-          sectionKey={Section.COMPARISON_TABLE}
-          currentSize={comparisonTable.size}
-          {...basicContainerProps}
-        >
-          <ComparisonTable
-            plots={comparisonTable.plots}
-            revisions={comparisonTable.revisions}
-          />
-        </PlotsContainer>
-      )}
-      {checkpointPlots && (
-        <PlotsContainer
-          title={checkpointPlots.sectionName}
-          sectionKey={Section.CHECKPOINT_PLOTS}
-          menu={{
-            metrics,
-            selectedMetrics: selectedPlots,
-            setSelectedPlots: setSelectedMetrics
-          }}
-          currentSize={checkpointPlots.size}
-          {...basicContainerProps}
-        >
-          <CheckpointPlots
-            plots={checkpointPlots.plots.filter(plot =>
-              selectedPlots?.includes(plot.title)
-            )}
-            colors={checkpointPlots.colors}
-            onPlotClick={handlePlotClick}
-          />
-        </PlotsContainer>
-      )}
-      {zoomedInPlot && (
-        <Modal onClose={() => setZoomedInPlot(undefined)}>
-          <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
-            {zoomedInPlot}
-          </div>
-        </Modal>
-      )}
+      <DragDropProvider>
+        {templatePlots && (
+          <PlotsContainer
+            title={templatePlots.sectionName}
+            sectionKey={Section.TEMPLATE_PLOTS}
+            currentSize={templatePlots.size}
+            {...basicContainerProps}
+          >
+            <TemplatePlots
+              plots={templatePlots.plots}
+              onPlotClick={handlePlotClick}
+            />
+          </PlotsContainer>
+        )}
+        {comparisonTable && (
+          <PlotsContainer
+            title={comparisonTable.sectionName}
+            sectionKey={Section.COMPARISON_TABLE}
+            currentSize={comparisonTable.size}
+            {...basicContainerProps}
+          >
+            <ComparisonTable
+              plots={comparisonTable.plots}
+              revisions={comparisonTable.revisions}
+            />
+          </PlotsContainer>
+        )}
+        {checkpointPlots && (
+          <PlotsContainer
+            title={checkpointPlots.sectionName}
+            sectionKey={Section.CHECKPOINT_PLOTS}
+            menu={{
+              metrics,
+              selectedMetrics: selectedPlots,
+              setSelectedPlots: setSelectedMetrics
+            }}
+            currentSize={checkpointPlots.size}
+            {...basicContainerProps}
+          >
+            <CheckpointPlots
+              plots={checkpointPlots.plots.filter(plot =>
+                selectedPlots?.includes(plot.title)
+              )}
+              colors={checkpointPlots.colors}
+              onPlotClick={handlePlotClick}
+            />
+          </PlotsContainer>
+        )}
+        {zoomedInPlot && (
+          <Modal onClose={() => setZoomedInPlot(undefined)}>
+            <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
+              {zoomedInPlot}
+            </div>
+          </Modal>
+        )}
+      </DragDropProvider>
     </Theme>
   )
 }

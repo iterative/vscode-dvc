@@ -33,6 +33,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
 ) => (
   <Tippy
     animation={animation}
+    appendTo={'parent'}
     content={content}
     className={className}
     placement={placement}

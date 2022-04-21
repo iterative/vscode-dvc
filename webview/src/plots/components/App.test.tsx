@@ -816,6 +816,25 @@ describe('App', () => {
     expect(topDropIcon).toBeInTheDocument()
   })
 
+  it('should not show a drop target when moving an element from a whole different section (comparison to template)', () => {
+    renderAppWithData({
+      comparison: comparisonTableFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const headers = screen.getAllByRole('columnheader')
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+
+    dragEnter(headers[1], bottomSection, DragEnterDirection.LEFT)
+
+    const bottomDropIcon = screen.queryByTestId(
+      `${NewSectionBlock.BOTTOM}_drop-icon`
+    )
+
+    expect(bottomDropIcon).not.toBeInTheDocument()
+  })
+
   it('should prevent default behaviour when dragging over a new section', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
