@@ -1,0 +1,33 @@
+@import '../../variables.scss';
+
+.backdrop {
+  background-color: var(--editor-background-transparency-5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  border: none;
+}
+
+.modal {
+  background: var(--vscode-menu-background);
+  position: relative;
+  padding: 2rem;
+}
+
+.closeButton {
+  position: absolute;
+  right: -12px;
+  top: -40px;
+  border: none;
+  background: none;
+
+  svg {
+    fill: $fg-color;
+  }
+}
