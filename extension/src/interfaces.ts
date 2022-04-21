@@ -4,7 +4,8 @@ export interface IExtension {
 
   setupWorkspace: () => void
 
-  setRoots: () => Promise<void>
   initialize: () => Promise<void[]>
-  reset: () => void
+  resetMembers: () => void
+  setAvailable: (available: boolean) => void
+  setRoots: () => Promise<void>
 }
