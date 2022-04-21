@@ -14,7 +14,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
 // Dark Theme
 
-$row-bg-alt-color: rgba(60, 60, 60, 0.7);
+$row-bg-alt-color: rgba(60, 60, 60, 0.5);
 $header-bg-color: #303031;
 $meta-cell-color: #a0a0a0;
 $toggle-color: rgba(255, 255, 255, 0.21);
@@ -24,7 +24,7 @@ $params-color: #90cdf4;
 
 // Light theme
 
-$row-bg-alt-color-light: rgba(195, 195, 195, 0.7);
+$row-bg-alt-color-light: rgba(195, 195, 195, 0.3);
 $header-bg-color-light: #e1e1e1;
 $border-color-light: #7f7f7f;
 $metrics-color-light: #ce9f4c;
