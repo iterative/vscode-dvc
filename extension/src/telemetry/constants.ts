@@ -1,6 +1,7 @@
 import { ViewColumn } from 'vscode'
 import { WorkspaceScale } from './collect'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
+import { SortDefinition } from '../experiments/model/sortBy'
 import { PlotSize, Section, SectionCollapsed } from '../plots/webview/contract'
 
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
@@ -32,6 +33,10 @@ export const EventName = Object.assign(
       'views.experimentsTable.columnsReordered',
     VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED:
       'views.experimentsTable.columnResized',
+    VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED:
+      'views.experimentsTable.columnSortAdded',
+    VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED:
+      'views.experimentsTable.columnSortRemoved',
     VIEWS_EXPERIMENTS_TABLE_CREATED: 'views.experimentsTable.created',
     VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE:
       'views.experimentTable.toggleStatus',
@@ -115,7 +120,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_TREE_REMOVE]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
-  [EventName.QUEUE_EXPERIMENT_FROM_EXISTING]: undefined
+  [EventName.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined
@@ -164,6 +169,10 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED]: {
     width: number
+  }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED]: SortDefinition
+  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED]: {
+    path: string
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]: WebviewFocusChangedProperties

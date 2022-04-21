@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.9",
+  "version": "0.2.10",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -195,8 +195,8 @@
         "icon": "$(cloud-upload)"
       },
       {
-        "title": "%command.queueExperimentFromExisting%",
-        "command": "dvc.queueExperimentFromExisting",
+        "title": "%command.modifyExperimentParamsAndQueue%",
+        "command": "dvc.modifyExperimentParamsAndQueue",
         "category": "DVC",
         "icon": {
           "dark": "resources/dark/queue-experiment.svg",
@@ -401,6 +401,12 @@
           "type": "boolean",
           "default": null
         },
+        "dvc.doNotShowWalkthroughAfterInstall": {
+          "title": "%config.doNotShowWalkthroughAfterInstall.title%",
+          "description": "%config.doNotShowWalkthroughAfterInstall.description%",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.doNotShowUnableToFilter": {
           "title": "%config.doNotShowUnableToFilter.title%",
           "description": "%config.doNotShowUnableToFilter.description%",
@@ -535,7 +541,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.queueExperimentFromExisting",
+          "command": "dvc.modifyExperimentParamsAndQueue",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -879,7 +885,7 @@
         {
           "command": "dvc.views.experimentsTree.queueExperiment",
           "group": "1_do@3",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.runner.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsTree.removeExperiment",
@@ -1230,5 +1236,11 @@
   },
   "peerDependencies": {
     "typescript": "*"
+  },
+  "__metadata": {
+    "id": "96c35fb6-adb8-4c1e-b953-4004af8451e8",
+    "publisherDisplayName": "Iterative",
+    "publisherId": "bc4dde4d-67b8-48bd-865c-7ee75e976429",
+    "isPreReleaseVersion": false
   }
 }

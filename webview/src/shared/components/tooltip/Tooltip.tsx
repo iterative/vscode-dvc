@@ -22,6 +22,9 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onHide,
     placement,
     popperOptions,
+    visible,
+    onClickOutside,
+    hideOnClick,
     animation = false,
     className = styles.menu,
     arrow = false
@@ -40,6 +43,9 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     singleton={singleton}
     trigger={trigger}
     interactive={interactive}
+    visible={visible}
+    onClickOutside={onClickOutside}
+    hideOnClick={hideOnClick}
     onShow={onShow}
     onHide={onHide}
     ref={ref as Ref<Element>}
