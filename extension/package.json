@@ -1025,12 +1025,12 @@
       {
         "view": "dvc.views.welcome",
         "contents": "The located version of DVC is incompatible with the extension.\n[Find Another](command:dvc.setupWorkspace)\nUpgrade DVC then...\n[Check Compatibility](command:dvc.checkCLICompatible)",
-        "when": "dvc.cli.incompatible && dvc.project.available"
+        "when": "dvc.cli.incompatible"
       },
       {
         "view": "dvc.views.welcome",
         "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC please read [our docs](https://dvc.org/doc).",
-        "when": "dvc.commands.available && !dvc.project.available"
+        "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
       },
       {
         "view": "dvc.views.experimentsTree",
