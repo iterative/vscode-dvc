@@ -1,14 +1,13 @@
-import React, { DragEvent, useEffect, useRef, useState } from 'react'
 import {
   TemplatePlotEntry,
   TemplatePlotGroup,
   TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
+import React, { DragEvent, useState, useEffect } from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { removeFromPreviousAndAddToNewSection, ZoomablePlotProps } from './util'
-import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
@@ -28,7 +27,6 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
 }) => {
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
-  const draggedRef = useRef<DraggedInfo>()
 
   useEffect(() => {
     setSections(plots)
@@ -120,7 +118,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
   }
 
   const newDropSection = {
-    draggedRef,
+    acceptedGroups: Object.values(TemplatePlotGroup),
     hoveredSection,
     onDrop: handleDropInNewSection,
     setHoveredSection
@@ -152,7 +150,6 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
                 groupId={groupId}
                 groupIndex={i}
                 onDropInSection={handleDropInSection}
-                draggedRef={draggedRef}
                 multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
                 setSectionEntries={setSectionEntries}
                 onPlotClick={onPlotClick}
