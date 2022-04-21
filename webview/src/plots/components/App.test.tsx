@@ -885,7 +885,7 @@ describe('App', () => {
     expect(plots[1].style.display).toBe('none')
   })
 
-  it('should open a modal with the plot zoomed in when clicking a plot', () => {
+  it('should open a modal with the plot zoomed in when clicking a template plot', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
@@ -893,11 +893,41 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plots = screen.getAllByTestId(/^plot_/)
+    const [plot] = screen.getAllByTestId(/^plot_/)
 
-    fireEvent.click(plots[0])
+    fireEvent.click(plot)
 
     expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const [plot] = screen.getAllByTestId(/^plot-/)
+
+    fireEvent.click(plot)
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
+    renderAppWithData({
+      comparison: comparisonTableFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const [plot] = screen.getAllByAltText(/^Plot of/)
+
+    fireEvent.click(plot)
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
   })
 
   it('should close the zoomed plot modal when clicking the backdrop or the close button', () => {
@@ -906,14 +936,14 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const plots = screen.getAllByTestId(/^plot_/)
+    const [plot] = screen.getAllByTestId(/^plot_/)
 
-    fireEvent.click(plots[0])
+    fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal'))
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    fireEvent.click(plots[0])
+    fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal-close'))
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -925,9 +955,9 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const plots = screen.getAllByTestId(/^plot_/)
+    const [plot] = screen.getAllByTestId(/^plot_/)
 
-    fireEvent.click(plots[0])
+    fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal-content'))
 
     expect(screen.getByTestId('modal')).toBeInTheDocument()

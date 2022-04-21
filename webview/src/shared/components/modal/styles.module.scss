@@ -15,9 +15,8 @@
 }
 
 .modal {
-  background-color: $bg-color;
+  background: var(--vscode-menu-background);
   position: relative;
-  border: 1px solid $fg-color;
   padding: 2rem;
 }
 

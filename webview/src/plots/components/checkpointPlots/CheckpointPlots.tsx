@@ -18,11 +18,11 @@ import { withScale } from '../../../util/styles'
 import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
+import { ZoomablePlotProps } from '../templatePlots/util'
 
-interface CheckpointPlotsProps {
+interface CheckpointPlotsProps extends ZoomablePlotProps {
   plots: CheckpointPlotData[]
   colors: CheckpointPlotsColors
-  onPlotClick: (plot: JSX.Element) => void
 }
 
 export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({

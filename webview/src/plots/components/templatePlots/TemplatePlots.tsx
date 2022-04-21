@@ -7,15 +7,14 @@ import {
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
-import { removeFromPreviousAndAddToNewSection } from './util'
+import { removeFromPreviousAndAddToNewSection, ZoomablePlotProps } from './util'
 import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 
-interface TemplatePlotsProps {
+interface TemplatePlotsProps extends ZoomablePlotProps {
   plots: TemplatePlotSection[]
-  onPlotClick: (plot: JSX.Element) => void
 }
 
 export enum NewSectionBlock {

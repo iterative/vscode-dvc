@@ -3,6 +3,7 @@ import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { MutableRefObject, useEffect, useState } from 'react'
 import { VegaLite, VisualizationSpec } from 'react-vega'
+import { ZoomablePlotProps } from './util'
 import {
   DragDropContainer,
   DraggedInfo,
@@ -14,7 +15,7 @@ import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
 
-interface TemplatePlotsGridProps {
+interface TemplatePlotsGridProps extends ZoomablePlotProps {
   entries: TemplatePlotEntry[]
   groupId: string
   groupIndex: number
@@ -22,7 +23,6 @@ interface TemplatePlotsGridProps {
   draggedRef: MutableRefObject<DraggedInfo | undefined>
   multiView: boolean
   setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
-  onPlotClick: (plot: JSX.Element) => void
 }
 
 const autoSize = {
