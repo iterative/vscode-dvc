@@ -29,6 +29,10 @@ body {
   color: var(--vscode-editor-foreground);
 }
 
+.modal-open {
+  overflow: hidden;
+}
+
 .centered {
   display: flex;
   align-items: center;

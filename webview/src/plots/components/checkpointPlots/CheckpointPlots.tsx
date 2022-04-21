@@ -1,30 +1,34 @@
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   CheckpointPlotData,
   CheckpointPlotsColors
 } from 'dvc/src/plots/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useRef, useState } from 'react'
-import { Plot } from './Plot'
-import styles from '../styles.module.scss'
-import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import VegaLite from 'react-vega/lib/VegaLite'
+import { createSpec } from './util'
 import {
   DragDropContainer,
   DraggedInfo
 } from '../../../shared/components/dragDrop/DragDropContainer'
+import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { sendMessage } from '../../../shared/vscode'
 import { performOrderedUpdate } from '../../../util/objects'
 import { withScale } from '../../../util/styles'
-import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
-import { sendMessage } from '../../../shared/vscode'
+import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
+import styles from '../styles.module.scss'
+import { ZoomablePlotProps } from '../templatePlots/util'
 
-interface CheckpointPlotsProps {
+interface CheckpointPlotsProps extends ZoomablePlotProps {
   plots: CheckpointPlotData[]
   colors: CheckpointPlotsColors
 }
 
 export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   plots,
-  colors
+  colors,
+  onPlotClick
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
   const draggedRef = useRef<DraggedInfo>()
@@ -49,17 +53,30 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       }
       const { title, values } = plotData
       const key = `plot-${title}`
+      const spec = createSpec(title, colors)
+      const plotJSX = (
+        <VegaLite
+          actions={false}
+          config={config}
+          renderer="svg"
+          spec={spec}
+          data={{ values }}
+          data-testid={`${key}-vega`}
+        />
+      )
+
       return (
-        <div
+        <button
+          key={key}
           className={styles.plot}
           style={withScale(1)}
           id={title}
-          key={key}
           data-testid={key}
+          onClick={() => onPlotClick(plotJSX)}
         >
           <GripIcon className={styles.plotGripIcon} />
-          <Plot values={values} scale={colors} title={title} />
-        </div>
+          {plotJSX}
+        </button>
       )
     })
     .filter(Boolean)
