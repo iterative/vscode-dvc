@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react'
 import {
   CheckpointPlotData,
   PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { PlotsContainer } from './PlotsContainer'
+import React, { useEffect, useState } from 'react'
 import { CheckpointPlots } from './checkpointPlots/CheckpointPlots'
 import { ComparisonTable } from './comparisonTable/ComparisonTable'
+import { PlotsContainer } from './PlotsContainer'
+import styles from './styles.module.scss'
 import { TemplatePlots } from './templatePlots/TemplatePlots'
-import { PlotsWebviewState } from '../hooks/useAppReducer'
-import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import { Modal } from '../../shared/components/modal/Modal'
 import { Theme } from '../../shared/components/theme/Theme'
+import { sendMessage } from '../../shared/vscode'
+import { PlotsWebviewState } from '../hooks/useAppReducer'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(({ title }) => title).sort() || []
@@ -27,12 +29,24 @@ export const Plots = ({
 
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
+  const [zoomedInPlot, setZoomedInPlot] = useState<JSX.Element | undefined>(
+    undefined
+  )
 
   useEffect(() => {
     const metrics = getMetricsFromPlots(data?.checkpoint?.plots)
     setMetrics(metrics)
     setSelectedPlots(data?.checkpoint?.selectedMetrics || [])
   }, [data, setSelectedPlots, setMetrics])
+
+  useEffect(() => {
+    const modalOpenClass = 'modal-open'
+    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot)
+
+    return () => {
+      document.body.classList.remove(modalOpenClass)
+    }
+  }, [zoomedInPlot])
 
   if (!data || !data.sectionCollapsed) {
     return <EmptyState>Loading Plots...</EmptyState>
@@ -77,6 +91,8 @@ export const Plots = ({
     sectionCollapsed
   }
 
+  const handlePlotClick = (plot: JSX.Element) => setZoomedInPlot(plot)
+
   return (
     <Theme>
       {templatePlots && (
@@ -86,7 +102,10 @@ export const Plots = ({
           currentSize={templatePlots.size}
           {...basicContainerProps}
         >
-          <TemplatePlots plots={templatePlots.plots} />
+          <TemplatePlots
+            plots={templatePlots.plots}
+            onPlotClick={handlePlotClick}
+          />
         </PlotsContainer>
       )}
       {comparisonTable && (
@@ -119,8 +138,16 @@ export const Plots = ({
               selectedPlots?.includes(plot.title)
             )}
             colors={checkpointPlots.colors}
+            onPlotClick={handlePlotClick}
           />
         </PlotsContainer>
+      )}
+      {zoomedInPlot && (
+        <Modal onClose={() => setZoomedInPlot(undefined)}>
+          <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
+            {zoomedInPlot}
+          </div>
+        </Modal>
       )}
     </Theme>
   )
