@@ -1,10 +1,10 @@
-import React, { DragEvent, MutableRefObject } from 'react'
+import React, { DragEvent, useContext } from 'react'
 import cx from 'classnames'
 import { TemplatePlotSection } from 'dvc/src/plots/webview/contract'
 import styles from '../styles.module.scss'
 import { getIDWithoutIndex } from '../../../util/ids'
-import { DraggedInfo } from '../../../shared/components/dragDrop/DragDropContainer'
 import { AllIcons, Icon } from '../../../shared/components/Icon'
+import { DragDropContext } from '../../../shared/components/dragDrop/DragDropContext'
 
 interface AddedSectionProps {
   id: string
@@ -12,7 +12,7 @@ interface AddedSectionProps {
   setHoveredSection: (section: string) => void
   onDrop: (e: DragEvent<HTMLElement>) => void
   closestSection: TemplatePlotSection
-  draggedRef: MutableRefObject<DraggedInfo | undefined>
+  acceptedGroups: string[]
 }
 
 export const AddedSection: React.FC<AddedSectionProps> = ({
@@ -21,15 +21,19 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   hoveredSection,
   setHoveredSection,
   closestSection,
-  draggedRef
+  acceptedGroups
 }) => {
+  const { draggedRef } = useContext(DragDropContext)
   const handleDragLeave = () => {
     setHoveredSection('')
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    const draggedGroup = getIDWithoutIndex(draggedRef.current?.group)
-    if (draggedGroup !== closestSection.group) {
+    const draggedGroup = getIDWithoutIndex(draggedRef?.group) || ''
+    if (
+      acceptedGroups.includes(draggedGroup) &&
+      draggedGroup !== closestSection.group
+    ) {
       setHoveredSection(e.currentTarget.id)
     }
   }
