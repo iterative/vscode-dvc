@@ -234,12 +234,14 @@ $spinner-color-light: #000;
           right: 50%;
           position: absolute;
           border-right: 1px dotted rgb(127, 127, 127);
+          clip-path: inset(0.8px 0 0 0);
         }
       }
       &:first-of-type {
         .bullet::after {
           height: 50%;
           top: 50%;
+          clip-path: inset(0 0 0 0);
         }
       }
       &:last-of-type {
