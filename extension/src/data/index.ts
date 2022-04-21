@@ -7,6 +7,7 @@ import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
+import { ExperimentFlag } from '../cli/constants'
 
 export abstract class BaseData<
   T extends PlotsOutput | ExperimentsOutput
@@ -14,7 +15,7 @@ export abstract class BaseData<
   public readonly onDidUpdate: Event<T>
 
   protected readonly dvcRoot: string
-  protected readonly processManager: ProcessManager
+  protected processManager: ProcessManager
   protected readonly internalCommands: InternalCommands
 
   private collectedFiles: string[] = []
@@ -43,20 +44,24 @@ export abstract class BaseData<
 
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager(updatesPaused, {
-        name: 'update',
-        process: () => this.update()
-      })
+      new ProcessManager(
+        updatesPaused,
+        {
+          name: 'update',
+          process: () => this.update()
+        },
+        {
+          name: 'partialUpdate',
+          process: () => this.update(ExperimentFlag.NO_FETCH)
+        },
+        { name: 'fullUpdate', process: () => this.update() }
+      )
     )
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
     this.staticFiles = staticFiles
 
     this.waitForInitialData()
-  }
-
-  public managedUpdate() {
-    return this.processManager.run('update')
   }
 
   protected compareFiles(files: string[]) {
@@ -105,7 +110,7 @@ export abstract class BaseData<
           if (!path) {
             return
           }
-          this.managedUpdate()
+          this.managedUpdate(path)
         }
       )
     )
@@ -113,5 +118,7 @@ export abstract class BaseData<
 
   abstract collectFiles(data: T): string[]
 
-  abstract update(): Promise<unknown>
+  abstract managedUpdate(path?: string): Promise<unknown>
+
+  abstract update(...args: ExperimentFlag[]): Promise<unknown>
 }

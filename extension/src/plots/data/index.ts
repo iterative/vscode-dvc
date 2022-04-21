@@ -41,6 +41,10 @@ export class PlotsData extends BaseData<PlotsOutput> {
     return this.notifyChanged(data)
   }
 
+  public managedUpdate() {
+    return this.processManager.run('update')
+  }
+
   public collectFiles(data: PlotsOutput) {
     return Object.keys(data)
   }

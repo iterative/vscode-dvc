@@ -226,7 +226,7 @@ suite('Extension Test Suite', () => {
         .resolves([Uri.file(resolve('path', 'to', 'dvc'))])
 
       mockHasCheckpoints(expShowFixture)
-      const mockExpShow = stub(CliReader.prototype, 'experimentShow').resolves(
+      const mockExpShow = stub(CliReader.prototype, 'expShow').resolves(
         expShowFixture
       )
 
@@ -414,7 +414,7 @@ suite('Extension Test Suite', () => {
     })
 
     it('should set the dvc.cli.incompatible context value', async () => {
-      stub(CliReader.prototype, 'experimentShow').resolves({
+      stub(CliReader.prototype, 'expShow').resolves({
         workspace: { baseline: {} }
       })
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([])

@@ -66,8 +66,8 @@ describe('CliReader', () => {
         getMockedProcess(JSON.stringify(expShowFixture))
       )
 
-      const experiments = await cliReader.experimentShow(cwd)
-      expect(experiments).toStrictEqual(expShowFixture)
+      const cliOutput = await cliReader.expShow(cwd)
+      expect(cliOutput).toStrictEqual(expShowFixture)
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'show', SHOW_JSON],
         cwd,
