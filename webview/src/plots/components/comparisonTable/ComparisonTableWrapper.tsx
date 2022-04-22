@@ -1,5 +1,5 @@
 import { PlotsComparisonData, Section } from 'dvc/src/plots/webview/contract'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { ComparisonTable } from './ComparisonTable'
 import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
@@ -13,15 +13,8 @@ export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
   comparisonTable,
   basicContainerProps
 }) => {
-  const [revisions, setRevisions] = useState<string[]>([])
-  const [selectedPlots, setSelectedPlots] = useState<string[]>([])
-
-  useEffect(() => {
-    const allRevisions =
-      comparisonTable.revisions?.map(rev => rev.revision) || []
-    setRevisions(allRevisions)
-    setSelectedPlots(allRevisions)
-  }, [comparisonTable, setSelectedPlots, setRevisions])
+  const allRevisions = comparisonTable.revisions?.map(rev => rev.revision) || []
+  const [selectedPlots, setSelectedPlots] = useState<string[]>(allRevisions)
 
   const plots = comparisonTable.plots.filter(plot => {
     const plotRevisions = Object.values(plot.revisions)
@@ -38,7 +31,7 @@ export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
       title={comparisonTable.sectionName}
       sectionKey={Section.COMPARISON_TABLE}
       menu={{
-        plots: revisions,
+        plots: allRevisions,
         selectedPlots: selectedPlots,
         setSelectedPlots
       }}
