@@ -202,6 +202,16 @@ describe('ComparisonTable', () => {
     expect(headers).toStrictEqual([...revisions, newRevName])
   })
 
+  it('should pin the current pinned column on first render', () => {
+    const pinnedRevision = 'main'
+
+    renderTable({ ...basicProps, currentPinnedColumn: pinnedRevision })
+
+    const [pinnedColumn] = getHeaders()
+
+    expect(pinnedColumn.textContent).toBe(pinnedRevision)
+  })
+
   describe('Columns drag and drop', () => {
     const pinSecondColumn = () => {
       const secondColumn = screen.getByText(revisions[1])
