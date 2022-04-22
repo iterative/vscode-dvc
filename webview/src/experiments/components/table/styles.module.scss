@@ -131,6 +131,12 @@ $spinner-color-light: #000;
       height: 4px;
       vertical-align: middle;
       border: 1px solid currentColor;
+      background-color: $bg-color;
+    }
+
+    .unselectedExperiment.oddRow & {
+      background-image: linear-gradient($row-bg-alt-color, $row-bg-alt-color),
+        linear-gradient($bg-color, $bg-color);
     }
 
     .workspaceWithChanges.unselectedExperiment & {
