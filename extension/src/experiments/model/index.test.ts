@@ -1,5 +1,6 @@
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
+import { copyOriginalColors } from './colors'
 import { Operator } from './filterBy'
 import outputFixture from '../../test/fixtures/expShow/output'
 import rowsFixture from '../../test/fixtures/expShow/rows'
@@ -19,6 +20,15 @@ beforeEach(() => {
 
 describe('ExperimentsModel', () => {
   const runningExperiment = 'exp-12345'
+
+  const [
+    workspaceColor,
+    branchColor,
+    expColor,
+    fourthColor,
+    fifthColor,
+    sixthColor
+  ] = copyOriginalColors()
 
   const buildTestExperiment = (
     testParam: number,
@@ -85,7 +95,7 @@ describe('ExperimentsModel', () => {
 
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
-        // displayColor: expColor,
+        displayColor: expColor,
         id: runningExperiment,
         label: 'tip2'
       })
@@ -118,7 +128,7 @@ describe('ExperimentsModel', () => {
     experimentsModel.transformAndSet(experimentWithNewCheckpoint)
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
-        // displayColor: expColor,
+        displayColor: expColor,
         id: runningExperiment,
         label: 'tip3'
       })
@@ -160,32 +170,32 @@ describe('ExperimentsModel', () => {
 
     expect(experimentsModel.getSelectedRevisions()).toStrictEqual([
       expect.objectContaining({
-        // displayColor: workspaceColor,
+        displayColor: workspaceColor,
         id: 'workspace',
         label: 'workspace'
       }),
       expect.objectContaining({
-        // displayColor: branchColor,
+        displayColor: branchColor,
         id: 'testBranch',
         label: 'testBranch'
       }),
       expect.objectContaining({
-        // displayColor: expColor,
+        displayColor: expColor,
         id: runningExperiment,
         label: 'tip'
       }),
       expect.objectContaining({
-        // displayColor: expColor,
+        displayColor: fourthColor,
         id: '2included',
         label: '2includ'
       }),
       expect.objectContaining({
-        // displayColor: expColor,
+        displayColor: fifthColor,
         id: '3included',
         label: '3includ'
       }),
       expect.objectContaining({
-        // displayColor: expColor,
+        displayColor: sixthColor,
         id: '4included',
         label: '4includ'
       })
