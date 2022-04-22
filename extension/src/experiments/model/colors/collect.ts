@@ -1,15 +1,16 @@
+import { Color, copyOriginalColors } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 
 export type Colors = {
-  assigned: Map<string, string>
-  available: string[]
+  assigned: Map<string, Color>
+  available: Color[]
 }
 
 const getOrderedColorsToUnassign = (
   experimentIds: string[],
-  currentColors: Map<string, string>
-): string[] => {
-  const colorsToUnassign: string[] = []
+  currentColors: Map<string, Color>
+): Color[] => {
+  const colorsToUnassign: Color[] = []
   for (const [id, color] of currentColors) {
     if (!experimentIds.includes(id)) {
       colorsToUnassign.unshift(color)
@@ -18,12 +19,11 @@ const getOrderedColorsToUnassign = (
   return colorsToUnassign
 }
 
-const unassignColors = (
+export const unassignColors = (
   experimentIds: string[],
-  current: Map<string, string>,
-  unassigned: string[],
-  copyOriginalColors: () => string[]
-): string[] => {
+  current: Map<string, Color>,
+  unassigned: Color[]
+): Color[] => {
   if (!definedAndNonEmpty(experimentIds)) {
     return copyOriginalColors()
   }
@@ -39,20 +39,20 @@ const unassignColors = (
 
 const assignColors = (
   experimentIds: string[],
-  current: Map<string, string>,
-  available: string[],
-  copyOriginalColors: () => string[]
+  current: Map<string, Color>,
+  available: Color[]
 ): Colors => {
   const assigned = new Map()
 
   for (const id of experimentIds) {
-    if (available.length === 0) {
-      available = copyOriginalColors()
-    }
     const existingColor = current.get(id)
 
     if (existingColor) {
       assigned.set(id, existingColor)
+      continue
+    }
+
+    if (available.length === 0) {
       continue
     }
 
@@ -62,13 +62,14 @@ const assignColors = (
   return { assigned, available }
 }
 
+// can remove the whole thing
+
 export const collectColors = (
   ids: string[],
-  current: Map<string, string>,
-  unassigned: string[],
-  copyOriginalColors: () => string[]
+  current: Map<string, Color>,
+  unassigned: Color[]
 ): Colors => {
-  const available = unassignColors(ids, current, unassigned, copyOriginalColors)
+  const available = unassignColors(ids, current, unassigned)
 
-  return assignColors(ids, current, available, copyOriginalColors)
+  return assignColors(ids, current, available)
 }

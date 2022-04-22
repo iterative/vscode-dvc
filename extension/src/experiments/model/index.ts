@@ -6,22 +6,14 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import {
-  collectBranchAndExperimentIds,
-  collectExperiments,
-  collectStatuses
-} from './collect'
-import {
-  copyOriginalBranchColors,
-  copyOriginalExperimentColors
-} from './colors'
-import { collectColors, Colors } from './colors/collect'
+import { collectExperiments, collectColoredStatus } from './collect'
+import { Color, copyOriginalColors } from './colors'
 import {
   canSelect,
   limitToMaxSelected,
-  Status,
-  Statuses,
-  tooManySelected
+  ColoredStatus,
+  tooManySelected,
+  UNSELECTED
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
@@ -34,7 +26,7 @@ import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
 
 type SelectedExperimentWithColor = Experiment & {
-  displayColor: string
+  displayColor: Color
   selected: true
 }
 
@@ -55,9 +47,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
-  private branchColors: Colors
-  private experimentColors: Colors
-  private status: Statuses
+  private availableColors: Color[]
+  private coloredStatus: ColoredStatus
 
   private filters: Map<string, FilterDefinition> = new Map()
   private useFiltersForSelection = false
@@ -67,60 +58,58 @@ export class ExperimentsModel extends ModelWithPersistence {
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState)
 
-    this.branchColors = this.reviveColors(
-      PersistenceKey.BRANCH_COLORS,
-      copyOriginalBranchColors
-    )
     this.currentSorts = this.revive<SortDefinition[]>(
       PersistenceKey.EXPERIMENTS_SORT_BY,
       []
     )
-    this.experimentColors = this.reviveColors(
-      PersistenceKey.EXPERIMENTS_COLORS,
-      copyOriginalExperimentColors
-    )
+
     this.filters = new Map(
       this.revive<[string, FilterDefinition][]>(
         PersistenceKey.EXPERIMENTS_FILTER_BY,
         []
       )
     )
-    this.status = this.revive<Statuses>(PersistenceKey.EXPERIMENTS_STATUS, {})
+    this.coloredStatus = this.revive<ColoredStatus>(
+      PersistenceKey.EXPERIMENTS_STATUS,
+      {}
+    )
+
+    const assignedColors = new Set(
+      Object.values(this.coloredStatus).filter(Boolean)
+    )
+    this.availableColors = copyOriginalColors().filter(
+      color => !assignedColors.has(color)
+    )
   }
 
-  public async transformAndSet(
-    data: ExperimentsOutput,
-    hasCheckpoints = false
-  ) {
-    await this.collectColors(data)
-
+  public transformAndSet(data: ExperimentsOutput, hasCheckpoints = false) {
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
-      collectExperiments(
-        data,
-        this.getAssignedBranchColors(),
-        this.getAssignedExperimentColors(),
-        hasCheckpoints
-      )
+      collectExperiments(data, hasCheckpoints)
 
     this.workspace = workspace
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
 
-    this.setStatus()
+    this.setColoredStatus()
   }
 
   public toggleStatus(id: string) {
-    const newStatus = this.isSelected(id) ? Status.UNSELECTED : Status.SELECTED
-    this.status[id] = newStatus
+    const currentStatus = this.coloredStatus[id]
+    if (currentStatus) {
+      this.availableColors.unshift(currentStatus)
+      this.coloredStatus[id] = UNSELECTED
+    } else if (this.availableColors.length > 0) {
+      this.coloredStatus[id] = this.availableColors.shift() as Color
+    }
 
     this.setSelectionMode(false)
     this.persistStatus()
-    return newStatus
+    return this.coloredStatus[id]
   }
 
   public canSelect() {
-    return canSelect(this.status)
+    return canSelect(this.coloredStatus)
   }
 
   public getSorts(): SortDefinition[] {
@@ -210,6 +199,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getSelectedFromList(() => this.flattenExperiments())
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public setSelected(experiments: Experiment[]) {
     if (tooManySelected(experiments)) {
       experiments = limitToMaxSelected(experiments)
@@ -218,14 +208,22 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     const selected = new Set(experiments.map(exp => exp.id))
 
-    const acc: Statuses = {}
+    const acc: ColoredStatus = {}
 
     for (const { id } of this.getCombinedList()) {
-      const status = selected.has(id) ? Status.SELECTED : Status.UNSELECTED
-      acc[id] = status
+      const currentStatus = this.coloredStatus[id]
+
+      if (selected.has(id)) {
+        acc[id] = currentStatus || (this.availableColors.shift() as Color)
+      } else {
+        if (currentStatus) {
+          this.availableColors.unshift(currentStatus)
+        }
+        acc[id] = UNSELECTED
+      }
     }
 
-    this.status = acc
+    this.coloredStatus = acc
 
     this.persistStatus()
   }
@@ -252,16 +250,14 @@ export class ExperimentsModel extends ModelWithPersistence {
   })[] {
     return [
       {
-        ...this.workspace,
+        ...this.addSelected(this.workspace),
         hasChildren: false,
-        selected: !!this.status.workspace,
         type: ExperimentType.WORKSPACE
       },
       ...this.branches.map(branch => {
         return {
-          ...branch,
+          ...this.addSelected(branch),
           hasChildren: false,
-          selected: this.isSelected(branch.id),
           type: ExperimentType.BRANCH
         }
       }),
@@ -316,13 +312,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getRowData() {
     return [
-      { ...this.workspace, selected: this.isSelected('workspace') },
+      this.addSelected(this.workspace),
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
-        const branchWithSelected = {
-          ...branch,
-          selected: this.isSelected(branch.id)
-        }
+        const branchWithSelected = this.addSelected(branch)
 
         if (!definedAndNonEmpty(experiments)) {
           return branchWithSelected
@@ -337,7 +330,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public isSelected(id: string) {
-    return !!this.status[id]
+    return !!this.coloredStatus[id]
   }
 
   private getCombinedList() {
@@ -417,52 +410,30 @@ export class ExperimentsModel extends ModelWithPersistence {
     return flattenMapValues(this.checkpointsByTip)
   }
 
-  private setStatus() {
+  private setColoredStatus() {
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
       return
     }
-    this.status = collectStatuses(
+    const { coloredStatus, availableColors } = collectColoredStatus(
       this.getExperiments(),
       this.checkpointsByTip,
-      this.status
+      this.coloredStatus,
+      this.availableColors
     )
+    this.coloredStatus = coloredStatus
+    this.setAvailableColors(availableColors)
 
     this.persistStatus()
+  }
+
+  private setAvailableColors(colors: Color[]) {
+    this.availableColors = colors
   }
 
   private setSelectedToFilters() {
     const filteredExperiments = this.getFilteredExperiments()
     this.setSelected(filteredExperiments)
-  }
-
-  private async collectColors(data: ExperimentsOutput) {
-    const { branchIds, experimentIds } = collectBranchAndExperimentIds(data)
-    const [branchColors, experimentColors] = await Promise.all([
-      collectColors(
-        branchIds,
-        this.getAssignedBranchColors(),
-        this.branchColors.available,
-        copyOriginalBranchColors
-      ),
-      collectColors(
-        experimentIds,
-        this.getAssignedExperimentColors(),
-        this.experimentColors.available,
-        copyOriginalExperimentColors
-      )
-    ])
-
-    this.branchColors = branchColors
-    this.experimentColors = experimentColors
-
-    Promise.all([
-      this.persistColors(
-        PersistenceKey.EXPERIMENTS_COLORS,
-        this.experimentColors
-      ),
-      this.persistColors(PersistenceKey.BRANCH_COLORS, this.branchColors)
-    ])
   }
 
   private persistSorts() {
@@ -476,38 +447,13 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.persist(PersistenceKey.EXPERIMENTS_FILTER_BY, [...this.filters])
   }
 
-  private persistColors(prefix: PersistenceKey, colors: Colors) {
-    this.persist(prefix, {
-      assigned: [...colors.assigned],
-      available: colors.available
-    })
-  }
-
   private persistStatus() {
-    return this.persist(PersistenceKey.EXPERIMENTS_STATUS, this.status)
-  }
-
-  private reviveColors(
-    key: PersistenceKey,
-    copyOriginalColors: () => string[]
-  ) {
-    const { assigned, available } = this.revive<{
-      assigned: [string, string][]
-      available: string[]
-    }>(key, {
-      assigned: [],
-      available: copyOriginalColors()
-    })
-
-    return {
-      assigned: new Map(assigned),
-      available: available
-    }
+    return this.persist(PersistenceKey.EXPERIMENTS_STATUS, this.coloredStatus)
   }
 
   private addSelected(experiment: Experiment) {
     const { id } = experiment
-    if (!hasKey(this.status, id)) {
+    if (!hasKey(this.coloredStatus, id)) {
       return experiment
     }
 
@@ -515,34 +461,23 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     return {
       ...experiment,
+      displayColor: this.coloredStatus[id]
+        ? (this.coloredStatus[id] as Color)
+        : undefined,
       selected
     }
-  }
-
-  private getAssignedBranchColors() {
-    return this.branchColors.assigned
-  }
-
-  private getAssignedExperimentColors() {
-    return this.experimentColors.assigned
   }
 
   private getSelectedFromList(getList: () => Experiment[]) {
     const acc: SelectedExperimentWithColor[] = []
 
     for (const experiment of getList()) {
-      if (this.isSelectedExperimentWithColor(experiment)) {
-        acc.push(experiment)
+      const displayColor = this.coloredStatus[experiment.id]
+      if (displayColor) {
+        acc.push({ ...experiment, displayColor } as SelectedExperimentWithColor)
       }
     }
 
     return acc
-  }
-
-  private isSelectedExperimentWithColor(
-    experiment: Experiment
-  ): experiment is SelectedExperimentWithColor {
-    const { id, displayColor } = experiment
-    return !!(displayColor && this.isSelected(id))
   }
 }

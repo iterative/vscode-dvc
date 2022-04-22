@@ -17,7 +17,7 @@ import {
   RepeatMapping
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
-import { ComparisonRevision } from '../webview/contract'
+import { CheckpointPlotsColors, ComparisonRevision } from '../webview/contract'
 
 const COMMIT_FIELD = 'rev'
 
@@ -83,7 +83,7 @@ export const isMultiViewByCommitPlot = (
   template?: TopLevelSpec | VisualizationSpec
 ): boolean => !template || getFacetField(template) === COMMIT_FIELD
 
-export type ColorScale = { domain: string[]; range: string[] }
+export type ColorScale = CheckpointPlotsColors
 
 export const getColorScale = (
   revisions: ComparisonRevision[]

@@ -1,15 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs'
-import {
-  copyOriginalExperimentColors,
-  copyOriginalBranchColors,
-  getWorkspaceColor
-} from '../extension/src/experiments/model/colors'
+import { copyOriginalColors } from '../extension/src/experiments/model/colors'
 
-const colors = [
-  getWorkspaceColor(),
-  ...copyOriginalExperimentColors(),
-  ...copyOriginalBranchColors()
-]
+const colors = copyOriginalColors()
 
 const addSpin = (file: string) =>
   file.replace(

@@ -1,11 +1,6 @@
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
 import { Operator } from './filterBy'
-import {
-  copyOriginalBranchColors,
-  copyOriginalExperimentColors,
-  getWorkspaceColor
-} from './colors'
 import outputFixture from '../../test/fixtures/expShow/output'
 import rowsFixture from '../../test/fixtures/expShow/rows'
 import { buildMockMemento } from '../../test/util'
@@ -24,9 +19,6 @@ beforeEach(() => {
 
 describe('ExperimentsModel', () => {
   const runningExperiment = 'exp-12345'
-  const [expColor] = copyOriginalExperimentColors()
-  const [branchColor] = copyOriginalBranchColors()
-  const workspaceColor = getWorkspaceColor()
 
   const buildTestExperiment = (
     testParam: number,
@@ -58,13 +50,13 @@ describe('ExperimentsModel', () => {
     return { data }
   }
 
-  it('should return rows that equal the rows fixture when given the output fixture', async () => {
+  it('should return rows that equal the rows fixture when given the output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    await model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture, true)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
-  it('should continue to apply filters to new data if selection mode is set to use filters', async () => {
+  it('should continue to apply filters to new data if selection mode is set to use filters', () => {
     const testPath = joinMetricOrParamPath(
       MetricOrParamType.PARAMS,
       'params.yaml',
@@ -79,7 +71,7 @@ describe('ExperimentsModel', () => {
     })
     const baseline = buildTestExperiment(2, undefined, 'testBranch')
 
-    await experimentsModel.transformAndSet({
+    experimentsModel.transformAndSet({
       testBranch: {
         baseline,
         test0: buildTestExperiment(0, 'tip2'),
@@ -93,15 +85,15 @@ describe('ExperimentsModel', () => {
 
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
-        displayColor: expColor,
+        // displayColor: expColor,
         id: runningExperiment,
         label: 'tip2'
       })
     ])
 
     experimentsModel.setSelectionMode(true)
-
     experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
+
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([])
 
     const unfilteredCheckpoint = buildTestExperiment(
@@ -123,17 +115,17 @@ describe('ExperimentsModel', () => {
       }
     }
 
-    await experimentsModel.transformAndSet(experimentWithNewCheckpoint)
+    experimentsModel.transformAndSet(experimentWithNewCheckpoint)
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
-        displayColor: expColor,
+        // displayColor: expColor,
         id: runningExperiment,
         label: 'tip3'
       })
     ])
   })
 
-  it('should apply filters to checkpoints and experiments if selection mode is set to use filters', async () => {
+  it('should apply filters to checkpoints and experiments if selection mode is set to use filters', () => {
     const testPath = joinMetricOrParamPath(
       MetricOrParamType.PARAMS,
       'params.yaml',
@@ -148,7 +140,7 @@ describe('ExperimentsModel', () => {
     })
     const baseline = buildTestExperiment(2, undefined, 'testBranch')
 
-    await experimentsModel.transformAndSet({
+    experimentsModel.transformAndSet({
       testBranch: {
         '0notIncluded': buildTestExperiment(0, 'tip'),
         '1notIncluded': buildTestExperiment(1, 'tip'),
@@ -168,42 +160,42 @@ describe('ExperimentsModel', () => {
 
     expect(experimentsModel.getSelectedRevisions()).toStrictEqual([
       expect.objectContaining({
-        displayColor: workspaceColor,
+        // displayColor: workspaceColor,
         id: 'workspace',
         label: 'workspace'
       }),
       expect.objectContaining({
-        displayColor: branchColor,
+        // displayColor: branchColor,
         id: 'testBranch',
         label: 'testBranch'
       }),
       expect.objectContaining({
-        displayColor: expColor,
+        // displayColor: expColor,
         id: runningExperiment,
         label: 'tip'
       }),
       expect.objectContaining({
-        displayColor: expColor,
+        // displayColor: expColor,
         id: '2included',
         label: '2includ'
       }),
       expect.objectContaining({
-        displayColor: expColor,
+        // displayColor: expColor,
         id: '3included',
         label: '3includ'
       }),
       expect.objectContaining({
-        displayColor: expColor,
+        // displayColor: expColor,
         id: '4included',
         label: '4includ'
       })
     ])
   })
 
-  it('should always limit the number of selected experiments to 6', async () => {
+  it('should always limit the number of selected experiments to 7', () => {
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
 
-    await experimentsModel.transformAndSet({
+    experimentsModel.transformAndSet({
       testBranch: {
         baseline: buildTestExperiment(2, undefined, 'testBranch'),
         exp1: buildTestExperiment(0, 'tip'),
@@ -235,33 +227,33 @@ describe('ExperimentsModel', () => {
     expect((experimentsModel as any).useFiltersForSelection).toBe(false)
   })
 
-  it('should fetch branch params', async () => {
+  it('should fetch branch params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    await model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture, true)
 
     const branchParams = model.getExperimentParams('main')
     expect(definedAndNonEmpty(branchParams)).toBe(true)
   })
 
-  it('should fetch workspace params', async () => {
+  it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    await model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture, true)
 
     const workspaceParams = model.getExperimentParams('workspace')
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
   })
 
-  it("should fetch an experiment's params", async () => {
+  it("should fetch an experiment's params", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    await model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture, true)
 
     const experimentParams = model.getExperimentParams('exp-e7a67')
     expect(definedAndNonEmpty(experimentParams)).toBe(true)
   })
 
-  it("should fetch an empty array if the experiment's params cannot be found", async () => {
+  it("should fetch an empty array if the experiment's params cannot be found", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    await model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture, true)
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)

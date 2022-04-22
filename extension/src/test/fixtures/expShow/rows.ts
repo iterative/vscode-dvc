@@ -1,8 +1,8 @@
 import { join } from '../../util/path'
 import { RowData } from '../../../experiments/webview/contract'
-import { copyOriginalExperimentColors } from '../../../experiments/model/colors'
+import { copyOriginalColors } from '../../../experiments/model/colors'
 
-const colorsList = copyOriginalExperimentColors()
+const colorsList = copyOriginalColors()
 
 const data: RowData[] = [
   {
@@ -31,7 +31,7 @@ const data: RowData[] = [
         val_accuracy: 0.5608000159263611
       }
     },
-    displayColor: '#945dd6',
+    displayColor: colorsList[0],
     label: 'workspace',
     mutable: false,
     selected: true,
@@ -67,7 +67,7 @@ const data: RowData[] = [
     name: 'main',
     label: 'main',
     mutable: false,
-    displayColor: '#13adc7',
+    displayColor: colorsList[1],
     selected: true,
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     subRows: [
@@ -103,7 +103,7 @@ const data: RowData[] = [
         label: '4fb124a',
         mutable: false,
         displayNameOrParent: '[exp-e7a67]',
-        displayColor: colorsList[0],
+        displayColor: colorsList[2],
         id: 'exp-e7a67',
         sha: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         subRows: [
@@ -137,7 +137,7 @@ const data: RowData[] = [
             checkpoint_parent: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
             label: 'd1343a8',
             mutable: false,
-            displayColor: colorsList[0],
+            displayColor: undefined,
             id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
             selected: false,
             sha: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
@@ -170,7 +170,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
-            displayColor: colorsList[0],
+            displayColor: undefined,
             label: '1ee5f2e',
             mutable: false,
             id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
@@ -209,7 +209,7 @@ const data: RowData[] = [
         },
         name: 'test-branch',
         checkpoint_parent: '217312476f8854dda1865450b737eb6bc7a3ba1b',
-        displayColor: colorsList[1],
+        displayColor: colorsList[3],
         label: '42b8736',
         mutable: false,
         displayNameOrParent: '[test-branch]',
@@ -244,7 +244,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '9523bde67538cf31230efaff2dbc47d38a944ab5',
-            displayColor: colorsList[1],
+            displayColor: undefined,
             label: '2173124',
             mutable: false,
             id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
@@ -279,7 +279,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
-            displayColor: colorsList[1],
+            displayColor: undefined,
             label: '9523bde',
             mutable: false,
             id: '9523bde67538cf31230efaff2dbc47d38a944ab5',
@@ -318,7 +318,7 @@ const data: RowData[] = [
         },
         name: 'exp-83425',
         checkpoint_parent: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
-        displayColor: colorsList[2],
+        displayColor: colorsList[4],
         label: '1ba7bcd',
         mutable: false,
         displayNameOrParent: '[exp-83425]',
@@ -353,7 +353,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
-            displayColor: colorsList[2],
+            displayColor: undefined,
             label: '22e40e1',
             mutable: false,
             id: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
@@ -388,7 +388,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
-            displayColor: colorsList[2],
+            displayColor: undefined,
             label: '91116c1',
             mutable: false,
             id: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
@@ -423,7 +423,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
-            displayColor: colorsList[2],
+            displayColor: undefined,
             label: 'e821416',
             mutable: false,
             id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
@@ -458,7 +458,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '23250b33e3d6dd0e136262d1d26a2face031cb03',
-            displayColor: colorsList[2],
+            displayColor: undefined,
             label: 'c658f8b',
             mutable: false,
             id: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
@@ -493,7 +493,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
-            displayColor: colorsList[2],
+            displayColor: undefined,
             label: '23250b3',
             mutable: false,
             id: '23250b33e3d6dd0e136262d1d26a2face031cb03',

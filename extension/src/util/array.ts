@@ -30,11 +30,8 @@ export const reorderObjectList = <T extends { [key: string]: unknown }>(
     .map(orderedItem => items.find(item => item[compareKey] === orderedItem))
     .filter(Boolean) as T[]
 
-export const splitMatchedOrdered = (
-  values: string[],
-  existingOrder: string[]
-) => {
-  const orderedMatches: string[] = []
+export const splitMatchedOrdered = <T>(values: T[], existingOrder: T[]) => {
+  const orderedMatches: T[] = []
   const unmatched = [...values]
   for (const existingValue of existingOrder) {
     const index = unmatched.indexOf(existingValue)
@@ -47,3 +44,6 @@ export const splitMatchedOrdered = (
 
   return [orderedMatches, unmatched]
 }
+
+export const reorderListSubset = <T>(subset: T[], supersetOrder: T[]): T[] =>
+  splitMatchedOrdered(subset, supersetOrder)[0]
