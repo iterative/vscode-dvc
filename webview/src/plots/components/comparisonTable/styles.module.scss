@@ -76,14 +76,25 @@ $gap: 4px;
   left: 0;
   z-index: 1;
 
-  &::after {
+  &::before {
     content: '';
-    width: $gap;
+    width: calc($gap + 1px);
     height: calc(100% + $gap);
     position: absolute;
     right: 0;
     top: 0;
     background-color: $bg-color;
+    z-index: 5;
+  }
+
+  &::after {
+    content: '';
+    width: calc($gap / 2);
+    height: calc(100% + $gap);
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: var(--editor-foreground-transparency-4);
     z-index: 5;
   }
 }

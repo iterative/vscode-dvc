@@ -14,16 +14,17 @@ import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
 
-export type ComparisonTableProps = Omit<
-  PlotsComparisonData,
-  'sectionName' | 'size'
->
+export interface ComparisonTableProps
+  extends Omit<PlotsComparisonData, 'sectionName' | 'size'> {
+  currentPinnedColumn?: string
+}
 
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   plots,
-  revisions
+  revisions,
+  currentPinnedColumn
 }) => {
-  const pinnedColumn = useRef('')
+  const pinnedColumn = useRef(currentPinnedColumn || '')
   const [columns, setColumns] = useState<ComparisonTableColumn[]>([])
 
   const isPinned = (column: ComparisonTableColumn): boolean =>
