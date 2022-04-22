@@ -20,7 +20,7 @@ export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
     const allRevisions =
       comparisonTable.revisions?.map(rev => rev.revision) || []
     setRevisions(allRevisions)
-    setSelectedPlots(comparisonTable.selectedRevisions || allRevisions)
+    setSelectedPlots(allRevisions)
   }, [comparisonTable, setSelectedPlots, setRevisions])
 
   const plots = comparisonTable.plots.filter(plot => {

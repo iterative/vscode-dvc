@@ -3,7 +3,13 @@
  */
 import { join } from 'dvc/src/test/util/path'
 import React from 'react'
-import { render, cleanup, screen, fireEvent } from '@testing-library/react'
+import {
+  render,
+  cleanup,
+  screen,
+  fireEvent,
+  getByText
+} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
@@ -262,6 +268,56 @@ describe('App', () => {
     })
 
     expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
+  })
+
+  it('should toggle the visibility of revisions in the comparison table when clicking the revisions in the picker', async () => {
+    render(
+      <Plots
+        state={{
+          data: {
+            comparison: comparisonTableFixture,
+            sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+            template: null
+          }
+        }}
+      />
+    )
+
+    const summaryElement = await screen.findByText('Comparison')
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const workspaceHeader = screen.queryByText('workspace')
+    expect(workspaceHeader).toBeInTheDocument()
+
+    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    const [, selectMenu] = screen.getAllByRole('menu')
+    // eslint-disable-next-line testing-library/prefer-screen-queries
+    const workspaceItem = getByText(selectMenu, 'workspace')
+
+    fireEvent.click(workspaceItem, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(workspaceHeader).not.toBeInTheDocument()
+
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    fireEvent.click(workspaceItem, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const table = screen.getByRole('table')
+    // eslint-disable-next-line testing-library/prefer-screen-queries
+    expect(getByText(table, 'workspace')).toBeInTheDocument()
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
