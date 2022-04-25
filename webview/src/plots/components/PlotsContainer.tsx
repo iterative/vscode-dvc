@@ -6,7 +6,7 @@ import {
   SectionCollapsed
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { MetricsPicker } from './MetricsPicker'
+import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { SectionRenamer } from './SectionRenamer'
@@ -15,12 +15,6 @@ import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
 
-interface MenuProps {
-  metrics: string[]
-  selectedMetrics: string[]
-  setSelectedPlots: (selectedPlots: string[]) => void
-}
-
 export interface PlotsContainerProps {
   sectionCollapsed: SectionCollapsed
   sectionKey: Section
@@ -28,8 +22,13 @@ export interface PlotsContainerProps {
   onRename: (section: Section, name: string) => void
   onResize: (size: PlotSize, section: Section) => void
   currentSize: PlotSize
-  menu?: MenuProps
+  menu?: PlotsPickerProps
 }
+
+export type BasicContainerProps = Pick<
+  PlotsContainerProps,
+  'onRename' | 'onResize' | 'sectionCollapsed'
+>
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
@@ -77,13 +76,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   if (menu) {
     menuItems.push({
       icon: AllIcons.LINES,
-      onClickNode: (
-        <MetricsPicker
-          metrics={menu.metrics}
-          setSelectedMetrics={menu.setSelectedPlots}
-          selectedMetrics={menu.selectedMetrics}
-        />
-      ),
+      onClickNode: <PlotsPicker {...menu} />,
       tooltip: 'Choose metrics'
     })
   }
