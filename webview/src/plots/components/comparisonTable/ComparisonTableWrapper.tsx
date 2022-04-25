@@ -9,10 +9,10 @@ interface ComparisonTableWrapper {
   basicContainerProps: BasicContainerProps
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
   comparisonTable,
   basicContainerProps
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const allRevisions = comparisonTable.revisions?.map(rev => rev.revision) || []
   const [selectedPlots, setSelectedPlots] = useState<string[]>(allRevisions)
