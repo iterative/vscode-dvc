@@ -8,7 +8,7 @@ import {
   cleanup,
   screen,
   fireEvent,
-  getByText
+  within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
@@ -297,8 +297,7 @@ describe('App', () => {
     fireEvent.click(pickerButton)
 
     const [, selectMenu] = screen.getAllByRole('menu')
-    // eslint-disable-next-line testing-library/prefer-screen-queries
-    const workspaceItem = getByText(selectMenu, 'workspace')
+    const workspaceItem = within(selectMenu).getByText('workspace')
 
     fireEvent.click(workspaceItem, {
       bubbles: true,
@@ -316,8 +315,7 @@ describe('App', () => {
     })
 
     const table = screen.getByRole('table')
-    // eslint-disable-next-line testing-library/prefer-screen-queries
-    expect(getByText(table, 'workspace')).toBeInTheDocument()
+    expect(within(table).getByText('workspace')).toBeInTheDocument()
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {

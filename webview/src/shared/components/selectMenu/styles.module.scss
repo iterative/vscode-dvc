@@ -8,6 +8,8 @@ $background: var(--vscode-editor-background);
 
 .itemLabel {
   width: 165px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .itemIcon {
