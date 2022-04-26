@@ -16,7 +16,7 @@
     "cover:merge:jest": "nyc merge ./extension/coverage/jest coverage/jest-coverage-final.json",
     "cover:merge": "nyc merge ./coverage/combined coverage/coverage-final.json",
     "cover:mkdir": "mkdir -p ./coverage/combined",
-    "cover:report:integration": "nyc report --reporter=lcov --reporter=text --temp-dir=./extension/coverage/integration",
+    "cover:report:integration": "nyc report --reporter=lcov --temp-dir=./extension/coverage/integration",
     "cover": "yarn turbo run cover-vscode-run --filter=dvc && yarn run-s cover:report:integration cover:mkdir && yarn run-p cover:merge:* && yarn run-s cover:merge cover:report cover:clean",
     "cover:report": "nyc report --reporter=lcov --reporter=text --reporter=text-summary --temp-dir=./coverage --lines=95 --check-coverage",
     "build": "yarn turbo run package",
