@@ -216,8 +216,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.availableColors
     )
 
-    this.coloredStatus = coloredStatus
-    this.setAvailableColors(availableColors)
+    this.setColors(coloredStatus, availableColors)
 
     this.persistStatus()
   }
@@ -415,14 +414,15 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.coloredStatus,
       this.availableColors
     )
-    this.coloredStatus = coloredStatus
-    this.setAvailableColors(availableColors)
+
+    this.setColors(coloredStatus, availableColors)
 
     this.persistStatus()
   }
 
-  private setAvailableColors(colors: Color[]) {
-    this.availableColors = colors
+  private setColors(coloredStatus: ColoredStatus, availableColors: Color[]) {
+    this.coloredStatus = coloredStatus
+    this.availableColors = availableColors
   }
 
   private unassignColor(color: Color) {
