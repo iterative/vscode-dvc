@@ -1,4 +1,4 @@
-import { copyOriginalColors } from '../../../experiments/model/colors'
+import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import {
   DEFAULT_SECTION_NAMES,
   CheckpointPlotsData,

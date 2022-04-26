@@ -16,7 +16,7 @@ import { ExperimentsData } from '../../../experiments/data'
 import { mockHasCheckpoints } from '../experiments/util'
 import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
 import { PathsModel } from '../../../plots/paths/model'
-import { Color } from '../../../experiments/model/colors'
+import { Color } from '../../../experiments/model/status/colors'
 
 export const buildPlots = async (
   disposer: Disposer,

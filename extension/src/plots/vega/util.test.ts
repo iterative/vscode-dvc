@@ -10,7 +10,7 @@ import defaultTemplate from '../../test/fixtures/plotsDiff/templates/default'
 import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
 import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
-import { copyOriginalColors } from '../../experiments/model/colors'
+import { copyOriginalColors } from '../../experiments/model/status/colors'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {

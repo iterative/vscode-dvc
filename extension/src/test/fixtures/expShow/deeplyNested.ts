@@ -1,7 +1,7 @@
 import { ExperimentsOutput } from '../../../cli/reader'
 import { collectMetricsAndParams } from '../../../experiments/metricsAndParams/collect'
 import { collectExperiments } from '../../../experiments/model/collect'
-import { copyOriginalColors } from '../../../experiments/model/colors'
+import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { TableData } from '../../../experiments/webview/contract'
 
 export const deeplyNestedOutput: ExperimentsOutput = {

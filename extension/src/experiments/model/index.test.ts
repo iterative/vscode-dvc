@@ -1,6 +1,6 @@
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
-import { copyOriginalColors } from './colors'
+import { copyOriginalColors } from './status/colors'
 import { Operator } from './filterBy'
 import outputFixture from '../../test/fixtures/expShow/output'
 import rowsFixture from '../../test/fixtures/expShow/rows'
