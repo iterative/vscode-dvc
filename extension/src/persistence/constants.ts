@@ -1,6 +1,4 @@
 export enum PersistenceKey {
-  BRANCH_COLORS = 'branchColors:',
-  EXPERIMENTS_COLORS = 'experimentsColors:',
   EXPERIMENTS_FILTER_BY = 'experimentsFilterBy:',
   EXPERIMENTS_SORT_BY = 'experimentsSortBy:',
   EXPERIMENTS_STATUS = 'experimentsStatus:',

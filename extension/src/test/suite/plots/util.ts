@@ -16,6 +16,7 @@ import { ExperimentsData } from '../../../experiments/data'
 import { mockHasCheckpoints } from '../experiments/util'
 import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
 import { PathsModel } from '../../../plots/paths/model'
+import { Color } from '../../../experiments/model/colors'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -91,7 +92,7 @@ export const buildPlots = async (
 
 export const getExpectedCheckpointPlotsData = (
   domain: string[],
-  range: string[]
+  range: Color[]
 ) => {
   const { plots, sectionName, selectedMetrics, size } = checkpointPlotsFixture
   return {

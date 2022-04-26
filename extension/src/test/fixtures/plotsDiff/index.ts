@@ -15,7 +15,7 @@ import {
   TemplatePlots
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
-import { getWorkspaceColor } from '../../../experiments/model/colors'
+import { copyOriginalColors } from '../../../experiments/model/colors'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -464,13 +464,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
           } as TopLevelSpec,
           {
             domain: expectedRevisions,
-            range: [
-              getWorkspaceColor(),
-              '#13adc7',
-              '#f14c4c',
-              '#3794ff',
-              '#cca700'
-            ]
+            range: copyOriginalColors().slice(0, 5)
           }
         ) as VisualizationSpec,
         id: path,
@@ -521,14 +515,16 @@ export const getComparisonWebviewMessage = (
     plotAcc.push({ path, revisions: revisionsAcc })
   }
 
+  const [workspace, main, _4fb124a, _42b8735, _1ba7bcd] = copyOriginalColors()
+
   return {
     plots: plotAcc,
     revisions: [
-      { revision: 'workspace', displayColor: getWorkspaceColor() },
-      { revision: 'main', displayColor: '#13adc7' },
-      { revision: '4fb124a', displayColor: '#f14c4c' },
-      { revision: '42b8736', displayColor: '#3794ff' },
-      { revision: '1ba7bcd', displayColor: '#cca700' }
+      { revision: 'workspace', displayColor: workspace },
+      { revision: 'main', displayColor: main },
+      { revision: '4fb124a', displayColor: _4fb124a },
+      { revision: '42b8736', displayColor: _42b8735 },
+      { revision: '1ba7bcd', displayColor: _1ba7bcd }
     ],
     sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
     size: PlotSize.REGULAR

@@ -1,19 +1,16 @@
-import { sum } from '../../util/math'
+import { Color } from './colors'
 import { Experiment } from '../webview/contract'
 
 export const MAX_SELECTED_EXPERIMENTS = 7
 
-export enum Status {
-  SELECTED = 1,
-  UNSELECTED = 0
-}
+export const UNSELECTED = 0
 
-export type Statuses = Record<string, Status>
+export type ColoredStatus = Record<string, Color | typeof UNSELECTED>
 
-const getSelectedCount = (status: Statuses): number =>
-  sum(Object.values(status))
+const getSelectedCount = (status: ColoredStatus): number =>
+  Object.values(status).filter(Boolean).length
 
-export const canSelect = (status: Statuses): boolean =>
+export const canSelect = (status: ColoredStatus): boolean =>
   getSelectedCount(status) < MAX_SELECTED_EXPERIMENTS
 
 export const tooManySelected = (experiments: Experiment[]): boolean =>
