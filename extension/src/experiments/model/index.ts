@@ -17,7 +17,7 @@ import {
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
 import { Experiment, RowData } from '../webview/contract'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
 import { hasKey } from '../../util/object'
@@ -95,9 +95,9 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public toggleStatus(id: string) {
-    const currentStatus = this.coloredStatus[id]
-    if (currentStatus) {
-      this.availableColors.unshift(currentStatus)
+    const current = this.coloredStatus[id]
+    if (current) {
+      this.unassignColor(current)
       this.coloredStatus[id] = UNSELECTED
     } else if (this.availableColors.length > 0) {
       this.coloredStatus[id] = this.availableColors.shift() as Color
@@ -200,26 +200,33 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  public setSelected(experiments: Experiment[]) {
-    if (tooManySelected(experiments)) {
-      experiments = limitToMaxSelected(experiments)
+  public setSelected(selectedExperiments: Experiment[]) {
+    if (tooManySelected(selectedExperiments)) {
+      selectedExperiments = limitToMaxSelected(selectedExperiments)
       this.setSelectionMode(false)
     }
 
-    const selected = new Set(experiments.map(exp => exp.id))
+    const selected = new Set(selectedExperiments.map(exp => exp.id))
 
     const acc: ColoredStatus = {}
 
     for (const { id } of this.getCombinedList()) {
-      const currentStatus = this.coloredStatus[id]
-
+      const current = this.coloredStatus[id]
       if (selected.has(id)) {
-        acc[id] = currentStatus || (this.availableColors.shift() as Color)
-      } else {
-        if (currentStatus) {
-          this.availableColors.unshift(currentStatus)
-        }
-        acc[id] = UNSELECTED
+        continue
+      }
+
+      if (current) {
+        this.unassignColor(current)
+      }
+
+      acc[id] = UNSELECTED
+    }
+
+    for (const { id } of selectedExperiments) {
+      const current = this.coloredStatus[id]
+      if (selected.has(id)) {
+        acc[id] = current || (this.availableColors.shift() as Color)
       }
     }
 
@@ -429,6 +436,14 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private setAvailableColors(colors: Color[]) {
     this.availableColors = colors
+  }
+
+  private unassignColor(color: Color) {
+    this.availableColors.unshift(color)
+    this.availableColors = reorderListSubset(
+      this.availableColors,
+      copyOriginalColors()
+    )
   }
 
   private setSelectedToFilters() {

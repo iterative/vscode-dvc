@@ -128,7 +128,6 @@ describe('ExperimentsModel', () => {
     experimentsModel.transformAndSet(experimentWithNewCheckpoint)
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
-        displayColor: expColor,
         id: runningExperiment,
         label: 'tip3'
       })

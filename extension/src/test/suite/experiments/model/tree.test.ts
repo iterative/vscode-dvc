@@ -314,8 +314,8 @@ suite('Experiments Tree Test Suite', () => {
         { displayColor: colors[0], revision: 'workspace' },
         { displayColor: colors[2], revision: '4fb124a' },
         { displayColor: colors[3], revision: '42b8736' },
-        { displayColor: colors[4], revision: 'd1343a8' },
-        { displayColor: colors[1], revision: '1ee5f2e' },
+        { displayColor: colors[1], revision: 'd1343a8' },
+        { displayColor: colors[4], revision: '1ee5f2e' },
         { displayColor: colors[5], revision: '2173124' },
         { displayColor: colors[6], revision: '9523bde' }
       ])
