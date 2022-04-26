@@ -58,7 +58,7 @@ export type CheckpointPlotValues = {
   y: number
 }[]
 
-export type CheckpointPlotsColors = { domain: string[]; range: Color[] }
+export type ColorScale = { domain: string[]; range: Color[] }
 
 export type CheckpointPlotData = {
   title: string
@@ -67,7 +67,7 @@ export type CheckpointPlotData = {
 
 export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
-  colors: CheckpointPlotsColors
+  colors: ColorScale
   size: PlotSize
   sectionName: string
   selectedMetrics?: string[]
