@@ -1,5 +1,5 @@
 import { VisualizationSpec } from 'react-vega'
-import { Color } from '../../experiments/model/colors'
+import { Color } from '../../experiments/model/status/colors'
 
 export const PlotSize = {
   LARGE: 'LARGE',

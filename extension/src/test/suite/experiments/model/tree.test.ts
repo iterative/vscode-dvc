@@ -41,7 +41,7 @@ import { CliExecutor } from '../../../../cli/executor'
 import { Param } from '../../../../experiments/model/queue/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { MetricOrParamType } from '../../../../experiments/webview/contract'
-import { copyOriginalColors } from '../../../../experiments/model/colors'
+import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()

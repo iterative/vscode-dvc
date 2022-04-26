@@ -6,12 +6,9 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import {
-  collectExperiments,
-  collectColoredStatus,
-  collectSelected
-} from './collect'
-import { Color, copyOriginalColors } from './colors'
+import { collectExperiments } from './collect'
+import { collectColoredStatus, collectSelected } from './status/collect'
+import { Color, copyOriginalColors } from './status/colors'
 import {
   canSelect,
   limitToMaxSelected,

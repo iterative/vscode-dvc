@@ -1,6 +1,6 @@
+import { canSelect, limitToMaxSelected } from '.'
 import { copyOriginalColors } from './colors'
-import { canSelect, limitToMaxSelected } from './status'
-import { Experiment } from '../webview/contract'
+import { Experiment } from '../../webview/contract'
 
 describe('canSelect', () => {
   const colors = copyOriginalColors()

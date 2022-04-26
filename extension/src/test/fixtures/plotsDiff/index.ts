@@ -15,7 +15,7 @@ import {
   TemplatePlots
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
-import { copyOriginalColors } from '../../../experiments/model/colors'
+import { copyOriginalColors } from '../../../experiments/model/status/colors'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [

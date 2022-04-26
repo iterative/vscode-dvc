@@ -1,5 +1,5 @@
 import { Color } from './colors'
-import { Experiment } from '../webview/contract'
+import { Experiment } from '../../webview/contract'
 
 export const MAX_SELECTED_EXPERIMENTS = 7
 
