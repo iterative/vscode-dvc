@@ -476,11 +476,17 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     return {
       ...experiment,
-      displayColor: this.coloredStatus[id]
-        ? (this.coloredStatus[id] as Color)
-        : undefined,
+      displayColor: this.getDisplayColor(id),
       selected
     }
+  }
+
+  private getDisplayColor(id: string) {
+    const color = this.coloredStatus[id]
+    if (!color) {
+      return
+    }
+    return color
   }
 
   private getSelectedFromList(getList: () => Experiment[]) {
