@@ -268,7 +268,7 @@ const collectStatus = (
 const collectExistingStatuses = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
-  previousStatuses: ColoredStatus
+  previousStatus: ColoredStatus
 ) => {
   const existingStatuses: ColoredStatus = {}
   for (const experiment of [
@@ -276,11 +276,11 @@ const collectExistingStatuses = (
     ...flattenMapValues(checkpointsByTip)
   ]) {
     const { id } = experiment
-    if (!hasKey(previousStatuses, id)) {
+    if (!hasKey(previousStatus, id)) {
       continue
     }
 
-    existingStatuses[id] = previousStatuses[id]
+    existingStatuses[id] = previousStatus[id]
   }
   return existingStatuses
 }
@@ -307,19 +307,19 @@ export const unassignColors = (
 export const collectColoredStatus = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
-  previousStatuses: ColoredStatus,
+  previousStatus: ColoredStatus,
   unassignedColors: Color[]
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
   const availableColors = unassignColors(
     [...experiments, ...flattenMapValues(checkpointsByTip)],
-    previousStatuses,
+    previousStatus,
     unassignedColors
   )
 
   const coloredStatus = collectExistingStatuses(
     experiments,
     checkpointsByTip,
-    previousStatuses
+    previousStatus
   )
 
   for (const experiment of experiments) {
@@ -331,4 +331,67 @@ export const collectColoredStatus = (
   }
 
   return { availableColors, coloredStatus }
+}
+
+const unassignUnselected = (
+  selected: Set<string>,
+  experiments: Experiment[],
+  previousStatus: ColoredStatus,
+  previousAvailableColors: Color[]
+) => {
+  const coloredStatus: ColoredStatus = {}
+  const availableColors = [...previousAvailableColors]
+  for (const { id } of experiments) {
+    const current = previousStatus[id]
+    if (selected.has(id)) {
+      continue
+    }
+
+    if (current) {
+      availableColors.unshift(current)
+    }
+
+    coloredStatus[id] = UNSELECTED
+  }
+
+  return {
+    availableColors: reorderListSubset(availableColors, copyOriginalColors()),
+    coloredStatus
+  }
+}
+
+const assignSelected = (
+  selectedExperiments: Experiment[],
+  previousStatus: ColoredStatus,
+  coloredStatus: ColoredStatus,
+  availableColors: Color[]
+) => {
+  for (const { id } of selectedExperiments) {
+    coloredStatus[id] = previousStatus[id] || (availableColors.shift() as Color)
+  }
+
+  return { availableColors, coloredStatus }
+}
+
+export const collectSelected = (
+  selectedExperiments: Experiment[],
+  experiments: Experiment[],
+  previousStatus: ColoredStatus,
+  previousAvailableColors: Color[]
+) => {
+  const selected = new Set(selectedExperiments.map(exp => exp.id))
+
+  const { availableColors, coloredStatus } = unassignUnselected(
+    selected,
+    experiments,
+    previousStatus,
+    previousAvailableColors
+  )
+
+  return assignSelected(
+    selectedExperiments,
+    previousStatus,
+    coloredStatus,
+    availableColors
+  )
 }

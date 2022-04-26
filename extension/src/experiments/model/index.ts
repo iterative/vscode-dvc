@@ -6,7 +6,11 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import { collectExperiments, collectColoredStatus } from './collect'
+import {
+  collectExperiments,
+  collectColoredStatus,
+  collectSelected
+} from './collect'
 import { Color, copyOriginalColors } from './colors'
 import {
   canSelect,
@@ -199,38 +203,21 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getSelectedFromList(() => this.flattenExperiments())
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   public setSelected(selectedExperiments: Experiment[]) {
     if (tooManySelected(selectedExperiments)) {
       selectedExperiments = limitToMaxSelected(selectedExperiments)
       this.setSelectionMode(false)
     }
 
-    const selected = new Set(selectedExperiments.map(exp => exp.id))
+    const { availableColors, coloredStatus } = collectSelected(
+      selectedExperiments,
+      this.getCombinedList(),
+      this.coloredStatus,
+      this.availableColors
+    )
 
-    const acc: ColoredStatus = {}
-
-    for (const { id } of this.getCombinedList()) {
-      const current = this.coloredStatus[id]
-      if (selected.has(id)) {
-        continue
-      }
-
-      if (current) {
-        this.unassignColor(current)
-      }
-
-      acc[id] = UNSELECTED
-    }
-
-    for (const { id } of selectedExperiments) {
-      const current = this.coloredStatus[id]
-      if (selected.has(id)) {
-        acc[id] = current || (this.availableColors.shift() as Color)
-      }
-    }
-
-    this.coloredStatus = acc
+    this.coloredStatus = coloredStatus
+    this.setAvailableColors(availableColors)
 
     this.persistStatus()
   }
