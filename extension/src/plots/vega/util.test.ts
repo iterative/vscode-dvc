@@ -10,6 +10,7 @@ import defaultTemplate from '../../test/fixtures/plotsDiff/templates/default'
 import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
 import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
+import { copyOriginalColors } from '../../experiments/model/colors'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {
@@ -59,14 +60,15 @@ describe('getColorScale', () => {
   })
 
   it('should convert an object to a vega color scale', () => {
+    const [firstColor, secondColor] = copyOriginalColors()
     expect(
       getColorScale([
-        { displayColor: '#000000', revision: 'main' },
-        { displayColor: '#FFFFFF', revision: 'workspace' }
+        { displayColor: firstColor, revision: 'main' },
+        { displayColor: secondColor, revision: 'workspace' }
       ])
     ).toStrictEqual({
       domain: ['main', 'workspace'],
-      range: ['#000000', '#FFFFFF']
+      range: [firstColor, secondColor]
     })
   })
 })
@@ -80,7 +82,7 @@ describe('extendVegaSpec', () => {
   it('should extend the default linear template', () => {
     const colorScale = {
       domain: ['workspace', 'main'],
-      range: ['#FFFFFF', '#000000']
+      range: copyOriginalColors().slice(0, 2)
     }
     const extendedSpec = extendVegaSpec(linearTemplate, colorScale)
 

@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import VegaLite from 'react-vega/lib/VegaLite'
-import {
-  CheckpointPlotData,
-  CheckpointPlotsColors
-} from 'dvc/src/plots/webview/contract'
+import { CheckpointPlotData, ColorScale } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { createSpec } from './util'
 import styles from '../styles.module.scss'
@@ -19,7 +16,7 @@ import { ZoomablePlotProps } from '../templatePlots/util'
 
 interface CheckpointPlotsProps extends ZoomablePlotProps {
   plots: CheckpointPlotData[]
-  colors: CheckpointPlotsColors
+  colors: ColorScale
 }
 
 export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({

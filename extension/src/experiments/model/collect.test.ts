@@ -1,4 +1,5 @@
-import { collectExperiments, collectStatuses } from './collect'
+import { copyOriginalColors } from './colors'
+import { collectExperiments, collectColoredStatus } from './collect'
 import { Experiment } from '../webview/contract'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 
@@ -130,7 +131,7 @@ describe('collectExperiments', () => {
   })
 })
 
-describe('collectStatuses', () => {
+describe('collectColoredStatus', () => {
   const buildMockExperiments = (n: number, prefix = 'exp') => {
     const mockExperiments: Experiment[] = []
     for (let id = 0; id < n; id++) {
@@ -143,12 +144,21 @@ describe('collectStatuses', () => {
 
   it('should set new experiments to selected if there are less than 7', () => {
     const experiments = buildMockExperiments(4)
+    const colors = copyOriginalColors()
 
-    expect(collectStatuses(experiments, new Map(), {})).toStrictEqual({
-      exp1: 1,
-      exp2: 1,
-      exp3: 1,
-      exp4: 1
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      new Map(),
+      {},
+      copyOriginalColors()
+    )
+
+    expect(availableColors).toStrictEqual(colors.slice(4))
+    expect(coloredStatus).toStrictEqual({
+      exp1: colors[0],
+      exp2: colors[1],
+      exp3: colors[2],
+      exp4: colors[3]
     })
   })
 
@@ -157,105 +167,153 @@ describe('collectStatuses', () => {
       { id: 'exp1' },
       { id: 'exp2', queued: true }
     ] as Experiment[]
+    const colors = copyOriginalColors()
 
-    expect(collectStatuses(experiments, new Map(), {})).toStrictEqual({
-      exp1: 1
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      new Map(),
+      {},
+      copyOriginalColors()
+    )
+
+    expect(availableColors).toStrictEqual(colors.slice(1))
+    expect(coloredStatus).toStrictEqual({
+      exp1: colors[0]
     })
   })
 
   it('should not set more than 7 experiments to selected', () => {
     const experiments = buildMockExperiments(8)
+    const colors = copyOriginalColors()
 
-    expect(collectStatuses(experiments, new Map(), {})).toStrictEqual({
-      exp1: 1,
-      exp2: 1,
-      exp3: 1,
-      exp4: 1,
-      exp5: 1,
-      exp6: 1,
-      exp7: 1,
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      new Map(),
+      {},
+      copyOriginalColors()
+    )
+
+    expect(availableColors).toStrictEqual([])
+    expect(coloredStatus).toStrictEqual({
+      exp1: colors[0],
+      exp2: colors[1],
+      exp3: colors[2],
+      exp4: colors[3],
+      exp5: colors[4],
+      exp6: colors[5],
+      exp7: colors[6],
       exp8: 0
     })
   })
 
-  it('should drop statuses when the experiment is no longer present', () => {
+  it('should drop colors when the experiment is no longer present', () => {
     const experiments = buildMockExperiments(1)
+    const colors = copyOriginalColors()
 
-    expect(
-      collectStatuses(experiments, new Map(), {
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      new Map(),
+      {
         exp2: 0,
-        exp3: 1,
+        exp3: colors[2],
         exp4: 0,
-        exp5: 1,
+        exp5: colors[1],
         exp6: 0,
-        exp7: 1,
+        exp7: colors[0],
         exp8: 0
-      })
-    ).toStrictEqual({ exp1: 1 })
+      },
+      copyOriginalColors().slice(3)
+    )
+
+    expect(coloredStatus).toStrictEqual({ exp1: colors[0] })
+    expect(availableColors).toStrictEqual(colors.slice(1))
   })
 
-  it('should respect the existing status of experiments', () => {
+  it('should respect existing experiment colors', () => {
     const experiments = buildMockExperiments(10)
+    const colors = copyOriginalColors()
 
-    expect(
-      collectStatuses(experiments, new Map(), {
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      new Map(),
+      {
         exp1: 0,
-        exp10: 1,
+        exp10: colors[0],
         exp2: 0,
-        exp9: 1
-      })
-    ).toStrictEqual({
+        exp9: colors[1]
+      },
+      copyOriginalColors().slice(2)
+    )
+
+    expect(coloredStatus).toStrictEqual({
       exp1: 0,
-      exp10: 1,
+      exp10: colors[0],
       exp2: 0,
-      exp3: 1,
-      exp4: 1,
-      exp5: 1,
-      exp6: 1,
-      exp7: 1,
+      exp3: colors[2],
+      exp4: colors[3],
+      exp5: colors[4],
+      exp6: colors[5],
+      exp7: colors[6],
       exp8: 0,
-      exp9: 1
+      exp9: colors[1]
     })
+    expect(availableColors).toStrictEqual([])
   })
 
   it('should not unselect an experiment that is existing and selected', () => {
     const experiments = buildMockExperiments(9)
+    const colors = copyOriginalColors()
 
-    expect(collectStatuses(experiments, new Map(), { exp9: 1 })).toStrictEqual({
-      exp1: 1,
-      exp2: 1,
-      exp3: 1,
-      exp4: 1,
-      exp5: 1,
-      exp6: 1,
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      new Map(),
+      { exp9: colors[0] },
+      copyOriginalColors().slice(1)
+    )
+
+    expect(availableColors).toStrictEqual([])
+    expect(coloredStatus).toStrictEqual({
+      exp1: colors[1],
+      exp2: colors[2],
+      exp3: colors[3],
+      exp4: colors[4],
+      exp5: colors[5],
+      exp6: colors[6],
       exp7: 0,
       exp8: 0,
-      exp9: 1
+      exp9: colors[0]
     })
   })
 
-  it('should set the first new experiment to selected when there are already 7 selected', () => {
+  it('should set the first new experiment to selected when there are already 6 selected', () => {
     const experiments = buildMockExperiments(9)
+    const colors = copyOriginalColors()
 
-    expect(
-      collectStatuses(experiments, new Map(), {
-        exp4: 1,
-        exp5: 1,
-        exp6: 1,
-        exp7: 1,
-        exp8: 1,
-        exp9: 1
-      })
-    ).toStrictEqual({
-      exp1: 1,
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      new Map(),
+      {
+        exp4: colors[0],
+        exp5: colors[1],
+        exp6: colors[2],
+        exp7: colors[3],
+        exp8: colors[4],
+        exp9: colors[5]
+      },
+      copyOriginalColors().slice(6)
+    )
+
+    expect(availableColors).toStrictEqual([])
+    expect(coloredStatus).toStrictEqual({
+      exp1: colors[6],
       exp2: 0,
       exp3: 0,
-      exp4: 1,
-      exp5: 1,
-      exp6: 1,
-      exp7: 1,
-      exp8: 1,
-      exp9: 1
+      exp4: colors[0],
+      exp5: colors[1],
+      exp6: colors[2],
+      exp7: colors[3],
+      exp8: colors[4],
+      exp9: colors[5]
     })
   })
 
@@ -264,14 +322,23 @@ describe('collectStatuses', () => {
     const checkpointsByTip = new Map<string, Experiment[]>([
       ['exp1', buildMockExperiments(5, 'check')]
     ])
+    const colors = copyOriginalColors()
 
-    expect(collectStatuses(experiments, checkpointsByTip, {})).toStrictEqual({
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      checkpointsByTip,
+      {},
+      copyOriginalColors()
+    )
+
+    expect(availableColors).toStrictEqual(colors.slice(1))
+    expect(coloredStatus).toStrictEqual({
       check1: 0,
       check2: 0,
       check3: 0,
       check4: 0,
       check5: 0,
-      exp1: 1
+      exp1: colors[0]
     })
   })
 
@@ -288,18 +355,25 @@ describe('collectStatuses', () => {
       ['expC', buildMockExperiments(5, 'checkC')],
       ['expD', buildMockExperiments(6, 'checkD')]
     ])
+    const colors = copyOriginalColors()
 
-    expect(
-      collectStatuses(experiments, checkpointsByTip, {
-        checkC1: 1,
-        checkD2: 1,
-        checkD3: 1,
-        checkD4: 1,
-        checkD5: 1,
-        checkD6: 1,
-        expD: 1
-      })
-    ).toStrictEqual({
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      experiments,
+      checkpointsByTip,
+      {
+        checkC1: colors[1],
+        checkD2: colors[2],
+        checkD3: colors[3],
+        checkD4: colors[4],
+        checkD5: colors[5],
+        checkD6: colors[6],
+        expD: colors[0]
+      },
+      []
+    )
+
+    expect(availableColors).toStrictEqual([])
+    expect(coloredStatus).toStrictEqual({
       checkA1: 0,
       checkA2: 0,
       checkA3: 0,
@@ -310,21 +384,21 @@ describe('collectStatuses', () => {
       checkB3: 0,
       checkB4: 0,
       checkB5: 0,
-      checkC1: 1,
+      checkC1: colors[1],
       checkC2: 0,
       checkC3: 0,
       checkC4: 0,
       checkC5: 0,
       checkD1: 0,
-      checkD2: 1,
-      checkD3: 1,
-      checkD4: 1,
-      checkD5: 1,
-      checkD6: 1,
+      checkD2: colors[2],
+      checkD3: colors[3],
+      checkD4: colors[4],
+      checkD5: colors[5],
+      checkD6: colors[6],
       expA: 0,
       expB: 0,
       expC: 0,
-      expD: 1
+      expD: colors[0]
     })
   })
 })

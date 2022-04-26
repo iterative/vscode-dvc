@@ -14,7 +14,7 @@ import {
 import { addFilterViaQuickInput } from './filterBy/util'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
-import { Status } from '../../../../experiments/model/status'
+import { UNSELECTED } from '../../../../experiments/model/status'
 import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
@@ -41,6 +41,7 @@ import { CliExecutor } from '../../../../cli/executor'
 import { Param } from '../../../../experiments/model/queue/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { MetricOrParamType } from '../../../../experiments/webview/contract'
+import { copyOriginalColors } from '../../../../experiments/model/colors'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -102,7 +103,7 @@ suite('Experiments Tree Test Suite', () => {
           }
         )
 
-        expect(unSelected).to.equal(Status.UNSELECTED)
+        expect(unSelected).to.equal(UNSELECTED)
         expect(
           setSelectionModeSpy,
           'de-selecting any experiment disables auto-apply filters to experiments selection'
@@ -129,9 +130,7 @@ suite('Experiments Tree Test Suite', () => {
         }
       )
 
-      expect(selected, 'the experiment is now selected').to.equal(
-        Status.SELECTED
-      )
+      expect(selected, 'the experiment is now selected').to.equal(range[0])
 
       expect(messageSpy, 'we no longer send null').to.be.calledWithMatch(
         getExpectedCheckpointPlotsData(expectedDomain, expectedRange)
@@ -302,6 +301,8 @@ suite('Experiments Tree Test Suite', () => {
 
       await secondUpdateEvent
 
+      const colors = copyOriginalColors()
+
       expect(
         getFirstArgOfLastCall(setSelectionModeSpy),
         'auto-apply filters to experiment selection is not enabled when the user selects to use the most recent'
@@ -310,13 +311,13 @@ suite('Experiments Tree Test Suite', () => {
         plotsModel.getSelectedRevisionDetails(),
         'all running and the most recent experiments are now selected'
       ).to.deep.equal([
-        { displayColor: '#945dd6', revision: 'workspace' },
-        { displayColor: '#f14c4c', revision: '4fb124a' },
-        { displayColor: '#3794ff', revision: '42b8736' },
-        { displayColor: '#f14c4c', revision: 'd1343a8' },
-        { displayColor: '#f14c4c', revision: '1ee5f2e' },
-        { displayColor: '#3794ff', revision: '2173124' },
-        { displayColor: '#3794ff', revision: '9523bde' }
+        { displayColor: colors[0], revision: 'workspace' },
+        { displayColor: colors[2], revision: '4fb124a' },
+        { displayColor: colors[3], revision: '42b8736' },
+        { displayColor: colors[1], revision: 'd1343a8' },
+        { displayColor: colors[4], revision: '1ee5f2e' },
+        { displayColor: colors[5], revision: '2173124' },
+        { displayColor: colors[6], revision: '9523bde' }
       ])
       expect(
         mockPlotsDiff,
