@@ -9,6 +9,7 @@ module.exports = {
     '!src/shared/components/icons/*'
   ],
   coverageDirectory: 'coverage/jest',
+  coverageReporters: ['lcov'],
   globals: {
     __webpack_public_path__: true
   },
