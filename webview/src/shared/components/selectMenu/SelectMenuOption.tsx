@@ -5,7 +5,7 @@ import { AllIcons, Icon } from '../Icon'
 export interface SelectMenuOptionProps {
   id: string
   label: string
-  isSelected: boolean
+  isSelected?: boolean
 }
 
 interface SelectMenuOptionAllProps extends SelectMenuOptionProps {

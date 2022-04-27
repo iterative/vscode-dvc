@@ -6,7 +6,7 @@ export interface ContextMenuProps {
   children?: React.ReactElement
   content?: React.ReactNode
   disabled?: boolean
-  onClickOutside?: () => void
+  onClickOutside?: (event: Event) => void
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
@@ -22,7 +22,9 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     interactive
     disabled={disabled}
     content={content}
-    onClickOutside={onClickOutside}
+    onClickOutside={(_, event) =>
+      onClickOutside ? onClickOutside(event) : null
+    }
   >
     {children}
   </Tooltip>
