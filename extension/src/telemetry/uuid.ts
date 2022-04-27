@@ -1,11 +1,12 @@
 import { v4 } from 'uuid'
 import { writeFileSync, readFileSync } from 'fs-extra'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { userConfigDir } from 'appdirs'
 import { exists } from '../fileSystem'
 
 const readOrCreateConfig = () => {
+  const { userConfigDir } = require('appdirs') as {
+    userConfigDir: (appName: string, appAuthor: string) => string
+  }
+
   const legacyConfigPath = userConfigDir('dvc/user_id', 'iterative')
   const configPath = userConfigDir('telemetry', 'iterative')
   if (exists(configPath)) {
