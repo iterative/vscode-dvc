@@ -5,6 +5,7 @@ import { CliReader } from '../../cli/reader'
 import { Config } from '../../config'
 import { exists } from '../../fileSystem'
 import { getVenvBinPath } from '../../python'
+import { dvcDemoPath } from '../util'
 
 const config = {
   getCliPath: () => '',
@@ -14,7 +15,15 @@ const config = {
 export const cliReader = new CliReader(config)
 export const cliExecutor = new CliExecutor(config)
 
-export const initializeEmptyDvc = (): Promise<string> => {
+let demoInitialized: Promise<string>
+export const initializeDemoRepo = (): Promise<string> => {
+  if (!demoInitialized) {
+    demoInitialized = cliExecutor.pull(dvcDemoPath)
+  }
+  return demoInitialized
+}
+
+export const initializeEmptyRepo = (): Promise<string> => {
   if (exists(join(TEMP_DIR, '.dvc'))) {
     return Promise.resolve('')
   }
