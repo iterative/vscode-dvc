@@ -205,5 +205,9 @@ export const setup = async (extension: IExtension) => {
     return extension.initialize()
   }
 
-  extension.reset()
+  extension.resetMembers()
+
+  if (!isCliAvailable) {
+    extension.setAvailable(false)
+  }
 }

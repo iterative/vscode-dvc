@@ -3,7 +3,13 @@
  */
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import '@testing-library/jest-dom/extend-expect'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within
+} from '@testing-library/react'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
@@ -14,6 +20,7 @@ import {
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
+import { SortOrderLabel } from './SortPicker'
 import { Table } from './Table'
 import styles from './styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
@@ -115,13 +122,130 @@ describe('Table', () => {
     const tableData = { ...dummyTableData, ...testData }
     return render(<Table instance={tableInstance} tableData={tableData} />)
   }
+  const renderExperimentsTable = (
+    data: TableData = sortingTableDataFixture
+  ) => {
+    const view = render(<ExperimentsTable tableData={data} />)
+
+    mockDndElSpacing(view)
+
+    return view
+  }
 
   beforeAll(() => {
     jest.spyOn(ColumnOrder, 'useColumnOrder').mockImplementation(() => [])
   })
 
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   afterEach(() => {
     cleanup()
+  })
+
+  describe('Sorting through the UI', () => {
+    const mockColumnName = 'C'
+    const mockColumnPath = 'params:C'
+
+    const findSortableColumn = async (headerText = mockColumnName) =>
+      await screen.findByText(headerText)
+
+    const clickOnSortOption = async (optionLabel: SortOrderLabel) => {
+      const column = await findSortableColumn()
+      fireEvent.click(column, {
+        bubbles: true
+      })
+      const columnMenu = await screen.findByRole('menu')
+
+      const sortOption = await within(columnMenu).findByText(optionLabel)
+      fireEvent.click(sortOption)
+    }
+
+    describe('Given no sorting is present yet', () => {
+      it('should add an ascending sort to the column path when the user clicks on the Ascending option', async () => {
+        renderExperimentsTable()
+        await clickOnSortOption(SortOrderLabel.ASCENDING)
+        expect(mockedPostMessage).toBeCalledWith({
+          payload: {
+            descending: false,
+            path: mockColumnPath
+          },
+          type: 'column-sorted'
+        })
+      })
+
+      it('should add a descending sort to the column path when the user clicks on the Descending option', async () => {
+        renderExperimentsTable()
+        await clickOnSortOption(SortOrderLabel.DESCENDING)
+        expect(mockedPostMessage).toBeCalledWith({
+          payload: {
+            descending: true,
+            path: mockColumnPath
+          },
+          type: 'column-sorted'
+        })
+      })
+
+      it('should not do anything when the user clicks on the None option', async () => {
+        renderExperimentsTable()
+        await clickOnSortOption(SortOrderLabel.NONE)
+        expect(mockedPostMessage).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('Given an initial ascending column sort', () => {
+      it('should add a descending sort to the column path when the user clicks on the Descending option', async () => {
+        renderExperimentsTable({
+          ...sortingTableDataFixture,
+          sorts: [
+            {
+              descending: false,
+              path: mockColumnPath
+            }
+          ]
+        })
+        await clickOnSortOption(SortOrderLabel.DESCENDING)
+        expect(mockedPostMessage).toBeCalledWith({
+          payload: {
+            descending: true,
+            path: mockColumnPath
+          },
+          type: 'column-sorted'
+        })
+      })
+
+      it('should not do anything when the user clicks on the Ascending option', async () => {
+        renderExperimentsTable({
+          ...sortingTableDataFixture,
+          sorts: [
+            {
+              descending: false,
+              path: mockColumnPath
+            }
+          ]
+        })
+        await clickOnSortOption(SortOrderLabel.ASCENDING)
+        expect(mockedPostMessage).not.toHaveBeenCalled()
+      })
+
+      it('should remove the column sort when the user clicks on the None option', async () => {
+        renderExperimentsTable({
+          ...sortingTableDataFixture,
+          sorts: [
+            {
+              descending: false,
+              path: mockColumnPath
+            }
+          ]
+        })
+        await clickOnSortOption(SortOrderLabel.NONE)
+        expect(mockedPostMessage).toBeCalledWith({
+          payload: mockColumnPath,
+          type: 'column-sort-removed'
+        })
+      })
+    })
   })
 
   describe('Changes', () => {
@@ -167,16 +291,6 @@ describe('Table', () => {
   })
 
   describe('Columns order', () => {
-    const renderExperimentsTable = (
-      data: TableData = sortingTableDataFixture
-    ) => {
-      const view = render(<ExperimentsTable tableData={data} />)
-
-      mockDndElSpacing(view)
-
-      return view
-    }
-
     beforeEach(() => {
       mockGetComputedSpacing()
     })

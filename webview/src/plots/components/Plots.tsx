@@ -1,38 +1,33 @@
-import React, { useState, useEffect } from 'react'
-import {
-  CheckpointPlotData,
-  PlotSize,
-  Section
-} from 'dvc/src/plots/webview/contract'
+import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { PlotsContainer } from './PlotsContainer'
-import { CheckpointPlots } from './checkpointPlots/CheckpointPlots'
-import { ComparisonTable } from './comparisonTable/ComparisonTable'
-import { TemplatePlots } from './templatePlots/TemplatePlots'
+import React, { useEffect, useState } from 'react'
+import styles from './styles.module.scss'
+import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
+import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
+import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { PlotsWebviewState } from '../hooks/useAppReducer'
-import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import { Modal } from '../../shared/components/modal/Modal'
 import { Theme } from '../../shared/components/theme/Theme'
+import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
+import { sendMessage } from '../../shared/vscode'
 
-const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
-  plots?.map(({ title }) => title).sort() || []
-
-export const Plots = ({
-  state
-}: {
-  state: PlotsWebviewState
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-}) => {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const Plots = ({ state }: { state: PlotsWebviewState }) => {
   const { data } = state
 
-  const [metrics, setMetrics] = useState<string[]>([])
-  const [selectedPlots, setSelectedPlots] = useState<string[]>([])
+  const [zoomedInPlot, setZoomedInPlot] = useState<JSX.Element | undefined>(
+    undefined
+  )
 
   useEffect(() => {
-    const metrics = getMetricsFromPlots(data?.checkpoint?.plots)
-    setMetrics(metrics)
-    setSelectedPlots(data?.checkpoint?.selectedMetrics || [])
-  }, [data, setSelectedPlots, setMetrics])
+    const modalOpenClass = 'modal-open'
+    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot)
+
+    return () => {
+      document.body.classList.remove(modalOpenClass)
+    }
+  }, [zoomedInPlot])
 
   if (!data || !data.sectionCollapsed) {
     return <EmptyState>Loading Plots...</EmptyState>
@@ -47,14 +42,6 @@ export const Plots = ({
 
   if (!checkpointPlots && !templatePlots && !comparisonTable) {
     return <EmptyState>No Plots to Display</EmptyState>
-  }
-
-  const setSelectedMetrics = (metrics: string[]) => {
-    setSelectedPlots(metrics)
-    sendMessage({
-      payload: metrics,
-      type: MessageFromWebviewType.METRIC_TOGGLED
-    })
   }
 
   const changeSize = (size: PlotSize, section: Section) => {
@@ -77,51 +64,42 @@ export const Plots = ({
     sectionCollapsed
   }
 
+  const handlePlotClick = (plot: JSX.Element) => setZoomedInPlot(plot)
+
+  const wrapperProps = {
+    basicContainerProps,
+    onPlotClick: handlePlotClick
+  }
+
   return (
     <Theme>
-      {templatePlots && (
-        <PlotsContainer
-          title={templatePlots.sectionName}
-          sectionKey={Section.TEMPLATE_PLOTS}
-          currentSize={templatePlots.size}
-          {...basicContainerProps}
-        >
-          <TemplatePlots plots={templatePlots.plots} />
-        </PlotsContainer>
-      )}
-      {comparisonTable && (
-        <PlotsContainer
-          title={comparisonTable.sectionName}
-          sectionKey={Section.COMPARISON_TABLE}
-          currentSize={comparisonTable.size}
-          {...basicContainerProps}
-        >
-          <ComparisonTable
-            plots={comparisonTable.plots}
-            revisions={comparisonTable.revisions}
+      <DragDropProvider>
+        {templatePlots && (
+          <TemplatePlotsWrapper
+            templatePlots={templatePlots}
+            {...wrapperProps}
           />
-        </PlotsContainer>
-      )}
-      {checkpointPlots && (
-        <PlotsContainer
-          title={checkpointPlots.sectionName}
-          sectionKey={Section.CHECKPOINT_PLOTS}
-          menu={{
-            metrics,
-            selectedMetrics: selectedPlots,
-            setSelectedPlots: setSelectedMetrics
-          }}
-          currentSize={checkpointPlots.size}
-          {...basicContainerProps}
-        >
-          <CheckpointPlots
-            plots={checkpointPlots.plots.filter(plot =>
-              selectedPlots?.includes(plot.title)
-            )}
-            colors={checkpointPlots.colors}
+        )}
+        {comparisonTable && (
+          <ComparisonTableWrapper
+            comparisonTable={comparisonTable}
+            {...wrapperProps}
           />
-        </PlotsContainer>
-      )}
+        )}
+        {checkpointPlots && (
+          <CheckpointPlotsWrapper
+            checkpointPlots={checkpointPlots}
+            {...wrapperProps}
+          />
+        )}
+        {zoomedInPlot && (
+          <Modal onClose={() => setZoomedInPlot(undefined)}>
+            <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
+              {zoomedInPlot}
+            </div>
+          </Modal>
+        )}
+      </DragDropProvider>
     </Theme>
   )
 }

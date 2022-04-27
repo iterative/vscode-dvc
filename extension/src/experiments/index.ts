@@ -14,6 +14,7 @@ import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, MetricOrParamType, TableData } from './webview/contract'
+import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import {
   AvailableCommands,
@@ -374,6 +375,10 @@ export class Experiments extends BaseRepository<TableData> {
             return this.setExperimentStatus(message.payload)
           case MessageFromWebviewType.CONTEXT_MENU_INVOKED:
             return this.invokeContextMenu(message.payload)
+          case MessageFromWebviewType.COLUMN_SORTED:
+            return this.addColumnSort(message.payload)
+          case MessageFromWebviewType.COLUMN_SORT_REMOVED:
+            return this.removeColumnSort(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -484,6 +489,26 @@ export class Experiments extends BaseRepository<TableData> {
         return callback(id)
       }
     }
+  }
+
+  private addColumnSort(sort: SortDefinition) {
+    this.experiments.addSort(sort)
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED,
+      { ...sort },
+      undefined
+    )
+    return this.notifyChanged()
+  }
+
+  private removeColumnSort(path: string) {
+    this.experiments.removeSort(path)
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED,
+      { path },
+      undefined
+    )
+    return this.notifyChanged()
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {

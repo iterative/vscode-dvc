@@ -9,7 +9,7 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import {
-  CheckpointPlotsColors,
+  ColorScale,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSize,
@@ -33,7 +33,7 @@ jest.mock('../../shared/api')
 
 jest.mock('./checkpointPlots/util', () => ({
   ...jest.requireActual('./checkpointPlots/util'),
-  createSpec: (title: string, scale?: CheckpointPlotsColors) => ({
+  createSpec: (title: string, scale?: ColorScale) => ({
     ...jest.requireActual('./checkpointPlots/util').createSpec(title, scale),
     height: 100,
     width: 100
@@ -816,6 +816,25 @@ describe('App', () => {
     expect(topDropIcon).toBeInTheDocument()
   })
 
+  it('should not show a drop target when moving an element from a whole different section (comparison to template)', () => {
+    renderAppWithData({
+      comparison: comparisonTableFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const headers = screen.getAllByRole('columnheader')
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+
+    dragEnter(headers[1], bottomSection, DragEnterDirection.LEFT)
+
+    const bottomDropIcon = screen.queryByTestId(
+      `${NewSectionBlock.BOTTOM}_drop-icon`
+    )
+
+    expect(bottomDropIcon).not.toBeInTheDocument()
+  })
+
   it('should prevent default behaviour when dragging over a new section', () => {
     renderAppWithData({
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
@@ -883,5 +902,83 @@ describe('App', () => {
     dragEnter(plots[1], plots[1], DragEnterDirection.LEFT)
 
     expect(plots[1].style.display).toBe('none')
+  })
+
+  it('should open a modal with the plot zoomed in when clicking a template plot', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const [plot] = screen.getAllByTestId(/^plot_/)
+
+    fireEvent.click(plot)
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const [plot] = screen.getAllByTestId(/^plot-/)
+
+    fireEvent.click(plot)
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
+    renderAppWithData({
+      comparison: comparisonTableFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const [plot] = screen.getAllByAltText(/^Plot of/)
+
+    fireEvent.click(plot)
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+  })
+
+  it('should close the zoomed plot modal when clicking the backdrop or the close button', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const [plot] = screen.getAllByTestId(/^plot_/)
+
+    fireEvent.click(plot)
+    fireEvent.click(screen.getByTestId('modal'))
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    fireEvent.click(plot)
+    fireEvent.click(screen.getByTestId('modal-close'))
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+  })
+
+  it('should not close the zoomed in plot modal when interacting with the plot inside (modal content)', () => {
+    renderAppWithData({
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const [plot] = screen.getAllByTestId(/^plot_/)
+
+    fireEvent.click(plot)
+    fireEvent.click(screen.getByTestId('modal-content'))
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 })

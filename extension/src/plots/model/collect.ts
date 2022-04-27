@@ -1,6 +1,7 @@
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
 import {
+  ColorScale,
   CheckpointPlotValues,
   CheckpointPlotData,
   isImagePlot,
@@ -26,7 +27,7 @@ import {
 import { MetricsOrParams } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
-import { ColorScale, extendVegaSpec, isMultiViewPlot } from '../vega/util'
+import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
 
 type CheckpointPlotAccumulator = {

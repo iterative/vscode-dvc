@@ -6,6 +6,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
+import { ComparisonRevision } from 'dvc/src/plots/webview/contract'
 import { ComparisonTable, ComparisonTableProps } from './ComparisonTable'
 import {
   createBubbledEvent,
@@ -14,6 +15,7 @@ import {
 } from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
+import { DragDropProvider } from '../../../shared/components/dragDrop/DragDropContext'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
@@ -31,7 +33,11 @@ describe('ComparisonTable', () => {
   const basicProps: ComparisonTableProps = comparisonTableFixture
   const revisions = basicProps.revisions.map(({ revision }) => revision)
   const renderTable = (props = basicProps) =>
-    render(<ComparisonTable {...props} />)
+    render(
+      <DragDropProvider>
+        <ComparisonTable {...props} />
+      </DragDropProvider>
+    )
 
   it('should render a table', () => {
     renderTable()
@@ -189,12 +195,22 @@ describe('ComparisonTable', () => {
     const newRevisions = [
       ...basicProps.revisions,
       { displayColor: '#000000', revision: newRevName }
-    ]
+    ] as ComparisonRevision[]
 
     rerender(<ComparisonTable {...basicProps} revisions={newRevisions} />)
     const headers = getHeaders().map(header => header.textContent)
 
     expect(headers).toStrictEqual([...revisions, newRevName])
+  })
+
+  it('should pin the current pinned column on first render', () => {
+    const pinnedRevision = 'main'
+
+    renderTable({ ...basicProps, currentPinnedColumn: pinnedRevision })
+
+    const [pinnedColumn] = getHeaders()
+
+    expect(pinnedColumn.textContent).toBe(pinnedRevision)
   })
 
   describe('Columns drag and drop', () => {

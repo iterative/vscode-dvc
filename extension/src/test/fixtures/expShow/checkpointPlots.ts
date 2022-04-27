@@ -1,3 +1,4 @@
+import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import {
   DEFAULT_SECTION_NAMES,
   CheckpointPlotsData,
@@ -5,10 +6,12 @@ import {
   Section
 } from '../../../plots/webview/contract'
 
+const colors = copyOriginalColors()
+
 const data: CheckpointPlotsData = {
   colors: {
     domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
-    range: ['#f14c4c', '#3794ff', '#cca700']
+    range: [colors[2], colors[3], colors[4]]
   },
   plots: [
     {

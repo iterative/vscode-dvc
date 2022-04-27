@@ -3,6 +3,10 @@ import {
   TemplatePlotEntry
 } from 'dvc/src/plots/webview/contract'
 
+export interface ZoomablePlotProps {
+  onPlotClick: (plot: JSX.Element) => void
+}
+
 const remove = (section: TemplatePlotSection, entryId: string) => {
   const entries = section.entries.filter(({ id }) => id !== entryId)
   return entries.length > 0

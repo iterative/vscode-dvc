@@ -1,4 +1,4 @@
-import { commands, Event, EventEmitter, ExtensionContext } from 'vscode'
+import { commands, env, Event, EventEmitter, ExtensionContext } from 'vscode'
 import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
@@ -274,7 +274,7 @@ export class Extension extends Disposable implements IExtension {
       )
     )
 
-    showWalkthroughOnFirstUse(context.globalState)
+    showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
   }
 
@@ -346,19 +346,14 @@ export class Extension extends Disposable implements IExtension {
     return definedAndNonEmpty(this.dvcRoots)
   }
 
-  public reset() {
-    this.resetMembers()
-    return this.setAvailable(false)
-  }
-
-  private resetMembers() {
+  public resetMembers() {
     this.repositories.reset()
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
     this.plots.reset()
   }
 
-  private setAvailable(available: boolean) {
+  public setAvailable(available: boolean) {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available

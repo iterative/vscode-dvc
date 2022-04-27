@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, spy, restore, match } from 'sinon'
+import { stub, spy, restore } from 'sinon'
 import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
 import { buildExperiments } from './util'
 import { Disposable } from '../../../extension'
@@ -39,15 +39,10 @@ import { BaseWebview } from '../../../webview'
 import { MetricsAndParamsModel } from '../../../experiments/metricsAndParams/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
-import {
-  copyOriginalBranchColors,
-  copyOriginalExperimentColors,
-  getWorkspaceColor
-} from '../../../experiments/model/colors'
+import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { InternalCommands } from '../../../commands/internal'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
-import { Status } from '../../../experiments/model/status'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
@@ -240,7 +235,7 @@ suite('Experiments Test Suite', () => {
       const mockToggleExperimentStatus = stub(
         experiments,
         'toggleExperimentStatus'
-      ).returns(Status.SELECTED)
+      ).returns(copyOriginalColors()[0])
 
       const mockExperimentId = 'workspace'
 
@@ -262,6 +257,76 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a column sorted message from the webview', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockAddSort = stub(ExperimentsModel.prototype, 'addSort').returns(
+        undefined
+      )
+
+      const mockSortDefinition: SortDefinition = {
+        descending: false,
+        path: 'params:params.yaml:lr'
+      }
+
+      mockMessageReceived.fire({
+        payload: mockSortDefinition,
+        type: MessageFromWebviewType.COLUMN_SORTED
+      })
+
+      expect(mockAddSort).to.be.calledOnce
+      expect(
+        mockAddSort,
+        'should correctly handle a column sorted message'
+      ).to.be.calledWithExactly(mockSortDefinition)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED,
+        mockSortDefinition,
+        undefined
+      )
+    })
+
+    it('should handle a column sort removed from the webview', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockRemoveSort = stub(
+        ExperimentsModel.prototype,
+        'removeSort'
+      ).returns(undefined)
+
+      const mockSortPath = 'params:params.yaml:lr'
+
+      mockMessageReceived.fire({
+        payload: mockSortPath,
+        type: MessageFromWebviewType.COLUMN_SORT_REMOVED
+      })
+
+      expect(mockRemoveSort).to.be.calledOnce
+      expect(
+        mockRemoveSort,
+        'should correctly handle a column sort removed message'
+      ).to.be.calledWithExactly(mockSortPath)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED,
+        {
+          path: mockSortPath
+        },
+        undefined
+      )
+    })
+
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
 
@@ -274,12 +339,6 @@ suite('Experiments Test Suite', () => {
       })
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
-
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ExperimentsModel.prototype as any,
-        'getAssignedExperimentColors'
-      ).returns(new Map())
 
       const updatesPaused = disposable.track(new EventEmitter<boolean>())
 
@@ -318,10 +377,12 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
       await experiments.showWebview()
 
+      const colors = copyOriginalColors()
+
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
-            displayColor: getWorkspaceColor(),
+            displayColor: colors[0],
             id: 'workspace',
             label: 'workspace',
             mutable: false,
@@ -329,7 +390,7 @@ suite('Experiments Test Suite', () => {
             selected: true
           },
           {
-            displayColor: '#13adc7',
+            displayColor: colors[1],
             id: 'testBranch',
             label: 'testBranch',
             mutable: false,
@@ -339,6 +400,7 @@ suite('Experiments Test Suite', () => {
             sha: 'testBranch',
             subRows: [
               {
+                displayColor: colors[2],
                 id: 'testExp1',
                 label: 'testExp',
                 mutable: false,
@@ -347,6 +409,7 @@ suite('Experiments Test Suite', () => {
                 sha: 'testExp1'
               },
               {
+                displayColor: colors[3],
                 id: 'testExp2',
                 label: 'testExp',
                 mutable: false,
@@ -355,6 +418,7 @@ suite('Experiments Test Suite', () => {
                 sha: 'testExp2'
               },
               {
+                displayColor: colors[4],
                 id: 'testExp3',
                 label: 'testExp',
                 mutable: false,
@@ -398,7 +462,7 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
-            displayColor: getWorkspaceColor(),
+            displayColor: colors[0],
             id: 'workspace',
             label: 'workspace',
             mutable: false,
@@ -406,7 +470,7 @@ suite('Experiments Test Suite', () => {
             selected: true
           },
           {
-            displayColor: '#13adc7',
+            displayColor: colors[1],
             id: 'testBranch',
             label: 'testBranch',
             mutable: false,
@@ -416,6 +480,7 @@ suite('Experiments Test Suite', () => {
             sha: 'testBranch',
             subRows: [
               {
+                displayColor: colors[3],
                 id: 'testExp2',
                 label: 'testExp',
                 mutable: false,
@@ -424,6 +489,7 @@ suite('Experiments Test Suite', () => {
                 sha: 'testExp2'
               },
               {
+                displayColor: colors[2],
                 id: 'testExp1',
                 label: 'testExp',
                 mutable: false,
@@ -432,6 +498,7 @@ suite('Experiments Test Suite', () => {
                 sha: 'testExp1'
               },
               {
+                displayColor: colors[4],
                 id: 'testExp3',
                 label: 'testExp',
                 mutable: false,
@@ -508,19 +575,7 @@ suite('Experiments Test Suite', () => {
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
     it('should initialize given no persisted state and update persistence given any change', async () => {
-      const expectedExperimentColors = {
-        assigned: [
-          ['exp-e7a67', '#f14c4c'],
-          ['test-branch', '#3794ff'],
-          ['exp-83425', '#cca700']
-        ],
-        available: copyOriginalExperimentColors().slice(3)
-      }
-      const expectedBranchColors = {
-        assigned: [['main', '#13adc7']],
-        available: copyOriginalBranchColors().slice(1)
-      }
-
+      const colors = copyOriginalColors()
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
 
@@ -545,15 +600,6 @@ suite('Experiments Test Suite', () => {
         mementoSpy,
         'workspaceContext is called for filter initialization'
       ).to.be.calledWith('experimentsFilterBy:test', [])
-      expect(
-        mementoSpy,
-        'workspaceContext is called for experiment color initialization'
-      ).to.be.calledWith('experimentsColors:test', match.has('assigned'))
-      expect(
-        mementoSpy,
-        'workspaceContext is called for branch color initialization'
-      ).to.be.calledWith('branchColors:test', match.has('assigned'))
-      expect(mementoSpy).to.be.calledWith('experimentsStatus:test', {})
 
       expect(
         testRepository.getSorts(),
@@ -561,20 +607,8 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal([])
       expect(
         mockMemento.keys(),
-        'Memento starts with the colors and status keys'
-      ).to.deep.equal([
-        'experimentsColors:test',
-        'branchColors:test',
-        'experimentsStatus:test'
-      ])
-      expect(
-        mockMemento.get('experimentsColors:test'),
-        'the correct experiment colors are persisted'
-      ).to.deep.equal(expectedExperimentColors)
-      expect(
-        mockMemento.get('branchColors:test'),
-        'the correct branch colors are persisted'
-      ).to.deep.equal(expectedBranchColors)
+        'Memento starts with the status key'
+      ).to.deep.equal(['experimentsStatus:test'])
 
       expect(
         mockMemento.get('experimentsStatus:test'),
@@ -589,11 +623,11 @@ suite('Experiments Test Suite', () => {
         c658f8b14ac819ac2a5ea0449da6c15dbe8eb880: 0,
         d1343a87c6ee4a2e82d19525964d2fb2cb6756c9: 0,
         e821416bfafb4bc28b3e0a8ddb322505b0ad2361: 0,
-        'exp-83425': 1,
-        'exp-e7a67': 1,
-        main: 1,
-        'test-branch': 1,
-        workspace: 1
+        'exp-83425': colors[4],
+        'exp-e7a67': colors[2],
+        main: colors[1],
+        'test-branch': colors[3],
+        workspace: colors[0]
       })
 
       const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
@@ -686,41 +720,23 @@ suite('Experiments Test Suite', () => {
         c658f8b14ac819ac2a5ea0449da6c15dbe8eb880: 0,
         d1343a87c6ee4a2e82d19525964d2fb2cb6756c9: 0,
         e821416bfafb4bc28b3e0a8ddb322505b0ad2361: 0,
-        'exp-83425': 1,
+        'exp-83425': colors[4],
         'exp-e7a67': 0,
-        main: 1,
-        'test-branch': 1,
-        workspace: 1
+        main: colors[1],
+        'test-branch': colors[3],
+        workspace: colors[0]
       })
-      expect(
-        mockMemento.get('experimentsColors:test'),
-        'the correct experiment colors are persisted'
-      ).to.deep.equal(expectedExperimentColors)
-      expect(
-        mockMemento.get('branchColors:test'),
-        'the correct branch colors are persisted'
-      ).to.deep.equal(expectedBranchColors)
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
-      const assigned: [string, string][] = [
-        ['exp-e7a67', '#1e5a52'],
-        ['test-branch', '#96958f'],
-        ['exp-83425', '#5f5856']
-      ]
-      const available = ['#000000', '#FFFFFF', '#ABCDEF']
-
+      const colors = copyOriginalColors()
       const mockMemento = buildMockMemento({
-        'experimentsColors:test': {
-          assigned,
-          available
-        },
         'experimentsFilterBy:test': filterMapEntries,
         'experimentsSortBy:test': sortDefinitions,
         'experimentsStatus:test': {
-          'exp-83425': 1,
+          'exp-83425': colors[0],
           'exp-e7a67': 0,
-          'test-branch': 1
+          'test-branch': colors[1]
         }
       })
 
@@ -750,9 +766,9 @@ suite('Experiments Test Suite', () => {
         .getSelectedExperiments()
         .map(({ displayColor, id }) => ({ displayColor, id }))
       expect(selected).to.deep.equal([
-        { displayColor: '#96958f', id: 'test-branch' },
+        { displayColor: colors[1], id: 'test-branch' },
         {
-          displayColor: '#5f5856',
+          displayColor: colors[0],
           id: 'exp-83425'
         }
       ])

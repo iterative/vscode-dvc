@@ -1,6 +1,4 @@
 export enum PersistenceKey {
-  BRANCH_COLORS = 'branchColors:',
-  EXPERIMENTS_COLORS = 'experimentsColors:',
   EXPERIMENTS_FILTER_BY = 'experimentsFilterBy:',
   EXPERIMENTS_SORT_BY = 'experimentsSortBy:',
   EXPERIMENTS_STATUS = 'experimentsStatus:',
@@ -14,6 +12,5 @@ export enum PersistenceKey {
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOT_SIZES = 'plotSizes:',
   PLOT_SECTION_NAMES = 'plotSectionNames:',
-  PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:',
-  WALKTHROUGH_SHOWN_AFTER_INSTALL = 'walkthroughShownAfterInstall'
+  PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:'
 }
