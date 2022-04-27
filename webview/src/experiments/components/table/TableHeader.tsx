@@ -16,8 +16,8 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { SortOrder, SortPicker } from './SortPicker'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
-import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { sendMessage } from '../../../shared/vscode'
+import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 
 const ColumnDragHandle: React.FC<{
   column: HeaderGroup<Experiment>
@@ -104,12 +104,10 @@ const TableHeaderCell: React.FC<{
   }
 
   return (
-    <Tooltip
-      interactive
-      placement={'bottom'}
+    <ContextMenu
       disabled={menuDisabled}
       content={menuContent}
-      visible={menuVisible}
+      open={menuVisible}
       onClickOutside={onMenuBlur}
     >
       <div
@@ -131,7 +129,7 @@ const TableHeaderCell: React.FC<{
           />
         )}
       </div>
-    </Tooltip>
+    </ContextMenu>
   )
 }
 
