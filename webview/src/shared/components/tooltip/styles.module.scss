@@ -1,13 +1,13 @@
 :global(.tippy-box).menu {
-  background-color: var(--vscode-editor-foreground);
-  border-radius: 6px;
+  border-radius: 0;
+  background-color: var(--vscode-menu-background);
   max-width: max-content;
-  color: var(--vscode-editor-background);
+  color: var(--vscode-menu-foreground);
   font-size: 0.8rem;
   transition: none;
   white-space: nowrap;
   & > :global(.tippy-arrow) {
-    color: var(--vscode-editor-foreground);
+    color: var(--vscode-editor-background);
   }
   & > :global(.tippy-content) {
     padding: 8px 12px;
