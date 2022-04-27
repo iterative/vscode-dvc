@@ -6,6 +6,7 @@ import {
   EXTENSION_ID,
   IEventNamePropertyMapping
 } from './constants'
+import { getUserId } from './uuid'
 
 const mockedTelemetryReporter = jest.mocked(TelemetryReporter)
 
@@ -18,7 +19,9 @@ const mockedPackageJSON = {
   version: '0.1.0'
 }
 const mockedSendTelemetryEvent = jest.fn()
+const mockedGetUserId = jest.mocked(getUserId)
 
+jest.mock('./uuid')
 jest.mock('@vscode/extension-telemetry')
 jest.mock('vscode')
 
@@ -70,6 +73,8 @@ describe('getTelemetryReporter', () => {
 
 describe('sendTelemetryEvent', () => {
   it('should call the reporter with the correct event name and sanitized parameters', () => {
+    const mockedUserId = 'fbaff2be-6cde-4c94-ae98-b2e35e562712'
+    mockedGetUserId.mockReturnValueOnce(mockedUserId)
     const mockedEventName = 'mockedEvent' as keyof IEventNamePropertyMapping
     const mockedEventProperties = {
       a: 1,
@@ -95,7 +100,8 @@ describe('sendTelemetryEvent', () => {
         a: '1',
         b: '{"c":2,"d":{"e":"3"}}',
         h: 'some string',
-        i: 'true'
+        i: 'true',
+        user_id: mockedUserId
       },
       mockedMeasurements
     )
