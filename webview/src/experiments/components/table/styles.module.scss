@@ -14,7 +14,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
 // Dark Theme
 
-$row-bg-alt-color: rgba(60, 60, 60, 0.5);
+$row-bg-alt-color: var(--vscode-sideBar-background);
 $header-bg-color: #303031;
 $meta-cell-color: #a0a0a0;
 $toggle-color: rgba(255, 255, 255, 0.21);
@@ -24,7 +24,6 @@ $params-color: #90cdf4;
 
 // Light theme
 
-$row-bg-alt-color-light: rgba(195, 195, 195, 0.3);
 $header-bg-color-light: #e1e1e1;
 $border-color-light: #7f7f7f;
 $metrics-color-light: #ce9f4c;
@@ -135,8 +134,7 @@ $spinner-color-light: #000;
     }
 
     .unselectedExperiment.oddRow & {
-      background-image: linear-gradient($row-bg-alt-color, $row-bg-alt-color),
-        linear-gradient($bg-color, $bg-color);
+      background-color: $row-bg-alt-color;
     }
 
     .workspaceWithChanges.unselectedExperiment & {
@@ -240,7 +238,7 @@ $spinner-color-light: #000;
           right: calc(50% - 0.5px);
           position: absolute;
           border-right: 1px dotted rgb(127, 127, 127);
-          clip-path: inset(0.8px 0 0 0);
+          clip-path: inset(0.05rem 0 0 0);
         }
       }
       &:first-of-type {
@@ -353,10 +351,6 @@ $spinner-color-light: #000;
     border: 1px solid $border-color;
     .oddRow {
       background-color: $row-bg-alt-color;
-
-      :global(.vscode-light) & {
-        background-color: $row-bg-alt-color-light;
-      }
     }
   }
   .workspaceRowGroup {
