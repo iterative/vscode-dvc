@@ -3,13 +3,14 @@ import isEmpty from 'lodash.isempty'
 import omit from 'lodash.omit'
 import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
-import { cliReader, initializeEmptyDvc } from './util'
+import { cliReader, initializeDemoRepo, initializeEmptyDvc } from './util'
 import { dvcDemoPath } from '../util'
 
 suite('exp show --show-json', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
+      await initializeDemoRepo()
       const output = await cliReader.experimentShow(dvcDemoPath)
 
       expect(output.workspace, 'should have a workspace key').not.to.be
