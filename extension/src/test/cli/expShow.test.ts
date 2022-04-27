@@ -3,7 +3,7 @@ import isEmpty from 'lodash.isempty'
 import omit from 'lodash.omit'
 import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
-import { cliReader, initializeDemoRepo, initializeEmptyDvc } from './util'
+import { cliReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 
 suite('exp show --show-json', () => {
@@ -75,8 +75,7 @@ suite('exp show --show-json', () => {
 
   describe('Empty Repository', () => {
     it('should return the expected output', async () => {
-      await initializeEmptyDvc()
-
+      await initializeEmptyRepo()
       const output = await cliReader.experimentShow(TEMP_DIR)
 
       expect(

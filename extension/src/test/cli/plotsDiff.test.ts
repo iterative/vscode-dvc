@@ -1,7 +1,7 @@
 import { describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
-import { cliReader, initializeDemoRepo, initializeEmptyDvc } from './util'
+import { cliReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 import {
   ImagePlot,
@@ -86,8 +86,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
 
   describe('Empty Repository', () => {
     it('should return the expected output', async () => {
-      await initializeEmptyDvc()
-
+      await initializeEmptyRepo()
       const output = await cliReader.plotsDiff(TEMP_DIR)
 
       expect(output).deep.equal({})

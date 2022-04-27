@@ -23,7 +23,7 @@ export const initializeDemoRepo = (): Promise<string> => {
   return demoInitialized
 }
 
-export const initializeEmptyDvc = (): Promise<string> => {
+export const initializeEmptyRepo = (): Promise<string> => {
   if (exists(join(TEMP_DIR, '.dvc'))) {
     return Promise.resolve('')
   }
