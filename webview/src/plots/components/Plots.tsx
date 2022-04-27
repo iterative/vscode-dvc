@@ -1,6 +1,7 @@
 import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
+import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import styles from './styles.module.scss'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
@@ -16,9 +17,10 @@ import { sendMessage } from '../../shared/vscode'
 export const Plots = ({ state }: { state: PlotsWebviewState }) => {
   const { data } = state
 
-  const [zoomedInPlot, setZoomedInPlot] = useState<JSX.Element | undefined>(
+  const [zoomedInPlot, setZoomedInPlot] = useState<VegaLiteProps | undefined>(
     undefined
   )
+  const zoomedInPlotId = useRef('')
 
   useEffect(() => {
     const modalOpenClass = 'modal-open'
@@ -28,6 +30,24 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
       document.body.classList.remove(modalOpenClass)
     }
   }, [zoomedInPlot])
+
+  const handleZoomInPlot = useCallback((
+    props: VegaLiteProps,
+    id: string,
+    refresh?: boolean
+  ) => {
+    if (!refresh) {
+      setZoomedInPlot(props)
+      zoomedInPlotId.current = id
+      return
+    }
+
+    if (zoomedInPlotId.current && zoomedInPlot) {
+      if (zoomedInPlotId.current === id) {
+        setZoomedInPlot(props)
+      }
+    }
+  }, [setZoomedInPlot, zoomedInPlot])
 
   if (!data || !data.sectionCollapsed) {
     return <EmptyState>Loading Plots...</EmptyState>
@@ -64,11 +84,14 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
     sectionCollapsed
   }
 
-  const handlePlotClick = (plot: JSX.Element) => setZoomedInPlot(plot)
+  const handleModalClose = () => {
+    setZoomedInPlot(undefined)
+    zoomedInPlotId.current = ''
+  }
 
   const wrapperProps = {
     basicContainerProps,
-    onPlotClick: handlePlotClick
+    renderZoomedInPlot: handleZoomInPlot
   }
 
   return (
@@ -93,9 +116,9 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
           />
         )}
         {zoomedInPlot && (
-          <Modal onClose={() => setZoomedInPlot(undefined)}>
+          <Modal onClose={handleModalClose}>
             <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
-              {zoomedInPlot}
+              <VegaLite {...zoomedInPlot} />
             </div>
           </Modal>
         )}

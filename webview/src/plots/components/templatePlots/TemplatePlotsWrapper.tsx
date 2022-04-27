@@ -1,8 +1,8 @@
 import { Section, TemplatePlotsData } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { TemplatePlots } from './TemplatePlots'
-import { ZoomablePlotProps } from './util'
 import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
+import { ZoomablePlotProps } from '../ZoomablePlot'
 
 interface TemplatePlotsWrapperProps extends ZoomablePlotProps {
   templatePlots: TemplatePlotsData
@@ -12,7 +12,7 @@ interface TemplatePlotsWrapperProps extends ZoomablePlotProps {
 export const TemplatePlotsWrapper: React.FC<TemplatePlotsWrapperProps> = ({
   templatePlots,
   basicContainerProps,
-  onPlotClick
+  renderZoomedInPlot
 }) => {
   return (
     <PlotsContainer
@@ -21,7 +21,10 @@ export const TemplatePlotsWrapper: React.FC<TemplatePlotsWrapperProps> = ({
       currentSize={templatePlots.size}
       {...basicContainerProps}
     >
-      <TemplatePlots plots={templatePlots.plots} onPlotClick={onPlotClick} />
+      <TemplatePlots
+        plots={templatePlots.plots}
+        renderZoomedInPlot={renderZoomedInPlot}
+      />
     </PlotsContainer>
   )
 }

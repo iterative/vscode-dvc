@@ -7,10 +7,11 @@ import React, { DragEvent, useState, useEffect } from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
-import { removeFromPreviousAndAddToNewSection, ZoomablePlotProps } from './util'
+import { removeFromPreviousAndAddToNewSection } from './util'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
+import { ZoomablePlotProps } from '../ZoomablePlot'
 
 interface TemplatePlotsProps extends ZoomablePlotProps {
   plots: TemplatePlotSection[]
@@ -23,7 +24,7 @@ export enum NewSectionBlock {
 
 export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
   plots,
-  onPlotClick
+  renderZoomedInPlot
 }) => {
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
@@ -152,7 +153,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
                 onDropInSection={handleDropInSection}
                 multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
                 setSectionEntries={setSectionEntries}
-                onPlotClick={onPlotClick}
+                renderZoomedInPlot={renderZoomedInPlot}
               />
             </div>
           )
