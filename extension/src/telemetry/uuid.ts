@@ -1,32 +1,38 @@
+import { join } from 'path'
 import { v4 } from 'uuid'
-import { writeFileSync, readFileSync } from 'fs-extra'
-import { exists } from '../fileSystem'
+import { exists, loadJson, writeJson } from '../fileSystem'
 
-const readOrCreateConfig = () => {
+type UserConfig = {
+  user_id: string
+}
+
+const readOrCreateConfig = (): UserConfig | undefined => {
   const { userConfigDir } = require('appdirs') as {
     userConfigDir: (appName: string, appAuthor: string) => string
   }
 
-  const legacyConfigPath = userConfigDir('dvc/user_id', 'iterative')
   const configPath = userConfigDir('telemetry', 'iterative')
   if (exists(configPath)) {
-    return JSON.parse(readFileSync(configPath).toString())
+    return loadJson<UserConfig>(configPath)
   }
 
+  const legacyConfigPath = userConfigDir(join('dvc', 'user_id'), 'iterative')
   if (exists(legacyConfigPath)) {
-    const oldConfig = readFileSync(legacyConfigPath)
-    writeFileSync(configPath, oldConfig)
-    return JSON.parse(oldConfig.toString())
+    const oldConfig = loadJson<UserConfig>(legacyConfigPath)
+    if (oldConfig) {
+      writeJson(configPath, oldConfig)
+      return oldConfig
+    }
   }
 
   const newConfig = { user_id: v4() }
-  writeFileSync(configPath, JSON.stringify(newConfig))
+  writeJson(configPath, newConfig)
   return newConfig
 }
 
-const readOrCreateUserId = () => {
-  const { user_id } = readOrCreateConfig()
-  return user_id
+export const readOrCreateUserId = () => {
+  const config = readOrCreateConfig()
+  return config?.user_id || 'unknown'
 }
 
 let user_id: string
