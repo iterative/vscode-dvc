@@ -6,6 +6,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
+import { ComparisonRevision } from 'dvc/src/plots/webview/contract'
 import { ComparisonTable, ComparisonTableProps } from './ComparisonTable'
 import {
   createBubbledEvent,
@@ -194,7 +195,7 @@ describe('ComparisonTable', () => {
     const newRevisions = [
       ...basicProps.revisions,
       { displayColor: '#000000', revision: newRevName }
-    ]
+    ] as ComparisonRevision[]
 
     rerender(<ComparisonTable {...basicProps} revisions={newRevisions} />)
     const headers = getHeaders().map(header => header.textContent)

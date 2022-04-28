@@ -1,15 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs'
-import {
-  copyOriginalExperimentColors,
-  copyOriginalBranchColors,
-  getWorkspaceColor
-} from '../extension/src/experiments/model/colors'
+import { copyOriginalColors } from 'dvc/src/experiments/model/status/colors'
 
-const colors = [
-  getWorkspaceColor(),
-  ...copyOriginalExperimentColors(),
-  ...copyOriginalBranchColors()
-]
+const colors = copyOriginalColors()
 
 const addSpin = (file: string) =>
   file.replace(
@@ -28,7 +20,7 @@ const writeSpinner = (loadingIcon: string, color: string) => {
   )
 }
 
-;['loading', 'circle-filled', 'circle-outline'].map(iconName => {
+;['loading', 'circle-filled'].map(iconName => {
   const icon = readFileSync(
     `./node_modules/@vscode/codicons/src/icons/${iconName}.svg`
   )

@@ -1,4 +1,5 @@
 import { VisualizationSpec } from 'react-vega'
+import { Color } from '../../experiments/model/status/colors'
 
 export const PlotSize = {
   LARGE: 'LARGE',
@@ -42,7 +43,7 @@ export type ComparisonPlots = {
   revisions: ComparisonRevisionData
 }[]
 
-export type ComparisonRevision = { revision: string; displayColor: string }
+export type ComparisonRevision = { revision: string; displayColor: Color }
 
 export interface PlotsComparisonData {
   revisions: ComparisonRevision[]
@@ -57,7 +58,7 @@ export type CheckpointPlotValues = {
   y: number
 }[]
 
-export type CheckpointPlotsColors = { domain: string[]; range: string[] }
+export type ColorScale = { domain: string[]; range: Color[] }
 
 export type CheckpointPlotData = {
   title: string
@@ -66,7 +67,7 @@ export type CheckpointPlotData = {
 
 export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
-  colors: CheckpointPlotsColors
+  colors: ColorScale
   size: PlotSize
   sectionName: string
   selectedMetrics?: string[]

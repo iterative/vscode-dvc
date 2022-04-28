@@ -1,14 +1,17 @@
-import { canSelect, limitToMaxSelected } from './status'
-import { Experiment } from '../webview/contract'
+import { canSelect, limitToMaxSelected } from '.'
+import { copyOriginalColors } from './colors'
+import { Experiment } from '../../webview/contract'
 
 describe('canSelect', () => {
+  const colors = copyOriginalColors()
+
   const mockStatus = {
-    exp1: 1,
-    exp2: 1,
-    exp3: 1,
-    exp4: 1,
-    exp5: 1,
-    exp6: 1
+    exp1: colors[0],
+    exp2: colors[1],
+    exp3: colors[2],
+    exp4: colors[3],
+    exp5: colors[4],
+    exp6: colors[5]
   }
 
   it('should return true when there are less than 7 experiments selected', () => {
@@ -16,7 +19,7 @@ describe('canSelect', () => {
   })
 
   it('should return false when there are 7 experiments selected', () => {
-    expect(canSelect({ ...mockStatus, exp7: 1 })).toBe(false)
+    expect(canSelect({ ...mockStatus, exp7: colors[6] })).toBe(false)
   })
 })
 

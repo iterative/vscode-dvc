@@ -15,7 +15,7 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import {
-  CheckpointPlotsColors,
+  ColorScale,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSize,
@@ -39,7 +39,7 @@ jest.mock('../../shared/api')
 
 jest.mock('./checkpointPlots/util', () => ({
   ...jest.requireActual('./checkpointPlots/util'),
-  createSpec: (title: string, scale?: CheckpointPlotsColors) => ({
+  createSpec: (title: string, scale?: ColorScale) => ({
     ...jest.requireActual('./checkpointPlots/util').createSpec(title, scale),
     height: 100,
     width: 100
