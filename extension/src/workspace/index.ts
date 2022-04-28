@@ -40,6 +40,7 @@ export abstract class BaseWorkspace<
 
   public reset(): void {
     this.repositories = reset<T>(this.repositories, this.dispose)
+    this.resetDeferred()
   }
 
   public async getOnlyOrPickProject() {
