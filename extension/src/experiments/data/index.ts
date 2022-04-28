@@ -21,6 +21,8 @@ import { ExperimentsOutput } from '../../cli/reader'
 import { BaseData } from '../../data'
 import { ExperimentFlag } from '../../cli/constants'
 
+const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
+
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   constructor(
     dvcRoot: string,
@@ -42,7 +44,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     )
 
     this.watchExpGitRefs()
-    this.managedUpdate(join('.dvc', 'tmp', 'exps'))
+    this.managedUpdate(QUEUED_EXPERIMENT_PATH)
   }
 
   public collectFiles(data: ExperimentsOutput) {
@@ -51,7 +53,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
   public managedUpdate(path?: string) {
     if (
-      path?.includes(join('.dvc', 'tmp', 'exps')) ||
+      path?.includes(QUEUED_EXPERIMENT_PATH) ||
       this.processManager.isOngoingOrQueued('fullUpdate')
     ) {
       return this.processManager.run('fullUpdate')
