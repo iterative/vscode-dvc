@@ -71,21 +71,20 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       spec: { ...content, ...autoSize }
     } as VegaLiteProps
 
-    const wrapperProps = {
-      className: plotClassName,
-      'data-testid': `plot_${id}`,
-      id,
-      style: withScale(nbRevisions)
-    }
-
     return (
-      <ZoomablePlot
+      <div
         key={id}
-        plotProps={plotProps}
-        wrapperProps={wrapperProps}
+        className={plotClassName}
+        data-testid={`plot_${id}`}
         id={id}
-        renderZoomedInPlot={renderZoomedInPlot}
-      />
+        style={withScale(nbRevisions)}
+      >
+        <ZoomablePlot
+          plotProps={plotProps}
+          id={id}
+          renderZoomedInPlot={renderZoomedInPlot}
+        />
+      </div>
     )
   })
 

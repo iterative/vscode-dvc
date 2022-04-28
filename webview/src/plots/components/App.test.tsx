@@ -3,7 +3,13 @@
  */
 import { join } from 'dvc/src/test/util/path'
 import React from 'react'
-import { render, cleanup, screen, fireEvent } from '@testing-library/react'
+import {
+  render,
+  cleanup,
+  screen,
+  fireEvent,
+  within
+} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
@@ -912,7 +918,7 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const [plot] = screen.getAllByTestId(/^plot_/)
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
 
     fireEvent.click(plot)
 
@@ -927,7 +933,7 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const [plot] = screen.getAllByTestId(/^plot-/)
+    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByRole('button')
 
     fireEvent.click(plot)
 
@@ -944,6 +950,8 @@ describe('App', () => {
 
     const [plot] = screen.getAllByAltText(/^Plot of/)
 
+    expect(within(plot).queryByRole('button')).not.toBeInTheDocument()
+
     fireEvent.click(plot)
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -955,7 +963,7 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const [plot] = screen.getAllByTestId(/^plot_/)
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
 
     fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal'))
@@ -974,7 +982,7 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const [plot] = screen.getAllByTestId(/^plot_/)
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
 
     fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal-content'))

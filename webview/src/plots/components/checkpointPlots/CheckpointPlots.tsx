@@ -55,21 +55,20 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
         spec
       } as VegaLiteProps
 
-      const wrapperProps = {
-        className: styles.plot,
-        'data-testid': key,
-        id: title,
-        style: withScale(1)
-      }
-
       return (
-        <ZoomablePlot
+        <div
           key={key}
-          plotProps={plotProps}
-          id={key}
-          renderZoomedInPlot={renderZoomedInPlot}
-          wrapperProps={wrapperProps}
-        />
+          className={styles.plot}
+          data-testid={key}
+          id={title}
+          style={withScale(1)}
+        >
+          <ZoomablePlot
+            plotProps={plotProps}
+            id={key}
+            renderZoomedInPlot={renderZoomedInPlot}
+          />
+        </div>
       )
     })
     .filter(Boolean)

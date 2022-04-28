@@ -31,23 +31,20 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
     }
   }, [zoomedInPlot])
 
-  const handleZoomInPlot = useCallback((
-    props: VegaLiteProps,
-    id: string,
-    refresh?: boolean
-  ) => {
-    if (!refresh) {
-      setZoomedInPlot(props)
-      zoomedInPlotId.current = id
-      return
-    }
-
-    if (zoomedInPlotId.current && zoomedInPlot) {
-      if (zoomedInPlotId.current === id) {
+  const handleZoomInPlot = useCallback(
+    (props: VegaLiteProps, id: string, refresh?: boolean) => {
+      if (!refresh) {
         setZoomedInPlot(props)
+        zoomedInPlotId.current = id
+        return
       }
-    }
-  }, [setZoomedInPlot, zoomedInPlot])
+
+      if (zoomedInPlotId.current === id) {
+        setZoomedInPlot(plot => (plot ? props : undefined))
+      }
+    },
+    [setZoomedInPlot]
+  )
 
   if (!data || !data.sectionCollapsed) {
     return <EmptyState>Loading Plots...</EmptyState>
