@@ -358,7 +358,7 @@ describe('App', () => {
               ...comparisonTableFixture,
               revisions: [
                 ...comparisonTableFixture.revisions,
-                { displayColor: '#333333', revision: newRevision }
+                { displayColor: '#945dd6', revision: newRevision }
               ]
             },
             sectionCollapsed: DEFAULT_SECTION_COLLAPSED
