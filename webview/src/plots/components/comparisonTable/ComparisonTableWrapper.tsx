@@ -1,5 +1,5 @@
 import { PlotsComparisonData, Section } from 'dvc/src/plots/webview/contract'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ComparisonTable } from './ComparisonTable'
 import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
@@ -14,8 +14,26 @@ export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
   comparisonTable,
   basicContainerProps
 }) => {
-  const allRevisions = comparisonTable.revisions?.map(rev => rev.revision) || []
+  const { revisions: revs, sectionName, size } = comparisonTable
+  const [allRevisions, setAllRevisions] = useState(
+    revs?.map(rev => rev.revision) || []
+  )
   const [selectedPlots, setSelectedPlots] = useState<string[]>(allRevisions)
+
+  useEffect(() => {
+    setAllRevisions(allRevs => {
+      const revisionStrings = revs?.map(rev => rev.revision)
+      const newRevisions = revisionStrings.filter(rev => !allRevs.includes(rev))
+      setSelectedPlots(plots => {
+        const filteredRevisions = plots.filter(plot =>
+          revisionStrings.includes(plot)
+        )
+        return [...filteredRevisions, ...newRevisions]
+      })
+
+      return revisionStrings || []
+    })
+  }, [revs, setAllRevisions, setSelectedPlots])
 
   const plots = comparisonTable.plots.filter(plot => {
     const plotRevisions = Object.values(plot.revisions)
@@ -29,22 +47,20 @@ export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
 
   return (
     <PlotsContainer
-      title={comparisonTable.sectionName}
+      title={sectionName}
       sectionKey={Section.COMPARISON_TABLE}
       menu={{
         plots: allRevisions,
         selectedPlots: selectedPlots,
         setSelectedPlots
       }}
-      currentSize={comparisonTable.size}
+      currentSize={size}
       {...basicContainerProps}
     >
       {plots.length > 0 ? (
         <ComparisonTable
           plots={plots}
-          revisions={comparisonTable.revisions.filter(rev =>
-            selectedPlots.includes(rev.revision)
-          )}
+          revisions={revs.filter(rev => selectedPlots.includes(rev.revision))}
         />
       ) : (
         <EmptyState isFullScreen={false}>No Revisions to Show</EmptyState>
