@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, SinonStub } from 'sinon'
+import { stub, restore, SinonStub, match } from 'sinon'
 import { window, commands, QuickPickItem } from 'vscode'
 import {
   buildExperiments,
@@ -174,9 +174,6 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      const duration = 54321
-      mockDuration(duration)
-
       stub(CliExecutor.prototype, 'experimentRunQueue').resolves('true')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
@@ -196,7 +193,7 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledWith(
         RegisteredCliCommands.QUEUE_EXPERIMENT,
         undefined,
-        { duration }
+        match.has('duration')
       )
     })
 
