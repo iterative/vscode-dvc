@@ -7,7 +7,6 @@ import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
-import { ExperimentFlag } from '../cli/constants'
 
 export abstract class BaseData<
   T extends PlotsOutput | ExperimentsOutput
@@ -115,5 +114,5 @@ export abstract class BaseData<
 
   abstract managedUpdate(path?: string): Promise<unknown>
 
-  abstract update(...args: ExperimentFlag[]): Promise<unknown>
+  abstract update(...args: unknown[]): Promise<unknown>
 }
