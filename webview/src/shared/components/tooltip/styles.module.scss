@@ -1,6 +1,7 @@
 :global(.tippy-box).menu {
   border-radius: 0;
   background-color: var(--vscode-menu-background);
+  font-family: var(--vscode-font-family);
   max-width: max-content;
   color: var(--vscode-menu-foreground);
   font-size: 0.8rem;

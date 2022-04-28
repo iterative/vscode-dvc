@@ -1,7 +1,6 @@
 * {
   box-sizing: border-box;
   outline: none;
-  font-family: 'monospace', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html,
@@ -27,6 +26,7 @@ body {
 
   background-color: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
+  font-family: 'monospace', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .modal-open {
