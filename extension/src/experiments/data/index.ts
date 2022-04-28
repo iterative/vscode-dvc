@@ -27,11 +27,19 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>
   ) {
-    super(dvcRoot, internalCommands, updatesPaused, [
-      'dvc.lock',
-      'dvc.yaml',
-      'params.yaml'
-    ])
+    super(
+      dvcRoot,
+      internalCommands,
+      updatesPaused,
+      [
+        {
+          name: 'partialUpdate',
+          process: () => this.update(ExperimentFlag.NO_FETCH)
+        },
+        { name: 'fullUpdate', process: () => this.update() }
+      ],
+      ['dvc.lock', 'dvc.yaml', 'params.yaml']
+    )
 
     this.watchExpGitRefs()
     this.managedUpdate(join('.dvc', 'tmp', 'exps'))

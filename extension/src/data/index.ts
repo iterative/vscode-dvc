@@ -15,7 +15,7 @@ export abstract class BaseData<
   public readonly onDidUpdate: Event<T>
 
   protected readonly dvcRoot: string
-  protected processManager: ProcessManager
+  protected readonly processManager: ProcessManager
   protected readonly internalCommands: InternalCommands
 
   private collectedFiles: string[] = []
@@ -38,24 +38,19 @@ export abstract class BaseData<
     dvcRoot: string,
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
+    processes: { name: string; process: () => Promise<unknown> }[] = [
+      {
+        name: 'update',
+        process: () => this.update()
+      }
+    ],
     staticFiles: string[] = []
   ) {
     super()
 
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager(
-        updatesPaused,
-        {
-          name: 'update',
-          process: () => this.update()
-        },
-        {
-          name: 'partialUpdate',
-          process: () => this.update(ExperimentFlag.NO_FETCH)
-        },
-        { name: 'fullUpdate', process: () => this.update() }
-      )
+      new ProcessManager(updatesPaused, ...processes)
     )
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
