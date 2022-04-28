@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
-import React, { useState } from 'react'
+import React from 'react'
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
 import { Theme } from '../shared/components/theme/Theme'
@@ -16,19 +16,12 @@ export default {
 } as Meta
 
 const Template: Story<ContextMenuProps> = () => {
-  const [menuOpen, setMenuOpen] = useState(false)
-
   return (
     <Theme>
-      <ContextMenu open={menuOpen} onClickOutside={() => setMenuOpen(false)}>
-        <span
-          onContextMenu={e => {
-            e.preventDefault()
-            setMenuOpen(true)
-          }}
-        >
+      <ContextMenu content={<div>Test</div>}>
+        <div>
           <Icon width={15} icon={AllIcons.LINES} />
-        </span>
+        </div>
       </ContextMenu>
     </Theme>
   )

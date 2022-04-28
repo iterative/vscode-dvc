@@ -1,30 +1,49 @@
 import React from 'react'
+import { Instance } from 'tippy.js'
 import Tooltip from '../tooltip/Tooltip'
 
+const positionContextMenuOnTrigger = (
+  instance: Instance,
+  event: PointerEvent
+) => {
+  event.preventDefault()
+  instance.setProps({
+    getReferenceClientRect() {
+      const { top, bottom, height } = instance.reference.getBoundingClientRect()
+      return {
+        bottom,
+        height,
+        left: event.clientX,
+        right: event.clientX,
+        top,
+        width: 0
+      } as DOMRect
+    }
+  })
+}
+
 export interface ContextMenuProps {
-  open: boolean
-  children?: React.ReactElement
-  content?: React.ReactNode
+  children: React.ReactElement
+  content: React.ReactNode
   disabled?: boolean
-  onClickOutside?: (event: Event) => void
+  onShow?: () => void
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
   children,
+  content,
   disabled,
-  open,
-  onClickOutside,
-  content
+  onShow
 }) => (
   <Tooltip
-    visible={open}
+    arrow
+    trigger={'contextmenu'}
     placement={'bottom'}
     interactive
-    disabled={disabled}
+    onTrigger={positionContextMenuOnTrigger}
     content={content}
-    onClickOutside={(_, event) =>
-      onClickOutside ? onClickOutside(event) : null
-    }
+    onShow={onShow}
+    disabled={disabled}
   >
     {children}
   </Tooltip>

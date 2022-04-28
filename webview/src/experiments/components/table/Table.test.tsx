@@ -153,7 +153,7 @@ describe('Table', () => {
 
     const clickOnSortOption = async (optionLabel: SortOrderLabel) => {
       const column = await findSortableColumn()
-      fireEvent.click(column, {
+      fireEvent.contextMenu(column, {
         bubbles: true
       })
       const columnMenu = await screen.findByRole('menu')

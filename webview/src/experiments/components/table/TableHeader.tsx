@@ -4,7 +4,7 @@ import {
   MetricOrParam,
   MetricOrParamType
 } from 'dvc/src/experiments/webview/contract'
-import React, { useState } from 'react'
+import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import {
@@ -23,8 +23,7 @@ const ColumnDragHandle: React.FC<{
   column: HeaderGroup<Experiment>
   provided: DraggableProvided
   snapshot: DraggableStateSnapshot
-  onClick: () => void
-}> = ({ provided, snapshot, column, onClick }) => {
+}> = ({ provided, snapshot, column }) => {
   return (
     <span
       ref={provided.innerRef}
@@ -37,7 +36,6 @@ const ColumnDragHandle: React.FC<{
         [styles.staticColumn]: !snapshot.isDragging,
         [styles.isDroppedColumn]: snapshot.isDropAnimating
       })}
-      onClick={onClick}
       onKeyDown={e => {
         e.stopPropagation()
       }}
@@ -57,10 +55,7 @@ const TableHeaderCell: React.FC<{
   provided: DraggableProvided
   snapshot: DraggableStateSnapshot
   menuDisabled: boolean
-  menuVisible: boolean
   menuContent: React.ReactNode
-  onMenuBlur: () => void
-  onClick: () => void
 }> = ({
   column,
   columns,
@@ -68,11 +63,8 @@ const TableHeaderCell: React.FC<{
   sortOrder,
   provided,
   snapshot,
-  menuDisabled,
-  menuVisible,
   menuContent,
-  onMenuBlur,
-  onClick
+  menuDisabled
 }) => {
   const isPlaceholder = !!column.placeholderOf
   const canResize = column.canResize && !isPlaceholder
@@ -104,12 +96,7 @@ const TableHeaderCell: React.FC<{
   }
 
   return (
-    <ContextMenu
-      disabled={menuDisabled}
-      content={menuContent}
-      open={menuVisible}
-      onClickOutside={onMenuBlur}
-    >
+    <ContextMenu content={menuContent} disabled={menuDisabled}>
       <div
         {...column.getHeaderProps(headerPropsArgs())}
         key={column.id}
@@ -119,7 +106,6 @@ const TableHeaderCell: React.FC<{
           column={column}
           provided={provided}
           snapshot={snapshot}
-          onClick={onClick}
         />
         {canResize && (
           <div
@@ -148,8 +134,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   index,
   orderedColumns
 }) => {
-  const [sortMenuVisible, setSortMenuVisible] = useState(false)
-
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
   const isDraggable =
@@ -157,9 +141,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     !['id', 'timestamp'].includes(column.id) &&
     !column.columns
   const isSortable = isDraggable
-
-  const showSortMenu = () => setSortMenuVisible(isSortable)
-  const hideSortMenu = () => setSortMenuVisible(false)
 
   const sortOrder: SortOrder = (() => {
     const possibleOrders = {
@@ -211,19 +192,11 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           provided={provided}
           snapshot={snapshot}
           menuDisabled={!isSortable}
-          menuVisible={sortMenuVisible}
-          onMenuBlur={hideSortMenu}
-          onClick={() => {
-            if (!snapshot.isDragging) {
-              showSortMenu()
-            }
-          }}
           menuContent={
             <SortPicker
               sortOrder={sortOrder}
               setSelectedOrder={order => {
                 setColumnSort(order)
-                hideSortMenu()
               }}
             />
           }

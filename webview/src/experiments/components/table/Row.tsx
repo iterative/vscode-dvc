@@ -1,4 +1,4 @@
-import React, { EventHandler, SyntheticEvent, useState } from 'react'
+import React, { EventHandler, SyntheticEvent } from 'react'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -38,9 +38,6 @@ export const RowContent: React.FC<
   className,
   changes
 }): JSX.Element => {
-  const [menuOptions, setMenuOptions] = useState<SelectMenuOptionProps[]>([])
-  const [menuOpen, setMenuOpen] = useState(false)
-
   const { queued, running, displayColor } = original
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
@@ -52,43 +49,40 @@ export const RowContent: React.FC<
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
     })
   }
-  const invokeContextMenu: EventHandler<SyntheticEvent> = e => {
-    e.preventDefault()
-    e.stopPropagation()
 
+  const contextMenuOptions = (() => {
     const menuOptions: SelectMenuOptionProps[] = []
 
-    if (depth > 0) {
-      if (!queued) {
-        menuOptions.push(
-          {
-            id: MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE,
-            label: 'Apply to Workspace'
-          },
-          {
-            id: MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT,
-            label: 'Create New Branch'
-          }
-        )
-      }
-
-      if (depth === 1) {
-        menuOptions.push(
-          {
-            id: MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED,
-            label: 'Vary Param(s) and Queue'
-          },
-          {
-            id: MessageFromWebviewType.EXPERIMENT_REMOVED,
-            label: 'Remove Experiment'
-          }
-        )
-      }
+    if (!queued) {
+      menuOptions.push(
+        {
+          id: MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE,
+          label: 'Apply to Workspace'
+        },
+        {
+          id: MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT,
+          label: 'Create New Branch'
+        }
+      )
     }
 
-    setMenuOptions(menuOptions)
-    setMenuOpen(true)
+    if (depth === 1) {
+      menuOptions.push(
+        {
+          id: MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED,
+          label: 'Vary Param(s) and Queue'
+        },
+        {
+          id: MessageFromWebviewType.EXPERIMENT_REMOVED,
+          label: 'Remove Experiment'
+        }
+      )
+    }
 
+    return menuOptions
+  })()
+
+  const invokeContextMenu = () => {
     sendMessage({
       payload: { depth, id, queued, running },
       type: MessageFromWebviewType.CONTEXT_MENU_INVOKED
@@ -103,9 +97,11 @@ export const RowContent: React.FC<
   }
   return (
     <ContextMenu
-      content={<SelectMenu options={menuOptions} onClick={contextMenuAction} />}
-      open={menuOpen}
-      onClickOutside={() => setMenuOpen(false)}
+      disabled={contextMenuOptions.length === 0}
+      onShow={invokeContextMenu}
+      content={
+        <SelectMenu options={contextMenuOptions} onClick={contextMenuAction} />
+      }
     >
       <div
         {...getRowProps({
