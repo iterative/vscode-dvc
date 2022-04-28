@@ -10,6 +10,7 @@ import {
   quickPickInitialized,
   selectQuickPickItem
 } from './util'
+import { mockHasCheckpoints } from './experiments/util'
 import { WEBVIEW_TEST_TIMEOUT } from './timeouts'
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
@@ -224,6 +225,7 @@ suite('Extension Test Suite', () => {
         .onSecondCall()
         .resolves([Uri.file(resolve('path', 'to', 'dvc'))])
 
+      mockHasCheckpoints(expShowFixture)
       const mockExpShow = stub(CliReader.prototype, 'experimentShow').resolves(
         expShowFixture
       )
@@ -311,12 +313,12 @@ suite('Extension Test Suite', () => {
           cliAccessible: true,
           dvcPathUsed: true,
           dvcRootCount: 1,
-          hasCheckpoints: 0,
+          hasCheckpoints: 1,
           images: 3,
           metrics: 4,
           msPythonInstalled: false,
           msPythonUsed: false,
-          noCheckpoints: 1,
+          noCheckpoints: 0,
           params: 8,
           pythonPathUsed: false,
           templates: 3,
