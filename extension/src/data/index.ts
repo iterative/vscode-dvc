@@ -37,19 +37,14 @@ export abstract class BaseData<
     dvcRoot: string,
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
-    processes: { name: string; process: () => Promise<unknown> }[] = [
-      {
-        name: 'update',
-        process: () => this.update()
-      }
-    ],
+    updateProcesses: { name: string; process: () => Promise<unknown> }[],
     staticFiles: string[] = []
   ) {
     super()
 
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager(updatesPaused, ...processes)
+      new ProcessManager(updatesPaused, ...updateProcesses)
     )
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
@@ -113,6 +108,4 @@ export abstract class BaseData<
   abstract collectFiles(data: T): string[]
 
   abstract managedUpdate(path?: string): Promise<unknown>
-
-  abstract update(...args: unknown[]): Promise<unknown>
 }

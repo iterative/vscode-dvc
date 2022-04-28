@@ -1,5 +1,6 @@
+import { EventEmitter } from 'vscode'
 import { PlotsOutput } from '../../cli/reader'
-import { AvailableCommands } from '../../commands/internal'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
 import {
   definedAndNonEmpty,
@@ -10,6 +11,19 @@ import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<PlotsOutput> {
   private model?: PlotsModel
+
+  constructor(
+    dvcRoot: string,
+    internalCommands: InternalCommands,
+    updatesPaused: EventEmitter<boolean>
+  ) {
+    super(dvcRoot, internalCommands, updatesPaused, [
+      {
+        name: 'update',
+        process: () => this.update()
+      }
+    ])
+  }
 
   public async update(): Promise<void> {
     const revisions = flattenUnique([
