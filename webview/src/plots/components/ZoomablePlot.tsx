@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, MouseEvent } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import styles from './styles.module.scss'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
@@ -31,7 +31,12 @@ export const ZoomablePlot: React.FC<ZoomablePlotOwnProps> = ({
     }
   }, [plotProps, id, renderZoomedInPlot])
 
-  const handleOnClick = () => renderZoomedInPlot(plotProps, id)
+  const handleOnClick = (e: MouseEvent<HTMLButtonElement>) => {
+    const target = e.target as Element
+    if (![target.tagName, target.parentElement?.tagName].includes('SUMMARY')) {
+      renderZoomedInPlot(plotProps, id)
+    }
+  }
 
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
