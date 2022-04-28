@@ -21,7 +21,7 @@ import { ExperimentsOutput } from '../../cli/reader'
 import { BaseData } from '../../data'
 import { ExperimentFlag } from '../../cli/constants'
 
-const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
+export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   constructor(
