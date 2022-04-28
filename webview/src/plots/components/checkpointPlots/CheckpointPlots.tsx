@@ -47,6 +47,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       const key = `plot-${title}`
       const spec = createSpec(title, colors)
       const plotProps = {
+        actions: false,
         config,
         data: { values },
         'data-testid': `${key}-vega`,

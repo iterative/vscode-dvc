@@ -65,6 +65,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     const { id, content, multiView, revisions } = plot
     const nbRevisions = (multiView && revisions?.length) || 1
     const plotProps = {
+      actions: false,
       config,
       renderer: 'svg',
       spec: { ...content, ...autoSize }

@@ -115,7 +115,7 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
         {zoomedInPlot && (
           <Modal onClose={handleModalClose}>
             <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
-              <VegaLite {...zoomedInPlot} />
+              <VegaLite {...zoomedInPlot} actions />
             </div>
           </Modal>
         )}
