@@ -207,15 +207,12 @@ suite('Extension Test Suite', () => {
       const firstDisposal = disposalEvent()
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const secondTelemetryEventSent = new Promise(resolve =>
-        mockSendTelemetryEvent
-          .onFirstCall()
-          .returns(undefined)
-          .onSecondCall()
-          .callsFake(() => {
+      const correctTelemetryEventSent = new Promise(resolve =>
+        mockSendTelemetryEvent.callsFake((eventName: string) => {
+          if (eventName === EventName.EXTENSION_EXECUTION_DETAILS_CHANGED) {
             resolve(undefined)
-            return undefined
-          })
+          }
+        })
       )
 
       const mockUri = Uri.file(resolve('file', 'picked', 'path', 'to', 'dvc'))
@@ -227,12 +224,14 @@ suite('Extension Test Suite', () => {
         .onSecondCall()
         .resolves([Uri.file(resolve('path', 'to', 'dvc'))])
 
-      const mockExperimentShow = stub(
-        CliReader.prototype,
-        'experimentShow'
-      ).resolves(expShowFixture)
+      const mockExpShow = stub(CliReader.prototype, 'experimentShow').resolves(
+        expShowFixture
+      )
 
-      stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
+      const mockList = stub(
+        CliReader.prototype,
+        'listDvcOnlyRecursive'
+      ).resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
         { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
@@ -287,7 +286,7 @@ suite('Extension Test Suite', () => {
         mockPath
       )
 
-      await Promise.all([firstDisposal, secondTelemetryEventSent])
+      await Promise.all([firstDisposal, correctTelemetryEventSent])
 
       expect(mockShowOpenDialog, 'should show the open dialog').to.have.been
         .called
@@ -295,11 +294,13 @@ suite('Extension Test Suite', () => {
         mockCanRunCli,
         'should have checked to see if the cli could be run with the given execution details'
       ).to.have.been.called
+      expect(mockList, 'should have updated the repository data').to.have.been
+        .called
       expect(mockDiff, 'should have updated the repository data').to.have.been
         .called
       expect(mockStatus).to.have.been.called
-      expect(mockExperimentShow, 'should have updated the experiments data').to
-        .have.been.called
+      expect(mockExpShow, 'should have updated the experiments data').to.have
+        .been.called
 
       expect(
         mockSendTelemetryEvent,
@@ -423,7 +424,7 @@ suite('Extension Test Suite', () => {
 
       const mockVersion = stub(CliReader.prototype, 'version')
         .onFirstCall()
-        .resolves('2.9.3')
+        .resolves('1.0.0')
         .onSecondCall()
         .resolves(MIN_CLI_VERSION)
         .onThirdCall()
