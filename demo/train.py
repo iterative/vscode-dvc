@@ -1,36 +1,14 @@
 """Model training and evaluation."""
 import json
-from ruamel.yaml import YAML
 import os
+
+import numpy as np
 import torch
 import torch.nn.functional as F
 import torchvision
+
 from dvclive import Live
-import matplotlib.pyplot as plt
-import numpy as np
-
-live = Live()
-
-EPOCHS = 9
-
-class ConvNet(torch.nn.Module):
-    """Toy convolutional neural net."""
-    def __init__(self):
-        super().__init__()
-        self.conv1 = torch.nn.Conv2d(1, 8, 3, padding=1)
-        self.maxpool1 = torch.nn.MaxPool2d(2)
-        self.conv2 = torch.nn.Conv2d(8, 16, 3, padding=1)
-        self.dense1 = torch.nn.Linear(16*14*14, 32)
-        self.dense2 = torch.nn.Linear(32, 10)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = self.maxpool1(x)
-        x = F.relu(self.conv2(x))
-        x = x.view(-1, 16*14*14)
-        x = F.relu(self.dense1(x))
-        x = self.dense2(x)
-        return x
+from ruamel.yaml import YAML
 
 
 def transform(dataset):
@@ -61,24 +39,6 @@ def predict(model, x):
     return y_pred
 
 
-def write_heatmap(actual,predicted):
-    d = 'plots'
-    os.makedirs(d,exist_ok=True)
-    heatmap, xedges, yedges = np.histogram2d(
-      actual, 
-      predicted, 
-      density=True,
-      bins=20
-    )
-    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-
-    plt.clf()
-    plt.imshow(heatmap.T, extent=extent, origin='lower')
-    plt.xlabel('actual')
-    plt.ylabel('predicted')
-    plt.savefig(os.path.join(d, 'heatmap.png'))
-
-
 def get_metrics(y, y_pred, y_pred_label):
     """Get loss and accuracy metrics."""
     metrics = {}
@@ -101,37 +61,103 @@ def evaluate(model, x, y):
     with open("predictions.json", "w") as f:
         json.dump(predictions, f)
 
-    write_heatmap(actual,predicted)
     metrics = get_metrics(y, scores, labels)
 
-    return metrics
+    return metrics, predictions
+
+def get_confusion_image(predictions, dataset):
+    confusion = {}
+    for n, pred in enumerate(predictions):
+        actual = pred["actual"]
+        predicted = pred["predicted"]
+        image = np.array(dataset[n][0]) / 255
+        confusion[(actual, predicted)] = image
+
+    max_i, max_j = 0, 0
+    for (i, j) in confusion:
+        if i > max_i:
+            max_i = i
+        if j > max_j:
+            max_j = j
+
+    frame_size = 30
+    image_shape = (28, 28)
+    incorrect_color = np.array((255, 100, 100), dtype="uint8")
+    label_color = np.array((100, 100, 240), dtype="uint8")
+
+    out_matrix = np.ones(shape=((max_i+2) * frame_size, (max_j+2) * frame_size, 3), dtype="uint8") * 240
+
+    for i in range(max_i+1):
+        if (i, i) in confusion:
+            image = confusion[(i, i)]
+            xs = (i + 1) * frame_size + 1
+            xe = (i + 2) * frame_size - 1
+            ys = 1
+            ye = frame_size - 1
+            for c in range(3):
+                out_matrix[xs:xe, ys:ye, c] = (1 - image) * label_color[c]
+                out_matrix[ys:ye, xs:xe, c] = (1 - image) * label_color[c]
+
+    for (i, j) in confusion:
+        image = confusion[(i, j)]
+        assert image.shape == image_shape
+        xs = (i + 1) * frame_size + 1
+        xe = (i + 2) * frame_size - 1
+        ys = (j + 1) * frame_size + 1
+        ye = (j + 2) * frame_size - 1
+        assert (xe-xs, ye-ys) == image_shape
+        if i != j:
+            for c in range(3):
+                out_matrix[xs:xe, ys:ye, c] = (1 - image) * incorrect_color[c]
+
+    return out_matrix
 
 
 def main():
     """Train model and evaluate on test data."""
-    model = ConvNet()
+    torch.manual_seed(473987)
+
+    model = torch.nn.Sequential(
+        torch.nn.Flatten(),
+        torch.nn.Linear(28 * 28, 128),
+        torch.nn.ReLU(),
+        torch.nn.Dropout(0.1),
+        torch.nn.Linear(128, 64),
+        torch.nn.ReLU(),
+        torch.nn.Dropout(0.1),
+        torch.nn.Linear(64, 10),
+    )
+    live = Live("training_metrics")
+
     # Load model.
     if os.path.exists("model.pt"):
         model.load_state_dict(torch.load("model.pt"))
+
     # Load params.
     yaml = YAML(typ="safe")
     with open("params.yaml") as f:
         params = yaml.load(f)
-    torch.manual_seed(params["seed"])
+
     # Load train and test data.
     mnist_train = torchvision.datasets.MNIST("data", download=True)
     x_train, y_train = transform(mnist_train)
     mnist_test = torchvision.datasets.MNIST("data", download=True, train=False)
     x_test, y_test = transform(mnist_test)
+
     # Iterate over training epochs.
-    for i in range(1, EPOCHS+1):
+    for epoch in range(params["epochs"]):
+        print(f"EPOCH: {epoch + 1} / {params['epochs']}")
         train(model, x_train, y_train, params["lr"], params["weight_decay"])
         torch.save(model.state_dict(), "model.pt")
         # Evaluate and checkpoint.
-        metrics = evaluate(model, x_test, y_test)
+        metrics, predictions = evaluate(model, x_test, y_test)
         for k, v in metrics.items():
             live.log(k, v)
         live.next_step()
+
+    live.set_step(None)
+    missclassified = get_confusion_image(predictions, mnist_test)
+    live.log_image("missclassified.jpg", missclassified)
 
 
 if __name__ == "__main__":
