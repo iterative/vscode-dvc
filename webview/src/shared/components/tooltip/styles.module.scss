@@ -20,7 +20,6 @@ $background: var(--vscode-menu-background);
   & > :global(.tippy-content) {
     background-color: $background;
     box-shadow: $vscode-shadow;
-    padding: 2px 6px;
     z-index: 1;
   }
 }
