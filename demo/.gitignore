@@ -1,7 +1,7 @@
-/model.pt
-/data/MNIST/processed
 /.vscode/settings.json
-/.env
-/logs
-/logs_dvc_plots
-/plots
+.env
+/model.pt
+/training_metrics.json
+/training_metrics
+/misclassified.jpg
+/predictions.json

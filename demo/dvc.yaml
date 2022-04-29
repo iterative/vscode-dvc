@@ -5,20 +5,17 @@ stages:
     - data/MNIST
     - train.py
     params:
-    - seed
-    - lr
-    - weight_decay
+    - params.yaml:
     outs:
     - model.pt:
         checkpoint: true
+    metrics:
+      - training_metrics.json:
+          persist: true
     plots:
-    - plots
+    - training_metrics
+    - misclassified.jpg
     - predictions.json:
-        cache: false
         template: confusion
         x: actual
         y: predicted
-    live:
-      logs:
-        summary: true
-        html: true
