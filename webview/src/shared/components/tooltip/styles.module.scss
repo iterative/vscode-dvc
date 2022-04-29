@@ -23,6 +23,7 @@ $background: var(--vscode-menu-background);
     }
   }
   & > :global(.tippy-content) {
+    white-space: nowrap;
     padding: 0;
     background-color: $background;
     box-shadow: $vscode-shadow;
