@@ -5,6 +5,7 @@
     "**/*.test.*",
     "**/constants.ts",
     "**/contract.ts",
+    "demo/**",
     "extension/src/test/**",
     "webview/src/react-table-config.d.ts",
     "webview/src/shared/components/icons/**"

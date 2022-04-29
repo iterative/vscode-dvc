@@ -77,7 +77,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     menuItems.push({
       icon: AllIcons.LINES,
       onClickNode: <PlotsPicker {...menu} />,
-      tooltip: 'Choose metrics'
+      tooltip: 'Select Plots'
     })
   }
 

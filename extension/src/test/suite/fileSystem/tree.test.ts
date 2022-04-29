@@ -188,7 +188,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
     })
 
     it('should be able to open a file', async () => {
-      const fileToOpen = join(dvcDemoPath, 'logs.html')
+      const fileToOpen = join(dvcDemoPath, 'train.py')
       expect(getActiveTextEditorFilename()).not.to.equal(fileToOpen)
       const uri = Uri.file(fileToOpen)
 
@@ -204,7 +204,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to open a file to the side', async () => {
-      const fileToOpen = join(dvcDemoPath, 'logs.json')
+      const fileToOpen = join(dvcDemoPath, 'requirements.txt')
       expect(getActiveTextEditorFilename()).not.to.equal(fileToOpen)
 
       const activeEditorChanged = activeTextEditorChangedEvent(disposable)
@@ -236,7 +236,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to compare two files', async () => {
       const baseline = Uri.file(join(dvcDemoPath, 'logs.json'))
-      const comparison = Uri.file(join(dvcDemoPath, 'logs.html'))
+      const comparison = Uri.file(join(dvcDemoPath, 'requirements.txt'))
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(
