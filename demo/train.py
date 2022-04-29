@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import torchvision
 
 from dvclive import Live
+from PIL import Image
 from ruamel.yaml import YAML
 
 
@@ -153,11 +154,9 @@ def main():
         metrics, predictions = evaluate(model, x_test, y_test)
         for k, v in metrics.items():
             live.log(k, v)
+        missclassified = get_confusion_image(predictions, mnist_test)
+        Image.fromarray(missclassified).save("misclassified.jpg")
         live.next_step()
-
-    live.set_step(None)
-    missclassified = get_confusion_image(predictions, mnist_test)
-    live.log_image("missclassified.jpg", missclassified)
 
 
 if __name__ == "__main__":
