@@ -289,3 +289,22 @@ $gap: 20px;
   width: 80vw;
   height: calc(80vh - 100px);
 }
+
+:global(.has-actions) {
+  summary {
+    background: $fg-color !important;
+  }
+}
+
+:global(.vega-actions) {
+  background: $fg-color !important;
+
+  &::before,
+  &::after {
+    border-bottom-color: $fg-color !important;
+  }
+
+  a:hover {
+    background-color: var(--editor-background-transparency-1) !important;
+  }
+}
