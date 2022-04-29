@@ -3,7 +3,7 @@ import { getThemeValue, ThemeProperty } from '../../util/styles'
 
 const foregroundColor = getThemeValue(ThemeProperty.FOREGROUND_COLOR)
 const backgroundColor = 'var(--vscode-editor-foreground-transparency-1)'
-const font = getThemeValue(ThemeProperty.FONT_FAMILY)
+const font = 'var(--vscode-editor-font-family)'
 const fontWeight = 'normal' as FontWeight
 
 const title = {
