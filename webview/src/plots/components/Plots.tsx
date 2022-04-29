@@ -2,6 +2,7 @@ import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
@@ -12,6 +13,7 @@ import { Modal } from '../../shared/components/modal/Modal'
 import { Theme } from '../../shared/components/theme/Theme'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { sendMessage } from '../../shared/vscode'
+import { getThemeValue, ThemeProperty } from '../../util/styles'
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const Plots = ({ state }: { state: PlotsWebviewState }) => {
@@ -115,7 +117,19 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
         {zoomedInPlot && (
           <Modal onClose={handleModalClose}>
             <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
-              <VegaLite {...zoomedInPlot} />
+              <VegaLite
+                {...zoomedInPlot}
+                config={{
+                  ...(zoomedInPlot.config as Config),
+                  background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
+                }}
+                actions={{
+                  compiled: false,
+                  editor: false,
+                  export: true,
+                  source: false
+                }}
+              />
             </div>
           </Modal>
         )}
