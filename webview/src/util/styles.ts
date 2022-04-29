@@ -8,7 +8,9 @@ export const withScale = (scale: number) =>
 
 export enum ThemeProperty {
   BACKGROUND_COLOR = '--vscode-editor-background',
-  FOREGROUND_COLOR = '--vscode-editor-foreground'
+  FOREGROUND_COLOR = '--vscode-editor-foreground',
+  FONT_FAMILY = '--vscode-editor-font-family',
+  MENU_BACKGROUND = '--vscode-menu-background'
 }
 
 export const getThemeValue = (property: ThemeProperty) =>
