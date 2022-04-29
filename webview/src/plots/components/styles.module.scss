@@ -277,6 +277,14 @@ $gap: 20px;
   }
 }
 
+.zoomablePlot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+}
+
 .zoomedInPlot {
   width: 80vw;
   height: calc(80vh - 100px);
