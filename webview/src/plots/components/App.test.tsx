@@ -1019,7 +1019,7 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const [plot] = screen.getAllByTestId(/^plot_/)
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
 
     fireEvent.click(plot)
 
@@ -1034,7 +1034,7 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const [plot] = screen.getAllByTestId(/^plot-/)
+    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByRole('button')
 
     fireEvent.click(plot)
 
@@ -1051,6 +1051,8 @@ describe('App', () => {
 
     const [plot] = screen.getAllByAltText(/^Plot of/)
 
+    expect(within(plot).queryByRole('button')).not.toBeInTheDocument()
+
     fireEvent.click(plot)
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -1062,7 +1064,7 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const [plot] = screen.getAllByTestId(/^plot_/)
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
 
     fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal'))
@@ -1081,7 +1083,7 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const [plot] = screen.getAllByTestId(/^plot_/)
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
 
     fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal-content'))
