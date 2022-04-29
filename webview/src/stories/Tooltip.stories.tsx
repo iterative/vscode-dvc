@@ -32,7 +32,6 @@ const Template: Story = args => (
       <div
         style={{
           backgroundColor: 'black',
-          border: '1px dashed gray',
           display: 'inline-block',
           padding: '0.5em'
         }}
