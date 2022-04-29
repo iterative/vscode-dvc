@@ -1,6 +1,7 @@
 import { Config, FontWeight } from 'vega'
+import { getThemeValue, ThemeProperty } from '../../util/styles'
 
-const foregroundColor = 'var(--vscode-foreground)'
+const foregroundColor = getThemeValue(ThemeProperty.FOREGROUND_COLOR)
 const backgroundColor = 'var(--vscode-editor-foreground-transparency-1)'
 const font = 'var(--vscode-editor-font-family)'
 const fontWeight = 'normal' as FontWeight
