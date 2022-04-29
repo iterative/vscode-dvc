@@ -8,25 +8,27 @@ stages:
       size: 66544866
       nfiles: 10
     - path: train.py
-      md5: 3e52f9876bad40d131d536c9ef9f09b8
-      size: 4842
+      md5: 34dbe90b0ca07573e5757a71d71b238f
+      size: 4852
     params:
       params.yaml:
         epochs: 15
         lr: 0.003
         weight_decay: 0
     outs:
-    - path: missclassified.jpg
+    - path: misclassified.jpg
+      md5: 36ae1405cda9fb04d23b3db3e9184ff5
+      size: 32459
     - path: model.pt
-      md5: c7a5760efd52d3759d8e546ab867f4a6
+      md5: f382c168aebd0614ddd50c2982eeda85
       size: 439383
     - path: predictions.json
-      md5: 77955a85635a5273fd80ea4cfeca5822
+      md5: a06154363691202fee0ba7c88405e69f
       size: 310000
     - path: training_metrics
-      md5: 9ad74f1e8e0760fc5108bd684b2cd281.dir
-      size: 45614
-      nfiles: 4
+      md5: 2e717e7ebb5348a27ec27999490dbd44.dir
+      size: 12890
+      nfiles: 3
     - path: training_metrics.json
-      md5: 1d702331f65c5bc23c7552306d2d3861
+      md5: 991720a146a2b2575d60e9e17d447df8
       size: 69
