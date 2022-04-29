@@ -1,6 +1,7 @@
 $vscode-shadow: var(--vscode-widget-shadow) 0px 0px 8px 2px;
 $foreground: var(--vscode-menu-foreground);
 $background: var(--vscode-menu-background);
+$font: var(--vscode-font-family);
 
 :global(.tippy-box).padded {
   & > :global(.tippy-content) {
@@ -8,9 +9,8 @@ $background: var(--vscode-menu-background);
   }
 }
 :global(.tippy-box) {
-  font-family: var(--vscode-font-family);
+  font-family: $font;
   max-width: max-content;
-  color: $foreground;
   font-size: 0.8rem;
   transition: none;
   white-space: nowrap;
@@ -23,6 +23,7 @@ $background: var(--vscode-menu-background);
     }
   }
   & > :global(.tippy-content) {
+    color: $foreground;
     white-space: nowrap;
     padding: 0;
     background-color: $background;
