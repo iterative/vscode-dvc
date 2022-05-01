@@ -7,8 +7,8 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { CheckpointPlots } from './CheckpointPlots'
 import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
-import { ZoomablePlotProps } from '../templatePlots/util'
 import { sendMessage } from '../../../shared/vscode'
+import { ZoomablePlotProps } from '../ZoomablePlot'
 
 interface CheckpointPlotsWrapperProps extends ZoomablePlotProps {
   checkpointPlots: CheckpointPlotsData
@@ -21,7 +21,7 @@ const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
 export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
   checkpointPlots,
   basicContainerProps,
-  onPlotClick
+  renderZoomedInPlot
 }) => {
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
@@ -57,7 +57,7 @@ export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
           selectedPlots?.includes(plot.title)
         )}
         colors={checkpointPlots.colors}
-        onPlotClick={onPlotClick}
+        renderZoomedInPlot={renderZoomedInPlot}
       />
     </PlotsContainer>
   )
