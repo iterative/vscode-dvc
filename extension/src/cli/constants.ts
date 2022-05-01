@@ -44,6 +44,7 @@ export enum ExperimentSubCommand {
 }
 
 export enum ExperimentFlag {
+  NO_FETCH = '--no-fetch',
   QUEUE = '--queue',
   RESET = '--reset',
   RUN_ALL = '--run-all'
