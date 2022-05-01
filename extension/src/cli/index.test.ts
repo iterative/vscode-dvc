@@ -84,7 +84,7 @@ describe('executeProcess', () => {
     expect(mockedCreateProcess).toBeCalledWith({
       args,
       cwd,
-      env: { ...processEnv, DVC_NO_ANALYTICS: 'true' },
+      env: { ...processEnv, DVCLIVE_OPEN: 'false', DVC_NO_ANALYTICS: 'true' },
       executable: 'dvc'
     })
   })
@@ -124,6 +124,7 @@ describe('executeProcess', () => {
       args,
       cwd,
       env: {
+        DVCLIVE_OPEN: 'false',
         DVC_NO_ANALYTICS: 'true',
         PATH: joinEnvPath('/some/path/to', existingPath),
         SECRET_KEY

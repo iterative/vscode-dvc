@@ -22,6 +22,7 @@ const mockedDisposable = jest.mocked(Disposable)
 const mockedCreateProcess = jest.mocked(createProcess)
 const mockedGetProcessEnv = jest.mocked(getProcessEnv)
 const mockedEnv = {
+  DVCLIVE_OPEN: 'false',
   DVC_NO_ANALYTICS: 'true',
   PATH: '/all/of/the/goodies:/in/my/path'
 }
