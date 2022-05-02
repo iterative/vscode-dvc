@@ -130,28 +130,38 @@ $gap: 20px;
 .plot {
   aspect-ratio: 4 / 3;
   overflow: visible;
-  padding: 10px 10px 10px 30px;
+  padding: 20px 10px 10px 10px;
   cursor: grab;
   position: relative;
   border-radius: 5px;
   background: var(--editor-foreground-transparency-1);
   border: none;
 
+  .plotGripIcon {
+    position: absolute;
+    z-index: 2;
+    fill: $fg-color;
+    left: 0;
+    top: 0;
+    padding: 5px;
+    width: 100%;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    opacity: 0;
+
+    path {
+      transform: rotate(90deg);
+      transform-origin: center;
+    }
+  }
+
   &:hover {
     z-index: 2;
-  }
-}
 
-.plotGripIcon {
-  position: absolute;
-  z-index: 2;
-  fill: $fg-color;
-  left: 0;
-  top: 0;
-  padding: 5px;
-  height: 100%;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
+    .plotGripIcon {
+      opacity: 0.5;
+    }
+  }
 }
 
 .plot img,
