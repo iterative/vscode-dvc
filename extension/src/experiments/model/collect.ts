@@ -12,7 +12,7 @@ import { addToMapArray } from '../../util/map'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
 
-const getShortSha = (sha: string) => sha.slice(0, 7)
+export const getShortSha = (sha: string) => sha.slice(0, 7)
 
 export const isCheckpoint = (
   checkpointTip: string | undefined,

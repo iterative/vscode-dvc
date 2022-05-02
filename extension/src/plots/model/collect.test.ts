@@ -1,11 +1,14 @@
 import { join } from 'path'
 import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
+import cloneDeep from 'lodash.clonedeep'
+import merge from 'lodash.merge'
 import {
   collectData,
   collectCheckpointPlotsData,
   collectTemplates,
-  collectMetricOrder
+  collectMetricOrder,
+  collectRunningWorkspaceCheckpoint
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
@@ -66,6 +69,34 @@ describe('collectCheckpointPlotsData', () => {
   it('should return undefined given no input', () => {
     const data = collectCheckpointPlotsData({} as ExperimentsOutput)
     expect(data).toBeUndefined()
+  })
+})
+
+describe('collectRunningWorkspaceCheckpoint', () => {
+  const fixtureCopy = cloneDeep(expShowFixture)
+  const runningCheckpointFixture: ExperimentsOutput = merge(fixtureCopy, {
+    '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
+      '4fb124aebddb2adf1545030907687fa9a4c80e70': {
+        data: {
+          executor: 'workspace'
+        }
+      }
+    }
+  })
+
+  it('should return the expected sha from the test fixture', () => {
+    const checkpointRunningInTheWorkspace = collectRunningWorkspaceCheckpoint(
+      runningCheckpointFixture,
+      true
+    )
+
+    expect(checkpointRunningInTheWorkspace).toStrictEqual('4fb124a')
+  })
+
+  it('should always return undefined when there are no checkpoints', () => {
+    expect(
+      collectRunningWorkspaceCheckpoint(runningCheckpointFixture, false)
+    ).toBeUndefined()
   })
 })
 
@@ -232,6 +263,50 @@ describe('collectData', () => {
         sameContents(revisions as string[], ['1ba7bcd'])
       )
     )
+  })
+
+  it('should overwrite the workspace entry with the data from a checkpoint running in the workspace', () => {
+    const checkpointRunningInTheWorkspace = '42b8736'
+
+    const { revisionData, comparisonData } = collectData(
+      plotsDiffFixture,
+      checkpointRunningInTheWorkspace
+    )
+    const revisions = [
+      'main',
+      checkpointRunningInTheWorkspace,
+      'workspace',
+      '1ba7bcd',
+      '4fb124a'
+    ]
+
+    const values =
+      (logsLossPlot?.datapoints as {
+        [revision: string]: Record<string, unknown>[]
+      }) || {}
+
+    expect(isEmpty(values)).toBeFalsy()
+
+    const overwriteRevisions = values[checkpointRunningInTheWorkspace].map(
+      value => ({
+        ...value,
+        rev: 'workspace'
+      })
+    )
+
+    for (const revision of revisions) {
+      const expectedValues = values[revision].map(value => ({
+        ...value,
+        rev: revision
+      }))
+      expect(revisionData[revision][logsLossPath]).toStrictEqual(
+        revision === 'workspace' ? overwriteRevisions : expectedValues
+      )
+    }
+
+    expect(Object.keys(revisionData)).toStrictEqual(revisions)
+
+    expect(comparisonData.workspace).toStrictEqual(comparisonData['42b8736'])
   })
 })
 

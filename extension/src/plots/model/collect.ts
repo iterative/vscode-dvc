@@ -14,6 +14,7 @@ import {
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
+  ExperimentsBranchOutput,
   ExperimentsOutput,
   PlotsOutput,
   Value,
@@ -29,6 +30,7 @@ import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
+import { getShortSha } from '../../experiments/model/collect'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -220,6 +222,35 @@ export const collectCheckpointPlotsData = (
   return plotsData
 }
 
+const isRunningInWorkspace = (experiment: ExperimentFieldsOrError) =>
+  experiment.data?.executor === 'workspace'
+
+const collectRunningFromBranch = (
+  experimentsObject: ExperimentsBranchOutput
+): string | undefined => {
+  for (const [sha, experiment] of Object.entries(experimentsObject)) {
+    if (isRunningInWorkspace(experiment)) {
+      return getShortSha(sha)
+    }
+  }
+}
+
+export const collectRunningWorkspaceCheckpoint = (
+  data: ExperimentsOutput,
+  hasCheckpoints: boolean
+): string | undefined => {
+  if (!hasCheckpoints) {
+    return
+  }
+  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
+    const checkpointRunningInWorkspace =
+      collectRunningFromBranch(experimentsObject)
+    if (checkpointRunningInWorkspace) {
+      return checkpointRunningInWorkspace
+    }
+  }
+}
+
 type MetricOrderAccumulator = {
   newOrder: string[]
   uncollectedMetrics: string[]
@@ -289,16 +320,20 @@ export type ComparisonData = {
   }
 }
 
+const shouldSkipRev = (
+  rev: string | undefined,
+  workspaceRunningCheckpoint?: string
+): boolean => !!(!rev || (rev === 'workspace' && workspaceRunningCheckpoint))
+
 const collectImageData = (
   acc: ComparisonData,
   path: string,
-  plot: ImagePlot
+  plot: ImagePlot,
+  workspaceRunningCheckpoint?: string
 ) => {
-  const rev = Array.isArray(plot.revisions)
-    ? plot.revisions?.[0]
-    : plot.revisions
+  const rev = plot.revisions?.[0] as string
 
-  if (!rev) {
+  if (shouldSkipRev(rev, workspaceRunningCheckpoint)) {
     return
   }
 
@@ -307,6 +342,14 @@ const collectImageData = (
   }
 
   acc[rev][path] = plot
+
+  if (rev === workspaceRunningCheckpoint) {
+    if (!acc.workspace) {
+      acc.workspace = {}
+    }
+
+    acc.workspace[path] = plot
+  }
 }
 
 const collectDatapoints = (
@@ -315,23 +358,49 @@ const collectDatapoints = (
   rev: string,
   values: Record<string, unknown>[] = []
 ) => {
+  if (!acc[rev]) {
+    acc[rev] = {}
+  }
+  acc[rev][path] = []
+
   for (const value of values) {
     ;(acc[rev][path] as unknown[]).push({ ...value, rev })
+  }
+}
+
+const overwriteWorkspaceDatapoints = (
+  acc: RevisionData,
+  path: string,
+  data: Record<string, unknown>[] | undefined,
+  rev: string,
+  workspaceRunningCheckpoint?: string
+) => {
+  if (rev === workspaceRunningCheckpoint) {
+    collectDatapoints(acc, path, 'workspace', data)
   }
 }
 
 const collectPlotData = (
   acc: RevisionData,
   path: string,
-  plot: TemplatePlot
+  plot: TemplatePlot,
+  workspaceRunningCheckpoint?: string
 ) => {
   for (const rev of plot.revisions || []) {
-    if (!acc[rev]) {
-      acc[rev] = {}
+    if (shouldSkipRev(rev, workspaceRunningCheckpoint)) {
+      continue
     }
-    acc[rev][path] = []
 
-    collectDatapoints(acc, path, rev, plot.datapoints?.[rev])
+    const data = plot.datapoints?.[rev]
+
+    collectDatapoints(acc, path, rev, data)
+    overwriteWorkspaceDatapoints(
+      acc,
+      path,
+      data,
+      rev,
+      workspaceRunningCheckpoint
+    )
   }
 }
 
@@ -340,25 +409,38 @@ type DataAccumulator = {
   comparisonData: ComparisonData
 }
 
-const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
+const collectPathData = (
+  acc: DataAccumulator,
+  path: string,
+  plots: Plot[],
+  workspaceRunningCheckpoint?: string
+) => {
   for (const plot of plots) {
     if (isImagePlot(plot)) {
-      collectImageData(acc.comparisonData, path, plot)
+      collectImageData(
+        acc.comparisonData,
+        path,
+        plot,
+        workspaceRunningCheckpoint
+      )
       continue
     }
 
-    collectPlotData(acc.revisionData, path, plot)
+    collectPlotData(acc.revisionData, path, plot, workspaceRunningCheckpoint)
   }
 }
 
-export const collectData = (data: PlotsOutput): DataAccumulator => {
+export const collectData = (
+  data: PlotsOutput,
+  workspaceRunningCheckpoint?: string
+): DataAccumulator => {
   const acc = {
     comparisonData: {},
     revisionData: {}
   } as DataAccumulator
 
   for (const [path, plots] of Object.entries(data)) {
-    collectPathData(acc, path, plots)
+    collectPathData(acc, path, plots, workspaceRunningCheckpoint)
   }
 
   return acc

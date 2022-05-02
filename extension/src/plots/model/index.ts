@@ -3,6 +3,7 @@ import {
   collectCheckpointPlotsData,
   collectData,
   collectMetricOrder,
+  collectRunningWorkspaceCheckpoint,
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
@@ -37,6 +38,7 @@ export class PlotsModel extends ModelWithPersistence {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private branchRevisions: Record<string, string> = {}
+  private workspaceRunningCheckpoint: string | undefined
 
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
@@ -76,14 +78,18 @@ export class PlotsModel extends ModelWithPersistence {
     this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
   }
 
-  public transformAndSetExperiments(data: ExperimentsOutput) {
-    const checkpointPlots = collectCheckpointPlotsData(data)
+  public async transformAndSetExperiments(data: ExperimentsOutput) {
+    const [checkpointPlots, workspaceRunningCheckpoint] = await Promise.all([
+      collectCheckpointPlotsData(data),
+      collectRunningWorkspaceCheckpoint(data, this.experiments.hasCheckpoints())
+    ])
 
     if (!this.selectedMetrics && checkpointPlots) {
       this.selectedMetrics = checkpointPlots.map(({ title }) => title)
     }
 
     this.checkpointPlots = checkpointPlots
+    this.workspaceRunningCheckpoint = workspaceRunningCheckpoint
 
     this.setMetricOrder()
 
@@ -92,7 +98,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   public async transformAndSetPlots(data: PlotsOutput) {
     const [{ comparisonData, revisionData }, templates] = await Promise.all([
-      collectData(data),
+      collectData(data, this.workspaceRunningCheckpoint),
       collectTemplates(data)
     ])
 
