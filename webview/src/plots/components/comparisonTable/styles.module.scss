@@ -37,11 +37,16 @@ $gap: 4px;
 }
 
 .pin {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
   position: absolute;
   right: 10px;
   top: 10px;
   transform: rotate(-90deg);
   opacity: 0;
+  cursor: pointer;
 
   path {
     fill: $fg-color;

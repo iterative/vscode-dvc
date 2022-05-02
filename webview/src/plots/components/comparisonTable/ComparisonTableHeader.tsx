@@ -21,16 +21,16 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
   })
 
   return (
-    <button className={styles.header} onClick={onClicked}>
+    <div className={styles.header}>
       {!isPinned && <GripIcon className={styles.gripIcon} />}
-      <div className={pinClasses}>
+      <button className={pinClasses} onClick={onClicked}>
         <Pin />
-      </div>
+      </button>
       <span
         className={styles.bullet}
         style={{ backgroundColor: displayColor }}
       />
       {children}
-    </button>
+    </div>
   )
 }

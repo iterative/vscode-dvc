@@ -36,13 +36,13 @@ describe('ComparisonTableHeader', () => {
     expect(header).toBeInTheDocument()
   })
 
-  it('should call the pass onClicked prop when clicking the header', () => {
+  it('should call the pass onClicked prop when clicking the header pin', () => {
     const onClickedSpy = jest.fn()
     renderHeader({ ...fullProps, onClicked: onClickedSpy })
 
-    const header = screen.getByText(headerContent)
+    const headerPin = screen.getByRole('button')
 
-    fireEvent.click(header, {
+    fireEvent.click(headerPin, {
       bubbles: true,
       cancelable: true
     })
