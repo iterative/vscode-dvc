@@ -8,7 +8,7 @@ import {
   collectCheckpointPlotsData,
   collectTemplates,
   collectMetricOrder,
-  collectRunningWorkspaceCheckpoint
+  collectWorkspaceRunningCheckpoint
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
@@ -72,7 +72,7 @@ describe('collectCheckpointPlotsData', () => {
   })
 })
 
-describe('collectRunningWorkspaceCheckpoint', () => {
+describe('collectWorkspaceRunningCheckpoint', () => {
   const fixtureCopy = cloneDeep(expShowFixture)
   const runningCheckpointFixture: ExperimentsOutput = merge(fixtureCopy, {
     '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
@@ -85,7 +85,7 @@ describe('collectRunningWorkspaceCheckpoint', () => {
   })
 
   it('should return the expected sha from the test fixture', () => {
-    const checkpointRunningInTheWorkspace = collectRunningWorkspaceCheckpoint(
+    const checkpointRunningInTheWorkspace = collectWorkspaceRunningCheckpoint(
       runningCheckpointFixture,
       true
     )
@@ -95,7 +95,7 @@ describe('collectRunningWorkspaceCheckpoint', () => {
 
   it('should always return undefined when there are no checkpoints', () => {
     expect(
-      collectRunningWorkspaceCheckpoint(runningCheckpointFixture, false)
+      collectWorkspaceRunningCheckpoint(runningCheckpointFixture, false)
     ).toBeUndefined()
   })
 })

@@ -3,7 +3,7 @@ import {
   collectCheckpointPlotsData,
   collectData,
   collectMetricOrder,
-  collectRunningWorkspaceCheckpoint,
+  collectWorkspaceRunningCheckpoint,
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
@@ -81,7 +81,7 @@ export class PlotsModel extends ModelWithPersistence {
   public async transformAndSetExperiments(data: ExperimentsOutput) {
     const [checkpointPlots, workspaceRunningCheckpoint] = await Promise.all([
       collectCheckpointPlotsData(data),
-      collectRunningWorkspaceCheckpoint(data, this.experiments.hasCheckpoints())
+      collectWorkspaceRunningCheckpoint(data, this.experiments.hasCheckpoints())
     ])
 
     if (!this.selectedMetrics && checkpointPlots) {

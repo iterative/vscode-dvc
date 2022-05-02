@@ -235,7 +235,7 @@ const collectRunningFromBranch = (
   }
 }
 
-export const collectRunningWorkspaceCheckpoint = (
+export const collectWorkspaceRunningCheckpoint = (
   data: ExperimentsOutput,
   hasCheckpoints: boolean
 ): string | undefined => {
