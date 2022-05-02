@@ -19,6 +19,9 @@ import {
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/reader'
 import { BaseData } from '../../data'
+import { ExperimentFlag } from '../../cli/constants'
+
+export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   constructor(
@@ -26,24 +29,44 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>
   ) {
-    super(dvcRoot, internalCommands, updatesPaused, [
-      'dvc.lock',
-      'dvc.yaml',
-      'params.yaml'
-    ])
+    super(
+      dvcRoot,
+      internalCommands,
+      updatesPaused,
+      [
+        {
+          name: 'partialUpdate',
+          process: () => this.update(ExperimentFlag.NO_FETCH)
+        },
+        { name: 'fullUpdate', process: () => this.update() }
+      ],
+      ['dvc.lock', 'dvc.yaml', 'params.yaml']
+    )
 
     this.watchExpGitRefs()
-    this.managedUpdate()
+    this.managedUpdate(QUEUED_EXPERIMENT_PATH)
   }
 
   public collectFiles(data: ExperimentsOutput) {
     return collectFiles(data)
   }
 
-  public async update(): Promise<void> {
+  public managedUpdate(path?: string) {
+    if (
+      path?.includes(QUEUED_EXPERIMENT_PATH) ||
+      this.processManager.isOngoingOrQueued('fullUpdate')
+    ) {
+      return this.processManager.run('fullUpdate')
+    }
+
+    return this.processManager.run('partialUpdate')
+  }
+
+  public async update(...args: ExperimentFlag[]): Promise<void> {
     const data = await this.internalCommands.executeCommand<ExperimentsOutput>(
-      AvailableCommands.EXPERIMENT_SHOW,
-      this.dvcRoot
+      AvailableCommands.EXP_SHOW,
+      this.dvcRoot,
+      ...args
     )
 
     const files = this.collectFiles(data)
@@ -79,7 +102,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
               path.includes(watchedRelPath)
             )
           ) {
-            return this.managedUpdate()
+            return this.managedUpdate(path)
           }
         }
       )

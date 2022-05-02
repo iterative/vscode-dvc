@@ -22,6 +22,7 @@ const mockedDisposable = jest.mocked(Disposable)
 const mockedCreateProcess = jest.mocked(createProcess)
 const mockedGetProcessEnv = jest.mocked(getProcessEnv)
 const mockedEnv = {
+  DVCLIVE_OPEN: 'false',
   DVC_NO_ANALYTICS: 'true',
   PATH: '/all/of/the/goodies:/in/my/path'
 }
@@ -66,8 +67,8 @@ describe('CliReader', () => {
         getMockedProcess(JSON.stringify(expShowFixture))
       )
 
-      const experiments = await cliReader.experimentShow(cwd)
-      expect(experiments).toStrictEqual(expShowFixture)
+      const cliOutput = await cliReader.expShow(cwd)
+      expect(cliOutput).toStrictEqual(expShowFixture)
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'show', SHOW_JSON],
         cwd,

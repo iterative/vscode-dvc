@@ -4,7 +4,7 @@
 
 $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
-$border-color: grey;
+$border-color: rgb(128, 128, 128, 0.4);
 
 $nested-row-padding: 1.35rem;
 
@@ -14,7 +14,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
 // Dark Theme
 
-$row-bg-alt-color: rgba(60, 60, 60, 0.7);
+$row-bg-alt-color: var(--vscode-sideBar-background);
 $header-bg-color: #303031;
 $meta-cell-color: #a0a0a0;
 $toggle-color: rgba(255, 255, 255, 0.21);
@@ -24,7 +24,6 @@ $params-color: #90cdf4;
 
 // Light theme
 
-$row-bg-alt-color-light: rgba(195, 195, 195, 0.7);
 $header-bg-color-light: #e1e1e1;
 $border-color-light: #7f7f7f;
 $metrics-color-light: #ce9f4c;
@@ -41,7 +40,7 @@ $spinner-color-light: #000;
   left: 0;
   display: inline-block;
   position: absolute;
-  border: 2px solid $toggle-color;
+  border: 2px solid $fg-color;
   border-top: unset;
   border-left: unset;
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
@@ -131,6 +130,11 @@ $spinner-color-light: #000;
       height: 4px;
       vertical-align: middle;
       border: 1px solid currentColor;
+      background-color: $bg-color;
+    }
+
+    .unselectedExperiment.oddRow & {
+      background-color: $row-bg-alt-color;
     }
 
     .workspaceWithChanges.unselectedExperiment & {
@@ -231,15 +235,17 @@ $spinner-color-light: #000;
           content: '';
           height: 100%;
           top: 0;
-          right: 50%;
+          right: calc(50% - 0.5px);
           position: absolute;
           border-right: 1px dotted rgb(127, 127, 127);
+          clip-path: inset(0.05rem 0 0 0);
         }
       }
       &:first-of-type {
         .bullet::after {
           height: 50%;
           top: 50%;
+          clip-path: inset(0 0 0 0);
         }
       }
       &:last-of-type {
@@ -257,7 +263,6 @@ $spinner-color-light: #000;
     flex: 1;
   }
   .table {
-    margin: 0.5rem 1rem;
     display: inline-block;
     border-collapse: collapse;
   }
@@ -346,10 +351,6 @@ $spinner-color-light: #000;
     border: 1px solid $border-color;
     .oddRow {
       background-color: $row-bg-alt-color;
-
-      :global(.vscode-light) & {
-        background-color: $row-bg-alt-color-light;
-      }
     }
   }
   .workspaceRowGroup {
@@ -438,11 +439,11 @@ $spinner-color-light: #000;
   }
 
   .sortingHeaderCellAsc {
-    border-top: 1px solid white;
+    border-top: 2px solid $fg-color;
   }
 
   .sortingHeaderCellDesc {
-    border-bottom: 1px solid white;
+    border-bottom: 2px solid $fg-color;
   }
 
   .metaCell {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import VegaLite from 'react-vega/lib/VegaLite'
+import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { CheckpointPlotData, ColorScale } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { createSpec } from './util'
@@ -8,11 +8,10 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 import { performOrderedUpdate } from '../../../util/objects'
 import { withScale } from '../../../util/styles'
-import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 import { sendMessage } from '../../../shared/vscode'
 import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
-import { ZoomablePlotProps } from '../templatePlots/util'
+import { ZoomablePlot, ZoomablePlotProps } from '../ZoomablePlot'
 
 interface CheckpointPlotsProps extends ZoomablePlotProps {
   plots: CheckpointPlotData[]
@@ -22,7 +21,7 @@ interface CheckpointPlotsProps extends ZoomablePlotProps {
 export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   plots,
   colors,
-  onPlotClick
+  renderZoomedInPlot
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
 
@@ -47,29 +46,29 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       const { title, values } = plotData
       const key = `plot-${title}`
       const spec = createSpec(title, colors)
-      const plotJSX = (
-        <VegaLite
-          actions={false}
-          config={config}
-          renderer="svg"
-          spec={spec}
-          data={{ values }}
-          data-testid={`${key}-vega`}
-        />
-      )
+      const plotProps = {
+        actions: false,
+        config,
+        data: { values },
+        'data-testid': `${key}-vega`,
+        renderer: 'svg',
+        spec
+      } as VegaLiteProps
 
       return (
-        <button
+        <div
           key={key}
           className={styles.plot}
-          style={withScale(1)}
-          id={title}
           data-testid={key}
-          onClick={() => onPlotClick(plotJSX)}
+          id={title}
+          style={withScale(1)}
         >
-          <GripIcon className={styles.plotGripIcon} />
-          {plotJSX}
-        </button>
+          <ZoomablePlot
+            plotProps={plotProps}
+            id={key}
+            renderZoomedInPlot={renderZoomedInPlot}
+          />
+        </div>
       )
     })
     .filter(Boolean)
