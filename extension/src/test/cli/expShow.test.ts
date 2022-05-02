@@ -11,7 +11,7 @@ suite('exp show --show-json', () => {
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
-      const output = await cliReader.experimentShow(dvcDemoPath)
+      const output = await cliReader.expShow(dvcDemoPath)
 
       expect(output.workspace, 'should have a workspace key').not.to.be
         .undefined
@@ -76,7 +76,7 @@ suite('exp show --show-json', () => {
   describe('Empty Repository', () => {
     it('should return the expected output', async () => {
       await initializeEmptyRepo()
-      const output = await cliReader.experimentShow(TEMP_DIR)
+      const output = await cliReader.expShow(TEMP_DIR)
 
       expect(
         Object.keys(output),

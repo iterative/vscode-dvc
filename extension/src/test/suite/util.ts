@@ -118,10 +118,11 @@ export const getMockNow = () =>
   stub(Time, 'getCurrentEpoch').returns(FIRST_TRUTHY_TIME)
 
 export const bypassProcessManagerDebounce = (
-  mockNow: SinonStub<[], number>
+  mockNow: SinonStub<[], number>,
+  call = 1
 ) => {
   mockNow.resetBehavior()
-  mockNow.returns(DEFAULT_DEBOUNCE_WINDOW_MS + FIRST_TRUTHY_TIME)
+  mockNow.returns(DEFAULT_DEBOUNCE_WINDOW_MS * call + FIRST_TRUTHY_TIME)
 }
 
 export const buildInternalCommands = (disposer: Disposer) => {
@@ -161,7 +162,7 @@ export const buildDependencies = (
 
   const mockPlotsDiff = stub(cliReader, 'plotsDiff').resolves(plotsDiff)
 
-  const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(expShow)
+  const mockExperimentShow = stub(cliReader, 'expShow').resolves(expShow)
 
   const updatesPaused = disposer.track(new EventEmitter<boolean>())
 

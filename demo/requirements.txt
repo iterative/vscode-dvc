@@ -1,7 +1,3 @@
-dvc[s3]==2.10.1
-dvclive==0.6.0
-torch
-torchvision
-ruamel.yaml
-matplotlib
-numpy
+dvc==2.10.2
+torch==1.11.0
+torchvision==0.12.0

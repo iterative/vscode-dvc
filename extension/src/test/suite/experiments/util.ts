@@ -138,9 +138,7 @@ export const buildExperimentsDataDependencies = (disposer: Disposer) => {
   ).returns(mockDisposable)
 
   const { cliReader, internalCommands } = buildInternalCommands(disposer)
-  const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-    expShowFixture
-  )
+  const mockExperimentShow = stub(cliReader, 'expShow').resolves(expShowFixture)
   return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
 }
 

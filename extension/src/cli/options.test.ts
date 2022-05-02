@@ -9,6 +9,7 @@ jest.mock('../env')
 const mockedPATH = '/some/special/path'
 
 const mockedEnv = {
+  DVCLIVE_OPEN: 'false',
   DVC_NO_ANALYTICS: 'true',
   PATH: mockedPATH
 }
@@ -41,6 +42,7 @@ describe('getOptions', () => {
       command: `${pythonBinPath} -m dvc diff`,
       cwd,
       env: {
+        DVCLIVE_OPEN: 'false',
         DVC_NO_ANALYTICS: 'true',
         PATH: joinEnvPath(join('path', 'to', 'python', '.venv'), mockedPATH)
       },
@@ -57,6 +59,7 @@ describe('getOptions', () => {
       command: `${cliPath} diff`,
       cwd,
       env: {
+        DVCLIVE_OPEN: 'false',
         DVC_NO_ANALYTICS: 'true',
         PATH: joinEnvPath(join('path', 'to', 'python', '.venv'), mockedPATH)
       },

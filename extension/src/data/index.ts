@@ -37,26 +37,20 @@ export abstract class BaseData<
     dvcRoot: string,
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
+    updateProcesses: { name: string; process: () => Promise<unknown> }[],
     staticFiles: string[] = []
   ) {
     super()
 
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager(updatesPaused, {
-        name: 'update',
-        process: () => this.update()
-      })
+      new ProcessManager(updatesPaused, ...updateProcesses)
     )
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
     this.staticFiles = staticFiles
 
     this.waitForInitialData()
-  }
-
-  public managedUpdate() {
-    return this.processManager.run('update')
   }
 
   protected compareFiles(files: string[]) {
@@ -105,7 +99,7 @@ export abstract class BaseData<
           if (!path) {
             return
           }
-          this.managedUpdate()
+          this.managedUpdate(path)
         }
       )
     )
@@ -113,5 +107,5 @@ export abstract class BaseData<
 
   abstract collectFiles(data: T): string[]
 
-  abstract update(): Promise<unknown>
+  abstract managedUpdate(path?: string): Promise<unknown>
 }

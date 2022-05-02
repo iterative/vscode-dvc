@@ -11,11 +11,16 @@ import {
   getMockNow
 } from '../../util'
 import { dvcDemoPath } from '../../../util'
-import { ExperimentsData } from '../../../../experiments/data'
+import {
+  ExperimentsData,
+  QUEUED_EXPERIMENT_PATH
+} from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
 import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
 import { InternalCommands } from '../../../../commands/internal'
 import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
+import { ExperimentFlag } from '../../../../cli/constants'
+import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -170,5 +175,54 @@ suite('Experiments Data Test Suite', () => {
 
       expect(managedUpdateSpy).to.be.called
     })
+  })
+
+  it('should not use exp show to fetch git refs external to the workspace if the path is not from a temp workspace', async () => {
+    const mockNow = getMockNow()
+    const { data, mockExperimentShow } = buildExperimentsData(disposable)
+
+    await data.isReady()
+    bypassProcessManagerDebounce(mockNow)
+    const mockIsOngoingOrQueued = stub(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (data as any).processManager,
+      'isOngoingOrQueued'
+    ).returns(false)
+
+    mockExperimentShow.resetHistory()
+
+    await data.managedUpdate()
+
+    expect(mockIsOngoingOrQueued).to.be.calledWith('fullUpdate')
+    expect(mockExperimentShow).to.be.calledOnce
+    expect(mockExperimentShow).to.be.calledWithExactly(
+      dvcDemoPath,
+      ExperimentFlag.NO_FETCH
+    )
+
+    bypassProcessManagerDebounce(mockNow, 2)
+    mockExperimentShow.resetHistory()
+
+    await data.managedUpdate(EXPERIMENTS_GIT_LOGS_REFS)
+
+    expect(mockExperimentShow).to.be.calledOnce
+    expect(mockExperimentShow).to.be.calledWithExactly(
+      dvcDemoPath,
+      ExperimentFlag.NO_FETCH
+    )
+  })
+
+  it('should use exp show to fetch external git refs if the path to a temporary workspace (queued experiment) is provided', async () => {
+    const mockNow = getMockNow()
+    const { data, mockExperimentShow } = buildExperimentsData(disposable)
+
+    await data.isReady()
+    bypassProcessManagerDebounce(mockNow)
+    mockExperimentShow.resetHistory()
+
+    await data.managedUpdate(QUEUED_EXPERIMENT_PATH)
+
+    expect(mockExperimentShow).to.be.calledOnce
+    expect(mockExperimentShow).to.be.calledWithExactly(dvcDemoPath)
   })
 })

@@ -1,6 +1,13 @@
 import { join } from 'path'
 import { Cli, typeCheckCommands } from '.'
-import { Args, Command, Flag, ListFlag, SubCommand } from './constants'
+import {
+  Args,
+  Command,
+  ExperimentFlag,
+  Flag,
+  ListFlag,
+  SubCommand
+} from './constants'
 import { retry } from './retry'
 import { trim, trimAndSplit } from '../util/stdout'
 import { Plot } from '../plots/webview/contract'
@@ -105,7 +112,7 @@ export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
 
 export const autoRegisteredCommands = {
   DIFF: 'diff',
-  EXPERIMENT_SHOW: 'experimentShow',
+  EXP_SHOW: 'expShow',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
   PLOTS_DIFF: 'plotsDiff',
   STATUS: 'status'
@@ -117,8 +124,16 @@ export class CliReader extends Cli {
     this
   )
 
-  public experimentShow(cwd: string): Promise<ExperimentsOutput> {
-    return this.readShowProcessJson<ExperimentsOutput>(cwd, Command.EXPERIMENT)
+  public expShow(
+    cwd: string,
+    ...flags: ExperimentFlag[]
+  ): Promise<ExperimentsOutput> {
+    return this.readProcessJson<ExperimentsOutput>(
+      cwd,
+      Command.EXPERIMENT,
+      SubCommand.SHOW,
+      ...flags
+    )
   }
 
   public diff(cwd: string): Promise<DiffOutput> {
@@ -185,13 +200,5 @@ export class CliReader extends Cli {
       ...args,
       Flag.SHOW_JSON
     )
-  }
-
-  private readShowProcessJson<T>(
-    cwd: string,
-    command: Command,
-    ...args: Args
-  ): Promise<T> {
-    return this.readProcessJson<T>(cwd, command, SubCommand.SHOW, ...args)
   }
 }
