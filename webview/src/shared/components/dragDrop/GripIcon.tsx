@@ -6,5 +6,5 @@ interface GripIconProps {
 }
 
 export const GripIcon: React.FC<GripIconProps> = ({ className }) => (
-  <Icon icon={AllIcons.GRIPPER} width={35} height={35} className={className} />
+  <Icon icon={AllIcons.GRIPPER} width={30} height={30} className={className} />
 )
