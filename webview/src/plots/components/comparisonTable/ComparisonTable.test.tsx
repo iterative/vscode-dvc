@@ -2,7 +2,13 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom/extend-expect'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within
+} from '@testing-library/react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import React from 'react'
@@ -23,6 +29,8 @@ jest.mock('../../../shared/api')
 
 const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
+
+const getPin = (element: HTMLElement) => within(element).getByRole('button')
 
 describe('ComparisonTable', () => {
   afterEach(() => {
@@ -65,7 +73,7 @@ describe('ComparisonTable', () => {
 
     expect(firstColumn.textContent).toBe(expectedFirstColumn.textContent)
 
-    fireEvent.click(screen.getByText(secondExperiment), {
+    fireEvent.click(getPin(screen.getByText(secondExperiment)), {
       bubbles: true,
       cancelable: true
     })
@@ -81,7 +89,7 @@ describe('ComparisonTable', () => {
     const thirdExperiment = revisions[2]
     const [originalFirstColumn] = getHeaders()
 
-    fireEvent.click(screen.getByText(thirdExperiment), {
+    fireEvent.click(getPin(screen.getByText(thirdExperiment)), {
       bubbles: true,
       cancelable: true
     })
@@ -111,7 +119,7 @@ describe('ComparisonTable', () => {
 
     expect(firstColumn.textContent).toBe(expectedFirstColumn.textContent)
 
-    fireEvent.click(screen.getByText(secondExperiment), {
+    fireEvent.click(getPin(screen.getByText(secondExperiment)), {
       bubbles: true,
       cancelable: true
     })
@@ -120,7 +128,7 @@ describe('ComparisonTable', () => {
     expect(pinnedColumn.getAttribute('draggable')).toBe('false')
     expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
 
-    fireEvent.click(screen.getByText(secondExperiment), {
+    fireEvent.click(getPin(screen.getByText(secondExperiment)), {
       bubbles: true,
       cancelable: true
     })
@@ -155,7 +163,7 @@ describe('ComparisonTable', () => {
     expect(firstPlot.isSameNode(expectedFirstPlot)).toBe(true)
     expect(secondPlot.isSameNode(expectedSecondPlot)).toBe(true)
 
-    fireEvent.click(screen.getByText(secondExperiment), {
+    fireEvent.click(getPin(screen.getByText(secondExperiment)), {
       bubbles: true,
       cancelable: true
     })
@@ -215,7 +223,7 @@ describe('ComparisonTable', () => {
 
   describe('Columns drag and drop', () => {
     const pinSecondColumn = () => {
-      const secondColumn = screen.getByText(revisions[1])
+      const secondColumn = getPin(screen.getByText(revisions[1]))
 
       fireEvent.click(secondColumn, {
         bubbles: true,
