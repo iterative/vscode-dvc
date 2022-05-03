@@ -133,7 +133,6 @@ const data: RowData[] = [
             },
             checkpoint_parent: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
             label: 'd1343a8',
-
             displayColor: undefined,
             id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
             selected: false,

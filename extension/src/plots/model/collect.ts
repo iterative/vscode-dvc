@@ -326,7 +326,11 @@ const collectImageData = (
   path: string,
   plot: ImagePlot
 ) => {
-  const rev = plot.revisions?.[0] as string
+  const rev = plot.revisions?.[0]
+
+  if (!rev) {
+    return
+  }
 
   if (!acc[rev]) {
     acc[rev] = {}
@@ -341,13 +345,8 @@ const collectDatapoints = (
   rev: string,
   values: Record<string, unknown>[] = []
 ) => {
-  if (!acc[rev]) {
-    acc[rev] = {}
-  }
-  acc[rev][path] = []
-
   for (const value of values) {
-    ;(acc[rev][path] as Record<string, unknown>[]).push({ ...value, rev })
+    ;(acc[rev][path] as unknown[]).push({ ...value, rev })
   }
 }
 
@@ -357,9 +356,12 @@ const collectPlotData = (
   plot: TemplatePlot
 ) => {
   for (const rev of plot.revisions || []) {
-    const data = plot.datapoints?.[rev]
+    if (!acc[rev]) {
+      acc[rev] = {}
+    }
+    acc[rev][path] = []
 
-    collectDatapoints(acc, path, rev, data)
+    collectDatapoints(acc, path, rev, plot.datapoints?.[rev])
   }
 }
 
