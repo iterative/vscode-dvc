@@ -62,7 +62,7 @@ describe('ExperimentsModel', () => {
 
   it('should return rows that equal the rows fixture when given the output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
@@ -238,7 +238,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch branch params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture)
 
     const branchParams = model.getExperimentParams('main')
     expect(definedAndNonEmpty(branchParams)).toBe(true)
@@ -246,7 +246,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture)
 
     const workspaceParams = model.getExperimentParams('workspace')
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
@@ -254,7 +254,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an experiment's params", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture)
 
     const experimentParams = model.getExperimentParams('exp-e7a67')
     expect(definedAndNonEmpty(experimentParams)).toBe(true)
@@ -262,7 +262,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an empty array if the experiment's params cannot be found", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, true)
+    model.transformAndSet(outputFixture)
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)

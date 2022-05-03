@@ -9,6 +9,7 @@ import {
   ExperimentsOutput
 } from '../../cli/reader'
 import { addToMapArray } from '../../util/map'
+import { uniqueValues } from '../../util/array'
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
 
@@ -87,15 +88,13 @@ const transformExperimentData = (
   id: string,
   experimentFields: ExperimentFields,
   label: string | undefined,
-  hasCheckpoints: boolean,
   sha?: string,
   displayNameOrParent?: string
 ): Experiment => {
   const experiment = {
     id,
     label,
-    ...omit(experimentFields, Object.values(MetricOrParamType)),
-    mutable: !!(!hasCheckpoints && experimentFields.running)
+    ...omit(experimentFields, Object.values(MetricOrParamType))
   } as Experiment
 
   if (displayNameOrParent) {
@@ -115,8 +114,7 @@ const transformExperimentOrCheckpointData = (
   sha: string,
   experimentData: ExperimentFieldsOrError,
   experimentsObject: ExperimentsObject,
-  branchSha: string,
-  hasCheckpoints: boolean
+  branchSha: string
 ): {
   checkpointTipId?: string
   experiment: Experiment | undefined
@@ -139,7 +137,6 @@ const transformExperimentOrCheckpointData = (
       id,
       experimentFields,
       getShortSha(sha),
-      hasCheckpoints,
       sha,
       getDisplayNameOrParent(sha, branchSha, experimentsObject)
     )
@@ -174,8 +171,7 @@ const collectFromExperimentsObject = (
       sha,
       experimentData,
       experimentsObject,
-      branchSha,
-      acc.hasCheckpoints
+      branchSha
     )
     if (!experiment) {
       continue
@@ -199,13 +195,7 @@ const collectFromBranchesObject = (
 
     const name = experimentFields.name as string
 
-    const branch = transformExperimentData(
-      name,
-      experimentFields,
-      name,
-      acc.hasCheckpoints,
-      sha
-    )
+    const branch = transformExperimentData(name, experimentFields, name, sha)
 
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject, sha, branch.label)
@@ -216,24 +206,57 @@ const collectFromBranchesObject = (
 }
 
 export const collectExperiments = (
-  data: ExperimentsOutput,
-  hasCheckpoints = false
+  data: ExperimentsOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
   const workspaceId = 'workspace'
 
   const workspaceFields = workspace.baseline.data
   const workspaceBaseline = workspaceFields
-    ? transformExperimentData(
-        workspaceId,
-        workspaceFields,
-        workspaceId,
-        hasCheckpoints
-      )
+    ? transformExperimentData(workspaceId, workspaceFields, workspaceId)
     : undefined
 
-  const acc = new ExperimentsAccumulator(workspaceBaseline, hasCheckpoints)
+  const acc = new ExperimentsAccumulator(workspaceBaseline)
 
   collectFromBranchesObject(acc, branchesObject)
   return acc
+}
+
+const getDefaultMutableRevision = (hasCheckpoints: boolean): string[] => {
+  if (hasCheckpoints) {
+    return []
+  }
+  return ['workspace']
+}
+
+const noWorkspaceVsSelectedRaceCondition = (
+  hasCheckpoints: boolean,
+  running: boolean | undefined,
+  selected: boolean | undefined
+): boolean => !!(hasCheckpoints && running && !selected)
+
+const collectMutableRevision = (
+  acc: string[],
+  { label, running, selected }: Experiment,
+  hasCheckpoints: boolean
+) => {
+  if (noWorkspaceVsSelectedRaceCondition(hasCheckpoints, running, selected)) {
+    acc.push('workspace')
+  }
+  if (running && !hasCheckpoints) {
+    acc.push(label)
+  }
+}
+
+export const collectMutableRevisions = (
+  experiments: Experiment[],
+  hasCheckpoints: boolean
+): string[] => {
+  const acc = getDefaultMutableRevision(hasCheckpoints)
+
+  for (const experiment of experiments) {
+    collectMutableRevision(acc, experiment, hasCheckpoints)
+  }
+
+  return uniqueValues(acc)
 }

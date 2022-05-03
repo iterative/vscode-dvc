@@ -3,6 +3,7 @@ import {
   collectCheckpointPlotsData,
   collectData,
   collectMetricOrder,
+  collectOverwriteWorkspaceData,
   collectWorkspaceRunningCheckpoint,
   collectSelectedTemplatePlots,
   collectTemplates,
@@ -98,12 +99,28 @@ export class PlotsModel extends ModelWithPersistence {
 
   public async transformAndSetPlots(data: PlotsOutput) {
     const [{ comparisonData, revisionData }, templates] = await Promise.all([
-      collectData(data, this.workspaceRunningCheckpoint),
+      collectData(data),
       collectTemplates(data)
     ])
 
-    this.comparisonData = { ...this.comparisonData, ...comparisonData }
-    this.revisionData = { ...this.revisionData, ...revisionData }
+    const { overwriteComparisonData, overwriteRevisionData } =
+      collectOverwriteWorkspaceData(
+        this.workspaceRunningCheckpoint,
+        { ...this.comparisonData, ...comparisonData },
+        { ...this.revisionData, ...revisionData }
+      )
+
+    this.comparisonData = {
+      ...this.comparisonData,
+      ...comparisonData,
+      ...overwriteComparisonData
+    }
+    this.revisionData = {
+      ...this.revisionData,
+      ...revisionData,
+      ...overwriteRevisionData
+    }
+
     this.templates = { ...this.templates, ...templates }
 
     this.setComparisonOrder()

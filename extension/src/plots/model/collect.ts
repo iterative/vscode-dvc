@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash.clonedeep'
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
 import {
@@ -310,7 +311,7 @@ export const collectMetricOrder = (
 
 export type RevisionData = {
   [revision: string]: {
-    [path: string]: unknown[]
+    [path: string]: Record<string, unknown>[]
   }
 }
 
@@ -320,36 +321,18 @@ export type ComparisonData = {
   }
 }
 
-const shouldSkipRev = (
-  rev: string | undefined,
-  workspaceRunningCheckpoint?: string
-): boolean => !!(!rev || (rev === 'workspace' && workspaceRunningCheckpoint))
-
 const collectImageData = (
   acc: ComparisonData,
   path: string,
-  plot: ImagePlot,
-  workspaceRunningCheckpoint?: string
+  plot: ImagePlot
 ) => {
   const rev = plot.revisions?.[0] as string
-
-  if (shouldSkipRev(rev, workspaceRunningCheckpoint)) {
-    return
-  }
 
   if (!acc[rev]) {
     acc[rev] = {}
   }
 
   acc[rev][path] = plot
-
-  if (rev === workspaceRunningCheckpoint) {
-    if (!acc.workspace) {
-      acc.workspace = {}
-    }
-
-    acc.workspace[path] = plot
-  }
 }
 
 const collectDatapoints = (
@@ -364,43 +347,19 @@ const collectDatapoints = (
   acc[rev][path] = []
 
   for (const value of values) {
-    ;(acc[rev][path] as unknown[]).push({ ...value, rev })
-  }
-}
-
-const overwriteWorkspaceDatapoints = (
-  acc: RevisionData,
-  path: string,
-  data: Record<string, unknown>[] | undefined,
-  rev: string,
-  workspaceRunningCheckpoint?: string
-) => {
-  if (rev === workspaceRunningCheckpoint) {
-    collectDatapoints(acc, path, 'workspace', data)
+    ;(acc[rev][path] as Record<string, unknown>[]).push({ ...value, rev })
   }
 }
 
 const collectPlotData = (
   acc: RevisionData,
   path: string,
-  plot: TemplatePlot,
-  workspaceRunningCheckpoint?: string
+  plot: TemplatePlot
 ) => {
   for (const rev of plot.revisions || []) {
-    if (shouldSkipRev(rev, workspaceRunningCheckpoint)) {
-      continue
-    }
-
     const data = plot.datapoints?.[rev]
 
     collectDatapoints(acc, path, rev, data)
-    overwriteWorkspaceDatapoints(
-      acc,
-      path,
-      data,
-      rev,
-      workspaceRunningCheckpoint
-    )
   }
 }
 
@@ -409,41 +368,76 @@ type DataAccumulator = {
   comparisonData: ComparisonData
 }
 
-const collectPathData = (
-  acc: DataAccumulator,
-  path: string,
-  plots: Plot[],
-  workspaceRunningCheckpoint?: string
-) => {
+const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
   for (const plot of plots) {
     if (isImagePlot(plot)) {
-      collectImageData(
-        acc.comparisonData,
-        path,
-        plot,
-        workspaceRunningCheckpoint
-      )
+      collectImageData(acc.comparisonData, path, plot)
       continue
     }
 
-    collectPlotData(acc.revisionData, path, plot, workspaceRunningCheckpoint)
+    collectPlotData(acc.revisionData, path, plot)
   }
 }
 
-export const collectData = (
-  data: PlotsOutput,
-  workspaceRunningCheckpoint?: string
-): DataAccumulator => {
+export const collectData = (data: PlotsOutput): DataAccumulator => {
   const acc = {
     comparisonData: {},
     revisionData: {}
   } as DataAccumulator
 
   for (const [path, plots] of Object.entries(data)) {
-    collectPathData(acc, path, plots, workspaceRunningCheckpoint)
+    collectPathData(acc, path, plots)
   }
 
   return acc
+}
+
+const collectWorkspaceRevisionData = (overwriteRevisionData: {
+  [path: string]: Record<string, unknown>[]
+}) => {
+  const acc: { [path: string]: Record<string, unknown>[] } = {}
+
+  for (const [path, values] of Object.entries(overwriteRevisionData)) {
+    acc[path] = []
+    for (const value of values) {
+      acc[path].push({ ...value, rev: 'workspace' })
+    }
+  }
+
+  return acc
+}
+
+export const collectOverwriteWorkspaceData = (
+  runningSelectedCheckpoint: string | undefined,
+  comparisonData: ComparisonData,
+  revisionData: RevisionData
+): {
+  overwriteComparisonData: ComparisonData
+  overwriteRevisionData: RevisionData
+} => {
+  if (!runningSelectedCheckpoint) {
+    return { overwriteComparisonData: {}, overwriteRevisionData: {} }
+  }
+
+  const overwriteComparisonData = cloneDeep(
+    comparisonData[runningSelectedCheckpoint]
+  )
+  const overwriteRevisionData = cloneDeep(
+    revisionData[runningSelectedCheckpoint]
+  )
+
+  if (!overwriteComparisonData || !overwriteRevisionData) {
+    return { overwriteComparisonData: {}, overwriteRevisionData: {} }
+  }
+
+  const workspaceRevisionData = collectWorkspaceRevisionData(
+    overwriteRevisionData
+  )
+
+  return {
+    overwriteComparisonData: { workspace: overwriteComparisonData },
+    overwriteRevisionData: { workspace: workspaceRevisionData }
+  }
 }
 
 export type TemplateAccumulator = { [path: string]: string }

@@ -264,50 +264,6 @@ describe('collectData', () => {
       )
     )
   })
-
-  it('should overwrite the workspace entry with the data from a checkpoint running in the workspace', () => {
-    const checkpointRunningInTheWorkspace = '42b8736'
-
-    const { revisionData, comparisonData } = collectData(
-      plotsDiffFixture,
-      checkpointRunningInTheWorkspace
-    )
-    const revisions = [
-      'main',
-      checkpointRunningInTheWorkspace,
-      'workspace',
-      '1ba7bcd',
-      '4fb124a'
-    ]
-
-    const values =
-      (logsLossPlot?.datapoints as {
-        [revision: string]: Record<string, unknown>[]
-      }) || {}
-
-    expect(isEmpty(values)).toBeFalsy()
-
-    const overwriteRevisions = values[checkpointRunningInTheWorkspace].map(
-      value => ({
-        ...value,
-        rev: 'workspace'
-      })
-    )
-
-    for (const revision of revisions) {
-      const expectedValues = values[revision].map(value => ({
-        ...value,
-        rev: revision
-      }))
-      expect(revisionData[revision][logsLossPath]).toStrictEqual(
-        revision === 'workspace' ? overwriteRevisions : expectedValues
-      )
-    }
-
-    expect(Object.keys(revisionData)).toStrictEqual(revisions)
-
-    expect(comparisonData.workspace).toStrictEqual(comparisonData['42b8736'])
-  })
 })
 
 describe('collectTemplates', () => {

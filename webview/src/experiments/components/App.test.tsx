@@ -543,7 +543,6 @@ describe('App', () => {
               loss: testMetricNumberValue
             }
           },
-          mutable: false,
           params: {
             'params.yaml': {
               [testParamName]: testParamStringValue
@@ -558,7 +557,6 @@ describe('App', () => {
               loss: testMetricNumberValue + 1
             }
           },
-          mutable: false,
           params: {
             'params.yaml': {
               [testParamName]: 'Other Value'
