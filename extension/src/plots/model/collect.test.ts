@@ -8,14 +8,19 @@ import {
   collectCheckpointPlotsData,
   collectTemplates,
   collectMetricOrder,
-  collectWorkspaceRunningCheckpoint
+  collectWorkspaceRunningCheckpoint,
+  collectWorkspaceRaceConditionData
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 import checkpointPlotsFixture from '../../test/fixtures/expShow/checkpointPlots'
 import { ExperimentsOutput } from '../../cli/reader'
-import { definedAndNonEmpty, sameContents } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  sameContents,
+  uniqueValues
+} from '../../util/array'
 import { TemplatePlot } from '../webview/contract'
 
 const logsLossPath = join('logs', 'loss.tsv')
@@ -278,5 +283,59 @@ describe('collectTemplates', () => {
     ])
 
     expect(JSON.parse(templates[logsLossPath])).toStrictEqual(content)
+  })
+})
+
+describe('collectWorkspaceRaceConditionData', () => {
+  const { comparisonData, revisionData } = collectData(plotsDiffFixture)
+
+  it('should return no overwrite data if there is no selected checkpoint experiment running in the workspace', () => {
+    const { overwriteComparisonData, overwriteRevisionData } =
+      collectWorkspaceRaceConditionData(undefined, comparisonData, revisionData)
+    expect(overwriteComparisonData).toStrictEqual({})
+    expect(overwriteRevisionData).toStrictEqual({})
+  })
+
+  it('should return no overwrite data if there is no data relating to the requested checkpoint', () => {
+    const { overwriteComparisonData, overwriteRevisionData } =
+      collectWorkspaceRaceConditionData('7c500fd', comparisonData, revisionData)
+    expect(overwriteComparisonData).toStrictEqual({})
+    expect(overwriteRevisionData).toStrictEqual({})
+  })
+
+  it('should return the appropriate overwrite data if the revision exists inside of the given data', () => {
+    const { overwriteComparisonData, overwriteRevisionData } =
+      collectWorkspaceRaceConditionData('4fb124a', comparisonData, revisionData)
+
+    expect(overwriteComparisonData.workspace).toStrictEqual(
+      comparisonData['4fb124a']
+    )
+
+    expect(overwriteRevisionData.workspace).not.toStrictEqual(
+      revisionData['4fb124a']
+    )
+
+    const allWorkspaceValues = Object.values(overwriteRevisionData.workspace)
+    const allOverwriteValues = Object.values(revisionData['4fb124a'])
+
+    expect(allWorkspaceValues.length).toBeTruthy()
+    expect(allWorkspaceValues).toHaveLength(allOverwriteValues.length)
+
+    const allWorkspaceRevValues: string[] = []
+    const allWorkspaceNonRevValues: Record<string, unknown>[] = []
+
+    for (const values of allWorkspaceValues) {
+      for (const { rev, ...rest } of values) {
+        allWorkspaceRevValues.push(rev as string)
+        allWorkspaceNonRevValues.push(rest)
+      }
+    }
+
+    expect(uniqueValues(allWorkspaceRevValues)).toStrictEqual(['workspace'])
+    expect(allWorkspaceNonRevValues).toStrictEqual(
+      allOverwriteValues.flatMap(values =>
+        values.map(value => omit(value, 'rev'))
+      )
+    )
   })
 })

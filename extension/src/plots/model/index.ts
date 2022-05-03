@@ -3,7 +3,7 @@ import {
   collectCheckpointPlotsData,
   collectData,
   collectMetricOrder,
-  collectOverwriteWorkspaceData,
+  collectWorkspaceRaceConditionData,
   collectWorkspaceRunningCheckpoint,
   collectSelectedTemplatePlots,
   collectTemplates,
@@ -104,7 +104,7 @@ export class PlotsModel extends ModelWithPersistence {
     ])
 
     const { overwriteComparisonData, overwriteRevisionData } =
-      collectOverwriteWorkspaceData(
+      collectWorkspaceRaceConditionData(
         this.workspaceRunningCheckpoint,
         { ...this.comparisonData, ...comparisonData },
         { ...this.revisionData, ...revisionData }
@@ -120,7 +120,6 @@ export class PlotsModel extends ModelWithPersistence {
       ...revisionData,
       ...overwriteRevisionData
     }
-
     this.templates = { ...this.templates, ...templates }
 
     this.setComparisonOrder()

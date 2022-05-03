@@ -409,7 +409,7 @@ const collectWorkspaceRevisionData = (overwriteRevisionData: {
   return acc
 }
 
-export const collectOverwriteWorkspaceData = (
+export const collectWorkspaceRaceConditionData = (
   runningSelectedCheckpoint: string | undefined,
   comparisonData: ComparisonData,
   revisionData: RevisionData
@@ -428,7 +428,7 @@ export const collectOverwriteWorkspaceData = (
     revisionData[runningSelectedCheckpoint]
   )
 
-  if (!overwriteComparisonData || !overwriteRevisionData) {
+  if (!overwriteComparisonData && !overwriteRevisionData) {
     return { overwriteComparisonData: {}, overwriteRevisionData: {} }
   }
 
