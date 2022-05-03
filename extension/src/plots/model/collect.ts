@@ -309,10 +309,10 @@ export const collectMetricOrder = (
   return [...acc.newOrder, ...acc.uncollectedMetrics]
 }
 
+type RevisionPathData = { [path: string]: Record<string, unknown>[] }
+
 export type RevisionData = {
-  [revision: string]: {
-    [path: string]: Record<string, unknown>[]
-  }
+  [revision: string]: RevisionPathData
 }
 
 export type ComparisonData = {
@@ -394,10 +394,10 @@ export const collectData = (data: PlotsOutput): DataAccumulator => {
   return acc
 }
 
-const collectWorkspaceRevisionData = (overwriteRevisionData: {
-  [path: string]: Record<string, unknown>[]
-}) => {
-  const acc: { [path: string]: Record<string, unknown>[] } = {}
+const collectWorkspaceRevisionData = (
+  overwriteRevisionData: RevisionPathData
+) => {
+  const acc: RevisionPathData = {}
 
   for (const [path, values] of Object.entries(overwriteRevisionData)) {
     acc[path] = []
