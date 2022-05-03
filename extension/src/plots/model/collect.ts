@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash.clonedeep'
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
 import {
@@ -14,6 +15,7 @@ import {
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
+  ExperimentsBranchOutput,
   ExperimentsOutput,
   PlotsOutput,
   Value,
@@ -29,6 +31,7 @@ import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
+import { getShortSha } from '../../experiments/model/collect'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -220,6 +223,35 @@ export const collectCheckpointPlotsData = (
   return plotsData
 }
 
+const isRunningInWorkspace = (experiment: ExperimentFieldsOrError) =>
+  experiment.data?.executor === 'workspace'
+
+const collectRunningFromBranch = (
+  experimentsObject: ExperimentsBranchOutput
+): string | undefined => {
+  for (const [sha, experiment] of Object.entries(experimentsObject)) {
+    if (isRunningInWorkspace(experiment)) {
+      return getShortSha(sha)
+    }
+  }
+}
+
+export const collectWorkspaceRunningCheckpoint = (
+  data: ExperimentsOutput,
+  hasCheckpoints: boolean
+): string | undefined => {
+  if (!hasCheckpoints) {
+    return
+  }
+  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
+    const checkpointRunningInWorkspace =
+      collectRunningFromBranch(experimentsObject)
+    if (checkpointRunningInWorkspace) {
+      return checkpointRunningInWorkspace
+    }
+  }
+}
+
 type MetricOrderAccumulator = {
   newOrder: string[]
   uncollectedMetrics: string[]
@@ -277,10 +309,10 @@ export const collectMetricOrder = (
   return [...acc.newOrder, ...acc.uncollectedMetrics]
 }
 
+type RevisionPathData = { [path: string]: Record<string, unknown>[] }
+
 export type RevisionData = {
-  [revision: string]: {
-    [path: string]: unknown[]
-  }
+  [revision: string]: RevisionPathData
 }
 
 export type ComparisonData = {
@@ -294,9 +326,7 @@ const collectImageData = (
   path: string,
   plot: ImagePlot
 ) => {
-  const rev = Array.isArray(plot.revisions)
-    ? plot.revisions?.[0]
-    : plot.revisions
+  const rev = plot.revisions?.[0]
 
   if (!rev) {
     return
@@ -362,6 +392,54 @@ export const collectData = (data: PlotsOutput): DataAccumulator => {
   }
 
   return acc
+}
+
+const collectWorkspaceRevisionData = (
+  overwriteRevisionData: RevisionPathData
+) => {
+  const acc: RevisionPathData = {}
+
+  for (const [path, values] of Object.entries(overwriteRevisionData)) {
+    acc[path] = []
+    for (const value of values) {
+      acc[path].push({ ...value, rev: 'workspace' })
+    }
+  }
+
+  return acc
+}
+
+export const collectWorkspaceRaceConditionData = (
+  runningSelectedCheckpoint: string | undefined,
+  comparisonData: ComparisonData,
+  revisionData: RevisionData
+): {
+  overwriteComparisonData: ComparisonData
+  overwriteRevisionData: RevisionData
+} => {
+  if (!runningSelectedCheckpoint) {
+    return { overwriteComparisonData: {}, overwriteRevisionData: {} }
+  }
+
+  const overwriteComparisonData = cloneDeep(
+    comparisonData[runningSelectedCheckpoint]
+  )
+  const overwriteRevisionData = cloneDeep(
+    revisionData[runningSelectedCheckpoint]
+  )
+
+  if (!overwriteComparisonData && !overwriteRevisionData) {
+    return { overwriteComparisonData: {}, overwriteRevisionData: {} }
+  }
+
+  const workspaceRevisionData = collectWorkspaceRevisionData(
+    overwriteRevisionData
+  )
+
+  return {
+    overwriteComparisonData: { workspace: overwriteComparisonData },
+    overwriteRevisionData: { workspace: workspaceRevisionData }
+  }
 }
 
 export type TemplateAccumulator = { [path: string]: string }
