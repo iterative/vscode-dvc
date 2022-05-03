@@ -1,4 +1,4 @@
-import { collectExperiments } from './collect'
+import { collectExperiments, collectMutableRevisions } from './collect'
 import { Experiment } from '../webview/contract'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 
@@ -127,5 +127,66 @@ describe('collectExperiments', () => {
       })
       expect(continuationCheckpoints).toHaveLength(0)
     }
+  })
+})
+
+describe('collectMutableRevisions', () => {
+  const baseExperiments = [
+    { label: 'branch-A', running: false, selected: false },
+    { label: 'workspace', running: false, selected: false }
+  ] as Experiment[]
+
+  it('should not return the workspace when there is a selected running checkpoint experiment (race condition)', () => {
+    const experiments = [
+      {
+        label: 'exp-123',
+        running: true,
+        selected: true
+      },
+      ...baseExperiments
+    ] as Experiment[]
+
+    const mutableRevisions = collectMutableRevisions(experiments, true)
+    expect(mutableRevisions).toStrictEqual([])
+  })
+
+  it('should return the workspace when there is an unselected running checkpoint experiment', () => {
+    const experiments = [
+      {
+        label: 'exp-123',
+        running: true,
+        selected: false
+      },
+      ...baseExperiments
+    ] as Experiment[]
+
+    const mutableRevisions = collectMutableRevisions(experiments, true)
+    expect(mutableRevisions).toStrictEqual(['workspace'])
+  })
+
+  it('should return the workspace when there are no checkpoints', () => {
+    const experiments = [
+      { label: 'branch-A', running: false, selected: false },
+      { label: 'workspace', running: false, selected: false }
+    ] as Experiment[]
+
+    const mutableRevisions = collectMutableRevisions(experiments, false)
+    expect(mutableRevisions).toStrictEqual(['workspace'])
+  })
+
+  it('should return all running experiments when there are checkpoints', () => {
+    const experiments = [
+      { label: 'branch-A', running: false, selected: false },
+      { label: 'workspace', running: false, selected: false },
+      { label: 'running-1', running: true, selected: false },
+      { label: 'running-2', running: true, selected: true }
+    ] as Experiment[]
+
+    const mutableRevisions = collectMutableRevisions(experiments, false)
+    expect(mutableRevisions).toStrictEqual([
+      'workspace',
+      'running-1',
+      'running-2'
+    ])
   })
 })
