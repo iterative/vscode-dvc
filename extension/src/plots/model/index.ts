@@ -3,6 +3,8 @@ import {
   collectCheckpointPlotsData,
   collectData,
   collectMetricOrder,
+  collectWorkspaceRaceConditionData,
+  collectWorkspaceRunningCheckpoint,
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
@@ -37,6 +39,7 @@ export class PlotsModel extends ModelWithPersistence {
   private sectionCollapsed: SectionCollapsed
   private sectionNames: Record<Section, string>
   private branchRevisions: Record<string, string> = {}
+  private workspaceRunningCheckpoint: string | undefined
 
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
@@ -76,14 +79,18 @@ export class PlotsModel extends ModelWithPersistence {
     this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
   }
 
-  public transformAndSetExperiments(data: ExperimentsOutput) {
-    const checkpointPlots = collectCheckpointPlotsData(data)
+  public async transformAndSetExperiments(data: ExperimentsOutput) {
+    const [checkpointPlots, workspaceRunningCheckpoint] = await Promise.all([
+      collectCheckpointPlotsData(data),
+      collectWorkspaceRunningCheckpoint(data, this.experiments.hasCheckpoints())
+    ])
 
     if (!this.selectedMetrics && checkpointPlots) {
       this.selectedMetrics = checkpointPlots.map(({ title }) => title)
     }
 
     this.checkpointPlots = checkpointPlots
+    this.workspaceRunningCheckpoint = workspaceRunningCheckpoint
 
     this.setMetricOrder()
 
@@ -96,8 +103,23 @@ export class PlotsModel extends ModelWithPersistence {
       collectTemplates(data)
     ])
 
-    this.comparisonData = { ...this.comparisonData, ...comparisonData }
-    this.revisionData = { ...this.revisionData, ...revisionData }
+    const { overwriteComparisonData, overwriteRevisionData } =
+      collectWorkspaceRaceConditionData(
+        this.workspaceRunningCheckpoint,
+        { ...this.comparisonData, ...comparisonData },
+        { ...this.revisionData, ...revisionData }
+      )
+
+    this.comparisonData = {
+      ...this.comparisonData,
+      ...comparisonData,
+      ...overwriteComparisonData
+    }
+    this.revisionData = {
+      ...this.revisionData,
+      ...revisionData,
+      ...overwriteRevisionData
+    }
     this.templates = { ...this.templates, ...templates }
 
     this.setComparisonOrder()

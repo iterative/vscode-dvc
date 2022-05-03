@@ -1,18 +1,26 @@
 import { join } from 'path'
 import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
+import cloneDeep from 'lodash.clonedeep'
+import merge from 'lodash.merge'
 import {
   collectData,
   collectCheckpointPlotsData,
   collectTemplates,
-  collectMetricOrder
+  collectMetricOrder,
+  collectWorkspaceRunningCheckpoint,
+  collectWorkspaceRaceConditionData
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 import checkpointPlotsFixture from '../../test/fixtures/expShow/checkpointPlots'
 import { ExperimentsOutput } from '../../cli/reader'
-import { definedAndNonEmpty, sameContents } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  sameContents,
+  uniqueValues
+} from '../../util/array'
 import { TemplatePlot } from '../webview/contract'
 
 const logsLossPath = join('logs', 'loss.tsv')
@@ -66,6 +74,34 @@ describe('collectCheckpointPlotsData', () => {
   it('should return undefined given no input', () => {
     const data = collectCheckpointPlotsData({} as ExperimentsOutput)
     expect(data).toBeUndefined()
+  })
+})
+
+describe('collectWorkspaceRunningCheckpoint', () => {
+  const fixtureCopy = cloneDeep(expShowFixture)
+  const runningCheckpointFixture: ExperimentsOutput = merge(fixtureCopy, {
+    '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
+      '4fb124aebddb2adf1545030907687fa9a4c80e70': {
+        data: {
+          executor: 'workspace'
+        }
+      }
+    }
+  })
+
+  it('should return the expected sha from the test fixture', () => {
+    const checkpointRunningInTheWorkspace = collectWorkspaceRunningCheckpoint(
+      runningCheckpointFixture,
+      true
+    )
+
+    expect(checkpointRunningInTheWorkspace).toStrictEqual('4fb124a')
+  })
+
+  it('should always return undefined when there are no checkpoints', () => {
+    expect(
+      collectWorkspaceRunningCheckpoint(runningCheckpointFixture, false)
+    ).toBeUndefined()
   })
 })
 
@@ -247,5 +283,59 @@ describe('collectTemplates', () => {
     ])
 
     expect(JSON.parse(templates[logsLossPath])).toStrictEqual(content)
+  })
+})
+
+describe('collectWorkspaceRaceConditionData', () => {
+  const { comparisonData, revisionData } = collectData(plotsDiffFixture)
+
+  it('should return no overwrite data if there is no selected checkpoint experiment running in the workspace', () => {
+    const { overwriteComparisonData, overwriteRevisionData } =
+      collectWorkspaceRaceConditionData(undefined, comparisonData, revisionData)
+    expect(overwriteComparisonData).toStrictEqual({})
+    expect(overwriteRevisionData).toStrictEqual({})
+  })
+
+  it('should return no overwrite data if there is no data relating to the requested checkpoint', () => {
+    const { overwriteComparisonData, overwriteRevisionData } =
+      collectWorkspaceRaceConditionData('7c500fd', comparisonData, revisionData)
+    expect(overwriteComparisonData).toStrictEqual({})
+    expect(overwriteRevisionData).toStrictEqual({})
+  })
+
+  it('should return the appropriate overwrite data if the revision exists inside of the given data', () => {
+    const { overwriteComparisonData, overwriteRevisionData } =
+      collectWorkspaceRaceConditionData('4fb124a', comparisonData, revisionData)
+
+    expect(overwriteComparisonData.workspace).toStrictEqual(
+      comparisonData['4fb124a']
+    )
+
+    expect(overwriteRevisionData.workspace).not.toStrictEqual(
+      revisionData['4fb124a']
+    )
+
+    const allWorkspaceValues = Object.values(overwriteRevisionData.workspace)
+    const allOverwriteValues = Object.values(revisionData['4fb124a'])
+
+    expect(allWorkspaceValues.length).toBeTruthy()
+    expect(allWorkspaceValues).toHaveLength(allOverwriteValues.length)
+
+    const allWorkspaceRevValues: string[] = []
+    const allWorkspaceNonRevValues: Record<string, unknown>[] = []
+
+    for (const values of allWorkspaceValues) {
+      for (const { rev, ...rest } of values) {
+        allWorkspaceRevValues.push(rev as string)
+        allWorkspaceNonRevValues.push(rest)
+      }
+    }
+
+    expect(uniqueValues(allWorkspaceRevValues)).toStrictEqual(['workspace'])
+    expect(allWorkspaceNonRevValues).toStrictEqual(
+      allOverwriteValues.flatMap(values =>
+        values.map(value => omit(value, 'rev'))
+      )
+    )
   })
 })

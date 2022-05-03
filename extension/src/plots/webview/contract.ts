@@ -90,7 +90,7 @@ export type TemplatePlot = {
 }
 
 export type ImagePlot = {
-  revisions?: string[] | string
+  revisions?: string[]
   type: PlotsType
   url: string
   multiView?: boolean

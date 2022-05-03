@@ -6,13 +6,9 @@ export class ExperimentsAccumulator {
   public checkpointsByTip: Map<string, Experiment[]> = new Map()
   public experimentsByBranch: Map<string, Experiment[]> = new Map()
 
-  public hasCheckpoints: boolean
-
-  constructor(workspace: Experiment | undefined, hasCheckpoints: boolean) {
+  constructor(workspace: Experiment | undefined) {
     if (workspace) {
       this.workspace = workspace
     }
-
-    this.hasCheckpoints = hasCheckpoints
   }
 }
