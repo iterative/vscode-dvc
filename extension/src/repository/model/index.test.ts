@@ -371,5 +371,187 @@ describe('RepositoryState', () => {
         untracked: emptySet
       })
     })
+
+    it('should display all tracked paths as not in cache when the project is first opened (before pull)', () => {
+      const diff = {
+        added: [],
+        deleted: [
+          {
+            path: join('data', 'MNIST', 'raw')
+          },
+          {
+            path: 'misclassified.jpg'
+          },
+          {
+            path: 'model.pt'
+          },
+          {
+            path: 'predictions.json'
+          },
+          {
+            path: 'training_metrics.json'
+          },
+          {
+            path: 'training_metrics/'
+          }
+        ],
+        modified: [],
+        'not in cache': [],
+        renamed: []
+      }
+
+      const status = {
+        [join('data', 'MNIST', 'raw.dvc')]: [
+          {
+            'changed outs': {
+              [join('data', 'MNIST', 'raw')]: 'not in cache'
+            }
+          }
+        ],
+        train: [
+          {
+            'changed deps': {
+              [join('data', 'MNIST')]: 'modified'
+            }
+          },
+          {
+            'changed outs': {
+              'misclassified.jpg': 'not in cache',
+              'model.pt': 'not in cache',
+              'predictions.json': 'not in cache',
+              training_metrics: 'not in cache',
+              'training_metrics.json': 'not in cache'
+            }
+          },
+          'always changed'
+        ]
+      } as StatusOutput
+
+      const list = [
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'misclassified.jpg'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'model.pt'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'predictions.json'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'training_metrics.json'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('training_metrics', 'report.html')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('training_metrics', 'scalars', 'acc.tsv')
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: join('training_metrics', 'scalars', 'loss.tsv')
+        }
+      ]
+
+      const model = new RepositoryModel(dvcDemoPath)
+      model.setState({
+        diffFromCache: status,
+        diffFromHead: diff,
+        tracked: list,
+        untracked: new Set<string>()
+      })
+
+      expect(model.getState()).toStrictEqual({
+        added: emptySet,
+        deleted: emptySet,
+        gitModified: emptySet,
+        modified: emptySet,
+        notInCache: new Set([
+          resolve(dvcDemoPath, 'misclassified.jpg'),
+          resolve(dvcDemoPath, 'model.pt'),
+          resolve(dvcDemoPath, 'predictions.json'),
+          resolve(dvcDemoPath, 'training_metrics'),
+          resolve(dvcDemoPath, 'training_metrics.json'),
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw')
+        ]),
+        renamed: emptySet,
+        tracked: new Set([
+          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
+          resolve(dvcDemoPath, 'data'),
+          resolve(dvcDemoPath, 'data', 'MNIST'),
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+          resolve(dvcDemoPath, 'training_metrics'),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars')
+        ]),
+        untracked: emptySet
+      })
+    })
   })
 })
