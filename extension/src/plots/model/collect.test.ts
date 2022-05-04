@@ -350,18 +350,18 @@ describe('collectMissingRevisions', () => {
     'training_metrics/scalars/loss.tsv'
   ]
 
-  it('should return no revisions if there are no paths and no data (no plots in project)', () => {
+  it('should return the selected revisions if are no paths and no data (no plots in project)', () => {
     const comparisonData = {}
     const revisionData = {}
 
-    const noMissing = collectMissingRevisions(
+    const missingData = collectMissingRevisions(
       selectedRevisions,
       [],
       [],
       comparisonData,
       revisionData
     )
-    expect(noMissing).toStrictEqual([])
+    expect(missingData).toStrictEqual(selectedRevisions)
   })
 
   it('should return no revisions if there are non selected', () => {

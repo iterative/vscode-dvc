@@ -611,7 +611,7 @@ export const collectMissingRevisions = (
 
   const allPaths = [...comparisonPaths, ...templatePaths]
 
-  if (!isEmpty(allPaths) && isEmpty(comparisonData) && isEmpty(revisionData)) {
+  if (isEmpty(comparisonData) && isEmpty(revisionData)) {
     return selectedRevisions
   }
 
