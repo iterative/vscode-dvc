@@ -8,9 +8,11 @@ import {
   sameContents
 } from '../../util/array'
 import { PlotsModel } from '../model'
+import { PathsModel } from '../paths/model'
 
 export class PlotsData extends BaseData<PlotsOutput> {
-  private model?: PlotsModel
+  private plots?: PlotsModel
+  private paths?: PathsModel
 
   constructor(
     dvcRoot: string,
@@ -27,8 +29,8 @@ export class PlotsData extends BaseData<PlotsOutput> {
 
   public async update(): Promise<void> {
     const revisions = flattenUnique([
-      this.model?.getMissingRevisions() || [],
-      this.model?.getMutableRevisions() || []
+      this.plots?.getMissingRevisions(this.paths?.getComparisonPaths()) || [],
+      this.plots?.getMutableRevisions() || []
     ])
 
     if (
@@ -63,7 +65,8 @@ export class PlotsData extends BaseData<PlotsOutput> {
     return Object.keys(data)
   }
 
-  public setModel(model: PlotsModel) {
-    this.model = model
+  public setModels(plots: PlotsModel, paths: PathsModel) {
+    this.plots = plots
+    this.paths = paths
   }
 }

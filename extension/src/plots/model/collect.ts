@@ -1,4 +1,5 @@
 import cloneDeep from 'lodash.clonedeep'
+import isEmpty from 'lodash.isempty'
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
 import {
@@ -532,4 +533,69 @@ export const collectSelectedTemplatePlots = (
     })
   }
   return acc.length > 0 ? acc : undefined
+}
+
+const collectMissingRevision = (
+  selectedRevision: string,
+  comparisonPaths: string[],
+  templatePaths: string[],
+  comparisonData: { [path: string]: ImagePlot },
+  revisionData: RevisionPathData
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  if (
+    (!isEmpty(templatePaths) && isEmpty(revisionData)) ||
+    (!isEmpty(comparisonPaths) && isEmpty(comparisonData))
+  ) {
+    return selectedRevision
+  }
+
+  for (const path of templatePaths) {
+    if (isEmpty(revisionData[path])) {
+      return selectedRevision
+    }
+  }
+
+  for (const path of comparisonPaths) {
+    if (isEmpty(comparisonData[path])) {
+      return selectedRevision
+    }
+  }
+}
+
+export const collectMissingRevisions = (
+  selectedRevisions: string[],
+  comparisonPaths: string[],
+  templatePaths: string[],
+  comparisonData: ComparisonData,
+  revisionData: RevisionData
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  if (isEmpty(selectedRevisions)) {
+    return
+  }
+
+  if (isEmpty(comparisonData) && isEmpty(revisionData)) {
+    return selectedRevisions
+  }
+
+  if (isEmpty(comparisonPaths) && isEmpty(templatePaths)) {
+    return
+  }
+
+  const missingRevisions: string[] = []
+  for (const selectedRevision of selectedRevisions) {
+    const missingRevision = collectMissingRevision(
+      selectedRevision,
+      comparisonPaths,
+      templatePaths,
+      comparisonData[selectedRevision],
+      revisionData[selectedRevision]
+    )
+    if (missingRevision) {
+      missingRevisions.push(missingRevision)
+    }
+  }
+
+  return missingRevisions
 }

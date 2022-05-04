@@ -86,7 +86,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       new PathsModel(this.dvcRoot, this.workspaceState)
     )
 
-    this.data.setModel(this.plots)
+    this.data.setModels(this.plots, this.paths)
 
     this.waitForInitialData(experiments)
 
@@ -138,7 +138,9 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     if (
       this.paths?.hasPaths() &&
-      definedAndNonEmpty(this.plots?.getMissingRevisions())
+      definedAndNonEmpty(
+        this.plots?.getMissingRevisions(this.paths?.getComparisonPaths())
+      )
     ) {
       this.sendCheckpointPlotsData()
       return this.data.managedUpdate()

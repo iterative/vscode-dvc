@@ -6,6 +6,7 @@ import { PlotsData } from '../../../../plots/data'
 import { PlotsModel } from '../../../../plots/model'
 import { dvcDemoPath } from '../../../util'
 import { buildDependencies } from '../../util'
+import { PathsModel } from '../../../../plots/paths/model'
 
 suite('Plots Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -41,7 +42,11 @@ suite('Plots Data Test Suite', () => {
       getMutableRevisions: mockGetMutableRevisions
     } as unknown as PlotsModel
 
-    data.setModel(mockPlotsModel)
+    const mockPathsModel = {
+      getComparisonPaths: () => []
+    } as unknown as PathsModel
+
+    data.setModels(mockPlotsModel, mockPathsModel)
 
     return {
       data,

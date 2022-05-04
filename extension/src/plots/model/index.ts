@@ -9,7 +9,8 @@ import {
   collectTemplates,
   ComparisonData,
   RevisionData,
-  TemplateAccumulator
+  TemplateAccumulator,
+  collectMissingRevisions
 } from './collect'
 import {
   CheckpointPlotData,
@@ -153,14 +154,13 @@ export class PlotsModel extends ModelWithPersistence {
     }
   }
 
-  public getMissingRevisions() {
-    const cachedRevisions = new Set([
-      ...Object.keys(this.comparisonData),
-      ...Object.keys(this.revisionData)
-    ])
-
-    return this.getSelectedRevisions().filter(
-      revision => !cachedRevisions.has(revision)
+  public getMissingRevisions(comparisonPaths: string[] = []) {
+    return collectMissingRevisions(
+      this.getSelectedRevisions(),
+      comparisonPaths,
+      Object.keys(this.templates),
+      this.comparisonData,
+      this.revisionData
     )
   }
 
