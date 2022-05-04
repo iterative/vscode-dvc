@@ -10,7 +10,7 @@ import {
   ComparisonData,
   RevisionData,
   TemplateAccumulator,
-  collectMissingRevisions
+  collectMissingSelectedRevisions
 } from './collect'
 import {
   CheckpointPlotData,
@@ -155,7 +155,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getMissingRevisions(comparisonPaths: string[] = []) {
-    return collectMissingRevisions(
+    return collectMissingSelectedRevisions(
       this.getSelectedRevisions(),
       comparisonPaths,
       Object.keys(this.templates),

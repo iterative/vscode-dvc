@@ -10,7 +10,7 @@ import {
   collectMetricOrder,
   collectWorkspaceRunningCheckpoint,
   collectWorkspaceRaceConditionData,
-  collectMissingRevisions
+  collectMissingSelectedRevisions
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
@@ -341,7 +341,7 @@ describe('collectWorkspaceRaceConditionData', () => {
   })
 })
 
-describe('collectMissingRevisions', () => {
+describe('collectMissingSelectedRevisions', () => {
   const selectedRevisions = ['workspace', 'main']
   const comparisonPaths = ['misclassified.jpg']
   const templatePaths = [
@@ -354,7 +354,7 @@ describe('collectMissingRevisions', () => {
     const comparisonData = {}
     const revisionData = {}
 
-    const missingData = collectMissingRevisions(
+    const missingData = collectMissingSelectedRevisions(
       selectedRevisions,
       [],
       [],
@@ -385,7 +385,7 @@ describe('collectMissingRevisions', () => {
       }
     }
 
-    const nonSelected = collectMissingRevisions(
+    const nonSelected = collectMissingSelectedRevisions(
       [],
       comparisonPaths,
       templatePaths,
@@ -399,7 +399,7 @@ describe('collectMissingRevisions', () => {
     const comparisonData = {}
     const revisionData = {}
 
-    const selectedMissing = collectMissingRevisions(
+    const selectedMissing = collectMissingSelectedRevisions(
       selectedRevisions,
       comparisonPaths,
       templatePaths,
@@ -422,7 +422,7 @@ describe('collectMissingRevisions', () => {
       }
     }
 
-    const bothMissing = collectMissingRevisions(
+    const bothMissing = collectMissingSelectedRevisions(
       selectedRevisions,
       [],
       templatePaths,
@@ -453,7 +453,7 @@ describe('collectMissingRevisions', () => {
       }
     }
 
-    const bothMissing = collectMissingRevisions(
+    const bothMissing = collectMissingSelectedRevisions(
       selectedRevisions,
       [],
       templatePaths,

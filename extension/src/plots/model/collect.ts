@@ -574,7 +574,7 @@ const collectMissingRevision = (
   return checkData(selectedRevision, comparisonPaths, comparisonData)
 }
 
-const doStuff = (
+const collectMissingRevisions = (
   selectedRevisions: string[],
   comparisonPaths: string[],
   templatePaths: string[],
@@ -598,7 +598,7 @@ const doStuff = (
   return missingRevisions
 }
 
-export const collectMissingRevisions = (
+export const collectMissingSelectedRevisions = (
   selectedRevisions: string[],
   comparisonPaths: string[],
   templatePaths: string[],
@@ -619,7 +619,7 @@ export const collectMissingRevisions = (
     return []
   }
 
-  return doStuff(
+  return collectMissingRevisions(
     selectedRevisions,
     comparisonPaths,
     templatePaths,
