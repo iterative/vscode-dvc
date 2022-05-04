@@ -535,13 +535,24 @@ export const collectSelectedTemplatePlots = (
   return acc.length > 0 ? acc : undefined
 }
 
+const checkData = (
+  selectedRevision: string,
+  paths: string[],
+  data: { [path: string]: ImagePlot } | RevisionPathData
+) => {
+  for (const path of paths) {
+    if (isEmpty(data[path])) {
+      return selectedRevision
+    }
+  }
+}
+
 const collectMissingRevision = (
   selectedRevision: string,
   comparisonPaths: string[],
   templatePaths: string[],
   comparisonData: { [path: string]: ImagePlot },
   revisionData: RevisionPathData
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   if (
     (!isEmpty(templatePaths) && isEmpty(revisionData)) ||
@@ -550,41 +561,26 @@ const collectMissingRevision = (
     return selectedRevision
   }
 
-  for (const path of templatePaths) {
-    if (isEmpty(revisionData[path])) {
-      return selectedRevision
-    }
+  const missingFromRevisionData = checkData(
+    selectedRevision,
+    templatePaths,
+    revisionData
+  )
+
+  if (missingFromRevisionData) {
+    return missingFromRevisionData
   }
 
-  for (const path of comparisonPaths) {
-    if (isEmpty(comparisonData[path])) {
-      return selectedRevision
-    }
-  }
+  return checkData(selectedRevision, comparisonPaths, comparisonData)
 }
 
-export const collectMissingRevisions = (
+const doStuff = (
   selectedRevisions: string[],
   comparisonPaths: string[],
   templatePaths: string[],
   comparisonData: ComparisonData,
   revisionData: RevisionData
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): string[] => {
-  if (isEmpty(selectedRevisions)) {
-    return []
-  }
-
-  const allPaths = [...comparisonPaths, ...templatePaths]
-
-  if (!isEmpty(allPaths) && isEmpty(comparisonData) && isEmpty(revisionData)) {
-    return selectedRevisions
-  }
-
-  if (isEmpty(allPaths)) {
-    return []
-  }
-
   const missingRevisions: string[] = []
   for (const selectedRevision of selectedRevisions) {
     const missingRevision = collectMissingRevision(
@@ -600,4 +596,34 @@ export const collectMissingRevisions = (
   }
 
   return missingRevisions
+}
+
+export const collectMissingRevisions = (
+  selectedRevisions: string[],
+  comparisonPaths: string[],
+  templatePaths: string[],
+  comparisonData: ComparisonData,
+  revisionData: RevisionData
+): string[] => {
+  if (isEmpty(selectedRevisions)) {
+    return []
+  }
+
+  const allPaths = [...comparisonPaths, ...templatePaths]
+
+  if (!isEmpty(allPaths) && isEmpty(comparisonData) && isEmpty(revisionData)) {
+    return selectedRevisions
+  }
+
+  if (isEmpty(allPaths)) {
+    return []
+  }
+
+  return doStuff(
+    selectedRevisions,
+    comparisonPaths,
+    templatePaths,
+    comparisonData,
+    revisionData
+  )
 }
