@@ -1,4 +1,4 @@
-$vscode-shadow: var(--vscode-widget-shadow) 0px 0px 8px 2px;
+$vscode-drop-shadow: drop-shadow(0 0 4px var(--vscode-widget-shadow));
 $foreground: var(--vscode-menu-foreground);
 $background: var(--vscode-menu-background);
 $font: var(--vscode-font-family);
@@ -9,6 +9,7 @@ $font: var(--vscode-font-family);
   }
 }
 :global(.tippy-box) {
+  filter: $vscode-drop-shadow;
   font-family: $font;
   max-width: max-content;
   font-size: 0.8rem;
@@ -19,7 +20,6 @@ $font: var(--vscode-font-family);
     z-index: 2;
     ::before {
       overflow: hidden;
-      box-shadow: $vscode-shadow;
     }
   }
   & > :global(.tippy-content) {
@@ -27,7 +27,6 @@ $font: var(--vscode-font-family);
     white-space: nowrap;
     padding: 0;
     background-color: $background;
-    box-shadow: $vscode-shadow;
     z-index: 1;
   }
 }
