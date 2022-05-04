@@ -298,6 +298,10 @@ $gap: 20px;
 .zoomedInPlot {
   width: 80vw;
   height: calc(80vh - 100px);
+
+  svg {
+    background-color: transparent !important;
+  }
 }
 
 :global(.has-actions) {

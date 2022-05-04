@@ -16,8 +16,12 @@
 }
 
 .modal {
-  background: var(--vscode-menu-background);
+  background: $bg-color;
   position: relative;
+}
+
+.modalContent {
+  background: var(--editor-foreground-transparency-1);
   padding: 2rem;
 }
 

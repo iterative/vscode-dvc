@@ -121,7 +121,7 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
                 {...zoomedInPlot}
                 config={{
                   ...(zoomedInPlot.config as Config),
-                  background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
+                  background: getThemeValue(ThemeProperty.BACKGROUND_COLOR)
                 }}
                 actions={{
                   compiled: false,
