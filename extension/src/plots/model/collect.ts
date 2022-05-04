@@ -570,17 +570,19 @@ export const collectMissingRevisions = (
   comparisonData: ComparisonData,
   revisionData: RevisionData
   // eslint-disable-next-line sonarjs/cognitive-complexity
-) => {
+): string[] => {
   if (isEmpty(selectedRevisions)) {
-    return
+    return []
   }
 
-  if (isEmpty(comparisonData) && isEmpty(revisionData)) {
+  const allPaths = [...comparisonPaths, ...templatePaths]
+
+  if (!isEmpty(allPaths) && isEmpty(comparisonData) && isEmpty(revisionData)) {
     return selectedRevisions
   }
 
-  if (isEmpty(comparisonPaths) && isEmpty(templatePaths)) {
-    return
+  if (isEmpty(allPaths)) {
+    return []
   }
 
   const missingRevisions: string[] = []

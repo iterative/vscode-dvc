@@ -9,7 +9,8 @@ import {
   collectTemplates,
   collectMetricOrder,
   collectWorkspaceRunningCheckpoint,
-  collectWorkspaceRaceConditionData
+  collectWorkspaceRaceConditionData,
+  collectMissingRevisions
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
@@ -21,7 +22,7 @@ import {
   sameContents,
   uniqueValues
 } from '../../util/array'
-import { TemplatePlot } from '../webview/contract'
+import { PlotsType, TemplatePlot } from '../webview/contract'
 
 const logsLossPath = join('logs', 'loss.tsv')
 
@@ -337,5 +338,128 @@ describe('collectWorkspaceRaceConditionData', () => {
         values.map(value => omit(value, 'rev'))
       )
     )
+  })
+})
+
+describe('collectMissingRevisions', () => {
+  const selectedRevisions = ['workspace', 'main']
+  const comparisonPaths = ['misclassified.jpg']
+  const templatePaths = [
+    'predictions.json',
+    'training_metrics/scalars/acc.tsv',
+    'training_metrics/scalars/loss.tsv'
+  ]
+
+  it('should return no revisions if there are no paths and no data (no plots in project)', () => {
+    const comparisonData = {}
+    const revisionData = {}
+
+    const noMissing = collectMissingRevisions(
+      selectedRevisions,
+      [],
+      [],
+      comparisonData,
+      revisionData
+    )
+    expect(noMissing).toStrictEqual([])
+  })
+
+  it('should return no revisions if there are non selected', () => {
+    const comparisonData = {
+      workspace: {
+        'misclassified.jpg': {
+          revisions: ['workspace'],
+          type: PlotsType.IMAGE,
+          url: '.dvc/tmp/plots/workspace_misclassified.jpg'
+        }
+      }
+    }
+    const revisionData = {
+      main: {
+        'training_metrics/scalars/acc.tsv': [{ rev: 'has data' }],
+        'training_metrics/scalars/loss.tsv': [{ rev: 'has data' }]
+      },
+      workspace: {
+        'training_metrics/scalars/acc.tsv': [{ rev: 'has data' }],
+        'training_metrics/scalars/loss.tsv': [{ rev: 'has data' }]
+      }
+    }
+
+    const nonSelected = collectMissingRevisions(
+      [],
+      comparisonPaths,
+      templatePaths,
+      comparisonData,
+      revisionData
+    )
+    expect(nonSelected).toStrictEqual([])
+  })
+
+  it('should return the selected revisions if there are paths but no data', () => {
+    const comparisonData = {}
+    const revisionData = {}
+
+    const selectedMissing = collectMissingRevisions(
+      selectedRevisions,
+      comparisonPaths,
+      templatePaths,
+      comparisonData,
+      revisionData
+    )
+    expect(selectedMissing).toStrictEqual(selectedRevisions)
+  })
+
+  it('should return any selected revisions that is missing template plot data', () => {
+    const comparisonData = {}
+    const revisionData = {
+      main: {
+        'training_metrics/scalars/acc.tsv': [],
+        'training_metrics/scalars/loss.tsv': [{ rev: 'has data' }]
+      },
+      workspace: {
+        'training_metrics/scalars/acc.tsv': [{ rev: 'has data' }],
+        'training_metrics/scalars/loss.tsv': []
+      }
+    }
+
+    const bothMissing = collectMissingRevisions(
+      selectedRevisions,
+      [],
+      templatePaths,
+      comparisonData,
+      revisionData
+    )
+    expect(bothMissing).toStrictEqual(selectedRevisions)
+  })
+
+  it('should return any selected revision that is missing image data', () => {
+    const comparisonData = {
+      workspace: {
+        'misclassified.jpg': {
+          revisions: ['workspace'],
+          type: PlotsType.IMAGE,
+          url: '.dvc/tmp/plots/workspace_misclassified.jpg'
+        }
+      }
+    }
+    const revisionData = {
+      main: {
+        'training_metrics/scalars/acc.tsv': [{ rev: 'has data' }],
+        'training_metrics/scalars/loss.tsv': [{ rev: 'has data' }]
+      },
+      workspace: {
+        'training_metrics/scalars/acc.tsv': [{ rev: 'has data' }],
+        'training_metrics/scalars/loss.tsv': [{ rev: 'has data' }]
+      }
+    }
+
+    const bothMissing = collectMissingRevisions(
+      selectedRevisions,
+      [],
+      templatePaths,
+      comparisonData,
+      revisionData
+    )
+    expect(bothMissing).toStrictEqual(selectedRevisions)
   })
 })
