@@ -5,8 +5,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
-  width: 100%;
+  height: max(100%, 100vh);
+  width: max(100%, 100vw);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,8 +16,12 @@
 }
 
 .modal {
-  background: var(--vscode-menu-background);
+  background: $bg-color;
   position: relative;
+}
+
+.modalContent {
+  background: var(--editor-foreground-transparency-1);
   padding: 2rem;
 }
 
