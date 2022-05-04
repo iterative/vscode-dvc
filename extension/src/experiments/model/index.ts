@@ -6,7 +6,7 @@ import {
   filterExperiments,
   getFilterId
 } from './filterBy'
-import { collectExperiments } from './collect'
+import { collectExperiments, collectMutableRevisions } from './collect'
 import { collectColoredStatus, collectSelected } from './status/collect'
 import { Color, copyOriginalColors } from './status/colors'
 import {
@@ -83,9 +83,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public transformAndSet(data: ExperimentsOutput, hasCheckpoints = false) {
+  public transformAndSet(data: ExperimentsOutput) {
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
-      collectExperiments(data, hasCheckpoints)
+      collectExperiments(data)
 
     this.workspace = workspace
     this.branches = branches
@@ -181,15 +181,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getCombinedList().map(({ label }) => label)
   }
 
-  public getMutableRevisions() {
-    const acc: string[] = []
-
-    for (const { label, mutable } of this.getCombinedList()) {
-      if (mutable) {
-        acc.push(label)
-      }
-    }
-    return acc
+  public getMutableRevisions(hasCheckpoints: boolean) {
+    return collectMutableRevisions(this.getExperiments(), hasCheckpoints)
   }
 
   public getSelectedRevisions() {
