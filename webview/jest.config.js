@@ -6,7 +6,8 @@ module.exports = {
     '!**/*.test.*',
     '!src/stories/*',
     '!src/test/*',
-    '!src/shared/components/icons/*'
+    '!src/shared/components/icons/*',
+    '!src/util/wdyr.ts'
   ],
   coverageDirectory: 'coverage/jest',
   coverageReporters: ['json'],
