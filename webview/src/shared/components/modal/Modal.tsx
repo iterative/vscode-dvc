@@ -23,6 +23,7 @@ export const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
           <Icon icon={AllIcons.CLOSE} width={30} height={30} />
         </button>
         <div
+          className={styles.modalContent}
           role="none"
           onClick={(e: MouseEvent) => e.stopPropagation()}
           data-testid="modal-content"
