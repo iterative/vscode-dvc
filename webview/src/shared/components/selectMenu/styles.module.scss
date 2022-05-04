@@ -1,9 +1,13 @@
-$background: var(--vscode-editor-background);
+$hover-background-color: var(--vscode-list-hoverBackground);
 
 .item {
   display: flex;
   cursor: pointer;
-  height: 20px;
+  height: 24px;
+  padding: 2px 6px;
+  &:hover {
+    background-color: $hover-background-color;
+  }
 }
 
 .itemLabel {
