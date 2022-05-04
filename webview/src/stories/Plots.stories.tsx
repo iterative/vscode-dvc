@@ -119,3 +119,15 @@ ZoomedInPlot.play = async ({ canvasElement }) => {
 
   fireEvent.click(plot)
 }
+
+export const MultiviewZoomedInPlot = Template.bind({})
+MultiviewZoomedInPlot.parameters = {
+  chromatic: { delay: 300 }
+}
+MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  const plot = await canvas.findByTestId('plots-section_template-multi_1')
+  const plotButton = within(plot).getByRole('button')
+
+  fireEvent.click(plotButton)
+}
