@@ -1,6 +1,6 @@
 $vscode-drop-shadow: drop-shadow(0 0 4px var(--vscode-widget-shadow));
-$foreground: var(--vscode-menu-foreground);
-$background: var(--vscode-menu-background);
+$foreground: var(--vscode-quickInput-foreground);
+$background: var(--vscode-quickInput-background);
 $font: var(--vscode-font-family);
 
 :global(.tippy-box).padded {
