@@ -13,6 +13,7 @@ import Tooltip, {
   CELL_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/table/styles.module.scss'
+import tooltipStyles from '../../shared/components/tooltip/styles.module.scss'
 import { CopyButton } from '../components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
 const UndefinedCell = (
@@ -55,6 +56,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
 
   return (
     <Tooltip
+      className={tooltipStyles.padded}
       content={<CellTooltip cell={cell} />}
       placement="bottom"
       arrow={true}
