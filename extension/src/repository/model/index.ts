@@ -160,11 +160,11 @@ export class RepositoryModel
     return true
   }
 
-  private splitModifiedAgainstHead(
-    modifiedAgainstHead: string[],
+  private filterStatuses(
+    paths: string[],
     filter: (path: string) => boolean
   ): Set<string> {
-    return new Set(modifiedAgainstHead.filter(filter))
+    return new Set(paths.filter(filter))
   }
 
   private getAllModifiedAgainstCache(
@@ -172,14 +172,14 @@ export class RepositoryModel
     modifiedAgainstCache: Set<string>
   ): Set<string> {
     return new Set<string>([
-      ...this.splitModifiedAgainstHead(modifiedAgainstHead, path =>
+      ...this.filterStatuses(modifiedAgainstHead, path =>
         this.pathInSet(path, modifiedAgainstCache)
       ),
       ...modifiedAgainstCache
     ])
   }
 
-  private setModifiedAndNotInCache(
+  private setComplexStatuses(
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
@@ -194,13 +194,8 @@ export class RepositoryModel
       [Status.NOT_IN_CACHE]: notInCache
     } = this.collectModifiedAndNotInCache(statusOutput)
 
-    this.state.gitModified = this.splitModifiedAgainstHead(
-      modifiedAgainstHead,
-      path =>
-        this.pathNotInSet(
-          path,
-          new Set([...notInCache, ...modifiedAgainstCache])
-        )
+    this.state.gitModified = this.filterStatuses(modifiedAgainstHead, path =>
+      this.pathNotInSet(path, new Set([...notInCache, ...modifiedAgainstCache]))
     )
 
     this.state.modified = this.getAllModifiedAgainstCache(
@@ -210,10 +205,20 @@ export class RepositoryModel
 
     this.state.notInCache = new Set([
       ...this.getStateFromDiff(diffOutput[Status.NOT_IN_CACHE]),
-      ...this.splitModifiedAgainstHead(modifiedAgainstHead, path =>
-        this.pathInSet(path, notInCache)
+      ...this.filterStatuses(
+        [
+          ...this.getStateFromDiff(diffOutput[Status.DELETED]),
+          ...modifiedAgainstHead
+        ],
+        path => this.pathInSet(path, notInCache)
       )
     ])
+
+    this.state.deleted = new Set(
+      this.mapToTrackedPaths(diffOutput.deleted || []).filter(
+        path => !this.state.notInCache.has(path)
+      )
+    )
   }
 
   private updateStatus(
@@ -221,14 +226,13 @@ export class RepositoryModel
     statusOutput: StatusOutput
   ): void {
     this.state.added = this.getStateFromDiff(diffOutput.added)
-    this.state.deleted = this.getStateFromDiff(diffOutput.deleted)
     this.state.renamed = new Set(
       diffOutput.renamed
         ?.map(renamed => this.getAbsolutePath(renamed?.path?.new))
         .filter(path => this.state.tracked.has(path))
     )
 
-    this.setModifiedAndNotInCache(diffOutput, statusOutput)
+    this.setComplexStatuses(diffOutput, statusOutput)
   }
 
   private updateTracked(listOutput: ListOutput[]): void {

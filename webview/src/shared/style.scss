@@ -1,7 +1,6 @@
 * {
   box-sizing: border-box;
   outline: none;
-  font-family: 'monospace', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html,
@@ -27,6 +26,7 @@ body {
 
   background-color: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-editor-font-family);
 }
 
 .modal-open {
@@ -39,4 +39,8 @@ body {
   justify-content: center;
   margin: 0;
   flex-wrap: wrap;
+}
+
+button {
+  font-family: inherit;
 }

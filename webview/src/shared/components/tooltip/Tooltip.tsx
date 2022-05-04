@@ -26,7 +26,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onClickOutside,
     hideOnClick,
     animation = false,
-    className = styles.menu,
+    className = typeof content === 'string' ? styles.padded : undefined,
     arrow = false
   },
   ref

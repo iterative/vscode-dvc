@@ -3,6 +3,7 @@ import { useSingleton } from '@tippyjs/react'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
 import styles from './styles.module.scss'
 import Tooltip from '../tooltip/Tooltip'
+import tooltipStyles from '../tooltip/styles.module.scss'
 
 interface IconMenuProps {
   items: IconMenuItemProps[]
@@ -28,6 +29,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
 
   return (
     <Tooltip
+      className={tooltipStyles.padded}
       singleton={tooltipSource}
       placement="bottom-end"
       popperOptions={popperOptions}
