@@ -1,15 +1,15 @@
 import { ExperimentFields, ValueTreeRoot } from '../../cli/reader'
-import { MetricsOrParams } from '../webview/contract'
+import { Columns } from '../webview/contract'
 
 const extractMetricsOrParams = (
-  metricsOrParams?: ValueTreeRoot
-): MetricsOrParams | undefined => {
-  if (!metricsOrParams) {
+  columns?: ValueTreeRoot
+): Columns | undefined => {
+  if (!columns) {
     return
   }
-  const acc: MetricsOrParams = {}
+  const acc: Columns = {}
 
-  for (const [file, dataOrError] of Object.entries(metricsOrParams)) {
+  for (const [file, dataOrError] of Object.entries(columns)) {
     const data = dataOrError?.data
     if (!data) {
       continue
@@ -20,11 +20,11 @@ const extractMetricsOrParams = (
   return acc
 }
 
-export const extractMetricsAndParams = (
+export const extractColumns = (
   experiment: ExperimentFields
 ): {
-  metrics: MetricsOrParams | undefined
-  params: MetricsOrParams | undefined
+  metrics: Columns | undefined
+  params: Columns | undefined
 } => ({
   metrics: extractMetricsOrParams(experiment.metrics),
   params: extractMetricsOrParams(experiment.params)

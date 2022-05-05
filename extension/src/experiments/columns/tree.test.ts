@@ -1,19 +1,15 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
-import { ExperimentsMetricsAndParamsTree } from './tree'
-import {
-  appendMetricOrParamToPath,
-  joinMetricOrParamPath,
-  splitMetricOrParamPath
-} from './paths'
+import { ExperimentsColumnsTree } from './tree'
+import { appendColumnToPath, joinColumnPath, splitColumnPath } from './paths'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { Status } from '../../path/selection/model'
-import { MetricOrParamType } from '../webview/contract'
+import { ColumnType } from '../webview/contract'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -25,7 +21,7 @@ const mockedTreeItem = jest.mocked(TreeItem)
 
 const mockedDisposable = jest.mocked(Disposable)
 
-const { mockedExperiments, mockedGetChildMetricsOrParams, mockedGetDvcRoots } =
+const { mockedExperiments, mockedGetChildColumns, mockedGetDvcRoots } =
   buildMockedExperiments()
 
 const mockedInternalCommands = {
@@ -63,34 +59,31 @@ beforeEach(() => {
   } as unknown as (() => void) & Disposer)
 })
 
-describe('ExperimentsMetricsAndParamsTree', () => {
+describe('ExperimentsColumnsTree', () => {
   const getLabel = (path: string): string => {
-    const pathArray = splitMetricOrParamPath(path)
+    const pathArray = splitColumnPath(path)
     const [label] = pathArray.slice(-1)
     return label
   }
 
-  const rootMetricsAndParams = columnsFixture
-    .filter(metricOrParam =>
-      Object.values<string>(MetricOrParamType).includes(
-        metricOrParam.parentPath
-      )
+  const rootColumns = columnsFixture
+    .filter(column =>
+      Object.values<string>(ColumnType).includes(column.parentPath)
     )
-    .map(metricOrParam => ({
-      ...metricOrParam,
+    .map(column => ({
+      ...column,
       descendantStatuses: [],
-      label: getLabel(metricOrParam.path),
+      label: getLabel(column.path),
       status: Status.SELECTED
     }))
 
   describe('getChildren', () => {
     it('should return the experiments roots if there are multiple repositories and no path is provided', async () => {
-      const experimentsMetricsAndParamsTree =
-        new ExperimentsMetricsAndParamsTree(
-          mockedExperiments,
-          mockedInternalCommands,
-          mockedResourceLocator
-        )
+      const experimentsColumnsTree = new ExperimentsColumnsTree(
+        mockedExperiments,
+        mockedInternalCommands,
+        mockedResourceLocator
+      )
       const mockedDvcRoots = [
         join('path', 'to', 'first', 'root'),
         join('path', 'to', 'second', 'root')
@@ -98,24 +91,23 @@ describe('ExperimentsMetricsAndParamsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce(mockedDvcRoots)
 
-      expect(await experimentsMetricsAndParamsTree.getChildren()).toStrictEqual(
+      expect(await experimentsColumnsTree.getChildren()).toStrictEqual(
         mockedDvcRoots
       )
     })
 
     it('should return the params and metrics if there is only a single repository and no path is provided', async () => {
-      const experimentsMetricsAndParamsTree =
-        new ExperimentsMetricsAndParamsTree(
-          mockedExperiments,
-          mockedInternalCommands,
-          mockedResourceLocator
-        )
+      const experimentsColumnsTree = new ExperimentsColumnsTree(
+        mockedExperiments,
+        mockedInternalCommands,
+        mockedResourceLocator
+      )
       const mockedDvcRoot = join('path', 'to', 'only', 'root')
 
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
-      mockedGetChildMetricsOrParams.mockReturnValueOnce(rootMetricsAndParams)
+      mockedGetChildColumns.mockReturnValueOnce(rootColumns)
 
-      const children = await experimentsMetricsAndParamsTree.getChildren()
+      const children = await experimentsColumnsTree.getChildren()
 
       expect(children).toStrictEqual([
         {
@@ -124,7 +116,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'summary.json',
-          path: joinMetricOrParamPath(MetricOrParamType.METRICS, 'summary.json')
+          path: joinColumnPath(ColumnType.METRICS, 'summary.json')
         },
         {
           collapsibleState: 1,
@@ -132,7 +124,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'params.yaml',
-          path: joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
+          path: joinColumnPath(ColumnType.PARAMS, 'params.yaml')
         },
         {
           collapsibleState: 1,
@@ -140,40 +132,31 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: join('nested', 'params.yaml'),
-          path: joinMetricOrParamPath(
-            MetricOrParamType.PARAMS,
-            join('nested', 'params.yaml')
-          )
+          path: joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'))
         }
       ])
     })
 
     it("should return the param's children if a path is provided", async () => {
-      const experimentsMetricsAndParamsTree =
-        new ExperimentsMetricsAndParamsTree(
-          mockedExperiments,
-          mockedInternalCommands,
-          mockedResourceLocator
-        )
+      const experimentsColumnsTree = new ExperimentsColumnsTree(
+        mockedExperiments,
+        mockedInternalCommands,
+        mockedResourceLocator
+      )
 
       const mockedDvcRoot = join('path', 'to', 'dvc', 'repo')
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
 
-      mockedGetChildMetricsOrParams.mockReturnValueOnce(rootMetricsAndParams)
+      mockedGetChildColumns.mockReturnValueOnce(rootColumns)
 
-      await experimentsMetricsAndParamsTree.getChildren()
+      await experimentsColumnsTree.getChildren()
 
-      mockedGetChildMetricsOrParams.mockReturnValueOnce(rootMetricsAndParams)
+      mockedGetChildColumns.mockReturnValueOnce(rootColumns)
 
-      const children = await experimentsMetricsAndParamsTree.getChildren(
-        mockedDvcRoot
-      )
+      const children = await experimentsColumnsTree.getChildren(mockedDvcRoot)
 
-      const paramsPath = joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml'
-      )
-      const processPath = appendMetricOrParamToPath(paramsPath, 'process')
+      const paramsPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+      const processPath = appendColumnToPath(paramsPath, 'process')
 
       expect(children).toStrictEqual([
         {
@@ -182,7 +165,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'summary.json',
-          path: joinMetricOrParamPath(MetricOrParamType.METRICS, 'summary.json')
+          path: joinColumnPath(ColumnType.METRICS, 'summary.json')
         },
         {
           collapsibleState: 1,
@@ -198,16 +181,13 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: join('nested', 'params.yaml'),
-          path: joinMetricOrParamPath(
-            MetricOrParamType.PARAMS,
-            join('nested', 'params.yaml')
-          )
+          path: joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'))
         }
       ])
 
-      mockedGetChildMetricsOrParams.mockReturnValueOnce(
+      mockedGetChildColumns.mockReturnValueOnce(
         columnsFixture
-          .filter(metricOrParam => paramsPath === metricOrParam.parentPath)
+          .filter(column => paramsPath === column.parentPath)
           .map(param => {
             if (param.path === processPath) {
               return {
@@ -228,7 +208,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           })
       )
 
-      const grandChildren = await experimentsMetricsAndParamsTree.getChildren({
+      const grandChildren = await experimentsColumnsTree.getChildren({
         collapsibleState: TreeItemCollapsibleState.Collapsed,
         description: undefined,
         dvcRoot: mockedDvcRoot,
@@ -243,7 +223,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'epochs',
-          path: appendMetricOrParamToPath(paramsPath, 'epochs')
+          path: appendColumnToPath(paramsPath, 'epochs')
         },
         {
           collapsibleState: 0,
@@ -251,7 +231,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'learning_rate',
-          path: appendMetricOrParamToPath(paramsPath, 'learning_rate')
+          path: appendColumnToPath(paramsPath, 'learning_rate')
         },
         {
           collapsibleState: 0,
@@ -259,7 +239,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'dvc_logs_dir',
-          path: appendMetricOrParamToPath(paramsPath, 'dvc_logs_dir')
+          path: appendColumnToPath(paramsPath, 'dvc_logs_dir')
         },
         {
           collapsibleState: 0,
@@ -267,7 +247,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'log_file',
-          path: appendMetricOrParamToPath(paramsPath, 'log_file')
+          path: appendColumnToPath(paramsPath, 'log_file')
         },
         {
           collapsibleState: 0,
@@ -275,7 +255,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'dropout',
-          path: appendMetricOrParamToPath(paramsPath, 'dropout')
+          path: appendColumnToPath(paramsPath, 'dropout')
         },
         {
           collapsibleState: 1,
@@ -287,9 +267,9 @@ describe('ExperimentsMetricsAndParamsTree', () => {
         }
       ])
 
-      mockedGetChildMetricsOrParams.mockReturnValueOnce(
+      mockedGetChildColumns.mockReturnValueOnce(
         columnsFixture
-          .filter(metricOrParam => processPath === metricOrParam.parentPath)
+          .filter(column => processPath === column.parentPath)
           .map(param => ({
             ...param,
             descendantStatuses: undefined,
@@ -298,15 +278,14 @@ describe('ExperimentsMetricsAndParamsTree', () => {
             status: Status.SELECTED
           }))
       )
-      const greatGrandChildren =
-        await experimentsMetricsAndParamsTree.getChildren({
-          collapsibleState: TreeItemCollapsibleState.Collapsed,
-          description: '1/2',
-          dvcRoot: mockedDvcRoot,
-          iconPath: mockedIndeterminateCheckbox,
-          label: 'process',
-          path: processPath
-        })
+      const greatGrandChildren = await experimentsColumnsTree.getChildren({
+        collapsibleState: TreeItemCollapsibleState.Collapsed,
+        description: '1/2',
+        dvcRoot: mockedDvcRoot,
+        iconPath: mockedIndeterminateCheckbox,
+        label: 'process',
+        path: processPath
+      })
 
       expect(greatGrandChildren).toStrictEqual([
         {
@@ -315,8 +294,8 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'threshold',
-          path: joinMetricOrParamPath(
-            MetricOrParamType.PARAMS,
+          path: joinColumnPath(
+            ColumnType.PARAMS,
             'params.yaml',
             'process',
             'threshold'
@@ -328,8 +307,8 @@ describe('ExperimentsMetricsAndParamsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'test_arg',
-          path: joinMetricOrParamPath(
-            MetricOrParamType.PARAMS,
+          path: joinColumnPath(
+            ColumnType.PARAMS,
             'params.yaml',
             'process',
             'test_arg'
@@ -348,17 +327,15 @@ describe('ExperimentsMetricsAndParamsTree', () => {
         return mockedItem
       })
 
-      const experimentsMetricsAndParamsTree =
-        new ExperimentsMetricsAndParamsTree(
-          mockedExperiments,
-          mockedInternalCommands,
-          mockedResourceLocator
-        )
+      const experimentsColumnsTree = new ExperimentsColumnsTree(
+        mockedExperiments,
+        mockedInternalCommands,
+        mockedResourceLocator
+      )
 
       const mockedDvcRoot = join('dvc', 'repo')
 
-      const treeItem =
-        experimentsMetricsAndParamsTree.getTreeItem(mockedDvcRoot)
+      const treeItem = experimentsColumnsTree.getTreeItem(mockedDvcRoot)
 
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toStrictEqual({
@@ -373,19 +350,16 @@ describe('ExperimentsMetricsAndParamsTree', () => {
       return { collapsibleState, uri }
     })
 
-    const experimentsMetricsAndParamsTree = new ExperimentsMetricsAndParamsTree(
+    const experimentsColumnsTree = new ExperimentsColumnsTree(
       mockedExperiments,
       mockedInternalCommands,
       mockedResourceLocator
     )
 
     const filename = 'params.yml'
-    const relParamsPath = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
-      filename
-    )
+    const relParamsPath = joinColumnPath(ColumnType.PARAMS, filename)
 
-    const metricsAndParamsItem = {
+    const columnsItem = {
       collapsibleState: TreeItemCollapsibleState.Collapsed,
       description: '3/4',
       dvcRoot: mockedDvcRoot,
@@ -394,8 +368,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
       path: relParamsPath
     }
 
-    const treeItem =
-      experimentsMetricsAndParamsTree.getTreeItem(metricsAndParamsItem)
+    const treeItem = experimentsColumnsTree.getTreeItem(columnsItem)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
     expect(treeItem).toStrictEqual({
@@ -417,19 +390,16 @@ describe('ExperimentsMetricsAndParamsTree', () => {
       return { collapsibleState, uri }
     })
 
-    const experimentsMetricsAndParamsTree = new ExperimentsMetricsAndParamsTree(
+    const experimentsColumnsTree = new ExperimentsColumnsTree(
       mockedExperiments,
       mockedInternalCommands,
       mockedResourceLocator
     )
 
     const filename = 'params.yml'
-    const relParamsPath = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
-      filename
-    )
+    const relParamsPath = joinColumnPath(ColumnType.PARAMS, filename)
 
-    const metricsAndParamsItem = {
+    const columnsItem = {
       collapsibleState: TreeItemCollapsibleState.None,
       description: undefined,
       dvcRoot: mockedDvcRoot,
@@ -438,8 +408,7 @@ describe('ExperimentsMetricsAndParamsTree', () => {
       path: relParamsPath
     }
 
-    const treeItem =
-      experimentsMetricsAndParamsTree.getTreeItem(metricsAndParamsItem)
+    const treeItem = experimentsColumnsTree.getTreeItem(columnsItem)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
     expect(treeItem).toStrictEqual({

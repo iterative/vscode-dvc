@@ -1,5 +1,5 @@
 import get from 'lodash.get'
-import { splitMetricOrParamPath } from '../../metricsAndParams/paths'
+import { splitColumnPath } from '../../columns/paths'
 import { Experiment } from '../../webview/contract'
 
 export interface SortDefinition {
@@ -27,7 +27,7 @@ const buildSingleExperimentSortFunction = ({
   path,
   descending
 }: SortDefinition): SortFunction => {
-  const pathArray = splitMetricOrParamPath(path)
+  const pathArray = splitColumnPath(path)
   return descending
     ? (a, b) => compareExperimentsByPath(pathArray, b, a)
     : (a, b) => compareExperimentsByPath(pathArray, a, b)

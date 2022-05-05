@@ -1,13 +1,13 @@
 import { screen } from '@testing-library/react'
-import { MetricOrParamType } from 'dvc/src/experiments/webview/contract'
+import { ColumnType } from 'dvc/src/experiments/webview/contract'
 import { DND_DRAGGABLE_DATA_ATTR } from 'react-beautiful-dnd-test-utils'
 
 export const defaultColumns = ['Experiment', 'Timestamp']
 
 export const commonColumnFields = {
   hasChildren: false,
-  parentPath: MetricOrParamType.PARAMS,
-  type: MetricOrParamType.PARAMS
+  parentPath: ColumnType.PARAMS,
+  type: ColumnType.PARAMS
 }
 
 export const columns = [

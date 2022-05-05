@@ -1,5 +1,5 @@
 import { ExperimentsOutput } from '../../../cli/reader'
-import { collectMetricsAndParams } from '../../../experiments/metricsAndParams/collect'
+import { collectColumns } from '../../../experiments/columns/collect'
 import { collectExperiments } from '../../../experiments/model/collect'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { TableData } from '../../../experiments/webview/contract'
@@ -70,7 +70,7 @@ export const deeplyNestedOutput: ExperimentsOutput = {
   }
 }
 
-export const columns = collectMetricsAndParams(deeplyNestedOutput)
+export const columns = collectColumns(deeplyNestedOutput)
 
 const { workspace, branches } = collectExperiments(deeplyNestedOutput)
 const colors = copyOriginalColors()

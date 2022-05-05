@@ -1,7 +1,4 @@
-import {
-  MetricOrParam,
-  MetricOrParamType
-} from 'dvc/src/experiments/webview/contract'
+import { Column, ColumnType } from 'dvc/src/experiments/webview/contract'
 import { useColumnOrder } from './useColumnOrder'
 
 jest.mock('react', () => ({
@@ -11,42 +8,42 @@ jest.mock('../../shared/api')
 
 describe('useColumnOrder', () => {
   it('should return re-sorted columns with groups and generated parents', () => {
-    const metricsAndParams: MetricOrParam[] = [
+    const columns: Column[] = [
       {
         hasChildren: false,
         name: 'A',
-        parentPath: MetricOrParamType.METRICS,
-        path: `${MetricOrParamType.METRICS}:A`,
-        type: MetricOrParamType.METRICS
+        parentPath: ColumnType.METRICS,
+        path: `${ColumnType.METRICS}:A`,
+        type: ColumnType.METRICS
       },
       {
         hasChildren: false,
         name: 'B',
-        parentPath: MetricOrParamType.METRICS,
-        path: `${MetricOrParamType.METRICS}:B`,
-        type: MetricOrParamType.METRICS
+        parentPath: ColumnType.METRICS,
+        path: `${ColumnType.METRICS}:B`,
+        type: ColumnType.METRICS
       },
       {
         hasChildren: false,
         name: 'C',
-        parentPath: MetricOrParamType.PARAMS,
-        path: `${MetricOrParamType.PARAMS}:C`,
-        type: MetricOrParamType.PARAMS
+        parentPath: ColumnType.PARAMS,
+        path: `${ColumnType.PARAMS}:C`,
+        type: ColumnType.PARAMS
       }
     ]
     const columnOrder: string[] = [
-      `${MetricOrParamType.PARAMS}:C`,
-      `${MetricOrParamType.METRICS}:A`,
-      `${MetricOrParamType.METRICS}:B`
+      `${ColumnType.PARAMS}:C`,
+      `${ColumnType.METRICS}:A`,
+      `${ColumnType.METRICS}:B`
     ]
-    const groupedParams = useColumnOrder(metricsAndParams, columnOrder)
+    const groupedParams = useColumnOrder(columns, columnOrder)
 
     expect(groupedParams.map(col => col.path)).toStrictEqual([
-      `0/${MetricOrParamType.PARAMS}:C`,
-      `1/${MetricOrParamType.METRICS}:A`,
-      `1/${MetricOrParamType.METRICS}:B`,
-      `0/${MetricOrParamType.PARAMS}`,
-      `1/${MetricOrParamType.METRICS}`
+      `0/${ColumnType.PARAMS}:C`,
+      `1/${ColumnType.METRICS}:A`,
+      `1/${ColumnType.METRICS}:B`,
+      `0/${ColumnType.PARAMS}`,
+      `1/${ColumnType.METRICS}`
     ])
   })
 })

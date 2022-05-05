@@ -13,8 +13,8 @@ import { Experiments } from '../../../experiments'
 import { ResourceLocator } from '../../../resourceLocator'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import {
-  MetricOrParam,
-  MetricOrParamType,
+  Column,
+  ColumnType,
   TableData
 } from '../../../experiments/webview/contract'
 import {
@@ -35,9 +35,9 @@ import {
 } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
-import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
+import { joinColumnPath } from '../../../experiments/columns/paths'
 import { BaseWebview } from '../../../webview'
-import { MetricsAndParamsModel } from '../../../experiments/metricsAndParams/model'
+import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -169,7 +169,7 @@ suite('Experiments Test Suite', () => {
       ]
 
       const mockSetColumnReordered = stub(
-        MetricsAndParamsModel.prototype,
+        ColumnsModel.prototype,
         'setColumnOrder'
       ).returns(undefined)
 
@@ -200,7 +200,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetColumnWidth = stub(
-        MetricsAndParamsModel.prototype,
+        ColumnsModel.prototype,
         'setColumnWidth'
       ).returns(undefined)
 
@@ -539,18 +539,14 @@ suite('Experiments Test Suite', () => {
       })
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      const sortPath = joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'test'
-      )
+      const sortPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
 
       mockShowQuickPick.onFirstCall().resolves({
         label: 'test',
         value: {
           path: sortPath
         }
-      } as QuickPickItemWithValue<MetricOrParam>)
+      } as QuickPickItemWithValue<Column>)
 
       mockShowQuickPick.onSecondCall().resolves({
         label: 'Ascending',
@@ -618,51 +614,35 @@ suite('Experiments Test Suite', () => {
   describe('persisted state', () => {
     const firstSortDefinition = {
       descending: false,
-      path: joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'test'
-      )
+      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
     }
     const secondSortDefinition = {
       descending: true,
-      path: joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'other'
-      )
+      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'other')
     }
     const sortDefinitions: SortDefinition[] = [
       firstSortDefinition,
       secondSortDefinition
     ]
 
-    const firstFilterId = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
+    const firstFilterId = joinColumnPath(
+      ColumnType.PARAMS,
       'params.yaml',
       'test==1'
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'test'
-      ),
+      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test'),
       value: 1
     }
-    const secondFilterId = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
+    const secondFilterId = joinColumnPath(
+      ColumnType.PARAMS,
       'params.yaml',
       'other∈testcontains'
     )
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'other'
-      ),
+      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'other'),
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [

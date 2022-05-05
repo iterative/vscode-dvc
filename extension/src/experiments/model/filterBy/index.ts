@@ -1,7 +1,7 @@
 import get from 'lodash.get'
 import { Experiment } from '../../webview/contract'
 import { definedAndNonEmpty } from '../../../util/array'
-import { splitMetricOrParamPath } from '../../metricsAndParams/paths'
+import { splitColumnPath } from '../../columns/paths'
 
 export enum Operator {
   EQUAL = '==',
@@ -79,7 +79,7 @@ const buildFilter =
   ): ((experiment: Experiment) => boolean) =>
   experiment => {
     const firstFailure = filterDefinitions.find(filter => {
-      const pathArray = splitMetricOrParamPath(filter.path)
+      const pathArray = splitColumnPath(filter.path)
       const value = get(experiment, pathArray)
 
       return !evaluate<typeof value>(value, filter.operator, filter.value)

@@ -21,12 +21,12 @@ import {
   Value,
   ValueTree
 } from '../../cli/reader'
-import { extractMetricsAndParams } from '../../experiments/metricsAndParams/extract'
+import { extractColumns } from '../../experiments/columns/extract'
 import {
-  decodeMetricOrParam,
-  appendMetricOrParamToPath
-} from '../../experiments/metricsAndParams/paths'
-import { MetricsOrParams } from '../../experiments/webview/contract'
+  decodeColumn,
+  appendColumnToPath
+} from '../../experiments/columns/paths'
+import { Columns } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
@@ -62,7 +62,7 @@ const collectFromMetricsFile = (
     return
   }
 
-  const path = appendMetricOrParamToPath(...pathArray)
+  const path = appendColumnToPath(...pathArray)
 
   addToMapArray(acc.plots, path, { group: name, iteration, y: value })
 }
@@ -71,7 +71,7 @@ type MetricsAndDetailsOrUndefined =
   | {
       checkpoint_parent: string | undefined
       checkpoint_tip: string | undefined
-      metrics: MetricsOrParams | undefined
+      metrics: Columns | undefined
       queued: boolean | undefined
       running: boolean | undefined
     }
@@ -87,7 +87,7 @@ const transformExperimentData = (
 
   const { checkpoint_tip, checkpoint_parent, queued, running } =
     experimentFields
-  const { metrics } = extractMetricsAndParams(experimentFields)
+  const { metrics } = extractColumns(experimentFields)
 
   return { checkpoint_parent, checkpoint_tip, metrics, queued, running }
 }
@@ -95,7 +95,7 @@ const transformExperimentData = (
 type ValidData = {
   checkpoint_parent: string
   checkpoint_tip: string
-  metrics: MetricsOrParams
+  metrics: Columns
   queued: boolean | undefined
   running: boolean | undefined
 }
@@ -107,7 +107,7 @@ const collectFromMetrics = (
   acc: CheckpointPlotAccumulator,
   experimentName: string,
   iteration: number,
-  metrics: MetricsOrParams
+  metrics: Columns
 ) => {
   for (const file of Object.keys(metrics)) {
     collectFromMetricsFile(
@@ -217,7 +217,7 @@ export const collectCheckpointPlotsData = (
   const plotsData: CheckpointPlotData[] = []
 
   for (const [key, value] of acc.plots.entries()) {
-    plotsData.push({ title: decodeMetricOrParam(key), values: value })
+    plotsData.push({ title: decodeColumn(key), values: value })
   }
 
   return plotsData

@@ -11,7 +11,7 @@ const ViewOpenedEvent = {
   VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
     'views.experimentsFilterByTree.opened',
   VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED:
-    'views.experimentsMetricsAndParamsTree.opened',
+    'views.experimentsColumnsTree.opened',
   VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED: 'views.experimentsSortByTree.opened',
   VIEWS_EXPERIMENTS_TREE_OPENED: 'views.experimentsTree.opened',
   VIEWS_PLOTS_PATH_TREE_OPENED: 'views.plotsPathTree.opened',

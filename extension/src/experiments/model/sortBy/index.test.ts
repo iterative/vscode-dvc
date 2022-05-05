@@ -1,7 +1,7 @@
 import get from 'lodash.get'
 import { sortExperiments } from '.'
-import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
-import { Experiment, MetricOrParamType } from '../../webview/contract'
+import { joinColumnPath } from '../../columns/paths'
+import { Experiment, ColumnType } from '../../webview/contract'
 
 describe('sortExperiments', () => {
   const testId = 'f0778b3eb6a390d6f6731c735a2a4561d1792c3a'
@@ -15,12 +15,12 @@ describe('sortExperiments', () => {
     queued: false,
     timestamp: testTimestamp
   }
-  const testPathArray: [MetricOrParamType, string, string] = [
-    MetricOrParamType.PARAMS,
+  const testPathArray: [ColumnType, string, string] = [
+    ColumnType.PARAMS,
     'params.yaml',
     'test'
   ]
-  const testPath = joinMetricOrParamPath(...testPathArray)
+  const testPath = joinColumnPath(...testPathArray)
   const getTestParam = (experiment: Experiment) =>
     get(experiment, testPathArray)
 
@@ -62,8 +62,8 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
+    const testSortPath = joinColumnPath(
+      ColumnType.PARAMS,
       'params.yaml',
       'sort'
     )
@@ -120,13 +120,13 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
+    const testSortPath = joinColumnPath(
+      ColumnType.PARAMS,
       'params.yaml',
       'sort'
     )
-    const testSortPath2 = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
+    const testSortPath2 = joinColumnPath(
+      ColumnType.PARAMS,
       'params.yaml',
       'sort2'
     )
@@ -204,12 +204,12 @@ describe('sortExperiments', () => {
   })
 
   describe('Should use multiple sort definitions', () => {
-    const otherTestPathArray: [MetricOrParamType, string, string] = [
-      MetricOrParamType.PARAMS,
+    const otherTestPathArray: [ColumnType, string, string] = [
+      ColumnType.PARAMS,
       'params.yaml',
       'othertest'
     ]
-    const otherTestPath = joinMetricOrParamPath(...otherTestPathArray)
+    const otherTestPath = joinColumnPath(...otherTestPathArray)
     const testData = [
       {
         ...irrelevantExperimentData,

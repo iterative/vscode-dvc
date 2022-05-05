@@ -1,10 +1,8 @@
-import { MetricOrParam } from 'dvc/src/experiments/webview/contract'
+import { Column } from 'dvc/src/experiments/webview/contract'
 import { useMemo } from 'react'
 
-const getColumnsByPath = (
-  columns: MetricOrParam[]
-): Record<string, MetricOrParam> => {
-  const columnsByPath: Record<string, MetricOrParam> = {}
+const getColumnsByPath = (columns: Column[]): Record<string, Column> => {
+  const columnsByPath: Record<string, Column> = {}
   for (const column of columns) {
     columnsByPath[column.path] = column
   }
@@ -12,21 +10,21 @@ const getColumnsByPath = (
 }
 
 const getOrderedData = (
-  columnsByPath: Record<string, MetricOrParam>,
+  columnsByPath: Record<string, Column>,
   columnOrder: string[]
-): MetricOrParam[] => {
+): Column[] => {
   return columnOrder
     .map(path => ({
       ...columnsByPath[path]
     }))
-    .filter(Boolean) as MetricOrParam[]
+    .filter(Boolean) as Column[]
 }
 
 const collectParentNode = (
-  orderedData: MetricOrParam[],
+  orderedData: Column[],
   parentPath: string,
   groupNumberPrefix: string,
-  columnsByPath: Record<string, MetricOrParam>
+  columnsByPath: Record<string, Column>
 ) => {
   const parentNode = {
     ...columnsByPath[parentPath]
@@ -34,15 +32,15 @@ const collectParentNode = (
   parentNode.path = groupNumberPrefix + parentPath
 
   if (!orderedData.some(column => column.path === parentNode.path)) {
-    orderedData.push(parentNode as MetricOrParam)
+    orderedData.push(parentNode as Column)
   }
 }
 
 const collectOrderedData = (
-  orderedData: MetricOrParam[],
+  orderedData: Column[],
   previousGroups: string[],
   previousGroup: string,
-  columnsByPath: Record<string, MetricOrParam>
+  columnsByPath: Record<string, Column>
 ) => {
   const copy = [...orderedData]
   for (const node of copy) {
@@ -63,7 +61,7 @@ const collectOrderedData = (
 }
 
 const collectOrderedDataWithGroups = (
-  columns: MetricOrParam[],
+  columns: Column[],
   columnOrder: string[]
 ) => {
   const columnsByPath = getColumnsByPath(columns)
@@ -78,9 +76,9 @@ const collectOrderedDataWithGroups = (
 }
 
 export const useColumnOrder = (
-  params: MetricOrParam[],
+  params: Column[],
   columnOrder: string[]
-): MetricOrParam[] =>
+): Column[] =>
   useMemo(() => {
     if (params && columnOrder) {
       return collectOrderedDataWithGroups(params, columnOrder)

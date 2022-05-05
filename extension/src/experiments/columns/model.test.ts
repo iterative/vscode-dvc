@@ -1,22 +1,16 @@
-import { MetricsAndParamsModel } from './model'
-import { appendMetricOrParamToPath, joinMetricOrParamPath } from './paths'
+import { ColumnsModel } from './model'
+import { appendColumnToPath, joinColumnPath } from './paths'
 import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
-import { MetricOrParamType } from '../webview/contract'
+import { ColumnType } from '../webview/contract'
 
-describe('MetricsAndParamsModel', () => {
+describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
 
   describe('persistence', () => {
-    const paramsDotYamlPath = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
-      'params.yaml'
-    )
-    const testParamPath = appendMetricOrParamToPath(
-      paramsDotYamlPath,
-      'testparam'
-    )
+    const paramsDotYamlPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+    const testParamPath = appendColumnToPath(paramsDotYamlPath, 'testparam')
     const exampleData = {
       workspace: {
         baseline: {
@@ -33,18 +27,15 @@ describe('MetricsAndParamsModel', () => {
       }
     }
     it('Shows all items when given no persisted status', async () => {
-      const model = new MetricsAndParamsModel(
-        exampleDvcRoot,
-        buildMockMemento()
-      )
+      const model = new ColumnsModel(exampleDvcRoot, buildMockMemento())
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
         {
           hasChildren: true,
           name: 'params.yaml',
-          parentPath: MetricOrParamType.PARAMS,
+          parentPath: ColumnType.PARAMS,
           path: paramsDotYamlPath,
-          type: MetricOrParamType.PARAMS
+          type: ColumnType.PARAMS
         },
         {
           hasChildren: false,
@@ -52,15 +43,15 @@ describe('MetricsAndParamsModel', () => {
           name: 'testparam',
           parentPath: paramsDotYamlPath,
           path: testParamPath,
-          pathArray: [MetricOrParamType.PARAMS, 'params.yaml', 'testparam'],
-          type: MetricOrParamType.PARAMS,
+          pathArray: [ColumnType.PARAMS, 'params.yaml', 'testparam'],
+          type: ColumnType.PARAMS,
           types: ['boolean']
         }
       ])
     })
 
     it('Maintains deselection from persisted status', async () => {
-      const model = new MetricsAndParamsModel(
+      const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento({
           [PersistenceKey.METRICS_AND_PARAMS_STATUS + exampleDvcRoot]: {
@@ -74,9 +65,9 @@ describe('MetricsAndParamsModel', () => {
         {
           hasChildren: true,
           name: 'params.yaml',
-          parentPath: MetricOrParamType.PARAMS,
+          parentPath: ColumnType.PARAMS,
           path: paramsDotYamlPath,
-          type: MetricOrParamType.PARAMS
+          type: ColumnType.PARAMS
         }
       ])
     })
@@ -89,7 +80,7 @@ describe('MetricsAndParamsModel', () => {
         { path: 'C', width: 0 },
         { path: 'B', width: 0 }
       ]
-      const model = new MetricsAndParamsModel(
+      const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento({
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
@@ -100,7 +91,7 @@ describe('MetricsAndParamsModel', () => {
     })
 
     it('should re-order the columns if a new columnOrder is set', () => {
-      const model = new MetricsAndParamsModel(
+      const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento({
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]: [
@@ -123,7 +114,7 @@ describe('MetricsAndParamsModel', () => {
         { path: 'C', width: 42 },
         { path: 'B', width: 150 }
       ]
-      const model = new MetricsAndParamsModel(
+      const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento({
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
@@ -139,7 +130,7 @@ describe('MetricsAndParamsModel', () => {
         { path: 'C', width: 42 },
         { path: 'B', width: 150 }
       ]
-      const model = new MetricsAndParamsModel(
+      const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento({
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:

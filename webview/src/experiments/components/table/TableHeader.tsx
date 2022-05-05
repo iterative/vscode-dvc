@@ -1,8 +1,8 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import {
   Experiment,
-  MetricOrParam,
-  MetricOrParamType
+  Column,
+  ColumnType
 } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup } from 'react-table'
@@ -50,7 +50,7 @@ const ColumnDragHandle: React.FC<{
 const TableHeaderCell: React.FC<{
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
-  orderedColumns: MetricOrParam[]
+  orderedColumns: Column[]
   sortOrder: SortOrder
   provided: DraggableProvided
   snapshot: DraggableStateSnapshot
@@ -86,8 +86,8 @@ const TableHeaderCell: React.FC<{
         styles.th,
         column.placeholderOf ? styles.placeholderHeaderCell : styles.headerCell,
         {
-          [styles.paramHeaderCell]: column.group === MetricOrParamType.PARAMS,
-          [styles.metricHeaderCell]: column.group === MetricOrParamType.METRICS,
+          [styles.paramHeaderCell]: column.group === ColumnType.PARAMS,
+          [styles.metricHeaderCell]: column.group === ColumnType.METRICS,
           [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
           ...sortingClasses()
         }
@@ -124,7 +124,7 @@ interface TableHeaderProps {
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
   index: number
-  orderedColumns: MetricOrParam[]
+  orderedColumns: Column[]
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({

@@ -18,7 +18,7 @@ import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
-import { ExperimentsMetricsAndParamsTree } from './experiments/metricsAndParams/tree'
+import { ExperimentsColumnsTree } from './experiments/columns/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
@@ -137,7 +137,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.dispose.track(
-      new ExperimentsMetricsAndParamsTree(
+      new ExperimentsColumnsTree(
         this.experiments,
         this.internalCommands,
         this.resourceLocator

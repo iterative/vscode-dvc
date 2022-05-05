@@ -1,6 +1,6 @@
 import { Value, ValueTree } from '../../../cli/reader'
-import { appendMetricOrParamToPath } from '../../metricsAndParams/paths'
-import { MetricsOrParams } from '../../webview/contract'
+import { appendColumnToPath } from '../../columns/paths'
+import { Columns } from '../../webview/contract'
 
 export type Param = {
   path: string
@@ -22,12 +22,12 @@ const collectFromParamsFile = (
     return
   }
 
-  const path = appendMetricOrParamToPath(...pathArray)
+  const path = appendColumnToPath(...pathArray)
 
   acc.push({ path, value })
 }
 
-export const collectFlatExperimentParams = (params: MetricsOrParams = {}) => {
+export const collectFlatExperimentParams = (params: Columns = {}) => {
   const acc: { path: string; value: string | number | boolean }[] = []
   for (const file of Object.keys(params)) {
     collectFromParamsFile(acc, undefined, params[file], [file])

@@ -8,7 +8,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { EventName } from '../../telemetry/constants'
 import { InternalCommands } from '../../commands/internal'
 
-export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<WorkspaceExperiments> {
+export class ExperimentsColumnsTree extends BasePathSelectionTree<WorkspaceExperiments> {
   constructor(
     experiments: WorkspaceExperiments,
     internalCommands: InternalCommands,
@@ -17,8 +17,8 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<Works
     super(
       experiments,
       resourceLocator,
-      'dvc.views.experimentsMetricsAndParamsTree',
-      experiments.metricsOrParamsChanged.event,
+      'dvc.views.experimentsColumnsTree',
+      experiments.columnsChanged.event,
       RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
       EventName.VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED
     )
@@ -26,15 +26,15 @@ export class ExperimentsMetricsAndParamsTree extends BasePathSelectionTree<Works
     internalCommands.registerExternalCommand<PathSelectionItem>(
       RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
       ({ dvcRoot, path }) =>
-        this.workspace.getRepository(dvcRoot).toggleMetricOrParamStatus(path)
+        this.workspace.getRepository(dvcRoot).toggleColumnStatus(path)
     )
   }
 
   public getRepositoryChildren(dvcRoot: string, path: string) {
-    return this.workspace.getRepository(dvcRoot).getChildMetricsOrParams(path)
+    return this.workspace.getRepository(dvcRoot).getChildColumns(path)
   }
 
   public getRepositoryStatuses(dvcRoot: string) {
-    return this.workspace.getRepository(dvcRoot).getMetricsAndParamsStatuses()
+    return this.workspace.getRepository(dvcRoot).getColumnsStatuses()
   }
 }

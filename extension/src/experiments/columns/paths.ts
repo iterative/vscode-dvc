@@ -1,4 +1,4 @@
-import { MetricOrParamType } from '../webview/contract'
+import { ColumnType } from '../webview/contract'
 
 export const METRIC_PARAM_SEPARATOR = '.'
 const ENCODED_METRIC_PARAM_SEPARATOR = '%2E'
@@ -10,12 +10,12 @@ const FILE_SPLIT_REGEX = new RegExp(
   `([^${FILE_SEPARATOR}]*)(?:${FILE_SEPARATOR}([^${FILE_SEPARATOR}]*))?(?:${FILE_SEPARATOR}(.*))?`
 )
 
-export const encodeMetricOrParam = (segment: string) =>
+export const encodeColumn = (segment: string) =>
   segment.replace(ENCODE_METRIC_PARAM_REGEX, ENCODED_METRIC_PARAM_SEPARATOR)
-export const decodeMetricOrParam = (segment: string) =>
+export const decodeColumn = (segment: string) =>
   segment.replace(DECODE_METRIC_PARAM_REGEX, METRIC_PARAM_SEPARATOR)
 
-export const appendMetricOrParamToPath = (...pathSegments: string[]) => {
+export const appendColumnToPath = (...pathSegments: string[]) => {
   const [fileSegment, ...rest] = pathSegments
   if (rest.length === 0) {
     return fileSegment
@@ -23,14 +23,11 @@ export const appendMetricOrParamToPath = (...pathSegments: string[]) => {
   return (
     fileSegment +
     FILE_SEPARATOR +
-    rest.map(encodeMetricOrParam).join(METRIC_PARAM_SEPARATOR)
+    rest.map(encodeColumn).join(METRIC_PARAM_SEPARATOR)
   )
 }
 
-export const joinMetricOrParamPath = (
-  type: MetricOrParamType,
-  ...pathSegments: string[]
-) => {
+export const joinColumnPath = (type: ColumnType, ...pathSegments: string[]) => {
   const [fileSegment, ...rest] = pathSegments
   if (!fileSegment) {
     return type
@@ -38,10 +35,10 @@ export const joinMetricOrParamPath = (
   if (rest.length === 0) {
     return type + FILE_SEPARATOR + fileSegment
   }
-  return type + FILE_SEPARATOR + appendMetricOrParamToPath(fileSegment, ...rest)
+  return type + FILE_SEPARATOR + appendColumnToPath(fileSegment, ...rest)
 }
 
-export const splitMetricOrParamPath = (path: string) => {
+export const splitColumnPath = (path: string) => {
   const regexResult = FILE_SPLIT_REGEX.exec(path)
   if (!regexResult) {
     return []
@@ -56,6 +53,6 @@ export const splitMetricOrParamPath = (path: string) => {
   return [
     baseSegment,
     fileSegment,
-    ...paramPath.split(METRIC_PARAM_SEPARATOR).map(decodeMetricOrParam)
+    ...paramPath.split(METRIC_PARAM_SEPARATOR).map(decodeColumn)
   ]
 }

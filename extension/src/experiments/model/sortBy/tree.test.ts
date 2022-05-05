@@ -11,10 +11,10 @@ import {
 } from 'vscode'
 import { SortDefinition } from '.'
 import { ExperimentsSortByTree, SortItem } from './tree'
-import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
+import { joinColumnPath } from '../../columns/paths'
 import { InternalCommands } from '../../../commands/internal'
 import { buildMockedExperiments } from '../../../test/util/jest'
-import { MetricOrParamType } from '../../webview/contract'
+import { ColumnType } from '../../webview/contract'
 
 function buildMockedTreeItem(
   arg1: string | TreeItemLabel | Uri,
@@ -59,7 +59,7 @@ beforeEach(() => {
 
 describe('ExperimentsSortByTree', () => {
   const dvcRoot = 'demo'
-  const examplePath = joinMetricOrParamPath(MetricOrParamType.PARAMS, 'test')
+  const examplePath = joinColumnPath(ColumnType.PARAMS, 'test')
   const exampleSortDefinition: SortDefinition = {
     descending: true,
     path: examplePath
