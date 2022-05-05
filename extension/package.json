@@ -297,7 +297,8 @@
       {
         "title": "%command.showExperiments%",
         "command": "dvc.showExperiments",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(beaker)"
       },
       {
         "title": "%command.showOutput%",
@@ -307,7 +308,8 @@
       {
         "title": "%command.showPlots%",
         "command": "dvc.showPlots",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(graph-scatter)"
       },
       {
         "title": "%command.stopRunningExperiment%",
@@ -910,6 +912,11 @@
       ],
       "view/title": [
         {
+          "command": "dvc.showExperiments",
+          "when": "view == dvc.views.experimentsMetricsAndParamsTree",
+          "group": "navigation@1"
+        },
+        {
           "command": "dvc.runExperiment",
           "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
           "group": "navigation@1"
@@ -958,6 +965,11 @@
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree",
           "group": "navigation@2"
+        },
+        {
+          "command": "dvc.showPlots",
+          "when": "view == dvc.views.plotsPathsTree",
+          "group": "navigation@1"
         }
       ]
     },
