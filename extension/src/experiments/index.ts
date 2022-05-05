@@ -16,7 +16,11 @@ import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, MetricOrParamType, TableData } from './webview/contract'
 import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
-import { InternalCommands } from '../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -27,6 +31,8 @@ import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { Toast } from '../vscode/toast'
+import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
 
 export const ExperimentsScale = {
@@ -56,6 +62,8 @@ export class Experiments extends BaseRepository<TableData> {
     new EventEmitter<void>()
   )
 
+  private readonly internalCommands: InternalCommands
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -66,6 +74,8 @@ export class Experiments extends BaseRepository<TableData> {
     fileSystemData?: FileSystemData
   ) {
     super(dvcRoot, resourceLocator.beaker)
+
+    this.internalCommands = internalCommands
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeMetricsOrParams = this.metricsOrParamsChanged.event
@@ -96,14 +106,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.handleMessageFromWebview()
-
-    const waitForInitialData = this.dispose.track(
-      this.onDidChangeExperiments(() => {
-        this.deferred.resolve()
-        this.dispose.untrack(waitForInitialData)
-        waitForInitialData.dispose()
-      })
-    )
+    this.setupInitialData()
   }
 
   public update() {
@@ -320,6 +323,34 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelectedExperiments()
   }
 
+  public async modifyExperimentParamsAndQueue(experimentId?: string) {
+    const paramsToQueue = await this.pickParamsToQueue(experimentId)
+    if (paramsToQueue) {
+      return this.runCommand(
+        AvailableCommands.EXPERIMENT_QUEUE,
+        ...paramsToQueue
+      )
+    }
+  }
+
+  private setupInitialData() {
+    const waitForInitialData = this.dispose.track(
+      this.onDidChangeExperiments(() => {
+        this.deferred.resolve()
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
+      })
+    )
+  }
+
+  private async runCommand(commandId: CommandId, ...args: string[]) {
+    await Toast.showOutput(
+      this.internalCommands.executeCommand(commandId, this.dvcRoot, ...args)
+    )
+
+    return this.notifyChanged()
+  }
+
   private notifyChanged(data?: ExperimentsOutput) {
     this.experimentsChanged.fire(data)
     this.notifyMetricsOrParamsChanged()
@@ -362,6 +393,14 @@ export class Experiments extends BaseRepository<TableData> {
             return this.addColumnSort(message.payload)
           case MessageFromWebviewType.COLUMN_SORT_REMOVED:
             return this.removeColumnSort(message.payload)
+          case MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE:
+            return this.applyExperimentToWorkspace(message.payload)
+          case MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT:
+            return this.createBranchFromExperiment(message.payload)
+          case MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED:
+            return this.modifyExperimentParamsAndQueue(message.payload)
+          case MessageFromWebviewType.EXPERIMENT_REMOVED:
+            return this.removeExperiment(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -414,6 +453,25 @@ export class Experiments extends BaseRepository<TableData> {
       undefined
     )
     return this.notifyChanged()
+  }
+
+  private async createBranchFromExperiment(experimentId: string) {
+    const input = await getInput(Title.ENTER_BRANCH_NAME)
+    if (input) {
+      return this.runCommand(
+        AvailableCommands.EXPERIMENT_BRANCH,
+        experimentId,
+        input
+      )
+    }
+  }
+
+  private applyExperimentToWorkspace(experimentId: string) {
+    return this.runCommand(AvailableCommands.EXPERIMENT_APPLY, experimentId)
+  }
+
+  private removeExperiment(experimentId: string) {
+    return this.runCommand(AvailableCommands.EXPERIMENT_REMOVE, experimentId)
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {

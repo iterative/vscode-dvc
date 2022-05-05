@@ -17,6 +17,10 @@ export enum MessageFromWebviewType {
   COLUMN_SORTED = 'column-sorted',
   COLUMN_SORT_REMOVED = 'column-sort-removed',
   EXPERIMENT_TOGGLED = 'experiment-toggled',
+  EXPERIMENT_APPLIED_TO_WORKSPACE = 'experiment-applied-to-workspace',
+  BRANCH_CREATED_FROM_EXPERIMENT = 'branch-created-from-experiment',
+  EXPERIMENT_QUEUE_AND_PARAMS_VARIED = 'experiment-queue-and-params-varied',
+  EXPERIMENT_REMOVED = 'experiment-removed',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_COMPARISON_REORDERED = 'plots-comparison-reordered',
   PLOTS_METRICS_REORDERED = 'plots-metrics-reordered',
@@ -51,6 +55,22 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.EXPERIMENT_REMOVED
       payload: string
     }
   | {

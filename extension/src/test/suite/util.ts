@@ -187,3 +187,13 @@ export const getMessageReceivedEmitter = (
   webview: BaseWebview<PlotsData | TableData>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): EventEmitter<MessageFromWebview> => (webview as any).messageReceived
+
+export const getInputBoxEvent = (mockInputValue: string) => {
+  const mockInput = stub(window, 'showInputBox')
+  return new Promise(resolve =>
+    mockInput.callsFake(() => {
+      resolve(mockInputValue)
+      return Promise.resolve(mockInputValue)
+    })
+  )
+}
