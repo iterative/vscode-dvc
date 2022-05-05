@@ -1041,7 +1041,7 @@
         },
         {
           "id": "dvc.views.experimentsTree",
-          "name": "Experiments / Revisions",
+          "name": "Experiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
