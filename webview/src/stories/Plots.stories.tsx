@@ -1,5 +1,6 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
+import { fireEvent, within } from '@testing-library/react'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
@@ -106,3 +107,27 @@ AllSmall.args = {
   }
 }
 AllSmall.parameters = chromaticParameters
+
+export const ZoomedInPlot = Template.bind({})
+ZoomedInPlot.parameters = {
+  chromatic: { delay: 300 }
+}
+ZoomedInPlot.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  const plots = await canvas.findAllByTestId(/^plot_/)
+  const plot = within(plots[0]).getByRole('button')
+
+  fireEvent.click(plot)
+}
+
+export const MultiviewZoomedInPlot = Template.bind({})
+MultiviewZoomedInPlot.parameters = {
+  chromatic: { delay: 300 }
+}
+MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  const plot = await canvas.findByTestId('plots-section_template-multi_1')
+  const plotButton = within(plot).getByRole('button')
+
+  fireEvent.click(plotButton)
+}
