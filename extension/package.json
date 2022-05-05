@@ -965,6 +965,11 @@
           "group": "2_queue@1"
         },
         {
+          "command": "dvc.modifyExperimentParamsAndQueue",
+          "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
+          "group": "2_queue@2"
+        },
+        {
           "command": "dvc.views.experimentsTree.selectExperiments",
           "when": "view == dvc.views.experimentsTree",
           "group": "navigation@3"
