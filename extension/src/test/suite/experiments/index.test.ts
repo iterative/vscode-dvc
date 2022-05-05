@@ -395,7 +395,7 @@ suite('Experiments Test Suite', () => {
 
         const mockParams = ['param1', 'param2']
 
-        stub(Experiments.prototype, 'pickParamsToQueue').resolves(mockParams)
+        stub(Experiments.prototype, 'pickAndModifyParams').resolves(mockParams)
 
         const webview = await experiments.showWebview()
         const mockMessageReceived = getMessageReceivedEmitter(webview)

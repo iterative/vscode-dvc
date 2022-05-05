@@ -1,4 +1,4 @@
-import { pickParamsToQueue } from './quickPick'
+import { pickAndModifyParams } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { quickPickManyValues } from '../../../vscode/quickPick'
 
@@ -16,7 +16,7 @@ describe('pickParamsToQueue', () => {
   it('should return early if no params are selected', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce(undefined)
 
-    const paramsToQueue = await pickParamsToQueue([
+    const paramsToQueue = await pickAndModifyParams([
       { path: 'params.yaml:learning_rate', value: 2e-12 }
     ])
 
@@ -35,7 +35,7 @@ describe('pickParamsToQueue', () => {
     mockedGetInput.mockResolvedValueOnce(firstInput)
     mockedGetInput.mockResolvedValueOnce(undefined)
 
-    const paramsToQueue = await pickParamsToQueue([
+    const paramsToQueue = await pickAndModifyParams([
       unchanged,
       ...initialUserResponse
     ])
@@ -56,7 +56,7 @@ describe('pickParamsToQueue', () => {
     mockedGetInput.mockResolvedValueOnce(firstInput)
     mockedGetInput.mockResolvedValueOnce(secondInput)
 
-    const paramsToQueue = await pickParamsToQueue([
+    const paramsToQueue = await pickAndModifyParams([
       unchanged,
       ...initialUserResponse
     ])

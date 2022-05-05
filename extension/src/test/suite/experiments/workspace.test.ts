@@ -93,12 +93,12 @@ suite('Workspace Experiments Test Suite', () => {
     })
   }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-  describe('dvc.queueExperimentsFromExisting', () => {
+  describe('dvc.modifyExperimentParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { cliExecutor, experiments } = buildExperiments(disposable)
 
       const mockExperimentRunQueue = stub(
-        CliExecutor.prototype,
+        cliExecutor,
         'experimentRunQueue'
       ).resolves('true')
 

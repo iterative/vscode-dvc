@@ -38,7 +38,7 @@ const addUnchanged = (args: string[], unchanged: Param[]) => {
   return args
 }
 
-export const pickParamsToQueue = async (
+export const pickAndModifyParams = async (
   params: Param[]
 ): Promise<string[] | undefined> => {
   const paramsToModify = await pickParamsToModify(params)

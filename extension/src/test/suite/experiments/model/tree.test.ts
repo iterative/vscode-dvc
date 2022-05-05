@@ -521,12 +521,13 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to queue an experiment from an existing one with dvc.views.experimentsTree.queueExperiment', async () => {
       const baseExperimentId = 'workspace'
 
-      const { experiments, experimentsModel } = buildExperiments(disposable)
+      const { cliExecutor, experiments, experimentsModel } =
+        buildExperiments(disposable)
 
       await experiments.isReady()
 
       const mockExperimentRunQueue = stub(
-        CliExecutor.prototype,
+        cliExecutor,
         'experimentRunQueue'
       ).resolves('true')
 
