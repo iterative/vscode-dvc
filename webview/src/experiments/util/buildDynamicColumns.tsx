@@ -1,13 +1,13 @@
 import React from 'react'
 import get from 'lodash/get'
 import {
-  Column,
+  Column as TableColumn,
   Accessor,
   ColumnGroup,
   ColumnInstance,
   Cell
 } from 'react-table'
-import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
+import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
 import Tooltip, {
   CELL_TOOLTIP_DELAY
@@ -70,7 +70,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
   )
 }
 
-const Header: React.FC<{ column: Column<Experiment> }> = ({
+const Header: React.FC<{ column: TableColumn<Experiment> }> = ({
   column: { name }
 }) => {
   return (
@@ -87,9 +87,9 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
     get(originalRow, pathArray)
 
 const buildDynamicColumns = (
-  properties: MetricOrParam[],
+  properties: Column[],
   parentPath: string
-): Column<Experiment>[] =>
+): TableColumn<Experiment>[] =>
   properties
     .filter(column => column.parentPath === parentPath)
     .map(data => {
@@ -97,7 +97,7 @@ const buildDynamicColumns = (
 
       const childColumns = buildDynamicColumns(properties, path)
 
-      const column: ColumnGroup<Experiment> | Column<Experiment> = {
+      const column: ColumnGroup<Experiment> | TableColumn<Experiment> = {
         Cell,
         Header,
         accessor: pathArray && buildAccessor(pathArray),
@@ -125,8 +125,8 @@ const findDeepest = (
 ) => (!depth && columns ? findMaxDepth(columns) : maxDepth)
 
 const fixColumnsNesting = (
-  columns: Column<Experiment>[],
-  parent?: Column<Experiment>,
+  columns: TableColumn<Experiment>[],
+  parent?: TableColumn<Experiment>,
   depth = 0,
   maxDepth = 0
 ) =>
@@ -166,7 +166,7 @@ const fixColumnsNesting = (
     }
   )
 
-const buildColumns = (properties: MetricOrParam[], parentPath: string) =>
+const buildColumns = (properties: Column[], parentPath: string) =>
   fixColumnsNesting(buildDynamicColumns(properties, parentPath))
 
 export default buildColumns

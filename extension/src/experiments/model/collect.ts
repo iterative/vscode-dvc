@@ -1,7 +1,7 @@
 import omit from 'lodash.omit'
 import { ExperimentsAccumulator } from './accumulator'
-import { extractMetricsAndParams } from '../metricsAndParams/extract'
-import { Experiment, MetricOrParamType } from '../webview/contract'
+import { extractColumns } from '../columns/extract'
+import { Experiment, ColumnType } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
@@ -70,11 +70,11 @@ const getCheckpointTipId = (
   return experimentsObject[checkpointTip]?.data?.name
 }
 
-const transformMetricsAndParams = (
+const transformColumns = (
   experiment: Experiment,
   experimentFields: ExperimentFields
 ) => {
-  const { metrics, params } = extractMetricsAndParams(experimentFields)
+  const { metrics, params } = extractColumns(experimentFields)
 
   if (metrics) {
     experiment.metrics = metrics
@@ -94,7 +94,7 @@ const transformExperimentData = (
   const experiment = {
     id,
     label,
-    ...omit(experimentFields, Object.values(MetricOrParamType))
+    ...omit(experimentFields, Object.values(ColumnType))
   } as Experiment
 
   if (displayNameOrParent) {
@@ -105,7 +105,7 @@ const transformExperimentData = (
     experiment.sha = sha
   }
 
-  transformMetricsAndParams(experiment, experimentFields)
+  transformColumns(experiment, experimentFields)
 
   return experiment
 }

@@ -7,14 +7,14 @@ import { Disposable } from '../../../../../extension'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   Experiment,
-  MetricOrParam,
-  MetricOrParamType
+  Column,
+  ColumnType
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import { buildExperiments } from '../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
-import { joinMetricOrParamPath } from '../../../../../experiments/metricsAndParams/paths'
+import { joinColumnPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { ExperimentsOutput } from '../../../../../cli/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
@@ -116,7 +116,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
           value: {
             path: paramPath
           }
-        } as QuickPickItemWithValue<MetricOrParam>)
+        } as QuickPickItemWithValue<Column>)
         mockShowQuickPick
           .onSecondCall()
           .resolves({ value: descending } as QuickPickItemWithValue<boolean>)
@@ -133,22 +133,20 @@ suite('Experiments Sort By Tree Test Suite', () => {
         mockShowQuickPick.reset()
       }
 
-      const testParamParentPathArray: [MetricOrParamType, string] = [
-        MetricOrParamType.PARAMS,
+      const testParamParentPathArray: [ColumnType, string] = [
+        ColumnType.PARAMS,
         'params.yaml'
       ]
-      const testParamPathArray: [MetricOrParamType, ...string[]] = [
+      const testParamPathArray: [ColumnType, ...string[]] = [
         ...testParamParentPathArray,
         'testparam'
       ]
-      const otherTestParamPathArray: [MetricOrParamType, ...string[]] = [
+      const otherTestParamPathArray: [ColumnType, ...string[]] = [
         ...testParamParentPathArray,
         'testparam2'
       ]
-      const testParamPath = joinMetricOrParamPath(...testParamPathArray)
-      const otherTestParamPath = joinMetricOrParamPath(
-        ...otherTestParamPathArray
-      )
+      const testParamPath = joinColumnPath(...testParamPathArray)
+      const otherTestParamPath = joinColumnPath(...otherTestParamPathArray)
 
       const getParamsArray = (selector = testParamPathArray) =>
         messageSpy

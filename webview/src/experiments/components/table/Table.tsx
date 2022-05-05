@@ -1,6 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
-import { RowData } from 'dvc/src/experiments/webview/contract'
+import { Row } from 'dvc/src/experiments/webview/contract'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import { RowContent } from './Row'
@@ -97,8 +97,8 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   const { sorts, columns, changes, rows: experimentRows } = tableData
 
   const someExperimentsRunning = React.useMemo(() => {
-    const findRunningExperiment: (experiments?: RowData[]) => boolean = (
-      experiments?: RowData[]
+    const findRunningExperiment: (experiments?: Row[]) => boolean = (
+      experiments?: Row[]
     ) => {
       return !!experiments?.find(
         experiment =>

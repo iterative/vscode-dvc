@@ -1,10 +1,10 @@
 import { join } from '../../util/path'
-import { RowData } from '../../../experiments/webview/contract'
+import { Row } from '../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 
 const colorsList = copyOriginalColors()
 
-const data: RowData[] = [
+const data: Row[] = [
   {
     timestamp: null,
     params: {

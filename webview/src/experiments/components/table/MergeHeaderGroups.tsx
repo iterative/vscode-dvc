@@ -1,7 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
+import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 import { DragDropContext, Droppable, Responders } from 'react-beautiful-dnd'
 import { TableHeader } from './TableHeader'
@@ -12,7 +12,7 @@ export const MergedHeaderGroup: React.FC<
     headerGroup: HeaderGroup<Experiment>
     columns: HeaderGroup<Experiment>[]
     sorts: SortDefinition[]
-    orderedColumns: MetricOrParam[]
+    orderedColumns: Column[]
   } & Responders
 > = ({
   headerGroup,

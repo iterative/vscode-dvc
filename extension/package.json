@@ -913,7 +913,7 @@
       "view/title": [
         {
           "command": "dvc.showExperiments",
-          "when": "view == dvc.views.experimentsMetricsAndParamsTree",
+          "when": "view == dvc.views.experimentsColumnsTree",
           "group": "navigation@1"
         },
         {
@@ -992,8 +992,8 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.experimentsMetricsAndParamsTree",
-          "name": "Metrics & Params",
+          "id": "dvc.views.experimentsColumnsTree",
+          "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {

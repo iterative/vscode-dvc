@@ -3,11 +3,11 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
-import { pickFromMetricsAndParams } from '../../metricsAndParams/quickPick'
-import { MetricOrParam } from '../../webview/contract'
+import { pickFromColumns } from '../../columns/quickPick'
+import { Column } from '../../webview/contract'
 
-export const pickSortToAdd = async (metricsAndParams: MetricOrParam[]) => {
-  const picked = await pickFromMetricsAndParams(metricsAndParams, {
+export const pickSortToAdd = async (columns: Column[]) => {
+  const picked = await pickFromColumns(columns, {
     title: Title.SELECT_PARAM_OR_METRIC_SORT
   })
   if (picked === undefined) {

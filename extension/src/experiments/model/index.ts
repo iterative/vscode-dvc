@@ -17,7 +17,7 @@ import {
   UNSELECTED
 } from './status'
 import { collectFlatExperimentParams } from './queue/collect'
-import { Experiment, RowData } from '../webview/contract'
+import { Experiment, Row } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
@@ -342,14 +342,14 @@ export class ExperimentsModel extends ModelWithPersistence {
           }))
         }
       })
-      .filter((row: RowData) => this.filterTableRow(row, filters))
+      .filter((row: Row) => this.filterTableRow(row, filters))
   }
 
   private findIndexByPath(pathToRemove: string) {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
 
-  private filterTableRow(row: RowData, filters: FilterDefinition[]): boolean {
+  private filterTableRow(row: Row, filters: FilterDefinition[]): boolean {
     const hasUnfilteredCheckpoints = definedAndNonEmpty(row.subRows)
     if (hasUnfilteredCheckpoints) {
       return true

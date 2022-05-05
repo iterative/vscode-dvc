@@ -31,7 +31,7 @@ export enum RegisteredCommands {
   EXPERIMENT_FILTER_REMOVE = 'dvc.views.experimentsFilterByTree.removeFilter',
   EXPERIMENT_FILTERS_REMOVE = 'dvc.removeExperimentsTableFilters',
   EXPERIMENT_FILTERS_REMOVE_ALL = 'dvc.views.experimentsFilterByTree.removeAllFilters',
-  EXPERIMENT_METRICS_AND_PARAMS_TOGGLE = 'dvc.views.experimentsMetricsAndParamsTree.toggleStatus',
+  EXPERIMENT_METRICS_AND_PARAMS_TOGGLE = 'dvc.views.experimentsColumnsTree.toggleStatus',
   EXPERIMENT_TREE_APPLY = 'dvc.views.experimentsTree.applyExperiment',
   EXPERIMENT_TREE_BRANCH = 'dvc.views.experimentsTree.branchExperiment',
   EXPERIMENT_TREE_QUEUE = 'dvc.views.experimentsTree.queueExperiment',

@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
-import { MetricOrParam } from '../../experiments/webview/contract'
+import { Column } from '../../experiments/webview/contract'
 import { PlotPath } from '../../plots/paths/collect'
 
 export enum Status {
@@ -11,7 +11,7 @@ export enum Status {
 }
 
 export abstract class PathSelectionModel<
-  T extends MetricOrParam | PlotPath
+  T extends Column | PlotPath
 > extends ModelWithPersistence {
   protected status: Record<string, Status>
 

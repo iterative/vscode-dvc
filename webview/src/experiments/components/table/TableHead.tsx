@@ -1,5 +1,5 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment, MetricOrParam } from 'dvc/src/experiments/webview/contract'
+import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import React, { useRef } from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { DragUpdate } from 'react-beautiful-dnd'
@@ -11,7 +11,7 @@ import { sendMessage } from '../../../shared/vscode'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
-  columns: MetricOrParam[]
+  columns: Column[]
   sorts: SortDefinition[]
 }
 

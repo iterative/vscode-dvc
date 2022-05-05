@@ -15,12 +15,12 @@ export const addFilterViaQuickInput = (
   mockShowQuickPick.resetHistory()
   mockShowInputBox.resetHistory()
 
-  const metricOrParam = columnsFixture.find(
-    metricOrParam => metricOrParam.path === fixtureFilter.path
+  const column = columnsFixture.find(
+    column => column.path === fixtureFilter.path
   )
   mockShowQuickPick
     .onFirstCall()
-    .resolves({ value: metricOrParam } as unknown as QuickPickItem)
+    .resolves({ value: column } as unknown as QuickPickItem)
   mockShowQuickPick.onSecondCall().resolves({
     value: fixtureFilter.operator
   } as unknown as QuickPickItem)

@@ -23,7 +23,7 @@ import checkpointPlotsFixture from '../../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
 import expShowFixture from '../../../fixtures/expShow/output'
 import { Operator } from '../../../../experiments/model/filterBy'
-import { joinMetricOrParamPath } from '../../../../experiments/metricsAndParams/paths'
+import { joinColumnPath } from '../../../../experiments/columns/paths'
 import {
   ExperimentItem,
   ExperimentsTree
@@ -40,7 +40,7 @@ import { Response } from '../../../../vscode/response'
 import { CliExecutor } from '../../../../cli/executor'
 import { Param } from '../../../../experiments/model/queue/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
-import { MetricOrParamType } from '../../../../experiments/webview/contract'
+import { ColumnType } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 
 suite('Experiments Tree Test Suite', () => {
@@ -220,11 +220,7 @@ suite('Experiments Tree Test Suite', () => {
       stub(ExperimentsModel.prototype, 'getFilters').returns([
         {
           operator: Operator.EQUAL,
-          path: joinMetricOrParamPath(
-            MetricOrParamType.METRICS,
-            'summary.json',
-            'loss'
-          ),
+          path: joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
           value: unfilteredCheckpointValue
         }
       ])
@@ -344,11 +340,7 @@ suite('Experiments Tree Test Suite', () => {
 
       await addFilterViaQuickInput(experiments, {
         operator: Operator.EQUAL,
-        path: joinMetricOrParamPath(
-          MetricOrParamType.METRICS,
-          'summary.json',
-          'loss'
-        ),
+        path: joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
         value: '0'
       })
 

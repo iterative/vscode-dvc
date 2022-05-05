@@ -1,19 +1,19 @@
 import { join } from 'path'
-import { collectChanges, collectMetricsAndParams } from './collect'
-import { joinMetricOrParamPath } from './paths'
-import { MetricOrParam, MetricOrParamType } from '../webview/contract'
+import { collectChanges, collectColumns } from './collect'
+import { joinColumnPath } from './paths'
+import { Column, ColumnType } from '../webview/contract'
 import outputFixture from '../../test/fixtures/expShow/output'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { ExperimentsOutput } from '../../cli/reader'
 
-describe('collectMetricsAndParams', () => {
+describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {
-    const metricsAndParams = collectMetricsAndParams(outputFixture)
-    expect(metricsAndParams).toStrictEqual(columnsFixture)
+    const columns = collectColumns(outputFixture)
+    expect(columns).toStrictEqual(columnsFixture)
   })
 
   it('should output both params and metrics when both are present', () => {
-    const metricsAndParams = collectMetricsAndParams({
+    const columns = collectColumns({
       workspace: {
         baseline: {
           data: {
@@ -33,18 +33,14 @@ describe('collectMetricsAndParams', () => {
         }
       }
     })
-    const params = metricsAndParams.find(
-      metricOrParam => metricOrParam.type === MetricOrParamType.PARAMS
-    )
-    const metrics = metricsAndParams.find(
-      metricOrParam => metricOrParam.type === MetricOrParamType.METRICS
-    )
+    const params = columns.find(column => column.type === ColumnType.PARAMS)
+    const metrics = columns.find(column => column.type === ColumnType.METRICS)
     expect(params).toBeDefined()
     expect(metrics).toBeDefined()
   })
 
   it('should omit params when none exist in the source data', () => {
-    const metricsAndParams = collectMetricsAndParams({
+    const columns = collectColumns({
       workspace: {
         baseline: {
           data: {
@@ -57,27 +53,23 @@ describe('collectMetricsAndParams', () => {
         }
       }
     })
-    const params = metricsAndParams.find(
-      metricOrParam => metricOrParam.type === MetricOrParamType.PARAMS
-    )
-    const metrics = metricsAndParams.find(
-      metricOrParam => metricOrParam.type === MetricOrParamType.METRICS
-    )
+    const params = columns.find(column => column.type === ColumnType.PARAMS)
+    const metrics = columns.find(column => column.type === ColumnType.METRICS)
     expect(params).toBeUndefined()
     expect(metrics).toBeDefined()
   })
 
   it('should return an empty array if no params and metrics are provided', () => {
-    const metricsAndParams = collectMetricsAndParams({
+    const columns = collectColumns({
       workspace: {
         baseline: {}
       }
     })
-    expect(metricsAndParams).toStrictEqual([])
+    expect(columns).toStrictEqual([])
   })
 
   const exampleBigNumber = 3000000000
-  const metricsAndParams = collectMetricsAndParams({
+  const columns = collectColumns({
     branchA: {
       baseline: {
         data: {
@@ -122,11 +114,10 @@ describe('collectMetricsAndParams', () => {
     }
   })
 
-  const exampleMixedParam = metricsAndParams.find(
-    metricOrParam =>
-      metricOrParam.parentPath ===
-      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
-  ) as MetricOrParam
+  const exampleMixedParam = columns.find(
+    column =>
+      column.parentPath === joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+  ) as Column
 
   it('should correctly identify mixed type params', () => {
     expect(exampleMixedParam.types).toStrictEqual([
@@ -147,7 +138,7 @@ describe('collectMetricsAndParams', () => {
   })
 
   it('should find a different minNumber and maxNumber on a mixed param', () => {
-    const metricsAndParams = collectMetricsAndParams({
+    const columns = collectColumns({
       branch1: {
         baseline: {
           data: {
@@ -190,21 +181,17 @@ describe('collectMetricsAndParams', () => {
         baseline: {}
       }
     })
-    const mixedParam = metricsAndParams.find(
-      metricOrParam =>
-        metricOrParam.path ===
-        joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yaml',
-          'mixedNumber'
-        )
-    ) as MetricOrParam
+    const mixedParam = columns.find(
+      column =>
+        column.path ===
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'mixedNumber')
+    ) as Column
 
     expect(mixedParam.minNumber).toStrictEqual(-1)
     expect(mixedParam.maxNumber).toStrictEqual(1)
   })
 
-  const numericMetricsAndParams = collectMetricsAndParams({
+  const numericColumns = collectColumns({
     branch1: {
       baseline: {
         data: {
@@ -238,15 +225,13 @@ describe('collectMetricsAndParams', () => {
       baseline: {}
     }
   })
-  const param = numericMetricsAndParams.filter(
-    metricOrParam => metricOrParam.type === MetricOrParamType.PARAMS
-  ) as MetricOrParam[]
-  const paramWithNumbers = param.find(
-    p => p.name === 'withNumbers'
-  ) as MetricOrParam
+  const param = numericColumns.filter(
+    column => column.type === ColumnType.PARAMS
+  ) as Column[]
+  const paramWithNumbers = param.find(p => p.name === 'withNumbers') as Column
   const paramWithoutNumbers = param.find(
     p => p.name === 'withoutNumbers'
-  ) as MetricOrParam
+  ) as Column
 
   it('should not add a maxNumber or minNumber on a param with no numbers', () => {
     expect(paramWithoutNumbers.minNumber).toBeUndefined()
@@ -266,7 +251,7 @@ describe('collectMetricsAndParams', () => {
   })
 
   it('should aggregate multiple different field names', () => {
-    const metricsAndParams = collectMetricsAndParams({
+    const columns = collectColumns({
       branchA: {
         baseline: {
           data: {
@@ -311,11 +296,10 @@ describe('collectMetricsAndParams', () => {
       }
     })
 
-    const params = metricsAndParams.filter(
-      metricOrParam =>
-        metricOrParam.parentPath ===
-        joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
-    ) as MetricOrParam[]
+    const params = columns.filter(
+      column =>
+        column.parentPath === joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+    ) as Column[]
 
     expect(params?.map(({ name }) => name)).toStrictEqual([
       'one',
@@ -326,7 +310,7 @@ describe('collectMetricsAndParams', () => {
   })
 
   it('should create concatenated columns for nesting deeper than 5', () => {
-    const metricsAndParams = collectMetricsAndParams({
+    const columns = collectColumns({
       workspace: {
         baseline: {
           data: {
@@ -346,28 +330,24 @@ describe('collectMetricsAndParams', () => {
       }
     })
 
-    expect(metricsAndParams.map(({ path }) => path)).toStrictEqual([
-      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml'),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'one.two.three.four'
-      ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
+    expect(columns.map(({ path }) => path)).toStrictEqual([
+      joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
+      joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'one.two.three.four'),
+      joinColumnPath(
+        ColumnType.PARAMS,
         'params.yaml',
         'one.two.three.four',
         'five'
       ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
+      joinColumnPath(
+        ColumnType.PARAMS,
         'params.yaml',
         'one.two.three.four',
         'five',
         'six'
       ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
+      joinColumnPath(
+        ColumnType.PARAMS,
         'params.yaml',
         'one.two.three.four',
         'five',
@@ -378,7 +358,7 @@ describe('collectMetricsAndParams', () => {
   })
 
   it('should not report types for params and metrics without primitives or children for params and metrics without objects', () => {
-    const metricsAndParams = collectMetricsAndParams({
+    const columns = collectColumns({
       workspace: {
         baseline: {
           data: {
@@ -396,104 +376,63 @@ describe('collectMetricsAndParams', () => {
       }
     })
 
-    const objectParam = metricsAndParams.find(
-      metricOrParam =>
-        metricOrParam.parentPath ===
-        joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml')
-    ) as MetricOrParam
+    const objectParam = columns.find(
+      column =>
+        column.parentPath === joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+    ) as Column
 
     expect(objectParam.name).toStrictEqual('onlyHasChild')
     expect(objectParam.types).toBeUndefined()
 
-    const primitiveParam = metricsAndParams.find(
-      metricOrParam =>
-        metricOrParam.parentPath ===
-        joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yaml',
-          'onlyHasChild'
-        )
-    ) as MetricOrParam
+    const primitiveParam = columns.find(
+      column =>
+        column.parentPath ===
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'onlyHasChild')
+    ) as Column
 
     expect(primitiveParam.name).toStrictEqual('onlyHasPrimitive')
     expect(primitiveParam.types).toBeDefined()
 
-    const onlyHasPrimitiveChild = metricsAndParams.find(
-      metricOrParam =>
-        metricOrParam.parentPath ===
-        joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
+    const onlyHasPrimitiveChild = columns.find(
+      column =>
+        column.parentPath ===
+        joinColumnPath(
+          ColumnType.PARAMS,
           'params.yaml',
           'onlyHasChild',
           'onlyHasPrimitive'
         )
-    ) as MetricOrParam
+    ) as Column
 
     expect(onlyHasPrimitiveChild).toBeUndefined()
   })
 
   it('should collect all params and metrics from the test fixture', () => {
-    expect(
-      collectMetricsAndParams(outputFixture).map(({ path }) => path)
-    ).toStrictEqual([
-      joinMetricOrParamPath(MetricOrParamType.METRICS, 'summary.json'),
-      joinMetricOrParamPath(MetricOrParamType.METRICS, 'summary.json', 'loss'),
-      joinMetricOrParamPath(
-        MetricOrParamType.METRICS,
-        'summary.json',
-        'accuracy'
-      ),
-      joinMetricOrParamPath(
-        MetricOrParamType.METRICS,
-        'summary.json',
-        'val_loss'
-      ),
-      joinMetricOrParamPath(
-        MetricOrParamType.METRICS,
-        'summary.json',
-        'val_accuracy'
-      ),
-      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml'),
-      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml', 'epochs'),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'learning_rate'
-      ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'dvc_logs_dir'
-      ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'log_file'
-      ),
-      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml', 'dropout'),
-      joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml', 'process'),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'process',
-        'threshold'
-      ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'process',
-        'test_arg'
-      ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        join('nested', 'params.yaml')
-      ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        join('nested', 'params.yaml'),
-        'test'
-      )
-    ])
+    expect(collectColumns(outputFixture).map(({ path }) => path)).toStrictEqual(
+      [
+        joinColumnPath(ColumnType.METRICS, 'summary.json'),
+        joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
+        joinColumnPath(ColumnType.METRICS, 'summary.json', 'accuracy'),
+        joinColumnPath(ColumnType.METRICS, 'summary.json', 'val_loss'),
+        joinColumnPath(ColumnType.METRICS, 'summary.json', 'val_accuracy'),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'learning_rate'),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'dvc_logs_dir'),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'log_file'),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'dropout'),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'process'),
+        joinColumnPath(
+          ColumnType.PARAMS,
+          'params.yaml',
+          'process',
+          'threshold'
+        ),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'process', 'test_arg'),
+        joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml')),
+        joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'), 'test')
+      ]
+    )
   })
 })
 
@@ -595,16 +534,16 @@ describe('collectChanges', () => {
     }
 
     expect(collectChanges(data)).toStrictEqual([
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
+      joinColumnPath(
+        ColumnType.PARAMS,
         'params.yaml',
         'dropout',
         'lower',
         'p',
         '0.05'
       ),
-      joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
+      joinColumnPath(
+        ColumnType.PARAMS,
         'params.yaml',
         'dropout',
         'upper',
