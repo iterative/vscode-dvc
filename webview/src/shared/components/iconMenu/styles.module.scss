@@ -5,7 +5,6 @@
   display: flex;
   padding: 2px;
   border: 1px solid var(--editor-foreground-transparency-5);
-  border-radius: 5px;
   width: max-content;
   background-color: $bg-color;
 }
@@ -17,7 +16,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
   cursor: pointer;
   border: none;
   padding: 0;
