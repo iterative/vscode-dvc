@@ -50,6 +50,24 @@ describe('isVersionCompatible', () => {
     patch: minPatch
   } = extractSemver(MIN_CLI_VERSION) as ParsedSemver
 
+  it('should be compatible and not send a toast message if the provided version matches the min version', () => {
+    const isCompatible = isVersionCompatible(MIN_CLI_VERSION)
+
+    expect(isCompatible).toBe(true)
+    expect(mockedWarnWithOptions).not.toBeCalled()
+  })
+
+  it('should be compatible and not send a toast for a version with the same minor and higher patch', () => {
+    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+
+    const isCompatible = isVersionCompatible(
+      [minMajor, minMinor, minPatch + 10000].join(',')
+    )
+
+    expect(isCompatible).toBe(true)
+    expect(mockedWarnWithOptions).not.toBeCalled()
+  })
+
   it('should be compatible but send a toast for a version with a higher minor but lower patch', () => {
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
@@ -57,15 +75,6 @@ describe('isVersionCompatible', () => {
 
     expect(isCompatible).toBe(true)
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
-  })
-
-  it('should be compatible and not send a toast for a version with the same minor and higher patch', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
-
-    const isCompatible = isVersionCompatible('2.9.10')
-
-    expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toBeCalled()
   })
 
   it('should not be compatible and send a toast message if the provided version is a patch version before the minimum expected version', () => {
@@ -117,12 +126,5 @@ describe('isVersionCompatible', () => {
 
     expect(isCompatible).toBe(false)
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
-  })
-
-  it('should be compatible and not send a toast message if the provided version matches the min version', () => {
-    const isCompatible = isVersionCompatible(MIN_CLI_VERSION)
-
-    expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toBeCalled()
   })
 })
