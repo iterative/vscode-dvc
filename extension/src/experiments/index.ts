@@ -376,29 +376,34 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
-          case MessageFromWebviewType.COLUMN_REORDERED:
+          case MessageFromWebviewType.REORDER_COLUMNS:
             return this.setColumnOrder(message.payload)
-          case MessageFromWebviewType.COLUMN_RESIZED:
+          case MessageFromWebviewType.RESIZE_COLUMN:
             return this.setColumnWidth(
               message.payload.id,
               message.payload.width
             )
-          case MessageFromWebviewType.EXPERIMENT_TOGGLED:
+          case MessageFromWebviewType.TOGGLE_EXPERIMENT:
             return this.setExperimentStatus(message.payload)
-          case MessageFromWebviewType.COLUMN_SORTED:
+          case MessageFromWebviewType.SORT_COLUMN:
             return this.addColumnSort(message.payload)
-          case MessageFromWebviewType.COLUMN_SORT_REMOVED:
+          case MessageFromWebviewType.REMOVE_COLUMN_SORT:
             return this.removeColumnSort(message.payload)
-          case MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE:
+          case MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE:
             return this.applyExperimentToWorkspace(message.payload)
-          case MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT:
+          case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
             return this.createBranchFromExperiment(message.payload)
-          case MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED:
+          case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
             return this.modifyExperimentParamsAndRun(
               AvailableCommands.EXPERIMENT_QUEUE,
               message.payload
             )
-          case MessageFromWebviewType.EXPERIMENT_REMOVED:
+          case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN:
+            return this.modifyExperimentParamsAndRun(
+              AvailableCommands.EXPERIMENT_RUN,
+              message.payload
+            )
+          case MessageFromWebviewType.REMOVE_EXPERIMENT:
             return this.removeExperiment(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -419,7 +424,7 @@ export class Experiments extends BaseRepository<TableData> {
   private setColumnWidth(id: string, width: number) {
     this.columns.setColumnWidth(id, width)
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED,
+      EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN,
       { width },
       undefined
     )
@@ -437,7 +442,7 @@ export class Experiments extends BaseRepository<TableData> {
   private addColumnSort(sort: SortDefinition) {
     this.experiments.addSort(sort)
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED,
+      EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN,
       { ...sort },
       undefined
     )
@@ -447,7 +452,7 @@ export class Experiments extends BaseRepository<TableData> {
   private removeColumnSort(path: string) {
     this.experiments.removeSort(path)
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED,
+      EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT,
       { path },
       undefined
     )

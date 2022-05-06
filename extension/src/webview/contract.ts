@@ -12,22 +12,23 @@ export type WebviewData = TableData | PlotsData
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
-  COLUMN_REORDERED = 'column-reordered',
-  COLUMN_RESIZED = 'column-resized',
-  COLUMN_SORTED = 'column-sorted',
-  COLUMN_SORT_REMOVED = 'column-sort-removed',
-  EXPERIMENT_TOGGLED = 'experiment-toggled',
-  EXPERIMENT_APPLIED_TO_WORKSPACE = 'experiment-applied-to-workspace',
-  BRANCH_CREATED_FROM_EXPERIMENT = 'branch-created-from-experiment',
-  EXPERIMENT_QUEUE_AND_PARAMS_VARIED = 'experiment-queue-and-params-varied',
-  EXPERIMENT_REMOVED = 'experiment-removed',
-  METRIC_TOGGLED = 'metric-toggled',
-  PLOTS_COMPARISON_REORDERED = 'plots-comparison-reordered',
-  PLOTS_METRICS_REORDERED = 'plots-metrics-reordered',
-  PLOTS_SECTION_TOGGLED = 'plots-section-toggled',
-  PLOTS_TEMPLATES_REORDERED = 'plots-templates-reordered',
-  PLOTS_RESIZED = 'plots-resized',
-  SECTION_RENAMED = 'section-renamed'
+  APPLY_EXPERIMENT_TO_WORKSPACE = 'apply-experiment-to-workspace',
+  CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
+  REMOVE_COLUMN_SORT = 'remove-column-sort',
+  REMOVE_EXPERIMENT = 'remove-experiment',
+  RENAME_SECTION = 'rename-section',
+  REORDER_COLUMNS = 'reorder-columns',
+  REORDER_PLOTS_COMPARISON = 'reorder-plots-comparison',
+  REORDER_PLOTS_METRICS = 'reorder-plots-metrics',
+  REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
+  RESIZE_COLUMN = 'resize-column',
+  RESIZE_PLOTS = 'resize-plots',
+  SORT_COLUMN = 'sort-column',
+  TOGGLE_EXPERIMENT = 'toggle-experiment',
+  TOGGLE_METRIC = 'toggle-metric',
+  TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
+  VARY_EXPERIMENT_PARAMS_AND_QUEUE = 'vary-experiment-params-and-queue',
+  VARY_EXPERIMENT_PARAMS_AND_RUN = 'vary-experiment-params-and-run'
 }
 
 export type ColumnResizePayload = {
@@ -46,67 +47,71 @@ export type PlotsTemplatesReordered = {
 
 export type MessageFromWebview =
   | {
-      type: MessageFromWebviewType.COLUMN_REORDERED
+      type: MessageFromWebviewType.REORDER_COLUMNS
       payload: string[]
     }
   | {
-      type: MessageFromWebviewType.COLUMN_RESIZED
+      type: MessageFromWebviewType.RESIZE_COLUMN
       payload: ColumnResizePayload
     }
   | {
-      type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       payload: string
     }
   | {
-      type: MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE
+      type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
       payload: string
     }
   | {
-      type: MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT
+      type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
       payload: string
     }
   | {
-      type: MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED
+      type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
       payload: string
     }
   | {
-      type: MessageFromWebviewType.EXPERIMENT_REMOVED
+      type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
       payload: string
     }
   | {
-      type: MessageFromWebviewType.COLUMN_SORTED
+      type: MessageFromWebviewType.REMOVE_EXPERIMENT
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.SORT_COLUMN
       payload: SortDefinition
     }
   | {
-      type: MessageFromWebviewType.COLUMN_SORT_REMOVED
+      type: MessageFromWebviewType.REMOVE_COLUMN_SORT
       payload: string
     }
   | {
-      type: MessageFromWebviewType.METRIC_TOGGLED
+      type: MessageFromWebviewType.TOGGLE_METRIC
       payload: string[]
     }
   | {
-      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
       payload: string[]
     }
   | {
-      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_METRICS
       payload: string[]
     }
   | {
-      type: MessageFromWebviewType.PLOTS_RESIZED
+      type: MessageFromWebviewType.RESIZE_PLOTS
       payload: PlotsResizedPayload
     }
   | {
-      type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
       payload: Partial<SectionCollapsed>
     }
   | {
-      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
       payload: PlotsTemplatesReordered
     }
   | {
-      type: MessageFromWebviewType.SECTION_RENAMED
+      type: MessageFromWebviewType.RENAME_SECTION
       payload: PlotSectionRenamedPayload
     }
   | { type: MessageFromWebviewType.INITIALIZED }

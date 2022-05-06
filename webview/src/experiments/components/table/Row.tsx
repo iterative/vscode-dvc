@@ -58,12 +58,12 @@ export const RowContextMenu: React.FC<RowProp> = ({
       experimentMenuOption(
         id,
         'Apply to Workspace',
-        MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE
+        MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
       ),
       experimentMenuOption(
         id,
         'Create new Branch',
-        MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT
+        MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
       )
     ])
 
@@ -71,7 +71,12 @@ export const RowContextMenu: React.FC<RowProp> = ({
       experimentMenuOption(
         id,
         'Modify and Queue',
-        MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED
+        MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
+      ),
+      experimentMenuOption(
+        id,
+        'Modify and Run',
+        MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
       )
     ])
 
@@ -79,7 +84,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       experimentMenuOption(
         id,
         'Remove',
-        MessageFromWebviewType.EXPERIMENT_REMOVED
+        MessageFromWebviewType.REMOVE_EXPERIMENT
       )
     ])
 
@@ -107,7 +112,7 @@ export const RowContent: React.FC<
     e.stopPropagation()
     sendMessage({
       payload: id,
-      type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+      type: MessageFromWebviewType.TOGGLE_EXPERIMENT
     })
   }
 

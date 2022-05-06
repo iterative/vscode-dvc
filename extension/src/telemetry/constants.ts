@@ -31,28 +31,28 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
       'views.experimentsTable.columnsReordered',
-    VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED:
-      'views.experimentsTable.columnResized',
-    VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED:
-      'views.experimentsTable.columnSortAdded',
-    VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED:
-      'views.experimentsTable.columnSortRemoved',
     VIEWS_EXPERIMENTS_TABLE_CREATED: 'views.experimentsTable.created',
     VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE:
       'views.experimentTable.toggleStatus',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
       'views.experimentsTable.focusChanged',
+    VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
+      'views.experimentsTable.columnSortRemoved',
+    VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
+      'views.experimentsTable.columnResized',
+    VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
+      'views.experimentsTable.columnSortAdded',
 
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
-    VIEWS_PLOTS_METRICS_REORDERED: 'views.plots.metricsReordered',
     VIEWS_PLOTS_METRICS_SELECTED: 'views.plots.metricsSelected',
+    VIEWS_PLOTS_RENAME_SECTION: 'views.plots.sectionRenamed',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
-    VIEWS_PLOTS_SECTION_RENAMED: 'views.plots.sectionRenamed',
     VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
-    VIEWS_PLOTS_TEMPLATES_REORDERED: 'views.plots.templatesReordered',
+    VIEWS_REORDER_PLOTS_METRICS: 'views.plots.metricsReordered',
+    VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
     VIEWS_TERMINAL_CREATED: 'views.terminal.created',
@@ -169,11 +169,11 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED]: undefined
-  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED]: {
+  [EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN]: {
     width: number
   }
-  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED]: SortDefinition
-  [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED]: {
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN]: SortDefinition
+  [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT]: {
     path: string
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
@@ -182,13 +182,13 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
-  [EventName.VIEWS_PLOTS_METRICS_REORDERED]: undefined
+  [EventName.VIEWS_REORDER_PLOTS_METRICS]: undefined
   [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
-  [EventName.VIEWS_PLOTS_SECTION_RENAMED]: { section: Section }
+  [EventName.VIEWS_PLOTS_RENAME_SECTION]: { section: Section }
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: { section: Section; size: PlotSize }
   [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
-  [EventName.VIEWS_PLOTS_TEMPLATES_REORDERED]: undefined
+  [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
 
   [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount
 

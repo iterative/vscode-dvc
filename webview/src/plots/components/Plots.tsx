@@ -66,14 +66,14 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
   const changeSize = (size: PlotSize, section: Section) => {
     sendMessage({
       payload: { section, size },
-      type: MessageFromWebviewType.PLOTS_RESIZED
+      type: MessageFromWebviewType.RESIZE_PLOTS
     })
   }
 
   const setSectionName = (section: Section, name: string) => {
     sendMessage({
       payload: { name, section },
-      type: MessageFromWebviewType.SECTION_RENAMED
+      type: MessageFromWebviewType.RENAME_SECTION
     })
   }
 
