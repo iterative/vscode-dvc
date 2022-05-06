@@ -1,9 +1,9 @@
 import { MAX_CLI_VERSION, MIN_CLI_VERSION } from './constants'
 import { Toast } from '../vscode/toast'
 
-export const extractSemver = (
-  stdout: string
-): { major: number; minor: number; patch: number } | undefined => {
+export type ParsedSemver = { major: number; minor: number; patch: number }
+
+export const extractSemver = (stdout: string): ParsedSemver | undefined => {
   const semver = stdout.match(/^(\d+\.)?(\d+\.)?(\*|\d+)/)
   if (!semver) {
     return
@@ -23,6 +23,19 @@ const getTextAndSend = (version: string, update: 'CLI' | 'extension'): void => {
   Toast.warnWithOptions(text)
 }
 
+const warnIfMinorAhead = (
+  currentMajor: number,
+  minMajor: number,
+  currentMinor: number,
+  minMinor: number
+) => {
+  if (currentMajor === minMajor && currentMinor > minMinor) {
+    Toast.warnWithOptions(`The located version of the CLI is at least a minor version ahead of the expected version. 
+		This could lead to unexpected behaviour. 
+		Please upgrade to the most recent version of the extension and reload this window.`)
+  }
+}
+
 const checkCLIVersion = (
   version: string,
   currentSemVer: { major: number; minor: number; patch: number }
@@ -38,16 +51,22 @@ const checkCLIVersion = (
     return false
   }
 
-  const [minMajor, minMinor, minPatch] = MIN_CLI_VERSION.split('.')
+  const {
+    major: minMajor,
+    minor: minMinor,
+    patch: minPatch
+  } = extractSemver(MIN_CLI_VERSION) as ParsedSemver
 
   if (
-    currentMajor < Number(minMajor) ||
-    currentMinor < Number(minMinor) ||
-    (currentMinor === Number(minMinor) && currentPatch < Number(minPatch))
+    currentMajor < minMajor ||
+    currentMinor < minMinor ||
+    (currentMinor === minMinor && currentPatch < Number(minPatch))
   ) {
     getTextAndSend(version, 'CLI')
     return false
   }
+
+  warnIfMinorAhead(currentMajor, minMajor, currentMinor, minMinor)
 
   return true
 }
