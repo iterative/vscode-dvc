@@ -12,6 +12,7 @@ stages:
     metrics:
       - training_metrics.json:
           persist: true
+          cache: false
     plots:
     - training_metrics
     - misclassified.jpg
