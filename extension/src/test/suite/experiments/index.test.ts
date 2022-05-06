@@ -389,13 +389,18 @@ suite('Experiments Test Suite', () => {
         )
       })
 
-      it('should be able to handle a message to modify the params and queue of an experiment', async () => {
+      it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
         const { experiments, mockExecuteCommand } =
           setupExperimentsAndMockCommands()
 
-        const mockParams = ['param1', 'param2']
+        const mockModifiedParams = [
+          '-S',
+          'params.yaml:lr=0.001 ',
+          '-S',
+          'params.yaml:weight_decay=0'
+        ]
 
-        stub(Experiments.prototype, 'pickAndModifyParams').resolves(mockParams)
+        stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
 
         const webview = await experiments.showWebview()
         const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -412,7 +417,39 @@ suite('Experiments Test Suite', () => {
         expect(mockExecuteCommand).to.be.calledWithExactly(
           AvailableCommands.EXPERIMENT_QUEUE,
           dvcDemoPath,
-          ...mockParams
+          ...mockModifiedParams
+        )
+      })
+
+      it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
+        const { experiments, mockExecuteCommand } =
+          setupExperimentsAndMockCommands()
+
+        const mockModifiedParams = [
+          '-S',
+          'params.yaml:lr=0.001 ',
+          '-S',
+          'params.yaml:weight_decay=0'
+        ]
+
+        stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+
+        const webview = await experiments.showWebview()
+        const mockMessageReceived = getMessageReceivedEmitter(webview)
+        const mockExperimentId = 'mock-experiment-id'
+        const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+        mockMessageReceived.fire({
+          payload: mockExperimentId,
+          type: MessageFromWebviewType.EXPERIMENT_RUN_AND_PARAMS_VARIED
+        })
+
+        await tableChangePromise
+        expect(mockExecuteCommand).to.be.calledOnce
+        expect(mockExecuteCommand).to.be.calledWithExactly(
+          AvailableCommands.EXPERIMENT_RUN,
+          dvcDemoPath,
+          ...mockModifiedParams
         )
       })
 

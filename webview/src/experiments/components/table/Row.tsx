@@ -75,6 +75,14 @@ export const RowContextMenu: React.FC<RowProp> = ({
       )
     ])
 
+    pushIf(depth <= 1 || isWorkspace, [
+      experimentMenuOption(
+        id,
+        'Modify and Run',
+        MessageFromWebviewType.EXPERIMENT_RUN_AND_PARAMS_VARIED
+      )
+    ])
+
     pushIf(depth === 1, [
       experimentMenuOption(
         id,
