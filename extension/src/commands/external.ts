@@ -36,6 +36,7 @@ export enum RegisteredCommands {
   EXPERIMENT_TREE_BRANCH = 'dvc.views.experimentsTree.branchExperiment',
   EXPERIMENT_TREE_QUEUE = 'dvc.views.experimentsTree.queueExperiment',
   EXPERIMENT_TREE_REMOVE = 'dvc.views.experimentsTree.removeExperiment',
+  EXPERIMENT_TREE_RUN = 'dvc.views.experimentsTree.runExperiment',
   EXPERIMENT_SELECT = 'dvc.views.experimentsTree.selectExperiments',
   EXPERIMENT_SHOW = 'dvc.showExperiments',
   EXPERIMENT_SORT_ADD = 'dvc.addExperimentsTableSort',
@@ -44,6 +45,7 @@ export enum RegisteredCommands {
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
   EXPERIMENT_TOGGLE = 'dvc.views.experimentsTree.toggleStatus',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'dvc.modifyExperimentParamsAndQueue',
+  MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'dvc.modifyExperimentParamsAndRun',
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
   PLOTS_PATH_TOGGLE = 'dvc.views.plotsPathsTree.toggleStatus',

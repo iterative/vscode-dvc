@@ -1,7 +1,7 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
-import { pickParamsToQueue } from './model/queue/quickPick'
+import { pickAndModifyParams } from './model/queue/quickPick'
 import { pickExperiment } from './quickPick'
 import {
   pickFilterToAdd,
@@ -270,7 +270,7 @@ export class Experiments extends BaseRepository<TableData> {
     return pickExperiment(this.experiments.getQueuedExperiments())
   }
 
-  public async pickParamsToQueue(overrideId?: string) {
+  public async pickAndModifyParams(overrideId?: string) {
     const id = await this.getExperimentId(overrideId)
     if (!id) {
       return
@@ -282,7 +282,7 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    return pickParamsToQueue(params)
+    return pickAndModifyParams(params)
   }
 
   public getExperiments() {
@@ -319,13 +319,13 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelectedExperiments()
   }
 
-  public async modifyExperimentParamsAndQueue(experimentId?: string) {
-    const paramsToQueue = await this.pickParamsToQueue(experimentId)
-    if (paramsToQueue) {
-      return this.runCommand(
-        AvailableCommands.EXPERIMENT_QUEUE,
-        ...paramsToQueue
-      )
+  public async modifyExperimentParamsAndRun(
+    commandId: CommandId,
+    experimentId?: string
+  ) {
+    const paramsToModify = await this.pickAndModifyParams(experimentId)
+    if (paramsToModify) {
+      return this.runCommand(commandId, ...paramsToModify)
     }
   }
 
@@ -394,7 +394,10 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT:
             return this.createBranchFromExperiment(message.payload)
           case MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED:
-            return this.modifyExperimentParamsAndQueue(message.payload)
+            return this.modifyExperimentParamsAndRun(
+              AvailableCommands.EXPERIMENT_QUEUE,
+              message.payload
+            )
           case MessageFromWebviewType.EXPERIMENT_REMOVED:
             return this.removeExperiment(message.payload)
           default:
