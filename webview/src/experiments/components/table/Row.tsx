@@ -72,10 +72,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
         id,
         'Modify and Queue',
         MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED
-      )
-    ])
-
-    pushIf(depth <= 1 || isWorkspace, [
+      ),
       experimentMenuOption(
         id,
         'Modify and Run',
