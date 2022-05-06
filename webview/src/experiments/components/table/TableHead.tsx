@@ -54,7 +54,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   const onDragEnd = () => {
     sendMessage({
       payload: columnOrder,
-      type: MessageFromWebviewType.COLUMN_REORDERED
+      type: MessageFromWebviewType.REORDER_COLUMNS
     })
   }
 

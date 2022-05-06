@@ -155,7 +155,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   const removeColumnSort = () => {
     sendMessage({
       payload: column.id,
-      type: MessageFromWebviewType.COLUMN_SORT_REMOVED
+      type: MessageFromWebviewType.REMOVE_COLUMN_SORT
     })
   }
 
@@ -172,7 +172,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 
     sendMessage({
       payload,
-      type: MessageFromWebviewType.COLUMN_SORTED
+      type: MessageFromWebviewType.SORT_COLUMN
     })
   }
 

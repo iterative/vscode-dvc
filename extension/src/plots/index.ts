@@ -216,25 +216,25 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
-          case MessageFromWebviewType.METRIC_TOGGLED:
+          case MessageFromWebviewType.TOGGLE_METRIC:
             return this.setSelectedMetrics(message.payload)
-          case MessageFromWebviewType.PLOTS_RESIZED:
+          case MessageFromWebviewType.RESIZE_PLOTS:
             return this.setPlotSize(
               message.payload.section,
               message.payload.size
             )
-          case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
+          case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
             return this.setSectionCollapsed(message.payload)
-          case MessageFromWebviewType.SECTION_RENAMED:
+          case MessageFromWebviewType.RENAME_SECTION:
             return this.setSectionName(
               message.payload.section,
               message.payload.name
             )
-          case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
+          case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
             return this.setComparisonOrder(message.payload)
-          case MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED:
+          case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
             return this.setTemplateOrder(message.payload)
-          case MessageFromWebviewType.PLOTS_METRICS_REORDERED:
+          case MessageFromWebviewType.REORDER_PLOTS_METRICS:
             return this.setMetricOrder(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -272,7 +272,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private setSectionName(section: Section, name: string) {
     this.plots?.setSectionName(section, name)
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_SECTION_RENAMED,
+      EventName.VIEWS_PLOTS_RENAME_SECTION,
       { section },
       undefined
     )
@@ -296,7 +296,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       template: this.getTemplatePlots()
     })
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
+      EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
       undefined,
       undefined
     )
@@ -304,12 +304,12 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setMetricOrder(order: string[]) {
     this.plots?.setMetricOrder(order)
-    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_REORDERED)
+    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
   }
 
   private sendCheckpointPlotsAndEvent(
     event:
-      | typeof EventName.VIEWS_PLOTS_METRICS_REORDERED
+      | typeof EventName.VIEWS_REORDER_PLOTS_METRICS
       | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
   ) {
     this.sendCheckpointPlotsData()

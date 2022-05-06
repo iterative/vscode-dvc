@@ -103,7 +103,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
               payload: {
                 [sectionKey]: !sectionCollapsed[sectionKey]
               },
-              type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
+              type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
             })
           }}
         >
