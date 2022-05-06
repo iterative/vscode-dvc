@@ -12,7 +12,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('pickParamsToQueue', () => {
+describe('pickAndModifyParams', () => {
   it('should return early if no params are selected', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce(undefined)
 
