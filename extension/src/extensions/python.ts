@@ -38,11 +38,13 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
   const pythonBin = pythonExecutionDetails?.join(' ')
   if (pythonBin) {
-    return executeProcess({
-      args: ['-c', 'import sys; print(sys.executable)'],
-      cwd: process.cwd(),
-      executable: pythonBin
-    })
+    try {
+      return await executeProcess({
+        args: ['-c', 'import sys; print(sys.executable)'],
+        cwd: process.cwd(),
+        executable: pythonBin
+      })
+    } catch {}
   }
 }
 

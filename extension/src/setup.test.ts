@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import { extensions, Extension } from 'vscode'
 import { setup, setupWorkspace } from './setup'
 import { flushPromises } from './test/util/jest'
 import {
@@ -16,11 +17,14 @@ import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { Toast } from './vscode/toast'
 import { Response } from './vscode/response'
 
+jest.mock('vscode')
 jest.mock('./vscode/config')
 jest.mock('./vscode/resourcePicker')
 jest.mock('./vscode/quickPick')
 jest.mock('./vscode/toast')
 jest.mock('./vscode/workspaceFolders')
+
+const mockedExtensions = jest.mocked(extensions)
 
 const mockedCanRunCli = jest.fn()
 const mockedHasRoots = jest.fn()
@@ -47,6 +51,9 @@ const mockedSetUserConfigValue = jest.mocked(setUserConfigValue)
 
 beforeEach(() => {
   jest.resetAllMocks()
+  mockedExtensions.all = [
+    { id: 'ms-python.python' } as Extension<{ id: string }>
+  ]
 })
 
 describe('setupWorkspace', () => {

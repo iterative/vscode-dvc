@@ -13,6 +13,7 @@ import {
 import { mockHasCheckpoints } from './experiments/util'
 import { WEBVIEW_TEST_TIMEOUT } from './timeouts'
 import { Disposable } from '../../extension'
+import * as Python from '../../extensions/python'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import expShowFixture from '../fixtures/expShow/output'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
@@ -48,6 +49,7 @@ suite('Extension Test Suite', () => {
 
   describe('dvc.setupWorkspace', () => {
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
+      stub(Python, 'isPythonExtensionInstalled').returns(true)
       stub(CliReader.prototype, 'version').rejects('do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -80,6 +82,7 @@ suite('Extension Test Suite', () => {
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
       stub(CliReader.prototype, 'version').rejects('still do not run setup')
+      stub(Python, 'isPythonExtensionInstalled').returns(true)
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockUri = Uri.file(
@@ -133,6 +136,7 @@ suite('Extension Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should initialize the extension when the cli is usable', async () => {
+      stub(Python, 'isPythonExtensionInstalled').returns(true)
       const selectDvcPathFromFilePicker = async () => {
         const quickPick =
           window.createQuickPick<QuickPickItemWithValue<string>>()
@@ -315,7 +319,7 @@ suite('Extension Test Suite', () => {
           hasCheckpoints: 1,
           images: 3,
           metrics: 4,
-          msPythonInstalled: false,
+          msPythonInstalled: true,
           msPythonUsed: false,
           noCheckpoints: 0,
           params: 8,
