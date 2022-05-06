@@ -36,7 +36,7 @@ export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
     setSelectedPlots(metrics)
     sendMessage({
       payload: metrics,
-      type: MessageFromWebviewType.METRIC_TOGGLED
+      type: MessageFromWebviewType.TOGGLE_METRIC
     })
   }
 

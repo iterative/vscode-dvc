@@ -29,7 +29,7 @@ const Template: Story<ContextMenuProps> = () => {
                 label: 'Apply to Workspace',
                 message: {
                   payload: 'column-id',
-                  type: MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE
+                  type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
                 }
               }
             ]}

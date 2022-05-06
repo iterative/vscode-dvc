@@ -63,7 +63,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     setColumns(newOrder)
     sendMessage({
       payload: newOrder.map(({ revision }) => revision),
-      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
     })
   }
 

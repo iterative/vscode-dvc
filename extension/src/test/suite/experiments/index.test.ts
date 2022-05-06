@@ -175,7 +175,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockColumnOrder,
-        type: MessageFromWebviewType.COLUMN_REORDERED
+        type: MessageFromWebviewType.REORDER_COLUMNS
       })
 
       expect(mockSetColumnReordered).to.be.calledOnce
@@ -209,7 +209,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: { id: mockColumnId, width: mockWidth },
-        type: MessageFromWebviewType.COLUMN_RESIZED
+        type: MessageFromWebviewType.RESIZE_COLUMN
       })
 
       expect(mockSetColumnWidth).to.be.calledOnce
@@ -219,7 +219,7 @@ suite('Experiments Test Suite', () => {
       ).to.be.calledWithExactly(mockColumnId, mockWidth)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED,
+        EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN,
         { width: mockWidth },
         undefined
       )
@@ -242,7 +242,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
-        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
 
       expect(mockToggleExperimentStatus).to.be.calledOnce
@@ -277,7 +277,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockSortDefinition,
-        type: MessageFromWebviewType.COLUMN_SORTED
+        type: MessageFromWebviewType.SORT_COLUMN
       })
 
       expect(mockAddSort).to.be.calledOnce
@@ -287,7 +287,7 @@ suite('Experiments Test Suite', () => {
       ).to.be.calledWithExactly(mockSortDefinition)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED,
+        EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN,
         mockSortDefinition,
         undefined
       )
@@ -310,7 +310,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockSortPath,
-        type: MessageFromWebviewType.COLUMN_SORT_REMOVED
+        type: MessageFromWebviewType.REMOVE_COLUMN_SORT
       })
 
       expect(mockRemoveSort).to.be.calledOnce
@@ -320,7 +320,7 @@ suite('Experiments Test Suite', () => {
       ).to.be.calledWithExactly(mockSortPath)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED,
+        EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT,
         {
           path: mockSortPath
         },
@@ -352,7 +352,7 @@ suite('Experiments Test Suite', () => {
 
         mockMessageReceived.fire({
           payload: mockExperimentId,
-          type: MessageFromWebviewType.EXPERIMENT_APPLIED_TO_WORKSPACE
+          type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
         })
 
         expect(mockExecuteCommand).to.be.calledOnce
@@ -376,7 +376,7 @@ suite('Experiments Test Suite', () => {
 
         mockMessageReceived.fire({
           payload: mockExperimentId,
-          type: MessageFromWebviewType.BRANCH_CREATED_FROM_EXPERIMENT
+          type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
         })
 
         await inputEvent
@@ -409,7 +409,7 @@ suite('Experiments Test Suite', () => {
 
         mockMessageReceived.fire({
           payload: mockExperimentId,
-          type: MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED
+          type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
         })
 
         await tableChangePromise
@@ -441,7 +441,7 @@ suite('Experiments Test Suite', () => {
 
         mockMessageReceived.fire({
           payload: mockExperimentId,
-          type: MessageFromWebviewType.EXPERIMENT_RUN_AND_PARAMS_VARIED
+          type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
         })
 
         await tableChangePromise
@@ -463,7 +463,7 @@ suite('Experiments Test Suite', () => {
 
         mockMessageReceived.fire({
           payload: mockExperimentId,
-          type: MessageFromWebviewType.EXPERIMENT_REMOVED
+          type: MessageFromWebviewType.REMOVE_EXPERIMENT
         })
 
         expect(mockExecuteCommand).to.be.calledOnce

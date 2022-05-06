@@ -114,7 +114,7 @@ const reportResizedColumn = (state: TableState<Row>) => {
     const width = state.columnResizing.columnWidths[id]
     sendMessage({
       payload: { id, width },
-      type: MessageFromWebviewType.COLUMN_RESIZED
+      type: MessageFromWebviewType.RESIZE_COLUMN
     })
   }
 }

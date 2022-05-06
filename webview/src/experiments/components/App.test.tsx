@@ -399,7 +399,7 @@ describe('App', () => {
         expect(mockPostMessage).toBeCalledTimes(1)
         expect(mockPostMessage).toBeCalledWith({
           payload: id,
-          type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+          type: MessageFromWebviewType.TOGGLE_EXPERIMENT
         })
       }
 
@@ -436,7 +436,7 @@ describe('App', () => {
       })
       expect(mockPostMessage).toBeCalledWith({
         payload: 'main',
-        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
       mockPostMessage.mockClear()
 
@@ -449,7 +449,7 @@ describe('App', () => {
       })
       expect(mockPostMessage).toBeCalledWith({
         payload: 'main',
-        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
       mockPostMessage.mockClear()
 
