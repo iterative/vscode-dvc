@@ -72,6 +72,11 @@ export const RowContextMenu: React.FC<RowProp> = ({
         id,
         'Modify and Queue',
         MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED
+      ),
+      experimentMenuOption(
+        id,
+        'Modify and Run',
+        MessageFromWebviewType.EXPERIMENT_RUN_AND_PARAMS_VARIED
       )
     ])
 
