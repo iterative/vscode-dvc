@@ -20,6 +20,7 @@ export enum MessageFromWebviewType {
   EXPERIMENT_APPLIED_TO_WORKSPACE = 'experiment-applied-to-workspace',
   BRANCH_CREATED_FROM_EXPERIMENT = 'branch-created-from-experiment',
   EXPERIMENT_QUEUE_AND_PARAMS_VARIED = 'experiment-queue-and-params-varied',
+  EXPERIMENT_RUN_AND_PARAMS_VARIED = 'experiment-run-and-params-varied',
   EXPERIMENT_REMOVED = 'experiment-removed',
   METRIC_TOGGLED = 'metric-toggled',
   PLOTS_COMPARISON_REORDERED = 'plots-comparison-reordered',
@@ -67,6 +68,10 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.EXPERIMENT_QUEUE_AND_PARAMS_VARIED
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.EXPERIMENT_RUN_AND_PARAMS_VARIED
       payload: string
     }
   | {

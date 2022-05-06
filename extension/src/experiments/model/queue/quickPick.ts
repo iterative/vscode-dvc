@@ -10,7 +10,7 @@ const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
     params.map(param => ({
       description: `${param.value}`,
       label: param.path,
-      picked: true,
+      picked: false,
       value: param
     })),
     { title: Title.SELECT_PARAM_TO_MODIFY }
