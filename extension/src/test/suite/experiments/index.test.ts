@@ -395,7 +395,7 @@ suite('Experiments Test Suite', () => {
 
         const mockModifiedParams = [
           '-S',
-          'params.yaml:lr=0.001 ',
+          'params.yaml:lr=0.001',
           '-S',
           'params.yaml:weight_decay=0'
         ]
@@ -427,7 +427,7 @@ suite('Experiments Test Suite', () => {
 
         const mockModifiedParams = [
           '-S',
-          'params.yaml:lr=0.001 ',
+          'params.yaml:lr=0.001',
           '-S',
           'params.yaml:weight_decay=0'
         ]
