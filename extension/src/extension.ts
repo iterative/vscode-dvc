@@ -270,7 +270,7 @@ export class Extension extends Disposable implements IExtension {
     this.dispose.track(
       commands.registerCommand(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        this.setupWorkspace
+        () => this.setupWorkspace()
       )
     )
 
@@ -281,6 +281,9 @@ export class Extension extends Disposable implements IExtension {
   public async setupWorkspace() {
     const stopWatch = new StopWatch()
     try {
+      const previousCliPath = this.config.getCliPath()
+      const previousPythonPath = this.config.pythonBinPath
+
       const completed = await setupWorkspace()
       sendTelemetryEvent(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
@@ -289,6 +292,15 @@ export class Extension extends Disposable implements IExtension {
           duration: stopWatch.getElapsedTime()
         }
       )
+
+      const executionDetailsUnchanged =
+        this.config.getCliPath() === previousPythonPath &&
+        this.config.pythonBinPath === previousCliPath
+
+      if (completed && !this.cliAccessible && executionDetailsUnchanged) {
+        this.workspaceChanged.fire()
+      }
+
       return completed
     } catch (error: unknown) {
       return sendTelemetryEventAndThrow(
