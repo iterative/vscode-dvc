@@ -46,6 +46,7 @@ import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
+import { createFileSystemWatcher } from './fileSystem/watcher'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -62,6 +63,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly cliRunner: CliRunner
   private readonly status: Status
   private cliAccessible = false
+  private cliCompatible: boolean | undefined
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -276,6 +278,8 @@ export class Extension extends Disposable implements IExtension {
 
     showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
+
+    this.watchForVenvChanges()
   }
 
   public async setupWorkspace() {
@@ -316,6 +320,7 @@ export class Extension extends Disposable implements IExtension {
     setContextValue('dvc.cli.incompatible', undefined)
     const version = await this.cliReader.version(cwd)
     const compatible = isVersionCompatible(version)
+    this.cliCompatible = compatible
     setContextValue('dvc.cli.incompatible', !compatible)
     return this.setAvailable(compatible)
   }
@@ -409,6 +414,16 @@ export class Extension extends Disposable implements IExtension {
       pythonPathUsed: !!this.config.pythonBinPath,
       workspaceFolderCount: getWorkspaceFolderCount()
     }
+  }
+
+  private watchForVenvChanges() {
+    this.dispose.track(
+      createFileSystemWatcher('**/dvc{,.exe}', path => {
+        if (path && (!this.cliAccessible || !this.cliCompatible)) {
+          setup(this)
+        }
+      })
+    )
   }
 }
 
