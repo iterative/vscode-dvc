@@ -12,16 +12,14 @@ $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
 $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
-$row-bg-alt-color: var(--vscode-sideBar-background);
-$header-bg-color: #303031;
-$meta-cell-color: #a0a0a0;
-$toggle-color: rgba(255, 255, 255, 0.21);
-$spinner-color: rgb(255, 255, 255);
 $metrics-color: #fbd38d;
 $params-color: #90cdf4;
+$row-bg-alt-color: var(--vscode-sideBar-background);
+$header-bg-color: var(--vscode-dropdown-background);
+$meta-cell-color: var(--vscode-descriptionForeground);
+$changed-color: var(--vscode-gitDecoration-modifiedResourceForeground);
 
 // Extendable Silent Rules
-
 %expandableRowArrow {
   width: 8px;
   height: 8px;
@@ -103,7 +101,7 @@ $params-color: #90cdf4;
     }
 
     .workspaceWithChanges.normalExperiment & {
-      background-color: $metrics-color;
+      background-color: $changed-color;
     }
 
     .unselectedExperiment & {
@@ -119,7 +117,7 @@ $params-color: #90cdf4;
     }
 
     .workspaceWithChanges.unselectedExperiment & {
-      border: 1px solid $metrics-color;
+      border: 1px solid $changed-color;
     }
 
     .queuedExperiment & {
@@ -140,8 +138,8 @@ $params-color: #90cdf4;
       background-color: $row-bg-alt-color;
     }
     .workspaceWithChanges.runningExperiment & {
-      border-right-color: $metrics-color;
-      border-top-color: $metrics-color;
+      border-right-color: $changed-color;
+      border-top-color: $changed-color;
     }
 
     .runningExperiment.oddRow > .firstCell & {
@@ -340,7 +338,7 @@ $params-color: #90cdf4;
   }
 
   .workspaceChange {
-    color: $metrics-color;
+    color: $changed-color;
   }
 
   .td,
