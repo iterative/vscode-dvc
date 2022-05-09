@@ -38,3 +38,4 @@ jobs:
           target-branch: 'main'
           commit-message:
             'CI: increment version to {{version}} after release [skip ci]'
+          skip-tag: true
