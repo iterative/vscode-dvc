@@ -335,6 +335,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     white-space: nowrap;
     min-width: 0;
     position: relative;
+    height: 100%;
   }
   .td {
     font-size: 0.8rem;
@@ -406,6 +407,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .draggingColumn {
+  border: 1px solid $fg-color;
+  font-size: 0.7rem;
   opacity: 0.7;
 }
 

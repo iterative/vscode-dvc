@@ -14,13 +14,6 @@ import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
-import {
-  mockGetComputedSpacing,
-  mockDndElSpacing,
-  makeDnd,
-  DND_DIRECTION_LEFT,
-  DND_DIRECTION_RIGHT
-} from 'react-beautiful-dnd-test-utils'
 import { SortOrderLabel } from './SortPicker'
 import { Table } from './Table'
 import styles from './styles.module.scss'
@@ -30,9 +23,10 @@ import * as ColumnOrder from '../../hooks/useColumnOrder'
 import { vsCodeApi } from '../../../shared/api'
 import {
   expectHeaders,
-  makeGetDragEl,
   tableData as sortingTableDataFixture
 } from '../../../test/sort'
+import { dragAndDrop } from '../../../test/dragDrop'
+import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
@@ -127,11 +121,7 @@ describe('Table', () => {
   const renderExperimentsTable = (
     data: TableData = sortingTableDataFixture
   ) => {
-    const view = render(<ExperimentsTable tableData={data} />)
-
-    mockDndElSpacing(view)
-
-    return view
+    return render(<ExperimentsTable tableData={data} />)
   }
 
   beforeAll(() => {
@@ -293,45 +283,38 @@ describe('Table', () => {
   })
 
   describe('Columns order', () => {
-    beforeEach(() => {
-      mockGetComputedSpacing()
-    })
-
     it('should move a column from its current position to its new position', async () => {
-      const { getByText } = renderExperimentsTable()
+      renderExperimentsTable()
 
       await expectHeaders(['A', 'B', 'C'])
 
-      await makeDnd({
-        direction: DND_DIRECTION_LEFT,
-        getByText,
-        getDragEl: makeGetDragEl('C'),
-        positions: 1
-      })
+      dragAndDrop(
+        screen.getByText('B'),
+        screen.getByText('C'),
+        DragEnterDirection.AUTO
+      )
 
       await expectHeaders(['A', 'C', 'B'])
 
-      await makeDnd({
-        direction: DND_DIRECTION_RIGHT,
-        getByText,
-        getDragEl: makeGetDragEl('A'),
-        positions: 2
-      })
+      dragAndDrop(
+        screen.getByText('A'),
+        screen.getByText('B'),
+        DragEnterDirection.AUTO
+      )
 
       await expectHeaders(['C', 'B', 'A'])
     })
 
     it('should not move a column before the default columns', async () => {
-      const { getByText } = renderExperimentsTable()
+      renderExperimentsTable()
 
-      await makeDnd({
-        direction: DND_DIRECTION_LEFT,
-        getByText,
-        getDragEl: makeGetDragEl('B'),
-        positions: 3
-      })
+      dragAndDrop(
+        screen.getByText('B'),
+        screen.getByText('Timestamp'),
+        DragEnterDirection.AUTO
+      )
 
-      await expectHeaders(['B', 'A', 'C'])
+      await expectHeaders(['A', 'B', 'C'])
     })
 
     it('should order the columns with the columnOrder from the data', async () => {
