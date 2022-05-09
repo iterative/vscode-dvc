@@ -1,0 +1,18 @@
+{
+  "categories": [
+    {
+      "title": "### Product Updates",
+      "labels": ["product"]
+    },
+    {
+      "title": "### Bug Fixes",
+      "labels": ["bug"]
+    },
+    {
+      "title": "### Housekeeping",
+      "labels": [":house: housekeeping"]
+    }
+  ],
+  "pr_template": "- ${{TITLE}} [#${{NUMBER}}](https://github.com/iterative/vscode-dvc/pull/${{NUMBER}}) by [@${{AUTHOR}}](https://github.com/${{AUTHOR}})",
+  "max_pull_requests": 2000
+}

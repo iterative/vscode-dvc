@@ -1,6 +1,8 @@
 name: Publish Extension
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  pull_request:
 
 jobs:
   deploy:
@@ -10,7 +12,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.ref }}
 
@@ -20,21 +21,33 @@ jobs:
           node-version: '14'
           cache: 'yarn'
 
-      - run: yarn run install-frozen-lockfile
-      - run: yarn build
-      - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          extensionFile: './extension/dvc.vsix'
-          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          registryUrl: https://marketplace.visualstudio.com
-
-      - name: Bump Version after Release
-        uses: 'phips28/gh-action-bump-version@master'
+      - name: Build Changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGEJSON_DIR: 'extension'
         with:
-          target-branch: 'main'
-          commit-message:
-            'CI: increment version to {{version}} after release [skip ci]'
+          configuration: '.github/workflows/changelog-configuration.json'
+          toTag: 'main'
+          fromTag: 'd29bc91581b848905fc6d210b6030aeecc8ff3a3'
+      - name: view new Changelog
+        run: echo "${{ steps.changelog.outputs.changelog }}"
+
+      # - run: yarn run install-frozen-lockfile
+      # - run: yarn build
+      # - name: Publish to Visual Studio Marketplace
+      #   uses: HaaLeo/publish-vscode-extension@v1
+      #   with:
+      #     extensionFile: './extension/dvc.vsix'
+      #     pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+      #     registryUrl: https://marketplace.visualstudio.com
+
+      # - name: Bump Version after Release
+      #   uses: 'phips28/gh-action-bump-version@master'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     PACKAGEJSON_DIR: 'extension'
+      #   with:
+      #     target-branch: 'main'
+      #     commit-message:
+      #       'CI: increment version to {{version}} after release [skip ci]'
