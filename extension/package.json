@@ -945,6 +945,16 @@
       ],
       "view/title": [
         {
+          "command": "dvc.pull",
+          "when": "view == dvc.views.trackedExplorerTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.push",
+          "when": "view == dvc.views.trackedExplorerTree",
+          "group": "navigation@2"
+        },
+        {
           "command": "dvc.showExperiments",
           "when": "view == dvc.views.experimentsColumnsTree",
           "group": "navigation@1"

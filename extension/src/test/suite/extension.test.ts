@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy, match } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
-import { ensureFileSync } from 'fs-extra'
 import {
   closeAllEditors,
   configurationChangeEvent,
@@ -27,10 +26,6 @@ import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
 import { MIN_CLI_VERSION } from '../../cli/constants'
-import { dvcDemoPath } from '../util'
-import { fireWatcher } from '../../fileSystem/watcher'
-import { exists } from '../../fileSystem'
-import { getVenvBinPath } from '../../python'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -373,37 +368,6 @@ suite('Extension Test Suite', () => {
         { error: mockErrorMessage },
         { duration: 0 }
       )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should call setup if the cli is inaccessible and a virtual environment is updated with DVC', async () => {
-      const updateEvent = new Promise(resolve =>
-        workspace.onDidChangeConfiguration(e => {
-          if (e.affectsConfiguration(dvcPathOption)) {
-            resolve(undefined)
-          }
-        })
-      )
-
-      workspace
-        .getConfiguration()
-        .update(dvcPathOption, join('not', 'a', 'valid', 'dvc', 'path'), false)
-
-      await updateEvent
-
-      const mockSetup = stub(Setup, 'setup')
-      const setupEvent = new Promise(resolve =>
-        mockSetup.callsFake(() => {
-          resolve(undefined)
-          return Promise.resolve(undefined)
-        })
-      )
-
-      const dvcPath = getVenvBinPath(dvcDemoPath, '.env', 'dvc')
-      exists(dvcPath) ? fireWatcher(dvcPath) : ensureFileSync(dvcPath)
-
-      await setupEvent
-
-      expect(mockSetup).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
