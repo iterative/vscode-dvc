@@ -17,10 +17,4 @@
   opacity: 0.8;
   letter-spacing: 0.04em;
   color: $watermark-color;
-
-  @at-root {
-    :global(.vscode-light) & {
-      color: $watermark-color-light;
-    }
-  }
 }
