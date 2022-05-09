@@ -1,15 +1,15 @@
 {
   "categories": [
     {
-      "title": "### Product Updates",
+      "title": "### 🚀 New Features and Enhancements",
       "labels": ["product"]
     },
     {
-      "title": "### Bug Fixes",
+      "title": "### 🐛 Bug Fixes",
       "labels": ["bug"]
     },
     {
-      "title": "### Housekeeping",
+      "title": "### 🔨 Maintenance",
       "labels": [":house: housekeeping"]
     }
   ],
