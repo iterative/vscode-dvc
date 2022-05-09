@@ -4,7 +4,7 @@ import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 import { DragDropContext, Droppable, Responders } from 'react-beautiful-dnd'
-import { TableHeader } from './TableHeader'
+import { ColumnDragHandle, TableHeader } from './TableHeader'
 import styles from './styles.module.scss'
 
 export const MergedHeaderGroup: React.FC<
@@ -13,12 +13,16 @@ export const MergedHeaderGroup: React.FC<
     columns: HeaderGroup<Experiment>[]
     sorts: SortDefinition[]
     orderedColumns: Column[]
+    index: number
+    dragging?: HeaderGroup<Experiment>
   } & Responders
 > = ({
   headerGroup,
   sorts,
   columns,
   orderedColumns,
+  index,
+  dragging,
   onDragStart,
   onDragUpdate,
   onDragEnd
@@ -29,7 +33,20 @@ export const MergedHeaderGroup: React.FC<
       onDragUpdate={onDragUpdate}
       onDragEnd={onDragEnd}
     >
-      <Droppable droppableId="droppable" direction="horizontal">
+      <Droppable
+        droppableId={'headerGroup_' + index}
+        direction="horizontal"
+        mode={'virtual'}
+        renderClone={(provided, snapshot) => {
+          return (
+            <ColumnDragHandle
+              provided={provided}
+              snapshot={snapshot}
+              column={dragging}
+            />
+          )
+        }}
+      >
         {provided => (
           <div
             ref={provided.innerRef}
@@ -47,7 +64,7 @@ export const MergedHeaderGroup: React.FC<
                 index={i}
               />
             ))}
-            <div className={styles.dndPlaceholder}>{provided.placeholder}</div>
+            {/* <div className={styles.dndPlaceholder}>{provided.placeholder}</div> */}
           </div>
         )}
       </Droppable>

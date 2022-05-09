@@ -19,8 +19,8 @@ import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { sendMessage } from '../../../shared/vscode'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 
-const ColumnDragHandle: React.FC<{
-  column: HeaderGroup<Experiment>
+export const ColumnDragHandle: React.FC<{
+  column?: HeaderGroup<Experiment>
   provided: DraggableProvided
   snapshot: DraggableStateSnapshot
 }> = ({ provided, snapshot, column }) => {
@@ -42,7 +42,7 @@ const ColumnDragHandle: React.FC<{
       role={'columnheader'}
       tabIndex={0}
     >
-      {column.render('Header')}
+      {column?.render('Header')}
     </span>
   )
 }
@@ -51,18 +51,16 @@ const TableHeaderCell: React.FC<{
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   orderedColumns: Column[]
+  index: number
   sortOrder: SortOrder
-  provided: DraggableProvided
-  snapshot: DraggableStateSnapshot
   menuDisabled: boolean
   menuContent: React.ReactNode
 }> = ({
   column,
   columns,
   orderedColumns,
+  index,
   sortOrder,
-  provided,
-  snapshot,
   menuContent,
   menuDisabled
 }) => {
@@ -94,6 +92,8 @@ const TableHeaderCell: React.FC<{
       )
     }
   }
+  const isDraggable =
+    !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
 
   return (
     <ContextMenu content={menuContent} disabled={menuDisabled}>
@@ -102,11 +102,20 @@ const TableHeaderCell: React.FC<{
         key={column.id}
         data-testid={`header-${column.id}`}
       >
-        <ColumnDragHandle
-          column={column}
-          provided={provided}
-          snapshot={snapshot}
-        />
+        <Draggable
+          key={column.id}
+          draggableId={column.id}
+          index={index}
+          isDragDisabled={!isDraggable}
+        >
+          {(provided, snapshot) => (
+            <ColumnDragHandle
+              column={column}
+              provided={provided}
+              snapshot={snapshot}
+            />
+          )}
+        </Draggable>
         {canResize && (
           <div
             {...column.getResizerProps()}
@@ -136,11 +145,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 }) => {
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
-  const isDraggable =
+  const isSortable =
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
     !column.columns
-  const isSortable = isDraggable
 
   const sortOrder: SortOrder = (() => {
     const possibleOrders = {
@@ -177,31 +185,21 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   }
 
   return (
-    <Draggable
-      key={column.id}
-      draggableId={column.id}
+    <TableHeaderCell
+      column={column}
+      columns={columns}
+      orderedColumns={orderedColumns}
       index={index}
-      isDragDisabled={!isDraggable}
-    >
-      {(provided, snapshot) => (
-        <TableHeaderCell
-          column={column}
-          columns={columns}
-          orderedColumns={orderedColumns}
+      sortOrder={sortOrder}
+      menuDisabled={!isSortable}
+      menuContent={
+        <SortPicker
           sortOrder={sortOrder}
-          provided={provided}
-          snapshot={snapshot}
-          menuDisabled={!isSortable}
-          menuContent={
-            <SortPicker
-              sortOrder={sortOrder}
-              setSelectedOrder={order => {
-                setColumnSort(order)
-              }}
-            />
-          }
+          setSelectedOrder={order => {
+            setColumnSort(order)
+          }}
         />
-      )}
-    </Draggable>
+      }
+    />
   )
 }

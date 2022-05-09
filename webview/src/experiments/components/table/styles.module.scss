@@ -422,6 +422,8 @@ $changed-color: var(--vscode-gitDecoration-modifiedResourceForeground);
 }
 
 .draggingColumn {
+  border: 1px solid $fg-color;
+  font-size: 0.7rem;
   opacity: 0.7;
 }
 
