@@ -1,5 +1,6 @@
 import { join } from 'path'
 import { v4 } from 'uuid'
+import { getProcessPlatform } from '../env'
 import { exists, loadJson, writeJson } from '../fileSystem'
 
 type UserConfig = {
@@ -8,15 +9,20 @@ type UserConfig = {
 
 const readOrCreateConfig = (): UserConfig | undefined => {
   const { userConfigDir } = require('appdirs') as {
-    userConfigDir: (appName: string, appAuthor: string) => string
+    userConfigDir: (appName: string) => string
   }
 
-  const configPath = userConfigDir('telemetry', 'iterative')
+  const configPath = userConfigDir(join('iterative', 'telemetry'))
   if (exists(configPath)) {
     return loadJson<UserConfig>(configPath)
   }
 
-  const legacyConfigPath = userConfigDir(join('dvc', 'user_id'), 'iterative')
+  const legacyDirectory =
+    getProcessPlatform() === 'win32'
+      ? join('iterative', 'dvc', 'user_id')
+      : join('dvc', 'user_id')
+
+  const legacyConfigPath = userConfigDir(legacyDirectory)
   if (exists(legacyConfigPath)) {
     const oldConfig = loadJson<UserConfig>(legacyConfigPath)
     if (oldConfig) {
