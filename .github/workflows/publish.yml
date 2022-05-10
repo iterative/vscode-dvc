@@ -11,8 +11,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ github.ref }}
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
