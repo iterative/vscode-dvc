@@ -14,5 +14,5 @@
     }
   ],
   "pr_template": "- ${{TITLE}} [#${{NUMBER}}](https://github.com/iterative/vscode-dvc/pull/${{NUMBER}}) by [@${{AUTHOR}}](https://github.com/${{AUTHOR}})",
-  "max_pull_requests": 2000
+  "max_pull_requests": 200
 }
