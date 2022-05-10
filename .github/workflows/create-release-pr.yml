@@ -11,7 +11,7 @@ on:
         required: false
 
 jobs:
-  create-release:
+  create-release-pr:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -28,7 +28,7 @@ jobs:
         with:
           configuration: '.github/workflows/changelog-config.json'
           toTag: 'main'
-          fromTag: 'd29bc91581b848905fc6d210b6030aeecc8ff3a3'
+          fromTag: 'd29bc91581b848905fc6d210b6030aeecc8ff3a3' # to be set to previous tag
 
       - name: Set Release Date
         run: |
@@ -51,3 +51,4 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           title: 'Update Version and CHANGELOG'
+          token: ${{ secrets.GITHUB_TOKEN }}
