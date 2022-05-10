@@ -52,3 +52,4 @@ jobs:
         with:
           title: 'Update Version and CHANGELOG'
           token: ${{ secrets.GITHUB_TOKEN }}
+          base: main # can be removed before merging
