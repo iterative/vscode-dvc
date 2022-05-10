@@ -29,6 +29,7 @@
     "react-dom": "^17.0.1",
     "react-table": "^7.7.0",
     "react-vega": "^7.4.4",
+    "react-virtualized": "^9.22.3",
     "vega": "^5.21.0",
     "vega-lite": "^5.2.0"
   },
@@ -51,6 +52,7 @@
     "@types/react-dom": "^17.0.11",
     "@types/react-measure": "^2.0.8",
     "@types/react-table": "^7.7.8",
+    "@types/react-virtualized": "^9.21.21",
     "@types/webpack": "^5.28.0",
     "@welldone-software/why-did-you-render": "^7.0.1",
     "chromatic": "^6.5.3",
