@@ -1,7 +1,6 @@
 name: Create Release PR
 
 on:
-  pull_request: # to be removed
   workflow_dispatch:
     inputs:
       override_version:
@@ -50,7 +49,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          base: main # can be removed before merging
+          base: main
           body: |
             This PR updates the extension version and CHANGELOG.md.
 
