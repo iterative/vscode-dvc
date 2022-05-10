@@ -35,10 +35,8 @@ jobs:
           echo "release_date=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
 
       - name: Update Version
-        env:
-          OVERRIDE_VERSION: ${{ github.event.inputs.override_version }}
         run: |
-          echo "new_version=$(yarn workspace dvc version --new-version ${OVERRIDE_VERSION:-patch} --no-git-tag-version)" >> ${GITHUB_ENV}
+          echo "new_version=$(yarn workspace dvc version --new-version ${${{ github.event.inputs.override_version }}:-patch} --no-git-tag-version)" >> ${GITHUB_ENV}
 
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
