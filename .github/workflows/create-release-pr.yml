@@ -36,7 +36,8 @@ jobs:
 
       - name: Update Version
         run: |
-          echo "new_version=$(yarn workspace dvc version --new-version ${${{ github.event.inputs.override_version }}:-patch} --no-git-tag-version)" >> ${GITHUB_ENV}
+          OVERRIDE_VERSION=${{ github.event.inputs.override_version }}
+          echo "new_version=$(yarn workspace dvc version --new-version ${OVERRIDE_VERSION:-patch} --no-git-tag-version)" >> ${GITHUB_ENV}
 
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
