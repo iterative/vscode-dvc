@@ -1,4 +1,4 @@
-name: Create Release
+name: Create Release PR
 
 on:
   pull_request: # to be removed
@@ -50,4 +50,4 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          title: 'Add release artifacts'
+          title: 'Update Version and CHANGELOG'
