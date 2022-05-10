@@ -1,0 +1,53 @@
+name: Create Release
+
+on:
+  pull_request: # to be removed
+  workflow_dispatch:
+    inputs:
+      override_version:
+        description:
+          'Override semver - can be used to bump minor and major versions'
+        type: string
+        required: false
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Build Changelog
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@{latest-release}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          configuration: '.github/workflows/changelog-config.json'
+          toTag: 'main'
+          fromTag: 'd29bc91581b848905fc6d210b6030aeecc8ff3a3'
+
+      - name: Set Release Date
+        run: |
+          echo "release_date=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
+
+      - name: Update Version
+        env:
+          OVERRIDE_VERSION: ${{ github.event.inputs.override_version }}
+        run: |
+          echo "new_version=$(yarn workspace dvc version --new-version ${OVERRIDE_VERSION:-patch} --no-git-tag-version)" >> ${GITHUB_ENV}
+
+      - name: Update Changelog
+        uses: stefanzweifel/changelog-updater-action@v1
+        with:
+          latest-version: ${{ env.new_version }}
+          release-notes: ${{ steps.build_changelog.outputs.changelog }}
+          release-date: ${{ env.release_date }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          title: 'Add release artifacts'
