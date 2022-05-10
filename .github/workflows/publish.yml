@@ -8,14 +8,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ github.ref }}
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '14'
           cache: 'yarn'
@@ -28,14 +26,3 @@ jobs:
           extensionFile: './extension/dvc.vsix'
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
-
-      - name: Bump Version after Release
-        uses: 'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGEJSON_DIR: 'extension'
-        with:
-          target-branch: 'main'
-          commit-message:
-            'CI: increment version to {{version}} after release [skip ci]'
-          skip-tag: true
