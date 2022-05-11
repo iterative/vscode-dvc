@@ -38,6 +38,6 @@ jobs:
         with:
           body: ${{ steps.changelog_reader.outputs.changes }}
           commit: ${{ steps.checkout.outputs.commit }}
-          name: Release ${{ steps.changelog_reader.outputs.version }}
+          name: ${{ steps.changelog_reader.outputs.version }}
           tag: ${{ steps.changelog_reader.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
