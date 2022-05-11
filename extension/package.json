@@ -1108,6 +1108,10 @@
         "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
       },
       {
+        "view": "dvc.views.experimentsColumnsTree",
+        "contents": "No columns to display."
+      },
+      {
         "view": "dvc.views.experimentsTree",
         "contents": "No experiments to display. \n[Run Experiment](command:dvc.runExperiment)\n"
       },

@@ -11,7 +11,7 @@ export const pickFromColumns = (
   quickPickOptions: QuickPickOptionsWithTitle
 ) => {
   if (!definedAndNonEmpty(columns)) {
-    return Toast.showError('There are no params or metrics to select from')
+    return Toast.showError('There are no columns to select from.')
   }
   return quickPickValue<Column>(
     columns.map(column => ({
