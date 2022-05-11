@@ -49,6 +49,32 @@
     }
   },
   "contributes": {
+    "colors": [
+      {
+        "id": "dvc.metrics",
+        "description": "Color to indicate DVC metrics",
+        "defaults": {
+          "dark": "#fbd38d",
+          "light": "#fbd38d"
+        }
+      },
+      {
+        "id": "dvc.params",
+        "description": "Color to indicate DVC params",
+        "defaults": {
+          "dark": "#90cdf4",
+          "light": "#90cdf4"
+        }
+      },
+      {
+        "id": "dvc.changedParam",
+        "description": "Color to indicate a DVC param with a value that differs from the current git HEAD",
+        "defaults": {
+          "dark": "gitDecoration.modifiedResourceForeground",
+          "light": "gitDecoration.modifiedResourceForeground"
+        }
+      }
+    ],
     "commands": [
       {
         "title": "%command.addExperimentsTableFilter%",
