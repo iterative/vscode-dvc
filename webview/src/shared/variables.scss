@@ -1,11 +1,4 @@
 $fg-color: var(--vscode-editor-foreground);
 $bg-color: var(--vscode-editor-background);
 $bullet-size: 9px;
-
-// Dark
-
-$watermark-color: rgba(255, 255, 255, 0.6);
-
-// Light
-
-$watermark-color-light: rgba(0, 0, 0, 0.68);
+$watermark-color: var(--vscode-descriptionForeground);
