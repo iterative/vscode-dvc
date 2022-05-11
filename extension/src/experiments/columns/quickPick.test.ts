@@ -43,9 +43,9 @@ describe('pickFromColumns', () => {
   }
   const exampleColumns = [epochsParam, paramsYamlParam]
 
-  it('should return early if no params or metrics are provided', async () => {
+  it('should return early if no columns are provided', async () => {
     const picked = await pickFromColumns([], {
-      title: "can't pick from no params or metrics" as Title
+      title: "can't pick from no columns" as Title
     })
     expect(picked).toBeUndefined()
     expect(mockedShowError).toBeCalledTimes(1)
