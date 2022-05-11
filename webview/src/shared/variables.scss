@@ -2,3 +2,16 @@ $fg-color: var(--vscode-editor-foreground);
 $bg-color: var(--vscode-editor-background);
 $bullet-size: 9px;
 $watermark-color: var(--vscode-descriptionForeground);
+
+$border-color: rgb(128, 128, 128, 0.4);
+$metrics-color: #fbd38d;
+$params-color: #90cdf4;
+
+$row-bg-color: $bg-color;
+$header-fg-color: $fg-color;
+$row-bg-alt-color: var(--vscode-sideBar-background);
+$header-bg-color: var(--vscode-dropdown-background);
+$meta-cell-color: var(--vscode-descriptionForeground);
+$changed-color: var(--vscode-gitDecoration-modifiedResourceForeground);
+
+$hover-background-color: var(--vscode-list-hoverBackground);
