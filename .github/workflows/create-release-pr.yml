@@ -1,6 +1,7 @@
 name: Create Release PR
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       override_version:
@@ -15,9 +16,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      # - run:
+      #     echo "::set-output name=latest_tag::$(git describe --tags --abbrev=0)"
 
       - name: Build Changelog
         id: build_changelog
@@ -27,24 +31,27 @@ jobs:
         with:
           configuration: '.github/workflows/changelog-config.json'
           toTag: 'main'
-          fromTag: 'd29bc91581b848905fc6d210b6030aeecc8ff3a3' # to be set to previous tag
+          fromTag: 'd29bc91581b848905fc6d210b6030aeecc8ff3a3' # to be set to latest tag
+          # fromTag: ${{ steps.checkout.outputs.latest_tag }}
 
       - name: Set Release Date
+        id: set_release_date
         run: |
-          echo "release_date=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
+          echo "::set-output name=release_date::$(date --rfc-3339=date)"
 
       - name: Update Version
+        id: update_version
         run: |
           OVERRIDE_VERSION=${{ github.event.inputs.override_version }}
           yarn workspace dvc version --new-version ${OVERRIDE_VERSION:-patch} --no-git-tag-version
-          echo "new_version=$(cat extension/package.json | jq -r '.version')" >> ${GITHUB_ENV}
+          echo "::set-output name=new_version::$(cat extension/package.json | jq -r .version)"
 
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
         with:
-          latest-version: ${{ env.new_version }}
+          latest-version: '[${{ steps.update_version.outputs.new_version }}]'
           release-notes: ${{ steps.build_changelog.outputs.changelog }}
-          release-date: ${{ env.release_date }}
+          release-date: ${{ steps.set_release_date.outputs.release_date }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
