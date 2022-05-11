@@ -1,7 +1,6 @@
 name: Create Release PR
 
 on:
-  pull_request:
   workflow_dispatch:
     inputs:
       override_version:
@@ -20,8 +19,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      # - run:
-      #     echo "::set-output name=latest_tag::$(git describe --tags --abbrev=0)"
+      - run:
+          echo "::set-output name=latest_tag::$(git describe --tags --abbrev=0)"
 
       - name: Build Changelog
         id: build_changelog
@@ -31,8 +30,7 @@ jobs:
         with:
           configuration: '.github/workflows/changelog-config.json'
           toTag: 'main'
-          fromTag: 'd29bc91581b848905fc6d210b6030aeecc8ff3a3' # to be set to latest tag
-          # fromTag: ${{ steps.checkout.outputs.latest_tag }}
+          fromTag: ${{ steps.checkout.outputs.latest_tag }}
 
       - name: Set Release Date
         id: set_release_date
