@@ -3,7 +3,7 @@ $bg-color: var(--vscode-editor-background);
 $bullet-size: 9px;
 $watermark-color: var(--vscode-descriptionForeground);
 
-$border-color: rgb(128, 128, 128, 0.4);
+$border-color: var(--vscode-dropdown-border);
 $metrics-color: #fbd38d;
 $params-color: #90cdf4;
 
