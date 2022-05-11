@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { BaseWebview } from '.'
 import { BaseRepository } from './repository'
 import { WebviewData } from './contract'
 import { InternalCommands } from '../commands/internal'
@@ -35,14 +34,5 @@ export abstract class BaseWorkspaceWebviews<
     const repository = this.getRepository(dvcRoot)
     await repository.showWebview()
     return repository
-  }
-
-  public setWebview(dvcRoot: string, webview: BaseWebview<U>) {
-    const repository = this.getRepository(dvcRoot)
-    if (!repository) {
-      webview.dispose()
-    }
-
-    repository.setWebview(webview)
   }
 }
