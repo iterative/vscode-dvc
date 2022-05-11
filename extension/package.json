@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.13",
+  "version": "0.2.14",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1106,6 +1106,14 @@
         "view": "dvc.views.welcome",
         "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC please read [our docs](https://dvc.org/doc).",
         "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
+      },
+      {
+        "view": "dvc.views.trackedExplorerTree",
+        "contents": "No tracked data to display."
+      },
+      {
+        "view": "dvc.views.experimentsColumnsTree",
+        "contents": "No columns to display."
       },
       {
         "view": "dvc.views.experimentsTree",
