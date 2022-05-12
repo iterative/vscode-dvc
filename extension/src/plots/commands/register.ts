@@ -12,4 +12,9 @@ export const registerPlotsCommands = (
       plots.showWebview()
     }
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.PLOTS_SELECT,
+    (dvcRoot?: string) => plots.selectPlots(dvcRoot)
+  )
 }

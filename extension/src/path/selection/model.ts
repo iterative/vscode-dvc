@@ -42,8 +42,10 @@ export abstract class PathSelectionModel<
     )
   }
 
-  public getTerminalNodes() {
-    return this.data.filter(element => !element.hasChildren)
+  public getTerminalNodes(): (T & { selected: boolean })[] {
+    return this.data
+      .filter(element => !element.hasChildren)
+      .map(element => ({ ...element, selected: !!this.status[element.path] }))
   }
 
   public getChildren(path: string | undefined) {
@@ -74,6 +76,19 @@ export abstract class PathSelectionModel<
         : [this.status[element.path]]
       return [...terminalStatuses]
     })
+  }
+
+  public setSelected(elements: (T & { selected: boolean })[]) {
+    const terminalNodes = this.getTerminalNodes()
+    for (const { path, selected } of terminalNodes) {
+      const selectedElement = elements.find(
+        ({ path: selectedPath }) => path === selectedPath
+      )
+
+      if (!!selectedElement !== !!selected) {
+        this.toggleStatus(path)
+      }
+    }
   }
 
   protected setNewStatuses(data: { path: string }[]) {

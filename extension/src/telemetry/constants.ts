@@ -127,6 +127,7 @@ export interface IEventNamePropertyMapping {
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined
   [EventName.PLOTS_SHOW]: undefined
+  [EventName.PLOTS_SELECT]: undefined
 
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined

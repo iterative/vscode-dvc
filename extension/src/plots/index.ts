@@ -13,6 +13,7 @@ import { PlotsData } from './data'
 import { PlotsModel } from './model'
 import { collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
+import { pickPlotPaths } from './paths/quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -104,6 +105,18 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.paths?.setTemplateOrder()
     this.notifyChanged()
     return status
+  }
+
+  public async selectPlots() {
+    const paths = this.paths?.getTerminalNodes()
+
+    const selected = await pickPlotPaths(paths)
+    if (!selected) {
+      return
+    }
+
+    this.paths?.setSelected(selected)
+    return this.notifyChanged()
   }
 
   public getChildPaths(path: string) {
