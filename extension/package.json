@@ -67,7 +67,7 @@
         }
       },
       {
-        "id": "dvc.changedParam",
+        "id": "dvc.changedParams",
         "description": "Color to indicate a DVC param with a value that differs from the current git HEAD",
         "defaults": {
           "dark": "gitDecoration.modifiedResourceForeground",

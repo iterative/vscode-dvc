@@ -6,12 +6,12 @@ $watermark-color: var(--vscode-descriptionForeground);
 $border-color: var(--vscode-dropdown-border);
 $metrics-color: var(--vscode-dvc-metrics);
 $params-color: var(--vscode-dvc-params);
+$changed-color: var(--vscode-dvc-changedParam);
 
 $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $row-bg-alt-color: var(--vscode-sideBar-background);
 $header-bg-color: var(--vscode-dropdown-background);
 $meta-cell-color: var(--vscode-descriptionForeground);
-$changed-color: var(--vscode-gitDecoration-modifiedResourceForeground);
 
 $hover-background-color: var(--vscode-list-hoverBackground);
