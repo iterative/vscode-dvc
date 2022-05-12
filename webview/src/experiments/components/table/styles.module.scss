@@ -379,11 +379,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .sortingHeaderCellDesc {
     border-bottom: 2px solid $fg-color;
   }
-
-  .metaCell {
-    color: $meta-cell-color;
-    font-size: 0.75rem;
-  }
 }
 
 .webviewHeader {
