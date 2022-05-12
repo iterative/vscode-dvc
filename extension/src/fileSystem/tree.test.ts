@@ -10,10 +10,6 @@ import { WorkspaceRepositories } from '../repository/workspace'
 import { Repository } from '../repository'
 import { dvcDemoPath } from '../test/util'
 
-const mockedWorkspaceChanged = jest.mocked(new EventEmitter<void>())
-const mockedWorkspaceChangedFire = jest.fn()
-mockedWorkspaceChanged.fire = mockedWorkspaceChangedFire
-
 const mockedTreeDataChanged = jest.mocked(new EventEmitter<void>())
 const mockedTreeDataChangedFire = jest.fn()
 mockedTreeDataChanged.fire = mockedTreeDataChangedFire
@@ -67,7 +63,6 @@ describe('TrackedTreeView', () => {
     it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
-        mockedWorkspaceChanged,
         mockedRepositories
       )
       trackedTreeView.initialize([dvcDemoPath])
@@ -83,7 +78,6 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
-        mockedWorkspaceChanged,
         mockedRepositories
       )
       trackedTreeView.initialize(mockedDvcRoots)
@@ -112,7 +106,6 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
-        mockedWorkspaceChanged,
         mockedRepositories
       )
       trackedTreeView.initialize(mockedDvcRoots)
@@ -159,7 +152,6 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
-        mockedWorkspaceChanged,
         mockedRepositories
       )
       trackedTreeView.initialize([dvcDemoPath])
@@ -230,7 +222,6 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
-        mockedWorkspaceChanged,
         mockedRepositories
       )
       trackedTreeView.initialize([dvcDemoPath])
@@ -259,7 +250,6 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
-        mockedWorkspaceChanged,
         mockedRepositories
       )
       mockedExists.mockReturnValueOnce(false)
@@ -287,7 +277,6 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
-        mockedWorkspaceChanged,
         mockedRepositories
       )
       mockedExists.mockReturnValueOnce(true).mockReturnValueOnce(true)
@@ -320,7 +309,6 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
-        mockedWorkspaceChanged,
         mockedRepositories
       )
       mockedExists.mockReturnValueOnce(true)

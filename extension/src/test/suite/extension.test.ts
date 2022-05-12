@@ -18,7 +18,10 @@ import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import expShowFixture from '../fixtures/expShow/output'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
-import { RegisteredCommands } from '../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
 import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -26,6 +29,8 @@ import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
 import { MIN_CLI_VERSION } from '../../cli/constants'
+import * as WorkspaceFolders from '../../vscode/workspaceFolders'
+import { CliExecutor } from '../../cli/executor'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -390,6 +395,33 @@ suite('Extension Test Suite', () => {
           duration
         }
       )
+    })
+  })
+
+  describe('dvc.init', () => {
+    it('should be able to run dvc.init without error', async () => {
+      const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
+      const mockSetup = stub(Setup, 'setup')
+      const mockSetupCalled = new Promise(resolve =>
+        mockSetup.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      await commands.executeCommand(RegisteredCliCommands.INIT)
+      await mockSetupCalled
+      expect(mockInit).to.be.calledOnce
+      expect(mockSetup).to.be.calledOnce
+
+      mockInit.resetHistory()
+      mockSetup.resetHistory()
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(undefined)
+
+      await commands.executeCommand(RegisteredCliCommands.INIT)
+
+      expect(mockInit).not.to.be.called
+      expect(mockSetup).not.to.be.called
     })
   })
 

@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.13",
+  "version": "0.2.14",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -49,6 +49,32 @@
     }
   },
   "contributes": {
+    "colors": [
+      {
+        "id": "dvc.metrics",
+        "description": "Color to indicate a DVC metric column in the experiments table",
+        "defaults": {
+          "dark": "#fbd38d",
+          "light": "#fbd38d"
+        }
+      },
+      {
+        "id": "dvc.params",
+        "description": "Color to indicate a DVC param column in the experiments table",
+        "defaults": {
+          "dark": "#90cdf4",
+          "light": "#90cdf4"
+        }
+      },
+      {
+        "id": "dvc.workspaceChanged",
+        "description": "Color used in the experiments table to highlight a value in the workspace that differs from the latest committed value",
+        "defaults": {
+          "dark": "gitDecoration.modifiedResourceForeground",
+          "light": "gitDecoration.modifiedResourceForeground"
+        }
+      }
+    ],
     "commands": [
       {
         "title": "%command.addExperimentsTableFilter%",
@@ -1106,6 +1132,14 @@
         "view": "dvc.views.welcome",
         "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC please read [our docs](https://dvc.org/doc).",
         "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
+      },
+      {
+        "view": "dvc.views.trackedExplorerTree",
+        "contents": "No tracked data to display."
+      },
+      {
+        "view": "dvc.views.experimentsColumnsTree",
+        "contents": "No columns to display."
       },
       {
         "view": "dvc.views.experimentsTree",

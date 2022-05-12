@@ -2,37 +2,13 @@
 
 @import '../../../shared/variables.scss';
 
-$row-bg-color: $bg-color;
-$header-fg-color: $fg-color;
-$border-color: rgb(128, 128, 128, 0.4);
-
 $nested-row-padding: 1.35rem;
 
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
 $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
-// Dark Theme
-
-$row-bg-alt-color: var(--vscode-sideBar-background);
-$header-bg-color: #303031;
-$meta-cell-color: #a0a0a0;
-$toggle-color: rgba(255, 255, 255, 0.21);
-$spinner-color: rgb(255, 255, 255);
-$metrics-color: #fbd38d;
-$params-color: #90cdf4;
-
-// Light theme
-
-$header-bg-color-light: #e1e1e1;
-$border-color-light: #7f7f7f;
-$metrics-color-light: #ce9f4c;
-$params-color-light: #76add1;
-$toggle-color-light: rgba(0, 0, 0, 0.21);
-$spinner-color-light: #000;
-
 // Extendable Silent Rules
-
 %expandableRowArrow {
   width: 8px;
   height: 8px;
@@ -45,10 +21,6 @@ $spinner-color-light: #000;
   border-left: unset;
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
   margin: 12px 6px;
-
-  :global(.vscode-light) & {
-    border-color: $toggle-color-light;
-  }
 }
 
 %truncateLeftParent {
@@ -118,11 +90,7 @@ $spinner-color-light: #000;
     }
 
     .workspaceWithChanges.normalExperiment & {
-      background-color: $metrics-color;
-
-      :global(.vscode-light) & {
-        background-color: $metrics-color-light;
-      }
+      background-color: $changed-color;
     }
 
     .unselectedExperiment & {
@@ -138,11 +106,7 @@ $spinner-color-light: #000;
     }
 
     .workspaceWithChanges.unselectedExperiment & {
-      border: 1px solid $metrics-color;
-
-      :global(.vscode-light) & {
-        border: 1px solid $metrics-color-light;
-      }
+      border: 1px solid $changed-color;
     }
 
     .queuedExperiment & {
@@ -158,26 +122,13 @@ $spinner-color-light: #000;
       border-top: 1.5px solid currentColor;
       animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
       background-color: $bg-color;
-
-      @at-root {
-        :global(.vscode-light) & {
-          border-right-color: $spinner-color-light;
-          border-top-color: $spinner-color-light;
-        }
-      }
     }
     .runningExperiment.oddRow & {
       background-color: $row-bg-alt-color;
     }
     .workspaceWithChanges.runningExperiment & {
-      border-right-color: $metrics-color;
-      border-top-color: $metrics-color;
-      @at-root {
-        :global(.vscode-light) & {
-          border-right-color: $metrics-color-light;
-          border-top-color: $metrics-color-light;
-        }
-      }
+      border-right-color: $changed-color;
+      border-top-color: $changed-color;
     }
 
     .runningExperiment.oddRow > .firstCell & {
@@ -305,19 +256,11 @@ $spinner-color-light: #000;
       .paramHeaderCell,
       &.paramHeaderCell {
         color: $params-color;
-
-        :global(.vscode-light) & {
-          color: $params-color-light;
-        }
       }
 
       .metricHeaderCell,
       &.metricHeaderCell {
         color: $metrics-color;
-
-        :global(.vscode-light) & {
-          color: $metrics-color-light;
-        }
       }
     }
 
@@ -384,11 +327,7 @@ $spinner-color-light: #000;
   }
 
   .workspaceChange {
-    color: $metrics-color;
-
-    :global(.vscode-light) & {
-      color: $metrics-color-light;
-    }
+    color: $changed-color;
   }
 
   .td,
@@ -423,10 +362,6 @@ $spinner-color-light: #000;
   .placeholderHeaderCell {
     background-color: $header-bg-color;
     border-right: 2px solid $bg-color;
-
-    :global(.vscode-light) & {
-      background-color: $header-bg-color-light;
-    }
   }
 
   .headerCell {
@@ -443,11 +378,6 @@ $spinner-color-light: #000;
 
   .sortingHeaderCellDesc {
     border-bottom: 2px solid $fg-color;
-  }
-
-  .metaCell {
-    color: $meta-cell-color;
-    font-size: 0.75rem;
   }
 }
 
