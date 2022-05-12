@@ -47,7 +47,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
                 {!plot?.url ? (
-                  <p>No image to display.</p>
+                  <p>No plot to display.</p>
                 ) : (
                   <img
                     src={plot.url}
