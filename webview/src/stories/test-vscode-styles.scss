@@ -439,4 +439,10 @@ html {
   --vscode-gitDecoration-stageDeletedResourceForeground: #c74e39;
   --vscode-gitDecoration-conflictingResourceForeground: #6c6cc4;
   --vscode-gitDecoration-submoduleResourceForeground: #8db9e2;
+
+  --vscode-dvc-metrics: #fbd38d;
+  --vscode-dvc-params: #90cdf4;
+  --vscode-dvc-workspaceChanged: var(
+    --vscode-gitDecoration-modifiedResourceForeground
+  );
 }
