@@ -17,12 +17,12 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import {
-  mockDndElSpacing,
-  mockGetComputedSpacing,
-  makeDnd,
-  DND_DIRECTION_RIGHT
-} from 'react-beautiful-dnd-test-utils'
+// import {
+//   mockDndElSpacing,
+//   mockGetComputedSpacing,
+//   makeDnd,
+//   DND_DIRECTION_RIGHT
+// } from 'react-beautiful-dnd-test-utils'
 import {
   ColumnType,
   Row,
@@ -33,12 +33,12 @@ import { App } from './App'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
-import {
-  commonColumnFields,
-  expectHeaders,
-  makeGetDragEl,
-  tableData as sortingTableDataFixture
-} from '../../test/sort'
+// import {
+//   commonColumnFields,
+//   expectHeaders,
+//   makeGetDragEl,
+//   tableData as sortingTableDataFixture
+// } from '../../test/sort'
 import {
   CELL_TOOLTIP_DELAY,
   HEADER_TOOLTIP_DELAY
@@ -197,52 +197,52 @@ describe('App', () => {
     expect(noColumnsState).not.toBeInTheDocument()
   })
 
-  it('should be able to order a column to the final space after a new column is added', async () => {
-    const view = render(<App />)
-    mockDndElSpacing(view)
-    mockGetComputedSpacing()
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: sortingTableDataFixture,
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+  // it('should be able to order a column to the final space after a new column is added', async () => {
+  //   const view = render(<App />)
+  //   mockDndElSpacing(view)
+  //   mockGetComputedSpacing()
+  //   fireEvent(
+  //     window,
+  //     new MessageEvent('message', {
+  //       data: {
+  //         data: sortingTableDataFixture,
+  //         type: MessageToWebviewType.SET_DATA
+  //       }
+  //     })
+  //   )
 
-    const changedData: TableData = {
-      ...sortingTableDataFixture,
-      columns: [
-        ...sortingTableDataFixture.columns,
-        {
-          ...commonColumnFields,
-          id: 'D',
-          name: 'D',
-          path: 'params:D'
-        }
-      ]
-    }
+  //   const changedData: TableData = {
+  //     ...sortingTableDataFixture,
+  //     columns: [
+  //       ...sortingTableDataFixture.columns,
+  //       {
+  //         ...commonColumnFields,
+  //         id: 'D',
+  //         name: 'D',
+  //         path: 'params:D'
+  //       }
+  //     ]
+  //   }
 
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: changedData,
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+  //   fireEvent(
+  //     window,
+  //     new MessageEvent('message', {
+  //       data: {
+  //         data: changedData,
+  //         type: MessageToWebviewType.SET_DATA
+  //       }
+  //     })
+  //   )
 
-    await makeDnd({
-      direction: DND_DIRECTION_RIGHT,
-      getByText: view.getByText,
-      getDragEl: makeGetDragEl('B'),
-      positions: 2
-    })
+  //   await makeDnd({
+  //     direction: DND_DIRECTION_RIGHT,
+  //     getByText: view.getByText,
+  //     getDragEl: makeGetDragEl('B'),
+  //     positions: 2
+  //   })
 
-    await expectHeaders(['A', 'C', 'D', 'B'])
-  })
+  //   await expectHeaders(['A', 'C', 'D', 'B'])
+  // })
 
   describe('Row expansion', () => {
     const experimentLabel = '1ba7bcd'
