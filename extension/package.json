@@ -67,7 +67,7 @@
         }
       },
       {
-        "id": "dvc.changedCell",
+        "id": "dvc.workspaceChanged",
         "description": "Color used in the experiments table to indicate a value in the workspace that differs from the latest committed value",
         "defaults": {
           "dark": "gitDecoration.modifiedResourceForeground",
