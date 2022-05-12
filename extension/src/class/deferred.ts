@@ -10,7 +10,14 @@ export abstract class DeferredDisposable extends Disposable {
   }
 
   public resetDeferred() {
+    if (this.consumersStillWaiting()) {
+      return
+    }
     this.deferred = new Deferred()
     this.initialized = this.deferred.promise
+  }
+
+  private consumersStillWaiting() {
+    return this.deferred.state === 'none'
   }
 }
