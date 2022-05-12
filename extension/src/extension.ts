@@ -25,6 +25,7 @@ import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import {
+  getFirstWorkspaceFolder,
   getWorkspaceFolderCount,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
@@ -34,7 +35,7 @@ import {
   sendTelemetryEventAndThrow
 } from './telemetry'
 import { EventName } from './telemetry/constants'
-import { RegisteredCommands } from './commands/external'
+import { RegisteredCliCommands, RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
 import {
   registerWalkthroughCommands,
@@ -171,11 +172,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(
-        this.internalCommands,
-        this.workspaceChanged,
-        this.repositories
-      )
+      new TrackedExplorerTree(this.internalCommands, this.repositories)
     )
 
     setup(this)
@@ -258,6 +255,17 @@ export class Extension extends Disposable implements IExtension {
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXTENSION_SHOW_OUTPUT,
       () => outputChannel.show()
+    )
+
+    this.internalCommands.registerExternalCliCommand(
+      RegisteredCliCommands.INIT,
+      async () => {
+        const root = getFirstWorkspaceFolder()
+        if (root) {
+          await this.cliExecutor.init(root)
+          this.workspaceChanged.fire()
+        }
+      }
     )
 
     registerRepositoryCommands(this.repositories, this.internalCommands)
