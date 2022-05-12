@@ -52,7 +52,7 @@
     "colors": [
       {
         "id": "dvc.metrics",
-        "description": "Color to indicate a DVC metric column in the Experiments Webview",
+        "description": "Color to indicate a DVC metric column in the experiments table",
         "defaults": {
           "dark": "#fbd38d",
           "light": "#fbd38d"
@@ -60,15 +60,15 @@
       },
       {
         "id": "dvc.params",
-        "description": "Color to indicate a DVC param column in the Experiments Webview",
+        "description": "Color to indicate a DVC param column in the experiments table",
         "defaults": {
           "dark": "#90cdf4",
           "light": "#90cdf4"
         }
       },
       {
-        "id": "dvc.changedParams",
-        "description": "Color used in the Experiments Webview to indicate a DVC param in the workspace that differs from the latest committed value",
+        "id": "dvc.changedCell",
+        "description": "Color used in the experiments table to indicate a value that differs from the latest committed value",
         "defaults": {
           "dark": "gitDecoration.modifiedResourceForeground",
           "light": "gitDecoration.modifiedResourceForeground"
