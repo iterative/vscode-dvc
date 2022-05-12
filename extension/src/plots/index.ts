@@ -116,6 +116,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
 
     this.paths?.setSelected(selected)
+    this.paths?.setTemplateOrder()
     return this.notifyChanged()
   }
 

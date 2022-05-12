@@ -46,8 +46,4 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
     }
     return this.getRepository(dvcRoot).selectPlots()
   }
-
-  private async getDvcRoot(overrideRoot?: string) {
-    return overrideRoot || (await this.getOnlyOrPickProject())
-  }
 }
