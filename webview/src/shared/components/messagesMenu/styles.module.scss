@@ -1,4 +1,4 @@
-$hover-background-color: var(--vscode-list-hoverBackground);
+@import '../../../shared/variables.scss';
 
 .item {
   display: flex;
