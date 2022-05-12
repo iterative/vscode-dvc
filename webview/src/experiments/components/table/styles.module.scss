@@ -2,22 +2,11 @@
 
 @import '../../../shared/variables.scss';
 
-$row-bg-color: $bg-color;
-$header-fg-color: $fg-color;
-$border-color: rgb(128, 128, 128, 0.4);
-
 $nested-row-padding: 1.35rem;
 
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
 $workspace-row-edge-margin: $edge-padding - $cell-padding;
-
-$metrics-color: #fbd38d;
-$params-color: #90cdf4;
-$row-bg-alt-color: var(--vscode-sideBar-background);
-$header-bg-color: var(--vscode-dropdown-background);
-$meta-cell-color: var(--vscode-descriptionForeground);
-$changed-color: var(--vscode-gitDecoration-modifiedResourceForeground);
 
 // Extendable Silent Rules
 %expandableRowArrow {
