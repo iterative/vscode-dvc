@@ -68,7 +68,6 @@ export const CellWrapper: React.FC<
   <div
     {...cell.getCellProps({
       className: cx(styles.td, cell.isPlaceholder && styles.groupPlaceholder, {
-        [styles.metaCell]: !cell.column.group,
         [styles.workspaceChange]: changes?.includes(cell.column.id)
       })
     })}
