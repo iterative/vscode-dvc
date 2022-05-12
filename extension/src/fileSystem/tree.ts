@@ -1,7 +1,6 @@
 import { relative } from 'path'
 import {
   Event,
-  EventEmitter,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -19,7 +18,6 @@ import {
 } from '../commands/internal'
 import { tryThenMaybeForce } from '../cli/actions'
 import { Flag } from '../cli/constants'
-import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
@@ -48,14 +46,13 @@ export class TrackedExplorerTree
 
   constructor(
     internalCommands: InternalCommands,
-    workspaceChanged: EventEmitter<void>,
     repositories: WorkspaceRepositories
   ) {
     super()
 
     this.internalCommands = internalCommands
 
-    this.registerCommands(workspaceChanged)
+    this.registerCommands()
 
     this.repositories = repositories
 
@@ -174,21 +171,7 @@ export class TrackedExplorerTree
     })
   }
 
-  private registerCommands(workspaceChanged: EventEmitter<void>) {
-    this.internalCommands.registerExternalCliCommand(
-      RegisteredCliCommands.INIT,
-      async () => {
-        const root = getFirstWorkspaceFolder()
-        if (root) {
-          await this.internalCommands.executeCommand(
-            AvailableCommands.INIT,
-            root
-          )
-          workspaceChanged.fire()
-        }
-      }
-    )
-
+  private registerCommands() {
     this.internalCommands.registerExternalCommand<Resource>(
       RegisteredCommands.DELETE_TARGET,
       ({ resourceUri }) => deleteTarget(resourceUri)
