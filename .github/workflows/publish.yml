@@ -12,7 +12,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - run: echo "::set-output name=commit::$(git rev-parse HEAD)"
+
+      - name: Set Variables
+        id: set_variables
+        run: |
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
@@ -37,7 +41,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           body: ${{ steps.changelog_reader.outputs.changes }}
-          commit: ${{ steps.checkout.outputs.commit }}
+          commit: ${{ steps.set_variables.outputs.commit }}
           name: ${{ steps.changelog_reader.outputs.version }}
           tag: ${{ steps.changelog_reader.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
