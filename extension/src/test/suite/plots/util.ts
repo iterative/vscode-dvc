@@ -17,6 +17,7 @@ import { mockHasCheckpoints } from '../experiments/util'
 import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
 import { PathsModel } from '../../../plots/paths/model'
 import { Color } from '../../../experiments/model/status/colors'
+import { BaseWorkspaceWebviews } from '../../../webview/workspace'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -67,7 +68,7 @@ export const buildPlots = async (
 
   await plots.isReady()
 
-  stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([dvcDemoPath])
+  stub(BaseWorkspaceWebviews.prototype, 'getDvcRoots').returns([dvcDemoPath])
   stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 

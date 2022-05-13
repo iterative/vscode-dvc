@@ -21,8 +21,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public readonly updatesPaused: EventEmitter<boolean>
 
-  private focusedWebviewDvcRoot: string | undefined
-
   constructor(
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
@@ -38,13 +36,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     for (const [dvcRoot, repository] of Object.entries(this.repositories)) {
       workspacePlots.getRepository(dvcRoot).setExperiments(repository)
     }
-  }
-
-  public getFocusedWebview(): Experiments | undefined {
-    if (!this.focusedWebviewDvcRoot) {
-      return undefined
-    }
-    return this.getRepository(this.focusedWebviewDvcRoot)
   }
 
   public async addFilter(overrideRoot?: string) {
@@ -253,14 +244,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     return this.runCommand(commandId, cwd, experiment.name)
-  }
-
-  private async getDvcRoot(overrideRoot?: string) {
-    return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
-  }
-
-  private getFocusedOrOnlyOrPickProject() {
-    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
 
   private pickCurrentExperiment(cwd: string) {
