@@ -1,9 +1,17 @@
 import {
+  Section,
   TemplatePlotEntry,
   TemplatePlotGroup,
   TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
-import React, { DragEvent, useState, useEffect } from 'react'
+import React, {
+  DragEvent,
+  useState,
+  useEffect,
+  useContext,
+  useCallback
+} from 'react'
+import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
@@ -12,6 +20,12 @@ import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { ZoomablePlotProps } from '../ZoomablePlot'
+import { PlotsSizeContext } from '../PlotsSizeContext'
+import {
+  DEFAULT_NB_ITEMS_PER_ROW,
+  getNbItemsPerRow,
+  MaxItemsBeforeVirtualization
+} from '../util'
 
 interface TemplatePlotsProps extends ZoomablePlotProps {
   plots: TemplatePlotSection[]
@@ -28,10 +42,30 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
 }) => {
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
+  const [nbItemsPerRow, setNbItemsPerRow] = useState(DEFAULT_NB_ITEMS_PER_ROW)
+  const { sizes } = useContext(PlotsSizeContext)
+  const { [Section.TEMPLATE_PLOTS]: size } = sizes
+
+  const changeNbItemsPerRow = useCallback(
+    () => setNbItemsPerRow(getNbItemsPerRow(size)),
+    [setNbItemsPerRow, size]
+  )
 
   useEffect(() => {
     setSections(plots)
   }, [plots, setSections])
+
+  useEffect(() => {
+    changeNbItemsPerRow()
+  }, [size, changeNbItemsPerRow])
+
+  useEffect(() => {
+    window.addEventListener('resize', changeNbItemsPerRow)
+
+    return () => {
+      window.removeEventListener('resize', changeNbItemsPerRow)
+    }
+  }, [changeNbItemsPerRow])
 
   const setSectionOrder = (sections: TemplatePlotSection[]): void => {
     setSections(sections)
@@ -134,26 +168,37 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
       />
       {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
+
+        const useBigGrid =
+          Object.keys(section.entries).length >
+          MaxItemsBeforeVirtualization[size]
+
+        const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
+
+        const classes = cx({
+          [styles.multiViewPlotsGrid]: isMultiView,
+          [styles.singleViewPlotsGrid]: !isMultiView,
+          [styles.noBigGrid]: !useBigGrid
+        })
+
         return (
           section.entries.length > 0 && (
             <div
               key={groupId}
               id={groupId}
               data-testid={`plots-section_${groupId}`}
-              className={
-                section.group === TemplatePlotGroup.MULTI_VIEW
-                  ? styles.multiViewPlotsGrid
-                  : styles.singleViewPlotsGrid
-              }
+              className={classes}
             >
               <TemplatePlotsGrid
                 entries={section.entries}
                 groupId={groupId}
                 groupIndex={i}
                 onDropInSection={handleDropInSection}
-                multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
+                multiView={isMultiView}
                 setSectionEntries={setSectionEntries}
                 renderZoomedInPlot={renderZoomedInPlot}
+                useBigGrid={useBigGrid}
+                nbItemsPerRow={nbItemsPerRow}
               />
             </div>
           )

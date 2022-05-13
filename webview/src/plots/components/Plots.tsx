@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
+import { PlotsSizeProvider } from './PlotsSizeContext'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
@@ -93,47 +94,60 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
     renderZoomedInPlot: handleZoomInPlot
   }
 
+  const currentSizeOrRegular = (
+    section: { size: PlotSize } | null | undefined
+  ) => section?.size || PlotSize.REGULAR
+
   return (
     <Theme>
       <DragDropProvider>
-        {templatePlots && (
-          <TemplatePlotsWrapper
-            templatePlots={templatePlots}
-            {...wrapperProps}
-          />
-        )}
-        {comparisonTable && (
-          <ComparisonTableWrapper
-            comparisonTable={comparisonTable}
-            {...wrapperProps}
-          />
-        )}
-        {checkpointPlots && (
-          <CheckpointPlotsWrapper
-            checkpointPlots={checkpointPlots}
-            {...wrapperProps}
-          />
-        )}
-        {zoomedInPlot && (
-          <Modal onClose={handleModalClose}>
-            <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
-              <VegaLite
-                {...zoomedInPlot}
-                config={{
-                  ...(zoomedInPlot.config as Config),
-                  background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
-                }}
-                actions={{
-                  compiled: false,
-                  editor: false,
-                  export: true,
-                  source: false
-                }}
-              />
-            </div>
-          </Modal>
-        )}
+        <PlotsSizeProvider
+          sizes={{
+            [Section.CHECKPOINT_PLOTS]: currentSizeOrRegular(checkpointPlots),
+            [Section.TEMPLATE_PLOTS]: currentSizeOrRegular(templatePlots),
+            [Section.COMPARISON_TABLE]: currentSizeOrRegular(comparisonTable)
+          }}
+        >
+          {templatePlots && (
+            <TemplatePlotsWrapper
+              templatePlots={templatePlots}
+              {...wrapperProps}
+            />
+          )}
+          {comparisonTable && (
+            <ComparisonTableWrapper
+              comparisonTable={comparisonTable}
+              {...wrapperProps}
+            />
+          )}
+          {checkpointPlots && (
+            <CheckpointPlotsWrapper
+              checkpointPlots={checkpointPlots}
+              {...wrapperProps}
+            />
+          )}
+        </PlotsSizeProvider>
       </DragDropProvider>
+
+      {zoomedInPlot && (
+        <Modal onClose={handleModalClose}>
+          <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
+            <VegaLite
+              {...zoomedInPlot}
+              config={{
+                ...(zoomedInPlot.config as Config),
+                background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
+              }}
+              actions={{
+                compiled: false,
+                editor: false,
+                export: true,
+                source: false
+              }}
+            />
+          </div>
+        </Modal>
+      )}
     </Theme>
   )
 }

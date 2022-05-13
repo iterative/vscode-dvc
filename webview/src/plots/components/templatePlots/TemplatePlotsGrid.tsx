@@ -3,9 +3,11 @@ import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useEffect, useState } from 'react'
 import { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { BigGrid } from '../../../shared/components/bigGrid/BigGrid'
 import {
   DragDropContainer,
-  OnDrop
+  OnDrop,
+  WrapperProps
 } from '../../../shared/components/dragDrop/DragDropContainer'
 import { withScale } from '../../../util/styles'
 import { config } from '../constants'
@@ -20,6 +22,8 @@ interface TemplatePlotsGridProps extends ZoomablePlotProps {
   onDropInSection: OnDrop
   multiView: boolean
   setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
+  useBigGrid?: boolean
+  nbItemsPerRow: number
 }
 
 const autoSize = {
@@ -34,7 +38,9 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   onDropInSection,
   multiView,
   setSectionEntries,
-  renderZoomedInPlot
+  renderZoomedInPlot,
+  useBigGrid,
+  nbItemsPerRow
 }) => {
   const [order, setOrder] = useState<string[]>([])
 
@@ -99,6 +105,10 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         element: <DropTarget />,
         wrapperTag: 'div'
       }}
+      wrapperComponent={
+        useBigGrid ? (BigGrid as React.FC<WrapperProps>) : undefined
+      }
+      wrapperComponentProps={{ nbItemsPerRow }}
     />
   )
 }

@@ -1,17 +1,32 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { VegaLiteProps } from 'react-vega/lib/VegaLite'
-import { CheckpointPlotData, ColorScale } from 'dvc/src/plots/webview/contract'
+import cx from 'classnames'
+import {
+  CheckpointPlotData,
+  ColorScale,
+  Section
+} from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { createSpec } from './util'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import {
+  DragDropContainer,
+  WrapperProps
+} from '../../../shared/components/dragDrop/DragDropContainer'
 import { performOrderedUpdate } from '../../../util/objects'
 import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
 import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
 import { ZoomablePlot, ZoomablePlotProps } from '../ZoomablePlot'
+import { PlotsSizeContext } from '../PlotsSizeContext'
+import { BigGrid } from '../../../shared/components/bigGrid/BigGrid'
+import {
+  DEFAULT_NB_ITEMS_PER_ROW,
+  getNbItemsPerRow,
+  MaxItemsBeforeVirtualization
+} from '../util'
 
 interface CheckpointPlotsProps extends ZoomablePlotProps {
   plots: CheckpointPlotData[]
@@ -24,6 +39,25 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   renderZoomedInPlot
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
+  const [nbItemsPerRow, setNbItemsPerRow] = useState(DEFAULT_NB_ITEMS_PER_ROW)
+  const { sizes } = useContext(PlotsSizeContext)
+  const { [Section.CHECKPOINT_PLOTS]: size } = sizes
+  const changeNbItemsPerRow = useCallback(
+    () => setNbItemsPerRow(getNbItemsPerRow(size)),
+    [setNbItemsPerRow, size]
+  )
+
+  useEffect(() => {
+    changeNbItemsPerRow()
+  }, [size, changeNbItemsPerRow])
+
+  useEffect(() => {
+    window.addEventListener('resize', changeNbItemsPerRow)
+
+    return () => {
+      window.removeEventListener('resize', changeNbItemsPerRow)
+    }
+  }, [changeNbItemsPerRow])
 
   useEffect(() => {
     setOrder(pastOrder => performOrderedUpdate(pastOrder, plots, 'title'))
@@ -73,8 +107,14 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     })
     .filter(Boolean)
 
+  const useBigGrid = items.length > MaxItemsBeforeVirtualization[size]
+
   return plots.length > 0 ? (
-    <div className={styles.singleViewPlotsGrid}>
+    <div
+      className={cx(styles.singleViewPlotsGrid, {
+        [styles.noBigGrid]: !useBigGrid
+      })}
+    >
       <DragDropContainer
         order={order}
         setOrder={setMetricOrder}
@@ -85,6 +125,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
           element: <DropTarget />,
           wrapperTag: 'div'
         }}
+        wrapperComponent={
+          useBigGrid ? (BigGrid as React.FC<WrapperProps>) : undefined
+        }
+        wrapperComponentProps={{ nbItemsPerRow }}
       />
     </div>
   ) : (

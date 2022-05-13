@@ -339,6 +339,24 @@ const basicVega = {
   ]
 }
 
+const basicVegaContent = basicVega[join('logs', 'loss.tsv')][0]
+
+const multipleVega = {
+  [join('logs', '1-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '2-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '3-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '4-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '5-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '6-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '7-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '8-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '9-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '10-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '11-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '12-loss.tsv')]: [{ ...basicVegaContent }],
+  [join('logs', '13-loss.tsv')]: [{ ...basicVegaContent }]
+}
+
 const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'acc.png')]: [
     {
@@ -491,6 +509,15 @@ export const getMinimalWebviewMessage = () => ({
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
+  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
+  size: PlotSize.REGULAR
+})
+
+export const getManyTemplatePlotsWebviewMessage = (): TemplatePlotsData => ({
+  plots: extendedSpecs({
+    ...multipleVega,
+    ...require('./vega').default
+  }),
   sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })

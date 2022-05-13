@@ -20,6 +20,10 @@ const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
 const isSameGroup = (group1?: string, group2?: string) =>
   getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
 
+export type WrapperProps = {
+  items: JSX.Element[]
+}
+
 export type OnDrop = (
   draggedId: string,
   draggedGroup: string,
@@ -37,6 +41,9 @@ interface DragDropContainerProps {
     element: JSX.Element
     wrapperTag: 'div' | 'th'
   }
+  wrapperComponent?: React.FC<WrapperProps>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  wrapperComponentProps?: { [key: string]: any }
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -46,7 +53,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   items,
   group,
   onDrop,
-  dropTarget
+  dropTarget,
+  wrapperComponent
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
@@ -174,31 +183,30 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     />
   )
 
-  return (
-    <>
-      {items.flatMap(draggable => {
-        const { id } = draggable.props
-        const item = id && buildItem(id, draggable)
+  const wrappedItems = items.flatMap(draggable => {
+    const { id } = draggable.props
+    const item = id && buildItem(id, draggable)
 
-        if (id === draggedOverId) {
-          const target = (
-            <dropTarget.wrapperTag
-              data-testid="drop-target"
-              key="drop-target"
-              onDragOver={handleDragOver}
-              onDrop={handleOnDrop}
-              id={`${id}__drop`}
-            >
-              {dropTarget.element}
-            </dropTarget.wrapperTag>
-          )
-          return direction === DragEnterDirection.RIGHT
-            ? [item, target]
-            : [target, item]
-        }
+    if (id === draggedOverId) {
+      const target = (
+        <dropTarget.wrapperTag
+          data-testid="drop-target"
+          key="drop-target"
+          onDragOver={handleDragOver}
+          onDrop={handleOnDrop}
+          id={`${id}__drop`}
+        >
+          {dropTarget.element}
+        </dropTarget.wrapperTag>
+      )
+      return direction === DragEnterDirection.RIGHT
+        ? [item, target]
+        : [target, item]
+    }
 
-        return item
-      })}
-    </>
-  )
+    return item
+  })
+
+  const Wrapper = wrapperComponent
+  return Wrapper ? <Wrapper items={wrappedItems} /> : <>{wrappedItems}</>
 }
