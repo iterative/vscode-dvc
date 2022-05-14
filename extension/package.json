@@ -432,6 +432,12 @@
         "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
         "category": "DVC",
         "icon": "$(close)"
+      },
+      {
+        "title": "%command.views.plotsPathsTree.selectPlots%",
+        "command": "dvc.views.plotsPathsTree.selectPlots",
+        "category": "DVC",
+        "icon": "$(list-selection)"
       }
     ],
     "configuration": {
@@ -711,6 +717,10 @@
         {
           "command": "dvc.views.experimentsTree.selectExperiments",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.selectPlots",
+          "when": "dvc.commands.available && dvc.project.available"
         }
       ],
       "scm/title": [
@@ -967,6 +977,11 @@
           "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
           "group": "inline",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && dvc.experiments.filter.selected && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.selectPlots",
+          "group": "inline",
+          "when": "view == dvc.views.plotsPathsTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -1059,6 +1074,11 @@
           "command": "dvc.showPlots",
           "when": "view == dvc.views.plotsPathsTree",
           "group": "navigation@1"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.selectPlots",
+          "when": "view == dvc.views.plotsPathsTree",
+          "group": "navigation@2"
         }
       ]
     },

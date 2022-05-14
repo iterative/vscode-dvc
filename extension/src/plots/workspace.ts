@@ -38,4 +38,12 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
 
     return plots
   }
+
+  public async selectPlots(overrideRoot?: string) {
+    const dvcRoot = await this.getDvcRoot(overrideRoot)
+    if (!dvcRoot) {
+      return
+    }
+    return this.getRepository(dvcRoot).selectPlots()
+  }
 }
