@@ -221,7 +221,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     registerExperimentCommands(this.experiments, this.internalCommands)
-    registerPlotsCommands(this.plots)
+    registerPlotsCommands(this.plots, this.internalCommands)
 
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {

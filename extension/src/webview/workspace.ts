@@ -11,6 +11,8 @@ export abstract class BaseWorkspaceWebviews<
 > extends BaseWorkspace<T, ResourceLocator> {
   protected readonly workspaceState: Memento
 
+  protected focusedWebviewDvcRoot: string | undefined
+
   constructor(
     internalCommands: InternalCommands,
     workspaceState: Memento,
@@ -34,5 +36,20 @@ export abstract class BaseWorkspaceWebviews<
     const repository = this.getRepository(dvcRoot)
     await repository.showWebview()
     return repository
+  }
+
+  public getFocusedWebview(): T | undefined {
+    if (!this.focusedWebviewDvcRoot) {
+      return undefined
+    }
+    return this.getRepository(this.focusedWebviewDvcRoot)
+  }
+
+  protected async getDvcRoot(overrideRoot?: string) {
+    return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
+  }
+
+  protected getFocusedOrOnlyOrPickProject() {
+    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
 }
