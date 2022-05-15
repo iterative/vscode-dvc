@@ -1167,11 +1167,11 @@
       },
       {
         "view": "dvc.views.experimentsSortByTree",
-        "contents": "No sorts applied. \n[Add Sort](command:dvc.addExperimentsTableSort)\n"
+        "contents": "No sorts applied. \n[$(add) Add Sort](command:dvc.addExperimentsTableSort)\n"
       },
       {
         "view": "dvc.views.experimentsFilterByTree",
-        "contents": "No filters applied. \n[Add Filter](command:dvc.addExperimentsTableFilter)\n"
+        "contents": "No filters applied. \n[$(add) Add Filter](command:dvc.addExperimentsTableFilter)\n"
       },
       {
         "view": "dvc.views.plotsPathsTree",
