@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@tippyjs/react": "^4.2.6",
+    "@vscode/webview-ui-toolkit": "^1.0.0",
     "classnames": "^2.2.6",
     "react": "^17.0.1",
     "react-beautiful-dnd": "^13.1.0",

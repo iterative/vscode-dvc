@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
+import { GetStarted } from './GetStarted'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
@@ -54,13 +55,22 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
 
   const {
     checkpoint: checkpointPlots,
+    comparison: comparisonTable,
+    hasPlots,
+    hasSelectedPlots,
+    hasSelectedRevisions,
     sectionCollapsed,
-    template: templatePlots,
-    comparison: comparisonTable
+    template: templatePlots
   } = data
 
   if (!checkpointPlots && !templatePlots && !comparisonTable) {
-    return <EmptyState>No Plots to Display</EmptyState>
+    return (
+      <GetStarted
+        hasPlots={hasPlots}
+        hasSelectedPlots={hasSelectedPlots}
+        hasSelectedRevisions={hasSelectedRevisions}
+      />
+    )
   }
 
   const changeSize = (size: PlotSize, section: Section) => {

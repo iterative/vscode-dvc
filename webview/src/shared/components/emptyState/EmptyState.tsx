@@ -17,7 +17,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         isFullScreen ? styles.emptyScreen : styles.emptySection
       )}
     >
-      <p className={styles.emptyStateText}>{children}</p>
+      <div className={styles.emptyStateText}>{children}</div>
     </div>
   )
 }
