@@ -40,6 +40,8 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
 
+  private experiments?: Experiments
+
   private plots?: PlotsModel
   private paths?: PathsModel
 
@@ -80,6 +82,8 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public setExperiments(experiments: Experiments) {
+    this.experiments = experiments
+
     this.plots = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
@@ -165,6 +169,11 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webview?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
+      hasPlots: !!this.paths?.hasPaths(),
+      hasSelectedPlots: definedAndNonEmpty(this.paths?.getSelected()),
+      hasSelectedRevisions: definedAndNonEmpty(
+        this.plots?.getSelectedRevisionDetails()
+      ),
       sectionCollapsed: this.plots?.getSectionCollapsed(),
       template: this.getTemplatePlots()
     })
@@ -250,6 +259,10 @@ export class Plots extends BaseRepository<TPlotsData> {
             return this.setTemplateOrder(message.payload)
           case MessageFromWebviewType.REORDER_PLOTS_METRICS:
             return this.setMetricOrder(message.payload)
+          case MessageFromWebviewType.SELECT_PLOTS:
+            return this.selectPlotsFromWebview()
+          case MessageFromWebviewType.SELECT_EXPERIMENTS:
+            return this.selectExperimentsFromWebview()
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -319,6 +332,20 @@ export class Plots extends BaseRepository<TPlotsData> {
   private setMetricOrder(order: string[]) {
     this.plots?.setMetricOrder(order)
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
+  }
+
+  private selectPlotsFromWebview() {
+    this.selectPlots()
+    sendTelemetryEvent(EventName.VIEWS_PLOTS_SELECT_PLOTS, undefined, undefined)
+  }
+
+  private selectExperimentsFromWebview() {
+    this.experiments?.selectExperiments()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
+      undefined,
+      undefined
+    )
   }
 
   private sendCheckpointPlotsAndEvent(

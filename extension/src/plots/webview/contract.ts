@@ -130,6 +130,9 @@ export type PlotsData =
   | {
       comparison?: PlotsComparisonData | null
       checkpoint?: CheckpointPlotsData | null
+      hasPlots?: boolean
+      hasSelectedPlots?: boolean
+      hasSelectedRevisions?: boolean
       template?: TemplatePlotsData | null
       sectionCollapsed?: SectionCollapsed
     }

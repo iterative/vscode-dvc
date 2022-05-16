@@ -25,6 +25,8 @@ export enum MessageFromWebviewType {
   RESIZE_PLOTS = 'resize-plots',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
+  SELECT_EXPERIMENTS = 'select-experiments',
+  SELECT_PLOTS = 'select-plots',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   VARY_EXPERIMENT_PARAMS_AND_QUEUE = 'vary-experiment-params-and-queue',
@@ -115,6 +117,8 @@ export type MessageFromWebview =
       payload: PlotSectionRenamedPayload
     }
   | { type: MessageFromWebviewType.INITIALIZED }
+  | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
+  | { type: MessageFromWebviewType.SELECT_PLOTS }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA
