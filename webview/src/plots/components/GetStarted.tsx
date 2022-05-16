@@ -18,7 +18,7 @@ export const GetStarted = ({
   return (
     <EmptyState>
       <div>
-        <p>No Plots to Display</p>
+        <p>No Plots to Display.</p>
         {hasPlots && (
           <div>
             {!hasSelectedPlots && (
