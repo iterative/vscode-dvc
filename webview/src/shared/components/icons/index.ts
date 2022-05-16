@@ -1,3 +1,4 @@
+export { default as Add } from './Add'
 export { default as Check } from './Check'
 export { default as ChevronDown } from './ChevronDown'
 export { default as ChevronRight } from './ChevronRight'
