@@ -48,21 +48,19 @@ export const GetStarted = ({
         {!hasPlots && (
           <div>
             <p>
-              <text>
-                {'Learn how to '}
-                <a href="https://dvc.org/doc/studio/user-guide/views/visualize-experiments">
-                  visualize experiments
-                </a>
-                {' with DVC.'}
-              </text>
+              {'Learn how to '}
+              <a href="https://dvc.org/doc/studio/user-guide/views/visualize-experiments">
+                visualize experiments
+              </a>
+              {' with DVC.'}
             </p>
-            <text>
+            <p>
               {'Learn about the '}
               <a href="https://dvc.org/doc/command-reference/plots">
-                plots command
+                plots commands
               </a>
               .
-            </text>
+            </p>
           </div>
         )}
       </div>
