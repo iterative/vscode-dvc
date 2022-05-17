@@ -1054,7 +1054,7 @@
         },
         {
           "command": "dvc.runResetExperiment",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiments.webviewActive && !dvc.runner.running",
+          "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
           "group": "1_run@2"
         },
         {
