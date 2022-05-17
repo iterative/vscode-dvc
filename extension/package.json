@@ -1163,7 +1163,7 @@
       },
       {
         "view": "dvc.views.experimentsTree",
-        "contents": "No Experiments to Display. \n[Run Experiment](command:dvc.runExperiment)\n"
+        "contents": "No Experiments to Display."
       },
       {
         "view": "dvc.views.experimentsSortByTree",
