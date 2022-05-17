@@ -5,7 +5,9 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotSize
 } from 'dvc/src/plots/webview/contract'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture, {
+  manyCheckpointPlots
+} from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture, {
   manyTemplatePlots
 } from 'dvc/src/test/fixtures/plotsDiff/template'
@@ -109,24 +111,19 @@ AllSmall.args = {
 }
 AllSmall.parameters = chromaticParameters
 
-const manyCheckpointPlots = Array.from(
-  { length: 10 },
-  () => checkpointPlotsFixture.plots
-)
-  .flat()
-  .map((plot, i) => ({ ...plot, title: plot.title + i.toString() }))
+const moreCheckpointPlots = manyCheckpointPlots(10)
 
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {
   data: {
     checkpoint: {
       ...checkpointPlotsFixture,
-      plots: manyCheckpointPlots,
-      selectedMetrics: manyCheckpointPlots.map(plot => plot.title)
+      plots: moreCheckpointPlots,
+      selectedMetrics: moreCheckpointPlots.map(plot => plot.title)
     },
     comparison: undefined,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    template: manyTemplatePlots
+    template: manyTemplatePlots(10)
   }
 }
 VirtualizedPlots.parameters = chromaticParameters

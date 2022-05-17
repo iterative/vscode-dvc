@@ -341,20 +341,17 @@ const basicVega = {
 
 const basicVegaContent = basicVega[join('logs', 'loss.tsv')][0]
 
-const multipleVega = {
-  [join('logs', '1-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '2-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '3-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '4-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '5-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '6-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '7-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '8-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '9-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '10-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '11-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '12-loss.tsv')]: [{ ...basicVegaContent }],
-  [join('logs', '13-loss.tsv')]: [{ ...basicVegaContent }]
+const multipleVega = (length: number) => {
+  if (length === 0) {
+    return {}
+  }
+  const plots = {
+    ...basicVega
+  }
+  for (let i = 1; i < length; i++) {
+    plots[join('logs', `${i}-loss.tsv`)] = [{ ...basicVegaContent }]
+  }
+  return plots
 }
 
 const getImageData = (baseUrl: string, joinFunc = join) => ({
@@ -513,10 +510,11 @@ export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   size: PlotSize.REGULAR
 })
 
-export const getManyTemplatePlotsWebviewMessage = (): TemplatePlotsData => ({
+export const getManyTemplatePlotsWebviewMessage = (
+  length: number
+): TemplatePlotsData => ({
   plots: extendedSpecs({
-    ...multipleVega,
-    ...require('./vega').default
+    ...multipleVega(length)
   }),
   sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR

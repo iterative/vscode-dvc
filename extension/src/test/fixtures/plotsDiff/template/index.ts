@@ -5,6 +5,7 @@ import {
 
 const data = getTemplateWebviewMessage()
 
-export const manyTemplatePlots = getManyTemplatePlotsWebviewMessage()
+export const manyTemplatePlots = (length: number) =>
+  getManyTemplatePlotsWebviewMessage(length)
 
 export default data
