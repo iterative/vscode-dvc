@@ -18,7 +18,7 @@ export const GetStarted = ({
   return (
     <EmptyState>
       <div>
-        <p>No Plots to Display</p>
+        <p>No Plots to Display.</p>
         {hasPlots && (
           <div>
             {!hasSelectedPlots && (
@@ -43,6 +43,24 @@ export const GetStarted = ({
                 text={'Add Experiments'}
               />
             )}
+          </div>
+        )}
+        {!hasPlots && (
+          <div>
+            <p>
+              {'Learn how to '}
+              <a href="https://dvc.org/doc/studio/user-guide/views/visualize-experiments">
+                visualize experiments
+              </a>
+              {' with DVC.'}
+            </p>
+            <p>
+              {'Learn about the '}
+              <a href="https://dvc.org/doc/command-reference/plots">
+                plots commands
+              </a>
+              .
+            </p>
           </div>
         )}
       </div>
