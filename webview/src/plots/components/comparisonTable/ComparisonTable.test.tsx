@@ -40,6 +40,10 @@ describe('ComparisonTable', () => {
 
   const basicProps: ComparisonTableProps = comparisonTableFixture
   const revisions = basicProps.revisions.map(({ revision }) => revision)
+  const namedRevisions = basicProps.revisions.map(
+    ({ revision, displayNameOrParent }) =>
+      `${revision}${displayNameOrParent || ''}`
+  )
   const renderTable = (props = basicProps) =>
     render(
       <DragDropProvider>
@@ -179,7 +183,7 @@ describe('ComparisonTable', () => {
 
     let headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toStrictEqual(revisions)
+    expect(headers).toStrictEqual(namedRevisions)
 
     const filteredRevisions = basicProps.revisions.filter(
       ({ revision }) => revision !== revisions[3]
@@ -189,12 +193,12 @@ describe('ComparisonTable', () => {
 
     headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toStrictEqual([
-      revisions[0],
-      revisions[1],
-      revisions[2],
-      revisions[4]
-    ])
+    const expectedRevisions = filteredRevisions.map(
+      ({ revision, displayNameOrParent }) =>
+        `${revision}${displayNameOrParent || ''}`
+    )
+
+    expect(headers).toStrictEqual(expectedRevisions)
   })
 
   it('should add a new column if there is a new revision', () => {
@@ -208,7 +212,7 @@ describe('ComparisonTable', () => {
     rerender(<ComparisonTable {...basicProps} revisions={newRevisions} />)
     const headers = getHeaders().map(header => header.textContent)
 
-    expect(headers).toStrictEqual([...revisions, newRevName])
+    expect(headers).toStrictEqual([...namedRevisions, newRevName])
   })
 
   it('should pin the current pinned column on first render', () => {
@@ -254,11 +258,19 @@ describe('ComparisonTable', () => {
 
       let headers = getHeaders().map(header => header.textContent)
 
-      expect(headers).toStrictEqual(revisions)
+      expect(headers).toStrictEqual(namedRevisions)
 
       dragAndDrop(startingNode, endingNode)
 
       headers = getHeaders().map(header => header.textContent)
+
+      const expectedNamedRevisions = [
+        namedRevisions[0],
+        namedRevisions[3],
+        namedRevisions[1],
+        namedRevisions[2],
+        namedRevisions[4]
+      ]
 
       const expectedRevisions = [
         revisions[0],
@@ -268,7 +280,7 @@ describe('ComparisonTable', () => {
         revisions[4]
       ]
 
-      expect(headers).toStrictEqual(expectedRevisions)
+      expect(headers).toStrictEqual(expectedNamedRevisions)
       expect(mockPostMessage).toBeCalledTimes(1)
       expect(mockPostMessage).toBeCalledWith({
         payload: expectedRevisions,
@@ -283,11 +295,11 @@ describe('ComparisonTable', () => {
 
       const [, endingNode, , startingNode] = getHeaders()
       const expectedOrder = [
-        revisions[1],
-        revisions[0],
-        revisions[2],
-        revisions[3],
-        revisions[4]
+        namedRevisions[1],
+        namedRevisions[0],
+        namedRevisions[2],
+        namedRevisions[3],
+        namedRevisions[4]
       ]
 
       const headers = getHeaders().map(header => header.textContent)

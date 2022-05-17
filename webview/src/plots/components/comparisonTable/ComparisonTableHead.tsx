@@ -21,26 +21,33 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
-  const items = columns.map(({ revision, displayColor }) => {
-    const isPinned = revision === pinnedColumn
-    return (
-      <th
-        key={revision}
-        id={revision}
-        className={cx(styles.comparisonTableHeader, {
-          [styles.pinnedColumnHeader]: isPinned
-        })}
-      >
-        <ComparisonTableHeader
-          isPinned={isPinned}
-          onClicked={() => setPinnedColumn(revision)}
-          displayColor={displayColor}
+  const items = columns.map(
+    ({ revision, displayColor, displayNameOrParent }) => {
+      const isPinned = revision === pinnedColumn
+      return (
+        <th
+          key={revision}
+          id={revision}
+          className={cx(styles.comparisonTableHeader, {
+            [styles.pinnedColumnHeader]: isPinned
+          })}
         >
-          {revision}
-        </ComparisonTableHeader>
-      </th>
-    )
-  })
+          <ComparisonTableHeader
+            isPinned={isPinned}
+            onClicked={() => setPinnedColumn(revision)}
+            displayColor={displayColor}
+          >
+            {revision}
+            {displayNameOrParent && (
+              <span className={styles.experimentName}>
+                {displayNameOrParent}
+              </span>
+            )}
+          </ComparisonTableHeader>
+        </th>
+      )
+    }
+  )
 
   return (
     <thead>
