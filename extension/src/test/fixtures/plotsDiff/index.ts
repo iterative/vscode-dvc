@@ -545,8 +545,12 @@ export const getComparisonWebviewMessage = (
   return {
     plots: plotAcc,
     revisions: [
-      { revision: 'workspace', displayColor: workspace },
-      { revision: 'main', displayColor: main },
+      {
+        revision: 'workspace',
+        displayColor: workspace,
+        displayNameOrParent: undefined
+      },
+      { revision: 'main', displayColor: main, displayNameOrParent: undefined },
       {
         revision: '4fb124a',
         displayColor: _4fb124a,

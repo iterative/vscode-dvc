@@ -307,13 +307,41 @@ suite('Experiments Tree Test Suite', () => {
         plotsModel.getSelectedRevisionDetails(),
         'all running and the most recent experiments are now selected'
       ).to.deep.equal([
-        { displayColor: colors[0], revision: 'workspace' },
-        { displayColor: colors[2], revision: '4fb124a' },
-        { displayColor: colors[3], revision: '42b8736' },
-        { displayColor: colors[1], revision: 'd1343a8' },
-        { displayColor: colors[4], revision: '1ee5f2e' },
-        { displayColor: colors[5], revision: '2173124' },
-        { displayColor: colors[6], revision: '9523bde' }
+        {
+          displayColor: colors[0],
+          displayNameOrParent: undefined,
+          revision: 'workspace'
+        },
+        {
+          displayColor: colors[2],
+          displayNameOrParent: '[exp-e7a67]',
+          revision: '4fb124a'
+        },
+        {
+          displayColor: colors[3],
+          displayNameOrParent: '[test-branch]',
+          revision: '42b8736'
+        },
+        {
+          displayColor: colors[1],
+          displayNameOrParent: undefined,
+          revision: 'd1343a8'
+        },
+        {
+          displayColor: colors[4],
+          displayNameOrParent: undefined,
+          revision: '1ee5f2e'
+        },
+        {
+          displayColor: colors[5],
+          displayNameOrParent: undefined,
+          revision: '2173124'
+        },
+        {
+          displayColor: colors[6],
+          displayNameOrParent: undefined,
+          revision: '9523bde'
+        }
       ])
       expect(
         mockPlotsDiff,
