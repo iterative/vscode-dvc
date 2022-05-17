@@ -1155,27 +1155,27 @@
       },
       {
         "view": "dvc.views.trackedExplorerTree",
-        "contents": "No tracked data to display."
+        "contents": "No Tracked Data to Display."
       },
       {
         "view": "dvc.views.experimentsColumnsTree",
-        "contents": "No columns to display."
+        "contents": "No Columns to Display."
       },
       {
         "view": "dvc.views.experimentsTree",
-        "contents": "No experiments to display. \n[Run Experiment](command:dvc.runExperiment)\n"
+        "contents": "No Experiments to Display."
       },
       {
         "view": "dvc.views.experimentsSortByTree",
-        "contents": "No sorts applied. \n[$(add) Add Sort](command:dvc.addExperimentsTableSort)\n"
+        "contents": "No Sorts Applied. \n[$(add) Add Sort](command:dvc.addExperimentsTableSort)\n"
       },
       {
         "view": "dvc.views.experimentsFilterByTree",
-        "contents": "No filters applied. \n[$(add) Add Filter](command:dvc.addExperimentsTableFilter)\n"
+        "contents": "No Filters Applied. \n[$(add) Add Filter](command:dvc.addExperimentsTableFilter)\n"
       },
       {
         "view": "dvc.views.plotsPathsTree",
-        "contents": "No plots to display."
+        "contents": "No Plots to Display."
       }
     ],
     "walkthroughs": [
