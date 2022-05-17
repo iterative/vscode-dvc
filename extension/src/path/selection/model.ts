@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
-import { MetricOrParam } from '../../experiments/webview/contract'
+import { Column } from '../../experiments/webview/contract'
 import { PlotPath } from '../../plots/paths/collect'
 
 export enum Status {
@@ -11,7 +11,7 @@ export enum Status {
 }
 
 export abstract class PathSelectionModel<
-  T extends MetricOrParam | PlotPath
+  T extends Column | PlotPath
 > extends ModelWithPersistence {
   protected status: Record<string, Status>
 
@@ -42,8 +42,10 @@ export abstract class PathSelectionModel<
     )
   }
 
-  public getTerminalNodes() {
-    return this.data.filter(element => !element.hasChildren)
+  public getTerminalNodes(): (T & { selected: boolean })[] {
+    return this.data
+      .filter(element => !element.hasChildren)
+      .map(element => ({ ...element, selected: !!this.status[element.path] }))
   }
 
   public getChildren(path: string | undefined) {
@@ -74,6 +76,19 @@ export abstract class PathSelectionModel<
         : [this.status[element.path]]
       return [...terminalStatuses]
     })
+  }
+
+  public setSelected(elements: (T & { selected: boolean })[]) {
+    const terminalNodes = this.getTerminalNodes()
+    for (const { path, selected } of terminalNodes) {
+      const selectedElement = elements.find(
+        ({ path: selectedPath }) => path === selectedPath
+      )
+
+      if (!!selectedElement !== !!selected) {
+        this.toggleStatus(path)
+      }
+    }
   }
 
   protected setNewStatuses(data: { path: string }[]) {

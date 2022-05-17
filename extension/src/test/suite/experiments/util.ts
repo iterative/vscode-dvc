@@ -42,6 +42,7 @@ export const buildExperiments = (
   dvcRoot = dvcDemoPath
 ) => {
   const {
+    cliExecutor,
     cliReader,
     internalCommands,
     messageSpy,
@@ -67,6 +68,7 @@ export const buildExperiments = (
   experiments.setState(experimentShowData)
 
   return {
+    cliExecutor,
     cliReader,
     experiments,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

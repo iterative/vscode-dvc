@@ -1,9 +1,9 @@
-import { pickFromMetricsAndParams } from './quickPick'
-import { appendMetricOrParamToPath, joinMetricOrParamPath } from './paths'
+import { pickFromColumns } from './quickPick'
+import { appendColumnToPath, joinColumnPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Title } from '../../vscode/title'
-import { MetricOrParamType } from '../webview/contract'
+import { ColumnType } from '../webview/contract'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -17,11 +17,11 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('pickFromMetricsAndParams', () => {
-  const params = MetricOrParamType.PARAMS
+describe('pickFromColumns', () => {
+  const params = ColumnType.PARAMS
   const paramsYaml = 'params.yaml'
-  const paramsYamlPath = joinMetricOrParamPath(params, paramsYaml)
-  const epochsParamPath = appendMetricOrParamToPath(paramsYamlPath, 'epochs')
+  const paramsYamlPath = joinColumnPath(params, paramsYaml)
+  const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epochs')
   const epochsParam = {
     hasChildren: false,
     maxNumber: 5,
@@ -30,7 +30,7 @@ describe('pickFromMetricsAndParams', () => {
     name: 'epochs',
     parentPath: paramsYamlPath,
     path: epochsParamPath,
-    type: MetricOrParamType.PARAMS,
+    type: ColumnType.PARAMS,
     types: ['number']
   }
 
@@ -39,13 +39,13 @@ describe('pickFromMetricsAndParams', () => {
     name: paramsYaml,
     parentPath: params,
     path: paramsYamlPath,
-    type: MetricOrParamType.PARAMS
+    type: ColumnType.PARAMS
   }
-  const exampleMetricsAndParams = [epochsParam, paramsYamlParam]
+  const exampleColumns = [epochsParam, paramsYamlParam]
 
-  it('should return early if no params or metrics are provided', async () => {
-    const picked = await pickFromMetricsAndParams([], {
-      title: "can't pick from no params or metrics" as Title
+  it('should return early if no columns are provided', async () => {
+    const picked = await pickFromColumns([], {
+      title: "can't pick from no columns" as Title
     })
     expect(picked).toBeUndefined()
     expect(mockedShowError).toBeCalledTimes(1)
@@ -54,7 +54,7 @@ describe('pickFromMetricsAndParams', () => {
 
   it('should invoke a QuickPick with the correct options', async () => {
     const title = 'Test title' as Title
-    await pickFromMetricsAndParams(exampleMetricsAndParams, { title })
+    await pickFromColumns(exampleColumns, { title })
     expect(mockedQuickPickValue).toBeCalledWith(
       [
         {

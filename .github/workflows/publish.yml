@@ -8,21 +8,40 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        id: checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
+      - name: Set Variables
+        id: set_variables
+        run: |
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '14'
           cache: 'yarn'
-
       - run: yarn run install-frozen-lockfile
       - run: yarn build
+
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           extensionFile: './extension/dvc.vsix'
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
+
+      - name: Get Most Recent Changelog Entry
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@v2
+
+      - name: Create Github Release
+        uses: ncipollo/release-action@v1
+        with:
+          body: ${{ steps.changelog_reader.outputs.changes }}
+          commit: ${{ steps.set_variables.outputs.commit }}
+          name: ${{ steps.changelog_reader.outputs.version }}
+          tag: ${{ steps.changelog_reader.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}

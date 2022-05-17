@@ -41,7 +41,7 @@ export class InternalCommands extends Disposable {
   ): Promise<T> {
     const command = this.commands.get(commandId)
     if (!command) {
-      throw new Error('Unknown command')
+      throw new Error(`Unknown command: ${commandId}`)
     }
 
     return command(...args) as Promise<T>

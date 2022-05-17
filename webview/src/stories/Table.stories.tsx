@@ -47,6 +47,25 @@ const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
 
 export const WithData = Template.bind({})
 
+export const WithNoRunningExperiments = Template.bind({})
+WithNoRunningExperiments.args = {
+  tableData: {
+    ...tableData,
+    rows: rowsFixture.map(row => ({
+      ...row,
+      running: false,
+      subRows: row.subRows?.map(experiment => ({
+        ...experiment,
+        running: false,
+        subRows: experiment.subRows?.map(checkpoint => ({
+          ...checkpoint,
+          running: false
+        }))
+      }))
+    }))
+  }
+}
+
 export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = { tableData: deeplyNestedTableData }
 

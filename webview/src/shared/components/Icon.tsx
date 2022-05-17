@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  Add,
   Check,
   ChevronDown,
   ChevronRight,
@@ -15,6 +16,7 @@ import {
 } from './icons'
 
 export const AllIcons = {
+  ADD: Add,
   CHECK: Check,
   CHEVRON_DOWN: ChevronDown,
   CHEVRON_RIGHT: ChevronRight,

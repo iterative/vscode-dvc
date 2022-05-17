@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { BaseWebview } from '.'
 import { BaseRepository } from './repository'
 import { WebviewData } from './contract'
 import { InternalCommands } from '../commands/internal'
@@ -11,6 +10,8 @@ export abstract class BaseWorkspaceWebviews<
   U extends WebviewData
 > extends BaseWorkspace<T, ResourceLocator> {
   protected readonly workspaceState: Memento
+
+  protected focusedWebviewDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
@@ -37,12 +38,18 @@ export abstract class BaseWorkspaceWebviews<
     return repository
   }
 
-  public setWebview(dvcRoot: string, webview: BaseWebview<U>) {
-    const repository = this.getRepository(dvcRoot)
-    if (!repository) {
-      webview.dispose()
+  public getFocusedWebview(): T | undefined {
+    if (!this.focusedWebviewDvcRoot) {
+      return undefined
     }
+    return this.getRepository(this.focusedWebviewDvcRoot)
+  }
 
-    repository.setWebview(webview)
+  protected async getDvcRoot(overrideRoot?: string) {
+    return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
+  }
+
+  protected getFocusedOrOnlyOrPickProject() {
+    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
 }

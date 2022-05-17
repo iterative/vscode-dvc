@@ -1,11 +1,17 @@
 $fg-color: var(--vscode-editor-foreground);
 $bg-color: var(--vscode-editor-background);
 $bullet-size: 9px;
+$watermark-color: var(--vscode-descriptionForeground);
 
-// Dark
+$border-color: var(--vscode-dropdown-border);
+$metrics-color: var(--vscode-dvc-metrics);
+$params-color: var(--vscode-dvc-params);
+$changed-color: var(--vscode-dvc-workspaceChanged);
 
-$watermark-color: rgba(255, 255, 255, 0.6);
+$row-bg-color: $bg-color;
+$header-fg-color: $fg-color;
+$row-bg-alt-color: var(--vscode-sideBar-background);
+$header-bg-color: var(--vscode-dropdown-background);
+$meta-cell-color: var(--vscode-descriptionForeground);
 
-// Light
-
-$watermark-color-light: rgba(0, 0, 0, 0.68);
+$hover-background-color: var(--vscode-list-hoverBackground);

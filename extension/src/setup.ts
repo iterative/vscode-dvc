@@ -15,6 +15,7 @@ import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { Response } from './vscode/response'
 import { getSelectTitle, Title } from './vscode/title'
 import { Toast } from './vscode/toast'
+import { isPythonExtensionInstalled } from './extensions/python'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -104,32 +105,33 @@ const pickVenvOptions = async () => {
   return pickCliPath()
 }
 
-const quickPickVenvOption = () =>
-  quickPickValue<number>(
-    [
-      {
-        description: 'use the interpreter selected by the ms-python extension',
-        label: Response.YES,
-        value: 2
-      },
-      {
-        description: 'and I want to select the python interpreter',
-        label: Response.YES,
-        value: 1
-      },
-
-      {
-        description:
-          'all of the modules required to run this project are globally available',
-        label: 'No',
-        value: 0
-      }
-    ],
+const quickPickVenvOption = () => {
+  const options = [
     {
-      placeHolder: 'Does your project use a Python virtual environment?',
-      title: Title.SETUP_WORKSPACE
+      description: 'and I want to select the python interpreter',
+      label: Response.YES,
+      value: 1
+    },
+    {
+      description:
+        'all of the modules required to run this project are globally available',
+      label: 'No',
+      value: 0
     }
-  )
+  ]
+  if (isPythonExtensionInstalled()) {
+    options.unshift({
+      description: 'use the interpreter selected by the ms-python extension',
+      label: Response.YES,
+      value: 2
+    })
+  }
+
+  return quickPickValue<number>(options, {
+    placeHolder: 'Does your project use a Python virtual environment?',
+    title: Title.SETUP_WORKSPACE
+  })
+}
 
 const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {
   if (usesVenv === 1) {

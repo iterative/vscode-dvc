@@ -6,7 +6,7 @@ import {
   ValueTree,
   ValueTreeRoot
 } from '../../cli/reader'
-import { MetricOrParamType } from '../webview/contract'
+import { ColumnType } from '../webview/contract'
 
 export type OnValueCallback = (
   key: string,
@@ -16,7 +16,7 @@ export type OnValueCallback = (
 ) => void
 
 export interface ValueWalkMeta {
-  type: MetricOrParamType
+  type: ColumnType
   file: string
 }
 
@@ -37,7 +37,7 @@ const walkValueTree = (
 
 const walkValueFileRoot = (
   root: ValueTreeRoot,
-  type: MetricOrParamType,
+  type: ColumnType,
   onValue: OnValueCallback
 ) => {
   for (const [file, value] of Object.entries(root)) {
@@ -60,10 +60,10 @@ const walkExperiment = (
   if (data) {
     const { params, metrics } = data
     if (metrics) {
-      walkValueFileRoot(metrics, MetricOrParamType.METRICS, onValue)
+      walkValueFileRoot(metrics, ColumnType.METRICS, onValue)
     }
     if (params) {
-      walkValueFileRoot(params, MetricOrParamType.PARAMS, onValue)
+      walkValueFileRoot(params, ColumnType.PARAMS, onValue)
     }
   }
 }

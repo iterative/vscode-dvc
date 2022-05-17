@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react'
 import {
-  MetricOrParam,
-  RowData as Experiment,
+  Column,
+  Row,
   TableData,
   InitiallyUndefinedTableData,
-  MetricOrParamType
+  ColumnType
 } from 'dvc/src/experiments/webview/contract'
 import {
-  Row,
-  Column,
+  Row as TableRow,
+  Column as TableColumn,
   useTable,
   useExpanded,
   useFlexLayout,
@@ -37,7 +37,7 @@ const dateFormatter = new Intl.DateTimeFormat([], {
 })
 
 const countRowsAndAddIndexes: (
-  rows: Row<Experiment>[],
+  rows: TableRow<Row>[],
   index?: number
 ) => number = (rows, index = 0) => {
   for (const row of rows) {
@@ -68,14 +68,14 @@ const DateCellContents: React.FC<{ value: string }> = ({ value }) => {
   )
 }
 
-const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
+const getColumns = (columns: Column[]): TableColumn<Row>[] =>
   [
     {
       Cell: ({
         row: {
           original: { label, displayNameOrParent }
         }
-      }: Cell<Experiment>) => {
+      }: Cell<Row>) => {
         return (
           <div className={styles.experimentCellContents}>
             <span className={styles.experimentCellPrimaryName}>{label}</span>
@@ -104,17 +104,17 @@ const getColumns = (columns: MetricOrParam[]): Column<Experiment>[] =>
       accessor: 'timestamp',
       width: 100
     },
-    ...buildDynamicColumns(columns, MetricOrParamType.METRICS),
-    ...buildDynamicColumns(columns, MetricOrParamType.PARAMS)
-  ] as Column<Experiment>[]
+    ...buildDynamicColumns(columns, ColumnType.METRICS),
+    ...buildDynamicColumns(columns, ColumnType.PARAMS)
+  ] as TableColumn<Row>[]
 
-const reportResizedColumn = (state: TableState<Experiment>) => {
+const reportResizedColumn = (state: TableState<Row>) => {
   const id = state.columnResizing.isResizingColumn
   if (id) {
     const width = state.columnResizing.columnWidths[id]
     sendMessage({
       payload: { id, width },
-      type: MessageFromWebviewType.COLUMN_RESIZED
+      type: MessageFromWebviewType.RESIZE_COLUMN
     })
   }
 }
@@ -123,7 +123,7 @@ export const ExperimentsTable: React.FC<{
   tableData: InitiallyUndefinedTableData
 }> = ({ tableData: initiallyUndefinedTableData }) => {
   const getRowId = useCallback(
-    (experiment: Experiment, relativeIndex: number, parent?: Row<Experiment>) =>
+    (experiment: Row, relativeIndex: number, parent?: TableRow<Row>) =>
       parent ? [parent.id, experiment.id].join('.') : String(relativeIndex),
     []
   )
@@ -144,9 +144,9 @@ export const ExperimentsTable: React.FC<{
         columnResizing: {
           columnWidths: tableData.columnWidths
         }
-      } as Partial<TableState<Experiment>>
+      } as Partial<TableState<Row>>
 
-      const defaultColumn: Partial<Column<Experiment>> = {
+      const defaultColumn: Partial<TableColumn<Row>> = {
         minWidth: MINIMUM_COLUMN_WIDTH,
         width: DEFAULT_COLUMN_WIDTH
       }
@@ -157,7 +157,7 @@ export const ExperimentsTable: React.FC<{
 
   const { rows: data } = tableData
 
-  const instance = useTable<Experiment>(
+  const instance = useTable<Row>(
     {
       autoResetExpanded: false,
       autoResetResize: false,

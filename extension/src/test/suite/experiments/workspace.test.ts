@@ -93,12 +93,12 @@ suite('Workspace Experiments Test Suite', () => {
     })
   }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-  describe('dvc.queueExperimentsFromExisting', () => {
+  describe('dvc.modifyExperimentParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { cliExecutor, experiments } = buildExperiments(disposable)
 
       const mockExperimentRunQueue = stub(
-        CliExecutor.prototype,
+        cliExecutor,
         'experimentRunQueue'
       ).resolves('true')
 
@@ -150,6 +150,70 @@ suite('Workspace Experiments Test Suite', () => {
         'params.yaml:dropout=0.15',
         '-S',
         'params.yaml:process.threshold=0.16'
+      )
+    })
+  })
+
+  describe('dvc.modifyExperimentParamsAndRun', () => {
+    it('should be able to run an experiment using an existing one as a base', async () => {
+      const { experiments } = buildExperiments(disposable)
+
+      const mockExperimentRun = stub(
+        CliRunner.prototype,
+        'runExperiment'
+      ).resolves(undefined)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<
+          QuickPickItem[] | QuickPickItemWithValue<{ id: string }> | undefined
+        >
+      >
+      mockShowQuickPick
+        .onFirstCall()
+        .resolves({ value: { id: 'workspace' } } as QuickPickItemWithValue<{
+          id: string
+        }>)
+        .onSecondCall()
+        .resolves([
+          {
+            label: 'params.yaml:dropout',
+            value: { path: 'params.yaml:dropout', value: 0.1 }
+          },
+          {
+            label: 'params.yaml:process.threshold',
+            value: { path: 'params.yaml:process.threshold', value: 0.15 }
+          }
+        ] as QuickPickItemWithValue<Param>[])
+
+      const dropout = '0.222222'
+      const threshold = '0.1665'
+
+      stub(window, 'showInputBox')
+        .onFirstCall()
+        .resolves(dropout)
+        .onSecondCall()
+        .resolves(threshold)
+
+      await commands.executeCommand(
+        RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_RUN
+      )
+
+      expect(mockExperimentRun).to.be.calledOnce
+      expect(mockExperimentRun).to.be.calledWith(
+        dvcDemoPath,
+        '-S',
+        `params.yaml:dropout=${dropout}`,
+        '-S',
+        `params.yaml:process.threshold=${threshold}`
       )
     })
   })

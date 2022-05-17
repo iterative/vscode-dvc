@@ -188,7 +188,7 @@ suite('Plots Test Suite', () => {
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         payload: mockSelectedMetrics,
-        type: MessageFromWebviewType.METRIC_TOGGLED
+        type: MessageFromWebviewType.TOGGLE_METRIC
       })
 
       expect(mockSetSelectedMetrics).to.be.calledOnce
@@ -225,7 +225,7 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: { section: Section.TEMPLATE_PLOTS, size: PlotSize.SMALL },
-        type: MessageFromWebviewType.PLOTS_RESIZED
+        type: MessageFromWebviewType.RESIZE_PLOTS
       })
 
       expect(mockSetPlotSize).to.be.calledOnce
@@ -258,7 +258,7 @@ suite('Plots Test Suite', () => {
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         payload: mockSectionCollapsed,
-        type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
+        type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
       })
 
       expect(mockSetSectionCollapsed).to.be.calledOnce
@@ -298,7 +298,7 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: { name: mockName, section: Section.TEMPLATE_PLOTS },
-        type: MessageFromWebviewType.SECTION_RENAMED
+        type: MessageFromWebviewType.RENAME_SECTION
       })
 
       expect(mockSetSectionName).to.be.calledOnce
@@ -308,7 +308,7 @@ suite('Plots Test Suite', () => {
       )
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_SECTION_RENAMED,
+        EventName.VIEWS_PLOTS_RENAME_SECTION,
         { section: Section.TEMPLATE_PLOTS },
         undefined
       )
@@ -337,7 +337,7 @@ suite('Plots Test Suite', () => {
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         payload: mockComparisonOrder,
-        type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+        type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
       })
 
       expect(mockSetComparisonOrder).to.be.calledOnce
@@ -389,7 +389,7 @@ suite('Plots Test Suite', () => {
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         payload: mockTemplateOrder,
-        type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+        type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
       })
 
       expect(mockSetTemplateOrder).to.be.calledOnce
@@ -410,7 +410,7 @@ suite('Plots Test Suite', () => {
       })
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
+        EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
         undefined,
         undefined
       )
@@ -438,7 +438,7 @@ suite('Plots Test Suite', () => {
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         payload: mockMetricOrder,
-        type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+        type: MessageFromWebviewType.REORDER_PLOTS_METRICS
       })
 
       expect(mockSetMetricOrder).to.be.calledOnce
@@ -459,12 +459,64 @@ suite('Plots Test Suite', () => {
       })
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_METRICS_REORDERED,
+        EventName.VIEWS_REORDER_PLOTS_METRICS,
         undefined,
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
+
+  it('should handle a select experiments message from the webview', async () => {
+    const { plots, experiments } = await buildPlots(
+      disposable,
+      plotsDiffFixture
+    )
+
+    const mockSelectExperiments = stub(
+      experiments,
+      'selectExperiments'
+    ).resolves(undefined)
+
+    const webview = await plots.showWebview()
+
+    const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+    const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+    mockMessageReceived.fire({
+      type: MessageFromWebviewType.SELECT_EXPERIMENTS
+    })
+
+    expect(mockSelectExperiments).to.be.calledOnce
+    expect(mockSendTelemetryEvent).to.be.calledOnce
+    expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+      EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
+      undefined,
+      undefined
+    )
+  }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+  it('should handle a select plots message from the webview', async () => {
+    const { plots } = await buildPlots(disposable, plotsDiffFixture)
+
+    const mockSelectExperiments = stub(plots, 'selectPlots').resolves(undefined)
+
+    const webview = await plots.showWebview()
+
+    const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+    const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+    mockMessageReceived.fire({
+      type: MessageFromWebviewType.SELECT_PLOTS
+    })
+
+    expect(mockSelectExperiments).to.be.calledOnce
+    expect(mockSendTelemetryEvent).to.be.calledOnce
+    expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+      EventName.VIEWS_PLOTS_SELECT_PLOTS,
+      undefined,
+      undefined
+    )
+  }).timeout(WEBVIEW_TEST_TIMEOUT)
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
@@ -493,6 +545,9 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: TPlotsData = {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
+        hasPlots: true,
+        hasSelectedPlots: true,
+        hasSelectedRevisions: true,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
         template: templatePlotsFixture
       }

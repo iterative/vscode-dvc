@@ -1,13 +1,10 @@
 import { FilterDefinition, getFilterId, Operator } from '.'
 import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
-import {
-  appendMetricOrParamToPath,
-  joinMetricOrParamPath
-} from '../../metricsAndParams/paths'
+import { appendColumnToPath, joinColumnPath } from '../../columns/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
-import { MetricOrParamType } from '../../webview/contract'
+import { ColumnType } from '../../webview/contract'
 
 jest.mock('../../../vscode/inputBox')
 jest.mock('../../../vscode/quickPick')
@@ -21,11 +18,8 @@ beforeEach(() => {
 })
 
 const paramsYaml = 'params.yaml'
-const paramsYamlPath = joinMetricOrParamPath(
-  MetricOrParamType.PARAMS,
-  paramsYaml
-)
-const epochsParamPath = appendMetricOrParamToPath(paramsYamlPath, 'epoch')
+const paramsYamlPath = joinColumnPath(ColumnType.PARAMS, paramsYaml)
+const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epoch')
 
 const epochsParam = {
   hasChildren: false,
@@ -35,7 +29,7 @@ const epochsParam = {
   name: 'epochs',
   parentPath: paramsYamlPath,
   path: epochsParamPath,
-  type: MetricOrParamType.PARAMS,
+  type: ColumnType.PARAMS,
   types: ['number']
 }
 const boolParam = {
@@ -45,8 +39,8 @@ const boolParam = {
   minNumber: 0,
   name: 'bool',
   parentPath: paramsYamlPath,
-  path: appendMetricOrParamToPath(paramsYamlPath, 'bool'),
-  type: MetricOrParamType.PARAMS,
+  path: appendColumnToPath(paramsYamlPath, 'bool'),
+  type: ColumnType.PARAMS,
   types: ['boolean']
 }
 const mixedParam = {
@@ -56,8 +50,8 @@ const mixedParam = {
   minNumber: 2,
   name: 'mixed',
   parentPath: paramsYamlPath,
-  path: appendMetricOrParamToPath(paramsYamlPath, 'mixed'),
-  type: MetricOrParamType.PARAMS,
+  path: appendColumnToPath(paramsYamlPath, 'mixed'),
+  type: ColumnType.PARAMS,
   types: ['number', 'string', 'boolean']
 }
 

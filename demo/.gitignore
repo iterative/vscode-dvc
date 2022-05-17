@@ -1,7 +1,7 @@
 /.vscode/settings.json
 .env
 /model.pt
-/training_metrics.json
 /training_metrics
 /misclassified.jpg
 /predictions.json
+

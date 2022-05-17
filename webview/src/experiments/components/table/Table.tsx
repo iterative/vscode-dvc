@@ -1,5 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
+import { Row } from 'dvc/src/experiments/webview/contract'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import { RowContent } from './Row'
@@ -7,15 +8,23 @@ import { InstanceProp, RowProp, TableProps, WithChanges } from './interfaces'
 
 export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   row,
-  instance
+  instance,
+  contextMenuDisabled
 }) => {
   instance.prepareRow(row)
-  return <RowContent row={row} className={styles.nestedRow} />
+  return (
+    <RowContent
+      row={row}
+      className={styles.nestedRow}
+      contextMenuDisabled={contextMenuDisabled}
+    />
+  )
 }
 
 export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
   row,
-  instance
+  instance,
+  contextMenuDisabled
 }) => {
   instance.prepareRow(row)
   return (
@@ -25,10 +34,19 @@ export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
         row.isExpanded && row.subRows.length > 0 && styles.expandedGroup
       )}
     >
-      <NestedRow row={row} instance={instance} />
+      <NestedRow
+        row={row}
+        instance={instance}
+        contextMenuDisabled={contextMenuDisabled}
+      />
       {row.isExpanded &&
         row.subRows.map(row => (
-          <NestedRow row={row} instance={instance} key={row.id} />
+          <NestedRow
+            row={row}
+            instance={instance}
+            key={row.id}
+            contextMenuDisabled={contextMenuDisabled}
+          />
         ))}
     </div>
   )
@@ -37,7 +55,8 @@ export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
 export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
   row,
   instance,
-  changes
+  changes,
+  contextMenuDisabled
 }) => {
   instance.prepareRow(row)
   return (
@@ -52,13 +71,18 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
         )
       })}
     >
-      <RowContent row={row} changes={changes} />
+      <RowContent
+        row={row}
+        changes={changes}
+        contextMenuDisabled={contextMenuDisabled}
+      />
       {row.isExpanded &&
         row.subRows.map(subRow => (
           <ExperimentGroup
             row={subRow}
             instance={instance}
             key={subRow.values.id}
+            contextMenuDisabled={contextMenuDisabled}
           />
         ))}
     </div>
@@ -70,7 +94,21 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   tableData
 }) => {
   const { getTableProps, rows } = instance
-  const { sorts, columns, changes } = tableData
+  const { sorts, columns, changes, rows: experimentRows } = tableData
+
+  const someExperimentsRunning = React.useMemo(() => {
+    const findRunningExperiment: (experiments?: Row[]) => boolean = (
+      experiments?: Row[]
+    ) => {
+      return !!experiments?.find(
+        experiment =>
+          experiment.running || findRunningExperiment(experiment.subRows)
+      )
+    }
+
+    return findRunningExperiment(experimentRows)
+  }, [experimentRows])
+
   return (
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
@@ -81,6 +119,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
             instance={instance}
             key={row.id}
             changes={changes}
+            contextMenuDisabled={someExperimentsRunning}
           />
         ))}
       </div>

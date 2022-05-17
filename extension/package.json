@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.11",
+  "version": "0.2.15",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -49,6 +49,32 @@
     }
   },
   "contributes": {
+    "colors": [
+      {
+        "id": "dvc.metrics",
+        "description": "Color to indicate a DVC metric column in the experiments table",
+        "defaults": {
+          "dark": "#fbd38d",
+          "light": "#fbd38d"
+        }
+      },
+      {
+        "id": "dvc.params",
+        "description": "Color to indicate a DVC param column in the experiments table",
+        "defaults": {
+          "dark": "#90cdf4",
+          "light": "#90cdf4"
+        }
+      },
+      {
+        "id": "dvc.workspaceChanged",
+        "description": "Color used in the experiments table to highlight a value in the workspace that differs from the latest committed value",
+        "defaults": {
+          "dark": "gitDecoration.modifiedResourceForeground",
+          "light": "gitDecoration.modifiedResourceForeground"
+        }
+      }
+    ],
     "commands": [
       {
         "title": "%command.addExperimentsTableFilter%",
@@ -204,6 +230,15 @@
         }
       },
       {
+        "title": "%command.modifyExperimentParamsAndRun%",
+        "command": "dvc.modifyExperimentParamsAndRun",
+        "category": "DVC",
+        "icon": {
+          "light": "resources/light/run-experiment.svg",
+          "dark": "resources/dark/run-experiment.svg"
+        }
+      },
+      {
         "title": "%command.queueExperiment%",
         "command": "dvc.queueExperiment",
         "category": "DVC",
@@ -297,7 +332,8 @@
       {
         "title": "%command.showExperiments%",
         "command": "dvc.showExperiments",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(beaker)"
       },
       {
         "title": "%command.showOutput%",
@@ -307,7 +343,8 @@
       {
         "title": "%command.showPlots%",
         "command": "dvc.showPlots",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(graph-scatter)"
       },
       {
         "title": "%command.stopRunningExperiment%",
@@ -345,12 +382,14 @@
       {
         "title": "%command.views.experimentsTree.applyExperiment%",
         "command": "dvc.views.experimentsTree.applyExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(merge)"
       },
       {
         "title": "%command.views.experimentsTree.branchExperiment%",
         "command": "dvc.views.experimentsTree.branchExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(source-control)"
       },
       {
         "title": "%command.views.experimentsTree.queueExperiment%",
@@ -365,7 +404,16 @@
         "title": "%command.views.experimentsTree.removeExperiment%",
         "command": "dvc.views.experimentsTree.removeExperiment",
         "category": "DVC",
-        "icon": "$(close)"
+        "icon": "$(trash)"
+      },
+      {
+        "title": "%command.views.experimentsTree.runExperiment%",
+        "command": "dvc.views.experimentsTree.runExperiment",
+        "category": "DVC",
+        "icon": {
+          "light": "resources/light/run-experiment.svg",
+          "dark": "resources/dark/run-experiment.svg"
+        }
       },
       {
         "title": "%command.views.experimentsTree.selectExperiments%",
@@ -384,6 +432,12 @@
         "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
         "category": "DVC",
         "icon": "$(close)"
+      },
+      {
+        "title": "%command.views.plotsPathsTree.selectPlots%",
+        "command": "dvc.views.plotsPathsTree.selectPlots",
+        "category": "DVC",
+        "icon": "$(list-selection)"
       }
     ],
     "configuration": {
@@ -545,6 +599,10 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "command": "dvc.modifyExperimentParamsAndRun",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "command": "dvc.queueExperiment",
           "when": "dvc.commands.available && dvc.project.available"
         },
@@ -629,6 +687,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.views.experimentsTree.runExperiment",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "false"
         },
@@ -654,6 +716,10 @@
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.selectPlots",
           "when": "dvc.commands.available && dvc.project.available"
         }
       ],
@@ -874,23 +940,28 @@
         },
         {
           "command": "dvc.views.experimentsTree.applyExperiment",
-          "group": "1_do@1",
+          "group": "inline@1",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsTree.branchExperiment",
-          "group": "1_do@2",
+          "group": "inline@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.runner.running"
         },
         {
-          "command": "dvc.views.experimentsTree.queueExperiment",
-          "group": "1_do@3",
+          "command": "dvc.views.experimentsTree.removeExperiment",
+          "group": "inline@3",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.runner.running"
+        },
+        {
+          "command": "dvc.views.experimentsTree.runExperiment",
+          "group": "1_do@1",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.runner.running"
         },
         {
-          "command": "dvc.views.experimentsTree.removeExperiment",
-          "group": "7_modification@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.runner.running"
+          "command": "dvc.views.experimentsTree.queueExperiment",
+          "group": "1_do@2",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",
@@ -906,38 +977,78 @@
           "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
           "group": "inline",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && dvc.experiments.filter.selected && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.selectPlots",
+          "group": "inline",
+          "when": "view == dvc.views.plotsPathsTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
         {
-          "command": "dvc.runExperiment",
-          "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
+          "command": "dvc.pull",
+          "when": "view == dvc.views.trackedExplorerTree",
           "group": "navigation@1"
+        },
+        {
+          "command": "dvc.push",
+          "when": "view == dvc.views.trackedExplorerTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.showExperiments",
+          "when": "view == dvc.views.experimentsColumnsTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.showExperiments",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiments.webviewActive",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiments.webviewActive",
+          "group": "1_run@1"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "when": "view == dvc.views.experimentsTree && dvc.experiments.webviewActive",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.showPlots",
+          "when": "view == dvc.views.experimentsTree && !dvc.plots.webviewActive",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.views.experimentsTree.selectExperiments",
+          "when": "view == dvc.views.experimentsTree && dvc.plots.webviewActive",
+          "group": "navigation@2"
         },
         {
           "command": "dvc.runQueuedExperiments",
           "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
-          "group": "navigation@2"
+          "group": "1_run@2"
         },
         {
           "command": "dvc.queueExperiment",
           "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
-          "group": "navigation@3"
+          "group": "2_queue@1"
         },
         {
-          "command": "dvc.views.experimentsTree.selectExperiments",
-          "when": "view == dvc.views.experimentsTree",
-          "group": "navigation@4"
+          "command": "dvc.modifyExperimentParamsAndQueue",
+          "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
+          "group": "2_queue@2"
         },
         {
           "command": "dvc.views.experimentsTree.autoApplyFilters",
           "when": "view == dvc.views.experimentsTree && !dvc.experiments.filter.selected",
-          "group": "navigation@5"
+          "group": "navigation@4"
         },
         {
           "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
           "when": "view == dvc.views.experimentsTree && dvc.experiments.filter.selected",
-          "group": "navigation@5"
+          "group": "navigation@4"
         },
         {
           "command": "dvc.addExperimentsTableSort",
@@ -957,6 +1068,16 @@
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.showPlots",
+          "when": "view == dvc.views.plotsPathsTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.selectPlots",
+          "when": "view == dvc.views.plotsPathsTree",
           "group": "navigation@2"
         }
       ]
@@ -980,8 +1101,8 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.experimentsMetricsAndParamsTree",
-          "name": "Metrics & Params",
+          "id": "dvc.views.experimentsColumnsTree",
+          "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1033,16 +1154,24 @@
         "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
       },
       {
+        "view": "dvc.views.trackedExplorerTree",
+        "contents": "No tracked data to display."
+      },
+      {
+        "view": "dvc.views.experimentsColumnsTree",
+        "contents": "No columns to display."
+      },
+      {
         "view": "dvc.views.experimentsTree",
         "contents": "No experiments to display. \n[Run Experiment](command:dvc.runExperiment)\n"
       },
       {
         "view": "dvc.views.experimentsSortByTree",
-        "contents": "No sorts applied. \n[Add Sort](command:dvc.addExperimentsTableSort)\n"
+        "contents": "No sorts applied. \n[$(add) Add Sort](command:dvc.addExperimentsTableSort)\n"
       },
       {
         "view": "dvc.views.experimentsFilterByTree",
-        "contents": "No filters applied. \n[Add Filter](command:dvc.addExperimentsTableFilter)\n"
+        "contents": "No filters applied. \n[$(add) Add Filter](command:dvc.addExperimentsTableFilter)\n"
       },
       {
         "view": "dvc.views.plotsPathsTree",
@@ -1184,8 +1313,7 @@
     "lint:tsc": "tsc --noEmit",
     "lint": "run-p 'lint:*'",
     "dev": "shx rm -rf dist && tsc -watch -p ./",
-    "build": "yarn build-webpack && yarn package",
-    "build-webpack": "webpack --mode production",
+    "build": "yarn webpack --mode production",
     "package": "vsce package --yarn -o ./dvc.vsix",
     "test-vscode-build": "tsc -p .",
     "test-vscode-run": "node ./dist/test/runTest.js",

@@ -13,6 +13,7 @@ import { PlotsData } from './data'
 import { PlotsModel } from './model'
 import { collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
+import { pickPlotPaths } from './paths/quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -38,6 +39,8 @@ export class Plots extends BaseRepository<TPlotsData> {
   public readonly onDidChangePaths: Event<void>
 
   private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
+
+  private experiments?: Experiments
 
   private plots?: PlotsModel
   private paths?: PathsModel
@@ -79,6 +82,8 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public setExperiments(experiments: Experiments) {
+    this.experiments = experiments
+
     this.plots = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
     )
@@ -104,6 +109,19 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.paths?.setTemplateOrder()
     this.notifyChanged()
     return status
+  }
+
+  public async selectPlots() {
+    const paths = this.paths?.getTerminalNodes()
+
+    const selected = await pickPlotPaths(paths)
+    if (!selected) {
+      return
+    }
+
+    this.paths?.setSelected(selected)
+    this.paths?.setTemplateOrder()
+    return this.notifyChanged()
   }
 
   public getChildPaths(path: string) {
@@ -151,6 +169,11 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webview?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(),
+      hasPlots: !!this.paths?.hasPaths(),
+      hasSelectedPlots: definedAndNonEmpty(this.paths?.getSelected()),
+      hasSelectedRevisions: definedAndNonEmpty(
+        this.plots?.getSelectedRevisionDetails()
+      ),
       sectionCollapsed: this.plots?.getSectionCollapsed(),
       template: this.getTemplatePlots()
     })
@@ -216,26 +239,30 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
-          case MessageFromWebviewType.METRIC_TOGGLED:
+          case MessageFromWebviewType.TOGGLE_METRIC:
             return this.setSelectedMetrics(message.payload)
-          case MessageFromWebviewType.PLOTS_RESIZED:
+          case MessageFromWebviewType.RESIZE_PLOTS:
             return this.setPlotSize(
               message.payload.section,
               message.payload.size
             )
-          case MessageFromWebviewType.PLOTS_SECTION_TOGGLED:
+          case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
             return this.setSectionCollapsed(message.payload)
-          case MessageFromWebviewType.SECTION_RENAMED:
+          case MessageFromWebviewType.RENAME_SECTION:
             return this.setSectionName(
               message.payload.section,
               message.payload.name
             )
-          case MessageFromWebviewType.PLOTS_COMPARISON_REORDERED:
+          case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
             return this.setComparisonOrder(message.payload)
-          case MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED:
+          case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
             return this.setTemplateOrder(message.payload)
-          case MessageFromWebviewType.PLOTS_METRICS_REORDERED:
+          case MessageFromWebviewType.REORDER_PLOTS_METRICS:
             return this.setMetricOrder(message.payload)
+          case MessageFromWebviewType.SELECT_PLOTS:
+            return this.selectPlotsFromWebview()
+          case MessageFromWebviewType.SELECT_EXPERIMENTS:
+            return this.selectExperimentsFromWebview()
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -272,7 +299,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private setSectionName(section: Section, name: string) {
     this.plots?.setSectionName(section, name)
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_SECTION_RENAMED,
+      EventName.VIEWS_PLOTS_RENAME_SECTION,
       { section },
       undefined
     )
@@ -296,7 +323,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       template: this.getTemplatePlots()
     })
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_TEMPLATES_REORDERED,
+      EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
       undefined,
       undefined
     )
@@ -304,12 +331,26 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setMetricOrder(order: string[]) {
     this.plots?.setMetricOrder(order)
-    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_REORDERED)
+    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
+  }
+
+  private selectPlotsFromWebview() {
+    this.selectPlots()
+    sendTelemetryEvent(EventName.VIEWS_PLOTS_SELECT_PLOTS, undefined, undefined)
+  }
+
+  private selectExperimentsFromWebview() {
+    this.experiments?.selectExperiments()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
+      undefined,
+      undefined
+    )
   }
 
   private sendCheckpointPlotsAndEvent(
     event:
-      | typeof EventName.VIEWS_PLOTS_METRICS_REORDERED
+      | typeof EventName.VIEWS_REORDER_PLOTS_METRICS
       | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
   ) {
     this.sendCheckpointPlotsData()

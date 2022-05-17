@@ -48,7 +48,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
         group: section.group,
         paths: section.entries.map(({ id }) => id)
       })),
-      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
     })
   }
 

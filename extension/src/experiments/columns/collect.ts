@@ -1,7 +1,7 @@
 import get from 'lodash/get'
 import { ValueWalkMeta, walkRepo } from './walk'
-import { joinMetricOrParamPath, METRIC_PARAM_SEPARATOR } from './paths'
-import { MetricOrParam, MetricOrParamType } from '../webview/contract'
+import { joinColumnPath, METRIC_PARAM_SEPARATOR } from './paths'
+import { Column, ColumnType } from '../webview/contract'
 import {
   ExperimentFields,
   ExperimentFieldsOrError,
@@ -33,13 +33,13 @@ const concatenatePathSegments = (path: string[], limit = 5) => {
   return path
 }
 
-const setStringLength = (column: MetricOrParam, stringLength: number) => {
+const setStringLength = (column: Column, stringLength: number) => {
   if (!column.maxStringLength || column.maxStringLength < stringLength) {
     column.maxStringLength = stringLength
   }
 }
 
-const mergeNumberIntoColumn = (column: MetricOrParam, value: number) => {
+const mergeNumberIntoColumn = (column: Column, value: number) => {
   const { maxNumber, minNumber } = column
   if (maxNumber === undefined || maxNumber < value) {
     column.maxNumber = value
@@ -50,7 +50,7 @@ const mergeNumberIntoColumn = (column: MetricOrParam, value: number) => {
 }
 
 const mergeValueIntoColumn = (
-  column: MetricOrParam,
+  column: Column,
   valueType: string,
   value: Value
 ) => {
@@ -67,15 +67,13 @@ const mergeValueIntoColumn = (
   }
 }
 
-export const collectMetricsAndParams = (
-  data: ExperimentsOutput
-): MetricOrParam[] => {
-  const collectedColumns: Record<string, MetricOrParam> = {}
+export const collectColumns = (data: ExperimentsOutput): Column[] => {
+  const collectedColumns: Record<string, Column> = {}
 
-  const mergeParentColumnByPath = (path: string[], type: MetricOrParamType) => {
+  const mergeParentColumnByPath = (path: string[], type: ColumnType) => {
     const name = path[path.length - 1]
-    const columnPath = joinMetricOrParamPath(type, ...path)
-    const parentPath = joinMetricOrParamPath(type, ...path.slice(0, -1))
+    const columnPath = joinColumnPath(type, ...path)
+    const parentPath = joinColumnPath(type, ...path.slice(0, -1))
     if (!collectedColumns[columnPath]) {
       collectedColumns[columnPath] = {
         hasChildren: true,
@@ -98,12 +96,8 @@ export const collectMetricsAndParams = (
     path: string,
     valueType: string
   ) => {
-    const parentPath = joinMetricOrParamPath(
-      type,
-      file,
-      ...concatenatedAncestors
-    )
-    const newColumn: MetricOrParam = {
+    const parentPath = joinColumnPath(type, file, ...concatenatedAncestors)
+    const newColumn: Column = {
       hasChildren: false,
       maxStringLength: String(value).length,
       name,
@@ -130,12 +124,7 @@ export const collectMetricsAndParams = (
     concatenatedAncestors: string[]
   ) => {
     const { type, file } = meta
-    const path = joinMetricOrParamPath(
-      type,
-      file,
-      ...concatenatedAncestors,
-      name
-    )
+    const path = joinColumnPath(type, file, ...concatenatedAncestors, name)
     const valueType = getValueType(value)
     if (!collectedColumns[path]) {
       collectedColumns[path] = buildValueColumn(
@@ -165,7 +154,7 @@ export const collectMetricsAndParams = (
 
 const collectChange = (
   changes: string[],
-  type: MetricOrParamType,
+  type: ColumnType,
   file: string,
   key: string,
   value: Value | ValueTree,
@@ -183,13 +172,13 @@ const collectChange = (
   }
 
   if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
-    changes.push(joinMetricOrParamPath(type, file, ...ancestors, key))
+    changes.push(joinColumnPath(type, file, ...ancestors, key))
   }
 }
 
 const collectFileChanges = (
   changes: string[],
-  type: MetricOrParamType,
+  type: ColumnType,
   commitData: ExperimentFields,
   file: string,
   value: ValueTreeOrError
@@ -204,12 +193,12 @@ const collectFileChanges = (
   }
 }
 
-const collectMetricsAndParamsChanges = (
+const collectColumnsChanges = (
   changes: string[],
   workspaceData: ExperimentFields,
   commitData: ExperimentFields
 ) => {
-  for (const type of Object.values(MetricOrParamType)) {
+  for (const type of Object.values(ColumnType)) {
     for (const [file, value] of Object.entries(workspaceData?.[type] || {})) {
       collectFileChanges(changes, type, commitData, file, value)
     }
@@ -237,7 +226,7 @@ export const collectChanges = (data: ExperimentsOutput): string[] => {
     return changes
   }
 
-  collectMetricsAndParamsChanges(changes, workspace, currentCommit)
+  collectColumnsChanges(changes, workspace, currentCommit)
 
   return changes.sort()
 }

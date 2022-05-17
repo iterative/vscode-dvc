@@ -11,6 +11,7 @@ import {
   within
 } from '@testing-library/react'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
 import {
@@ -153,7 +154,7 @@ describe('Table', () => {
 
     const clickOnSortOption = async (optionLabel: SortOrderLabel) => {
       const column = await findSortableColumn()
-      fireEvent.click(column, {
+      fireEvent.contextMenu(column, {
         bubbles: true
       })
       const columnMenu = await screen.findByRole('menu')
@@ -171,7 +172,7 @@ describe('Table', () => {
             descending: false,
             path: mockColumnPath
           },
-          type: 'column-sorted'
+          type: MessageFromWebviewType.SORT_COLUMN
         })
       })
 
@@ -183,7 +184,7 @@ describe('Table', () => {
             descending: true,
             path: mockColumnPath
           },
-          type: 'column-sorted'
+          type: MessageFromWebviewType.SORT_COLUMN
         })
       })
 
@@ -211,7 +212,7 @@ describe('Table', () => {
             descending: true,
             path: mockColumnPath
           },
-          type: 'column-sorted'
+          type: MessageFromWebviewType.SORT_COLUMN
         })
       })
 
@@ -242,7 +243,7 @@ describe('Table', () => {
         await clickOnSortOption(SortOrderLabel.NONE)
         expect(mockedPostMessage).toBeCalledWith({
           payload: mockColumnPath,
-          type: 'column-sort-removed'
+          type: MessageFromWebviewType.REMOVE_COLUMN_SORT
         })
       })
     })
@@ -373,7 +374,7 @@ describe('Table', () => {
 
       expect(mockedPostMessage).toBeCalledWith({
         payload: { id: 'id', width: 353 },
-        type: 'column-resized'
+        type: MessageFromWebviewType.RESIZE_COLUMN
       })
     })
   })

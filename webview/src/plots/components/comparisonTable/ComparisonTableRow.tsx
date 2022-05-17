@@ -35,21 +35,25 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
         {nbColumns > 1 && <td colSpan={nbColumns - 1}></td>}
       </tr>
       <tr>
-        {plots.map((plot: ComparisonPlot) => {
-          const isPinned = pinnedColumn === plot.revision
+        {plots.map((plot: ComparisonPlot | undefined) => {
+          const isPinned = pinnedColumn === plot?.revision
 
           return (
             <td
-              key={path + plot.revision}
+              key={path + plot?.revision || 'missing'}
               className={cx({ [styles.pinnedColumnCell]: isPinned })}
             >
               <div
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                <img
-                  src={plot.url}
-                  alt={`Plot of ${path} (${plot.revision})`}
-                />
+                {!plot?.url ? (
+                  <p>No plot to display.</p>
+                ) : (
+                  <img
+                    src={plot.url}
+                    alt={`Plot of ${path} (${plot.revision})`}
+                  />
+                )}
               </div>
             </td>
           )

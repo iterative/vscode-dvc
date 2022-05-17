@@ -1,5 +1,6 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
+import { fireEvent, within } from '@testing-library/react'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
@@ -25,6 +26,9 @@ export default {
     data: {
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonPlotsFixture,
+      hasPlots: true,
+      hasSelectedPlots: false,
+      hasSelectedRevisions: false,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: templatePlotsFixture
     }
@@ -80,6 +84,37 @@ WithComparisonOnly.args = {
 export const WithoutPlots = Template.bind({})
 WithoutPlots.args = {
   data: {
+    hasPlots: false,
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+  }
+}
+
+export const WithoutPlotsSelected = Template.bind({})
+WithoutPlotsSelected.args = {
+  data: {
+    hasPlots: true,
+    hasSelectedPlots: false,
+    hasSelectedRevisions: true,
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+  }
+}
+
+export const WithoutExperimentsSelected = Template.bind({})
+WithoutExperimentsSelected.args = {
+  data: {
+    hasPlots: true,
+    hasSelectedPlots: true,
+    hasSelectedRevisions: false,
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+  }
+}
+
+export const WithoutAnySelected = Template.bind({})
+WithoutAnySelected.args = {
+  data: {
+    hasPlots: true,
+    hasSelectedPlots: false,
+    hasSelectedRevisions: false,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED
   }
 }
@@ -127,3 +162,27 @@ VirtualizedPlots.args = {
   }
 }
 VirtualizedPlots.parameters = chromaticParameters
+
+export const ZoomedInPlot = Template.bind({})
+ZoomedInPlot.parameters = {
+  chromatic: { delay: 300 }
+}
+ZoomedInPlot.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  const plots = await canvas.findAllByTestId(/^plot_/)
+  const plot = within(plots[0]).getByRole('button')
+
+  fireEvent.click(plot)
+}
+
+export const MultiviewZoomedInPlot = Template.bind({})
+MultiviewZoomedInPlot.parameters = {
+  chromatic: { delay: 300 }
+}
+MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  const plot = await canvas.findByTestId('plots-section_template-multi_1')
+  const plotButton = within(plot).getByRole('button')
+
+  fireEvent.click(plotButton)
+}

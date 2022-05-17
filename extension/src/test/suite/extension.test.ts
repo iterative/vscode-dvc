@@ -13,11 +13,15 @@ import {
 import { mockHasCheckpoints } from './experiments/util'
 import { WEBVIEW_TEST_TIMEOUT } from './timeouts'
 import { Disposable } from '../../extension'
+import * as Python from '../../extensions/python'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import expShowFixture from '../fixtures/expShow/output'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
-import { RegisteredCommands } from '../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
 import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -25,6 +29,8 @@ import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
 import { MIN_CLI_VERSION } from '../../cli/constants'
+import * as WorkspaceFolders from '../../vscode/workspaceFolders'
+import { CliExecutor } from '../../cli/executor'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -46,8 +52,10 @@ suite('Extension Test Suite', () => {
     ])
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('dvc.setupWorkspace', () => {
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
+      stub(Python, 'isPythonExtensionInstalled').returns(true)
       stub(CliReader.prototype, 'version').rejects('do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -80,6 +88,7 @@ suite('Extension Test Suite', () => {
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
       stub(CliReader.prototype, 'version').rejects('still do not run setup')
+      stub(Python, 'isPythonExtensionInstalled').returns(true)
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockUri = Uri.file(
@@ -133,6 +142,7 @@ suite('Extension Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should initialize the extension when the cli is usable', async () => {
+      stub(Python, 'isPythonExtensionInstalled').returns(true)
       const selectDvcPathFromFilePicker = async () => {
         const quickPick =
           window.createQuickPick<QuickPickItemWithValue<string>>()
@@ -315,7 +325,7 @@ suite('Extension Test Suite', () => {
           hasCheckpoints: 1,
           images: 3,
           metrics: 4,
-          msPythonInstalled: false,
+          msPythonInstalled: true,
           msPythonUsed: false,
           noCheckpoints: 0,
           params: 8,
@@ -385,6 +395,33 @@ suite('Extension Test Suite', () => {
           duration
         }
       )
+    })
+  })
+
+  describe('dvc.init', () => {
+    it('should be able to run dvc.init without error', async () => {
+      const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
+      const mockSetup = stub(Setup, 'setup')
+      const mockSetupCalled = new Promise(resolve =>
+        mockSetup.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      await commands.executeCommand(RegisteredCliCommands.INIT)
+      await mockSetupCalled
+      expect(mockInit).to.be.calledOnce
+      expect(mockSetup).to.be.calledOnce
+
+      mockInit.resetHistory()
+      mockSetup.resetHistory()
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(undefined)
+
+      await commands.executeCommand(RegisteredCliCommands.INIT)
+
+      expect(mockInit).not.to.be.called
+      expect(mockSetup).not.to.be.called
     })
   })
 

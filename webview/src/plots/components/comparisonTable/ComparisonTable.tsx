@@ -63,7 +63,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     setColumns(newOrder)
     sendMessage({
       payload: newOrder.map(({ revision }) => revision),
-      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
     })
   }
 
@@ -95,7 +95,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
         <ComparisonTableRow
           key={path}
           path={path}
-          plots={columns.map(column => revs[column.revision]).filter(Boolean)}
+          plots={columns.map(column => revs[column.revision])}
           nbColumns={columns.length}
           pinnedColumn={pinnedColumn.current}
         />

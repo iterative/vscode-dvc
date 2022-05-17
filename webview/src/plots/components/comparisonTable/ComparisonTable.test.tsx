@@ -105,7 +105,7 @@ describe('ComparisonTable', () => {
         thirdExperiment,
         ...revisions.filter(rev => rev !== thirdExperiment)
       ],
-      type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
     })
   })
 
@@ -272,7 +272,7 @@ describe('ComparisonTable', () => {
       expect(mockPostMessage).toBeCalledTimes(1)
       expect(mockPostMessage).toBeCalledWith({
         payload: expectedRevisions,
-        type: MessageFromWebviewType.PLOTS_COMPARISON_REORDERED
+        type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
       })
     })
 

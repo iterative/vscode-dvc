@@ -135,6 +135,35 @@ describe('App', () => {
     expect(emptyState).toBeInTheDocument()
   })
 
+  it('should render the get started buttons when no plots or experiments are selected', async () => {
+    renderAppWithData({
+      checkpoint: null,
+      hasPlots: true,
+      hasSelectedPlots: false,
+      hasSelectedRevisions: false,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+    const addPlotsButton = await screen.findByText('Add Plots')
+    const addExperimentsButton = await screen.findByText('Add Experiments')
+
+    expect(addPlotsButton).toBeInTheDocument()
+    expect(addExperimentsButton).toBeInTheDocument()
+
+    mockPostMessage.mockReset()
+
+    fireEvent.click(addPlotsButton)
+
+    expect(mockPostMessage).toBeCalledWith({
+      type: MessageFromWebviewType.SELECT_PLOTS
+    })
+    mockPostMessage.mockReset()
+
+    fireEvent.click(addExperimentsButton)
+    expect(mockPostMessage).toBeCalledWith({
+      type: MessageFromWebviewType.SELECT_EXPERIMENTS
+    })
+  })
+
   it('should render only checkpoint plots when given a message with only checkpoint plots data', () => {
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
@@ -211,7 +240,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toBeCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.PLOTS_SECTION_TOGGLED
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
     sendSetDataMessage({
@@ -397,7 +426,7 @@ describe('App', () => {
         'summary.json:val_accuracy',
         'summary.json:val_loss'
       ],
-      type: MessageFromWebviewType.METRIC_TOGGLED
+      type: MessageFromWebviewType.TOGGLE_METRIC
     })
 
     fireEvent.click(lossItem, {
@@ -412,7 +441,7 @@ describe('App', () => {
         'summary.json:val_accuracy',
         'summary.json:val_loss'
       ],
-      type: MessageFromWebviewType.METRIC_TOGGLED
+      type: MessageFromWebviewType.TOGGLE_METRIC
     })
   })
 
@@ -458,7 +487,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toBeCalledWith({
       payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
-      type: MessageFromWebviewType.PLOTS_RESIZED
+      type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
     const smallButton = screen.getByText('Small')
@@ -466,7 +495,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toBeCalledWith({
       payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.SMALL },
-      type: MessageFromWebviewType.PLOTS_RESIZED
+      type: MessageFromWebviewType.RESIZE_PLOTS
     })
   })
 
@@ -485,7 +514,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toBeCalledWith({
       payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
-      type: MessageFromWebviewType.PLOTS_RESIZED
+      type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
     mockPostMessage.mockClear()
@@ -572,7 +601,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toBeCalledWith({
       payload: { name: newTitle, section: Section.CHECKPOINT_PLOTS },
-      type: MessageFromWebviewType.SECTION_RENAMED
+      type: MessageFromWebviewType.RENAME_SECTION
     })
   })
 
@@ -631,7 +660,7 @@ describe('App', () => {
     expect(mockPostMessage).toBeCalledTimes(1)
     expect(mockPostMessage).toBeCalledWith({
       payload: expectedOrder,
-      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_METRICS
     })
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
@@ -773,7 +802,7 @@ describe('App', () => {
           paths: [join('other', 'multiview.tsv')]
         }
       ],
-      type: MessageFromWebviewType.PLOTS_TEMPLATES_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
     })
   })
 

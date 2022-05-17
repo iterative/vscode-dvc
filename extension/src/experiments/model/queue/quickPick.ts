@@ -10,7 +10,7 @@ const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
     params.map(param => ({
       description: `${param.value}`,
       label: param.path,
-      picked: true,
+      picked: false,
       value: param
     })),
     { title: Title.SELECT_PARAM_TO_MODIFY }
@@ -38,7 +38,7 @@ const addUnchanged = (args: string[], unchanged: Param[]) => {
   return args
 }
 
-export const pickParamsToQueue = async (
+export const pickAndModifyParams = async (
   params: Param[]
 ): Promise<string[] | undefined> => {
   const paramsToModify = await pickParamsToModify(params)

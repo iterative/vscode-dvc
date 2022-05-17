@@ -24,11 +24,11 @@ import {
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
 import {
-  MetricOrParamType,
-  RowData,
+  ColumnType,
+  Row,
   TableData
 } from 'dvc/src/experiments/webview/contract'
-import { joinMetricOrParamPath } from 'dvc/src/experiments/metricsAndParams/paths'
+import { joinColumnPath } from 'dvc/src/experiments/columns/paths'
 import { App } from './App'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
@@ -277,9 +277,7 @@ describe('App', () => {
           tableDataFixture.rows[0],
           {
             ...tableDataFixture.rows[1],
-            subRows: [
-              ...(tableDataFixture.rows[1].subRows as RowData[])
-            ].reverse()
+            subRows: [...(tableDataFixture.rows[1].subRows as Row[])].reverse()
           }
         ]
       }
@@ -401,7 +399,7 @@ describe('App', () => {
         expect(mockPostMessage).toBeCalledTimes(1)
         expect(mockPostMessage).toBeCalledWith({
           payload: id,
-          type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+          type: MessageFromWebviewType.TOGGLE_EXPERIMENT
         })
       }
 
@@ -438,7 +436,7 @@ describe('App', () => {
       })
       expect(mockPostMessage).toBeCalledWith({
         payload: 'main',
-        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
       mockPostMessage.mockClear()
 
@@ -451,7 +449,7 @@ describe('App', () => {
       })
       expect(mockPostMessage).toBeCalledWith({
         payload: 'main',
-        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
       mockPostMessage.mockClear()
 
@@ -473,8 +471,8 @@ describe('App', () => {
     })
 
     const testParamName = 'test_param_with_long_name'
-    const testParamPath = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
+    const testParamPath = joinColumnPath(
+      ColumnType.PARAMS,
       'params.yaml',
       testParamName
     )
@@ -487,12 +485,9 @@ describe('App', () => {
         {
           hasChildren: true,
           name: 'summary.json',
-          parentPath: joinMetricOrParamPath(MetricOrParamType.METRICS),
-          path: joinMetricOrParamPath(
-            MetricOrParamType.METRICS,
-            'summary.json'
-          ),
-          type: MetricOrParamType.METRICS
+          parentPath: joinColumnPath(ColumnType.METRICS),
+          path: joinColumnPath(ColumnType.METRICS, 'summary.json'),
+          type: ColumnType.METRICS
         },
         {
           hasChildren: false,
@@ -500,37 +495,27 @@ describe('App', () => {
           maxStringLength: 18,
           minNumber: testMetricNumberValue,
           name: 'loss',
-          parentPath: joinMetricOrParamPath(
-            MetricOrParamType.METRICS,
-            'summary.json'
-          ),
-          path: joinMetricOrParamPath(
-            MetricOrParamType.METRICS,
-            'summary.json',
-            'loss'
-          ),
-          pathArray: [MetricOrParamType.METRICS, 'summary.json', 'loss'],
-          type: MetricOrParamType.METRICS,
+          parentPath: joinColumnPath(ColumnType.METRICS, 'summary.json'),
+          path: joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
+          pathArray: [ColumnType.METRICS, 'summary.json', 'loss'],
+          type: ColumnType.METRICS,
           types: ['number']
         },
         {
           hasChildren: true,
           name: 'params.yaml',
-          parentPath: MetricOrParamType.PARAMS,
-          path: joinMetricOrParamPath(MetricOrParamType.PARAMS, 'params.yaml'),
-          type: MetricOrParamType.PARAMS
+          parentPath: ColumnType.PARAMS,
+          path: joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
+          type: ColumnType.PARAMS
         },
         {
           hasChildren: false,
           maxStringLength: 10,
           name: testParamName,
-          parentPath: joinMetricOrParamPath(
-            MetricOrParamType.PARAMS,
-            'params.yaml'
-          ),
+          parentPath: joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
           path: testParamPath,
-          pathArray: [MetricOrParamType.PARAMS, 'params.yaml', testParamName],
-          type: MetricOrParamType.PARAMS,
+          pathArray: [ColumnType.PARAMS, 'params.yaml', testParamName],
+          type: ColumnType.PARAMS,
           types: ['string']
         }
       ],

@@ -1,11 +1,7 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
 import { TableData } from './webview/contract'
-import {
-  CommandId,
-  AvailableCommands,
-  InternalCommands
-} from '../commands/internal'
+import { CommandId, InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
@@ -21,13 +17,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
-  public readonly metricsOrParamsChanged = this.dispose.track(
-    new EventEmitter<void>()
-  )
+  public readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
 
   public readonly updatesPaused: EventEmitter<boolean>
-
-  private focusedWebviewDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
@@ -44,13 +36,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     for (const [dvcRoot, repository] of Object.entries(this.repositories)) {
       workspacePlots.getRepository(dvcRoot).setExperiments(repository)
     }
-  }
-
-  public getFocusedWebview(): Experiments | undefined {
-    if (!this.focusedWebviewDvcRoot) {
-      return undefined
-    }
-    return this.getRepository(this.focusedWebviewDvcRoot)
   }
 
   public async addFilter(overrideRoot?: string) {
@@ -102,7 +87,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).autoApplyFilters(enable)
   }
 
-  public async modifyExperimentParamsAndQueue(
+  public async modifyExperimentParamsAndRun(
+    commandId: CommandId,
     overrideRoot?: string,
     overrideId?: string
   ) {
@@ -116,16 +102,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const paramsToQueue = await repository.pickParamsToQueue(overrideId)
-    if (!paramsToQueue) {
-      return
-    }
-
-    return this.runCommand(
-      AvailableCommands.EXPERIMENT_QUEUE,
-      cwd,
-      ...paramsToQueue
-    )
+    return await repository.modifyExperimentParamsAndRun(commandId, overrideId)
   }
 
   public async getCwdThenRun(commandId: CommandId) {
@@ -242,8 +219,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     experiments.dispose.track(
-      experiments.onDidChangeMetricsOrParams(() => {
-        this.metricsOrParamsChanged.fire()
+      experiments.onDidChangeColumns(() => {
+        this.columnsChanged.fire()
       })
     )
 
@@ -267,14 +244,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     return this.runCommand(commandId, cwd, experiment.name)
-  }
-
-  private async getDvcRoot(overrideRoot?: string) {
-    return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
-  }
-
-  private getFocusedOrOnlyOrPickProject() {
-    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
 
   private pickCurrentExperiment(cwd: string) {

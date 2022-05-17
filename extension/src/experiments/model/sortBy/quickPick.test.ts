@@ -1,11 +1,8 @@
 import { pickSortsToRemove, pickSortToAdd } from './quickPick'
-import {
-  appendMetricOrParamToPath,
-  joinMetricOrParamPath
-} from '../../metricsAndParams/paths'
+import { appendColumnToPath, joinColumnPath } from '../../columns/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
-import { MetricOrParamType } from '../../webview/contract'
+import { ColumnType } from '../../webview/contract'
 
 jest.mock('../../../vscode/quickPick')
 
@@ -17,11 +14,8 @@ beforeEach(() => {
 })
 
 const paramsYaml = 'params.yaml'
-const paramsYamlPath = joinMetricOrParamPath(
-  MetricOrParamType.PARAMS,
-  paramsYaml
-)
-const epochsParamPath = appendMetricOrParamToPath(paramsYamlPath, 'epochs')
+const paramsYamlPath = joinColumnPath(ColumnType.PARAMS, paramsYaml)
+const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epochs')
 const epochsParam = {
   hasChildren: false,
   maxNumber: 5,
@@ -30,18 +24,18 @@ const epochsParam = {
   name: 'epochs',
   parentPath: paramsYamlPath,
   path: epochsParamPath,
-  type: MetricOrParamType.PARAMS,
+  type: ColumnType.PARAMS,
   types: ['number']
 }
 
 const paramsYamlParam = {
   hasChildren: true,
   name: paramsYaml,
-  parentPath: MetricOrParamType.PARAMS,
+  parentPath: ColumnType.PARAMS,
   path: paramsYamlPath,
-  type: MetricOrParamType.PARAMS
+  type: ColumnType.PARAMS
 }
-const exampleMetricsAndParams = [epochsParam, paramsYamlParam]
+const exampleColumns = [epochsParam, paramsYamlParam]
 
 describe('pickSortToAdd', () => {
   it('should not invoke a quickPick if an empty array', async () => {
@@ -52,21 +46,21 @@ describe('pickSortToAdd', () => {
 
   it('should resolve with no value if canceled at param or metric select', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
-    expect(await pickSortToAdd(exampleMetricsAndParams)).toBe(undefined)
+    expect(await pickSortToAdd(exampleColumns)).toBe(undefined)
     expect(mockedQuickPickValue).toBeCalledTimes(1)
   })
 
   it('should resolve with no value if canceled at order select', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
-    expect(await pickSortToAdd(exampleMetricsAndParams)).toBe(undefined)
+    expect(await pickSortToAdd(exampleColumns)).toBe(undefined)
     expect(mockedQuickPickValue).toBeCalledTimes(2)
   })
 
   it('should invoke a descending sort with the expected quickPick calls', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
     mockedQuickPickValue.mockResolvedValueOnce(false)
-    const resolvedPromise = await pickSortToAdd(exampleMetricsAndParams)
+    const resolvedPromise = await pickSortToAdd(exampleColumns)
     expect(mockedQuickPickValue).toBeCalledTimes(2)
     expect(mockedQuickPickValue).toBeCalledWith(
       [
@@ -84,7 +78,7 @@ describe('pickSortToAdd', () => {
   it('should invoke an ascending sort with the expected quickPick calls', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(paramsYamlParam)
     mockedQuickPickValue.mockResolvedValueOnce(false)
-    const resolvedPromise = await pickSortToAdd(exampleMetricsAndParams)
+    const resolvedPromise = await pickSortToAdd(exampleColumns)
     expect(mockedQuickPickValue).toBeCalledTimes(2)
     expect(resolvedPromise).toStrictEqual({
       descending: false,

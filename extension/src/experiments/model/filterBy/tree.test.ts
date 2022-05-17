@@ -2,10 +2,10 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { commands, ThemeIcon, TreeItem, window } from 'vscode'
 import { Operator } from '.'
 import { ExperimentsFilterByTree } from './tree'
-import { joinMetricOrParamPath } from '../../metricsAndParams/paths'
+import { joinColumnPath } from '../../columns/paths'
 import { InternalCommands } from '../../../commands/internal'
 import { buildMockedExperiments } from '../../../test/util/jest'
-import { MetricOrParamType } from '../../webview/contract'
+import { ColumnType } from '../../webview/contract'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -73,11 +73,7 @@ describe('ExperimentsFilterByTree', () => {
     const mockedFilters = [
       {
         operator: Operator.EQUAL,
-        path: joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yaml',
-          'param'
-        ),
+        path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'param'),
         value: '90000'
       }
     ]
@@ -91,16 +87,8 @@ describe('ExperimentsFilterByTree', () => {
       {
         description: '== 90000',
         dvcRoot: 'demo',
-        id: joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yaml',
-          'param==90000'
-        ),
-        label: joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yaml',
-          'param'
-        )
+        id: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'param==90000'),
+        label: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'param')
       }
     ])
   })
@@ -115,11 +103,7 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetFilters.mockReturnValueOnce([
       {
         operator: Operator.EQUAL,
-        path: joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yaml',
-          'param'
-        ),
+        path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'param'),
         value: '90000'
       }
     ])
@@ -132,20 +116,12 @@ describe('ExperimentsFilterByTree', () => {
     const mockedFilters = [
       {
         operator: '==',
-        path: joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yml',
-          'param'
-        ),
+        path: joinColumnPath(ColumnType.PARAMS, 'params.yml', 'param'),
         value: 90000
       },
       {
         operator: '<',
-        path: joinMetricOrParamPath(
-          MetricOrParamType.METRICS,
-          'logs.json',
-          'metric'
-        ),
+        path: joinColumnPath(ColumnType.METRICS, 'logs.json', 'metric'),
         value: '1'
       }
     ]
@@ -168,30 +144,14 @@ describe('ExperimentsFilterByTree', () => {
       {
         description: '== 90000',
         dvcRoot: 'demo',
-        id: joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yml',
-          'param==90000'
-        ),
-        label: joinMetricOrParamPath(
-          MetricOrParamType.PARAMS,
-          'params.yml',
-          'param'
-        )
+        id: joinColumnPath(ColumnType.PARAMS, 'params.yml', 'param==90000'),
+        label: joinColumnPath(ColumnType.PARAMS, 'params.yml', 'param')
       },
       {
         description: '< 1',
         dvcRoot: 'demo',
-        id: joinMetricOrParamPath(
-          MetricOrParamType.METRICS,
-          'logs.json',
-          'metric<1'
-        ),
-        label: joinMetricOrParamPath(
-          MetricOrParamType.METRICS,
-          'logs.json',
-          'metric'
-        )
+        id: joinColumnPath(ColumnType.METRICS, 'logs.json', 'metric<1'),
+        label: joinColumnPath(ColumnType.METRICS, 'logs.json', 'metric')
       }
     ])
   })
@@ -220,8 +180,8 @@ describe('ExperimentsFilterByTree', () => {
     it('should return a tree item for a filter', async () => {
       const mockedFilter = {
         operator: '>=',
-        path: joinMetricOrParamPath(
-          MetricOrParamType.METRICS,
+        path: joinColumnPath(
+          ColumnType.METRICS,
           'summary.json',
           'success_metric'
         ),
@@ -251,13 +211,13 @@ describe('ExperimentsFilterByTree', () => {
       const item = experimentsFilterByTree.getTreeItem({
         description: '>= 100',
         dvcRoot,
-        id: joinMetricOrParamPath(
-          MetricOrParamType.METRICS,
+        id: joinColumnPath(
+          ColumnType.METRICS,
           'summary.json',
           'success_metric>=100'
         ),
-        label: joinMetricOrParamPath(
-          MetricOrParamType.METRICS,
+        label: joinColumnPath(
+          ColumnType.METRICS,
           'summary.json',
           'success_metric'
         )

@@ -26,9 +26,9 @@ export const buildMockedEventEmitter = <T = void>() => {
 }
 
 export const buildMockedExperiments = () => {
-  const mockedMetricsOrParamsChanged = buildMockedEventEmitter()
+  const mockedColumnsChanged = buildMockedEventEmitter()
   const mockedExperimentsChanged = buildMockedEventEmitter()
-  const mockedGetChildMetricsOrParams = jest.fn()
+  const mockedGetChildColumns = jest.fn()
   const mockedGetDvcRoots = jest.fn()
   const mockedGetExperiments = jest.fn()
   const mockedGetCheckpoints = jest.fn()
@@ -37,34 +37,34 @@ export const buildMockedExperiments = () => {
   const mockedGetSorts = jest.fn()
   const mockedGetSelectedRevisions = jest.fn()
   const mockedExperiments = {
+    columnsChanged: mockedColumnsChanged,
     experimentsChanged: mockedExperimentsChanged,
     getDvcRoots: mockedGetDvcRoots,
     getRepository: () =>
       ({
         getCheckpoints: mockedGetCheckpoints,
-        getChildMetricsOrParams: mockedGetChildMetricsOrParams,
+        getChildColumns: mockedGetChildColumns,
         getExperiments: mockedGetExperiments,
         getFilter: mockedGetFilter,
         getFilters: mockedGetFilters,
         getSelectedRevisions: mockedGetSelectedRevisions,
         getSorts: mockedGetSorts
       } as unknown as Experiments),
-    isReady: () => true,
-    metricsOrParamsChanged: mockedMetricsOrParamsChanged
+    isReady: () => true
   } as unknown as WorkspaceExperiments
 
   return {
+    mockedColumnsChanged,
     mockedExperiments,
     mockedExperimentsChanged,
     mockedGetCheckpoints,
-    mockedGetChildMetricsOrParams,
+    mockedGetChildColumns,
     mockedGetDvcRoots,
     mockedGetExperiments,
     mockedGetFilter,
     mockedGetFilters,
     mockedGetSelectedRevisions,
-    mockedGetSorts,
-    mockedMetricsOrParamsChanged
+    mockedGetSorts
   }
 }
 

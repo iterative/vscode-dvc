@@ -13,8 +13,8 @@ import { Experiments } from '../../../experiments'
 import { ResourceLocator } from '../../../resourceLocator'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import {
-  MetricOrParam,
-  MetricOrParamType,
+  Column,
+  ColumnType,
   TableData
 } from '../../../experiments/webview/contract'
 import {
@@ -23,6 +23,7 @@ import {
   closeAllEditors,
   experimentsUpdatedEvent,
   extensionUri,
+  getInputBoxEvent,
   getMessageReceivedEmitter
 } from '../util'
 import { buildMockMemento, dvcDemoPath } from '../../util'
@@ -34,13 +35,13 @@ import {
 } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
-import { joinMetricOrParamPath } from '../../../experiments/metricsAndParams/paths'
+import { joinColumnPath } from '../../../experiments/columns/paths'
 import { BaseWebview } from '../../../webview'
-import { MetricsAndParamsModel } from '../../../experiments/metricsAndParams/model'
+import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { InternalCommands } from '../../../commands/internal'
+import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -168,13 +169,13 @@ suite('Experiments Test Suite', () => {
       ]
 
       const mockSetColumnReordered = stub(
-        MetricsAndParamsModel.prototype,
+        ColumnsModel.prototype,
         'setColumnOrder'
       ).returns(undefined)
 
       mockMessageReceived.fire({
         payload: mockColumnOrder,
-        type: MessageFromWebviewType.COLUMN_REORDERED
+        type: MessageFromWebviewType.REORDER_COLUMNS
       })
 
       expect(mockSetColumnReordered).to.be.calledOnce
@@ -199,7 +200,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetColumnWidth = stub(
-        MetricsAndParamsModel.prototype,
+        ColumnsModel.prototype,
         'setColumnWidth'
       ).returns(undefined)
 
@@ -208,7 +209,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: { id: mockColumnId, width: mockWidth },
-        type: MessageFromWebviewType.COLUMN_RESIZED
+        type: MessageFromWebviewType.RESIZE_COLUMN
       })
 
       expect(mockSetColumnWidth).to.be.calledOnce
@@ -218,7 +219,7 @@ suite('Experiments Test Suite', () => {
       ).to.be.calledWithExactly(mockColumnId, mockWidth)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED,
+        EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN,
         { width: mockWidth },
         undefined
       )
@@ -241,7 +242,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
-        type: MessageFromWebviewType.EXPERIMENT_TOGGLED
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
 
       expect(mockToggleExperimentStatus).to.be.calledOnce
@@ -276,7 +277,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockSortDefinition,
-        type: MessageFromWebviewType.COLUMN_SORTED
+        type: MessageFromWebviewType.SORT_COLUMN
       })
 
       expect(mockAddSort).to.be.calledOnce
@@ -286,7 +287,7 @@ suite('Experiments Test Suite', () => {
       ).to.be.calledWithExactly(mockSortDefinition)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED,
+        EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN,
         mockSortDefinition,
         undefined
       )
@@ -309,7 +310,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockSortPath,
-        type: MessageFromWebviewType.COLUMN_SORT_REMOVED
+        type: MessageFromWebviewType.REMOVE_COLUMN_SORT
       })
 
       expect(mockRemoveSort).to.be.calledOnce
@@ -319,12 +320,159 @@ suite('Experiments Test Suite', () => {
       ).to.be.calledWithExactly(mockSortPath)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED,
+        EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT,
         {
           path: mockSortPath
         },
         undefined
       )
+    })
+
+    describe('Handling webview messages that run extension commands', () => {
+      const setupExperimentsAndMockCommands = () => {
+        const { experiments, internalCommands } = buildExperiments(
+          disposable,
+          expShowFixture
+        )
+        const mockExecuteCommand = stub(
+          internalCommands,
+          'executeCommand'
+        ).resolves(undefined)
+
+        return { experiments, mockExecuteCommand }
+      }
+
+      it('should be able to handle a message to apply an experiment to workspace', async () => {
+        const { experiments, mockExecuteCommand } =
+          setupExperimentsAndMockCommands()
+
+        const webview = await experiments.showWebview()
+        const mockMessageReceived = getMessageReceivedEmitter(webview)
+        const mockExperimentId = 'mock-experiment-id'
+
+        mockMessageReceived.fire({
+          payload: mockExperimentId,
+          type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
+        })
+
+        expect(mockExecuteCommand).to.be.calledOnce
+        expect(mockExecuteCommand).to.be.calledWithExactly(
+          AvailableCommands.EXPERIMENT_APPLY,
+          dvcDemoPath,
+          mockExperimentId
+        )
+      })
+
+      it('should be able to handle a message to create a branch from an experiment', async () => {
+        const { experiments, mockExecuteCommand } =
+          setupExperimentsAndMockCommands()
+
+        const mockBranch = 'mock-branch-input'
+        const inputEvent = getInputBoxEvent(mockBranch)
+
+        const webview = await experiments.showWebview()
+        const mockMessageReceived = getMessageReceivedEmitter(webview)
+        const mockExperimentId = 'mock-experiment-id'
+
+        mockMessageReceived.fire({
+          payload: mockExperimentId,
+          type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
+        })
+
+        await inputEvent
+        expect(mockExecuteCommand).to.be.calledOnce
+        expect(mockExecuteCommand).to.be.calledWithExactly(
+          AvailableCommands.EXPERIMENT_BRANCH,
+          dvcDemoPath,
+          mockExperimentId,
+          mockBranch
+        )
+      })
+
+      it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
+        const { experiments, mockExecuteCommand } =
+          setupExperimentsAndMockCommands()
+
+        const mockModifiedParams = [
+          '-S',
+          'params.yaml:lr=0.001',
+          '-S',
+          'params.yaml:weight_decay=0'
+        ]
+
+        stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+
+        const webview = await experiments.showWebview()
+        const mockMessageReceived = getMessageReceivedEmitter(webview)
+        const mockExperimentId = 'mock-experiment-id'
+        const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+        mockMessageReceived.fire({
+          payload: mockExperimentId,
+          type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
+        })
+
+        await tableChangePromise
+        expect(mockExecuteCommand).to.be.calledOnce
+        expect(mockExecuteCommand).to.be.calledWithExactly(
+          AvailableCommands.EXPERIMENT_QUEUE,
+          dvcDemoPath,
+          ...mockModifiedParams
+        )
+      })
+
+      it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
+        const { experiments, mockExecuteCommand } =
+          setupExperimentsAndMockCommands()
+
+        const mockModifiedParams = [
+          '-S',
+          'params.yaml:lr=0.001',
+          '-S',
+          'params.yaml:weight_decay=0'
+        ]
+
+        stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+
+        const webview = await experiments.showWebview()
+        const mockMessageReceived = getMessageReceivedEmitter(webview)
+        const mockExperimentId = 'mock-experiment-id'
+        const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+        mockMessageReceived.fire({
+          payload: mockExperimentId,
+          type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
+        })
+
+        await tableChangePromise
+        expect(mockExecuteCommand).to.be.calledOnce
+        expect(mockExecuteCommand).to.be.calledWithExactly(
+          AvailableCommands.EXPERIMENT_RUN,
+          dvcDemoPath,
+          ...mockModifiedParams
+        )
+      })
+
+      it('should be able to handle a message to remove an experiment', async () => {
+        const { experiments, mockExecuteCommand } =
+          setupExperimentsAndMockCommands()
+
+        const webview = await experiments.showWebview()
+        const mockMessageReceived = getMessageReceivedEmitter(webview)
+        const mockExperimentId = 'mock-experiment-id'
+
+        mockMessageReceived.fire({
+          payload: mockExperimentId,
+          type: MessageFromWebviewType.REMOVE_EXPERIMENT
+        })
+
+        expect(mockExecuteCommand).to.be.calledOnce
+        expect(mockExecuteCommand).to.be.calledWithExactly(
+          AvailableCommands.EXPERIMENT_REMOVE,
+          dvcDemoPath,
+          mockExperimentId
+        )
+      })
     })
 
     it('should be able to sort', async () => {
@@ -428,18 +576,14 @@ suite('Experiments Test Suite', () => {
       })
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      const sortPath = joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'test'
-      )
+      const sortPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
 
       mockShowQuickPick.onFirstCall().resolves({
         label: 'test',
         value: {
           path: sortPath
         }
-      } as QuickPickItemWithValue<MetricOrParam>)
+      } as QuickPickItemWithValue<Column>)
 
       mockShowQuickPick.onSecondCall().resolves({
         label: 'Ascending',
@@ -507,51 +651,35 @@ suite('Experiments Test Suite', () => {
   describe('persisted state', () => {
     const firstSortDefinition = {
       descending: false,
-      path: joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'test'
-      )
+      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
     }
     const secondSortDefinition = {
       descending: true,
-      path: joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'other'
-      )
+      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'other')
     }
     const sortDefinitions: SortDefinition[] = [
       firstSortDefinition,
       secondSortDefinition
     ]
 
-    const firstFilterId = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
+    const firstFilterId = joinColumnPath(
+      ColumnType.PARAMS,
       'params.yaml',
       'test==1'
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'test'
-      ),
+      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test'),
       value: 1
     }
-    const secondFilterId = joinMetricOrParamPath(
-      MetricOrParamType.PARAMS,
+    const secondFilterId = joinColumnPath(
+      ColumnType.PARAMS,
       'params.yaml',
       'other∈testcontains'
     )
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: joinMetricOrParamPath(
-        MetricOrParamType.PARAMS,
-        'params.yaml',
-        'other'
-      ),
+      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'other'),
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [

@@ -5,6 +5,7 @@ import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
 import { PlotsSizeProvider } from './PlotsSizeContext'
+import { GetStarted } from './GetStarted'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
@@ -55,26 +56,35 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
 
   const {
     checkpoint: checkpointPlots,
+    comparison: comparisonTable,
+    hasPlots,
+    hasSelectedPlots,
+    hasSelectedRevisions,
     sectionCollapsed,
-    template: templatePlots,
-    comparison: comparisonTable
+    template: templatePlots
   } = data
 
   if (!checkpointPlots && !templatePlots && !comparisonTable) {
-    return <EmptyState>No Plots to Display</EmptyState>
+    return (
+      <GetStarted
+        hasPlots={hasPlots}
+        hasSelectedPlots={hasSelectedPlots}
+        hasSelectedRevisions={hasSelectedRevisions}
+      />
+    )
   }
 
   const changeSize = (size: PlotSize, section: Section) => {
     sendMessage({
       payload: { section, size },
-      type: MessageFromWebviewType.PLOTS_RESIZED
+      type: MessageFromWebviewType.RESIZE_PLOTS
     })
   }
 
   const setSectionName = (section: Section, name: string) => {
     sendMessage({
       payload: { name, section },
-      type: MessageFromWebviewType.SECTION_RENAMED
+      type: MessageFromWebviewType.RENAME_SECTION
     })
   }
 

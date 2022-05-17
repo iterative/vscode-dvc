@@ -1,7 +1,7 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
-import { pickParamsToQueue } from './model/queue/quickPick'
+import { pickAndModifyParams } from './model/queue/quickPick'
 import { pickExperiment } from './quickPick'
 import {
   pickFilterToAdd,
@@ -9,14 +9,18 @@ import {
 } from './model/filterBy/quickPick'
 import { tooManySelected } from './model/status'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
-import { MetricsAndParamsModel } from './metricsAndParams/model'
+import { ColumnsModel } from './columns/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
-import { Experiment, MetricOrParamType, TableData } from './webview/contract'
+import { Experiment, ColumnType, TableData } from './webview/contract'
 import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
-import { InternalCommands } from '../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -27,17 +31,19 @@ import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { Toast } from '../vscode/toast'
+import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
 
 export const ExperimentsScale = {
-  ...MetricOrParamType,
+  ...ColumnType,
   HAS_CHECKPOINTS: 'hasCheckpoints',
   NO_CHECKPOINTS: 'noCheckpoints'
 } as const
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
-  public readonly onDidChangeMetricsOrParams: Event<void>
+  public readonly onDidChangeColumns: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -45,16 +51,16 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly fileSystemData: FileSystemData
 
   private readonly experiments: ExperimentsModel
-  private readonly metricsAndParams: MetricsAndParamsModel
+  private readonly columns: ColumnsModel
   private readonly checkpoints: CheckpointsModel
 
   private readonly experimentsChanged = this.dispose.track(
     new EventEmitter<ExperimentsOutput | void>()
   )
 
-  private readonly metricsOrParamsChanged = this.dispose.track(
-    new EventEmitter<void>()
-  )
+  private readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
+
+  private readonly internalCommands: InternalCommands
 
   constructor(
     dvcRoot: string,
@@ -67,16 +73,16 @@ export class Experiments extends BaseRepository<TableData> {
   ) {
     super(dvcRoot, resourceLocator.beaker)
 
+    this.internalCommands = internalCommands
+
     this.onDidChangeExperiments = this.experimentsChanged.event
-    this.onDidChangeMetricsOrParams = this.metricsOrParamsChanged.event
+    this.onDidChangeColumns = this.columnsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
     )
 
-    this.metricsAndParams = this.dispose.track(
-      new MetricsAndParamsModel(dvcRoot, workspaceState)
-    )
+    this.columns = this.dispose.track(new ColumnsModel(dvcRoot, workspaceState))
 
     this.checkpoints = this.dispose.track(new CheckpointsModel())
 
@@ -96,14 +102,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.handleMessageFromWebview()
-
-    const waitForInitialData = this.dispose.track(
-      this.onDidChangeExperiments(() => {
-        this.deferred.resolve()
-        this.dispose.untrack(waitForInitialData)
-        waitForInitialData.dispose()
-      })
-    )
+    this.setupInitialData()
   }
 
   public update() {
@@ -116,7 +115,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async setState(data: ExperimentsOutput) {
     await Promise.all([
-      this.metricsAndParams.transformAndSet(data),
+      this.columns.transformAndSet(data),
       this.experiments.transformAndSet(data)
     ])
 
@@ -127,20 +126,20 @@ export class Experiments extends BaseRepository<TableData> {
     return this.checkpoints.hasCheckpoints()
   }
 
-  public getChildMetricsOrParams(path?: string) {
-    return this.metricsAndParams.getChildren(path)
+  public getChildColumns(path?: string) {
+    return this.columns.getChildren(path)
   }
 
-  public toggleMetricOrParamStatus(path: string) {
-    const status = this.metricsAndParams.toggleStatus(path)
+  public toggleColumnStatus(path: string) {
+    const status = this.columns.toggleStatus(path)
 
-    this.notifyMetricsOrParamsChanged()
+    this.notifyColumnsChanged()
 
     return status
   }
 
-  public getMetricsAndParamsStatuses() {
-    return this.metricsAndParams.getTerminalNodeStatuses()
+  public getColumnsStatuses() {
+    return this.columns.getTerminalNodeStatuses()
   }
 
   public toggleExperimentStatus(id: string) {
@@ -160,7 +159,7 @@ export class Experiments extends BaseRepository<TableData> {
   public getScale() {
     const acc = createTypedAccumulator(ExperimentsScale)
 
-    for (const { type } of this.metricsAndParams.getTerminalNodes()) {
+    for (const { type } of this.columns.getTerminalNodes()) {
       acc[type] = acc[type] + 1
     }
     const checkpointType = this.hasCheckpoints()
@@ -171,8 +170,8 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async addSort() {
-    const metricsAndParams = this.metricsAndParams.getTerminalNodes()
-    const sortToAdd = await pickSortToAdd(metricsAndParams)
+    const columns = this.columns.getTerminalNodes()
+    const sortToAdd = await pickSortToAdd(columns)
     if (!sortToAdd) {
       return
     }
@@ -200,8 +199,8 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async addFilter() {
-    const metricsAndParams = this.metricsAndParams.getTerminalNodes()
-    const filterToAdd = await pickFilterToAdd(metricsAndParams)
+    const columns = this.columns.getTerminalNodes()
+    const filterToAdd = await pickFilterToAdd(columns)
     if (!filterToAdd) {
       return
     }
@@ -271,7 +270,7 @@ export class Experiments extends BaseRepository<TableData> {
     return pickExperiment(this.experiments.getQueuedExperiments())
   }
 
-  public async pickParamsToQueue(overrideId?: string) {
+  public async pickAndModifyParams(overrideId?: string) {
     const id = await this.getExperimentId(overrideId)
     if (!id) {
       return
@@ -283,7 +282,7 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    return pickParamsToQueue(params)
+    return pickAndModifyParams(params)
   }
 
   public getExperiments() {
@@ -320,13 +319,41 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelectedExperiments()
   }
 
-  private notifyChanged(data?: ExperimentsOutput) {
-    this.experimentsChanged.fire(data)
-    this.notifyMetricsOrParamsChanged()
+  public async modifyExperimentParamsAndRun(
+    commandId: CommandId,
+    experimentId?: string
+  ) {
+    const paramsToModify = await this.pickAndModifyParams(experimentId)
+    if (paramsToModify) {
+      return this.runCommand(commandId, ...paramsToModify)
+    }
   }
 
-  private notifyMetricsOrParamsChanged() {
-    this.metricsOrParamsChanged.fire()
+  private setupInitialData() {
+    const waitForInitialData = this.dispose.track(
+      this.onDidChangeExperiments(() => {
+        this.deferred.resolve()
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
+      })
+    )
+  }
+
+  private async runCommand(commandId: CommandId, ...args: string[]) {
+    await Toast.showOutput(
+      this.internalCommands.executeCommand(commandId, this.dvcRoot, ...args)
+    )
+
+    return this.notifyChanged()
+  }
+
+  private notifyChanged(data?: ExperimentsOutput) {
+    this.experimentsChanged.fire(data)
+    this.notifyColumnsChanged()
+  }
+
+  private notifyColumnsChanged() {
+    this.columnsChanged.fire()
     return this.sendWebviewData()
   }
 
@@ -336,10 +363,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   private getWebviewData() {
     return {
-      changes: this.metricsAndParams.getChanges(),
-      columnOrder: this.metricsAndParams.getColumnOrder(),
-      columnWidths: this.metricsAndParams.getColumnWidths(),
-      columns: this.metricsAndParams.getSelected(),
+      changes: this.columns.getChanges(),
+      columnOrder: this.columns.getColumnOrder(),
+      columnWidths: this.columns.getColumnWidths(),
+      columns: this.columns.getSelected(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
@@ -349,19 +376,35 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
-          case MessageFromWebviewType.COLUMN_REORDERED:
+          case MessageFromWebviewType.REORDER_COLUMNS:
             return this.setColumnOrder(message.payload)
-          case MessageFromWebviewType.COLUMN_RESIZED:
+          case MessageFromWebviewType.RESIZE_COLUMN:
             return this.setColumnWidth(
               message.payload.id,
               message.payload.width
             )
-          case MessageFromWebviewType.EXPERIMENT_TOGGLED:
+          case MessageFromWebviewType.TOGGLE_EXPERIMENT:
             return this.setExperimentStatus(message.payload)
-          case MessageFromWebviewType.COLUMN_SORTED:
+          case MessageFromWebviewType.SORT_COLUMN:
             return this.addColumnSort(message.payload)
-          case MessageFromWebviewType.COLUMN_SORT_REMOVED:
+          case MessageFromWebviewType.REMOVE_COLUMN_SORT:
             return this.removeColumnSort(message.payload)
+          case MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE:
+            return this.applyExperimentToWorkspace(message.payload)
+          case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
+            return this.createBranchFromExperiment(message.payload)
+          case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
+            return this.modifyExperimentParamsAndRun(
+              AvailableCommands.EXPERIMENT_QUEUE,
+              message.payload
+            )
+          case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN:
+            return this.modifyExperimentParamsAndRun(
+              AvailableCommands.EXPERIMENT_RUN,
+              message.payload
+            )
+          case MessageFromWebviewType.REMOVE_EXPERIMENT:
+            return this.removeExperiment(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -370,7 +413,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private setColumnOrder(order: string[]) {
-    this.metricsAndParams.setColumnOrder(order)
+    this.columns.setColumnOrder(order)
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED,
       undefined,
@@ -379,9 +422,9 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private setColumnWidth(id: string, width: number) {
-    this.metricsAndParams.setColumnWidth(id, width)
+    this.columns.setColumnWidth(id, width)
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_RESIZED,
+      EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN,
       { width },
       undefined
     )
@@ -399,7 +442,7 @@ export class Experiments extends BaseRepository<TableData> {
   private addColumnSort(sort: SortDefinition) {
     this.experiments.addSort(sort)
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORTED,
+      EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN,
       { ...sort },
       undefined
     )
@@ -409,11 +452,30 @@ export class Experiments extends BaseRepository<TableData> {
   private removeColumnSort(path: string) {
     this.experiments.removeSort(path)
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMN_SORT_REMOVED,
+      EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT,
       { path },
       undefined
     )
     return this.notifyChanged()
+  }
+
+  private async createBranchFromExperiment(experimentId: string) {
+    const input = await getInput(Title.ENTER_BRANCH_NAME)
+    if (input) {
+      return this.runCommand(
+        AvailableCommands.EXPERIMENT_BRANCH,
+        experimentId,
+        input
+      )
+    }
+  }
+
+  private applyExperimentToWorkspace(experimentId: string) {
+    return this.runCommand(AvailableCommands.EXPERIMENT_APPLY, experimentId)
+  }
+
+  private removeExperiment(experimentId: string) {
+    return this.runCommand(AvailableCommands.EXPERIMENT_REMOVE, experimentId)
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {

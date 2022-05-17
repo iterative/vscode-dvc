@@ -18,13 +18,14 @@ import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
-import { ExperimentsMetricsAndParamsTree } from './experiments/metricsAndParams/tree'
+import { ExperimentsColumnsTree } from './experiments/columns/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import {
+  getFirstWorkspaceFolder,
   getWorkspaceFolderCount,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
@@ -34,7 +35,7 @@ import {
   sendTelemetryEventAndThrow
 } from './telemetry'
 import { EventName } from './telemetry/constants'
-import { RegisteredCommands } from './commands/external'
+import { RegisteredCliCommands, RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
 import {
   registerWalkthroughCommands,
@@ -46,6 +47,7 @@ import { WorkspacePlots } from './plots/workspace'
 import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
+import { createFileSystemWatcher } from './fileSystem/watcher'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -62,6 +64,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly cliRunner: CliRunner
   private readonly status: Status
   private cliAccessible = false
+  private cliCompatible: boolean | undefined
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -137,7 +140,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.dispose.track(
-      new ExperimentsMetricsAndParamsTree(
+      new ExperimentsColumnsTree(
         this.experiments,
         this.internalCommands,
         this.resourceLocator
@@ -169,11 +172,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(
-        this.internalCommands,
-        this.workspaceChanged,
-        this.repositories
-      )
+      new TrackedExplorerTree(this.internalCommands, this.repositories)
     )
 
     setup(this)
@@ -222,7 +221,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     registerExperimentCommands(this.experiments, this.internalCommands)
-    registerPlotsCommands(this.plots)
+    registerPlotsCommands(this.plots, this.internalCommands)
 
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
@@ -258,6 +257,17 @@ export class Extension extends Disposable implements IExtension {
       () => outputChannel.show()
     )
 
+    this.internalCommands.registerExternalCliCommand(
+      RegisteredCliCommands.INIT,
+      async () => {
+        const root = getFirstWorkspaceFolder()
+        if (root) {
+          await this.cliExecutor.init(root)
+          this.workspaceChanged.fire()
+        }
+      }
+    )
+
     registerRepositoryCommands(this.repositories, this.internalCommands)
 
     reRegisterVsCodeCommands(this.internalCommands)
@@ -270,17 +280,22 @@ export class Extension extends Disposable implements IExtension {
     this.dispose.track(
       commands.registerCommand(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        this.setupWorkspace
+        () => this.setupWorkspace()
       )
     )
 
     showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
+
+    this.watchForVenvChanges()
   }
 
   public async setupWorkspace() {
     const stopWatch = new StopWatch()
     try {
+      const previousCliPath = this.config.getCliPath()
+      const previousPythonPath = this.config.pythonBinPath
+
       const completed = await setupWorkspace()
       sendTelemetryEvent(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
@@ -289,6 +304,15 @@ export class Extension extends Disposable implements IExtension {
           duration: stopWatch.getElapsedTime()
         }
       )
+
+      const executionDetailsUnchanged =
+        this.config.getCliPath() === previousPythonPath &&
+        this.config.pythonBinPath === previousCliPath
+
+      if (completed && !this.cliAccessible && executionDetailsUnchanged) {
+        this.workspaceChanged.fire()
+      }
+
       return completed
     } catch (error: unknown) {
       return sendTelemetryEventAndThrow(
@@ -304,6 +328,7 @@ export class Extension extends Disposable implements IExtension {
     setContextValue('dvc.cli.incompatible', undefined)
     const version = await this.cliReader.version(cwd)
     const compatible = isVersionCompatible(version)
+    this.cliCompatible = compatible
     setContextValue('dvc.cli.incompatible', !compatible)
     return this.setAvailable(compatible)
   }
@@ -397,6 +422,16 @@ export class Extension extends Disposable implements IExtension {
       pythonPathUsed: !!this.config.pythonBinPath,
       workspaceFolderCount: getWorkspaceFolderCount()
     }
+  }
+
+  private watchForVenvChanges() {
+    this.dispose.track(
+      createFileSystemWatcher('**/dvc{,.exe}', path => {
+        if (path && (!this.cliAccessible || !this.cliCompatible)) {
+          setup(this)
+        }
+      })
+    )
   }
 }
 

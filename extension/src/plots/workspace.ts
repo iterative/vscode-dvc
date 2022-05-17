@@ -30,6 +30,20 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
       })
     )
 
+    plots.dispose.track(
+      plots.onDidChangeIsWebviewFocused(
+        dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
+      )
+    )
+
     return plots
+  }
+
+  public async selectPlots(overrideRoot?: string) {
+    const dvcRoot = await this.getDvcRoot(overrideRoot)
+    if (!dvcRoot) {
+      return
+    }
+    return this.getRepository(dvcRoot).selectPlots()
   }
 }

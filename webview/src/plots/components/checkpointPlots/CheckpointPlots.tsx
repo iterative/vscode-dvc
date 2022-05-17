@@ -48,7 +48,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     setOrder(order)
     sendMessage({
       payload: order,
-      type: MessageFromWebviewType.PLOTS_METRICS_REORDERED
+      type: MessageFromWebviewType.REORDER_PLOTS_METRICS
     })
   }
 
