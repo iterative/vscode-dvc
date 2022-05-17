@@ -41,6 +41,8 @@ export class PlotsModel extends ModelWithPersistence {
   private branchRevisions: Record<string, string> = {}
   private workspaceRunningCheckpoint: string | undefined
 
+  private fetchedRevs = new Set<string>()
+
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
 
@@ -97,7 +99,9 @@ export class PlotsModel extends ModelWithPersistence {
     return this.removeStaleData()
   }
 
-  public async transformAndSetPlots(data: PlotsOutput) {
+  public async transformAndSetPlots(data: PlotsOutput, revs: string[]) {
+    this.fetchedRevs = new Set([...this.fetchedRevs, ...revs])
+
     const [{ comparisonData, revisionData }, templates] = await Promise.all([
       collectData(data),
       collectTemplates(data)
@@ -151,6 +155,12 @@ export class PlotsModel extends ModelWithPersistence {
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize(Section.CHECKPOINT_PLOTS)
     }
+  }
+
+  public getUnfetchedRevisions() {
+    return this.getSelectedRevisions().filter(
+      revision => !this.fetchedRevs.has(revision)
+    )
   }
 
   public getMissingRevisions() {
@@ -306,6 +316,7 @@ export class PlotsModel extends ModelWithPersistence {
       if (sha && this.branchRevisions[id] !== sha) {
         delete this.revisionData[id]
         delete this.comparisonData[id]
+        this.fetchedRevs.delete(id)
         this.branchRevisions[id] = sha
       }
     }
