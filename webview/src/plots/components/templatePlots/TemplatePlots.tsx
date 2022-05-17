@@ -4,13 +4,7 @@ import {
   TemplatePlotGroup,
   TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
-import React, {
-  DragEvent,
-  useState,
-  useEffect,
-  useContext,
-  useCallback
-} from 'react'
+import React, { DragEvent, useState, useEffect, useContext } from 'react'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
@@ -21,11 +15,8 @@ import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { ZoomablePlotProps } from '../ZoomablePlot'
 import { PlotsSizeContext } from '../PlotsSizeContext'
-import {
-  DEFAULT_NB_ITEMS_PER_ROW,
-  getNbItemsPerRow,
-  MaxItemsBeforeVirtualization
-} from '../util'
+import { MaxItemsBeforeVirtualization } from '../util'
+import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 
 interface TemplatePlotsProps extends ZoomablePlotProps {
   plots: TemplatePlotSection[]
@@ -42,30 +33,13 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
 }) => {
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
-  const [nbItemsPerRow, setNbItemsPerRow] = useState(DEFAULT_NB_ITEMS_PER_ROW)
   const { sizes } = useContext(PlotsSizeContext)
   const { [Section.TEMPLATE_PLOTS]: size } = sizes
-
-  const changeNbItemsPerRow = useCallback(
-    () => setNbItemsPerRow(getNbItemsPerRow(size)),
-    [setNbItemsPerRow, size]
-  )
+  const nbItemsPerRow = useNbItemsPerRow(size)
 
   useEffect(() => {
     setSections(plots)
   }, [plots, setSections])
-
-  useEffect(() => {
-    changeNbItemsPerRow()
-  }, [size, changeNbItemsPerRow])
-
-  useEffect(() => {
-    window.addEventListener('resize', changeNbItemsPerRow)
-
-    return () => {
-      window.removeEventListener('resize', changeNbItemsPerRow)
-    }
-  }, [changeNbItemsPerRow])
 
   const setSectionOrder = (sections: TemplatePlotSection[]): void => {
     setSections(sections)

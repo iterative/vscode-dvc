@@ -106,9 +106,13 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         wrapperTag: 'div'
       }}
       wrapperComponent={
-        useBigGrid ? (BigGrid as React.FC<WrapperProps>) : undefined
+        useBigGrid
+          ? {
+              component: BigGrid as React.FC<WrapperProps>,
+              props: { nbItemsPerRow }
+            }
+          : undefined
       }
-      wrapperComponentProps={{ nbItemsPerRow }}
     />
   )
 }

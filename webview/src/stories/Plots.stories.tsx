@@ -111,7 +111,7 @@ AllSmall.args = {
 }
 AllSmall.parameters = chromaticParameters
 
-const moreCheckpointPlots = manyCheckpointPlots(10)
+const moreCheckpointPlots = manyCheckpointPlots(15)
 
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {
@@ -123,7 +123,7 @@ VirtualizedPlots.args = {
     },
     comparison: undefined,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    template: manyTemplatePlots(10)
+    template: manyTemplatePlots(25)
   }
 }
 VirtualizedPlots.parameters = chromaticParameters

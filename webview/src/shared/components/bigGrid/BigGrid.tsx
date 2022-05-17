@@ -19,7 +19,10 @@ export const BigGrid: React.FC<BigGridProps> = ({
   nbItemsPerRow = DEFAULT_NB_ITEMS_PER_ROW
 }) => {
   const cache = useRef(
-    new CellMeasurerCache({ defaultHeight: 200, defaultWidth: 200 })
+    new CellMeasurerCache({
+      defaultHeight: 200,
+      defaultWidth: 200
+    })
   )
   const cellRenderer = ({
     columnIndex,

@@ -8,6 +8,7 @@ import React, {
 import { DragEnterDirection, getDragEnterDirection } from './util'
 import { DragDropContext, DragDropContextValue } from './DragDropContext'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
+import { Any } from '../../../util/objects'
 
 const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
   if (direction === DragEnterDirection.RIGHT) {
@@ -41,9 +42,12 @@ interface DragDropContainerProps {
     element: JSX.Element
     wrapperTag: 'div' | 'th'
   }
-  wrapperComponent?: React.FC<WrapperProps>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  wrapperComponentProps?: { [key: string]: any }
+  wrapperComponent?: {
+    component: React.FC<WrapperProps>
+    props: {
+      [key: string]: Any
+    }
+  }
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -207,6 +211,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     return item
   })
 
-  const Wrapper = wrapperComponent
-  return Wrapper ? <Wrapper items={wrappedItems} /> : <>{wrappedItems}</>
+  const Wrapper = wrapperComponent?.component
+  return Wrapper ? (
+    <Wrapper {...wrapperComponent.props} items={wrappedItems} />
+  ) : (
+    <>{wrappedItems}</>
+  )
 }

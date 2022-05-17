@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import cx from 'classnames'
 import {
@@ -22,11 +22,8 @@ import { DropTarget } from '../DropTarget'
 import { ZoomablePlot, ZoomablePlotProps } from '../ZoomablePlot'
 import { PlotsSizeContext } from '../PlotsSizeContext'
 import { BigGrid } from '../../../shared/components/bigGrid/BigGrid'
-import {
-  DEFAULT_NB_ITEMS_PER_ROW,
-  getNbItemsPerRow,
-  MaxItemsBeforeVirtualization
-} from '../util'
+import { MaxItemsBeforeVirtualization } from '../util'
+import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 
 interface CheckpointPlotsProps extends ZoomablePlotProps {
   plots: CheckpointPlotData[]
@@ -39,25 +36,9 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   renderZoomedInPlot
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
-  const [nbItemsPerRow, setNbItemsPerRow] = useState(DEFAULT_NB_ITEMS_PER_ROW)
   const { sizes } = useContext(PlotsSizeContext)
   const { [Section.CHECKPOINT_PLOTS]: size } = sizes
-  const changeNbItemsPerRow = useCallback(
-    () => setNbItemsPerRow(getNbItemsPerRow(size)),
-    [setNbItemsPerRow, size]
-  )
-
-  useEffect(() => {
-    changeNbItemsPerRow()
-  }, [size, changeNbItemsPerRow])
-
-  useEffect(() => {
-    window.addEventListener('resize', changeNbItemsPerRow)
-
-    return () => {
-      window.removeEventListener('resize', changeNbItemsPerRow)
-    }
-  }, [changeNbItemsPerRow])
+  const nbItemsPerRow = useNbItemsPerRow(size)
 
   useEffect(() => {
     setOrder(pastOrder => performOrderedUpdate(pastOrder, plots, 'title'))
@@ -126,9 +107,13 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
           wrapperTag: 'div'
         }}
         wrapperComponent={
-          useBigGrid ? (BigGrid as React.FC<WrapperProps>) : undefined
+          useBigGrid
+            ? {
+                component: BigGrid as React.FC<WrapperProps>,
+                props: { nbItemsPerRow }
+              }
+            : undefined
         }
-        wrapperComponentProps={{ nbItemsPerRow }}
       />
     </div>
   ) : (

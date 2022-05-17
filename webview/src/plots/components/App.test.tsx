@@ -1134,9 +1134,9 @@ describe('App', () => {
     }
 
     describe('Large plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than six large plots', async () => {
+      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         renderAppWithData({
-          checkpoint: createCheckpointPlots(7),
+          checkpoint: createCheckpointPlots(11),
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED
         })
         await screen.findByTestId('plots-wrapper')
@@ -1154,9 +1154,9 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are six or fewer large plots', async () => {
+      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
         renderAppWithData({
-          checkpoint: createCheckpointPlots(6),
+          checkpoint: createCheckpointPlots(10),
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED
         })
         await screen.findByTestId('plots-wrapper')
@@ -1174,10 +1174,10 @@ describe('App', () => {
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
-      it('should  wrap the template plots in a big grid (virtualize them) when there are more than six large plots', async () => {
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         renderAppWithData({
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(7)
+          template: manyTemplatePlots(11)
         })
         await screen.findByTestId('plots-wrapper')
 
@@ -1194,10 +1194,10 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the template plots in a big grid (virtualize them) when there are six or fewer large plots', async () => {
+      it('should not wrap the template plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
         renderAppWithData({
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(6)
+          template: manyTemplatePlots(10)
         })
         await screen.findByTestId('plots-wrapper')
 
@@ -1269,9 +1269,9 @@ describe('App', () => {
     })
 
     describe('Regular plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than eight regular plots', async () => {
+      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
         renderAppWithData({
-          checkpoint: createCheckpointPlots(9),
+          checkpoint: createCheckpointPlots(16),
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED
         })
         await screen.findByTestId('plots-wrapper')
@@ -1281,9 +1281,9 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fewer regular plots', async () => {
+      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fifteen regular plots', async () => {
         renderAppWithData({
-          checkpoint: createCheckpointPlots(8),
+          checkpoint: createCheckpointPlots(15),
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED
         })
         await screen.findByTestId('plots-wrapper')
@@ -1293,10 +1293,10 @@ describe('App', () => {
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
-      it('should  wrap the template plots in a big grid (virtualize them) when there are more than eight regular plots', async () => {
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
         renderAppWithData({
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(9)
+          template: manyTemplatePlots(16)
         })
         await screen.findByTestId('plots-wrapper')
 
@@ -1305,10 +1305,10 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the template plots in a big grid (virtualize them) when there are eight or fewer regular plots', async () => {
+      it('should not wrap the template plots in a big grid (virtualize them) when there are fifteen or fewer regular plots', async () => {
         renderAppWithData({
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(8)
+          template: manyTemplatePlots(15)
         })
         await screen.findByTestId('plots-wrapper')
 
