@@ -43,10 +43,6 @@ export const collectTree = (
     const pathArray = getPathArray(path)
 
     isTracked.add(path)
-    const dir = dirname(path)
-    if (dir !== '.') {
-      isTracked.add(dir)
-    }
 
     for (let idx = 0; idx < pathArray.length; idx++) {
       const path = getPath(pathArray, idx)

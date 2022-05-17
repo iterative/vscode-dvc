@@ -39,7 +39,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: true,
-              isTracked: true,
+              isTracked: false,
               resourceUri: makeUri('logs')
             },
             {
@@ -67,7 +67,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: true,
-              isTracked: true,
+              isTracked: false,
               resourceUri: makeUri('data', 'MNIST', 'raw')
             }
           ]
