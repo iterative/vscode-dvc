@@ -31,6 +31,7 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
+import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
@@ -1158,8 +1159,10 @@ describe('App', () => {
     }
 
     const resizeScreen = (width: number) => {
-      global.innerWidth = width
-      global.dispatchEvent(new Event('resize'))
+      act(() => {
+        global.innerWidth = width
+        global.dispatchEvent(new Event('resize'))
+      })
     }
 
     describe('Large plots', () => {
@@ -1244,7 +1247,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(7)
+        const checkpoint = createCheckpointPlots(40)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1262,13 +1265,15 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(5453)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[2].id).toBe(checkpoint.plots[2].title)
+          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render three large plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
@@ -1276,7 +1281,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render two large plot per row when the screen is larger than 800px (but less than 1600px)', () => {
@@ -1284,7 +1290,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render one large plot per row when the screen is smaller than 800px', () => {
@@ -1292,7 +1299,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[4].id).toBe(checkpoint.plots[4].title)
         })
       })
     })
@@ -1347,7 +1354,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(7)
+        const checkpoint = createCheckpointPlots(40)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1365,13 +1372,15 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(6453)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[2].id).toBe(checkpoint.plots[2].title)
+          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render four regular plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
@@ -1379,7 +1388,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render three regular plot per row when the screen is larger than 800px (but less than 1600px)', () => {
@@ -1387,7 +1397,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render one regular plot per row when the screen is smaller than 800px', () => {
@@ -1395,7 +1406,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[4].id).toBe(checkpoint.plots[4].title)
         })
       })
     })
@@ -1450,7 +1461,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(7)
+        const checkpoint = createCheckpointPlots(40)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1468,13 +1479,15 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(5473)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[2].id).toBe(checkpoint.plots[2].title)
+          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render six small plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
@@ -1482,7 +1495,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render four small plot per row when the screen is larger than 800px (but less than 1600px)', () => {
@@ -1490,7 +1504,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render one small plot per row when the screen is smaller than 800px but larger than 600px', () => {
@@ -1498,7 +1513,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
         })
 
         it('should render two small plot per row when the screen is smaller than 600px', () => {
@@ -1506,7 +1522,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[4].id).toBe(checkpoint.plots[4].title)
         })
       })
     })
