@@ -47,8 +47,7 @@ export const createProcess = ({
   return Object.assign(process, {
     dispose: () => {
       const kill = require('tree-kill')
-      kill(process.pid, 'SIGINT')
-      disposed.fire(true)
+      kill(process.pid, 'SIGINT', () => disposed.fire(true))
     },
     onDidDispose: disposed.event
   })
