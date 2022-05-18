@@ -143,6 +143,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
     const orderIdxChanged = droppedIndex + orderIdxChange
     const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
+    setDraggedId('')
 
     if (isEnabled && isSameGroup(e.dataTransfer.getData('group'), group)) {
       applyDrop(e, orderIdxChanged, draggedIndex, newOrder, oldDraggedId)
