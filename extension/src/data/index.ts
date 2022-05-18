@@ -9,7 +9,7 @@ import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 
 export abstract class BaseData<
-  T extends PlotsOutput | ExperimentsOutput
+  T extends { data: PlotsOutput; revs: string[] } | ExperimentsOutput
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
 

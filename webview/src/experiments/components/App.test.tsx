@@ -153,7 +153,7 @@ describe('App', () => {
       })
     )
 
-    const noColumnsState = screen.queryByText('No Columns Selected')
+    const noColumnsState = screen.queryByText('No Columns Selected.')
     expect(noColumnsState).toBeInTheDocument()
   })
 
@@ -169,7 +169,7 @@ describe('App', () => {
       })
     )
 
-    const noExperimentsState = screen.queryByText('No Experiments to Display')
+    const noExperimentsState = screen.queryByText('No Experiments to Display.')
     expect(noExperimentsState).toBeInTheDocument()
   })
 
@@ -190,10 +190,10 @@ describe('App', () => {
     const loadingState = screen.queryByText('Loading experiments...')
     expect(loadingState).not.toBeInTheDocument()
 
-    const noExperimentsState = screen.queryByText('No Experiments to Display')
+    const noExperimentsState = screen.queryByText('No Experiments to Display.')
     expect(noExperimentsState).not.toBeInTheDocument()
 
-    const noColumnsState = screen.queryByText('No Columns Selected')
+    const noColumnsState = screen.queryByText('No Columns Selected.')
     expect(noColumnsState).not.toBeInTheDocument()
   })
 

@@ -453,6 +453,38 @@ suite('Experiments Test Suite', () => {
         )
       })
 
+      it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
+        const { experiments, mockExecuteCommand } =
+          setupExperimentsAndMockCommands()
+
+        const mockModifiedParams = [
+          '-S',
+          'params.yaml:lr=0.0001',
+          '-S',
+          'params.yaml:weight_decay=0.2'
+        ]
+
+        stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+
+        const webview = await experiments.showWebview()
+        const mockMessageReceived = getMessageReceivedEmitter(webview)
+        const mockExperimentId = 'mock-experiment-id'
+        const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+        mockMessageReceived.fire({
+          payload: mockExperimentId,
+          type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN
+        })
+
+        await tableChangePromise
+        expect(mockExecuteCommand).to.be.calledOnce
+        expect(mockExecuteCommand).to.be.calledWithExactly(
+          AvailableCommands.EXPERIMENT_RUN_RESET,
+          dvcDemoPath,
+          ...mockModifiedParams
+        )
+      })
+
       it('should be able to handle a message to remove an experiment', async () => {
         const { experiments, mockExecuteCommand } =
           setupExperimentsAndMockCommands()

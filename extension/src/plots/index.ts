@@ -63,9 +63,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.dispose.track(
-      this.data.onDidUpdate(async data => {
+      this.data.onDidUpdate(async ({ data, revs }) => {
         await Promise.all([
-          this.plots?.transformAndSetPlots(data),
+          this.plots?.transformAndSetPlots(data, revs),
           this.paths?.transformAndSet(data)
         ])
         this.notifyChanged()
@@ -156,7 +156,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     if (
       this.paths?.hasPaths() &&
-      definedAndNonEmpty(this.plots?.getMissingRevisions())
+      definedAndNonEmpty(this.plots?.getUnfetchedRevisions())
     ) {
       this.sendCheckpointPlotsData()
       return this.data.managedUpdate()

@@ -133,18 +133,26 @@ export class CliRunner extends Disposable implements ICli {
     )
   }
 
-  public async stop() {
+  public stop() {
+    const stopped = new Promise<boolean>(resolve => {
+      if (!this.currentProcess) {
+        return resolve(false)
+      }
+      const listener = this.dispose.track(
+        this.currentProcess.onDidDispose(disposed => {
+          this.dispose.untrack(listener)
+          listener?.dispose()
+          this.pseudoTerminal.close()
+          resolve(disposed)
+        })
+      )
+    })
+
     try {
       this.currentProcess?.dispose()
-      await this.currentProcess
-      return false
-    } catch {
-      const stopped = !this.currentProcess || this.currentProcess.killed
-      if (stopped) {
-        this.pseudoTerminal.close()
-      }
-      return stopped
-    }
+    } catch {}
+
+    return stopped
   }
 
   public isExperimentRunning() {

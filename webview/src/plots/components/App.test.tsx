@@ -161,7 +161,7 @@ describe('App', () => {
       checkpoint: null,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
-    const emptyState = await screen.findByText('No Plots to Display')
+    const emptyState = await screen.findByText('No Plots to Display.')
 
     expect(emptyState).toBeInTheDocument()
   })

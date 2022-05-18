@@ -44,3 +44,15 @@ body {
 button {
   font-family: inherit;
 }
+
+a {
+  color: var(--vscode-textLink-foreground);
+
+  &:hover {
+    color: var(--vscode-textLink-activeForeground);
+  }
+
+  &:active {
+    color: var(--vscode-textLink-activeForeground);
+  }
+}
