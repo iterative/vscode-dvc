@@ -1,5 +1,6 @@
 import { ChildProcess } from 'child_process'
 import { Readable } from 'stream'
+import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import execa from 'execa'
 import { Logger } from './common/logger'
@@ -16,7 +17,9 @@ interface ProcessResult {
   signal?: string
 }
 
-export type Process = RunningProcess & Promise<ProcessResult> & Disposable
+export type Process = RunningProcess &
+  Promise<ProcessResult> &
+  Disposable & { onDidDispose: Event<boolean> }
 
 export interface ProcessOptions {
   executable: string
@@ -39,10 +42,15 @@ export const createProcess = ({
     windowsHide: true
   })
 
+  const disposed = new EventEmitter<boolean>()
+
   return Object.assign(process, {
     dispose: () => {
-      process.kill('SIGINT')
-    }
+      const kill = require('tree-kill')
+      kill(process.pid, 'SIGINT')
+      disposed.fire(true)
+    },
+    onDidDispose: disposed.event
   })
 }
 
