@@ -165,6 +165,16 @@ export class ExperimentsTree
     )
 
     internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TREE_RUN_RESET,
+      ({ dvcRoot, id }: ExperimentItem) =>
+        this.experiments.modifyExperimentParamsAndRun(
+          AvailableCommands.EXPERIMENT_RUN_RESET,
+          dvcRoot,
+          id
+        )
+    )
+
+    internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_REMOVE,
       ({ dvcRoot, id }: ExperimentItem) =>
         this.experiments.runCommand(

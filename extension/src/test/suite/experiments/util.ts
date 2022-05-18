@@ -44,6 +44,7 @@ export const buildExperiments = (
   const {
     cliExecutor,
     cliReader,
+    cliRunner,
     internalCommands,
     messageSpy,
     mockExperimentShow,
@@ -70,6 +71,7 @@ export const buildExperiments = (
   return {
     cliExecutor,
     cliReader,
+    cliRunner,
     experiments,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     experimentsModel: (experiments as any).experiments,

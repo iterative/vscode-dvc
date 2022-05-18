@@ -403,6 +403,12 @@ export class Experiments extends BaseRepository<TableData> {
               AvailableCommands.EXPERIMENT_RUN,
               message.payload
             )
+          case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
+            return this.modifyExperimentParamsAndRun(
+              AvailableCommands.EXPERIMENT_RUN_RESET,
+              message.payload
+            )
+
           case MessageFromWebviewType.REMOVE_EXPERIMENT:
             return this.removeExperiment(message.payload)
           default:

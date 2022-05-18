@@ -30,7 +30,8 @@ export enum MessageFromWebviewType {
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   VARY_EXPERIMENT_PARAMS_AND_QUEUE = 'vary-experiment-params-and-queue',
-  VARY_EXPERIMENT_PARAMS_AND_RUN = 'vary-experiment-params-and-run'
+  VARY_EXPERIMENT_PARAMS_AND_RUN = 'vary-experiment-params-and-run',
+  VARY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'vary-experiment-params-reset-and-run'
 }
 
 export type ColumnResizePayload = {
@@ -74,6 +75,10 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN
       payload: string
     }
   | {
