@@ -1,6 +1,6 @@
 import { PlotSize } from 'dvc/src/plots/webview/contract'
 
-export const MaxItemsBeforeVirtualization = {
+const MaxItemsBeforeVirtualization = {
   [PlotSize.LARGE]: 10,
   [PlotSize.REGULAR]: 15,
   [PlotSize.SMALL]: 20
@@ -41,3 +41,6 @@ export const getNbItemsPerRow = (size: PlotSize) => {
 
   return size === PlotSize.SMALL && innerWidth >= 600 ? 2 : 1
 }
+
+export const shouldUseVirtualizedGrid = (nbItems: number, size: PlotSize) =>
+  nbItems > MaxItemsBeforeVirtualization[size]

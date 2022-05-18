@@ -15,7 +15,7 @@ import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { ZoomablePlotProps } from '../ZoomablePlot'
 import { PlotsSizeContext } from '../PlotsSizeContext'
-import { MaxItemsBeforeVirtualization } from '../util'
+import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 
 interface TemplatePlotsProps extends ZoomablePlotProps {
@@ -143,16 +143,17 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
       {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
 
-        const useBigGrid =
-          Object.keys(section.entries).length >
-          MaxItemsBeforeVirtualization[size]
+        const useVirtualizedGrid = shouldUseVirtualizedGrid(
+          Object.keys(section.entries).length,
+          size
+        )
 
         const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
 
         const classes = cx({
           [styles.multiViewPlotsGrid]: isMultiView,
           [styles.singleViewPlotsGrid]: !isMultiView,
-          [styles.noBigGrid]: !useBigGrid
+          [styles.noBigGrid]: !useVirtualizedGrid
         })
 
         return (
@@ -171,7 +172,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
                 multiView={isMultiView}
                 setSectionEntries={setSectionEntries}
                 renderZoomedInPlot={renderZoomedInPlot}
-                useBigGrid={useBigGrid}
+                useVirtualizedGrid={useVirtualizedGrid}
                 nbItemsPerRow={nbItemsPerRow}
               />
             </div>

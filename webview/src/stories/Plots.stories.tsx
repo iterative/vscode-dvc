@@ -9,9 +9,8 @@ import {
 import checkpointPlotsFixture, {
   manyCheckpointPlots
 } from 'dvc/src/test/fixtures/expShow/checkpointPlots'
-import templatePlotsFixture, {
-  manyTemplatePlots
-} from 'dvc/src/test/fixtures/plotsDiff/template'
+import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
+import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { chromaticParameters } from './util'
 import { Plots } from '../plots/components/Plots'

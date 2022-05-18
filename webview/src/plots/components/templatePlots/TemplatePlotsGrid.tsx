@@ -3,7 +3,7 @@ import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useEffect, useState } from 'react'
 import { VegaLiteProps } from 'react-vega/lib/VegaLite'
-import { BigGrid } from '../../../shared/components/bigGrid/BigGrid'
+import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
   DragDropContainer,
   OnDrop,
@@ -22,7 +22,7 @@ interface TemplatePlotsGridProps extends ZoomablePlotProps {
   onDropInSection: OnDrop
   multiView: boolean
   setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
-  useBigGrid?: boolean
+  useVirtualizedGrid?: boolean
   nbItemsPerRow: number
 }
 
@@ -39,7 +39,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   multiView,
   setSectionEntries,
   renderZoomedInPlot,
-  useBigGrid,
+  useVirtualizedGrid,
   nbItemsPerRow
 }) => {
   const [order, setOrder] = useState<string[]>([])
@@ -106,9 +106,9 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         wrapperTag: 'div'
       }}
       wrapperComponent={
-        useBigGrid
+        useVirtualizedGrid
           ? {
-              component: BigGrid as React.FC<WrapperProps>,
+              component: VirtualizedGrid as React.FC<WrapperProps>,
               props: { nbItemsPerRow }
             }
           : undefined

@@ -9,12 +9,12 @@ import {
 import styles from './styles.module.scss'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/components/util'
 
-interface BigGridProps {
+interface VirtualizedGridProps {
   items: JSX.Element[]
   nbItemsPerRow: number
 }
 
-export const BigGrid: React.FC<BigGridProps> = ({
+export const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
   items,
   nbItemsPerRow = DEFAULT_NB_ITEMS_PER_ROW
 }) => {

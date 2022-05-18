@@ -16,7 +16,7 @@ import checkpointPlotsFixture, {
   manyCheckpointPlots
 } from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
-import { manyTemplatePlots } from 'dvc/src/test/fixtures/plotsDiff/template'
+import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
   ColorScale,
   DEFAULT_SECTION_COLLAPSED,
@@ -55,6 +55,25 @@ const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
 
 const heightToSuppressVegaError = 1000
+const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+  HTMLElement.prototype,
+  'offsetHeight'
+)?.value
+const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+  HTMLElement.prototype,
+  'offsetWidth'
+)?.value
+
+beforeAll(() => {
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: 50
+  })
+  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+    configurable: true,
+    value: 50
+  })
+})
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -65,6 +84,17 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+})
+
+afterAll(() => {
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: originalOffsetHeight
+  })
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: originalOffsetWidth
+  })
 })
 
 describe('App', () => {
@@ -1125,17 +1155,6 @@ describe('App', () => {
   })
 
   describe('Virtualization', () => {
-    beforeAll(() => {
-      Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-        configurable: true,
-        value: 50
-      })
-      Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
-        configurable: true,
-        value: 50
-      })
-    })
-
     const changeSize = async (size: string, buttonPosition: number) => {
       const sizePickerButton =
         screen.getAllByTestId('icon-menu-item')[buttonPosition]
@@ -1147,6 +1166,21 @@ describe('App', () => {
       fireEvent.click(sizeButton)
       await screen.findByTestId('plots-wrapper')
       fireEvent.click(sizePickerButton)
+      await screen.findByTestId('plots-wrapper')
+    }
+
+    const renderAppAndChangeSize = async (
+      data: PlotsData,
+      size: string,
+      buttonPosition: number
+    ) => {
+      renderAppWithData({
+        ...data,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+      await screen.findByTestId('plots-wrapper')
+
+      await changeSize(size, buttonPosition)
     }
 
     const createCheckpointPlots = (nbOfPlots: number) => {
@@ -1167,13 +1201,11 @@ describe('App', () => {
 
     describe('Large plots', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
-        renderAppWithData({
-          checkpoint: createCheckpointPlots(11),
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Large', 2)
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(11) },
+          'Large',
+          2
+        )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
 
@@ -1187,13 +1219,11 @@ describe('App', () => {
       })
 
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
-        renderAppWithData({
-          checkpoint: createCheckpointPlots(10),
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Large', 2)
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(10) },
+          'Large',
+          2
+        )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
 
@@ -1207,13 +1237,11 @@ describe('App', () => {
       })
 
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
-        renderAppWithData({
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(11)
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Large', 1)
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(11) },
+          'Large',
+          1
+        )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
 
@@ -1227,13 +1255,11 @@ describe('App', () => {
       })
 
       it('should not wrap the template plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
-        renderAppWithData({
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(10)
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Large', 1)
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(10) },
+          'Large',
+          1
+        )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
 
@@ -1251,13 +1277,7 @@ describe('App', () => {
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          renderAppWithData({
-            checkpoint,
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-          })
-          await screen.findByTestId('plots-wrapper')
-
-          await changeSize('Large', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Large', 2)
         })
 
         it('should render one large plot per row per 1000px of screen when the screen is larger than 2000px', () => {
@@ -1306,49 +1326,41 @@ describe('App', () => {
 
     describe('Regular plots', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
-        renderAppWithData({
-          checkpoint: createCheckpointPlots(16),
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Regular', 2)
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(16) },
+          'Regular',
+          2
+        )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fifteen regular plots', async () => {
-        renderAppWithData({
-          checkpoint: createCheckpointPlots(15),
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Regular', 2)
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(15) },
+          'Regular',
+          2
+        )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
-        renderAppWithData({
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(16)
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Regular', 1)
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(16) },
+          'Regular',
+          1
+        )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
       it('should not wrap the template plots in a big grid (virtualize them) when there are fifteen or fewer regular plots', async () => {
-        renderAppWithData({
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(15)
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Regular', 1)
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(15) },
+          'Regular',
+          1
+        )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
@@ -1358,13 +1370,7 @@ describe('App', () => {
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          renderAppWithData({
-            checkpoint,
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-          })
-          await screen.findByTestId('plots-wrapper')
-
-          await changeSize('Regular', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Regular', 2)
         })
 
         it('should render one regular plot per row per 800px of screen when the screen is larger than 2000px', () => {
@@ -1413,49 +1419,41 @@ describe('App', () => {
 
     describe('Small plots', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
-        renderAppWithData({
-          checkpoint: createCheckpointPlots(21),
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Small', 2)
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(21) },
+          'Small',
+          2
+        )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
-        renderAppWithData({
-          checkpoint: createCheckpointPlots(20),
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Small', 2)
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(20) },
+          'Small',
+          2
+        )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
-        renderAppWithData({
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(21)
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Small', 1)
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(21) },
+          'Small',
+          1
+        )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
       it('should not wrap the template plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
-        renderAppWithData({
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-          template: manyTemplatePlots(20)
-        })
-        await screen.findByTestId('plots-wrapper')
-
-        await changeSize('Small', 1)
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(20) },
+          'Small',
+          1
+        )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
@@ -1465,13 +1463,7 @@ describe('App', () => {
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          renderAppWithData({
-            checkpoint,
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-          })
-          await screen.findByTestId('plots-wrapper')
-
-          await changeSize('Small', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Small', 2)
         })
 
         it('should render one small plot per row per 500px of screen when the screen is larger than 2000px', () => {

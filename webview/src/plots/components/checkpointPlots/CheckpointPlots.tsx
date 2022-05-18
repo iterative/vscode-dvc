@@ -21,8 +21,8 @@ import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
 import { ZoomablePlot, ZoomablePlotProps } from '../ZoomablePlot'
 import { PlotsSizeContext } from '../PlotsSizeContext'
-import { BigGrid } from '../../../shared/components/bigGrid/BigGrid'
-import { MaxItemsBeforeVirtualization } from '../util'
+import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
+import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 
 interface CheckpointPlotsProps extends ZoomablePlotProps {
@@ -88,12 +88,12 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     })
     .filter(Boolean)
 
-  const useBigGrid = items.length > MaxItemsBeforeVirtualization[size]
+  const useVirtualizedGrid = shouldUseVirtualizedGrid(items.length, size)
 
   return plots.length > 0 ? (
     <div
       className={cx(styles.singleViewPlotsGrid, {
-        [styles.noBigGrid]: !useBigGrid
+        [styles.noBigGrid]: !useVirtualizedGrid
       })}
     >
       <DragDropContainer
@@ -107,9 +107,9 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
           wrapperTag: 'div'
         }}
         wrapperComponent={
-          useBigGrid
+          useVirtualizedGrid
             ? {
-                component: BigGrid as React.FC<WrapperProps>,
+                component: VirtualizedGrid as React.FC<WrapperProps>,
                 props: { nbItemsPerRow }
               }
             : undefined
