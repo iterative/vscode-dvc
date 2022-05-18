@@ -45,6 +45,9 @@ const evaluate = <T>(
   operator: Operator,
   filterValue: T
 ): boolean => {
+  if (valueToEvaluate === undefined) {
+    return true
+  }
   switch (operator) {
     case Operator.GREATER_THAN:
       return valueToEvaluate > filterValue

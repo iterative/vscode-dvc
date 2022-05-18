@@ -37,6 +37,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     disposable.dispose()
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsFilterByTree', () => {
     it('should appear in the UI', async () => {
       await expect(
@@ -80,15 +81,26 @@ suite('Experiments Filter By Tree Test Suite', () => {
           subRows: main.subRows
             ?.filter(experiment => {
               const accuracy = experiment.metrics?.['summary.json']?.accuracy
-              return accuracy && accuracy >= 0.45
+              return !!(
+                accuracy === undefined ||
+                (accuracy && accuracy >= 0.45)
+              )
             })
-            .map(experiment => ({
-              ...experiment,
-              subRows: experiment.subRows?.filter(checkpoint => {
-                const accuracy = checkpoint.metrics?.['summary.json']?.accuracy
-                return accuracy && accuracy >= 0.45
-              })
-            }))
+            .map(experiment =>
+              experiment.queued
+                ? experiment
+                : {
+                    ...experiment,
+                    subRows: experiment.subRows?.filter(checkpoint => {
+                      const accuracy =
+                        checkpoint.metrics?.['summary.json']?.accuracy
+                      return !!(
+                        accuracy === undefined ||
+                        (accuracy && accuracy >= 0.45)
+                      )
+                    })
+                  }
+            )
         }
       ]
 
