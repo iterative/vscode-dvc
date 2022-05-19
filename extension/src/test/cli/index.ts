@@ -3,9 +3,14 @@ import { URI } from 'vscode-uri'
 import { stub } from 'sinon'
 import mock from 'mock-require'
 import { TEMP_DIR, ENV_DIR } from './constants'
-import { removeDir } from '../../fileSystem'
-import { setupVenv } from '../../python'
-import { runMocha } from '../util/mocha'
+
+const importModulesAfterMockingVsCode = () => {
+  const { removeDir } = require('../../fileSystem')
+  const { runMocha } = require('../util/mocha')
+  const { setupVenv } = require('../../python')
+
+  return { removeDir, runMocha, setupVenv }
+}
 
 class MockEventEmitter {
   public fire() {
@@ -18,6 +23,7 @@ class MockEventEmitter {
 }
 
 mock('vscode', {
+  Event: () => undefined,
   EventEmitter: MockEventEmitter,
   Uri: {
     file: URI.file
@@ -32,6 +38,8 @@ mock('@hediet/std/disposable', {
     })
   }
 })
+
+const { setupVenv, removeDir, runMocha } = importModulesAfterMockingVsCode()
 
 async function main() {
   try {
