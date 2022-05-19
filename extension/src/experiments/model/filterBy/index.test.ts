@@ -31,12 +31,39 @@ describe('filterExperiments', () => {
       id: 3,
       params: {
         'params.yaml': {
+          bool: null,
           filter: 3,
-          sort: 1
+          sort: 1,
+          text: 'not missing'
         }
       }
     }
   ] as unknown as Experiment[]
+
+  it('should not filter experiments if they do not have the provided value (for queued experiments)', () => {
+    const unfilteredQueuedExperiments = filterExperiments(
+      [
+        {
+          operator: Operator.IS_FALSE,
+          path: joinColumnPath(ColumnType.METRICS, 'metrics.json', 'acc'),
+          value: undefined
+        }
+      ],
+      experiments
+    )
+
+    expect(
+      experiments
+        .map(
+          experiment => experiment[ColumnType.METRICS]?.['metrics.json']?.acc
+        )
+        .filter(Boolean)
+    ).toHaveLength(0)
+
+    expect(
+      unfilteredQueuedExperiments.map(experiment => experiment.id)
+    ).toStrictEqual([1, 2, 3])
+  })
 
   it('should return the original experiments if no filters are provided', () => {
     const unFilteredExperiments = filterExperiments([], experiments)

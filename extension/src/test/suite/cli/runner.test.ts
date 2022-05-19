@@ -56,8 +56,11 @@ suite('CLI Runner Test Suite', () => {
         true
       )
 
-      const stopped = await cliRunner.stop()
-      expect(stopped).to.be.true
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const closeSpy = spy((cliRunner as any).pseudoTerminal, 'close')
+
+      await cliRunner.stop()
+      expect(closeSpy).to.be.calledOnce
 
       await completed
 

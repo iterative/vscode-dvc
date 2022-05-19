@@ -9,7 +9,7 @@ import {
 } from '../../util/array'
 import { PlotsModel } from '../model'
 
-export class PlotsData extends BaseData<PlotsOutput> {
+export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
   private model?: PlotsModel
 
   constructor(
@@ -26,7 +26,7 @@ export class PlotsData extends BaseData<PlotsOutput> {
   }
 
   public async update(): Promise<void> {
-    const revisions = flattenUnique([
+    const revs = flattenUnique([
       this.model?.getMissingRevisions() || [],
       this.model?.getMutableRevisions() || []
     ])
@@ -35,12 +35,12 @@ export class PlotsData extends BaseData<PlotsOutput> {
       (await this.internalCommands.executeCommand<boolean>(
         AvailableCommands.IS_EXPERIMENT_RUNNING
       )) &&
-      !definedAndNonEmpty(revisions)
+      !definedAndNonEmpty(revs)
     ) {
       return
     }
 
-    const args = sameContents(revisions, ['workspace']) ? [] : revisions
+    const args = sameContents(revs, ['workspace']) ? [] : revs
 
     const data = await this.internalCommands.executeCommand<PlotsOutput>(
       AvailableCommands.PLOTS_DIFF,
@@ -48,18 +48,18 @@ export class PlotsData extends BaseData<PlotsOutput> {
       ...args
     )
 
-    const files = this.collectFiles(data)
+    const files = this.collectFiles({ data })
 
     this.compareFiles(files)
 
-    return this.notifyChanged(data)
+    return this.notifyChanged({ data, revs })
   }
 
   public managedUpdate() {
     return this.processManager.run('update')
   }
 
-  public collectFiles(data: PlotsOutput) {
+  public collectFiles({ data }: { data: PlotsOutput }) {
     return Object.keys(data)
   }
 

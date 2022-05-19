@@ -39,6 +39,16 @@ const registerExperimentCwdCommands = (
       )
   )
 
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+    () =>
+      experiments.pauseUpdatesThenRun(() =>
+        experiments.modifyExperimentParamsAndRun(
+          AvailableCommands.EXPERIMENT_RUN_RESET
+        )
+      )
+  )
+
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUE,
     () =>
