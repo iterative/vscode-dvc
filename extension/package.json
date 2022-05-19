@@ -678,10 +678,6 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.runner.running"
         },
         {
-          "command": "dvc.resetAndRunCheckpointExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.runner.running"
-        },
-        {
           "command": "dvc.selectForCompare",
           "when": "false"
         },
