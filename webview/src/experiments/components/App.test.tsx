@@ -5,6 +5,7 @@
 import React from 'react'
 import {
   cleanup,
+  createEvent,
   fireEvent,
   render,
   screen,
@@ -24,6 +25,7 @@ import {
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
 import {
+  Column,
   ColumnType,
   Row,
   TableData
@@ -220,7 +222,7 @@ describe('App', () => {
           id: 'D',
           name: 'D',
           path: 'params:D'
-        }
+        } as Column
       ]
     }
 
@@ -668,6 +670,33 @@ describe('App', () => {
       expect(tooltip).toHaveTextContent(
         `Metric: ${String(testMetricNumberValue)}`
       )
+    })
+  })
+
+  describe('Context Menu Suppression', () => {
+    it('Suppresses the context menu on a table with no data', () => {
+      render(<App />)
+      const target = screen.getByText('Loading Experiments...')
+      const contextMenuEvent = createEvent.contextMenu(target)
+      fireEvent(target, contextMenuEvent)
+      expect(contextMenuEvent.defaultPrevented).toBe(true)
+    })
+
+    it('Suppresses the context menu on a table with data', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      const target = screen.getAllByRole('row')[0]
+      const contextMenuEvent = createEvent.contextMenu(target)
+      fireEvent(target, contextMenuEvent)
+      expect(contextMenuEvent.defaultPrevented).toBe(true)
     })
   })
 })

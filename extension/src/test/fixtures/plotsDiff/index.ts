@@ -339,6 +339,21 @@ const basicVega = {
   ]
 }
 
+const basicVegaContent = basicVega[join('logs', 'loss.tsv')][0]
+
+const multipleVega = (length: number) => {
+  if (length === 0) {
+    return {}
+  }
+  const plots = {
+    ...basicVega
+  }
+  for (let i = 1; i < length; i++) {
+    plots[join('logs', `${i}-loss.tsv`)] = [{ ...basicVegaContent }]
+  }
+  return plots
+}
+
 const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'acc.png')]: [
     {
@@ -491,6 +506,16 @@ export const getMinimalWebviewMessage = () => ({
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
+  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
+  size: PlotSize.REGULAR
+})
+
+export const getManyTemplatePlotsWebviewMessage = (
+  length: number
+): TemplatePlotsData => ({
+  plots: extendedSpecs({
+    ...multipleVega(length)
+  }),
   sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })

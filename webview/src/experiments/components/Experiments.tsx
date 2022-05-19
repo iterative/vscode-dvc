@@ -22,7 +22,7 @@ import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
-import { Theme } from '../../shared/components/theme/Theme'
+import { useThemeVariables } from '../../shared/components/theme/Theme'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
 const DEFAULT_COLUMN_WIDTH = 75
@@ -134,6 +134,7 @@ export const ExperimentsTable: React.FC<{
         columnOrder: [],
         columnWidths: {},
         columns: [],
+        hasCheckpoints: false,
         rows: [],
         sorts: [],
         ...initiallyUndefinedTableData
@@ -213,16 +214,21 @@ export const ExperimentsTable: React.FC<{
 const Experiments: React.FC<{
   tableData?: TableData | null
 }> = ({ tableData }) => {
+  const variables = useThemeVariables()
   return (
-    <Theme>
-      <div className={styles.experiments}>
-        {tableData ? (
-          <ExperimentsTable tableData={tableData} />
-        ) : (
-          <EmptyState>Loading Experiments...</EmptyState>
-        )}
-      </div>
-    </Theme>
+    <div
+      className={styles.experiments}
+      style={variables}
+      onContextMenu={e => {
+        e.preventDefault()
+      }}
+    >
+      {tableData ? (
+        <ExperimentsTable tableData={tableData} />
+      ) : (
+        <EmptyState>Loading Experiments...</EmptyState>
+      )}
+    </div>
   )
 }
 

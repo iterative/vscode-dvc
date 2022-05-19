@@ -107,9 +107,10 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_REMOVE]: undefined
   [EventName.EXPERIMENT_REMOVE_QUEUE]: undefined
   [EventName.EXPERIMENT_REMOVE_QUEUED]: undefined
+  [EventName.EXPERIMENT_RESUME]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RUN_QUEUED]: undefined
-  [EventName.EXPERIMENT_RUN_RESET]: undefined
+  [EventName.EXPERIMENT_RESET_AND_RUN]: undefined
   [EventName.EXPERIMENT_SELECT]: undefined
   [EventName.EXPERIMENT_SHOW]: undefined
   [EventName.EXPERIMENT_SORT_ADD]: undefined
@@ -120,11 +121,13 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_TREE_BRANCH]: undefined
   [EventName.EXPERIMENT_TREE_QUEUE]: undefined
   [EventName.EXPERIMENT_TREE_REMOVE]: undefined
+  [EventName.EXPERIMENT_TREE_RESUME]: undefined
   [EventName.EXPERIMENT_TREE_RUN]: undefined
-  [EventName.EXPERIMENT_TREE_RUN_RESET]: undefined
+  [EventName.EXPERIMENT_TREE_RESET_AND_RUN]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE]: undefined
+  [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RESUME]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RUN]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }

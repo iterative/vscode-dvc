@@ -18,9 +18,9 @@ import { Toast } from '../vscode/toast'
 import { Disposable } from '../class/dispose'
 
 export const autoRegisteredCommands = {
+  EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
   EXPERIMENT_RUN: 'runExperiment',
   EXPERIMENT_RUN_QUEUED: 'runExperimentQueue',
-  EXPERIMENT_RUN_RESET: 'runExperimentReset',
   IS_EXPERIMENT_RUNNING: 'isExperimentRunning'
 } as const
 

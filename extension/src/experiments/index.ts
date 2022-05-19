@@ -44,6 +44,7 @@ export const ExperimentsScale = {
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
   public readonly onDidChangeColumns: Event<void>
+  public readonly onDidChangeCheckpoints: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -56,6 +57,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   private readonly experimentsChanged = this.dispose.track(
     new EventEmitter<ExperimentsOutput | void>()
+  )
+
+  private readonly checkpointsChanged = this.dispose.track(
+    new EventEmitter<void>()
   )
 
   private readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
@@ -77,6 +82,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeColumns = this.columnsChanged.event
+    this.onDidChangeCheckpoints = this.checkpointsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
@@ -96,9 +102,13 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.dispose.track(this.cliData.onDidUpdate(data => this.setState(data)))
     this.dispose.track(
-      this.fileSystemData.onDidUpdate(data =>
+      this.fileSystemData.onDidUpdate(data => {
+        const hadCheckpoints = this.hasCheckpoints()
         this.checkpoints.transformAndSet(data)
-      )
+        if (hadCheckpoints !== this.hasCheckpoints()) {
+          this.checkpointsChanged.fire()
+        }
+      })
     )
 
     this.handleMessageFromWebview()
@@ -369,6 +379,7 @@ export class Experiments extends BaseRepository<TableData> {
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
+      hasCheckpoints: this.hasCheckpoints(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
@@ -407,7 +418,7 @@ export class Experiments extends BaseRepository<TableData> {
             )
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
             return this.modifyExperimentParamsAndRun(
-              AvailableCommands.EXPERIMENT_RUN_RESET,
+              AvailableCommands.EXPERIMENT_RESET_AND_RUN,
               message.payload
             )
 

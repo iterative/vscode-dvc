@@ -1,9 +1,11 @@
 import {
+  Section,
   TemplatePlotEntry,
   TemplatePlotGroup,
   TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
-import React, { DragEvent, useState, useEffect } from 'react'
+import React, { DragEvent, useState, useEffect, useContext } from 'react'
+import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
@@ -12,6 +14,9 @@ import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { ZoomablePlotProps } from '../ZoomablePlot'
+import { PlotsSizeContext } from '../PlotsSizeContext'
+import { shouldUseVirtualizedGrid } from '../util'
+import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 
 interface TemplatePlotsProps extends ZoomablePlotProps {
   plots: TemplatePlotSection[]
@@ -28,6 +33,9 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
 }) => {
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
+  const { sizes } = useContext(PlotsSizeContext)
+  const { [Section.TEMPLATE_PLOTS]: size } = sizes
+  const nbItemsPerRow = useNbItemsPerRow(size)
 
   useEffect(() => {
     setSections(plots)
@@ -134,26 +142,38 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
       />
       {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
+
+        const useVirtualizedGrid = shouldUseVirtualizedGrid(
+          Object.keys(section.entries).length,
+          size
+        )
+
+        const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
+
+        const classes = cx({
+          [styles.multiViewPlotsGrid]: isMultiView,
+          [styles.singleViewPlotsGrid]: !isMultiView,
+          [styles.noBigGrid]: !useVirtualizedGrid
+        })
+
         return (
           section.entries.length > 0 && (
             <div
               key={groupId}
               id={groupId}
               data-testid={`plots-section_${groupId}`}
-              className={
-                section.group === TemplatePlotGroup.MULTI_VIEW
-                  ? styles.multiViewPlotsGrid
-                  : styles.singleViewPlotsGrid
-              }
+              className={classes}
             >
               <TemplatePlotsGrid
                 entries={section.entries}
                 groupId={groupId}
                 groupIndex={i}
                 onDropInSection={handleDropInSection}
-                multiView={section.group === TemplatePlotGroup.MULTI_VIEW}
+                multiView={isMultiView}
                 setSectionEntries={setSectionEntries}
                 renderZoomedInPlot={renderZoomedInPlot}
+                useVirtualizedGrid={useVirtualizedGrid}
+                nbItemsPerRow={nbItemsPerRow}
               />
             </div>
           )

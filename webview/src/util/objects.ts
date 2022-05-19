@@ -10,3 +10,7 @@ export const performOrderedUpdate = (
 
   return [...current, ...added].map(item => item?.[key]) as string[]
 }
+
+type BaseType = string | number | boolean | Object | undefined | null
+
+export type Any = BaseType | BaseType[]
