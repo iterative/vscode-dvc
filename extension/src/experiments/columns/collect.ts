@@ -1,3 +1,5 @@
+import { join } from 'path'
+import { Uri } from 'vscode'
 import get from 'lodash/get'
 import { ValueWalkMeta, walkRepo } from './walk'
 import { joinColumnPath, METRIC_PARAM_SEPARATOR } from './paths'
@@ -203,6 +205,16 @@ const collectColumnsChanges = (
       collectFileChanges(changes, type, commitData, file, value)
     }
   }
+}
+
+export const collectParamsFiles = (
+  dvcRoot: string,
+  data: ExperimentsOutput
+): Set<string> => {
+  const files = Object.keys(data.workspace.baseline.data?.params || {}).map(
+    file => Uri.file(join(dvcRoot, file)).fsPath
+  )
+  return new Set(files)
 }
 
 const getData = (value: { baseline: ExperimentFieldsOrError }) =>

@@ -1,5 +1,5 @@
 import { Memento } from 'vscode'
-import { collectChanges, collectColumns } from './collect'
+import { collectChanges, collectColumns, collectParamsFiles } from './collect'
 import { splitColumnPath } from './paths'
 import { Column, ColumnType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
@@ -10,6 +10,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   private columnOrderState: string[] = []
   private columnWidthsState: Record<string, number> = {}
   private columnsChanges: string[] = []
+  private paramsFiles = new Set<string>()
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(
@@ -35,6 +36,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public getColumnWidths(): Record<string, number> {
     return this.columnWidthsState
+  }
+
+  public getParamsFiles() {
+    return this.paramsFiles
   }
 
   public transformAndSet(data: ExperimentsOutput) {
@@ -72,12 +77,16 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     )
   }
 
-  private transformAndSetColumns(data: ExperimentsOutput) {
-    const columns = collectColumns(data)
+  private async transformAndSetColumns(data: ExperimentsOutput) {
+    const [columns, paramsFiles] = await Promise.all([
+      collectColumns(data),
+      collectParamsFiles(this.dvcRoot, data)
+    ])
 
     this.setNewStatuses(columns)
 
     this.data = columns
+    this.paramsFiles = paramsFiles
   }
 
   private transformAndSetChanges(data: ExperimentsOutput) {

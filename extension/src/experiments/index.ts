@@ -1,4 +1,4 @@
-import { Event, EventEmitter, Memento } from 'vscode'
+import { Event, EventEmitter, Memento, Uri, window } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickAndModifyParams } from './model/queue/quickPick'
@@ -34,12 +34,15 @@ import { EventName } from '../telemetry/constants'
 import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
+import { setContextValue } from '../vscode/context'
 
 export const ExperimentsScale = {
   ...ColumnType,
   HAS_CHECKPOINTS: 'hasCheckpoints',
   NO_CHECKPOINTS: 'noCheckpoints'
 } as const
+
+const paramsFileActive = 'dvc.params.fileActive'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -113,6 +116,21 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.handleMessageFromWebview()
     this.setupInitialData()
+
+    window.onDidChangeActiveTextEditor(event => {
+      if (!event) {
+        setContextValue(paramsFileActive, false)
+        return
+      }
+      const path = Uri.file(event.document.fileName).fsPath
+      if (path.includes(this.dvcRoot)) {
+        if (this.columns.getParamsFiles().has(path)) {
+          setContextValue(paramsFileActive, true)
+          return
+        }
+        setContextValue(paramsFileActive, false)
+      }
+    })
   }
 
   public update() {
