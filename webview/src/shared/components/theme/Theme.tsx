@@ -12,7 +12,7 @@ type CSSVariables = DetailedHTMLProps<
   HTMLDivElement
 >
 
-export const Theme: React.FC = ({ children }) => {
+export const useThemeVariables = () => {
   const [variables, setVariables] = useState<CSSVariables>({})
 
   const createCSSVariables = useCallback(() => {
@@ -55,6 +55,11 @@ export const Theme: React.FC = ({ children }) => {
     }
   }, [createCSSVariables, createObserver])
 
+  return variables
+}
+
+export const Theme: React.FC = ({ children }) => {
+  const variables = useThemeVariables()
   return (
     <div style={variables} data-testid="theme-wrapper">
       {children}
