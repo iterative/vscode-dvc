@@ -464,61 +464,61 @@ suite('Plots Test Suite', () => {
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
-  })
 
-  it('should handle a select experiments message from the webview', async () => {
-    const { plots, experiments } = await buildPlots(
-      disposable,
-      plotsDiffFixture
-    )
+    it('should handle a select experiments message from the webview', async () => {
+      const { plots, experiments } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
 
-    const mockSelectExperiments = stub(
-      experiments,
-      'selectExperiments'
-    ).resolves(undefined)
+      const mockSelectExperiments = stub(
+        experiments,
+        'selectExperiments'
+      ).resolves(undefined)
 
-    const webview = await plots.showWebview()
+      const webview = await plots.showWebview()
 
-    const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-    const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-    mockMessageReceived.fire({
-      type: MessageFromWebviewType.SELECT_EXPERIMENTS
-    })
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_EXPERIMENTS
+      })
 
-    expect(mockSelectExperiments).to.be.calledOnce
-    expect(mockSendTelemetryEvent).to.be.calledOnce
-    expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-      EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
-      undefined,
-      undefined
-    )
-  }).timeout(WEBVIEW_TEST_TIMEOUT)
+      expect(mockSelectExperiments).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-  it('should handle a select plots message from the webview', async () => {
-    const { plots } = await buildPlots(disposable, plotsDiffFixture)
+    it('should handle a select plots message from the webview', async () => {
+      const { plots } = await buildPlots(disposable, plotsDiffFixture)
 
-    const mockSelectExperiments = stub(plots, 'selectPlots').resolves(undefined)
+      const mockSelectExperiments = stub(plots, 'selectPlots').resolves(
+        undefined
+      )
 
-    const webview = await plots.showWebview()
+      const webview = await plots.showWebview()
 
-    const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-    const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-    mockMessageReceived.fire({
-      type: MessageFromWebviewType.SELECT_PLOTS
-    })
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_PLOTS
+      })
 
-    expect(mockSelectExperiments).to.be.calledOnce
-    expect(mockSendTelemetryEvent).to.be.calledOnce
-    expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-      EventName.VIEWS_PLOTS_SELECT_PLOTS,
-      undefined,
-      undefined
-    )
-  }).timeout(WEBVIEW_TEST_TIMEOUT)
+      expect(mockSelectExperiments).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SELECT_PLOTS,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-  describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
       const { plots, messageSpy, mockPlotsDiff } = await buildPlots(
         disposable,
