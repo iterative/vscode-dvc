@@ -856,6 +856,16 @@
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
+          "command": "dvc.resumeCheckpointExperiment",
+          "group": "navigation@1",
+          "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
+        },
+        {
+          "command": "dvc.resetAndRunCheckpointExperiment",
+          "group": "navigation@2",
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
+        },
+        {
           "command": "dvc.resetAndRunCheckpointExperiment",
           "group": "navigation@2",
           "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
