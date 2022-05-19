@@ -43,12 +43,13 @@ export interface Column extends ColumnAggregateData {
 }
 
 export type TableData = {
-  rows: Row[]
-  columns: Column[]
-  sorts: SortDefinition[]
   changes: string[]
   columnOrder: string[]
+  columns: Column[]
   columnWidths: Record<string, number>
+  hasCheckpoints: boolean
+  rows: Row[]
+  sorts: SortDefinition[]
 }
 
 export type InitiallyUndefinedTableData = TableData | undefined

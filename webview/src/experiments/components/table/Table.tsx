@@ -9,7 +9,8 @@ import { InstanceProp, RowProp, TableProps, WithChanges } from './interfaces'
 export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   row,
   instance,
-  contextMenuDisabled
+  contextMenuDisabled,
+  projectHasCheckpoints
 }) => {
   instance.prepareRow(row)
   return (
@@ -17,6 +18,7 @@ export const NestedRow: React.FC<RowProp & InstanceProp> = ({
       row={row}
       className={styles.nestedRow}
       contextMenuDisabled={contextMenuDisabled}
+      projectHasCheckpoints={projectHasCheckpoints}
     />
   )
 }
@@ -24,7 +26,8 @@ export const NestedRow: React.FC<RowProp & InstanceProp> = ({
 export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
   row,
   instance,
-  contextMenuDisabled
+  contextMenuDisabled,
+  projectHasCheckpoints
 }) => {
   instance.prepareRow(row)
   return (
@@ -38,6 +41,7 @@ export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
         row={row}
         instance={instance}
         contextMenuDisabled={contextMenuDisabled}
+        projectHasCheckpoints={projectHasCheckpoints}
       />
       {row.isExpanded &&
         row.subRows.map(row => (
@@ -46,6 +50,7 @@ export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
             instance={instance}
             key={row.id}
             contextMenuDisabled={contextMenuDisabled}
+            projectHasCheckpoints={projectHasCheckpoints}
           />
         ))}
     </div>
@@ -56,7 +61,8 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
   row,
   instance,
   changes,
-  contextMenuDisabled
+  contextMenuDisabled,
+  projectHasCheckpoints
 }) => {
   instance.prepareRow(row)
   return (
@@ -73,6 +79,7 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
     >
       <RowContent
         row={row}
+        projectHasCheckpoints={projectHasCheckpoints}
         changes={changes}
         contextMenuDisabled={contextMenuDisabled}
       />
@@ -83,6 +90,7 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
             instance={instance}
             key={subRow.values.id}
             contextMenuDisabled={contextMenuDisabled}
+            projectHasCheckpoints={projectHasCheckpoints}
           />
         ))}
     </div>
@@ -94,7 +102,13 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   tableData
 }) => {
   const { getTableProps, rows } = instance
-  const { sorts, columns, changes, rows: experimentRows } = tableData
+  const {
+    sorts,
+    columns,
+    changes,
+    rows: experimentRows,
+    hasCheckpoints
+  } = tableData
 
   const someExperimentsRunning = React.useMemo(() => {
     const findRunningExperiment: (experiments?: Row[]) => boolean = (
@@ -120,6 +134,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
             key={row.id}
             changes={changes}
             contextMenuDisabled={someExperimentsRunning}
+            projectHasCheckpoints={hasCheckpoints}
           />
         ))}
       </div>
