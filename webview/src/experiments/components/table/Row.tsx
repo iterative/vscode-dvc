@@ -39,9 +39,6 @@ const experimentMenuOption = (
   } as MessagesMenuOptionProps
 }
 
-const isNotCheckpoint = (depth: number, isWorkspace: boolean): boolean =>
-  depth <= 1 || isWorkspace
-
 export const RowContextMenu: React.FC<RowProp> = ({
   projectHasCheckpoints = false,
   row: {
@@ -79,7 +76,9 @@ export const RowContextMenu: React.FC<RowProp> = ({
       )
     ])
 
-    pushIf(isNotCheckpoint(depth, isWorkspace) && !projectHasCheckpoints, [
+    const isNotCheckpoint = depth <= 1 || isWorkspace
+
+    pushIf(isNotCheckpoint && !projectHasCheckpoints, [
       experimentMenuOption(
         id,
         'Modify and Run',
@@ -87,7 +86,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       )
     ])
 
-    pushIf(isNotCheckpoint(depth, isWorkspace) && projectHasCheckpoints, [
+    pushIf(isNotCheckpoint && projectHasCheckpoints, [
       experimentMenuOption(
         id,
         'Modify and Resume',
@@ -100,7 +99,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       )
     ])
 
-    pushIf(isNotCheckpoint(depth, isWorkspace), [
+    pushIf(isNotCheckpoint, [
       experimentMenuOption(
         id,
         'Modify and Queue',
