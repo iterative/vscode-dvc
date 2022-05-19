@@ -78,20 +78,15 @@ export const RowContextMenu: React.FC<RowProp> = ({
 
     const isNotCheckpoint = depth <= 1 || isWorkspace
 
-    pushIf(isNotCheckpoint && !projectHasCheckpoints, [
+    pushIf(isNotCheckpoint, [
       experimentMenuOption(
         id,
-        'Modify and Run',
+        projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
         MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
       )
     ])
 
     pushIf(isNotCheckpoint && projectHasCheckpoints, [
-      experimentMenuOption(
-        id,
-        'Modify and Resume',
-        MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
-      ),
       experimentMenuOption(
         id,
         'Modify, Reset and Run',
