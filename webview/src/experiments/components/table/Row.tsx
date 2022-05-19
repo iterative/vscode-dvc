@@ -39,7 +39,11 @@ const experimentMenuOption = (
   } as MessagesMenuOptionProps
 }
 
+const isNotCheckpoint = (depth: number, isWorkspace: boolean): boolean =>
+  depth <= 1 || isWorkspace
+
 export const RowContextMenu: React.FC<RowProp> = ({
+  projectHasCheckpoints = false,
   row: {
     original: { queued },
     depth,
@@ -75,17 +79,28 @@ export const RowContextMenu: React.FC<RowProp> = ({
       )
     ])
 
-    pushIf(depth <= 1 || isWorkspace, [
+    pushIf(isNotCheckpoint(depth, isWorkspace) && !projectHasCheckpoints, [
       experimentMenuOption(
         id,
         'Modify and Run',
         MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
+      )
+    ])
+
+    pushIf(isNotCheckpoint(depth, isWorkspace) && projectHasCheckpoints, [
+      experimentMenuOption(
+        id,
+        'Modify and Resume',
+        MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
       ),
       experimentMenuOption(
         id,
-        'Modify Reset and Run',
+        'Modify, Reset and Run',
         MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN
-      ),
+      )
+    ])
+
+    pushIf(isNotCheckpoint(depth, isWorkspace), [
       experimentMenuOption(
         id,
         'Modify and Queue',
@@ -94,14 +109,20 @@ export const RowContextMenu: React.FC<RowProp> = ({
     ])
 
     return menuOptions
-  }, [queued, isWorkspace, depth, id])
+  }, [queued, isWorkspace, depth, id, projectHasCheckpoints])
 
   return <MessagesMenu options={contextMenuOptions} />
 }
 
 export const RowContent: React.FC<
   RowProp & { className?: string } & WithChanges
-> = ({ row, className, changes, contextMenuDisabled }): JSX.Element => {
+> = ({
+  row,
+  className,
+  changes,
+  contextMenuDisabled,
+  projectHasCheckpoints
+}): JSX.Element => {
   const {
     getRowProps,
     cells: [firstCell, ...cells],
@@ -124,7 +145,12 @@ export const RowContent: React.FC<
   return (
     <ContextMenu
       disabled={contextMenuDisabled}
-      content={<RowContextMenu row={row} />}
+      content={
+        <RowContextMenu
+          row={row}
+          projectHasCheckpoints={projectHasCheckpoints}
+        />
+      }
     >
       <div
         {...getRowProps({

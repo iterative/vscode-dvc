@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { ColumnType } from 'dvc/src/experiments/webview/contract'
+import { ColumnType, TableData } from 'dvc/src/experiments/webview/contract'
 import { DND_DRAGGABLE_DATA_ATTR } from 'react-beautiful-dnd-test-utils'
 
 export const defaultColumns = ['Experiment', 'Timestamp']
@@ -31,11 +31,12 @@ export const columns = [
   }
 ]
 
-export const tableData = {
+export const tableData: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
   columns,
+  hasCheckpoints: false,
   rows: [
     {
       id: 'workspace',
