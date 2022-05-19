@@ -8,7 +8,8 @@ import {
   cleanup,
   screen,
   fireEvent,
-  within
+  within,
+  createEvent
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
@@ -1118,5 +1119,26 @@ describe('App', () => {
     fireEvent.click(screen.getByTestId('modal-content'))
 
     expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  describe('Context Menu Suppression', () => {
+    it('Suppresses the context menu with no plots data', () => {
+      render(<App />)
+      const target = screen.getByText('Loading Plots...')
+      const contextMenuEvent = createEvent.contextMenu(target)
+      fireEvent(target, contextMenuEvent)
+      expect(contextMenuEvent.defaultPrevented).toBe(true)
+    })
+
+    it('Suppresses the context menu with plots data', () => {
+      renderAppWithData({
+        checkpoint: checkpointPlotsFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+      const target = screen.getByText('Experiment Checkpoints')
+      const contextMenuEvent = createEvent.contextMenu(target)
+      fireEvent(target, contextMenuEvent)
+      expect(contextMenuEvent.defaultPrevented).toBe(true)
+    })
   })
 })
