@@ -41,7 +41,7 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   const isHovered = hoveredSection === id
 
   return (
-    <div className={styles.singleViewPlotsGrid}>
+    <div className={cx(styles.singleViewPlotsGrid, styles.noBigGrid)}>
       <div
         id={id}
         data-testid={id}

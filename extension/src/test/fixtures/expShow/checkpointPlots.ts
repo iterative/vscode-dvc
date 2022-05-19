@@ -93,4 +93,10 @@ const data: CheckpointPlotsData = {
   sectionName: DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS]
 }
 
+export const manyCheckpointPlots = (length: number) =>
+  Array.from({ length }, () => data.plots[0]).map((plot, i) => ({
+    ...plot,
+    title: plot.title + i.toString()
+  }))
+
 export default data

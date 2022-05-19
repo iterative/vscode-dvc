@@ -8,6 +8,7 @@ import React, {
 import { DragEnterDirection, getDragEnterDirection } from './util'
 import { DragDropContext, DragDropContextValue } from './DragDropContext'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
+import { Any } from '../../../util/objects'
 
 const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
   if (direction === DragEnterDirection.RIGHT) {
@@ -19,6 +20,10 @@ const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
 
 const isSameGroup = (group1?: string, group2?: string) =>
   getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
+
+export type WrapperProps = {
+  items: JSX.Element[]
+}
 
 export type OnDrop = (
   draggedId: string,
@@ -37,6 +42,12 @@ interface DragDropContainerProps {
     element: JSX.Element
     wrapperTag: 'div' | 'th'
   }
+  wrapperComponent?: {
+    component: React.FC<WrapperProps>
+    props: {
+      [key: string]: Any
+    }
+  }
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -46,7 +57,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   items,
   group,
   onDrop,
-  dropTarget
+  dropTarget,
+  wrapperComponent
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
@@ -130,6 +143,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
     const orderIdxChanged = droppedIndex + orderIdxChange
     const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
+    setDraggedId('')
 
     if (isEnabled && isSameGroup(e.dataTransfer.getData('group'), group)) {
       applyDrop(e, orderIdxChanged, draggedIndex, newOrder, oldDraggedId)
@@ -174,31 +188,34 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     />
   )
 
-  return (
-    <>
-      {items.flatMap(draggable => {
-        const { id } = draggable.props
-        const item = id && buildItem(id, draggable)
+  const wrappedItems = items.flatMap(draggable => {
+    const { id } = draggable.props
+    const item = id && buildItem(id, draggable)
 
-        if (id === draggedOverId) {
-          const target = (
-            <dropTarget.wrapperTag
-              data-testid="drop-target"
-              key="drop-target"
-              onDragOver={handleDragOver}
-              onDrop={handleOnDrop}
-              id={`${id}__drop`}
-            >
-              {dropTarget.element}
-            </dropTarget.wrapperTag>
-          )
-          return direction === DragEnterDirection.RIGHT
-            ? [item, target]
-            : [target, item]
-        }
+    if (id === draggedOverId) {
+      const target = (
+        <dropTarget.wrapperTag
+          data-testid="drop-target"
+          key="drop-target"
+          onDragOver={handleDragOver}
+          onDrop={handleOnDrop}
+          id={`${id}__drop`}
+        >
+          {dropTarget.element}
+        </dropTarget.wrapperTag>
+      )
+      return direction === DragEnterDirection.RIGHT
+        ? [item, target]
+        : [target, item]
+    }
 
-        return item
-      })}
-    </>
+    return item
+  })
+
+  const Wrapper = wrapperComponent?.component
+  return Wrapper ? (
+    <Wrapper {...wrapperComponent.props} items={wrappedItems} />
+  ) : (
+    <>{wrappedItems}</>
   )
 }

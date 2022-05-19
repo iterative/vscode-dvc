@@ -13,18 +13,16 @@ export const TemplatePlotsWrapper: React.FC<TemplatePlotsWrapperProps> = ({
   templatePlots,
   basicContainerProps,
   renderZoomedInPlot
-}) => {
-  return (
-    <PlotsContainer
-      title={templatePlots.sectionName}
-      sectionKey={Section.TEMPLATE_PLOTS}
-      currentSize={templatePlots.size}
-      {...basicContainerProps}
-    >
-      <TemplatePlots
-        plots={templatePlots.plots}
-        renderZoomedInPlot={renderZoomedInPlot}
-      />
-    </PlotsContainer>
-  )
-}
+}) => (
+  <PlotsContainer
+    title={templatePlots.sectionName}
+    sectionKey={Section.TEMPLATE_PLOTS}
+    currentSize={templatePlots.size}
+    {...basicContainerProps}
+  >
+    <TemplatePlots
+      plots={templatePlots.plots}
+      renderZoomedInPlot={renderZoomedInPlot}
+    />
+  </PlotsContainer>
+)
