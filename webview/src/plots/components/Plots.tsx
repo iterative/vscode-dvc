@@ -12,13 +12,17 @@ import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper
 import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
-import { Theme } from '../../shared/components/theme/Theme'
+import { useThemeVariables } from '../../shared/components/theme/Theme'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { sendMessage } from '../../shared/vscode'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 
+interface PlotsProps {
+  state: PlotsWebviewState
+}
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export const Plots = ({ state }: { state: PlotsWebviewState }) => {
+const PlotsContent = ({ state }: PlotsProps) => {
   const { data } = state
 
   const [zoomedInPlot, setZoomedInPlot] = useState<VegaLiteProps | undefined>(
@@ -109,35 +113,33 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
   ) => section?.size || PlotSize.REGULAR
 
   return (
-    <Theme>
-      <DragDropProvider>
-        <PlotsSizeProvider
-          sizes={{
-            [Section.CHECKPOINT_PLOTS]: currentSizeOrRegular(checkpointPlots),
-            [Section.TEMPLATE_PLOTS]: currentSizeOrRegular(templatePlots),
-            [Section.COMPARISON_TABLE]: currentSizeOrRegular(comparisonTable)
-          }}
-        >
-          {templatePlots && (
-            <TemplatePlotsWrapper
-              templatePlots={templatePlots}
-              {...wrapperProps}
-            />
-          )}
-          {comparisonTable && (
-            <ComparisonTableWrapper
-              comparisonTable={comparisonTable}
-              {...wrapperProps}
-            />
-          )}
-          {checkpointPlots && (
-            <CheckpointPlotsWrapper
-              checkpointPlots={checkpointPlots}
-              {...wrapperProps}
-            />
-          )}
-        </PlotsSizeProvider>
-      </DragDropProvider>
+    <DragDropProvider>
+      <PlotsSizeProvider
+        sizes={{
+          [Section.CHECKPOINT_PLOTS]: currentSizeOrRegular(checkpointPlots),
+          [Section.TEMPLATE_PLOTS]: currentSizeOrRegular(templatePlots),
+          [Section.COMPARISON_TABLE]: currentSizeOrRegular(comparisonTable)
+        }}
+      >
+        {templatePlots && (
+          <TemplatePlotsWrapper
+            templatePlots={templatePlots}
+            {...wrapperProps}
+          />
+        )}
+        {comparisonTable && (
+          <ComparisonTableWrapper
+            comparisonTable={comparisonTable}
+            {...wrapperProps}
+          />
+        )}
+        {checkpointPlots && (
+          <CheckpointPlotsWrapper
+            checkpointPlots={checkpointPlots}
+            {...wrapperProps}
+          />
+        )}
+      </PlotsSizeProvider>
 
       {zoomedInPlot && (
         <Modal onClose={handleModalClose}>
@@ -158,6 +160,21 @@ export const Plots = ({ state }: { state: PlotsWebviewState }) => {
           </div>
         </Modal>
       )}
-    </Theme>
+    </DragDropProvider>
+  )
+}
+
+export const Plots = ({ state }: PlotsProps) => {
+  const variables = useThemeVariables()
+
+  return (
+    <div
+      style={variables}
+      onContextMenu={e => {
+        e.preventDefault()
+      }}
+    >
+      <PlotsContent state={state} />
+    </div>
   )
 }
