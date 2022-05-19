@@ -252,7 +252,9 @@ export class Experiments extends BaseRepository<TableData> {
     this.experiments.setSelectionMode(useFilters)
 
     if (useFilters) {
-      const filteredExperiments = this.experiments.getFilteredExperiments()
+      const filteredExperiments = this.experiments
+        .getFilteredExperiments()
+        .filter(exp => !exp.queued)
       if (tooManySelected(filteredExperiments)) {
         await this.warnAndDoNotAutoApply(filteredExperiments)
       } else {

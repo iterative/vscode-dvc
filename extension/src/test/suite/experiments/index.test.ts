@@ -327,186 +327,188 @@ suite('Experiments Test Suite', () => {
         undefined
       )
     })
+  })
 
-    describe('Handling webview messages that run extension commands', () => {
-      const setupExperimentsAndMockCommands = () => {
-        const { experiments, internalCommands } = buildExperiments(
-          disposable,
-          expShowFixture
-        )
-        const mockExecuteCommand = stub(
-          internalCommands,
-          'executeCommand'
-        ).resolves(undefined)
+  describe('handleMessageFromWebview', () => {
+    const setupExperimentsAndMockCommands = () => {
+      const { experiments, internalCommands } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+      const mockExecuteCommand = stub(
+        internalCommands,
+        'executeCommand'
+      ).resolves(undefined)
 
-        return { experiments, mockExecuteCommand }
-      }
+      return { experiments, mockExecuteCommand }
+    }
 
-      it('should be able to handle a message to apply an experiment to workspace', async () => {
-        const { experiments, mockExecuteCommand } =
-          setupExperimentsAndMockCommands()
+    it('should be able to handle a message to apply an experiment to workspace', async () => {
+      const { experiments, mockExecuteCommand } =
+        setupExperimentsAndMockCommands()
 
-        const webview = await experiments.showWebview()
-        const mockMessageReceived = getMessageReceivedEmitter(webview)
-        const mockExperimentId = 'mock-experiment-id'
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentId = 'mock-experiment-id'
 
-        mockMessageReceived.fire({
-          payload: mockExperimentId,
-          type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
-        })
-
-        expect(mockExecuteCommand).to.be.calledOnce
-        expect(mockExecuteCommand).to.be.calledWithExactly(
-          AvailableCommands.EXPERIMENT_APPLY,
-          dvcDemoPath,
-          mockExperimentId
-        )
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
       })
 
-      it('should be able to handle a message to create a branch from an experiment', async () => {
-        const { experiments, mockExecuteCommand } =
-          setupExperimentsAndMockCommands()
-
-        const mockBranch = 'mock-branch-input'
-        const inputEvent = getInputBoxEvent(mockBranch)
-
-        const webview = await experiments.showWebview()
-        const mockMessageReceived = getMessageReceivedEmitter(webview)
-        const mockExperimentId = 'mock-experiment-id'
-
-        mockMessageReceived.fire({
-          payload: mockExperimentId,
-          type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
-        })
-
-        await inputEvent
-        expect(mockExecuteCommand).to.be.calledOnce
-        expect(mockExecuteCommand).to.be.calledWithExactly(
-          AvailableCommands.EXPERIMENT_BRANCH,
-          dvcDemoPath,
-          mockExperimentId,
-          mockBranch
-        )
-      })
-
-      it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
-        const { experiments, mockExecuteCommand } =
-          setupExperimentsAndMockCommands()
-
-        const mockModifiedParams = [
-          '-S',
-          'params.yaml:lr=0.001',
-          '-S',
-          'params.yaml:weight_decay=0'
-        ]
-
-        stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-
-        const webview = await experiments.showWebview()
-        const mockMessageReceived = getMessageReceivedEmitter(webview)
-        const mockExperimentId = 'mock-experiment-id'
-        const tableChangePromise = experimentsUpdatedEvent(experiments)
-
-        mockMessageReceived.fire({
-          payload: mockExperimentId,
-          type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
-        })
-
-        await tableChangePromise
-        expect(mockExecuteCommand).to.be.calledOnce
-        expect(mockExecuteCommand).to.be.calledWithExactly(
-          AvailableCommands.EXPERIMENT_QUEUE,
-          dvcDemoPath,
-          ...mockModifiedParams
-        )
-      })
-
-      it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
-        const { experiments, mockExecuteCommand } =
-          setupExperimentsAndMockCommands()
-
-        const mockModifiedParams = [
-          '-S',
-          'params.yaml:lr=0.001',
-          '-S',
-          'params.yaml:weight_decay=0'
-        ]
-
-        stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-
-        const webview = await experiments.showWebview()
-        const mockMessageReceived = getMessageReceivedEmitter(webview)
-        const mockExperimentId = 'mock-experiment-id'
-        const tableChangePromise = experimentsUpdatedEvent(experiments)
-
-        mockMessageReceived.fire({
-          payload: mockExperimentId,
-          type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
-        })
-
-        await tableChangePromise
-        expect(mockExecuteCommand).to.be.calledOnce
-        expect(mockExecuteCommand).to.be.calledWithExactly(
-          AvailableCommands.EXPERIMENT_RUN,
-          dvcDemoPath,
-          ...mockModifiedParams
-        )
-      })
-
-      it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
-        const { experiments, mockExecuteCommand } =
-          setupExperimentsAndMockCommands()
-
-        const mockModifiedParams = [
-          '-S',
-          'params.yaml:lr=0.0001',
-          '-S',
-          'params.yaml:weight_decay=0.2'
-        ]
-
-        stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-
-        const webview = await experiments.showWebview()
-        const mockMessageReceived = getMessageReceivedEmitter(webview)
-        const mockExperimentId = 'mock-experiment-id'
-        const tableChangePromise = experimentsUpdatedEvent(experiments)
-
-        mockMessageReceived.fire({
-          payload: mockExperimentId,
-          type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN
-        })
-
-        await tableChangePromise
-        expect(mockExecuteCommand).to.be.calledOnce
-        expect(mockExecuteCommand).to.be.calledWithExactly(
-          AvailableCommands.EXPERIMENT_RUN_RESET,
-          dvcDemoPath,
-          ...mockModifiedParams
-        )
-      })
-
-      it('should be able to handle a message to remove an experiment', async () => {
-        const { experiments, mockExecuteCommand } =
-          setupExperimentsAndMockCommands()
-
-        const webview = await experiments.showWebview()
-        const mockMessageReceived = getMessageReceivedEmitter(webview)
-        const mockExperimentId = 'mock-experiment-id'
-
-        mockMessageReceived.fire({
-          payload: mockExperimentId,
-          type: MessageFromWebviewType.REMOVE_EXPERIMENT
-        })
-
-        expect(mockExecuteCommand).to.be.calledOnce
-        expect(mockExecuteCommand).to.be.calledWithExactly(
-          AvailableCommands.EXPERIMENT_REMOVE,
-          dvcDemoPath,
-          mockExperimentId
-        )
-      })
+      expect(mockExecuteCommand).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        AvailableCommands.EXPERIMENT_APPLY,
+        dvcDemoPath,
+        mockExperimentId
+      )
     })
 
+    it('should be able to handle a message to create a branch from an experiment', async () => {
+      const { experiments, mockExecuteCommand } =
+        setupExperimentsAndMockCommands()
+
+      const mockBranch = 'mock-branch-input'
+      const inputEvent = getInputBoxEvent(mockBranch)
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentId = 'mock-experiment-id'
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
+      })
+
+      await inputEvent
+      expect(mockExecuteCommand).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        AvailableCommands.EXPERIMENT_BRANCH,
+        dvcDemoPath,
+        mockExperimentId,
+        mockBranch
+      )
+    })
+
+    it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
+      const { experiments, mockExecuteCommand } =
+        setupExperimentsAndMockCommands()
+
+      const mockModifiedParams = [
+        '-S',
+        'params.yaml:lr=0.001',
+        '-S',
+        'params.yaml:weight_decay=0'
+      ]
+
+      stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentId = 'mock-experiment-id'
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
+      })
+
+      await tableChangePromise
+      expect(mockExecuteCommand).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        AvailableCommands.EXPERIMENT_QUEUE,
+        dvcDemoPath,
+        ...mockModifiedParams
+      )
+    })
+
+    it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
+      const { experiments, mockExecuteCommand } =
+        setupExperimentsAndMockCommands()
+
+      const mockModifiedParams = [
+        '-S',
+        'params.yaml:lr=0.001',
+        '-S',
+        'params.yaml:weight_decay=0'
+      ]
+
+      stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentId = 'mock-experiment-id'
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
+      })
+
+      await tableChangePromise
+      expect(mockExecuteCommand).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        AvailableCommands.EXPERIMENT_RUN,
+        dvcDemoPath,
+        ...mockModifiedParams
+      )
+    })
+
+    it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
+      const { experiments, mockExecuteCommand } =
+        setupExperimentsAndMockCommands()
+
+      const mockModifiedParams = [
+        '-S',
+        'params.yaml:lr=0.0001',
+        '-S',
+        'params.yaml:weight_decay=0.2'
+      ]
+
+      stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentId = 'mock-experiment-id'
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN
+      })
+
+      await tableChangePromise
+      expect(mockExecuteCommand).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        AvailableCommands.EXPERIMENT_RUN_RESET,
+        dvcDemoPath,
+        ...mockModifiedParams
+      )
+    })
+
+    it('should be able to handle a message to remove an experiment', async () => {
+      const { experiments, mockExecuteCommand } =
+        setupExperimentsAndMockCommands()
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentId = 'mock-experiment-id'
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.REMOVE_EXPERIMENT
+      })
+
+      expect(mockExecuteCommand).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        AvailableCommands.EXPERIMENT_REMOVE,
+        dvcDemoPath,
+        mockExperimentId
+      )
+    })
+  })
+
+  describe('Sorting', () => {
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
 
