@@ -12,8 +12,11 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture, {
+  manyCheckpointPlots
+} from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
+import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
   ColorScale,
   DEFAULT_SECTION_COLLAPSED,
@@ -28,6 +31,7 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
+import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
@@ -51,6 +55,25 @@ const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
 
 const heightToSuppressVegaError = 1000
+const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+  HTMLElement.prototype,
+  'offsetHeight'
+)?.value
+const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+  HTMLElement.prototype,
+  'offsetWidth'
+)?.value
+
+beforeAll(() => {
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: 50
+  })
+  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+    configurable: true,
+    value: 50
+  })
+})
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -61,6 +84,17 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+})
+
+afterAll(() => {
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: originalOffsetHeight
+  })
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    value: originalOffsetWidth
+  })
 })
 
 describe('App', () => {
@@ -1118,5 +1152,371 @@ describe('App', () => {
     fireEvent.click(screen.getByTestId('modal-content'))
 
     expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  describe('Virtualization', () => {
+    const changeSize = async (size: string, buttonPosition: number) => {
+      const sizePickerButton =
+        screen.getAllByTestId('icon-menu-item')[buttonPosition]
+      fireEvent.mouseEnter(sizePickerButton)
+      fireEvent.click(sizePickerButton)
+
+      const sizeButton = await screen.findByText(size)
+
+      fireEvent.click(sizeButton)
+      await screen.findByTestId('plots-wrapper')
+      fireEvent.click(sizePickerButton)
+      await screen.findByTestId('plots-wrapper')
+    }
+
+    const renderAppAndChangeSize = async (
+      data: PlotsData,
+      size: string,
+      buttonPosition: number
+    ) => {
+      renderAppWithData({
+        ...data,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+      await screen.findByTestId('plots-wrapper')
+
+      await changeSize(size, buttonPosition)
+    }
+
+    const createCheckpointPlots = (nbOfPlots: number) => {
+      const plots = manyCheckpointPlots(nbOfPlots)
+      return {
+        ...checkpointPlotsFixture,
+        plots,
+        selectedMetrics: plots.map(plot => plot.title)
+      }
+    }
+
+    const resizeScreen = (width: number) => {
+      act(() => {
+        global.innerWidth = width
+        global.dispatchEvent(new Event('resize'))
+      })
+    }
+
+    describe('Large plots', () => {
+      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(11) },
+          'Large',
+          2
+        )
+
+        expect(screen.getByRole('grid')).toBeInTheDocument()
+
+        sendSetDataMessage({
+          checkpoint: createCheckpointPlots(50)
+        })
+
+        await screen.findByTestId('plots-wrapper')
+
+        expect(screen.getByRole('grid')).toBeInTheDocument()
+      })
+
+      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(10) },
+          'Large',
+          2
+        )
+
+        expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+
+        sendSetDataMessage({
+          checkpoint: createCheckpointPlots(1)
+        })
+
+        await screen.findByTestId('plots-wrapper')
+
+        expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+      })
+
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(11) },
+          'Large',
+          1
+        )
+
+        expect(screen.getByRole('grid')).toBeInTheDocument()
+
+        sendSetDataMessage({
+          template: manyTemplatePlots(50)
+        })
+
+        await screen.findByTestId('plots-wrapper')
+
+        expect(screen.getByRole('grid')).toBeInTheDocument()
+      })
+
+      it('should not wrap the template plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(10) },
+          'Large',
+          1
+        )
+
+        expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+
+        sendSetDataMessage({
+          template: manyTemplatePlots(1)
+        })
+
+        await screen.findByTestId('plots-wrapper')
+
+        expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+      })
+
+      describe('Sizing', () => {
+        const checkpoint = createCheckpointPlots(40)
+
+        beforeEach(async () => {
+          // eslint-disable-next-line testing-library/no-render-in-setup
+          await renderAppAndChangeSize({ checkpoint }, 'Large', 2)
+        })
+
+        it('should render one large plot per row per 1000px of screen when the screen is larger than 2000px', () => {
+          resizeScreen(3000)
+
+          let plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+
+          resizeScreen(5453)
+
+          plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render three large plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+          resizeScreen(1849)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render two large plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+          resizeScreen(936)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render one large plot per row when the screen is smaller than 800px', () => {
+          resizeScreen(563)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[4].id).toBe(checkpoint.plots[4].title)
+        })
+      })
+    })
+
+    describe('Regular plots', () => {
+      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(16) },
+          'Regular',
+          2
+        )
+
+        expect(screen.getByRole('grid')).toBeInTheDocument()
+      })
+
+      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fifteen regular plots', async () => {
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(15) },
+          'Regular',
+          2
+        )
+
+        expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+      })
+
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(16) },
+          'Regular',
+          1
+        )
+
+        expect(screen.getByRole('grid')).toBeInTheDocument()
+      })
+
+      it('should not wrap the template plots in a big grid (virtualize them) when there are fifteen or fewer regular plots', async () => {
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(15) },
+          'Regular',
+          1
+        )
+
+        expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+      })
+
+      describe('Sizing', () => {
+        const checkpoint = createCheckpointPlots(40)
+
+        beforeEach(async () => {
+          // eslint-disable-next-line testing-library/no-render-in-setup
+          await renderAppAndChangeSize({ checkpoint }, 'Regular', 2)
+        })
+
+        it('should render one regular plot per row per 800px of screen when the screen is larger than 2000px', () => {
+          resizeScreen(3200)
+
+          let plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+
+          resizeScreen(6453)
+
+          plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render four regular plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+          resizeScreen(1889)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render three regular plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+          resizeScreen(938)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render one regular plot per row when the screen is smaller than 800px', () => {
+          resizeScreen(562)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[4].id).toBe(checkpoint.plots[4].title)
+        })
+      })
+    })
+
+    describe('Small plots', () => {
+      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(21) },
+          'Small',
+          2
+        )
+
+        expect(screen.getByRole('grid')).toBeInTheDocument()
+      })
+
+      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
+        await renderAppAndChangeSize(
+          { checkpoint: createCheckpointPlots(20) },
+          'Small',
+          2
+        )
+
+        expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+      })
+
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(21) },
+          'Small',
+          1
+        )
+
+        expect(screen.getByRole('grid')).toBeInTheDocument()
+      })
+
+      it('should not wrap the template plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
+        await renderAppAndChangeSize(
+          { template: manyTemplatePlots(20) },
+          'Small',
+          1
+        )
+
+        expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+      })
+
+      describe('Sizing', () => {
+        const checkpoint = createCheckpointPlots(40)
+
+        beforeEach(async () => {
+          // eslint-disable-next-line testing-library/no-render-in-setup
+          await renderAppAndChangeSize({ checkpoint }, 'Small', 2)
+        })
+
+        it('should render one small plot per row per 500px of screen when the screen is larger than 2000px', () => {
+          resizeScreen(3004)
+
+          let plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+
+          resizeScreen(5473)
+
+          plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render six small plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+          resizeScreen(1839)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render four small plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+          resizeScreen(956)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render one small plot per row when the screen is smaller than 800px but larger than 600px', () => {
+          resizeScreen(663)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots.length).toBe(checkpoint.plots.length)
+        })
+
+        it('should render two small plot per row when the screen is smaller than 600px', () => {
+          resizeScreen(569)
+
+          const plots = screen.getAllByTestId(/^plot-/)
+
+          expect(plots[4].id).toBe(checkpoint.plots[4].title)
+        })
+      })
+    })
   })
 })
