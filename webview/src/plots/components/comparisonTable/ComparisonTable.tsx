@@ -95,7 +95,10 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
         <ComparisonTableRow
           key={path}
           path={path}
-          plots={columns.map(column => revs[column.revision])}
+          plots={columns.map(column => ({
+            ...revs[column.revision],
+            revision: column.revision
+          }))}
           nbColumns={columns.length}
           pinnedColumn={pinnedColumn.current}
         />
