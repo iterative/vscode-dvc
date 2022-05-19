@@ -380,6 +380,26 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
+  describe('dvc.resumeCheckpointExperiment', () => {
+    it('should be able to run an experiment', async () => {
+      const mockRunExperiment = stub(
+        CliRunner.prototype,
+        'runExperiment'
+      ).resolves(undefined)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RESUME)
+
+      expect(mockRunExperiment).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)
+    })
+  })
+
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
       const mockRunExperimentReset = stub(

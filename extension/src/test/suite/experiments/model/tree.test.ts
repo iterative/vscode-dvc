@@ -580,7 +580,68 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to reset and run a new experiment from an existing one with dvc.views.experimentsTree.resetRunExperiment', async () => {
+    it('should be able to run a new experiment from an existing one with dvc.views.experimentsTree.runExperiment', async () => {
+      const baseExperimentId = 'workspace'
+
+      const { cliRunner, experiments, experimentsModel } =
+        buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+        undefined
+      )
+
+      const mockGetOnlyOrPickProject = stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+      const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
+      >
+      mockShowQuickPick.resolves([
+        {
+          label: 'params.yaml:dropout',
+          value: { path: 'params.yaml:dropout', value: 0.16 }
+        },
+        {
+          label: 'params.yaml:process.threshold',
+          value: { path: 'params.yaml:process.threshold', value: 0.1 }
+        }
+      ] as QuickPickItemWithValue<Param>[])
+
+      stub(window, 'showInputBox')
+        .onFirstCall()
+        .resolves('0.15')
+        .onSecondCall()
+        .resolves('0.82')
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_RUN, {
+        dvcRoot: dvcDemoPath,
+        id: baseExperimentId
+      })
+
+      expect(mockGetOnlyOrPickProject).not.to.be.called
+      expect(getParamsSpy).to.be.calledOnce
+      expect(getParamsSpy).to.be.calledWithExactly(baseExperimentId)
+      expect(mockShowQuickPick).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledWith(
+        dvcDemoPath,
+        '-S',
+        'params.yaml:dropout=0.15',
+        '-S',
+        'params.yaml:process.threshold=0.82'
+      )
+    })
+
+    it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experimentsTree.resetRunExperiment', async () => {
       const baseExperimentId = 'workspace'
 
       const { cliRunner, experiments, experimentsModel } =
