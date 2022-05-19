@@ -23,7 +23,6 @@ class MockEventEmitter {
 }
 
 mock('vscode', {
-  Event: () => undefined,
   EventEmitter: MockEventEmitter,
   Uri: {
     file: URI.file
