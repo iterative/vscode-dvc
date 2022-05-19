@@ -417,7 +417,7 @@ export class Experiments extends BaseRepository<TableData> {
             )
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
             return this.modifyExperimentParamsAndRun(
-              AvailableCommands.EXPERIMENT_RUN_RESET,
+              AvailableCommands.EXPERIMENT_RESET_AND_RUN,
               message.payload
             )
 

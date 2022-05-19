@@ -624,7 +624,7 @@ suite('Experiments Tree Test Suite', () => {
         .resolves('0.82')
 
       await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TREE_RUN_RESET,
+        RegisteredCommands.EXPERIMENT_TREE_RESET_AND_RUN,
         {
           dvcRoot: dvcDemoPath,
           id: baseExperimentId
