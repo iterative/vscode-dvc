@@ -1,11 +1,12 @@
 import cx from 'classnames'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   PlotSize,
   Section,
   SectionCollapsed
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { PlotsSizeContext } from './PlotsSizeContext'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
@@ -43,6 +44,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   const [isRenaming, setIsRenaming] = useState(false)
   const [sectionTitle, setSectionTitle] = useState(title)
   const [size, setSize] = useState<PlotSize>(currentSize)
+  const { changePlotsSizes } = useContext(PlotsSizeContext)
 
   const open = !sectionCollapsed[sectionKey]
 
@@ -70,6 +72,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       return
     }
     onResize(newSize, sectionKey)
+    changePlotsSizes?.(newSize, sectionKey)
     setSize(newSize)
   }
 

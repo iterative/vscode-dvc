@@ -1,17 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { VegaLiteProps } from 'react-vega/lib/VegaLite'
-import { CheckpointPlotData, ColorScale } from 'dvc/src/plots/webview/contract'
+import cx from 'classnames'
+import {
+  CheckpointPlotData,
+  ColorScale,
+  Section
+} from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { createSpec } from './util'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import {
+  DragDropContainer,
+  WrapperProps
+} from '../../../shared/components/dragDrop/DragDropContainer'
 import { performOrderedUpdate } from '../../../util/objects'
 import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
 import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
 import { ZoomablePlot, ZoomablePlotProps } from '../ZoomablePlot'
+import { PlotsSizeContext } from '../PlotsSizeContext'
+import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
+import { shouldUseVirtualizedGrid } from '../util'
+import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 
 interface CheckpointPlotsProps extends ZoomablePlotProps {
   plots: CheckpointPlotData[]
@@ -24,6 +36,9 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   renderZoomedInPlot
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
+  const { sizes } = useContext(PlotsSizeContext)
+  const { [Section.CHECKPOINT_PLOTS]: size } = sizes
+  const nbItemsPerRow = useNbItemsPerRow(size)
 
   useEffect(() => {
     setOrder(pastOrder => performOrderedUpdate(pastOrder, plots, 'title'))
@@ -73,8 +88,14 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     })
     .filter(Boolean)
 
+  const useVirtualizedGrid = shouldUseVirtualizedGrid(items.length, size)
+
   return plots.length > 0 ? (
-    <div className={styles.singleViewPlotsGrid}>
+    <div
+      className={cx(styles.singleViewPlotsGrid, {
+        [styles.noBigGrid]: !useVirtualizedGrid
+      })}
+    >
       <DragDropContainer
         order={order}
         setOrder={setMetricOrder}
@@ -85,6 +106,14 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
           element: <DropTarget />,
           wrapperTag: 'div'
         }}
+        wrapperComponent={
+          useVirtualizedGrid
+            ? {
+                component: VirtualizedGrid as React.FC<WrapperProps>,
+                props: { nbItemsPerRow }
+              }
+            : undefined
+        }
       />
     </div>
   ) : (
