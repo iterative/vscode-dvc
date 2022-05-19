@@ -8,6 +8,7 @@ import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { WorkspacePlots } from '../plots/workspace'
 import { Title } from '../vscode/title'
+import { setContextValue } from '../vscode/context'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -21,15 +22,34 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public readonly updatesPaused: EventEmitter<boolean>
 
+  private readonly checkpointsChanged: EventEmitter<void>
+
   constructor(
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
     workspaceState: Memento,
-    experiments?: Record<string, Experiments>
+    experiments?: Record<string, Experiments>,
+    checkpointsChanged?: EventEmitter<void>
   ) {
     super(internalCommands, workspaceState, experiments)
 
     this.updatesPaused = updatesPaused
+
+    this.checkpointsChanged = this.dispose.track(
+      checkpointsChanged || new EventEmitter()
+    )
+
+    const onDidChangeCheckpoints = this.checkpointsChanged.event
+
+    this.dispose.track(
+      onDidChangeCheckpoints(() => {
+        const workspaceHasCheckpoints = Object.values(this.repositories).some(
+          experiments => experiments.hasCheckpoints()
+        )
+
+        setContextValue('dvc.experiment.checkpoints', workspaceHasCheckpoints)
+      })
+    )
   }
 
   public linkRepositories(workspacePlots: WorkspacePlots) {
@@ -221,6 +241,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     experiments.dispose.track(
       experiments.onDidChangeColumns(() => {
         this.columnsChanged.fire()
+      })
+    )
+
+    experiments.dispose.track(
+      experiments.onDidChangeCheckpoints(() => {
+        this.checkpointsChanged.fire()
       })
     )
 

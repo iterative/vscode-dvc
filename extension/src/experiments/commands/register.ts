@@ -29,14 +29,19 @@ const registerExperimentCwdCommands = (
       )
   )
 
+  const modifyExperimentParamsAndRun = () =>
+    experiments.pauseUpdatesThenRun(() =>
+      experiments.modifyExperimentParamsAndRun(AvailableCommands.EXPERIMENT_RUN)
+    )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_RESUME,
+    modifyExperimentParamsAndRun
+  )
+
   internalCommands.registerExternalCommand(
     RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
-    () =>
-      experiments.pauseUpdatesThenRun(() =>
-        experiments.modifyExperimentParamsAndRun(
-          AvailableCommands.EXPERIMENT_RUN
-        )
-      )
+    modifyExperimentParamsAndRun
   )
 
   internalCommands.registerExternalCommand(
@@ -44,7 +49,7 @@ const registerExperimentCwdCommands = (
     () =>
       experiments.pauseUpdatesThenRun(() =>
         experiments.modifyExperimentParamsAndRun(
-          AvailableCommands.EXPERIMENT_RUN_RESET
+          AvailableCommands.EXPERIMENT_RESET_AND_RUN
         )
       )
   )
@@ -138,8 +143,13 @@ const registerExperimentRunCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RUN_RESET,
-    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN_RESET)
+    RegisteredCliCommands.EXPERIMENT_RESUME,
+    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN,
+    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RESET_AND_RUN)
   )
 
   internalCommands.registerExternalCliCommand(
