@@ -154,21 +154,28 @@ export class ExperimentsTree
         )
     )
 
+    const modifyExperimentParamsAndRun = ({ dvcRoot, id }: ExperimentItem) =>
+      this.experiments.modifyExperimentParamsAndRun(
+        AvailableCommands.EXPERIMENT_RUN,
+        dvcRoot,
+        id
+      )
+
     internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_RUN,
-      ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.modifyExperimentParamsAndRun(
-          AvailableCommands.EXPERIMENT_RUN,
-          dvcRoot,
-          id
-        )
+      modifyExperimentParamsAndRun
     )
 
     internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_RUN_RESET,
+      RegisteredCommands.EXPERIMENT_TREE_RESUME,
+      modifyExperimentParamsAndRun
+    )
+
+    internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TREE_RESET_AND_RUN,
       ({ dvcRoot, id }: ExperimentItem) =>
         this.experiments.modifyExperimentParamsAndRun(
-          AvailableCommands.EXPERIMENT_RUN_RESET,
+          AvailableCommands.EXPERIMENT_RESET_AND_RUN,
           dvcRoot,
           id
         )

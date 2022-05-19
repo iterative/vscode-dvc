@@ -112,6 +112,7 @@ suite('Experiments Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: columnsFixture,
+        hasCheckpoints: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -480,7 +481,7 @@ suite('Experiments Test Suite', () => {
       await tableChangePromise
       expect(mockExecuteCommand).to.be.calledOnce
       expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_RUN_RESET,
+        AvailableCommands.EXPERIMENT_RESET_AND_RUN,
         dvcDemoPath,
         ...mockModifiedParams
       )

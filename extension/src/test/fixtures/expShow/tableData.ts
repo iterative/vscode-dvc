@@ -5,6 +5,7 @@ import columnsFixture from './columns'
 const tableDataFixture: TableData = {
   rows: rowsFixture,
   columns: columnsFixture,
+  hasCheckpoints: true,
   sorts: [],
   changes: [],
   columnOrder: [],

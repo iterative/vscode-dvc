@@ -17,6 +17,7 @@ const tableData: TableData = {
     'params:params.yaml:dvc_logs_dir': 300
   },
   columns: columnsFixture,
+  hasCheckpoints: true,
   rows: rowsFixture.map(row => ({
     ...row,
     subRows: row.subRows?.map(experiment => ({

@@ -25,6 +25,7 @@ import {
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
 import {
+  Column,
   ColumnType,
   Row,
   TableData
@@ -221,7 +222,7 @@ describe('App', () => {
           id: 'D',
           name: 'D',
           path: 'params:D'
-        }
+        } as Column
       ]
     }
 

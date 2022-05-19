@@ -20,5 +20,5 @@ module.exports = {
   preset: 'ts-jest',
   setupFiles: ['jest-canvas-mock', '<rootDir>/setup-tests.js'],
   testEnvironment: 'node',
-  testTimeout: 10000
+  testTimeout: 20000
 }
