@@ -49,7 +49,5 @@ export abstract class BaseWorkspaceWebviews<
     return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
   }
 
-  protected getFocusedOrOnlyOrPickProject() {
-    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
-  }
+  abstract getFocusedOrOnlyOrPickProject(): string | Promise<string | undefined>
 }

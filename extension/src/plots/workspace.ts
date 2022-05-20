@@ -46,4 +46,8 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
     }
     return this.getRepository(dvcRoot).selectPlots()
   }
+
+  public getFocusedOrOnlyOrPickProject() {
+    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
+  }
 }

@@ -44,6 +44,7 @@ export const ExperimentsScale = {
 } as const
 
 export class Experiments extends BaseRepository<TableData> {
+  public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
   public readonly onDidChangeColumns: Event<void>
   public readonly onDidChangeCheckpoints: Event<void>
@@ -56,6 +57,10 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
   private readonly checkpoints: CheckpointsModel
+
+  private readonly paramsFileFocused = this.dispose.track(
+    new EventEmitter<string | undefined>()
+  )
 
   private readonly experimentsChanged = this.dispose.track(
     new EventEmitter<ExperimentsOutput | void>()
@@ -82,6 +87,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.internalCommands = internalCommands
 
+    this.onDidChangeIsParamsFileFocused = this.paramsFileFocused.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeColumns = this.columnsChanged.event
     this.onDidChangeCheckpoints = this.checkpointsChanged.event
@@ -542,8 +548,11 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private setActiveEditorContext() {
-    const setActiveEditorContext = (active: boolean) =>
+    const setActiveEditorContext = (active: boolean) => {
       setContextValue('dvc.params.fileActive', active)
+      const activeDvcRoot = active ? this.dvcRoot : undefined
+      this.paramsFileFocused.fire(activeDvcRoot)
+    }
 
     this.dispose.track(
       this.onDidChangeColumns(() => {
