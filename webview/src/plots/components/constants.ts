@@ -8,7 +8,7 @@ const fontWeight = 'normal' as FontWeight
 
 const title = {
   font,
-  fontSize: 16,
+  fontSize: 12,
   fontWeight
 }
 
