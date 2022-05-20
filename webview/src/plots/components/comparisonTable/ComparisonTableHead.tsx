@@ -21,7 +21,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
-  const items = columns.map(({ revision, displayColor, experimentName }) => {
+  const items = columns.map(({ revision, displayColor, group }) => {
     const isPinned = revision === pinnedColumn
     return (
       <th
@@ -37,9 +37,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           displayColor={displayColor}
         >
           {revision}
-          {experimentName && (
-            <span className={styles.experimentName}>{experimentName}</span>
-          )}
+          {group && <span className={styles.experimentName}>{group}</span>}
         </ComparisonTableHeader>
       </th>
     )

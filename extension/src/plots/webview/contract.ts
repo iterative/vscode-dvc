@@ -45,7 +45,7 @@ export type ComparisonPlots = {
 
 export type ComparisonRevision = {
   revision: string
-  experimentName?: string
+  group?: string
   displayColor: Color
 }
 

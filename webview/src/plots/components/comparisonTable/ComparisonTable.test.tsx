@@ -41,8 +41,7 @@ describe('ComparisonTable', () => {
   const basicProps: ComparisonTableProps = comparisonTableFixture
   const revisions = basicProps.revisions.map(({ revision }) => revision)
   const namedRevisions = basicProps.revisions.map(
-    ({ revision, displayNameOrParent }) =>
-      `${revision}${displayNameOrParent || ''}`
+    ({ revision, group }) => `${revision}${group || ''}`
   )
   const renderTable = (props = basicProps) =>
     render(
@@ -194,8 +193,7 @@ describe('ComparisonTable', () => {
     headers = getHeaders().map(header => header.textContent)
 
     const expectedRevisions = filteredRevisions.map(
-      ({ revision, displayNameOrParent }) =>
-        `${revision}${displayNameOrParent || ''}`
+      ({ revision, group }) => `${revision}${group || ''}`
     )
 
     expect(headers).toStrictEqual(expectedRevisions)

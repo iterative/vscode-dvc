@@ -187,9 +187,9 @@ export class PlotsModel extends ModelWithPersistence {
       this.comparisonOrder,
       this.experiments
         .getSelectedRevisions()
-        .map(({ label: revision, displayColor, name }) => ({
+        .map(({ label: revision, displayColor, logicalGroupName }) => ({
           displayColor,
-          experimentName: name,
+          group: logicalGroupName,
           revision
         })),
       'revision'
