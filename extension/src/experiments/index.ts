@@ -1,4 +1,4 @@
-import { Event, EventEmitter, Memento, Uri, window } from 'vscode'
+import { Event, EventEmitter, Memento, window } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickAndModifyParams } from './model/queue/quickPick'
@@ -35,14 +35,13 @@ import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
 import { setContextValue } from '../vscode/context'
+import { standardizePath } from '../fileSystem/path'
 
 export const ExperimentsScale = {
   ...ColumnType,
   HAS_CHECKPOINTS: 'hasCheckpoints',
   NO_CHECKPOINTS: 'noCheckpoints'
 } as const
-
-const paramsFileActive = 'dvc.params.fileActive'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
@@ -543,20 +542,37 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private setActiveEditorContext() {
+    const setActiveEditorContext = (active: boolean) =>
+      setContextValue('dvc.params.fileActive', active)
+
     this.dispose.track(
-      window.onDidChangeActiveTextEditor(event => {
-        if (!event) {
-          // webview active
-          setContextValue(paramsFileActive, false)
+      this.onDidChangeColumns(() => {
+        const path = standardizePath(window.activeTextEditor?.document.fileName)
+        if (!path) {
           return
         }
-        const path = Uri.file(event.document.fileName).fsPath
+
+        if (!this.columns.getParamsFiles().has(path)) {
+          return
+        }
+        setActiveEditorContext(true)
+      })
+    )
+
+    this.dispose.track(
+      window.onDidChangeActiveTextEditor(event => {
+        const path = standardizePath(event?.document.fileName)
+        if (!path) {
+          setActiveEditorContext(false)
+          return
+        }
+
         if (path.includes(this.dvcRoot)) {
           if (this.columns.getParamsFiles().has(path)) {
-            setContextValue(paramsFileActive, true)
+            setActiveEditorContext(true)
             return
           }
-          setContextValue(paramsFileActive, false)
+          setActiveEditorContext(false)
         }
       })
     )
