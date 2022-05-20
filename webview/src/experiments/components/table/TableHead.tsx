@@ -2,12 +2,16 @@ import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import React, { useRef } from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
-import { DragUpdate } from 'react-beautiful-dnd'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
-import { MergedHeaderGroup } from './MergeHeaderGroups'
+import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { useColumnOrder } from '../../hooks/useColumnOrder'
 import { sendMessage } from '../../../shared/vscode'
+import { leafColumnIds, reorderColumnIds } from '../../util/columns'
+import {
+  OnDragOver,
+  OnDragStart
+} from '../../../shared/components/dragDrop/DragDropWorkbench'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -32,26 +36,44 @@ export const TableHead: React.FC<TableHeadProps> = ({
   }
 
   const fullColumnOrder = useRef<string[]>()
+  const draggingIds = useRef<string[]>()
 
-  const onDragStart = () => {
-    fullColumnOrder.current = allColumns.map(column => column.id)
+  const onDragStart: OnDragStart = draggedId => {
+    const displacerHeader = allHeaders.find(header => header.id === draggedId)
+    if (displacerHeader) {
+      draggingIds.current = leafColumnIds(displacerHeader)
+      fullColumnOrder.current = allColumns.map(({ id }) => id)
+    }
   }
 
-  const onDragUpdate = (column: DragUpdate) => {
-    if (!column.destination) {
-      return
-    }
-    const { draggableId, destination } = column
-    if (destination.index > 1) {
-      const newColumnOrder = [...(fullColumnOrder.current as string[])]
-      const oldIndex = newColumnOrder.indexOf(draggableId)
-      newColumnOrder.splice(oldIndex, 1)
-      newColumnOrder.splice(destination.index, 0, draggableId)
-      setColumnOrder(newColumnOrder)
-    }
+  const findDisplacedHeader = (
+    draggedOverId: string,
+    cb: (displacedHeader: HeaderGroup<Experiment>) => void
+  ) => {
+    const displacedHeader = allHeaders.find(
+      header => header.id === draggedOverId
+    )
+
+    displacedHeader && cb(displacedHeader)
+  }
+
+  const onDragUpdate: OnDragOver = (_, draggedOverId: string) => {
+    const displacer = draggingIds.current
+    displacer &&
+      findDisplacedHeader(draggedOverId, displacedHeader => {
+        const displaced = leafColumnIds(displacedHeader)
+        if (!displaced.some(id => displacer.includes(id))) {
+          fullColumnOrder.current &&
+            setColumnOrder(
+              reorderColumnIds(fullColumnOrder.current, displacer, displaced)
+            )
+        }
+      })
   }
 
   const onDragEnd = () => {
+    draggingIds.current = undefined
+    fullColumnOrder.current = undefined
     sendMessage({
       payload: columnOrder,
       type: MessageFromWebviewType.REORDER_COLUMNS
@@ -62,7 +84,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
     <div className={styles.thead}>
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
-        <MergedHeaderGroup
+        <MergedHeaderGroups
           {...headerGroup.getHeaderGroupProps()}
           orderedColumns={orderedColumns}
           headerGroup={headerGroup}
