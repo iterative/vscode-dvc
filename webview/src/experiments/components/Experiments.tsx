@@ -24,6 +24,7 @@ import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
 import { useThemeVariables } from '../../shared/components/theme/Theme'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
@@ -208,7 +209,11 @@ export const ExperimentsTable: React.FC<{
     return <EmptyState>No Experiments to Display.</EmptyState>
   }
 
-  return <Table instance={instance} tableData={tableData} />
+  return (
+    <DragDropProvider>
+      <Table instance={instance} tableData={tableData} />
+    </DragDropProvider>
+  )
 }
 
 const Experiments: React.FC<{
