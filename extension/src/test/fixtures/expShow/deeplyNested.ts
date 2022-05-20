@@ -1,8 +1,9 @@
 import { ExperimentsOutput } from '../../../cli/reader'
-import { collectColumns } from '../../../experiments/columns/collect'
-import { collectExperiments } from '../../../experiments/model/collect'
-import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { TableData } from '../../../experiments/webview/contract'
+import {
+  Column,
+  ColumnType,
+  TableData
+} from '../../../experiments/webview/contract'
 
 export const deeplyNestedOutput: ExperimentsOutput = {
   workspace: {
@@ -70,13 +71,210 @@ export const deeplyNestedOutput: ExperimentsOutput = {
   }
 }
 
-export const columns = collectColumns(deeplyNestedOutput)
+export const columns: Column[] = [
+  {
+    hasChildren: true,
+    name: 'params.yaml',
+    parentPath: 'params',
+    path: 'params:params.yaml',
+    type: ColumnType.PARAMS
+  },
+  {
+    hasChildren: true,
+    name: 'nested1',
+    parentPath: 'params:params.yaml',
+    path: 'params:params.yaml:nested1',
+    type: ColumnType.PARAMS
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 15,
+    name: 'doubled',
+    parentPath: 'params:params.yaml:nested1',
+    path: 'params:params.yaml:nested1.doubled',
+    pathArray: ['params', 'params.yaml', 'nested1', 'doubled'],
+    type: ColumnType.PARAMS,
+    types: ['string']
+  },
+  {
+    hasChildren: true,
+    name: 'nested1.nested2.nested3.nested4',
+    parentPath: 'params:params.yaml',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4',
+    type: ColumnType.PARAMS
+  },
+  {
+    hasChildren: true,
+    name: 'nested5',
+    parentPath: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5',
+    type: ColumnType.PARAMS
+  },
+  {
+    hasChildren: true,
+    name: 'nested6',
+    parentPath:
+      'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6',
+    type: ColumnType.PARAMS
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 6,
+    name: 'nested7',
+    parentPath:
+      'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6.nested7',
+    pathArray: [
+      'params',
+      'params.yaml',
+      'nested1',
+      'nested2',
+      'nested3',
+      'nested4',
+      'nested5',
+      'nested6',
+      'nested7'
+    ],
+    type: ColumnType.PARAMS,
+    types: ['string']
+  },
+  {
+    hasChildren: true,
+    name: 'nested1.nested2.nested3',
+    parentPath: 'params:params.yaml',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3',
+    type: ColumnType.PARAMS
+  },
+  {
+    hasChildren: true,
+    name: 'nested4',
+    parentPath: 'params:params.yaml:nested1%2Enested2%2Enested3',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4',
+    type: ColumnType.PARAMS
+  },
+  {
+    hasChildren: true,
+    name: 'nested5b',
+    parentPath: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b',
+    type: ColumnType.PARAMS
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 23,
+    name: 'nested6',
+    parentPath:
+      'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6',
+    pathArray: [
+      'params',
+      'params.yaml',
+      'nested1',
+      'nested2',
+      'nested3',
+      'nested4',
+      'nested5b',
+      'nested6'
+    ],
+    type: ColumnType.PARAMS,
+    types: ['string']
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 16,
+    name: 'doubled',
+    parentPath:
+      'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b',
+    path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled',
+    pathArray: [
+      'params',
+      'params.yaml',
+      'nested1',
+      'nested2',
+      'nested3',
+      'nested4',
+      'nested5b',
+      'doubled'
+    ],
+    type: ColumnType.PARAMS,
+    types: ['string']
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 1,
+    name: 'outlier',
+    parentPath: 'params:params.yaml',
+    path: 'params:params.yaml:outlier',
+    pathArray: ['params', 'params.yaml', 'outlier'],
+    type: ColumnType.PARAMS,
+    types: ['number'],
+    maxNumber: 1,
+    minNumber: 1
+  }
+]
 
-const { workspace, branches } = collectExperiments(deeplyNestedOutput)
-const colors = copyOriginalColors()
 export const rows = [
-  { ...workspace, displayColor: colors[0] },
-  ...branches.map((branch, i) => ({ ...branch, displayColor: colors[i + 1] }))
+  {
+    id: 'workspace',
+    label: 'workspace',
+    timestamp: null,
+    queued: false,
+    running: false,
+    executor: null,
+    params: {
+      'params.yaml': {
+        nested1: {
+          doubled: 'first instance!',
+          nested2: {
+            nested3: {
+              nested4: {
+                nested5: { nested6: { nested7: 'Lucky!' } },
+                nested5b: {
+                  nested6: 'Wow!!!!!!!!!!!!!!!!!!!!',
+                  doubled: 'second instance!'
+                }
+              }
+            }
+          }
+        },
+        outlier: 1
+      }
+    },
+    displayColor: '#945dd6',
+    selected: true
+  },
+  {
+    id: 'main',
+    label: 'main',
+    timestamp: '2020-11-21T19:58:22',
+    queued: false,
+    running: false,
+    executor: null,
+    name: 'main',
+    sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+    params: {
+      'params.yaml': {
+        nested1: {
+          doubled: 'first instance!',
+          nested2: {
+            nested3: {
+              nested4: {
+                nested5: { nested6: { nested7: 'Lucky!' } },
+                nested5b: {
+                  nested6: 'Wow!!!!!!!!!!!!!!!!!!!!',
+                  doubled: 'second instance!'
+                }
+              }
+            }
+          }
+        },
+        outlier: 1
+      }
+    },
+    displayColor: '#13adc7',
+    selected: true
+  }
 ]
 
 const deeplyNestedTableData: TableData = {

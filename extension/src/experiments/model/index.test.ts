@@ -4,6 +4,10 @@ import { copyOriginalColors } from './status/colors'
 import { Operator } from './filterBy'
 import outputFixture from '../../test/fixtures/expShow/output'
 import rowsFixture from '../../test/fixtures/expShow/rows'
+import {
+  deeplyNestedOutput,
+  rows as deeplyNestedRows
+} from '../../test/fixtures/expShow/deeplyNested'
 import { buildMockMemento } from '../../test/util'
 import { joinColumnPath } from '../columns/paths'
 import { Experiment, ColumnType } from '../webview/contract'
@@ -64,6 +68,12 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
+  })
+
+  it('should return data that equal the deeply nested output fixture', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(deeplyNestedOutput)
+    expect(model.getRowData()).toStrictEqual(deeplyNestedRows)
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', () => {
