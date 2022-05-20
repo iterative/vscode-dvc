@@ -23,6 +23,7 @@ const mockedGetInput = jest.mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
 
+jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
@@ -69,7 +70,8 @@ describe('Experiments', () => {
         pickCurrentExperiment: jest.fn(),
         showWebview: jest.fn()
       } as unknown as Experiments
-    }
+    },
+    buildMockedEventEmitter()
   )
 
   describe('getCwdThenReport', () => {

@@ -37,16 +37,20 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
       <tr>
         {plots.map((plot: ComparisonPlot | undefined) => {
           const isPinned = pinnedColumn === plot?.revision
+          const missing = !plot?.url
 
           return (
             <td
               key={path + plot?.revision || 'missing'}
-              className={cx({ [styles.pinnedColumnCell]: isPinned })}
+              className={cx({
+                [styles.pinnedColumnCell]: isPinned,
+                [styles.missing]: missing
+              })}
             >
               <div
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                {!plot?.url ? (
+                {missing ? (
                   <p>No plot to display.</p>
                 ) : (
                   <img

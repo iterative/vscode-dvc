@@ -209,12 +209,11 @@ $gap: 20px;
 .comparisonTable {
   table-layout: fixed;
   width: 100%;
-  min-width: 100%;
   position: relative;
   padding: 0 20px;
 
   .smallPlots & {
-    width: 100%;
+    width: calc(25% * var(--scale));
     padding-right: $gap;
   }
 
@@ -229,35 +228,30 @@ $gap: 20px;
   }
 
   @media (min-width: 1000px) {
-    min-width: 75%;
-
     .smallPlots & {
-      width: 75%;
+      width: calc(20% * var(--scale));
     }
 
     .regularPlots & {
-      width: 100%;
+      width: calc(25% * var(--scale));
     }
 
     .largePlots & {
-      min-width: 100%;
       width: calc(33% * var(--scale));
     }
   }
 
   @media (min-width: 2000px) {
-    min-width: 100%;
-
     .smallPlots & {
-      width: 50%;
+      width: calc(15% * var(--scale));
     }
 
     .regularPlots & {
-      width: 75%;
+      width: calc(20% * var(--scale));
     }
 
     .largePlots & {
-      width: 100%;
+      width: calc(25% * var(--scale));
       padding-right: 0;
     }
   }
