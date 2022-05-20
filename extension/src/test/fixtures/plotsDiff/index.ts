@@ -548,23 +548,23 @@ export const getComparisonWebviewMessage = (
       {
         revision: 'workspace',
         displayColor: workspace,
-        displayNameOrParent: undefined
+        group: undefined
       },
-      { revision: 'main', displayColor: main, displayNameOrParent: undefined },
+      { revision: 'main', displayColor: main, group: undefined },
       {
         revision: '4fb124a',
         displayColor: _4fb124a,
-        displayNameOrParent: '[exp-e7a67]'
+        group: '[exp-e7a67]'
       },
       {
         revision: '42b8736',
         displayColor: _42b8735,
-        displayNameOrParent: '[test-branch]'
+        group: '[test-branch]'
       },
       {
         revision: '1ba7bcd',
         displayColor: _1ba7bcd,
-        displayNameOrParent: '[exp-83425]'
+        group: '[exp-83425]'
       }
     ],
     sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],

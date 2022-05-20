@@ -309,37 +309,37 @@ suite('Experiments Tree Test Suite', () => {
       ).to.deep.equal([
         {
           displayColor: colors[0],
-          displayNameOrParent: undefined,
+          group: undefined,
           revision: 'workspace'
         },
         {
           displayColor: colors[2],
-          displayNameOrParent: '[exp-e7a67]',
+          group: '[exp-e7a67]',
           revision: '4fb124a'
         },
         {
           displayColor: colors[3],
-          displayNameOrParent: '[test-branch]',
+          group: '[test-branch]',
           revision: '42b8736'
         },
         {
           displayColor: colors[1],
-          displayNameOrParent: undefined,
+          group: '[exp-e7a67]',
           revision: 'd1343a8'
         },
         {
           displayColor: colors[4],
-          displayNameOrParent: undefined,
+          group: '[exp-e7a67]',
           revision: '1ee5f2e'
         },
         {
           displayColor: colors[5],
-          displayNameOrParent: undefined,
+          group: '[test-branch]',
           revision: '2173124'
         },
         {
           displayColor: colors[6],
-          displayNameOrParent: undefined,
+          group: '[test-branch]',
           revision: '9523bde'
         }
       ])
