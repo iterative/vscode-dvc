@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -47,6 +47,7 @@ import { ExperimentsData } from '../../../experiments/data'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
+import * as VscodeContext from '../../../vscode/context'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -926,5 +927,91 @@ suite('Experiments Test Suite', () => {
         }
       ])
     })
+  })
+
+  describe('editor/title icons', () => {
+    const getActiveEditorUpdatedEvent = () =>
+      new Promise(resolve => {
+        const listener = disposable.track(
+          window.onDidChangeActiveTextEditor(() => {
+            resolve(undefined)
+            disposable.untrack(listener)
+            listener.dispose()
+          })
+        )
+      })
+
+    it('should set the appropriate context value when a params file is opened', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
+
+      const setContextValueSpy = spy(VscodeContext, 'setContextValue')
+
+      const activeEditorUpdated = getActiveEditorUpdatedEvent()
+
+      await window.showTextDocument(paramsFile)
+      await activeEditorUpdated
+
+      const activeEditorClosed = getActiveEditorUpdatedEvent()
+
+      expect(setContextValueSpy).to.be.calledOnce
+      expect(setContextValueSpy).to.be.calledWithExactly(
+        'dvc.params.fileActive',
+        true
+      )
+
+      setContextValueSpy.resetHistory()
+
+      await closeAllEditors()
+      await activeEditorClosed
+
+      expect(setContextValueSpy).to.be.calledOnce
+      expect(setContextValueSpy).to.be.calledWithExactly(
+        'dvc.params.fileActive',
+        false
+      )
+    })
+
+    it('should set the appropriate context value when a params file is open and the extension starts', async () => {
+      const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
+      await window.showTextDocument(paramsFile)
+
+      const setContextValueSpy = spy(VscodeContext, 'setContextValue')
+
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      expect(setContextValueSpy).to.be.calledOnce
+      expect(setContextValueSpy).to.be.calledWithExactly(
+        'dvc.params.fileActive',
+        true
+      )
+
+      setContextValueSpy.resetHistory()
+      const activeEditorClosed = getActiveEditorUpdatedEvent()
+
+      await closeAllEditors()
+      await activeEditorClosed
+
+      expect(setContextValueSpy).to.be.calledOnce
+      expect(setContextValueSpy).to.be.calledWithExactly(
+        'dvc.params.fileActive',
+        false
+      )
+    })
+  })
+
+  it('should not set a context value when a non-params file is open and the extension starts', async () => {
+    const nonParamsFile = Uri.file(join(dvcDemoPath, '.gitignore'))
+    await window.showTextDocument(nonParamsFile)
+
+    const setContextValueSpy = spy(VscodeContext, 'setContextValue')
+
+    const { experiments } = buildExperiments(disposable)
+    await experiments.isReady()
+
+    expect(setContextValueSpy).not.to.be.called
   })
 })

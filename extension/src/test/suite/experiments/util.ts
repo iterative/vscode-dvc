@@ -109,7 +109,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     resourceLocator
   )
   experiments.setState(expShowFixture)
-  return { experiments, messageSpy, workspaceExperiments }
+  return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {

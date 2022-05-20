@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, SinonStub, match } from 'sinon'
-import { window, commands, QuickPickItem } from 'vscode'
+import { window, commands, QuickPickItem, Uri } from 'vscode'
 import {
   buildExperiments,
   buildMultiRepoExperiments,
@@ -27,6 +27,8 @@ import {
 } from '../../../vscode/quickPick'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
+import { join } from '../../util/path'
+import { AvailableCommands } from '../../../commands/internal'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -52,7 +54,7 @@ suite('Workspace Experiments Test Suite', () => {
       )
     })
 
-  describe('showExperimentsTable', () => {
+  describe('project focus', () => {
     it('should prompt to pick a project even if a webview is focused', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
@@ -90,6 +92,52 @@ suite('Workspace Experiments Test Suite', () => {
       await workspaceExperiments.showWebview()
 
       expect(mockQuickPickOne).to.not.be.called
+    })
+
+    it('should not prompt to pick a project if a params file is focused', async () => {
+      const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
+        dvcDemoPath
+      )
+
+      const { workspaceExperiments, experiments, internalCommands } =
+        buildMultiRepoExperiments(disposable)
+
+      await workspaceExperiments.isReady()
+
+      const focusedWebview = onDidChangeIsWebviewFocused(experiments)
+
+      await workspaceExperiments.showWebview()
+
+      expect(await focusedWebview).to.equal(dvcDemoPath)
+
+      const focusedParamsFile = new Promise(resolve => {
+        const listener: Disposable = experiments.onDidChangeIsParamsFileFocused(
+          (event: string | undefined) => {
+            listener.dispose()
+            return resolve(event)
+          }
+        )
+      })
+
+      const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
+      await window.showTextDocument(paramsFile)
+
+      expect(await focusedParamsFile).to.equal(dvcDemoPath)
+
+      mockQuickPickOne.resetHistory()
+
+      const mockExecuteCommand = stub(
+        internalCommands,
+        'executeCommand'
+      ).resolves(undefined)
+
+      await workspaceExperiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
+
+      expect(mockQuickPickOne).not.to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWith(
+        AvailableCommands.EXPERIMENT_RUN,
+        dvcDemoPath
+      )
     })
   }).timeout(WEBVIEW_TEST_TIMEOUT)
 

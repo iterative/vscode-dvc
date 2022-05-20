@@ -1,4 +1,4 @@
-import { Event, EventEmitter, Memento } from 'vscode'
+import { Event, EventEmitter, Memento, window } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickAndModifyParams } from './model/queue/quickPick'
@@ -34,6 +34,8 @@ import { EventName } from '../telemetry/constants'
 import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
+import { setContextValue } from '../vscode/context'
+import { standardizePath } from '../fileSystem/path'
 
 export const ExperimentsScale = {
   ...ColumnType,
@@ -42,6 +44,7 @@ export const ExperimentsScale = {
 } as const
 
 export class Experiments extends BaseRepository<TableData> {
+  public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
   public readonly onDidChangeColumns: Event<void>
   public readonly onDidChangeCheckpoints: Event<void>
@@ -54,6 +57,10 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
   private readonly checkpoints: CheckpointsModel
+
+  private readonly paramsFileFocused = this.dispose.track(
+    new EventEmitter<string | undefined>()
+  )
 
   private readonly experimentsChanged = this.dispose.track(
     new EventEmitter<ExperimentsOutput | void>()
@@ -80,6 +87,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.internalCommands = internalCommands
 
+    this.onDidChangeIsParamsFileFocused = this.paramsFileFocused.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeColumns = this.columnsChanged.event
     this.onDidChangeCheckpoints = this.checkpointsChanged.event
@@ -113,6 +121,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.handleMessageFromWebview()
     this.setupInitialData()
+    this.setActiveEditorContext()
   }
 
   public update() {
@@ -536,5 +545,45 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     return experiment?.id
+  }
+
+  private setActiveEditorContext() {
+    const setActiveEditorContext = (active: boolean) => {
+      setContextValue('dvc.params.fileActive', active)
+      const activeDvcRoot = active ? this.dvcRoot : undefined
+      this.paramsFileFocused.fire(activeDvcRoot)
+    }
+
+    this.dispose.track(
+      this.onDidChangeColumns(() => {
+        const path = standardizePath(window.activeTextEditor?.document.fileName)
+        if (!path) {
+          return
+        }
+
+        if (!this.columns.getParamsFiles().has(path)) {
+          return
+        }
+        setActiveEditorContext(true)
+      })
+    )
+
+    this.dispose.track(
+      window.onDidChangeActiveTextEditor(event => {
+        const path = standardizePath(event?.document.fileName)
+        if (!path) {
+          setActiveEditorContext(false)
+          return
+        }
+
+        if (path.includes(this.dvcRoot)) {
+          if (this.columns.getParamsFiles().has(path)) {
+            setActiveEditorContext(true)
+            return
+          }
+          setActiveEditorContext(false)
+        }
+      })
+    )
   }
 }
