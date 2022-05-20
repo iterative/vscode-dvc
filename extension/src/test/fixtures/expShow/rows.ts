@@ -99,6 +99,7 @@ const data: Row[] = [
         name: 'exp-e7a67',
         checkpoint_parent: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
         label: '4fb124a',
+        logicalGroupName: '[exp-e7a67]',
         displayNameOrParent: '[exp-e7a67]',
         displayColor: colorsList[2],
         id: 'exp-e7a67',
@@ -133,6 +134,7 @@ const data: Row[] = [
             },
             checkpoint_parent: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
             label: 'd1343a8',
+            logicalGroupName: '[exp-e7a67]',
             displayColor: undefined,
             id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
             selected: false,
@@ -168,6 +170,7 @@ const data: Row[] = [
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
             displayColor: undefined,
             label: '1ee5f2e',
+            logicalGroupName: '[exp-e7a67]',
             id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
             selected: false,
             sha: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53'
@@ -206,6 +209,7 @@ const data: Row[] = [
         checkpoint_parent: '217312476f8854dda1865450b737eb6bc7a3ba1b',
         displayColor: colorsList[3],
         label: '42b8736',
+        logicalGroupName: '[test-branch]',
         displayNameOrParent: '[test-branch]',
         id: 'test-branch',
         sha: '42b8736b08170529903cd203a1f40382a4b4a8cd',
@@ -240,6 +244,7 @@ const data: Row[] = [
             checkpoint_parent: '9523bde67538cf31230efaff2dbc47d38a944ab5',
             displayColor: undefined,
             label: '2173124',
+            logicalGroupName: '[test-branch]',
             id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
             selected: false,
             sha: '217312476f8854dda1865450b737eb6bc7a3ba1b'
@@ -274,6 +279,7 @@ const data: Row[] = [
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
             displayColor: undefined,
             label: '9523bde',
+            logicalGroupName: '[test-branch]',
             id: '9523bde67538cf31230efaff2dbc47d38a944ab5',
             selected: false,
             sha: '9523bde67538cf31230efaff2dbc47d38a944ab5'
@@ -312,6 +318,7 @@ const data: Row[] = [
         checkpoint_parent: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
         displayColor: colorsList[4],
         label: '1ba7bcd',
+        logicalGroupName: '[exp-83425]',
         displayNameOrParent: '[exp-83425]',
         id: 'exp-83425',
         sha: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
@@ -346,6 +353,7 @@ const data: Row[] = [
             checkpoint_parent: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
             displayColor: undefined,
             label: '22e40e1',
+            logicalGroupName: '[exp-83425]',
             id: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
             selected: false,
             sha: '22e40e1fa3c916ac567f69b85969e3066a91dda4'
@@ -380,6 +388,7 @@ const data: Row[] = [
             checkpoint_parent: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
             displayColor: undefined,
             label: '91116c1',
+            logicalGroupName: '[exp-83425]',
             id: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
             selected: false,
             sha: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15'
@@ -414,6 +423,7 @@ const data: Row[] = [
             checkpoint_parent: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
             displayColor: undefined,
             label: 'e821416',
+            logicalGroupName: '[exp-83425]',
             id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
             selected: false,
             sha: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361'
@@ -448,6 +458,7 @@ const data: Row[] = [
             checkpoint_parent: '23250b33e3d6dd0e136262d1d26a2face031cb03',
             displayColor: undefined,
             label: 'c658f8b',
+            logicalGroupName: '[exp-83425]',
             id: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
             selected: false,
             sha: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880'
@@ -482,6 +493,7 @@ const data: Row[] = [
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
             displayColor: undefined,
             label: '23250b3',
+            logicalGroupName: '[exp-83425]',
             id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
             selected: false,
             sha: '23250b33e3d6dd0e136262d1d26a2face031cb03'
