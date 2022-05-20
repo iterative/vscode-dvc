@@ -116,21 +116,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.handleMessageFromWebview()
     this.setupInitialData()
-
-    window.onDidChangeActiveTextEditor(event => {
-      if (!event) {
-        setContextValue(paramsFileActive, false)
-        return
-      }
-      const path = Uri.file(event.document.fileName).fsPath
-      if (path.includes(this.dvcRoot)) {
-        if (this.columns.getParamsFiles().has(path)) {
-          setContextValue(paramsFileActive, true)
-          return
-        }
-        setContextValue(paramsFileActive, false)
-      }
-    })
+    this.setActiveEditorContext()
   }
 
   public update() {
@@ -554,5 +540,25 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     return experiment?.id
+  }
+
+  private setActiveEditorContext() {
+    this.dispose.track(
+      window.onDidChangeActiveTextEditor(event => {
+        if (!event) {
+          // webview active
+          setContextValue(paramsFileActive, false)
+          return
+        }
+        const path = Uri.file(event.document.fileName).fsPath
+        if (path.includes(this.dvcRoot)) {
+          if (this.columns.getParamsFiles().has(path)) {
+            setContextValue(paramsFileActive, true)
+            return
+          }
+          setContextValue(paramsFileActive, false)
+        }
+      })
+    )
   }
 }
