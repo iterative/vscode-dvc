@@ -12,7 +12,7 @@ export const createTreeView = <T>(
   treeDataProvider: TreeDataProvider<string | T>
 ): TreeView<string | T> =>
   window.createTreeView<string | T>(name, {
-    canSelectMany: true,
+    canSelectMany: false,
     showCollapseAll: true,
     treeDataProvider
   })
