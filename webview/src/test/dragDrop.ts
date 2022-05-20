@@ -30,15 +30,20 @@ export const dragEnter = (
 
   draggedOver.dispatchEvent(createBubbledEvent('dragenter'))
 
-  const clientX =
-    100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
-  const left = 100
-  const right = left + 100
-  const dragOverEvent = createBubbledEvent('dragover', { clientX })
-  jest
-    .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
-    .mockImplementationOnce(() => ({ left, right }))
-  draggedOver.dispatchEvent(dragOverEvent)
+  if (direction !== DragDropUtils.DragEnterDirection.AUTO) {
+    const clientX =
+      100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
+    const left = 100
+    const right = left + 100
+    const dragOverEvent = createBubbledEvent('dragover', { clientX })
+    jest
+      .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
+      .mockImplementationOnce(() => ({ left, right }))
+    draggedOver.dispatchEvent(dragOverEvent)
+  } else {
+    draggedOver.dispatchEvent(createBubbledEvent('dragover'))
+  }
+
   jest.useRealTimers()
 }
 

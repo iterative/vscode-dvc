@@ -7,42 +7,52 @@ import {
 import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
-import {
-  Draggable,
-  DraggableProvided,
-  DraggableStateSnapshot
-} from 'react-beautiful-dnd'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { SortOrder, SortPicker } from './SortPicker'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { sendMessage } from '../../../shared/vscode'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
+import {
+  Draggable,
+  OnDragOver,
+  OnDragStart,
+  OnDrop
+} from '../../../shared/components/dragDrop/DragDropWorkbench'
 
-const ColumnDragHandle: React.FC<{
+export const ColumnDragHandle: React.FC<{
+  disabled: boolean
   column: HeaderGroup<Experiment>
-  provided: DraggableProvided
-  snapshot: DraggableStateSnapshot
-}> = ({ provided, snapshot, column }) => {
+  onDragOver: OnDragOver
+  onDragStart: OnDragStart
+  onDrop: OnDrop
+}> = ({ disabled, column, onDragOver, onDragStart, onDrop }) => {
+  const DropTarget = <span>{column?.name}</span>
+
   return (
     <span
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
       data-testid="rendered-header"
-      style={provided.draggableProps.style}
-      className={cx(styles.cellContents, {
-        [styles.draggingColumn]: snapshot.isDragging,
-        [styles.staticColumn]: !snapshot.isDragging,
-        [styles.isDroppedColumn]: snapshot.isDropAnimating
-      })}
+      className={cx(styles.cellContents)}
       onKeyDown={e => {
         e.stopPropagation()
       }}
       role={'columnheader'}
       tabIndex={0}
     >
-      {column.render('Header')}
+      <Draggable
+        id={column.id}
+        disabled={disabled}
+        group={'experiment-table'}
+        dropTarget={{
+          element: DropTarget,
+          wrapperTag: 'div'
+        }}
+        onDragOver={onDragOver}
+        onDragStart={onDragStart}
+        onDrop={onDrop}
+      >
+        <span>{column?.render('Header')}</span>
+      </Draggable>
     </span>
   )
 }
@@ -52,19 +62,21 @@ const TableHeaderCell: React.FC<{
   columns: HeaderGroup<Experiment>[]
   orderedColumns: Column[]
   sortOrder: SortOrder
-  provided: DraggableProvided
-  snapshot: DraggableStateSnapshot
   menuDisabled: boolean
   menuContent: React.ReactNode
+  onDragOver: OnDragOver
+  onDragStart: OnDragStart
+  onDrop: OnDrop
 }> = ({
   column,
   columns,
   orderedColumns,
   sortOrder,
-  provided,
-  snapshot,
   menuContent,
-  menuDisabled
+  menuDisabled,
+  onDragOver,
+  onDragStart,
+  onDrop
 }) => {
   const isPlaceholder = !!column.placeholderOf
   const canResize = column.canResize && !isPlaceholder
@@ -94,6 +106,8 @@ const TableHeaderCell: React.FC<{
       )
     }
   }
+  const isDraggable =
+    !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
 
   return (
     <ContextMenu content={menuContent} disabled={menuDisabled}>
@@ -104,8 +118,10 @@ const TableHeaderCell: React.FC<{
       >
         <ColumnDragHandle
           column={column}
-          provided={provided}
-          snapshot={snapshot}
+          disabled={!isDraggable}
+          onDragOver={onDragOver}
+          onDragStart={onDragStart}
+          onDrop={onDrop}
         />
         {canResize && (
           <div
@@ -123,24 +139,27 @@ interface TableHeaderProps {
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
-  index: number
   orderedColumns: Column[]
+  onDragOver: OnDragOver
+  onDragStart: OnDragStart
+  onDrop: OnDrop
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
   sorts,
-  index,
-  orderedColumns
+  orderedColumns,
+  onDragOver,
+  onDragStart,
+  onDrop
 }) => {
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
-  const isDraggable =
+  const isSortable =
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
     !column.columns
-  const isSortable = isDraggable
 
   const sortOrder: SortOrder = (() => {
     const possibleOrders = {
@@ -177,31 +196,23 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   }
 
   return (
-    <Draggable
-      key={column.id}
-      draggableId={column.id}
-      index={index}
-      isDragDisabled={!isDraggable}
-    >
-      {(provided, snapshot) => (
-        <TableHeaderCell
-          column={column}
-          columns={columns}
-          orderedColumns={orderedColumns}
+    <TableHeaderCell
+      column={column}
+      columns={columns}
+      orderedColumns={orderedColumns}
+      sortOrder={sortOrder}
+      onDragOver={onDragOver}
+      onDragStart={onDragStart}
+      onDrop={onDrop}
+      menuDisabled={!isSortable}
+      menuContent={
+        <SortPicker
           sortOrder={sortOrder}
-          provided={provided}
-          snapshot={snapshot}
-          menuDisabled={!isSortable}
-          menuContent={
-            <SortPicker
-              sortOrder={sortOrder}
-              setSelectedOrder={order => {
-                setColumnSort(order)
-              }}
-            />
-          }
+          setSelectedOrder={order => {
+            setColumnSort(order)
+          }}
         />
-      )}
-    </Draggable>
+      }
+    />
   )
 }

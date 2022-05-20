@@ -19,12 +19,6 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import {
-  mockDndElSpacing,
-  mockGetComputedSpacing,
-  makeDnd,
-  DND_DIRECTION_RIGHT
-} from 'react-beautiful-dnd-test-utils'
-import {
   Column,
   ColumnType,
   Row,
@@ -38,7 +32,6 @@ import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
   expectHeaders,
-  makeGetDragEl,
   tableData as sortingTableDataFixture
 } from '../../test/sort'
 import {
@@ -46,6 +39,8 @@ import {
   HEADER_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
 import { getRow } from '../../test/queries'
+import { dragAndDrop } from '../../test/dragDrop'
+import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -200,9 +195,7 @@ describe('App', () => {
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {
-    const view = render(<App />)
-    mockDndElSpacing(view)
-    mockGetComputedSpacing()
+    render(<App />)
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -236,12 +229,10 @@ describe('App', () => {
       })
     )
 
-    await makeDnd({
-      direction: DND_DIRECTION_RIGHT,
-      getByText: view.getByText,
-      getDragEl: makeGetDragEl('B'),
-      positions: 2
-    })
+    const headerB = screen.getByText('B')
+    const headerD = screen.getByText('D')
+
+    dragAndDrop(headerB, headerD, DragEnterDirection.AUTO)
 
     await expectHeaders(['A', 'C', 'D', 'B'])
   })
