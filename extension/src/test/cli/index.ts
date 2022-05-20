@@ -1,8 +1,6 @@
 import { mkdirp } from 'fs-extra'
-import { URI } from 'vscode-uri'
-import { stub } from 'sinon'
-import mock from 'mock-require'
 import { TEMP_DIR, ENV_DIR } from './constants'
+require('../../vscode/mockModule')
 
 const importModulesAfterMockingVsCode = () => {
   const { removeDir } = require('../../fileSystem')
@@ -11,32 +9,6 @@ const importModulesAfterMockingVsCode = () => {
 
   return { removeDir, runMocha, setupVenv }
 }
-
-class MockEventEmitter {
-  public fire() {
-    return stub()
-  }
-
-  public event() {
-    return stub()
-  }
-}
-
-mock('vscode', {
-  EventEmitter: MockEventEmitter,
-  Uri: {
-    file: URI.file
-  }
-})
-
-mock('@hediet/std/disposable', {
-  Disposable: {
-    fn: () => ({
-      track: <T>(disposable: T): T => disposable,
-      untrack: () => undefined
-    })
-  }
-})
 
 const { setupVenv, removeDir, runMocha } = importModulesAfterMockingVsCode()
 

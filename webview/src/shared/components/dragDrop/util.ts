@@ -2,7 +2,8 @@ import { DragEvent } from 'react'
 
 export enum DragEnterDirection {
   RIGHT = 'RIGHT',
-  LEFT = 'LEFT'
+  LEFT = 'LEFT',
+  AUTO = 'AUTO'
 }
 
 export const getEventCurrentTargetDistances = (e: DragEvent<HTMLElement>) => {
