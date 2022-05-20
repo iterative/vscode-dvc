@@ -249,6 +249,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
     .cellContents {
       @extend %truncateLeftChild;
+      display: block;
+
+      span[draggable='true'] {
+        display: block;
+      }
     }
 
     &:last-child,
