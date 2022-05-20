@@ -1,4 +1,5 @@
 import React, { DragEvent, useContext } from 'react'
+import { DropTargetInfo, makeTarget } from './DragDropContainer'
 import { DragDropContext, DragDropContextValue } from './DragDropContext'
 
 export type OnDrop = (draggedId: string, draggedOverId: string) => void
@@ -9,10 +10,7 @@ export interface DraggableProps {
   id: string
   group: string
   disabled: boolean
-  dropTarget: {
-    element: JSX.Element
-    wrapperTag: 'div' | 'th'
-  }
+  dropTarget: DropTargetInfo
   children: JSX.Element
   onDrop?: OnDrop
   onDragStart?: OnDragStart
@@ -55,13 +53,15 @@ export const Draggable: React.FC<DraggableProps> = ({
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
-    if (!disabled && draggedId && id !== draggedId && id !== draggedOverId) {
-      setGroupState?.(group, {
+    !disabled &&
+      draggedId &&
+      id !== draggedId &&
+      id !== draggedOverId &&
+      (setGroupState?.(group, {
         ...groupState,
         draggedOverId: id
-      })
-      onDragOver?.(draggedId, id)
-    }
+      }) ||
+        onDragOver?.(draggedId, id))
   }
 
   const handleDragOver = (e: DragEvent<HTMLElement>) => {
@@ -89,17 +89,7 @@ export const Draggable: React.FC<DraggableProps> = ({
     />
   )
   if (id === draggedOverId) {
-    return (
-      <dropTarget.wrapperTag
-        data-testid="drop-target"
-        key="drop-target"
-        onDragOver={handleDragOver}
-        onDrop={handleOnDrop}
-        id={`${id}_drop`}
-      >
-        {dropTarget.element}
-      </dropTarget.wrapperTag>
-    )
+    return makeTarget(dropTarget, handleDragOver, handleOnDrop, id)
   }
 
   return item

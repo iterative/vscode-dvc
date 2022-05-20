@@ -14,6 +14,7 @@ import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
+import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
 import { SortOrderLabel } from './SortPicker'
 import { Table } from './Table'
 import styles from './styles.module.scss'
@@ -23,6 +24,7 @@ import * as ColumnOrder from '../../hooks/useColumnOrder'
 import { vsCodeApi } from '../../../shared/api'
 import {
   expectHeaders,
+  getHeaders,
   tableData as sortingTableDataFixture
 } from '../../../test/sort'
 import { dragAndDrop } from '../../../test/dragDrop'
@@ -360,6 +362,43 @@ describe('Table', () => {
         payload: { id: 'id', width: 353 },
         type: MessageFromWebviewType.RESIZE_COLUMN
       })
+    })
+
+    it('should move all the columns from a group from their current position to their new position', async () => {
+      renderExperimentsTable({ ...tableDataFixture })
+
+      let headers = await getHeaders()
+
+      expect(headers.indexOf('threshold')).toBeGreaterThan(
+        headers.indexOf('loss')
+      )
+      expect(headers.indexOf('test')).toBeGreaterThan(
+        headers.indexOf('accuracy')
+      )
+
+      dragAndDrop(
+        screen.getByText('process'),
+        screen.getByText('loss'),
+        DragEnterDirection.AUTO
+      )
+
+      headers = await getHeaders()
+
+      expect(headers.indexOf('loss')).toBeGreaterThan(
+        headers.indexOf('threshold')
+      )
+
+      dragAndDrop(
+        screen.getByText('summary.json'),
+        screen.getByText('test'),
+        DragEnterDirection.AUTO
+      )
+
+      headers = await getHeaders()
+
+      expect(headers.indexOf('accuracy')).toBeGreaterThan(
+        headers.indexOf('test')
+      )
     })
   })
 })

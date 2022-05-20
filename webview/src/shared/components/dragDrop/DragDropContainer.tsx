@@ -3,7 +3,8 @@ import React, {
   useEffect,
   useState,
   useRef,
-  useContext
+  useContext,
+  DragEventHandler
 } from 'react'
 import { DragEnterDirection, getDragEnterDirection } from './util'
 import { DragDropContext, DragDropContextValue } from './DragDropContext'
@@ -31,6 +32,28 @@ export type OnDrop = (
   groupId: string,
   position: number
 ) => void
+
+export type DropTargetInfo = {
+  element: JSX.Element
+  wrapperTag: 'div' | 'th'
+}
+
+export const makeTarget = (
+  dropTarget: DropTargetInfo,
+  handleDragOver: DragEventHandler<HTMLElement>,
+  handleOnDrop: DragEventHandler<HTMLElement>,
+  id: string
+) => (
+  <dropTarget.wrapperTag
+    data-testid="drop-target"
+    key="drop-target"
+    onDragOver={handleDragOver}
+    onDrop={handleOnDrop}
+    id={`${id}__drop`}
+  >
+    {dropTarget.element}
+  </dropTarget.wrapperTag>
+)
 interface DragDropContainerProps {
   order: string[]
   setOrder: (order: string[]) => void
@@ -38,10 +61,7 @@ interface DragDropContainerProps {
   items: JSX.Element[] // Every item must have a id prop for drag and drop to work
   group: string
   onDrop?: OnDrop
-  dropTarget: {
-    element: JSX.Element
-    wrapperTag: 'div' | 'th'
-  }
+  dropTarget: DropTargetInfo
   wrapperComponent?: {
     component: React.FC<WrapperProps>
     props: {
@@ -193,17 +213,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const item = id && buildItem(id, draggable)
 
     if (id === draggedOverId) {
-      const target = (
-        <dropTarget.wrapperTag
-          data-testid="drop-target"
-          key="drop-target"
-          onDragOver={handleDragOver}
-          onDrop={handleOnDrop}
-          id={`${id}__drop`}
-        >
-          {dropTarget.element}
-        </dropTarget.wrapperTag>
-      )
+      const target = makeTarget(dropTarget, handleDragOver, handleOnDrop, id)
+
       return direction === DragEnterDirection.RIGHT
         ? [item, target]
         : [target, item]
