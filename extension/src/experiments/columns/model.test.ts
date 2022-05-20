@@ -14,15 +14,15 @@ import {
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
 
-  it('should return columns that equal the columns fixture when given the output fixture', () => {
+  it('should return columns that equal the columns fixture when given the output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture)
+    await model.transformAndSet(outputFixture)
     expect(model.getSelected()).toStrictEqual(columnsFixture)
   })
 
-  it('should return data that equal the deeply nested output fixture', () => {
+  it('should return data that equal the deeply nested output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
-    model.transformAndSet(deeplyNestedOutput)
+    await model.transformAndSet(deeplyNestedOutput)
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
   })
   describe('persistence', () => {
