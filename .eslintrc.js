@@ -68,6 +68,7 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'check-file',
+    'etc',
     'jest',
     'jsx-a11y',
     'react-hooks',
@@ -93,6 +94,7 @@ module.exports = {
     'array-callback-return': 'off',
     camelcase: 'off',
     curly: ['error', 'all'],
+    'etc/no-commented-out-code': 'error',
     'import/no-unresolved': 'off',
     'import/order': [
       'error',
