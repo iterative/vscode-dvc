@@ -3,7 +3,7 @@ import { PersistenceKey } from './constants'
 import { DeferredDisposable } from '../class/deferred'
 
 export class ModelWithPersistence extends DeferredDisposable {
-  private readonly dvcRoot: string
+  protected readonly dvcRoot: string
   private readonly workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {

@@ -2,7 +2,6 @@
 import { join } from 'dvc/src/test/util/path'
 import { ColumnGroup } from 'react-table'
 import { Experiment, ColumnType } from 'dvc/src/experiments/webview/contract'
-import { collectColumns } from 'dvc/src/experiments/columns/collect'
 import { columns as deeplyNestedColumnsFixture } from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import { joinColumnPath } from 'dvc/src/experiments/columns/paths'
@@ -330,24 +329,43 @@ describe('buildDynamicColumns', () => {
   })
 
   it('Correctly parses a minimal input with a single-depth column at the start', () => {
-    const input = collectColumns({
-      workspace: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: {
-                  a: 'b',
-                  c: {
-                    d: 'e'
-                  }
-                }
-              }
-            }
-          }
-        }
+    const input = [
+      {
+        hasChildren: true,
+        name: 'params.yaml',
+        parentPath: 'params',
+        path: 'params:params.yaml',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        maxStringLength: 1,
+        name: 'a',
+        parentPath: 'params:params.yaml',
+        path: 'params:params.yaml:a',
+        pathArray: ['params', 'params.yaml', 'a'],
+        type: ColumnType.PARAMS,
+        types: ['string']
+      },
+      {
+        hasChildren: true,
+        name: 'c',
+        parentPath: 'params:params.yaml',
+        path: 'params:params.yaml:c',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        maxStringLength: 1,
+        name: 'd',
+        parentPath: 'params:params.yaml:c',
+        path: 'params:params.yaml:c.d',
+        pathArray: ['params', 'params.yaml', 'c', 'd'],
+        type: ColumnType.PARAMS,
+        types: ['string']
       }
-    })
+    ]
+
     expect(
       simplifyColumns(buildDynamicColumns(input, ColumnType.PARAMS))
     ).toStrictEqual([
@@ -380,24 +398,43 @@ describe('buildDynamicColumns', () => {
   })
 
   it('Correctly parses a minimal input with a single-depth number-keyed column at the end', () => {
-    const input = collectColumns({
-      workspace: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: {
-                  c: {
-                    d: 'e'
-                  },
-                  1: 'g'
-                }
-              }
-            }
-          }
-        }
+    const input = [
+      {
+        hasChildren: true,
+        name: 'params.yaml',
+        parentPath: 'params',
+        path: 'params:params.yaml',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        maxStringLength: 1,
+        name: '1',
+        parentPath: 'params:params.yaml',
+        path: 'params:params.yaml:1',
+        pathArray: ['params', 'params.yaml', '1'],
+        type: ColumnType.PARAMS,
+        types: ['string']
+      },
+      {
+        hasChildren: true,
+        name: 'c',
+        parentPath: 'params:params.yaml',
+        path: 'params:params.yaml:c',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        maxStringLength: 1,
+        name: 'd',
+        parentPath: 'params:params.yaml:c',
+        path: 'params:params.yaml:c.d',
+        pathArray: ['params', 'params.yaml', 'c', 'd'],
+        type: ColumnType.PARAMS,
+        types: ['string']
       }
-    })
+    ]
+
     expect(
       simplifyColumns(buildDynamicColumns(input, ColumnType.PARAMS))
     ).toStrictEqual([
@@ -430,24 +467,42 @@ describe('buildDynamicColumns', () => {
   })
 
   it('Correctly parses a minimal input with a single-depth string-keyed column at the end', () => {
-    const input = collectColumns({
-      workspace: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: {
-                  c: {
-                    d: 'e'
-                  },
-                  f: 'g'
-                }
-              }
-            }
-          }
-        }
+    const input = [
+      {
+        hasChildren: true,
+        name: 'params.yaml',
+        parentPath: 'params',
+        path: 'params:params.yaml',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: true,
+        name: 'c',
+        parentPath: 'params:params.yaml',
+        path: 'params:params.yaml:c',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        maxStringLength: 1,
+        name: 'd',
+        parentPath: 'params:params.yaml:c',
+        path: 'params:params.yaml:c.d',
+        pathArray: ['params', 'params.yaml', 'c', 'd'],
+        type: ColumnType.PARAMS,
+        types: ['string']
+      },
+      {
+        hasChildren: false,
+        maxStringLength: 1,
+        name: 'f',
+        parentPath: 'params:params.yaml',
+        path: 'params:params.yaml:f',
+        pathArray: ['params', 'params.yaml', 'f'],
+        type: ColumnType.PARAMS,
+        types: ['string']
       }
-    })
+    ]
     expect(
       simplifyColumns(buildDynamicColumns(input, ColumnType.PARAMS))
     ).toStrictEqual([

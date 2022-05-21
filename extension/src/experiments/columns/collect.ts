@@ -1,3 +1,4 @@
+import { join } from 'path'
 import get from 'lodash/get'
 import { ValueWalkMeta, walkRepo } from './walk'
 import { joinColumnPath, METRIC_PARAM_SEPARATOR } from './paths'
@@ -10,6 +11,7 @@ import {
   ValueTree,
   ValueTreeOrError
 } from '../../cli/reader'
+import { standardizePath } from '../../fileSystem/path'
 
 const getValueType = (value: Value) => {
   if (value === null) {
@@ -203,6 +205,16 @@ const collectColumnsChanges = (
       collectFileChanges(changes, type, commitData, file, value)
     }
   }
+}
+
+export const collectParamsFiles = (
+  dvcRoot: string,
+  data: ExperimentsOutput
+): Set<string> => {
+  const files = Object.keys(data.workspace.baseline.data?.params || {})
+    .filter(Boolean)
+    .map(file => standardizePath(join(dvcRoot, file))) as string[]
+  return new Set(files)
 }
 
 const getData = (value: { baseline: ExperimentFieldsOrError }) =>
