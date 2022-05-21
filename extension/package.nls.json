@@ -43,7 +43,7 @@
   "command.resetWorkspace": "Reset the Workspace",
   "command.runExperiment": "Run Experiment",
   "command.resumeCheckpointExperiment": "Resume Checkpoint Experiment",
-  "command.runQueuedExperiments": "Run All Queued Experiments",
+  "command.runQueuedExperiments": "Start the Experiments Queue",
   "command.resetAndRunCheckpointExperiment": "Reset and Run Checkpoint Experiment",
   "command.selectForCompare": "Select for Compare",
   "command.setupWorkspace": "Setup The Workspace",
