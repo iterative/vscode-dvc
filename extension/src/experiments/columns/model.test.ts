@@ -4,10 +4,27 @@ import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { ColumnType } from '../webview/contract'
+import outputFixture from '../../test/fixtures/expShow/output'
+import columnsFixture from '../../test/fixtures/expShow/columns'
+import {
+  deeplyNestedOutput,
+  columns as deeplyNestedColumns
+} from '../../test/fixtures/expShow/deeplyNested'
 
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
 
+  it('should return columns that equal the columns fixture when given the output fixture', async () => {
+    const model = new ColumnsModel('', buildMockMemento())
+    await model.transformAndSet(outputFixture)
+    expect(model.getSelected()).toStrictEqual(columnsFixture)
+  })
+
+  it('should return data that equal the deeply nested output fixture', async () => {
+    const model = new ColumnsModel('', buildMockMemento())
+    await model.transformAndSet(deeplyNestedOutput)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
+  })
   describe('persistence', () => {
     const paramsDotYamlPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml')
     const testParamPath = appendColumnToPath(paramsDotYamlPath, 'testparam')

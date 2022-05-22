@@ -60,6 +60,28 @@ const getDisplayNameOrParent = (
   }
 }
 
+const getLogicalGroupName = (
+  sha: string,
+  branchSha: string,
+  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
+): string | undefined => {
+  const experiment = experimentsObject[sha]?.data
+
+  const { checkpoint_tip: checkpointTip = undefined, name = undefined } =
+    experiment || {}
+
+  if (name) {
+    return `[${name}]`
+  }
+
+  return (
+    getDisplayNameOrParent(sha, branchSha, experimentsObject) ||
+    (checkpointTip && checkpointTip !== sha
+      ? getLogicalGroupName(checkpointTip, branchSha, experimentsObject)
+      : undefined)
+  )
+}
+
 const getCheckpointTipId = (
   checkpointTip: string | undefined,
   experimentsObject: ExperimentsObject
@@ -89,7 +111,8 @@ const transformExperimentData = (
   experimentFields: ExperimentFields,
   label: string | undefined,
   sha?: string,
-  displayNameOrParent?: string
+  displayNameOrParent?: string,
+  logicalGroupName?: string
 ): Experiment => {
   const experiment = {
     id,
@@ -99,6 +122,10 @@ const transformExperimentData = (
 
   if (displayNameOrParent) {
     experiment.displayNameOrParent = displayNameOrParent
+  }
+
+  if (logicalGroupName) {
+    experiment.logicalGroupName = logicalGroupName
   }
 
   if (sha) {
@@ -138,7 +165,8 @@ const transformExperimentOrCheckpointData = (
       experimentFields,
       getShortSha(sha),
       sha,
-      getDisplayNameOrParent(sha, branchSha, experimentsObject)
+      getDisplayNameOrParent(sha, branchSha, experimentsObject),
+      getLogicalGroupName(sha, branchSha, experimentsObject)
     )
   }
 }

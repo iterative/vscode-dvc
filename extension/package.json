@@ -838,6 +838,11 @@
         {
           "command": "dvc.runExperiment",
           "group": "navigation@0",
+          "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available && !dvc.experiment.checkpoints"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "group": "navigation@0",
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available && !dvc.experiment.checkpoints"
         },
         {
@@ -851,9 +856,19 @@
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
+          "command": "dvc.resumeCheckpointExperiment",
+          "group": "navigation@1",
+          "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
+        },
+        {
           "command": "dvc.resetAndRunCheckpointExperiment",
           "group": "navigation@2",
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
+        },
+        {
+          "command": "dvc.resetAndRunCheckpointExperiment",
+          "group": "navigation@2",
+          "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.runQueuedExperiments",
@@ -861,9 +876,19 @@
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
+          "command": "dvc.runQueuedExperiments",
+          "group": "navigation@3",
+          "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available"
+        },
+        {
           "command": "dvc.queueExperiment",
           "group": "navigation@4",
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
+        },
+        {
+          "command": "dvc.queueExperiment",
+          "group": "navigation@4",
+          "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available"
         }
       ],
       "view/item/context": [

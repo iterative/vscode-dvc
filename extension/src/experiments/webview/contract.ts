@@ -9,6 +9,7 @@ export interface Experiment extends BaseExperimentFields {
   id: string
   label: string
   displayNameOrParent?: string
+  logicalGroupName?: string
   params?: Columns
   metrics?: Columns
   displayColor?: string

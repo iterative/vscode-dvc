@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { ColumnType, TableData } from 'dvc/src/experiments/webview/contract'
-import { DND_DRAGGABLE_DATA_ATTR } from 'react-beautiful-dnd-test-utils'
 
 export const defaultColumns = ['Experiment', 'Timestamp']
 
@@ -49,10 +48,6 @@ export const tableData: TableData = {
   ],
   sorts: []
 }
-
-export const makeGetDragEl = (text: string) => () =>
-  // eslint-disable-next-line testing-library/no-node-access
-  screen.getByText(text).closest(DND_DRAGGABLE_DATA_ATTR)
 
 export const getHeaders = async () => {
   const renderedHeader = await screen.findAllByTestId('rendered-header')
