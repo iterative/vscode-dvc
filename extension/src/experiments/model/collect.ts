@@ -67,10 +67,6 @@ const getLogicalGroupName = (
 ): string | undefined => {
   const experiment = experimentsObject[sha]?.data
 
-  // if (!experiment) {
-  //   return
-  // }
-
   const { checkpoint_tip: checkpointTip = undefined, name = undefined } =
     experiment || {}
 
