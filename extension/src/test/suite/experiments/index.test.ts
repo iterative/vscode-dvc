@@ -513,7 +513,7 @@ suite('Experiments Test Suite', () => {
         setupExperimentsAndMockCommands()
 
       const experimentToToggle = 'exp-e7a67'
-      const queuedExperiment = '90aea7f'
+      const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
 
       const isExperimentSelected = (expId: string): boolean =>
         !!experimentsModel.getExperiments().find(({ id }) => id === expId)
@@ -528,11 +528,15 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const toggleSpy = spy(experimentsModel, 'toggleStatus')
 
       mockMessageReceived.fire({
         payload: experimentToToggle,
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
+
+      expect(toggleSpy).to.be.calledWith(experimentToToggle)
+      toggleSpy.resetHistory()
 
       expect(
         isExperimentSelected(experimentToToggle),
@@ -543,6 +547,8 @@ suite('Experiments Test Suite', () => {
         payload: queuedExperiment,
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
+
+      expect(toggleSpy).to.be.calledWith(queuedExperiment)
 
       expect(
         isExperimentSelected(queuedExperiment),
