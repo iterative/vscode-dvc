@@ -333,16 +333,15 @@ suite('Experiments Test Suite', () => {
 
   describe('handleMessageFromWebview', () => {
     const setupExperimentsAndMockCommands = () => {
-      const { experiments, internalCommands } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, experimentsModel, internalCommands } =
+        buildExperiments(disposable, expShowFixture)
+
       const mockExecuteCommand = stub(
         internalCommands,
         'executeCommand'
       ).resolves(undefined)
 
-      return { experiments, mockExecuteCommand }
+      return { experiments, experimentsModel, mockExecuteCommand }
     }
 
     it('should be able to handle a message to apply an experiment to workspace', async () => {
@@ -507,6 +506,48 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath,
         mockExperimentId
       )
+    })
+
+    it("should be able to handle a message to toggle an experiment's status", async () => {
+      const { experiments, experimentsModel } =
+        setupExperimentsAndMockCommands()
+
+      const experimentToToggle = 'exp-e7a67'
+      const queuedExperiment = '90aea7f'
+
+      const isExperimentSelected = (expId: string): boolean =>
+        !!experimentsModel.getExperiments().find(({ id }) => id === expId)
+          ?.selected
+
+      expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
+        .to.be.true
+      expect(
+        isExperimentSelected(queuedExperiment),
+        'queued experiment cannot be selected'
+      ).to.be.false
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: experimentToToggle,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+
+      expect(
+        isExperimentSelected(experimentToToggle),
+        'experiment has been toggled to unselected'
+      ).to.be.false
+
+      mockMessageReceived.fire({
+        payload: queuedExperiment,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+
+      expect(
+        isExperimentSelected(queuedExperiment),
+        'queued experiment cannot be selected'
+      ).to.be.false
     })
   })
 
