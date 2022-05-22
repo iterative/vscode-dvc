@@ -226,13 +226,11 @@ export class ExperimentsTree
         collapsibleState: experiment.hasChildren
           ? this.getCollapsibleState(experiment.displayNameOrParent)
           : TreeItemCollapsibleState.None,
-        command: experiment.queued
-          ? undefined
-          : {
-              arguments: [{ dvcRoot, id: experiment.id }],
-              command: RegisteredCommands.EXPERIMENT_TOGGLE,
-              title: 'toggle'
-            },
+        command: {
+          arguments: [{ dvcRoot, id: experiment.id }],
+          command: RegisteredCommands.EXPERIMENT_TOGGLE,
+          title: 'toggle'
+        },
         description: experiment.displayNameOrParent,
         dvcRoot,
         iconPath: this.getExperimentIcon(experiment),

@@ -212,7 +212,11 @@ describe('ExperimentsTree', () => {
         },
         {
           collapsibleState: 0,
-          command: undefined,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'f81f1b5' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
           description: undefined,
           dvcRoot: 'repo',
           iconPath: mockedClockResource,
