@@ -96,6 +96,13 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public toggleStatus(id: string) {
+    if (
+      this.flattenExperiments().find(({ id: queuedId }) => queuedId === id)
+        ?.queued
+    ) {
+      return
+    }
+
     const current = this.coloredStatus[id]
     if (current) {
       this.unassignColor(current)
