@@ -31,7 +31,6 @@ import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { Toast } from '../vscode/toast'
 import { pickPaths } from '../path/selection/quickPick'
-import { Title } from '../vscode/title'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -116,7 +115,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async selectPlots() {
     const paths = this.paths?.getTerminalNodes()
 
-    const selected = await pickPaths(Title.SELECT_PLOTS, 'plots', paths)
+    const selected = await pickPaths('plots', paths)
     if (!selected) {
       return
     }

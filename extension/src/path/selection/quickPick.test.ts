@@ -20,7 +20,7 @@ beforeEach(() => {
 describe('pickPaths', () => {
   it('should not call quickPickManyValues if undefined is provided', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce([])
-    await pickPaths(Title.SELECT_PLOTS, 'plots', undefined)
+    await pickPaths('plots', undefined)
 
     expect(mockedShowError).toBeCalledTimes(1)
     expect(mockedQuickPickManyValues).not.toBeCalled()
@@ -28,7 +28,7 @@ describe('pickPaths', () => {
 
   it('should not call quickPickManyValues if no plots paths are provided', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce([])
-    await pickPaths(Title.SELECT_PLOTS, 'plots', [])
+    await pickPaths('plots', [])
 
     expect(mockedShowError).toBeCalledTimes(1)
     expect(mockedQuickPickManyValues).not.toBeCalled()
@@ -61,7 +61,7 @@ describe('pickPaths', () => {
       }
     ]
 
-    await pickPaths(Title.SELECT_PLOTS, 'plots', plotPaths)
+    await pickPaths('plots', plotPaths)
 
     expect(mockedShowError).not.toBeCalled()
     expect(mockedQuickPickManyValues).toBeCalledTimes(1)

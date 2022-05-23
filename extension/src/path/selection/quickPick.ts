@@ -33,10 +33,11 @@ const collectItems = <T extends PathType>(
 }
 
 export const pickPaths = <T extends PathType>(
-  title: Title,
   type: 'plots' | 'columns',
   paths?: PathWithSelected<T>[]
 ): Thenable<PathWithSelected<T>[] | undefined> => {
+  const title = type === 'plots' ? Title.SELECT_PLOTS : Title.SELECT_COLUMNS
+
   if (!definedAndNonEmpty(paths)) {
     return Toast.showError(`There are no ${type} to select.`)
   }

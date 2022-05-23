@@ -271,7 +271,7 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectColumns() {
     const columns = this.columns.getTerminalNodes()
 
-    const selected = await pickPaths(Title.SELECT_COLUMNS, 'columns', columns)
+    const selected = await pickPaths('columns', columns)
     if (!selected) {
       return
     }
