@@ -312,8 +312,8 @@
         "icon": "$(play)"
       },
       {
-        "title": "%command.runQueuedExperiments%",
-        "command": "dvc.runQueuedExperiments",
+        "title": "%command.startExperimentsQueue%",
+        "command": "dvc.startExperimentsQueue",
         "category": "DVC",
         "icon": "$(run-all)"
       },
@@ -674,7 +674,7 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.runner.running && dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.runQueuedExperiments",
+          "command": "dvc.startExperimentsQueue",
           "when": "dvc.commands.available && dvc.project.available && !dvc.runner.running"
         },
         {
@@ -871,12 +871,12 @@
           "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.runQueuedExperiments",
+          "command": "dvc.startExperimentsQueue",
           "group": "navigation@3",
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
-          "command": "dvc.runQueuedExperiments",
+          "command": "dvc.startExperimentsQueue",
           "group": "navigation@3",
           "when": "dvc.params.fileActive && !dvc.runner.running && dvc.commands.available"
         },
@@ -1145,7 +1145,7 @@
           "group": "3_queue@1"
         },
         {
-          "command": "dvc.runQueuedExperiments",
+          "command": "dvc.startExperimentsQueue",
           "when": "view == dvc.views.experimentsTree && !dvc.runner.running",
           "group": "3_queue@2"
         },

@@ -7,7 +7,7 @@ export enum RegisteredCliCommands {
   EXPERIMENT_REMOVE_QUEUED = 'dvc.removeQueuedExperiment',
   EXPERIMENT_RESUME = 'dvc.resumeCheckpointExperiment',
   EXPERIMENT_RUN = 'dvc.runExperiment',
-  EXPERIMENT_RUN_QUEUED = 'dvc.runQueuedExperiments',
+  EXPERIMENT_RUN_QUEUED = 'dvc.startExperimentsQueue',
   EXPERIMENT_RESET_AND_RUN = 'dvc.resetAndRunCheckpointExperiment',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
 
