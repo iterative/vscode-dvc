@@ -131,6 +131,11 @@ const registerExperimentQuickPickCommands = (
     RegisteredCommands.EXPERIMENT_SELECT,
     (dvcRoot?: string) => experiments.selectExperiments(dvcRoot)
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_COLUMNS_SELECT,
+    (dvcRoot?: string) => experiments.selectColumns(dvcRoot)
+  )
 }
 
 const registerExperimentRunCommands = (

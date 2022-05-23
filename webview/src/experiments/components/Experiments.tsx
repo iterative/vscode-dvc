@@ -25,6 +25,7 @@ import { sendMessage } from '../../shared/vscode'
 import { useThemeVariables } from '../../shared/components/theme/Theme'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
+import { StartButton } from '../../shared/components/button/StartButton'
 
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
@@ -136,6 +137,7 @@ export const ExperimentsTable: React.FC<{
         columnWidths: {},
         columns: [],
         hasCheckpoints: false,
+        hasColumns: false,
         rows: [],
         sorts: [],
         ...initiallyUndefinedTableData
@@ -157,7 +159,7 @@ export const ExperimentsTable: React.FC<{
       return [tableData, columns, defaultColumn, initialState]
     }, [initiallyUndefinedTableData])
 
-  const { rows: data } = tableData
+  const { hasColumns, rows: data } = tableData
 
   const instance = useTable<Row>(
     {
@@ -200,13 +202,42 @@ export const ExperimentsTable: React.FC<{
   }, [toggleAllRowsExpanded])
 
   const hasOnlyDefaultColumns = columns.length <= 2
-  if (hasOnlyDefaultColumns) {
-    return <EmptyState>No Columns Selected.</EmptyState>
-  }
-
   const hasOnlyWorkspace = data.length <= 1
-  if (hasOnlyWorkspace) {
-    return <EmptyState>No Experiments to Display.</EmptyState>
+  if (hasOnlyDefaultColumns || hasOnlyWorkspace) {
+    return (
+      <EmptyState>
+        {hasColumns && !hasOnlyWorkspace && (
+          <div>
+            <p>No Columns Selected.</p>
+            <StartButton
+              onClick={() =>
+                sendMessage({
+                  type: MessageFromWebviewType.SELECT_COLUMNS
+                })
+              }
+              text={'Add Columns'}
+            />
+          </div>
+        )}
+        {(!hasColumns || hasOnlyWorkspace) && (
+          <div>
+            <p>No Experiments to Display.</p>
+            <p>
+              {'Get started with '}
+              <a href="https://dvc.org/doc/start/experiments">experiments</a>
+              {'.'}
+            </p>
+            <p>
+              {'Learn about the '}
+              <a href="https://dvc.org/doc/command-reference/exp">
+                exp commands
+              </a>
+              {'.'}
+            </p>
+          </div>
+        )}
+      </EmptyState>
+    )
   }
 
   return (

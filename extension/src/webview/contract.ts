@@ -27,6 +27,7 @@ export enum MessageFromWebviewType {
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
   SELECT_EXPERIMENTS = 'select-experiments',
+  SELECT_COLUMNS = 'select-columns',
   SELECT_PLOTS = 'select-plots',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
@@ -126,6 +127,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
   | { type: MessageFromWebviewType.REFRESH_REVISION; payload: string }
+  | { type: MessageFromWebviewType.SELECT_COLUMNS }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

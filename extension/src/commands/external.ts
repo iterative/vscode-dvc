@@ -27,6 +27,7 @@ export enum RegisteredCliCommands {
 
 export enum RegisteredCommands {
   EXPERIMENT_AUTO_APPLY_FILTERS = 'dvc.views.experimentsTree.autoApplyFilters',
+  EXPERIMENT_COLUMNS_SELECT = 'dvc.views.experimentsColumnsTree.selectColumns',
   EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS = 'dvc.views.experimentsTree.disableAutoApplyFilters',
   EXPERIMENT_FILTER_ADD = 'dvc.addExperimentsTableFilter',
   EXPERIMENT_FILTER_REMOVE = 'dvc.views.experimentsFilterByTree.removeFilter',

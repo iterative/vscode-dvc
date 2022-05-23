@@ -40,6 +40,8 @@ export const EventName = Object.assign(
       'views.experimentsTable.columnSortRemoved',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
       'views.experimentsTable.columnResized',
+    VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS:
+      'views.experimentsTable.selectColumns',
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
 
@@ -99,6 +101,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_AUTO_APPLY_FILTERS]: undefined
   [EventName.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
+  [EventName.EXPERIMENT_COLUMNS_SELECT]: undefined
   [EventName.EXPERIMENT_FILTER_ADD]: undefined
   [EventName.EXPERIMENT_FILTER_REMOVE]: undefined
   [EventName.EXPERIMENT_FILTERS_REMOVE]: undefined
@@ -187,6 +190,7 @@ export interface IEventNamePropertyMapping {
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]: WebviewFocusChangedProperties
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS]: undefined
 
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined

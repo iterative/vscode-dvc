@@ -437,6 +437,12 @@
         "icon": "$(list-selection)"
       },
       {
+        "title": "%command.views.experimentsColumnsTree.selectColumns%",
+        "command": "dvc.views.experimentsColumnsTree.selectColumns",
+        "category": "DVC",
+        "icon": "$(list-selection)"
+      },
+      {
         "title": "%command.views.experimentsTree.autoApplyFilters%",
         "command": "dvc.views.experimentsTree.autoApplyFilters",
         "category": "DVC",
@@ -696,6 +702,10 @@
         {
           "command": "dvc.stopRunningExperiment",
           "when": "dvc.commands.available && dvc.project.available && dvc.runner.running"
+        },
+        {
+          "command": "dvc.views.experimentsColumnsTree.selectColumns",
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.views.experimentsTree.applyExperiment",
@@ -1058,6 +1068,16 @@
           "command": "dvc.showExperiments",
           "when": "view == dvc.views.experimentsTree && !dvc.experiments.webviewActive",
           "group": "navigation@1"
+        },
+        {
+          "command": "dvc.views.experimentsColumnsTree.selectColumns",
+          "when": "view == dvc.views.experimentsColumnsTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.views.experimentsColumnsTree.selectColumns",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsColumnsTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.runExperiment",

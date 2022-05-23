@@ -18,6 +18,7 @@ const tableData: TableData = {
   },
   columns: columnsFixture,
   hasCheckpoints: true,
+  hasColumns: true,
   rows: rowsFixture.map(row => ({
     ...row,
     subRows: row.subRows?.map(experiment => ({

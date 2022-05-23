@@ -13,7 +13,6 @@ import { PlotsData } from './data'
 import { PlotsModel } from './model'
 import { collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
-import { pickPlotPaths } from './paths/quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -31,6 +30,8 @@ import { getModifiedTime, removeDir } from '../fileSystem'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { Toast } from '../vscode/toast'
+import { pickPaths } from '../path/selection/quickPick'
+import { Title } from '../vscode/title'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -115,7 +116,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async selectPlots() {
     const paths = this.paths?.getTerminalNodes()
 
-    const selected = await pickPlotPaths(paths)
+    const selected = await pickPaths(Title.SELECT_PLOTS, 'plots', paths)
     if (!selected) {
       return
     }

@@ -77,6 +77,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     )
   }
 
+  public hasColumns() {
+    return this.data.length > 0
+  }
+
   private async transformAndSetColumns(data: ExperimentsOutput) {
     const [columns, paramsFiles] = await Promise.all([
       collectColumns(data),
