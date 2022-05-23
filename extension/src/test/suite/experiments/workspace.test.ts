@@ -470,7 +470,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.runQueuedExperiments', () => {
+  describe('dvc.startExperimentsQueue', () => {
     it('should be able to execute all experiments in the run queue', async () => {
       const mockRunExperimentQueue = stub(
         CliRunner.prototype,
