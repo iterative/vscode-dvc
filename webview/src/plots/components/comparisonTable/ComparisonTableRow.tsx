@@ -44,10 +44,10 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
 
           return (
             <td
-              key={path + plot?.revision || 'missing'}
+              key={path + plot.revision}
               className={cx({
                 [styles.pinnedColumnCell]: isPinned,
-                [styles.missing]: missing
+                [styles.missing]: isShown && missing
               })}
             >
               <div

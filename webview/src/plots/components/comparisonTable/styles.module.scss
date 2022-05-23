@@ -83,6 +83,9 @@ $gap: 4px;
 
 .missing {
   background-color: $bg-color;
+  border-style: solid;
+  border-width: thin;
+  border-color: $watermark-color;
 }
 
 .rowToggler {
