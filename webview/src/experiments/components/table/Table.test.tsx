@@ -150,9 +150,9 @@ describe('Table', () => {
       fireEvent.contextMenu(column, {
         bubbles: true
       })
-      const columnMenu = await screen.findByRole('menu')
+      const columnMenu = await screen.findAllByRole('menu')
 
-      const sortOption = await within(columnMenu).findByText(optionLabel)
+      const sortOption = await within(columnMenu[0]).findByText(optionLabel)
       fireEvent.click(sortOption)
     }
 
