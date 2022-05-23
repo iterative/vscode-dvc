@@ -19,13 +19,13 @@ import {
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
+import { GetStarted } from './GetStarted'
 import styles from './table/styles.module.scss'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
 import { useThemeVariables } from '../../shared/components/theme/Theme'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
-import { StartButton } from '../../shared/components/button/StartButton'
 
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
@@ -205,38 +205,7 @@ export const ExperimentsTable: React.FC<{
   const hasOnlyWorkspace = data.length <= 1
   if (hasOnlyDefaultColumns || hasOnlyWorkspace) {
     return (
-      <EmptyState>
-        {hasColumns && !hasOnlyWorkspace && (
-          <div>
-            <p>No Columns Selected.</p>
-            <StartButton
-              onClick={() =>
-                sendMessage({
-                  type: MessageFromWebviewType.SELECT_COLUMNS
-                })
-              }
-              text={'Add Columns'}
-            />
-          </div>
-        )}
-        {(!hasColumns || hasOnlyWorkspace) && (
-          <div>
-            <p>No Experiments to Display.</p>
-            <p>
-              {'Get started with '}
-              <a href="https://dvc.org/doc/start/experiments">experiments</a>
-              {'.'}
-            </p>
-            <p>
-              {'Learn about the '}
-              <a href="https://dvc.org/doc/command-reference/exp">
-                exp commands
-              </a>
-              {'.'}
-            </p>
-          </div>
-        )}
-      </EmptyState>
+      <GetStarted hasOnlyWorkspace={hasOnlyWorkspace} hasColumns={hasColumns} />
     )
   }
 
