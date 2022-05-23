@@ -19,6 +19,7 @@ import { CheckpointsModel } from '../../../experiments/checkpoints/model'
 import { FileSystemData } from '../../../fileSystem/data'
 import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
+import { ColumnsModel } from '../../../experiments/columns/model'
 
 const hasCheckpoints = (data: ExperimentsOutput) => {
   const [experimentsWithBaseline] = Object.values(omit(data, 'workspace'))
@@ -73,6 +74,8 @@ export const buildExperiments = (
     cliExecutor,
     cliReader,
     cliRunner,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any,
+    columnsModel: (experiments as any).columns as ColumnsModel,
     experiments,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     experimentsModel: (experiments as any).experiments as ExperimentsModel,

@@ -1,8 +1,15 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, spy, restore } from 'sinon'
-import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
+import { stub, spy, restore, SinonStub } from 'sinon'
+import {
+  EventEmitter,
+  window,
+  commands,
+  workspace,
+  Uri,
+  QuickPickItem
+} from 'vscode'
 import { buildExperiments } from './util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
@@ -11,7 +18,10 @@ import columnsFixture from '../../fixtures/expShow/columns'
 import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
 import { Experiments } from '../../../experiments'
 import { ResourceLocator } from '../../../resourceLocator'
-import { QuickPickItemWithValue } from '../../../vscode/quickPick'
+import {
+  QuickPickItemWithValue,
+  QuickPickOptionsWithTitle
+} from '../../../vscode/quickPick'
 import {
   Column,
   ColumnType,
@@ -48,6 +58,7 @@ import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
+import { Title } from '../../../vscode/title'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -334,15 +345,25 @@ suite('Experiments Test Suite', () => {
 
   describe('handleMessageFromWebview', () => {
     const setupExperimentsAndMockCommands = () => {
-      const { experiments, experimentsModel, internalCommands } =
-        buildExperiments(disposable, expShowFixture)
-
+      const {
+        columnsModel,
+        experiments,
+        experimentsModel,
+        internalCommands,
+        messageSpy
+      } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
         internalCommands,
         'executeCommand'
       ).resolves(undefined)
 
-      return { experiments, experimentsModel, mockExecuteCommand }
+      return {
+        columnsModel,
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockExecuteCommand
+      }
     }
 
     it('should be able to handle a message to apply an experiment to workspace', async () => {
@@ -555,6 +576,49 @@ suite('Experiments Test Suite', () => {
         isExperimentSelected(queuedExperiment),
         'queued experiment cannot be selected'
       ).to.be.false
+    })
+    it('should be able to handle a message to select columns', async () => {
+      const { columnsModel, experiments, messageSpy } =
+        setupExperimentsAndMockCommands()
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
+      >
+      mockShowQuickPick.resolves([])
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_COLUMNS
+      })
+
+      expect(mockShowQuickPick).to.be.calledWith(
+        columnsModel.getTerminalNodes().map(column => ({
+          label: column.path,
+          picked: column.selected,
+          value: column
+        })),
+        { canPickMany: true, title: Title.SELECT_COLUMNS }
+      )
+
+      await tableChangePromise
+
+      const allColumnsUnselected: TableData = {
+        changes: workspaceChangesFixture,
+        columnOrder: [],
+        columnWidths: {},
+        columns: [],
+        hasCheckpoints: true,
+        hasColumns: true,
+        rows: rowsFixture,
+        sorts: []
+      }
+
+      expect(messageSpy).to.be.calledWith(allColumnsUnselected)
     })
   })
 
@@ -1049,17 +1113,17 @@ suite('Experiments Test Suite', () => {
         false
       )
     })
-  })
 
-  it('should not set a context value when a non-params file is open and the extension starts', async () => {
-    const nonParamsFile = Uri.file(join(dvcDemoPath, '.gitignore'))
-    await window.showTextDocument(nonParamsFile)
+    it('should not set a context value when a non-params file is open and the extension starts', async () => {
+      const nonParamsFile = Uri.file(join(dvcDemoPath, '.gitignore'))
+      await window.showTextDocument(nonParamsFile)
 
-    const setContextValueSpy = spy(VscodeContext, 'setContextValue')
+      const setContextValueSpy = spy(VscodeContext, 'setContextValue')
 
-    const { experiments } = buildExperiments(disposable)
-    await experiments.isReady()
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
 
-    expect(setContextValueSpy).not.to.be.called
+      expect(setContextValueSpy).not.to.be.called
+    })
   })
 })
