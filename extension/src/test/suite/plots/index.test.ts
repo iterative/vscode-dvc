@@ -519,6 +519,42 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a manual refresh message from the webview', async () => {
+      const { data, plots, plotsModel, mockPlotsDiff } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const removeDataSpy = spy(plotsModel, 'setupManualRefresh')
+
+      const webview = await plots.showWebview()
+      mockPlotsDiff.resetHistory()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const dataUpdateEvent = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      mockMessageReceived.fire({
+        payload: 'main',
+        type: MessageFromWebviewType.REFRESH_REVISION
+      })
+
+      await dataUpdateEvent
+
+      expect(removeDataSpy).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_MANUAL_REFRESH,
+        undefined,
+        undefined
+      )
+      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'main')
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should be able to make the plots webview visible', async () => {
       const { plots, messageSpy, mockPlotsDiff } = await buildPlots(
         disposable,

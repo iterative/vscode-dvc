@@ -125,7 +125,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.INITIALIZED }
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
-  | { type: MessageFromWebviewType.REFRESH_REVISION }
+  | { type: MessageFromWebviewType.REFRESH_REVISION; payload: string }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

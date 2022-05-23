@@ -229,9 +229,11 @@ export class Plots extends BaseRepository<TPlotsData> {
     if (this.webview) {
       return {
         ...plot,
-        url: `${this.webview.getWebviewUri(plot.url)}?${getModifiedTime(
-          plot.url
-        )}`
+        url: plot.url
+          ? `${this.webview.getWebviewUri(plot.url)}?${getModifiedTime(
+              plot.url
+            )}`
+          : undefined
       }
     }
   }
@@ -265,7 +267,7 @@ export class Plots extends BaseRepository<TPlotsData> {
           case MessageFromWebviewType.SELECT_EXPERIMENTS:
             return this.selectExperimentsFromWebview()
           case MessageFromWebviewType.REFRESH_REVISION:
-            return this.attemptToRefreshData()
+            return this.attemptToRefreshData(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -351,15 +353,15 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
   }
 
-  private attemptToRefreshData() {
+  private attemptToRefreshData(revision: string) {
+    Toast.infoWithOptions(`Attempting to refresh plots data for ${revision}.`)
+    this.plots?.setupManualRefresh(revision)
     this.data.managedUpdate()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
       undefined,
       undefined
     )
-
-    return Toast.infoWithOptions('Attempting to refresh plots data.')
   }
 
   private sendCheckpointPlotsAndEvent(
