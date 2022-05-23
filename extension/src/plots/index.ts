@@ -354,7 +354,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private attemptToRefreshData(revision: string) {
-    Toast.infoWithOptions(`Attempting to refresh plots data for ${revision}.`)
+    Toast.infoWithOptions(`Attempting to refresh ${revision} plots data.`)
     this.plots?.setupManualRefresh(revision)
     this.data.managedUpdate()
     sendTelemetryEvent(
