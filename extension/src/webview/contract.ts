@@ -21,6 +21,7 @@ export enum MessageFromWebviewType {
   REORDER_PLOTS_COMPARISON = 'reorder-plots-comparison',
   REORDER_PLOTS_METRICS = 'reorder-plots-metrics',
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
+  REFRESH_REVISION = 'refresh-revision',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
   SORT_COLUMN = 'sort-column',
@@ -124,6 +125,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.INITIALIZED }
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
+  | { type: MessageFromWebviewType.REFRESH_REVISION }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

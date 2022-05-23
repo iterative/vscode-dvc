@@ -1,8 +1,11 @@
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { AllIcons, Icon } from '../../../shared/components/Icon'
+import { RefreshButton } from '../../../shared/components/button/RefreshButton'
+import { sendMessage } from '../../../shared/vscode'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -51,7 +54,16 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
                 {missing ? (
-                  <p>No plot to display.</p>
+                  <div>
+                    <p>No Plot to Display.</p>
+                    <RefreshButton
+                      onClick={() =>
+                        sendMessage({
+                          type: MessageFromWebviewType.REFRESH_REVISION
+                        })
+                      }
+                    />
+                  </div>
                 ) : (
                   <img
                     src={plot.url}

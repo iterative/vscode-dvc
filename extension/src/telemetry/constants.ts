@@ -46,6 +46,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
+    VIEWS_PLOTS_MANUAL_REFRESH: 'views.plots.manualRefresh',
     VIEWS_PLOTS_METRICS_SELECTED: 'views.plots.metricsSelected',
     VIEWS_PLOTS_RENAME_SECTION: 'views.plots.sectionRenamed',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
@@ -190,6 +191,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
+  [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: undefined
   [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
   [EventName.VIEWS_PLOTS_RENAME_SECTION]: { section: Section }
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined

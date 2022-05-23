@@ -3,19 +3,20 @@ import { ButtonProps } from './Button'
 import { IconButton } from './IconButton'
 import { AllIcons } from '../Icon'
 
-export const StartButton: React.FC<ButtonProps> = ({
+type RefreshButtonProps = Omit<ButtonProps, 'text'>
+
+export const RefreshButton: React.FC<RefreshButtonProps> = ({
   appearance,
   onClick,
-  isNested,
-  text
-}: ButtonProps) => {
+  isNested
+}: RefreshButtonProps) => {
   return (
     <IconButton
       appearance={appearance}
       isNested={isNested}
-      icon={AllIcons.ADD}
+      icon={AllIcons.REFRESH}
       onClick={onClick}
-      text={text}
+      text={'Refresh'}
     />
   )
 }

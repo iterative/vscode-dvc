@@ -12,6 +12,8 @@ import {
 } from './ComparisonTableRow'
 import styles from '../styles.module.scss'
 
+jest.mock('../../../shared/api')
+
 describe('ComparisonTableRow', () => {
   afterEach(() => {
     cleanup()
