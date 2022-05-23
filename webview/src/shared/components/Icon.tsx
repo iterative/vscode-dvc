@@ -12,6 +12,7 @@ import {
   Gripper,
   Lines,
   Pencil,
+  Refresh,
   UpArrow
 } from './icons'
 
@@ -28,6 +29,7 @@ export const AllIcons = {
   GRIPPER: Gripper,
   LINES: Lines,
   PENCIL: Pencil,
+  REFRESH: Refresh,
   UP_ARROW: UpArrow
 }
 

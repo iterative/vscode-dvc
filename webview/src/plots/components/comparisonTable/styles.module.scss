@@ -83,6 +83,9 @@ $gap: 4px;
 
 .missing {
   background-color: $bg-color;
+  border-style: solid;
+  border-width: thin;
+  border-color: $watermark-color;
 }
 
 .rowToggler {
@@ -148,6 +151,7 @@ $gap: 4px;
 .cell img {
   width: 100%;
   height: auto;
+  vertical-align: middle;
 }
 
 .experimentName {

@@ -223,6 +223,39 @@ describe('ComparisonTable', () => {
     expect(pinnedColumn.textContent).toBe(pinnedRevision)
   })
 
+  it('should display a refresh button for each revision that has a missing image', () => {
+    const revisionWithNoData = 'missing-data'
+
+    renderTable({
+      ...basicProps,
+      plots: basicProps.plots.map(({ path, revisions }) => ({
+        path,
+        revisions: {
+          ...revisions,
+          [revisionWithNoData]: { revision: revisionWithNoData, url: undefined }
+        }
+      })),
+      revisions: [
+        ...basicProps.revisions,
+        { displayColor: '#f56565', revision: revisionWithNoData }
+      ]
+    })
+
+    const refreshButtons = screen.getAllByText('Refresh')
+
+    expect(refreshButtons).toHaveLength(basicProps.plots.length)
+
+    for (const button of refreshButtons) {
+      fireEvent.click(button)
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: revisionWithNoData,
+        type: MessageFromWebviewType.REFRESH_REVISION
+      })
+      mockPostMessage.mockReset()
+    }
+  })
+
   describe('Columns drag and drop', () => {
     const pinSecondColumn = () => {
       const secondColumn = getPin(screen.getByText(revisions[1]))

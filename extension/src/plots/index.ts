@@ -30,6 +30,7 @@ import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
 import { getModifiedTime, removeDir } from '../fileSystem'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { Toast } from '../vscode/toast'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -228,9 +229,11 @@ export class Plots extends BaseRepository<TPlotsData> {
     if (this.webview) {
       return {
         ...plot,
-        url: `${this.webview.getWebviewUri(plot.url)}?${getModifiedTime(
-          plot.url
-        )}`
+        url: plot.url
+          ? `${this.webview.getWebviewUri(plot.url)}?${getModifiedTime(
+              plot.url
+            )}`
+          : undefined
       }
     }
   }
@@ -263,6 +266,8 @@ export class Plots extends BaseRepository<TPlotsData> {
             return this.selectPlotsFromWebview()
           case MessageFromWebviewType.SELECT_EXPERIMENTS:
             return this.selectExperimentsFromWebview()
+          case MessageFromWebviewType.REFRESH_REVISION:
+            return this.attemptToRefreshData(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -343,6 +348,17 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.experiments?.selectExperiments()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
+      undefined,
+      undefined
+    )
+  }
+
+  private attemptToRefreshData(revision: string) {
+    Toast.infoWithOptions(`Attempting to refresh ${revision} plots data.`)
+    this.plots?.setupManualRefresh(revision)
+    this.data.managedUpdate()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_MANUAL_REFRESH,
       undefined,
       undefined
     )

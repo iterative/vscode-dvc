@@ -157,6 +157,10 @@ export class PlotsModel extends ModelWithPersistence {
     }
   }
 
+  public setupManualRefresh(id: string) {
+    this.deleteRevisionData(id)
+  }
+
   public getUnfetchedRevisions() {
     return this.getSelectedRevisions().filter(
       revision => !this.fetchedRevs.has(revision)
@@ -315,12 +319,16 @@ export class PlotsModel extends ModelWithPersistence {
   private removeStaleBranches() {
     for (const { id, sha } of this.experiments.getBranchRevisions()) {
       if (sha && this.branchRevisions[id] !== sha) {
-        delete this.revisionData[id]
-        delete this.comparisonData[id]
-        this.fetchedRevs.delete(id)
+        this.deleteRevisionData(id)
         this.branchRevisions[id] = sha
       }
     }
+  }
+
+  private deleteRevisionData(id: string) {
+    delete this.revisionData[id]
+    delete this.comparisonData[id]
+    this.fetchedRevs.delete(id)
   }
 
   private getSelectedRevisions() {
@@ -369,11 +377,9 @@ export class PlotsModel extends ModelWithPersistence {
 
     for (const revision of selectedRevisions) {
       const image = this.comparisonData?.[revision]?.[path]
-      if (image) {
-        pathRevisions.revisions[revision] = {
-          revision,
-          url: image.url
-        }
+      pathRevisions.revisions[revision] = {
+        revision,
+        url: image?.url
       }
     }
     acc.push(pathRevisions)
