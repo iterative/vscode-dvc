@@ -33,6 +33,12 @@ jobs:
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
 
+      - name: Publish to Open VSX Registry
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          extensionFile: './extension/dvc.vsix'
+          pat: ${{ secrets.OPEN_VSX_TOKEN }}
+
       - name: Get Most Recent Changelog Entry
         id: changelog_reader
         uses: mindsers/changelog-reader-action@v2
