@@ -1,4 +1,5 @@
 import {
+  ComparisonPlots,
   ComparisonRevision,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
@@ -26,6 +27,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
 }) => {
   const pinnedColumn = useRef(currentPinnedColumn || '')
   const [columns, setColumns] = useState<ComparisonTableColumn[]>([])
+  const [comparisonPlots, setComparisonPlots] = useState<ComparisonPlots>([])
 
   const isPinned = (column: ComparisonTableColumn): boolean =>
     column.revision === pinnedColumn.current
@@ -53,6 +55,8 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
       }),
     [revisions, getPinnedColumnRevision]
   )
+
+  useEffect(() => setComparisonPlots(plots), [plots])
 
   const setColumnsOrder = (order: string[]) => {
     const newOrder = reorderObjectList<ComparisonRevision>(
@@ -91,7 +95,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
         setColumnsOrder={setColumnsOrder}
         setPinnedColumn={changePinnedColumn}
       />
-      {plots.map(({ path, revisions: revs }) => (
+      {comparisonPlots.map(({ path, revisions: revs }) => (
         <ComparisonTableRow
           key={path}
           path={path}
