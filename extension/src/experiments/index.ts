@@ -350,6 +350,15 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
+  private hideTableColumn(path: string) {
+    this.toggleColumnStatus(path)
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
+      { path },
+      undefined
+    )
+  }
+
   private setupInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
@@ -408,7 +417,7 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.TOGGLE_EXPERIMENT:
             return this.setExperimentStatus(message.payload)
           case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
-            return this.toggleColumnStatus(message.payload)
+            return this.hideTableColumn(message.payload)
           case MessageFromWebviewType.SORT_COLUMN:
             return this.addColumnSort(message.payload)
           case MessageFromWebviewType.REMOVE_COLUMN_SORT:
