@@ -215,7 +215,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               setColumnSort(order)
             }}
           />
-          <VSCodeDivider></VSCodeDivider>
+          <VSCodeDivider />
           <MessagesMenu
             options={[
               {
