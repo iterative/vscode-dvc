@@ -7,8 +7,8 @@ export const DropTarget: React.FC = () => (
     <Icon
       icon={AllIcons.ELLIPSIS}
       className={styles.smallDropIcon}
-      width={20}
-      height={20}
+      width={15}
+      height={15}
     />
   </div>
 )
