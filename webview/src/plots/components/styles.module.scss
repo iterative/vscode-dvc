@@ -42,6 +42,10 @@ $gap: 20px;
   display: flex !important;
   align-items: center;
   justify-content: center;
+
+  svg {
+    overflow: visible;
+  }
 }
 
 .singleViewPlotsGrid,
