@@ -3,12 +3,6 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { sendMessage } from '../../shared/vscode'
 import { StartButton } from '../../shared/components/button/StartButton'
 
-export type GetStartedProps = {
-  hasPlots?: boolean
-  hasSelectedPlots?: boolean
-  hasSelectedRevisions?: boolean
-}
-
 const NoPlotsText: React.FC = () => <p>No Plots to Display.</p>
 
 export const NoPlots: React.FC = () => (
