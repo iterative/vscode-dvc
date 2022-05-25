@@ -24,7 +24,7 @@ export const GetStarted = ({
                 type: MessageFromWebviewType.SELECT_COLUMNS
               })
             }
-            text={'Add Columns'}
+            text="Add Columns"
           />
         </div>
       )}
@@ -32,14 +32,13 @@ export const GetStarted = ({
         <div>
           <p>No Experiments to Display.</p>
           <p>
-            {'Get started with '}
-            <a href="https://dvc.org/doc/start/experiments">experiments</a>
-            {'.'}
+            Get started with{' '}
+            <a href="https://dvc.org/doc/start/experiments">experiments</a>.
           </p>
           <p>
-            {'Learn about the '}
+            Learn about the{' '}
             <a href="https://dvc.org/doc/command-reference/exp">exp commands</a>
-            {'.'}
+            .
           </p>
         </div>
       )}
