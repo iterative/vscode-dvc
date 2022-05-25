@@ -11,19 +11,19 @@ interface Settings {
   }
 }
 
-interface VscodePython {
+export interface VscodePython {
   ready: Thenable<void>
   settings: Settings
 }
 
-export const getPythonExtensionSettings = async (): Promise<
-  Settings | undefined
-> => {
+const getPythonExtensionSettings = async (): Promise<Settings | undefined> => {
   const api = await getExtensionAPI<VscodePython>(PYTHON_EXTENSION_ID)
   if (!api) {
     return
   }
-  await api.ready
+  try {
+    await api.ready
+  } catch {}
   return api.settings
 }
 

@@ -13,13 +13,17 @@ type PackageJSON = {
 const getExtension = <T>(id: string): Extension<T & PackageJSON> | undefined =>
   extensions.getExtension<T & PackageJSON>(id)
 
-export const getExtensionAPI = <T>(name: string): Thenable<T> | undefined => {
+export const getExtensionAPI = async <T>(
+  name: string
+): Promise<T | undefined> => {
   const extension = getExtension<T>(name)
   if (!extension) {
     return
   }
 
-  return extension.activate()
+  try {
+    return await extension.activate()
+  } catch {}
 }
 
 export const getExtensionVersion = <T>(id: string): string | undefined => {
