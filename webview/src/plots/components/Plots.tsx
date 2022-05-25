@@ -12,7 +12,7 @@ import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper
 import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
-import { useThemeVariables } from '../../shared/components/theme/Theme'
+import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { sendMessage } from '../../shared/vscode'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
@@ -164,18 +164,8 @@ const PlotsContent = ({ state }: PlotsProps) => {
   )
 }
 
-export const Plots = ({ state }: PlotsProps) => {
-  const variables = useThemeVariables()
-
-  return (
-    <div
-      className={styles.plots}
-      style={variables}
-      onContextMenu={e => {
-        e.preventDefault()
-      }}
-    >
-      <PlotsContent state={state} />
-    </div>
-  )
-}
+export const Plots = ({ state }: PlotsProps) => (
+  <WebviewWrapper>
+    <PlotsContent state={state} />
+  </WebviewWrapper>
+)

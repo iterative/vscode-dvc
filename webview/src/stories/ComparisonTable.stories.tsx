@@ -7,7 +7,7 @@ import {
   ComparisonTable,
   ComparisonTableProps
 } from '../plots/components/comparisonTable/ComparisonTable'
-import { Theme } from '../shared/components/theme/Theme'
+import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
 
 export default {
@@ -18,11 +18,11 @@ export default {
 
 const Template: Story<ComparisonTableProps> = ({ plots, revisions }) => {
   return (
-    <Theme>
+    <WebviewWrapper>
       <DragDropProvider>
         <ComparisonTable plots={plots} revisions={revisions} />
       </DragDropProvider>
-    </Theme>
+    </WebviewWrapper>
   )
 }
 
