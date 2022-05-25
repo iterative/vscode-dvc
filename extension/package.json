@@ -54,16 +54,16 @@
         "id": "dvc.metrics",
         "description": "Color to indicate a DVC metric column in the experiments table",
         "defaults": {
-          "dark": "#fbd38d",
-          "light": "#fbd38d"
+          "dark": "charts.yellow",
+          "light": "charts.yellow"
         }
       },
       {
         "id": "dvc.params",
         "description": "Color to indicate a DVC param column in the experiments table",
         "defaults": {
-          "dark": "#90cdf4",
-          "light": "#90cdf4"
+          "dark": "charts.blue",
+          "light": "charts.blue"
         }
       },
       {
