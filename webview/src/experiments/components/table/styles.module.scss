@@ -340,9 +340,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     white-space: nowrap;
     min-width: 0;
     position: relative;
+  }
+  .th {
     height: 100%;
   }
   .td {
+    height: auto;
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
