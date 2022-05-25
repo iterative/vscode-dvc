@@ -8,6 +8,7 @@ import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
 import { SortOrder, SortPicker } from './SortPicker'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
@@ -19,6 +20,7 @@ import {
   OnDragStart,
   OnDrop
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
+import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 
 export const ColumnDragHandle: React.FC<{
   disabled: boolean
@@ -206,12 +208,27 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDrop={onDrop}
       menuDisabled={!isSortable}
       menuContent={
-        <SortPicker
-          sortOrder={sortOrder}
-          setSelectedOrder={order => {
-            setColumnSort(order)
-          }}
-        />
+        <div>
+          <SortPicker
+            sortOrder={sortOrder}
+            setSelectedOrder={order => {
+              setColumnSort(order)
+            }}
+          />
+          <VSCodeDivider />
+          <MessagesMenu
+            options={[
+              {
+                id: 'hide-column',
+                label: 'Hide Column',
+                message: {
+                  payload: column.id,
+                  type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+                }
+              }
+            ]}
+          />
+        </div>
       }
     />
   )

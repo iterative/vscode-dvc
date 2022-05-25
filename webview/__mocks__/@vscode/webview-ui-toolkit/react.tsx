@@ -12,3 +12,7 @@ export const VSCodeButton: React.FC<MockButtonProps> = ({
 }: MockButtonProps) => {
   return <button onClick={onClick}>{children}</button>
 }
+
+export const VSCodeDivider: React.FC = () => {
+  return <hr />
+}
