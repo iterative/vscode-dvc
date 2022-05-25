@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.19] - 2022-05-25
+
+### 🚀 New Features and Enhancements
+
+- Improve experiments table empty states
+  [#1755](https://github.com/iterative/vscode-dvc/pull/1755) by
+  [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Mitigate Python extension rejecting ready promise
+  [#1765](https://github.com/iterative/vscode-dvc/pull/1765) by
+  [@mattseddon](https://github.com/mattseddon)
+
 ## [0.2.18] - 2022-05-24
 
 ### 🚀 New Features and Enhancements
