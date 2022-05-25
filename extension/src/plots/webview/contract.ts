@@ -43,14 +43,15 @@ export type ComparisonPlots = {
   revisions: ComparisonRevisionData
 }[]
 
-export type ComparisonRevision = {
+export type Revision = {
+  id?: string
   revision: string
   group?: string
   displayColor: Color
 }
 
 export interface PlotsComparisonData {
-  revisions: ComparisonRevision[]
+  revisions: Revision[]
   plots: ComparisonPlots
   sectionName: string
   size: PlotSize

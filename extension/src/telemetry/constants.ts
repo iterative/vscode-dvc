@@ -48,6 +48,7 @@ export const EventName = Object.assign(
 
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
+    VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_MANUAL_REFRESH: 'views.plots.manualRefresh',
     VIEWS_PLOTS_METRICS_SELECTED: 'views.plots.metricsSelected',
@@ -207,6 +208,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
+  [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_REORDER_PLOTS_METRICS]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
 

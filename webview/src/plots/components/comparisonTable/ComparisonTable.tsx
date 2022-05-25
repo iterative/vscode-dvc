@@ -1,6 +1,6 @@
 import {
   ComparisonPlots,
-  ComparisonRevision,
+  Revision,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
@@ -40,7 +40,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   useEffect(
     () =>
       setColumns(() => {
-        const acc: ComparisonRevision[] = []
+        const acc: Revision[] = []
 
         for (const column of revisions) {
           if (isPinned(column)) {
@@ -59,11 +59,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   useEffect(() => setComparisonPlots(plots), [plots])
 
   const setColumnsOrder = (order: string[]) => {
-    const newOrder = reorderObjectList<ComparisonRevision>(
-      order,
-      columns,
-      'revision'
-    )
+    const newOrder = reorderObjectList<Revision>(order, columns, 'revision')
     setColumns(newOrder)
     sendMessage({
       payload: newOrder.map(({ revision }) => revision),
