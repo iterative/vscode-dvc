@@ -5,7 +5,7 @@ import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
 import { PlotsSizeProvider } from './PlotsSizeContext'
-import { GetStarted } from './GetStarted'
+import { AddPlots, NoPlots } from './GetStarted'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
@@ -16,6 +16,7 @@ import { useThemeVariables } from '../../shared/components/theme/Theme'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { sendMessage } from '../../shared/vscode'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
+import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 
 interface PlotsProps {
   state: PlotsWebviewState
@@ -71,9 +72,14 @@ const PlotsContent = ({ state }: PlotsProps) => {
   if (!checkpointPlots && !templatePlots && !comparisonTable) {
     return (
       <GetStarted
-        hasPlots={hasPlots}
-        hasSelectedPlots={hasSelectedPlots}
-        hasSelectedRevisions={hasSelectedRevisions}
+        addItems={
+          <AddPlots
+            hasSelectedPlots={!!hasSelectedPlots}
+            hasSelectedRevisions={!!hasSelectedRevisions}
+          />
+        }
+        empty={<NoPlots />}
+        showEmpty={!hasPlots}
       />
     )
   }
