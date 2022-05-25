@@ -113,6 +113,7 @@ describe('Table', () => {
     columnWidths: {},
     columns: [],
     hasCheckpoints: false,
+    hasColumns: true,
     rows: [],
     sorts: []
   }

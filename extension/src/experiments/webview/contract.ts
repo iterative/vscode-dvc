@@ -49,6 +49,7 @@ export type TableData = {
   columns: Column[]
   columnWidths: Record<string, number>
   hasCheckpoints: boolean
+  hasColumns: boolean
   rows: Row[]
   sorts: SortDefinition[]
 }

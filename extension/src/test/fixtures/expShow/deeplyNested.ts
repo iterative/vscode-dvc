@@ -301,6 +301,7 @@ const deeplyNestedTableData: TableData = {
     }
   ],
   columns,
+  hasColumns: true,
   rows
 }
 

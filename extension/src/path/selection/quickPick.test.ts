@@ -1,9 +1,9 @@
 import { join } from 'path'
-import { PathType } from './collect'
-import { pickPlotPaths } from './quickPick'
+import { pickPaths } from './quickPick'
 import { quickPickManyValues } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Title } from '../../vscode/title'
+import { PathType } from '../../plots/paths/collect'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -17,10 +17,10 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('pickPlotPaths', () => {
+describe('pickPaths', () => {
   it('should not call quickPickManyValues if undefined is provided', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce([])
-    await pickPlotPaths(undefined)
+    await pickPaths('plots', undefined)
 
     expect(mockedShowError).toBeCalledTimes(1)
     expect(mockedQuickPickManyValues).not.toBeCalled()
@@ -28,7 +28,7 @@ describe('pickPlotPaths', () => {
 
   it('should not call quickPickManyValues if no plots paths are provided', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce([])
-    await pickPlotPaths([])
+    await pickPaths('plots', [])
 
     expect(mockedShowError).toBeCalledTimes(1)
     expect(mockedQuickPickManyValues).not.toBeCalled()
@@ -61,7 +61,7 @@ describe('pickPlotPaths', () => {
       }
     ]
 
-    await pickPlotPaths(plotPaths)
+    await pickPaths('plots', plotPaths)
 
     expect(mockedShowError).not.toBeCalled()
     expect(mockedQuickPickManyValues).toBeCalledTimes(1)

@@ -52,6 +52,7 @@
   "command.showOutput": "Show DVC Output",
   "command.showPlots": "Show Plots",
   "command.stopRunningExperiment": "Stop Running Experiment",
+  "command.views.experimentsColumnsTree.selectColumns": "Select Columns to Display in the Experiments Table",
   "command.views.experimentsFilterByTree.removeAllFilters": "Remove All Filters From Experiments Table",
   "command.views.experimentsFilterByTree.removeFilter": "Remove Filter From Experiments Table",
   "command.views.experimentsSortByTree.removeAllSorts": "Remove All Sorts From Experiments Table",

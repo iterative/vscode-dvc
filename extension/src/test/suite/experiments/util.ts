@@ -74,7 +74,7 @@ export const buildExperiments = (
     cliExecutor,
     cliReader,
     cliRunner,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any,
     columnsModel: (experiments as any).columns as ColumnsModel,
     experiments,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

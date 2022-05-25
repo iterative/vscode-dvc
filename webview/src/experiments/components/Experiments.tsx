@@ -19,6 +19,7 @@ import {
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
+import { GetStarted } from './GetStarted'
 import styles from './table/styles.module.scss'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
@@ -136,6 +137,7 @@ export const ExperimentsTable: React.FC<{
         columnWidths: {},
         columns: [],
         hasCheckpoints: false,
+        hasColumns: false,
         rows: [],
         sorts: [],
         ...initiallyUndefinedTableData
@@ -157,7 +159,7 @@ export const ExperimentsTable: React.FC<{
       return [tableData, columns, defaultColumn, initialState]
     }, [initiallyUndefinedTableData])
 
-  const { rows: data } = tableData
+  const { hasColumns, rows: data } = tableData
 
   const instance = useTable<Row>(
     {
@@ -200,13 +202,11 @@ export const ExperimentsTable: React.FC<{
   }, [toggleAllRowsExpanded])
 
   const hasOnlyDefaultColumns = columns.length <= 2
-  if (hasOnlyDefaultColumns) {
-    return <EmptyState>No Columns Selected.</EmptyState>
-  }
-
   const hasOnlyWorkspace = data.length <= 1
-  if (hasOnlyWorkspace) {
-    return <EmptyState>No Experiments to Display.</EmptyState>
+  if (hasOnlyDefaultColumns || hasOnlyWorkspace) {
+    return (
+      <GetStarted hasOnlyWorkspace={hasOnlyWorkspace} hasColumns={hasColumns} />
+    )
   }
 
   return (

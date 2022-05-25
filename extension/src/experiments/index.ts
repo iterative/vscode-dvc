@@ -36,6 +36,7 @@ import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
 import { setContextValue } from '../vscode/context'
 import { standardizePath } from '../fileSystem/path'
+import { pickPaths } from '../path/selection/quickPick'
 
 export const ExperimentsScale = {
   ...ColumnType,
@@ -267,6 +268,18 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public async selectColumns() {
+    const columns = this.columns.getTerminalNodes()
+
+    const selected = await pickPaths('columns', columns)
+    if (!selected) {
+      return
+    }
+
+    this.columns.setSelected(selected)
+    return this.notifyChanged()
+  }
+
   public async autoApplyFilters(useFilters: boolean) {
     this.experiments.setSelectionMode(useFilters)
 
@@ -398,6 +411,7 @@ export class Experiments extends BaseRepository<TableData> {
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
       hasCheckpoints: this.hasCheckpoints(),
+      hasColumns: this.columns.hasColumns(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
@@ -444,6 +458,8 @@ export class Experiments extends BaseRepository<TableData> {
 
           case MessageFromWebviewType.REMOVE_EXPERIMENT:
             return this.removeExperiment(message.payload)
+          case MessageFromWebviewType.SELECT_COLUMNS:
+            return this.setColumnsStatus()
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -473,6 +489,15 @@ export class Experiments extends BaseRepository<TableData> {
     this.toggleExperimentStatus(id)
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE,
+      undefined,
+      undefined
+    )
+  }
+
+  private setColumnsStatus() {
+    this.selectColumns()
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS,
       undefined,
       undefined
     )

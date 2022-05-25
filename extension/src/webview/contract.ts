@@ -28,6 +28,7 @@ export enum MessageFromWebviewType {
   TOGGLE_EXPERIMENT = 'toggle-experiment',
   HIDE_EXPERIMENTS_TABLE_COLUMN = 'hide-experiments-table-column',
   SELECT_EXPERIMENTS = 'select-experiments',
+  SELECT_COLUMNS = 'select-columns',
   SELECT_PLOTS = 'select-plots',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
@@ -131,6 +132,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
   | { type: MessageFromWebviewType.REFRESH_REVISION; payload: string }
+  | { type: MessageFromWebviewType.SELECT_COLUMNS }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

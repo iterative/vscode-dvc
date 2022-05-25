@@ -5,6 +5,7 @@ export enum Title {
   ENTER_RELATIVE_DESTINATION = 'Enter a Destination Relative to the Root',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',
   SELECT_BASE_EXPERIMENT = 'Select an Experiment to Use as a Base',
+  SELECT_COLUMNS = 'Select Columns to Display in the Experiments Table',
   SELECT_EXPERIMENT = 'Select an Experiment',
   SELECT_EXPERIMENTS = 'Select up to 7 Experiments to Display in Plots',
   SELECT_FILTERS_TO_REMOVE = 'Select Filter(s) to Remove',
