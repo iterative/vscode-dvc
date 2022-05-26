@@ -3,17 +3,17 @@
  */
 import React from 'react'
 import { render, cleanup, screen } from '@testing-library/react'
-import { Theme } from './Theme'
+import { WebviewWrapper } from './WebviewWrapper'
 
-describe('Theme', () => {
+describe('Wrapper', () => {
   afterEach(() => {
     cleanup()
   })
 
   it('should add some css variables to the markup', () => {
-    render(<Theme />)
+    render(<WebviewWrapper>Test</WebviewWrapper>)
 
-    const theme = screen.getByTestId('theme-wrapper')
+    const theme = screen.getByText('Test')
     const expectedVariables = [
       '--editor-background-transparency-1',
       '--editor-background-transparency-2',
