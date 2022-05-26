@@ -100,13 +100,17 @@ const transformColumns = (
   experiment: Experiment,
   experimentFields: ExperimentFields
 ) => {
-  const { metrics, params } = extractColumns(experimentFields)
+  const { metrics, params, deps } = extractColumns(experimentFields)
 
   if (metrics) {
     experiment.metrics = metrics
   }
   if (params) {
     experiment.params = params
+  }
+
+  if (deps) {
+    experiment.deps = deps
   }
 }
 
