@@ -220,7 +220,7 @@ const Experiments: React.FC<{
   tableData?: TableData | null
 }> = ({ tableData }) => {
   return (
-    <WebviewWrapper>
+    <WebviewWrapper className={styles.experiments}>
       {tableData ? (
         <ExperimentsTable tableData={tableData} />
       ) : (
