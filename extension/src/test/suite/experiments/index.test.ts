@@ -1153,7 +1153,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('Empty repository', () => {
-    it('should not return any experiments to the tree when there are no columns', async () => {
+    it('should not show any experiments in the experiments tree when there are no columns', async () => {
       const { experiments } = buildExperiments(disposable, {
         b9f016df00d499f6d2a73e7dc34d1600c78066eb: {
           baseline: {
