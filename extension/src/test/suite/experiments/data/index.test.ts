@@ -62,7 +62,7 @@ suite('Experiments Data Test Suite', () => {
         join(
           dvcDemoPath,
           '**',
-          `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,summary.json}`
+          `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
         )
       )
     })
@@ -134,14 +134,14 @@ suite('Experiments Data Test Suite', () => {
         join(
           dvcDemoPath,
           '**',
-          `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,summary.json}`
+          `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
         )
       )
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.equal(
         join(
           dvcDemoPath,
           '**',
-          `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
+          `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
         )
       )
     })
