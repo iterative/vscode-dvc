@@ -5,7 +5,7 @@ import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
 import { PlotsSizeProvider } from './PlotsSizeContext'
-import { AddPlots, NoPlots } from './GetStarted'
+import { AddPlots, Welcome } from './GetStarted'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
@@ -78,8 +78,8 @@ const PlotsContent = ({ state }: PlotsProps) => {
             hasSelectedRevisions={!!hasSelectedRevisions}
           />
         }
-        empty={<NoPlots />}
         showEmpty={!hasPlots}
+        welcome={<Welcome />}
       />
     )
   }

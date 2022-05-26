@@ -5,23 +5,6 @@ import { StartButton } from '../../shared/components/button/StartButton'
 
 const NoPlotsText: React.FC = () => <p>No Plots to Display.</p>
 
-export const NoPlots: React.FC = () => (
-  <div>
-    <NoPlotsText />
-    <p>
-      Learn how to{' '}
-      <a href="https://dvc.org/doc/studio/user-guide/views/visualize-experiments">
-        visualize experiments
-      </a>{' '}
-      with DVC.
-    </p>
-    <p>
-      Learn about the{' '}
-      <a href="https://dvc.org/doc/command-reference/plots">plots commands</a>.
-    </p>
-  </div>
-)
-
 export type AddPlotsProps = {
   hasSelectedPlots: boolean
   hasSelectedRevisions: boolean
@@ -57,5 +40,22 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
         />
       )}
     </div>
+  </div>
+)
+
+export const Welcome: React.FC = () => (
+  <div>
+    <NoPlotsText />
+    <p>
+      Learn how to{' '}
+      <a href="https://dvc.org/doc/studio/user-guide/views/visualize-experiments">
+        visualize experiments
+      </a>{' '}
+      with DVC.
+    </p>
+    <p>
+      Learn about the{' '}
+      <a href="https://dvc.org/doc/command-reference/plots">plots commands</a>.
+    </p>
   </div>
 )

@@ -20,7 +20,7 @@ import {
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
-import { AddColumns, NoExperiments } from './GetStarted'
+import { AddColumns, Welcome } from './GetStarted'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
 import { useThemeVariables } from '../../shared/components/theme/Theme'
@@ -208,8 +208,8 @@ export const ExperimentsTable: React.FC<{
     return (
       <GetStarted
         addItems={<AddColumns />}
-        empty={<NoExperiments />}
         showEmpty={!hasColumns || hasOnlyWorkspace}
+        welcome={<Welcome />}
       />
     )
   }

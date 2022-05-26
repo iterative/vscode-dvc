@@ -4,13 +4,17 @@ import { EmptyState } from '../emptyState/EmptyState'
 export type GetStartedProps = {
   addItems: React.ReactNode
   showEmpty: boolean
-  empty: React.ReactNode
+  welcome: React.ReactNode
 }
 
-export const GetStarted = ({ addItems, empty, showEmpty }: GetStartedProps) => {
+export const GetStarted: React.FC<GetStartedProps> = ({
+  addItems,
+  welcome,
+  showEmpty
+}: GetStartedProps) => {
   if (!showEmpty) {
     return <EmptyState>{addItems}</EmptyState>
   }
 
-  return <EmptyState>{empty}</EmptyState>
+  return <EmptyState>{welcome}</EmptyState>
 }
