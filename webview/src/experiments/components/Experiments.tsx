@@ -23,7 +23,7 @@ import styles from './table/styles.module.scss'
 import { AddColumns, Welcome } from './GetStarted'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
-import { useThemeVariables } from '../../shared/components/theme/Theme'
+import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
@@ -224,21 +224,14 @@ export const ExperimentsTable: React.FC<{
 const Experiments: React.FC<{
   tableData?: TableData | null
 }> = ({ tableData }) => {
-  const variables = useThemeVariables()
   return (
-    <div
-      className={styles.experiments}
-      style={variables}
-      onContextMenu={e => {
-        e.preventDefault()
-      }}
-    >
+    <WebviewWrapper className={styles.experiments}>
       {tableData ? (
         <ExperimentsTable tableData={tableData} />
       ) : (
         <EmptyState>Loading Experiments...</EmptyState>
       )}
-    </div>
+    </WebviewWrapper>
   )
 }
 
