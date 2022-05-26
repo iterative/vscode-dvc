@@ -1,5 +1,10 @@
-import { ExperimentFields, ValueTreeRoot } from '../../cli/reader'
-import { Columns } from '../webview/contract'
+import { set } from 'lodash'
+import {
+  ExperimentFields,
+  OutsOrDepsDetails,
+  ValueTreeRoot
+} from '../../cli/reader'
+import { Columns, ColumnType } from '../webview/contract'
 
 const extractMetricsOrParams = (
   columns?: ValueTreeRoot
@@ -20,12 +25,32 @@ const extractMetricsOrParams = (
   return acc
 }
 
+const extractOutsOrDepsDetails = (
+  details: OutsOrDepsDetails | undefined,
+  key: ColumnType
+) => {
+  if (!details) {
+    return undefined
+  }
+
+  const detailsTree = {}
+
+  for (const [file, value] of Object.entries(details)) {
+    const paths = file.split('/')
+    set(detailsTree, paths, value.hash)
+  }
+
+  return { [key]: detailsTree }
+}
+
 export const extractColumns = (
   experiment: ExperimentFields
 ): {
   metrics: Columns | undefined
   params: Columns | undefined
+  deps: Columns | undefined
 } => ({
+  deps: extractOutsOrDepsDetails(experiment.deps, ColumnType.DEPS),
   metrics: extractMetricsOrParams(experiment.metrics),
   params: extractMetricsOrParams(experiment.params)
 })
