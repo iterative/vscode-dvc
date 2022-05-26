@@ -31,6 +31,14 @@ const data: Row[] = [
         val_accuracy: 0.5608000159263611
       }
     },
+    deps: {
+      deps: {
+        data: {
+          MNIST: '0aed307494600d178fbdc0d000d6db38.dir'
+        },
+        'train.py': '90f29a92c178927514c7f4d61a984a8a'
+      }
+    },
     displayColor: colorsList[0],
     label: 'workspace',
     selected: true,

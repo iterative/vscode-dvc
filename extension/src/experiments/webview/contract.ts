@@ -16,6 +16,7 @@ export interface Experiment extends BaseExperimentFields {
   selected?: boolean
   mutable?: boolean
   sha?: string
+  deps?: Columns
 }
 
 export interface Row extends Experiment {
@@ -30,7 +31,8 @@ export interface ColumnAggregateData {
 
 export enum ColumnType {
   METRICS = 'metrics',
-  PARAMS = 'params'
+  PARAMS = 'params',
+  DEPS = 'deps'
 }
 
 export interface Column extends ColumnAggregateData {

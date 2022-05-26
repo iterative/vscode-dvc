@@ -76,7 +76,7 @@ export interface BaseExperimentFields {
   checkpoint_parent?: string
 }
 
-interface OutsOrDepsDetails {
+export interface OutsOrDepsDetails {
   [filename: string]: { hash: string; size: number; nfiles: null | number }
 }
 

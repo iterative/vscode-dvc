@@ -28,7 +28,8 @@ describe('buildDynamicColumns', () => {
     expect(
       simplifyColumns([
         ...buildDynamicColumns(columnsFixture, ColumnType.METRICS),
-        ...buildDynamicColumns(columnsFixture, ColumnType.PARAMS)
+        ...buildDynamicColumns(columnsFixture, ColumnType.PARAMS),
+        ...buildDynamicColumns(columnsFixture, ColumnType.DEPS)
       ])
     ).toStrictEqual([
       {
@@ -153,6 +154,29 @@ describe('buildDynamicColumns', () => {
           }
         ],
         id: joinColumnPath(ColumnType.PARAMS, nestedParamsFile)
+      },
+      {
+        columns: [
+          {
+            columns: [
+              { id: joinColumnPath(ColumnType.DEPS, 'deps', 'data', 'MNIST') }
+            ],
+            id: joinColumnPath(ColumnType.DEPS, 'deps', 'data')
+          },
+          {
+            columns: [
+              {
+                id: joinColumnPath(ColumnType.DEPS, 'deps', 'train.py')
+              }
+            ],
+            id: joinColumnPath(
+              ColumnType.DEPS,
+              'deps',
+              'train.py_previous_placeholder'
+            )
+          }
+        ],
+        id: joinColumnPath(ColumnType.DEPS, 'deps')
       }
     ])
   })

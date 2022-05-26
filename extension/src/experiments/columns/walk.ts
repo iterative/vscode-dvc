@@ -4,7 +4,8 @@ import {
   ExperimentsOutput,
   Value,
   ValueTree,
-  ValueTreeRoot
+  ValueTreeRoot,
+  OutsOrDepsDetails
 } from '../../cli/reader'
 import { ColumnType } from '../webview/contract'
 
@@ -52,18 +53,37 @@ const walkValueFileRoot = (
   }
 }
 
+const walkOutsOrDepsDetails = (
+  root: OutsOrDepsDetails,
+  type: ColumnType,
+  onValue: OnValueCallback
+) => {
+  for (const [file, value] of Object.entries(root)) {
+    const meta = {
+      file: ColumnType.DEPS,
+      type
+    }
+    const paths = file.split('/')
+    onValue(paths.slice(-1)[0], value.hash, meta, paths.slice(0, -1))
+  }
+}
+
 const walkExperiment = (
   experiment: ExperimentFieldsOrError,
   onValue: OnValueCallback
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const { data } = experiment
   if (data) {
-    const { params, metrics } = data
+    const { params, metrics, deps } = data
     if (metrics) {
       walkValueFileRoot(metrics, ColumnType.METRICS, onValue)
     }
     if (params) {
       walkValueFileRoot(params, ColumnType.PARAMS, onValue)
+    }
+    if (deps) {
+      walkOutsOrDepsDetails(deps, ColumnType.DEPS, onValue)
     }
   }
 }

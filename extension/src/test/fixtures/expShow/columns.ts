@@ -180,6 +180,40 @@ const data: Column[] = [
     path: joinColumnPath(ColumnType.PARAMS, nestedParamsFile, 'test'),
     pathArray: [ColumnType.PARAMS, nestedParamsFile, 'test'],
     types: ['boolean']
+  },
+  {
+    type: ColumnType.DEPS,
+    hasChildren: true,
+    name: 'deps',
+    parentPath: 'deps',
+    path: 'deps:deps'
+  },
+  {
+    type: ColumnType.DEPS,
+    hasChildren: true,
+    name: 'data',
+    parentPath: 'deps:deps',
+    path: 'deps:deps:data'
+  },
+  {
+    type: ColumnType.DEPS,
+    hasChildren: false,
+    maxStringLength: 36,
+    name: 'MNIST',
+    parentPath: 'deps:deps:data',
+    path: 'deps:deps:data.MNIST',
+    pathArray: ['deps', 'deps', 'data', 'MNIST'],
+    types: ['string']
+  },
+  {
+    type: ColumnType.DEPS,
+    hasChildren: false,
+    maxStringLength: 32,
+    name: 'train.py',
+    parentPath: 'deps:deps',
+    path: 'deps:deps:train%2Epy',
+    pathArray: ['deps', 'deps', 'train.py'],
+    types: ['string']
   }
 ]
 

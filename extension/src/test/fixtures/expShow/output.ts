@@ -35,6 +35,18 @@ const data: ExperimentsOutput = {
               val_accuracy: 0.5608000159263611
             }
           }
+        },
+        deps: {
+          'data/MNIST': {
+            hash: '0aed307494600d178fbdc0d000d6db38.dir',
+            size: 10,
+            nfiles: 10
+          },
+          'train.py': {
+            hash: '90f29a92c178927514c7f4d61a984a8a',
+            size: 50,
+            nfiles: null
+          }
         }
       }
     }

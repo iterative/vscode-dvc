@@ -430,7 +430,15 @@ describe('collectColumns', () => {
         ),
         joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'process', 'test_arg'),
         joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml')),
-        joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'), 'test')
+        joinColumnPath(
+          ColumnType.PARAMS,
+          join('nested', 'params.yaml'),
+          'test'
+        ),
+        joinColumnPath(ColumnType.DEPS, 'deps'),
+        joinColumnPath(ColumnType.DEPS, 'deps', 'data'),
+        joinColumnPath(ColumnType.DEPS, 'deps', 'data', 'MNIST'),
+        joinColumnPath(ColumnType.DEPS, 'deps', 'train.py')
       ]
     )
   })
