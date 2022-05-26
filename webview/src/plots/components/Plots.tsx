@@ -175,6 +175,7 @@ export const Plots = ({ state }: PlotsProps) => {
 
   return (
     <div
+      className={styles.plots}
       style={variables}
       onContextMenu={e => {
         e.preventDefault()
