@@ -133,6 +133,14 @@ describe('ExperimentsColumnsTree', () => {
           iconPath: mockedSelectedCheckbox,
           label: join('nested', 'params.yaml'),
           path: joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'))
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'deps',
+          path: joinColumnPath(ColumnType.DEPS, 'deps')
         }
       ])
     })
@@ -182,6 +190,14 @@ describe('ExperimentsColumnsTree', () => {
           iconPath: mockedSelectedCheckbox,
           label: join('nested', 'params.yaml'),
           path: joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'))
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'deps',
+          path: joinColumnPath(ColumnType.DEPS, 'deps')
         }
       ])
 
