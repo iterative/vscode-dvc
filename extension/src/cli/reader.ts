@@ -56,9 +56,11 @@ export interface ValueTreeOrError {
   error?: { type: string; msg: string }
 }
 
-export interface ValueTreeRoot {
-  [filename: string]: ValueTreeOrError
+type RelPathObject<T> = {
+  [relPath: string]: T
 }
+
+export type ValueTreeRoot = RelPathObject<ValueTreeOrError>
 
 interface ValueTreeNode {
   [key: string]: Value | ValueTree
@@ -76,18 +78,14 @@ export interface BaseExperimentFields {
   checkpoint_parent?: string
 }
 
-type DepsDetails = { hash: string; size: number; nfiles: null | number }
-type OutsDetails = DepsDetails & { use_cache: boolean; is_data_source: boolean }
-
-interface OutsOrDepsDetails {
-  [filename: string]: DepsDetails | OutsDetails
-}
+type Dep = { hash: string; size: number; nfiles: null | number }
+type Out = Dep & { use_cache: boolean; is_data_source: boolean }
 
 export interface ExperimentFields extends BaseExperimentFields {
   params?: ValueTreeRoot
   metrics?: ValueTreeRoot
-  deps?: OutsOrDepsDetails
-  outs?: OutsOrDepsDetails
+  deps?: RelPathObject<Dep>
+  outs?: RelPathObject<Out>
 }
 
 export interface ExperimentFieldsOrError {
