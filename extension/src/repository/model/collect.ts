@@ -11,7 +11,7 @@ export type PathItem = Resource & {
   isTracked: boolean
 }
 
-const transform = (
+const transformToAbsTree = (
   dvcRoot: string,
   acc: Map<string, Set<string>>,
   trackedRelPaths: Set<string>
@@ -51,7 +51,7 @@ export const collectTree = (
     }
   }
 
-  return transform(dvcRoot, relTree, trackedRelPaths)
+  return transformToAbsTree(dvcRoot, relTree, trackedRelPaths)
 }
 
 const collectMissingParents = (acc: string[], absPath: string) => {
