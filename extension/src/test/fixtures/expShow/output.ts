@@ -6,32 +6,32 @@ const data: ExperimentsOutput = {
     baseline: {
       data: {
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -41,7 +41,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -59,14 +59,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -80,7 +80,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -115,32 +115,32 @@ const data: ExperimentsOutput = {
     baseline: {
       data: {
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -150,7 +150,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -169,14 +169,14 @@ const data: ExperimentsOutput = {
         },
         name: 'main',
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -190,7 +190,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -225,32 +225,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
         checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -260,7 +260,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -279,14 +279,14 @@ const data: ExperimentsOutput = {
         },
         name: 'exp-e7a67',
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -300,7 +300,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -335,32 +335,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
         checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -370,7 +370,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -388,14 +388,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -409,7 +409,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -444,32 +444,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -479,7 +479,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -497,14 +497,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -518,7 +518,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -553,32 +553,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '217312476f8854dda1865450b737eb6bc7a3ba1b',
         checkpoint_tip: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -588,7 +588,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -624,14 +624,14 @@ const data: ExperimentsOutput = {
         },
         name: 'test-branch',
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -645,7 +645,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -663,32 +663,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '9523bde67538cf31230efaff2dbc47d38a944ab5',
         checkpoint_tip: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -698,7 +698,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -716,14 +716,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -737,7 +737,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -772,32 +772,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         checkpoint_tip: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -807,7 +807,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -825,14 +825,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -846,7 +846,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -881,32 +881,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
         checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -916,7 +916,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -935,14 +935,14 @@ const data: ExperimentsOutput = {
         },
         name: 'exp-83425',
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -956,7 +956,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -991,32 +991,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
         checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -1026,7 +1026,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -1061,14 +1061,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -1082,7 +1082,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -1100,32 +1100,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
         checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -1135,7 +1135,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -1170,14 +1170,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -1191,7 +1191,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -1209,32 +1209,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
         checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -1244,7 +1244,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -1262,14 +1262,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -1283,7 +1283,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -1318,32 +1318,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '23250b33e3d6dd0e136262d1d26a2face031cb03',
         checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -1353,7 +1353,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -1371,14 +1371,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -1392,7 +1392,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -1427,32 +1427,32 @@ const data: ExperimentsOutput = {
         checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -1462,7 +1462,7 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
@@ -1480,14 +1480,14 @@ const data: ExperimentsOutput = {
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -1501,7 +1501,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
@@ -1534,32 +1534,32 @@ const data: ExperimentsOutput = {
     '90aea7f2482117a55dfcadcdb901aaa6610fbbc9': {
       data: {
         deps: {
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null
           },
-          'src/prepare.py': {
+          [join('src', 'prepare.py')]: {
             hash: 'f09ea0c15980b43010257ccb9f0055e2',
             size: 1576,
             nfiles: null
           },
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2
           },
-          'src/featurization.py': {
+          [join('src', 'featurization.py')]: {
             hash: 'e0265fc22f056a4b86d85c3056bc2894',
             size: 2490,
             nfiles: null
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2
           },
-          'src/train.py': {
+          [join('src', 'train.py')]: {
             hash: 'c3961d777cfbd7727f9fde4851896006',
             size: 967,
             nfiles: null
@@ -1569,21 +1569,21 @@ const data: ExperimentsOutput = {
             size: 1763725,
             nfiles: null
           },
-          'src/evaluate.py': {
+          [join('src', 'evaluate.py')]: {
             hash: '44e714021a65edf881b1716e791d7f59',
             size: 2346,
             nfiles: null
           }
         },
         outs: {
-          'data/prepared': {
+          [join('data', 'prepared')]: {
             hash: '153aad06d376b6595932470e459ef42a.dir',
             size: 8437363,
             nfiles: 2,
             use_cache: true,
             is_data_source: false
           },
-          'data/features': {
+          [join('data', 'features')]: {
             hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
             size: 2232588,
             nfiles: 2,
@@ -1597,7 +1597,7 @@ const data: ExperimentsOutput = {
             use_cache: true,
             is_data_source: false
           },
-          'data/data.xml': {
+          [join('data', 'data.xml')]: {
             hash: '22a1a2931c8370d3aeedd7183606fd7f',
             size: 14445097,
             nfiles: null,
