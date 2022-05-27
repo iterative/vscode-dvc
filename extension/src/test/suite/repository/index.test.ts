@@ -211,7 +211,9 @@ suite('Repository Test Suite', () => {
 
       const deleted = new Set([
         join(dvcDemoPath, model),
-        join(dvcDemoPath, dataDir)
+        join(dvcDemoPath, dataDir),
+        join(dvcDemoPath, compressedDataset),
+        join(dvcDemoPath, dataset)
       ])
 
       const tracked = new Set([

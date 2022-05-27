@@ -1,6 +1,7 @@
 import { dirname, join, resolve } from 'path'
 import omit from 'lodash.omit'
 import {
+  collectDeleted,
   collectModifiedAgainstHead,
   collectTrackedNonLeafs,
   collectTrackedOuts,
@@ -220,21 +221,21 @@ export class RepositoryModel
       modifiedAgainstCache
     )
 
+    const deletedWithChildren = collectDeleted(
+      this.getStateFromDiff(diffOutput[Status.DELETED]),
+      this.getTracked()
+    )
+
     this.state.notInCache = new Set([
       ...this.getStateFromDiff(diffOutput[Status.NOT_IN_CACHE]),
       ...this.filterStatuses(
-        [
-          ...this.getStateFromDiff(diffOutput[Status.DELETED]),
-          ...modifiedAgainstHead
-        ],
+        [...deletedWithChildren, ...modifiedAgainstHead],
         path => this.pathInSet(path, notInCache)
       )
     ])
 
     this.state.deleted = new Set(
-      this.mapToTrackedPaths(diffOutput.deleted || []).filter(
-        path => !this.state.notInCache.has(path)
-      )
+      [...deletedWithChildren].filter(path => !this.state.notInCache.has(path))
     )
   }
 

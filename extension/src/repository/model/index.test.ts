@@ -539,7 +539,67 @@ describe('RepositoryState', () => {
           resolve(dvcDemoPath, 'predictions.json'),
           resolve(dvcDemoPath, 'training_metrics'),
           resolve(dvcDemoPath, 'training_metrics.json'),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw')
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-images-idx3-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-images-idx3-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-labels-idx1-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-labels-idx1-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-images-idx3-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-images-idx3-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-labels-idx1-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-labels-idx1-ubyte.gz'
+          ),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars'),
+          resolve(dvcDemoPath, 'training_metrics', 'report.html'),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'acc.tsv'),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv')
         ]),
         renamed: emptySet,
         tracked: new Set([
