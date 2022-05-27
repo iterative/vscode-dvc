@@ -14,44 +14,44 @@ export type PathItem = Resource & {
 const transform = (
   dvcRoot: string,
   acc: Map<string, Set<string>>,
-  isTracked: Set<string>
+  trackedRelPaths: Set<string>
 ): Map<string, PathItem[]> => {
-  const treeMap = new Map<string, PathItem[]>()
+  const absTree = new Map<string, PathItem[]>()
 
   for (const [path, childPaths] of acc.entries()) {
     const items = [...childPaths].map(childPath => ({
       dvcRoot,
       isDirectory: !!acc.get(childPath),
-      isTracked: isTracked.has(childPath),
+      isTracked: trackedRelPaths.has(childPath),
       resourceUri: Uri.file(join(dvcRoot, childPath))
     }))
     const absPath = Uri.file(join(dvcRoot, path)).fsPath
-    treeMap.set(absPath, items)
+    absTree.set(absPath, items)
   }
 
-  return treeMap
+  return absTree
 }
 
 export const collectTree = (
   dvcRoot: string,
-  leafs: Set<string>,
-  isTracked = new Set<string>() // rel
+  absLeafs: Set<string>,
+  trackedRelPaths = new Set<string>()
 ): Map<string, PathItem[]> => {
-  const acc = new Map<string, Set<string>>()
+  const relTree = new Map<string, Set<string>>()
 
-  for (const leaf of leafs) {
-    const path = relative(dvcRoot, leaf) // rel
-    const pathArray = getPathArray(path)
+  for (const absLeaf of absLeafs) {
+    const relPath = relative(dvcRoot, absLeaf)
+    const relPathArray = getPathArray(relPath)
 
-    isTracked.add(path)
+    trackedRelPaths.add(relPath)
 
-    for (let idx = 0; idx < pathArray.length; idx++) {
-      const path = getPath(pathArray, idx)
-      addToMapSet(acc, path, getDirectChild(pathArray, idx))
+    for (let idx = 0; idx < relPathArray.length; idx++) {
+      const path = getPath(relPathArray, idx)
+      addToMapSet(relTree, path, getDirectChild(relPathArray, idx))
     }
   }
 
-  return transform(dvcRoot, acc, isTracked)
+  return transform(dvcRoot, relTree, trackedRelPaths)
 }
 
 const collectMissingParents = (acc: string[], absPath: string) => {
@@ -91,32 +91,32 @@ export const collectModifiedAgainstHead = (
   return acc
 }
 
-const collectPath = (
+const collectAbsPath = (
   acc: Set<string>,
-  leafs: Set<string>,
+  absLeafs: Set<string>,
   dvcRoot: string,
-  path: string
+  absPath: string
 ) => {
-  const pathArray = getPathArray(relative(dvcRoot, path))
+  const relPathArray = getPathArray(relative(dvcRoot, absPath))
 
-  for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-    const path = join(dvcRoot, getPath(pathArray, reverseIdx))
-    if (acc.has(path) || leafs.has(path)) {
+  for (let reverseIdx = relPathArray.length; reverseIdx > 0; reverseIdx--) {
+    const absPath = join(dvcRoot, getPath(relPathArray, reverseIdx))
+    if (acc.has(absPath) || absLeafs.has(absPath)) {
       continue
     }
 
-    acc.add(path)
+    acc.add(absPath)
   }
 }
 
 export const collectTrackedNonLeafs = (
   dvcRoot: string,
-  leafs = new Set<string>()
+  absLeafs = new Set<string>()
 ): Set<string> => {
   const acc = new Set<string>()
 
-  for (const path of leafs) {
-    collectPath(acc, leafs, dvcRoot, path)
+  for (const absPath of absLeafs) {
+    collectAbsPath(acc, absLeafs, dvcRoot, absPath)
   }
 
   return acc
