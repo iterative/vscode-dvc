@@ -17,9 +17,9 @@ export enum Section {
 }
 
 export const DEFAULT_SECTION_NAMES = {
-  [Section.CHECKPOINT_PLOTS]: 'Experiment Checkpoints',
-  [Section.TEMPLATE_PLOTS]: 'Plots',
-  [Section.COMPARISON_TABLE]: 'Comparison'
+  [Section.CHECKPOINT_PLOTS]: 'Trends',
+  [Section.TEMPLATE_PLOTS]: 'Data Series',
+  [Section.COMPARISON_TABLE]: 'Images'
 }
 
 export const DEFAULT_SECTION_SIZES = {
