@@ -1,4 +1,4 @@
-# Output channel
+# Output Channel
 
 All `DVC` CLI commands generate two entries in this extension's dedicated output
 channel.

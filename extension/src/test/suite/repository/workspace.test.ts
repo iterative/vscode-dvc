@@ -25,7 +25,7 @@ suite('Workspace Repositories Test Suite', () => {
   })
 
   describe('WorkspaceRepositories', () => {
-    it('should be able to run commit from the command palette with multiple roots in the workspace', async () => {
+    it('should be able to run commit from the Command Palette with multiple roots in the workspace', async () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
 
@@ -54,7 +54,7 @@ suite('Workspace Repositories Test Suite', () => {
       ).to.be.calledWith('workbench.scm.focus')
     })
 
-    it('should be able to run checkout from the command palette with multiple roots in the workspace', async () => {
+    it('should be able to run checkout from the Command Palette with multiple roots in the workspace', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
 
       stub(WorkspaceRepositories.prototype, 'getDvcRoots').returns([
@@ -72,7 +72,7 @@ suite('Workspace Repositories Test Suite', () => {
       expect(mockQuickPickOne).to.be.calledOnce
     })
 
-    it('should not run pull from the command palette if the user fails to select from multiple roots in the workspace', async () => {
+    it('should not run pull from the Command Palette if the user fails to select from multiple roots in the workspace', async () => {
       const mockPull = stub(CliExecutor.prototype, 'pull').resolves('')
 
       stub(WorkspaceRepositories.prototype, 'getDvcRoots').returns([
