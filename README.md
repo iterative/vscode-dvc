@@ -1,4 +1,4 @@
-# VS Code DVC: Insider Preview
+# DVC Extension for Visual Studio Code
 
 <!--- These will be broken until the repo is public --->
 <!--- [![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml) --->
@@ -14,8 +14,10 @@ users of all technical backgrounds to effectively use [DVC](https://dvc.org/).
 
 ## Current State
 
-This project is currently in closed alpha testing, and constantly evolving.
-After we conclude alpha and beta testing the repository will become public.
+We want early adopter feedback! Please let us know what you like and don't like
+about the extension. Feel free to reach out in this repository's
+[issues](https://github.com/iterative/vscode-dvc/issues) or via any of the other
+existing [support channels](https://dvc.org/support).
 
 ## Quick Start
 
@@ -23,12 +25,20 @@ After we conclude alpha and beta testing the repository will become public.
   [Install a supported version of DVC on your system](https://dvc.org/doc/install)
 - **Step 2.**
   [Install the DVC extension for Visual Studio Code](https://code.visualstudio.com/docs/editor/extension-gallery).
-- **Step 3.** See walkthrough.
+- **Step 3.** See Walkthrough.
 
-**Note:** You will be prompted to open our walkthrough after installation. If
-for any reason you need to revisit the walkthrough, open the Command Palette
-(⇧⌃P on Windows/Linux or ⇧⌘P on macOS) and select the `DVC: Get Started`
-command.
+## Useful commands
+
+Open the Command Palette (`F1` or ⇧⌃P on Windows/Linux or ⇧⌘P on macOS) and type
+in one of the following commands:
+
+| Command                    | Description                                                                                                                 |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `DVC: Get Started`         | Open the extension's walkthrough. Which details all of the current features and provides links to extra learning resources. |
+| `View: Show DVC`           | Open the extension's view container.                                                                                        |
+| `DVC: Setup The Workspace` | Activate the extension's workspace setup wizard.                                                                            |
+| `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
+| `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
 
 ## Features
 
