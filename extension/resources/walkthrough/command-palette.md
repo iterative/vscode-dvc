@@ -2,7 +2,7 @@
 
 This extension makes extensive use of the
 [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
-Which can be accessed via ⇧⌃P on Windows/Linux or ⇧⌘P on macOS.
+Which can be accessed via `F1` or ⇧⌃P on Windows/Linux or ⇧⌘P on macOS.
 
 To see a list of available commands click [here](command:dvc.showCommands) or
 type DVC into the Command Palette.
