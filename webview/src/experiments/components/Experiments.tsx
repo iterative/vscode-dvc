@@ -19,13 +19,14 @@ import {
 } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
-import { GetStarted } from './GetStarted'
 import styles from './table/styles.module.scss'
+import { AddColumns, Welcome } from './GetStarted'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
-import { useThemeVariables } from '../../shared/components/theme/Theme'
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
+import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
+import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
 const DEFAULT_COLUMN_WIDTH = 75
 const MINIMUM_COLUMN_WIDTH = 50
@@ -205,7 +206,11 @@ export const ExperimentsTable: React.FC<{
   const hasOnlyWorkspace = data.length <= 1
   if (hasOnlyDefaultColumns || hasOnlyWorkspace) {
     return (
-      <GetStarted hasOnlyWorkspace={hasOnlyWorkspace} hasColumns={hasColumns} />
+      <GetStarted
+        addItems={<AddColumns />}
+        showEmpty={!hasColumns || hasOnlyWorkspace}
+        welcome={<Welcome />}
+      />
     )
   }
 
@@ -219,21 +224,14 @@ export const ExperimentsTable: React.FC<{
 const Experiments: React.FC<{
   tableData?: TableData | null
 }> = ({ tableData }) => {
-  const variables = useThemeVariables()
   return (
-    <div
-      className={styles.experiments}
-      style={variables}
-      onContextMenu={e => {
-        e.preventDefault()
-      }}
-    >
+    <WebviewWrapper className={styles.experiments}>
       {tableData ? (
         <ExperimentsTable tableData={tableData} />
       ) : (
         <EmptyState>Loading Experiments...</EmptyState>
       )}
-    </div>
+    </WebviewWrapper>
   )
 }
 

@@ -12,6 +12,8 @@ export interface Experiment extends BaseExperimentFields {
   logicalGroupName?: string
   params?: Columns
   metrics?: Columns
+  deps?: Columns
+  outs?: Columns
   displayColor?: string
   selected?: boolean
   mutable?: boolean

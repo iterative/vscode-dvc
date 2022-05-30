@@ -7,7 +7,7 @@ import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 import { IconMenu } from '../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../shared/components/iconMenu/IconMenuItem'
 import { AllIcons } from '../shared/components/Icon'
-import { Theme } from '../shared/components/theme/Theme'
+import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 
 const items: IconMenuItemProps[] = [
   {
@@ -90,9 +90,9 @@ export default {
 const Template: Story<{
   items: IconMenuItemProps[]
 }> = ({ items }) => (
-  <Theme>
+  <WebviewWrapper>
     <IconMenu items={items} />
-  </Theme>
+  </WebviewWrapper>
 )
 
 export const MenuWithIcons = Template.bind({})

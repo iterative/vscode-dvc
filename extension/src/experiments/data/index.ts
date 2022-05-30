@@ -40,7 +40,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
         },
         { name: 'fullUpdate', process: () => this.update() }
       ],
-      ['dvc.lock', 'dvc.yaml', 'params.yaml']
+      ['dvc.lock', 'dvc.yaml', 'params.yaml', '*.dvc']
     )
 
     this.watchExpGitRefs()

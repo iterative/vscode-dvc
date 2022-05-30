@@ -127,7 +127,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             sectionTitle
           )}
         </summary>
-        <div className={styles.centered}>
+        <div>
           {open && (
             <div className={sizeClass} data-testid="plots-wrapper">
               {children}
