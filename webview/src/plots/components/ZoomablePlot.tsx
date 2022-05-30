@@ -31,7 +31,17 @@ export const ZoomablePlot: React.FC<ZoomablePlotOwnProps> = ({
     }
   }, [plotProps, id, renderZoomedInPlot])
 
-  const handleOnClick = () => renderZoomedInPlot(plotProps, id)
+  const handleOnClick = () => {
+    const zoomedPlotWithLegend = { ...plotProps } as VegaLiteProps & {
+      spec: { encoding?: { color?: { legend?: { disable?: boolean } } } }
+    }
+    if (
+      zoomedPlotWithLegend.spec.encoding?.color?.legend?.disable !== undefined
+    ) {
+      delete zoomedPlotWithLegend.spec.encoding.color.legend.disable
+    }
+    return renderZoomedInPlot(zoomedPlotWithLegend, id)
+  }
 
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
