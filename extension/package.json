@@ -434,13 +434,13 @@
         "title": "%command.views.experimentsTree.selectExperiments%",
         "command": "dvc.views.experimentsTree.selectExperiments",
         "category": "DVC",
-        "icon": "$(list-selection)"
+        "icon": "$(list-filter)"
       },
       {
         "title": "%command.views.experimentsColumnsTree.selectColumns%",
         "command": "dvc.views.experimentsColumnsTree.selectColumns",
         "category": "DVC",
-        "icon": "$(list-selection)"
+        "icon": "$(list-filter)"
       },
       {
         "title": "%command.views.experimentsTree.autoApplyFilters%",
@@ -458,7 +458,7 @@
         "title": "%command.views.plotsPathsTree.selectPlots%",
         "command": "dvc.views.plotsPathsTree.selectPlots",
         "category": "DVC",
-        "icon": "$(list-selection)"
+        "icon": "$(list-filter)"
       }
     ],
     "configuration": {
