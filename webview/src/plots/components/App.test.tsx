@@ -203,9 +203,9 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
-    expect(screen.queryByText('Plots')).not.toBeInTheDocument()
-    expect(screen.queryByText('Comparison')).not.toBeInTheDocument()
+    expect(screen.getByText('Trends')).toBeInTheDocument()
+    expect(screen.queryByText('Data Series')).not.toBeInTheDocument()
+    expect(screen.queryByText('Images')).not.toBeInTheDocument()
   })
 
   it('should render checkpoint and template plots when given messages with both types of plots data', () => {
@@ -219,12 +219,12 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
-    expect(screen.getByText('Plots')).toBeInTheDocument()
+    expect(screen.getByText('Trends')).toBeInTheDocument()
+    expect(screen.getByText('Data Series')).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
-    const expectedSectionName = 'Comparison'
+    const expectedSectionName = 'Images'
 
     renderAppWithData({
       checkpoint: checkpointPlotsFixture,
@@ -244,12 +244,12 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    expect(screen.getByText('Experiment Checkpoints')).toBeInTheDocument()
+    expect(screen.getByText('Trends')).toBeInTheDocument()
 
     sendSetDataMessage({
       checkpoint: null
     })
-    expect(screen.queryByText('Experiment Checkpoints')).not.toBeInTheDocument()
+    expect(screen.queryByText('Trends')).not.toBeInTheDocument()
   })
 
   it('should toggle the checkpoint plots section in state when its header is clicked', async () => {
@@ -258,7 +258,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const summaryElement = await screen.findByText('Experiment Checkpoints')
+    const summaryElement = await screen.findByText('Trends')
     const visiblePlots = await screen.findAllByLabelText('Vega visualization')
     visiblePlots.map(visiblePlot => {
       expect(visiblePlot).toBeInTheDocument()
@@ -300,7 +300,7 @@ describe('App', () => {
       />
     )
 
-    const summaryElement = await screen.findByText('Experiment Checkpoints')
+    const summaryElement = await screen.findByText('Trends')
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
@@ -347,7 +347,7 @@ describe('App', () => {
       />
     )
 
-    const summaryElement = await screen.findByText('Comparison')
+    const summaryElement = await screen.findByText('Images')
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
@@ -394,7 +394,7 @@ describe('App', () => {
       />
     )
 
-    const summaryElement = await screen.findByText('Comparison')
+    const summaryElement = await screen.findByText('Images')
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
@@ -579,7 +579,7 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
-    const originalText = 'Experiment Checkpoints'
+    const originalText = 'Trends'
 
     expect(screen.getByText(originalText)).toBeInTheDocument()
 
@@ -600,7 +600,7 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
-    const originalText = 'Experiment Checkpoints'
+    const originalText = 'Trends'
 
     expect(screen.getByText(originalText)).toBeInTheDocument()
 
@@ -1535,7 +1535,7 @@ describe('App', () => {
         checkpoint: checkpointPlotsFixture,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED
       })
-      const target = screen.getByText('Experiment Checkpoints')
+      const target = screen.getByText('Trends')
       const contextMenuEvent = createEvent.contextMenu(target)
       fireEvent(target, contextMenuEvent)
       expect(contextMenuEvent.defaultPrevented).toBe(true)
