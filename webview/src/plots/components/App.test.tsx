@@ -1552,9 +1552,9 @@ describe('App', () => {
       })
       const ribbon = screen.getByTestId('ribbon')
 
-      const revisions = within(ribbon)
-        .getAllByRole('listitem')
-        .map(item => item.textContent)
+      const revisionBlocks = within(ribbon).getAllByRole('listitem')
+      revisionBlocks.shift()
+      const revisions = revisionBlocks.map(item => item.textContent)
       expect(revisions).toStrictEqual(
         comparisonTableFixture.revisions.map(rev =>
           rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
@@ -1588,7 +1588,17 @@ describe('App', () => {
         }
       })
 
-      it('should copy the experiment name when clicking the text', () => {
+      beforeAll(() => {
+        jest.useFakeTimers()
+      })
+
+      afterAll(() => {
+        jest.useRealTimers()
+      })
+
+      it('should copy the experiment name when clicking the text', async () => {
+        mockWriteText.mockResolvedValueOnce('success')
+
         renderAppWithData({
           comparison: comparisonTableFixture,
           sectionCollapsed: DEFAULT_SECTION_COLLAPSED
@@ -1598,14 +1608,14 @@ describe('App', () => {
           screen.getByTestId('ribbon-main')
         ).getAllByRole('button')[0]
 
+        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
         fireEvent.click(mainNameButton)
 
         expect(mockWriteText).toBeCalledWith('main')
+        await screen.findByText(CopyTooltip.COPIED)
       })
 
       it('should display that the experiment was copied when clicking the text', async () => {
-        jest.useFakeTimers()
-
         mockWriteText.mockResolvedValueOnce('success')
 
         renderAppWithData({
@@ -1621,11 +1631,10 @@ describe('App', () => {
         fireEvent.click(mainNameButton)
 
         expect(await screen.findByText(CopyTooltip.COPIED)).toBeInTheDocument()
-        jest.useRealTimers()
       })
 
-      it('should display copy again when hovering the text 2s after clicking the text', () => {
-        jest.useFakeTimers()
+      it('should display copy again when hovering the text 2s after clicking the text', async () => {
+        mockWriteText.mockResolvedValueOnce('success')
 
         renderAppWithData({
           comparison: comparisonTableFixture,
@@ -1636,13 +1645,12 @@ describe('App', () => {
           screen.getByTestId('ribbon-main')
         ).getAllByRole('button')[0]
 
-        fireEvent.click(mainNameButton)
         fireEvent.mouseEnter(mainNameButton, { bubbles: true })
+        fireEvent.click(mainNameButton)
 
         jest.advanceTimersByTime(2001)
 
-        expect(screen.getByText(CopyTooltip.NORMAL)).toBeInTheDocument()
-        jest.useRealTimers()
+        expect(await screen.findByText(CopyTooltip.NORMAL)).toBeInTheDocument()
       })
     })
   })

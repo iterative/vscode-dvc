@@ -61,3 +61,20 @@
   padding: 10px 15px;
   margin: 0;
 }
+
+.addButtonWrapper {
+  background-color: $accent-color;
+  list-style: none;
+}
+
+.addButton {
+  background-color: transparent;
+  border: none;
+  display: inline-flex;
+  gap: 7px;
+  height: 38px;
+  align-items: center;
+  justify-content: space-between;
+  color: $fg-color;
+  padding: 0 10px;
+}
