@@ -8,7 +8,8 @@ import {
   commands,
   workspace,
   Uri,
-  QuickPickItem
+  QuickPickItem,
+  ViewColumn
 } from 'vscode'
 import { buildExperiments } from './util'
 import { Disposable } from '../../../extension'
@@ -387,6 +388,28 @@ suite('Experiments Test Suite', () => {
         EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
         { path: mockColumnId },
         undefined
+      )
+    })
+
+    it('should be able to handle a message to open the source params file from a column path', async () => {
+      const { experiments } = setupExperimentsAndMockCommands()
+
+      const mockShowTextDocument = stub(window, 'showTextDocument')
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockColumnId = 'params:params.yaml:lr'
+
+      mockMessageReceived.fire({
+        payload: mockColumnId,
+        type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
+      })
+
+      expect(mockShowTextDocument).to.be.calledOnce
+      expect(mockShowTextDocument).to.be.calledWithExactly(
+        Uri.file(join(dvcDemoPath, 'params.yaml')),
+        {
+          viewColumn: ViewColumn.Beside
+        }
       )
     })
 
