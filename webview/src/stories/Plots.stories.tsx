@@ -157,7 +157,7 @@ VirtualizedPlots.args = {
     },
     comparison: undefined,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    template: manyTemplatePlots(225)
+    template: manyTemplatePlots(125)
   }
 }
 VirtualizedPlots.parameters = chromaticParameters
