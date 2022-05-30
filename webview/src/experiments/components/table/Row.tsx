@@ -53,9 +53,6 @@ export const RowContextMenu: React.FC<RowProp> = ({
   const contextMenuOptions = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = []
 
-    // const pushIf = (condition: boolean, options: MessagesMenuOptionProps[]) =>
-    //   condition && menuOptions.push(...options)
-
     pushIf(menuOptions, !queued && !isWorkspace && depth > 0, [
       experimentMenuOption(
         id,
