@@ -1542,4 +1542,41 @@ describe('App', () => {
       expect(contextMenuEvent.defaultPrevented).toBe(true)
     })
   })
+
+  describe('Ribbon', () => {
+    it('should show the revisions at the top', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+      const ribbon = screen.getByTestId('ribbon')
+
+      const revisions = within(ribbon)
+        .getAllByRole('listitem')
+        .map(item => item.textContent)
+      expect(revisions).toStrictEqual(
+        comparisonTableFixture.revisions.map(rev =>
+          rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
+        )
+      )
+    })
+
+    it('should send a message with the revision to be removed when clicking the clear button', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+
+      const mainClearButton = within(
+        screen.getByTestId('ribbon-main')
+      ).getAllByRole('button')[1]
+
+      fireEvent.click(mainClearButton)
+
+      expect(mockPostMessage).toBeCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+    })
+  })
 })

@@ -17,7 +17,7 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
     })
   }
   return (
-    <div className={styles.list}>
+    <ul className={styles.list} data-testid="ribbon">
       {revisions.map(revision => (
         <RibbonBlock
           revision={revision}
@@ -25,6 +25,6 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
           onClear={() => removeRevision(revision.id || '')}
         />
       ))}
-    </div>
+    </ul>
   )
 }

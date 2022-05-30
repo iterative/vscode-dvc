@@ -41,9 +41,10 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   const exp = revision.group?.replace(/[[\]]/g, '') || revision.revision
 
   return (
-    <div
+    <li
       className={styles.block}
       style={{ borderColor: revision.displayColor }}
+      data-testid={`ribbon-${revision.id}`}
     >
       <Tooltip content={<>{copyTooltip}</>} hideOnClick={false}>
         <button className={styles.label} onClick={() => copyExp(exp)}>
@@ -58,6 +59,6 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
           <Icon icon={AllIcons.CLOSE} width={12} height={12} />
         </button>
       </Tooltip>
-    </div>
+    </li>
   )
 }
