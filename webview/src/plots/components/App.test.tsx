@@ -353,7 +353,9 @@ describe('App', () => {
       cancelable: true
     })
 
-    const workspaceHeader = screen.queryByText('workspace')
+    const comparisonTable = screen.getByRole('table')
+
+    const workspaceHeader = within(comparisonTable).queryByText('workspace')
     expect(workspaceHeader).toBeInTheDocument()
 
     const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
@@ -378,8 +380,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    const table = screen.getByRole('table')
-    expect(within(table).getByText('workspace')).toBeInTheDocument()
+    expect(within(comparisonTable).getByText('workspace')).toBeInTheDocument()
   })
 
   it('should show the newest revision in the comparision table even if some revisions were filtered out', async () => {
@@ -432,7 +433,7 @@ describe('App', () => {
     )
 
     const workspaceHeader = screen.queryAllByText(newRevision)
-    expect(workspaceHeader.length).toBe(2) // One in the table and one in the menu
+    expect(workspaceHeader.length).toBe(3) // One in the table, one in the menu, and one in the ribbon
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {

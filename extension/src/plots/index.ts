@@ -358,7 +358,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private setExperimentStatus(id: string) {
     this.experiments?.toggleExperimentStatus(id)
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE,
+      EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE,
       undefined,
       undefined
     )
