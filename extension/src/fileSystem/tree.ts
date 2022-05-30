@@ -246,7 +246,7 @@ export class TrackedExplorerTree
       const tracked = await collectTrackedPaths(pathItem, (path: string) =>
         this.getRepoChildren(dvcRoot, path)
       )
-      const args = [dvcRoot, ...tracked]
+      const args = [dvcRoot, ...tracked.sort()]
 
       return tryThenMaybeForce(this.internalCommands, commandId, ...args)
     }
