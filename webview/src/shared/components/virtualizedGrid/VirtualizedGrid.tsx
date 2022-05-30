@@ -59,6 +59,7 @@ export const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
             columnCount={nbItemsPerRow}
             columnWidth={cache.current.columnWidth}
             cellRenderer={cellRenderer}
+            overscanRowCount={15}
           />
         )}
       </AutoSizer>
