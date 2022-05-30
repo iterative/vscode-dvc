@@ -21,6 +21,8 @@ import {
   OnDrop
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
+import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
+import { pushIf } from '../../../util/array'
 
 export const ColumnDragHandle: React.FC<{
   disabled: boolean
@@ -197,6 +199,32 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     })
   }
 
+  const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
+    const menuOptions: MessagesMenuOptionProps[] = [
+      {
+        id: 'hide-column',
+        label: 'Hide Column',
+        message: {
+          payload: column.id,
+          type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+        }
+      }
+    ]
+
+    pushIf(menuOptions, column.group === ColumnType.PARAMS, [
+      {
+        id: 'open-to-the-side',
+        label: 'Open to the Side',
+        message: {
+          payload: column.id,
+          type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
+        }
+      }
+    ])
+
+    return menuOptions
+  }, [column])
+
   return (
     <TableHeaderCell
       column={column}
@@ -206,28 +234,21 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragOver={onDragOver}
       onDragStart={onDragStart}
       onDrop={onDrop}
-      menuDisabled={!isSortable}
+      menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
       menuContent={
         <div>
-          <SortPicker
-            sortOrder={sortOrder}
-            setSelectedOrder={order => {
-              setColumnSort(order)
-            }}
-          />
-          <VSCodeDivider />
-          <MessagesMenu
-            options={[
-              {
-                id: 'hide-column',
-                label: 'Hide Column',
-                message: {
-                  payload: column.id,
-                  type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
-                }
-              }
-            ]}
-          />
+          {isSortable && (
+            <div>
+              <SortPicker
+                sortOrder={sortOrder}
+                setSelectedOrder={order => {
+                  setColumnSort(order)
+                }}
+              />
+              <VSCodeDivider />
+            </div>
+          )}
+          <MessagesMenu options={contextMenuOptions} />
         </div>
       }
     />

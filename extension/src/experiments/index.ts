@@ -1,4 +1,5 @@
-import { Event, EventEmitter, Memento, window } from 'vscode'
+import { join } from 'path'
+import { Event, EventEmitter, Memento, Uri, ViewColumn, window } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickAndModifyParams } from './model/queue/quickPick'
@@ -15,6 +16,7 @@ import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
 import { SortDefinition } from './model/sortBy'
+import { splitColumnPath } from './columns/paths'
 import { ResourceLocator } from '../resourceLocator'
 import {
   AvailableCommands,
@@ -380,6 +382,13 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
+  private async openParamsFileToTheSide(path: string) {
+    const [, fileSegment] = splitColumnPath(path)
+    await window.showTextDocument(Uri.file(join(this.dvcRoot, fileSegment)), {
+      viewColumn: ViewColumn.Beside
+    })
+  }
+
   private setupInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
@@ -440,6 +449,8 @@ export class Experiments extends BaseRepository<TableData> {
             return this.setExperimentStatus(message.payload)
           case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
             return this.hideTableColumn(message.payload)
+          case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
+            return this.openParamsFileToTheSide(message.payload)
           case MessageFromWebviewType.SORT_COLUMN:
             return this.addColumnSort(message.payload)
           case MessageFromWebviewType.REMOVE_COLUMN_SORT:
