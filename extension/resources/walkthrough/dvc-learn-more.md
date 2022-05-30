@@ -15,4 +15,4 @@
 
 - Read our [blog](https://dvc.org/blog).
 
-- Meet the [community](https://dvc.org/community).
+- Meet the [Community](https://dvc.org/community).
