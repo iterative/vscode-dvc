@@ -1306,7 +1306,7 @@
           {
             "id": "dvc.installDVC",
             "title": "Install DVC",
-            "description": "The DVC Extension requires DVC to be installed. To install follow the guide shown on [dvc.org](https://dvc.org).\n\n[Install DVC](https://dvc.org/doc/install)\n",
+            "description": "The DVC extension requires DVC to be installed. To install follow the guide shown on [dvc.org](https://dvc.org).\n\n[Install DVC](https://dvc.org/doc/install)\n",
             "media": {
               "markdown": "resources/walkthrough/install-dvc.md"
             },
@@ -1318,7 +1318,7 @@
           {
             "id": "dvc.setup",
             "title": "Setup The Workspace",
-            "description": "Setup the workspace for the dvc extension.\n[Setup The Workspace](command:dvc.setupWorkspace)",
+            "description": "Setup the workspace for the DVC extension.\n[Setup The Workspace](command:dvc.setupWorkspace)",
             "media": {
               "markdown": "resources/walkthrough/setup-workspace.md"
             },
@@ -1329,7 +1329,7 @@
           {
             "id": "dvc.showCommands",
             "title": "Available Commands",
-            "description": "View all of the available commands.\n[View Commands](command:dvc.showCommands)",
+            "description": "View available commands.\n[View Commands](command:dvc.showCommands)",
             "media": {
               "markdown": "resources/walkthrough/command-palette.md"
             },
@@ -1353,7 +1353,7 @@
           {
             "id": "dvc.scm",
             "title": "Source Control Management",
-            "description": "Open the DVC SCM view.\n[Show SCM](command:workbench.view.scm)",
+            "description": "Open the SCM view.\n[Show SCM](command:workbench.view.scm)",
             "media": {
               "markdown": "resources/walkthrough/source-control-management.md"
             },

@@ -26,7 +26,7 @@ After we conclude alpha and beta testing the repository will become public.
 - **Step 3.** See walkthrough.
 
 **Note:** You will be prompted to open our walkthrough after installation. If
-for any reason you need to revisit the walkthrough, open the command palette
+for any reason you need to revisit the walkthrough, open the Command Palette
 (⇧⌃P on Windows/Linux or ⇧⌘P on macOS) and select the `DVC: Get Started`
 command.
 
