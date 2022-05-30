@@ -9,8 +9,7 @@ import {
   screen,
   fireEvent,
   within,
-  createEvent,
-  waitFor
+  createEvent
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
