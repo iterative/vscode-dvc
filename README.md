@@ -61,6 +61,10 @@ pipelines, and most scripts are capable of running outside of DVC.
 See development docs and contributing guidelines in
 [CONTRIBUTING.md](CONTRIBUTING.md)
 
+## Explore
+
+View [more resources](extension/resources/walkthrough/dvc-learn-more.md).
+
 ## Data and telemetry
 
 The DVC Extension for Visual Studio Code collects usage data and sends it to
