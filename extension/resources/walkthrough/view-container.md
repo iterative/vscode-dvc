@@ -5,7 +5,7 @@ experiments and plots in the workspace.
 
 Click on the `DVC` icon in the
 [Activity Bar](https://code.visualstudio.com/docs/getstarted/userinterface) to
-access the container or run
+access the container or use
 [View: Show DVC](command:workbench.view.extension.dvc-views) from the Command
 Palette.
 

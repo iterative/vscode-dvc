@@ -11,5 +11,5 @@ Use the workspace setup wizard to set the required config options.
 
 Once completed, the rest of the walkthrough will appear.
 
-The wizard can be accessed by clicking [here](command:dvc.setupWorkspace) or
-entering `DVC: Setup The Workspace` into the Command Palette.
+The wizard can be accessed by clicking [here](command:dvc.setupWorkspace) or use
+`DVC: Setup The Workspace` from the Command Palette.
