@@ -9,7 +9,7 @@ interface RibbonBlockProps {
   onClear: () => void
 }
 
-enum CopyTooltip {
+export enum CopyTooltip {
   NORMAL = 'Copy',
   COPIED = 'Copied'
 }

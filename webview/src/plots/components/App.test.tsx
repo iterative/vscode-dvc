@@ -9,7 +9,8 @@ import {
   screen,
   fireEvent,
   within,
-  createEvent
+  createEvent,
+  waitFor
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
@@ -36,6 +37,7 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
+import { CopyTooltip } from './ribbon/RibbonBlock'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
@@ -1576,6 +1578,72 @@ describe('App', () => {
       expect(mockPostMessage).toBeCalledWith({
         payload: 'main',
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+    })
+
+    describe('Copy button', () => {
+      const mockWriteText = jest.fn()
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: mockWriteText
+        }
+      })
+
+      it('should copy the experiment name when clicking the text', () => {
+        renderAppWithData({
+          comparison: comparisonTableFixture,
+          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        })
+
+        const mainNameButton = within(
+          screen.getByTestId('ribbon-main')
+        ).getAllByRole('button')[0]
+
+        fireEvent.click(mainNameButton)
+
+        expect(mockWriteText).toBeCalledWith('main')
+      })
+
+      it('should display that the experiment was copied when clicking the text', async () => {
+        jest.useFakeTimers()
+
+        mockWriteText.mockResolvedValueOnce('success')
+
+        renderAppWithData({
+          comparison: comparisonTableFixture,
+          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        })
+
+        const mainNameButton = within(
+          screen.getByTestId('ribbon-main')
+        ).getAllByRole('button')[0]
+
+        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
+        fireEvent.click(mainNameButton)
+
+        expect(await screen.findByText(CopyTooltip.COPIED)).toBeInTheDocument()
+        jest.useRealTimers()
+      })
+
+      it('should display copy again when hovering the text 2s after clicking the text', () => {
+        jest.useFakeTimers()
+
+        renderAppWithData({
+          comparison: comparisonTableFixture,
+          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        })
+
+        const mainNameButton = within(
+          screen.getByTestId('ribbon-main')
+        ).getAllByRole('button')[0]
+
+        fireEvent.click(mainNameButton)
+        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
+
+        jest.advanceTimersByTime(2001)
+
+        expect(screen.getByText(CopyTooltip.NORMAL)).toBeInTheDocument()
+        jest.useRealTimers()
       })
     })
   })
