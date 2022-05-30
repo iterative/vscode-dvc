@@ -76,8 +76,11 @@ export interface BaseExperimentFields {
   checkpoint_parent?: string
 }
 
+type DepsDetails = { hash: string; size: number; nfiles: null | number }
+type OutsDetails = DepsDetails & { use_cache: boolean; is_data_source: boolean }
+
 interface OutsOrDepsDetails {
-  [filename: string]: { hash: string; size: number; nfiles: null | number }
+  [filename: string]: DepsDetails | OutsDetails
 }
 
 export interface ExperimentFields extends BaseExperimentFields {

@@ -1,4 +1,5 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
+import { fireEvent, within } from '@testing-library/react'
 import React from 'react'
 import { ComparisonRevisionData } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
@@ -6,7 +7,8 @@ import {
   ComparisonTable,
   ComparisonTableProps
 } from '../plots/components/comparisonTable/ComparisonTable'
-import { Theme } from '../shared/components/theme/Theme'
+import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
+import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
 
 export default {
   args: comparisonTableFixture,
@@ -14,26 +16,28 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: Story<ComparisonTableProps> = ({
-  plots,
-  revisions,
-  currentPinnedColumn
-}) => (
-  <Theme>
-    <ComparisonTable
-      plots={plots}
-      revisions={revisions}
-      currentPinnedColumn={currentPinnedColumn}
-    />
-  </Theme>
-)
+const Template: Story<ComparisonTableProps> = ({ plots, revisions }) => {
+  return (
+    <WebviewWrapper>
+      <DragDropProvider>
+        <ComparisonTable plots={plots} revisions={revisions} />
+      </DragDropProvider>
+    </WebviewWrapper>
+  )
+}
 
 export const Basic = Template.bind({})
 
 export const WithPinnedColumn = Template.bind({})
-WithPinnedColumn.args = {
-  ...comparisonTableFixture,
-  currentPinnedColumn: 'main'
+WithPinnedColumn.parameters = {
+  chromatic: { delay: 300 }
+}
+WithPinnedColumn.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  const mainHeader = await canvas.findByTestId('main-header')
+  const pin = within(mainHeader).getByRole('button')
+
+  fireEvent.click(pin)
 }
 
 const removeSingleImage = (

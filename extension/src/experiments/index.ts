@@ -320,6 +320,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getExperiments() {
+    if (!this.columns.hasColumns()) {
+      return []
+    }
+
     return this.experiments.getExperiments()
   }
 
@@ -332,6 +336,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getSelectedRevisions() {
+    if (!this.columns.hasColumns()) {
+      return []
+    }
+
     return this.experiments.getSelectedRevisions()
   }
 

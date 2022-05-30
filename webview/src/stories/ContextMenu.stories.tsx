@@ -3,7 +3,7 @@ import React from 'react'
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { Theme } from '../shared/components/theme/Theme'
+import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import {
   ContextMenu,
   ContextMenuProps
@@ -19,7 +19,7 @@ export default {
 
 const Template: Story<ContextMenuProps> = () => {
   return (
-    <Theme>
+    <WebviewWrapper>
       <ContextMenu
         content={
           <MessagesMenu
@@ -40,7 +40,7 @@ const Template: Story<ContextMenuProps> = () => {
           <Icon width={15} icon={AllIcons.LINES} />
         </div>
       </ContextMenu>
-    </Theme>
+    </WebviewWrapper>
   )
 }
 

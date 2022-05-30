@@ -213,16 +213,6 @@ describe('ComparisonTable', () => {
     expect(headers).toStrictEqual([...namedRevisions, newRevName])
   })
 
-  it('should pin the current pinned column on first render', () => {
-    const pinnedRevision = 'main'
-
-    renderTable({ ...basicProps, currentPinnedColumn: pinnedRevision })
-
-    const [pinnedColumn] = getHeaders()
-
-    expect(pinnedColumn.textContent).toBe(pinnedRevision)
-  })
-
   it('should display a refresh button for each revision that has a missing image', () => {
     const revisionWithNoData = 'missing-data'
 

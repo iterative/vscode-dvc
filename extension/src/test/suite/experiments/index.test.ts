@@ -601,6 +601,7 @@ suite('Experiments Test Suite', () => {
         'queued experiment cannot be selected'
       ).to.be.false
     })
+
     it('should be able to handle a message to select columns', async () => {
       const { columnsModel, experiments, messageSpy } =
         setupExperimentsAndMockCommands()
@@ -1148,6 +1149,37 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
 
       expect(setContextValueSpy).not.to.be.called
+    })
+  })
+
+  describe('Empty repository', () => {
+    it('should not show any experiments in the experiments tree when there are no columns', async () => {
+      const { experiments } = buildExperiments(disposable, {
+        b9f016df00d499f6d2a73e7dc34d1600c78066eb: {
+          baseline: {
+            data: {
+              deps: {}
+            }
+          }
+        },
+        workspace: {
+          baseline: {
+            data: {
+              deps: {}
+            }
+          }
+        }
+      })
+      await experiments.isReady()
+
+      expect(
+        experiments.getExperiments(),
+        'should send no experiments to the tree'
+      ).to.deep.equal([])
+      expect(
+        experiments.getSelectedRevisions(),
+        'should show 0 selected experiments as selected in the description'
+      ).to.deep.equal([])
     })
   })
 })

@@ -1,19 +1,8 @@
-import React, {
-  DetailedHTMLProps,
-  HTMLAttributes,
-  useState,
-  useLayoutEffect,
-  useCallback
-} from 'react'
+import { useState, useLayoutEffect, useCallback } from 'react'
 import { alphaToHex, getThemeValue, ThemeProperty } from '../../../util/styles'
 
-type CSSVariables = DetailedHTMLProps<
-  HTMLAttributes<HTMLDivElement>,
-  HTMLDivElement
->
-
 export const useThemeVariables = () => {
-  const [variables, setVariables] = useState<CSSVariables>({})
+  const [variables, setVariables] = useState<Record<string, string>>({})
 
   const createCSSVariables = useCallback(() => {
     const ColorsWithOpacity = {
@@ -56,13 +45,4 @@ export const useThemeVariables = () => {
   }, [createCSSVariables, createObserver])
 
   return variables
-}
-
-export const Theme: React.FC = ({ children }) => {
-  const variables = useThemeVariables()
-  return (
-    <div style={variables} data-testid="theme-wrapper">
-      {children}
-    </div>
-  )
 }
