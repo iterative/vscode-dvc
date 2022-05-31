@@ -1,12 +1,10 @@
 import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
-import { Config } from 'vega-lite'
-import styles from './styles.module.scss'
-import { removeLegendSuppression } from './util'
+import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { PlotsSizeProvider } from './PlotsSizeContext'
 import { AddPlots, Welcome } from './GetStarted'
+import { ZoomedInPlot } from './ZoomedInPlot'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
@@ -16,7 +14,6 @@ import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { sendMessage } from '../../shared/vscode'
-import { getThemeValue, ThemeProperty } from '../../util/styles'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 
 interface PlotsProps {
@@ -44,15 +41,13 @@ const PlotsContent = ({ state }: PlotsProps) => {
   const handleZoomInPlot = useCallback(
     (props: VegaLiteProps, id: string, refresh?: boolean) => {
       if (!refresh) {
-        setZoomedInPlot(removeLegendSuppression(props))
+        setZoomedInPlot(props)
         zoomedInPlotId.current = id
         return
       }
 
       if (zoomedInPlotId.current === id) {
-        setZoomedInPlot(plot =>
-          plot ? removeLegendSuppression(props) : undefined
-        )
+        setZoomedInPlot(plot => (plot ? props : undefined))
       }
     },
     [setZoomedInPlot]
@@ -152,21 +147,7 @@ const PlotsContent = ({ state }: PlotsProps) => {
 
       {zoomedInPlot && (
         <Modal onClose={handleModalClose}>
-          <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
-            <VegaLite
-              {...zoomedInPlot}
-              config={{
-                ...(zoomedInPlot.config as Config),
-                background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
-              }}
-              actions={{
-                compiled: false,
-                editor: false,
-                export: true,
-                source: false
-              }}
-            />
-          </div>
+          <ZoomedInPlot props={zoomedInPlot} />
         </Modal>
       )}
     </DragDropProvider>

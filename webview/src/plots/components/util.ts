@@ -1,5 +1,4 @@
 import { PlotSize } from 'dvc/src/plots/webview/contract'
-import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 
 const MaxItemsBeforeVirtualization = {
   [PlotSize.LARGE]: 10,
@@ -45,19 +44,3 @@ export const getNbItemsPerRow = (size: PlotSize) => {
 
 export const shouldUseVirtualizedGrid = (nbItems: number, size: PlotSize) =>
   nbItems > MaxItemsBeforeVirtualization[size]
-
-export const removeLegendSuppression = (
-  plotProps?: VegaLiteProps
-): VegaLiteProps => {
-  const plot = { ...plotProps } as VegaLiteProps & {
-    spec: {
-      encoding?: {
-        color?: { legend?: { disable?: boolean } }
-      }
-    }
-  }
-  if (plot?.spec?.encoding?.color?.legend?.disable !== undefined) {
-    plot.spec.encoding.color.legend.disable = false
-  }
-  return plot
-}
