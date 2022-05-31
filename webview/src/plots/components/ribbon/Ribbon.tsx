@@ -4,7 +4,8 @@ import React from 'react'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
-import { AllIcons, Icon } from '../../../shared/components/Icon'
+import { AllIcons } from '../../../shared/components/Icon'
+import { IconButton } from '../../../shared/components/button/IconButton'
 
 interface RibbonProps {
   revisions: Revision[]
@@ -29,12 +30,11 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
   return (
     <ul className={styles.list} data-testid="ribbon">
       <li className={styles.addButtonWrapper}>
-        <button className={styles.addButton} onClick={selectRevisions}>
-          <Icon icon={AllIcons.LINES} width={15} height={15} />
-          <span>
-            {revisions.length} of {MAX_NB_EXP}
-          </span>
-        </button>
+        <IconButton
+          onClick={selectRevisions}
+          icon={AllIcons.LINES}
+          text={`${revisions.length} of ${MAX_NB_EXP}`}
+        />
       </li>
       {revisions.map(revision => (
         <RibbonBlock

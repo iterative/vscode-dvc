@@ -1580,6 +1580,34 @@ describe('App', () => {
       })
     })
 
+    it('should display the number of experiments selected', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+
+      expect(
+        screen.getByText(`${comparisonTableFixture.revisions.length} of 7`)
+      ).toBeInTheDocument()
+    })
+
+    it('should send a message to select the revisions when clicking the filter button', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+
+      const filterButton = within(screen.getByTestId('ribbon')).getAllByRole(
+        'button'
+      )[0]
+
+      fireEvent.click(filterButton)
+
+      expect(mockPostMessage).toBeCalledWith({
+        type: MessageFromWebviewType.SELECT_EXPERIMENTS
+      })
+    })
+
     describe('Copy button', () => {
       const mockWriteText = jest.fn()
       Object.assign(navigator, {
