@@ -16,7 +16,7 @@ import {
 import {
   CheckpointPlotData,
   ComparisonPlots,
-  ComparisonRevision,
+  Revision,
   ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
@@ -189,13 +189,14 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getSelectedRevisionDetails() {
-    return reorderObjectList<ComparisonRevision>(
+    return reorderObjectList<Revision>(
       this.comparisonOrder,
       this.experiments
         .getSelectedRevisions()
-        .map(({ label: revision, displayColor, logicalGroupName }) => ({
+        .map(({ label: revision, displayColor, logicalGroupName, id }) => ({
           displayColor,
           group: logicalGroupName,
+          id,
           revision
         })),
       'revision'

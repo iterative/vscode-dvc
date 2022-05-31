@@ -1,0 +1,59 @@
+@import '../../../shared/variables.scss';
+
+.block {
+  border-left-style: solid;
+  border-left-width: 3px;
+  padding: 4px;
+  background-color: $header-bg-color;
+  color: $fg-color;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8125rem;
+
+  svg {
+    fill: $fg-color;
+    display: block;
+  }
+}
+
+.label {
+  height: 30px;
+  background-color: transparent;
+  border: none;
+  text-align: left;
+  color: $fg-color;
+
+  span {
+    display: block;
+  }
+}
+
+.subtitle {
+  color: $watermark-color;
+}
+
+.clearButton {
+  background-color: transparent;
+  border: none;
+  padding: 3px;
+  opacity: 0;
+
+  .block:hover & {
+    opacity: 1;
+  }
+
+  :hover {
+    background-color: $row-bg-alt-color;
+  }
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid $border-color;
+  padding: 10px 15px;
+  margin: 0;
+}

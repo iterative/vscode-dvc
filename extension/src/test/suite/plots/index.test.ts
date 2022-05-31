@@ -693,5 +693,35 @@ suite('Plots Test Suite', () => {
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a toggle experiment message from the webview', async () => {
+      const { plots, experiments } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const mockSelectExperiments = stub(
+        experiments,
+        'toggleExperimentStatus'
+      ).resolves(undefined)
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: 'main',
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+
+      expect(mockSelectExperiments).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 })

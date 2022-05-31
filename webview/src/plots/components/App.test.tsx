@@ -36,6 +36,7 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
+import { CopyTooltip } from './ribbon/RibbonBlock'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
@@ -353,7 +354,9 @@ describe('App', () => {
       cancelable: true
     })
 
-    const workspaceHeader = screen.queryByText('workspace')
+    const comparisonTable = screen.getByRole('table')
+
+    const workspaceHeader = within(comparisonTable).queryByText('workspace')
     expect(workspaceHeader).toBeInTheDocument()
 
     const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
@@ -378,8 +381,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    const table = screen.getByRole('table')
-    expect(within(table).getByText('workspace')).toBeInTheDocument()
+    expect(within(comparisonTable).getByText('workspace')).toBeInTheDocument()
   })
 
   it('should show the newest revision in the comparision table even if some revisions were filtered out', async () => {
@@ -432,7 +434,7 @@ describe('App', () => {
     )
 
     const workspaceHeader = screen.queryAllByText(newRevision)
-    expect(workspaceHeader.length).toBe(2) // One in the table and one in the menu
+    expect(workspaceHeader.length).toBe(3) // One in the table, one in the menu, and one in the ribbon
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
@@ -1539,6 +1541,109 @@ describe('App', () => {
       const contextMenuEvent = createEvent.contextMenu(target)
       fireEvent(target, contextMenuEvent)
       expect(contextMenuEvent.defaultPrevented).toBe(true)
+    })
+  })
+
+  describe('Ribbon', () => {
+    it('should show the revisions at the top', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+      const ribbon = screen.getByTestId('ribbon')
+
+      const revisions = within(ribbon)
+        .getAllByRole('listitem')
+        .map(item => item.textContent)
+      expect(revisions).toStrictEqual(
+        comparisonTableFixture.revisions.map(rev =>
+          rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
+        )
+      )
+    })
+
+    it('should send a message with the revision to be removed when clicking the clear button', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+
+      const mainClearButton = within(
+        screen.getByTestId('ribbon-main')
+      ).getAllByRole('button')[1]
+
+      fireEvent.click(mainClearButton)
+
+      expect(mockPostMessage).toBeCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+    })
+
+    describe('Copy button', () => {
+      const mockWriteText = jest.fn()
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: mockWriteText
+        }
+      })
+
+      it('should copy the experiment name when clicking the text', () => {
+        renderAppWithData({
+          comparison: comparisonTableFixture,
+          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        })
+
+        const mainNameButton = within(
+          screen.getByTestId('ribbon-main')
+        ).getAllByRole('button')[0]
+
+        fireEvent.click(mainNameButton)
+
+        expect(mockWriteText).toBeCalledWith('main')
+      })
+
+      it('should display that the experiment was copied when clicking the text', async () => {
+        jest.useFakeTimers()
+
+        mockWriteText.mockResolvedValueOnce('success')
+
+        renderAppWithData({
+          comparison: comparisonTableFixture,
+          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        })
+
+        const mainNameButton = within(
+          screen.getByTestId('ribbon-main')
+        ).getAllByRole('button')[0]
+
+        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
+        fireEvent.click(mainNameButton)
+
+        expect(await screen.findByText(CopyTooltip.COPIED)).toBeInTheDocument()
+        jest.useRealTimers()
+      })
+
+      it('should display copy again when hovering the text 2s after clicking the text', () => {
+        jest.useFakeTimers()
+
+        renderAppWithData({
+          comparison: comparisonTableFixture,
+          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        })
+
+        const mainNameButton = within(
+          screen.getByTestId('ribbon-main')
+        ).getAllByRole('button')[0]
+
+        fireEvent.click(mainNameButton)
+        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
+
+        jest.advanceTimersByTime(2001)
+
+        expect(screen.getByText(CopyTooltip.NORMAL)).toBeInTheDocument()
+        jest.useRealTimers()
+      })
     })
   })
 })
