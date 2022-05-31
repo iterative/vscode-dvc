@@ -20,17 +20,13 @@
 
 .label {
   height: 30px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  align-items: center;
   background-color: transparent;
   border: none;
   text-align: left;
   color: $fg-color;
 
   span {
-    flex: 1 0 100%;
+    display: block;
   }
 }
 
