@@ -387,6 +387,11 @@ export class Experiments extends BaseRepository<TableData> {
     await window.showTextDocument(Uri.file(join(this.dvcRoot, fileSegment)), {
       viewColumn: ViewColumn.Beside
     })
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE,
+      { path },
+      undefined
+    )
   }
 
   private setupInitialData() {
