@@ -150,3 +150,33 @@ export const collectTrackedPaths = async (
   }
   return acc
 }
+
+const isUncollectedChild = (
+  deleted: Set<string>,
+  deletedPath: string,
+  trackedPath: string
+): boolean => {
+  return !deleted.has(trackedPath) && isSameOrChild(deletedPath, trackedPath)
+}
+
+const collectIfDeletedChild = (
+  deleted: Set<string>,
+  deletedPath: string,
+  trackedPath: string
+): void => {
+  if (isUncollectedChild(deleted, deletedPath, trackedPath)) {
+    deleted.add(trackedPath)
+  }
+}
+
+export const collectDeleted = (
+  deleted: Set<string>,
+  tracked: Set<string>
+): Set<string> => {
+  for (const trackedPath of tracked) {
+    for (const deletedPath of deleted) {
+      collectIfDeletedChild(deleted, deletedPath, trackedPath)
+    }
+  }
+  return deleted
+}
