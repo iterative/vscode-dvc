@@ -1,9 +1,9 @@
-import { dirname, join, resolve } from 'path'
+import { dirname, join, relative, resolve } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
-import { PathOutput } from '../../cli/reader'
-import { isSameOrChild } from '../../fileSystem'
+import { ExperimentsOutput, PathOutput } from '../../cli/reader'
+import { isSameOrChild, relativeWithUri } from '../../fileSystem'
 import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
 
 export type PathItem = Resource & {
@@ -11,50 +11,47 @@ export type PathItem = Resource & {
   isTracked: boolean
 }
 
-const transform = (
+const transformToAbsTree = (
   dvcRoot: string,
   acc: Map<string, Set<string>>,
-  isTracked: Set<string>
+  trackedRelPaths: Set<string>
 ): Map<string, PathItem[]> => {
-  const treeMap = new Map<string, PathItem[]>()
+  const absTree = new Map<string, PathItem[]>()
 
-  for (const [path, paths] of acc.entries()) {
-    const items = [...paths].map(path => ({
+  for (const [path, childPaths] of acc.entries()) {
+    const items = [...childPaths].map(childPath => ({
       dvcRoot,
-      isDirectory: !!acc.get(path),
-      isTracked: isTracked.has(path),
-      resourceUri: Uri.file(join(dvcRoot, path))
+      isDirectory: !!acc.get(childPath),
+      isTracked: trackedRelPaths.has(childPath),
+      resourceUri: Uri.file(join(dvcRoot, childPath))
     }))
     const absPath = Uri.file(join(dvcRoot, path)).fsPath
-    treeMap.set(absPath, items)
+    absTree.set(absPath, items)
   }
 
-  return treeMap
+  return absTree
 }
 
 export const collectTree = (
   dvcRoot: string,
-  paths: string[]
+  absLeafs: Set<string>,
+  trackedRelPaths = new Set<string>()
 ): Map<string, PathItem[]> => {
-  const acc = new Map<string, Set<string>>()
-  const isTracked = new Set<string>()
+  const relTree = new Map<string, Set<string>>()
 
-  for (const path of paths) {
-    const pathArray = getPathArray(path)
+  for (const absLeaf of absLeafs) {
+    const relPath = relative(dvcRoot, absLeaf)
+    const relPathArray = getPathArray(relPath)
 
-    isTracked.add(path)
-    const dir = dirname(path)
-    if (dir !== '.') {
-      isTracked.add(dir)
-    }
+    trackedRelPaths.add(relPath)
 
-    for (let idx = 0; idx < pathArray.length; idx++) {
-      const path = getPath(pathArray, idx)
-      addToMapSet(acc, path, getDirectChild(pathArray, idx))
+    for (let idx = 0; idx < relPathArray.length; idx++) {
+      const path = getPath(relPathArray, idx)
+      addToMapSet(relTree, path, getDirectChild(relPathArray, idx))
     }
   }
 
-  return transform(dvcRoot, acc, isTracked)
+  return transformToAbsTree(dvcRoot, relTree, trackedRelPaths)
 }
 
 const collectMissingParents = (acc: string[], absPath: string) => {
@@ -94,28 +91,62 @@ export const collectModifiedAgainstHead = (
   return acc
 }
 
-const collectPath = (acc: Set<string>, dvcRoot: string, path: string) => {
-  const pathArray = getPathArray(path)
+const collectAbsPath = (
+  acc: Set<string>,
+  absLeafs: Set<string>,
+  dvcRoot: string,
+  absPath: string
+) => {
+  const relPathArray = getPathArray(relative(dvcRoot, absPath))
 
-  for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-    const path = join(dvcRoot, getPath(pathArray, reverseIdx))
-    if (acc.has(path)) {
+  for (let reverseIdx = relPathArray.length; reverseIdx > 0; reverseIdx--) {
+    const absPath = join(dvcRoot, getPath(relPathArray, reverseIdx))
+    if (acc.has(absPath) || absLeafs.has(absPath)) {
       continue
     }
 
-    acc.add(path)
+    acc.add(absPath)
   }
 }
 
-export const collectTracked = (
+export const collectTrackedNonLeafs = (
   dvcRoot: string,
-  paths: string[] = []
+  absLeafs = new Set<string>()
 ): Set<string> => {
   const acc = new Set<string>()
 
-  for (const path of paths) {
-    collectPath(acc, dvcRoot, path)
+  for (const absPath of absLeafs) {
+    collectAbsPath(acc, absLeafs, dvcRoot, absPath)
   }
 
+  return acc
+}
+
+export const collectTrackedOuts = (data: ExperimentsOutput): Set<string> => {
+  const acc = new Set<string>()
+  for (const [relPath, { use_cache }] of Object.entries(
+    data.workspace.baseline.data?.outs || {}
+  )) {
+    if (use_cache) {
+      acc.add(relPath)
+    }
+  }
+  return acc
+}
+
+export const collectTrackedPaths = async (
+  { dvcRoot, resourceUri, isTracked }: PathItem,
+  getChildren: (path: string) => Promise<PathItem[]>
+): Promise<string[]> => {
+  const acc = []
+
+  if (isTracked) {
+    acc.push(relativeWithUri(dvcRoot, resourceUri))
+    return acc
+  }
+  const children = await getChildren(resourceUri.fsPath)
+  for (const child of children) {
+    acc.push(...(await collectTrackedPaths(child, getChildren)))
+  }
   return acc
 }

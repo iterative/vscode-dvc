@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { ensureFileSync } from 'fs-extra'
 import {
+  EventEmitter,
   window,
   commands,
   Uri,
@@ -27,12 +28,17 @@ import {
 } from '../../../commands/external'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
+import { buildExperiments } from '../experiments/util'
+import { Repository } from '../../../repository'
+import expShowFixture from '../../fixtures/expShow/output'
+import { WorkspaceRepositories } from '../../../repository/workspace'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   const { join } = path
 
-  const getPathItem = (relPath: string) => ({
+  const getPathItem = (relPath: string, isTracked = true) => ({
     dvcRoot: dvcDemoPath,
+    isTracked,
     resourceUri: Uri.file(join(dvcDemoPath, relPath))
   })
 
@@ -275,6 +281,99 @@ suite('Tracked Explorer Tree Test Suite', () => {
       })
     })
 
+    it('should pull the correct target(s) when asked to dvc.pullTarget a non-tracked directory', async () => {
+      const { cliReader, experiments, internalCommands, updatesPaused } =
+        buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stub(cliReader, 'listDvcOnlyRecursive').resolves([
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'data/data.xml'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'data/features/test.pkl'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'data/features/train.pkl'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'data/prepared/test.tsv'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'data/prepared/train.tsv'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'evaluation/importance.png'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'model.pkl'
+        }
+      ])
+      stub(cliReader, 'status').resolves({})
+      stub(cliReader, 'diff').resolves({})
+
+      const repository = disposable.track(
+        new Repository(
+          dvcDemoPath,
+          internalCommands,
+          updatesPaused,
+          new EventEmitter<void>()
+        )
+      )
+
+      const experimentDataUpdatedEvent = new Promise(resolve =>
+        disposable.track(
+          experiments.onDidChangeExperiments(() => resolve(undefined))
+        )
+      )
+
+      repository.setExperiments(experiments)
+      experiments.setState(expShowFixture)
+
+      stub(WorkspaceRepositories.prototype, 'getRepository').returns(repository)
+      stub(WorkspaceRepositories.prototype, 'isReady').resolves(undefined)
+      const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
+        'target pulled'
+      )
+
+      await Promise.all([repository.isReady(), experimentDataUpdatedEvent])
+
+      await commands.executeCommand(
+        RegisteredCliCommands.PULL_TARGET,
+        getPathItem('data', false)
+      )
+
+      expect(mockPull).to.be.calledOnce
+      expect(mockPull).to.be.calledWithExactly(
+        dvcDemoPath,
+        join('data', 'data.xml'),
+        join('data', 'features'),
+        join('data', 'prepared')
+      )
+    })
+
     it('should be able to run dvc.pullTarget without error', async () => {
       const relPath = 'data'
       stub(path, 'relative').returns(relPath)
@@ -315,8 +414,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
-      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath, '-R')
-      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath, '-R', '-f')
+      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath)
+      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
 
     it('should be able to run dvc.pushTarget without error', async () => {
@@ -362,8 +461,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'Force'
       )
       expect(mockPush).to.be.calledTwice
-      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath, '-R')
-      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath, '-R', '-f')
+      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath)
+      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
   })
 })
