@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
+import { removeLegendSuppression } from './util'
 import { PlotsSizeProvider } from './PlotsSizeContext'
 import { AddPlots, Welcome } from './GetStarted'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
@@ -40,10 +41,15 @@ const PlotsContent = ({ state }: PlotsProps) => {
     }
   }, [zoomedInPlot])
 
+  const setZoomedInPlotWithLegend = (props?: VegaLiteProps) => {
+    removeLegendSuppression(props)
+    return setZoomedInPlot(props)
+  }
+
   const handleZoomInPlot = useCallback(
     (props: VegaLiteProps, id: string, refresh?: boolean) => {
       if (!refresh) {
-        setZoomedInPlot(props)
+        setZoomedInPlotWithLegend(props)
         zoomedInPlotId.current = id
         return
       }

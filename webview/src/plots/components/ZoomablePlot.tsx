@@ -16,20 +16,6 @@ interface ZoomablePlotOwnProps extends ZoomablePlotProps {
   id: string
 }
 
-const removeLegendSuppression = (plotProps: VegaLiteProps): VegaLiteProps => {
-  const plot = { ...plotProps } as VegaLiteProps & {
-    spec: {
-      encoding?: {
-        color?: { legend?: { disable?: boolean } }
-      }
-    }
-  }
-  if (plot.spec.encoding?.color?.legend?.disable !== undefined) {
-    delete plot.spec.encoding.color.legend.disable
-  }
-  return plot
-}
-
 export const ZoomablePlot: React.FC<ZoomablePlotOwnProps> = ({
   plotProps,
   renderZoomedInPlot,
@@ -45,10 +31,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotOwnProps> = ({
     }
   }, [plotProps, id, renderZoomedInPlot])
 
-  const handleOnClick = () => {
-    const zoomedPlot = removeLegendSuppression(plotProps)
-    return renderZoomedInPlot(zoomedPlot, id)
-  }
+  const handleOnClick = () => renderZoomedInPlot(plotProps, id)
 
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
