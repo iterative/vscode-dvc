@@ -1,4 +1,4 @@
-# Source control management
+# Source Control Management
 
 Resources tracked by `DVC` can be managed through the SCM view.
 

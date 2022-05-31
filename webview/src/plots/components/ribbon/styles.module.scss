@@ -20,17 +20,13 @@
 
 .label {
   height: 30px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  align-items: center;
   background-color: transparent;
   border: none;
   text-align: left;
   color: $fg-color;
 
   span {
-    flex: 1 0 100%;
+    display: block;
   }
 }
 
@@ -65,16 +61,4 @@
 .addButtonWrapper {
   background-color: $accent-color;
   list-style: none;
-}
-
-.addButton {
-  background-color: transparent;
-  border: none;
-  display: inline-flex;
-  gap: 7px;
-  height: 38px;
-  align-items: center;
-  justify-content: space-between;
-  color: $fg-color;
-  padding: 0 10px;
 }

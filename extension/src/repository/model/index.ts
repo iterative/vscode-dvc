@@ -1,8 +1,10 @@
-import { dirname, resolve } from 'path'
-import isEqual from 'lodash.isequal'
+import { dirname, join, resolve } from 'path'
+import omit from 'lodash.omit'
 import {
+  collectDeleted,
   collectModifiedAgainstHead,
-  collectTracked,
+  collectTrackedNonLeafs,
+  collectTrackedOuts,
   collectTree,
   PathItem
 } from './collect'
@@ -11,6 +13,7 @@ import { DecorationModel } from '../decorationProvider'
 import {
   ChangedType,
   DiffOutput,
+  ExperimentsOutput,
   ListOutput,
   PathOutput,
   PathStatus,
@@ -20,6 +23,7 @@ import {
   StatusOutput
 } from '../../cli/reader'
 import { Disposable } from '../../class/dispose'
+import { sameContents } from '../../util/array'
 
 type OutputData = {
   diffFromCache: StatusOutput
@@ -46,11 +50,13 @@ export class RepositoryModel
     modified: new Set<string>(),
     notInCache: new Set<string>(),
     renamed: new Set<string>(),
-    tracked: new Set<string>(),
+    trackedLeafs: new Set<string>(),
+    trackedNonLeafs: new Set<string>(),
     untracked: new Set<string>()
   }
 
   private tree = new Map<string, PathItem[]>()
+  private relTrackedOuts = new Set<string>()
 
   constructor(dvcRoot: string) {
     super()
@@ -59,7 +65,10 @@ export class RepositoryModel
   }
 
   public getState() {
-    return this.state
+    return {
+      ...omit(this.state, ['trackedLeafs', 'trackedNonLeafs']),
+      tracked: this.getTracked()
+    }
   }
 
   public getChildren(path: string): PathItem[] {
@@ -90,6 +99,15 @@ export class RepositoryModel
     )
   }
 
+  public transformAndSetExperiments(data: ExperimentsOutput) {
+    const relTrackedOuts = collectTrackedOuts(data)
+
+    if (!sameContents([...relTrackedOuts], [...this.relTrackedOuts])) {
+      this.relTrackedOuts = relTrackedOuts
+      this.collectTree()
+    }
+  }
+
   private getAbsolutePath(path: string): string {
     return resolve(this.dvcRoot, path)
   }
@@ -110,7 +128,7 @@ export class RepositoryModel
       .map(([relativePath, status]) => {
         const absolutePath = this.getAbsolutePath(relativePath)
 
-        if (!this.state.tracked.has(absolutePath)) {
+        if (!this.isTracked(absolutePath)) {
           return
         }
 
@@ -137,7 +155,7 @@ export class RepositoryModel
   private mapToTrackedPaths(diff: PathOutput[] = []): string[] {
     return diff
       .map(entry => this.getAbsolutePath(entry.path))
-      .filter(path => this.state.tracked.has(path))
+      .filter(path => this.isTracked(path))
   }
 
   private getStateFromDiff(diff?: PathOutput[]): Set<string> {
@@ -186,7 +204,7 @@ export class RepositoryModel
     const modifiedAgainstHead = collectModifiedAgainstHead(
       this.dvcRoot,
       diffOutput.modified || [],
-      this.state.tracked
+      this.getTracked()
     )
 
     const {
@@ -203,21 +221,21 @@ export class RepositoryModel
       modifiedAgainstCache
     )
 
+    const deletedWithChildren = collectDeleted(
+      this.getStateFromDiff(diffOutput[Status.DELETED]),
+      this.getTracked()
+    )
+
     this.state.notInCache = new Set([
       ...this.getStateFromDiff(diffOutput[Status.NOT_IN_CACHE]),
       ...this.filterStatuses(
-        [
-          ...this.getStateFromDiff(diffOutput[Status.DELETED]),
-          ...modifiedAgainstHead
-        ],
+        [...deletedWithChildren, ...modifiedAgainstHead],
         path => this.pathInSet(path, notInCache)
       )
     ])
 
     this.state.deleted = new Set(
-      this.mapToTrackedPaths(diffOutput.deleted || []).filter(
-        path => !this.state.notInCache.has(path)
-      )
+      [...deletedWithChildren].filter(path => !this.state.notInCache.has(path))
     )
   }
 
@@ -229,21 +247,43 @@ export class RepositoryModel
     this.state.renamed = new Set(
       diffOutput.renamed
         ?.map(renamed => this.getAbsolutePath(renamed?.path?.new))
-        .filter(path => this.state.tracked.has(path))
+        .filter(path => this.isTracked(path))
     )
 
     this.setComplexStatuses(diffOutput, statusOutput)
   }
 
   private updateTracked(listOutput: ListOutput[]): void {
-    const trackedPaths = listOutput.map(tracked => tracked.path)
+    const trackedLeafs = new Set(
+      listOutput.map(tracked => join(this.dvcRoot, tracked.path))
+    )
+    const trackedNonLeafs = collectTrackedNonLeafs(this.dvcRoot, trackedLeafs)
 
-    const tracked = collectTracked(this.dvcRoot, trackedPaths)
-
-    if (!isEqual(tracked, this.state.tracked)) {
-      this.tree = collectTree(this.dvcRoot, trackedPaths)
+    if (
+      !sameContents(
+        [...trackedNonLeafs, ...trackedLeafs],
+        [...this.getTracked()]
+      )
+    ) {
+      this.state.trackedNonLeafs = trackedNonLeafs
+      this.state.trackedLeafs = trackedLeafs
+      this.collectTree()
     }
+  }
 
-    this.state.tracked = tracked
+  private getTracked() {
+    return new Set([...this.state.trackedNonLeafs, ...this.state.trackedLeafs])
+  }
+
+  private isTracked(path: string) {
+    return this.getTracked().has(path)
+  }
+
+  private collectTree() {
+    this.tree = collectTree(
+      this.dvcRoot,
+      this.state.trackedLeafs,
+      this.relTrackedOuts
+    )
   }
 }

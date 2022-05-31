@@ -9,21 +9,25 @@ describe('collectTree', () => {
   const makeAbsPath = (...paths: string[]): string => makeUri(...paths).fsPath
 
   it('should transform recursive list output into a tree', () => {
-    const paths = [
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
-      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
-      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
-      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
-      join('logs', 'acc.tsv'),
-      join('logs', 'loss.tsv'),
-      'model.pt'
-    ]
+    const paths = new Set([
+      makeAbsPath('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      makeAbsPath('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
+      makeAbsPath('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
+      makeAbsPath('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
+      makeAbsPath('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
+      makeAbsPath('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
+      makeAbsPath('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
+      makeAbsPath('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+      makeAbsPath('logs', 'acc.tsv'),
+      makeAbsPath('logs', 'loss.tsv'),
+      makeAbsPath('model.pt')
+    ])
 
-    const treeData = collectTree(dvcDemoPath, paths)
+    const treeData = collectTree(
+      dvcDemoPath,
+      paths,
+      new Set([join('data', 'MNIST', 'raw')])
+    )
 
     expect(treeData).toStrictEqual(
       new Map([
@@ -39,7 +43,7 @@ describe('collectTree', () => {
             {
               dvcRoot: dvcDemoPath,
               isDirectory: true,
-              isTracked: true,
+              isTracked: false,
               resourceUri: makeUri('logs')
             },
             {

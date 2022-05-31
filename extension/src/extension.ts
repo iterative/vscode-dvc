@@ -359,6 +359,7 @@ export class Extension extends Disposable implements IExtension {
     ])
 
     this.experiments.linkRepositories(this.plots)
+    this.experiments.linkRepositories(this.repositories)
 
     return Promise.all([
       this.repositories.isReady(),

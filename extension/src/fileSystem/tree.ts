@@ -17,7 +17,6 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { tryThenMaybeForce } from '../cli/actions'
-import { Flag } from '../cli/constants'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
@@ -27,7 +26,7 @@ import { warnOfConsequences } from '../vscode/modal'
 import { Response } from '../vscode/response'
 import { Resource } from '../repository/commands'
 import { WorkspaceRepositories } from '../repository/workspace'
-import { PathItem } from '../repository/model/collect'
+import { collectTrackedPaths, PathItem } from '../repository/model/collect'
 import { Title } from '../vscode/title'
 import { Disposable } from '../class/dispose'
 
@@ -242,12 +241,13 @@ export class TrackedExplorerTree
   }
 
   private tryThenForce(commandId: CommandId) {
-    return ({ dvcRoot, resourceUri, isTracked }: PathItem) => {
-      const relPath = relativeWithUri(dvcRoot, resourceUri)
-      const args = [dvcRoot, relPath]
-      if (!isTracked) {
-        args.push(Flag.RECURSIVE)
-      }
+    return async (pathItem: PathItem) => {
+      const { dvcRoot } = pathItem
+      const tracked = await collectTrackedPaths(pathItem, (path: string) =>
+        this.getRepoChildren(dvcRoot, path)
+      )
+      const args = [dvcRoot, ...tracked.sort()]
+
       return tryThenMaybeForce(this.internalCommands, commandId, ...args)
     }
   }

@@ -46,7 +46,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
       style={{ borderColor: revision.displayColor }}
       data-testid={`ribbon-${revision.id}`}
     >
-      <Tooltip content={<>{copyTooltip}</>} hideOnClick={false}>
+      <Tooltip content={<>{copyTooltip}</>} hideOnClick={false} delay={500}>
         <button className={styles.label} onClick={() => copyExp(exp)}>
           <span>{exp}</span>
           {revision.group && (
@@ -54,7 +54,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
           )}
         </button>
       </Tooltip>
-      <Tooltip content="Clear" placement="bottom">
+      <Tooltip content="Clear" placement="bottom" delay={500}>
         <button className={styles.clearButton} onClick={onClear}>
           <Icon icon={AllIcons.CLOSE} width={12} height={12} />
         </button>
