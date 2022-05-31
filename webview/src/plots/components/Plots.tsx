@@ -41,21 +41,18 @@ const PlotsContent = ({ state }: PlotsProps) => {
     }
   }, [zoomedInPlot])
 
-  const setZoomedInPlotWithLegend = (props?: VegaLiteProps) => {
-    removeLegendSuppression(props)
-    return setZoomedInPlot(props)
-  }
-
   const handleZoomInPlot = useCallback(
     (props: VegaLiteProps, id: string, refresh?: boolean) => {
       if (!refresh) {
-        setZoomedInPlotWithLegend(props)
+        setZoomedInPlot(removeLegendSuppression(props))
         zoomedInPlotId.current = id
         return
       }
 
       if (zoomedInPlotId.current === id) {
-        setZoomedInPlot(plot => (plot ? props : undefined))
+        setZoomedInPlot(plot =>
+          plot ? removeLegendSuppression(props) : undefined
+        )
       }
     },
     [setZoomedInPlot]

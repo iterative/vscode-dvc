@@ -185,3 +185,16 @@ MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
 
   fireEvent.click(plotButton)
 }
+
+export const CheckpointZoomedInPlot = Template.bind({})
+CheckpointZoomedInPlot.parameters = {
+  chromatic: { delay: 500 }
+}
+CheckpointZoomedInPlot.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  const plot = await canvas.findByText('summary.json:val_accuracy')
+
+  plot.scrollIntoView()
+
+  fireEvent.click(plot)
+}

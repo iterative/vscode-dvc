@@ -49,7 +49,7 @@ export const shouldUseVirtualizedGrid = (nbItems: number, size: PlotSize) =>
 export const removeLegendSuppression = (
   plotProps?: VegaLiteProps
 ): VegaLiteProps => {
-  const plot = plotProps as VegaLiteProps & {
+  const plot = { ...plotProps } as VegaLiteProps & {
     spec: {
       encoding?: {
         color?: { legend?: { disable?: boolean } }
@@ -57,7 +57,7 @@ export const removeLegendSuppression = (
     }
   }
   if (plot?.spec?.encoding?.color?.legend?.disable !== undefined) {
-    delete plot.spec.encoding.color.legend.disable
+    plot.spec.encoding.color.legend.disable = false
   }
   return plot
 }
