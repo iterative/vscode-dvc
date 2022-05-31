@@ -370,14 +370,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    border-right: 2px solid $bg-color;
+    border-right: 2px solid $header-border-color;
   }
 
   .headerCell {
     @extend .placeholderHeaderCell;
     color: $header-fg-color;
     text-align: center;
-    border-bottom: 2px solid $bg-color;
+    border-bottom: 2px solid $header-border-color;
     padding: 0.31rem $cell-padding;
   }
 
