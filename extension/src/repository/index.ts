@@ -5,6 +5,7 @@ import { RepositoryModel } from './model'
 import { SourceControlManagement } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
+import { Experiments } from '../experiments'
 
 export const RepositoryScale = {
   TRACKED: 'tracked'
@@ -61,6 +62,16 @@ export class Repository extends DeferredDisposable {
 
   public getScale() {
     return { tracked: this.getState().tracked.size }
+  }
+
+  public setExperiments(experiments: Experiments) {
+    this.dispose.track(
+      experiments.onDidChangeExperiments(data => {
+        if (data) {
+          this.model.transformAndSetExperiments(data)
+        }
+      })
+    )
   }
 
   private async initialize() {

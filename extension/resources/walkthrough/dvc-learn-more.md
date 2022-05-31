@@ -1,4 +1,4 @@
-# DVC CLI - Resources
+# More Resources
 
 - Get started with our [guide](https://dvc.org/doc/start).
 
@@ -11,6 +11,8 @@
 - Check out the [DVC github repository](https://github.com/iterative/dvc) or an
   [example project](https://github.com/iterative/example-get-started).
 
+- Explore our [free course](https://learn.iterative.ai/).
+
 - Read our [blog](https://dvc.org/blog).
 
-- Meet the [community](https://dvc.org/community).
+- Meet the [Community](https://dvc.org/community).

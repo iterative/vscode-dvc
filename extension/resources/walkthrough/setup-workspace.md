@@ -7,9 +7,9 @@ You will need a `DVC` project opened within the workspace to see all of the
 extension's available features. See the `Explore More Resources` step for
 details on creating a `DVC` project.
 
-Use the workspace setup wizard to set the required config options. See the
-welcome view underneath the `DVC Tracked` view in the side bar's explorer view
-container or [DVC: Setup The Workspace](command:dvc.setupWorkspace) from the
-command palette.
+Use the workspace setup wizard to set the required config options.
 
 Once completed, the rest of the walkthrough will appear.
+
+The wizard can be accessed by clicking [here](command:dvc.setupWorkspace) or use
+`DVC: Setup The Workspace` from the Command Palette.
