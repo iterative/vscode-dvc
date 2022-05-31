@@ -1553,7 +1553,8 @@ describe('App', () => {
       const ribbon = screen.getByTestId('ribbon')
 
       const revisionBlocks = within(ribbon).getAllByRole('listitem')
-      revisionBlocks.shift()
+      revisionBlocks.shift() // Remove filter button
+      revisionBlocks.shift() // Remove refresh all
       const revisions = revisionBlocks.map(item => item.textContent)
       expect(revisions).toStrictEqual(
         comparisonTableFixture.revisions.map(rev =>
@@ -1606,6 +1607,27 @@ describe('App', () => {
       expect(mockPostMessage).toBeCalledWith({
         type: MessageFromWebviewType.SELECT_EXPERIMENTS
       })
+    })
+
+    it('should send messages to refresh each revision when clicking the refresh all button', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+
+      const refreshAllButton = within(
+        screen.getByTestId('ribbon')
+      ).getAllByRole('button')[1]
+
+      fireEvent.click(refreshAllButton)
+
+      expect(mockPostMessage).toHaveBeenNthCalledWith(
+        comparisonTableFixture.revisions.length,
+        {
+          payload: expect.any(String),
+          type: MessageFromWebviewType.REFRESH_REVISION
+        }
+      )
     })
 
     describe('Copy button', () => {

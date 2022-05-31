@@ -21,6 +21,15 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
     })
   }
 
+  const refreshRevisions = () => {
+    for (const revision of revisions) {
+      sendMessage({
+        payload: revision.revision,
+        type: MessageFromWebviewType.REFRESH_REVISION
+      })
+    }
+  }
+
   const selectRevisions = () => {
     sendMessage({
       type: MessageFromWebviewType.SELECT_EXPERIMENTS
@@ -34,6 +43,14 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
           onClick={selectRevisions}
           icon={AllIcons.LINES}
           text={`${revisions.length} of ${MAX_NB_EXP}`}
+        />
+      </li>
+      <li className={styles.addButtonWrapper}>
+        <IconButton
+          onClick={refreshRevisions}
+          icon={AllIcons.REFRESH}
+          text="Refresh All"
+          appearance="secondary"
         />
       </li>
       {revisions.map(revision => (
