@@ -533,3 +533,18 @@ export const collectSelectedTemplatePlots = (
   }
   return acc.length > 0 ? acc : undefined
 }
+
+export const collectBranchRevisionDetails = (
+  branchShas: {
+    id: string
+    sha: string | undefined
+  }[]
+) => {
+  const branchRevisions: Record<string, string> = {}
+  for (const { id, sha } of branchShas) {
+    if (sha) {
+      branchRevisions[id] = sha
+    }
+  }
+  return branchRevisions
+}
