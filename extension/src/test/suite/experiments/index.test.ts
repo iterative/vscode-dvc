@@ -397,7 +397,7 @@ suite('Experiments Test Suite', () => {
       const mockShowTextDocument = stub(window, 'showTextDocument')
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockColumnId = 'params:params.yaml:lr'
+      const mockColumnId = 'params:params.yaml_5'
 
       mockMessageReceived.fire({
         payload: mockColumnId,
@@ -407,6 +407,28 @@ suite('Experiments Test Suite', () => {
       expect(mockShowTextDocument).to.be.calledOnce
       expect(mockShowTextDocument).to.be.calledWithExactly(
         Uri.file(join(dvcDemoPath, 'params.yaml')),
+        {
+          viewColumn: ViewColumn.Beside
+        }
+      )
+    })
+
+    it('should be able to handle a message to open different params files than the default one', async () => {
+      const { experiments } = setupExperimentsAndMockCommands()
+
+      const mockShowTextDocument = stub(window, 'showTextDocument')
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockColumnId = 'params:params_alt.json_5:nested1.nested2'
+
+      mockMessageReceived.fire({
+        payload: mockColumnId,
+        type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
+      })
+
+      expect(mockShowTextDocument).to.be.calledOnce
+      expect(mockShowTextDocument).to.be.calledWithExactly(
+        Uri.file(join(dvcDemoPath, 'params_alt.json')),
         {
           viewColumn: ViewColumn.Beside
         }
