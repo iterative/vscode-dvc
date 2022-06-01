@@ -379,6 +379,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     text-align: center;
     border-bottom: 2px solid $header-border-color;
     padding: 0.31rem $cell-padding;
+
+    &.leafHeader {
+      border-bottom: none;
+    }
   }
 
   .sortingHeaderCellAsc {
