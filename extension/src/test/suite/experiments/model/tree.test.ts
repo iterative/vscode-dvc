@@ -520,11 +520,6 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to remove multiple experiments with dvc.views.experimentsTree.removeExperiment', async () => {
       const mockExperimentId = 'exp-removed'
-      const mockExperiment = {
-        dvcRoot: dvcDemoPath,
-        id: mockExperimentId,
-        type: ExperimentType.EXPERIMENT
-      }
       const mockQueuedExperimentLabel = 'queued-removed'
 
       const mockExperimentRemove = stub(
@@ -555,10 +550,11 @@ suite('Experiments Tree Test Suite', () => {
         }
       ])
 
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TREE_REMOVE,
-        mockExperiment
-      )
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
+        dvcRoot: dvcDemoPath,
+        id: mockExperimentId,
+        type: ExperimentType.EXPERIMENT
+      })
 
       expect(mockExperimentRemove).to.be.calledWithExactly(
         dvcDemoPath,
