@@ -490,6 +490,32 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
+    it('should be able to remove the provided experiment with dvc.views.experimentsTree.removeExperiment (if no experiments are selected)', async () => {
+      const mockExperiment = 'exp-to-remove'
+
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      ).resolves('')
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (ExperimentsTree as any).prototype,
+        'getSelectedExperimentItems'
+      ).returns([])
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
+        dvcRoot: dvcDemoPath,
+        id: mockExperiment,
+        type: ExperimentType.EXPERIMENT
+      })
+
+      expect(mockExperimentRemove).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperiment
+      )
+    })
+
     it('should be able to remove multiple experiments with dvc.views.experimentsTree.removeExperiment', async () => {
       const mockExperiment = 'exp-removed'
       const mockQueuedExperiment = 'queued-removed'
@@ -512,7 +538,7 @@ suite('Experiments Tree Test Suite', () => {
         },
         {
           dvcRoot: dvcDemoPath,
-          id: mockQueuedExperiment,
+          label: mockQueuedExperiment,
           type: ExperimentType.QUEUED
         },
         {

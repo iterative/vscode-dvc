@@ -317,23 +317,36 @@ const initializeAccumulatorRoot = (
   }
 }
 
+const collectExperimentItem = (
+  acc: { [dvcRoot: string]: string[] },
+  deletable: Set<string>,
+  experimentItem: ExperimentItem
+) => {
+  const { dvcRoot, type, id, label } = experimentItem
+  if (!deletable.has(type)) {
+    return
+  }
+  initializeAccumulatorRoot(acc, dvcRoot)
+  if (type === ExperimentType.QUEUED) {
+    acc[dvcRoot].push(label)
+    return
+  }
+
+  acc[dvcRoot].push(id)
+}
+
 export const collectDeletable = (
   experimentItems: (string | ExperimentItem)[]
 ): { [dvcRoot: string]: string[] } => {
   const deletable = new Set([ExperimentType.EXPERIMENT, ExperimentType.QUEUED])
 
   const acc: Record<string, string[]> = {}
-  for (const exp of experimentItems) {
-    if (typeof exp === 'string') {
+  for (const experimentItem of experimentItems) {
+    if (typeof experimentItem === 'string') {
       continue
     }
 
-    const { dvcRoot, type, id } = exp
-    if (!deletable.has(type)) {
-      continue
-    }
-    initializeAccumulatorRoot(acc, dvcRoot)
-    acc[dvcRoot].push(id)
+    collectExperimentItem(acc, deletable, experimentItem)
   }
 
   return acc

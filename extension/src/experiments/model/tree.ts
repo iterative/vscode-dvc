@@ -169,16 +169,18 @@ export class ExperimentsTree
 
     internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_REMOVE,
-      async () => {
+      async experimentItem => {
         const selected = this.getSelectedExperimentItems()
 
-        const deletable = collectDeletable(selected)
+        const deletable = collectDeletable(
+          definedAndNonEmpty(selected) ? selected : [experimentItem]
+        )
 
-        for (const [dvcRoot, expNames] of Object.entries(deletable)) {
+        for (const [dvcRoot, ids] of Object.entries(deletable)) {
           await this.experiments.runCommand(
             AvailableCommands.EXPERIMENT_REMOVE,
             dvcRoot,
-            ...uniqueValues(expNames)
+            ...uniqueValues(ids)
           )
         }
       }
