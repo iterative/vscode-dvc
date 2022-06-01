@@ -308,17 +308,19 @@ export const collectMutableRevisions = (
   return uniqueValues(acc)
 }
 
+type DeletableExperimentAccumulator = { [dvcRoot: string]: Set<string> }
+
 const initializeAccumulatorRoot = (
-  acc: Record<string, (string | ExperimentItem)[]>,
+  acc: DeletableExperimentAccumulator,
   dvcRoot: string
 ) => {
   if (!acc[dvcRoot]) {
-    acc[dvcRoot] = []
+    acc[dvcRoot] = new Set<string>()
   }
 }
 
 const collectExperimentItem = (
-  acc: { [dvcRoot: string]: string[] },
+  acc: DeletableExperimentAccumulator,
   deletable: Set<string>,
   experimentItem: ExperimentItem
 ) => {
@@ -328,19 +330,19 @@ const collectExperimentItem = (
   }
   initializeAccumulatorRoot(acc, dvcRoot)
   if (type === ExperimentType.QUEUED) {
-    acc[dvcRoot].push(label)
+    acc[dvcRoot].add(label)
     return
   }
 
-  acc[dvcRoot].push(id)
+  acc[dvcRoot].add(id)
 }
 
 export const collectDeletable = (
   experimentItems: (string | ExperimentItem)[]
-): { [dvcRoot: string]: string[] } => {
+): DeletableExperimentAccumulator => {
   const deletable = new Set([ExperimentType.EXPERIMENT, ExperimentType.QUEUED])
 
-  const acc: Record<string, string[]> = {}
+  const acc: DeletableExperimentAccumulator = {}
   for (const experimentItem of experimentItems) {
     if (typeof experimentItem === 'string') {
       continue

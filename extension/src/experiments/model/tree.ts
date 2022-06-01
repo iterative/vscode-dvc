@@ -13,7 +13,7 @@ import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { definedAndNonEmpty, uniqueValues } from '../../util/array'
+import { definedAndNonEmpty } from '../../util/array'
 import { createTreeView, getRootItem } from '../../vscode/tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
@@ -170,17 +170,15 @@ export class ExperimentsTree
     internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_REMOVE,
       async experimentItem => {
-        const selected = this.getSelectedExperimentItems()
+        const selected = [...this.getSelectedExperimentItems(), experimentItem]
 
-        const deletable = collectDeletable(
-          definedAndNonEmpty(selected) ? selected : [experimentItem]
-        )
+        const deletable = collectDeletable(selected)
 
         for (const [dvcRoot, ids] of Object.entries(deletable)) {
           await this.experiments.runCommand(
             AvailableCommands.EXPERIMENT_REMOVE,
             dvcRoot,
-            ...uniqueValues(ids)
+            ...ids
           )
         }
       }
