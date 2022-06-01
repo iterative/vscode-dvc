@@ -519,7 +519,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a manual refresh message from the webview', async () => {
+    it('should handle a message to manually refresh a revision from the webview', async () => {
       const { data, plots, plotsModel, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture
@@ -548,11 +548,51 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-        undefined,
+        { revisions: 1 },
         undefined
       )
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'main')
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to manually refresh all visible plots from the webview', async () => {
+      const { data, plots, mockPlotsDiff } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+      mockPlotsDiff.resetHistory()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const dataUpdateEvent = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      mockMessageReceived.fire({
+        payload: ['1ba7bcd', '42b8736', '4fb124a', 'main', 'workspace'],
+        type: MessageFromWebviewType.REFRESH_REVISIONS
+      })
+
+      await dataUpdateEvent
+
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_MANUAL_REFRESH,
+        { revisions: 5 },
+        undefined
+      )
+      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        '1ba7bcd',
+        '42b8736',
+        '4fb124a',
+        'main',
+        'workspace'
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to make the plots webview visible', async () => {
