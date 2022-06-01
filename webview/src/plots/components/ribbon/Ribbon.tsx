@@ -21,14 +21,11 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
     })
   }
 
-  const refreshRevisions = () => {
-    for (const revision of revisions) {
-      sendMessage({
-        payload: revision.revision,
-        type: MessageFromWebviewType.REFRESH_REVISION
-      })
-    }
-  }
+  const refreshRevisions = () =>
+    sendMessage({
+      payload: revisions.map(({ revision }) => revision),
+      type: MessageFromWebviewType.REFRESH_REVISIONS
+    })
 
   const selectRevisions = () => {
     sendMessage({

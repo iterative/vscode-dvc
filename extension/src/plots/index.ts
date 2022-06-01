@@ -267,7 +267,9 @@ export class Plots extends BaseRepository<TPlotsData> {
           case MessageFromWebviewType.SELECT_EXPERIMENTS:
             return this.selectExperimentsFromWebview()
           case MessageFromWebviewType.REFRESH_REVISION:
-            return this.attemptToRefreshData(message.payload)
+            return this.attemptToRefreshRevData(message.payload)
+          case MessageFromWebviewType.REFRESH_REVISIONS:
+            return this.attemptToRefreshSelectedData(message.payload)
           case MessageFromWebviewType.TOGGLE_EXPERIMENT:
             return this.setExperimentStatus(message.payload)
           default:
@@ -364,13 +366,26 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
   }
 
-  private attemptToRefreshData(revision: string) {
-    Toast.infoWithOptions(`Attempting to refresh ${revision} plots data.`)
+  private attemptToRefreshRevData(revision: string) {
+    Toast.infoWithOptions(`Attempting to refresh plots data for ${revision}.`)
     this.plots?.setupManualRefresh(revision)
     this.data.managedUpdate()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-      undefined,
+      { revisions: 1 },
+      undefined
+    )
+  }
+
+  private attemptToRefreshSelectedData(revisions: string[]) {
+    Toast.infoWithOptions('Attempting to refresh visible plots data.')
+    for (const revision of revisions) {
+      this.plots?.setupManualRefresh(revision)
+    }
+    this.data.managedUpdate()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_MANUAL_REFRESH,
+      { revisions: revisions.length },
       undefined
     )
   }
