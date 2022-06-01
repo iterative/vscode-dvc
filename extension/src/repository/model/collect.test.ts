@@ -1,11 +1,12 @@
 import { join } from 'path'
 import { Uri } from 'vscode'
-import { collectTree } from './collect'
+import { collectSelected, collectTree } from './collect'
 import { dvcDemoPath } from '../../test/util'
 
+const makeUri = (...paths: string[]): Uri =>
+  Uri.file(join(dvcDemoPath, ...paths))
+
 describe('collectTree', () => {
-  const makeUri = (...paths: string[]): Uri =>
-    Uri.file(join(dvcDemoPath, ...paths))
   const makeAbsPath = (...paths: string[]): string => makeUri(...paths).fsPath
 
   it('should transform recursive list output into a tree', () => {
@@ -188,5 +189,35 @@ describe('collectTree', () => {
         ]
       ])
     )
+  })
+})
+
+describe('collectSelected', () => {
+  it('should exclude all children from the final list', () => {
+    const logsPathItem = {
+      dvcRoot: dvcDemoPath,
+      isDirectory: true,
+      isTracked: true,
+      resourceUri: makeUri('logs')
+    }
+
+    const selected = collectSelected([
+      {
+        dvcRoot: dvcDemoPath,
+        isDirectory: false,
+        isTracked: true,
+        resourceUri: makeUri('logs', 'loss.tsv')
+      },
+      {
+        dvcRoot: dvcDemoPath,
+        isDirectory: false,
+        isTracked: true,
+        resourceUri: makeUri('logs', 'acc.tsv')
+      },
+      logsPathItem
+    ])
+    expect(selected).toStrictEqual({
+      [dvcDemoPath]: [logsPathItem]
+    })
   })
 })
