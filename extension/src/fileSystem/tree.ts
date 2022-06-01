@@ -41,7 +41,7 @@ export class TrackedExplorerTree
 {
   public readonly onDidChangeTreeData: Event<void>
 
-  private readonly treeView: TreeView<string | PathItem>
+  private readonly view: TreeView<string | PathItem>
   private readonly internalCommands: InternalCommands
   private readonly repositories: WorkspaceRepositories
 
@@ -63,7 +63,7 @@ export class TrackedExplorerTree
 
     this.onDidChangeTreeData = repositories.treeDataChanged.event
 
-    this.treeView = this.dispose.track(
+    this.view = this.dispose.track(
       createTreeView<PathItem>('dvc.views.trackedExplorerTree', this, true)
     )
   }
@@ -272,6 +272,6 @@ export class TrackedExplorerTree
   }
 
   private getSelectedPathItems() {
-    return [...this.treeView.selection]
+    return [...this.view.selection]
   }
 }
