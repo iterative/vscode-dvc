@@ -1,6 +1,6 @@
 {
   "displayName": "DVC",
-  "description": "Integrates an Open-source Version Control System for Machine Learning Projects into VS Code.",
+  "description": "Machine learning experiment management with tracking, plots, and data versioning.",
   "command.addExperimentsTableFilter": "Add Filter To Experiments Table",
   "command.addExperimentsTableSort": "Add Or Update Sort On Experiments Table",
   "command.addTarget": "Add Target",
