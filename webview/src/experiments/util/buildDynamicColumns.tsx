@@ -14,7 +14,7 @@ import Tooltip, {
 } from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/table/styles.module.scss'
 import tooltipStyles from '../../shared/components/tooltip/styles.module.scss'
-import { CopyButton } from '../components/copyButton/CopyButton'
+import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
 const UndefinedCell = (
   <div className={styles.innerCell}>
@@ -63,7 +63,11 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
       delay={[CELL_TOOLTIP_DELAY, 0]}
     >
       <div className={styles.innerCell}>
-        <CopyButton value={stringValue} />
+        <CopyButton
+          value={stringValue}
+          className={styles.copyButton}
+          tooltip="Copy cell contents"
+        />
         <span className={styles.cellContents}>{displayValue}</span>
       </div>
     </Tooltip>

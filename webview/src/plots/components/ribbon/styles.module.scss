@@ -1,5 +1,9 @@
 @import '../../../shared/variables.scss';
 
+.copyButton {
+  display: none;
+}
+
 .block {
   border-left-style: solid;
   border-left-width: 3px;
@@ -16,6 +20,11 @@
     fill: $fg-color;
     display: block;
   }
+
+  &:hover .copyButton {
+    display: inline;
+    font-size: 0.8125rem;
+  }
 }
 
 .label {
@@ -24,10 +33,14 @@
   border: none;
   text-align: left;
   color: $fg-color;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-  span {
-    display: block;
-  }
+.title {
+  display: inline-flex;
+  align-items: center;
 }
 
 .subtitle {

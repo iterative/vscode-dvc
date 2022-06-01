@@ -455,18 +455,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .copyButton {
-  flex: 0 0 0.8em;
-  font-size: 1.5em;
   display: none;
-  border: none;
-  background: none;
-  color: $fg-color;
-  cursor: pointer;
-  width: 0.8em;
-  height: 0.8em;
-  line-height: 0.8em;
-  padding: 0;
-  margin: 0 0.25em;
 }
 
 .cellContents {
