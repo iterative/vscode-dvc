@@ -22,7 +22,6 @@ import {
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
-import { pushIf } from '../../../util/array'
 
 export const ColumnDragHandle: React.FC<{
   disabled: boolean
@@ -202,17 +201,16 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = [
       {
+        hidden: !!column.headers,
         id: 'hide-column',
         label: 'Hide Column',
         message: {
           payload: column.id,
           type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
         }
-      }
-    ]
-
-    pushIf(menuOptions, column.group === ColumnType.PARAMS, [
+      },
       {
+        hidden: column.group !== ColumnType.PARAMS,
         id: 'open-to-the-side',
         label: 'Open to the Side',
         message: {
@@ -220,7 +218,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
         }
       }
-    ])
+    ]
 
     return menuOptions
   }, [column])
