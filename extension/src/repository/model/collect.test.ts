@@ -200,6 +200,20 @@ describe('collectSelected', () => {
     resourceUri: makeUri('logs')
   }
 
+  const accPathItem = {
+    dvcRoot: dvcDemoPath,
+    isDirectory: false,
+    isTracked: true,
+    resourceUri: makeUri('logs', 'acc.tsv')
+  }
+
+  const lossPathItem = {
+    dvcRoot: dvcDemoPath,
+    isDirectory: false,
+    isTracked: true,
+    resourceUri: makeUri('logs', 'loss.tsv')
+  }
+
   it('should return an empty object if no path items are provided', () => {
     expect(collectSelected([])).toStrictEqual({})
   })
@@ -213,38 +227,23 @@ describe('collectSelected', () => {
   })
 
   it('should return a root given it is select', () => {
-    const selected = collectSelected([
-      dvcDemoPath,
-      logsPathItem,
-      {
-        dvcRoot: dvcDemoPath,
-        isDirectory: false,
-        isTracked: true,
-        resourceUri: makeUri('logs', 'acc.tsv')
-      }
-    ])
+    const selected = collectSelected([dvcDemoPath, logsPathItem, accPathItem])
 
     expect(selected).toStrictEqual({
       [dvcDemoPath]: [dvcDemoPath]
     })
   })
 
+  it('should return siblings if a parent is not provided', () => {
+    const selected = collectSelected([accPathItem, lossPathItem])
+
+    expect(selected).toStrictEqual({
+      [dvcDemoPath]: [accPathItem, lossPathItem]
+    })
+  })
+
   it('should exclude all children from the final list', () => {
-    const selected = collectSelected([
-      {
-        dvcRoot: dvcDemoPath,
-        isDirectory: false,
-        isTracked: true,
-        resourceUri: makeUri('logs', 'loss.tsv')
-      },
-      {
-        dvcRoot: dvcDemoPath,
-        isDirectory: false,
-        isTracked: true,
-        resourceUri: makeUri('logs', 'acc.tsv')
-      },
-      logsPathItem
-    ])
+    const selected = collectSelected([lossPathItem, accPathItem, logsPathItem])
 
     expect(selected).toStrictEqual({
       [dvcDemoPath]: [logsPathItem]
