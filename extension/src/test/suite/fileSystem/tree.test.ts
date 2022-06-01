@@ -32,6 +32,7 @@ import { buildExperiments } from '../experiments/util'
 import { Repository } from '../../../repository'
 import expShowFixture from '../../fixtures/expShow/output'
 import { WorkspaceRepositories } from '../../../repository/workspace'
+import { TrackedExplorerTree } from '../../../fileSystem/tree'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   const { join } = path
@@ -354,16 +355,18 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       stub(WorkspaceRepositories.prototype, 'getRepository').returns(repository)
       stub(WorkspaceRepositories.prototype, 'isReady').resolves(undefined)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([getPathItem('data', false)])
       const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
 
       await Promise.all([repository.isReady(), experimentDataUpdatedEvent])
 
-      await commands.executeCommand(
-        RegisteredCliCommands.PULL_TARGET,
-        getPathItem('data', false)
-      )
+      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET)
 
       expect(mockPull).to.be.calledOnce
       expect(mockPull).to.be.calledWithExactly(
@@ -381,11 +384,13 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([getPathItem(relPath)])
 
-      await commands.executeCommand(
-        RegisteredCliCommands.PULL_TARGET,
-        getPathItem(relPath)
-      )
+      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET)
 
       expect(mockPull).to.be.calledOnce
     })
@@ -407,10 +412,13 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand(
-        RegisteredCliCommands.PULL_TARGET,
-        getPathItem(relPath)
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([getPathItem(relPath)])
+
+      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET)
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
@@ -426,10 +434,13 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target pushed'
       )
 
-      await commands.executeCommand(
-        RegisteredCliCommands.PUSH_TARGET,
-        getPathItem(relPath)
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([getPathItem(relPath)])
+
+      await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET)
 
       expect(mockPush).to.be.calledOnce
     })
@@ -450,10 +461,13 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand(
-        RegisteredCliCommands.PUSH_TARGET,
-        getPathItem(relPath)
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([getPathItem(relPath)])
+
+      await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET)
 
       expect(mockShowWarningMessage).to.be.calledWith(
         'I AM AN ERROR. \n\nWould you like to force this action?',

@@ -135,11 +135,15 @@ export const collectTrackedOuts = (data: ExperimentsOutput): Set<string> => {
 }
 
 export const collectTrackedPaths = async (
-  { dvcRoot, resourceUri, isTracked }: PathItem,
+  pathItem: string | PathItem,
   getChildren: (path: string) => Promise<PathItem[]>
 ): Promise<string[]> => {
-  const acc = []
+  const acc: string[] = []
+  if (typeof pathItem === 'string') {
+    return acc
+  }
 
+  const { dvcRoot, resourceUri, isTracked } = pathItem
   if (isTracked) {
     acc.push(relativeWithUri(dvcRoot, resourceUri))
     return acc
@@ -147,6 +151,62 @@ export const collectTrackedPaths = async (
   const children = await getChildren(resourceUri.fsPath)
   for (const child of children) {
     acc.push(...(await collectTrackedPaths(child, getChildren)))
+  }
+  return acc
+}
+
+const collectSelectedDirectories = (
+  pathItems: (string | PathItem)[]
+): string[] =>
+  pathItems
+    .map(pathItem => {
+      if (typeof pathItem === 'string') {
+        return pathItem
+      }
+      return pathItem.isDirectory ? pathItem.resourceUri.fsPath : undefined
+    })
+    .filter(Boolean) as string[]
+
+const parentIsSelected = (fsPath: string, allDirectories: string[]) => {
+  for (const directory of allDirectories.filter(
+    directory => directory !== fsPath
+  )) {
+    if (fsPath.includes(directory)) {
+      return true
+    }
+  }
+  return false
+}
+
+const initializeAccumulatorRoot = (
+  acc: Record<string, (string | PathItem)[]>,
+  dvcRoot: string
+) => {
+  if (!acc[dvcRoot]) {
+    acc[dvcRoot] = []
+  }
+}
+
+export const collectSelected = (
+  pathItems: (string | PathItem)[]
+): Record<string, (string | PathItem)[]> => {
+  const directories = collectSelectedDirectories(pathItems)
+
+  const acc: Record<string, (string | PathItem)[]> = {}
+  for (const pathItem of pathItems) {
+    if (typeof pathItem === 'string') {
+      initializeAccumulatorRoot(acc, pathItem)
+      acc[pathItem].push(pathItem)
+      continue
+    }
+    const { dvcRoot, resourceUri } = pathItem
+    const { fsPath } = resourceUri
+    initializeAccumulatorRoot(acc, dvcRoot)
+
+    if (parentIsSelected(fsPath, directories)) {
+      continue
+    }
+    acc[dvcRoot].push(pathItem)
   }
   return acc
 }
