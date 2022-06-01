@@ -1,4 +1,5 @@
 import { Memento } from 'vscode'
+import isEqual from 'lodash.isequal'
 import {
   collectCheckpointPlotsData,
   collectData,
@@ -9,12 +10,13 @@ import {
   collectTemplates,
   ComparisonData,
   RevisionData,
-  TemplateAccumulator
+  TemplateAccumulator,
+  collectBranchRevisionDetails
 } from './collect'
 import {
   CheckpointPlotData,
   ComparisonPlots,
-  ComparisonRevision,
+  Revision,
   ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NAMES,
@@ -187,13 +189,14 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getSelectedRevisionDetails() {
-    return reorderObjectList<ComparisonRevision>(
+    return reorderObjectList<Revision>(
       this.comparisonOrder,
       this.experiments
         .getSelectedRevisions()
-        .map(({ label: revision, displayColor, logicalGroupName }) => ({
+        .map(({ label: revision, displayColor, logicalGroupName, id }) => ({
           displayColor,
           group: logicalGroupName,
+          id,
           revision
         })),
       'revision'
@@ -314,15 +317,27 @@ export class PlotsModel extends ModelWithPersistence {
       revisions,
       this.revisionData
     )
+
+    for (const fetchedRev of this.fetchedRevs) {
+      if (!revisions.includes(fetchedRev)) {
+        this.fetchedRevs.delete(fetchedRev)
+      }
+    }
   }
 
   private removeStaleBranches() {
-    for (const { id, sha } of this.experiments.getBranchRevisions()) {
-      if (sha && this.branchRevisions[id] !== sha) {
+    const currentBranchRevisions = collectBranchRevisionDetails(
+      this.experiments.getBranchRevisions()
+    )
+    for (const id of Object.keys(this.branchRevisions)) {
+      if (this.branchRevisions[id] !== currentBranchRevisions[id]) {
         this.deleteRevisionData(id)
-        this.branchRevisions[id] = sha
       }
     }
+    if (!isEqual(this.branchRevisions, currentBranchRevisions)) {
+      this.deleteRevisionData('workspace')
+    }
+    this.branchRevisions = currentBranchRevisions
   }
 
   private deleteRevisionData(id: string) {

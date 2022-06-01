@@ -8,6 +8,7 @@ import { ZoomedInPlot } from './ZoomedInPlot'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
+import { Ribbon } from './ribbon/Ribbon'
 import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
@@ -117,40 +118,43 @@ const PlotsContent = ({ state }: PlotsProps) => {
   ) => section?.size || PlotSize.REGULAR
 
   return (
-    <DragDropProvider>
-      <PlotsSizeProvider
-        sizes={{
-          [Section.CHECKPOINT_PLOTS]: currentSizeOrRegular(checkpointPlots),
-          [Section.TEMPLATE_PLOTS]: currentSizeOrRegular(templatePlots),
-          [Section.COMPARISON_TABLE]: currentSizeOrRegular(comparisonTable)
-        }}
-      >
-        {templatePlots && (
-          <TemplatePlotsWrapper
-            templatePlots={templatePlots}
-            {...wrapperProps}
-          />
-        )}
-        {comparisonTable && (
-          <ComparisonTableWrapper
-            comparisonTable={comparisonTable}
-            {...wrapperProps}
-          />
-        )}
-        {checkpointPlots && (
-          <CheckpointPlotsWrapper
-            checkpointPlots={checkpointPlots}
-            {...wrapperProps}
-          />
-        )}
-      </PlotsSizeProvider>
+    <>
+      <Ribbon revisions={comparisonTable?.revisions || []} />
+      <DragDropProvider>
+        <PlotsSizeProvider
+          sizes={{
+            [Section.CHECKPOINT_PLOTS]: currentSizeOrRegular(checkpointPlots),
+            [Section.TEMPLATE_PLOTS]: currentSizeOrRegular(templatePlots),
+            [Section.COMPARISON_TABLE]: currentSizeOrRegular(comparisonTable)
+          }}
+        >
+          {templatePlots && (
+            <TemplatePlotsWrapper
+              templatePlots={templatePlots}
+              {...wrapperProps}
+            />
+          )}
+          {comparisonTable && (
+            <ComparisonTableWrapper
+              comparisonTable={comparisonTable}
+              {...wrapperProps}
+            />
+          )}
+          {checkpointPlots && (
+            <CheckpointPlotsWrapper
+              checkpointPlots={checkpointPlots}
+              {...wrapperProps}
+            />
+          )}
+        </PlotsSizeProvider>
+      </DragDropProvider>
 
       {zoomedInPlot && (
         <Modal onClose={handleModalClose}>
           <ZoomedInPlot props={zoomedInPlot} />
         </Modal>
       )}
-    </DragDropProvider>
+    </>
   )
 }
 

@@ -268,6 +268,8 @@ export class Plots extends BaseRepository<TPlotsData> {
             return this.selectExperimentsFromWebview()
           case MessageFromWebviewType.REFRESH_REVISION:
             return this.attemptToRefreshData(message.payload)
+          case MessageFromWebviewType.TOGGLE_EXPERIMENT:
+            return this.setExperimentStatus(message.payload)
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
@@ -348,6 +350,15 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.experiments?.selectExperiments()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
+      undefined,
+      undefined
+    )
+  }
+
+  private setExperimentStatus(id: string) {
+    this.experiments?.toggleExperimentStatus(id)
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE,
       undefined,
       undefined
     )
