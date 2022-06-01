@@ -3,6 +3,7 @@ import cx from 'classnames'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
+import { FilterDefinition } from 'dvc/src/experiments/model/filterBy'
 import { TableHeader } from './TableHeader'
 import styles from './styles.module.scss'
 import {
@@ -15,6 +16,7 @@ export const MergedHeaderGroups: React.FC<{
   headerGroup: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
+  filters: FilterDefinition[]
   orderedColumns: Column[]
   onDragUpdate: OnDragOver
   onDragStart: OnDragStart
@@ -22,6 +24,7 @@ export const MergedHeaderGroups: React.FC<{
 }> = ({
   headerGroup,
   sorts,
+  filters,
   columns,
   orderedColumns,
   onDragUpdate,
@@ -41,6 +44,7 @@ export const MergedHeaderGroups: React.FC<{
             column={column}
             columns={columns}
             sorts={sorts}
+            filters={filters}
             onDragOver={onDragUpdate}
             onDragStart={onDragStart}
             onDrop={onDragEnd}

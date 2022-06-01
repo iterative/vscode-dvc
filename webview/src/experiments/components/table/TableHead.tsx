@@ -3,6 +3,7 @@ import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import React, { useRef } from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { FilterDefinition } from 'dvc/src/experiments/model/filterBy'
 import styles from './styles.module.scss'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { useColumnOrder } from '../../hooks/useColumnOrder'
@@ -17,9 +18,11 @@ interface TableHeadProps {
   instance: TableInstance<Experiment>
   columns: Column[]
   sorts: SortDefinition[]
+  filters: FilterDefinition[]
 }
 
 export const TableHead: React.FC<TableHeadProps> = ({
+  filters,
   instance: {
     headerGroups,
     setColumnOrder,
@@ -90,6 +93,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
           headerGroup={headerGroup}
           columns={allHeaders}
           sorts={sorts}
+          filters={filters}
           onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}

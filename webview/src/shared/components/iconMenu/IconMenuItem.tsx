@@ -9,6 +9,7 @@ export interface IconMenuItemProps {
   onClick?: () => void
   onClickNode?: React.ReactNode
   tooltip: string
+  hidden?: boolean
 }
 
 export interface IconMenuItemAllProps extends IconMenuItemProps {

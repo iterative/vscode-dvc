@@ -52,6 +52,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   <Tooltip
     arrow
     trigger={'contextmenu'}
+    delay={[100, 200]}
     placement={'bottom'}
     interactive
     onTrigger={positionContextMenuAndDisableEvents}

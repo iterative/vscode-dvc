@@ -440,6 +440,7 @@ export class Experiments extends BaseRepository<TableData> {
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
+      filters: this.experiments.getFilters(),
       hasCheckpoints: this.hasCheckpoints(),
       hasColumns: this.columns.hasColumns(),
       hasRunningExperiment: this.experiments.hasRunningExperiment(),

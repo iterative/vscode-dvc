@@ -281,6 +281,7 @@ const deeplyNestedTableData: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
+  filters: [],
   hasCheckpoints: false,
   hasRunningExperiment: false,
   sorts: [

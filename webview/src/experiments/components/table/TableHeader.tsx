@@ -4,13 +4,13 @@ import {
   Column,
   ColumnType
 } from 'dvc/src/experiments/webview/contract'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
+import { FilterDefinition } from 'dvc/src/experiments/model/filterBy'
 import styles from './styles.module.scss'
-import { SortOrder, SortPicker } from './SortPicker'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { sendMessage } from '../../../shared/vscode'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
@@ -22,6 +22,15 @@ import {
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
+import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
+import { IconMenuItemProps } from '../../../shared/components/iconMenu/IconMenuItem'
+import { AllIcons } from '../../../shared/components/Icon'
+
+export enum SortOrder {
+  ASCENDING = 'ascending',
+  DESCENDING = 'descending',
+  NONE = 'none'
+}
 
 export const ColumnDragHandle: React.FC<{
   disabled: boolean
@@ -63,10 +72,12 @@ export const ColumnDragHandle: React.FC<{
 const TableHeaderCell: React.FC<{
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
+  hasFilter: boolean
   orderedColumns: Column[]
   sortOrder: SortOrder
-  menuDisabled: boolean
-  menuContent: React.ReactNode
+  sortEnabled: boolean
+  menuDisabled?: boolean
+  menuContent?: React.ReactNode
   onDragOver: OnDragOver
   onDragStart: OnDragStart
   onDrop: OnDrop
@@ -74,7 +85,9 @@ const TableHeaderCell: React.FC<{
   column,
   columns,
   orderedColumns,
+  hasFilter,
   sortOrder,
+  sortEnabled,
   menuContent,
   menuDisabled,
   onDragOver,
@@ -106,6 +119,7 @@ const TableHeaderCell: React.FC<{
           [styles.depHeaderCell]: column.group === ColumnType.DEPS,
           [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
           [styles.leafHeader]: column.headers === undefined,
+          [styles.menuEnabled]: sortEnabled,
           ...sortingClasses()
         }
       )
@@ -114,16 +128,46 @@ const TableHeaderCell: React.FC<{
   const isDraggable =
     !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
 
+  const menuItems: IconMenuItemProps[] = [
+    {
+      hidden: !sortEnabled || sortOrder === SortOrder.NONE,
+      icon:
+        (sortOrder === SortOrder.DESCENDING && AllIcons.DOWN_ARROW) ||
+        AllIcons.UP_ARROW,
+      onClick: () => {},
+      tooltip: 'Sorted column'
+    },
+    {
+      hidden: !hasFilter,
+      icon: AllIcons.LINES,
+      onClick: () => {},
+      tooltip: 'Filtered column'
+    }
+  ]
+
+  const [menuSupressed, setMenuSupressed] = React.useState<boolean>(false)
+
   return (
-    <ContextMenu content={menuContent} disabled={menuDisabled}>
+    <ContextMenu
+      content={menuContent}
+      disabled={menuDisabled || menuSupressed}
+      onShow={() => {
+        return !column.isResizing
+      }}
+    >
       <div
         {...column.getHeaderProps(headerPropsArgs())}
         key={column.id}
         data-testid={`header-${column.id}`}
+        role={'columnheader'}
+        tabIndex={0}
       >
+        <div className={styles.iconMenu}>
+          <IconMenu items={menuItems} />
+        </div>
         <ColumnDragHandle
           column={column}
-          disabled={!isDraggable}
+          disabled={!isDraggable || menuSupressed}
           onDragOver={onDragOver}
           onDragStart={onDragStart}
           onDrop={onDrop}
@@ -131,6 +175,8 @@ const TableHeaderCell: React.FC<{
         {canResize && (
           <div
             {...column.getResizerProps()}
+            onMouseEnter={() => setMenuSupressed(true)}
+            onMouseLeave={() => setMenuSupressed(false)}
             className={styles.columnResizer}
             style={{ height: resizerHeight }}
           />
@@ -144,6 +190,7 @@ interface TableHeaderProps {
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
+  filters: FilterDefinition[]
   orderedColumns: Column[]
   onDragOver: OnDragOver
   onDragStart: OnDragStart
@@ -153,6 +200,7 @@ interface TableHeaderProps {
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
+  filters,
   sorts,
   orderedColumns,
   onDragOver,
@@ -161,6 +209,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 }) => {
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
+  const filter = filters.find(({ path }) => path === column.id)
   const isSortable =
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
@@ -175,30 +224,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 
     return possibleOrders[`${sort?.descending}`]
   })()
-
-  const removeColumnSort = () => {
-    sendMessage({
-      payload: column.id,
-      type: MessageFromWebviewType.REMOVE_COLUMN_SORT
-    })
-  }
-
-  const setColumnSort = (selectedSort: SortOrder) => {
-    if (selectedSort === SortOrder.NONE) {
-      removeColumnSort()
-      return
-    }
-
-    const payload: SortDefinition = {
-      descending: selectedSort === SortOrder.DESCENDING,
-      path: column.id
-    }
-
-    sendMessage({
-      payload,
-      type: MessageFromWebviewType.SORT_COLUMN
-    })
-  }
 
   const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = [
@@ -231,24 +256,50 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       columns={columns}
       orderedColumns={orderedColumns}
       sortOrder={sortOrder}
+      sortEnabled={isSortable}
+      hasFilter={!!filter}
       onDragOver={onDragOver}
       onDragStart={onDragStart}
       onDrop={onDrop}
       menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
       menuContent={
         <div>
-          {isSortable && (
-            <div>
-              <SortPicker
-                sortOrder={sortOrder}
-                setSelectedOrder={order => {
-                  setColumnSort(order)
-                }}
-              />
-              <VSCodeDivider />
-            </div>
-          )}
           <MessagesMenu options={contextMenuOptions} />
+          <VSCodeDivider />
+          <MessagesMenu
+            options={[
+              {
+                id: SortOrder.ASCENDING,
+                label: 'Sort Ascending',
+                message: {
+                  payload: {
+                    descending: false,
+                    path: column.id
+                  },
+                  type: MessageFromWebviewType.SORT_COLUMN
+                }
+              },
+              {
+                id: SortOrder.DESCENDING,
+                label: 'Sort Descending',
+                message: {
+                  payload: {
+                    descending: true,
+                    path: column.id
+                  },
+                  type: MessageFromWebviewType.SORT_COLUMN
+                }
+              },
+              {
+                id: SortOrder.NONE,
+                label: 'Remove Sort',
+                message: {
+                  payload: column.id,
+                  type: MessageFromWebviewType.REMOVE_COLUMN_SORT
+                }
+              }
+            ]}
+          />
         </div>
       }
     />

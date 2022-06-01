@@ -101,13 +101,24 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   tableData
 }) => {
   const { getTableProps, rows } = instance
-  const { sorts, columns, changes, hasCheckpoints, hasRunningExperiment } =
-    tableData
+  const {
+    filters,
+    sorts,
+    columns,
+    changes,
+    hasCheckpoints,
+    hasRunningExperiment
+  } = tableData
 
   return (
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
-        <TableHead instance={instance} sorts={sorts} columns={columns} />
+        <TableHead
+          instance={instance}
+          sorts={sorts}
+          filters={filters}
+          columns={columns}
+        />
         {rows.map(row => (
           <TableBody
             row={row}

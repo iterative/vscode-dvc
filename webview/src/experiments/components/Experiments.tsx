@@ -28,8 +28,8 @@ import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
-const DEFAULT_COLUMN_WIDTH = 75
-const MINIMUM_COLUMN_WIDTH = 50
+const DEFAULT_COLUMN_WIDTH = 90
+const MINIMUM_COLUMN_WIDTH = 90
 
 const timeFormatter = new Intl.DateTimeFormat([], {
   hour: '2-digit',
@@ -138,6 +138,7 @@ export const ExperimentsTable: React.FC<{
         columnOrder: [],
         columnWidths: {},
         columns: [],
+        filters: [],
         hasCheckpoints: false,
         hasColumns: false,
         hasRunningExperiment: false,
