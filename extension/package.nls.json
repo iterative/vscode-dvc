@@ -1,6 +1,6 @@
 {
   "displayName": "DVC",
-  "description": "DVC VS Code extension",
+  "description": "Integrates an Open-source Version Control System for Machine Learning Projects into VS Code.",
   "command.addExperimentsTableFilter": "Add Filter To Experiments Table",
   "command.addExperimentsTableSort": "Add Or Update Sort On Experiments Table",
   "command.addTarget": "Add Target",
