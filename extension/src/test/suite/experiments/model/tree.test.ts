@@ -24,10 +24,7 @@ import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
 import expShowFixture from '../../../fixtures/expShow/output'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { joinColumnPath } from '../../../../experiments/columns/paths'
-import {
-  ExperimentItem,
-  ExperimentsTree
-} from '../../../../experiments/model/tree'
+import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, buildSingleRepoExperiments } from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { InternalCommands } from '../../../../commands/internal'
@@ -42,6 +39,7 @@ import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ColumnType } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
+import { ExperimentItem } from '../../../../experiments/model/collect'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -472,14 +470,69 @@ suite('Experiments Tree Test Suite', () => {
         'experimentRemove'
       ).resolves('')
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
-        dvcRoot: dvcDemoPath,
-        id: mockExperiment
-      })
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (ExperimentsTree as any).prototype,
+        'getSelectedExperimentItems'
+      ).returns([
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperiment,
+          type: ExperimentType.EXPERIMENT
+        }
+      ])
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE)
 
       expect(mockExperimentRemove).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperiment
+      )
+    })
+
+    it('should be able to remove multiple experiments with dvc.views.experimentsTree.removeExperiment', async () => {
+      const mockExperiment = 'exp-removed'
+      const mockQueuedExperiment = 'queued-removed'
+
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      ).resolves('')
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (ExperimentsTree as any).prototype,
+        'getSelectedExperimentItems'
+      ).returns([
+        dvcDemoPath,
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperiment,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockQueuedExperiment,
+          type: ExperimentType.QUEUED
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'checkpoint-excluded',
+          type: ExperimentType.CHECKPOINT
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'workspace-excluded',
+          type: ExperimentType.WORKSPACE
+        }
+      ])
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE)
+
+      expect(mockExperimentRemove).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperiment,
+        mockQueuedExperiment
       )
     })
 
