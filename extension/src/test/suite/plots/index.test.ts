@@ -1,5 +1,6 @@
 import { join } from 'path'
 import merge from 'lodash.merge'
+import isEqual from 'lodash.isequal'
 import cloneDeep from 'lodash.clonedeep'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
@@ -18,11 +19,12 @@ import {
   getMockNow,
   getMessageReceivedEmitter
 } from '../util'
-import { dvcDemoPath } from '../../util'
+import { basePlotsUrl, dvcDemoPath } from '../../util'
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
   PlotSize,
+  PlotsType,
   Section,
   TemplatePlotGroup
 } from '../../../plots/webview/contract'
@@ -46,6 +48,7 @@ suite('Plots Test Suite', () => {
     return closeAllEditors()
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Plots', () => {
     it('should call plots diff once on instantiation with missing revisions if there are no plots', async () => {
       const { mockPlotsDiff, messageSpy, plots, data } = await buildPlots(
@@ -154,8 +157,105 @@ suite('Plots Test Suite', () => {
       await dataUpdateEvent
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'main')
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        'main',
+        'workspace'
+      )
     })
+
+    it('should re-fetch data when moving between branches', async () => {
+      const mockNow = getMockNow()
+      const { data, experiments, mockPlotsDiff, plots, plotsModel } =
+        await buildPlots(disposable, plotsDiffFixture)
+      mockPlotsDiff.resetHistory()
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockSendPlots = stub(plots as any, 'sendPlots')
+
+      mockPlotsDiff
+        .onFirstCall()
+        .resolves({
+          [join('plots', 'acc.png')]: [
+            {
+              revisions: ['workspace'],
+              type: PlotsType.IMAGE,
+              url: join(basePlotsUrl, 'workspace_plots_acc.png')
+            },
+            {
+              revisions: ['another-branch'],
+              type: PlotsType.IMAGE,
+              url: join(basePlotsUrl, 'another-branch_plots_acc.png')
+            }
+          ]
+        })
+        .onSecondCall()
+        .resolves(plotsDiffFixture)
+
+      const differentBranch = {
+        baseline: merge(
+          cloneDeep(
+            expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
+              '4fb124aebddb2adf1545030907687fa9a4c80e70'
+            ]
+          ),
+          { data: { name: 'another-branch' } }
+        )
+      }
+
+      const updatedExpShowFixture = {
+        '9235a02880a0372545e5f7f4d79a5d9eee6331ac': differentBranch,
+        workspace: differentBranch
+      }
+
+      const branchChangedEvent = new Promise(resolve =>
+        disposable.track(
+          data.onDidUpdate(() => {
+            if (plotsModel) {
+              resolve(undefined)
+            }
+          })
+        )
+      )
+      const plotsSentEvent = new Promise(resolve =>
+        mockSendPlots.callsFake(() => {
+          if (isEqual(plotsModel.getMissingRevisions(), [])) {
+            resolve(undefined)
+          }
+        })
+      )
+
+      bypassProcessManagerDebounce(mockNow)
+      experiments.setState(updatedExpShowFixture)
+
+      await branchChangedEvent
+      await plotsSentEvent
+
+      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        'another-branch',
+        'workspace'
+      )
+
+      bypassProcessManagerDebounce(mockNow, 2)
+      const dataUpdateEvent = new Promise(resolve =>
+        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      )
+
+      experiments.setState(expShowFixture)
+      await dataUpdateEvent
+
+      expect(mockPlotsDiff).to.be.calledTwice
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        '1ba7bcd',
+        '42b8736',
+        '4fb124a',
+        'main',
+        'workspace'
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should remove the temporary plots directory on dispose', async () => {
       const { mockRemoveDir, plots } = await buildPlots(
