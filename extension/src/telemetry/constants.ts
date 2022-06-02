@@ -205,7 +205,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
-  [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: undefined
+  [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: { revisions: number }
   [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
   [EventName.VIEWS_PLOTS_RENAME_SECTION]: { section: Section }
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined

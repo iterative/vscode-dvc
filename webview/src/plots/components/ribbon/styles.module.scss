@@ -24,6 +24,7 @@
   border: none;
   text-align: left;
   color: $fg-color;
+  min-width: max-content;
 
   span {
     display: block;
@@ -56,4 +57,10 @@
   border-bottom: 1px solid $border-color;
   padding: 10px 15px;
   margin: 0;
+  flex-wrap: wrap;
+}
+
+.addButtonWrapper {
+  background-color: $accent-color;
+  list-style: none;
 }
