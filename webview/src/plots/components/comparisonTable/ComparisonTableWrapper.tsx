@@ -2,7 +2,6 @@ import { PlotsComparisonData, Section } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { ComparisonTable } from './ComparisonTable'
 import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
-import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 interface ComparisonTableWrapper {
   comparisonTable: PlotsComparisonData
@@ -22,11 +21,7 @@ export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
       currentSize={size}
       {...basicContainerProps}
     >
-      {plots.length > 0 ? (
-        <ComparisonTable plots={plots} revisions={revisions} />
-      ) : (
-        <EmptyState isFullScreen={false}>No Revisions to Show</EmptyState>
-      )}
+      <ComparisonTable plots={plots} revisions={revisions} />
     </PlotsContainer>
   )
 }
