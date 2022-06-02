@@ -235,6 +235,16 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .tr {
     position: relative;
+    & > *:first-child {
+      background-color: $row-bg-color;
+      position: sticky;
+      left: 0;
+      z-index: 3;
+    }
+
+    &.oddRow > *:first-child {
+      background-color: $row-bg-alt-color;
+    }
   }
 
   .headerRow {
@@ -292,9 +302,19 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     margin: 0.5rem 0;
   }
   .normalRowGroup {
-    border: $row-border;
+    border-top: $row-border;
+    border-bottom: $row-border;
     .oddRow {
       background-color: $row-bg-alt-color;
+    }
+    .td {
+      &:first-child {
+        border-left: $row-border;
+      }
+
+      &:last-child {
+        border-right: $row-border;
+      }
     }
   }
   .workspaceRowGroup {
@@ -530,6 +550,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 .thead {
   position: sticky;
   top: 0;
-  z-index: 3;
+  z-index: 4;
   background-color: $bg-color;
 }
