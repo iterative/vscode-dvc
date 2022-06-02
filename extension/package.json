@@ -1248,6 +1248,10 @@
           "id": "dvc.views.plotsPathsTree",
           "name": "Plots",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "id": "dvc.views.support",
+          "name": "Support"
         }
       ]
     },
@@ -1295,6 +1299,11 @@
       {
         "view": "dvc.views.plotsPathsTree",
         "contents": "No Plots to Display."
+      },
+      {
+        "view": "dvc.views.support",
+        "contents": "[$(github) Github Issues](https://github.com/iterative/vscode-dvc/issues)\n[$(comment-discussion) Discord](https://discord.com/invite/dvwXA2N)",
+        "when": "true"
       }
     ],
     "walkthroughs": [
