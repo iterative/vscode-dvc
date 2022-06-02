@@ -8,7 +8,7 @@ import { isDirectory } from '../fileSystem'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
-jest.mock('../filesystem')
+jest.mock('../fileSystem')
 
 const mockedScm = jest.mocked(scm)
 const mockedDisposable = jest.mocked(Disposable)
