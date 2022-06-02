@@ -359,14 +359,17 @@ suite('Tracked Explorer Tree Test Suite', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (TrackedExplorerTree as any).prototype,
         'getSelectedPathItems'
-      ).returns([getPathItem('data', false)])
+      ).returns([])
       const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
 
       await Promise.all([repository.isReady(), experimentDataUpdatedEvent])
 
-      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET)
+      await commands.executeCommand(
+        RegisteredCliCommands.PULL_TARGET,
+        getPathItem('data', false)
+      )
 
       expect(mockPull).to.be.calledOnce
       expect(mockPull).to.be.calledWithExactly(
@@ -390,7 +393,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
-      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET)
+      await commands.executeCommand(
+        RegisteredCliCommands.PULL_TARGET,
+        getPathItem(relPath)
+      )
 
       expect(mockPull).to.be.calledOnce
     })
@@ -418,7 +424,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
-      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET)
+      await commands.executeCommand(
+        RegisteredCliCommands.PULL_TARGET,
+        getPathItem(relPath)
+      )
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
@@ -440,7 +449,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
-      await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET)
+      await commands.executeCommand(
+        RegisteredCliCommands.PUSH_TARGET,
+        getPathItem(relPath)
+      )
 
       expect(mockPush).to.be.calledOnce
     })
@@ -465,9 +477,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (TrackedExplorerTree as any).prototype,
         'getSelectedPathItems'
-      ).returns([getPathItem(relPath)])
+      ).returns([])
 
-      await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET)
+      await commands.executeCommand(
+        RegisteredCliCommands.PUSH_TARGET,
+        getPathItem(relPath)
+      )
 
       expect(mockShowWarningMessage).to.be.calledWith(
         'I AM AN ERROR. \n\nWould you like to force this action?',

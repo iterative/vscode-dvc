@@ -247,8 +247,11 @@ export class TrackedExplorerTree
   }
 
   private tryThenForce(commandId: CommandId) {
-    return async () => {
-      const selected = this.getSelected()
+    return async (pathItem: PathItem) => {
+      const selected = collectSelected([
+        ...this.getSelectedPathItems(),
+        pathItem
+      ])
 
       for (const [dvcRoot, pathItems] of Object.entries(selected)) {
         const tracked = []
@@ -265,10 +268,6 @@ export class TrackedExplorerTree
         await tryThenMaybeForce(this.internalCommands, commandId, ...args)
       }
     }
-  }
-
-  private getSelected() {
-    return collectSelected(this.getSelectedPathItems())
   }
 
   private getSelectedPathItems() {
