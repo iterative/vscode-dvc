@@ -7,9 +7,8 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
-This [extension](https://marketplace.visualstudio.com/VSCode) integrates [DVC
-features] right into the popular [VSCode IDE], allowing users of all levels to
-use DVC visually.
+This [extension] integrates [DVC features] right into the popular [VS Code IDE],
+allowing users of all levels to use DVC visually.
 
 > **Note**: We want early adopter feedback!  
 > Please let us know what you like and don't like about the extension. Feel free
@@ -17,7 +16,7 @@ use DVC visually.
 
 [extension]: https://marketplace.visualstudio.com/VSCode
 [dvc features]: https://dvc.org/doc/start
-[vscode ide]: https://code.visualstudio.com/
+[vs code ide]: https://code.visualstudio.com/
 [issues in this repo]: https://github.com/iterative/vscode-dvc/issues
 [dvc support channels]: https://dvc.org/support
 
