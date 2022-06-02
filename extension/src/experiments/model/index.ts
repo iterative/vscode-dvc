@@ -16,7 +16,7 @@ import {
   tooManySelected,
   UNSELECTED
 } from './status'
-import { collectFlatExperimentParams } from './queue/collect'
+import { collectFlatExperimentParams } from './modify/collect'
 import { Experiment, Row } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'

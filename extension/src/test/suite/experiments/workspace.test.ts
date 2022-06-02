@@ -20,7 +20,7 @@ import {
 } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
-import { Param } from '../../../experiments/model/queue/collect'
+import { Param } from '../../../experiments/model/modify/collect'
 import {
   QuickPickItemWithValue,
   QuickPickOptionsWithTitle
