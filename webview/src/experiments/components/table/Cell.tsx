@@ -39,7 +39,6 @@ export const FirstCell: React.FC<
     <div
       {...cell.getCellProps({
         className: cx(
-          styles.firstCell,
           styles.td,
           styles.experimentCell,
           isPlaceholder && styles.groupPlaceholder
