@@ -4,7 +4,7 @@ import { Columns } from '../../webview/contract'
 
 export type Param = {
   path: string
-  value: number | string | boolean
+  value: Value
 }
 
 const collectFromParamsFile = (

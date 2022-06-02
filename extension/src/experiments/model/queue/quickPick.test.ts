@@ -48,13 +48,16 @@ describe('pickAndModifyParams', () => {
     const unchanged = { path: 'params.yaml:learning_rate', value: 2e-12 }
     const initialUserResponse = [
       { path: 'params.yaml:dropout', value: 0.15 },
-      { path: 'params.yaml:process.threshold', value: 0.86 }
+      { path: 'params.yaml:process.threshold', value: 0.86 },
+      { path: 'params.yaml:code_names', value: [0, 1, 2] }
     ]
     mockedQuickPickManyValues.mockResolvedValueOnce(initialUserResponse)
     const firstInput = '0.16'
     const secondInput = '0.87'
+    const thirdInput = '[0,1,2]'
     mockedGetInput.mockResolvedValueOnce(firstInput)
     mockedGetInput.mockResolvedValueOnce(secondInput)
+    mockedGetInput.mockResolvedValueOnce(thirdInput)
 
     const paramsToQueue = await pickAndModifyParams([
       unchanged,
@@ -67,8 +70,10 @@ describe('pickAndModifyParams', () => {
       '-S',
       `params.yaml:process.threshold=${secondInput}`,
       '-S',
+      `params.yaml:code_names=${thirdInput}`,
+      '-S',
       [unchanged.path, unchanged.value].join('=')
     ])
-    expect(mockedGetInput).toBeCalledTimes(2)
+    expect(mockedGetInput).toBeCalledTimes(3)
   })
 })
