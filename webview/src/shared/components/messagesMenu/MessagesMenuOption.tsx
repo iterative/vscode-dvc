@@ -7,6 +7,7 @@ export interface MessagesMenuOptionProps {
   id: string
   label: string
   message: MessageFromWebview
+  hidden?: boolean
 }
 
 interface MessagesMenuOptionAllProps extends MessagesMenuOptionProps {

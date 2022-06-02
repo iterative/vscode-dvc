@@ -10,8 +10,10 @@ export interface MessagesMenuProps {
 
 export const MessagesMenu: React.FC<MessagesMenuProps> = ({ options }) => (
   <div role="menu">
-    {options.map((option, i) => (
-      <MessagesMenuOption key={option.id} {...option} index={i} />
-    ))}
+    {options
+      .filter(({ hidden }) => !hidden)
+      .map((option, i) => (
+        <MessagesMenuOption key={option.id} {...option} index={i} />
+      ))}
   </div>
 )

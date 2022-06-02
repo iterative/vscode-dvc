@@ -9,6 +9,7 @@ import { sendMessage } from '../../../shared/vscode'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
+import { pushIf } from '../../../util/array'
 
 const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   if (running) {
@@ -52,10 +53,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   const contextMenuOptions = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = []
 
-    const pushIf = (condition: boolean, options: MessagesMenuOptionProps[]) =>
-      condition && menuOptions.push(...options)
-
-    pushIf(!queued && !isWorkspace && depth > 0, [
+    pushIf(menuOptions, !queued && !isWorkspace && depth > 0, [
       experimentMenuOption(
         id,
         'Apply to Workspace',
@@ -68,7 +66,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       )
     ])
 
-    pushIf(depth === 1, [
+    pushIf(menuOptions, depth === 1, [
       experimentMenuOption(
         id,
         'Remove',
@@ -78,7 +76,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
 
     const isNotCheckpoint = depth <= 1 || isWorkspace
 
-    pushIf(isNotCheckpoint, [
+    pushIf(menuOptions, isNotCheckpoint, [
       experimentMenuOption(
         id,
         projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
@@ -86,7 +84,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       )
     ])
 
-    pushIf(isNotCheckpoint && projectHasCheckpoints, [
+    pushIf(menuOptions, isNotCheckpoint && projectHasCheckpoints, [
       experimentMenuOption(
         id,
         'Modify, Reset and Run',
@@ -94,7 +92,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       )
     ])
 
-    pushIf(isNotCheckpoint, [
+    pushIf(menuOptions, isNotCheckpoint, [
       experimentMenuOption(
         id,
         'Modify and Queue',
