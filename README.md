@@ -12,13 +12,48 @@ allowing users of all backgrounds to use DVC.
 
 > **Note**: We want early adopter feedback!  
 > Please let us know what you like and don't like about the extension. Feel free
-> to open [issues in this repo] or reach out via [DVC support channels].
+> to open [issues in this repo] or reach out via [DVC support] channels.
 
 [extension]: https://marketplace.visualstudio.com/VSCode
 [dvc features]: https://dvc.org/doc/start
 [vs code ide]: https://code.visualstudio.com/
 [issues in this repo]: https://github.com/iterative/vscode-dvc/issues
-[dvc support channels]: https://dvc.org/support
+[dvc support]: https://dvc.org/support
+
+## What it does (extension features)
+
+The DVC Extension augments and adds several [Views], adds special [Editors].
+Furthermore it exposes these and other DVC functions in the [Command Palette].
+Specifically:
+
+- It provides _Editors_ to manage [Experiments][exp-view] and display
+  [Plots][plots-view] as _Tabs_ in the IDE.
+- Adds a [DVC Tracked] panel to the _Explorer_ view. This shows a tree of the
+  data that DVC is tracking, with real-time file/dir [states] and options to
+  [synchronize] them (from/to remote storage).
+- Adds a [DVC panel] to the _Source Control_ view to list the [workspace
+  status]. You can [restore] or reset project versions (based on the current Git
+  `HEAD` commit) as well as [manage new and existing data] from here.
+- Adds a brand-new [DVC View]
+  (<img src="docs/dvc.png" alt="DVC icon" height="1em"/> in the Activity Bar)
+  with panels to visualize and manage [DVC Experiments].
+- Registers several [commands] in the _Command Palette_.
+- Includes a [DVC channel] for the _Output_ panel (useful for
+  [debugging](#debugging)). 
+
+[views]: https://code.visualstudio.com/docs/getstarted/userinterface#_views
+[editors]:
+  https://code.visualstudio.com/docs/getstarted/userinterface#_open-editors
+[command palette]:
+  https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
+
+[exp-view]: extension/resources/walkthrough/experiments-table.md
+[plots-view]: extension/resources/walkthrough/plots.md
+[dvc tracked]: extension/resources/walkthrough/tracked-explorer.md
+[dvc panel]: extension/resources/walkthrough/source-control-management.md
+[dvc view]: extension/resources/walkthrough/view-container.md
+[command palette]: extension/resources/walkthrough/command-palette.md
+[dvc output]: #
 
 ## Quick Start
 
