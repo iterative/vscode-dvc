@@ -63,18 +63,15 @@ Specifically:
   [Install the DVC extension for Visual Studio Code](https://code.visualstudio.com/docs/editor/extension-gallery).
 - **Step 3.** See Walkthrough.
 
-## Features
-
-- [Command Palette](extension/resources/walkthrough/command-palette.md)
-- [Source Control Management](extension/resources/walkthrough/source-control-management.md)
-- [Tracked Resources](extension/resources/walkthrough/tracked-explorer.md)
-- [DVC View Container](extension/resources/walkthrough/view-container.md)
-- [Experiments Table](extension/resources/walkthrough/experiments-table.md)
-- [Plots](extension/resources/walkthrough/plots.md)
-
 ### Learn more about DVC (Data Version Control)
 
 View [more resources](extension/resources/walkthrough/dvc-learn-more.md).
+
+## Configuration
+
+<!-- TODO -->
+
+See the .vscode/ dir.
 
 ## Useful commands
 
@@ -90,6 +87,17 @@ in one of the following commands:
 | `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
 
 ## Debugging
+
+### The DVC Extension
+
+Please see the DVC [channel] in the IDE's _Output_ panel to see the underlying
+DVC commands being run, as wel as their error output. Feel free to share this
+with us via [DVC support].
+
+[channel]:
+  https://code.visualstudio.com/api/extension-capabilities/common-capabilities#output-channel
+
+### Your DVC project
 
 Due to the way DVC pipelines run scripts of any language from the command line,
 users must debug pipeline scripts (e.g. `train.py`) standalone in whatever way
