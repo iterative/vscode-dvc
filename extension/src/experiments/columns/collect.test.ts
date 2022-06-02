@@ -416,6 +416,7 @@ describe('collectColumns', () => {
         joinColumnPath(ColumnType.METRICS, 'summary.json', 'val_loss'),
         joinColumnPath(ColumnType.METRICS, 'summary.json', 'val_accuracy'),
         joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
+        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'code_names'),
         joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
         joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'learning_rate'),
         joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'dvc_logs_dir'),

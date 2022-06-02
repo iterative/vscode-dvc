@@ -4,18 +4,18 @@ import { Columns } from '../../webview/contract'
 
 export type Param = {
   path: string
-  value: number | string | boolean
+  value: Value
 }
 
 const collectFromParamsFile = (
-  acc: { path: string; value: string | number | boolean }[],
+  acc: { path: string; value: Value }[],
   key: string | undefined,
   value: Value | ValueTree,
   ancestors: string[] = []
 ) => {
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
-  if (typeof value === 'object') {
+  if (!Array.isArray(value) && typeof value === 'object') {
     for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
       collectFromParamsFile(acc, childKey, childValue, pathArray)
     }
