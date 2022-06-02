@@ -1,12 +1,7 @@
 import cx from 'classnames'
-import React, { useContext, useEffect, useState } from 'react'
-import {
-  PlotSize,
-  Section,
-  SectionCollapsed
-} from 'dvc/src/plots/webview/contract'
+import React, { useEffect, useState } from 'react'
+import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { PlotsSizeContext } from './PlotsSizeContext'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
@@ -16,27 +11,23 @@ import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
 
-export interface PlotsContainerProps {
-  sectionCollapsed: SectionCollapsed
+export interface CommonPlotsContainerProps {
+  onResize: (size: PlotSize) => void
+}
+
+export interface PlotsContainerProps extends CommonPlotsContainerProps {
+  sectionCollapsed: boolean
   sectionKey: Section
   title: string
-  onRename: (section: Section, name: string) => void
-  onResize: (size: PlotSize, section: Section) => void
   currentSize: PlotSize
   menu?: PlotsPickerProps
 }
-
-export type BasicContainerProps = Pick<
-  PlotsContainerProps,
-  'onRename' | 'onResize' | 'sectionCollapsed'
->
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
   sectionKey,
   title,
   children,
-  onRename,
   onResize,
   currentSize,
   menu
@@ -44,9 +35,8 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   const [isRenaming, setIsRenaming] = useState(false)
   const [sectionTitle, setSectionTitle] = useState(title)
   const [size, setSize] = useState<PlotSize>(currentSize)
-  const { changePlotsSizes } = useContext(PlotsSizeContext)
 
-  const open = !sectionCollapsed[sectionKey]
+  const open = !sectionCollapsed
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
@@ -71,8 +61,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     if (size === newSize) {
       return
     }
-    onResize(newSize, sectionKey)
-    changePlotsSizes?.(newSize, sectionKey)
+    sendMessage({
+      payload: { section: sectionKey, size: newSize },
+      type: MessageFromWebviewType.RESIZE_PLOTS
+    })
+    onResize(newSize)
     setSize(newSize)
   }
 
@@ -90,10 +83,13 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     tooltip: 'Resize'
   })
 
-  const onTitleChanged = (title: string) => {
+  const onTitleChanged = (name: string) => {
     setIsRenaming(false)
-    setSectionTitle(title)
-    onRename(sectionKey, title)
+    setSectionTitle(name)
+    sendMessage({
+      payload: { name, section: sectionKey },
+      type: MessageFromWebviewType.RENAME_SECTION
+    })
   }
 
   return (
@@ -104,7 +100,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             e.preventDefault()
             sendMessage({
               payload: {
-                [sectionKey]: !sectionCollapsed[sectionKey]
+                [sectionKey]: !sectionCollapsed
               },
               type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
             })

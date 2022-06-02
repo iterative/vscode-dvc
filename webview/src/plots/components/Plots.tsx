@@ -1,36 +1,40 @@
-import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import React, { useEffect, useRef, useState, useCallback } from 'react'
-import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import React, { useEffect } from 'react'
+import VegaLite from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
-import { PlotsSizeProvider } from './PlotsSizeContext'
 import { AddPlots, Welcome } from './GetStarted'
 import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
-import { PlotsWebviewState } from '../hooks/useAppReducer'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
-import { sendMessage } from '../../shared/vscode'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState } from '../store'
+import { setZoomedInPlot } from './webviewSlice'
 
-interface PlotsProps {
-  state: PlotsWebviewState
-}
-
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const PlotsContent = ({ state }: PlotsProps) => {
-  const { data } = state
-
-  const [zoomedInPlot, setZoomedInPlot] = useState<VegaLiteProps | undefined>(
-    undefined
+const PlotsContent = () => {
+  const dispatch = useDispatch()
+  const {
+    hasData,
+    hasPlots,
+    hasSelectedPlots,
+    hasSelectedRevisions,
+    zoomedInPlot
+  } = useSelector((state: RootState) => state.webview)
+  const hasCheckpointData = useSelector(
+    (state: RootState) => state.checkpoint.hasData
   )
-  const zoomedInPlotId = useRef('')
+  const hasComparisonData = useSelector(
+    (state: RootState) => state.comparison.hasData
+  )
+  const hasTemplateData = useSelector(
+    (state: RootState) => state.template.hasData
+  )
 
   useEffect(() => {
     const modalOpenClass = 'modal-open'
@@ -41,36 +45,11 @@ const PlotsContent = ({ state }: PlotsProps) => {
     }
   }, [zoomedInPlot])
 
-  const handleZoomInPlot = useCallback(
-    (props: VegaLiteProps, id: string, refresh?: boolean) => {
-      if (!refresh) {
-        setZoomedInPlot(props)
-        zoomedInPlotId.current = id
-        return
-      }
-
-      if (zoomedInPlotId.current === id) {
-        setZoomedInPlot(plot => (plot ? props : undefined))
-      }
-    },
-    [setZoomedInPlot]
-  )
-
-  if (!data || !data.sectionCollapsed) {
+  if (!hasData) {
     return <EmptyState>Loading Plots...</EmptyState>
   }
 
-  const {
-    checkpoint: checkpointPlots,
-    comparison: comparisonTable,
-    hasPlots,
-    hasSelectedPlots,
-    hasSelectedRevisions,
-    sectionCollapsed,
-    template: templatePlots
-  } = data
-
-  if (!checkpointPlots && !templatePlots && !comparisonTable) {
+  if (!hasCheckpointData && !hasComparisonData && !hasTemplateData) {
     return (
       <GetStarted
         addItems={
@@ -85,79 +64,26 @@ const PlotsContent = ({ state }: PlotsProps) => {
     )
   }
 
-  const changeSize = (size: PlotSize, section: Section) => {
-    sendMessage({
-      payload: { section, size },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-  }
-
-  const setSectionName = (section: Section, name: string) => {
-    sendMessage({
-      payload: { name, section },
-      type: MessageFromWebviewType.RENAME_SECTION
-    })
-  }
-
-  const basicContainerProps = {
-    onRename: setSectionName,
-    onResize: changeSize,
-    sectionCollapsed
-  }
-
   const handleModalClose = () => {
-    setZoomedInPlot(undefined)
-    zoomedInPlotId.current = ''
+    dispatch(setZoomedInPlot(undefined))
   }
-
-  const wrapperProps = {
-    basicContainerProps,
-    renderZoomedInPlot: handleZoomInPlot
-  }
-
-  const currentSizeOrRegular = (
-    section: { size: PlotSize } | null | undefined
-  ) => section?.size || PlotSize.REGULAR
 
   return (
     <>
-      <Ribbon revisions={comparisonTable?.revisions || []} />
+      <Ribbon />
       <DragDropProvider>
-        <PlotsSizeProvider
-          sizes={{
-            [Section.CHECKPOINT_PLOTS]: currentSizeOrRegular(checkpointPlots),
-            [Section.TEMPLATE_PLOTS]: currentSizeOrRegular(templatePlots),
-            [Section.COMPARISON_TABLE]: currentSizeOrRegular(comparisonTable)
-          }}
-        >
-          {templatePlots && (
-            <TemplatePlotsWrapper
-              templatePlots={templatePlots}
-              {...wrapperProps}
-            />
-          )}
-          {comparisonTable && (
-            <ComparisonTableWrapper
-              comparisonTable={comparisonTable}
-              {...wrapperProps}
-            />
-          )}
-          {checkpointPlots && (
-            <CheckpointPlotsWrapper
-              checkpointPlots={checkpointPlots}
-              {...wrapperProps}
-            />
-          )}
-        </PlotsSizeProvider>
+        {hasTemplateData && <TemplatePlotsWrapper />}
+        {hasComparisonData && <ComparisonTableWrapper />}
+        {hasCheckpointData && <CheckpointPlotsWrapper />}
       </DragDropProvider>
 
       {zoomedInPlot && (
         <Modal onClose={handleModalClose}>
           <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
             <VegaLite
-              {...zoomedInPlot}
+              {...zoomedInPlot.plot}
               config={{
-                ...(zoomedInPlot.config as Config),
+                ...(zoomedInPlot.plot.config as Config),
                 background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
               }}
               actions={{
@@ -174,8 +100,8 @@ const PlotsContent = ({ state }: PlotsProps) => {
   )
 }
 
-export const Plots = ({ state }: PlotsProps) => (
+export const Plots = () => (
   <WebviewWrapper>
-    <PlotsContent state={state} />
+    <PlotsContent />
   </WebviewWrapper>
 )

@@ -1,11 +1,11 @@
 import {
-  Section,
   TemplatePlotEntry,
   TemplatePlotGroup,
   TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
-import React, { DragEvent, useState, useEffect, useContext } from 'react'
+import React, { DragEvent, useState, useEffect } from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
@@ -13,52 +13,44 @@ import { removeFromPreviousAndAddToNewSection } from './util'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
-import { ZoomablePlotProps } from '../ZoomablePlot'
-import { PlotsSizeContext } from '../PlotsSizeContext'
 import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
-
-interface TemplatePlotsProps extends ZoomablePlotProps {
-  plots: TemplatePlotSection[]
-}
+import { RootState } from '../../store'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
   BOTTOM = 'drop-section-bottom'
 }
 
-export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
-  plots,
-  renderZoomedInPlot
-}) => {
+export const TemplatePlots: React.FC = () => {
+  const { plots, size } = useSelector((state: RootState) => state.template)
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
-  const { sizes } = useContext(PlotsSizeContext)
-  const { [Section.TEMPLATE_PLOTS]: size } = sizes
   const nbItemsPerRow = useNbItemsPerRow(size)
 
   useEffect(() => {
     setSections(plots)
   }, [plots, setSections])
 
-  const setSectionOrder = (sections: TemplatePlotSection[]): void => {
-    setSections(sections)
-    sendMessage({
+  useEffect(() => {
+    /*sendMessage({
       payload: sections.map(section => ({
         group: section.group,
         paths: section.entries.map(({ id }) => id)
       })),
       type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
-    })
-  }
+    })*/
+  }, [sections])
 
   const setSectionEntries = (index: number, entries: TemplatePlotEntry[]) => {
-    sections[index] = {
-      ...sections[index],
-      entries
-    }
-
-    setSectionOrder(sections)
+    setSections(sections => {
+      const updatedSections = [...sections]
+      updatedSections[index] = {
+        ...sections[index],
+        entries
+      }
+      return updatedSections
+    })
   }
 
   const firstSection = sections[0]
@@ -91,12 +83,12 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
 
     if (e.currentTarget.id === NewSectionBlock.TOP) {
       if (firstSection.group !== group) {
-        setTimeout(() => setSectionOrder([newSection, ...updatedSections]), 1)
+        setTimeout(() => setSections([newSection, ...updatedSections]), 1)
       }
       return
     }
     if (lastSection.group !== group) {
-      setTimeout(() => setSectionOrder([...updatedSections, newSection]), 1)
+      setTimeout(() => setSections([...updatedSections, newSection]), 1)
     }
   }
 
@@ -123,7 +115,7 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
       position
     )
 
-    setSectionOrder(updatedSections)
+    setSections(updatedSections)
   }
 
   const newDropSection = {
@@ -142,7 +134,6 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
       />
       {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
-
         const useVirtualizedGrid = shouldUseVirtualizedGrid(
           Object.keys(section.entries).length,
           size
@@ -171,7 +162,6 @@ export const TemplatePlots: React.FC<TemplatePlotsProps> = ({
                 onDropInSection={handleDropInSection}
                 multiView={isMultiView}
                 setSectionEntries={setSectionEntries}
-                renderZoomedInPlot={renderZoomedInPlot}
                 useVirtualizedGrid={useVirtualizedGrid}
                 nbItemsPerRow={nbItemsPerRow}
               />

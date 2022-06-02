@@ -1,4 +1,5 @@
 import React from 'react'
+import { Provider, useDispatch } from 'react-redux'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { fireEvent, within } from '@testing-library/react'
 import {
@@ -14,11 +15,21 @@ import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtuali
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { chromaticParameters } from './util'
 import { Plots } from '../plots/components/Plots'
-import { useAppReducer } from '../plots/hooks/useAppReducer'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
 import '../plots/components/styles.module.scss'
+import { store } from '../plots/store'
+import { feedStore } from '../plots/components/App'
+import { MessageToWebviewType } from 'dvc/src/webview/contract'
+
+const MockedState: React.FC<{ data: PlotsData }> = ({ children, data }) => {
+  const dispatch = useDispatch()
+  const message = { data, type: MessageToWebviewType.SET_DATA }
+  feedStore(message, dispatch)
+
+  return <>{children}</>
+}
 
 export default {
   args: {
@@ -39,8 +50,13 @@ export default {
 const Template: Story<{
   data?: PlotsData
 }> = ({ data }) => {
-  const [state] = useAppReducer({ data })
-  return <Plots state={state} />
+  return (
+    <Provider store={store}>
+      <MockedState data={data}>
+        <Plots />
+      </MockedState>
+    </Provider>
+  )
 }
 
 export const WithData = Template.bind({})

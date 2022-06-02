@@ -1,10 +1,7 @@
-import {
-  ComparisonPlots,
-  Revision,
-  PlotsComparisonData
-} from 'dvc/src/plots/webview/contract'
+import { ComparisonPlots, Revision } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import {
@@ -14,16 +11,12 @@ import {
 import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
+import { RootState } from '../../store'
 
-export type ComparisonTableProps = Omit<
-  PlotsComparisonData,
-  'sectionName' | 'size'
->
-
-export const ComparisonTable: React.FC<ComparisonTableProps> = ({
-  plots,
-  revisions
-}) => {
+export const ComparisonTable: React.FC = () => {
+  const { plots, revisions } = useSelector(
+    (state: RootState) => state.comparison
+  )
   const pinnedColumn = useRef('')
   const [columns, setColumns] = useState<ComparisonTableColumn[]>([])
   const [comparisonPlots, setComparisonPlots] = useState<ComparisonPlots>([])

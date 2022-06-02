@@ -1,37 +1,32 @@
 import React, { useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import styles from './styles.module.scss'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
+import { setZoomedInPlot } from './webviewSlice'
 
-export interface ZoomablePlotProps {
-  renderZoomedInPlot: (
-    plot: VegaLiteProps,
-    id: string,
-    refresh?: boolean
-  ) => void
-}
-
-interface ZoomablePlotOwnProps extends ZoomablePlotProps {
+interface ZoomablePlotProps {
   plotProps: VegaLiteProps
   id: string
 }
 
-export const ZoomablePlot: React.FC<ZoomablePlotOwnProps> = ({
+export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   plotProps,
-  renderZoomedInPlot,
   id
 }) => {
+  const dispatch = useDispatch()
   const previousPlotProps = useRef(plotProps)
   useEffect(() => {
     if (
       JSON.stringify(previousPlotProps.current) !== JSON.stringify(plotProps)
     ) {
-      renderZoomedInPlot(plotProps, id, true)
+      dispatch(setZoomedInPlot({ plot: plotProps, id, refresh: true }))
       previousPlotProps.current = plotProps
     }
-  }, [plotProps, id, renderZoomedInPlot])
+  }, [plotProps, id, dispatch])
+  debugger
 
-  const handleOnClick = () => renderZoomedInPlot(plotProps, id)
+  const handleOnClick = () => dispatch(setZoomedInPlot({ plot: plotProps, id }))
 
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
