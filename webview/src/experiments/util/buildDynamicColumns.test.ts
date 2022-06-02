@@ -57,6 +57,22 @@ describe('buildDynamicColumns', () => {
           {
             columns: [
               {
+                id: joinColumnPath(
+                  ColumnType.PARAMS,
+                  'params.yaml',
+                  'code_names'
+                )
+              }
+            ],
+            id: joinColumnPath(
+              ColumnType.PARAMS,
+              'params.yaml',
+              'code_names_previous_placeholder'
+            )
+          },
+          {
+            columns: [
+              {
                 id: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'epochs')
               }
             ],
