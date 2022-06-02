@@ -1,7 +1,7 @@
 import { join, resolve, sep } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { RepositoryModel } from '.'
-import { ListOutput, StatusOutput } from '../../cli/reader'
+import { ExperimentsOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { dvcDemoPath } from '../../test/util'
 
 jest.mock('@hediet/std/disposable')
@@ -84,6 +84,7 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: new Set([join(dvcDemoPath, deleted)]),
         gitModified: new Set([join(dvcDemoPath, output)]),
+        hasRemote: new Set(list.map(entry => join(dvcDemoPath, entry.path))),
         modified: new Set([
           join(dvcDemoPath, rawDataDir),
           join(dvcDemoPath, logDir),
@@ -132,6 +133,7 @@ describe('RepositoryState', () => {
           join(dvcDemoPath, rawDataDir),
           join(dvcDemoPath, data)
         ]),
+        hasRemote: new Set([join(dvcDemoPath, data)]),
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
@@ -171,6 +173,7 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
+        hasRemote: new Set([join(dvcDemoPath, data)]),
         modified: new Set([join(dvcDemoPath, rawDataDir)]),
         notInCache: emptySet,
         renamed: emptySet,
@@ -206,6 +209,7 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
+        hasRemote: emptySet,
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
@@ -350,11 +354,24 @@ describe('RepositoryState', () => {
         tracked: list,
         untracked: new Set<string>()
       })
+      model.transformAndSetExperiments({
+        workspace: {
+          baseline: {
+            data: {
+              outs: { [join('data', 'MNIST', 'raw')]: { use_cache: true } }
+            }
+          }
+        }
+      } as ExperimentsOutput)
 
       expect(model.getState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
+        hasRemote: new Set([
+          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw')
+        ]),
         modified: emptySet,
         notInCache: new Set([
           ...diff['not in cache'].map(({ path }) => resolve(dvcDemoPath, path)),
@@ -527,11 +544,87 @@ describe('RepositoryState', () => {
         tracked: list,
         untracked: new Set<string>()
       })
+      model.transformAndSetExperiments({
+        workspace: {
+          baseline: {
+            data: {
+              outs: { [join('data', 'MNIST', 'raw')]: { use_cache: true } }
+            }
+          }
+        }
+      } as ExperimentsOutput)
 
       expect(model.getState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
+        hasRemote: new Set([
+          resolve(dvcDemoPath, 'misclassified.jpg'),
+          resolve(dvcDemoPath, 'model.pt'),
+          resolve(dvcDemoPath, 'predictions.json'),
+          resolve(dvcDemoPath, 'training_metrics.json'),
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-images-idx3-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-images-idx3-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-labels-idx1-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-labels-idx1-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-images-idx3-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-images-idx3-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-labels-idx1-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-labels-idx1-ubyte.gz'
+          ),
+          resolve(dvcDemoPath, 'training_metrics.json'),
+          resolve(dvcDemoPath, 'training_metrics', 'report.html'),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'acc.tsv'),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv')
+        ]),
         modified: emptySet,
         notInCache: new Set([
           resolve(dvcDemoPath, 'misclassified.jpg'),

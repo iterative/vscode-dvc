@@ -1,11 +1,12 @@
 import { join } from 'path'
 import { Uri } from 'vscode'
-import { collectTree } from './collect'
+import { collectSelected, collectTree } from './collect'
 import { dvcDemoPath } from '../../test/util'
 
+const makeUri = (...paths: string[]): Uri =>
+  Uri.file(join(dvcDemoPath, ...paths))
+
 describe('collectTree', () => {
-  const makeUri = (...paths: string[]): Uri =>
-    Uri.file(join(dvcDemoPath, ...paths))
   const makeAbsPath = (...paths: string[]): string => makeUri(...paths).fsPath
 
   it('should transform recursive list output into a tree', () => {
@@ -188,5 +189,89 @@ describe('collectTree', () => {
         ]
       ])
     )
+  })
+})
+
+describe('collectSelected', () => {
+  const logsPathItem = {
+    dvcRoot: dvcDemoPath,
+    isDirectory: true,
+    isTracked: true,
+    resourceUri: makeUri('logs')
+  }
+
+  const accPathItem = {
+    dvcRoot: dvcDemoPath,
+    isDirectory: false,
+    isTracked: true,
+    resourceUri: makeUri('logs', 'acc.tsv')
+  }
+
+  const lossPathItem = {
+    dvcRoot: dvcDemoPath,
+    isDirectory: false,
+    isTracked: true,
+    resourceUri: makeUri('logs', 'loss.tsv')
+  }
+
+  it('should return an empty object if no path items are provided', () => {
+    expect(collectSelected([])).toStrictEqual({})
+  })
+
+  it('should return the original item if only one is provided', () => {
+    const selected = collectSelected([logsPathItem])
+
+    expect(selected).toStrictEqual({
+      [dvcDemoPath]: [logsPathItem]
+    })
+  })
+
+  it('should return a root given it is select', () => {
+    const selected = collectSelected([dvcDemoPath, logsPathItem, accPathItem])
+
+    expect(selected).toStrictEqual({
+      [dvcDemoPath]: [dvcDemoPath]
+    })
+  })
+
+  it('should return siblings if a parent is not provided', () => {
+    const selected = collectSelected([accPathItem, lossPathItem])
+
+    expect(selected).toStrictEqual({
+      [dvcDemoPath]: [accPathItem, lossPathItem]
+    })
+  })
+
+  it('should exclude all children from the final list', () => {
+    const selected = collectSelected([lossPathItem, accPathItem, logsPathItem])
+
+    expect(selected).toStrictEqual({
+      [dvcDemoPath]: [logsPathItem]
+    })
+  })
+
+  it('should return multiple entries when multiple roots are provided', () => {
+    const mockOtherRepoItem = {
+      dvcRoot: __dirname,
+      isDirectory: true,
+      isTracked: true,
+      resourceUri: Uri.file(join(__dirname, 'mock', 'path'))
+    }
+
+    const selected = collectSelected([
+      mockOtherRepoItem,
+      {
+        dvcRoot: dvcDemoPath,
+        isDirectory: false,
+        isTracked: true,
+        resourceUri: makeUri('logs', 'acc.tsv')
+      },
+      logsPathItem
+    ])
+
+    expect(selected).toStrictEqual({
+      [__dirname]: [mockOtherRepoItem],
+      [dvcDemoPath]: [logsPathItem]
+    })
   })
 })

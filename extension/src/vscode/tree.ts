@@ -9,10 +9,11 @@ import {
 
 export const createTreeView = <T>(
   name: string,
-  treeDataProvider: TreeDataProvider<string | T>
+  treeDataProvider: TreeDataProvider<string | T>,
+  canSelectMany = false
 ): TreeView<string | T> =>
   window.createTreeView<string | T>(name, {
-    canSelectMany: false,
+    canSelectMany,
     showCollapseAll: true,
     treeDataProvider
   })

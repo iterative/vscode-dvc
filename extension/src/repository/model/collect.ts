@@ -135,18 +135,105 @@ export const collectTrackedOuts = (data: ExperimentsOutput): Set<string> => {
 }
 
 export const collectTrackedPaths = async (
-  { dvcRoot, resourceUri, isTracked }: PathItem,
+  pathItem: string | PathItem,
   getChildren: (path: string) => Promise<PathItem[]>
 ): Promise<string[]> => {
-  const acc = []
+  const acc: string[] = []
+  if (typeof pathItem === 'string') {
+    return acc
+  }
 
-  if (isTracked) {
+  const { dvcRoot, resourceUri, isTracked } = pathItem
+  if (isTracked !== false) {
     acc.push(relativeWithUri(dvcRoot, resourceUri))
     return acc
   }
   const children = await getChildren(resourceUri.fsPath)
   for (const child of children) {
     acc.push(...(await collectTrackedPaths(child, getChildren)))
+  }
+  return acc
+}
+
+type SelectedPathAccumulator = { [dvcRoot: string]: (string | PathItem)[] }
+
+const collectSelectedPaths = (pathItems: (string | PathItem)[]): string[] => {
+  const acc = new Set<string>()
+  for (const pathItem of pathItems) {
+    if (typeof pathItem === 'string') {
+      acc.add(pathItem)
+      continue
+    }
+    acc.add(pathItem.resourceUri.fsPath)
+  }
+  return [...acc]
+}
+
+const parentIsSelected = (fsPath: string, paths: string[]) => {
+  for (const path of paths.filter(path => path !== fsPath)) {
+    if (fsPath.includes(path)) {
+      return true
+    }
+  }
+  return false
+}
+
+const initializeAccumulatorRoot = (
+  acc: SelectedPathAccumulator,
+  dvcRoot: string
+) => {
+  if (!acc[dvcRoot]) {
+    acc[dvcRoot] = []
+  }
+}
+
+const collectPathItem = (
+  acc: SelectedPathAccumulator,
+  addedPaths: Set<string>,
+  pathItem: PathItem | string,
+  dvcRoot: string,
+  path: string
+) => {
+  initializeAccumulatorRoot(acc, dvcRoot)
+  acc[dvcRoot].push(pathItem)
+  addedPaths.add(path)
+}
+
+const collectRoot = (
+  acc: SelectedPathAccumulator,
+  addedPaths: Set<string>,
+  path: string
+) => collectPathItem(acc, addedPaths, path, path, path)
+
+const collectRootOrPathItem = (
+  acc: SelectedPathAccumulator,
+  addedPaths: Set<string>,
+  paths: string[],
+  pathItem: string | PathItem
+) => {
+  const path =
+    typeof pathItem === 'string' ? pathItem : pathItem.resourceUri.fsPath
+  if (addedPaths.has(path) || parentIsSelected(path, paths)) {
+    return
+  }
+
+  if (typeof pathItem === 'string') {
+    collectRoot(acc, addedPaths, path)
+    return
+  }
+
+  const { dvcRoot } = pathItem
+  collectPathItem(acc, addedPaths, pathItem, dvcRoot, path)
+}
+
+export const collectSelected = (
+  pathItems: (string | PathItem)[]
+): SelectedPathAccumulator => {
+  const selectedPaths = collectSelectedPaths(pathItems)
+  const acc: SelectedPathAccumulator = {}
+  const addedPaths = new Set<string>()
+  for (const pathItem of pathItems) {
+    collectRootOrPathItem(acc, addedPaths, selectedPaths, pathItem)
   }
   return acc
 }

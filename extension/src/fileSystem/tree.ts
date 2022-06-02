@@ -4,13 +4,13 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
-  Uri,
-  window
+  TreeView,
+  Uri
 } from 'vscode'
 import { exists, relativeWithUri } from '.'
 import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
-import { definedAndNonEmpty } from '../util/array'
+import { definedAndNonEmpty, uniqueValues } from '../util/array'
 import {
   AvailableCommands,
   CommandId,
@@ -26,9 +26,14 @@ import { warnOfConsequences } from '../vscode/modal'
 import { Response } from '../vscode/response'
 import { Resource } from '../repository/commands'
 import { WorkspaceRepositories } from '../repository/workspace'
-import { collectTrackedPaths, PathItem } from '../repository/model/collect'
+import {
+  collectSelected,
+  collectTrackedPaths,
+  PathItem
+} from '../repository/model/collect'
 import { Title } from '../vscode/title'
 import { Disposable } from '../class/dispose'
+import { createTreeView } from '../vscode/tree'
 
 export class TrackedExplorerTree
   extends Disposable
@@ -36,6 +41,7 @@ export class TrackedExplorerTree
 {
   public readonly onDidChangeTreeData: Event<void>
 
+  private readonly view: TreeView<string | PathItem>
   private readonly internalCommands: InternalCommands
   private readonly repositories: WorkspaceRepositories
 
@@ -57,8 +63,8 @@ export class TrackedExplorerTree
 
     this.onDidChangeTreeData = repositories.treeDataChanged.event
 
-    this.dispose.track(
-      window.registerTreeDataProvider('dvc.views.trackedExplorerTree', this)
+    this.view = this.dispose.track(
+      createTreeView<PathItem>('dvc.views.trackedExplorerTree', this, true)
     )
   }
 
@@ -242,13 +248,29 @@ export class TrackedExplorerTree
 
   private tryThenForce(commandId: CommandId) {
     return async (pathItem: PathItem) => {
-      const { dvcRoot } = pathItem
-      const tracked = await collectTrackedPaths(pathItem, (path: string) =>
-        this.getRepoChildren(dvcRoot, path)
-      )
-      const args = [dvcRoot, ...tracked.sort()]
+      const selected = collectSelected([
+        ...this.getSelectedPathItems(),
+        pathItem
+      ])
 
-      return tryThenMaybeForce(this.internalCommands, commandId, ...args)
+      for (const [dvcRoot, pathItems] of Object.entries(selected)) {
+        const tracked = []
+        for (const pathItem of pathItems) {
+          tracked.push(
+            ...(await collectTrackedPaths(pathItem, (path: string) =>
+              this.getRepoChildren(dvcRoot, path)
+            ))
+          )
+        }
+
+        const args = [dvcRoot, ...uniqueValues(tracked).sort()]
+
+        await tryThenMaybeForce(this.internalCommands, commandId, ...args)
+      }
     }
+  }
+
+  private getSelectedPathItems() {
+    return [...this.view.selection]
   }
 }
