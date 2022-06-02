@@ -2,7 +2,7 @@ import { join } from 'path'
 import { Event, EventEmitter, Memento, Uri, ViewColumn, window } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
-import { pickAndModifyParams } from './model/queue/quickPick'
+import { pickAndModifyParams } from './model/modify/quickPick'
 import { pickExperiment } from './quickPick'
 import {
   pickFilterToAdd,

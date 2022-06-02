@@ -38,7 +38,7 @@ import {
 } from '../../../../vscode/quickPick'
 import { Response } from '../../../../vscode/response'
 import { CliExecutor } from '../../../../cli/executor'
-import { Param } from '../../../../experiments/model/queue/collect'
+import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ColumnType } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
