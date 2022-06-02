@@ -47,12 +47,13 @@ export const splitColumnPath = (path: string) => {
   if (!fileSegment) {
     return [baseSegment]
   }
+  const cleanFileSegment = fileSegment.replace(/_\d+$/g, '')
   if (!paramPath) {
-    return [baseSegment, fileSegment]
+    return [baseSegment, cleanFileSegment]
   }
   return [
     baseSegment,
-    fileSegment,
+    cleanFileSegment,
     ...paramPath.split(METRIC_PARAM_SEPARATOR).map(decodeColumn)
   ]
 }
