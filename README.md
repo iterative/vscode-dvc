@@ -8,7 +8,7 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
 This [extension] integrates [DVC features] right into the popular [VS Code IDE],
-allowing users of all levels to use DVC visually.
+allowing users of all backgrounds to use DVC.
 
 > **Note**: We want early adopter feedback!  
 > Please let us know what you like and don't like about the extension. Feel free
@@ -28,6 +28,19 @@ allowing users of all levels to use DVC visually.
   [Install the DVC extension for Visual Studio Code](https://code.visualstudio.com/docs/editor/extension-gallery).
 - **Step 3.** See Walkthrough.
 
+## Features
+
+- [Command Palette](extension/resources/walkthrough/command-palette.md)
+- [Source Control Management](extension/resources/walkthrough/source-control-management.md)
+- [Tracked Resources](extension/resources/walkthrough/tracked-explorer.md)
+- [DVC View Container](extension/resources/walkthrough/view-container.md)
+- [Experiments Table](extension/resources/walkthrough/experiments-table.md)
+- [Plots](extension/resources/walkthrough/plots.md)
+
+### Learn more about DVC (Data Version Control)
+
+View [more resources](extension/resources/walkthrough/dvc-learn-more.md).
+
 ## Useful commands
 
 Open the Command Palette (`F1` or ⇧⌃P on Windows/Linux or ⇧⌘P on macOS) and type
@@ -41,16 +54,7 @@ in one of the following commands:
 | `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
 | `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
 
-## Features
-
-- [Command Palette](extension/resources/walkthrough/command-palette.md)
-- [Source Control Management](extension/resources/walkthrough/source-control-management.md)
-- [Tracked Resources](extension/resources/walkthrough/tracked-explorer.md)
-- [DVC View Container](extension/resources/walkthrough/view-container.md)
-- [Experiments Table](extension/resources/walkthrough/experiments-table.md)
-- [Plots](extension/resources/walkthrough/plots.md)
-
-### Debugging
+## Debugging
 
 Due to the way DVC pipelines run scripts of any language from the command line,
 users must debug pipeline scripts (e.g. `train.py`) standalone in whatever way
@@ -61,10 +65,6 @@ pipelines, and most scripts are capable of running outside of DVC.
 
 See development docs and contributing guidelines in
 [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## Explore
-
-View [more resources](extension/resources/walkthrough/dvc-learn-more.md).
 
 ## Data and telemetry
 
