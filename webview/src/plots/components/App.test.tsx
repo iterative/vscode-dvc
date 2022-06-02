@@ -1627,5 +1627,26 @@ describe('App', () => {
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
     })
+
+
+    it('should send a message to refresh each revision when clicking the refresh all button', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+
+      const refreshAllButton = within(
+        screen.getByTestId('ribbon')
+      ).getAllByRole('button')[1]
+
+      mockPostMessage.mockReset()
+      fireEvent.click(refreshAllButton)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd'],
+        type: MessageFromWebviewType.REFRESH_REVISIONS
+      })
+    })
   })
 })

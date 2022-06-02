@@ -370,15 +370,19 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    border-right: 2px solid $bg-color;
+    border-right: 2px solid $header-border-color;
   }
 
   .headerCell {
     @extend .placeholderHeaderCell;
     color: $header-fg-color;
     text-align: center;
-    border-bottom: 2px solid $bg-color;
+    border-bottom: 2px solid $header-border-color;
     padding: 0.31rem $cell-padding;
+
+    &.leafHeader {
+      border-bottom: none;
+    }
   }
 
   .sortingHeaderCellAsc {
@@ -511,4 +515,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   @extend %headerCellPadding;
   overflow-x: hidden;
   text-overflow: ellipsis;
+}
+
+.thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: $bg-color;
 }
