@@ -1,15 +1,15 @@
-import { Revision } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
+import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
+import { RootState } from '../../store'
 
-interface RibbonProps {
-  revisions: Revision[]
-}
-
-export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
+export const Ribbon: React.FC = () => {
+  const revisions = useSelector(
+    (state: RootState) => state.comparison.revisions
+  )
   const removeRevision = (revision: string) => {
     sendMessage({
       payload: revision,

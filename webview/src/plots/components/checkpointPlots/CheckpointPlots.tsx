@@ -1,11 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import cx from 'classnames'
-import {
-  CheckpointPlotData,
-  ColorScale,
-  Section
-} from 'dvc/src/plots/webview/contract'
+import { CheckpointPlotData, ColorScale } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { createSpec } from './util'
 import styles from '../styles.module.scss'
@@ -19,25 +16,23 @@ import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
 import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
-import { ZoomablePlot, ZoomablePlotProps } from '../ZoomablePlot'
-import { PlotsSizeContext } from '../PlotsSizeContext'
+import { ZoomablePlot } from '../ZoomablePlot'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
+import { RootState } from '../../store'
 
-interface CheckpointPlotsProps extends ZoomablePlotProps {
+interface CheckpointPlotsProps {
   plots: CheckpointPlotData[]
   colors: ColorScale
 }
 
 export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   plots,
-  colors,
-  renderZoomedInPlot
+  colors
 }) => {
   const [order, setOrder] = useState(plots.map(plot => plot.title))
-  const { sizes } = useContext(PlotsSizeContext)
-  const { [Section.CHECKPOINT_PLOTS]: size } = sizes
+  const { size } = useSelector((state: RootState) => state.checkpoint)
   const nbItemsPerRow = useNbItemsPerRow(size)
 
   useEffect(() => {
@@ -78,11 +73,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
           id={title}
           style={withScale(1)}
         >
-          <ZoomablePlot
-            plotProps={plotProps}
-            id={key}
-            renderZoomedInPlot={renderZoomedInPlot}
-          />
+          <ZoomablePlot plotProps={plotProps} id={key} />
         </div>
       )
     })

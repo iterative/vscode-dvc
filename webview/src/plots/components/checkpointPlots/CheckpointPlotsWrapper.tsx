@@ -1,36 +1,32 @@
 import {
   CheckpointPlotData,
-  CheckpointPlotsData,
+  PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { CheckpointPlots } from './CheckpointPlots'
-import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
+import { PlotsContainer } from '../PlotsContainer'
 import { sendMessage } from '../../../shared/vscode'
-import { ZoomablePlotProps } from '../ZoomablePlot'
-
-interface CheckpointPlotsWrapperProps extends ZoomablePlotProps {
-  checkpointPlots: CheckpointPlotsData
-  basicContainerProps: BasicContainerProps
-}
+import { RootState } from '../../store'
+import { changeSize } from './checkpointPlotsSlice'
 
 const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
   plots?.map(({ title }) => title).sort() || []
 
-export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
-  checkpointPlots,
-  basicContainerProps,
-  renderZoomedInPlot
-}) => {
+export const CheckpointPlotsWrapper: React.FC = () => {
+  const dispatch = useDispatch()
+  const { plots, size, sectionName, selectedMetrics, isCollapsed, colors } =
+    useSelector((state: RootState) => state.checkpoint)
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
   useEffect(() => {
-    const metrics = getMetricsFromPlots(checkpointPlots.plots)
+    const metrics = getMetricsFromPlots(plots)
     setMetrics(metrics)
-    setSelectedPlots(checkpointPlots.selectedMetrics || [])
-  }, [checkpointPlots, setSelectedPlots, setMetrics])
+    setSelectedPlots(selectedMetrics || [])
+  }, [plots, selectedMetrics, setSelectedPlots, setMetrics])
 
   const setSelectedMetrics = (metrics: string[]) => {
     setSelectedPlots(metrics)
@@ -40,24 +36,26 @@ export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
     })
   }
 
+  const handleResize = (size: PlotSize) => {
+    dispatch(changeSize(size))
+  }
+
   return (
     <PlotsContainer
-      title={checkpointPlots.sectionName}
+      title={sectionName}
       sectionKey={Section.CHECKPOINT_PLOTS}
       menu={{
         plots: metrics,
         selectedPlots: selectedPlots,
         setSelectedPlots: setSelectedMetrics
       }}
-      currentSize={checkpointPlots.size}
-      {...basicContainerProps}
+      currentSize={size}
+      sectionCollapsed={isCollapsed}
+      onResize={handleResize}
     >
       <CheckpointPlots
-        plots={checkpointPlots.plots.filter(plot =>
-          selectedPlots?.includes(plot.title)
-        )}
-        colors={checkpointPlots.colors}
-        renderZoomedInPlot={renderZoomedInPlot}
+        plots={plots.filter(plot => selectedPlots?.includes(plot.title))}
+        colors={colors}
       />
     </PlotsContainer>
   )

@@ -13,9 +13,9 @@ import { withScale } from '../../../util/styles'
 import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
-import { ZoomablePlot, ZoomablePlotProps } from '../ZoomablePlot'
+import { ZoomablePlot } from '../ZoomablePlot'
 
-interface TemplatePlotsGridProps extends ZoomablePlotProps {
+interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
   groupId: string
   groupIndex: number
@@ -38,7 +38,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   onDropInSection,
   multiView,
   setSectionEntries,
-  renderZoomedInPlot,
   useVirtualizedGrid,
   nbItemsPerRow
 }) => {
@@ -85,11 +84,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         id={id}
         style={withScale(nbRevisions)}
       >
-        <ZoomablePlot
-          plotProps={plotProps}
-          id={id}
-          renderZoomedInPlot={renderZoomedInPlot}
-        />
+        <ZoomablePlot id={id} plotProps={plotProps} />
       </div>
     )
   })
