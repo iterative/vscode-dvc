@@ -277,7 +277,7 @@ $gap: 20px;
 .dropTarget {
   height: auto;
   opacity: 0.5;
-  border: 3px dashed var(--vscode-focusBorder);
+  border: 3px dashed $accent-color;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -285,7 +285,7 @@ $gap: 20px;
 
 .dropIcon {
   border-radius: 100%;
-  border: 3px solid var(--vscode-focusBorder);
+  border: 3px solid $accent-color;
   padding: 20px;
 }
 
@@ -298,7 +298,7 @@ $gap: 20px;
   box-sizing: content-box;
 
   path {
-    fill: var(--vscode-focusBorder);
+    fill: $accent-color;
   }
 }
 
