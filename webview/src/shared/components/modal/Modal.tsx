@@ -1,4 +1,4 @@
-import React, { MouseEvent } from 'react'
+import React, { MouseEvent, useEffect } from 'react'
 import styles from './styles.module.scss'
 import { AllIcons, Icon } from '../Icon'
 
@@ -7,6 +7,18 @@ interface ModalProps {
 }
 
 export const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
+  useEffect(() => {
+    const checkKeyAndClose = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', checkKeyAndClose)
+
+    return () => {
+      window.removeEventListener('keydown', checkKeyAndClose)
+    }
+  }, [onClose])
   return (
     <div
       className={styles.backdrop}

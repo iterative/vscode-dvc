@@ -523,3 +523,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   overflow-x: hidden;
   text-overflow: ellipsis;
 }
+
+.thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: $bg-color;
+}

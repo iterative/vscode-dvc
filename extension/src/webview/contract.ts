@@ -14,6 +14,7 @@ export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   APPLY_EXPERIMENT_TO_WORKSPACE = 'apply-experiment-to-workspace',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
+  OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
   RENAME_SECTION = 'rename-section',
@@ -67,6 +68,10 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
       payload: string
     }
   | {

@@ -37,6 +37,8 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
       'views.experimentsTable.focusChanged',
     VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN: 'views.experimentsTable.columnHidden',
+    VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
+      'views.experimentsTable.paramsFileOpened',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
       'views.experimentsTable.columnSortRemoved',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
@@ -196,6 +198,9 @@ export interface IEventNamePropertyMapping {
     path: string
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE]: {
+    path: string
+  }
 
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
