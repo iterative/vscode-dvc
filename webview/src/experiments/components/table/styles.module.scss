@@ -131,7 +131,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       border-top-color: $changed-color;
     }
 
-    .runningExperiment.oddRow > .firstCell & {
+    .runningExperiment.oddRow > .experimentCell & {
       border-left: 1.5px solid $row-bg-alt-color;
       border-bottom: 1.5px solid $row-bg-alt-color;
     }
@@ -170,13 +170,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   display: flex;
   flex-flow: column nowrap;
 
-  .firstCell {
-    display: flex;
-    flex-flow: row nowrap;
-  }
   .experimentGroup {
     .nestedRow {
-      .firstCell {
+      .experimentCell {
         padding-left: $nested-row-padding;
       }
     }
@@ -362,6 +358,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
   }
   .experimentCell {
+    display: flex;
+    flex-flow: row nowrap;
     text-align: left;
     .innerCell {
       justify-content: flex-start;
