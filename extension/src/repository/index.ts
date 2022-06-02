@@ -69,6 +69,7 @@ export class Repository extends DeferredDisposable {
       experiments.onDidChangeExperiments(data => {
         if (data) {
           this.model.transformAndSetExperiments(data)
+          this.setState()
         }
       })
     )
