@@ -65,8 +65,14 @@ export class RepositoryModel
   }
 
   public getState() {
+    const acc = []
+    for (const relTrackedOut of this.relTrackedOuts) {
+      acc.push(join(this.dvcRoot, relTrackedOut))
+    }
+
     return {
       ...omit(this.state, ['trackedLeafs', 'trackedNonLeafs']),
+      hasRemote: new Set([...acc, ...this.state.trackedLeafs]),
       tracked: this.getTracked()
     }
   }
