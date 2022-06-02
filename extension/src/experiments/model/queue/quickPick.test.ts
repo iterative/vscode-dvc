@@ -54,7 +54,7 @@ describe('pickAndModifyParams', () => {
     mockedQuickPickManyValues.mockResolvedValueOnce(initialUserResponse)
     const firstInput = '0.16'
     const secondInput = '0.87'
-    const thirdInput = '[0,1,2]'
+    const thirdInput = '[0,1,3]'
     mockedGetInput.mockResolvedValueOnce(firstInput)
     mockedGetInput.mockResolvedValueOnce(secondInput)
     mockedGetInput.mockResolvedValueOnce(thirdInput)
@@ -63,6 +63,12 @@ describe('pickAndModifyParams', () => {
       unchanged,
       ...initialUserResponse
     ])
+
+    expect(mockedGetInput).toBeCalledTimes(3)
+    expect(mockedGetInput).toBeCalledWith(
+      'Enter a Value for params.yaml:code_names',
+      '[0,1,2]'
+    )
 
     expect(paramsToQueue).toStrictEqual([
       '-S',

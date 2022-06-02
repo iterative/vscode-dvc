@@ -6,13 +6,13 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
 import { Value } from '../../../cli/reader'
 
-const standardizeValue = (value: Value) =>
-  typeof value === 'object' ? JSON.stringify(value) : value
+const standardizeValue = (value: Value): string =>
+  typeof value === 'object' ? JSON.stringify(value) : `${value}`
 
 const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
   quickPickManyValues<Param>(
     params.map(param => ({
-      description: `${param.value}`,
+      description: standardizeValue(param.value),
       label: param.path,
       picked: false,
       value: param
@@ -27,7 +27,7 @@ const pickNewParamValues = async (
   for (const { path, value } of paramsToModify) {
     const input = await getInput(
       getEnterValueTitle(path),
-      `${standardizeValue(value)}`
+      standardizeValue(value)
     )
     if (input === undefined) {
       return
