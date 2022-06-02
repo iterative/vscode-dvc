@@ -70,6 +70,16 @@ const data: Column[] = [
   {
     type: ColumnType.PARAMS,
     hasChildren: false,
+    maxStringLength: 3,
+    name: 'code_names',
+    parentPath: joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
+    path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'code_names'),
+    pathArray: [ColumnType.PARAMS, 'params.yaml', 'code_names'],
+    types: ['array']
+  },
+  {
+    type: ColumnType.PARAMS,
+    hasChildren: false,
     maxStringLength: 1,
     name: 'epochs',
     parentPath: joinColumnPath(ColumnType.PARAMS, 'params.yaml'),

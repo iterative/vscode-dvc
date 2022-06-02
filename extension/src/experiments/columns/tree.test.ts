@@ -222,6 +222,14 @@ describe('ExperimentsColumnsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
+          label: 'code_names',
+          path: appendColumnToPath(paramsPath, 'code_names')
+        },
+        {
+          collapsibleState: 0,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
           label: 'epochs',
           path: appendColumnToPath(paramsPath, 'epochs')
         },

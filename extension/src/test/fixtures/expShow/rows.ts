@@ -92,6 +92,7 @@ const data: Row[] = [
     },
     params: {
       'params.yaml': {
+        code_names: [0, 1],
         epochs: 2,
         learning_rate: 2.2e-7,
         dvc_logs_dir: 'dvc_logs',
@@ -196,6 +197,7 @@ const data: Row[] = [
     },
     params: {
       'params.yaml': {
+        code_names: [0, 1],
         epochs: 5,
         learning_rate: 2.1e-7,
         dvc_logs_dir: 'dvc_logs',
@@ -304,6 +306,7 @@ const data: Row[] = [
         },
         params: {
           'params.yaml': {
+            code_names: [0, 1],
             epochs: 2,
             learning_rate: 2e-12,
             dvc_logs_dir: 'dvc_logs',
@@ -410,6 +413,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 2,
                 learning_rate: 2e-12,
                 dvc_logs_dir: 'dvc_logs',
@@ -517,6 +521,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 2,
                 learning_rate: 2e-12,
                 dvc_logs_dir: 'dvc_logs',
@@ -629,6 +634,7 @@ const data: Row[] = [
         },
         params: {
           'params.yaml': {
+            code_names: [0, 1],
             epochs: 2,
             learning_rate: 2.2e-7,
             dvc_logs_dir: 'dvc_logs',
@@ -735,6 +741,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 2,
                 learning_rate: 2.2e-7,
                 dvc_logs_dir: 'dvc_logs',
@@ -842,6 +849,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 2,
                 learning_rate: 2.2e-7,
                 dvc_logs_dir: 'dvc_logs',
@@ -954,6 +962,7 @@ const data: Row[] = [
         },
         params: {
           'params.yaml': {
+            code_names: [0, 1],
             epochs: 5,
             learning_rate: 2.1e-7,
             dvc_logs_dir: 'dvc_logs',
@@ -1060,6 +1069,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 5,
                 learning_rate: 2.1e-7,
                 dvc_logs_dir: 'dvc_logs',
@@ -1167,6 +1177,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 5,
                 learning_rate: 2.1e-7,
                 dvc_logs_dir: 'dvc_logs',
@@ -1274,6 +1285,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 5,
                 learning_rate: 2.1e-7,
                 dvc_logs_dir: 'dvc_logs',
@@ -1381,6 +1393,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 5,
                 learning_rate: 2.1e-7,
                 dvc_logs_dir: 'dvc_logs',
@@ -1488,6 +1501,7 @@ const data: Row[] = [
             },
             params: {
               'params.yaml': {
+                code_names: [0, 1],
                 epochs: 5,
                 learning_rate: 2.1e-7,
                 dvc_logs_dir: 'dvc_logs',
@@ -1585,6 +1599,7 @@ const data: Row[] = [
         },
         params: {
           'params.yaml': {
+            code_names: [0, 1],
             epochs: 5,
             learning_rate: 2.1e-7,
             dvc_logs_dir: 'dvc_logs',

@@ -328,7 +328,7 @@ suite('Extension Test Suite', () => {
           msPythonInstalled: true,
           msPythonUsed: false,
           noCheckpoints: 0,
-          params: 8,
+          params: 9,
           pythonPathUsed: false,
           templates: 3,
           tracked: 15,

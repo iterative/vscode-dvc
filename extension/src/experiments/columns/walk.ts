@@ -27,7 +27,7 @@ const walkValueTree = (
   ancestors: string[] = []
 ) => {
   for (const [key, value] of Object.entries(tree)) {
-    if (value && typeof value === 'object') {
+    if (value && !Array.isArray(value) && typeof value === 'object') {
       walkValueTree(value, meta, onValue, [...ancestors, key])
     } else {
       onValue(key, value, meta, ancestors)
