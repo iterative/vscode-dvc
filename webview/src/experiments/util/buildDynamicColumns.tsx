@@ -83,8 +83,13 @@ const Header: React.FC<{ column: TableColumn<Experiment> }> = ({
 }
 
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
-  pathArray => originalRow =>
-    get(originalRow, pathArray)
+  pathArray => originalRow => {
+    const value = get(originalRow, pathArray)
+    if (!Array.isArray(value)) {
+      return value
+    }
+    return `[${value.join(', ')}]`
+  }
 
 const buildDynamicColumns = (
   properties: Column[],
