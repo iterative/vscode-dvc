@@ -4,20 +4,22 @@
 <!--- [![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml) --->
 <!--- [![Cross-Platform Test](https://github.com/iterative/vscode-dvc/actions/workflows/cross-platform-test.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/cross-platform-test.yml) --->
 <!-- [![DVC CLI Output Test](https://github.com/iterative/vscode-dvc/actions/workflows/dvc-cli-output-test.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/dvc-cli-output-test.yml) -->
-
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
-A [Visual Studio Code](https://code.visualstudio.com/)
-[extension](https://marketplace.visualstudio.com/VSCode) that aims to allow
-users of all technical backgrounds to effectively use [DVC](https://dvc.org/).
+This [extension](https://marketplace.visualstudio.com/VSCode) integrates [DVC
+features] right into the popular [VSCode IDE], allowing users of all levels to
+use DVC visually.
 
-## Current State
+> **Note**: We want early adopter feedback!  
+> Please let us know what you like and don't like about the extension. Feel free
+> to open [issues in this repo] or reach out via [DVC support channels].
 
-We want early adopter feedback! Please let us know what you like and don't like
-about the extension. Feel free to reach out in this repository's
-[issues](https://github.com/iterative/vscode-dvc/issues) or via any of the other
-existing [support channels](https://dvc.org/support).
+[extension]: https://marketplace.visualstudio.com/VSCode
+[dvc features]: https://dvc.org/doc/start
+[vscode ide]: https://code.visualstudio.com/
+[issues in this repo]: https://github.com/iterative/vscode-dvc/issues
+[dvc support channels]: https://dvc.org/support
 
 ## Quick Start
 
