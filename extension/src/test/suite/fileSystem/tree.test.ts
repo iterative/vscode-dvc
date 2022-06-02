@@ -32,6 +32,7 @@ import { buildExperiments } from '../experiments/util'
 import { Repository } from '../../../repository'
 import expShowFixture from '../../fixtures/expShow/output'
 import { WorkspaceRepositories } from '../../../repository/workspace'
+import { TrackedExplorerTree } from '../../../fileSystem/tree'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   const { join } = path
@@ -354,6 +355,11 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       stub(WorkspaceRepositories.prototype, 'getRepository').returns(repository)
       stub(WorkspaceRepositories.prototype, 'isReady').resolves(undefined)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([])
       const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
@@ -381,6 +387,11 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([getPathItem(relPath)])
 
       await commands.executeCommand(
         RegisteredCliCommands.PULL_TARGET,
@@ -407,6 +418,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([getPathItem(relPath)])
+
       await commands.executeCommand(
         RegisteredCliCommands.PULL_TARGET,
         getPathItem(relPath)
@@ -425,6 +442,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockPush = stub(CliExecutor.prototype, 'push').resolves(
         'target pushed'
       )
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([getPathItem(relPath)])
 
       await commands.executeCommand(
         RegisteredCliCommands.PUSH_TARGET,
@@ -449,6 +472,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (TrackedExplorerTree as any).prototype,
+        'getSelectedPathItems'
+      ).returns([])
 
       await commands.executeCommand(
         RegisteredCliCommands.PUSH_TARGET,
