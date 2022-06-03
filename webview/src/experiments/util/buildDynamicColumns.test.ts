@@ -28,7 +28,7 @@ describe('buildDynamicColumns', () => {
     expect(
       simplifyColumns([
         ...buildDynamicColumns(columnsFixture, ColumnType.METRICS),
-        ...buildDynamicColumns(columnsFixture, ColumnType.PARAMS)
+        ...buildDynamicColumns(columnsFixture, ColumnType.PARAMS) // add deps to this test
       ])
     ).toStrictEqual([
       {

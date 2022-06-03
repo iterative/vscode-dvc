@@ -190,6 +190,100 @@ const data: Column[] = [
     path: joinColumnPath(ColumnType.PARAMS, nestedParamsFile, 'test'),
     pathArray: [ColumnType.PARAMS, nestedParamsFile, 'test'],
     types: ['boolean']
+  },
+  {
+    hasChildren: true,
+    name: 'data',
+    parentPath: ColumnType.DEPS,
+    path: 'deps:data',
+    type: ColumnType.DEPS
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 32,
+    name: 'data.xml',
+    parentPath: 'deps:data',
+    path: 'deps:data/data.xml',
+    pathArray: [ColumnType.DEPS, 'data', 'data.xml'],
+    type: ColumnType.DEPS,
+    types: ['string']
+  },
+  {
+    hasChildren: true,
+    name: 'src',
+    parentPath: ColumnType.DEPS,
+    path: 'deps:src',
+    type: ColumnType.DEPS
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 32,
+    name: 'prepare.py',
+    parentPath: 'deps:src',
+    path: 'deps:src/prepare.py',
+    pathArray: [ColumnType.DEPS, 'src', 'prepare.py'],
+    type: ColumnType.DEPS,
+    types: ['string']
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 36,
+    name: 'prepared',
+    parentPath: 'deps:data',
+    path: 'deps:data/prepared',
+    pathArray: [ColumnType.DEPS, 'data', 'prepared'],
+    type: ColumnType.DEPS,
+    types: ['string']
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 32,
+    name: 'featurization.py',
+    parentPath: 'deps:src',
+    path: 'deps:src/featurization.py',
+    pathArray: [ColumnType.DEPS, 'src', 'featurization.py'],
+    type: ColumnType.DEPS,
+    types: ['string']
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 36,
+    name: 'features',
+    parentPath: 'deps:data',
+    path: 'deps:data/features',
+    pathArray: [ColumnType.DEPS, 'data', 'features'],
+    type: ColumnType.DEPS,
+    types: ['string']
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 32,
+    name: 'train.py',
+    parentPath: 'deps:src',
+    path: 'deps:src/train.py',
+    pathArray: [ColumnType.DEPS, 'src', 'train.py'],
+    type: ColumnType.DEPS,
+    types: ['string']
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 32,
+    name: 'model.pkl',
+    parentPath: ColumnType.DEPS,
+    path: joinColumnPath(ColumnType.DEPS, 'model.pkl'),
+    pathArray: [ColumnType.DEPS, 'model.pkl'],
+    type: ColumnType.DEPS,
+    types: ['string']
+  },
+  {
+    hasChildren: false,
+    maxStringLength: 32,
+    name: 'evaluate.py',
+    parentPath: joinColumnPath(ColumnType.DEPS, 'src'),
+    path: joinColumnPath(ColumnType.DEPS, 'src', 'evaluate.py'),
+    pathArray: [ColumnType.DEPS, 'src', 'evaluate.py'],
+    type: ColumnType.DEPS,
+    types: ['string']
   }
 ]
 

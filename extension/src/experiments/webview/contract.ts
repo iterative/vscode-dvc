@@ -12,7 +12,9 @@ export interface Experiment extends BaseExperimentFields {
   logicalGroupName?: string
   params?: Columns
   metrics?: Columns
-  deps?: Columns
+  deps?: {
+    [filename: string]: ValueTree | string
+  }
   outs?: Columns
   displayColor?: string
   selected?: boolean
@@ -32,7 +34,8 @@ export interface ColumnAggregateData {
 
 export enum ColumnType {
   METRICS = 'metrics',
-  PARAMS = 'params'
+  PARAMS = 'params',
+  DEPS = 'deps'
 }
 
 export interface Column extends ColumnAggregateData {

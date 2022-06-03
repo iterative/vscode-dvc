@@ -1,7 +1,7 @@
 import { join } from 'path'
 import get from 'lodash/get'
-import { ValueWalkMeta, walkRepo } from './walk'
-import { joinColumnPath, METRIC_PARAM_SEPARATOR } from './paths'
+import { walkRepo } from './walk'
+import { joinColumnPath } from './paths'
 import { Column, ColumnType } from '../webview/contract'
 import {
   ExperimentFields,
@@ -23,7 +23,7 @@ const getValueType = (value: Value) => {
   return typeof value
 }
 
-const concatenatePathSegments = (path: string[], limit = 5) => {
+const concatenatePathSegments = (path: string[], sep: string, limit = 5) => {
   /*
     This function doesn't receive the first and final layer, and the
     concatenated layer itself counts as one; because of this, we must subtract 3
@@ -32,7 +32,7 @@ const concatenatePathSegments = (path: string[], limit = 5) => {
   const convertedLimit = limit - 3
   if (path.length > convertedLimit) {
     const cutoff = path.length - convertedLimit
-    const concatenatedPath = path.slice(0, cutoff).join(METRIC_PARAM_SEPARATOR)
+    const concatenatedPath = path.slice(0, cutoff).join(sep)
     return [concatenatedPath, ...path.slice(cutoff)]
   }
   return path
@@ -95,20 +95,20 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
   const buildValueColumn = (
     name: string,
     value: Value,
-    { type, file }: ValueWalkMeta,
+    type: ColumnType,
     ancestors: string[],
     concatenatedAncestors: string[],
     path: string,
     valueType: string
   ) => {
-    const parentPath = joinColumnPath(type, file, ...concatenatedAncestors)
+    const parentPath = joinColumnPath(type, ...concatenatedAncestors)
     const newColumn: Column = {
       hasChildren: false,
       maxStringLength: String(value).length,
       name,
       parentPath,
       path,
-      pathArray: [type, file, ...ancestors, name],
+      pathArray: [type, ...ancestors, name],
       type,
       types: [valueType]
     }
@@ -124,18 +124,17 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
   const mergeValueColumn = (
     name: string,
     value: Value,
-    meta: ValueWalkMeta,
+    type: ColumnType,
     ancestors: string[],
     concatenatedAncestors: string[]
   ) => {
-    const { type, file } = meta
-    const path = joinColumnPath(type, file, ...concatenatedAncestors, name)
+    const path = joinColumnPath(type, ...concatenatedAncestors, name)
     const valueType = getValueType(value)
     if (!collectedColumns[path]) {
       collectedColumns[path] = buildValueColumn(
         name,
         value,
-        meta,
+        type,
         ancestors,
         concatenatedAncestors,
         path,
@@ -146,13 +145,15 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
     }
   }
 
-  walkRepo(data, (key, value, meta, ancestors) => {
-    const concatenatedAncestors = concatenatePathSegments(ancestors)
-    const fullConcatenatedPath = [meta.file, ...concatenatedAncestors]
-    for (let i = 1; i <= fullConcatenatedPath.length; i++) {
-      mergeParentColumnByPath(fullConcatenatedPath.slice(0, i), meta.type)
+  walkRepo(data, (key, value, type, ancestors, sep) => {
+    const concatenatedAncestors =
+      ancestors.length > 2
+        ? [ancestors[0], ...concatenatePathSegments(ancestors.slice(1), sep)]
+        : ancestors
+    for (let i = 1; i <= concatenatedAncestors.length; i++) {
+      mergeParentColumnByPath(concatenatedAncestors.slice(0, i), type)
     }
-    mergeValueColumn(key, value, meta, ancestors, concatenatedAncestors)
+    mergeValueColumn(key, value, type, ancestors, concatenatedAncestors)
   })
   return Object.values(collectedColumns)
 }
@@ -179,6 +180,8 @@ const collectChange = (
   if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
     changes.push(joinColumnPath(type, file, ...ancestors, key))
   }
+
+  // needs deps
 }
 
 const collectFileChanges = (

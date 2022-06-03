@@ -133,6 +133,30 @@ describe('ExperimentsColumnsTree', () => {
           iconPath: mockedSelectedCheckbox,
           label: join('nested', 'params.yaml'),
           path: joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'))
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'data',
+          path: joinColumnPath(ColumnType.DEPS, 'data')
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'src',
+          path: joinColumnPath(ColumnType.DEPS, 'src')
+        },
+        {
+          collapsibleState: 0,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'model.pkl',
+          path: joinColumnPath(ColumnType.DEPS, 'model.pkl')
         }
       ])
     })
@@ -182,6 +206,30 @@ describe('ExperimentsColumnsTree', () => {
           iconPath: mockedSelectedCheckbox,
           label: join('nested', 'params.yaml'),
           path: joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'))
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'data',
+          path: joinColumnPath(ColumnType.DEPS, 'data')
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'src',
+          path: joinColumnPath(ColumnType.DEPS, 'src')
+        },
+        {
+          collapsibleState: 0,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'model.pkl',
+          path: joinColumnPath(ColumnType.DEPS, 'model.pkl')
         }
       ])
 

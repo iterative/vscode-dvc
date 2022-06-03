@@ -431,7 +431,21 @@ describe('collectColumns', () => {
         ),
         joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'process', 'test_arg'),
         joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml')),
-        joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'), 'test')
+        joinColumnPath(
+          ColumnType.PARAMS,
+          join('nested', 'params.yaml'),
+          'test'
+        ),
+        joinColumnPath(ColumnType.DEPS, 'data'),
+        joinColumnPath(ColumnType.DEPS, join('data', 'data.xml')),
+        joinColumnPath(ColumnType.DEPS, 'src'),
+        joinColumnPath(ColumnType.DEPS, join('src', 'prepare.py')),
+        joinColumnPath(ColumnType.DEPS, join('data', 'prepared')),
+        joinColumnPath(ColumnType.DEPS, join('src', 'featurization.py')),
+        joinColumnPath(ColumnType.DEPS, join('data', 'features')),
+        joinColumnPath(ColumnType.DEPS, join('src', 'train.py')),
+        joinColumnPath(ColumnType.DEPS, 'model.pkl'),
+        joinColumnPath(ColumnType.DEPS, join('src', 'evaluate.py'))
       ]
     )
   })
