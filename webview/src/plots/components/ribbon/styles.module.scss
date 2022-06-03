@@ -2,6 +2,9 @@
 
 .copyButton {
   display: none;
+  position: absolute;
+  right: 0;
+  top: 3px;
 }
 
 .block {
@@ -42,6 +45,8 @@
 .title {
   display: inline-flex;
   align-items: center;
+  padding-right: 15px;
+  position: relative;
 }
 
 .subtitle {
