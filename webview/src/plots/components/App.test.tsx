@@ -36,7 +36,6 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
-import { CopyTooltip } from './ribbon/RibbonBlock'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
@@ -1524,80 +1523,6 @@ describe('App', () => {
       expect(mockPostMessage).toBeCalledWith({
         payload: ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd'],
         type: MessageFromWebviewType.REFRESH_REVISIONS
-      })
-    })
-
-    describe('Copy button', () => {
-      const mockWriteText = jest.fn()
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: mockWriteText
-        }
-      })
-
-      beforeAll(() => {
-        jest.useFakeTimers()
-      })
-
-      afterAll(() => {
-        jest.useRealTimers()
-      })
-
-      it('should copy the experiment name when clicking the text', async () => {
-        mockWriteText.mockResolvedValueOnce('success')
-
-        renderAppWithData({
-          comparison: comparisonTableFixture,
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-
-        const mainNameButton = within(
-          screen.getByTestId('ribbon-main')
-        ).getAllByRole('button')[0]
-
-        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
-        fireEvent.click(mainNameButton)
-
-        expect(mockWriteText).toBeCalledWith('main')
-        await screen.findByText(CopyTooltip.COPIED)
-      })
-
-      it('should display that the experiment was copied when clicking the text', async () => {
-        mockWriteText.mockResolvedValueOnce('success')
-
-        renderAppWithData({
-          comparison: comparisonTableFixture,
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-
-        const mainNameButton = within(
-          screen.getByTestId('ribbon-main')
-        ).getAllByRole('button')[0]
-
-        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
-        fireEvent.click(mainNameButton)
-
-        expect(await screen.findByText(CopyTooltip.COPIED)).toBeInTheDocument()
-      })
-
-      it('should display copy again when hovering the text 2s after clicking the text', async () => {
-        mockWriteText.mockResolvedValueOnce('success')
-
-        renderAppWithData({
-          comparison: comparisonTableFixture,
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
-
-        const mainNameButton = within(
-          screen.getByTestId('ribbon-main')
-        ).getAllByRole('button')[0]
-
-        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
-        fireEvent.click(mainNameButton)
-
-        jest.advanceTimersByTime(2001)
-
-        expect(await screen.findByText(CopyTooltip.NORMAL)).toBeInTheDocument()
       })
     })
   })
