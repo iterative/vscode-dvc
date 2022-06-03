@@ -29,8 +29,8 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
     >
       <div className={styles.label}>
         <div className={styles.title}>
-          <CopyButton value={exp} className={styles.copyButton} />
           {exp}
+          <CopyButton value={exp} className={styles.copyButton} />
         </div>
         {revision.group && (
           <div className={styles.subtitle}>{revision.revision}</div>
