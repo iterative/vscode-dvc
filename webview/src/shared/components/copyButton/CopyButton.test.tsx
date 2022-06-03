@@ -35,7 +35,7 @@ describe('CopyButton', () => {
 
   it('should call writeText with the value prop and show the success icon for a second when writeText resolves', async () => {
     mockWriteText.mockResolvedValueOnce(undefined)
-    render(<CopyButton value={exampleCopyText} />)
+    render(<CopyButton value={exampleCopyText} tooltip={defaultStateTitle} />)
     const copyButtonElement = screen.getByTitle(defaultStateTitle)
 
     fireEvent.click(copyButtonElement, {
@@ -53,7 +53,7 @@ describe('CopyButton', () => {
 
   it('should call writeText with the value prop and show the failure icon for a second when writeText rejects', async () => {
     mockWriteText.mockRejectedValueOnce(new Error('Copying is not allowed!'))
-    render(<CopyButton value={exampleCopyText} />)
+    render(<CopyButton value={exampleCopyText} tooltip={defaultStateTitle} />)
     const copyButtonElement = screen.getByTitle(defaultStateTitle)
 
     fireEvent.click(copyButtonElement, {
@@ -73,7 +73,7 @@ describe('CopyButton', () => {
 
   it('should restart the state reset timer if clicked while in the success state', async () => {
     mockWriteText.mockResolvedValueOnce(undefined)
-    render(<CopyButton value={exampleCopyText} />)
+    render(<CopyButton value={exampleCopyText} tooltip={defaultStateTitle} />)
     const copyButtonElement = screen.getByTitle(defaultStateTitle)
 
     // Click once

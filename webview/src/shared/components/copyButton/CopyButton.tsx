@@ -1,7 +1,8 @@
 import React, { FC, useEffect, useRef, useState } from 'react'
-import CopyIcon from '../../../shared/components/icons/Copy'
-import CheckIcon from '../../../shared/components/icons/Check'
-import styles from '../table/styles.module.scss'
+import cx from 'classnames'
+import styles from './styles.module.scss'
+import CopyIcon from '../icons/Copy'
+import CheckIcon from '../icons/Check'
 
 const enum CopyButtonState {
   DEFAULT,
@@ -17,13 +18,17 @@ const copyIconComponents: Record<CopyButtonState, FC> = {
   [CopyButtonState.FAILURE]: FailureIcon
 }
 
-const copyIconTitles: Record<CopyButtonState, string> = {
-  [CopyButtonState.DEFAULT]: 'Copy cell contents',
-  [CopyButtonState.SUCCESS]: 'Copy successful',
-  [CopyButtonState.FAILURE]: 'Copy failed'
-}
+export const CopyButton: React.FC<{
+  value: string
+  tooltip?: string
+  className?: string
+}> = ({ value, tooltip, className }) => {
+  const copyIconTitles: Record<CopyButtonState, string> = {
+    [CopyButtonState.DEFAULT]: tooltip || 'Copy',
+    [CopyButtonState.SUCCESS]: 'Copy successful',
+    [CopyButtonState.FAILURE]: 'Copy failed'
+  }
 
-export const CopyButton: React.FC<{ value: string }> = ({ value }) => {
   const timer = useRef<number>()
   const [state, setState] = useState<CopyButtonState>(CopyButtonState.DEFAULT)
   const IconComponent = copyIconComponents[state]
@@ -38,7 +43,7 @@ export const CopyButton: React.FC<{ value: string }> = ({ value }) => {
   return (
     <button
       title={copyIconTitles[state]}
-      className={styles.copyButton}
+      className={cx(styles.button, className)}
       onClick={() => {
         navigator.clipboard
           .writeText(value)
