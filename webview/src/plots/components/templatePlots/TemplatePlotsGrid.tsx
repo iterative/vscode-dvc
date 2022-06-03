@@ -84,7 +84,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         id={id}
         style={withScale(nbRevisions)}
       >
-        <ZoomablePlot id={id} plotProps={plotProps} />
+        <ZoomablePlot id={id} plotProps={JSON.stringify(plotProps)} />
       </div>
     )
   })

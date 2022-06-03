@@ -5,6 +5,7 @@ import {
   DEFAULT_SECTION_SIZES,
   PlotSize,
   Section,
+  TemplatePlot,
   TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
 
@@ -26,9 +27,7 @@ export const templatePlotsSlice = createSlice({
   initialState,
   reducers: {
     update: (state, action: PayloadAction<TemplatePlotsData>) => {
-      state.plots = action.payload.plots
-      state.sectionName = action.payload.sectionName
-      state.size = action.payload.size
+      Object.assign(state, action.payload)
       state.hasData = !!action.payload
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
