@@ -11,7 +11,7 @@ export const limitAncestorDepth = (
   const [path, ...rest] = ancestors
   /*
     The depth is only limited for the middle of the path array.
-		The first and final layer are excluded, and the
+    The first and final layer are excluded, and the
     concatenated layer itself counts as one; because of this, we must subtract 3
     from what we want the final layer count to be.
   */
@@ -44,7 +44,7 @@ const mergeParentColumnByPath = (
   }
 }
 
-export const getValueType = (value: Value) => {
+const getValueType = (value: Value) => {
   if (value === null) {
     return 'null'
   }
