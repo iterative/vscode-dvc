@@ -1,10 +1,10 @@
 import { join } from 'path'
-import { collectChanges, collectColumns } from './collect'
-import { joinColumnPath } from './paths'
-import { Column, ColumnType } from '../webview/contract'
-import outputFixture from '../../test/fixtures/expShow/output'
-import columnsFixture from '../../test/fixtures/expShow/columns'
-import { ExperimentsOutput } from '../../cli/reader'
+import { collectChanges, collectColumns } from '.'
+import { joinColumnPath } from '../paths'
+import { Column, ColumnType } from '../../webview/contract'
+import outputFixture from '../../../test/fixtures/expShow/output'
+import columnsFixture from '../../../test/fixtures/expShow/columns'
+import { ExperimentsOutput } from '../../../cli/reader'
 
 describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {

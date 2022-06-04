@@ -1,15 +1,13 @@
-import { sep } from 'path'
-import set from 'lodash.set'
 import { Deps, ExperimentFields, ValueTreeRoot } from '../../cli/reader'
-import { Columns } from '../webview/contract'
+import { DepColumns, MetricOrParamColumns } from '../webview/contract'
 
 const extractMetricsOrParams = (
   columns?: ValueTreeRoot
-): Columns | undefined => {
+): MetricOrParamColumns | undefined => {
   if (!columns) {
     return
   }
-  const acc: Columns = {}
+  const acc: MetricOrParamColumns = {}
 
   for (const [file, dataOrError] of Object.entries(columns)) {
     const data = dataOrError?.data
@@ -22,15 +20,15 @@ const extractMetricsOrParams = (
   return acc
 }
 
-const extractDeps = (columns?: Deps): Columns | undefined => {
+const extractDeps = (columns?: Deps): DepColumns | undefined => {
   if (!columns) {
     return
   }
 
-  const acc = {}
+  const acc: DepColumns = {}
 
-  for (const [file, { hash }] of Object.entries(columns)) {
-    set(acc, [...file.split(sep)], hash)
+  for (const [path, { hash }] of Object.entries(columns)) {
+    acc[path] = hash
   }
 
   return acc
@@ -39,9 +37,9 @@ const extractDeps = (columns?: Deps): Columns | undefined => {
 export const extractColumns = (
   experiment: ExperimentFields
 ): {
-  deps: Columns | undefined
-  metrics: Columns | undefined
-  params: Columns | undefined
+  deps: DepColumns | undefined
+  metrics: MetricOrParamColumns | undefined
+  params: MetricOrParamColumns | undefined
 } => ({
   deps: extractDeps(experiment.deps),
   metrics: extractMetricsOrParams(experiment.metrics),

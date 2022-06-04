@@ -1,8 +1,12 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
 import { SortDefinition } from '../model/sortBy'
 
-export interface Columns {
+export interface MetricOrParamColumns {
   [filename: string]: ValueTree
+}
+
+export interface DepColumns {
+  [path: string]: string
 }
 
 export interface Experiment extends BaseExperimentFields {
@@ -10,12 +14,10 @@ export interface Experiment extends BaseExperimentFields {
   label: string
   displayNameOrParent?: string
   logicalGroupName?: string
-  params?: Columns
-  metrics?: Columns
-  deps?: {
-    [filename: string]: ValueTree | string
-  }
-  outs?: Columns
+  params?: MetricOrParamColumns
+  metrics?: MetricOrParamColumns
+  deps?: DepColumns
+  outs?: MetricOrParamColumns
   displayColor?: string
   selected?: boolean
   mutable?: boolean

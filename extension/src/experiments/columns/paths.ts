@@ -1,4 +1,3 @@
-import { sep } from 'path'
 import { ColumnType } from '../webview/contract'
 
 export const METRIC_PARAM_SEPARATOR = '.'
@@ -38,10 +37,6 @@ export const joinColumnPath = (
   }
   if (rest.length === 0) {
     return type + FILE_SEPARATOR + fileSegment
-  }
-
-  if (type === ColumnType.DEPS) {
-    return type + FILE_SEPARATOR + pathSegments.join(sep)
   }
 
   return type + FILE_SEPARATOR + appendColumnToPath(fileSegment, ...rest)
