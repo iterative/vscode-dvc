@@ -229,10 +229,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     width: 1rem;
   }
 
-  .thead {
-    border-bottom: $row-border;
-  }
-
   .tr {
     position: relative;
     & > *:first-child {
@@ -537,8 +533,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .thead {
+  background-color: $bg-color;
+  border-bottom: $row-border;
+  box-shadow: 0 5px 8px -2px var(--vscode-widget-shadow);
   position: sticky;
   top: 0;
   z-index: 4;
-  background-color: $bg-color;
 }
