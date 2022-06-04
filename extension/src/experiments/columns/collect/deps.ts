@@ -34,7 +34,6 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
       acc,
       name,
       hash,
-      ColumnType.DEPS,
       [ColumnType.DEPS, file],
       path,
       joinColumnPath(ColumnType.DEPS, limitedDepthAncestors.join(sep))

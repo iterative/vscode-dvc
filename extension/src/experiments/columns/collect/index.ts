@@ -19,7 +19,6 @@ import { standardizePath } from '../../../fileSystem/path'
 const collectFromExperiment = (
   acc: ColumnAccumulator,
   experiment: ExperimentFieldsOrError
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const { data } = experiment
   if (data) {

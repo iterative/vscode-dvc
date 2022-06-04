@@ -37,7 +37,6 @@ const collectMetricOrParam = (
     acc,
     name,
     value,
-    type,
     [type, ...pathArray, name],
     joinColumnPath(type, ...limitedDepthAncestors, name),
     joinColumnPath(type, ...limitedDepthAncestors)

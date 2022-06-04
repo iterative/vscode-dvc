@@ -109,7 +109,6 @@ const mergeValueIntoColumn = (column: Column, value: Value) => {
 const buildValueColumn = (
   name: string,
   value: Value,
-  type: ColumnType,
   pathArray: string[],
   path: string,
   parentPath: string
@@ -123,7 +122,7 @@ const buildValueColumn = (
     parentPath,
     path,
     pathArray,
-    type,
+    type: pathArray[0] as ColumnType,
     types: [valueType]
   }
 
@@ -139,13 +138,12 @@ export const mergeValueColumn = (
   acc: ColumnAccumulator,
   name: string,
   value: Value,
-  type: ColumnType,
   pathArray: string[],
   path: string,
   parentPath: string
 ) => {
   if (!acc[path]) {
-    acc[path] = buildValueColumn(name, value, type, pathArray, path, parentPath)
+    acc[path] = buildValueColumn(name, value, pathArray, path, parentPath)
     return
   }
   mergeValueIntoColumn(acc[path], value)
