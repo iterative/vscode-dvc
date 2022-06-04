@@ -19,19 +19,15 @@ export abstract class PathSelectionModel<
 
   private readonly statusKey: PersistenceKey
 
-  private readonly splitFunc: (path: string) => string[]
-
   constructor(
     dvcRoot: string,
     workspaceState: Memento,
-    statusKey: PersistenceKey,
-    splitFunc: (path: string) => string[]
+    statusKey: PersistenceKey
   ) {
     super(dvcRoot, workspaceState)
 
     this.statusKey = statusKey
     this.status = workspaceState.get(this.statusKey + dvcRoot, {})
-    this.splitFunc = splitFunc
   }
 
   public getSelected() {
@@ -53,7 +49,7 @@ export abstract class PathSelectionModel<
       return {
         ...element,
         descendantStatuses: this.getTerminalNodeStatuses(element.path),
-        label: (element as Column)?.name || this.getLabel(element.path), // put label in both
+        label: element.name,
         status: this.status[element.path]
       }
     })
@@ -155,11 +151,6 @@ export abstract class PathSelectionModel<
 
   private persistStatus() {
     return this.persist(this.statusKey, this.status)
-  }
-
-  private getLabel(path: string) {
-    const [label] = this.splitFunc(path).slice(-1)
-    return label
   }
 
   abstract filterChildren(path?: string): T[]

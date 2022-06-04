@@ -8,6 +8,7 @@ import {
 import { joinColumnPath } from '../paths'
 import { ColumnType } from '../../webview/contract'
 import { ExperimentFields } from '../../../cli/reader'
+import { getPathArray } from '../../../fileSystem/util'
 
 export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
   const { deps } = data
@@ -15,7 +16,7 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
     return
   }
   for (const [file, { hash }] of Object.entries(deps)) {
-    const pathArray = file.split(sep)
+    const pathArray = getPathArray(file)
     const name = pathArray.pop() as string
 
     const limitedDepthAncestors = limitAncestorDepth(pathArray, sep)
