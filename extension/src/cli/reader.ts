@@ -69,7 +69,7 @@ type RelPathObject<T> = {
 
 export type ValueTreeRoot = RelPathObject<ValueTreeOrError>
 
-interface ValueTreeNode {
+export interface ValueTreeNode {
   [key: string]: Value | ValueTree
 }
 

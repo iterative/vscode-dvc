@@ -10,6 +10,7 @@ import {
   ExperimentFields,
   Value,
   ValueTree,
+  ValueTreeNode,
   ValueTreeOrError,
   ValueTreeRoot
 } from '../../../cli/reader'
@@ -45,6 +46,9 @@ const collectMetricOrParam = (
   )
 }
 
+const notLeaf = (value: ValueTreeNode): boolean =>
+  value && !Array.isArray(value) && typeof value === 'object'
+
 const walkValueTree = (
   acc: ColumnAccumulator,
   type: ColumnType,
@@ -52,7 +56,7 @@ const walkValueTree = (
   ancestors: string[] = []
 ) => {
   for (const [label, value] of Object.entries(tree)) {
-    if (value && !Array.isArray(value) && typeof value === 'object') {
+    if (notLeaf(value)) {
       walkValueTree(acc, type, value, [...ancestors, label])
     } else {
       collectMetricOrParam(acc, type, ancestors, label, value)
