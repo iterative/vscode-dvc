@@ -1,18 +1,16 @@
 import { join } from 'path'
-import get from 'lodash/get'
 import { ColumnAccumulator } from './util'
-import { collectDeps } from './deps'
-import { collectMetricsAndParams } from './metricsAndParams'
-import { joinColumnPath } from '../paths'
-import { Column, ColumnType } from '../../webview/contract'
+import { collectDepChanges, collectDeps } from './deps'
+import {
+  collectMetricAndParamChanges,
+  collectMetricsAndParams
+} from './metricsAndParams'
+import { Column } from '../../webview/contract'
 import {
   ExperimentFields,
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
-  ExperimentsOutput,
-  Value,
-  ValueTree,
-  ValueTreeOrError
+  ExperimentsOutput
 } from '../../../cli/reader'
 import { standardizePath } from '../../../fileSystem/path'
 
@@ -49,59 +47,13 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
   return Object.values(acc)
 }
 
-const collectChange = (
-  changes: string[],
-  type: ColumnType,
-  file: string,
-  key: string,
-  value: Value | ValueTree,
-  commitData: ExperimentFields,
-  ancestors: string[] = []
-) => {
-  if (typeof value === 'object') {
-    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
-      collectChange(changes, type, file, childKey, childValue, commitData, [
-        ...ancestors,
-        key
-      ])
-    }
-    return
-  }
-
-  if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
-    changes.push(joinColumnPath(type, file, ...ancestors, key))
-  }
-
-  // needs deps
-}
-
-const collectFileChanges = (
-  changes: string[],
-  type: ColumnType,
-  commitData: ExperimentFields,
-  file: string,
-  value: ValueTreeOrError
-) => {
-  const data = value.data
-  if (!data) {
-    return
-  }
-
-  for (const [key, value] of Object.entries(data)) {
-    collectChange(changes, type, file, key, value, commitData)
-  }
-}
-
 const collectColumnsChanges = (
   changes: string[],
   workspaceData: ExperimentFields,
   commitData: ExperimentFields
 ) => {
-  for (const type of Object.values(ColumnType)) {
-    for (const [file, value] of Object.entries(workspaceData?.[type] || {})) {
-      collectFileChanges(changes, type, commitData, file, value)
-    }
-  }
+  collectMetricAndParamChanges(changes, workspaceData, commitData)
+  collectDepChanges(changes, workspaceData, commitData)
 }
 
 export const collectParamsFiles = (

@@ -4,6 +4,7 @@ import { joinColumnPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
 import outputFixture from '../../../test/fixtures/expShow/output'
 import columnsFixture from '../../../test/fixtures/expShow/columns'
+import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
 import { ExperimentsOutput } from '../../../cli/reader'
 
 describe('collectColumns', () => {
@@ -468,6 +469,11 @@ describe('collectChanges', () => {
       }
     }
   }
+
+  it('should return the expected data from the output fixture', () => {
+    const changes = collectChanges(outputFixture)
+    expect(changes).toStrictEqual(workspaceChangesFixture)
+  })
 
   it('should return an empty array if there are no changes from the current commit and the workspace', () => {
     const data: ExperimentsOutput = {

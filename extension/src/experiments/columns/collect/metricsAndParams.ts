@@ -1,3 +1,4 @@
+import get from 'lodash.get'
 import {
   ColumnAccumulator,
   limitAncestorDepth,
@@ -9,6 +10,7 @@ import {
   ExperimentFields,
   Value,
   ValueTree,
+  ValueTreeOrError,
   ValueTreeRoot
 } from '../../../cli/reader'
 import { joinColumnPath, METRIC_PARAM_SEPARATOR } from '../paths'
@@ -81,5 +83,58 @@ export const collectMetricsAndParams = (
   }
   if (params) {
     walkValueFileRoot(acc, params, ColumnType.PARAMS)
+  }
+}
+
+const collectChange = (
+  changes: string[],
+  type: ColumnType,
+  file: string,
+  key: string,
+  value: Value | ValueTree,
+  commitData: ExperimentFields,
+  ancestors: string[] = []
+) => {
+  if (typeof value === 'object') {
+    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
+      collectChange(changes, type, file, childKey, childValue, commitData, [
+        ...ancestors,
+        key
+      ])
+    }
+    return
+  }
+
+  if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
+    changes.push(joinColumnPath(type, file, ...ancestors, key))
+  }
+}
+
+const collectFileChanges = (
+  changes: string[],
+  type: ColumnType,
+  commitData: ExperimentFields,
+  file: string,
+  value: ValueTreeOrError
+) => {
+  const data = value.data
+  if (!data) {
+    return
+  }
+
+  for (const [key, value] of Object.entries(data)) {
+    collectChange(changes, type, file, key, value, commitData)
+  }
+}
+
+export const collectMetricAndParamChanges = (
+  changes: string[],
+  workspaceData: ExperimentFields,
+  commitData: ExperimentFields
+) => {
+  for (const type of [ColumnType.METRICS, ColumnType.PARAMS]) {
+    for (const [file, value] of Object.entries(workspaceData?.[type] || {})) {
+      collectFileChanges(changes, type, commitData, file, value)
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { sep } from 'path'
+import get from 'lodash.get'
 import {
   ColumnAccumulator,
   limitAncestorDepth,
@@ -39,5 +40,19 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
       path,
       joinColumnPath(ColumnType.DEPS, limitedDepthAncestors.join(sep))
     )
+  }
+}
+
+export const collectDepChanges = (
+  changes: string[],
+  workspaceData: ExperimentFields,
+  commitData: ExperimentFields
+) => {
+  for (const [file, { hash }] of Object.entries(
+    workspaceData?.[ColumnType.DEPS] || {}
+  )) {
+    if (get(commitData?.[ColumnType.DEPS], [file, 'hash']) !== hash) {
+      changes.push(joinColumnPath(ColumnType.DEPS, file))
+    }
   }
 }
