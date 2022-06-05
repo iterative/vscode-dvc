@@ -7,7 +7,6 @@ import {
 } from './metricsAndParams'
 import { Column } from '../../webview/contract'
 import {
-  ExperimentFields,
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
   ExperimentsOutput
@@ -47,25 +46,6 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
   return Object.values(acc)
 }
 
-const collectColumnsChanges = (
-  changes: string[],
-  workspaceData: ExperimentFields,
-  commitData: ExperimentFields
-) => {
-  collectMetricAndParamChanges(changes, workspaceData, commitData)
-  collectDepChanges(changes, workspaceData, commitData)
-}
-
-export const collectParamsFiles = (
-  dvcRoot: string,
-  data: ExperimentsOutput
-): Set<string> => {
-  const files = Object.keys(data.workspace.baseline.data?.params || {})
-    .filter(Boolean)
-    .map(file => standardizePath(join(dvcRoot, file))) as string[]
-  return new Set(files)
-}
-
 const getData = (value: { baseline: ExperimentFieldsOrError }) =>
   value.baseline.data || {}
 
@@ -87,7 +67,18 @@ export const collectChanges = (data: ExperimentsOutput): string[] => {
     return changes
   }
 
-  collectColumnsChanges(changes, workspace, currentCommit)
+  collectMetricAndParamChanges(changes, workspace, currentCommit)
+  collectDepChanges(changes, workspace, currentCommit)
 
   return changes.sort()
+}
+
+export const collectParamsFiles = (
+  dvcRoot: string,
+  data: ExperimentsOutput
+): Set<string> => {
+  const files = Object.keys(data.workspace.baseline.data?.params || {})
+    .filter(Boolean)
+    .map(file => standardizePath(join(dvcRoot, file))) as string[]
+  return new Set(files)
 }
