@@ -18,9 +18,9 @@ import { buildMetricOrParamPath, METRIC_PARAM_SEPARATOR } from '../paths'
 const collectMetricOrParam = (
   acc: ColumnAccumulator,
   type: ColumnType,
+  pathArray: string[],
   label: string,
-  value: Value,
-  pathArray: string[]
+  value: Value
 ) => {
   const limitedDepthAncestors = limitAncestorDepth(
     pathArray,
@@ -55,7 +55,7 @@ const walkValueTree = (
     if (value && !Array.isArray(value) && typeof value === 'object') {
       walkValueTree(acc, type, value, [...ancestors, label])
     } else {
-      collectMetricOrParam(acc, type, label, value, ancestors)
+      collectMetricOrParam(acc, type, ancestors, label, value)
     }
   }
 }
