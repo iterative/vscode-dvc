@@ -20,9 +20,11 @@
   "homepage": "https://github.com/iterative/vscode-dvc/README.md",
   "keywords": [
     "iterative",
-    "data",
-    "version",
-    "control",
+    "data version control",
+    "plots",
+    "experiment tracking",
+    "hyperparameters",
+    "dataset",
     "dvc"
   ],
   "categories": [
