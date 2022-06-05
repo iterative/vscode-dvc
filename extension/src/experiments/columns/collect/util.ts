@@ -26,10 +26,10 @@ export const limitAncestorDepth = (
 
 const mergeParentColumnByPath = (
   acc: ColumnAccumulator,
-  label: string,
+  type: ColumnType,
   path: string,
   parentPath: string,
-  type: ColumnType
+  label: string
 ) => {
   if (!acc[path]) {
     acc[path] = {
@@ -82,10 +82,10 @@ export const mergeAncestors = (
       const pathArray = limitedDepthAncestors.slice(0, i)
       mergeParentColumnByPath(
         acc,
-        pathArray[pathArray.length - 1],
+        type,
         join(...pathArray),
         join(...pathArray.slice(0, -1)),
-        type
+        pathArray[pathArray.length - 1]
       )
     }
   }
