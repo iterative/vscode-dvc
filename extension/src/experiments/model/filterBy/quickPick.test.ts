@@ -1,7 +1,7 @@
 import { FilterDefinition, getFilterId, Operator } from '.'
 import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
-import { appendColumnToPath, joinColumnPath } from '../../columns/paths'
+import { appendColumnToPath, buildMetricOrParamPath } from '../../columns/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { ColumnType } from '../../webview/contract'
@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 
 const paramsYaml = 'params.yaml'
-const paramsYamlPath = joinColumnPath(ColumnType.PARAMS, paramsYaml)
+const paramsYamlPath = buildMetricOrParamPath(ColumnType.PARAMS, paramsYaml)
 const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epoch')
 
 const epochsParam = {

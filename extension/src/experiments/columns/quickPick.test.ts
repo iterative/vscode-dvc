@@ -1,5 +1,5 @@
 import { pickFromColumns } from './quickPick'
-import { appendColumnToPath, joinColumnPath } from './paths'
+import { appendColumnToPath, buildMetricOrParamPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Title } from '../../vscode/title'
@@ -20,7 +20,7 @@ beforeEach(() => {
 describe('pickFromColumns', () => {
   const params = ColumnType.PARAMS
   const paramsYaml = 'params.yaml'
-  const paramsYamlPath = joinColumnPath(params, paramsYaml)
+  const paramsYamlPath = buildMetricOrParamPath(params, paramsYaml)
   const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epochs')
   const epochsParam = {
     hasChildren: false,

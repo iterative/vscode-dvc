@@ -24,7 +24,7 @@ import {
   Row,
   TableData
 } from 'dvc/src/experiments/webview/contract'
-import { joinColumnPath } from 'dvc/src/experiments/columns/paths'
+import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import { App } from './App'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
@@ -464,7 +464,7 @@ describe('App', () => {
     })
 
     const testParamName = 'test_param_with_long_name'
-    const testParamPath = joinColumnPath(
+    const testParamPath = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       testParamName
@@ -478,8 +478,8 @@ describe('App', () => {
         {
           hasChildren: true,
           name: 'summary.json',
-          parentPath: joinColumnPath(ColumnType.METRICS),
-          path: joinColumnPath(ColumnType.METRICS, 'summary.json'),
+          parentPath: buildMetricOrParamPath(ColumnType.METRICS),
+          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
           type: ColumnType.METRICS
         },
         {
@@ -488,8 +488,15 @@ describe('App', () => {
           maxStringLength: 18,
           minNumber: testMetricNumberValue,
           name: 'loss',
-          parentPath: joinColumnPath(ColumnType.METRICS, 'summary.json'),
-          path: joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
+          parentPath: buildMetricOrParamPath(
+            ColumnType.METRICS,
+            'summary.json'
+          ),
+          path: buildMetricOrParamPath(
+            ColumnType.METRICS,
+            'summary.json',
+            'loss'
+          ),
           pathArray: [ColumnType.METRICS, 'summary.json', 'loss'],
           type: ColumnType.METRICS,
           types: ['number']
@@ -498,14 +505,14 @@ describe('App', () => {
           hasChildren: true,
           name: 'params.yaml',
           parentPath: ColumnType.PARAMS,
-          path: joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
           type: ColumnType.PARAMS
         },
         {
           hasChildren: false,
           maxStringLength: 10,
           name: testParamName,
-          parentPath: joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
+          parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
           path: testParamPath,
           pathArray: [ColumnType.PARAMS, 'params.yaml', testParamName],
           type: ColumnType.PARAMS,

@@ -13,7 +13,7 @@ import {
   ValueTreeOrError,
   ValueTreeRoot
 } from '../../../cli/reader'
-import { joinColumnPath, METRIC_PARAM_SEPARATOR } from '../paths'
+import { buildMetricOrParamPath, METRIC_PARAM_SEPARATOR } from '../paths'
 
 const collectMetricOrParam = (
   acc: ColumnAccumulator,
@@ -26,12 +26,12 @@ const collectMetricOrParam = (
     pathArray,
     METRIC_PARAM_SEPARATOR
   )
-  const path = joinColumnPath(type, ...limitedDepthAncestors, name)
+  const path = buildMetricOrParamPath(type, ...limitedDepthAncestors, name)
   mergeAncestors(
     acc,
     path,
     limitedDepthAncestors,
-    (...pathArray: string[]) => joinColumnPath(type, ...pathArray),
+    (...pathArray: string[]) => buildMetricOrParamPath(type, ...pathArray),
     type
   )
 
@@ -40,8 +40,8 @@ const collectMetricOrParam = (
     name,
     value,
     [type, ...pathArray, name],
-    joinColumnPath(type, ...limitedDepthAncestors, name),
-    joinColumnPath(type, ...limitedDepthAncestors)
+    buildMetricOrParamPath(type, ...limitedDepthAncestors, name),
+    buildMetricOrParamPath(type, ...limitedDepthAncestors)
   )
 }
 
@@ -106,7 +106,7 @@ const collectChange = (
   }
 
   if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
-    changes.push(joinColumnPath(type, file, ...ancestors, key))
+    changes.push(buildMetricOrParamPath(type, file, ...ancestors, key))
   }
 }
 

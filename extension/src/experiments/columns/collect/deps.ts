@@ -6,7 +6,7 @@ import {
   mergeAncestors,
   mergeValueColumn
 } from './util'
-import { joinColumnPath } from '../paths'
+import { buildMetricOrParamPath } from '../paths'
 import { ColumnType } from '../../webview/contract'
 import { ExperimentFields } from '../../../cli/reader'
 import { getPathArray } from '../../../fileSystem/util'
@@ -21,14 +21,14 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
     const name = pathArray.pop() as string
 
     const limitedDepthAncestors = limitAncestorDepth(pathArray, sep)
-    const path = joinColumnPath(ColumnType.DEPS, file)
+    const path = buildMetricOrParamPath(ColumnType.DEPS, file)
 
     mergeAncestors(
       acc,
       path,
       limitedDepthAncestors,
       (...pathArray: string[]) =>
-        joinColumnPath(ColumnType.DEPS, pathArray.join(sep)),
+        buildMetricOrParamPath(ColumnType.DEPS, pathArray.join(sep)),
       ColumnType.DEPS
     )
 
@@ -38,7 +38,7 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
       hash,
       [ColumnType.DEPS, file],
       path,
-      joinColumnPath(ColumnType.DEPS, limitedDepthAncestors.join(sep))
+      buildMetricOrParamPath(ColumnType.DEPS, limitedDepthAncestors.join(sep))
     )
   }
 }
@@ -52,7 +52,7 @@ export const collectDepChanges = (
     workspaceData?.[ColumnType.DEPS] || {}
   )) {
     if (get(commitData?.[ColumnType.DEPS], [file, 'hash']) !== hash) {
-      changes.push(joinColumnPath(ColumnType.DEPS, file))
+      changes.push(buildMetricOrParamPath(ColumnType.DEPS, file))
     }
   }
 }

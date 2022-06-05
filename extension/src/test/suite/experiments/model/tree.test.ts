@@ -23,7 +23,7 @@ import checkpointPlotsFixture from '../../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
 import expShowFixture from '../../../fixtures/expShow/output'
 import { Operator } from '../../../../experiments/model/filterBy'
-import { joinColumnPath } from '../../../../experiments/columns/paths'
+import { buildMetricOrParamPath } from '../../../../experiments/columns/paths'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, buildSingleRepoExperiments } from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
@@ -218,7 +218,11 @@ suite('Experiments Tree Test Suite', () => {
       stub(ExperimentsModel.prototype, 'getFilters').returns([
         {
           operator: Operator.EQUAL,
-          path: joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
+          path: buildMetricOrParamPath(
+            ColumnType.METRICS,
+            'summary.json',
+            'loss'
+          ),
           value: unfilteredCheckpointValue
         }
       ])
@@ -373,7 +377,11 @@ suite('Experiments Tree Test Suite', () => {
 
       await addFilterViaQuickInput(experiments, {
         operator: Operator.EQUAL,
-        path: joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
+        path: buildMetricOrParamPath(
+          ColumnType.METRICS,
+          'summary.json',
+          'loss'
+        ),
         value: '0'
       })
 
