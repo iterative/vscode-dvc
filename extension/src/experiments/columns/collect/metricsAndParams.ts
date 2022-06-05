@@ -17,58 +17,58 @@ import { buildMetricOrParamPath, METRIC_PARAM_SEPARATOR } from '../paths'
 
 const collectMetricOrParam = (
   acc: ColumnAccumulator,
-  name: string,
-  value: Value,
   type: ColumnType,
+  label: string,
+  value: Value,
   pathArray: string[]
 ) => {
   const limitedDepthAncestors = limitAncestorDepth(
     pathArray,
     METRIC_PARAM_SEPARATOR
   )
-  const path = buildMetricOrParamPath(type, ...limitedDepthAncestors, name)
+  const path = buildMetricOrParamPath(type, ...limitedDepthAncestors, label)
   mergeAncestors(
     acc,
+    type,
     path,
     limitedDepthAncestors,
-    (...pathArray: string[]) => buildMetricOrParamPath(type, ...pathArray),
-    type
+    (...pathArray: string[]) => buildMetricOrParamPath(type, ...pathArray)
   )
 
   mergeValueColumn(
     acc,
-    name,
-    value,
-    [type, ...pathArray, name],
-    buildMetricOrParamPath(type, ...limitedDepthAncestors, name),
-    buildMetricOrParamPath(type, ...limitedDepthAncestors)
+    buildMetricOrParamPath(type, ...limitedDepthAncestors, label),
+    buildMetricOrParamPath(type, ...limitedDepthAncestors),
+    [type, ...pathArray, label],
+    label,
+    value
   )
 }
 
 const walkValueTree = (
   acc: ColumnAccumulator,
-  tree: ValueTree,
   type: ColumnType,
+  tree: ValueTree,
   ancestors: string[] = []
 ) => {
-  for (const [key, value] of Object.entries(tree)) {
+  for (const [label, value] of Object.entries(tree)) {
     if (value && !Array.isArray(value) && typeof value === 'object') {
-      walkValueTree(acc, value, type, [...ancestors, key])
+      walkValueTree(acc, type, value, [...ancestors, label])
     } else {
-      collectMetricOrParam(acc, key, value, type, ancestors)
+      collectMetricOrParam(acc, type, label, value, ancestors)
     }
   }
 }
 
 export const walkValueFileRoot = (
   acc: ColumnAccumulator,
-  root: ValueTreeRoot,
-  type: ColumnType
+  type: ColumnType,
+  root: ValueTreeRoot
 ) => {
   for (const [file, value] of Object.entries(root)) {
     const { data } = value
     if (data) {
-      walkValueTree(acc, data, type, [file])
+      walkValueTree(acc, type, data, [file])
     }
   }
 }
@@ -79,10 +79,10 @@ export const collectMetricsAndParams = (
 ) => {
   const { metrics, params } = data
   if (metrics) {
-    walkValueFileRoot(acc, metrics, ColumnType.METRICS)
+    walkValueFileRoot(acc, ColumnType.METRICS, metrics)
   }
   if (params) {
-    walkValueFileRoot(acc, params, ColumnType.PARAMS)
+    walkValueFileRoot(acc, ColumnType.PARAMS, params)
   }
 }
 

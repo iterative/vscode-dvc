@@ -72,10 +72,10 @@ const mergeNumberIntoColumn = (column: Column, value: number) => {
 
 export const mergeAncestors = (
   acc: ColumnAccumulator,
+  type: ColumnType,
   path: string,
   limitedDepthAncestors: string[],
-  join: (...pathArray: string[]) => string,
-  type: ColumnType
+  join: (...pathArray: string[]) => string
 ) => {
   if (!acc[path]) {
     for (let i = 1; i <= limitedDepthAncestors.length; i++) {
@@ -107,11 +107,11 @@ const mergeValueIntoColumn = (column: Column, value: Value) => {
 }
 
 const buildValueColumn = (
-  label: string,
-  value: Value,
-  pathArray: string[],
   path: string,
-  parentPath: string
+  parentPath: string,
+  pathArray: string[],
+  label: string,
+  value: Value
 ) => {
   const valueType = getValueType(value)
 
@@ -136,14 +136,14 @@ const buildValueColumn = (
 
 export const mergeValueColumn = (
   acc: ColumnAccumulator,
-  name: string,
-  value: Value,
-  pathArray: string[],
   path: string,
-  parentPath: string
+  parentPath: string,
+  pathArray: string[],
+  label: string,
+  value: Value
 ) => {
   if (!acc[path]) {
-    acc[path] = buildValueColumn(name, value, pathArray, path, parentPath)
+    acc[path] = buildValueColumn(path, parentPath, pathArray, label, value)
     return
   }
   mergeValueIntoColumn(acc[path], value)

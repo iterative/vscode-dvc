@@ -18,26 +18,26 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
   }
   for (const [file, { hash }] of Object.entries(deps)) {
     const pathArray = getPathArray(file)
-    const name = pathArray.pop() as string
+    const label = pathArray.pop() as string
 
     const limitedDepthAncestors = limitAncestorDepth(pathArray, sep)
     const path = buildDepPath(file)
 
     mergeAncestors(
       acc,
+      ColumnType.DEPS,
       path,
       limitedDepthAncestors,
-      (...pathArray: string[]) => buildDepPath(...pathArray),
-      ColumnType.DEPS
+      (...pathArray: string[]) => buildDepPath(...pathArray)
     )
 
     mergeValueColumn(
       acc,
-      name,
-      hash,
-      [ColumnType.DEPS, file],
       path,
-      buildDepPath(...limitedDepthAncestors)
+      buildDepPath(...limitedDepthAncestors),
+      [ColumnType.DEPS, file],
+      label,
+      hash
     )
   }
 }
