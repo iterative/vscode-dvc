@@ -406,7 +406,7 @@ describe('buildDynamicColumns', () => {
     const input = [
       {
         hasChildren: true,
-        name: 'params.yaml',
+        label: 'params.yaml',
         parentPath: 'params',
         path: 'params:params.yaml',
         type: ColumnType.PARAMS
@@ -414,7 +414,7 @@ describe('buildDynamicColumns', () => {
       {
         hasChildren: false,
         maxStringLength: 1,
-        name: 'a',
+        label: 'a',
         parentPath: 'params:params.yaml',
         path: 'params:params.yaml:a',
         pathArray: ['params', 'params.yaml', 'a'],
@@ -423,7 +423,7 @@ describe('buildDynamicColumns', () => {
       },
       {
         hasChildren: true,
-        name: 'c',
+        label: 'c',
         parentPath: 'params:params.yaml',
         path: 'params:params.yaml:c',
         type: ColumnType.PARAMS
@@ -431,7 +431,7 @@ describe('buildDynamicColumns', () => {
       {
         hasChildren: false,
         maxStringLength: 1,
-        name: 'd',
+        label: 'd',
         parentPath: 'params:params.yaml:c',
         path: 'params:params.yaml:c.d',
         pathArray: ['params', 'params.yaml', 'c', 'd'],
@@ -484,7 +484,7 @@ describe('buildDynamicColumns', () => {
     const input = [
       {
         hasChildren: true,
-        name: 'params.yaml',
+        label: 'params.yaml',
         parentPath: 'params',
         path: 'params:params.yaml',
         type: ColumnType.PARAMS
@@ -492,7 +492,7 @@ describe('buildDynamicColumns', () => {
       {
         hasChildren: false,
         maxStringLength: 1,
-        name: '1',
+        label: '1',
         parentPath: 'params:params.yaml',
         path: 'params:params.yaml:1',
         pathArray: ['params', 'params.yaml', '1'],
@@ -501,7 +501,7 @@ describe('buildDynamicColumns', () => {
       },
       {
         hasChildren: true,
-        name: 'c',
+        label: 'c',
         parentPath: 'params:params.yaml',
         path: 'params:params.yaml:c',
         type: ColumnType.PARAMS
@@ -509,7 +509,7 @@ describe('buildDynamicColumns', () => {
       {
         hasChildren: false,
         maxStringLength: 1,
-        name: 'd',
+        label: 'd',
         parentPath: 'params:params.yaml:c',
         path: 'params:params.yaml:c.d',
         pathArray: ['params', 'params.yaml', 'c', 'd'],
@@ -562,14 +562,14 @@ describe('buildDynamicColumns', () => {
     const input = [
       {
         hasChildren: true,
-        name: 'params.yaml',
+        label: 'params.yaml',
         parentPath: 'params',
         path: 'params:params.yaml',
         type: ColumnType.PARAMS
       },
       {
         hasChildren: true,
-        name: 'c',
+        label: 'c',
         parentPath: 'params:params.yaml',
         path: 'params:params.yaml:c',
         type: ColumnType.PARAMS
@@ -577,7 +577,7 @@ describe('buildDynamicColumns', () => {
       {
         hasChildren: false,
         maxStringLength: 1,
-        name: 'd',
+        label: 'd',
         parentPath: 'params:params.yaml:c',
         path: 'params:params.yaml:c.d',
         pathArray: ['params', 'params.yaml', 'c', 'd'],
@@ -587,7 +587,7 @@ describe('buildDynamicColumns', () => {
       {
         hasChildren: false,
         maxStringLength: 1,
-        name: 'f',
+        label: 'f',
         parentPath: 'params:params.yaml',
         path: 'params:params.yaml:f',
         pathArray: ['params', 'params.yaml', 'f'],

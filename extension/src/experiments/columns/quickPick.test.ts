@@ -24,10 +24,10 @@ describe('pickFromColumns', () => {
   const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epochs')
   const epochsParam = {
     hasChildren: false,
+    label: 'epochs',
     maxNumber: 5,
     maxStringLength: 1,
     minNumber: 2,
-    name: 'epochs',
     parentPath: paramsYamlPath,
     path: epochsParamPath,
     type: ColumnType.PARAMS,
@@ -36,7 +36,7 @@ describe('pickFromColumns', () => {
 
   const paramsYamlParam = {
     hasChildren: true,
-    name: paramsYaml,
+    label: paramsYaml,
     parentPath: params,
     path: paramsYamlPath,
     type: ColumnType.PARAMS

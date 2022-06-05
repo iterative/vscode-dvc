@@ -9,49 +9,49 @@ describe('collectPath', () => {
     expect(collectPaths(plotsDiffFixture)).toStrictEqual([
       {
         hasChildren: false,
-        name: 'acc.png',
+        label: 'acc.png',
         parentPath: 'plots',
         path: join('plots', 'acc.png'),
         type: new Set(['comparison'])
       },
       {
         hasChildren: true,
-        name: 'plots',
+        label: 'plots',
         parentPath: undefined,
         path: 'plots'
       },
       {
         hasChildren: false,
-        name: 'heatmap.png',
+        label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
         type: new Set(['comparison'])
       },
       {
         hasChildren: false,
-        name: 'loss.png',
+        label: 'loss.png',
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
         type: new Set(['comparison'])
       },
       {
         hasChildren: false,
-        name: 'loss.tsv',
+        label: 'loss.tsv',
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
         type: new Set(['template-single'])
       },
-      { hasChildren: true, name: 'logs', parentPath: undefined, path: 'logs' },
+      { hasChildren: true, label: 'logs', parentPath: undefined, path: 'logs' },
       {
         hasChildren: false,
-        name: 'acc.tsv',
+        label: 'acc.tsv',
         parentPath: 'logs',
         path: join('logs', 'acc.tsv'),
         type: new Set(['template-single'])
       },
       {
         hasChildren: false,
-        name: 'predictions.json',
+        label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
         type: new Set(['template-multi'])
@@ -96,41 +96,41 @@ describe('collectPath', () => {
     expect(collectPaths(mockPlotsDiff)).toStrictEqual([
       {
         hasChildren: false,
-        name: 'acc.tsv',
+        label: 'acc.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'acc.tsv'),
         type: new Set(['template-single'])
       },
       {
         hasChildren: true,
-        name: 'scalars',
+        label: 'scalars',
         parentPath: 'logs',
         path: join('logs', 'scalars')
       },
-      { hasChildren: true, name: 'logs', parentPath: undefined, path: 'logs' },
+      { hasChildren: true, label: 'logs', parentPath: undefined, path: 'logs' },
       {
         hasChildren: false,
-        name: 'loss.tsv',
+        label: 'loss.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'loss.tsv'),
         type: new Set(['template-single'])
       },
       {
         hasChildren: false,
-        name: 'heatmap.png',
+        label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
         type: new Set(['comparison'])
       },
       {
         hasChildren: true,
-        name: 'plots',
+        label: 'plots',
         parentPath: undefined,
         path: 'plots'
       },
       {
         hasChildren: false,
-        name: 'predictions.json',
+        label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
         type: new Set(['template-multi'])

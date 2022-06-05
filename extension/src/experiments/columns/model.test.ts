@@ -52,15 +52,15 @@ describe('ColumnsModel', () => {
       expect(model.getSelected()).toStrictEqual([
         {
           hasChildren: true,
-          name: 'params.yaml',
+          label: 'params.yaml',
           parentPath: ColumnType.PARAMS,
           path: paramsDotYamlPath,
           type: ColumnType.PARAMS
         },
         {
           hasChildren: false,
+          label: 'testparam',
           maxStringLength: 4,
-          name: 'testparam',
           parentPath: paramsDotYamlPath,
           path: testParamPath,
           pathArray: [ColumnType.PARAMS, 'params.yaml', 'testparam'],
@@ -84,7 +84,7 @@ describe('ColumnsModel', () => {
       expect(model.getSelected()).toStrictEqual([
         {
           hasChildren: true,
-          name: 'params.yaml',
+          label: 'params.yaml',
           parentPath: ColumnType.PARAMS,
           path: paramsDotYamlPath,
           type: ColumnType.PARAMS

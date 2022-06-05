@@ -230,9 +230,9 @@ describe('collectColumns', () => {
   const param = numericColumns.filter(
     column => column.type === ColumnType.PARAMS
   ) as Column[]
-  const paramWithNumbers = param.find(p => p.name === 'withNumbers') as Column
+  const paramWithNumbers = param.find(p => p.label === 'withNumbers') as Column
   const paramWithoutNumbers = param.find(
-    p => p.name === 'withoutNumbers'
+    p => p.label === 'withoutNumbers'
   ) as Column
 
   it('should not add a maxNumber or minNumber on a param with no numbers', () => {
@@ -304,7 +304,7 @@ describe('collectColumns', () => {
         buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
     ) as Column[]
 
-    expect(params?.map(({ name }) => name)).toStrictEqual([
+    expect(params?.map(({ label }) => label)).toStrictEqual([
       'one',
       'two',
       'three',
@@ -389,7 +389,7 @@ describe('collectColumns', () => {
         buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
     ) as Column
 
-    expect(objectParam.name).toStrictEqual('onlyHasChild')
+    expect(objectParam.label).toStrictEqual('onlyHasChild')
     expect(objectParam.types).toBeUndefined()
 
     const primitiveParam = columns.find(
@@ -398,7 +398,7 @@ describe('collectColumns', () => {
         buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'onlyHasChild')
     ) as Column
 
-    expect(primitiveParam.name).toStrictEqual('onlyHasPrimitive')
+    expect(primitiveParam.label).toStrictEqual('onlyHasPrimitive')
     expect(primitiveParam.types).toBeDefined()
 
     const onlyHasPrimitiveChild = columns.find(

@@ -40,7 +40,7 @@ describe('pickPaths', () => {
     const plotPaths = [
       {
         hasChildren: false,
-        name: 'loss.tsv',
+        label: 'loss.tsv',
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
         selected: true,
@@ -48,7 +48,7 @@ describe('pickPaths', () => {
       },
       {
         hasChildren: false,
-        name: 'acc.tsv',
+        label: 'acc.tsv',
         parentPath: 'logs',
         path: join('logs', 'acc.tsv'),
         selected: true,
@@ -56,7 +56,7 @@ describe('pickPaths', () => {
       },
       {
         hasChildren: false,
-        name: 'fun.tsv',
+        label: 'fun.tsv',
         parentPath: 'logs',
         path: join('logs', 'fun.tsv'),
         selected: false,

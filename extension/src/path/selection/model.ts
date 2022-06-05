@@ -49,7 +49,7 @@ export abstract class PathSelectionModel<
       return {
         ...element,
         descendantStatuses: this.getTerminalNodeStatuses(element.path),
-        label: element.name,
+        label: element.label,
         status: this.status[element.path]
       }
     })

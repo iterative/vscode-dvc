@@ -23,10 +23,10 @@ const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epoch')
 
 const epochsParam = {
   hasChildren: false,
+  label: 'epochs',
   maxNumber: 5,
   maxStringLength: 1,
   minNumber: 2,
-  name: 'epochs',
   parentPath: paramsYamlPath,
   path: epochsParamPath,
   type: ColumnType.PARAMS,
@@ -34,10 +34,10 @@ const epochsParam = {
 }
 const boolParam = {
   hasChildren: false,
+  label: 'bool',
   maxNumber: 1,
   maxStringLength: 1,
   minNumber: 0,
-  name: 'bool',
   parentPath: paramsYamlPath,
   path: appendColumnToPath(paramsYamlPath, 'bool'),
   type: ColumnType.PARAMS,
@@ -45,10 +45,10 @@ const boolParam = {
 }
 const mixedParam = {
   hasChildren: false,
+  label: 'mixed',
   maxNumber: 5,
   maxStringLength: 44,
   minNumber: 2,
-  name: 'mixed',
   parentPath: paramsYamlPath,
   path: appendColumnToPath(paramsYamlPath, 'mixed'),
   type: ColumnType.PARAMS,

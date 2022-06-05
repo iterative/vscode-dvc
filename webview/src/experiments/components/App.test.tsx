@@ -213,7 +213,7 @@ describe('App', () => {
         {
           ...commonColumnFields,
           id: 'D',
-          name: 'D',
+          label: 'D',
           path: 'params:D'
         } as Column
       ]
@@ -477,17 +477,17 @@ describe('App', () => {
       columns: [
         {
           hasChildren: true,
-          name: 'summary.json',
+          label: 'summary.json',
           parentPath: buildMetricOrParamPath(ColumnType.METRICS),
           path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
           type: ColumnType.METRICS
         },
         {
           hasChildren: false,
+          label: 'loss',
           maxNumber: testMetricNumberValue,
           maxStringLength: 18,
           minNumber: testMetricNumberValue,
-          name: 'loss',
           parentPath: buildMetricOrParamPath(
             ColumnType.METRICS,
             'summary.json'
@@ -503,15 +503,15 @@ describe('App', () => {
         },
         {
           hasChildren: true,
-          name: 'params.yaml',
+          label: 'params.yaml',
           parentPath: ColumnType.PARAMS,
           path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
           type: ColumnType.PARAMS
         },
         {
           hasChildren: false,
+          label: testParamName,
           maxStringLength: 10,
-          name: testParamName,
           parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
           path: testParamPath,
           pathArray: [ColumnType.PARAMS, 'params.yaml', testParamName],

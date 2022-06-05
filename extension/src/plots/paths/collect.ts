@@ -12,7 +12,7 @@ export enum PathType {
 }
 
 export type PlotPath = {
-  name: string
+  label: string
   path: string
   type?: Set<PathType>
   parentPath: string | undefined
@@ -74,7 +74,7 @@ const collectPath = (
 
   const plotPath: PlotPath = {
     hasChildren,
-    name: pathArray[idx - 1],
+    label: pathArray[idx - 1],
     parentPath: getParent(pathArray, idx),
     path
   }

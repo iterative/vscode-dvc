@@ -11,7 +11,7 @@ const data: Column[] = [
   {
     type: ColumnType.METRICS,
     hasChildren: true,
-    name: 'summary.json',
+    label: 'summary.json',
     parentPath: buildMetricOrParamPath(ColumnType.METRICS),
     path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json')
   },
@@ -19,7 +19,7 @@ const data: Column[] = [
     type: ColumnType.METRICS,
     hasChildren: false,
     maxStringLength: 18,
-    name: 'loss',
+    label: 'loss',
     parentPath: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
     path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'loss'),
     pathArray: [ColumnType.METRICS, 'summary.json', 'loss'],
@@ -31,7 +31,7 @@ const data: Column[] = [
     type: ColumnType.METRICS,
     hasChildren: false,
     maxStringLength: 19,
-    name: 'accuracy',
+    label: 'accuracy',
     parentPath: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
     path: buildMetricOrParamPath(
       ColumnType.METRICS,
@@ -47,7 +47,7 @@ const data: Column[] = [
     type: ColumnType.METRICS,
     hasChildren: false,
     maxStringLength: 18,
-    name: 'val_loss',
+    label: 'val_loss',
     parentPath: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
     path: buildMetricOrParamPath(
       ColumnType.METRICS,
@@ -63,7 +63,7 @@ const data: Column[] = [
     type: ColumnType.METRICS,
     hasChildren: false,
     maxStringLength: 19,
-    name: 'val_accuracy',
+    label: 'val_accuracy',
     parentPath: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
     path: buildMetricOrParamPath(
       ColumnType.METRICS,
@@ -78,7 +78,7 @@ const data: Column[] = [
   {
     type: ColumnType.PARAMS,
     hasChildren: true,
-    name: 'params.yaml',
+    label: 'params.yaml',
     parentPath: ColumnType.PARAMS,
     path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
   },
@@ -86,7 +86,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 3,
-    name: 'code_names',
+    label: 'code_names',
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(
       ColumnType.PARAMS,
@@ -100,7 +100,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 1,
-    name: 'epochs',
+    label: 'epochs',
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'epochs'],
@@ -112,7 +112,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 6,
-    name: 'learning_rate',
+    label: 'learning_rate',
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(
       ColumnType.PARAMS,
@@ -128,7 +128,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 8,
-    name: 'dvc_logs_dir',
+    label: 'dvc_logs_dir',
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(
       ColumnType.PARAMS,
@@ -142,7 +142,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 8,
-    name: 'log_file',
+    label: 'log_file',
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'log_file'),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'log_file'],
@@ -152,7 +152,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 5,
-    name: 'dropout',
+    label: 'dropout',
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'dropout'),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dropout'],
@@ -163,7 +163,7 @@ const data: Column[] = [
   {
     type: ColumnType.PARAMS,
     hasChildren: true,
-    name: 'process',
+    label: 'process',
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'process')
   },
@@ -171,7 +171,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 4,
-    name: 'threshold',
+    label: 'threshold',
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -192,7 +192,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 6,
-    name: 'test_arg',
+    label: 'test_arg',
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -212,7 +212,7 @@ const data: Column[] = [
   {
     type: ColumnType.PARAMS,
     hasChildren: true,
-    name: nestedParamsFile,
+    label: nestedParamsFile,
     parentPath: ColumnType.PARAMS,
     path: buildMetricOrParamPath(ColumnType.PARAMS, nestedParamsFile)
   },
@@ -220,7 +220,7 @@ const data: Column[] = [
     type: ColumnType.PARAMS,
     hasChildren: false,
     maxStringLength: 4,
-    name: 'test',
+    label: 'test',
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, nestedParamsFile),
     path: buildMetricOrParamPath(ColumnType.PARAMS, nestedParamsFile, 'test'),
     pathArray: [ColumnType.PARAMS, nestedParamsFile, 'test'],
@@ -228,7 +228,7 @@ const data: Column[] = [
   },
   {
     hasChildren: true,
-    name: 'data',
+    label: 'data',
     parentPath: ColumnType.DEPS,
     path: buildDepPath('data'),
     type: ColumnType.DEPS
@@ -236,7 +236,7 @@ const data: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 32,
-    name: 'data.xml',
+    label: 'data.xml',
     parentPath: buildDepPath('data'),
     path: buildDepPath('data', 'data.xml'),
     pathArray: [ColumnType.DEPS, join('data', 'data.xml')],
@@ -245,7 +245,7 @@ const data: Column[] = [
   },
   {
     hasChildren: true,
-    name: 'src',
+    label: 'src',
     parentPath: ColumnType.DEPS,
     path: buildDepPath('src'),
     type: ColumnType.DEPS
@@ -253,7 +253,7 @@ const data: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 32,
-    name: 'prepare.py',
+    label: 'prepare.py',
     parentPath: buildDepPath('src'),
     path: buildDepPath('src', 'prepare.py'),
     pathArray: [ColumnType.DEPS, join('src', 'prepare.py')],
@@ -263,7 +263,7 @@ const data: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 36,
-    name: 'prepared',
+    label: 'prepared',
     parentPath: buildDepPath('data'),
     path: buildDepPath('data', 'prepared'),
     pathArray: [ColumnType.DEPS, join('data', 'prepared')],
@@ -273,7 +273,7 @@ const data: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 32,
-    name: 'featurization.py',
+    label: 'featurization.py',
     parentPath: buildDepPath('src'),
     path: buildDepPath('src', 'featurization.py'),
     pathArray: [ColumnType.DEPS, join('src', 'featurization.py')],
@@ -283,7 +283,7 @@ const data: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 36,
-    name: 'features',
+    label: 'features',
     parentPath: buildDepPath('data'),
     path: buildDepPath('data', 'features'),
     pathArray: [ColumnType.DEPS, join('data', 'features')],
@@ -293,7 +293,7 @@ const data: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 32,
-    name: 'train.py',
+    label: 'train.py',
     parentPath: buildDepPath('src'),
     path: buildDepPath('src', 'train.py'),
     pathArray: [ColumnType.DEPS, join('src', 'train.py')],
@@ -303,7 +303,7 @@ const data: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 32,
-    name: 'model.pkl',
+    label: 'model.pkl',
     parentPath: ColumnType.DEPS,
     path: buildDepPath('model.pkl'),
     pathArray: [ColumnType.DEPS, 'model.pkl'],
@@ -313,7 +313,7 @@ const data: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 32,
-    name: 'evaluate.py',
+    label: 'evaluate.py',
     parentPath: buildDepPath('src'),
     path: buildDepPath('src', 'evaluate.py'),
     pathArray: [ColumnType.DEPS, join('src', 'evaluate.py')],

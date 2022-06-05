@@ -26,7 +26,7 @@ export const limitAncestorDepth = (
 
 const mergeParentColumnByPath = (
   acc: ColumnAccumulator,
-  name: string,
+  label: string,
   path: string,
   parentPath: string,
   type: ColumnType
@@ -34,7 +34,7 @@ const mergeParentColumnByPath = (
   if (!acc[path]) {
     acc[path] = {
       hasChildren: true,
-      name,
+      label,
       parentPath,
       path,
       type
@@ -107,7 +107,7 @@ const mergeValueIntoColumn = (column: Column, value: Value) => {
 }
 
 const buildValueColumn = (
-  name: string,
+  label: string,
   value: Value,
   pathArray: string[],
   path: string,
@@ -117,8 +117,8 @@ const buildValueColumn = (
 
   const newColumn: Column = {
     hasChildren: false,
+    label,
     maxStringLength: String(value).length,
-    name,
     parentPath,
     path,
     pathArray,
