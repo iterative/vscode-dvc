@@ -26,8 +26,10 @@
     "dvc"
   ],
   "categories": [
+    "Machine Learning",
     "Data Science",
-    "Visualization"
+    "Visualization",
+    "SCM Providers"
   ],
   "galleryBanner": {
     "color": "#333",
