@@ -1,9 +1,7 @@
-import { buildMetricOrParamPath } from '../../../experiments/columns/paths'
-import { ColumnType } from '../../../experiments/webview/contract'
-import { join } from '../../util/path'
+import { buildDepPath } from '../../../experiments/columns/paths'
 
 const data = [
-  buildMetricOrParamPath(ColumnType.DEPS, join('src', 'prepare.py')),
+  buildDepPath('src', 'prepare.py'),
   'metrics:summary.json:accuracy',
   'metrics:summary.json:loss',
   'metrics:summary.json:val_accuracy',

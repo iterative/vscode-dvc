@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { collectChanges, collectColumns } from '.'
-import { buildMetricOrParamPath } from '../paths'
+import { buildDepPath, buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
 import outputFixture from '../../../test/fixtures/expShow/output'
 import columnsFixture from '../../../test/fixtures/expShow/columns'
@@ -464,19 +464,16 @@ describe('collectColumns', () => {
           join('nested', 'params.yaml'),
           'test'
         ),
-        buildMetricOrParamPath(ColumnType.DEPS, 'data'),
-        buildMetricOrParamPath(ColumnType.DEPS, join('data', 'data.xml')),
-        buildMetricOrParamPath(ColumnType.DEPS, 'src'),
-        buildMetricOrParamPath(ColumnType.DEPS, join('src', 'prepare.py')),
-        buildMetricOrParamPath(ColumnType.DEPS, join('data', 'prepared')),
-        buildMetricOrParamPath(
-          ColumnType.DEPS,
-          join('src', 'featurization.py')
-        ),
-        buildMetricOrParamPath(ColumnType.DEPS, join('data', 'features')),
-        buildMetricOrParamPath(ColumnType.DEPS, join('src', 'train.py')),
-        buildMetricOrParamPath(ColumnType.DEPS, 'model.pkl'),
-        buildMetricOrParamPath(ColumnType.DEPS, join('src', 'evaluate.py'))
+        buildDepPath('data'),
+        buildDepPath('data', 'data.xml'),
+        buildDepPath('src'),
+        buildDepPath('src', 'prepare.py'),
+        buildDepPath('data', 'prepared'),
+        buildDepPath('src', 'featurization.py'),
+        buildDepPath('data', 'features'),
+        buildDepPath('src', 'train.py'),
+        buildDepPath('model.pkl'),
+        buildDepPath('src', 'evaluate.py')
       ]
     )
   })

@@ -1,4 +1,5 @@
 import { join } from 'path'
+import { definedAndNonEmpty } from '../../util/array'
 import { ColumnType } from '../webview/contract'
 
 export const METRIC_PARAM_SEPARATOR = '.'
@@ -43,8 +44,12 @@ export const buildMetricOrParamPath = (
   return type + FILE_SEPARATOR + appendColumnToPath(fileSegment, ...rest)
 }
 
-export const buildDepPath = (...pathSegments: string[]) =>
-  buildMetricOrParamPath(ColumnType.DEPS, join(...pathSegments))
+export const buildDepPath = (...pathSegments: string[]) => {
+  if (!definedAndNonEmpty(pathSegments)) {
+    return ColumnType.DEPS
+  }
+  return buildMetricOrParamPath(ColumnType.DEPS, join(...pathSegments))
+}
 
 export const splitColumnPath = (path: string) => {
   const regexResult = FILE_SPLIT_REGEX.exec(path)

@@ -1,6 +1,9 @@
 import { join } from '../../util/path'
 import { Column, ColumnType } from '../../../experiments/webview/contract'
-import { buildMetricOrParamPath } from '../../../experiments/columns/paths'
+import {
+  buildDepPath,
+  buildMetricOrParamPath
+} from '../../../experiments/columns/paths'
 
 const nestedParamsFile = join('nested', 'params.yaml')
 
@@ -227,15 +230,15 @@ const data: Column[] = [
     hasChildren: true,
     name: 'data',
     parentPath: ColumnType.DEPS,
-    path: buildMetricOrParamPath(ColumnType.DEPS, 'data'),
+    path: buildDepPath('data'),
     type: ColumnType.DEPS
   },
   {
     hasChildren: false,
     maxStringLength: 32,
     name: 'data.xml',
-    parentPath: buildMetricOrParamPath(ColumnType.DEPS, 'data'),
-    path: buildMetricOrParamPath(ColumnType.DEPS, join('data', 'data.xml')),
+    parentPath: buildDepPath('data'),
+    path: buildDepPath('data', 'data.xml'),
     pathArray: [ColumnType.DEPS, join('data', 'data.xml')],
     type: ColumnType.DEPS,
     types: ['string']
@@ -244,15 +247,15 @@ const data: Column[] = [
     hasChildren: true,
     name: 'src',
     parentPath: ColumnType.DEPS,
-    path: buildMetricOrParamPath(ColumnType.DEPS, 'src'),
+    path: buildDepPath('src'),
     type: ColumnType.DEPS
   },
   {
     hasChildren: false,
     maxStringLength: 32,
     name: 'prepare.py',
-    parentPath: buildMetricOrParamPath(ColumnType.DEPS, 'src'),
-    path: buildMetricOrParamPath(ColumnType.DEPS, join('src', 'prepare.py')),
+    parentPath: buildDepPath('src'),
+    path: buildDepPath('src', 'prepare.py'),
     pathArray: [ColumnType.DEPS, join('src', 'prepare.py')],
     type: ColumnType.DEPS,
     types: ['string']
@@ -261,8 +264,8 @@ const data: Column[] = [
     hasChildren: false,
     maxStringLength: 36,
     name: 'prepared',
-    parentPath: buildMetricOrParamPath(ColumnType.DEPS, 'data'),
-    path: buildMetricOrParamPath(ColumnType.DEPS, join('data', 'prepared')),
+    parentPath: buildDepPath('data'),
+    path: buildDepPath('data', 'prepared'),
     pathArray: [ColumnType.DEPS, join('data', 'prepared')],
     type: ColumnType.DEPS,
     types: ['string']
@@ -271,11 +274,8 @@ const data: Column[] = [
     hasChildren: false,
     maxStringLength: 32,
     name: 'featurization.py',
-    parentPath: buildMetricOrParamPath(ColumnType.DEPS, 'src'),
-    path: buildMetricOrParamPath(
-      ColumnType.DEPS,
-      join('src', 'featurization.py')
-    ),
+    parentPath: buildDepPath('src'),
+    path: buildDepPath('src', 'featurization.py'),
     pathArray: [ColumnType.DEPS, join('src', 'featurization.py')],
     type: ColumnType.DEPS,
     types: ['string']
@@ -284,8 +284,8 @@ const data: Column[] = [
     hasChildren: false,
     maxStringLength: 36,
     name: 'features',
-    parentPath: buildMetricOrParamPath(ColumnType.DEPS, 'data'),
-    path: buildMetricOrParamPath(ColumnType.DEPS, join('data', 'features')),
+    parentPath: buildDepPath('data'),
+    path: buildDepPath('data', 'features'),
     pathArray: [ColumnType.DEPS, join('data', 'features')],
     type: ColumnType.DEPS,
     types: ['string']
@@ -294,8 +294,8 @@ const data: Column[] = [
     hasChildren: false,
     maxStringLength: 32,
     name: 'train.py',
-    parentPath: buildMetricOrParamPath(ColumnType.DEPS, 'src'),
-    path: buildMetricOrParamPath(ColumnType.DEPS, join('src', 'train.py')),
+    parentPath: buildDepPath('src'),
+    path: buildDepPath('src', 'train.py'),
     pathArray: [ColumnType.DEPS, join('src', 'train.py')],
     type: ColumnType.DEPS,
     types: ['string']
@@ -305,7 +305,7 @@ const data: Column[] = [
     maxStringLength: 32,
     name: 'model.pkl',
     parentPath: ColumnType.DEPS,
-    path: buildMetricOrParamPath(ColumnType.DEPS, 'model.pkl'),
+    path: buildDepPath('model.pkl'),
     pathArray: [ColumnType.DEPS, 'model.pkl'],
     type: ColumnType.DEPS,
     types: ['string']
@@ -314,8 +314,8 @@ const data: Column[] = [
     hasChildren: false,
     maxStringLength: 32,
     name: 'evaluate.py',
-    parentPath: buildMetricOrParamPath(ColumnType.DEPS, 'src'),
-    path: buildMetricOrParamPath(ColumnType.DEPS, join('src', 'evaluate.py')),
+    parentPath: buildDepPath('src'),
+    path: buildDepPath('src', 'evaluate.py'),
     pathArray: [ColumnType.DEPS, join('src', 'evaluate.py')],
     type: ColumnType.DEPS,
     types: ['string']

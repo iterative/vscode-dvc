@@ -4,6 +4,7 @@ import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
 import { ExperimentsColumnsTree } from './tree'
 import {
   appendColumnToPath,
+  buildDepPath,
   buildMetricOrParamPath,
   splitColumnPath
 } from './paths'
@@ -147,7 +148,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'data',
-          path: buildMetricOrParamPath(ColumnType.DEPS, 'data')
+          path: buildDepPath('data')
         },
         {
           collapsibleState: 1,
@@ -155,7 +156,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'src',
-          path: buildMetricOrParamPath(ColumnType.DEPS, 'src')
+          path: buildDepPath('src')
         },
         {
           collapsibleState: 0,
@@ -163,7 +164,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'model.pkl',
-          path: buildMetricOrParamPath(ColumnType.DEPS, 'model.pkl')
+          path: buildDepPath('model.pkl')
         }
       ])
     })
@@ -226,7 +227,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'data',
-          path: buildMetricOrParamPath(ColumnType.DEPS, 'data')
+          path: buildDepPath('data')
         },
         {
           collapsibleState: 1,
@@ -234,7 +235,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'src',
-          path: buildMetricOrParamPath(ColumnType.DEPS, 'src')
+          path: buildDepPath('src')
         },
         {
           collapsibleState: 0,
@@ -242,7 +243,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'model.pkl',
-          path: buildMetricOrParamPath(ColumnType.DEPS, 'model.pkl')
+          path: buildDepPath('model.pkl')
         }
       ])
 
