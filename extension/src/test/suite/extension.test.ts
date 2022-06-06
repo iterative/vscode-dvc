@@ -320,6 +320,7 @@ suite('Extension Test Suite', () => {
         EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
         {
           cliAccessible: true,
+          deps: 8,
           dvcPathUsed: true,
           dvcRootCount: 1,
           hasCheckpoints: 1,
