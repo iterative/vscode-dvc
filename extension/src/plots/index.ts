@@ -172,10 +172,8 @@ export class Plots extends BaseRepository<TPlotsData> {
       comparison: this.getComparisonPlots(),
       hasPlots: !!this.paths?.hasPaths(),
       hasSelectedPlots: definedAndNonEmpty(this.paths?.getSelected()),
-      hasSelectedRevisions: definedAndNonEmpty(
-        this.plots?.getSelectedRevisionDetails()
-      ),
       sectionCollapsed: this.plots?.getSectionCollapsed(),
+      selectedRevisions: this.plots?.getSelectedRevisionDetails(),
       template: this.getTemplatePlots()
     })
   }
@@ -206,7 +204,6 @@ export class Plots extends BaseRepository<TPlotsData> {
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: this.plots.getSelectedRevisionDetails(),
       sectionName: this.plots.getSectionName(Section.COMPARISON_TABLE),
       size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
     }
@@ -317,7 +314,8 @@ export class Plots extends BaseRepository<TPlotsData> {
   private setComparisonOrder(order: string[]) {
     this.plots?.setComparisonOrder(order)
     this.webview?.show({
-      comparison: this.getComparisonPlots()
+      comparison: this.getComparisonPlots(),
+      selectedRevisions: this.plots?.getSelectedRevisionDetails()
     })
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_REVISIONS_REORDERED,

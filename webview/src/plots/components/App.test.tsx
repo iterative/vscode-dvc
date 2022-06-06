@@ -13,6 +13,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import checkpointPlotsFixture, {
   manyCheckpointPlots
 } from 'dvc/src/test/fixtures/expShow/checkpointPlots'
@@ -172,8 +173,8 @@ describe('App', () => {
       checkpoint: null,
       hasPlots: true,
       hasSelectedPlots: false,
-      hasSelectedRevisions: false,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: undefined
     })
     const addPlotsButton = await screen.findByText('Add Plots')
     const addExperimentsButton = await screen.findByText('Add Experiments')
@@ -890,6 +891,7 @@ describe('App', () => {
     renderAppWithData({
       comparison: comparisonTableFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: plotsRevisionsFixture,
       template: complexTemplatePlotsFixture
     })
 
@@ -1007,7 +1009,8 @@ describe('App', () => {
   it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
     renderAppWithData({
       comparison: comparisonTableFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: plotsRevisionsFixture
     })
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -1445,7 +1448,8 @@ describe('App', () => {
     it('should show the revisions at the top', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
       const ribbon = screen.getByTestId('ribbon')
 
@@ -1454,7 +1458,7 @@ describe('App', () => {
       revisionBlocks.shift() // Remove refresh all
       const revisions = revisionBlocks.map(item => item.textContent)
       expect(revisions).toStrictEqual(
-        comparisonTableFixture.revisions.map(rev =>
+        plotsRevisionsFixture.map(rev =>
           rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
         )
       )
@@ -1463,7 +1467,8 @@ describe('App', () => {
     it('should send a message with the revision to be removed when clicking the clear button', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       const mainClearButton = within(
@@ -1481,11 +1486,12 @@ describe('App', () => {
     it('should display the number of experiments selected', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       expect(
-        screen.getByText(`${comparisonTableFixture.revisions.length} of 7`)
+        screen.getByText(`${plotsRevisionsFixture.length} of 7`)
       ).toBeInTheDocument()
     })
 
@@ -1509,7 +1515,8 @@ describe('App', () => {
     it('should send a message to refresh each revision when clicking the refresh all button', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       const refreshAllButton = within(

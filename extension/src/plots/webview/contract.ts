@@ -51,7 +51,6 @@ export type Revision = {
 }
 
 export interface PlotsComparisonData {
-  revisions: Revision[]
   plots: ComparisonPlots
   sectionName: string
   size: PlotSize
@@ -137,7 +136,7 @@ export type PlotsData =
       checkpoint?: CheckpointPlotsData | null
       hasPlots?: boolean
       hasSelectedPlots?: boolean
-      hasSelectedRevisions?: boolean
+      selectedRevisions?: Revision[]
       template?: TemplatePlotsData | null
       sectionCollapsed?: SectionCollapsed
     }
