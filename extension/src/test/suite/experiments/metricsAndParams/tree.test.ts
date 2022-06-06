@@ -8,7 +8,7 @@ import { dvcDemoPath } from '../../../util'
 import { RegisteredCommands } from '../../../../commands/external'
 import {
   appendColumnToPath,
-  joinColumnPath
+  buildMetricOrParamPath
 } from '../../../../experiments/columns/paths'
 import { buildExperiments } from '../util'
 import { Status } from '../../../../path/selection/model'
@@ -35,7 +35,7 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsColumnsTree.toggleStatus', async () => {
-      const path = joinColumnPath(
+      const path = buildMetricOrParamPath(
         ColumnType.PARAMS,
         paramsFile,
         'learning_rate'
@@ -79,7 +79,7 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsColumnsTree.toggleStatus', async () => {
-      const path = joinColumnPath(ColumnType.PARAMS, paramsFile)
+      const path = buildMetricOrParamPath(ColumnType.PARAMS, paramsFile)
 
       const { experiments } = buildExperiments(disposable)
 
@@ -130,7 +130,10 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it("should be able to select a child and set all of the ancestors' statuses to indeterminate with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
-      const grandParentPath = joinColumnPath(ColumnType.PARAMS, paramsFile)
+      const grandParentPath = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        paramsFile
+      )
       const parentPath = appendColumnToPath(grandParentPath, 'process')
 
       const { experiments } = buildExperiments(disposable)
@@ -196,7 +199,10 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
-      const grandParentPath = joinColumnPath(ColumnType.PARAMS, paramsFile)
+      const grandParentPath = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        paramsFile
+      )
       const parentPath = appendColumnToPath(grandParentPath, 'process')
 
       const { experiments } = buildExperiments(disposable)
@@ -266,7 +272,10 @@ suite('Experiments Metrics And Params Tree Test Suite', () => {
     })
 
     it("should be able to unselect the last selected child and set it's children and ancestors to unselected with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
-      const grandParentPath = joinColumnPath(ColumnType.PARAMS, paramsFile)
+      const grandParentPath = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        paramsFile
+      )
       const parentPath = appendColumnToPath(grandParentPath, 'process')
 
       const { experiments } = buildExperiments(disposable)

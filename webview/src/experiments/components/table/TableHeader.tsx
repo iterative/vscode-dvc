@@ -103,6 +103,7 @@ const TableHeaderCell: React.FC<{
         {
           [styles.paramHeaderCell]: column.group === ColumnType.PARAMS,
           [styles.metricHeaderCell]: column.group === ColumnType.METRICS,
+          [styles.depHeaderCell]: column.group === ColumnType.DEPS,
           [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
           [styles.leafHeader]: column.headers === undefined,
           ...sortingClasses()
