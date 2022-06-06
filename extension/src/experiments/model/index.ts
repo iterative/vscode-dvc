@@ -25,6 +25,7 @@ import { hasKey } from '../../util/object'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
+import { sum } from '../../util/math'
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
@@ -321,6 +322,15 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public isSelected(id: string) {
     return !!this.coloredStatus[id]
+  }
+
+  public getExperimentCount() {
+    return sum([
+      this.flattenCheckpoints().length,
+      this.flattenExperiments().length,
+      this.branches.length,
+      1
+    ])
   }
 
   private getCombinedList() {
