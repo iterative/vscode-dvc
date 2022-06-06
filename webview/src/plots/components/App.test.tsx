@@ -13,9 +13,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import checkpointPlotsFixture, {
-  manyCheckpointPlots
-} from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
@@ -1084,7 +1082,13 @@ describe('App', () => {
     }
 
     const createCheckpointPlots = (nbOfPlots: number) => {
-      const plots = manyCheckpointPlots(nbOfPlots)
+      const plots = []
+      for (let i = 0; i < nbOfPlots; i++) {
+        plots.push({
+          title: `plot-${i}`,
+          values: []
+        })
+      }
       return {
         ...checkpointPlotsFixture,
         plots,
