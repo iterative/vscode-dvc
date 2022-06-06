@@ -235,7 +235,7 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 32,
+    maxStringLength: 7,
     label: 'data.xml',
     parentPath: buildDepPath('data'),
     path: buildDepPath('data', 'data.xml'),
@@ -252,7 +252,7 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 32,
+    maxStringLength: 7,
     label: 'prepare.py',
     parentPath: buildDepPath('src'),
     path: buildDepPath('src', 'prepare.py'),
@@ -262,7 +262,7 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 36,
+    maxStringLength: 7,
     label: 'prepared',
     parentPath: buildDepPath('data'),
     path: buildDepPath('data', 'prepared'),
@@ -272,7 +272,7 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 32,
+    maxStringLength: 7,
     label: 'featurization.py',
     parentPath: buildDepPath('src'),
     path: buildDepPath('src', 'featurization.py'),
@@ -282,7 +282,7 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 36,
+    maxStringLength: 7,
     label: 'features',
     parentPath: buildDepPath('data'),
     path: buildDepPath('data', 'features'),
@@ -292,7 +292,7 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 32,
+    maxStringLength: 7,
     label: 'train.py',
     parentPath: buildDepPath('src'),
     path: buildDepPath('src', 'train.py'),
@@ -302,7 +302,7 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 32,
+    maxStringLength: 7,
     label: 'model.pkl',
     parentPath: ColumnType.DEPS,
     path: buildDepPath('model.pkl'),
@@ -312,7 +312,7 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 32,
+    maxStringLength: 7,
     label: 'evaluate.py',
     parentPath: buildDepPath('src'),
     path: buildDepPath('src', 'evaluate.py'),

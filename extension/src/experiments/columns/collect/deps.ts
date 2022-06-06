@@ -10,6 +10,7 @@ import { buildDepPath } from '../paths'
 import { ColumnType } from '../../webview/contract'
 import { ExperimentFields } from '../../../cli/reader'
 import { getPathArray } from '../../../fileSystem/util'
+import { shortenForLabel } from '../../../util/string'
 
 export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
   const { deps } = data
@@ -37,7 +38,7 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
       buildDepPath(...limitedDepthAncestors),
       [ColumnType.DEPS, file],
       label,
-      hash
+      shortenForLabel(hash)
     )
   }
 }

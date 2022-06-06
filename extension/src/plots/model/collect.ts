@@ -31,7 +31,7 @@ import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
-import { getShortSha } from '../../experiments/model/collect'
+import { shortenForLabel } from '../../util/string'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -231,7 +231,7 @@ const collectRunningFromBranch = (
 ): string | undefined => {
   for (const [sha, experiment] of Object.entries(experimentsObject)) {
     if (isRunningInWorkspace(experiment)) {
-      return getShortSha(sha)
+      return shortenForLabel(sha)
     }
   }
 }

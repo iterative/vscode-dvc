@@ -1,4 +1,5 @@
 import { Deps, ExperimentFields, ValueTreeRoot } from '../../cli/reader'
+import { shortenForLabel } from '../../util/string'
 import { DepColumns, MetricOrParamColumns } from '../webview/contract'
 
 const extractMetricsOrParams = (
@@ -28,7 +29,7 @@ const extractDeps = (columns?: Deps): DepColumns | undefined => {
   const acc: DepColumns = {}
 
   for (const [path, { hash }] of Object.entries(columns)) {
-    acc[path] = hash
+    acc[path] = shortenForLabel(hash)
   }
 
   return acc
