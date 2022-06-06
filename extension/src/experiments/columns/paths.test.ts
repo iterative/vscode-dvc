@@ -1,10 +1,10 @@
-import { joinColumnPath, splitColumnPath } from './paths'
+import { buildMetricOrParamPath, splitColumnPath } from './paths'
 import { ColumnType } from '../webview/contract'
 
 describe('joinColumnPath', () => {
   it('should properly join params with a nested param path', () => {
     expect(
-      joinColumnPath(
+      buildMetricOrParamPath(
         ColumnType.PARAMS,
         'params.yaml',
         'parent',
@@ -16,18 +16,20 @@ describe('joinColumnPath', () => {
 
   it('should properly join params with a non-nested param path', () => {
     expect(
-      joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'parent')
+      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'parent')
     ).toStrictEqual('params:params.yaml:parent')
   })
 
   it('should properly join a path to a file with no params', () => {
-    expect(joinColumnPath(ColumnType.PARAMS, 'params.yaml')).toStrictEqual(
-      'params:params.yaml'
-    )
+    expect(
+      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
+    ).toStrictEqual('params:params.yaml')
   })
 
   it('should properly join a path to a file with no file or params', () => {
-    expect(joinColumnPath(ColumnType.PARAMS)).toStrictEqual(ColumnType.PARAMS)
+    expect(buildMetricOrParamPath(ColumnType.PARAMS)).toStrictEqual(
+      ColumnType.PARAMS
+    )
   })
 })
 

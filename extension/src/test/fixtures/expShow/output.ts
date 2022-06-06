@@ -12,8 +12,8 @@ const data: ExperimentsOutput = {
             nfiles: null
           },
           [join('src', 'prepare.py')]: {
-            hash: 'f09ea0c15980b43010257ccb9f0055e2',
-            size: 1576,
+            hash: '935ee6803ac617d0ef138ac33a9e9a77',
+            size: 1431,
             nfiles: null
           },
           [join('data', 'prepared')]: {

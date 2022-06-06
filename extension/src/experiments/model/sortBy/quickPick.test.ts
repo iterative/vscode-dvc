@@ -1,5 +1,5 @@
 import { pickSortsToRemove, pickSortToAdd } from './quickPick'
-import { appendColumnToPath, joinColumnPath } from '../../columns/paths'
+import { appendColumnToPath, buildMetricOrParamPath } from '../../columns/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { ColumnType } from '../../webview/contract'
@@ -14,14 +14,14 @@ beforeEach(() => {
 })
 
 const paramsYaml = 'params.yaml'
-const paramsYamlPath = joinColumnPath(ColumnType.PARAMS, paramsYaml)
+const paramsYamlPath = buildMetricOrParamPath(ColumnType.PARAMS, paramsYaml)
 const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epochs')
 const epochsParam = {
   hasChildren: false,
+  label: 'epochs',
   maxNumber: 5,
   maxStringLength: 1,
   minNumber: 2,
-  name: 'epochs',
   parentPath: paramsYamlPath,
   path: epochsParamPath,
   type: ColumnType.PARAMS,
@@ -30,7 +30,7 @@ const epochsParam = {
 
 const paramsYamlParam = {
   hasChildren: true,
-  name: paramsYaml,
+  label: paramsYaml,
   parentPath: ColumnType.PARAMS,
   path: paramsYamlPath,
   type: ColumnType.PARAMS
