@@ -35,14 +35,14 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
 
   return (
     <ul className={styles.list} data-testid="ribbon">
-      <li className={styles.addButtonWrapper}>
+      <li className={styles.buttonWrapper}>
         <IconButton
           onClick={selectRevisions}
           icon={AllIcons.LINES}
           text={`${revisions.length} of ${MAX_NB_EXP}`}
         />
       </li>
-      <li className={styles.addButtonWrapper}>
+      <li className={styles.buttonWrapper}>
         <IconButton
           onClick={refreshRevisions}
           icon={AllIcons.REFRESH}

@@ -2,12 +2,14 @@
 
 .copyButton {
   display: none;
+  position: absolute;
+  right: 0;
+  top: 3px;
 }
 
 .block {
   border-left-style: solid;
   border-left-width: 3px;
-  padding: 4px;
   background-color: $header-bg-color;
   color: $fg-color;
   display: inline-flex;
@@ -28,7 +30,8 @@
 }
 
 .label {
-  height: 30px;
+  height: 26px;
+  padding: 2px 4px;
   background-color: transparent;
   border: none;
   text-align: left;
@@ -37,15 +40,20 @@
   flex-direction: column;
   justify-content: center;
   min-width: max-content;
+  line-height: 1.1;
 }
 
 .title {
   display: inline-flex;
   align-items: center;
+  padding-right: 15px;
+  position: relative;
+  font-size: 0.8rem;
 }
 
 .subtitle {
   color: $watermark-color;
+  font-size: 0.5625rem;
 }
 
 .clearButton {
@@ -66,14 +74,13 @@
 .list {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 6px;
   border-bottom: 1px solid $border-color;
   padding: 10px 15px;
   margin: 0;
   flex-wrap: wrap;
 }
 
-.addButtonWrapper {
-  background-color: $accent-color;
+.buttonWrapper {
   list-style: none;
 }

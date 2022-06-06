@@ -1,5 +1,5 @@
 import { ColumnsModel } from './model'
-import { appendColumnToPath, joinColumnPath } from './paths'
+import { appendColumnToPath, buildMetricOrParamPath } from './paths'
 import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -26,7 +26,10 @@ describe('ColumnsModel', () => {
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
   })
   describe('persistence', () => {
-    const paramsDotYamlPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+    const paramsDotYamlPath = buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml'
+    )
     const testParamPath = appendColumnToPath(paramsDotYamlPath, 'testparam')
     const exampleData = {
       workspace: {
@@ -49,15 +52,15 @@ describe('ColumnsModel', () => {
       expect(model.getSelected()).toStrictEqual([
         {
           hasChildren: true,
-          name: 'params.yaml',
+          label: 'params.yaml',
           parentPath: ColumnType.PARAMS,
           path: paramsDotYamlPath,
           type: ColumnType.PARAMS
         },
         {
           hasChildren: false,
+          label: 'testparam',
           maxStringLength: 4,
-          name: 'testparam',
           parentPath: paramsDotYamlPath,
           path: testParamPath,
           pathArray: [ColumnType.PARAMS, 'params.yaml', 'testparam'],
@@ -81,7 +84,7 @@ describe('ColumnsModel', () => {
       expect(model.getSelected()).toStrictEqual([
         {
           hasChildren: true,
-          name: 'params.yaml',
+          label: 'params.yaml',
           parentPath: ColumnType.PARAMS,
           path: paramsDotYamlPath,
           type: ColumnType.PARAMS

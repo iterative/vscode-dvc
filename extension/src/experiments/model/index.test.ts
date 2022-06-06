@@ -9,7 +9,7 @@ import {
   rows as deeplyNestedRows
 } from '../../test/fixtures/expShow/deeplyNested'
 import { buildMockMemento } from '../../test/util'
-import { joinColumnPath } from '../columns/paths'
+import { buildMetricOrParamPath } from '../columns/paths'
 import { Experiment, ColumnType } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 
@@ -77,7 +77,11 @@ describe('ExperimentsModel', () => {
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', () => {
-    const testPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
+    const testPath = buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      'test'
+    )
 
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
     experimentsModel.addFilter({
@@ -141,7 +145,11 @@ describe('ExperimentsModel', () => {
   })
 
   it('should apply filters to checkpoints and experiments if selection mode is set to use filters', () => {
-    const testPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
+    const testPath = buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      'test'
+    )
 
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
     experimentsModel.addFilter({

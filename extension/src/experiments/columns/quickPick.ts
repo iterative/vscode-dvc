@@ -16,7 +16,7 @@ export const pickFromColumns = (
   return quickPickValue<Column>(
     columns.map(column => ({
       description: column.path,
-      label: column.name,
+      label: column.label,
       value: column
     })),
     quickPickOptions

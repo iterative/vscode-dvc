@@ -27,7 +27,7 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
           process: () => this.update()
         }
       ],
-      ['dvc.yaml']
+      ['dvc.yaml', 'dvc.lock']
     )
   }
 

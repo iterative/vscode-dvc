@@ -274,6 +274,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       &.metricHeaderCell {
         color: $metrics-color;
       }
+
+      .depHeaderCell,
+      &.depHeaderCell {
+        color: $deps-color;
+      }
     }
 
     &:last-child {

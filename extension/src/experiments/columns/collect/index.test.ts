@@ -1,10 +1,11 @@
 import { join } from 'path'
-import { collectChanges, collectColumns } from './collect'
-import { joinColumnPath } from './paths'
-import { Column, ColumnType } from '../webview/contract'
-import outputFixture from '../../test/fixtures/expShow/output'
-import columnsFixture from '../../test/fixtures/expShow/columns'
-import { ExperimentsOutput } from '../../cli/reader'
+import { collectChanges, collectColumns } from '.'
+import { buildDepPath, buildMetricOrParamPath } from '../paths'
+import { Column, ColumnType } from '../../webview/contract'
+import outputFixture from '../../../test/fixtures/expShow/output'
+import columnsFixture from '../../../test/fixtures/expShow/columns'
+import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
+import { ExperimentsOutput } from '../../../cli/reader'
 
 describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {
@@ -116,7 +117,8 @@ describe('collectColumns', () => {
 
   const exampleMixedParam = columns.find(
     column =>
-      column.parentPath === joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+      column.parentPath ===
+      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
   ) as Column
 
   it('should correctly identify mixed type params', () => {
@@ -184,7 +186,7 @@ describe('collectColumns', () => {
     const mixedParam = columns.find(
       column =>
         column.path ===
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'mixedNumber')
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'mixedNumber')
     ) as Column
 
     expect(mixedParam.minNumber).toStrictEqual(-1)
@@ -228,9 +230,9 @@ describe('collectColumns', () => {
   const param = numericColumns.filter(
     column => column.type === ColumnType.PARAMS
   ) as Column[]
-  const paramWithNumbers = param.find(p => p.name === 'withNumbers') as Column
+  const paramWithNumbers = param.find(p => p.label === 'withNumbers') as Column
   const paramWithoutNumbers = param.find(
-    p => p.name === 'withoutNumbers'
+    p => p.label === 'withoutNumbers'
   ) as Column
 
   it('should not add a maxNumber or minNumber on a param with no numbers', () => {
@@ -298,10 +300,11 @@ describe('collectColumns', () => {
 
     const params = columns.filter(
       column =>
-        column.parentPath === joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+        column.parentPath ===
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
     ) as Column[]
 
-    expect(params?.map(({ name }) => name)).toStrictEqual([
+    expect(params?.map(({ label }) => label)).toStrictEqual([
       'one',
       'two',
       'three',
@@ -331,22 +334,26 @@ describe('collectColumns', () => {
     })
 
     expect(columns.map(({ path }) => path)).toStrictEqual([
-      joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
-      joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'one.two.three.four'),
-      joinColumnPath(
+      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
+      buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'one.two.three.four'
+      ),
+      buildMetricOrParamPath(
         ColumnType.PARAMS,
         'params.yaml',
         'one.two.three.four',
         'five'
       ),
-      joinColumnPath(
+      buildMetricOrParamPath(
         ColumnType.PARAMS,
         'params.yaml',
         'one.two.three.four',
         'five',
         'six'
       ),
-      joinColumnPath(
+      buildMetricOrParamPath(
         ColumnType.PARAMS,
         'params.yaml',
         'one.two.three.four',
@@ -378,25 +385,26 @@ describe('collectColumns', () => {
 
     const objectParam = columns.find(
       column =>
-        column.parentPath === joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+        column.parentPath ===
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
     ) as Column
 
-    expect(objectParam.name).toStrictEqual('onlyHasChild')
+    expect(objectParam.label).toStrictEqual('onlyHasChild')
     expect(objectParam.types).toBeUndefined()
 
     const primitiveParam = columns.find(
       column =>
         column.parentPath ===
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'onlyHasChild')
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'onlyHasChild')
     ) as Column
 
-    expect(primitiveParam.name).toStrictEqual('onlyHasPrimitive')
+    expect(primitiveParam.label).toStrictEqual('onlyHasPrimitive')
     expect(primitiveParam.types).toBeDefined()
 
     const onlyHasPrimitiveChild = columns.find(
       column =>
         column.parentPath ===
-        joinColumnPath(
+        buildMetricOrParamPath(
           ColumnType.PARAMS,
           'params.yaml',
           'onlyHasChild',
@@ -410,28 +418,62 @@ describe('collectColumns', () => {
   it('should collect all params and metrics from the test fixture', () => {
     expect(collectColumns(outputFixture).map(({ path }) => path)).toStrictEqual(
       [
-        joinColumnPath(ColumnType.METRICS, 'summary.json'),
-        joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
-        joinColumnPath(ColumnType.METRICS, 'summary.json', 'accuracy'),
-        joinColumnPath(ColumnType.METRICS, 'summary.json', 'val_loss'),
-        joinColumnPath(ColumnType.METRICS, 'summary.json', 'val_accuracy'),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml'),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'code_names'),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'learning_rate'),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'dvc_logs_dir'),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'log_file'),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'dropout'),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'process'),
-        joinColumnPath(
+        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
+        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'loss'),
+        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'accuracy'),
+        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'val_loss'),
+        buildMetricOrParamPath(
+          ColumnType.METRICS,
+          'summary.json',
+          'val_accuracy'
+        ),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'code_names'),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          'params.yaml',
+          'learning_rate'
+        ),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          'params.yaml',
+          'dvc_logs_dir'
+        ),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'log_file'),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'dropout'),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'process'),
+        buildMetricOrParamPath(
           ColumnType.PARAMS,
           'params.yaml',
           'process',
           'threshold'
         ),
-        joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'process', 'test_arg'),
-        joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml')),
-        joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'), 'test')
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          'params.yaml',
+          'process',
+          'test_arg'
+        ),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          join('nested', 'params.yaml')
+        ),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          join('nested', 'params.yaml'),
+          'test'
+        ),
+        buildDepPath('data'),
+        buildDepPath('data', 'data.xml'),
+        buildDepPath('src'),
+        buildDepPath('src', 'prepare.py'),
+        buildDepPath('data', 'prepared'),
+        buildDepPath('src', 'featurization.py'),
+        buildDepPath('data', 'features'),
+        buildDepPath('src', 'train.py'),
+        buildDepPath('model.pkl'),
+        buildDepPath('src', 'evaluate.py')
       ]
     )
   })
@@ -454,6 +496,11 @@ describe('collectChanges', () => {
       }
     }
   }
+
+  it('should return the expected data from the output fixture', () => {
+    const changes = collectChanges(outputFixture)
+    expect(changes).toStrictEqual(workspaceChangesFixture)
+  })
 
   it('should return an empty array if there are no changes from the current commit and the workspace', () => {
     const data: ExperimentsOutput = {
@@ -535,7 +582,7 @@ describe('collectChanges', () => {
     }
 
     expect(collectChanges(data)).toStrictEqual([
-      joinColumnPath(
+      buildMetricOrParamPath(
         ColumnType.PARAMS,
         'params.yaml',
         'dropout',
@@ -543,7 +590,7 @@ describe('collectChanges', () => {
         'p',
         '0.05'
       ),
-      joinColumnPath(
+      buildMetricOrParamPath(
         ColumnType.PARAMS,
         'params.yaml',
         'dropout',
