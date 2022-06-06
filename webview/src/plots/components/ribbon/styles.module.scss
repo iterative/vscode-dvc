@@ -78,7 +78,12 @@
   flex-wrap: wrap;
 }
 
-.addButtonWrapper {
-  background-color: $accent-color;
+.buttonWrapper {
   list-style: none;
+  height: 38px;
+
+  vscode-button,
+  button {
+    height: 100%;
+  }
 }
