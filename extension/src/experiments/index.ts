@@ -257,6 +257,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public getExperimentCount() {
+    return this.experiments.getExperimentCount()
+  }
+
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 

@@ -328,7 +328,13 @@ export class ExperimentsTree
       )
     )
 
-    return `${selected} of ${dvcRoots.length * MAX_SELECTED_EXPERIMENTS}`
+    const total = sum(
+      dvcRoots.map(dvcRoot =>
+        this.experiments.getRepository(dvcRoot).getExperimentCount()
+      )
+    )
+
+    return `plot ${selected} of ${total} (max ${MAX_SELECTED_EXPERIMENTS})`
   }
 
   private isRoot(element: string | ExperimentItem): element is string {
