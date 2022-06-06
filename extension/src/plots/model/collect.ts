@@ -26,12 +26,12 @@ import {
   decodeColumn,
   appendColumnToPath
 } from '../../experiments/columns/paths'
-import { Columns } from '../../experiments/webview/contract'
+import { MetricOrParamColumns } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
-import { getShortSha } from '../../experiments/model/collect'
+import { shortenForLabel } from '../../util/string'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -71,7 +71,7 @@ type MetricsAndDetailsOrUndefined =
   | {
       checkpoint_parent: string | undefined
       checkpoint_tip: string | undefined
-      metrics: Columns | undefined
+      metrics: MetricOrParamColumns | undefined
       queued: boolean | undefined
       running: boolean | undefined
     }
@@ -95,7 +95,7 @@ const transformExperimentData = (
 type ValidData = {
   checkpoint_parent: string
   checkpoint_tip: string
-  metrics: Columns
+  metrics: MetricOrParamColumns
   queued: boolean | undefined
   running: boolean | undefined
 }
@@ -107,7 +107,7 @@ const collectFromMetrics = (
   acc: CheckpointPlotAccumulator,
   experimentName: string,
   iteration: number,
-  metrics: Columns
+  metrics: MetricOrParamColumns
 ) => {
   for (const file of Object.keys(metrics)) {
     collectFromMetricsFile(
@@ -231,7 +231,7 @@ const collectRunningFromBranch = (
 ): string | undefined => {
   for (const [sha, experiment] of Object.entries(experimentsObject)) {
     if (isRunningInWorkspace(experiment)) {
-      return getShortSha(sha)
+      return shortenForLabel(sha)
     }
   }
 }
