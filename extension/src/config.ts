@@ -1,3 +1,4 @@
+import { Disposable } from '@hediet/std/disposable'
 import { EventEmitter, Event, workspace } from 'vscode'
 import {
   getOnDidChangePythonExecutionDetails,
@@ -5,6 +6,7 @@ import {
 } from './extensions/python'
 import { ConfigKey, getConfigValue } from './vscode/config'
 import { DeferredDisposable } from './class/deferred'
+import { getOnDidChangeExtensions } from './vscode/extensions'
 
 export class Config extends DeferredDisposable {
   public readonly onDidChangeExecutionDetails: Event<void>
@@ -15,15 +17,20 @@ export class Config extends DeferredDisposable {
 
   private readonly executionDetailsChanged: EventEmitter<void>
 
-  constructor() {
+  private pythonExecutionDetailsListener?: Disposable
+  private readonly onDidChangeExtensionsEvent: Event<void>
+
+  constructor(onDidChangeExtensionsEvent = getOnDidChangeExtensions()) {
     super()
 
     this.executionDetailsChanged = this.dispose.track(new EventEmitter())
     this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
+    this.onDidChangeExtensionsEvent = onDidChangeExtensionsEvent
 
     this.setPythonBinPath()
 
     this.onDidChangePythonExecutionDetails()
+    this.onDidChangeExtensions()
 
     this.onDidConfigurationChange()
   }
@@ -46,10 +53,20 @@ export class Config extends DeferredDisposable {
   }
 
   private async onDidChangePythonExecutionDetails() {
+    this.pythonExecutionDetailsListener?.dispose()
     const onDidChangePythonExecutionDetails =
       await getOnDidChangePythonExecutionDetails()
-    this.dispose.track(
+    this.pythonExecutionDetailsListener = this.dispose.track(
       onDidChangePythonExecutionDetails?.(() => {
+        this.setPythonAndNotifyIfChanged()
+      })
+    )
+  }
+
+  private onDidChangeExtensions() {
+    this.dispose.track(
+      this.onDidChangeExtensionsEvent(() => {
+        this.onDidChangePythonExecutionDetails()
         this.setPythonAndNotifyIfChanged()
       })
     )
