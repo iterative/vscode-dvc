@@ -11,21 +11,21 @@ describe('useColumnOrder', () => {
     const columns: Column[] = [
       {
         hasChildren: false,
-        name: 'A',
+        label: 'A',
         parentPath: ColumnType.METRICS,
         path: `${ColumnType.METRICS}:A`,
         type: ColumnType.METRICS
       },
       {
         hasChildren: false,
-        name: 'B',
+        label: 'B',
         parentPath: ColumnType.METRICS,
         path: `${ColumnType.METRICS}:B`,
         type: ColumnType.METRICS
       },
       {
         hasChildren: false,
-        name: 'C',
+        label: 'C',
         parentPath: ColumnType.PARAMS,
         path: `${ColumnType.PARAMS}:C`,
         type: ColumnType.PARAMS

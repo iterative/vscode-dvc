@@ -2,7 +2,12 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
 import { ExperimentsColumnsTree } from './tree'
-import { appendColumnToPath, joinColumnPath, splitColumnPath } from './paths'
+import {
+  appendColumnToPath,
+  buildDepPath,
+  buildMetricOrParamPath,
+  splitColumnPath
+} from './paths'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
@@ -116,7 +121,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'summary.json',
-          path: joinColumnPath(ColumnType.METRICS, 'summary.json')
+          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json')
         },
         {
           collapsibleState: 1,
@@ -124,7 +129,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'params.yaml',
-          path: joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+          path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
         },
         {
           collapsibleState: 1,
@@ -132,7 +137,34 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: join('nested', 'params.yaml'),
-          path: joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'))
+          path: buildMetricOrParamPath(
+            ColumnType.PARAMS,
+            join('nested', 'params.yaml')
+          )
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'data',
+          path: buildDepPath('data')
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'src',
+          path: buildDepPath('src')
+        },
+        {
+          collapsibleState: 0,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'model.pkl',
+          path: buildDepPath('model.pkl')
         }
       ])
     })
@@ -155,7 +187,10 @@ describe('ExperimentsColumnsTree', () => {
 
       const children = await experimentsColumnsTree.getChildren(mockedDvcRoot)
 
-      const paramsPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml')
+      const paramsPath = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml'
+      )
       const processPath = appendColumnToPath(paramsPath, 'process')
 
       expect(children).toStrictEqual([
@@ -165,7 +200,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'summary.json',
-          path: joinColumnPath(ColumnType.METRICS, 'summary.json')
+          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json')
         },
         {
           collapsibleState: 1,
@@ -181,7 +216,34 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: join('nested', 'params.yaml'),
-          path: joinColumnPath(ColumnType.PARAMS, join('nested', 'params.yaml'))
+          path: buildMetricOrParamPath(
+            ColumnType.PARAMS,
+            join('nested', 'params.yaml')
+          )
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'data',
+          path: buildDepPath('data')
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'src',
+          path: buildDepPath('src')
+        },
+        {
+          collapsibleState: 0,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: 'model.pkl',
+          path: buildDepPath('model.pkl')
         }
       ])
 
@@ -302,7 +364,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'threshold',
-          path: joinColumnPath(
+          path: buildMetricOrParamPath(
             ColumnType.PARAMS,
             'params.yaml',
             'process',
@@ -315,7 +377,7 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'test_arg',
-          path: joinColumnPath(
+          path: buildMetricOrParamPath(
             ColumnType.PARAMS,
             'params.yaml',
             'process',
@@ -365,7 +427,7 @@ describe('ExperimentsColumnsTree', () => {
     )
 
     const filename = 'params.yml'
-    const relParamsPath = joinColumnPath(ColumnType.PARAMS, filename)
+    const relParamsPath = buildMetricOrParamPath(ColumnType.PARAMS, filename)
 
     const columnsItem = {
       collapsibleState: TreeItemCollapsibleState.Collapsed,
@@ -405,7 +467,7 @@ describe('ExperimentsColumnsTree', () => {
     )
 
     const filename = 'params.yml'
-    const relParamsPath = joinColumnPath(ColumnType.PARAMS, filename)
+    const relParamsPath = buildMetricOrParamPath(ColumnType.PARAMS, filename)
 
     const columnsItem = {
       collapsibleState: TreeItemCollapsibleState.None,
