@@ -334,7 +334,7 @@ export class ExperimentsTree
       )
     )
 
-    return `plot ${selected} of ${total} (max ${MAX_SELECTED_EXPERIMENTS})`
+    return `${selected} of ${total} (max ${MAX_SELECTED_EXPERIMENTS})`
   }
 
   private isRoot(element: string | ExperimentItem): element is string {
