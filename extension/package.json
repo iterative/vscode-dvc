@@ -55,6 +55,14 @@
   "contributes": {
     "colors": [
       {
+        "id": "dvc.deps",
+        "description": "Color to indicate a DVC dep column in the experiments table",
+        "defaults": {
+          "dark": "#b079e7",
+          "light": "#4f1886"
+        }
+      },
+      {
         "id": "dvc.metrics",
         "description": "Color to indicate a DVC metric column in the experiments table",
         "defaults": {

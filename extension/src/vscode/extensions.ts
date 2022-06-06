@@ -41,3 +41,5 @@ export const isInstalled = (id: string): boolean =>
 
 export const showExtension = (id: string) =>
   commands.executeCommand('workbench.extensions.search', `@id:${id}`)
+
+export const getOnDidChangeExtensions = () => extensions.onDidChange
