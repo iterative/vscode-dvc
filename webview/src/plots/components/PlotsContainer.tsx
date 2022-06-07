@@ -15,6 +15,7 @@ import { AllIcons, Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
+import Tooltip from '../../shared/components/tooltip/Tooltip'
 
 export interface PlotsContainerProps {
   sectionCollapsed: SectionCollapsed
@@ -30,6 +31,24 @@ export type BasicContainerProps = Pick<
   PlotsContainerProps,
   'onRename' | 'onResize' | 'sectionCollapsed'
 >
+
+export const SectionDescription = {
+  [Section.CHECKPOINT_PLOTS]:
+    'Linear plots based on data from the experiments table.',
+  [Section.COMPARISON_TABLE]:
+    'A table used to display image plots side by side.',
+  [Section.TEMPLATE_PLOTS]:
+    'JSON, YAML, CSV or TSV files visualized using Vega pre-defined or custom Vega-Lite templates.'
+}
+
+const InfoIcon = () => (
+  <Icon
+    icon={AllIcons.INFO}
+    width={16}
+    height={16}
+    className={styles.infoIcon}
+  />
+)
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
@@ -96,6 +115,13 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     onRename(sectionKey, title)
   }
 
+  const tooltipContent = (
+    <div className={styles.infoTooltip}>
+      <InfoIcon />
+      {SectionDescription[sectionKey]}
+    </div>
+  )
+
   return (
     <div className={styles.plotsContainerWrapper}>
       <details open={open} className={styles.plotsContainer}>
@@ -126,6 +152,14 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           ) : (
             sectionTitle
           )}
+          <Tooltip content={tooltipContent} placement="bottom-end">
+            <div
+              className={styles.infoTooltipToggle}
+              data-testid="info-tooltip-toggle"
+            >
+              <InfoIcon />
+            </div>
+          </Tooltip>
         </summary>
         <div>
           {open && (
