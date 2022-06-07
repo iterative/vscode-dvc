@@ -29,12 +29,7 @@ const writeMissingConfigs = (
     return
   }
 
-  if (isEmpty(config)) {
-    writeJson(configPath, { ...legacyConfig, user_id })
-    return
-  }
-
-  if (config.user_id !== user_id) {
+  if (isEmpty(config) || config.user_id !== user_id) {
     writeJson(configPath, { ...config, ...legacyConfig, user_id })
     return
   }
