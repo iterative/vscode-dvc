@@ -1444,20 +1444,24 @@ describe('App', () => {
     })
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Ribbon', () => {
+    const getDisplayedRevisionOrder = () => {
+      const ribbon = screen.getByTestId('ribbon')
+      const revisionBlocks = within(ribbon).getAllByRole('listitem')
+      return revisionBlocks
+        .map(item => item.textContent)
+        .filter(text => !text?.includes(' of ') && text !== 'Refresh All')
+    }
+
     it('should show the revisions at the top', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
         selectedRevisions: plotsRevisionsFixture
       })
-      const ribbon = screen.getByTestId('ribbon')
 
-      const revisionBlocks = within(ribbon).getAllByRole('listitem')
-      revisionBlocks.shift() // Remove filter button
-      revisionBlocks.shift() // Remove refresh all
-      const revisions = revisionBlocks.map(item => item.textContent)
-      expect(revisions).toStrictEqual(
+      expect(getDisplayedRevisionOrder()).toStrictEqual(
         plotsRevisionsFixture.map(rev =>
           rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
         )
@@ -1531,6 +1535,38 @@ describe('App', () => {
         payload: ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd'],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
+    })
+
+    it('should not reorder the ribbon when comparison plots are reordered', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
+      })
+
+      const expectedRevisions = plotsRevisionsFixture.map(rev =>
+        rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
+      )
+
+      expect(getDisplayedRevisionOrder()).toStrictEqual(expectedRevisions)
+
+      sendSetDataMessage({
+        comparison: comparisonTableFixture,
+        selectedRevisions: [
+          {
+            displayColor: '#f56565',
+            group: undefined,
+            id: 'new-revision',
+            revision: 'new-revision'
+          },
+          ...plotsRevisionsFixture.reverse()
+        ]
+      })
+
+      expect(getDisplayedRevisionOrder()).toStrictEqual([
+        ...expectedRevisions,
+        'new-revision'
+      ])
     })
   })
 })
