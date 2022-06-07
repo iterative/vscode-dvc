@@ -17,6 +17,8 @@ $gap: 20px;
     margin: 14px 10px;
     font-weight: bold;
     font-size: 1.25rem;
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -318,6 +320,25 @@ $gap: 20px;
   svg {
     background-color: transparent !important;
     max-width: 100%;
+  }
+}
+
+.infoIcon {
+  fill: $accent-color;
+  margin-left: 6px;
+}
+
+.infoTooltip {
+  max-width: 220px;
+  padding: 12px 8px;
+  white-space: normal;
+  display: flex;
+  gap: 4px;
+  font-size: 0.8125rem;
+
+  svg {
+    min-width: 16px;
+    min-height: 16px;
   }
 }
 
