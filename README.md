@@ -7,24 +7,22 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
-This [extension] integrates [DVC features] right into the popular [VS Code IDE],
-allowing users of all backgrounds to use DVC.
+Run, compare, visualize, and track machine learning experiments right in your
+IDE, without need for special services or subscriptions. Compare and visualize
+ML model metrics, and manage data effectively with [DVC](https://dvc.org/).
 
 > **Note**: We want early adopter feedback!  
 > Please let us know what you like and don't like about the extension. Feel free
 > to open [issues in this repo] or reach out via [DVC support] channels.
 
-[extension]: https://marketplace.visualstudio.com/VSCode
-[dvc features]: https://dvc.org/doc/start
-[vs code ide]: https://code.visualstudio.com/
 [issues in this repo]: https://github.com/iterative/vscode-dvc/issues
 [dvc support]: https://dvc.org/support
 
 ## What it does (extension features)
 
-The DVC Extension augments and adds several [Views], adds special [Editors].
-Furthermore it exposes these and other DVC functions in the [Command Palette].
-Specifically:
+This [extension] augments and adds several [Views], adds special [Editors] to
+[VS Code]. Furthermore, it exposes these and other DVC functions in the [Command
+Palette]. Specifically:
 
 - It provides _Editors_ to manage [Experiments][exp-view] and display
   [Plots][plots-view] as _Tabs_ in the IDE.
@@ -42,6 +40,7 @@ Specifically:
 - Includes a [DVC channel] for the _Output_ panel (useful for
   [debugging](#debugging)). 
 
+[extension]: https://marketplace.visualstudio.com/VSCode
 [views]: https://code.visualstudio.com/docs/getstarted/userinterface#_views
 [editors]:
   https://code.visualstudio.com/docs/getstarted/userinterface#_open-editors
@@ -49,6 +48,7 @@ Specifically:
   https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
 
 [exp-view]: extension/resources/walkthrough/experiments-table.md
+[vs code]: https://code.visualstudio.com/
 [plots-view]: extension/resources/walkthrough/plots.md
 [dvc tracked]: extension/resources/walkthrough/tracked-explorer.md
 [dvc panel]: extension/resources/walkthrough/source-control-management.md
