@@ -36,6 +36,7 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
+import { SectionDescription } from './PlotsContainer'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
@@ -1052,6 +1053,33 @@ describe('App', () => {
     fireEvent.click(screen.getByTestId('modal-content'))
 
     expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  it('should show a tooltip with the meaning of each plot section', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      comparison: comparisonTableFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const [templateInfo, comparisonInfo, checkpointInfo] =
+      screen.getAllByTestId('info-tooltip-toggle')
+
+    fireEvent.mouseEnter(templateInfo, { bubbles: true })
+    expect(
+      screen.getByText(SectionDescription[Section.TEMPLATE_PLOTS])
+    ).toBeInTheDocument()
+
+    fireEvent.mouseEnter(comparisonInfo, { bubbles: true })
+    expect(
+      screen.getByText(SectionDescription[Section.COMPARISON_TABLE])
+    ).toBeInTheDocument()
+
+    fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
+    expect(
+      screen.getByText(SectionDescription[Section.CHECKPOINT_PLOTS])
+    ).toBeInTheDocument()
   })
 
   describe('Virtualization', () => {

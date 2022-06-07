@@ -32,6 +32,15 @@ export type BasicContainerProps = Pick<
   'onRename' | 'onResize' | 'sectionCollapsed'
 >
 
+export const SectionDescription = {
+  [Section.CHECKPOINT_PLOTS]:
+    'linear plots based on data from the experiments table.',
+  [Section.COMPARISON_TABLE]:
+    'a table used to display image plots side by side.',
+  [Section.TEMPLATE_PLOTS]:
+    'JSON, YAML, CSV or TSV files visualized using Vega pre-defined or custom Vega-Lite templates.'
+}
+
 const InfoIcon = () => (
   <Icon
     icon={AllIcons.INFO}
@@ -40,15 +49,6 @@ const InfoIcon = () => (
     className={styles.infoIcon}
   />
 )
-
-const SectionDescription = {
-  [Section.CHECKPOINT_PLOTS]:
-    'linear plots based on data from the experiments table.',
-  [Section.COMPARISON_TABLE]:
-    'a table used to display image plots side by side.',
-  [Section.TEMPLATE_PLOTS]:
-    'JSON, YAML, CSV or TSV files visualized using Vega pre-defined or custom Vega-Lite templates.'
-}
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
@@ -153,7 +153,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             sectionTitle
           )}
           <Tooltip content={tooltipContent} placement="bottom-end">
-            <div>
+            <div data-testid="info-tooltip-toggle">
               <InfoIcon />
             </div>
           </Tooltip>
