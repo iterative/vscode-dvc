@@ -1,8 +1,9 @@
 import { commands, env, Event, EventEmitter, ExtensionContext } from 'vscode'
-import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
+import { Config } from './config'
+import { Context } from './context'
 import { isVersionCompatible } from './cli/version'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
@@ -133,11 +134,7 @@ export class Extension extends Disposable implements IExtension {
       new WorkspaceRepositories(this.internalCommands)
     )
 
-    this.dispose.track(
-      this.cliRunner.onDidCompleteProcess(({ cwd }) =>
-        this.experiments.getRepository(cwd).update()
-      )
-    )
+    this.dispose.track(new Context(this.experiments, this.cliRunner))
 
     this.dispose.track(
       new ExperimentsColumnsTree(

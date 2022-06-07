@@ -192,6 +192,15 @@ const transformExperimentOrCheckpointData = (
   }
 }
 
+const collectHasRunningExperiment = (
+  acc: ExperimentsAccumulator,
+  experiment: Experiment
+) => {
+  if (experiment.running) {
+    acc.hasRunning = true
+  }
+}
+
 const collectExperimentOrCheckpoint = (
   acc: ExperimentsAccumulator,
   experiment: Experiment,
@@ -227,6 +236,7 @@ const collectFromExperimentsObject = (
     }
 
     collectExperimentOrCheckpoint(acc, experiment, branchName, checkpointTipId)
+    collectHasRunningExperiment(acc, experiment)
   }
 }
 
@@ -248,6 +258,7 @@ const collectFromBranchesObject = (
 
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject, sha, branch.label)
+      collectHasRunningExperiment(acc, branch)
 
       acc.branches.push(branch)
     }
