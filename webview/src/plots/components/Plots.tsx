@@ -63,7 +63,7 @@ const PlotsContent = ({ state }: PlotsProps) => {
     comparison: comparisonTable,
     hasPlots,
     hasSelectedPlots,
-    hasSelectedRevisions,
+    selectedRevisions,
     sectionCollapsed,
     template: templatePlots
   } = data
@@ -74,7 +74,7 @@ const PlotsContent = ({ state }: PlotsProps) => {
         addItems={
           <AddPlots
             hasSelectedPlots={!!hasSelectedPlots}
-            hasSelectedRevisions={!!hasSelectedRevisions}
+            hasSelectedRevisions={!!selectedRevisions?.length}
           />
         }
         showEmpty={!hasPlots}
@@ -119,7 +119,7 @@ const PlotsContent = ({ state }: PlotsProps) => {
 
   return (
     <>
-      <Ribbon revisions={comparisonTable?.revisions || []} />
+      <Ribbon revisions={selectedRevisions || []} />
       <DragDropProvider>
         <PlotsSizeProvider
           sizes={{
@@ -137,6 +137,7 @@ const PlotsContent = ({ state }: PlotsProps) => {
           {comparisonTable && (
             <ComparisonTableWrapper
               comparisonTable={comparisonTable}
+              revisions={selectedRevisions || []}
               {...wrapperProps}
             />
           )}
