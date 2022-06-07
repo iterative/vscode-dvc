@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.21",
+  "version": "0.2.23",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -20,14 +20,18 @@
   "homepage": "https://github.com/iterative/vscode-dvc/README.md",
   "keywords": [
     "iterative",
-    "data",
-    "version",
-    "control",
+    "data version control",
+    "plots",
+    "experiment tracking",
+    "hyperparameters",
+    "dataset",
     "dvc"
   ],
   "categories": [
+    "Machine Learning",
     "Data Science",
-    "Visualization"
+    "Visualization",
+    "SCM Providers"
   ],
   "galleryBanner": {
     "color": "#333",
@@ -50,6 +54,14 @@
   },
   "contributes": {
     "colors": [
+      {
+        "id": "dvc.deps",
+        "description": "Color to indicate a DVC dep column in the experiments table",
+        "defaults": {
+          "dark": "#b079e7",
+          "light": "#4f1886"
+        }
+      },
       {
         "id": "dvc.metrics",
         "description": "Color to indicate a DVC metric column in the experiments table",
@@ -1248,6 +1260,10 @@
           "id": "dvc.views.plotsPathsTree",
           "name": "Plots",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "id": "dvc.views.support",
+          "name": "Support"
         }
       ]
     },
@@ -1295,6 +1311,11 @@
       {
         "view": "dvc.views.plotsPathsTree",
         "contents": "No Plots to Display."
+      },
+      {
+        "view": "dvc.views.support",
+        "contents": "[$(github) Github Issues](https://github.com/iterative/vscode-dvc/issues)\n[$(comment-discussion) Discord](https://discord.gg/BGCjJHvDHt)",
+        "when": "true"
       }
     ],
     "walkthroughs": [

@@ -1,6 +1,5 @@
 import { Memento } from 'vscode'
 import { collectChanges, collectColumns, collectParamsFiles } from './collect'
-import { splitColumnPath } from './paths'
 import { Column, ColumnType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/reader'
 import { PersistenceKey } from '../../persistence/constants'
@@ -13,12 +12,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   private paramsFiles = new Set<string>()
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    super(
-      dvcRoot,
-      workspaceState,
-      PersistenceKey.METRICS_AND_PARAMS_STATUS,
-      splitColumnPath
-    )
+    super(dvcRoot, workspaceState, PersistenceKey.METRICS_AND_PARAMS_STATUS)
 
     this.columnOrderState = this.revive(
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,

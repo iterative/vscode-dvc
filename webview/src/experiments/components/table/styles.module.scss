@@ -3,6 +3,7 @@
 @import '../../../shared/variables.scss';
 
 $nested-row-padding: 1.35rem;
+$row-border: 1px solid $border-color;
 
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
@@ -131,7 +132,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       border-top-color: $changed-color;
     }
 
-    .runningExperiment.oddRow > .firstCell & {
+    .runningExperiment.oddRow > .experimentCell & {
       border-left: 1.5px solid $row-bg-alt-color;
       border-bottom: 1.5px solid $row-bg-alt-color;
     }
@@ -170,13 +171,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   display: flex;
   flex-flow: column nowrap;
 
-  .firstCell {
-    display: flex;
-    flex-flow: row nowrap;
-  }
   .experimentGroup {
     .nestedRow {
-      .firstCell {
+      .experimentCell {
         padding-left: $nested-row-padding;
       }
     }
@@ -233,11 +230,21 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
 
   .thead {
-    border-bottom: 1px solid $border-color;
+    border-bottom: $row-border;
   }
 
   .tr {
     position: relative;
+    & > *:first-child {
+      background-color: $row-bg-color;
+      position: sticky;
+      left: 0;
+      z-index: 3;
+    }
+
+    &.oddRow > *:first-child {
+      background-color: $row-bg-alt-color;
+    }
   }
 
   .headerRow {
@@ -267,6 +274,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       &.metricHeaderCell {
         color: $metrics-color;
       }
+
+      .depHeaderCell,
+      &.depHeaderCell {
+        color: $deps-color;
+      }
     }
 
     &:last-child {
@@ -295,9 +307,19 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     margin: 0.5rem 0;
   }
   .normalRowGroup {
-    border: 1px solid $border-color;
+    border-top: $row-border;
+    border-bottom: $row-border;
     .oddRow {
       background-color: $row-bg-alt-color;
+    }
+    .td {
+      &:first-child {
+        border-left: $row-border;
+      }
+
+      &:last-child {
+        border-right: $row-border;
+      }
     }
   }
   .workspaceRowGroup {
@@ -308,7 +330,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         padding-left: $workspace-row-edge-margin;
         .innerCell {
           padding-left: $cell-padding;
-          border-left: 1px solid $border-color;
+          border-left: $row-border;
         }
       }
 
@@ -316,7 +338,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         padding-right: $workspace-row-edge-margin;
         .innerCell {
           padding-right: $cell-padding;
-          border-right: 1px solid $border-color;
+          border-right: $row-border;
         }
       }
     }
@@ -326,8 +348,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       height: 100%;
       width: 100%;
       background-color: none;
-      border-top: 1px solid $border-color;
-      border-bottom: 1px solid $border-color;
+      border-top: $row-border;
+      border-bottom: $row-border;
     }
   }
 
@@ -362,6 +384,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
   }
   .experimentCell {
+    display: flex;
+    flex-flow: row nowrap;
     text-align: left;
     .innerCell {
       justify-content: flex-start;
@@ -459,18 +483,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .copyButton {
-  flex: 0 0 0.8em;
-  font-size: 1.5em;
   display: none;
-  border: none;
-  background: none;
-  color: $fg-color;
-  cursor: pointer;
-  width: 0.8em;
-  height: 0.8em;
-  line-height: 0.8em;
-  padding: 0;
-  margin: 0 0.25em;
 }
 
 .cellContents {
@@ -531,6 +544,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 .thead {
   position: sticky;
   top: 0;
-  z-index: 3;
+  z-index: 4;
   background-color: $bg-color;
 }

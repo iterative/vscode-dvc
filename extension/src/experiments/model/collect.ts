@@ -1,4 +1,6 @@
+import { ThemeIcon, TreeItemCollapsibleState, Uri } from 'vscode'
 import omit from 'lodash.omit'
+import { ExperimentType } from '.'
 import { ExperimentsAccumulator } from './accumulator'
 import { extractColumns } from '../columns/extract'
 import { Experiment, ColumnType } from '../webview/contract'
@@ -10,10 +12,26 @@ import {
 } from '../../cli/reader'
 import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
+import { RegisteredCommands } from '../../commands/external'
+import { Resource } from '../../resourceLocator'
+import { shortenForLabel } from '../../util/string'
+
+export type ExperimentItem = {
+  command?: {
+    arguments: { dvcRoot: string; id: string }[]
+    command: RegisteredCommands
+    title: string
+  }
+  dvcRoot: string
+  description: string | undefined
+  id: string
+  label: string
+  collapsibleState: TreeItemCollapsibleState
+  type: ExperimentType
+  iconPath: ThemeIcon | Uri | Resource
+}
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
-
-export const getShortSha = (sha: string) => sha.slice(0, 7)
 
 export const isCheckpoint = (
   checkpointTip: string | undefined,
@@ -53,7 +71,7 @@ const getDisplayNameOrParent = (
     branchSha !== checkpointParent &&
     experimentsObject[checkpointParent]?.data?.checkpoint_tip !== checkpointTip
   ) {
-    return `(${getShortSha(checkpointParent)})`
+    return `(${shortenForLabel(checkpointParent)})`
   }
   if (name) {
     return `[${name}]`
@@ -96,13 +114,16 @@ const transformColumns = (
   experiment: Experiment,
   experimentFields: ExperimentFields
 ) => {
-  const { metrics, params } = extractColumns(experimentFields)
+  const { metrics, params, deps } = extractColumns(experimentFields)
 
   if (metrics) {
     experiment.metrics = metrics
   }
   if (params) {
     experiment.params = params
+  }
+  if (deps) {
+    experiment.deps = deps
   }
 }
 
@@ -163,7 +184,7 @@ const transformExperimentOrCheckpointData = (
     experiment: transformExperimentData(
       id,
       experimentFields,
-      getShortSha(sha),
+      shortenForLabel(sha),
       sha,
       getDisplayNameOrParent(sha, branchSha, experimentsObject),
       getLogicalGroupName(sha, branchSha, experimentsObject)
@@ -287,4 +308,50 @@ export const collectMutableRevisions = (
   }
 
   return uniqueValues(acc)
+}
+
+type DeletableExperimentAccumulator = { [dvcRoot: string]: Set<string> }
+
+const initializeAccumulatorRoot = (
+  acc: DeletableExperimentAccumulator,
+  dvcRoot: string
+) => {
+  if (!acc[dvcRoot]) {
+    acc[dvcRoot] = new Set<string>()
+  }
+}
+
+const collectExperimentItem = (
+  acc: DeletableExperimentAccumulator,
+  deletable: Set<string>,
+  experimentItem: ExperimentItem
+) => {
+  const { dvcRoot, type, id, label } = experimentItem
+  if (!deletable.has(type)) {
+    return
+  }
+  initializeAccumulatorRoot(acc, dvcRoot)
+  if (type === ExperimentType.QUEUED) {
+    acc[dvcRoot].add(label)
+    return
+  }
+
+  acc[dvcRoot].add(id)
+}
+
+export const collectDeletable = (
+  experimentItems: (string | ExperimentItem)[]
+): DeletableExperimentAccumulator => {
+  const deletable = new Set([ExperimentType.EXPERIMENT, ExperimentType.QUEUED])
+
+  const acc: DeletableExperimentAccumulator = {}
+  for (const experimentItem of experimentItems) {
+    if (typeof experimentItem === 'string') {
+      continue
+    }
+
+    collectExperimentItem(acc, deletable, experimentItem)
+  }
+
+  return acc
 }

@@ -4,10 +4,14 @@ import React from 'react'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
+import { AllIcons } from '../../../shared/components/Icon'
+import { IconButton } from '../../../shared/components/button/IconButton'
 
 interface RibbonProps {
   revisions: Revision[]
 }
+
+const MAX_NB_EXP = 7
 
 export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
   const removeRevision = (revision: string) => {
@@ -16,8 +20,36 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
       type: MessageFromWebviewType.TOGGLE_EXPERIMENT
     })
   }
+
+  const refreshRevisions = () =>
+    sendMessage({
+      payload: revisions.map(({ revision }) => revision),
+      type: MessageFromWebviewType.REFRESH_REVISIONS
+    })
+
+  const selectRevisions = () => {
+    sendMessage({
+      type: MessageFromWebviewType.SELECT_EXPERIMENTS
+    })
+  }
+
   return (
     <ul className={styles.list} data-testid="ribbon">
+      <li className={styles.buttonWrapper}>
+        <IconButton
+          onClick={selectRevisions}
+          icon={AllIcons.LINES}
+          text={`${revisions.length} of ${MAX_NB_EXP}`}
+        />
+      </li>
+      <li className={styles.buttonWrapper}>
+        <IconButton
+          onClick={refreshRevisions}
+          icon={AllIcons.REFRESH}
+          text="Refresh All"
+          appearance="secondary"
+        />
+      </li>
       {revisions.map(revision => (
         <RibbonBlock
           revision={revision}

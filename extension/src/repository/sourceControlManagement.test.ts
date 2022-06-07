@@ -4,12 +4,15 @@ import {
   SourceControlManagement,
   SourceControlManagementState
 } from './sourceControlManagement'
+import { isDirectory } from '../fileSystem'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
+jest.mock('../fileSystem')
 
 const mockedScm = jest.mocked(scm)
 const mockedDisposable = jest.mocked(Disposable)
+const mockedIsDirectory = jest.mocked(isDirectory)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -23,6 +26,7 @@ beforeEach(() => {
 describe('SourceControlManagement', () => {
   describe('setState', () => {
     it('should be able to set the state', () => {
+      mockedIsDirectory.mockReturnValue(false)
       const dvcRoot = __dirname
       const mockedCreateSourceControl = jest.fn().mockReturnValueOnce({
         createResourceGroup: jest
@@ -50,6 +54,14 @@ describe('SourceControlManagement', () => {
         added: new Set(['/some/new/path']),
         deleted: new Set(['/some/deleted/path', '/some/other/deleted/path']),
         dispose: () => undefined,
+        hasRemote: new Set([
+          '/some/new/path',
+          '/some/deleted/path',
+          '/some/other/deleted/path',
+          '/some/excluded/tracked/path',
+          '/some/missing/path',
+          '/some/other/missing/path'
+        ]),
         notInCache: new Set(['/some/missing/path', '/some/other/missing/path']),
         tracked: new Set(['/some/excluded/tracked/path'])
       } as unknown as SourceControlManagementState
@@ -61,11 +73,15 @@ describe('SourceControlManagement', () => {
           {
             contextValue: 'deleted',
             dvcRoot,
+            isDirectory: false,
+            isTracked: true,
             resourceUri: Uri.file('/some/deleted/path')
           },
           {
             contextValue: 'deleted',
             dvcRoot,
+            isDirectory: false,
+            isTracked: true,
             resourceUri: Uri.file('/some/other/deleted/path')
           }
         ],
@@ -73,6 +89,8 @@ describe('SourceControlManagement', () => {
           {
             contextValue: 'added',
             dvcRoot,
+            isDirectory: false,
+            isTracked: true,
             resourceUri: Uri.file('/some/new/path')
           }
         ],
@@ -80,11 +98,15 @@ describe('SourceControlManagement', () => {
           {
             contextValue: 'notInCache',
             dvcRoot,
+            isDirectory: false,
+            isTracked: true,
             resourceUri: Uri.file('/some/missing/path')
           },
           {
             contextValue: 'notInCache',
             dvcRoot,
+            isDirectory: false,
+            isTracked: true,
             resourceUri: Uri.file('/some/other/missing/path')
           }
         ]

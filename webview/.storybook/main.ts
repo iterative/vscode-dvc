@@ -16,7 +16,8 @@ export default {
           }
         }
       }
-    }
+    },
+    'storybook-addon-designs'
   ],
   core: {
     builder: 'webpack5'

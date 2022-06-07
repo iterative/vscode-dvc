@@ -36,7 +36,6 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
-import { CopyTooltip } from './ribbon/RibbonBlock'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
@@ -333,108 +332,6 @@ describe('App', () => {
     })
 
     expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
-  })
-
-  it('should toggle the visibility of revisions in the comparison table when clicking the revisions in the picker', async () => {
-    render(
-      <Plots
-        state={{
-          data: {
-            comparison: comparisonTableFixture,
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-            template: null
-          }
-        }}
-      />
-    )
-
-    const summaryElement = await screen.findByText('Images')
-    fireEvent.click(summaryElement, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    const comparisonTable = screen.getByRole('table')
-
-    const workspaceHeader = within(comparisonTable).queryByText('workspace')
-    expect(workspaceHeader).toBeInTheDocument()
-
-    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(pickerButton)
-    fireEvent.click(pickerButton)
-
-    const [, selectMenu] = screen.getAllByRole('menu')
-    const workspaceItem = within(selectMenu).getByText('workspace')
-
-    fireEvent.click(workspaceItem, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(workspaceHeader).not.toBeInTheDocument()
-
-    fireEvent.mouseEnter(pickerButton)
-    fireEvent.click(pickerButton)
-
-    fireEvent.click(workspaceItem, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(within(comparisonTable).getByText('workspace')).toBeInTheDocument()
-  })
-
-  it('should show the newest revision in the comparision table even if some revisions were filtered out', async () => {
-    const { rerender } = render(
-      <Plots
-        state={{
-          data: {
-            comparison: comparisonTableFixture,
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-          }
-        }}
-      />
-    )
-
-    const summaryElement = await screen.findByText('Images')
-    fireEvent.click(summaryElement, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(pickerButton)
-    fireEvent.click(pickerButton)
-
-    const [, selectMenu] = screen.getAllByRole('menu')
-    const workspaceItem = within(selectMenu).getByText('workspace')
-
-    fireEvent.click(workspaceItem, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    const newRevision = 'newRev'
-
-    rerender(
-      <Plots
-        state={{
-          data: {
-            comparison: {
-              ...comparisonTableFixture,
-              revisions: [
-                ...comparisonTableFixture.revisions,
-                { displayColor: '#945dd6', revision: newRevision }
-              ]
-            },
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-          }
-        }}
-      />
-    )
-
-    const workspaceHeader = screen.queryAllByText(newRevision)
-    expect(workspaceHeader.length).toBe(3) // One in the table, one in the menu, and one in the ribbon
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
@@ -1552,9 +1449,10 @@ describe('App', () => {
       })
       const ribbon = screen.getByTestId('ribbon')
 
-      const revisions = within(ribbon)
-        .getAllByRole('listitem')
-        .map(item => item.textContent)
+      const revisionBlocks = within(ribbon).getAllByRole('listitem')
+      revisionBlocks.shift() // Remove filter button
+      revisionBlocks.shift() // Remove refresh all
+      const revisions = revisionBlocks.map(item => item.textContent)
       expect(revisions).toStrictEqual(
         comparisonTableFixture.revisions.map(rev =>
           rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
@@ -1580,69 +1478,51 @@ describe('App', () => {
       })
     })
 
-    describe('Copy button', () => {
-      const mockWriteText = jest.fn()
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: mockWriteText
-        }
+    it('should display the number of experiments selected', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
       })
 
-      it('should copy the experiment name when clicking the text', () => {
-        renderAppWithData({
-          comparison: comparisonTableFixture,
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
+      expect(
+        screen.getByText(`${comparisonTableFixture.revisions.length} of 7`)
+      ).toBeInTheDocument()
+    })
 
-        const mainNameButton = within(
-          screen.getByTestId('ribbon-main')
-        ).getAllByRole('button')[0]
-
-        fireEvent.click(mainNameButton)
-
-        expect(mockWriteText).toBeCalledWith('main')
+    it('should send a message to select the revisions when clicking the filter button', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
       })
 
-      it('should display that the experiment was copied when clicking the text', async () => {
-        jest.useFakeTimers()
+      const filterButton = within(screen.getByTestId('ribbon')).getAllByRole(
+        'button'
+      )[0]
 
-        mockWriteText.mockResolvedValueOnce('success')
+      fireEvent.click(filterButton)
 
-        renderAppWithData({
-          comparison: comparisonTableFixture,
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
+      expect(mockPostMessage).toBeCalledWith({
+        type: MessageFromWebviewType.SELECT_EXPERIMENTS
+      })
+    })
 
-        const mainNameButton = within(
-          screen.getByTestId('ribbon-main')
-        ).getAllByRole('button')[0]
-
-        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
-        fireEvent.click(mainNameButton)
-
-        expect(await screen.findByText(CopyTooltip.COPIED)).toBeInTheDocument()
-        jest.useRealTimers()
+    it('should send a message to refresh each revision when clicking the refresh all button', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
       })
 
-      it('should display copy again when hovering the text 2s after clicking the text', () => {
-        jest.useFakeTimers()
+      const refreshAllButton = within(
+        screen.getByTestId('ribbon')
+      ).getAllByRole('button')[1]
 
-        renderAppWithData({
-          comparison: comparisonTableFixture,
-          sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-        })
+      mockPostMessage.mockReset()
+      fireEvent.click(refreshAllButton)
 
-        const mainNameButton = within(
-          screen.getByTestId('ribbon-main')
-        ).getAllByRole('button')[0]
-
-        fireEvent.click(mainNameButton)
-        fireEvent.mouseEnter(mainNameButton, { bubbles: true })
-
-        jest.advanceTimersByTime(2001)
-
-        expect(screen.getByText(CopyTooltip.NORMAL)).toBeInTheDocument()
-        jest.useRealTimers()
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd'],
+        type: MessageFromWebviewType.REFRESH_REVISIONS
       })
     })
   })

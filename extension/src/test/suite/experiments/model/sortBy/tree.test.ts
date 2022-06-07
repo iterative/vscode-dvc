@@ -14,7 +14,7 @@ import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import { buildExperiments } from '../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
-import { joinColumnPath } from '../../../../../experiments/columns/paths'
+import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { ExperimentsOutput } from '../../../../../cli/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
@@ -145,8 +145,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
         ...testParamParentPathArray,
         'testparam2'
       ]
-      const testParamPath = joinColumnPath(...testParamPathArray)
-      const otherTestParamPath = joinColumnPath(...otherTestParamPathArray)
+      const testParamPath = buildMetricOrParamPath(...testParamPathArray)
+      const otherTestParamPath = buildMetricOrParamPath(
+        ...otherTestParamPathArray
+      )
 
       const getParamsArray = (selector = testParamPathArray) =>
         messageSpy

@@ -4,11 +4,15 @@ import { getInput } from '../../../vscode/inputBox'
 import { Flag } from '../../../cli/constants'
 import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
+import { Value } from '../../../cli/reader'
+
+const standardizeValue = (value: Value): string =>
+  typeof value === 'object' ? JSON.stringify(value) : `${value}`
 
 const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
   quickPickManyValues<Param>(
     params.map(param => ({
-      description: `${param.value}`,
+      description: standardizeValue(param.value),
       label: param.path,
       picked: false,
       value: param
@@ -21,18 +25,21 @@ const pickNewParamValues = async (
 ): Promise<string[] | undefined> => {
   const args: string[] = []
   for (const { path, value } of paramsToModify) {
-    const input = await getInput(getEnterValueTitle(path), `${value}`)
+    const input = await getInput(
+      getEnterValueTitle(path),
+      standardizeValue(value)
+    )
     if (input === undefined) {
       return
     }
-    args.push(Flag.SET_PARAM, [path, input.trim()].join('='))
+    args.push(Flag.SET_PARAM, [path, standardizeValue(input.trim())].join('='))
   }
   return args
 }
 
 const addUnchanged = (args: string[], unchanged: Param[]) => {
   for (const { path, value } of unchanged) {
-    args.push(Flag.SET_PARAM, [path, value].join('='))
+    args.push(Flag.SET_PARAM, [path, standardizeValue(value)].join('='))
   }
 
   return args

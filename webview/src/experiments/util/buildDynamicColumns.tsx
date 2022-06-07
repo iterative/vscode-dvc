@@ -14,7 +14,7 @@ import Tooltip, {
 } from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/table/styles.module.scss'
 import tooltipStyles from '../../shared/components/tooltip/styles.module.scss'
-import { CopyButton } from '../components/copyButton/CopyButton'
+import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
 const UndefinedCell = (
   <div className={styles.innerCell}>
@@ -63,7 +63,11 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
       delay={[CELL_TOOLTIP_DELAY, 0]}
     >
       <div className={styles.innerCell}>
-        <CopyButton value={stringValue} />
+        <CopyButton
+          value={stringValue}
+          className={styles.copyButton}
+          tooltip="Copy cell contents"
+        />
         <span className={styles.cellContents}>{displayValue}</span>
       </div>
     </Tooltip>
@@ -83,8 +87,13 @@ const Header: React.FC<{ column: TableColumn<Experiment> }> = ({
 }
 
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
-  pathArray => originalRow =>
-    get(originalRow, pathArray)
+  pathArray => originalRow => {
+    const value = get(originalRow, pathArray)
+    if (!Array.isArray(value)) {
+      return value
+    }
+    return `[${value.join(', ')}]`
+  }
 
 const buildDynamicColumns = (
   properties: Column[],
@@ -93,7 +102,7 @@ const buildDynamicColumns = (
   properties
     .filter(column => column.parentPath === parentPath)
     .map(data => {
-      const { path, type, pathArray, name } = data
+      const { path, type, pathArray, label } = data
 
       const childColumns = buildDynamicColumns(properties, path)
 
@@ -104,7 +113,7 @@ const buildDynamicColumns = (
         columns: childColumns.length > 0 ? childColumns : undefined,
         group: type,
         id: path,
-        name
+        name: label
       }
       return column
     })

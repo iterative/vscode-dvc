@@ -1,8 +1,12 @@
 import { basename, extname } from 'path'
 import { scm, SourceControl, SourceControlResourceGroup, Uri } from 'vscode'
+import { PathItem } from './model/collect'
+import { isDirectory } from '../fileSystem'
 import { Disposable } from '../class/dispose'
 
-export type SourceControlManagementState = Record<Status, Set<string>>
+export type SourceControlManagementState = Record<Status, Set<string>> & {
+  hasRemote: Set<string>
+}
 
 export interface SourceControlManagementModel {
   getState: () => SourceControlManagementState
@@ -20,7 +24,9 @@ enum Status {
 
 const gitCommitReady = [Status.ADDED, Status.GIT_MODIFIED, Status.RENAMED]
 
-type ResourceState = { resourceUri: Uri; contextValue: Status; dvcRoot: string }
+type ResourceState = PathItem & {
+  contextValue: Status
+}
 
 export class SourceControlManagement extends Disposable {
   private readonly dvcRoot: string
@@ -113,7 +119,7 @@ export class SourceControlManagement extends Disposable {
     for (const entry of Object.entries(state)) {
       const [status, resources] = entry as [Status, Set<string>]
       if (validStatuses.includes(status)) {
-        acc.push(...this.getResourceStates(status, resources))
+        acc.push(...this.getResourceStates(status, resources, state))
       }
     }
     return acc
@@ -121,7 +127,8 @@ export class SourceControlManagement extends Disposable {
 
   private getResourceStates(
     contextValue: Status,
-    paths: Set<string>
+    paths: Set<string>,
+    state: SourceControlManagementState
   ): ResourceState[] {
     return [...paths]
       .filter(
@@ -131,6 +138,8 @@ export class SourceControlManagement extends Disposable {
         return {
           contextValue,
           dvcRoot: this.dvcRoot,
+          isDirectory: isDirectory(path),
+          isTracked: state.hasRemote.has(path),
           resourceUri: Uri.file(path)
         }
       })

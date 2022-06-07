@@ -1,6 +1,7 @@
 import { InternalVsCodeApi } from '../src/shared/api'
 import { action } from '@storybook/addon-actions'
 import { viewports } from '../src/stories/util'
+import './styles.scss'
 
 declare global {
   interface Window {
