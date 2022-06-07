@@ -37,6 +37,7 @@ export const tableData: TableData = {
   columns,
   hasCheckpoints: false,
   hasColumns: true,
+  hasRunningExperiment: false,
   rows: [
     {
       id: 'workspace',
