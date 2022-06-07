@@ -56,6 +56,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
+  private hasRunning = false
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState)
@@ -85,13 +86,19 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSet(data: ExperimentsOutput) {
-    const { workspace, branches, experimentsByBranch, checkpointsByTip } =
-      collectExperiments(data)
+    const {
+      workspace,
+      branches,
+      experimentsByBranch,
+      checkpointsByTip,
+      hasRunning
+    } = collectExperiments(data)
 
     this.workspace = workspace
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
+    this.hasRunning = hasRunning
 
     this.setColoredStatus()
   }
@@ -115,6 +122,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.setSelectionMode(false)
     this.persistStatus()
     return this.coloredStatus[id]
+  }
+
+  public hasRunningExperiment() {
+    return this.hasRunning
   }
 
   public canSelect() {

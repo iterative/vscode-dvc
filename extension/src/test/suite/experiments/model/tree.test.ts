@@ -284,9 +284,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'the same experiments are still selected'
       ).to.be.calledWithMatch({
-        comparison: {
-          revisions: initiallySelectedRevisions
-        }
+        selectedRevisions: initiallySelectedRevisions
       })
       setSelectionModeSpy.resetHistory()
       messageSpy.resetHistory()

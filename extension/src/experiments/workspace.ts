@@ -19,6 +19,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
+  public readonly onDidChangeExperiments = this.experimentsChanged.event
+
   public readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
 
   public readonly updatesPaused: EventEmitter<boolean>

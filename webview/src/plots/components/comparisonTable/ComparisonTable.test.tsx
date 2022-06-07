@@ -11,6 +11,7 @@ import {
 } from '@testing-library/react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import React from 'react'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import { ComparisonTable, ComparisonTableProps } from './ComparisonTable'
@@ -38,7 +39,10 @@ describe('ComparisonTable', () => {
     jest.clearAllMocks()
   })
 
-  const basicProps: ComparisonTableProps = comparisonTableFixture
+  const basicProps: ComparisonTableProps = {
+    ...comparisonTableFixture,
+    revisions: plotsRevisionsFixture
+  }
   const revisions = basicProps.revisions.map(({ revision }) => revision)
   const namedRevisions = basicProps.revisions.map(
     ({ revision, group }) => `${revision}${group || ''}`
