@@ -1,6 +1,5 @@
 import React from 'react'
 import cx from 'classnames'
-import { Row } from 'dvc/src/experiments/webview/contract'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import { RowContent } from './Row'
@@ -102,26 +101,8 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   tableData
 }) => {
   const { getTableProps, rows } = instance
-  const {
-    sorts,
-    columns,
-    changes,
-    rows: experimentRows,
-    hasCheckpoints
-  } = tableData
-
-  const someExperimentsRunning = React.useMemo(() => {
-    const findRunningExperiment: (experiments?: Row[]) => boolean = (
-      experiments?: Row[]
-    ) => {
-      return !!experiments?.find(
-        experiment =>
-          experiment.running || findRunningExperiment(experiment.subRows)
-      )
-    }
-
-    return findRunningExperiment(experimentRows)
-  }, [experimentRows])
+  const { sorts, columns, changes, hasCheckpoints, hasRunningExperiment } =
+    tableData
 
   return (
     <div className={styles.tableContainer}>
@@ -133,7 +114,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
             instance={instance}
             key={row.id}
             changes={changes}
-            contextMenuDisabled={someExperimentsRunning}
+            contextMenuDisabled={hasRunningExperiment}
             projectHasCheckpoints={hasCheckpoints}
           />
         ))}

@@ -111,6 +111,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columns: columnsFixture,
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: filteredRows,
         sorts: []
       }
@@ -139,6 +140,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columns: columnsFixture,
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: [workspace, main],
         sorts: []
       }

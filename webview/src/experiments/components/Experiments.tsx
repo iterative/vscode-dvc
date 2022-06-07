@@ -140,6 +140,7 @@ export const ExperimentsTable: React.FC<{
         columns: [],
         hasCheckpoints: false,
         hasColumns: false,
+        hasRunningExperiment: false,
         rows: [],
         sorts: [],
         ...initiallyUndefinedTableData
