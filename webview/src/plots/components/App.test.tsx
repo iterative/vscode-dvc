@@ -13,13 +13,11 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import checkpointPlotsFixture, {
-  manyCheckpointPlots
-} from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
-  ColorScale,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSize,
@@ -44,10 +42,12 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 jest.mock('../../shared/api')
 
 jest.mock('./checkpointPlots/util', () => ({
-  ...jest.requireActual('./checkpointPlots/util'),
-  createSpec: (title: string, scale?: ColorScale) => ({
-    ...jest.requireActual('./checkpointPlots/util').createSpec(title, scale),
+  createSpec: () => ({
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    encoding: {},
     height: 100,
+    layer: [],
+    transform: [],
     width: 100
   })
 }))
@@ -173,8 +173,8 @@ describe('App', () => {
       checkpoint: null,
       hasPlots: true,
       hasSelectedPlots: false,
-      hasSelectedRevisions: false,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: undefined
     })
     const addPlotsButton = await screen.findByText('Add Plots')
     const addExperimentsButton = await screen.findByText('Add Experiments')
@@ -891,6 +891,7 @@ describe('App', () => {
     renderAppWithData({
       comparison: comparisonTableFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: plotsRevisionsFixture,
       template: complexTemplatePlotsFixture
     })
 
@@ -1008,7 +1009,8 @@ describe('App', () => {
   it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
     renderAppWithData({
       comparison: comparisonTableFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: plotsRevisionsFixture
     })
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -1112,7 +1114,13 @@ describe('App', () => {
     }
 
     const createCheckpointPlots = (nbOfPlots: number) => {
-      const plots = manyCheckpointPlots(nbOfPlots)
+      const plots = []
+      for (let i = 0; i < nbOfPlots; i++) {
+        plots.push({
+          title: `plot-${i}`,
+          values: []
+        })
+      }
       return {
         ...checkpointPlotsFixture,
         plots,
@@ -1201,7 +1209,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1213,14 +1221,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(5453)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[20].id).toBe(checkpoint.plots[20].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1229,7 +1237,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1238,7 +1246,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1294,7 +1302,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1306,14 +1314,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[20].id).toBe(checkpoint.plots[20].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(6453)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[19].id).toBe(checkpoint.plots[19].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1322,7 +1330,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1331,7 +1339,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1387,7 +1395,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1399,14 +1407,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(5473)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1415,7 +1423,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1424,7 +1432,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1433,7 +1441,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1469,20 +1477,25 @@ describe('App', () => {
     })
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Ribbon', () => {
+    const getDisplayedRevisionOrder = () => {
+      const ribbon = screen.getByTestId('ribbon')
+      const revisionBlocks = within(ribbon).getAllByRole('listitem')
+      return revisionBlocks
+        .map(item => item.textContent)
+        .filter(text => !text?.includes(' of ') && text !== 'Refresh All')
+    }
+
     it('should show the revisions at the top', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
-      const ribbon = screen.getByTestId('ribbon')
 
-      const revisionBlocks = within(ribbon).getAllByRole('listitem')
-      revisionBlocks.shift() // Remove filter button
-      revisionBlocks.shift() // Remove refresh all
-      const revisions = revisionBlocks.map(item => item.textContent)
-      expect(revisions).toStrictEqual(
-        comparisonTableFixture.revisions.map(rev =>
+      expect(getDisplayedRevisionOrder()).toStrictEqual(
+        plotsRevisionsFixture.map(rev =>
           rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
         )
       )
@@ -1491,7 +1504,8 @@ describe('App', () => {
     it('should send a message with the revision to be removed when clicking the clear button', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       const mainClearButton = within(
@@ -1509,11 +1523,12 @@ describe('App', () => {
     it('should display the number of experiments selected', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       expect(
-        screen.getByText(`${comparisonTableFixture.revisions.length} of 7`)
+        screen.getByText(`${plotsRevisionsFixture.length} of 7`)
       ).toBeInTheDocument()
     })
 
@@ -1537,7 +1552,8 @@ describe('App', () => {
     it('should send a message to refresh each revision when clicking the refresh all button', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       const refreshAllButton = within(
@@ -1552,6 +1568,38 @@ describe('App', () => {
         payload: ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd'],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
+    })
+
+    it('should not reorder the ribbon when comparison plots are reordered', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
+      })
+
+      const expectedRevisions = plotsRevisionsFixture.map(rev =>
+        rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
+      )
+
+      expect(getDisplayedRevisionOrder()).toStrictEqual(expectedRevisions)
+
+      sendSetDataMessage({
+        comparison: comparisonTableFixture,
+        selectedRevisions: [
+          {
+            displayColor: '#f56565',
+            group: undefined,
+            id: 'new-revision',
+            revision: 'new-revision'
+          },
+          ...plotsRevisionsFixture.reverse()
+        ]
+      })
+
+      expect(getDisplayedRevisionOrder()).toStrictEqual([
+        ...expectedRevisions,
+        'new-revision'
+      ])
     })
   })
 })

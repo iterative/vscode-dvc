@@ -12,6 +12,7 @@ import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
+import plotsRevisionsFixture from '../../fixtures/plotsDiff/revisions'
 import {
   bypassProcessManagerDebounce,
   closeAllEditors,
@@ -449,14 +450,12 @@ suite('Plots Test Suite', () => {
         messageSpy,
         "should update the webview's comparison revision state"
       ).to.be.calledWithExactly({
-        comparison: {
-          ...comparisonPlotsFixture,
-          revisions: reorderObjectList(
-            mockComparisonOrder,
-            comparisonPlotsFixture.revisions,
-            'revision'
-          )
-        }
+        comparison: comparisonPlotsFixture,
+        selectedRevisions: reorderObjectList(
+          mockComparisonOrder,
+          plotsRevisionsFixture,
+          'revision'
+        )
       })
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
@@ -723,8 +722,8 @@ suite('Plots Test Suite', () => {
         comparison: comparisonPlotsFixture,
         hasPlots: true,
         hasSelectedPlots: true,
-        hasSelectedRevisions: true,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture,
         template: templatePlotsFixture
       }
 

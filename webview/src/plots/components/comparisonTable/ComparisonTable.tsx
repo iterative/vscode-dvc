@@ -16,7 +16,7 @@ import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
 
 export type ComparisonTableProps = Omit<
-  PlotsComparisonData,
+  PlotsComparisonData & { revisions: Revision[] },
   'sectionName' | 'size'
 >
 

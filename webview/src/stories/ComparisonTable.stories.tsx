@@ -3,6 +3,7 @@ import { fireEvent, within } from '@testing-library/react'
 import React from 'react'
 import { ComparisonRevisionData } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import {
   ComparisonTable,
   ComparisonTableProps
@@ -11,7 +12,7 @@ import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapp
 import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
 
 export default {
-  args: comparisonTableFixture,
+  args: { ...comparisonTableFixture, revisions: plotsRevisionsFixture },
   component: ComparisonTable,
   title: 'Comparison Table'
 } as Meta
