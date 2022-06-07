@@ -323,6 +323,11 @@ $gap: 20px;
   }
 }
 
+.infoTooltipToggle {
+  display: flex;
+  align-items: center;
+}
+
 .infoIcon {
   fill: $accent-color;
   margin-left: 6px;

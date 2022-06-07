@@ -153,7 +153,10 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             sectionTitle
           )}
           <Tooltip content={tooltipContent} placement="bottom-end">
-            <div data-testid="info-tooltip-toggle">
+            <div
+              className={styles.infoTooltipToggle}
+              data-testid="info-tooltip-toggle"
+            >
               <InfoIcon />
             </div>
           </Tooltip>
