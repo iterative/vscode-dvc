@@ -13,14 +13,11 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
-import checkpointPlotsFixture, {
-  manyCheckpointPlots
-} from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
-  ColorScale,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSize,
@@ -44,10 +41,12 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 jest.mock('../../shared/api')
 
 jest.mock('./checkpointPlots/util', () => ({
-  ...jest.requireActual('./checkpointPlots/util'),
-  createSpec: (title: string, scale?: ColorScale) => ({
-    ...jest.requireActual('./checkpointPlots/util').createSpec(title, scale),
+  createSpec: () => ({
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    encoding: {},
     height: 100,
+    layer: [],
+    transform: [],
     width: 100
   })
 }))
@@ -1087,7 +1086,13 @@ describe('App', () => {
     }
 
     const createCheckpointPlots = (nbOfPlots: number) => {
-      const plots = manyCheckpointPlots(nbOfPlots)
+      const plots = []
+      for (let i = 0; i < nbOfPlots; i++) {
+        plots.push({
+          title: `plot-${i}`,
+          values: []
+        })
+      }
       return {
         ...checkpointPlotsFixture,
         plots,
@@ -1176,7 +1181,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1188,14 +1193,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(5453)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[20].id).toBe(checkpoint.plots[20].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1204,7 +1209,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1213,7 +1218,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1269,7 +1274,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1281,14 +1286,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[20].id).toBe(checkpoint.plots[20].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(6453)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[19].id).toBe(checkpoint.plots[19].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1297,7 +1302,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1306,7 +1311,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1362,7 +1367,7 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
@@ -1374,14 +1379,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(5473)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1390,7 +1395,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1399,7 +1404,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1408,7 +1413,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
