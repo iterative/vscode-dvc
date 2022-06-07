@@ -17,7 +17,6 @@ import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlot
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
-  ColorScale,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSize,
@@ -41,10 +40,12 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 jest.mock('../../shared/api')
 
 jest.mock('./checkpointPlots/util', () => ({
-  ...jest.requireActual('./checkpointPlots/util'),
-  createSpec: (title: string, scale?: ColorScale) => ({
-    ...jest.requireActual('./checkpointPlots/util').createSpec(title, scale),
+  createSpec: () => ({
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    encoding: {},
     height: 100,
+    layer: [],
+    transform: [],
     width: 100
   })
 }))
