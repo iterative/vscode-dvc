@@ -34,9 +34,9 @@ export type BasicContainerProps = Pick<
 
 export const SectionDescription = {
   [Section.CHECKPOINT_PLOTS]:
-    'linear plots based on data from the experiments table.',
+    'Linear plots based on data from the experiments table.',
   [Section.COMPARISON_TABLE]:
-    'a table used to display image plots side by side.',
+    'A table used to display image plots side by side.',
   [Section.TEMPLATE_PLOTS]:
     'JSON, YAML, CSV or TSV files visualized using Vega pre-defined or custom Vega-Lite templates.'
 }
