@@ -282,6 +282,7 @@ const deeplyNestedTableData: TableData = {
   columnOrder: [],
   columnWidths: {},
   hasCheckpoints: false,
+  hasRunningExperiment: false,
   sorts: [
     {
       path: 'params:params.yaml:nested1.doubled',
