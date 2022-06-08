@@ -15,7 +15,7 @@ require additional services or databases. It enables other DVC features as well!
 - **Experiment bookkeeping**: Activate a visual system to record training data,
   parameters, and metrics on top of [Git](https://git-scm.com/). Use it to
   navigate your experiments, compare their results, and find the best ML model
-- **Plots dashboard**: Visualize experiment data in a customizable View.
+- **Visualization**: Plot experiment data in a customizable View.
 - **Live tracking**: Capture and see metrics changing in real time.
 - **Reproducibility**: Reliably get back to any previous experiment. Run it
   again or use it as the base for new experiments.
@@ -35,19 +35,21 @@ require additional services or databases. It enables other DVC features as well!
   your control and your existing Git hosting is used to share and collaborate.
 - Go beyond a simple metrics dashboard with complete ML experiments that include
   metrics, code, and data. Powered by [DVC experiment versioning].
-- Data versioning on top of your favorite cloud storage, such as Amazon S3,
-  Azure Blob Storage, Google Cloud Storage, NFS, etc.
+- Implement [data versioning] on top of your favorite cloud storage, such as
+  Amazon S3, Azure Blob Storage, Google Cloud Storage, NFS, etc.
 
 [dvc experiment versioning]:
   https://dvc.org/doc/user-guide/experiment-management/experiments-overview
+[data versioning]: https://dvc.org/doc/use-cases/versioning-data-and-model-files
 
 ## Quick start
 
-- **Step 1.**
-  [Install a supported version of DVC on your system](https://dvc.org/doc/install)
-- **Step 2.**
-  [Install the DVC extension for Visual Studio Code](https://code.visualstudio.com/docs/editor/extension-gallery).
-- **Step 3.** See Walkthrough.
+1. [Install DVC](https://dvc.org/doc/install) on your system.
+2. [Install the DVC Extension] in VS Code.
+3. Follow the Walkthrough that pops up!
+
+[install the dvc extension]:
+  https://code.visualstudio.com/docs/editor/extension-gallery
 
 ### Learn more about DVC (Data Version Control)
 
@@ -55,11 +57,10 @@ View [more resources](extension/resources/walkthrough/dvc-learn-more.md).
 
 ## UI components
 
-This [extension] augments and adds several [Views], adds special [Editors] to
-[VS Code]. Furthermore, it exposes these and other DVC functions in the [Command
-Palette]. Specifically:
+This [extension] augments and adds several [Views], adds special [Editors] to VS
+Code. It also exposes these and other DVC functions in the [Command Palette].
 
-- It provides _Editors_ to manage [Experiments][exp-view] and display
+- Provides _Editors_ to manage [Experiments][exp-view] and display
   [Plots][plots-view] as _Tabs_ in the IDE.
 - Adds a [DVC Tracked] panel to the _Explorer_ view. This shows a tree of the
   data that DVC is tracking, with real-time file/dir [states] and options to
@@ -82,7 +83,6 @@ Palette]. Specifically:
 [command palette]:
   https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
 [exp-view]: extension/resources/walkthrough/experiments-table.md
-[vs code]: https://code.visualstudio.com/
 [plots-view]: extension/resources/walkthrough/plots.md
 [dvc tracked]: extension/resources/walkthrough/tracked-explorer.md
 [dvc panel]: extension/resources/walkthrough/source-control-management.md
