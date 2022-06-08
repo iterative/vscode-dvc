@@ -49,6 +49,7 @@ require additional services or databases. It enables other DVC features as well!
 3. Follow the **Get Started** page that pops up!
 
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
+>
 > > Codespaces] will include this extension automatically.
 
 [install the dvc extension]:
@@ -120,18 +121,20 @@ See [Command Palette] for a full list.
 
 These are the [VS Code Settings] available for the Extension:
 
-| **Option**                             | **Description**                                                                                                                               |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dvc.dvcPath`                          | (Required) Path to the DVC binary                                                                                                             |
-| `dvc.pythonPath`                       | Path to the Python binary (Python is a requisite of DVC). Useful when using a virtual environment                                             |
-| `dvc.doNotShowWalkthroughAfterInstall` | Prevent the extension from opening the **Get Starged** page by default after installation. Useful for pre-configured development environments |
-| `dvc.doNotRecommendRedHatExtension`    | Turn off the tip to install the Red Hat YAML extension for syntax recognition of `dvc.yaml` and `.dvc` files.                                 |
-| `dvc.doNotShowCliUnavailable`          | ...                                                                                                                                           |
-| `dvc.doNotShowUnableToFilter`          | ...                                                                                                                                           |
+| **Option**                             | **Description**                                                                                                                                      |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dvc.dvcPath`                          | Path or shell command to the DVC binary. Required unless Microsoft's [Python extension] is installed and the `dvc` package found in its environment. |
+| `dvc.pythonPath`                       | Path to the desired Python interpreter to use with DVC. Required when using a virtual environment.                                                   |
+| `dvc.doNotShowWalkthroughAfterInstall` | Do not prompt to show the Get Started page after installing. Useful for pre-configured development environments                                      |
+| `dvc.doNotRecommendRedHatExtension`    | Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation (`dvc.yaml` and `.dvc` files).                      |
+| `dvc.doNotShowCliUnavailable`          | Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.                                                             |
+| `dvc.doNotShowUnableToFilter`          | Do not warn before disabling auto-apply filters when these would result in too many experiments being selected.                                      |
 
 > **Note** that the `Setup The Workspace` command helps you set up the basic
 > ones at the [Workspace level] (saved to `.vscode/setting.json`).
 
+[python extension]:
+  https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
 
