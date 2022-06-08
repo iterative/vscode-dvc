@@ -14,6 +14,7 @@ module.exports = {
   globals: {
     __webpack_public_path__: true
   },
+  maxWorkers: '50%',
   moduleNameMapper: {
     '\\.(scss|css|less)$': 'identity-obj-proxy'
   },
