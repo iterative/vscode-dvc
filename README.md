@@ -21,8 +21,8 @@ require additional services or databases. It enables other DVC features as well!
   again or use it as the base for new experiments.
 - **Data Management**: Handle large datasets, files, and models effectively.
 
-> **Note**: We want early adopter feedback! Feel free to open [issues] or reach
-> [DVC support].
+> **Note**: We are in public beta and welcome early adopter feedback!  
+> Feel free to open [issues] or reach out to [DVC support].
 >
 > [issues]: https://github.com/iterative/vscode-dvc/issues
 > [dvc support]: https://dvc.org/support
