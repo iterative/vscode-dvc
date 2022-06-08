@@ -40,7 +40,7 @@ Palette]. Specifically:
 - Includes a [DVC channel] for the _Output_ panel (useful for
   [debugging](#debugging)). 
 
-[extension]: https://marketplace.visualstudio.com/VSCode
+[extension]: https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
 [views]: https://code.visualstudio.com/docs/getstarted/userinterface#_views
 [editors]:
   https://code.visualstudio.com/docs/getstarted/userinterface#_open-editors
