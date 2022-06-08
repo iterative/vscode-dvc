@@ -601,7 +601,7 @@
         },
         {
           "command": "dvc.init",
-          "when": "false"
+          "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
         },
         {
           "command": "dvc.moveTargets",
