@@ -16,12 +16,6 @@ export enum Section {
   COMPARISON_TABLE = 'comparison-table'
 }
 
-export const DEFAULT_SECTION_NAMES = {
-  [Section.CHECKPOINT_PLOTS]: 'Trends',
-  [Section.TEMPLATE_PLOTS]: 'Data Series',
-  [Section.COMPARISON_TABLE]: 'Images'
-}
-
 export const DEFAULT_SECTION_SIZES = {
   [Section.CHECKPOINT_PLOTS]: PlotSize.REGULAR,
   [Section.TEMPLATE_PLOTS]: PlotSize.REGULAR,
@@ -51,9 +45,7 @@ export type Revision = {
 }
 
 export interface PlotsComparisonData {
-  revisions: Revision[]
   plots: ComparisonPlots
-  sectionName: string
   size: PlotSize
 }
 
@@ -74,7 +66,6 @@ export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
   colors: ColorScale
   size: PlotSize
-  sectionName: string
   selectedMetrics?: string[]
 }
 
@@ -122,7 +113,6 @@ export type TemplatePlotSection = {
 
 export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
-  sectionName: string
   size: PlotSize
 }
 
@@ -137,7 +127,7 @@ export type PlotsData =
       checkpoint?: CheckpointPlotsData | null
       hasPlots?: boolean
       hasSelectedPlots?: boolean
-      hasSelectedRevisions?: boolean
+      selectedRevisions?: Revision[]
       template?: TemplatePlotsData | null
       sectionCollapsed?: SectionCollapsed
     }

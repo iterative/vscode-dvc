@@ -19,7 +19,6 @@ import {
   Revision,
   ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   PlotSize,
   Section,
@@ -39,7 +38,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   private plotSizes: Record<Section, PlotSize>
   private sectionCollapsed: SectionCollapsed
-  private sectionNames: Record<Section, string>
   private branchRevisions: Record<string, string> = {}
   private workspaceRunningCheckpoint: string | undefined
 
@@ -70,10 +68,6 @@ export class PlotsModel extends ModelWithPersistence {
     this.sectionCollapsed = this.revive(
       PersistenceKey.PLOT_SECTION_COLLAPSED,
       DEFAULT_SECTION_COLLAPSED
-    )
-    this.sectionNames = this.revive(
-      PersistenceKey.PLOT_SECTION_NAMES,
-      DEFAULT_SECTION_NAMES
     )
     this.comparisonOrder = this.revive(PersistenceKey.PLOT_COMPARISON_ORDER, [])
     this.selectedMetrics = this.revive(
@@ -153,7 +147,6 @@ export class PlotsModel extends ModelWithPersistence {
     return {
       colors,
       plots: this.getPlots(this.checkpointPlots, selectedExperiments),
-      sectionName: this.getSectionName(Section.CHECKPOINT_PLOTS),
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize(Section.CHECKPOINT_PLOTS)
     }
@@ -287,15 +280,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getSectionCollapsed() {
     return this.sectionCollapsed
-  }
-
-  public setSectionName(section: Section, name: string) {
-    this.sectionNames[section] = name
-    this.persist(PersistenceKey.PLOT_SECTION_NAMES, this.sectionNames)
-  }
-
-  public getSectionName(section: Section): string {
-    return this.sectionNames[section] || DEFAULT_SECTION_NAMES[section]
   }
 
   private removeStaleData() {

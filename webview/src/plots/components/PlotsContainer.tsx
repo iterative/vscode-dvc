@@ -10,17 +10,16 @@ import { PlotsSizeContext } from './PlotsSizeContext'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
-import { SectionRenamer } from './SectionRenamer'
 import { AllIcons, Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
+import Tooltip from '../../shared/components/tooltip/Tooltip'
 
 export interface PlotsContainerProps {
   sectionCollapsed: SectionCollapsed
   sectionKey: Section
   title: string
-  onRename: (section: Section, name: string) => void
   onResize: (size: PlotSize, section: Section) => void
   currentSize: PlotSize
   menu?: PlotsPickerProps
@@ -28,21 +27,36 @@ export interface PlotsContainerProps {
 
 export type BasicContainerProps = Pick<
   PlotsContainerProps,
-  'onRename' | 'onResize' | 'sectionCollapsed'
+  'onResize' | 'sectionCollapsed'
 >
+
+export const SectionDescription = {
+  [Section.CHECKPOINT_PLOTS]:
+    'Linear plots based on data from the experiments table.',
+  [Section.COMPARISON_TABLE]:
+    'A table used to display image plots side by side.',
+  [Section.TEMPLATE_PLOTS]:
+    'JSON, YAML, CSV or TSV files visualized using Vega pre-defined or custom Vega-Lite templates.'
+}
+
+const InfoIcon = () => (
+  <Icon
+    icon={AllIcons.INFO}
+    width={16}
+    height={16}
+    className={styles.infoIcon}
+  />
+)
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
   sectionKey,
   title,
   children,
-  onRename,
   onResize,
   currentSize,
   menu
 }) => {
-  const [isRenaming, setIsRenaming] = useState(false)
-  const [sectionTitle, setSectionTitle] = useState(title)
   const [size, setSize] = useState<PlotSize>(currentSize)
   const { changePlotsSizes } = useContext(PlotsSizeContext)
 
@@ -59,14 +73,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     [styles.largePlots]: size === PlotSize.LARGE
   })
 
-  const menuItems: IconMenuItemProps[] = [
-    {
-      icon: AllIcons.PENCIL,
-      onClick: () => setIsRenaming(true),
-      tooltip: 'Rename'
-    }
-  ]
-
   const changeSize = (newSize: PlotSize) => {
     if (size === newSize) {
       return
@@ -75,26 +81,30 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     changePlotsSizes?.(newSize, sectionKey)
     setSize(newSize)
   }
+  const menuItems: IconMenuItemProps[] = [
+    {
+      icon: AllIcons.DOTS,
+      onClickNode: (
+        <SizePicker currentSize={size} setSelectedSize={changeSize} />
+      ),
+      tooltip: 'Resize'
+    }
+  ]
 
   if (menu) {
-    menuItems.push({
+    menuItems.unshift({
       icon: AllIcons.LINES,
       onClickNode: <PlotsPicker {...menu} />,
       tooltip: 'Select Plots'
     })
   }
 
-  menuItems.push({
-    icon: AllIcons.DOTS,
-    onClickNode: <SizePicker currentSize={size} setSelectedSize={changeSize} />,
-    tooltip: 'Resize'
-  })
-
-  const onTitleChanged = (title: string) => {
-    setIsRenaming(false)
-    setSectionTitle(title)
-    onRename(sectionKey, title)
-  }
+  const tooltipContent = (
+    <div className={styles.infoTooltip}>
+      <InfoIcon />
+      {SectionDescription[sectionKey]}
+    </div>
+  )
 
   return (
     <div className={styles.plotsContainerWrapper}>
@@ -118,14 +128,15 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             className={styles.detailsIcon}
           />
 
-          {isRenaming ? (
-            <SectionRenamer
-              defaultTitle={sectionTitle}
-              onChangeTitle={onTitleChanged}
-            />
-          ) : (
-            sectionTitle
-          )}
+          {title}
+          <Tooltip content={tooltipContent} placement="bottom-end">
+            <div
+              className={styles.infoTooltipToggle}
+              data-testid="info-tooltip-toggle"
+            >
+              <InfoIcon />
+            </div>
+          </Tooltip>
         </summary>
         <div>
           {open && (

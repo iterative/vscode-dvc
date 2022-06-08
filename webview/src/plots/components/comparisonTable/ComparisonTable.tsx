@@ -16,8 +16,8 @@ import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
 
 export type ComparisonTableProps = Omit<
-  PlotsComparisonData,
-  'sectionName' | 'size'
+  PlotsComparisonData & { revisions: Revision[] },
+  'size'
 >
 
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({

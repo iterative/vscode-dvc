@@ -11,11 +11,6 @@ import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapp
 
 const items: IconMenuItemProps[] = [
   {
-    icon: AllIcons.PENCIL,
-    onClick: () => alert('Rename'),
-    tooltip: 'Rename'
-  },
-  {
     icon: AllIcons.DOWN_ARROW,
     onClick: () => alert('Move down'),
     tooltip: 'Move Down'

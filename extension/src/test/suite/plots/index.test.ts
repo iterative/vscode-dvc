@@ -12,6 +12,7 @@ import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
+import plotsRevisionsFixture from '../../fixtures/plotsDiff/revisions'
 import {
   bypassProcessManagerDebounce,
   closeAllEditors,
@@ -383,37 +384,6 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a section renamed message from the webview', async () => {
-      const { plots, plotsModel } = await buildPlots(disposable)
-
-      const webview = await plots.showWebview()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockSetSectionName = stub(plotsModel, 'setSectionName').returns(
-        undefined
-      )
-      const mockName = 'some cool section name'
-
-      mockMessageReceived.fire({
-        payload: { name: mockName, section: Section.TEMPLATE_PLOTS },
-        type: MessageFromWebviewType.RENAME_SECTION
-      })
-
-      expect(mockSetSectionName).to.be.calledOnce
-      expect(mockSetSectionName).to.be.calledWithExactly(
-        Section.TEMPLATE_PLOTS,
-        mockName
-      )
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_RENAME_SECTION,
-        { section: Section.TEMPLATE_PLOTS },
-        undefined
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should handle a comparison revisions reordered message from the webview', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(
         disposable,
@@ -449,14 +419,12 @@ suite('Plots Test Suite', () => {
         messageSpy,
         "should update the webview's comparison revision state"
       ).to.be.calledWithExactly({
-        comparison: {
-          ...comparisonPlotsFixture,
-          revisions: reorderObjectList(
-            mockComparisonOrder,
-            comparisonPlotsFixture.revisions,
-            'revision'
-          )
-        }
+        comparison: comparisonPlotsFixture,
+        selectedRevisions: reorderObjectList(
+          mockComparisonOrder,
+          plotsRevisionsFixture,
+          'revision'
+        )
       })
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
@@ -723,8 +691,8 @@ suite('Plots Test Suite', () => {
         comparison: comparisonPlotsFixture,
         hasPlots: true,
         hasSelectedPlots: true,
-        hasSelectedRevisions: true,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture,
         template: templatePlotsFixture
       }
 

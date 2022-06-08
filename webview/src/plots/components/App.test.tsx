@@ -13,13 +13,11 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import checkpointPlotsFixture, {
-  manyCheckpointPlots
-} from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
-  ColorScale,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSize,
@@ -36,6 +34,7 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
+import { SectionDescription } from './PlotsContainer'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
@@ -43,10 +42,12 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 jest.mock('../../shared/api')
 
 jest.mock('./checkpointPlots/util', () => ({
-  ...jest.requireActual('./checkpointPlots/util'),
-  createSpec: (title: string, scale?: ColorScale) => ({
-    ...jest.requireActual('./checkpointPlots/util').createSpec(title, scale),
+  createSpec: () => ({
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    encoding: {},
     height: 100,
+    layer: [],
+    transform: [],
     width: 100
   })
 }))
@@ -172,8 +173,8 @@ describe('App', () => {
       checkpoint: null,
       hasPlots: true,
       hasSelectedPlots: false,
-      hasSelectedRevisions: false,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: undefined
     })
     const addPlotsButton = await screen.findByText('Add Plots')
     const addExperimentsButton = await screen.findByText('Add Experiments')
@@ -308,7 +309,7 @@ describe('App', () => {
 
     expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
 
-    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -340,7 +341,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const [, pickerButton] = screen.getAllByTestId('icon-menu-item')
+    const [pickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -382,7 +383,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const sizePickerButton = screen.getAllByTestId('icon-menu-item')[2]
+    const sizePickerButton = screen.getAllByTestId('icon-menu-item')[1]
     fireEvent.mouseEnter(sizePickerButton)
     fireEvent.click(sizePickerButton)
 
@@ -409,7 +410,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const sizeButton = screen.getAllByTestId('icon-menu-item')[2]
+    const sizeButton = screen.getAllByTestId('icon-menu-item')[1]
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 
@@ -436,7 +437,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const sizeButton = screen.getAllByTestId('icon-menu-item')[2]
+    const sizeButton = screen.getAllByTestId('icon-menu-item')[1]
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 
@@ -456,84 +457,6 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toBeCalled()
-  })
-
-  it('should show an input to rename the section when clicking the rename icon button', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-
-    expect(screen.queryByRole('textbox')).toBeNull()
-
-    const [renameButton] = screen.getAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(renameButton)
-    fireEvent.click(renameButton)
-
-    expect(screen.getByRole('textbox')).toBeInTheDocument()
-  })
-
-  it('should change the title of the section when hitting enter on the title input', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-    const originalText = 'Trends'
-
-    expect(screen.getByText(originalText)).toBeInTheDocument()
-
-    const [renameButton] = screen.getAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(renameButton)
-    fireEvent.click(renameButton)
-
-    const titleInput = screen.getByRole('textbox')
-    const newTitle = 'Brand new section'
-    fireEvent.change(titleInput, { target: { value: newTitle } })
-    fireEvent.keyDown(titleInput, { key: 'Enter' })
-
-    expect(screen.getByText(newTitle)).toBeInTheDocument()
-  })
-
-  it('should change the title of the section on the blur event of the input', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-    const originalText = 'Trends'
-
-    expect(screen.getByText(originalText)).toBeInTheDocument()
-
-    const [renameButton] = screen.getAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(renameButton)
-    fireEvent.click(renameButton)
-
-    const titleInput = screen.getByRole('textbox')
-    const newTitle = 'Brand new section'
-    fireEvent.change(titleInput, { target: { value: newTitle } })
-    fireEvent.blur(titleInput)
-
-    expect(screen.getByText(newTitle)).toBeInTheDocument()
-  })
-
-  it('should send a message to the extension with the new section name after a section rename', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-
-    const [renameButton] = screen.getAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(renameButton)
-    fireEvent.click(renameButton)
-
-    const titleInput = screen.getByRole('textbox')
-    const newTitle = 'Brand new section'
-    fireEvent.change(titleInput, { target: { value: newTitle } })
-    fireEvent.keyDown(titleInput, { key: 'Enter' })
-
-    expect(mockPostMessage).toBeCalledWith({
-      payload: { name: newTitle, section: Section.CHECKPOINT_PLOTS },
-      type: MessageFromWebviewType.RENAME_SECTION
-    })
   })
 
   it('should display the checkpoint plots in the order stored', () => {
@@ -627,7 +550,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -890,6 +813,7 @@ describe('App', () => {
     renderAppWithData({
       comparison: comparisonTableFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: plotsRevisionsFixture,
       template: complexTemplatePlotsFixture
     })
 
@@ -1007,7 +931,8 @@ describe('App', () => {
   it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
     renderAppWithData({
       comparison: comparisonTableFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: plotsRevisionsFixture
     })
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -1054,6 +979,33 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
+  it('should show a tooltip with the meaning of each plot section', () => {
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      comparison: comparisonTableFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: complexTemplatePlotsFixture
+    })
+
+    const [templateInfo, comparisonInfo, checkpointInfo] =
+      screen.getAllByTestId('info-tooltip-toggle')
+
+    fireEvent.mouseEnter(templateInfo, { bubbles: true })
+    expect(
+      screen.getByText(SectionDescription[Section.TEMPLATE_PLOTS])
+    ).toBeInTheDocument()
+
+    fireEvent.mouseEnter(comparisonInfo, { bubbles: true })
+    expect(
+      screen.getByText(SectionDescription[Section.COMPARISON_TABLE])
+    ).toBeInTheDocument()
+
+    fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
+    expect(
+      screen.getByText(SectionDescription[Section.CHECKPOINT_PLOTS])
+    ).toBeInTheDocument()
+  })
+
   describe('Virtualization', () => {
     const changeSize = async (size: string, buttonPosition: number) => {
       const sizePickerButton =
@@ -1084,7 +1036,13 @@ describe('App', () => {
     }
 
     const createCheckpointPlots = (nbOfPlots: number) => {
-      const plots = manyCheckpointPlots(nbOfPlots)
+      const plots = []
+      for (let i = 0; i < nbOfPlots; i++) {
+        plots.push({
+          title: `plot-${i}`,
+          values: []
+        })
+      }
       return {
         ...checkpointPlotsFixture,
         plots,
@@ -1104,7 +1062,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(11) },
           'Large',
-          2
+          1
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1122,7 +1080,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(10) },
           'Large',
-          2
+          1
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1140,7 +1098,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(11) },
           'Large',
-          1
+          0
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1158,7 +1116,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(10) },
           'Large',
-          1
+          0
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1173,11 +1131,11 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Large', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Large', 1)
         })
 
         it('should render one large plot per row per 1000px of screen when the screen is larger than 2000px', () => {
@@ -1185,14 +1143,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(5453)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[20].id).toBe(checkpoint.plots[20].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1201,7 +1159,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1210,7 +1168,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1229,7 +1187,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(16) },
           'Regular',
-          2
+          1
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1239,7 +1197,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
           'Regular',
-          2
+          1
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1249,7 +1207,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(16) },
           'Regular',
-          1
+          0
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1259,18 +1217,18 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
           'Regular',
-          1
+          0
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Regular', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Regular', 1)
         })
 
         it('should render one regular plot per row per 800px of screen when the screen is larger than 2000px', () => {
@@ -1278,14 +1236,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[20].id).toBe(checkpoint.plots[20].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(6453)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[19].id).toBe(checkpoint.plots[19].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1294,7 +1252,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1303,7 +1261,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1322,7 +1280,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(21) },
           'Small',
-          2
+          1
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1332,7 +1290,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(20) },
           'Small',
-          2
+          1
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1342,7 +1300,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
           'Small',
-          1
+          0
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1352,18 +1310,18 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
           'Small',
-          1
+          0
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(40)
+        const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Small', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Small', 1)
         })
 
         it('should render one small plot per row per 500px of screen when the screen is larger than 2000px', () => {
@@ -1371,14 +1329,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
           resizeScreen(5473)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[22].id).toBe(checkpoint.plots[22].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1387,7 +1345,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[24].id).toBe(checkpoint.plots[24].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1396,7 +1354,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1405,7 +1363,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[33].id).toBe(checkpoint.plots[33].title)
+          expect(plots[9].id).toBe(checkpoint.plots[9].title)
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
@@ -1441,20 +1399,25 @@ describe('App', () => {
     })
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Ribbon', () => {
+    const getDisplayedRevisionOrder = () => {
+      const ribbon = screen.getByTestId('ribbon')
+      const revisionBlocks = within(ribbon).getAllByRole('listitem')
+      return revisionBlocks
+        .map(item => item.textContent)
+        .filter(text => !text?.includes(' of ') && text !== 'Refresh All')
+    }
+
     it('should show the revisions at the top', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
-      const ribbon = screen.getByTestId('ribbon')
 
-      const revisionBlocks = within(ribbon).getAllByRole('listitem')
-      revisionBlocks.shift() // Remove filter button
-      revisionBlocks.shift() // Remove refresh all
-      const revisions = revisionBlocks.map(item => item.textContent)
-      expect(revisions).toStrictEqual(
-        comparisonTableFixture.revisions.map(rev =>
+      expect(getDisplayedRevisionOrder()).toStrictEqual(
+        plotsRevisionsFixture.map(rev =>
           rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
         )
       )
@@ -1463,7 +1426,8 @@ describe('App', () => {
     it('should send a message with the revision to be removed when clicking the clear button', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       const mainClearButton = within(
@@ -1481,11 +1445,12 @@ describe('App', () => {
     it('should display the number of experiments selected', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       expect(
-        screen.getByText(`${comparisonTableFixture.revisions.length} of 7`)
+        screen.getByText(`${plotsRevisionsFixture.length} of 7`)
       ).toBeInTheDocument()
     })
 
@@ -1509,7 +1474,8 @@ describe('App', () => {
     it('should send a message to refresh each revision when clicking the refresh all button', () => {
       renderAppWithData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
       })
 
       const refreshAllButton = within(
@@ -1524,6 +1490,38 @@ describe('App', () => {
         payload: ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd'],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
+    })
+
+    it('should not reorder the ribbon when comparison plots are reordered', () => {
+      renderAppWithData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture
+      })
+
+      const expectedRevisions = plotsRevisionsFixture.map(rev =>
+        rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
+      )
+
+      expect(getDisplayedRevisionOrder()).toStrictEqual(expectedRevisions)
+
+      sendSetDataMessage({
+        comparison: comparisonTableFixture,
+        selectedRevisions: [
+          {
+            displayColor: '#f56565',
+            group: undefined,
+            id: 'new-revision',
+            revision: 'new-revision'
+          },
+          ...plotsRevisionsFixture.reverse()
+        ]
+      })
+
+      expect(getDisplayedRevisionOrder()).toStrictEqual([
+        ...expectedRevisions,
+        'new-revision'
+      ])
     })
   })
 })
