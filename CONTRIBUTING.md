@@ -93,9 +93,3 @@ There are some discrepancies between the Storybook environment and the
 environment of a real VS Code extension, custom themes being one big one. Always
 make sure to try out changed components in the full dev environment before
 merging!
-
-# Resources
-
-Check out the
-[Resources page](https://github.com/iterative/vscode-dvc/wiki/Resources) of our
-GitHub wiki for a list of relevant docs and related projects.
