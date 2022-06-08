@@ -12,14 +12,22 @@ Run, compare, visualize, and track machine learning experiments right in VS
 Code. This extension uses open-source tool [DVC](https://dvc.org/) and does not
 require additional services or databases. It enables other DVC features as well!
 
-> **Note**: We want early adopter feedback!  
-> Please let us know what you like and don't like about the extension. Feel free
-> to open [issues in this repo] or reach out via [DVC support] channels.
+- **Experiment bookkeeping**: A system to record training metrics, parameters,
+  and data that can be used to navigate your experiments, compare their results,
+  and find the best model
+- **Plots dashboard**: Visualize experiments data in a customizable View.
+- **Live tracking**: Run and see how metrics change in real time.
+- **Reproducibility**: Pick any past experiment, and get back to it to run it
+  again or use it as a base for a new experiment.
+- **Data Management**: Manage large datasets, files, and models.
 
-[issues in this repo]: https://github.com/iterative/vscode-dvc/issues
-[dvc support]: https://dvc.org/support
+> **Note**: We want early adopter feedback! Feel free to open [issues] or reach
+> [DVC support].
+>
+> [issues]: https://github.com/iterative/vscode-dvc/issues
+> [dvc support]: https://dvc.org/support
 
-## What it does (extension features)
+## UI components
 
 This [extension] augments and adds several [Views], adds special [Editors] to
 [VS Code]. Furthermore, it exposes these and other DVC functions in the [Command
