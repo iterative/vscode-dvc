@@ -4,7 +4,7 @@ import {
   Column,
   ColumnType
 } from 'dvc/src/experiments/webview/contract'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -12,7 +12,6 @@ import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import { FilterDefinition } from 'dvc/src/experiments/model/filterBy'
 import styles from './styles.module.scss'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
-import { sendMessage } from '../../../shared/vscode'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import {
   Draggable,
