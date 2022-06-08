@@ -16,11 +16,6 @@ import { AllIcons } from '../Icon'
 
 const items: IconMenuItemProps[] = [
   {
-    icon: AllIcons.PENCIL,
-    onClick: jest.fn,
-    tooltip: 'Rename'
-  },
-  {
     icon: AllIcons.UP_ARROW,
     onClick: jest.fn,
     tooltip: 'Move Up'
@@ -39,7 +34,7 @@ const basicProps = {
 const renderMenu = (props = basicProps) => render(<IconMenu {...props} />)
 
 const item = {
-  icon: AllIcons.PENCIL,
+  icon: AllIcons.ADD,
   onClickNode: 'Menu',
   tooltip: 'Tooltip'
 }

@@ -10,7 +10,6 @@ import { PlotsSizeContext } from './PlotsSizeContext'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
-import { SectionRenamer } from './SectionRenamer'
 import { AllIcons, Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
@@ -21,7 +20,6 @@ export interface PlotsContainerProps {
   sectionCollapsed: SectionCollapsed
   sectionKey: Section
   title: string
-  onRename: (section: Section, name: string) => void
   onResize: (size: PlotSize, section: Section) => void
   currentSize: PlotSize
   menu?: PlotsPickerProps
@@ -29,7 +27,7 @@ export interface PlotsContainerProps {
 
 export type BasicContainerProps = Pick<
   PlotsContainerProps,
-  'onRename' | 'onResize' | 'sectionCollapsed'
+  'onResize' | 'sectionCollapsed'
 >
 
 export const SectionDescription = {
@@ -55,13 +53,10 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionKey,
   title,
   children,
-  onRename,
   onResize,
   currentSize,
   menu
 }) => {
-  const [isRenaming, setIsRenaming] = useState(false)
-  const [sectionTitle, setSectionTitle] = useState(title)
   const [size, setSize] = useState<PlotSize>(currentSize)
   const { changePlotsSizes } = useContext(PlotsSizeContext)
 
@@ -78,14 +73,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     [styles.largePlots]: size === PlotSize.LARGE
   })
 
-  const menuItems: IconMenuItemProps[] = [
-    {
-      icon: AllIcons.PENCIL,
-      onClick: () => setIsRenaming(true),
-      tooltip: 'Rename'
-    }
-  ]
-
   const changeSize = (newSize: PlotSize) => {
     if (size === newSize) {
       return
@@ -94,25 +81,22 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     changePlotsSizes?.(newSize, sectionKey)
     setSize(newSize)
   }
+  const menuItems: IconMenuItemProps[] = [
+    {
+      icon: AllIcons.DOTS,
+      onClickNode: (
+        <SizePicker currentSize={size} setSelectedSize={changeSize} />
+      ),
+      tooltip: 'Resize'
+    }
+  ]
 
   if (menu) {
-    menuItems.push({
+    menuItems.unshift({
       icon: AllIcons.LINES,
       onClickNode: <PlotsPicker {...menu} />,
       tooltip: 'Select Plots'
     })
-  }
-
-  menuItems.push({
-    icon: AllIcons.DOTS,
-    onClickNode: <SizePicker currentSize={size} setSelectedSize={changeSize} />,
-    tooltip: 'Resize'
-  })
-
-  const onTitleChanged = (title: string) => {
-    setIsRenaming(false)
-    setSectionTitle(title)
-    onRename(sectionKey, title)
   }
 
   const tooltipContent = (
@@ -144,14 +128,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             className={styles.detailsIcon}
           />
 
-          {isRenaming ? (
-            <SectionRenamer
-              defaultTitle={sectionTitle}
-              onChangeTitle={onTitleChanged}
-            />
-          ) : (
-            sectionTitle
-          )}
+          {title}
           <Tooltip content={tooltipContent} placement="bottom-end">
             <div
               className={styles.infoTooltipToggle}

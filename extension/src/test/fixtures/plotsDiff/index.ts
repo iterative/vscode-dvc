@@ -5,11 +5,9 @@ import { PlotsOutput } from '../../../cli/reader'
 import {
   ComparisonPlots,
   ComparisonRevisionData,
-  DEFAULT_SECTION_NAMES,
   TemplatePlotSection,
   PlotSize,
   PlotsType,
-  Section,
   TemplatePlotGroup,
   TemplatePlotsData,
   TemplatePlots
@@ -531,14 +529,12 @@ export const getRevisions = () => {
 
 export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
-  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR,
   revisions: getRevisions()
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
-  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })
 
@@ -548,7 +544,6 @@ export const getManyTemplatePlotsWebviewMessage = (
   plots: extendedSpecs({
     ...multipleVega(length)
   }),
-  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })
 
@@ -574,7 +569,6 @@ export const getComparisonWebviewMessage = (
 
   return {
     plots: plotAcc,
-    sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
     size: PlotSize.REGULAR
   }
 }

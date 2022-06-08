@@ -90,15 +90,7 @@ const PlotsContent = ({ state }: PlotsProps) => {
     })
   }
 
-  const setSectionName = (section: Section, name: string) => {
-    sendMessage({
-      payload: { name, section },
-      type: MessageFromWebviewType.RENAME_SECTION
-    })
-  }
-
   const basicContainerProps = {
-    onRename: setSectionName,
     onResize: changeSize,
     sectionCollapsed
   }

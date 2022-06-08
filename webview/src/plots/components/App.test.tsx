@@ -309,7 +309,7 @@ describe('App', () => {
 
     expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
 
-    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -341,7 +341,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const [, pickerButton] = screen.getAllByTestId('icon-menu-item')
+    const [pickerButton] = screen.getAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -383,7 +383,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const sizePickerButton = screen.getAllByTestId('icon-menu-item')[2]
+    const sizePickerButton = screen.getAllByTestId('icon-menu-item')[1]
     fireEvent.mouseEnter(sizePickerButton)
     fireEvent.click(sizePickerButton)
 
@@ -410,7 +410,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const sizeButton = screen.getAllByTestId('icon-menu-item')[2]
+    const sizeButton = screen.getAllByTestId('icon-menu-item')[1]
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 
@@ -437,7 +437,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const sizeButton = screen.getAllByTestId('icon-menu-item')[2]
+    const sizeButton = screen.getAllByTestId('icon-menu-item')[1]
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 
@@ -457,84 +457,6 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toBeCalled()
-  })
-
-  it('should show an input to rename the section when clicking the rename icon button', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-
-    expect(screen.queryByRole('textbox')).toBeNull()
-
-    const [renameButton] = screen.getAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(renameButton)
-    fireEvent.click(renameButton)
-
-    expect(screen.getByRole('textbox')).toBeInTheDocument()
-  })
-
-  it('should change the title of the section when hitting enter on the title input', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-    const originalText = 'Trends'
-
-    expect(screen.getByText(originalText)).toBeInTheDocument()
-
-    const [renameButton] = screen.getAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(renameButton)
-    fireEvent.click(renameButton)
-
-    const titleInput = screen.getByRole('textbox')
-    const newTitle = 'Brand new section'
-    fireEvent.change(titleInput, { target: { value: newTitle } })
-    fireEvent.keyDown(titleInput, { key: 'Enter' })
-
-    expect(screen.getByText(newTitle)).toBeInTheDocument()
-  })
-
-  it('should change the title of the section on the blur event of the input', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-    const originalText = 'Trends'
-
-    expect(screen.getByText(originalText)).toBeInTheDocument()
-
-    const [renameButton] = screen.getAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(renameButton)
-    fireEvent.click(renameButton)
-
-    const titleInput = screen.getByRole('textbox')
-    const newTitle = 'Brand new section'
-    fireEvent.change(titleInput, { target: { value: newTitle } })
-    fireEvent.blur(titleInput)
-
-    expect(screen.getByText(newTitle)).toBeInTheDocument()
-  })
-
-  it('should send a message to the extension with the new section name after a section rename', () => {
-    renderAppWithData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-
-    const [renameButton] = screen.getAllByTestId('icon-menu-item')
-    fireEvent.mouseEnter(renameButton)
-    fireEvent.click(renameButton)
-
-    const titleInput = screen.getByRole('textbox')
-    const newTitle = 'Brand new section'
-    fireEvent.change(titleInput, { target: { value: newTitle } })
-    fireEvent.keyDown(titleInput, { key: 'Enter' })
-
-    expect(mockPostMessage).toBeCalledWith({
-      payload: { name: newTitle, section: Section.CHECKPOINT_PLOTS },
-      type: MessageFromWebviewType.RENAME_SECTION
-    })
   })
 
   it('should display the checkpoint plots in the order stored', () => {
@@ -628,7 +550,7 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     })
 
-    const [, pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -1140,7 +1062,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(11) },
           'Large',
-          2
+          1
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1158,7 +1080,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(10) },
           'Large',
-          2
+          1
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1176,7 +1098,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(11) },
           'Large',
-          1
+          0
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1194,7 +1116,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(10) },
           'Large',
-          1
+          0
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1213,7 +1135,7 @@ describe('App', () => {
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Large', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Large', 1)
         })
 
         it('should render one large plot per row per 1000px of screen when the screen is larger than 2000px', () => {
@@ -1265,7 +1187,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(16) },
           'Regular',
-          2
+          1
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1275,7 +1197,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
           'Regular',
-          2
+          1
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1285,7 +1207,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(16) },
           'Regular',
-          1
+          0
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1295,7 +1217,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
           'Regular',
-          1
+          0
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1306,7 +1228,7 @@ describe('App', () => {
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Regular', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Regular', 1)
         })
 
         it('should render one regular plot per row per 800px of screen when the screen is larger than 2000px', () => {
@@ -1358,7 +1280,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(21) },
           'Small',
-          2
+          1
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1368,7 +1290,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(20) },
           'Small',
-          2
+          1
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1378,7 +1300,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
           'Small',
-          1
+          0
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1388,7 +1310,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
           'Small',
-          1
+          0
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1399,7 +1321,7 @@ describe('App', () => {
 
         beforeEach(async () => {
           // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Small', 2)
+          await renderAppAndChangeSize({ checkpoint }, 'Small', 1)
         })
 
         it('should render one small plot per row per 500px of screen when the screen is larger than 2000px', () => {

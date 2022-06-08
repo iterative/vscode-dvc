@@ -18,11 +18,11 @@ export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
   revisions,
   basicContainerProps
 }) => {
-  const { sectionName, size, plots } = comparisonTable
+  const { size, plots } = comparisonTable
 
   return (
     <PlotsContainer
-      title={sectionName}
+      title="Images"
       sectionKey={Section.COMPARISON_TABLE}
       currentSize={size}
       {...basicContainerProps}
