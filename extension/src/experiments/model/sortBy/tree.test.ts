@@ -11,7 +11,7 @@ import {
 } from 'vscode'
 import { SortDefinition } from '.'
 import { ExperimentsSortByTree, SortItem } from './tree'
-import { joinColumnPath } from '../../columns/paths'
+import { buildMetricOrParamPath } from '../../columns/paths'
 import { InternalCommands } from '../../../commands/internal'
 import { buildMockedExperiments } from '../../../test/util/jest'
 import { ColumnType } from '../../webview/contract'
@@ -59,7 +59,7 @@ beforeEach(() => {
 
 describe('ExperimentsSortByTree', () => {
   const dvcRoot = 'demo'
-  const examplePath = joinColumnPath(ColumnType.PARAMS, 'test')
+  const examplePath = buildMetricOrParamPath(ColumnType.PARAMS, 'test')
   const exampleSortDefinition: SortDefinition = {
     descending: true,
     path: examplePath

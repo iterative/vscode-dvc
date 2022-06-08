@@ -25,6 +25,7 @@ import { hasKey } from '../../util/object'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
+import { sum } from '../../util/math'
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
@@ -55,6 +56,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
+  private hasRunning = false
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState)
@@ -84,13 +86,19 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSet(data: ExperimentsOutput) {
-    const { workspace, branches, experimentsByBranch, checkpointsByTip } =
-      collectExperiments(data)
+    const {
+      workspace,
+      branches,
+      experimentsByBranch,
+      checkpointsByTip,
+      hasRunning
+    } = collectExperiments(data)
 
     this.workspace = workspace
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
+    this.hasRunning = hasRunning
 
     this.setColoredStatus()
   }
@@ -114,6 +122,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.setSelectionMode(false)
     this.persistStatus()
     return this.coloredStatus[id]
+  }
+
+  public hasRunningExperiment() {
+    return this.hasRunning
   }
 
   public canSelect() {
@@ -321,6 +333,15 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public isSelected(id: string) {
     return !!this.coloredStatus[id]
+  }
+
+  public getExperimentCount() {
+    return sum([
+      this.flattenCheckpoints().length,
+      this.flattenExperiments().length,
+      this.branches.length,
+      1
+    ])
   }
 
   private getCombinedList() {

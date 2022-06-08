@@ -14,6 +14,7 @@ import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
 import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
+import { shortenForLabel } from '../../util/string'
 
 export type ExperimentItem = {
   command?: {
@@ -31,8 +32,6 @@ export type ExperimentItem = {
 }
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
-
-export const getShortSha = (sha: string) => sha.slice(0, 7)
 
 export const isCheckpoint = (
   checkpointTip: string | undefined,
@@ -72,7 +71,7 @@ const getDisplayNameOrParent = (
     branchSha !== checkpointParent &&
     experimentsObject[checkpointParent]?.data?.checkpoint_tip !== checkpointTip
   ) {
-    return `(${getShortSha(checkpointParent)})`
+    return `(${shortenForLabel(checkpointParent)})`
   }
   if (name) {
     return `[${name}]`
@@ -115,13 +114,16 @@ const transformColumns = (
   experiment: Experiment,
   experimentFields: ExperimentFields
 ) => {
-  const { metrics, params } = extractColumns(experimentFields)
+  const { metrics, params, deps } = extractColumns(experimentFields)
 
   if (metrics) {
     experiment.metrics = metrics
   }
   if (params) {
     experiment.params = params
+  }
+  if (deps) {
+    experiment.deps = deps
   }
 }
 
@@ -182,11 +184,20 @@ const transformExperimentOrCheckpointData = (
     experiment: transformExperimentData(
       id,
       experimentFields,
-      getShortSha(sha),
+      shortenForLabel(sha),
       sha,
       getDisplayNameOrParent(sha, branchSha, experimentsObject),
       getLogicalGroupName(sha, branchSha, experimentsObject)
     )
+  }
+}
+
+const collectHasRunningExperiment = (
+  acc: ExperimentsAccumulator,
+  experiment: Experiment
+) => {
+  if (experiment.running) {
+    acc.hasRunning = true
   }
 }
 
@@ -225,6 +236,7 @@ const collectFromExperimentsObject = (
     }
 
     collectExperimentOrCheckpoint(acc, experiment, branchName, checkpointTipId)
+    collectHasRunningExperiment(acc, experiment)
   }
 }
 
@@ -246,6 +258,7 @@ const collectFromBranchesObject = (
 
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject, sha, branch.label)
+      collectHasRunningExperiment(acc, branch)
 
       acc.branches.push(branch)
     }

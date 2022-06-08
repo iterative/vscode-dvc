@@ -14,7 +14,7 @@ import {
 } from '../../../../../experiments/model/filterBy'
 import { dvcDemoPath } from '../../../../util'
 import { experimentsUpdatedEvent } from '../../../util'
-import { joinColumnPath } from '../../../../../experiments/columns/paths'
+import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
 import {
@@ -58,7 +58,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      const accuracyPath = joinColumnPath(
+      const accuracyPath = buildMetricOrParamPath(
         ColumnType.METRICS,
         'summary.json',
         'accuracy'
@@ -111,6 +111,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columns: columnsFixture,
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: filteredRows,
         sorts: []
       }
@@ -139,6 +140,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columns: columnsFixture,
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: [workspace, main],
         sorts: []
       }
@@ -161,7 +163,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      const lossPath = joinColumnPath(
+      const lossPath = buildMetricOrParamPath(
         ColumnType.METRICS,
         'summary.json',
         'loss'
@@ -246,7 +248,11 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const filter = {
         operator: Operator.EQUAL,
-        path: joinColumnPath(ColumnType.METRICS, 'summary.json', 'loss'),
+        path: buildMetricOrParamPath(
+          ColumnType.METRICS,
+          'summary.json',
+          'loss'
+        ),
         value: '0'
       }
       const filterId = getFilterId(filter)

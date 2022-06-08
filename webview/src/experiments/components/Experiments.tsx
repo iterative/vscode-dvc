@@ -108,7 +108,8 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] =>
       width: 100
     },
     ...buildDynamicColumns(columns, ColumnType.METRICS),
-    ...buildDynamicColumns(columns, ColumnType.PARAMS)
+    ...buildDynamicColumns(columns, ColumnType.PARAMS),
+    ...buildDynamicColumns(columns, ColumnType.DEPS)
   ] as TableColumn<Row>[]
 
 const reportResizedColumn = (state: TableState<Row>) => {
@@ -139,6 +140,7 @@ export const ExperimentsTable: React.FC<{
         columns: [],
         hasCheckpoints: false,
         hasColumns: false,
+        hasRunningExperiment: false,
         rows: [],
         sorts: [],
         ...initiallyUndefinedTableData

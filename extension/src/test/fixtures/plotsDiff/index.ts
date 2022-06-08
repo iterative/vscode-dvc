@@ -5,11 +5,9 @@ import { PlotsOutput } from '../../../cli/reader'
 import {
   ComparisonPlots,
   ComparisonRevisionData,
-  DEFAULT_SECTION_NAMES,
   TemplatePlotSection,
   PlotSize,
   PlotsType,
-  Section,
   TemplatePlotGroup,
   TemplatePlotsData,
   TemplatePlots
@@ -498,15 +496,45 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   return [singleViewPlots, multiViewPlots]
 }
 
+export const getRevisions = () => {
+  const [workspace, main, _4fb124a, _42b8735, _1ba7bcd] = copyOriginalColors()
+  return [
+    {
+      id: 'workspace',
+      revision: 'workspace',
+      displayColor: workspace,
+      group: undefined
+    },
+    { id: 'main', revision: 'main', displayColor: main, group: undefined },
+    {
+      id: 'exp-e7a67',
+      revision: '4fb124a',
+      displayColor: _4fb124a,
+      group: '[exp-e7a67]'
+    },
+    {
+      id: 'test-branch',
+      revision: '42b8736',
+      displayColor: _42b8735,
+      group: '[test-branch]'
+    },
+    {
+      id: 'exp-83425',
+      revision: '1ba7bcd',
+      displayColor: _1ba7bcd,
+      group: '[exp-83425]'
+    }
+  ]
+}
+
 export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
-  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
-  size: PlotSize.REGULAR
+  size: PlotSize.REGULAR,
+  revisions: getRevisions()
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
-  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })
 
@@ -516,7 +544,6 @@ export const getManyTemplatePlotsWebviewMessage = (
   plots: extendedSpecs({
     ...multipleVega(length)
   }),
-  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: PlotSize.REGULAR
 })
 
@@ -540,38 +567,8 @@ export const getComparisonWebviewMessage = (
     plotAcc.push({ path, revisions: revisionsAcc })
   }
 
-  const [workspace, main, _4fb124a, _42b8735, _1ba7bcd] = copyOriginalColors()
-
   return {
     plots: plotAcc,
-    revisions: [
-      {
-        id: 'workspace',
-        revision: 'workspace',
-        displayColor: workspace,
-        group: undefined
-      },
-      { id: 'main', revision: 'main', displayColor: main, group: undefined },
-      {
-        id: 'exp-e7a67',
-        revision: '4fb124a',
-        displayColor: _4fb124a,
-        group: '[exp-e7a67]'
-      },
-      {
-        id: 'test-branch',
-        revision: '42b8736',
-        displayColor: _42b8735,
-        group: '[test-branch]'
-      },
-      {
-        id: 'exp-83425',
-        revision: '1ba7bcd',
-        displayColor: _1ba7bcd,
-        group: '[exp-83425]'
-      }
-    ],
-    sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
     size: PlotSize.REGULAR
   }
 }

@@ -13,19 +13,19 @@ export const columns = [
   {
     ...commonColumnFields,
     id: 'A',
-    name: 'A',
+    label: 'A',
     path: 'params:A'
   },
   {
     ...commonColumnFields,
     id: 'B',
-    name: 'B',
+    label: 'B',
     path: 'params:B'
   },
   {
     ...commonColumnFields,
     id: 'C',
-    name: 'C',
+    label: 'C',
     path: 'params:C'
   }
 ]
@@ -37,6 +37,7 @@ export const tableData: TableData = {
   columns,
   hasCheckpoints: false,
   hasColumns: true,
+  hasRunningExperiment: false,
   rows: [
     {
       id: 'workspace',

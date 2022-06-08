@@ -42,7 +42,7 @@ export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
 
   return (
     <PlotsContainer
-      title={checkpointPlots.sectionName}
+      title="Trends"
       sectionKey={Section.CHECKPOINT_PLOTS}
       menu={{
         plots: metrics,

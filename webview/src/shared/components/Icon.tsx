@@ -10,8 +10,8 @@ import {
   Ellipsis,
   GraphLine,
   Gripper,
+  Info,
   Lines,
-  Pencil,
   Refresh,
   UpArrow
 } from './icons'
@@ -27,8 +27,8 @@ export const AllIcons = {
   ELLIPSIS: Ellipsis,
   GRAPH_LINE: GraphLine,
   GRIPPER: Gripper,
+  INFO: Info,
   LINES: Lines,
-  PENCIL: Pencil,
   REFRESH: Refresh,
   UP_ARROW: UpArrow
 }

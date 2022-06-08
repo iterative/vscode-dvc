@@ -12,6 +12,7 @@ import checkpointPlotsFixture, {
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import { chromaticParameters } from './util'
 import { Plots } from '../plots/components/Plots'
 import { useAppReducer } from '../plots/hooks/useAppReducer'
@@ -27,8 +28,8 @@ export default {
       comparison: comparisonPlotsFixture,
       hasPlots: true,
       hasSelectedPlots: false,
-      hasSelectedRevisions: false,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: plotsRevisionsFixture,
       template: templatePlotsFixture
     }
   },
@@ -52,6 +53,7 @@ WithEmptyCheckpoints.args = {
     checkpoint: { ...checkpointPlotsFixture, selectedMetrics: [] },
     comparison: comparisonPlotsFixture,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture,
     template: templatePlotsFixture
   }
 }
@@ -60,7 +62,8 @@ export const WithCheckpointOnly = Template.bind({})
 WithCheckpointOnly.args = {
   data: {
     checkpoint: checkpointPlotsFixture,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture
   }
 }
 
@@ -68,6 +71,7 @@ export const WithTemplateOnly = Template.bind({})
 WithTemplateOnly.args = {
   data: {
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture,
     template: templatePlotsFixture
   }
 }
@@ -76,7 +80,8 @@ export const WithComparisonOnly = Template.bind({})
 WithComparisonOnly.args = {
   data: {
     comparison: comparisonPlotsFixture,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture
   }
 }
 
@@ -84,7 +89,8 @@ export const WithoutPlots = Template.bind({})
 WithoutPlots.args = {
   data: {
     hasPlots: false,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture
   }
 }
 
@@ -93,8 +99,8 @@ WithoutPlotsSelected.args = {
   data: {
     hasPlots: true,
     hasSelectedPlots: false,
-    hasSelectedRevisions: true,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture
   }
 }
 
@@ -103,8 +109,8 @@ WithoutExperimentsSelected.args = {
   data: {
     hasPlots: true,
     hasSelectedPlots: true,
-    hasSelectedRevisions: false,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: []
   }
 }
 
@@ -113,8 +119,8 @@ WithoutAnySelected.args = {
   data: {
     hasPlots: true,
     hasSelectedPlots: false,
-    hasSelectedRevisions: false,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: undefined
   }
 }
 
@@ -129,6 +135,7 @@ AllLarge.args = {
     checkpoint: { ...checkpointPlotsFixture, size: PlotSize.LARGE },
     comparison: { ...comparisonPlotsFixture, size: PlotSize.LARGE },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture,
     template: { ...templatePlotsFixture, size: PlotSize.LARGE }
   }
 }
@@ -140,6 +147,7 @@ AllSmall.args = {
     checkpoint: { ...checkpointPlotsFixture, size: PlotSize.SMALL },
     comparison: { ...comparisonPlotsFixture, size: PlotSize.SMALL },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture,
     template: { ...templatePlotsFixture, size: PlotSize.SMALL }
   }
 }
@@ -157,6 +165,7 @@ VirtualizedPlots.args = {
     },
     comparison: undefined,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture,
     template: manyTemplatePlots(125)
   }
 }

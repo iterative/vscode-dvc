@@ -257,6 +257,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public getExperimentCount() {
+    return this.experiments.getExperimentCount()
+  }
+
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 
@@ -373,6 +377,10 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
+  public hasRunningExperiment() {
+    return this.experiments.hasRunningExperiment()
+  }
+
   private hideTableColumn(path: string) {
     this.toggleColumnStatus(path)
     sendTelemetryEvent(
@@ -434,6 +442,7 @@ export class Experiments extends BaseRepository<TableData> {
       columns: this.columns.getSelected(),
       hasCheckpoints: this.hasCheckpoints(),
       hasColumns: this.columns.hasColumns(),
+      hasRunningExperiment: this.experiments.hasRunningExperiment(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }

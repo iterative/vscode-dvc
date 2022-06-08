@@ -1,8 +1,12 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
 import { SortDefinition } from '../model/sortBy'
 
-export interface Columns {
+export interface MetricOrParamColumns {
   [filename: string]: ValueTree
+}
+
+export interface DepColumns {
+  [path: string]: string
 }
 
 export interface Experiment extends BaseExperimentFields {
@@ -10,10 +14,10 @@ export interface Experiment extends BaseExperimentFields {
   label: string
   displayNameOrParent?: string
   logicalGroupName?: string
-  params?: Columns
-  metrics?: Columns
-  deps?: Columns
-  outs?: Columns
+  params?: MetricOrParamColumns
+  metrics?: MetricOrParamColumns
+  deps?: DepColumns
+  outs?: MetricOrParamColumns
   displayColor?: string
   selected?: boolean
   mutable?: boolean
@@ -32,12 +36,13 @@ export interface ColumnAggregateData {
 
 export enum ColumnType {
   METRICS = 'metrics',
-  PARAMS = 'params'
+  PARAMS = 'params',
+  DEPS = 'deps'
 }
 
 export interface Column extends ColumnAggregateData {
   hasChildren: boolean
-  name: string
+  label: string
   parentPath: string
   path: string
   pathArray?: string[]
@@ -52,6 +57,7 @@ export type TableData = {
   columnWidths: Record<string, number>
   hasCheckpoints: boolean
   hasColumns: boolean
+  hasRunningExperiment: boolean
   rows: Row[]
   sorts: SortDefinition[]
 }

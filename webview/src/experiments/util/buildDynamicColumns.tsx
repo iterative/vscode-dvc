@@ -23,6 +23,7 @@ const UndefinedCell = (
 )
 
 const groupLabels: Record<string, string> = {
+  deps: 'Dep',
   metrics: 'Metric',
   params: 'Parameter'
 }
@@ -102,7 +103,7 @@ const buildDynamicColumns = (
   properties
     .filter(column => column.parentPath === parentPath)
     .map(data => {
-      const { path, type, pathArray, name } = data
+      const { path, type, pathArray, label } = data
 
       const childColumns = buildDynamicColumns(properties, path)
 
@@ -113,7 +114,7 @@ const buildDynamicColumns = (
         columns: childColumns.length > 0 ? childColumns : undefined,
         group: type,
         id: path,
-        name
+        name: label
       }
       return column
     })

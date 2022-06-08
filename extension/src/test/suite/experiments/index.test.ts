@@ -46,7 +46,7 @@ import {
 } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
-import { joinColumnPath } from '../../../experiments/columns/paths'
+import { buildMetricOrParamPath } from '../../../experiments/columns/paths'
 import { BaseWebview } from '../../../webview'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
@@ -127,6 +127,7 @@ suite('Experiments Test Suite', () => {
         columns: columnsFixture,
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -684,6 +685,7 @@ suite('Experiments Test Suite', () => {
         columns: [],
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -794,7 +796,11 @@ suite('Experiments Test Suite', () => {
       })
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      const sortPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
+      const sortPath = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'test'
+      )
 
       mockShowQuickPick.onFirstCall().resolves({
         label: 'test',
@@ -869,35 +875,35 @@ suite('Experiments Test Suite', () => {
   describe('persisted state', () => {
     const firstSortDefinition = {
       descending: false,
-      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
+      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'test')
     }
     const secondSortDefinition = {
       descending: true,
-      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'other')
+      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'other')
     }
     const sortDefinitions: SortDefinition[] = [
       firstSortDefinition,
       secondSortDefinition
     ]
 
-    const firstFilterId = joinColumnPath(
+    const firstFilterId = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'test==1'
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test'),
+      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'test'),
       value: 1
     }
-    const secondFilterId = joinColumnPath(
+    const secondFilterId = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'other∈testcontains'
     )
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'other'),
+      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'other'),
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [
