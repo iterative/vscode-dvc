@@ -188,7 +188,6 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     return {
       plots,
-      sectionName: this.plots.getSectionName(Section.TEMPLATE_PLOTS),
       size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
     }
   }
@@ -204,7 +203,6 @@ export class Plots extends BaseRepository<TPlotsData> {
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      sectionName: this.plots.getSectionName(Section.COMPARISON_TABLE),
       size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
     }
   }
@@ -248,11 +246,6 @@ export class Plots extends BaseRepository<TPlotsData> {
             )
           case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
             return this.setSectionCollapsed(message.payload)
-          case MessageFromWebviewType.RENAME_SECTION:
-            return this.setSectionName(
-              message.payload.section,
-              message.payload.name
-            )
           case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
             return this.setComparisonOrder(message.payload)
           case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
@@ -298,15 +291,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_TOGGLE,
       collapsed,
-      undefined
-    )
-  }
-
-  private setSectionName(section: Section, name: string) {
-    this.plots?.setSectionName(section, name)
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_RENAME_SECTION,
-      { section },
       undefined
     )
   }

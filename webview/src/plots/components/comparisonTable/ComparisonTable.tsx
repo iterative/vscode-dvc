@@ -17,7 +17,7 @@ import { sendMessage } from '../../../shared/vscode'
 
 export type ComparisonTableProps = Omit<
   PlotsComparisonData & { revisions: Revision[] },
-  'sectionName' | 'size'
+  'size'
 >
 
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({

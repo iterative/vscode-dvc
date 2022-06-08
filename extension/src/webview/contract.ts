@@ -17,7 +17,6 @@ export enum MessageFromWebviewType {
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
-  RENAME_SECTION = 'rename-section',
   REORDER_COLUMNS = 'reorder-columns',
   REORDER_PLOTS_COMPARISON = 'reorder-plots-comparison',
   REORDER_PLOTS_METRICS = 'reorder-plots-metrics',
@@ -129,10 +128,6 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
       payload: PlotsTemplatesReordered
-    }
-  | {
-      type: MessageFromWebviewType.RENAME_SECTION
-      payload: PlotSectionRenamedPayload
     }
   | { type: MessageFromWebviewType.INITIALIZED }
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
