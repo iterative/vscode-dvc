@@ -12,20 +12,46 @@ Run, compare, visualize, and track machine learning experiments right in VS
 Code. This extension uses open-source tool [DVC](https://dvc.org/) and does not
 require additional services or databases. It enables other DVC features as well!
 
-- **Experiment bookkeeping**: A system to record training metrics, parameters,
-  and data that can be used to navigate your experiments, compare their results,
-  and find the best model
-- **Plots dashboard**: Visualize experiments data in a customizable View.
-- **Live tracking**: Run and see how metrics change in real time.
-- **Reproducibility**: Pick any past experiment, and get back to it to run it
-  again or use it as a base for a new experiment.
-- **Data Management**: Manage large datasets, files, and models.
+- **Experiment bookkeeping**: Activate a visual system to record training data,
+  parameters, and metrics on top of [Git](https://git-scm.com/). Use it to
+  navigate your experiments, compare their results, and find the best ML model
+- **Plots dashboard**: Visualize experiment data in a customizable View.
+- **Live tracking**: Capture and see metrics changing in real time.
+- **Reproducibility**: Reliably get back to any previous experiment. Run it
+  again or use it as the base for new experiments.
+- **Data Management**: Handle large datasets, files, and models effectively.
 
 > **Note**: We want early adopter feedback! Feel free to open [issues] or reach
 > [DVC support].
 >
 > [issues]: https://github.com/iterative/vscode-dvc/issues
 > [dvc support]: https://dvc.org/support
+
+### Why use this extension?
+
+- Enjoy the best developer experience with the first experiment tracking
+  interface for an IDE.
+- No external servers, databases, subscriptions, etc. Data stays fully under
+  your control and your existing Git hosting is used to share and collaborate.
+- Go beyond a simple metrics dashboard with complete ML experiments that include
+  metrics, code, and data. Powered by [DVC experiment versioning].
+- Data versioning on top of your favorite cloud storage, such as Amazon S3,
+  Azure Blob Storage, Google Cloud Storage, NFS, etc.
+
+[dvc experiment versioning]:
+  https://dvc.org/doc/user-guide/experiment-management/experiments-overview
+
+## Quick start
+
+- **Step 1.**
+  [Install a supported version of DVC on your system](https://dvc.org/doc/install)
+- **Step 2.**
+  [Install the DVC extension for Visual Studio Code](https://code.visualstudio.com/docs/editor/extension-gallery).
+- **Step 3.** See Walkthrough.
+
+### Learn more about DVC (Data Version Control)
+
+View [more resources](extension/resources/walkthrough/dvc-learn-more.md).
 
 ## UI components
 
@@ -63,18 +89,6 @@ Palette]. Specifically:
 [dvc view]: extension/resources/walkthrough/view-container.md
 [command palette]: extension/resources/walkthrough/command-palette.md
 [dvc output]: #
-
-## Quick Start
-
-- **Step 1.**
-  [Install a supported version of DVC on your system](https://dvc.org/doc/install)
-- **Step 2.**
-  [Install the DVC extension for Visual Studio Code](https://code.visualstudio.com/docs/editor/extension-gallery).
-- **Step 3.** See Walkthrough.
-
-### Learn more about DVC (Data Version Control)
-
-View [more resources](extension/resources/walkthrough/dvc-learn-more.md).
 
 ## Configuration
 
