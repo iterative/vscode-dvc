@@ -48,7 +48,7 @@ require additional services or databases. It enables other DVC features as well!
 2. [Install the DVC Extension] in VS Code.
 3. Follow the **Get Started** page that pops up!
 
-> 💡 Feel free to try our [example DVC project] first! Opening it [with Github
+> 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
 > Codespaces] will include this extension automatically.
 
 [install the dvc extension]:
@@ -103,9 +103,22 @@ Code. It also exposes these and other DVC functions in the [Command Palette].
 
 ## Configuration
 
-<!-- TODO -->
+These are the [VS Code Settings] available for the Extension:
 
-See the .vscode/ dir.
+| **Option**                             | **Description**                                                                                                                               |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dvc.dvcPath`                          | (Required) Path to the DVC binary                                                                                                             |
+| `dvc.pythonPath`                       | Path to the Python binary (Python is a requisite of DVC). Useful when using a virtual environment                                             |
+| `dvc.doNotShowWalkthroughAfterInstall` | Prevent the extension from opening the **Get Starged** page by default after installation. Useful for pre-configured development environments |
+| `dvc.doNotRecommendRedHatExtension`    | Turn off the tip to install the Red Hat YAML extension for syntax recognition of `dvc.yaml` and `.dvc` files.                                 |
+| `dvc.doNotShowCliUnavailable`          | ...                                                                                                                                           |
+| `dvc.doNotShowUnableToFilter`          | ...                                                                                                                                           |
+
+> **Note** that the `Setup The Workspace` command helps you set up the basic
+> ones at the [Workspace level] (saved to `.vscode/setting.json`).
+
+[workspace level]:
+  https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
 
 ## Useful commands
 
