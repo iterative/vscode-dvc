@@ -1,5 +1,6 @@
 import { basename, extname, join, relative, resolve } from 'path'
 import {
+  ensureFileSync,
   existsSync,
   lstatSync,
   readdir,
@@ -104,4 +105,7 @@ export const loadJson = <T>(path: string): T | undefined => {
 export const writeJson = <T extends Record<string, unknown>>(
   path: string,
   obj: T
-): void => writeFileSync(path, JSON.stringify(obj))
+): void => {
+  ensureFileSync(path)
+  return writeFileSync(path, JSON.stringify(obj))
+}
