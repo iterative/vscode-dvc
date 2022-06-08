@@ -19,6 +19,7 @@ const tableData: TableData = {
   columns: columnsFixture,
   hasCheckpoints: true,
   hasColumns: true,
+  hasRunningExperiment: true,
   rows: rowsFixture.map(row => ({
     ...row,
     subRows: row.subRows?.map(experiment => ({
@@ -59,6 +60,7 @@ export const WithNoRunningExperiments = Template.bind({})
 WithNoRunningExperiments.args = {
   tableData: {
     ...tableData,
+    hasRunningExperiment: false,
     rows: rowsFixture.map(row => ({
       ...row,
       running: false,

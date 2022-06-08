@@ -6,6 +6,7 @@ const tableDataFixture: TableData = {
   rows: rowsFixture,
   columns: columnsFixture,
   hasCheckpoints: true,
+  hasRunningExperiment: true,
   hasColumns: true,
   sorts: [],
   changes: [],

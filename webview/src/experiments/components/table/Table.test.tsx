@@ -114,6 +114,7 @@ describe('Table', () => {
     columns: [],
     hasCheckpoints: false,
     hasColumns: true,
+    hasRunningExperiment: false,
     rows: [],
     sorts: []
   }

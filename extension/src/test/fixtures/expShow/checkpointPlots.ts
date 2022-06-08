@@ -1,10 +1,5 @@
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import {
-  DEFAULT_SECTION_NAMES,
-  CheckpointPlotsData,
-  PlotSize,
-  Section
-} from '../../../plots/webview/contract'
+import { CheckpointPlotsData, PlotSize } from '../../../plots/webview/contract'
 
 const colors = copyOriginalColors()
 
@@ -89,8 +84,7 @@ const data: CheckpointPlotsData = {
     'summary.json:val_loss',
     'summary.json:val_accuracy'
   ],
-  size: PlotSize.REGULAR,
-  sectionName: DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS]
+  size: PlotSize.REGULAR
 }
 
 export const manyCheckpointPlots = (length: number) =>

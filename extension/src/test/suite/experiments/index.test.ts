@@ -127,6 +127,7 @@ suite('Experiments Test Suite', () => {
         columns: columnsFixture,
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -684,6 +685,7 @@ suite('Experiments Test Suite', () => {
         columns: [],
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: rowsFixture,
         sorts: []
       }

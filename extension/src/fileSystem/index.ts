@@ -1,10 +1,12 @@
 import { basename, extname, join, relative, resolve } from 'path'
 import {
+  ensureFileSync,
   existsSync,
   lstatSync,
   readdir,
   readFileSync,
-  removeSync
+  removeSync,
+  writeFileSync
 } from 'fs-extra'
 import { load } from 'js-yaml'
 import { Uri } from 'vscode'
@@ -90,4 +92,20 @@ export const loadYaml = <T>(path: string): T | undefined => {
   } catch {
     Logger.error(`failed to load yaml ${path}`)
   }
+}
+
+export const loadJson = <T>(path: string): T | undefined => {
+  try {
+    return JSON.parse(readFileSync(path).toString()) as T
+  } catch {
+    Logger.error(`failed to load JSON from ${path}`)
+  }
+}
+
+export const writeJson = <T extends Record<string, unknown>>(
+  path: string,
+  obj: T
+): void => {
+  ensureFileSync(path)
+  return writeFileSync(path, JSON.stringify(obj))
 }

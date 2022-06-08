@@ -23,6 +23,7 @@ const UndefinedCell = (
 )
 
 const groupLabels: Record<string, string> = {
+  deps: 'Dep',
   metrics: 'Metric',
   params: 'Parameter'
 }

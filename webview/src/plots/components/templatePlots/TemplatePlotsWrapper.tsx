@@ -15,7 +15,7 @@ export const TemplatePlotsWrapper: React.FC<TemplatePlotsWrapperProps> = ({
   renderZoomedInPlot
 }) => (
   <PlotsContainer
-    title={templatePlots.sectionName}
+    title="Data Series"
     sectionKey={Section.TEMPLATE_PLOTS}
     currentSize={templatePlots.size}
     {...basicContainerProps}
