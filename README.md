@@ -7,9 +7,9 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
-Run, compare, visualize, and track machine learning experiments right in your
-IDE, without need for special services or subscriptions. Compare and visualize
-ML model metrics, and manage data effectively with [DVC](https://dvc.org/).
+Run, compare, visualize, and track machine learning experiments right in VS Code.
+This extension uses open-source tool [DVC](https://dvc.org/) and does not
+require additional services or databases. It enables other DVC features as well!
 
 > **Note**: We want early adopter feedback!  
 > Please let us know what you like and don't like about the extension. Feel free
@@ -40,7 +40,7 @@ Palette]. Specifically:
 - Includes a [DVC channel] for the _Output_ panel (useful for
   [debugging](#debugging)). 
 
-[extension]: https://marketplace.visualstudio.com/VSCode
+[extension]: https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
 [views]: https://code.visualstudio.com/docs/getstarted/userinterface#_views
 [editors]:
   https://code.visualstudio.com/docs/getstarted/userinterface#_open-editors
