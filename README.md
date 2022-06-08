@@ -142,7 +142,7 @@ These are the [VS Code Settings] available for the Extension:
 ### The DVC Extension
 
 Please see the DVC [channel] in the IDE's _Output_ panel to see the underlying
-DVC commands being run, as wel as their error output. Feel free to share this
+DVC commands being run, as well as their error output. Feel free to share this
 with us via [DVC support].
 
 [channel]:
