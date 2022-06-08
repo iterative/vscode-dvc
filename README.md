@@ -61,7 +61,7 @@ require additional services or databases. It enables other DVC features as well!
 ### Learn more about DVC (Data Version Control)
 
 See the DVC documentation to Get Started with [Experiment Versioning] or [Data
-Management]. For deeper learning, try our [free course].
+Management]. For deeper learning, try our [free course]!
 
 [experiment versioning]: https://dvc.org/doc/start/experiments
 [data management]: https://dvc.org/doc/start/data-management
