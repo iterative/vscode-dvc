@@ -46,14 +46,25 @@ require additional services or databases. It enables other DVC features as well!
 
 1. [Install DVC](https://dvc.org/doc/install) on your system.
 2. [Install the DVC Extension] in VS Code.
-3. Follow the Walkthrough that pops up!
+3. Follow the **Get Started** page that pops up!
+
+> 💡 Feel free to try our [example DVC project] first! Opening it [with Github
+> Codespaces] will include this extension automatically.
 
 [install the dvc extension]:
   https://code.visualstudio.com/docs/editor/extension-gallery
+[example dvc project]: https://github.com/iterative/example-get-started
+[with github codespaces]:
+  https://docs.github.com/en/codespaces/getting-started/quickstart#creating-your-codespace
 
 ### Learn more about DVC (Data Version Control)
 
-View [more resources](extension/resources/walkthrough/dvc-learn-more.md).
+See the DVC documentation to Get Started with [Experiment Versioning] or [Data
+Management]. For deeper learning, try our [free course].
+
+[experiment versioning]: https://dvc.org/doc/start/experiments
+[data management]: https://dvc.org/doc/start/data-management
+[free course]: https://learn.iterative.ai/
 
 ## UI components
 
