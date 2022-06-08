@@ -49,7 +49,7 @@ require additional services or databases. It enables other DVC features as well!
 3. Follow the **Get Started** page that pops up!
 
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
-> Codespaces] will include this extension automatically.
+> > Codespaces] will include this extension automatically.
 
 [install the dvc extension]:
   https://code.visualstudio.com/docs/editor/extension-gallery
@@ -101,6 +101,21 @@ Code. It also exposes these and other DVC functions in the [Command Palette].
 [command palette]: extension/resources/walkthrough/command-palette.md
 [dvc output]: #
 
+## Useful commands
+
+Open the Command Palette (`F1` or ⇧⌃P on Windows/Linux or ⇧⌘P on macOS) and type
+in one of the following commands:
+
+| Command                    | Description                                                                                                                 |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `DVC: Get Started`         | Open the extension's walkthrough. Which details all of the current features and provides links to extra learning resources. |
+| `View: Show DVC`           | Open the extension's view container.                                                                                        |
+| `DVC: Setup The Workspace` | Activate the extension's workspace setup wizard.                                                                            |
+| `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
+| `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
+
+See [Command Palette] for a full list.
+
 ## Configuration
 
 These are the [VS Code Settings] available for the Extension:
@@ -119,19 +134,6 @@ These are the [VS Code Settings] available for the Extension:
 
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
-
-## Useful commands
-
-Open the Command Palette (`F1` or ⇧⌃P on Windows/Linux or ⇧⌘P on macOS) and type
-in one of the following commands:
-
-| Command                    | Description                                                                                                                 |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `DVC: Get Started`         | Open the extension's walkthrough. Which details all of the current features and provides links to extra learning resources. |
-| `View: Show DVC`           | Open the extension's view container.                                                                                        |
-| `DVC: Setup The Workspace` | Activate the extension's workspace setup wizard.                                                                            |
-| `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
-| `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
 
 ## Debugging
 
