@@ -14,7 +14,7 @@ require additional services or databases. It enables other DVC features as well!
 
 - **Experiment bookkeeping**: Activate a visual system to record training data,
   parameters, and metrics on top of [Git](https://git-scm.com/). Use it to
-  navigate your experiments, compare their results, and find the best ML model
+  navigate your experiments, compare their results, and find the best ML model.
 - **Visualization**: Plot experiment data in a customizable View.
 - **Live tracking**: Capture and see metrics changing in real time.
 - **Reproducibility**: Reliably get back to any previous experiment. Run it
