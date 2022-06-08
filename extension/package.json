@@ -1321,13 +1321,13 @@
     "walkthroughs": [
       {
         "id": "welcome",
-        "title": "Get Started with DVC",
-        "description": "Your first steps to set up a DVC project with all the powerful tools and features that the DVC extension has to offer!",
+        "title": "Get Started with the DVC Extension",
+        "description": "First steps to set up a DVC environment with all the powerful features that this extension has to offer!",
         "steps": [
           {
             "id": "dvc.installDVC",
             "title": "Install DVC",
-            "description": "The DVC extension requires DVC to be installed. To install follow the guide shown on [dvc.org](https://dvc.org).\n\n[Install DVC](https://dvc.org/doc/install)\n",
+            "description": "This extension requires DVC.\n\n[Install DVC](https://dvc.org/doc/install)\n",
             "media": {
               "markdown": "resources/walkthrough/install-dvc.md"
             },
@@ -1433,7 +1433,7 @@
           },
           {
             "id": "dvc.learnMore",
-            "title": "Explore More Resources",
+            "title": "Learn more about DVC",
             "description": "Take a look into our [documentation](https://dvc.org/doc) to learn more about DVC. \n[Learn More](https://dvc.org/doc)",
             "media": {
               "markdown": "resources/walkthrough/dvc-learn-more.md"
