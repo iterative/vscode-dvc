@@ -4,11 +4,12 @@
 <!--- [![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml) --->
 <!--- [![Cross-Platform Test](https://github.com/iterative/vscode-dvc/actions/workflows/cross-platform-test.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/cross-platform-test.yml) --->
 <!-- [![DVC CLI Output Test](https://github.com/iterative/vscode-dvc/actions/workflows/dvc-cli-output-test.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/dvc-cli-output-test.yml) -->
+
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
-Run, compare, visualize, and track machine learning experiments right in VS Code.
-This extension uses open-source tool [DVC](https://dvc.org/) and does not
+Run, compare, visualize, and track machine learning experiments right in VS
+Code. This extension uses open-source tool [DVC](https://dvc.org/) and does not
 require additional services or databases. It enables other DVC features as well!
 
 > **Note**: We want early adopter feedback!  
@@ -38,7 +39,7 @@ Palette]. Specifically:
   visualize and manage [DVC Experiments].
 - Registers several [commands] in the _Command Palette_.
 - Includes a [DVC channel] for the _Output_ panel (useful for
-  [debugging](#debugging)). 
+  [debugging](#debugging)).
 
 [extension]: https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
 [views]: https://code.visualstudio.com/docs/getstarted/userinterface#_views
@@ -46,7 +47,6 @@ Palette]. Specifically:
   https://code.visualstudio.com/docs/getstarted/userinterface#_open-editors
 [command palette]:
   https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
-
 [exp-view]: extension/resources/walkthrough/experiments-table.md
 [vs code]: https://code.visualstudio.com/
 [plots-view]: extension/resources/walkthrough/plots.md
