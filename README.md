@@ -99,7 +99,7 @@ Code. It also exposes these and other DVC functions in the [Command Palette].
 [dvc tracked]: extension/resources/walkthrough/tracked-explorer.md
 [dvc panel]: extension/resources/walkthrough/source-control-management.md
 [dvc view]: extension/resources/walkthrough/view-container.md
-[command palette]: extension/resources/walkthrough/command-palette.md
+[commands]: extension/resources/walkthrough/command-palette.md
 [dvc output]: #
 
 ## Useful commands
@@ -115,7 +115,7 @@ in one of the following commands:
 | `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
 | `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
 
-See [Command Palette] for a full list.
+See the full list of VS Code [commands] available.
 
 ## Configuration
 
