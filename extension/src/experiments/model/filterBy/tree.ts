@@ -16,7 +16,7 @@ import { definedAndNonEmpty, joinTruthyItems } from '../../../util/array'
 import { createTreeView, getRootItem } from '../../../vscode/tree'
 import { Disposable } from '../../../class/dispose'
 
-type FilterItem = {
+export type FilterItem = {
   description: string
   dvcRoot: string
   id: string
@@ -173,7 +173,7 @@ export class ExperimentsFilterByTree
         this.getDescriptionText('Experiment', filtered.experiments),
         this.getDescriptionText('Checkpoint', filtered.checkpoints)
       ],
-      ','
+      ', '
     )
 
     if (!combinedText) {
