@@ -3,7 +3,8 @@ import {
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
-  TreeItemCollapsibleState
+  TreeItemCollapsibleState,
+  TreeView
 } from 'vscode'
 import { getFilterId } from '.'
 import { WorkspaceExperiments } from '../../workspace'
@@ -11,7 +12,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import { definedAndNonEmpty } from '../../../util/array'
+import { definedAndNonEmpty, joinTruthyItems } from '../../../util/array'
 import { createTreeView, getRootItem } from '../../../vscode/tree'
 import { Disposable } from '../../../class/dispose'
 
@@ -29,6 +30,7 @@ export class ExperimentsFilterByTree
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
+  private readonly view: TreeView<string | FilterItem>
   private viewed = false
 
   constructor(
@@ -39,7 +41,7 @@ export class ExperimentsFilterByTree
 
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
-    this.dispose.track(
+    this.view = this.dispose.track(
       createTreeView<FilterItem>('dvc.views.experimentsFilterByTree', this)
     )
 
@@ -54,6 +56,8 @@ export class ExperimentsFilterByTree
       RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL,
       resource => this.removeAllFilters(resource)
     )
+
+    this.updateDescriptionOnChange()
   }
 
   public getTreeItem(element: string | FilterItem): TreeItem {
@@ -138,5 +142,59 @@ export class ExperimentsFilterByTree
 
   private getDvcRoots() {
     return this.experiments.getDvcRoots()
+  }
+
+  private updateDescriptionOnChange() {
+    this.dispose.track(
+      this.onDidChangeTreeData(() => {
+        this.view.description = this.getDescription()
+      })
+    )
+  }
+
+  private getDescription() {
+    const dvcRoots = this.experiments.getDvcRoots()
+    if (!definedAndNonEmpty(dvcRoots)) {
+      return
+    }
+
+    const filtered = { checkpoints: 0, experiments: 0 }
+
+    for (const dvcRoot of dvcRoots) {
+      const { experiments, checkpoints } = this.experiments
+        .getRepository(dvcRoot)
+        .getFilteredCounts()
+      filtered.checkpoints = filtered.checkpoints + checkpoints
+      filtered.experiments = filtered.experiments + experiments
+    }
+
+    const text = joinTruthyItems(
+      [
+        this.getDescriptionText(filtered.experiments, 'Experiment'),
+        this.getDescriptionText(filtered.checkpoints, 'Checkpoint')
+      ],
+      ','
+    )
+
+    if (!text) {
+      return
+    }
+
+    return `${text} Filtered`
+  }
+
+  private getDescriptionText(
+    filteredCount: number,
+    type: 'Experiment' | 'Checkpoint'
+  ) {
+    if (!filteredCount) {
+      return
+    }
+
+    const text = `${filteredCount} ${type}`
+    if (filteredCount === 1) {
+      return text
+    }
+    return text + 's'
   }
 }

@@ -348,6 +348,29 @@ export class ExperimentsModel extends ModelWithPersistence {
     ])
   }
 
+  public getFilteredCounts() {
+    const experiments = this.flattenExperiments()
+    const totalExperiments = experiments.length
+
+    const remainingExperiments = filterExperiments(
+      this.getFilters(),
+      experiments
+    ).length
+
+    const checkpoints = this.flattenCheckpoints()
+    const totalCheckpoints = checkpoints.length
+
+    const remainingCheckpoints = filterExperiments(
+      this.getFilters(),
+      checkpoints
+    ).length
+
+    return {
+      checkpoints: totalCheckpoints - remainingCheckpoints,
+      experiments: totalExperiments - remainingExperiments
+    }
+  }
+
   private getCombinedList() {
     return [
       this.workspace,
