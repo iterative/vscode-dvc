@@ -108,7 +108,10 @@ const TableHeaderCell: React.FC<{
           [styles.leafHeader]: column.headers === undefined,
           ...sortingClasses()
         }
-      )
+      ),
+      style: {
+        position: undefined
+      }
     }
   }
   const isDraggable =

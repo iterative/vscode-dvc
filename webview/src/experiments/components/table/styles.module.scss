@@ -236,6 +236,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       position: sticky;
       left: 0;
       z-index: 3;
+      border-right: 2px solid var(--editor-foreground-transparency-4);
     }
 
     &.oddRow > *:first-child {
@@ -360,7 +361,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     position: relative;
   }
   .th {
-    height: 100%;
+    height: auto;
   }
   .td {
     height: auto;
