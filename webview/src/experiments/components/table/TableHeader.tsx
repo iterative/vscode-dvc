@@ -119,13 +119,11 @@ const getIconMenuItems = (
     icon:
       (sortOrder === SortOrder.DESCENDING && AllIcons.DOWN_ARROW) ||
       AllIcons.UP_ARROW,
-    onClick: () => {},
     tooltip: 'Table Sorted By'
   },
   {
     hidden: !hasFilter,
     icon: AllIcons.LINES,
-    onClick: () => {},
     tooltip: 'Table Filtered By'
   }
 ]
