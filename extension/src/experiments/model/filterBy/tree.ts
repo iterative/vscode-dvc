@@ -168,24 +168,24 @@ export class ExperimentsFilterByTree
       filtered.experiments = filtered.experiments + experiments
     }
 
-    const text = joinTruthyItems(
+    const combinedText = joinTruthyItems(
       [
-        this.getDescriptionText(filtered.experiments, 'Experiment'),
-        this.getDescriptionText(filtered.checkpoints, 'Checkpoint')
+        this.getDescriptionText('Experiment', filtered.experiments),
+        this.getDescriptionText('Checkpoint', filtered.checkpoints)
       ],
       ','
     )
 
-    if (!text) {
+    if (!combinedText) {
       return
     }
 
-    return `${text} Filtered`
+    return `${combinedText} Filtered`
   }
 
   private getDescriptionText(
-    filteredCount: number,
-    type: 'Experiment' | 'Checkpoint'
+    type: 'Experiment' | 'Checkpoint',
+    filteredCount: number
   ) {
     if (!filteredCount) {
       return
