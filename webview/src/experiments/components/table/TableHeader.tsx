@@ -24,9 +24,9 @@ import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
 import { AllIcons } from '../../../shared/components/Icon'
 
 export enum SortOrder {
-  ASCENDING = 'ascending',
-  DESCENDING = 'descending',
-  NONE = 'none'
+  ASCENDING = 'Sort Ascending',
+  DESCENDING = 'Sort Descending',
+  NONE = 'Remove Sort'
 }
 
 const possibleOrders = {
@@ -34,12 +34,6 @@ const possibleOrders = {
   true: SortOrder.DESCENDING,
   undefined: SortOrder.NONE
 } as const
-
-export enum SortOrderLabel {
-  ASCENDING = 'Sort Ascending',
-  DESCENDING = 'Sort Descending',
-  NONE = 'Remove Sort'
-}
 
 export const ColumnDragHandle: React.FC<{
   disabled: boolean
@@ -179,9 +173,6 @@ const TableHeaderCell: React.FC<{
     <ContextMenu
       content={menuContent}
       disabled={menuDisabled || menuSuppressed}
-      onShow={() => {
-        return !column.isResizing
-      }}
     >
       <div
         {...column.getHeaderProps(
@@ -294,8 +285,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           <MessagesMenu
             options={[
               {
+                hidden: sortOrder === SortOrder.ASCENDING,
                 id: SortOrder.ASCENDING,
-                label: SortOrderLabel.ASCENDING,
+                label: SortOrder.ASCENDING,
                 message: {
                   payload: {
                     descending: false,
@@ -305,8 +297,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 }
               },
               {
+                hidden: sortOrder === SortOrder.DESCENDING,
                 id: SortOrder.DESCENDING,
-                label: SortOrderLabel.DESCENDING,
+                label: SortOrder.DESCENDING,
                 message: {
                   payload: {
                     descending: true,
@@ -316,8 +309,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 }
               },
               {
+                hidden: sortOrder === SortOrder.NONE,
                 id: SortOrder.NONE,
-                label: SortOrderLabel.NONE,
+                label: SortOrder.NONE,
                 message: {
                   payload: column.id,
                   type: MessageFromWebviewType.REMOVE_COLUMN_SORT
