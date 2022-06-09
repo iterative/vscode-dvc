@@ -21,7 +21,6 @@ import {
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
 import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
-import { IconMenuItemProps } from '../../../shared/components/iconMenu/IconMenuItem'
 import { AllIcons } from '../../../shared/components/Icon'
 
 export enum SortOrder {
@@ -29,6 +28,12 @@ export enum SortOrder {
   DESCENDING = 'descending',
   NONE = 'none'
 }
+
+const possibleOrders = {
+  false: SortOrder.ASCENDING,
+  true: SortOrder.DESCENDING,
+  undefined: SortOrder.NONE
+} as const
 
 export enum SortOrderLabel {
   ASCENDING = 'Sort Ascending',
@@ -73,6 +78,64 @@ export const ColumnDragHandle: React.FC<{
   )
 }
 
+const calcResizerHeight = (
+  isPlaceholder: boolean,
+  orderedColumns: Column[],
+  column: HeaderGroup<Experiment>,
+  columns: HeaderGroup<Experiment>[]
+) => {
+  const nbUpperLevels = isPlaceholder
+    ? 0
+    : countUpperLevels(orderedColumns, column, columns, 0)
+  return 100 + nbUpperLevels * 92 + '%'
+}
+
+const getHeaderPropsArgs = (
+  column: HeaderGroup<Experiment>,
+  sortEnabled: boolean,
+  sortOrder: SortOrder
+) => {
+  return {
+    className: cx(
+      styles.th,
+      column.placeholderOf ? styles.placeholderHeaderCell : styles.headerCell,
+      {
+        [styles.paramHeaderCell]: column.group === ColumnType.PARAMS,
+        [styles.metricHeaderCell]: column.group === ColumnType.METRICS,
+        [styles.depHeaderCell]: column.group === ColumnType.DEPS,
+        [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
+        [styles.leafHeader]: column.headers === undefined,
+        [styles.menuEnabled]: sortEnabled,
+        [styles.sortingHeaderCellAsc]:
+          sortOrder === SortOrder.ASCENDING && !column.parent?.placeholderOf,
+        [styles.sortingHeaderCellDesc]:
+          sortOrder === SortOrder.DESCENDING && !column.placeholderOf
+      }
+    )
+  }
+}
+
+const getIconMenuItems = (
+  sortEnabled: boolean,
+  sortOrder: SortOrder,
+  hasFilter: boolean
+) => [
+  {
+    hidden: !sortEnabled || sortOrder === SortOrder.NONE,
+    icon:
+      (sortOrder === SortOrder.DESCENDING && AllIcons.DOWN_ARROW) ||
+      AllIcons.UP_ARROW,
+    onClick: () => {},
+    tooltip: 'Table Sorted By'
+  },
+  {
+    hidden: !hasFilter,
+    icon: AllIcons.LINES,
+    onClick: () => {},
+    tooltip: 'Table Filtered By'
+  }
+]
+
 const TableHeaderCell: React.FC<{
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
@@ -97,82 +160,46 @@ const TableHeaderCell: React.FC<{
   onDragOver,
   onDragStart,
   onDrop
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
-  const isPlaceholder = !!column.placeholderOf
-  const canResize = column.canResize && !isPlaceholder
-  const nbUpperLevels = isPlaceholder
-    ? 0
-    : countUpperLevels(orderedColumns, column, columns, 0)
-  const resizerHeight = 100 + nbUpperLevels * 92 + '%'
+  const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
 
-  const sortingClasses = () => ({
-    [styles.sortingHeaderCellAsc]:
-      sortOrder === 'ascending' && !column.parent?.placeholderOf,
-    [styles.sortingHeaderCellDesc]:
-      sortOrder === 'descending' && !column.placeholderOf
-  })
-
-  const headerPropsArgs = () => {
-    return {
-      className: cx(
-        styles.th,
-        column.placeholderOf ? styles.placeholderHeaderCell : styles.headerCell,
-        {
-          [styles.paramHeaderCell]: column.group === ColumnType.PARAMS,
-          [styles.metricHeaderCell]: column.group === ColumnType.METRICS,
-          [styles.depHeaderCell]: column.group === ColumnType.DEPS,
-          [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-          [styles.leafHeader]: column.headers === undefined,
-          [styles.menuEnabled]: sortEnabled,
-          ...sortingClasses()
-        }
-      )
-    }
-  }
   const isDraggable =
     !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
 
-  const menuItems: IconMenuItemProps[] = [
-    {
-      hidden: !sortEnabled || sortOrder === SortOrder.NONE,
-      icon:
-        (sortOrder === SortOrder.DESCENDING && AllIcons.DOWN_ARROW) ||
-        AllIcons.UP_ARROW,
-      onClick: () => {},
-      tooltip: 'Sorted By'
-    },
-    {
-      hidden: !hasFilter,
-      icon: AllIcons.LINES,
-      onClick: () => {},
-      tooltip: 'Filtered By'
-    }
-  ]
-
-  const [menuSupressed, setMenuSupressed] = React.useState<boolean>(false)
+  const isPlaceholder = !!column.placeholderOf
+  const canResize = column.canResize && !isPlaceholder
+  const resizerHeight = calcResizerHeight(
+    isPlaceholder,
+    orderedColumns,
+    column,
+    columns
+  )
 
   return (
     <ContextMenu
       content={menuContent}
-      disabled={menuDisabled || menuSupressed}
+      disabled={menuDisabled || menuSuppressed}
       onShow={() => {
         return !column.isResizing
       }}
     >
       <div
-        {...column.getHeaderProps(headerPropsArgs())}
+        {...column.getHeaderProps(
+          getHeaderPropsArgs(column, sortEnabled, sortOrder)
+        )}
         key={column.id}
         data-testid={`header-${column.id}`}
         role={'columnheader'}
         tabIndex={0}
       >
         <div className={styles.iconMenu}>
-          <IconMenu items={menuItems} />
+          <IconMenu
+            items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)}
+          />
         </div>
         <ColumnDragHandle
           column={column}
-          disabled={!isDraggable || menuSupressed}
+          disabled={!isDraggable || menuSuppressed}
           onDragOver={onDragOver}
           onDragStart={onDragStart}
           onDrop={onDrop}
@@ -180,8 +207,8 @@ const TableHeaderCell: React.FC<{
         {canResize && (
           <div
             {...column.getResizerProps()}
-            onMouseEnter={() => setMenuSupressed(true)}
-            onMouseLeave={() => setMenuSupressed(false)}
+            onMouseEnter={() => setMenuSuppressed(true)}
+            onMouseLeave={() => setMenuSuppressed(false)}
             className={styles.columnResizer}
             style={{ height: resizerHeight }}
           />
@@ -221,15 +248,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     !['id', 'timestamp'].includes(column.id) &&
     !column.columns
 
-  const sortOrder: SortOrder = (() => {
-    const possibleOrders = {
-      false: SortOrder.ASCENDING,
-      true: SortOrder.DESCENDING,
-      undefined: SortOrder.NONE
-    }
-
-    return possibleOrders[`${sort?.descending}`]
-  })()
+  const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
 
   const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = [
