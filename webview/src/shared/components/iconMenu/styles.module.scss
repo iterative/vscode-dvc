@@ -16,7 +16,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   border: none;
   padding: 0;
   background: inherit;
@@ -24,6 +23,10 @@
 
   &:hover {
     background-color: var(--editor-foreground-transparency-1);
+  }
+
+  &.clickable {
+    cursor: pointer;
   }
 }
 

@@ -60,6 +60,7 @@ export type TableData = {
   hasRunningExperiment: boolean
   rows: Row[]
   sorts: SortDefinition[]
+  filters: string[]
 }
 
 export type InitiallyUndefinedTableData = TableData | undefined
