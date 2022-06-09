@@ -49,14 +49,16 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
         }}
       >
         <ul className={styles.menu} role="menu">
-          {items.map(item => (
-            <IconMenuItem
-              {...item}
-              key={item.tooltip}
-              tooltipTarget={tooltipTarget}
-              menuTarget={menuTarget}
-            />
-          ))}
+          {items
+            .filter(({ hidden }) => !hidden)
+            .map(item => (
+              <IconMenuItem
+                {...item}
+                key={item.tooltip}
+                tooltipTarget={tooltipTarget}
+                menuTarget={menuTarget}
+              />
+            ))}
         </ul>
       </Tooltip>
     </Tooltip>

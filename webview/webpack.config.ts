@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import type { Configuration as DevServerConfiguration } from 'webpack-dev-server'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 
@@ -7,17 +8,20 @@ const r = (file: string) => resolve(__dirname, file)
 const styleLoader = 'style-loader'
 const cssLoader = 'css-loader'
 
-export default {
-  devServer: {
-    disableHostCheck: true,
-    headers: {
-      'Access-Control-Allow-Headers':
-        'X-Requested-With, content-type, Authorization',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Origin': '*'
-    },
-    hot: true
+const devServer: DevServerConfiguration = {
+  allowedHosts: 'all',
+  headers: {
+    'Access-Control-Allow-Headers':
+      'X-Requested-With, content-type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Origin': '*'
   },
+  hot: false,
+  liveReload: true
+}
+
+export default {
+  devServer,
   devtool: 'source-map',
   entry: {
     experiments: { dependOn: 'react', import: r('src/experiments/index.tsx') },

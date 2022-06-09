@@ -15,6 +15,7 @@ export const MergedHeaderGroups: React.FC<{
   headerGroup: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
+  filters: string[]
   orderedColumns: Column[]
   onDragUpdate: OnDragOver
   onDragStart: OnDragStart
@@ -22,6 +23,7 @@ export const MergedHeaderGroups: React.FC<{
 }> = ({
   headerGroup,
   sorts,
+  filters,
   columns,
   orderedColumns,
   onDragUpdate,
@@ -41,6 +43,7 @@ export const MergedHeaderGroups: React.FC<{
             column={column}
             columns={columns}
             sorts={sorts}
+            filters={filters}
             onDragOver={onDragUpdate}
             onDragStart={onDragStart}
             onDrop={onDragEnd}

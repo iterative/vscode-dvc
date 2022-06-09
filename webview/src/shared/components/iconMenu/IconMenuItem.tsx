@@ -1,4 +1,5 @@
 import React from 'react'
+import cx from 'classnames'
 import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
 import { Icon, IconValues } from '../Icon'
@@ -9,6 +10,7 @@ export interface IconMenuItemProps {
   onClick?: () => void
   onClickNode?: React.ReactNode
   tooltip: string
+  hidden?: boolean
 }
 
 export interface IconMenuItemAllProps extends IconMenuItemProps {
@@ -28,7 +30,7 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
     <Tooltip content={tooltip} singleton={tooltipTarget}>
       <button
         aria-label={tooltip}
-        className={styles.item}
+        className={cx(styles.item, { [styles.clickable]: !!onClick })}
         onClick={onClick}
         data-testid="icon-menu-item"
       >

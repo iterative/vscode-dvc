@@ -162,6 +162,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return [...this.filters.values()]
   }
 
+  public getFilterPaths() {
+    return this.getFilters().map(({ path }) => path)
+  }
+
   public canAutoApplyFilters(...filterIdsToRemove: string[]): boolean {
     if (!this.useFiltersForSelection) {
       return true

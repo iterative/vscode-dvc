@@ -17,9 +17,11 @@ interface TableHeadProps {
   instance: TableInstance<Experiment>
   columns: Column[]
   sorts: SortDefinition[]
+  filters: string[]
 }
 
 export const TableHead: React.FC<TableHeadProps> = ({
+  filters,
   instance: {
     headerGroups,
     setColumnOrder,
@@ -90,6 +92,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
           headerGroup={headerGroup}
           columns={allHeaders}
           sorts={sorts}
+          filters={filters}
           onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
