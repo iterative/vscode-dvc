@@ -471,6 +471,12 @@
         "command": "dvc.views.plotsPathsTree.selectPlots",
         "category": "DVC",
         "icon": "$(list-filter)"
+      },
+      {
+        "title": "%command.views.plotsPathsTree.refreshPlots%",
+        "command": "dvc.views.plotsPathsTree.refreshPlots",
+        "category": "DVC",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {
@@ -778,6 +784,10 @@
         {
           "command": "dvc.views.plotsPathsTree.selectPlots",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.refreshPlots",
+          "when": "dvc.commands.available && dvc.project.available"
         }
       ],
       "scm/title": [
@@ -1058,6 +1068,11 @@
           "command": "dvc.views.plotsPathsTree.selectPlots",
           "group": "inline",
           "when": "view == dvc.views.plotsPathsTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.refreshPlots",
+          "group": "inline",
+          "when": "view == dvc.views.plotsPathsTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -1210,6 +1225,11 @@
           "command": "dvc.views.plotsPathsTree.selectPlots",
           "when": "view == dvc.views.plotsPathsTree",
           "group": "navigation@2"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.refreshPlots",
+          "when": "view == dvc.views.plotsPathsTree",
+          "group": "navigation@3"
         }
       ]
     },
