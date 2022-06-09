@@ -9,7 +9,6 @@ import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
-import { FilterDefinition } from 'dvc/src/experiments/model/filterBy'
 import styles from './styles.module.scss'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
@@ -29,6 +28,12 @@ export enum SortOrder {
   ASCENDING = 'ascending',
   DESCENDING = 'descending',
   NONE = 'none'
+}
+
+export enum SortOrderLabel {
+  ASCENDING = 'Sort Ascending',
+  DESCENDING = 'Sort Descending',
+  NONE = 'Remove Sort'
 }
 
 export const ColumnDragHandle: React.FC<{
@@ -92,6 +97,7 @@ const TableHeaderCell: React.FC<{
   onDragOver,
   onDragStart,
   onDrop
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const isPlaceholder = !!column.placeholderOf
   const canResize = column.canResize && !isPlaceholder
@@ -134,13 +140,13 @@ const TableHeaderCell: React.FC<{
         (sortOrder === SortOrder.DESCENDING && AllIcons.DOWN_ARROW) ||
         AllIcons.UP_ARROW,
       onClick: () => {},
-      tooltip: 'Sorted column'
+      tooltip: 'Sorted By'
     },
     {
       hidden: !hasFilter,
       icon: AllIcons.LINES,
       onClick: () => {},
-      tooltip: 'Filtered column'
+      tooltip: 'Filtered By'
     }
   ]
 
@@ -189,7 +195,7 @@ interface TableHeaderProps {
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
-  filters: FilterDefinition[]
+  filters: string[]
   orderedColumns: Column[]
   onDragOver: OnDragOver
   onDragStart: OnDragStart
@@ -208,7 +214,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 }) => {
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
-  const filter = filters.find(({ path }) => path === column.id)
+
+  const hasFilter = !!(column.id && filters.includes(column.id))
   const isSortable =
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
@@ -256,7 +263,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       orderedColumns={orderedColumns}
       sortOrder={sortOrder}
       sortEnabled={isSortable}
-      hasFilter={!!filter}
+      hasFilter={hasFilter}
       onDragOver={onDragOver}
       onDragStart={onDragStart}
       onDrop={onDrop}
@@ -269,7 +276,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             options={[
               {
                 id: SortOrder.ASCENDING,
-                label: 'Sort Ascending',
+                label: SortOrderLabel.ASCENDING,
                 message: {
                   payload: {
                     descending: false,
@@ -280,7 +287,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               },
               {
                 id: SortOrder.DESCENDING,
-                label: 'Sort Descending',
+                label: SortOrderLabel.DESCENDING,
                 message: {
                   payload: {
                     descending: true,
@@ -291,7 +298,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               },
               {
                 id: SortOrder.NONE,
-                label: 'Remove Sort',
+                label: SortOrderLabel.NONE,
                 message: {
                   payload: column.id,
                   type: MessageFromWebviewType.REMOVE_COLUMN_SORT

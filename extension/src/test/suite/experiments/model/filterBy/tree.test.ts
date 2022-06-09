@@ -109,7 +109,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: columnsFixture,
-        filters: [],
+        filters: [accuracyPath],
         hasCheckpoints: true,
         hasColumns: true,
         hasRunningExperiment: true,

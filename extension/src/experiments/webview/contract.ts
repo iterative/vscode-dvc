@@ -1,5 +1,4 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
-import { FilterDefinition } from '../model/filterBy'
 import { SortDefinition } from '../model/sortBy'
 
 export interface MetricOrParamColumns {
@@ -61,7 +60,7 @@ export type TableData = {
   hasRunningExperiment: boolean
   rows: Row[]
   sorts: SortDefinition[]
-  filters: FilterDefinition[]
+  filters: string[]
 }
 
 export type InitiallyUndefinedTableData = TableData | undefined

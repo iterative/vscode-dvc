@@ -10,6 +10,7 @@ import React from 'react'
 import { TableInstance } from 'react-table'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
 import { Table } from './Table'
+import { SortOrderLabel } from './TableHeader'
 import styles from './styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnOrder'
@@ -135,10 +136,21 @@ describe('Table', () => {
   })
 
   describe('Sorting through the UI', () => {
+    const mockColumnName = 'C'
     const mockColumnPath = 'params:C'
 
     const findSortableColumn = async () =>
       await screen.findByTestId(`header-${mockColumnPath}`)
+
+    const clickOnSortOption = async (optionLabel: SortOrderLabel) => {
+      const column = await screen.findByText(mockColumnName)
+      fireEvent.contextMenu(column, {
+        bubbles: true
+      })
+
+      const sortOption = await screen.findByText(optionLabel)
+      fireEvent.click(sortOption)
+    }
 
     describe('Sortable column', () => {
       it('should not not have a sorting indicator if it is not sorted yet', () => {
@@ -148,11 +160,9 @@ describe('Table', () => {
         expect(sortIcons.length).toBe(0)
       })
 
-      it('should add an ascending sort to the column, if it is not sorted yet', async () => {
+      it('should be able to add an ascending sort to the column, if it is not sorted yet', async () => {
         renderExperimentsTable()
-        const column = await findSortableColumn()
-
-        fireEvent.click(column)
+        await clickOnSortOption(SortOrderLabel.ASCENDING)
 
         expect(mockedPostMessage).toBeCalledWith({
           payload: {
@@ -163,27 +173,7 @@ describe('Table', () => {
         })
       })
 
-      it('should work with the keyboard as well', async () => {
-        renderExperimentsTable()
-        const column = await findSortableColumn()
-
-        fireEvent.keyDown(column, {
-          bubbles: true,
-          code: 'Enter',
-          key: 'Enter',
-          keyCode: 13
-        })
-
-        expect(mockedPostMessage).toBeCalledWith({
-          payload: {
-            descending: false,
-            path: mockColumnPath
-          },
-          type: MessageFromWebviewType.SORT_COLUMN
-        })
-      })
-
-      it('should add a descending sort to the column, if it has an ascending sort', async () => {
+      it('should add a descending sort to the column, when clicking on the descending option', async () => {
         renderExperimentsTable({
           ...sortingTableDataFixture,
           sorts: [
@@ -197,7 +187,7 @@ describe('Table', () => {
         const column = await findSortableColumn()
         expect(column).toHaveClass('sortingHeaderCellAsc')
 
-        fireEvent.click(column)
+        await clickOnSortOption(SortOrderLabel.DESCENDING)
 
         expect(mockedPostMessage).toBeCalledWith({
           payload: {
@@ -208,7 +198,7 @@ describe('Table', () => {
         })
       })
 
-      it('should remove the column sort if it has a descending sort', async () => {
+      it('should remove the column sort if the remove option is selected', async () => {
         renderExperimentsTable({
           ...sortingTableDataFixture,
           sorts: [
@@ -222,7 +212,7 @@ describe('Table', () => {
         const column = await findSortableColumn()
         expect(column).toHaveClass('sortingHeaderCellDesc')
 
-        fireEvent.click(column)
+        await clickOnSortOption(SortOrderLabel.NONE)
 
         expect(mockedPostMessage).toBeCalledWith({
           payload: mockColumnPath,
