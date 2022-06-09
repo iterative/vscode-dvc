@@ -9,8 +9,8 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
+import { SortOrder } from './TableHeader'
 import { Table } from './Table'
-import { SortOrderLabel } from './TableHeader'
 import styles from './styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnOrder'
@@ -142,7 +142,7 @@ describe('Table', () => {
     const findSortableColumn = async () =>
       await screen.findByTestId(`header-${mockColumnPath}`)
 
-    const clickOnSortOption = async (optionLabel: SortOrderLabel) => {
+    const clickOnSortOption = async (optionLabel: SortOrder) => {
       const column = await screen.findByText(mockColumnName)
       fireEvent.contextMenu(column, {
         bubbles: true
@@ -162,7 +162,7 @@ describe('Table', () => {
 
       it('should be able to add an ascending sort to the column, if it is not sorted yet', async () => {
         renderExperimentsTable()
-        await clickOnSortOption(SortOrderLabel.ASCENDING)
+        await clickOnSortOption(SortOrder.ASCENDING)
 
         expect(mockedPostMessage).toBeCalledWith({
           payload: {
@@ -187,7 +187,7 @@ describe('Table', () => {
         const column = await findSortableColumn()
         expect(column).toHaveClass('sortingHeaderCellAsc')
 
-        await clickOnSortOption(SortOrderLabel.DESCENDING)
+        await clickOnSortOption(SortOrder.DESCENDING)
 
         expect(mockedPostMessage).toBeCalledWith({
           payload: {
@@ -212,7 +212,7 @@ describe('Table', () => {
         const column = await findSortableColumn()
         expect(column).toHaveClass('sortingHeaderCellDesc')
 
-        await clickOnSortOption(SortOrderLabel.NONE)
+        await clickOnSortOption(SortOrder.NONE)
 
         expect(mockedPostMessage).toBeCalledWith({
           payload: mockColumnPath,
