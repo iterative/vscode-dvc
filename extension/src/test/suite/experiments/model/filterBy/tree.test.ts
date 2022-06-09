@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, MessageItem } from 'vscode'
-import { addFilterViaQuickInput } from './util'
+import { window, commands, MessageItem, EventEmitter, TreeView } from 'vscode'
+import { addFilterViaQuickInput, mockQuickInputFilter } from './util'
 import { Disposable } from '../../../../../extension'
 import columnsFixture from '../../../../fixtures/expShow/columns'
 import rowsFixture from '../../../../fixtures/expShow/rows'
@@ -12,7 +12,7 @@ import {
   getFilterId,
   Operator
 } from '../../../../../experiments/model/filterBy'
-import { dvcDemoPath } from '../../../../util'
+import { buildMockMemento, dvcDemoPath } from '../../../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
@@ -25,6 +25,10 @@ import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { Response } from '../../../../../vscode/response'
 import { ExperimentsModel } from '../../../../../experiments/model'
 import { Title } from '../../../../../vscode/title'
+import {
+  ExperimentsFilterByTree,
+  FilterItem
+} from '../../../../../experiments/model/filterBy/tree'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -344,6 +348,106 @@ suite('Experiments Filter By Tree Test Suite', () => {
         getRepositorySpy,
         'should not call get repository in removeFilters without a root'
       ).not.to.be.called
+    })
+
+    it('should update the description when a filter is added or removed', async () => {
+      const { experiments, internalCommands } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const workspaceExperiments = disposable.track(
+        new WorkspaceExperiments(
+          internalCommands,
+          disposable.track(new EventEmitter()),
+          buildMockMemento(),
+          { [dvcDemoPath]: experiments },
+          disposable.track(new EventEmitter())
+        )
+      )
+      disposable.track(
+        experiments.onDidChangeExperiments(() =>
+          workspaceExperiments.experimentsChanged.fire()
+        )
+      )
+
+      const mockTreeView = {
+        description: undefined,
+        dispose: stub()
+      } as unknown as TreeView<string | FilterItem>
+      stub(window, 'createTreeView').returns(mockTreeView)
+
+      stub(internalCommands, 'registerExternalCommand').returns(undefined)
+      disposable.track(
+        new ExperimentsFilterByTree(workspaceExperiments, internalCommands)
+      )
+      const getUpdateEvent = () =>
+        new Promise(resolve =>
+          disposable.track(
+            workspaceExperiments.onDidChangeExperiments(() =>
+              resolve(undefined)
+            )
+          )
+        )
+
+      const tableFilterAdded = getUpdateEvent()
+
+      const filter = {
+        operator: Operator.EQUAL,
+        path: buildMetricOrParamPath(
+          ColumnType.METRICS,
+          'summary.json',
+          'loss'
+        ),
+        value: '0'
+      }
+
+      mockQuickInputFilter(filter)
+      experiments.addFilter()
+      await tableFilterAdded
+
+      expect(experiments.getFilteredCounts()).to.deep.equal({
+        checkpoints: 9,
+        experiments: 3
+      })
+
+      expect(mockTreeView.description).to.equal(
+        '3 Experiments, 9 Checkpoints Filtered'
+      )
+
+      const tableFilterRemoved = getUpdateEvent()
+      experiments.removeFilter(getFilterId(filter))
+
+      await tableFilterRemoved
+
+      expect(experiments.getFilteredCounts()).to.deep.equal({
+        checkpoints: 0,
+        experiments: 0
+      })
+
+      expect(mockTreeView.description).to.be.undefined
+
+      stub(experiments, 'getFilteredCounts')
+        .onFirstCall()
+        .returns({
+          checkpoints: 1,
+          experiments: 0
+        })
+        .onSecondCall()
+        .returns({
+          checkpoints: 0,
+          experiments: 1
+        })
+
+      const allButOneCheckpointFilteredEvent = getUpdateEvent()
+      workspaceExperiments.experimentsChanged.fire()
+      await allButOneCheckpointFilteredEvent
+
+      expect(mockTreeView.description).to.equal('1 Checkpoint Filtered')
+
+      const allButOneExperimentFilteredEvent = getUpdateEvent()
+      workspaceExperiments.experimentsChanged.fire()
+      await allButOneExperimentFilteredEvent
+
+      expect(mockTreeView.description).to.equal('1 Experiment Filtered')
     })
   })
 })
