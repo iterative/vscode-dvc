@@ -3,7 +3,7 @@ import {
   TemplatePlotGroup,
   TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
-import React, { DragEvent, useState, useEffect } from 'react'
+import React, { DragEvent, useState, useEffect, useRef } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -27,19 +27,24 @@ export const TemplatePlots: React.FC = () => {
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = useNbItemsPerRow(size)
+  const shouldSendMessage = useRef(true)
 
   useEffect(() => {
+    shouldSendMessage.current = false
     setSections(plots)
   }, [plots, setSections])
 
   useEffect(() => {
-    /*sendMessage({
-      payload: sections.map(section => ({
-        group: section.group,
-        paths: section.entries.map(({ id }) => id)
-      })),
-      type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
-    })*/
+    if (shouldSendMessage.current) {
+      sendMessage({
+        payload: sections.map(section => ({
+          group: section.group,
+          paths: section.entries.map(({ id }) => id)
+        })),
+        type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
+      })
+    }
+    shouldSendMessage.current = true
   }, [sections])
 
   const setSectionEntries = (index: number, entries: TemplatePlotEntry[]) => {

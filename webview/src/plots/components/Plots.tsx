@@ -77,13 +77,13 @@ const PlotsContent = () => {
         {hasCheckpointData && <CheckpointPlotsWrapper />}
       </DragDropProvider>
 
-      {zoomedInPlot && (
+      {zoomedInPlot?.plot && (
         <Modal onClose={handleModalClose}>
           <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
             <VegaLite
-              {...zoomedInPlot.plot}
+              {...JSON.parse(zoomedInPlot.plot)}
               config={{
-                ...(zoomedInPlot.plot.config as Config),
+                ...(JSON.parse(zoomedInPlot.plot).config as Config),
                 background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
               }}
               actions={{

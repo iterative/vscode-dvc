@@ -14,23 +14,22 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   plotProps,
   id
 }) => {
-  const persedProps = JSON.parse(plotProps)
+  const parsedProps = JSON.parse(plotProps)
   const dispatch = useDispatch()
-  const previousPlotProps = useRef(persedProps)
+  const previousPlotProps = useRef(parsedProps)
   useEffect(() => {
     if (previousPlotProps.current !== plotProps) {
-      dispatch(setZoomedInPlot({ plot: persedProps, id, refresh: true }))
+      dispatch(setZoomedInPlot({ plot: plotProps, id, refresh: true }))
       previousPlotProps.current = plotProps
     }
   }, [plotProps, id, dispatch])
 
-  const handleOnClick = () =>
-    dispatch(setZoomedInPlot({ plot: persedProps, id }))
+  const handleOnClick = () => dispatch(setZoomedInPlot({ plot: plotProps, id }))
 
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
       <GripIcon className={styles.plotGripIcon} />
-      <VegaLite {...persedProps} />
+      <VegaLite {...parsedProps} />
     </button>
   )
 }

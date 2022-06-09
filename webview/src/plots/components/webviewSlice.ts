@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 
 type ZoomedInPlotState = {
-  plot: VegaLiteProps
+  plot: string
   id: string
   refresh?: boolean
 }
@@ -42,14 +42,19 @@ export const webviewSlice = createSlice({
       state,
       action: PayloadAction<ZoomedInPlotState | undefined>
     ) => {
-      if (!action.payload?.refresh) {
-        state.zoomedInPlot = undefined // Don't want to keep anything extra from old zoomed in plot as replacing the whole thing is not allowed by Immer (only assign)
-        Object.assign(state.zoomedInPlot, action.payload)
+      if (!action.payload) {
+        state.zoomedInPlot = initialState.zoomedInPlot
         return
       }
 
-      if (action.payload.id === state.zoomedInPlot?.id) {
-        Object.assign(state.zoomedInPlot, action.payload)
+      if (
+        action.payload.id === state.zoomedInPlot?.id ||
+        !action.payload.refresh
+      ) {
+        state.zoomedInPlot = {
+          id: action.payload.id,
+          plot: action.payload.plot
+        }
       }
     }
   }
