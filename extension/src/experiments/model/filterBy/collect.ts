@@ -1,4 +1,8 @@
-import { FilterDefinition, filterExperiment, filterExperiments } from '.'
+import {
+  FilterDefinition,
+  filterExperiment,
+  splitExperimentsByFilters
+} from '.'
 import { ExperimentType } from '..'
 import { definedAndNonEmpty } from '../../../util/array'
 import { Experiment } from '../../webview/contract'
@@ -28,7 +32,10 @@ export const collectFiltered = (
   experiment: Experiment,
   checkpoints: ExperimentWithType[]
 ): ExperimentWithType[] => {
-  const { filtered, unfiltered } = filterExperiments(filters, checkpoints)
+  const { filtered, unfiltered } = splitExperimentsByFilters(
+    filters,
+    checkpoints
+  )
   acc.push(...filtered)
   const hasUnfilteredCheckpoints = definedAndNonEmpty(unfiltered)
   if (hasUnfilteredCheckpoints) {

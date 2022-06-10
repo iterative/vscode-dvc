@@ -3,7 +3,7 @@ import { SortDefinition, sortExperiments } from './sortBy'
 import {
   FilterDefinition,
   filterExperiment,
-  filterExperiments,
+  splitExperimentsByFilters,
   getFilterId
 } from './filterBy'
 import { collectExperiments, collectMutableRevisions } from './collect'
@@ -421,7 +421,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     if (!checkpoints) {
       return
     }
-    const { unfiltered } = filterExperiments(filters, checkpoints)
+    const { unfiltered } = splitExperimentsByFilters(filters, checkpoints)
     return unfiltered
   }
 

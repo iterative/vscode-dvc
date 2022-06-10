@@ -1,8 +1,8 @@
-import { filterExperiments, Operator } from '.'
+import { splitExperimentsByFilters, Operator } from '.'
 import { buildMetricOrParamPath } from '../../columns/paths'
 import { Experiment, ColumnType } from '../../webview/contract'
 
-describe('filterExperiments', () => {
+describe('splitExperimentsByFilters', () => {
   const paramsFile = 'params.yaml'
   const experiments = [
     {
@@ -44,7 +44,7 @@ describe('filterExperiments', () => {
     const {
       unfiltered: unfilteredQueuedExperiments,
       filtered: filteredQueuedExperiments
-    } = filterExperiments(
+    } = splitExperimentsByFilters(
       [
         {
           operator: Operator.IS_FALSE,
@@ -76,13 +76,13 @@ describe('filterExperiments', () => {
   })
 
   it('should mark the original experiments as unfiltered if no filters are provided', () => {
-    const { filtered, unfiltered } = filterExperiments([], experiments)
+    const { filtered, unfiltered } = splitExperimentsByFilters([], experiments)
     expect(unfiltered).toStrictEqual(experiments)
     expect(filtered).toStrictEqual([])
   })
 
   it('should split the experiments by a given filter', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.GREATER_THAN,
@@ -97,7 +97,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments by an equals filter', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.EQUAL,
@@ -112,7 +112,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments by a not equals filter', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.NOT_EQUAL,
@@ -127,7 +127,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments by multiple filters', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.GREATER_THAN,
@@ -147,7 +147,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments by multiple filters on multiple params', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.GREATER_THAN_OR_EQUAL,
@@ -172,7 +172,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments using string contains', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.CONTAINS,
@@ -187,7 +187,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split all experiments if given a numeric column to filter with string contains', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.CONTAINS,
@@ -202,7 +202,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments when given a numeric column to filter with string does not contain', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.NOT_CONTAINS,
@@ -217,7 +217,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments using string does not contain', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.NOT_CONTAINS,
@@ -232,7 +232,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments using boolean is true', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.IS_TRUE,
@@ -247,7 +247,7 @@ describe('filterExperiments', () => {
   })
 
   it('should split the experiments using boolean is false', () => {
-    const { filtered, unfiltered } = filterExperiments(
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.IS_FALSE,

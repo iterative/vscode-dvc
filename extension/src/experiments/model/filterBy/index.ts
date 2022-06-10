@@ -98,7 +98,7 @@ interface FilteredExperimentsAccumulator<T extends Experiment> {
   unfiltered: T[]
 }
 
-export const filterExperiments = <T extends Experiment>(
+export const splitExperimentsByFilters = <T extends Experiment>(
   filterDefinitions: FilterDefinition[],
   unfilteredExperiments: T[]
 ): FilteredExperimentsAccumulator<T> => {
