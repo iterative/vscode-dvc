@@ -30,7 +30,8 @@ export const collectFiltered = (
 ): ExperimentWithType[] => {
   const { filtered, unfiltered } = filterExperiments(filters, checkpoints)
   acc.push(...filtered)
-  if (definedAndNonEmpty(unfiltered)) {
+  const hasUnfilteredCheckpoints = definedAndNonEmpty(unfiltered)
+  if (hasUnfilteredCheckpoints) {
     return acc
   }
   if (!filterExperiment(filters, experiment)) {
