@@ -105,7 +105,10 @@ const getHeaderPropsArgs = (
         [styles.sortingHeaderCellDesc]:
           sortOrder === SortOrder.DESCENDING && !column.placeholderOf
       }
-    )
+    ),
+    style: {
+      position: undefined
+    }
   }
 }
 

@@ -19,11 +19,15 @@ import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
 import {
   ColumnType,
+  Experiment,
   TableData
 } from '../../../../../experiments/webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { Response } from '../../../../../vscode/response'
-import { ExperimentsModel } from '../../../../../experiments/model'
+import {
+  ExperimentsModel,
+  ExperimentType
+} from '../../../../../experiments/model'
 import { Title } from '../../../../../vscode/title'
 import {
   ExperimentsFilterByTree,
@@ -404,11 +408,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
       experiments.addFilter()
       await tableFilterAdded
 
-      expect(experiments.getFilteredCounts()).to.deep.equal({
-        checkpoints: 9,
-        experiments: 3
-      })
-
       expect(mockTreeView.description).to.equal(
         '3 Experiments, 9 Checkpoints Filtered'
       )
@@ -418,24 +417,21 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await tableFilterRemoved
 
-      expect(experiments.getFilteredCounts()).to.deep.equal({
-        checkpoints: 0,
-        experiments: 0
-      })
-
       expect(mockTreeView.description).to.be.undefined
 
-      stub(experiments, 'getFilteredCounts')
+      stub(experiments, 'getFilteredExperiments')
         .onFirstCall()
-        .returns({
-          checkpoints: 1,
-          experiments: 0
-        })
+        .returns([
+          { id: '0ef13xs', type: ExperimentType.CHECKPOINT } as Experiment & {
+            type: ExperimentType
+          }
+        ])
         .onSecondCall()
-        .returns({
-          checkpoints: 0,
-          experiments: 1
-        })
+        .returns([
+          { id: 'exp-1', type: ExperimentType.EXPERIMENT } as Experiment & {
+            type: ExperimentType
+          }
+        ])
 
       const allButOneCheckpointFilteredEvent = getUpdateEvent()
       workspaceExperiments.experimentsChanged.fire()

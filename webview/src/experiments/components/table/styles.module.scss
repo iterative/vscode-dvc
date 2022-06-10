@@ -251,17 +251,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     width: 1rem;
   }
 
-  .thead {
-    border-bottom: $row-border;
-  }
-
   .tr {
     position: relative;
     & > *:first-child {
-      background-color: $row-bg-color;
       position: sticky;
       left: 0;
       z-index: 3;
+      border-right: 2px solid var(--editor-foreground-transparency-4);
     }
 
     &.oddRow > *:first-child {
@@ -269,7 +265,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
   }
 
-  .headerRow {
+  .bodyRow {
+    & > *:first-child {
+      background-color: $row-bg-color;
+    }
+  }
+
+  .headRow {
     font-size: 0.7rem;
 
     .headerCellWrapper {
@@ -284,6 +286,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         display: block;
         cursor: grab;
       }
+    }
+
+    & > *:first-child {
+      background-color: $header-bg-color;
     }
 
     &:last-child,
@@ -387,7 +393,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     position: relative;
   }
   .th {
-    height: 100%;
+    height: auto;
   }
   .td {
     height: auto;
@@ -557,10 +563,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .thead {
+  background-color: $bg-color;
+  border-bottom: $row-border;
+  box-shadow: 0 5px 8px -2px var(--vscode-widget-shadow);
   position: sticky;
   top: 0;
   z-index: 4;
-  background-color: $bg-color;
 }
 
 .tableIndicators {

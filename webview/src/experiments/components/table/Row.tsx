@@ -149,6 +149,7 @@ export const RowContent: React.FC<
           className: cx(
             className,
             styles.tr,
+            styles.bodyRow,
             getExperimentTypeClass(original),
             flatIndex % 2 === 0 || styles.oddRow,
             isWorkspace ? styles.workspaceRow : styles.normalRow,

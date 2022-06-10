@@ -125,6 +125,16 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.notifyChanged()
   }
 
+  public refreshPlots() {
+    Toast.infoWithOptions(
+      'Attempting to refresh plots for selected experiments.'
+    )
+    for (const { revision } of this.plots?.getSelectedRevisionDetails() || []) {
+      this.plots?.setupManualRefresh(revision)
+    }
+    this.data.managedUpdate()
+  }
+
   public getChildPaths(path: string) {
     return this.paths?.getChildren(path) || []
   }
