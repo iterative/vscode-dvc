@@ -6,15 +6,11 @@ import { experimentsUpdatedEvent } from '../../../util'
 import { Experiments } from '../../../../../experiments'
 import { RegisteredCommands } from '../../../../../commands/external'
 
-export const addFilterViaQuickInput = (
-  experiments: Experiments,
+export const mockQuickInputFilter = (
   fixtureFilter: FilterDefinition,
   mockShowQuickPick = stub(window, 'showQuickPick'),
   mockShowInputBox = stub(window, 'showInputBox')
 ) => {
-  mockShowQuickPick.resetHistory()
-  mockShowInputBox.resetHistory()
-
   const column = columnsFixture.find(
     column => column.path === fixtureFilter.path
   )
@@ -25,6 +21,18 @@ export const addFilterViaQuickInput = (
     value: fixtureFilter.operator
   } as unknown as QuickPickItem)
   mockShowInputBox.onFirstCall().resolves(fixtureFilter.value as string)
+}
+
+export const addFilterViaQuickInput = (
+  experiments: Experiments,
+  fixtureFilter: FilterDefinition,
+  mockShowQuickPick = stub(window, 'showQuickPick'),
+  mockShowInputBox = stub(window, 'showInputBox')
+) => {
+  mockShowQuickPick.resetHistory()
+  mockShowInputBox.resetHistory()
+
+  mockQuickInputFilter(fixtureFilter, mockShowQuickPick, mockShowInputBox)
 
   const tableFilterAdded = experimentsUpdatedEvent(experiments)
 

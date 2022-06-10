@@ -27,7 +27,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 %truncateLeftParent {
   overflow: hidden;
   text-overflow: ellipsis;
-  direction: rtl;
 }
 
 %truncateLeftChild {
@@ -51,6 +50,29 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   &:hover {
     & .copyButton {
       display: block;
+    }
+  }
+}
+
+.iconMenu {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding-bottom: 3.5px;
+
+  ul[role='menu'] {
+    background-color: $header-bg-color;
+    padding-left: 2px;
+    margin: 0;
+    border: none;
+
+    button {
+      width: 13px;
+      height: 11px;
+      svg {
+        fill: currentColor;
+        transform: scale(0.7);
+      }
     }
   }
 }
@@ -257,6 +279,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
       span[draggable='true'] {
         display: block;
+        cursor: grab;
       }
     }
 
@@ -279,7 +302,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     &:last-child {
-      font-size: 0.9rem;
+      font-size: 0.7rem;
 
       .headerCell {
         text-align: right;
@@ -404,14 +427,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     &.leafHeader {
       border-bottom: none;
     }
-  }
-
-  .sortingHeaderCellAsc {
-    border-top: 2px solid $fg-color;
-  }
-
-  .sortingHeaderCellDesc {
-    border-bottom: 2px solid $fg-color;
   }
 }
 
