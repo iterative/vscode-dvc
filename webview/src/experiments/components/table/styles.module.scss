@@ -547,3 +547,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   z-index: 4;
   background-color: $bg-color;
 }
+
+.tableIndicators {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  padding: 0.2rem;
+  font-size: 0.75rem;
+}

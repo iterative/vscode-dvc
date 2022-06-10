@@ -19,6 +19,18 @@ interface TableHeadProps {
   sorts: SortDefinition[]
 }
 
+const TableIndicators = ({ sorts }: { sorts?: SortDefinition[] }) => {
+  return (
+    <div className={styles.tableIndicators}>
+      {sorts && sorts.length > 0 && (
+        <div>
+          {sorts.length} sort{sorts.length > 1 && 's'}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export const TableHead: React.FC<TableHeadProps> = ({
   instance: {
     headerGroups,
@@ -82,6 +94,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
 
   return (
     <div className={styles.thead}>
+      <TableIndicators sorts={sorts} />
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
         <MergedHeaderGroups
