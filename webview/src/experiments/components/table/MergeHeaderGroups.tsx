@@ -33,7 +33,7 @@ export const MergedHeaderGroups: React.FC<{
   return (
     <div
       {...headerGroup.getHeaderGroupProps({
-        className: cx(styles.tr, styles.headerRow)
+        className: cx(styles.tr, styles.headRow)
       })}
     >
       {headerGroup.headers.map((column: HeaderGroup<Experiment>) => (

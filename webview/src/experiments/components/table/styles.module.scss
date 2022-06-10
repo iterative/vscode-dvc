@@ -254,7 +254,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .tr {
     position: relative;
     & > *:first-child {
-      background-color: $row-bg-color;
       position: sticky;
       left: 0;
       z-index: 3;
@@ -266,7 +265,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
   }
 
-  .headerRow {
+  .bodyRow {
+    & > *:first-child {
+      background-color: $row-bg-color;
+    }
+  }
+
+  .headRow {
     font-size: 0.7rem;
 
     .headerCellWrapper {
@@ -281,6 +286,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         display: block;
         cursor: grab;
       }
+    }
+
+    & > *:first-child {
+      background-color: $header-bg-color;
     }
 
     &:last-child,
