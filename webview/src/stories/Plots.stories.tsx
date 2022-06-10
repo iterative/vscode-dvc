@@ -22,9 +22,12 @@ import '../plots/components/styles.module.scss'
 import { store } from '../plots/store'
 import { feedStore } from '../plots/components/App'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
+import { clearData } from '../plots/actions'
 
 const MockedState: React.FC<{ data: PlotsData }> = ({ children, data }) => {
   const dispatch = useDispatch()
+  dispatch(clearData())
+
   const message = { data, type: MessageToWebviewType.SET_DATA }
   feedStore(message, dispatch)
 

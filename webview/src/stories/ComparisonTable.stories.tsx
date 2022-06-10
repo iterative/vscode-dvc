@@ -1,14 +1,33 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { fireEvent, within } from '@testing-library/react'
 import React from 'react'
-import { ComparisonRevisionData } from 'dvc/src/plots/webview/contract'
-import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import {
-  ComparisonTable,
-  ComparisonTableProps
-} from '../plots/components/comparisonTable/ComparisonTable'
+  ComparisonRevisionData,
+  DEFAULT_SECTION_NAMES,
+  PlotsComparisonData,
+  PlotSize,
+  Section
+} from 'dvc/src/plots/webview/contract'
+import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
+import { Provider, useDispatch } from 'react-redux'
+import { clearData } from '../plots/actions'
+import { ReducerName } from '../plots/constants'
+import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
+import { store } from '../plots/store'
+
+const MockedState: React.FC<{ data: PlotsComparisonData }> = ({
+  children,
+  data
+}) => {
+  const dispatch = useDispatch()
+  dispatch(clearData(ReducerName.comparison))
+  dispatch(update(data))
+
+  return <>{children}</>
+}
 
 export default {
   args: comparisonTableFixture,
@@ -16,13 +35,24 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: Story<ComparisonTableProps> = ({ plots, revisions }) => {
+const Template: Story = ({ plots, revisions }) => {
   return (
-    <WebviewWrapper>
-      <DragDropProvider>
-        <ComparisonTable plots={plots} revisions={revisions} />
-      </DragDropProvider>
-    </WebviewWrapper>
+    <Provider store={store}>
+      <MockedState
+        data={{
+          plots,
+          revisions,
+          sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
+          size: PlotSize.REGULAR
+        }}
+      >
+        <WebviewWrapper>
+          <DragDropProvider>
+            <ComparisonTable />
+          </DragDropProvider>
+        </WebviewWrapper>
+      </MockedState>
+    </Provider>
   )
 }
 

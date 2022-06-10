@@ -8,6 +8,8 @@ import {
   PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
+import { clearData } from '../../actions'
+import { ReducerName } from '../../constants'
 
 export interface CheckpointPlotsState extends CheckpointPlotsData {
   isCollapsed: boolean
@@ -29,7 +31,7 @@ const initialState: CheckpointPlotsState = {
 }
 
 export const checkpointPlotsSlice = createSlice({
-  name: 'checkpointPlots',
+  name: ReducerName.checkpoint,
   initialState,
   reducers: {
     update: (state, action: PayloadAction<CheckpointPlotsData>) => {
@@ -47,6 +49,15 @@ export const checkpointPlotsSlice = createSlice({
     changeSize: (state, action: PayloadAction<PlotSize>) => {
       state.size = action.payload
     }
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(clearData, (state, action) => {
+        if (!action.payload || action.payload === ReducerName.checkpoint) {
+          return { ...initialState }
+        }
+      })
+      .addDefaultCase(() => {})
   }
 })
 
