@@ -3,6 +3,7 @@ import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
+import ErrorIcon from '../../../shared/components/icons/Error'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -48,7 +49,8 @@ export const FirstCell: React.FC<
       <div className={styles.innerCell}>
         <RowExpansionButton row={row} />
         <span className={styles.bullet} style={{ color: bulletColor }}>
-          {row.original.queued && <ClockIcon />}
+          {(row.original.queued && <ClockIcon />) ||
+            (row.original.error && <ErrorIcon />)}
         </span>
         {isPlaceholder ? null : (
           <div className={styles.cellContents}>{cell.render('Cell')}</div>

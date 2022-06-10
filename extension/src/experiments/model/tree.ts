@@ -1,5 +1,6 @@
 import {
   Event,
+  ThemeColor,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -253,16 +254,21 @@ export class ExperimentsTree
 
   private getExperimentIcon({
     displayColor,
+    error,
     running,
     type,
     selected
   }: {
     displayColor?: string
+    error?: string
     label: string
     running?: boolean
     type?: ExperimentType
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
+    if (error) {
+      return new ThemeIcon('error', new ThemeColor('errorForeground'))
+    }
     if (running) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }

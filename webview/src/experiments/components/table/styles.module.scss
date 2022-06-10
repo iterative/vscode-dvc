@@ -95,6 +95,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .queuedExperiment & svg {
     height: 12px;
   }
+  .errorExperiment & svg {
+    height: 12px;
+    color: var(--vscode-errorForeground);
+  }
 
   &::before {
     display: inline-block;
@@ -132,6 +136,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       border: 1px solid $changed-color;
     }
 
+    .errorExperiment & {
+      display: none;
+    }
     .queuedExperiment & {
       display: none;
     }

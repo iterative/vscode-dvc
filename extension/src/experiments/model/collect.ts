@@ -40,8 +40,12 @@ export const isCheckpoint = (
 
 const getExperimentId = (
   sha: string,
-  experimentsFields: ExperimentFields
+  experimentsFields?: ExperimentFields
 ): string => {
+  if (!experimentsFields) {
+    return sha
+  }
+
   const { name, checkpoint_tip } = experimentsFields
 
   if (isCheckpoint(checkpoint_tip, sha)) {
@@ -129,16 +133,20 @@ const transformColumns = (
 
 const transformExperimentData = (
   id: string,
-  experimentFields: ExperimentFields,
+  experimentFieldsOrError: ExperimentFieldsOrError,
   label: string | undefined,
   sha?: string,
   displayNameOrParent?: string,
   logicalGroupName?: string
 ): Experiment => {
+  const data = experimentFieldsOrError.data || {}
+
+  const error = experimentFieldsOrError.error
+
   const experiment = {
     id,
     label,
-    ...omit(experimentFields, Object.values(ColumnType))
+    ...omit(data, Object.values(ColumnType))
   } as Experiment
 
   if (displayNameOrParent) {
@@ -153,7 +161,11 @@ const transformExperimentData = (
     experiment.sha = sha
   }
 
-  transformColumns(experiment, experimentFields)
+  if (error) {
+    experiment.error = error.msg
+  }
+
+  transformColumns(experiment, data)
 
   return experiment
 }
@@ -183,7 +195,7 @@ const transformExperimentOrCheckpointData = (
     checkpointTipId,
     experiment: transformExperimentData(
       id,
-      experimentFields,
+      experimentData,
       shortenForLabel(sha),
       sha,
       getDisplayNameOrParent(sha, branchSha, experimentsObject),
@@ -247,14 +259,9 @@ const collectFromBranchesObject = (
   for (const [sha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
   )) {
-    const experimentFields = baseline.data
-    if (!experimentFields) {
-      continue
-    }
+    const name = baseline.data?.name || sha
 
-    const name = experimentFields.name as string
-
-    const branch = transformExperimentData(name, experimentFields, name, sha)
+    const branch = transformExperimentData(name, baseline, name, sha)
 
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject, sha, branch.label)
@@ -271,10 +278,11 @@ export const collectExperiments = (
   const { workspace, ...branchesObject } = data
   const workspaceId = 'workspace'
 
-  const workspaceFields = workspace.baseline.data
-  const workspaceBaseline = workspaceFields
-    ? transformExperimentData(workspaceId, workspaceFields, workspaceId)
-    : undefined
+  const workspaceBaseline = transformExperimentData(
+    workspaceId,
+    workspace.baseline,
+    workspaceId
+  )
 
   const acc = new ExperimentsAccumulator(workspaceBaseline)
 

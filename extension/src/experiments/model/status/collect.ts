@@ -21,8 +21,8 @@ const collectStatus = (
   experiment: Experiment,
   unassignColors?: Color[]
 ) => {
-  const { id, queued } = experiment
-  if (!id || queued || hasKey(acc, id)) {
+  const { id, queued, error } = experiment
+  if (!id || queued || error || hasKey(acc, id)) {
     return
   }
   acc[id] = getStatus(acc, unassignColors)

@@ -12,6 +12,7 @@ export interface DepColumns {
 export interface Experiment extends BaseExperimentFields {
   id: string
   label: string
+  error?: string
   displayNameOrParent?: string
   logicalGroupName?: string
   params?: MetricOrParamColumns

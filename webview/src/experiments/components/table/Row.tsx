@@ -11,9 +11,17 @@ import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMe
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
 import { pushIf } from '../../../util/array'
 
-const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
+const getExperimentTypeClass = ({
+  error,
+  running,
+  queued,
+  selected
+}: Experiment) => {
   if (running) {
     return styles.runningExperiment
+  }
+  if (error) {
+    return styles.errorExperiment
   }
   if (queued) {
     return styles.queuedExperiment

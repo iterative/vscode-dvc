@@ -104,11 +104,19 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.setColoredStatus()
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public toggleStatus(id: string) {
-    if (
-      this.flattenExperiments().find(({ id: queuedId }) => queuedId === id)
-        ?.queued
-    ) {
+    const experiment = this.flattenExperiments().find(
+      ({ id: queuedId }) => queuedId === id
+    )
+
+    if (!experiment || experiment.queued || experiment.error) {
+      const current = this.coloredStatus[id]
+      if (!current) {
+        return
+      }
+      this.unassignColor(current)
+      this.coloredStatus[id] = UNSELECTED
       return
     }
 
@@ -250,7 +258,9 @@ export class ExperimentsModel extends ModelWithPersistence {
       ({ id }) => this.getUnfilteredCheckpointsByTip(id, filters) || []
     )
 
-    return [...unfilteredExperiments, ...unfilteredCheckpoints]
+    return [...unfilteredExperiments, ...unfilteredCheckpoints].filter(
+      exp => !exp.error
+    )
   }
 
   public getLabels() {
