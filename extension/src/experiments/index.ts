@@ -75,7 +75,9 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
-  private readonly decorationProvider: DecorationProvider
+  private readonly decorationProvider = this.dispose.track(
+    new DecorationProvider()
+  )
 
   private readonly internalCommands: InternalCommands
 
@@ -123,8 +125,6 @@ export class Experiments extends BaseRepository<TableData> {
         }
       })
     )
-
-    this.decorationProvider = this.dispose.track(new DecorationProvider())
 
     this.handleMessageFromWebview()
     this.setupInitialData()

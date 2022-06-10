@@ -13,9 +13,10 @@ export const collectFilteredCounts = (
   for (const { type } of experiments) {
     if (type === ExperimentType.CHECKPOINT) {
       filtered.checkpoints = filtered.checkpoints + 1
-      continue
     }
-    filtered.experiments = filtered.experiments + 1
+    if (type === ExperimentType.EXPERIMENT) {
+      filtered.experiments = filtered.experiments + 1
+    }
   }
 
   return filtered

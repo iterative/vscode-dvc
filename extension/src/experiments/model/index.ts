@@ -364,7 +364,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getFilteredExperiments() {
     const acc: ExperimentWithType[] = []
 
-    for (const experiment of this.flattenExperiments()) {
+    for (const experiment of this.getCurrentExperiments()) {
       const checkpoints = this.getCheckpoints(experiment.id) || []
       collectFiltered(acc, this.getFilters(), experiment, checkpoints)
     }
