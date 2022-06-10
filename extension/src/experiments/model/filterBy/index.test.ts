@@ -41,7 +41,10 @@ describe('filterExperiments', () => {
   ] as unknown as Experiment[]
 
   it('should not filter experiments if they do not have the provided value (for queued experiments)', () => {
-    const unfilteredQueuedExperiments = filterExperiments(
+    const {
+      unfiltered: unfilteredQueuedExperiments,
+      filtered: filteredQueuedExperiments
+    } = filterExperiments(
       [
         {
           operator: Operator.IS_FALSE,
@@ -67,15 +70,19 @@ describe('filterExperiments', () => {
     expect(
       unfilteredQueuedExperiments.map(experiment => experiment.id)
     ).toStrictEqual([1, 2, 3])
+    expect(
+      filteredQueuedExperiments.map(experiment => experiment.id)
+    ).toStrictEqual([])
   })
 
-  it('should return the original experiments if no filters are provided', () => {
-    const unFilteredExperiments = filterExperiments([], experiments)
-    expect(unFilteredExperiments).toStrictEqual(experiments)
+  it('should mark the original experiments as unfiltered if no filters are provided', () => {
+    const { filtered, unfiltered } = filterExperiments([], experiments)
+    expect(unfiltered).toStrictEqual(experiments)
+    expect(filtered).toStrictEqual([])
   })
 
-  it('should filter the experiments by a given filter', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by a given filter', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.GREATER_THAN,
@@ -85,13 +92,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
-      3
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 2])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([3])
   })
 
-  it('should filter the experiments by an equals filter', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by an equals filter', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.EQUAL,
@@ -101,13 +107,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
-      2
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([2])
   })
 
-  it('should filter the experiments by a not equals filter', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by a not equals filter', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.NOT_EQUAL,
@@ -117,13 +122,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
-      1, 3
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([2])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1, 3])
   })
 
-  it('should filter the experiments by multiple filters', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by multiple filters', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.GREATER_THAN,
@@ -138,13 +142,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
-      1, 2
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1, 2])
   })
 
-  it('should filter the experiments by multiple filters on multiple params', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by multiple filters on multiple params', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.GREATER_THAN_OR_EQUAL,
@@ -164,11 +167,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(filteredExperiments).toStrictEqual([])
+    expect(filtered).toStrictEqual(experiments)
+    expect(unfiltered).toStrictEqual([])
   })
 
-  it('should filter the experiments using string contains', () => {
-    const experimentsWithText = filterExperiments(
+  it('should split the experiments using string contains', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.CONTAINS,
@@ -178,13 +182,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(experimentsWithText.map(experiment => experiment.id)).toStrictEqual([
-      1
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([2, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1])
   })
 
-  it('should filter all experiments if given a numeric column to filter with string contains', () => {
-    const noExperiments = filterExperiments(
+  it('should split all experiments if given a numeric column to filter with string contains', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.CONTAINS,
@@ -194,11 +197,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(noExperiments).toStrictEqual([])
+    expect(filtered).toStrictEqual(experiments)
+    expect(unfiltered).toStrictEqual([])
   })
 
-  it('should not filter any experiments if given a numeric column to filter with string does not contain', () => {
-    const unfilteredExperiments = filterExperiments(
+  it('should split the experiments when given a numeric column to filter with string does not contain', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.NOT_CONTAINS,
@@ -208,11 +212,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(unfilteredExperiments).toStrictEqual(experiments)
+    expect(filtered).toStrictEqual([])
+    expect(unfiltered).toStrictEqual(experiments)
   })
 
-  it('should filter the experiments using string does not contain', () => {
-    const experimentsWithoutText = filterExperiments(
+  it('should split the experiments using string does not contain', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.NOT_CONTAINS,
@@ -222,13 +227,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(
-      experimentsWithoutText.map(experiment => experiment.id)
-    ).toStrictEqual([2, 3])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([2, 3])
   })
 
-  it('should filter the experiments using boolean is true', () => {
-    const experimentsWithTrueBool = filterExperiments(
+  it('should split the experiments using boolean is true', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.IS_TRUE,
@@ -238,13 +242,12 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(
-      experimentsWithTrueBool.map(experiment => experiment.id)
-    ).toStrictEqual([1])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([2, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1])
   })
 
-  it('should filter the experiments using boolean is false', () => {
-    const experimentsWithFalseBool = filterExperiments(
+  it('should split the experiments using boolean is false', () => {
+    const { filtered, unfiltered } = filterExperiments(
       [
         {
           operator: Operator.IS_FALSE,
@@ -254,8 +257,7 @@ describe('filterExperiments', () => {
       ],
       experiments
     )
-    expect(
-      experimentsWithFalseBool.map(experiment => experiment.id)
-    ).toStrictEqual([2])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([2])
   })
 })

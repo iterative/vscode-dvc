@@ -9,6 +9,7 @@ import {
 } from 'vscode'
 import { ExperimentType } from '.'
 import { collectDeletable, ExperimentItem } from './collect'
+import { getDecoratableUri } from './filterBy/decorationProvider'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
@@ -76,7 +77,7 @@ export class ExperimentsTree
 
     const { label, collapsibleState, iconPath, command, description, type } =
       element
-    const item = new TreeItem(label, collapsibleState)
+    const item = new TreeItem(getDecoratableUri(label), collapsibleState)
     item.iconPath = iconPath
     item.description = description
     item.contextValue = type

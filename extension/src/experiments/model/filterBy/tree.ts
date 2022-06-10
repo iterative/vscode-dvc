@@ -7,6 +7,7 @@ import {
   TreeView
 } from 'vscode'
 import { getFilterId } from '.'
+import { collectFilteredCounts } from './collect'
 import { WorkspaceExperiments } from '../../workspace'
 import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
@@ -158,20 +159,17 @@ export class ExperimentsFilterByTree
       return
     }
 
-    const filtered = { checkpoints: 0, experiments: 0 }
+    const filteredExperiments = dvcRoots.flatMap(dvcRoot =>
+      this.experiments.getRepository(dvcRoot).getFilteredExperiments()
+    )
 
-    for (const dvcRoot of dvcRoots) {
-      const { experiments, checkpoints } = this.experiments
-        .getRepository(dvcRoot)
-        .getFilteredCounts()
-      filtered.checkpoints = filtered.checkpoints + checkpoints
-      filtered.experiments = filtered.experiments + experiments
-    }
+    const { checkpoints, experiments } =
+      collectFilteredCounts(filteredExperiments)
 
     const combinedText = joinTruthyItems(
       [
-        this.getDescriptionText('Experiment', filtered.experiments),
-        this.getDescriptionText('Checkpoint', filtered.checkpoints)
+        this.getDescriptionText('Experiment', experiments),
+        this.getDescriptionText('Checkpoint', checkpoints)
       ],
       ', '
     )
