@@ -106,7 +106,7 @@ const getHeaderPropsArgs = (
           sortOrder === SortOrder.DESCENDING && !column.placeholderOf
       }
     ),
-    styles: {
+    style: {
       position: undefined
     }
   }
