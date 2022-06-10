@@ -33,22 +33,21 @@ export const MergedHeaderGroups: React.FC<{
   return (
     <div
       {...headerGroup.getHeaderGroupProps({
-        className: cx(styles.tr, styles.headerRow)
+        className: cx(styles.tr, styles.headRow)
       })}
     >
       {headerGroup.headers.map((column: HeaderGroup<Experiment>) => (
-        <div key={column.id}>
-          <TableHeader
-            orderedColumns={orderedColumns}
-            column={column}
-            columns={columns}
-            sorts={sorts}
-            filters={filters}
-            onDragOver={onDragUpdate}
-            onDragStart={onDragStart}
-            onDrop={onDragEnd}
-          />
-        </div>
+        <TableHeader
+          key={column.id}
+          orderedColumns={orderedColumns}
+          column={column}
+          columns={columns}
+          sorts={sorts}
+          filters={filters}
+          onDragOver={onDragUpdate}
+          onDragStart={onDragStart}
+          onDrop={onDragEnd}
+        />
       ))}
     </div>
   )
