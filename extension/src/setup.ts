@@ -108,27 +108,27 @@ const pickVenvOptions = async () => {
 const quickPickVenvOption = () => {
   const options = [
     {
-      description: 'and I want to select the python interpreter',
-      label: Response.YES,
+      description: '• Let me select the virtual environment manually',
+      label: 'Manual',
       value: 1
     },
     {
-      description:
-        'all of the modules required to run this project are globally available',
-      label: 'No',
+      description: '• DVC is available globally (e.g. installed as a binary)',
+      label: 'Global',
       value: 0
     }
   ]
   if (isPythonExtensionInstalled()) {
     options.unshift({
-      description: 'use the interpreter selected by the ms-python extension',
-      label: Response.YES,
+      description:
+        '• Use the virtual environment detected automatically by the Python extension',
+      label: 'Auto',
       value: 2
     })
   }
 
   return quickPickValue<number>(options, {
-    placeHolder: 'Does your project use a Python virtual environment?',
+    placeHolder: 'Select an environment where DVC is installed',
     title: Title.SETUP_WORKSPACE
   })
 }

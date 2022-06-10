@@ -257,6 +257,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public getFilteredCounts() {
+    return this.experiments.getFilteredCounts()
+  }
+
   public getExperimentCount() {
     return this.experiments.getExperimentCount()
   }
@@ -440,6 +444,7 @@ export class Experiments extends BaseRepository<TableData> {
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
+      filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.hasCheckpoints(),
       hasColumns: this.columns.hasColumns(),
       hasRunningExperiment: this.experiments.hasRunningExperiment(),

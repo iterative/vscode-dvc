@@ -17,6 +17,7 @@ const tableData: TableData = {
     'params:params.yaml:dvc_logs_dir': 300
   },
   columns: columnsFixture,
+  filters: ['params:params.yaml:lr'],
   hasCheckpoints: true,
   hasColumns: true,
   hasRunningExperiment: true,

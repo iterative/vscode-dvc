@@ -162,6 +162,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return [...this.filters.values()]
   }
 
+  public getFilterPaths() {
+    return this.getFilters().map(({ path }) => path)
+  }
+
   public canAutoApplyFilters(...filterIdsToRemove: string[]): boolean {
     if (!this.useFiltersForSelection) {
       return true
@@ -342,6 +346,29 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.branches.length,
       1
     ])
+  }
+
+  public getFilteredCounts() {
+    const experiments = this.flattenExperiments()
+    const totalExperiments = experiments.length
+
+    const remainingExperiments = filterExperiments(
+      this.getFilters(),
+      experiments
+    ).length
+
+    const checkpoints = this.flattenCheckpoints()
+    const totalCheckpoints = checkpoints.length
+
+    const remainingCheckpoints = filterExperiments(
+      this.getFilters(),
+      checkpoints
+    ).length
+
+    return {
+      checkpoints: totalCheckpoints - remainingCheckpoints,
+      experiments: totalExperiments - remainingExperiments
+    }
   }
 
   private getCombinedList() {
