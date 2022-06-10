@@ -5,6 +5,7 @@ import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
+import { Indicators } from './Indicators'
 import { useColumnOrder } from '../../hooks/useColumnOrder'
 import { sendMessage } from '../../../shared/vscode'
 import { leafColumnIds, reorderColumnIds } from '../../util/columns'
@@ -20,26 +21,14 @@ interface TableHeadProps {
   filters: string[]
 }
 
-const TableIndicators = ({ sorts }: { sorts?: SortDefinition[] }) => {
-  return (
-    <div className={styles.tableIndicators}>
-      {sorts && sorts.length > 0 && (
-        <div>
-          {sorts.length} sort{sorts.length > 1 && 's'}
-        </div>
-      )}
-    </div>
-  )
-}
-
 export const TableHead: React.FC<TableHeadProps> = ({
-  filters,
   instance: {
     headerGroups,
     setColumnOrder,
     state: { columnOrder },
     allColumns
   },
+  filters,
   columns,
   sorts
 }) => {
@@ -96,7 +85,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
 
   return (
     <div className={styles.thead}>
-      <TableIndicators sorts={sorts} />
+      <Indicators sorts={sorts} filters={filters} />
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
         <MergedHeaderGroups
