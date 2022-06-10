@@ -421,7 +421,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     if (!checkpoints) {
       return
     }
-    return filterExperiments(filters, checkpoints).unfiltered
+    const { unfiltered } = filterExperiments(filters, checkpoints)
+    return unfiltered
   }
 
   private getExperimentsByBranch(branch: Experiment) {
