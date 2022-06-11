@@ -1,6 +1,24 @@
 import React from 'react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
+import cx from 'classnames'
 import styles from './styles.module.scss'
+import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
+import SvgFilter from '../../../shared/components/icons/Filter'
+
+const Indicator = ({
+  icon: Icon,
+  count
+}: {
+  icon: React.FC
+  count?: number
+}) => (
+  <span
+    className={cx(styles.indicatorIcon, count && styles.indicatorWithCount)}
+  >
+    <Icon />
+    {count ? <span className={styles.indicatorCount}>{count}</span> : null}
+  </span>
+)
 
 export const Indicators = ({
   sorts,
@@ -11,16 +29,8 @@ export const Indicators = ({
 }) => {
   return (
     <div className={styles.tableIndicators}>
-      {sorts && sorts.length > 0 && (
-        <div>
-          {sorts.length} sort{sorts.length > 1 && 's'}
-        </div>
-      )}
-      {filters && filters.length > 0 && (
-        <div>
-          {filters.length} filter{filters.length > 1 && 's'}
-        </div>
-      )}
+      <Indicator icon={SvgSortPrecedence} count={sorts?.length} />
+      <Indicator icon={SvgFilter} count={filters?.length} />
     </div>
   )
 }

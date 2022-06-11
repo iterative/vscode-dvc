@@ -576,6 +576,34 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   top: 0;
   left: 0;
   z-index: 4;
-  padding: 0.2rem;
   font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+}
+
+$badge-size: 0.85rem;
+
+.indicatorIcon {
+  display: inline-block;
+  position: relative;
+  padding: 0.15rem 0.35rem 0.15rem 0.1rem;
+  color: $watermark-color;
+  &.indicatorWithCount {
+    color: $fg-color;
+  }
+}
+
+.indicatorCount {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-weight: bold;
+  background-color: var(--vscode-activityBarBadge-background);
+  color: var(--vscode-activityBarBadge-foreground);
+  border-radius: 100%;
+  width: $badge-size;
+  height: $badge-size;
+  line-height: $badge-size;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.5rem;
 }
