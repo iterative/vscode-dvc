@@ -1,3 +1,5 @@
+<img src="https://github.com/iterative/vscode-dvc/blob/preview-banner/extension/resources/repo-banner.svg">
+
 # DVC Extension for Visual Studio Code
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/iterative.dvc.svg)](https://https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
