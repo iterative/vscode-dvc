@@ -46,7 +46,8 @@ export default {
     design: {
       type: 'figma',
       url: 'https://www.figma.com/file/AuQXbrFj60xA2QXOjo9Z65/Experiments-Panel-%E2%80%A2-496'
-    }
+    },
+    layout: 'fullscreen'
   },
   title: 'Table'
 } as Meta
@@ -91,4 +92,13 @@ WithNoExperiments.args = {
 export const WithNoColumns = Template.bind({})
 WithNoColumns.args = {
   tableData: { ...tableData, columns: [] }
+}
+
+export const WithNoSortsOrFilters = Template.bind({})
+WithNoSortsOrFilters.args = {
+  tableData: {
+    ...tableData,
+    filters: [],
+    sorts: []
+  }
 }
