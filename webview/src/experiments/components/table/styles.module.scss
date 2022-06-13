@@ -89,6 +89,24 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   color: $error-color;
 }
 
+.errorIcon {
+  fill: $error-color;
+  margin-left: 6px;
+  margin-top: 3px;
+}
+
+.errorTooltip {
+  white-space: normal;
+  display: flex;
+  gap: 4px;
+  font-size: 0.8125rem;
+
+  svg {
+    min-width: 16px;
+    min-height: 16px;
+  }
+}
+
 .bullet {
   color: $fg-color;
   display: inline-block;

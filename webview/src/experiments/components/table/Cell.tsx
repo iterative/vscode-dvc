@@ -3,6 +3,8 @@ import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
+import ErrorIcon from '../../../shared/components/icons/Error'
+import Tooltip from '../../../shared/components/tooltip/Tooltip'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -35,32 +37,41 @@ export const FirstCell: React.FC<
 > = ({ cell, bulletColor }) => {
   const { row, isPlaceholder } = cell
 
+  const { error, queued } = row.original
+
   return (
-    <div
-      {...cell.getCellProps({
-        className: cx(
-          styles.td,
-          styles.experimentCell,
-          isPlaceholder && styles.groupPlaceholder
-        )
-      })}
+    <Tooltip
+      content={
+        <div className={styles.errorTooltip}>
+          <ErrorIcon className={styles.errorIcon} />
+          {error}
+        </div>
+      }
+      placement={'bottom'}
+      disabled={!error}
     >
-      <div className={styles.innerCell}>
-        <RowExpansionButton row={row} />
-        <span className={styles.bullet} style={{ color: bulletColor }}>
-          {row.original.queued && <ClockIcon />}
-        </span>
-        {isPlaceholder ? null : (
-          <div
-            className={
-              styles.cellContents && row.original.error && styles.errorLabel
-            }
-          >
-            {cell.render('Cell')}
-          </div>
-        )}
+      <div
+        {...cell.getCellProps({
+          className: cx(
+            styles.td,
+            styles.experimentCell,
+            isPlaceholder && styles.groupPlaceholder
+          )
+        })}
+      >
+        <div className={styles.innerCell}>
+          <RowExpansionButton row={row} />
+          <span className={styles.bullet} style={{ color: bulletColor }}>
+            {queued && <ClockIcon />}
+          </span>
+          {isPlaceholder ? null : (
+            <div className={styles.cellContents && error && styles.errorLabel}>
+              {cell.render('Cell')}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Tooltip>
   )
 }
 
