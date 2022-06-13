@@ -3,7 +3,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { commands, ThemeIcon, TreeItem, Uri, window } from 'vscode'
 import { ExperimentType } from '.'
 import { ExperimentsTree } from './tree'
-import { getDecoratableUri } from './filterBy/decorationProvider'
+import { getDecoratableUri } from './decorationProvider'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
 import { InternalCommands } from '../../commands/internal'
@@ -127,6 +127,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-12345',
           label: '90aea7f',
           selected: true,
+          tooltip: undefined,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -136,6 +137,7 @@ describe('ExperimentsTree', () => {
           label: 'f0778b3',
           running: true,
           selected: true,
+          tooltip: undefined,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -145,6 +147,7 @@ describe('ExperimentsTree', () => {
           label: 'e350702',
           running: false,
           selected: false,
+          tooltip: undefined,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -152,6 +155,7 @@ describe('ExperimentsTree', () => {
           id: 'f81f1b5',
           label: 'f81f1b5',
           queued: true,
+          tooltip: undefined,
           type: ExperimentType.QUEUED
         }
       ]
@@ -181,6 +185,7 @@ describe('ExperimentsTree', () => {
           iconPath: getMockedUri('circle-filled', '#b180d7'),
           id: 'exp-12345',
           label: '90aea7f',
+          tooltip: undefined,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -195,6 +200,7 @@ describe('ExperimentsTree', () => {
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
           id: 'exp-67899',
           label: 'f0778b3',
+          tooltip: undefined,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -209,6 +215,7 @@ describe('ExperimentsTree', () => {
           iconPath: getMockedUri('circle-outline', '#4063e2'),
           id: 'exp-abcdef',
           label: 'e350702',
+          tooltip: undefined,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -223,6 +230,7 @@ describe('ExperimentsTree', () => {
           iconPath: mockedClockResource,
           id: 'f81f1b5',
           label: 'f81f1b5',
+          tooltip: undefined,
           type: ExperimentType.QUEUED
         }
       ])
@@ -243,11 +251,13 @@ describe('ExperimentsTree', () => {
         {
           id: 'aaaaaaaaaaaaaaaaa',
           label: 'aaaaaaa',
+          tooltip: undefined,
           type: ExperimentType.CHECKPOINT
         },
         {
           id: 'bbbbbbbbbbbbbbbbb',
           label: 'bbbbbbb',
+          tooltip: undefined,
           type: ExperimentType.CHECKPOINT
         }
       ]
@@ -260,6 +270,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('loading~spin'),
         id: 'ebbd66f',
         label: 'ebbd66f',
+        tooltip: undefined,
         type: ExperimentType.EXPERIMENT
       })
 
@@ -276,6 +287,7 @@ describe('ExperimentsTree', () => {
           iconPath: new ThemeIcon('circle-filled'),
           id: 'aaaaaaaaaaaaaaaaa',
           label: 'aaaaaaa',
+          tooltip: undefined,
           type: ExperimentType.CHECKPOINT
         },
         {
@@ -290,6 +302,7 @@ describe('ExperimentsTree', () => {
           iconPath: new ThemeIcon('circle-filled'),
           id: 'bbbbbbbbbbbbbbbbb',
           label: 'bbbbbbb',
+          tooltip: undefined,
           type: ExperimentType.CHECKPOINT
         }
       ])
@@ -341,6 +354,7 @@ describe('ExperimentsTree', () => {
         iconPath: mockedClockResource,
         id: 'f0778b3',
         label: 'f0778b3',
+        tooltip: undefined,
         type: ExperimentType.QUEUED
       })
       expect(treeItem).toStrictEqual(mockedItem)
@@ -374,6 +388,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('loading~spin'),
         id: 'workspace',
         label: 'workspace',
+        tooltip: undefined,
         type: ExperimentType.WORKSPACE
       })
 
@@ -407,6 +422,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('loading~spin'),
         id: 'f0778b3',
         label: 'f0778b3',
+        tooltip: undefined,
         type: ExperimentType.EXPERIMENT
       })
 
@@ -440,6 +456,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0778b3',
         label: 'f0778b3',
+        tooltip: undefined,
         type: ExperimentType.EXPERIMENT
       })
       expect(treeItem).toStrictEqual({
@@ -472,6 +489,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0998a3',
         label: 'f0998a3',
+        tooltip: undefined,
         type: ExperimentType.EXPERIMENT
       })
 

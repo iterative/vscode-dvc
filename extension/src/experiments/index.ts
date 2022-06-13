@@ -15,7 +15,7 @@ import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
-import { DecorationProvider } from './model/filterBy/decorationProvider'
+import { DecorationProvider } from './model/decorationProvider'
 import { SortDefinition } from './model/sortBy'
 import { splitColumnPath } from './columns/paths'
 import { ResourceLocator } from '../resourceLocator'
@@ -432,7 +432,8 @@ export class Experiments extends BaseRepository<TableData> {
   private notifyChanged(data?: ExperimentsOutput) {
     this.decorationProvider.setState(
       this.experiments.getLabels(),
-      this.experiments.getLabelsToDecorate()
+      this.experiments.getLabelsToDecorate(),
+      this.experiments.getErrors()
     )
     this.experimentsChanged.fire(data)
     this.notifyColumnsChanged()

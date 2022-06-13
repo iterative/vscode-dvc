@@ -263,6 +263,14 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
+  public getErrors() {
+    return new Set(
+      this.getCombinedList()
+        .filter(({ error }) => error)
+        .map(({ label }) => label)
+    )
+  }
+
   public getLabels() {
     return this.getCombinedList().map(({ label }) => label)
   }

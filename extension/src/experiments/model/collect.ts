@@ -1,4 +1,9 @@
-import { ThemeIcon, TreeItemCollapsibleState, Uri } from 'vscode'
+import {
+  MarkdownString,
+  ThemeIcon,
+  TreeItemCollapsibleState,
+  Uri
+} from 'vscode'
 import omit from 'lodash.omit'
 import { ExperimentType } from '.'
 import { ExperimentsAccumulator } from './accumulator'
@@ -29,6 +34,7 @@ export type ExperimentItem = {
   collapsibleState: TreeItemCollapsibleState
   type: ExperimentType
   iconPath: ThemeIcon | Uri | Resource
+  tooltip: MarkdownString | undefined
 }
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
