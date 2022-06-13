@@ -16,7 +16,7 @@ databases are required.
 - **Experiment bookkeeping**: Activate a visual interface to record training
   data, parameters, and metrics on top of [Git](https://git-scm.com/). Use it to
   navigate your experiments, compare their results, and find the best ML models.
-- **Visualization**: Plot experiment data in a customizable View.
+- **Visualization**: Plot experiment data in a customizable dashboard.
 - **Live tracking**: Capture and see metrics changing in real time.
 - **Reproducibility**: Reliably get back to any previous experiment. Run it
   again or use it as the base for new experiments.
