@@ -174,6 +174,7 @@ const TableHeaderCell: React.FC<{
     <ContextMenu
       content={menuContent}
       disabled={menuDisabled || menuSuppressed}
+      trigger={'contextmenu click'}
     >
       <div
         {...column.getHeaderProps(

@@ -108,8 +108,8 @@ export class CliRunner extends Disposable implements ICli {
     )
   }
 
-  public runExperimentReset(dvcRoot: string) {
-    return this.runExperiment(dvcRoot, ExperimentFlag.RESET)
+  public runExperimentReset(dvcRoot: string, ...args: Args) {
+    return this.runExperiment(dvcRoot, ExperimentFlag.RESET, ...args)
   }
 
   public runExperimentQueue(dvcRoot: string) {

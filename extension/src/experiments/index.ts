@@ -24,6 +24,7 @@ import {
   CommandId,
   InternalCommands
 } from '../commands/internal'
+import { Args } from '../cli/constants'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -420,7 +421,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private async runCommand(commandId: CommandId, ...args: string[]) {
+  private async runCommand(commandId: CommandId, ...args: Args) {
     await Toast.showOutput(
       this.internalCommands.executeCommand(commandId, this.dvcRoot, ...args)
     )
