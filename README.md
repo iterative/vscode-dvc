@@ -9,12 +9,13 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
 Run, compare, visualize, and track machine learning experiments right in VS
-Code. This extension uses open-source tool [DVC](https://dvc.org/) and does not
-require additional services or databases. It enables other DVC features as well!
+Code. This extension uses [DVC](https://dvc.org/), an open-source data
+versioning and ML experiment management tool. No additional services or
+databases are required.
 
-- **Experiment bookkeeping**: Activate a visual system to record training data,
-  parameters, and metrics on top of [Git](https://git-scm.com/). Use it to
-  navigate your experiments, compare their results, and find the best ML model.
+- **Experiment bookkeeping**: Activate a visual interface to record training
+  data, parameters, and metrics on top of [Git](https://git-scm.com/). Use it to
+  navigate your experiments, compare their results, and find the best ML models.
 - **Visualization**: Plot experiment data in a customizable View.
 - **Live tracking**: Capture and see metrics changing in real time.
 - **Reproducibility**: Reliably get back to any previous experiment. Run it
@@ -45,14 +46,12 @@ require additional services or databases. It enables other DVC features as well!
 ## Quick start
 
 1. [Install DVC](https://dvc.org/doc/install) on your system.
-2. [Install the DVC Extension] in VS Code.
+2. Install this extension in VS Code.
 3. Follow the **Get Started** page that pops up!
 
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github
 > Codespaces] will include this extension automatically.
 
-[install the dvc extension]:
-  https://code.visualstudio.com/docs/editor/extension-gallery
 [example dvc project]: https://github.com/iterative/example-get-started
 [with github codespaces]:
   https://docs.github.com/en/codespaces/getting-started/quickstart#creating-your-codespace
