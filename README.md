@@ -1,4 +1,4 @@
-<img src="https://github.com/iterative/vscode-dvc/blob/preview-banner/extension/resources/repo-banner.svg">
+<img src="https://github.com/iterative/vscode-dvc/blob/main/extension/resources/banner.svg">
 
 # DVC Extension for Visual Studio Code
 
@@ -54,9 +54,9 @@ databases are required.
 2. Install [this extension] in VS Code.
 3. Follow the **Get Started** page that pops up!
 
-> 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
->
-> > Codespaces] will include this extension automatically.
+<!-- prettier-ignore -->
+> 💡 Feel free to try our [example DVC project] first! Opening it [with Github
+> Codespaces] will include this extension automatically.
 
 [this extension]:
   https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
