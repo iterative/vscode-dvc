@@ -65,7 +65,9 @@ export const FirstCell: React.FC<
             {queued && <ClockIcon />}
           </span>
           {isPlaceholder ? null : (
-            <div className={styles.cellContents && error && styles.errorLabel}>
+            <div
+              className={cx(styles.cellContents, error && styles.errorLabel)}
+            >
               {cell.render('Cell')}
             </div>
           )}
