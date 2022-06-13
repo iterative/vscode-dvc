@@ -697,4 +697,105 @@ describe('App', () => {
       expect(contextMenuEvent.defaultPrevented).toBe(true)
     })
   })
+
+  describe('Sort and Filter Indicators', () => {
+    it('should show an indicator with the amount of applied sorts', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              sorts: []
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      const sortIndicator = screen.getByLabelText('sorts')
+      expect(sortIndicator).toHaveTextContent('')
+
+      const { columns } = tableDataFixture
+      const firstSortPath = columns[columns.length - 1].path
+      const secondSortPath = columns[columns.length - 2].path
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              sorts: [{ descending: true, path: firstSortPath }]
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      expect(sortIndicator).toHaveTextContent('1')
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              sorts: [
+                { descending: true, path: firstSortPath },
+                { descending: false, path: secondSortPath }
+              ]
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      expect(sortIndicator).toHaveTextContent('2')
+    })
+  })
+
+  it('should show an indicator with the amount of applied filters', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filters: []
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    const filterIndicator = screen.getByLabelText('filters')
+    expect(filterIndicator).toHaveTextContent('')
+
+    const { columns } = tableDataFixture
+    const firstFilterPath = columns[columns.length - 1].path
+    const secondFilterPath = columns[columns.length - 2].path
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filters: [firstFilterPath]
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    expect(filterIndicator).toHaveTextContent('1')
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filters: [firstFilterPath, secondFilterPath]
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    expect(filterIndicator).toHaveTextContent('2')
+  })
 })

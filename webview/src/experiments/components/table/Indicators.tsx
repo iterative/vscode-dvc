@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import cx from 'classnames'
 import styles from './styles.module.scss'
@@ -6,16 +6,20 @@ import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
 import SvgFilter from '../../../shared/components/icons/Filter'
 
 const Indicator = ({
-  icon: Icon,
-  count
+  children,
+  count,
+  'aria-label': ariaLabel
 }: {
-  icon: React.FC
+  children: ReactNode
   count?: number
+  'aria-label'?: string
 }) => (
   <span
     className={cx(styles.indicatorIcon, count && styles.indicatorWithCount)}
+    role="status"
+    aria-label={ariaLabel}
   >
-    <Icon />
+    {children}
     {count ? <span className={styles.indicatorCount}>{count}</span> : null}
   </span>
 )
@@ -29,8 +33,12 @@ export const Indicators = ({
 }) => {
   return (
     <div className={styles.tableIndicators}>
-      <Indicator icon={SvgSortPrecedence} count={sorts?.length} />
-      <Indicator icon={SvgFilter} count={filters?.length} />
+      <Indicator count={sorts?.length} aria-label="sorts">
+        <SvgSortPrecedence />
+      </Indicator>
+      <Indicator count={filters?.length} aria-label="filters">
+        <SvgFilter />
+      </Indicator>
     </div>
   )
 }
