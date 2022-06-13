@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import VegaLite from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import styles from './styles.module.scss'
@@ -7,16 +8,16 @@ import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
+import { setZoomedInPlot } from './webviewSlice'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
-import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../store'
-import { setZoomedInPlot } from './webviewSlice'
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const PlotsContent = () => {
   const dispatch = useDispatch()
   const {
@@ -64,10 +65,6 @@ const PlotsContent = () => {
     )
   }
 
-  const handleModalClose = () => {
-    dispatch(setZoomedInPlot(undefined))
-  }
-
   return (
     <>
       <Ribbon />
@@ -78,7 +75,11 @@ const PlotsContent = () => {
       </DragDropProvider>
 
       {zoomedInPlot?.plot && (
-        <Modal onClose={handleModalClose}>
+        <Modal
+          onClose={() => {
+            dispatch(setZoomedInPlot(undefined))
+          }}
+        >
           <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
             <VegaLite
               {...JSON.parse(zoomedInPlot.plot)}

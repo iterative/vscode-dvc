@@ -1,14 +1,16 @@
 import React, { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 import {
+  CheckpointPlotsData,
+  PlotsComparisonData,
   PlotsData,
   PlotsDataKeys,
   Section,
-  SectionCollapsed
+  SectionCollapsed,
+  TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebview } from 'dvc/src/webview/contract'
 import { Plots } from './Plots'
-import { useDispatch } from 'react-redux'
-import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import {
   setCollapsed as setCheckpointPlotsCollapsed,
   update as updateCheckpointPlots
@@ -28,46 +30,51 @@ import {
   updateHasSelectedRevisions
 } from './webviewSlice'
 import { AppDispatch } from '../store'
+import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
+
+const dispatchCollapsedSections = (
+  sections: SectionCollapsed,
+  dispatch: AppDispatch
+) => {
+  if (sections) {
+    dispatch(setCheckpointPlotsCollapsed(sections[Section.CHECKPOINT_PLOTS]))
+    dispatch(setComparisonTableCollapsed(sections[Section.COMPARISON_TABLE]))
+    dispatch(setTemplatePlotsCollapsed(sections[Section.TEMPLATE_PLOTS]))
+  }
+}
 
 export const feedStore = (
   data: MessageToWebview<PlotsData>,
   dispatch: AppDispatch
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   if (data.data) {
     dispatch(initialize())
     for (const key of Object.keys(data.data)) {
       switch (key) {
         case PlotsDataKeys.checkpoint:
-          dispatch(updateCheckpointPlots(data.data[key]!))
+          dispatch(updateCheckpointPlots(data.data[key] as CheckpointPlotsData))
           continue
         case PlotsDataKeys.comparison:
-          dispatch(updateComparisonTable(data.data[key]!))
+          dispatch(updateComparisonTable(data.data[key] as PlotsComparisonData))
           continue
         case PlotsDataKeys.template:
-          dispatch(updateTemplatePlots(data.data[key]!))
+          dispatch(updateTemplatePlots(data.data[key] as TemplatePlotsData))
           continue
         case PlotsDataKeys.sectionCollapsed:
-          const sections = data.data[key] as SectionCollapsed
-          if (sections) {
-            dispatch(
-              setCheckpointPlotsCollapsed(sections[Section.CHECKPOINT_PLOTS])
-            )
-            dispatch(
-              setComparisonTableCollapsed(sections[Section.COMPARISON_TABLE])
-            )
-            dispatch(
-              setTemplatePlotsCollapsed(sections[Section.TEMPLATE_PLOTS])
-            )
-          }
+          dispatchCollapsedSections(
+            data.data[key] as SectionCollapsed,
+            dispatch
+          )
           continue
         case PlotsDataKeys.hasPlots:
-          dispatch(updateHasPlots(data.data[key]!))
+          dispatch(updateHasPlots(!!data.data[key]))
           continue
         case PlotsDataKeys.hasSelectedPlots:
-          dispatch(updateHasSelectedPlots(data.data[key]!))
+          dispatch(updateHasSelectedPlots(!!data.data[key]))
           continue
         case PlotsDataKeys.hasSelectedRevisions:
-          dispatch(updateHasSelectedRevisions(data.data[key]!))
+          dispatch(updateHasSelectedRevisions(!!data.data[key]))
           continue
         default:
           continue

@@ -2,9 +2,9 @@ import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ComparisonTable } from './ComparisonTable'
+import { changeSize } from './comparisonTableSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { RootState } from '../../store'
-import { changeSize } from './comparisonTableSlice'
 
 export const ComparisonTableWrapper: React.FC = () => {
   const dispatch = useDispatch()

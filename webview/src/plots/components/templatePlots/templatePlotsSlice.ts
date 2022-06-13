@@ -16,36 +16,37 @@ export interface TemplatePlotsState extends TemplatePlotsData {
 }
 
 const initialState: TemplatePlotsState = {
+  hasData: false,
+  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
   plots: [],
   sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
-  size: DEFAULT_SECTION_SIZES[Section.TEMPLATE_PLOTS],
-  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
-  hasData: false
+  size: DEFAULT_SECTION_SIZES[Section.TEMPLATE_PLOTS]
 }
 
 export const templatePlotsSlice = createSlice({
-  name: ReducerName.template,
-  initialState,
-  reducers: {
-    update: (state, action: PayloadAction<TemplatePlotsData>) => {
-      Object.assign(state, action.payload)
-      state.hasData = !!action.payload
-    },
-    setCollapsed: (state, action: PayloadAction<boolean>) => {
-      state.isCollapsed = action.payload
-    },
-    changeSize: (state, action: PayloadAction<PlotSize>) => {
-      state.size = action.payload
-    }
-  },
   extraReducers: builder => {
     builder
-      .addCase(clearData, (state, action) => {
+      .addCase(clearData, (_, action) => {
         if (!action.payload || action.payload === ReducerName.template) {
           return { ...initialState }
         }
       })
       .addDefaultCase(() => {})
+  },
+  initialState,
+  name: ReducerName.template,
+
+  reducers: {
+    changeSize: (state, action: PayloadAction<PlotSize>) => {
+      state.size = action.payload
+    },
+    setCollapsed: (state, action: PayloadAction<boolean>) => {
+      state.isCollapsed = action.payload
+    },
+    update: (state, action: PayloadAction<TemplatePlotsData>) => {
+      Object.assign(state, action.payload)
+      state.hasData = !!action.payload
+    }
   }
 })
 

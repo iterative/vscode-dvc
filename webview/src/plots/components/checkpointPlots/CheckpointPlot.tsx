@@ -1,12 +1,12 @@
 import { ColorScale } from 'dvc/src/plots/webview/contract'
 import React from 'react'
+import { useSelector } from 'react-redux'
+import { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { createSpec } from './util'
 import { config } from '../constants'
 import { ZoomablePlot } from '../ZoomablePlot'
-import { createSpec } from './util'
 import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
-import { VegaLiteProps } from 'react-vega/lib/VegaLite'
-import { useSelector } from 'react-redux'
 import { RootState } from '../../store'
 
 interface CheckpointPlotProps {

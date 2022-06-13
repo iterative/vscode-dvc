@@ -16,29 +16,15 @@ export interface ComparisonTableState extends PlotsComparisonData {
 }
 
 const initialState: ComparisonTableState = {
-  sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
-  size: DEFAULT_SECTION_SIZES[Section.COMPARISON_TABLE],
+  hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.COMPARISON_TABLE],
   plots: [],
   revisions: [],
-  hasData: false
+  sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
+  size: DEFAULT_SECTION_SIZES[Section.COMPARISON_TABLE]
 }
 
 export const comparisonTableSlice = createSlice({
-  name: ReducerName.comparison,
-  initialState,
-  reducers: {
-    update: (state, action: PayloadAction<PlotsComparisonData>) => {
-      Object.assign(state, action.payload)
-      state.hasData = !!action.payload
-    },
-    setCollapsed: (state, action: PayloadAction<boolean>) => {
-      state.isCollapsed = action.payload
-    },
-    changeSize: (state, action: PayloadAction<PlotSize>) => {
-      state.size = action.payload
-    }
-  },
   extraReducers: builder => {
     builder
       .addCase(clearData, (_, action) => {
@@ -47,6 +33,20 @@ export const comparisonTableSlice = createSlice({
         }
       })
       .addDefaultCase(() => {})
+  },
+  initialState,
+  name: ReducerName.comparison,
+  reducers: {
+    changeSize: (state, action: PayloadAction<PlotSize>) => {
+      state.size = action.payload
+    },
+    setCollapsed: (state, action: PayloadAction<boolean>) => {
+      state.isCollapsed = action.payload
+    },
+    update: (state, action: PayloadAction<PlotsComparisonData>) => {
+      Object.assign(state, action.payload)
+      state.hasData = !!action.payload
+    }
   }
 })
 

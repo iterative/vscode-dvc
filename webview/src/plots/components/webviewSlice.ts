@@ -24,20 +24,20 @@ const initialState: WebviewState = {
 }
 
 export const webviewSlice = createSlice({
-  name: ReducerName.webview,
+  extraReducers: builder => {
+    builder
+      .addCase(clearData, (_, action) => {
+        if (!action.payload || action.payload === ReducerName.webview) {
+          return { ...initialState }
+        }
+      })
+      .addDefaultCase(() => {})
+  },
   initialState,
+  name: ReducerName.webview,
   reducers: {
     initialize: state => {
       state.hasData = true
-    },
-    updateHasPlots: (state, action: PayloadAction<boolean>) => {
-      state.hasPlots = action.payload
-    },
-    updateHasSelectedPlots: (state, action: PayloadAction<boolean>) => {
-      state.hasSelectedPlots = action.payload
-    },
-    updateHasSelectedRevisions: (state, action: PayloadAction<boolean>) => {
-      state.hasSelectedRevisions = action.payload
     },
     setZoomedInPlot: (
       state,
@@ -57,16 +57,16 @@ export const webviewSlice = createSlice({
           plot: action.payload.plot
         }
       }
+    },
+    updateHasPlots: (state, action: PayloadAction<boolean>) => {
+      state.hasPlots = action.payload
+    },
+    updateHasSelectedPlots: (state, action: PayloadAction<boolean>) => {
+      state.hasSelectedPlots = action.payload
+    },
+    updateHasSelectedRevisions: (state, action: PayloadAction<boolean>) => {
+      state.hasSelectedRevisions = action.payload
     }
-  },
-  extraReducers: builder => {
-    builder
-      .addCase(clearData, (state, action) => {
-        if (!action.payload || action.payload === ReducerName.webview) {
-          return { ...initialState }
-        }
-      })
-      .addDefaultCase(() => {})
   }
 })
 

@@ -19,21 +19,37 @@ export interface CheckpointPlotsState extends CheckpointPlotsData {
 }
 
 const initialState: CheckpointPlotsState = {
-  sectionName: DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS],
-  size: DEFAULT_SECTION_SIZES[Section.CHECKPOINT_PLOTS],
+  colors: { domain: [], range: [] },
+  hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
   plots: [],
   plotsById: {},
   plotsIds: [],
-  colors: { domain: [], range: [] },
+  sectionName: DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS],
   selectedMetrics: [],
-  hasData: false
+  size: DEFAULT_SECTION_SIZES[Section.CHECKPOINT_PLOTS]
 }
 
 export const checkpointPlotsSlice = createSlice({
-  name: ReducerName.checkpoint,
+  extraReducers: builder => {
+    builder
+      .addCase(clearData, (_, action) => {
+        if (!action.payload || action.payload === ReducerName.checkpoint) {
+          return { ...initialState }
+        }
+      })
+      .addDefaultCase(() => {})
+  },
   initialState,
+  name: ReducerName.checkpoint,
   reducers: {
+    changeSize: (state, action: PayloadAction<PlotSize>) => {
+      state.size = action.payload
+    },
+
+    setCollapsed: (state, action: PayloadAction<boolean>) => {
+      state.isCollapsed = action.payload
+    },
     update: (state, action: PayloadAction<CheckpointPlotsData>) => {
       Object.assign(state, action.payload)
       state.plotsIds = action.payload.plots.map(plot => plot.title)
@@ -42,22 +58,7 @@ export const checkpointPlotsSlice = createSlice({
         state.plotsById[plot.title] = plot
       }
       state.hasData = !!action.payload
-    },
-    setCollapsed: (state, action: PayloadAction<boolean>) => {
-      state.isCollapsed = action.payload
-    },
-    changeSize: (state, action: PayloadAction<PlotSize>) => {
-      state.size = action.payload
     }
-  },
-  extraReducers: builder => {
-    builder
-      .addCase(clearData, (state, action) => {
-        if (!action.payload || action.payload === ReducerName.checkpoint) {
-          return { ...initialState }
-        }
-      })
-      .addDefaultCase(() => {})
   }
 })
 

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { ColorScale } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { CheckpointPlot } from './CheckpointPlot'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import {
@@ -16,7 +17,6 @@ import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/Virt
 import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 import { RootState } from '../../store'
-import { CheckpointPlot } from './CheckpointPlot'
 
 interface CheckpointPlotsProps {
   plotsIds: string[]

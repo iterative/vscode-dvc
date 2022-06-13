@@ -3,10 +3,10 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { CheckpointPlots } from './CheckpointPlots'
+import { changeSize } from './checkpointPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { sendMessage } from '../../../shared/vscode'
 import { RootState } from '../../store'
-import { changeSize } from './checkpointPlotsSlice'
 
 export const CheckpointPlotsWrapper: React.FC = () => {
   const dispatch = useDispatch()

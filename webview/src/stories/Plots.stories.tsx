@@ -7,6 +7,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotSize
 } from 'dvc/src/plots/webview/contract'
+import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import checkpointPlotsFixture, {
   manyCheckpointPlots
 } from 'dvc/src/test/fixtures/expShow/checkpointPlots'
@@ -21,7 +22,6 @@ import '../shared/style.scss'
 import '../plots/components/styles.module.scss'
 import { store } from '../plots/store'
 import { feedStore } from '../plots/components/App'
-import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { clearData } from '../plots/actions'
 
 const MockedState: React.FC<{ data: PlotsData }> = ({ children, data }) => {

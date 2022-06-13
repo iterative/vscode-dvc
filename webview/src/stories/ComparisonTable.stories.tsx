@@ -1,6 +1,7 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { fireEvent, within } from '@testing-library/react'
 import React from 'react'
+import { Provider, useDispatch } from 'react-redux'
 import {
   ComparisonRevisionData,
   DEFAULT_SECTION_NAMES,
@@ -12,7 +13,6 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
-import { Provider, useDispatch } from 'react-redux'
 import { clearData } from '../plots/actions'
 import { ReducerName } from '../plots/constants'
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'

@@ -3,6 +3,7 @@
  */
 import { join } from 'dvc/src/test/util/path'
 import React from 'react'
+import { Provider } from 'react-redux'
 import {
   render,
   cleanup,
@@ -34,12 +35,12 @@ import {
 import { reorderObjectList } from 'dvc/src/util/array'
 import { act } from 'react-dom/test-utils'
 import { App } from './App'
-import { Plots } from './Plots'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { CopyTooltip } from './ribbon/RibbonBlock'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
+import { store } from '../store'
 
 jest.mock('../../shared/api')
 
@@ -111,7 +112,11 @@ describe('App', () => {
   }
 
   const renderAppWithData = (data: PlotsData) => {
-    render(<App />)
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    )
     sendSetDataMessage(data)
   }
 
@@ -289,17 +294,11 @@ describe('App', () => {
   })
 
   it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {
-    render(
-      <Plots
-        state={{
-          data: {
-            checkpoint: checkpointPlotsFixture,
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-            template: null
-          }
-        }}
-      />
-    )
+    renderAppWithData({
+      checkpoint: checkpointPlotsFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: null
+    })
 
     const summaryElement = await screen.findByText('Trends')
     fireEvent.click(summaryElement, {
@@ -336,17 +335,11 @@ describe('App', () => {
   })
 
   it('should toggle the visibility of revisions in the comparison table when clicking the revisions in the picker', async () => {
-    render(
-      <Plots
-        state={{
-          data: {
-            comparison: comparisonTableFixture,
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-            template: null
-          }
-        }}
-      />
-    )
+    renderAppWithData({
+      comparison: comparisonTableFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      template: null
+    })
 
     const summaryElement = await screen.findByText('Images')
     fireEvent.click(summaryElement, {
@@ -385,16 +378,10 @@ describe('App', () => {
   })
 
   it('should show the newest revision in the comparision table even if some revisions were filtered out', async () => {
-    const { rerender } = render(
-      <Plots
-        state={{
-          data: {
-            comparison: comparisonTableFixture,
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-          }
-        }}
-      />
-    )
+    renderAppWithData({
+      comparison: comparisonTableFixture,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
 
     const summaryElement = await screen.findByText('Images')
     fireEvent.click(summaryElement, {
@@ -415,23 +402,15 @@ describe('App', () => {
     })
 
     const newRevision = 'newRev'
-
-    rerender(
-      <Plots
-        state={{
-          data: {
-            comparison: {
-              ...comparisonTableFixture,
-              revisions: [
-                ...comparisonTableFixture.revisions,
-                { displayColor: '#945dd6', revision: newRevision }
-              ]
-            },
-            sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-          }
-        }}
-      />
-    )
+    sendSetDataMessage({
+      comparison: {
+        ...comparisonTableFixture,
+        revisions: [
+          ...comparisonTableFixture.revisions,
+          { displayColor: '#945dd6', revision: newRevision }
+        ]
+      }
+    })
 
     const workspaceHeader = screen.queryAllByText(newRevision)
     expect(workspaceHeader.length).toBe(3) // One in the table, one in the menu, and one in the ribbon

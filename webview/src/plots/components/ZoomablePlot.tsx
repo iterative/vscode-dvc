@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import VegaLite from 'react-vega/lib/VegaLite'
+import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
-import { setZoomedInPlot } from './webviewSlice'
 
 interface ZoomablePlotProps {
   plotProps: string
@@ -19,12 +19,12 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   const previousPlotProps = useRef(parsedProps)
   useEffect(() => {
     if (previousPlotProps.current !== plotProps) {
-      dispatch(setZoomedInPlot({ plot: plotProps, id, refresh: true }))
+      dispatch(setZoomedInPlot({ id, plot: plotProps, refresh: true }))
       previousPlotProps.current = plotProps
     }
   }, [plotProps, id, dispatch])
 
-  const handleOnClick = () => dispatch(setZoomedInPlot({ plot: plotProps, id }))
+  const handleOnClick = () => dispatch(setZoomedInPlot({ id, plot: plotProps }))
 
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
