@@ -1,6 +1,7 @@
 import { relative } from 'path'
 import {
   Event,
+  ThemeIcon,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -93,8 +94,8 @@ export class TrackedExplorerTree
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
-
     treeItem.contextValue = this.getContextValue(resourceUri, isDirectory)
+    treeItem.iconPath = isDirectory ? ThemeIcon.Folder : ThemeIcon.File
 
     if (!isDirectory && treeItem.contextValue !== 'virtual') {
       treeItem.command = {

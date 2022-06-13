@@ -3,10 +3,11 @@ import { SortDefinition, sortExperiments } from './sortBy'
 import {
   FilterDefinition,
   filterExperiment,
-  filterExperiments,
+  splitExperimentsByFilters,
   getFilterId
 } from './filterBy'
 import { collectExperiments, collectMutableRevisions } from './collect'
+import { collectFiltered, ExperimentWithType } from './filterBy/collect'
 import { collectColoredStatus, collectSelected } from './status/collect'
 import { Color, copyOriginalColors } from './status/colors'
 import {
@@ -162,6 +163,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return [...this.filters.values()]
   }
 
+  public getFilterPaths() {
+    return this.getFilters().map(({ path }) => path)
+  }
+
   public canAutoApplyFilters(...filterIdsToRemove: string[]): boolean {
     if (!this.useFiltersForSelection) {
       return true
@@ -171,7 +176,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     for (const id of filterIdsToRemove) {
       filters.delete(id)
     }
-    const filteredExperiments = this.getFilteredExperiments([
+    const filteredExperiments = this.getUnfilteredExperiments([
       ...filters.values()
     ])
     return !tooManySelected(filteredExperiments)
@@ -235,20 +240,32 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.useFiltersForSelection = useFilters
   }
 
-  public getFilteredExperiments(filters = this.getFilters()) {
-    const filteredExperiments = this.getSubRows(this.getExperiments(), filters)
-
-    const filteredCheckpoints = filteredExperiments.flatMap(
-      ({ id }) => this.getFilteredCheckpointsByTip(id, filters) || []
+  public getUnfilteredExperiments(filters = this.getFilters()) {
+    const unfilteredExperiments = this.getSubRows(
+      this.getExperiments(),
+      filters
     )
 
-    return [...filteredExperiments, ...filteredCheckpoints]
+    const unfilteredCheckpoints = unfilteredExperiments.flatMap(
+      ({ id }) => this.getUnfilteredCheckpointsByTip(id, filters) || []
+    )
+
+    return [...unfilteredExperiments, ...unfilteredCheckpoints]
   }
 
-  public getExperiments(): (Experiment & {
+  public getLabels() {
+    return this.getCombinedList().map(({ label }) => label)
+  }
+
+  public getLabelsToDecorate() {
+    return new Set<string>(
+      this.getFilteredExperiments().map(({ label }) => label)
+    )
+  }
+
+  public getExperiments(): (ExperimentWithType & {
     hasChildren: boolean
     selected?: boolean
-    type: ExperimentType
   })[] {
     return [
       {
@@ -344,6 +361,17 @@ export class ExperimentsModel extends ModelWithPersistence {
     ])
   }
 
+  public getFilteredExperiments() {
+    const acc: ExperimentWithType[] = []
+
+    for (const experiment of this.getCurrentExperiments()) {
+      const checkpoints = this.getCheckpoints(experiment.id) || []
+      collectFiltered(acc, this.getFilters(), experiment, checkpoints)
+    }
+
+    return acc
+  }
+
   private getCombinedList() {
     return [
       this.workspace,
@@ -356,7 +384,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
     return experiments
       .map(experiment => {
-        const checkpoints = this.getFilteredCheckpointsByTip(
+        const checkpoints = this.getUnfilteredCheckpointsByTip(
           experiment.id,
           filters
         )
@@ -385,7 +413,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return !!filterExperiment(filters, row)
   }
 
-  private getFilteredCheckpointsByTip(
+  private getUnfilteredCheckpointsByTip(
     sha: string,
     filters: FilterDefinition[]
   ) {
@@ -393,7 +421,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     if (!checkpoints) {
       return
     }
-    return filterExperiments(filters, checkpoints)
+    const { unfiltered } = splitExperimentsByFilters(filters, checkpoints)
+    return unfiltered
   }
 
   private getExperimentsByBranch(branch: Experiment) {
@@ -452,7 +481,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   private setSelectedToFilters() {
-    const filteredExperiments = this.getFilteredExperiments()
+    const filteredExperiments = this.getUnfilteredExperiments()
     this.setSelected(filteredExperiments)
   }
 

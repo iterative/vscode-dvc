@@ -60,6 +60,7 @@ import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
+import { ExperimentFlag } from '../../../cli/constants'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -125,6 +126,7 @@ suite('Experiments Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: columnsFixture,
+        filters: [],
         hasCheckpoints: true,
         hasColumns: true,
         hasRunningExperiment: true,
@@ -548,8 +550,10 @@ suite('Experiments Test Suite', () => {
     })
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments, cliRunner } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
 
       const mockModifiedParams = [
         '-S',
@@ -559,6 +563,9 @@ suite('Experiments Test Suite', () => {
       ]
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+        undefined
+      )
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -571,10 +578,10 @@ suite('Experiments Test Suite', () => {
       })
 
       await tableChangePromise
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_RESET_AND_RUN,
+      expect(mockRunExperiment).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledWithExactly(
         dvcDemoPath,
+        ExperimentFlag.RESET,
         ...mockModifiedParams
       )
     })
@@ -683,6 +690,7 @@ suite('Experiments Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: [],
+        filters: [],
         hasCheckpoints: true,
         hasColumns: true,
         hasRunningExperiment: true,

@@ -36,12 +36,12 @@
     "vega-lite": "^5.2.0"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^6.4.19",
-    "@storybook/addons": "^6.4.19",
-    "@storybook/builder-webpack5": "^6.4.19",
-    "@storybook/manager-webpack5": "^6.4.19",
+    "@storybook/addon-essentials": "^6.5.8",
+    "@storybook/addons": "^6.5.8",
+    "@storybook/builder-webpack5": "^6.5.8",
+    "@storybook/manager-webpack5": "^6.5.8",
     "@storybook/preset-scss": "^1.0.3",
-    "@storybook/react": "^6.4.19",
+    "@storybook/react": "^6.5.8",
     "@svgr/cli": "^6.0.0",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^12.1.2",
@@ -72,9 +72,9 @@
     "style-loader": "^3.3.1",
     "ts-jest": "^27.1.4",
     "ts-loader": "^9.2.6",
-    "webpack": "^5.69.1",
+    "webpack": "^5.73.0",
     "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.4"
+    "webpack-dev-server": "^4.9.2"
   },
   "svgr": {
     "typescript": true,

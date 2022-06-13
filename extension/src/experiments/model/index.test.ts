@@ -112,7 +112,7 @@ describe('ExperimentsModel', () => {
     ])
 
     experimentsModel.setSelectionMode(true)
-    experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
+    experimentsModel.setSelected(experimentsModel.getUnfilteredExperiments())
 
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([])
 
@@ -175,7 +175,7 @@ describe('ExperimentsModel', () => {
     })
 
     experimentsModel.setSelectionMode(true)
-    experimentsModel.setSelected(experimentsModel.getFilteredExperiments())
+    experimentsModel.setSelected(experimentsModel.getUnfilteredExperiments())
 
     expect(experimentsModel.getSelectedRevisions()).toStrictEqual([
       expect.objectContaining({

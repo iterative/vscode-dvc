@@ -17,4 +17,9 @@ export const registerPlotsCommands = (
     RegisteredCommands.PLOTS_SELECT,
     (dvcRoot?: string) => plots.selectPlots(dvcRoot)
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.PLOTS_REFRESH,
+    (dvcRoot?: string) => plots.refresh(dvcRoot)
+  )
 }

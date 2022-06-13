@@ -1,7 +1,7 @@
 {
   "name": "dvc",
   "private": true,
-  "preview": true,
+  "preview": false,
   "displayName": "%displayName%",
   "description": "%description%",
   "publisher": "iterative",
@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.2.25",
+  "version": "0.3.0",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -471,6 +471,12 @@
         "command": "dvc.views.plotsPathsTree.selectPlots",
         "category": "DVC",
         "icon": "$(list-filter)"
+      },
+      {
+        "title": "%command.views.plotsPathsTree.refreshPlots%",
+        "command": "dvc.views.plotsPathsTree.refreshPlots",
+        "category": "DVC",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {
@@ -601,7 +607,7 @@
         },
         {
           "command": "dvc.init",
-          "when": "false"
+          "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
         },
         {
           "command": "dvc.moveTargets",
@@ -777,6 +783,10 @@
         },
         {
           "command": "dvc.views.plotsPathsTree.selectPlots",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.refreshPlots",
           "when": "dvc.commands.available && dvc.project.available"
         }
       ],
@@ -1058,6 +1068,11 @@
           "command": "dvc.views.plotsPathsTree.selectPlots",
           "group": "inline",
           "when": "view == dvc.views.plotsPathsTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.refreshPlots",
+          "group": "inline",
+          "when": "view == dvc.views.plotsPathsTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -1210,6 +1225,11 @@
           "command": "dvc.views.plotsPathsTree.selectPlots",
           "when": "view == dvc.views.plotsPathsTree",
           "group": "navigation@2"
+        },
+        {
+          "command": "dvc.views.plotsPathsTree.refreshPlots",
+          "when": "view == dvc.views.plotsPathsTree",
+          "group": "navigation@3"
         }
       ]
     },
@@ -1514,7 +1534,7 @@
     "ts-loader": "^9.2.6",
     "vsce": "^2.6.7",
     "vscode-uri": "^3.0.2",
-    "webpack": "^5.69.1",
+    "webpack": "^5.73.0",
     "webpack-cli": "^4.9.2"
   },
   "peerDependencies": {

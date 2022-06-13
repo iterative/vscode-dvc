@@ -15,6 +15,7 @@ import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
+import { DecorationProvider } from './model/filterBy/decorationProvider'
 import { SortDefinition } from './model/sortBy'
 import { splitColumnPath } from './columns/paths'
 import { ResourceLocator } from '../resourceLocator'
@@ -23,6 +24,7 @@ import {
   CommandId,
   InternalCommands
 } from '../commands/internal'
+import { Args } from '../cli/constants'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -74,6 +76,9 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
+  private readonly decorationProvider = this.dispose.track(
+    new DecorationProvider()
+  )
 
   private readonly internalCommands: InternalCommands
 
@@ -257,6 +262,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public getFilteredExperiments() {
+    return this.experiments.getFilteredExperiments()
+  }
+
   public getExperimentCount() {
     return this.experiments.getExperimentCount()
   }
@@ -291,7 +300,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     if (useFilters) {
       const filteredExperiments = this.experiments
-        .getFilteredExperiments()
+        .getUnfilteredExperiments()
         .filter(exp => !exp.queued)
       if (tooManySelected(filteredExperiments)) {
         await this.warnAndDoNotAutoApply(filteredExperiments)
@@ -412,7 +421,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private async runCommand(commandId: CommandId, ...args: string[]) {
+  private async runCommand(commandId: CommandId, ...args: Args) {
     await Toast.showOutput(
       this.internalCommands.executeCommand(commandId, this.dvcRoot, ...args)
     )
@@ -421,6 +430,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private notifyChanged(data?: ExperimentsOutput) {
+    this.decorationProvider.setState(
+      this.experiments.getLabels(),
+      this.experiments.getLabelsToDecorate()
+    )
     this.experimentsChanged.fire(data)
     this.notifyColumnsChanged()
   }
@@ -440,6 +453,7 @@ export class Experiments extends BaseRepository<TableData> {
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
+      filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.hasCheckpoints(),
       hasColumns: this.columns.hasColumns(),
       hasRunningExperiment: this.experiments.hasRunningExperiment(),

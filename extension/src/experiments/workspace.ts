@@ -1,6 +1,7 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
 import { TableData } from './webview/contract'
+import { Args } from '../cli/constants'
 import { CommandId, InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
@@ -209,7 +210,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     commandId: CommandId,
     cwd: string,
     title: Title,
-    ...args: string[]
+    ...args: Args
   ) {
     const input = await getInput(title)
     if (input) {
@@ -217,7 +218,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
   }
 
-  public runCommand(commandId: CommandId, cwd: string, ...args: string[]) {
+  public runCommand(commandId: CommandId, cwd: string, ...args: Args) {
     return Toast.showOutput(
       this.internalCommands.executeCommand(commandId, cwd, ...args)
     )
