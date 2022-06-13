@@ -5,6 +5,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { RowProp, WithChanges } from './interfaces'
 import styles from './styles.module.scss'
 import { FirstCell, CellWrapper } from './Cell'
+import { RowSelectionContext } from './RowSelectionContext'
 import { sendMessage } from '../../../shared/vscode'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
@@ -26,7 +27,7 @@ const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
 }
 
 const experimentMenuOption = (
-  id: string,
+  id: string | string[],
   label: string,
   type: MessageFromWebviewType
 ) => {
@@ -48,9 +49,31 @@ export const RowContextMenu: React.FC<RowProp> = ({
     values: { id }
   }
 }) => {
+  const { selectedRows } = React.useContext(RowSelectionContext)
+
   const isWorkspace = id === 'workspace'
 
   const contextMenuOptions = React.useMemo(() => {
+    const isFromSelection = selectedRows[id]
+    if (isFromSelection) {
+      const selectedRowsList = Object.values(selectedRows).filter(
+        value => value !== undefined
+      ) as RowProp[]
+
+      if (selectedRowsList.length > 1) {
+        const deletable = selectedRowsList.filter(
+          value => value.row.depth === 1
+        )
+
+        return [
+          experimentMenuOption(
+            deletable.map(value => value.row.values.id),
+            'Remove Selected Rows',
+            MessageFromWebviewType.REMOVE_EXPERIMENT
+          )
+        ]
+      }
+    }
     const menuOptions: MessagesMenuOptionProps[] = []
 
     pushIf(menuOptions, !queued && !isWorkspace && depth > 0, [
@@ -101,9 +124,14 @@ export const RowContextMenu: React.FC<RowProp> = ({
     ])
 
     return menuOptions
-  }, [queued, isWorkspace, depth, id, projectHasCheckpoints])
+  }, [queued, isWorkspace, depth, id, projectHasCheckpoints, selectedRows])
 
-  return <MessagesMenu options={contextMenuOptions} />
+  return (
+    (contextMenuOptions.length > 0 && (
+      <MessagesMenu options={contextMenuOptions} />
+    )) ||
+    null
+  )
 }
 
 export const RowContent: React.FC<
@@ -134,6 +162,19 @@ export const RowContent: React.FC<
     })
   }
 
+  const { toggleRowSelected, selectedRows } =
+    React.useContext(RowSelectionContext)
+
+  const isRowSelected = selectedRows[id]
+
+  const toggleRowSelection = React.useCallback<EventHandler<SyntheticEvent>>(
+    e => {
+      e.preventDefault()
+      e.stopPropagation()
+      toggleRowSelected?.({ row })
+    },
+    [row, toggleRowSelected]
+  )
   return (
     <ContextMenu
       disabled={contextMenuDisabled}
@@ -151,23 +192,28 @@ export const RowContent: React.FC<
             styles.tr,
             styles.bodyRow,
             getExperimentTypeClass(original),
-            flatIndex % 2 === 0 || styles.oddRow,
+            flatIndex % 2 === 0 || (styles.oddRow && !isRowSelected),
             isWorkspace ? styles.workspaceRow : styles.normalRow,
             styles.row,
+            isRowSelected && styles.rowSelected,
             isWorkspace && changes?.length && styles.workspaceWithChanges
           )
         })}
         tabIndex={0}
         role="row"
-        onClick={toggleExperiment}
+        onClick={toggleRowSelection}
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
-            toggleExperiment(e)
+            toggleRowSelection(e)
           }
         }}
         data-testid={isWorkspace && 'workspace-row'}
       >
-        <FirstCell cell={firstCell} bulletColor={displayColor} />
+        <FirstCell
+          cell={firstCell}
+          bulletColor={displayColor}
+          toggleExperiment={toggleExperiment}
+        />
         {cells.map(cell => {
           const cellId = `${cell.column.id}___${cell.row.id}`
           return (

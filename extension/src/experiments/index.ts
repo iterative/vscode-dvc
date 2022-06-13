@@ -624,8 +624,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.runCommand(AvailableCommands.EXPERIMENT_APPLY, experimentId)
   }
 
-  private removeExperiment(experimentId: string) {
-    return this.runCommand(AvailableCommands.EXPERIMENT_REMOVE, experimentId)
+  private removeExperiment(experimentId: string | string[]) {
+    return this.runCommand(
+      AvailableCommands.EXPERIMENT_REMOVE,
+      // eslint-disable-next-line unicorn/prefer-spread
+      ...experimentId.slice(0)
+    )
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {

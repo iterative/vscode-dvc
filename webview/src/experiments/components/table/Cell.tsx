@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { EventHandler, SyntheticEvent } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
@@ -31,8 +31,9 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
 export const FirstCell: React.FC<
   CellProp & {
     bulletColor?: string
+    toggleExperiment: EventHandler<SyntheticEvent>
   }
-> = ({ cell, bulletColor }) => {
+> = ({ cell, bulletColor, toggleExperiment }) => {
   const { row, isPlaceholder } = cell
 
   return (
@@ -44,6 +45,15 @@ export const FirstCell: React.FC<
           isPlaceholder && styles.groupPlaceholder
         )
       })}
+      tabIndex={0}
+      aria-checked={bulletColor !== undefined}
+      role="switch"
+      onClick={toggleExperiment}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          toggleExperiment(e)
+        }
+      }}
     >
       <div className={styles.innerCell}>
         <RowExpansionButton row={row} />
