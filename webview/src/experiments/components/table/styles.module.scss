@@ -85,6 +85,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
 }
 
+.errorLabel {
+  color: $error-color;
+}
+
 .bullet {
   color: $fg-color;
   display: inline-block;
@@ -94,10 +98,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   position: relative;
   .queuedExperiment & svg {
     height: 12px;
-  }
-  .errorExperiment & svg {
-    height: 12px;
-    color: var(--vscode-errorForeground);
   }
 
   &::before {
