@@ -18,8 +18,8 @@ databases are required.
   experiments, compare their results, and find the best ML models.
 - **Visualization**: Plot experiment data in a customizable dashboard.
 - **Live tracking**: Capture and see metrics changing in real time.
-- **Reproducibility**: Reliably get back to any previous experiment. Run it
-  again or use it as the base for new experiments.
+- **Reproducibility**: Make sure that anyone can recover or confirm previous
+  experiments, and run new experiments based on their results.
 - **Data Management**: Handle large datasets, files, and models effectively.
 
 > **Note**: We are in public beta and welcome early adopter feedback!  
@@ -50,7 +50,7 @@ databases are required.
 3. Follow the **Get Started** page that pops up!
 
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
-> Codespaces] will include this extension automatically.
+> > Codespaces] will include this extension automatically.
 
 [example dvc project]: https://github.com/iterative/example-get-started
 [with github codespaces]:
