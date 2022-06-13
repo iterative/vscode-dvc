@@ -23,10 +23,10 @@ databases are required.
 - **Data Management**: Handle large datasets, files, and models effectively.
 
 > **Note**: We are in public beta and welcome early adopter feedback!  
-> Feel free to open [issues] or reach out to [DVC support].
+> Feel free to reach out [via Discord] or open [issues in GitHub].
 >
-> [issues]: https://github.com/iterative/vscode-dvc/issues
-> [dvc support]: https://dvc.org/support
+> [issues in github]: https://github.com/iterative/vscode-dvc/issues
+> [via discord]: https://discord.gg/BGCjJHvDHt
 
 ### Why use this extension?
 
@@ -142,7 +142,7 @@ These are the [VS Code Settings] available for the Extension:
 
 Please see the DVC [channel] in the IDE's _Output_ panel to see the underlying
 DVC commands being run, as well as their error output. Feel free to share this
-with us via [DVC support].
+with us [via Discord] or use it to report [issues in GitHub].
 
 [channel]:
   https://code.visualstudio.com/api/extension-capabilities/common-capabilities#output-channel
