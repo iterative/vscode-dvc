@@ -41,17 +41,19 @@ export interface ContextMenuProps {
   content?: React.ReactNode
   disabled?: boolean
   onShow?: () => void
+  trigger?: string
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
   children,
   content,
   disabled,
-  onShow
+  onShow,
+  trigger = 'contextmenu'
 }) => (
   <Tooltip
     arrow
-    trigger={'contextmenu'}
+    trigger={trigger}
     delay={[100, 200]}
     placement={'bottom'}
     interactive
