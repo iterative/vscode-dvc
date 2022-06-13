@@ -27,29 +27,25 @@ First, ensure that [Yarn](https://yarnpkg.com/) and
 - Run `Tasks: Run Build Task` (Ctrl+Shift+b) to start the extension and webview
   development servers (alternatively run `yarn dev-server` from the terminal).
 
+  > **Warning**: Having a separate (`.vsix`) version of the extension installed
+  > may cause all kinds of chaos in your development environment.
+
 - Open the Extension Development Host, a child instance of VS Code with the
   results of the dev servers installed as an extension, with `Start Debugging`
   (f5).
 
-  > **Note**: selecting the `Run Extension` option when running the debugger
-  > will prevent all other extensions from being loaded into the VS code
-  > instance. This will improve the performance of VS code but can cause certain
-  > DVC commands to fail if the project uses an isolated python environment (see
-  > [this note](#note)).
+  > **Note**: using the `Run Extension` command when running the debugger will
+  > prevent all other extensions from loading into VS Code. This will improve
+  > the performance of VS Code but can cause certain DVC commands to fail if the
+  > project uses an isolated python environment (see [this warning](#warning)).
 
-- Open the demo or another DVC project in the Extension Development Host; VS
-  Code will remember the last project opened, so this step only has to be done
-  once.
+- Open a DVC project in the Extension Development Host. VS Code will remember
+  the last project opened, so this step only has to be done once.
 
-> **Warning**  
-> Please be aware that having a separate (`.vsix`) version of the extension
-> installed may cause all kinds of chaos in your development environment.
+  > **Note**: We have provided a demo project as part of this repo, but feel
+  > free to use any DVC project that you have available.
 
-Finally, you'll probably want a DVC project to test the extension. We have
-provided a demo project as part of this repo, but feel free to use any DVC
-project that you have available.
-
-<a id='note'></a>
+<a id='warning'></a>
 
 > **Warning**  
 > When using any project that relies on an isolated Python environment (`conda`,
@@ -81,7 +77,7 @@ encouraged to try other DVC repositories- especially real-world cases!
   environment to be loaded.
 
 - This will happen automatically IF the `ms-python.python` extension is
-  installed within the VS code instance that you are developing against.
+  installed within the VS Code instance that you are developing against.
 
 ## React component development with Storybook
 
