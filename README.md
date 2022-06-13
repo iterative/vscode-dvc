@@ -13,9 +13,9 @@ Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
 databases are required.
 
-- **Experiment bookkeeping**: Activate a visual interface to record training
-  data, parameters, and metrics on top of [Git](https://git-scm.com/). Use it to
-  navigate your experiments, compare their results, and find the best ML models.
+- **Experiment tracking**: Visually record training data, parameters, and
+  metrics on top of [Git](https://git-scm.com/). Use this to navigate your
+  experiments, compare their results, and find the best ML models.
 - **Visualization**: Plot experiment data in a customizable dashboard.
 - **Live tracking**: Capture and see metrics changing in real time.
 - **Reproducibility**: Reliably get back to any previous experiment. Run it
@@ -49,7 +49,7 @@ databases are required.
 2. Install this extension in VS Code.
 3. Follow the **Get Started** page that pops up!
 
-> 💡 Feel free to try our [example DVC project] first! Opening it [with Github
+> 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
 > Codespaces] will include this extension automatically.
 
 [example dvc project]: https://github.com/iterative/example-get-started
