@@ -48,7 +48,7 @@ require additional services or databases. It enables other DVC features as well!
 2. [Install the DVC Extension] in VS Code.
 3. Follow the **Get Started** page that pops up!
 
-> 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
+> 💡 Feel free to try our [example DVC project] first! Opening it [with Github
 > Codespaces] will include this extension automatically.
 
 [install the dvc extension]:
