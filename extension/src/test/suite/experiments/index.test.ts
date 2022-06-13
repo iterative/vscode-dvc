@@ -8,7 +8,8 @@ import {
   commands,
   workspace,
   Uri,
-  QuickPickItem
+  QuickPickItem,
+  ViewColumn
 } from 'vscode'
 import { buildExperiments } from './util'
 import { Disposable } from '../../../extension'
@@ -45,7 +46,7 @@ import {
 } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
-import { joinColumnPath } from '../../../experiments/columns/paths'
+import { buildMetricOrParamPath } from '../../../experiments/columns/paths'
 import { BaseWebview } from '../../../webview'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
@@ -59,6 +60,7 @@ import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
+import { ExperimentFlag } from '../../../cli/constants'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -124,8 +126,10 @@ suite('Experiments Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: columnsFixture,
+        filters: [],
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -390,6 +394,50 @@ suite('Experiments Test Suite', () => {
       )
     })
 
+    it('should be able to handle a message to open the source params file from a column path', async () => {
+      const { experiments } = setupExperimentsAndMockCommands()
+
+      const mockShowTextDocument = stub(window, 'showTextDocument')
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockColumnId = 'params:params.yaml_5'
+
+      mockMessageReceived.fire({
+        payload: mockColumnId,
+        type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
+      })
+
+      expect(mockShowTextDocument).to.be.calledOnce
+      expect(mockShowTextDocument).to.be.calledWithExactly(
+        Uri.file(join(dvcDemoPath, 'params.yaml')),
+        {
+          viewColumn: ViewColumn.Beside
+        }
+      )
+    })
+
+    it('should be able to handle a message to open different params files than the default one', async () => {
+      const { experiments } = setupExperimentsAndMockCommands()
+
+      const mockShowTextDocument = stub(window, 'showTextDocument')
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockColumnId = 'params:params_alt.json_5:nested1.nested2'
+
+      mockMessageReceived.fire({
+        payload: mockColumnId,
+        type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
+      })
+
+      expect(mockShowTextDocument).to.be.calledOnce
+      expect(mockShowTextDocument).to.be.calledWithExactly(
+        Uri.file(join(dvcDemoPath, 'params_alt.json')),
+        {
+          viewColumn: ViewColumn.Beside
+        }
+      )
+    })
+
     it('should be able to handle a message to apply an experiment to workspace', async () => {
       const { experiments, mockExecuteCommand } =
         setupExperimentsAndMockCommands()
@@ -502,8 +550,10 @@ suite('Experiments Test Suite', () => {
     })
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments, cliRunner } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
 
       const mockModifiedParams = [
         '-S',
@@ -513,6 +563,9 @@ suite('Experiments Test Suite', () => {
       ]
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+        undefined
+      )
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -525,10 +578,10 @@ suite('Experiments Test Suite', () => {
       })
 
       await tableChangePromise
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_RESET_AND_RUN,
+      expect(mockRunExperiment).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledWithExactly(
         dvcDemoPath,
+        ExperimentFlag.RESET,
         ...mockModifiedParams
       )
     })
@@ -637,8 +690,10 @@ suite('Experiments Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: [],
+        filters: [],
         hasCheckpoints: true,
         hasColumns: true,
+        hasRunningExperiment: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -749,7 +804,11 @@ suite('Experiments Test Suite', () => {
       })
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      const sortPath = joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
+      const sortPath = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'test'
+      )
 
       mockShowQuickPick.onFirstCall().resolves({
         label: 'test',
@@ -824,35 +883,35 @@ suite('Experiments Test Suite', () => {
   describe('persisted state', () => {
     const firstSortDefinition = {
       descending: false,
-      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test')
+      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'test')
     }
     const secondSortDefinition = {
       descending: true,
-      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'other')
+      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'other')
     }
     const sortDefinitions: SortDefinition[] = [
       firstSortDefinition,
       secondSortDefinition
     ]
 
-    const firstFilterId = joinColumnPath(
+    const firstFilterId = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'test==1'
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'test'),
+      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'test'),
       value: 1
     }
-    const secondFilterId = joinColumnPath(
+    const secondFilterId = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'other∈testcontains'
     )
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: joinColumnPath(ColumnType.PARAMS, 'params.yaml', 'other'),
+      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'other'),
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [

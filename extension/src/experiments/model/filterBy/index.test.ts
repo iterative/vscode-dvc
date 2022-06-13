@@ -1,8 +1,8 @@
-import { filterExperiments, Operator } from '.'
-import { joinColumnPath } from '../../columns/paths'
+import { splitExperimentsByFilters, Operator } from '.'
+import { buildMetricOrParamPath } from '../../columns/paths'
 import { Experiment, ColumnType } from '../../webview/contract'
 
-describe('filterExperiments', () => {
+describe('splitExperimentsByFilters', () => {
   const paramsFile = 'params.yaml'
   const experiments = [
     {
@@ -41,11 +41,18 @@ describe('filterExperiments', () => {
   ] as unknown as Experiment[]
 
   it('should not filter experiments if they do not have the provided value (for queued experiments)', () => {
-    const unfilteredQueuedExperiments = filterExperiments(
+    const {
+      unfiltered: unfilteredQueuedExperiments,
+      filtered: filteredQueuedExperiments
+    } = splitExperimentsByFilters(
       [
         {
           operator: Operator.IS_FALSE,
-          path: joinColumnPath(ColumnType.METRICS, 'metrics.json', 'acc'),
+          path: buildMetricOrParamPath(
+            ColumnType.METRICS,
+            'metrics.json',
+            'acc'
+          ),
           value: undefined
         }
       ],
@@ -63,195 +70,194 @@ describe('filterExperiments', () => {
     expect(
       unfilteredQueuedExperiments.map(experiment => experiment.id)
     ).toStrictEqual([1, 2, 3])
+    expect(
+      filteredQueuedExperiments.map(experiment => experiment.id)
+    ).toStrictEqual([])
   })
 
-  it('should return the original experiments if no filters are provided', () => {
-    const unFilteredExperiments = filterExperiments([], experiments)
-    expect(unFilteredExperiments).toStrictEqual(experiments)
+  it('should mark the original experiments as unfiltered if no filters are provided', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters([], experiments)
+    expect(unfiltered).toStrictEqual(experiments)
+    expect(filtered).toStrictEqual([])
   })
 
-  it('should filter the experiments by a given filter', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by a given filter', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.GREATER_THAN,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '2'
         }
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
-      3
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 2])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([3])
   })
 
-  it('should filter the experiments by an equals filter', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by an equals filter', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.EQUAL,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '2'
         }
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
-      2
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([2])
   })
 
-  it('should filter the experiments by a not equals filter', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by a not equals filter', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.NOT_EQUAL,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '2'
         }
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
-      1, 3
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([2])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1, 3])
   })
 
-  it('should filter the experiments by multiple filters', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by multiple filters', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.GREATER_THAN,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '0'
         },
         {
           operator: Operator.LESS_THAN_OR_EQUAL,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '2'
         }
       ],
       experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toStrictEqual([
-      1, 2
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1, 2])
   })
 
-  it('should filter the experiments by multiple filters on multiple params', () => {
-    const filteredExperiments = filterExperiments(
+  it('should split the experiments by multiple filters on multiple params', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.GREATER_THAN_OR_EQUAL,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '0'
         },
         {
           operator: Operator.LESS_THAN,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '10'
         },
         {
           operator: Operator.EQUAL,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'sort'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'sort'),
           value: '10'
         }
       ],
       experiments
     )
-    expect(filteredExperiments).toStrictEqual([])
+    expect(filtered).toStrictEqual(experiments)
+    expect(unfiltered).toStrictEqual([])
   })
 
-  it('should filter the experiments using string contains', () => {
-    const experimentsWithText = filterExperiments(
+  it('should split the experiments using string contains', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.CONTAINS,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'text'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'text'),
           value: 'def'
         }
       ],
       experiments
     )
-    expect(experimentsWithText.map(experiment => experiment.id)).toStrictEqual([
-      1
-    ])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([2, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1])
   })
 
-  it('should filter all experiments if given a numeric column to filter with string contains', () => {
-    const noExperiments = filterExperiments(
+  it('should split all experiments if given a numeric column to filter with string contains', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.CONTAINS,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '1'
         }
       ],
       experiments
     )
-    expect(noExperiments).toStrictEqual([])
+    expect(filtered).toStrictEqual(experiments)
+    expect(unfiltered).toStrictEqual([])
   })
 
-  it('should not filter any experiments if given a numeric column to filter with string does not contain', () => {
-    const unfilteredExperiments = filterExperiments(
+  it('should split the experiments when given a numeric column to filter with string does not contain', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.NOT_CONTAINS,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'filter'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'filter'),
           value: '1'
         }
       ],
       experiments
     )
-    expect(unfilteredExperiments).toStrictEqual(experiments)
+    expect(filtered).toStrictEqual([])
+    expect(unfiltered).toStrictEqual(experiments)
   })
 
-  it('should filter the experiments using string does not contain', () => {
-    const experimentsWithoutText = filterExperiments(
+  it('should split the experiments using string does not contain', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.NOT_CONTAINS,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'text'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'text'),
           value: 'def'
         }
       ],
       experiments
     )
-    expect(
-      experimentsWithoutText.map(experiment => experiment.id)
-    ).toStrictEqual([2, 3])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([2, 3])
   })
 
-  it('should filter the experiments using boolean is true', () => {
-    const experimentsWithTrueBool = filterExperiments(
+  it('should split the experiments using boolean is true', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.IS_TRUE,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'bool'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'bool'),
           value: undefined
         }
       ],
       experiments
     )
-    expect(
-      experimentsWithTrueBool.map(experiment => experiment.id)
-    ).toStrictEqual([1])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([2, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1])
   })
 
-  it('should filter the experiments using boolean is false', () => {
-    const experimentsWithFalseBool = filterExperiments(
+  it('should split the experiments using boolean is false', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
       [
         {
           operator: Operator.IS_FALSE,
-          path: joinColumnPath(ColumnType.PARAMS, paramsFile, 'bool'),
+          path: buildMetricOrParamPath(ColumnType.PARAMS, paramsFile, 'bool'),
           value: undefined
         }
       ],
       experiments
     )
-    expect(
-      experimentsWithFalseBool.map(experiment => experiment.id)
-    ).toStrictEqual([2])
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([2])
   })
 })

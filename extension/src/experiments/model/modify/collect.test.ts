@@ -7,6 +7,7 @@ describe('collectFlatExperimentParams', () => {
   it('should flatten the params into an array', () => {
     const params = collectFlatExperimentParams(rowsFixture[0].params)
     expect(params).toStrictEqual([
+      { path: appendColumnToPath('params.yaml', 'code_names'), value: [0, 1] },
       { path: appendColumnToPath('params.yaml', 'epochs'), value: 2 },
       {
         path: appendColumnToPath('params.yaml', 'learning_rate'),

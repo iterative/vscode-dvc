@@ -5,11 +5,11 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
-import { SectionRenamer } from './SectionRenamer'
 import { AllIcons, Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
+import Tooltip from '../../shared/components/tooltip/Tooltip'
 
 export interface CommonPlotsContainerProps {
   onResize: (size: PlotSize) => void
@@ -23,6 +23,24 @@ export interface PlotsContainerProps extends CommonPlotsContainerProps {
   menu?: PlotsPickerProps
 }
 
+export const SectionDescription = {
+  [Section.CHECKPOINT_PLOTS]:
+    'Linear plots based on data from the experiments table.',
+  [Section.COMPARISON_TABLE]:
+    'A table used to display image plots side by side.',
+  [Section.TEMPLATE_PLOTS]:
+    'JSON, YAML, CSV or TSV files visualized using Vega pre-defined or custom Vega-Lite templates.'
+}
+
+const InfoIcon = () => (
+  <Icon
+    icon={AllIcons.INFO}
+    width={16}
+    height={16}
+    className={styles.infoIcon}
+  />
+)
+
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
   sectionKey,
@@ -32,8 +50,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   currentSize,
   menu
 }) => {
-  const [isRenaming, setIsRenaming] = useState(false)
-  const [sectionTitle, setSectionTitle] = useState(title)
   const [size, setSize] = useState<PlotSize>(currentSize)
 
   const open = !sectionCollapsed
@@ -49,14 +65,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     [styles.largePlots]: size === PlotSize.LARGE
   })
 
-  const menuItems: IconMenuItemProps[] = [
-    {
-      icon: AllIcons.PENCIL,
-      onClick: () => setIsRenaming(true),
-      tooltip: 'Rename'
-    }
-  ]
-
   const changeSize = (newSize: PlotSize) => {
     if (size === newSize) {
       return
@@ -68,29 +76,30 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     onResize(newSize)
     setSize(newSize)
   }
+  const menuItems: IconMenuItemProps[] = [
+    {
+      icon: AllIcons.DOTS,
+      onClickNode: (
+        <SizePicker currentSize={size} setSelectedSize={changeSize} />
+      ),
+      tooltip: 'Resize'
+    }
+  ]
 
   if (menu) {
-    menuItems.push({
+    menuItems.unshift({
       icon: AllIcons.LINES,
       onClickNode: <PlotsPicker {...menu} />,
       tooltip: 'Select Plots'
     })
   }
 
-  menuItems.push({
-    icon: AllIcons.DOTS,
-    onClickNode: <SizePicker currentSize={size} setSelectedSize={changeSize} />,
-    tooltip: 'Resize'
-  })
-
-  const onTitleChanged = (name: string) => {
-    setIsRenaming(false)
-    setSectionTitle(name)
-    sendMessage({
-      payload: { name, section: sectionKey },
-      type: MessageFromWebviewType.RENAME_SECTION
-    })
-  }
+  const tooltipContent = (
+    <div className={styles.infoTooltip}>
+      <InfoIcon />
+      {SectionDescription[sectionKey]}
+    </div>
+  )
 
   return (
     <div className={styles.plotsContainerWrapper}>
@@ -114,14 +123,15 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             className={styles.detailsIcon}
           />
 
-          {isRenaming ? (
-            <SectionRenamer
-              defaultTitle={sectionTitle}
-              onChangeTitle={onTitleChanged}
-            />
-          ) : (
-            sectionTitle
-          )}
+          {title}
+          <Tooltip content={tooltipContent} placement="bottom-end">
+            <div
+              className={styles.infoTooltipToggle}
+              data-testid="info-tooltip-toggle"
+            >
+              <InfoIcon />
+            </div>
+          </Tooltip>
         </summary>
         <div>
           {open && (

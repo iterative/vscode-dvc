@@ -74,14 +74,14 @@ export const deeplyNestedOutput: ExperimentsOutput = {
 export const columns: Column[] = [
   {
     hasChildren: true,
-    name: 'params.yaml',
+    label: 'params.yaml',
     parentPath: 'params',
     path: 'params:params.yaml',
     type: ColumnType.PARAMS
   },
   {
     hasChildren: true,
-    name: 'nested1',
+    label: 'nested1',
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:nested1',
     type: ColumnType.PARAMS
@@ -89,7 +89,7 @@ export const columns: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 15,
-    name: 'doubled',
+    label: 'doubled',
     parentPath: 'params:params.yaml:nested1',
     path: 'params:params.yaml:nested1.doubled',
     pathArray: ['params', 'params.yaml', 'nested1', 'doubled'],
@@ -98,21 +98,21 @@ export const columns: Column[] = [
   },
   {
     hasChildren: true,
-    name: 'nested1.nested2.nested3.nested4',
+    label: 'nested1.nested2.nested3.nested4',
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4',
     type: ColumnType.PARAMS
   },
   {
     hasChildren: true,
-    name: 'nested5',
+    label: 'nested5',
     parentPath: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5',
     type: ColumnType.PARAMS
   },
   {
     hasChildren: true,
-    name: 'nested6',
+    label: 'nested6',
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6',
@@ -121,7 +121,7 @@ export const columns: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 6,
-    name: 'nested7',
+    label: 'nested7',
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6.nested7',
@@ -141,21 +141,21 @@ export const columns: Column[] = [
   },
   {
     hasChildren: true,
-    name: 'nested1.nested2.nested3',
+    label: 'nested1.nested2.nested3',
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3',
     type: ColumnType.PARAMS
   },
   {
     hasChildren: true,
-    name: 'nested4',
+    label: 'nested4',
     parentPath: 'params:params.yaml:nested1%2Enested2%2Enested3',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4',
     type: ColumnType.PARAMS
   },
   {
     hasChildren: true,
-    name: 'nested5b',
+    label: 'nested5b',
     parentPath: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b',
     type: ColumnType.PARAMS
@@ -163,7 +163,7 @@ export const columns: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 23,
-    name: 'nested6',
+    label: 'nested6',
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6',
@@ -183,7 +183,7 @@ export const columns: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 16,
-    name: 'doubled',
+    label: 'doubled',
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled',
@@ -203,7 +203,7 @@ export const columns: Column[] = [
   {
     hasChildren: false,
     maxStringLength: 1,
-    name: 'outlier',
+    label: 'outlier',
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:outlier',
     pathArray: ['params', 'params.yaml', 'outlier'],
@@ -281,7 +281,12 @@ const deeplyNestedTableData: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
+  filters: [
+    'params:params.yaml:nested1.doubled',
+    'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled'
+  ],
   hasCheckpoints: false,
+  hasRunningExperiment: false,
   sorts: [
     {
       path: 'params:params.yaml:nested1.doubled',

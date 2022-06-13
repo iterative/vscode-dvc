@@ -125,6 +125,16 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.notifyChanged()
   }
 
+  public refreshPlots() {
+    Toast.infoWithOptions(
+      'Attempting to refresh plots for selected experiments.'
+    )
+    for (const { revision } of this.plots?.getSelectedRevisionDetails() || []) {
+      this.plots?.setupManualRefresh(revision)
+    }
+    this.data.managedUpdate()
+  }
+
   public getChildPaths(path: string) {
     return this.paths?.getChildren(path) || []
   }
@@ -172,10 +182,8 @@ export class Plots extends BaseRepository<TPlotsData> {
       comparison: this.getComparisonPlots(),
       hasPlots: !!this.paths?.hasPaths(),
       hasSelectedPlots: definedAndNonEmpty(this.paths?.getSelected()),
-      hasSelectedRevisions: definedAndNonEmpty(
-        this.plots?.getSelectedRevisionDetails()
-      ),
       sectionCollapsed: this.plots?.getSectionCollapsed(),
+      selectedRevisions: this.plots?.getSelectedRevisionDetails(),
       template: this.getTemplatePlots()
     })
   }
@@ -190,7 +198,6 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     return {
       plots,
-      sectionName: this.plots.getSectionName(Section.TEMPLATE_PLOTS),
       size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
     }
   }
@@ -206,8 +213,6 @@ export class Plots extends BaseRepository<TPlotsData> {
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: this.plots.getSelectedRevisionDetails(),
-      sectionName: this.plots.getSectionName(Section.COMPARISON_TABLE),
       size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
     }
   }
@@ -251,11 +256,6 @@ export class Plots extends BaseRepository<TPlotsData> {
             )
           case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
             return this.setSectionCollapsed(message.payload)
-          case MessageFromWebviewType.RENAME_SECTION:
-            return this.setSectionName(
-              message.payload.section,
-              message.payload.name
-            )
           case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
             return this.setComparisonOrder(message.payload)
           case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
@@ -267,7 +267,9 @@ export class Plots extends BaseRepository<TPlotsData> {
           case MessageFromWebviewType.SELECT_EXPERIMENTS:
             return this.selectExperimentsFromWebview()
           case MessageFromWebviewType.REFRESH_REVISION:
-            return this.attemptToRefreshData(message.payload)
+            return this.attemptToRefreshRevData(message.payload)
+          case MessageFromWebviewType.REFRESH_REVISIONS:
+            return this.attemptToRefreshSelectedData(message.payload)
           case MessageFromWebviewType.TOGGLE_EXPERIMENT:
             return this.setExperimentStatus(message.payload)
           default:
@@ -303,19 +305,11 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
   }
 
-  private setSectionName(section: Section, name: string) {
-    this.plots?.setSectionName(section, name)
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_RENAME_SECTION,
-      { section },
-      undefined
-    )
-  }
-
   private setComparisonOrder(order: string[]) {
     this.plots?.setComparisonOrder(order)
     this.webview?.show({
-      comparison: this.getComparisonPlots()
+      comparison: this.getComparisonPlots(),
+      selectedRevisions: this.plots?.getSelectedRevisionDetails()
     })
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
@@ -364,13 +358,26 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
   }
 
-  private attemptToRefreshData(revision: string) {
-    Toast.infoWithOptions(`Attempting to refresh ${revision} plots data.`)
+  private attemptToRefreshRevData(revision: string) {
+    Toast.infoWithOptions(`Attempting to refresh plots data for ${revision}.`)
     this.plots?.setupManualRefresh(revision)
     this.data.managedUpdate()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-      undefined,
+      { revisions: 1 },
+      undefined
+    )
+  }
+
+  private attemptToRefreshSelectedData(revisions: string[]) {
+    Toast.infoWithOptions('Attempting to refresh visible plots data.')
+    for (const revision of revisions) {
+      this.plots?.setupManualRefresh(revision)
+    }
+    this.data.managedUpdate()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_MANUAL_REFRESH,
+      { revisions: revisions.length },
       undefined
     )
   }

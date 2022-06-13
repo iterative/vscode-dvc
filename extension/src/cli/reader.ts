@@ -49,7 +49,14 @@ export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
-export type Value = string | number | boolean | null
+export type Value =
+  | string
+  | number
+  | boolean
+  | null
+  | number[]
+  | string[]
+  | boolean[]
 
 export interface ValueTreeOrError {
   data?: ValueTree
@@ -62,7 +69,7 @@ type RelPathObject<T> = {
 
 export type ValueTreeRoot = RelPathObject<ValueTreeOrError>
 
-interface ValueTreeNode {
+export interface ValueTreeNode {
   [key: string]: Value | ValueTree
 }
 
@@ -81,10 +88,12 @@ export interface BaseExperimentFields {
 type Dep = { hash: string; size: number; nfiles: null | number }
 type Out = Dep & { use_cache: boolean; is_data_source: boolean }
 
+export type Deps = RelPathObject<Dep>
+
 export interface ExperimentFields extends BaseExperimentFields {
   params?: ValueTreeRoot
   metrics?: ValueTreeRoot
-  deps?: RelPathObject<Dep>
+  deps?: Deps
   outs?: RelPathObject<Out>
 }
 

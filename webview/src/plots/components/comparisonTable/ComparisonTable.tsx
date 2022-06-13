@@ -14,9 +14,12 @@ import { sendMessage } from '../../../shared/vscode'
 import { RootState } from '../../store'
 
 export const ComparisonTable: React.FC = () => {
-  const { plots, revisions } = useSelector(
-    (state: RootState) => state.comparison
+  const { plots } = useSelector((state: RootState) => state.comparison)
+
+  const { selectedRevisions: revisions } = useSelector(
+    (state: RootState) => state.webview
   )
+
   const pinnedColumn = useRef('')
   const [columns, setColumns] = useState<ComparisonTableColumn[]>([])
   const [comparisonPlots, setComparisonPlots] = useState<ComparisonPlots>([])

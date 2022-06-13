@@ -12,6 +12,7 @@ import {
 import { Provider, useDispatch } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import React from 'react'
 import { PlotsComparisonData, Revision } from 'dvc/src/plots/webview/contract'
 import { ComparisonTable } from './ComparisonTable'
@@ -27,6 +28,7 @@ import { DragDropProvider } from '../../../shared/components/dragDrop/DragDropCo
 import { store } from '../../store'
 import { ReducerName } from '../../constants'
 import { clearData } from '../../actions'
+import { updateSelectedRevisions } from '../webviewSlice'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
@@ -43,27 +45,40 @@ describe('ComparisonTable', () => {
     jest.clearAllMocks()
   })
 
-  const MockedState: React.FC<{ data: PlotsComparisonData }> = ({
-    children,
-    data
-  }) => {
+  const MockedState: React.FC<{
+    data: PlotsComparisonData
+    selectedRevisions: Revision[]
+  }> = ({ children, data, selectedRevisions }) => {
     const dispatch = useDispatch()
     dispatch(clearData(ReducerName.comparison))
     dispatch(update(data))
+    dispatch(updateSelectedRevisions(selectedRevisions))
 
     return <>{children}</>
   }
 
-  const revisions = comparisonTableFixture.revisions.map(
-    ({ revision }) => revision
-  )
-  const namedRevisions = comparisonTableFixture.revisions.map(
+  const selectedRevisions: Revision[] = plotsRevisionsFixture
+  const revisions = selectedRevisions.map(({ revision }) => revision)
+  const namedRevisions = selectedRevisions.map(
     ({ revision, group }) => `${revision}${group || ''}`
   )
-  const renderTable = (props = comparisonTableFixture) =>
+
+  interface RenderTableProps extends PlotsComparisonData {
+    revisions: Revision[]
+  }
+  const renderTable = (
+    // eslint-disable-next-line unicorn/no-object-as-default-parameter
+    props: RenderTableProps = {
+      ...comparisonTableFixture,
+      revisions: plotsRevisionsFixture
+    }
+  ) =>
     render(
       <Provider store={store}>
-        <MockedState data={props}>
+        <MockedState
+          data={props}
+          selectedRevisions={revisions as unknown as Revision[]}
+        >
           <DragDropProvider>
             <ComparisonTable />
           </DragDropProvider>
@@ -203,7 +218,10 @@ describe('ComparisonTable', () => {
   it('should remove a column if it is not part of the revisions anymore', () => {
     const { rerender } = render(
       <Provider store={store}>
-        <MockedState data={comparisonTableFixture}>
+        <MockedState
+          data={comparisonTableFixture}
+          selectedRevisions={plotsRevisionsFixture}
+        >
           <DragDropProvider>
             <ComparisonTable />
           </DragDropProvider>
@@ -215,14 +233,15 @@ describe('ComparisonTable', () => {
 
     expect(headers).toStrictEqual(namedRevisions)
 
-    const filteredRevisions = comparisonTableFixture.revisions.filter(
+    const filteredRevisions = selectedRevisions.filter(
       ({ revision }) => revision !== revisions[3]
     )
 
     rerender(
       <Provider store={store}>
         <MockedState
-          data={{ ...comparisonTableFixture, revisions: filteredRevisions }}
+          data={comparisonTableFixture}
+          selectedRevisions={filteredRevisions}
         >
           <DragDropProvider>
             <ComparisonTable />
@@ -243,7 +262,10 @@ describe('ComparisonTable', () => {
   it('should add a new column if there is a new revision', () => {
     const { rerender } = render(
       <Provider store={store}>
-        <MockedState data={comparisonTableFixture}>
+        <MockedState
+          data={comparisonTableFixture}
+          selectedRevisions={plotsRevisionsFixture}
+        >
           <DragDropProvider>
             <ComparisonTable />
           </DragDropProvider>
@@ -252,14 +274,15 @@ describe('ComparisonTable', () => {
     )
     const newRevName = 'newRev'
     const newRevisions = [
-      ...comparisonTableFixture.revisions,
+      ...selectedRevisions,
       { displayColor: '#000000', revision: newRevName }
     ] as Revision[]
 
     rerender(
       <Provider store={store}>
         <MockedState
-          data={{ ...comparisonTableFixture, revisions: newRevisions }}
+          data={comparisonTableFixture}
+          selectedRevisions={newRevisions}
         >
           <DragDropProvider>
             <ComparisonTable />
@@ -285,7 +308,7 @@ describe('ComparisonTable', () => {
         }
       })),
       revisions: [
-        ...comparisonTableFixture.revisions,
+        ...selectedRevisions,
         {
           displayColor: '#f56565',
           group: undefined,

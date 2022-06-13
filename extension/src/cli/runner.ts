@@ -10,7 +10,6 @@ import { getOptions } from './options'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
-import { setContextValue } from '../vscode/context'
 import { StopWatch } from '../util/time'
 import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
@@ -70,7 +69,6 @@ export class CliRunner extends Disposable implements ICli {
     this.dispose.track(
       this.onDidCompleteProcess(() => {
         this.pseudoTerminal.setBlocked(false)
-        CliRunner.setRunningContext(false)
         this.processOutput.fire(
           '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
         )
@@ -101,9 +99,6 @@ export class CliRunner extends Disposable implements ICli {
     )
   }
 
-  private static setRunningContext = (isRunning: boolean) =>
-    setContextValue('dvc.runner.running', isRunning)
-
   public runExperiment(dvcRoot: string, ...args: Args) {
     return this.run(
       dvcRoot,
@@ -113,8 +108,8 @@ export class CliRunner extends Disposable implements ICli {
     )
   }
 
-  public runExperimentReset(dvcRoot: string) {
-    return this.runExperiment(dvcRoot, ExperimentFlag.RESET)
+  public runExperimentReset(dvcRoot: string, ...args: Args) {
+    return this.runExperiment(dvcRoot, ExperimentFlag.RESET, ...args)
   }
 
   public runExperimentQueue(dvcRoot: string) {
@@ -207,7 +202,6 @@ export class CliRunner extends Disposable implements ICli {
   }
 
   private startProcess(cwd: string, args: Args) {
-    CliRunner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     this.currentProcess = this.createProcess({

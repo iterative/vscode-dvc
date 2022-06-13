@@ -1,7 +1,8 @@
-import { Event, EventEmitter, Memento, window } from 'vscode'
+import { join } from 'path'
+import { Event, EventEmitter, Memento, Uri, ViewColumn, window } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
-import { pickAndModifyParams } from './model/queue/quickPick'
+import { pickAndModifyParams } from './model/modify/quickPick'
 import { pickExperiment } from './quickPick'
 import {
   pickFilterToAdd,
@@ -14,13 +15,16 @@ import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
+import { DecorationProvider } from './model/filterBy/decorationProvider'
 import { SortDefinition } from './model/sortBy'
+import { splitColumnPath } from './columns/paths'
 import { ResourceLocator } from '../resourceLocator'
 import {
   AvailableCommands,
   CommandId,
   InternalCommands
 } from '../commands/internal'
+import { Args } from '../cli/constants'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -72,6 +76,9 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
+  private readonly decorationProvider = this.dispose.track(
+    new DecorationProvider()
+  )
 
   private readonly internalCommands: InternalCommands
 
@@ -255,6 +262,14 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public getFilteredExperiments() {
+    return this.experiments.getFilteredExperiments()
+  }
+
+  public getExperimentCount() {
+    return this.experiments.getExperimentCount()
+  }
+
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 
@@ -285,7 +300,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     if (useFilters) {
       const filteredExperiments = this.experiments
-        .getFilteredExperiments()
+        .getUnfilteredExperiments()
         .filter(exp => !exp.queued)
       if (tooManySelected(filteredExperiments)) {
         await this.warnAndDoNotAutoApply(filteredExperiments)
@@ -371,10 +386,26 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
+  public hasRunningExperiment() {
+    return this.experiments.hasRunningExperiment()
+  }
+
   private hideTableColumn(path: string) {
     this.toggleColumnStatus(path)
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
+      { path },
+      undefined
+    )
+  }
+
+  private async openParamsFileToTheSide(path: string) {
+    const [, fileSegment] = splitColumnPath(path)
+    await window.showTextDocument(Uri.file(join(this.dvcRoot, fileSegment)), {
+      viewColumn: ViewColumn.Beside
+    })
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE,
       { path },
       undefined
     )
@@ -390,7 +421,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private async runCommand(commandId: CommandId, ...args: string[]) {
+  private async runCommand(commandId: CommandId, ...args: Args) {
     await Toast.showOutput(
       this.internalCommands.executeCommand(commandId, this.dvcRoot, ...args)
     )
@@ -399,6 +430,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private notifyChanged(data?: ExperimentsOutput) {
+    this.decorationProvider.setState(
+      this.experiments.getLabels(),
+      this.experiments.getLabelsToDecorate()
+    )
     this.experimentsChanged.fire(data)
     this.notifyColumnsChanged()
   }
@@ -418,8 +453,10 @@ export class Experiments extends BaseRepository<TableData> {
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
+      filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.hasCheckpoints(),
       hasColumns: this.columns.hasColumns(),
+      hasRunningExperiment: this.experiments.hasRunningExperiment(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
@@ -440,6 +477,8 @@ export class Experiments extends BaseRepository<TableData> {
             return this.setExperimentStatus(message.payload)
           case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
             return this.hideTableColumn(message.payload)
+          case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
+            return this.openParamsFileToTheSide(message.payload)
           case MessageFromWebviewType.SORT_COLUMN:
             return this.addColumnSort(message.payload)
           case MessageFromWebviewType.REMOVE_COLUMN_SORT:

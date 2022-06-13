@@ -3,7 +3,6 @@ import {
   CheckpointPlotData,
   CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   PlotSize,
   Section
@@ -25,7 +24,6 @@ const initialState: CheckpointPlotsState = {
   plots: [],
   plotsById: {},
   plotsIds: [],
-  sectionName: DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS],
   selectedMetrics: [],
   size: DEFAULT_SECTION_SIZES[Section.CHECKPOINT_PLOTS]
 }

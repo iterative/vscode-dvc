@@ -8,6 +8,8 @@ import {
   Uri
 } from 'vscode'
 import { ExperimentType } from '.'
+import { collectDeletable, ExperimentItem } from './collect'
+import { getDecoratableUri } from './filterBy/decorationProvider'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
@@ -20,21 +22,6 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
 import { Title } from '../../vscode/title'
 import { Disposable } from '../../class/dispose'
-
-export type ExperimentItem = {
-  command?: {
-    arguments: { dvcRoot: string; id: string }[]
-    command: RegisteredCommands
-    title: string
-  }
-  dvcRoot: string
-  description: string | undefined
-  id: string
-  label: string
-  collapsibleState: TreeItemCollapsibleState
-  type: ExperimentType
-  iconPath: ThemeIcon | Uri | Resource
-}
 
 export class ExperimentsTree
   extends Disposable
@@ -60,7 +47,7 @@ export class ExperimentsTree
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
-      createTreeView<ExperimentItem>('dvc.views.experimentsTree', this)
+      createTreeView<ExperimentItem>('dvc.views.experimentsTree', this, true)
     )
 
     this.dispose.track(
@@ -90,7 +77,7 @@ export class ExperimentsTree
 
     const { label, collapsibleState, iconPath, command, description, type } =
       element
-    const item = new TreeItem(label, collapsibleState)
+    const item = new TreeItem(getDecoratableUri(label), collapsibleState)
     item.iconPath = iconPath
     item.description = description
     item.contextValue = type
@@ -183,12 +170,19 @@ export class ExperimentsTree
 
     internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TREE_REMOVE,
-      ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.runCommand(
-          AvailableCommands.EXPERIMENT_REMOVE,
-          dvcRoot,
-          id
-        )
+      async experimentItem => {
+        const selected = [...this.getSelectedExperimentItems(), experimentItem]
+
+        const deletable = collectDeletable(selected)
+
+        for (const [dvcRoot, ids] of Object.entries(deletable)) {
+          await this.experiments.runCommand(
+            AvailableCommands.EXPERIMENT_REMOVE,
+            dvcRoot,
+            ...ids
+          )
+        }
+      }
     )
   }
 
@@ -335,7 +329,13 @@ export class ExperimentsTree
       )
     )
 
-    return `${selected} of ${dvcRoots.length * MAX_SELECTED_EXPERIMENTS}`
+    const total = sum(
+      dvcRoots.map(dvcRoot =>
+        this.experiments.getRepository(dvcRoot).getExperimentCount()
+      )
+    )
+
+    return `${selected} of ${total} (max ${MAX_SELECTED_EXPERIMENTS})`
   }
 
   private isRoot(element: string | ExperimentItem): element is string {
@@ -344,5 +344,9 @@ export class ExperimentsTree
 
   private getDisplayId(type: ExperimentType, label: string, id: string) {
     return type === ExperimentType.CHECKPOINT ? label : id
+  }
+
+  private getSelectedExperimentItems() {
+    return [...this.view.selection]
   }
 }

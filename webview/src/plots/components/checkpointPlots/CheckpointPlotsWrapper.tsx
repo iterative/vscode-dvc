@@ -10,8 +10,9 @@ import { RootState } from '../../store'
 
 export const CheckpointPlotsWrapper: React.FC = () => {
   const dispatch = useDispatch()
-  const { plotsIds, size, sectionName, selectedMetrics, isCollapsed, colors } =
-    useSelector((state: RootState) => state.checkpoint)
+  const { plotsIds, size, selectedMetrics, isCollapsed, colors } = useSelector(
+    (state: RootState) => state.checkpoint
+  )
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
@@ -34,7 +35,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
 
   return (
     <PlotsContainer
-      title={sectionName}
+      title="Trends"
       sectionKey={Section.CHECKPOINT_PLOTS}
       menu={{
         plots: metrics,

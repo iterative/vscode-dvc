@@ -2,12 +2,12 @@ import { Meta, Story } from '@storybook/react/types-6-0'
 import { fireEvent, within } from '@testing-library/react'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
+import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import {
   ComparisonRevisionData,
-  DEFAULT_SECTION_NAMES,
+  Revision,
   PlotsComparisonData,
-  PlotSize,
-  Section
+  PlotSize
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
@@ -17,20 +17,22 @@ import { clearData } from '../plots/actions'
 import { ReducerName } from '../plots/constants'
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
 import { store } from '../plots/store'
+import { updateSelectedRevisions } from '../plots/components/webviewSlice'
 
-const MockedState: React.FC<{ data: PlotsComparisonData }> = ({
-  children,
-  data
-}) => {
+const MockedState: React.FC<{
+  data: PlotsComparisonData
+  selectedRevisions: Revision[]
+}> = ({ children, data, selectedRevisions }) => {
   const dispatch = useDispatch()
   dispatch(clearData(ReducerName.comparison))
   dispatch(update(data))
+  dispatch(updateSelectedRevisions(selectedRevisions))
 
   return <>{children}</>
 }
 
 export default {
-  args: comparisonTableFixture,
+  args: { ...comparisonTableFixture, revisions: plotsRevisionsFixture },
   component: ComparisonTable,
   title: 'Comparison Table'
 } as Meta
@@ -41,10 +43,9 @@ const Template: Story = ({ plots, revisions }) => {
       <MockedState
         data={{
           plots,
-          revisions,
-          sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
           size: PlotSize.REGULAR
         }}
+        selectedRevisions={revisions}
       >
         <WebviewWrapper>
           <DragDropProvider>

@@ -17,8 +17,10 @@ const tableData: TableData = {
     'params:params.yaml:dvc_logs_dir': 300
   },
   columns: columnsFixture,
+  filters: ['params:params.yaml:lr'],
   hasCheckpoints: true,
   hasColumns: true,
+  hasRunningExperiment: true,
   rows: rowsFixture.map(row => ({
     ...row,
     subRows: row.subRows?.map(experiment => ({
@@ -40,6 +42,12 @@ export default {
     tableData
   },
   component: Experiments,
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/AuQXbrFj60xA2QXOjo9Z65/Experiments-Panel-%E2%80%A2-496'
+    }
+  },
   title: 'Table'
 } as Meta
 
@@ -53,6 +61,7 @@ export const WithNoRunningExperiments = Template.bind({})
 WithNoRunningExperiments.args = {
   tableData: {
     ...tableData,
+    hasRunningExperiment: false,
     rows: rowsFixture.map(row => ({
       ...row,
       running: false,

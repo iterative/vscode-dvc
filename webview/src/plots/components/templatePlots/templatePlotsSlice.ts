@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   PlotSize,
   Section,
@@ -19,7 +18,6 @@ const initialState: TemplatePlotsState = {
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
   plots: [],
-  sectionName: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
   size: DEFAULT_SECTION_SIZES[Section.TEMPLATE_PLOTS]
 }
 

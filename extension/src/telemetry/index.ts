@@ -5,6 +5,7 @@ import {
   IEventNamePropertyMapping,
   ViewOpenedEventName
 } from './constants'
+import { getUserId } from './uuid'
 import { Logger } from '../common/logger'
 import { getExtensionVersion } from '../vscode/extensions'
 
@@ -90,7 +91,7 @@ export const sendTelemetryEvent = <
     : undefined
   reporter.sendTelemetryEvent(
     eventName as string,
-    sanitizedProperties,
+    { ...sanitizedProperties, user_id: getUserId() },
     measurements
   )
 }

@@ -2,6 +2,103 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2022-06-10
+
+### 🚀 New Features and Enhancements
+
+- Sort and Filter indicators for the Experiments Table [#1760](https://github.com/iterative/vscode-dvc/pull/1760) by [@wolmir](https://github.com/wolmir)
+- Add filtered counts to Filter By tree [#1866](https://github.com/iterative/vscode-dvc/pull/1866) by [@mattseddon](https://github.com/mattseddon)
+- Setup workspace config: change copy to be more explicit [#1865](https://github.com/iterative/vscode-dvc/pull/1865) by [@shcheklein](https://github.com/shcheklein)
+
+### 🐛 Bug Fixes
+
+- Use primary button color as accent color [#1859](https://github.com/iterative/vscode-dvc/pull/1859) by [@sroy3](https://github.com/sroy3)
+- Explicitly set icons in DVC Tracked tree [#1869](https://github.com/iterative/vscode-dvc/pull/1869) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove preview tag from marketplace listing [#1860](https://github.com/iterative/vscode-dvc/pull/1860) by [@mattseddon](https://github.com/mattseddon)
+- Add init to command palette when there is no DVC project in the workspace [#1861](https://github.com/iterative/vscode-dvc/pull/1861) by [@mattseddon](https://github.com/mattseddon)
+- Upgrade dev dependencies and resolutions (security) [#1864](https://github.com/iterative/vscode-dvc/pull/1864) by [@mattseddon](https://github.com/mattseddon)
+- Bump min required version of DVC to new release [#1867](https://github.com/iterative/vscode-dvc/pull/1867) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.2.25] - 2022-06-08
+
+### 🐛 Bug Fixes
+
+- Ensure file exists before trying to write JSON [#1856](https://github.com/iterative/vscode-dvc/pull/1856) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove plot section rename feature [#1855](https://github.com/iterative/vscode-dvc/pull/1855) by [@sroy3](https://github.com/sroy3)
+
+## [0.2.24] - 2022-06-07
+
+### 🚀 New Features and Enhancements
+
+- Add cross-product uuid to all telemetry events [#1619](https://github.com/iterative/vscode-dvc/pull/1619) by [@mattseddon](https://github.com/mattseddon)
+- Add tooltip with the meaning of each plot section [#1851](https://github.com/iterative/vscode-dvc/pull/1851) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Decouple ribbon from comparison table revisions [#1844](https://github.com/iterative/vscode-dvc/pull/1844) by [@mattseddon](https://github.com/mattseddon)
+- Suppress context menus, hide run buttons and show stop button when an experiment is running [#1848](https://github.com/iterative/vscode-dvc/pull/1848) by [@mattseddon](https://github.com/mattseddon)
+- Add dep prefix to experiments table tooltip [#1853](https://github.com/iterative/vscode-dvc/pull/1853) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Faster virtualization tests [#1846](https://github.com/iterative/vscode-dvc/pull/1846) by [@sroy3](https://github.com/sroy3)
+- Add CODEOWNERS file [#1852](https://github.com/iterative/vscode-dvc/pull/1852) by [@sroy3](https://github.com/sroy3)
+
+## [0.2.23] - 2022-06-07
+
+### 🚀 New Features and Enhancements
+
+- Use copy button component for the plots ribbon experiments [#1812](https://github.com/iterative/vscode-dvc/pull/1812) by [@sroy3](https://github.com/sroy3)
+- Plots ribbon copy button to the right [#1831](https://github.com/iterative/vscode-dvc/pull/1831) by [@sroy3](https://github.com/sroy3)
+- Add deps to experiment table and columns tree [#1830](https://github.com/iterative/vscode-dvc/pull/1830) by [@mattseddon](https://github.com/mattseddon)
+- Update description shown above experiments tree [#1841](https://github.com/iterative/vscode-dvc/pull/1841) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Listen for extensions being installed/unistalled to avoid race condition when both this extension and ms-python.python are installed during startup [#1839](https://github.com/iterative/vscode-dvc/pull/1839) by [@mattseddon](https://github.com/mattseddon)
+- Watch all dvc.locks for changes to plots [#1840](https://github.com/iterative/vscode-dvc/pull/1840) by [@mattseddon](https://github.com/mattseddon)
+- Reduce the spacing between ribbon elements [#1842](https://github.com/iterative/vscode-dvc/pull/1842) by [@sroy3](https://github.com/sroy3)
+- Fix the height of the buttons in the ribbon [#1843](https://github.com/iterative/vscode-dvc/pull/1843) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Add storybook design addon [#1828](https://github.com/iterative/vscode-dvc/pull/1828) by [@rogermparent](https://github.com/rogermparent)
+- Add Storybook preview styles that allow for sticky header/column [#1834](https://github.com/iterative/vscode-dvc/pull/1834) by [@rogermparent](https://github.com/rogermparent)
+
+## [0.2.22] - 2022-06-03
+
+### 🚀 New Features and Enhancements
+
+- Add legend to zoomed in plots [#1794](https://github.com/iterative/vscode-dvc/pull/1794) by [@mattseddon](https://github.com/mattseddon)
+- Close modal on Escape [#1811](https://github.com/iterative/vscode-dvc/pull/1811) by [@sroy3](https://github.com/sroy3)
+- Add position:sticky to Experiment table head [#1805](https://github.com/iterative/vscode-dvc/pull/1805) by [@rogermparent](https://github.com/rogermparent)
+- Experiment table open to the side [#1796](https://github.com/iterative/vscode-dvc/pull/1796) by [@wolmir](https://github.com/wolmir)
+- Add experiments from plots ribbon [#1798](https://github.com/iterative/vscode-dvc/pull/1798) by [@sroy3](https://github.com/sroy3)
+- Add support view to DVC container [#1817](https://github.com/iterative/vscode-dvc/pull/1817) by [@mattseddon](https://github.com/mattseddon)
+- Add multi-select push and pull to tracked explorer tree [#1809](https://github.com/iterative/vscode-dvc/pull/1809) by [@mattseddon](https://github.com/mattseddon)
+- Add multi-select remove to experiments tree [#1810](https://github.com/iterative/vscode-dvc/pull/1810) by [@mattseddon](https://github.com/mattseddon)
+- Make Experiments Table Experiments Column Sticky [#1825](https://github.com/iterative/vscode-dvc/pull/1825) by [@rogermparent](https://github.com/rogermparent)
+
+### 🐛 Bug Fixes
+
+- Use vscode tree.tableColumnsBorder to add contrast in light themes [#1803](https://github.com/iterative/vscode-dvc/pull/1803) by [@wolmir](https://github.com/wolmir)
+- Fix experiment names overflowing from plots ribbon [#1821](https://github.com/iterative/vscode-dvc/pull/1821) by [@sroy3](https://github.com/sroy3)
+- Accomodate params that are lists [#1818](https://github.com/iterative/vscode-dvc/pull/1818) by [@mattseddon](https://github.com/mattseddon)
+- Watch all dvc.yamls for changes to plots [#1822](https://github.com/iterative/vscode-dvc/pull/1822) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update extension description for the marketplace [#1807](https://github.com/iterative/vscode-dvc/pull/1807) by [@mattseddon](https://github.com/mattseddon)
+- Rename experiments model queue folder to experiments model modify [#1819](https://github.com/iterative/vscode-dvc/pull/1819) by [@mattseddon](https://github.com/mattseddon)
+- Remove revision filtering from comparison table icon menu [#1823](https://github.com/iterative/vscode-dvc/pull/1823) by [@sroy3](https://github.com/sroy3)
+- Replace firstCell with experimentCell [#1824](https://github.com/iterative/vscode-dvc/pull/1824) by [@rogermparent](https://github.com/rogermparent)
+
 ## [0.2.21] - 2022-06-01
 
 ### 🚀 New Features and Enhancements

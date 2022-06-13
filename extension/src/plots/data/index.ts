@@ -17,12 +17,18 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>
   ) {
-    super(dvcRoot, internalCommands, updatesPaused, [
-      {
-        name: 'update',
-        process: () => this.update()
-      }
-    ])
+    super(
+      dvcRoot,
+      internalCommands,
+      updatesPaused,
+      [
+        {
+          name: 'update',
+          process: () => this.update()
+        }
+      ],
+      ['dvc.yaml', 'dvc.lock']
+    )
   }
 
   public async update(): Promise<void> {

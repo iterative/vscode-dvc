@@ -5,6 +5,7 @@ import {
   PlotsComparisonData,
   PlotsData,
   PlotsDataKeys,
+  Revision,
   Section,
   SectionCollapsed,
   TemplatePlotsData
@@ -27,7 +28,7 @@ import {
   initialize,
   updateHasPlots,
   updateHasSelectedPlots,
-  updateHasSelectedRevisions
+  updateSelectedRevisions
 } from './webviewSlice'
 import { AppDispatch } from '../store'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
@@ -73,8 +74,8 @@ export const feedStore = (
         case PlotsDataKeys.hasSelectedPlots:
           dispatch(updateHasSelectedPlots(!!data.data[key]))
           continue
-        case PlotsDataKeys.hasSelectedRevisions:
-          dispatch(updateHasSelectedRevisions(!!data.data[key]))
+        case PlotsDataKeys.selectedRevisions:
+          dispatch(updateSelectedRevisions(data.data[key] as Revision[]))
           continue
         default:
           continue

@@ -128,5 +128,32 @@ suite('Plots Paths Tree Test Suite', () => {
         template: templatePlotsFixture
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to refresh revision data for all plots using dvc.views.plotsPathsTree.refreshPlots', async () => {
+      const { data, mockPlotsDiff, plots } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      await plots.showWebview()
+
+      const dataUpdated = new Promise(resolve =>
+        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      )
+      mockPlotsDiff.resetHistory()
+
+      await commands.executeCommand(RegisteredCommands.PLOTS_REFRESH)
+      await dataUpdated
+
+      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        '1ba7bcd',
+        '42b8736',
+        '4fb124a',
+        'main',
+        'workspace'
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 })

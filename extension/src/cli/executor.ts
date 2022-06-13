@@ -76,11 +76,11 @@ export class CliExecutor extends Cli {
     )
   }
 
-  public experimentRemove(cwd: string, experimentName: string) {
+  public experimentRemove(cwd: string, ...experimentNames: string[]) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.REMOVE,
-      experimentName
+      ...experimentNames
     )
   }
 

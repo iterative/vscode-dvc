@@ -320,6 +320,7 @@ suite('Extension Test Suite', () => {
         EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
         {
           cliAccessible: true,
+          deps: 8,
           dvcPathUsed: true,
           dvcRootCount: 1,
           hasCheckpoints: 1,
@@ -328,7 +329,7 @@ suite('Extension Test Suite', () => {
           msPythonInstalled: true,
           msPythonUsed: false,
           noCheckpoints: 0,
-          params: 8,
+          params: 9,
           pythonPathUsed: false,
           templates: 3,
           tracked: 15,

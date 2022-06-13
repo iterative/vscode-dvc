@@ -8,7 +8,7 @@ import { RootState } from '../../store'
 
 export const ComparisonTableWrapper: React.FC = () => {
   const dispatch = useDispatch()
-  const { sectionName, size, isCollapsed } = useSelector(
+  const { size, isCollapsed } = useSelector(
     (state: RootState) => state.comparison
   )
   const handleResize = (size: PlotSize) => {
@@ -17,7 +17,7 @@ export const ComparisonTableWrapper: React.FC = () => {
 
   return (
     <PlotsContainer
-      title={sectionName}
+      title="Images"
       sectionKey={Section.COMPARISON_TABLE}
       currentSize={size}
       sectionCollapsed={isCollapsed}

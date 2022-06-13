@@ -28,8 +28,8 @@ import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
-const DEFAULT_COLUMN_WIDTH = 75
-const MINIMUM_COLUMN_WIDTH = 50
+const DEFAULT_COLUMN_WIDTH = 90
+const MINIMUM_COLUMN_WIDTH = 90
 
 const timeFormatter = new Intl.DateTimeFormat([], {
   hour: '2-digit',
@@ -108,7 +108,8 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] =>
       width: 100
     },
     ...buildDynamicColumns(columns, ColumnType.METRICS),
-    ...buildDynamicColumns(columns, ColumnType.PARAMS)
+    ...buildDynamicColumns(columns, ColumnType.PARAMS),
+    ...buildDynamicColumns(columns, ColumnType.DEPS)
   ] as TableColumn<Row>[]
 
 const reportResizedColumn = (state: TableState<Row>) => {
@@ -137,8 +138,10 @@ export const ExperimentsTable: React.FC<{
         columnOrder: [],
         columnWidths: {},
         columns: [],
+        filters: [],
         hasCheckpoints: false,
         hasColumns: false,
+        hasRunningExperiment: false,
         rows: [],
         sorts: [],
         ...initiallyUndefinedTableData

@@ -3,6 +3,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { commands, ThemeIcon, TreeItem, Uri, window } from 'vscode'
 import { ExperimentType } from '.'
 import { ExperimentsTree } from './tree'
+import { getDecoratableUri } from './filterBy/decorationProvider'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
 import { InternalCommands } from '../../commands/internal'
@@ -347,10 +348,13 @@ describe('ExperimentsTree', () => {
 
     it('should return a tree item for the workspace', () => {
       let mockedItem = {}
-      mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
+      mockedTreeItem.mockImplementationOnce(function (
+        resourceUri,
+        collapsibleState
+      ) {
         expect(collapsibleState).toStrictEqual(0)
-        expect(label).toStrictEqual('workspace')
-        mockedItem = { collapsibleState, label }
+        expect(resourceUri).toStrictEqual(getDecoratableUri('workspace'))
+        mockedItem = { collapsibleState, resourceUri }
         return mockedItem
       })
       mockedThemeIcon.mockImplementationOnce(function (id) {

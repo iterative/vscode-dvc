@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Revision } from 'dvc/src/plots/webview/contract'
 import { clearData } from '../actions'
 import { ReducerName } from '../constants'
 
@@ -11,7 +12,7 @@ export interface WebviewState {
   hasData: boolean
   hasPlots: boolean
   hasSelectedPlots: boolean
-  hasSelectedRevisions: boolean
+  selectedRevisions: Revision[]
   zoomedInPlot: ZoomedInPlotState | undefined
 }
 
@@ -19,7 +20,7 @@ const initialState: WebviewState = {
   hasData: false,
   hasPlots: false,
   hasSelectedPlots: false,
-  hasSelectedRevisions: false,
+  selectedRevisions: [],
   zoomedInPlot: undefined
 }
 
@@ -64,8 +65,8 @@ export const webviewSlice = createSlice({
     updateHasSelectedPlots: (state, action: PayloadAction<boolean>) => {
       state.hasSelectedPlots = action.payload
     },
-    updateHasSelectedRevisions: (state, action: PayloadAction<boolean>) => {
-      state.hasSelectedRevisions = action.payload
+    updateSelectedRevisions: (state, action: PayloadAction<Revision[]>) => {
+      state.selectedRevisions = action.payload
     }
   }
 })
@@ -74,7 +75,7 @@ export const {
   initialize,
   updateHasPlots,
   updateHasSelectedPlots,
-  updateHasSelectedRevisions,
+  updateSelectedRevisions,
   setZoomedInPlot
 } = webviewSlice.actions
 

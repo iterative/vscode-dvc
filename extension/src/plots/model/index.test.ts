@@ -1,7 +1,6 @@
 import { PlotsModel } from '.'
 import {
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   PlotSize,
   Section
@@ -84,49 +83,6 @@ describe('plotsModel', () => {
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       PersistenceKey.PLOT_SIZES + exampleDvcRoot,
       { ...DEFAULT_SECTION_SIZES, [Section.CHECKPOINT_PLOTS]: PlotSize.SMALL }
-    )
-  })
-
-  it('should change the the sectionName of a section when calling setSectionName', () => {
-    expect(model.getSectionName(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      DEFAULT_SECTION_NAMES[Section.CHECKPOINT_PLOTS]
-    )
-    expect(model.getSectionName(Section.TEMPLATE_PLOTS)).toStrictEqual(
-      DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS]
-    )
-
-    const newCheckpointPlotsName = 'Previously called live'
-    model.setSectionName(Section.CHECKPOINT_PLOTS, newCheckpointPlotsName)
-
-    expect(model.getSectionName(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      newCheckpointPlotsName
-    )
-    expect(model.getSectionName(Section.TEMPLATE_PLOTS)).toStrictEqual(
-      DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS]
-    )
-
-    const newTemplatePlotsName = 'Previously Called Static'
-    model.setSectionName(Section.TEMPLATE_PLOTS, newTemplatePlotsName)
-    expect(model.getSectionName(Section.TEMPLATE_PLOTS)).toStrictEqual(
-      newTemplatePlotsName
-    )
-  })
-
-  it('should update the persisted section names when calling setSectionName', () => {
-    const mementoUpdateSpy = jest.spyOn(memento, 'update')
-
-    const newName = 'Important Plots'
-    model.setSectionName(Section.CHECKPOINT_PLOTS, newName)
-
-    expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
-    expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      PersistenceKey.PLOT_SECTION_NAMES + exampleDvcRoot,
-      {
-        [Section.CHECKPOINT_PLOTS]: newName,
-        [Section.TEMPLATE_PLOTS]: DEFAULT_SECTION_NAMES[Section.TEMPLATE_PLOTS],
-        [Section.COMPARISON_TABLE]:
-          DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE]
-      }
     )
   })
 

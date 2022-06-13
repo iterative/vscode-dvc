@@ -8,7 +8,7 @@ import { RootState } from '../../store'
 
 export const TemplatePlotsWrapper: React.FC = () => {
   const dispatch = useDispatch()
-  const { size, sectionName, isCollapsed } = useSelector(
+  const { size, isCollapsed } = useSelector(
     (state: RootState) => state.template
   )
 
@@ -18,7 +18,7 @@ export const TemplatePlotsWrapper: React.FC = () => {
 
   return (
     <PlotsContainer
-      title={sectionName}
+      title="Data Series"
       sectionKey={Section.TEMPLATE_PLOTS}
       currentSize={size}
       sectionCollapsed={isCollapsed}

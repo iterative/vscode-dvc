@@ -3,6 +3,7 @@
 @import '../../../shared/variables.scss';
 
 $nested-row-padding: 1.35rem;
+$row-border: 1px solid $border-color;
 
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
@@ -26,7 +27,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 %truncateLeftParent {
   overflow: hidden;
   text-overflow: ellipsis;
-  direction: rtl;
 }
 
 %truncateLeftChild {
@@ -50,6 +50,29 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   &:hover {
     & .copyButton {
       display: block;
+    }
+  }
+}
+
+.iconMenu {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding-bottom: 3.5px;
+
+  ul[role='menu'] {
+    background-color: $header-bg-color;
+    padding-left: 2px;
+    margin: 0;
+    border: none;
+
+    button {
+      width: 13px;
+      height: 11px;
+      svg {
+        fill: currentColor;
+        transform: scale(0.7);
+      }
     }
   }
 }
@@ -131,7 +154,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       border-top-color: $changed-color;
     }
 
-    .runningExperiment.oddRow > .firstCell & {
+    .runningExperiment.oddRow > .experimentCell & {
       border-left: 1.5px solid $row-bg-alt-color;
       border-bottom: 1.5px solid $row-bg-alt-color;
     }
@@ -170,13 +193,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   display: flex;
   flex-flow: column nowrap;
 
-  .firstCell {
-    display: flex;
-    flex-flow: row nowrap;
-  }
   .experimentGroup {
     .nestedRow {
-      .firstCell {
+      .experimentCell {
         padding-left: $nested-row-padding;
       }
     }
@@ -232,15 +251,27 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     width: 1rem;
   }
 
-  .thead {
-    border-bottom: 1px solid $border-color;
-  }
-
   .tr {
     position: relative;
+    & > *:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 3;
+      border-right: 2px solid var(--editor-foreground-transparency-4);
+    }
+
+    &.oddRow > *:first-child {
+      background-color: $row-bg-alt-color;
+    }
   }
 
-  .headerRow {
+  .bodyRow {
+    & > *:first-child {
+      background-color: $row-bg-color;
+    }
+  }
+
+  .headRow {
     font-size: 0.7rem;
 
     .headerCellWrapper {
@@ -253,7 +284,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
       span[draggable='true'] {
         display: block;
+        cursor: grab;
       }
+    }
+
+    & > *:first-child {
+      background-color: $header-bg-color;
     }
 
     &:last-child,
@@ -267,10 +303,15 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       &.metricHeaderCell {
         color: $metrics-color;
       }
+
+      .depHeaderCell,
+      &.depHeaderCell {
+        color: $deps-color;
+      }
     }
 
     &:last-child {
-      font-size: 0.9rem;
+      font-size: 0.7rem;
 
       .headerCell {
         text-align: right;
@@ -295,9 +336,19 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     margin: 0.5rem 0;
   }
   .normalRowGroup {
-    border: 1px solid $border-color;
+    border-top: $row-border;
+    border-bottom: $row-border;
     .oddRow {
       background-color: $row-bg-alt-color;
+    }
+    .td {
+      &:first-child {
+        border-left: $row-border;
+      }
+
+      &:last-child {
+        border-right: $row-border;
+      }
     }
   }
   .workspaceRowGroup {
@@ -308,7 +359,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         padding-left: $workspace-row-edge-margin;
         .innerCell {
           padding-left: $cell-padding;
-          border-left: 1px solid $border-color;
+          border-left: $row-border;
         }
       }
 
@@ -316,7 +367,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         padding-right: $workspace-row-edge-margin;
         .innerCell {
           padding-right: $cell-padding;
-          border-right: 1px solid $border-color;
+          border-right: $row-border;
         }
       }
     }
@@ -326,8 +377,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       height: 100%;
       width: 100%;
       background-color: none;
-      border-top: 1px solid $border-color;
-      border-bottom: 1px solid $border-color;
+      border-top: $row-border;
+      border-bottom: $row-border;
     }
   }
 
@@ -342,7 +393,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     position: relative;
   }
   .th {
-    height: 100%;
+    height: auto;
   }
   .td {
     height: auto;
@@ -362,6 +413,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
   }
   .experimentCell {
+    display: flex;
+    flex-flow: row nowrap;
     text-align: left;
     .innerCell {
       justify-content: flex-start;
@@ -370,23 +423,19 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    border-right: 2px solid $bg-color;
+    border-right: 2px solid $header-border-color;
   }
 
   .headerCell {
     @extend .placeholderHeaderCell;
     color: $header-fg-color;
     text-align: center;
-    border-bottom: 2px solid $bg-color;
+    border-bottom: 2px solid $header-border-color;
     padding: 0.31rem $cell-padding;
-  }
 
-  .sortingHeaderCellAsc {
-    border-top: 2px solid $fg-color;
-  }
-
-  .sortingHeaderCellDesc {
-    border-bottom: 2px solid $fg-color;
+    &.leafHeader {
+      border-bottom: none;
+    }
   }
 }
 
@@ -455,18 +504,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .copyButton {
-  flex: 0 0 0.8em;
-  font-size: 1.5em;
   display: none;
-  border: none;
-  background: none;
-  color: $fg-color;
-  cursor: pointer;
-  width: 0.8em;
-  height: 0.8em;
-  line-height: 0.8em;
-  padding: 0;
-  margin: 0 0.25em;
 }
 
 .cellContents {
@@ -522,4 +560,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   @extend %headerCellPadding;
   overflow-x: hidden;
   text-overflow: ellipsis;
+}
+
+.thead {
+  background-color: $bg-color;
+  border-bottom: $row-border;
+  box-shadow: 0 5px 8px -2px var(--vscode-widget-shadow);
+  position: sticky;
+  top: 0;
+  z-index: 4;
 }

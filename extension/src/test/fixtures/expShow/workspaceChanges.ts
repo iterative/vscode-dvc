@@ -1,4 +1,7 @@
+import { buildDepPath } from '../../../experiments/columns/paths'
+
 const data = [
+  buildDepPath('src', 'prepare.py'),
   'metrics:summary.json:accuracy',
   'metrics:summary.json:loss',
   'metrics:summary.json:val_accuracy',

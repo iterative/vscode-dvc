@@ -116,6 +116,13 @@ suite('Repository Test Suite', () => {
         resolve(dvcDemoPath, MNISTDir)
       ])
 
+      const hasRemote = new Set([
+        resolve(dvcDemoPath, logAcc),
+        resolve(dvcDemoPath, logLoss),
+        resolve(dvcDemoPath, model),
+        resolve(dvcDemoPath, dataDir)
+      ])
+
       expect(mockDiff).to.be.calledWith(dvcDemoPath)
       expect(mockStatus).to.be.calledWith(dvcDemoPath)
       expect(mockGetAllUntracked).to.be.calledWith(dvcDemoPath)
@@ -124,6 +131,7 @@ suite('Repository Test Suite', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
+        hasRemote,
         modified,
         notInCache: emptySet,
         renamed: emptySet,
@@ -227,6 +235,15 @@ suite('Repository Test Suite', () => {
         resolve(dvcDemoPath, dataDir),
         resolve(dvcDemoPath, logDir)
       ])
+
+      const hasRemote = new Set([
+        resolve(dvcDemoPath, compressedDataset),
+        resolve(dvcDemoPath, dataset),
+        resolve(dvcDemoPath, logAcc),
+        resolve(dvcDemoPath, logLoss),
+        resolve(dvcDemoPath, model)
+      ])
+
       await dataUpdateEvent
 
       expect(mockDiff).to.be.calledTwice
@@ -238,6 +255,7 @@ suite('Repository Test Suite', () => {
         added: emptySet,
         deleted,
         gitModified: emptySet,
+        hasRemote,
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
@@ -373,6 +391,15 @@ suite('Repository Test Suite', () => {
         resolve(dvcDemoPath, model),
         resolve(dvcDemoPath, prepared)
       ])
+      const hasRemote = new Set([
+        resolve(dvcDemoPath, logAcc),
+        resolve(dvcDemoPath, logLoss),
+        resolve(dvcDemoPath, model),
+        resolve(dvcDemoPath, dataDir),
+        resolve(dvcDemoPath, features),
+        resolve(dvcDemoPath, dataXml),
+        resolve(dvcDemoPath, prepared)
+      ])
 
       expect(mockDiff).to.be.calledTwice
       expect(mockStatus).to.be.calledTwice
@@ -383,6 +410,7 @@ suite('Repository Test Suite', () => {
         added: emptySet,
         deleted,
         gitModified: emptySet,
+        hasRemote,
         modified,
         notInCache,
         renamed: emptySet,

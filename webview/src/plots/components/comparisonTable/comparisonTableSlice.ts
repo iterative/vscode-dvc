@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NAMES,
   DEFAULT_SECTION_SIZES,
   PlotsComparisonData,
   PlotSize,
@@ -19,8 +18,6 @@ const initialState: ComparisonTableState = {
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.COMPARISON_TABLE],
   plots: [],
-  revisions: [],
-  sectionName: DEFAULT_SECTION_NAMES[Section.COMPARISON_TABLE],
   size: DEFAULT_SECTION_SIZES[Section.COMPARISON_TABLE]
 }
 

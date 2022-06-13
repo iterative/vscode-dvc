@@ -1,3 +1,5 @@
+import { join } from 'path'
+import { definedAndNonEmpty } from '../../util/array'
 import { ColumnType } from '../webview/contract'
 
 export const METRIC_PARAM_SEPARATOR = '.'
@@ -27,7 +29,10 @@ export const appendColumnToPath = (...pathSegments: string[]) => {
   )
 }
 
-export const joinColumnPath = (type: ColumnType, ...pathSegments: string[]) => {
+export const buildMetricOrParamPath = (
+  type: ColumnType,
+  ...pathSegments: string[]
+): string => {
   const [fileSegment, ...rest] = pathSegments
   if (!fileSegment) {
     return type
@@ -35,7 +40,15 @@ export const joinColumnPath = (type: ColumnType, ...pathSegments: string[]) => {
   if (rest.length === 0) {
     return type + FILE_SEPARATOR + fileSegment
   }
+
   return type + FILE_SEPARATOR + appendColumnToPath(fileSegment, ...rest)
+}
+
+export const buildDepPath = (...pathSegments: string[]) => {
+  if (!definedAndNonEmpty(pathSegments)) {
+    return ColumnType.DEPS
+  }
+  return buildMetricOrParamPath(ColumnType.DEPS, join(...pathSegments))
 }
 
 export const splitColumnPath = (path: string) => {
@@ -47,12 +60,13 @@ export const splitColumnPath = (path: string) => {
   if (!fileSegment) {
     return [baseSegment]
   }
+  const cleanFileSegment = fileSegment.replace(/_\d+$/g, '')
   if (!paramPath) {
-    return [baseSegment, fileSegment]
+    return [baseSegment, cleanFileSegment]
   }
   return [
     baseSegment,
-    fileSegment,
+    cleanFileSegment,
     ...paramPath.split(METRIC_PARAM_SEPARATOR).map(decodeColumn)
   ]
 }

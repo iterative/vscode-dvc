@@ -1,6 +1,6 @@
 import get from 'lodash.get'
 import { sortExperiments } from '.'
-import { joinColumnPath } from '../../columns/paths'
+import { buildMetricOrParamPath } from '../../columns/paths'
 import { Experiment, ColumnType } from '../../webview/contract'
 
 describe('sortExperiments', () => {
@@ -20,7 +20,7 @@ describe('sortExperiments', () => {
     'params.yaml',
     'test'
   ]
-  const testPath = joinColumnPath(...testPathArray)
+  const testPath = buildMetricOrParamPath(...testPathArray)
   const getTestParam = (experiment: Experiment) =>
     get(experiment, testPathArray)
 
@@ -62,7 +62,7 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = joinColumnPath(
+    const testSortPath = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'sort'
@@ -120,12 +120,12 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = joinColumnPath(
+    const testSortPath = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'sort'
     )
-    const testSortPath2 = joinColumnPath(
+    const testSortPath2 = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'sort2'
@@ -209,7 +209,7 @@ describe('sortExperiments', () => {
       'params.yaml',
       'othertest'
     ]
-    const otherTestPath = joinColumnPath(...otherTestPathArray)
+    const otherTestPath = buildMetricOrParamPath(...otherTestPathArray)
     const testData = [
       {
         ...irrelevantExperimentData,
