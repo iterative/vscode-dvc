@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2022-06-14
+
+### 🐛 Bug Fixes
+
+- hotfix: VS Code badges in README [#1894](https://github.com/iterative/vscode-dvc/pull/1894) by [@jorgeorpinel](https://github.com/jorgeorpinel)
+
 ## [0.3.1] - 2022-06-14
 
 ### 🚀 New Features and Enhancements
