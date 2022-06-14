@@ -18,10 +18,11 @@ Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
 databases are required.
 
-- **Experiment tracking**: Visually record training data, parameters, and
-  metrics on top of [Git](https://git-scm.com/). Use this to navigate your
-  experiments, compare their results, and find the best ML models.
-- **Visualization**: Plot experiment data in a customizable dashboard.
+- **Experiment tracking**: Record training data, parameters, and metrics on top
+  of [Git](https://git-scm.com/). Navigate your experiments, compare their
+  results, and find the best ML models.
+- **Visualization**: Plot performance data in a customizable dashboard including
+  one or more overlaid experiments.
 - **Live tracking**: Capture and see metrics changing in real time.
 - **Reproducibility**: Make sure that anyone can recover or confirm previous
   experiments, and run new experiments based on their results.
