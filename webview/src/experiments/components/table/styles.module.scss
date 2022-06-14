@@ -585,10 +585,16 @@ $badge-size: 0.85rem;
 .indicatorIcon {
   display: inline-block;
   position: relative;
-  padding: 0.15rem 0.35rem 0.15rem 0.1rem;
   color: $watermark-color;
   border: none;
   background: none;
+  padding: 0;
+  text-align: center;
+  padding: 0.25rem;
+  margin: 0.025rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
   &.indicatorWithCount {
     color: $fg-color;
   }

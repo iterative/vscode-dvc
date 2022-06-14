@@ -798,4 +798,26 @@ describe('App', () => {
     )
     expect(filterIndicator).toHaveTextContent('2')
   })
+
+  it('should send a message to focus the relevant tree when clicked', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: tableDataFixture,
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    fireEvent.click(screen.getByLabelText('sorts'))
+    expect(mockPostMessage).toBeCalledWith({
+      type: MessageFromWebviewType.FOCUS_SORTS_TREE
+    })
+    mockPostMessage.mockClear()
+    fireEvent.click(screen.getByLabelText('filters'))
+    expect(mockPostMessage).toBeCalledWith({
+      type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+    })
+  })
 })
