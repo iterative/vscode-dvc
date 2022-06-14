@@ -11,12 +11,12 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
-<img src="https://github.com/iterative/vscode-dvc/blob/main/extension/resources/overview.gif">
-
 Run, compare, visualize, and track machine learning experiments right in VS
 Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
 databases are required.
+
+<img src="https://github.com/iterative/vscode-dvc/blob/main/extension/resources/overview.gif">
 
 - **Experiment tracking**: Record training data, parameters, and metrics on top
   of [Git](https://git-scm.com/). Navigate your experiments, compare their
