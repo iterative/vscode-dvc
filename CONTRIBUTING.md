@@ -73,8 +73,9 @@ encouraged to try other DVC repositories- especially real-world cases!
 
 <a id='warning'></a>
 
-> **Warning** When using any project that relies on an isolated Python
-> environment (`conda`, `venv`, etc.), Microsoft's
+> **Warning**  
+> When using any project that relies on an isolated Python environment (`conda`,
+> `venv`, etc.), Microsoft's
 > [Python extension](https://github.com/Microsoft/vscode-python) is required.
 > It's used by this extension to locate and utilize the required environment.
 
