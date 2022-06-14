@@ -84,33 +84,38 @@ Management]. For deeper learning, try our [free course]!
 
 This extension augments VS Code in the following ways:
 
-- Adds a **[DVC Tracked]** panel to the _Explorer_ view. This shows a tree of
-  the data files and directories tracked by DVC, including their state, and
-  options to [synchronize] them (from/to remote storage).
-- Adds a **[DVC panel]** to the _Source Control_ view to display the [workspace
-  status]. You can [restore] or reset project versions (based on the current Git
-  `HEAD` commit) as well as manage new and existing data from here.
 - Adds a brand-new new **[DVC View]** (<img
   src="https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/docs/dvc.png"
   alt="DVC logo" height="16"/> icon in the Activity Bar) with panels to
   visualize and manage [DVC Experiments].
 - Provides special _Editors_ to manage **[Experiments]** and display **[Plots]**
   in IDE _Tabs_.
+- Adds a **[DVC Tracked]** panel to the _Explorer_ view. This shows a tree of
+  the data files and directories tracked by DVC, including their state, and
+  options to [synchronize] them (from/to remote storage).
+- Adds a **[DVC panel]** to the _Source Control_ view to display the [workspace
+  status]. You can [restore] or reset project versions (based on the current Git
+  `HEAD` commit) as well as manage new and existing data from here.
 - Registers several **Commands** in the _[Command Palette]_ (see next section).
 - Includes a DVC channel for the _Output_ panel (useful for
   [debugging](#debugging)).
 
-[dvc tracked]: extension/resources/walkthrough/tracked-explorer.md
+[dvc view]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/view-container.md
+[experiments]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/experiments-table.md
+[plots]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/plots.md
+[command palette]:
+  https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
+[dvc tracked]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/dvc-tracked-files.md
 [synchronize]: https://dvc.org/doc/start/data-management#storing-and-sharing
-[dvc panel]: extension/resources/walkthrough/source-control-management.md
+[dvc panel]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/dvc-tracked-files.md
 [workspace status]:
   https://dvc.org/doc/command-reference/status#local-workspace-status
 [restore]: https://dvc.org/doc/start/data-management#switching-between-versions
-[dvc view]: extension/resources/walkthrough/view-container.md
-[experiments]: extension/resources/walkthrough/experiments-table.md
-[plots]: extension/resources/walkthrough/plots.md
-[command palette]:
-  https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
 
 ## Useful commands
 
@@ -125,13 +130,16 @@ in one of the following commands:
 | `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
 | `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
 
-Learn more about the available VS Code [commands].
+Learn more about the extension's [commands].
 
-[commands]: extension/resources/walkthrough/command-palette.md
+[commands]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/command-palette.md
 
 ## Configuration
 
-These are the [VS Code Settings] available for the Extension:
+These are the VS Code [settings] available for the Extension:
+
+[settings]: https://code.visualstudio.com/docs/getstarted/settings
 
 | **Option**                             | **Description**                                                                                                                                      |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -171,7 +179,7 @@ pipelines, and most scripts are capable of running outside of DVC.
 ## Contributing
 
 See the development and contributing guidelines in
-[CONTRIBUTING.md](CONTRIBUTING.md).
+[CONTRIBUTING.md](https://github.com/iterative/vscode-dvc/blob/main/CONTRIBUTING.md).
 
 ![GitHub Contributors Image](https://contrib.rocks/image?repo=iterative/vscode-dvc)
 
