@@ -1,3 +1,5 @@
+<img src="https://github.com/iterative/vscode-dvc/blob/main/extension/resources/banner.svg">
+
 # DVC Extension for Visual Studio Code
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/iterative.dvc.svg)](https://https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
@@ -8,6 +10,8 @@
 [![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
+
+<img src="https://github.com/iterative/vscode-dvc/blob/main/extension/resources/overview.gif">
 
 Run, compare, visualize, and track machine learning experiments right in VS
 Code. This extension uses [DVC](https://dvc.org/), an open-source data
@@ -52,9 +56,9 @@ databases are required.
 2. Install [this extension] in VS Code.
 3. Follow the **Get Started** page that pops up!
 
-> 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
->
-> > Codespaces] will include this extension automatically.
+<!-- prettier-ignore -->
+> 💡 Feel free to try our [example DVC project] first! Opening it [with Github
+> Codespaces] will include this extension automatically.
 
 [this extension]:
   https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
