@@ -1,10 +1,11 @@
 # DVC Extension for Visual Studio Code
 
-<!--- These will be broken until the repo is public --->
-<!--- [![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml) --->
-<!--- [![Cross-Platform Test](https://github.com/iterative/vscode-dvc/actions/workflows/cross-platform-test.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/cross-platform-test.yml) --->
-<!-- [![DVC CLI Output Test](https://github.com/iterative/vscode-dvc/actions/workflows/dvc-cli-output-test.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/dvc-cli-output-test.yml) -->
+[![Version](https://vsmarketplacebadge.apphb.com/version-short/iterative.dvc.svg)](https://https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
+[![Installs](https://vsmarketplacebadge.apphb.com/installs/iterative.dvc.svg)](https://https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
+[![Downloads](https://vsmarketplacebadge.apphb.com/downloads/iterative.dvc.svg)](https://https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
+[![Ratings](https://vsmarketplacebadge.apphb.com/rating-short/iterative.dvc.svg)](https://https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
 
+[![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
@@ -164,6 +165,8 @@ pipelines, and most scripts are capable of running outside of DVC.
 
 See the development and contributing guidelines in
 [CONTRIBUTING.md](CONTRIBUTING.md).
+
+![GitHub Contributors Image](https://contrib.rocks/https://contrib.rocks/image?repo=iterative/vscode-dvc)
 
 ## Data and telemetry
 
