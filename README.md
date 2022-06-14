@@ -20,7 +20,8 @@ databases are required.
 - **Live tracking**: Capture and see metrics changing in real time.
 - **Reproducibility**: Make sure that anyone can recover or confirm previous
   experiments, and run new experiments based on their results.
-- **Data Management**: Handle large datasets, files, and models effectively.
+- **Data Management**: Handle and version large datasets, files, and models
+  effectively right from VS Code.
 
 > **Note**: We are in public beta and welcome early adopter feedback!  
 > Feel free to reach out [via Discord] or open [issues in GitHub].
@@ -50,6 +51,7 @@ databases are required.
 3. Follow the **Get Started** page that pops up!
 
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
+>
 > > Codespaces] will include this extension automatically.
 
 [example dvc project]: https://github.com/iterative/example-get-started
