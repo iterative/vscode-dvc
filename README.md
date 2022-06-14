@@ -83,7 +83,7 @@ This extension augments VS Code in the following ways:
   status]. You can [restore] or reset project versions (based on the current Git
   `HEAD` commit) as well as manage new and existing data from here.
 - Adds a brand-new new **[DVC View]** (<img
-  src="https://user-images.githubusercontent.com/1477535/171570901-9012413c-f0bb-41d9-9a45-2653b4e3f1fe.png"
+  src="https://github.com/iterative/vscode-dvc/blob/main/extension/docs/dvc.png"
   alt="DVC logo" style="height: 1em;"/> icon in the Activity Bar) with panels to
   visualize and manage [DVC Experiments].
 - Provides special _Editors_ to manage **[Experiments]** and display **[Plots]**
