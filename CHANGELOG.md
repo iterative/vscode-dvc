@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2022-06-14
+
+### 🚀 New Features and Enhancements
+
+- Decorate filtered experiments/checkpoints in the experiments tree [#1871](https://github.com/iterative/vscode-dvc/pull/1871) by [@mattseddon](https://github.com/mattseddon)
+- Add (manual) refresh plots command to tree and palette [#1868](https://github.com/iterative/vscode-dvc/pull/1868) by [@mattseddon](https://github.com/mattseddon)
+- Add shadow to table head [#1835](https://github.com/iterative/vscode-dvc/pull/1835) by [@rogermparent](https://github.com/rogermparent)
+- Show table header context menu on left click (as well as right) [#1878](https://github.com/iterative/vscode-dvc/pull/1878) by [@mattseddon](https://github.com/mattseddon)
+- Swap codicons for Reset and Run/Resume experiment [#1880](https://github.com/iterative/vscode-dvc/pull/1880) by [@mattseddon](https://github.com/mattseddon)
+- Review and update the walkthrough [#1876](https://github.com/iterative/vscode-dvc/pull/1876) by [@shcheklein](https://github.com/shcheklein)
+
+### 🐛 Bug Fixes
+
+- Pass extra args to Reset and Run command [#1879](https://github.com/iterative/vscode-dvc/pull/1879) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add banner (and alternative) to resources folder [#1877](https://github.com/iterative/vscode-dvc/pull/1877) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.0] - 2022-06-10
 
 ### 🚀 New Features and Enhancements
