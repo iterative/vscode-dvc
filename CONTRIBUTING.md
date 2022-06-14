@@ -45,14 +45,6 @@ First, ensure that [Yarn](https://yarnpkg.com/) and
   > **Note**: We have provided a demo project as part of this repo, but feel
   > free to use any DVC project that you have available.
 
-<a id='warning'></a>
-
-> **Warning**  
-> When using any project that relies on an isolated Python environment (`conda`,
-> `venv`, etc.), Microsoft's
-> [Python extension](https://github.com/Microsoft/vscode-python) is required.
-> It's used by this extension to locate and utilize the required environment.
-
 ## The demo project
 
 The demo project was initially forked from
@@ -78,6 +70,14 @@ encouraged to try other DVC repositories- especially real-world cases!
 
 - This will happen automatically IF the `ms-python.python` extension is
   installed within the VS Code instance that you are developing against.
+
+<a id='warning'></a>
+
+> **Warning**  
+> When using any project that relies on an isolated Python environment (`conda`,
+> `venv`, etc.), Microsoft's
+> [Python extension](https://github.com/Microsoft/vscode-python) is required.
+> It's used by this extension to locate and utilize the required environment.
 
 ## React component development with Storybook
 
