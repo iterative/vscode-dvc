@@ -810,6 +810,7 @@ describe('App', () => {
         }
       })
     )
+    mockPostMessage.mockClear()
     fireEvent.click(screen.getByLabelText('sorts'))
     expect(mockPostMessage).toBeCalledWith({
       type: MessageFromWebviewType.FOCUS_SORTS_TREE

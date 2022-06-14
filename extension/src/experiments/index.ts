@@ -398,6 +398,30 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.hasRunningExperiment()
   }
 
+  private focusSortsTree() {
+    const commandPromise = commands.executeCommand(
+      'dvc.views.experimentsSortByTree.focus'
+    )
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE,
+      undefined,
+      undefined
+    )
+    return commandPromise
+  }
+
+  private focusFiltersTree() {
+    const commandPromise = commands.executeCommand(
+      'dvc.views.experimentsFilterByTree.focus'
+    )
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE,
+      undefined,
+      undefined
+    )
+    return commandPromise
+  }
+
   private hideTableColumn(path: string) {
     this.toggleColumnStatus(path)
     sendTelemetryEvent(
@@ -517,13 +541,9 @@ export class Experiments extends BaseRepository<TableData> {
             return this.setColumnsStatus()
 
           case MessageFromWebviewType.FOCUS_FILTERS_TREE:
-            return commands.executeCommand(
-              'dvc.views.experimentsFilterByTree.focus'
-            )
+            return this.focusFiltersTree()
           case MessageFromWebviewType.FOCUS_SORTS_TREE:
-            return commands.executeCommand(
-              'dvc.views.experimentsSortByTree.focus'
-            )
+            return this.focusSortsTree()
 
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
