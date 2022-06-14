@@ -587,6 +587,8 @@ $badge-size: 0.85rem;
   position: relative;
   padding: 0.15rem 0.35rem 0.15rem 0.1rem;
   color: $watermark-color;
+  border: none;
+  background: none;
   &.indicatorWithCount {
     color: $fg-color;
   }

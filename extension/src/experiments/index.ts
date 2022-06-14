@@ -1,5 +1,13 @@
 import { join } from 'path'
-import { Event, EventEmitter, Memento, Uri, ViewColumn, window } from 'vscode'
+import {
+  commands,
+  Event,
+  EventEmitter,
+  Memento,
+  Uri,
+  ViewColumn,
+  window
+} from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickAndModifyParams } from './model/modify/quickPick'
@@ -507,6 +515,16 @@ export class Experiments extends BaseRepository<TableData> {
             return this.removeExperiment(message.payload)
           case MessageFromWebviewType.SELECT_COLUMNS:
             return this.setColumnsStatus()
+
+          case MessageFromWebviewType.FOCUS_FILTERS_TREE:
+            return commands.executeCommand(
+              'dvc.views.experimentsFilterByTree.focus'
+            )
+          case MessageFromWebviewType.FOCUS_SORTS_TREE:
+            return commands.executeCommand(
+              'dvc.views.experimentsSortByTree.focus'
+            )
+
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }
