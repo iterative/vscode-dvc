@@ -5,7 +5,7 @@
   "displayName": "%displayName%",
   "description": "%description%",
   "publisher": "iterative",
-  "icon": "docs/dvc.png",
+  "icon": "images/dvc.png",
   "extensionDependencies": [
     "vscode.git"
   ],
