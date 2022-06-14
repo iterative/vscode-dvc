@@ -29,7 +29,7 @@ databases are required.
 - **Data Management**: Handle and version large datasets, files, and models
   effectively right from VS Code.
 
-> **Note**: We are in public beta and welcome early adopter feedback!
+> **Note**: We are in public beta and welcome early adopter feedback!  
 > Feel free to reach out [via Discord] or open [issues in GitHub].
 >
 > [issues in github]: https://github.com/iterative/vscode-dvc/issues
