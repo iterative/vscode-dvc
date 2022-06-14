@@ -29,31 +29,34 @@ databases are required.
 > [issues in github]: https://github.com/iterative/vscode-dvc/issues
 > [via discord]: https://discord.gg/BGCjJHvDHt
 
-### Why use this extension?
+### Why prefer this extension?
 
 - Enjoy the best developer experience with the first experiment tracking
   interface for an IDE.
 - No external servers, databases, subscriptions, etc. Data stays fully under
   your control and your existing Git hosting is used to share and collaborate.
 - Go beyond a simple metrics dashboard with complete ML experiments that include
-  metrics, code, and data. Powered by [DVC experiment versioning].
+  metrics, code, and data. Powered by [DVC experiment
+  versioning][dvc experiments].
 - Implement [data versioning] on top of your favorite cloud storage, such as
   Amazon S3, Azure Blob Storage, Google Cloud Storage, NFS, etc.
 
-[dvc experiment versioning]:
+[dvc experiments]:
   https://dvc.org/doc/user-guide/experiment-management/experiments-overview
 [data versioning]: https://dvc.org/doc/use-cases/versioning-data-and-model-files
 
 ## Quick start
 
 1. [Install DVC](https://dvc.org/doc/install) on your system.
-2. Install this extension in VS Code.
+2. Install [this extension] in VS Code.
 3. Follow the **Get Started** page that pops up!
 
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github >
 >
 > > Codespaces] will include this extension automatically.
 
+[this extension]:
+  https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
 [example dvc project]: https://github.com/iterative/example-get-started
 [with github codespaces]:
   https://docs.github.com/en/codespaces/getting-started/quickstart#creating-your-codespace
@@ -67,40 +70,39 @@ Management]. For deeper learning, try our [free course]!
 [data management]: https://dvc.org/doc/start/data-management
 [free course]: https://learn.iterative.ai/
 
-## UI components
+<!-- [learn more]: extension/resources/walkthrough/dvc-learn-more.md -->
 
-This [extension] augments and adds several [Views], adds special [Editors] to VS
-Code. It also exposes these and other DVC functions in the [Command Palette].
+## What you get
 
-- Provides _Editors_ to manage [Experiments][exp-view] and display
-  [Plots][plots-view] as _Tabs_ in the IDE.
-- Adds a [DVC Tracked] panel to the _Explorer_ view. This shows a tree of the
-  data that DVC is tracking, with real-time file/dir [states] and options to
-  [synchronize] them (from/to remote storage).
-- Adds a [DVC panel] to the _Source Control_ view to list the [workspace
+This extension augments VS Code in the following ways:
+
+- Adds a **[DVC Tracked]** panel to the _Explorer_ view. This shows a tree of
+  the data files and directories tracked by DVC, including their state, and
+  options to [synchronize] them (from/to remote storage).
+- Adds a **[DVC panel]** to the _Source Control_ view to display the [workspace
   status]. You can [restore] or reset project versions (based on the current Git
-  `HEAD` commit) as well as [manage new and existing data] from here.
-- Adds a brand-new [DVC View] (<img
+  `HEAD` commit) as well as manage new and existing data from here.
+- Adds a brand-new new **[DVC View]** (<img
   src="https://user-images.githubusercontent.com/1477535/171570901-9012413c-f0bb-41d9-9a45-2653b4e3f1fe.png"
   alt="DVC logo" style="height: 1em;"/> icon in the Activity Bar) with panels to
   visualize and manage [DVC Experiments].
-- Registers several [commands] in the _Command Palette_.
-- Includes a [DVC channel] for the _Output_ panel (useful for
+- Provides special _Editors_ to manage **[Experiments]** and display **[Plots]**
+  in IDE _Tabs_.
+- Registers several **Commands** in the _[Command Palette]_ (see next section).
+- Includes a DVC channel for the _Output_ panel (useful for
   [debugging](#debugging)).
 
-[extension]: https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
-[views]: https://code.visualstudio.com/docs/getstarted/userinterface#_views
-[editors]:
-  https://code.visualstudio.com/docs/getstarted/userinterface#_open-editors
+[dvc tracked]: extension/resources/walkthrough/tracked-explorer.md
+[synchronize]: https://dvc.org/doc/start/data-management#storing-and-sharing
+[dvc panel]: extension/resources/walkthrough/source-control-management.md
+[workspace status]:
+  https://dvc.org/doc/command-reference/status#local-workspace-status
+[restore]: https://dvc.org/doc/start/data-management#switching-between-versions
+[dvc view]: extension/resources/walkthrough/view-container.md
+[experiments]: extension/resources/walkthrough/experiments-table.md
+[plots]: extension/resources/walkthrough/plots.md
 [command palette]:
   https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
-[exp-view]: extension/resources/walkthrough/experiments-table.md
-[plots-view]: extension/resources/walkthrough/plots.md
-[dvc tracked]: extension/resources/walkthrough/tracked-explorer.md
-[dvc panel]: extension/resources/walkthrough/source-control-management.md
-[dvc view]: extension/resources/walkthrough/view-container.md
-[commands]: extension/resources/walkthrough/command-palette.md
-[dvc output]: #
 
 ## Useful commands
 
@@ -115,7 +117,9 @@ in one of the following commands:
 | `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
 | `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
 
-See the full list of VS Code [commands] available.
+Learn more about the available VS Code [commands].
+
+[commands]: extension/resources/walkthrough/command-palette.md
 
 ## Configuration
 
@@ -158,8 +162,8 @@ pipelines, and most scripts are capable of running outside of DVC.
 
 ## Contributing
 
-See development docs and contributing guidelines in
-[CONTRIBUTING.md](CONTRIBUTING.md)
+See the development and contributing guidelines in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Data and telemetry
 
