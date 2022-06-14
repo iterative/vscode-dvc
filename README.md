@@ -1,4 +1,4 @@
-![banner](https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/resources/banner.svg)
+![banner](https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/resources/banner.png)
 
 # DVC Extension for Visual Studio Code
 
