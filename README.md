@@ -171,7 +171,7 @@ pipelines, and most scripts are capable of running outside of DVC.
 See the development and contributing guidelines in
 [CONTRIBUTING.md](CONTRIBUTING.md).
 
-![GitHub Contributors Image](https://contrib.rocks/https://contrib.rocks/image?repo=iterative/vscode-dvc)
+![GitHub Contributors Image](https://contrib.rocks/image?repo=iterative/vscode-dvc)
 
 ## Data and telemetry
 
