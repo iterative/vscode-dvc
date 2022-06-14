@@ -3,6 +3,7 @@ import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
+import { Icon } from '../../../shared/components/Icon'
 import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
 import SvgFilter from '../../../shared/components/icons/Filter'
 import { sendMessage } from '../../../shared/vscode'
@@ -47,14 +48,14 @@ export const Indicators = ({
         aria-label="sorts"
         onClick={focusSortsTree}
       >
-        <SvgSortPrecedence />
+        <Icon width={16} height={16} icon={SvgSortPrecedence} />
       </Indicator>
       <Indicator
         count={filters?.length}
         aria-label="filters"
         onClick={focusFiltersTree}
       >
-        <SvgFilter />
+        <Icon width={16} height={16} icon={SvgFilter} />
       </Indicator>
     </div>
   )
