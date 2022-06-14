@@ -1,4 +1,4 @@
-<img src="https://github.com/iterative/vscode-dvc/blob/main/extension/resources/banner.svg">
+![banner](https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/resources/banner.svg)
 
 # DVC Extension for Visual Studio Code
 
@@ -16,7 +16,7 @@ Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
 databases are required.
 
-<img src="https://github.com/iterative/vscode-dvc/blob/main/extension/resources/overview.gif">
+<img src="https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/resources/overview.gif">
 
 - **Experiment tracking**: Record training data, parameters, and metrics on top
   of [Git](https://git-scm.com/). Navigate your experiments, compare their
@@ -89,7 +89,7 @@ This extension augments VS Code in the following ways:
   status]. You can [restore] or reset project versions (based on the current Git
   `HEAD` commit) as well as manage new and existing data from here.
 - Adds a brand-new new **[DVC View]** (<img
-  src="https://github.com/iterative/vscode-dvc/blob/main/extension/docs/dvc.png"
+  src="https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/docs/dvc.png"
   alt="DVC logo" style="height: 1em;"/> icon in the Activity Bar) with panels to
   visualize and manage [DVC Experiments].
 - Provides special _Editors_ to manage **[Experiments]** and display **[Plots]**
