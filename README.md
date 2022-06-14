@@ -92,7 +92,7 @@ This extension augments VS Code in the following ways:
   `HEAD` commit) as well as manage new and existing data from here.
 - Adds a brand-new new **[DVC View]** (<img
   src="https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/docs/dvc.png"
-  alt="DVC logo" style="height: 1em;"/> icon in the Activity Bar) with panels to
+  alt="DVC logo" height="16"/> icon in the Activity Bar) with panels to
   visualize and manage [DVC Experiments].
 - Provides special _Editors_ to manage **[Experiments]** and display **[Plots]**
   in IDE _Tabs_.
