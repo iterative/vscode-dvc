@@ -10,7 +10,7 @@ see the files and directories that are managed by DVC (even if they are not yet
 downloaded) in a view similar to the regular `Explorer` view
 
 <p align="center">
-  <img src="images/dvc-tracked-explorer.png" 
+  <img src="images/dvc-tracked-explorer.png"
        alt="DVC-Tracked Explorer Integration" />
 </p>
 
