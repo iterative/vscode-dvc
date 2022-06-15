@@ -45,11 +45,14 @@ const focusFiltersTree = () =>
 const focusSortsTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_SORTS_TREE })
 
+const pluralize = (word: string, number: number | undefined) =>
+  number === 1 ? word : `${word}s`
+
 const formatCountMessage = (item: string, count: number | undefined) =>
-  `${count || 'No'} ${item}${count === 1 ? '' : 's'} applied`
+  `${count || 'No'} ${pluralize(item, count)} applied`
 
 const formatFilteredCountMessage = (item: string, filteredCount: number) =>
-  `${filteredCount} ${item}${filteredCount === 1 ? '' : 's'} filtered`
+  `${filteredCount || 'No'} ${pluralize(item, filteredCount)} filtered`
 
 export const Indicators = ({
   sorts,

@@ -803,8 +803,8 @@ describe('App', () => {
     )
     expect(filterIndicator).toHaveTextContent('1')
     expect(tooltip).toHaveTextContent('1 filter applied')
-    expect(tooltip).toHaveTextContent('0 experiments filtered')
-    expect(tooltip).toHaveTextContent('0 checkpoints filtered')
+    expect(tooltip).toHaveTextContent('No experiments filtered')
+    expect(tooltip).toHaveTextContent('No checkpoints filtered')
     fireEvent(
       window,
       new MessageEvent('message', {
