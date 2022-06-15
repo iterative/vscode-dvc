@@ -142,7 +142,7 @@ export class RepositoryData extends DeferredDisposable {
 
     this.dispose.track(
       createFileSystemWatcher(
-        new RelativePattern(this.dvcRoot, '**/*.*'),
+        new RelativePattern(this.dvcRoot, '**'),
         (path: string) => {
           if (isExcluded(this.dvcRoot, path)) {
             return
