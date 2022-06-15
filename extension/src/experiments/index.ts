@@ -1,5 +1,13 @@
 import { join } from 'path'
-import { Event, EventEmitter, Memento, Uri, ViewColumn, window } from 'vscode'
+import {
+  commands,
+  Event,
+  EventEmitter,
+  Memento,
+  Uri,
+  ViewColumn,
+  window
+} from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickAndModifyParams } from './model/modify/quickPick'
@@ -18,6 +26,7 @@ import { Experiment, ColumnType, TableData } from './webview/contract'
 import { DecorationProvider } from './model/filterBy/decorationProvider'
 import { SortDefinition } from './model/sortBy'
 import { splitColumnPath } from './columns/paths'
+import { collectFilteredCounts } from './model/filterBy/collect'
 import { ResourceLocator } from '../resourceLocator'
 import {
   AvailableCommands,
@@ -390,6 +399,30 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.hasRunningExperiment()
   }
 
+  private focusSortsTree() {
+    const commandPromise = commands.executeCommand(
+      'dvc.views.experimentsSortByTree.focus'
+    )
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE,
+      undefined,
+      undefined
+    )
+    return commandPromise
+  }
+
+  private focusFiltersTree() {
+    const commandPromise = commands.executeCommand(
+      'dvc.views.experimentsFilterByTree.focus'
+    )
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE,
+      undefined,
+      undefined
+    )
+    return commandPromise
+  }
+
   private hideTableColumn(path: string) {
     this.toggleColumnStatus(path)
     sendTelemetryEvent(
@@ -453,6 +486,7 @@ export class Experiments extends BaseRepository<TableData> {
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
+      filteredCounts: collectFilteredCounts(this.getFilteredExperiments()),
       filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.hasCheckpoints(),
       hasColumns: this.columns.hasColumns(),
@@ -507,6 +541,12 @@ export class Experiments extends BaseRepository<TableData> {
             return this.removeExperiment(message.payload)
           case MessageFromWebviewType.SELECT_COLUMNS:
             return this.setColumnsStatus()
+
+          case MessageFromWebviewType.FOCUS_FILTERS_TREE:
+            return this.focusFiltersTree()
+          case MessageFromWebviewType.FOCUS_SORTS_TREE:
+            return this.focusSortsTree()
+
           default:
             Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
         }

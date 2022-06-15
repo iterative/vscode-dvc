@@ -126,6 +126,7 @@ suite('Experiments Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: columnsFixture,
+        filteredCounts: { checkpoints: 0, experiments: 0 },
         filters: [],
         hasCheckpoints: true,
         hasColumns: true,
@@ -690,6 +691,7 @@ suite('Experiments Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: [],
+        filteredCounts: { checkpoints: 0, experiments: 0 },
         filters: [],
         hasCheckpoints: true,
         hasColumns: true,
@@ -699,6 +701,72 @@ suite('Experiments Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWith(allColumnsUnselected)
+    })
+
+    it('should be able to handle a message to focus the sorts tree', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const executeCommandStub = stub(commands, 'executeCommand')
+
+      const messageReceived = new Promise(resolve =>
+        disposable.track(mockMessageReceived.event(() => resolve(undefined)))
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.FOCUS_SORTS_TREE
+      })
+
+      expect(executeCommandStub).to.be.calledWith(
+        'dvc.views.experimentsSortByTree.focus'
+      )
+
+      await messageReceived
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(
+        mockSendTelemetryEvent,
+        'should send a telemetry call that the sorts tree has been focused'
+      ).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE,
+        undefined,
+        undefined
+      )
+    })
+
+    it('should be able to handle a message to focus the filters tree', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const executeCommandStub = stub(commands, 'executeCommand')
+
+      const messageReceived = new Promise(resolve =>
+        disposable.track(mockMessageReceived.event(() => resolve(undefined)))
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+      })
+
+      expect(executeCommandStub).to.be.calledWith(
+        'dvc.views.experimentsFilterByTree.focus'
+      )
+
+      await messageReceived
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(
+        mockSendTelemetryEvent,
+        'should send a telemetry call that the filters tree has been focused'
+      ).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE,
+        undefined,
+        undefined
+      )
     })
   })
 

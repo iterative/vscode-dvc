@@ -570,3 +570,50 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   top: 0;
   z-index: 4;
 }
+
+.tableIndicators {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+}
+
+$badge-size: 0.85rem;
+
+.indicatorIcon {
+  display: inline-block;
+  position: relative;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: center;
+  padding: 0.25rem;
+  margin: 0.025rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+  svg {
+    fill: $watermark-color;
+  }
+  &.indicatorWithCount svg {
+    fill: $fg-color;
+  }
+}
+
+.indicatorCount {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-weight: bold;
+  background-color: $indicator-badge-background;
+  color: $indicator-badge-foreground;
+  border-radius: 100%;
+  width: $badge-size;
+  height: $badge-size;
+  line-height: $badge-size;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.5rem;
+}

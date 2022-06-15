@@ -697,4 +697,156 @@ describe('App', () => {
       expect(contextMenuEvent.defaultPrevented).toBe(true)
     })
   })
+
+  describe('Sort and Filter Indicators', () => {
+    it('should show an indicator with the amount of applied sorts', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              sorts: []
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      const sortIndicator = screen.getByLabelText('sorts')
+      expect(sortIndicator).toHaveTextContent('')
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(sortIndicator)
+
+      const tooltip = screen.getByRole('tooltip')
+
+      expect(tooltip).toHaveTextContent('No sorts applied')
+
+      const { columns } = tableDataFixture
+      const firstSortPath = columns[columns.length - 1].path
+      const secondSortPath = columns[columns.length - 2].path
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              sorts: [{ descending: true, path: firstSortPath }]
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      expect(sortIndicator).toHaveTextContent('1')
+      expect(tooltip).toHaveTextContent('1 sort applied')
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              sorts: [
+                { descending: true, path: firstSortPath },
+                { descending: false, path: secondSortPath }
+              ]
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+      expect(sortIndicator).toHaveTextContent('2')
+      expect(tooltip).toHaveTextContent('2 sorts applied')
+    })
+  })
+
+  it('should show an indicator with the amount of applied filters', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filters: []
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    const filterIndicator = screen.getByLabelText('filters')
+    expect(filterIndicator).toHaveTextContent('')
+
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+    fireEvent.mouseEnter(filterIndicator)
+
+    const tooltip = screen.getByRole('tooltip')
+
+    expect(tooltip).toHaveTextContent('No filters applied')
+
+    const { columns } = tableDataFixture
+    const firstFilterPath = columns[columns.length - 1].path
+    const secondFilterPath = columns[columns.length - 2].path
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filters: [firstFilterPath]
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    expect(filterIndicator).toHaveTextContent('1')
+    expect(tooltip).toHaveTextContent('1 filter applied')
+    expect(tooltip).toHaveTextContent('No experiments filtered')
+    expect(tooltip).toHaveTextContent('No checkpoints filtered')
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filteredCounts: {
+              checkpoints: 2,
+              experiments: 1
+            },
+            filters: [firstFilterPath, secondFilterPath]
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    expect(filterIndicator).toHaveTextContent('2')
+    expect(tooltip).toHaveTextContent('2 filters applied')
+    expect(tooltip).toHaveTextContent('1 experiment filtered')
+    expect(tooltip).toHaveTextContent('2 checkpoints filtered')
+  })
+
+  it('should send a message to focus the relevant tree when clicked', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: tableDataFixture,
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    mockPostMessage.mockClear()
+    fireEvent.click(screen.getByLabelText('sorts'))
+    expect(mockPostMessage).toBeCalledWith({
+      type: MessageFromWebviewType.FOCUS_SORTS_TREE
+    })
+    mockPostMessage.mockClear()
+    fireEvent.click(screen.getByLabelText('filters'))
+    expect(mockPostMessage).toBeCalledWith({
+      type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+    })
+  })
 })
