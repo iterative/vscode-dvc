@@ -3,6 +3,7 @@ import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import React, { useRef } from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import styles from './styles.module.scss'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { Indicators } from './Indicators'
@@ -18,6 +19,7 @@ interface TableHeadProps {
   instance: TableInstance<Experiment>
   columns: Column[]
   sorts: SortDefinition[]
+  filteredCounts: FilteredCounts
   filters: string[]
 }
 
@@ -28,6 +30,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
     state: { columnOrder },
     allColumns
   },
+  filteredCounts,
   filters,
   columns,
   sorts
@@ -85,7 +88,11 @@ export const TableHead: React.FC<TableHeadProps> = ({
 
   return (
     <div className={styles.thead}>
-      <Indicators sorts={sorts} filters={filters} />
+      <Indicators
+        sorts={sorts}
+        filters={filters}
+        filteredCounts={filteredCounts}
+      />
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
         <MergedHeaderGroups

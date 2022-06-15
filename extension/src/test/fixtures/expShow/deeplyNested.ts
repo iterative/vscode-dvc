@@ -281,6 +281,7 @@ const deeplyNestedTableData: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
+  filteredCounts: { experiments: 0, checkpoints: 0 },
   filters: [
     'params:params.yaml:nested1.doubled',
     'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled'

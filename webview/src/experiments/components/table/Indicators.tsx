@@ -2,6 +2,7 @@ import React, { MouseEventHandler, ReactNode } from 'react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
@@ -47,12 +48,17 @@ const focusSortsTree = () =>
 const formatCountMessage = (item: string, count: number | undefined) =>
   `${count || 'No'} ${item}${count === 1 ? '' : 's'} applied`
 
+const formatFilteredCountMessage = (item: string, filteredCount: number) =>
+  `${filteredCount} ${item} filtered`
+
 export const Indicators = ({
   sorts,
-  filters
+  filters,
+  filteredCounts
 }: {
   sorts?: SortDefinition[]
   filters?: string[]
+  filteredCounts: FilteredCounts
 }) => {
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
@@ -70,7 +76,27 @@ export const Indicators = ({
         count={filters?.length}
         aria-label="filters"
         onClick={focusFiltersTree}
-        tooltipContent={formatCountMessage('filter', filtersCount)}
+        tooltipContent={
+          <>
+            <div>{formatCountMessage('filter', filtersCount)}</div>
+            {filtersCount ? (
+              <>
+                <div>
+                  {formatFilteredCountMessage(
+                    'experiments',
+                    filteredCounts.experiments
+                  )}
+                </div>
+                <div>
+                  {formatFilteredCountMessage(
+                    'checkpoints',
+                    filteredCounts.checkpoints
+                  )}
+                </div>
+              </>
+            ) : null}
+          </>
+        }
       >
         <Icon width={16} height={16} icon={SvgFilter} />
       </Indicator>

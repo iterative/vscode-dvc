@@ -106,6 +106,7 @@ describe('Table', () => {
     columnOrder: [],
     columnWidths: {},
     columns: [],
+    filteredCounts: { checkpoints: 0, experiments: 0 },
     filters: [],
     hasCheckpoints: false,
     hasColumns: true,
