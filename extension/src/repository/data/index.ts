@@ -141,7 +141,7 @@ export class RepositoryData extends DeferredDisposable {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
 
     this.dispose.track(
-      createFileSystemWatcher(join(this.dvcRoot, '**'), (path: string) => {
+      createFileSystemWatcher(join(this.dvcRoot, '**/*.*'), (path: string) => {
         if (isExcluded(this.dvcRoot, path)) {
           return
         }
