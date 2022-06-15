@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2022-06-15
+
+### 🚀 New Features and Enhancements
+
+- Improve reset the workspace SCM command [#1900](https://github.com/iterative/vscode-dvc/pull/1900) by [@mattseddon](https://github.com/mattseddon)
+- Add global sort and filter indicators to the Experiments Table webview [#1872](https://github.com/iterative/vscode-dvc/pull/1872) by [@rogermparent](https://github.com/rogermparent)
+
+### 🐛 Bug Fixes
+
+- Fix Windows repo file watcher using RelativePattern [#1905](https://github.com/iterative/vscode-dvc/pull/1905) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Upgrade @vscode/test-electron [#1901](https://github.com/iterative/vscode-dvc/pull/1901) by [@mattseddon](https://github.com/mattseddon)
+- Remove unused SVGs [#1899](https://github.com/iterative/vscode-dvc/pull/1899) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.2] - 2022-06-14
 
 ### 🐛 Bug Fixes
