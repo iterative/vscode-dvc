@@ -49,7 +49,7 @@ const formatCountMessage = (item: string, count: number | undefined) =>
   `${count || 'No'} ${item}${count === 1 ? '' : 's'} applied`
 
 const formatFilteredCountMessage = (item: string, filteredCount: number) =>
-  `${filteredCount} ${item} filtered`
+  `${filteredCount} ${item}${filteredCount === 1 ? '' : 's'} filtered`
 
 export const Indicators = ({
   sorts,
@@ -83,13 +83,13 @@ export const Indicators = ({
               <>
                 <div>
                   {formatFilteredCountMessage(
-                    'experiments',
+                    'experiment',
                     filteredCounts.experiments
                   )}
                 </div>
                 <div>
                   {formatFilteredCountMessage(
-                    'checkpoints',
+                    'checkpoint',
                     filteredCounts.checkpoints
                   )}
                 </div>
