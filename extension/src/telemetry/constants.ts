@@ -150,6 +150,7 @@ export interface IEventNamePropertyMapping {
   [EventName.COMMIT_TARGET]: undefined
   [EventName.COMMIT]: undefined
   [EventName.DELETE_TARGET]: undefined
+  [EventName.DISCARD_WORKSPACE_CHANGES]: undefined
   [EventName.INIT]: undefined
   [EventName.MOVE_TARGETS]: undefined
   [EventName.PULL_TARGET]: undefined
@@ -158,7 +159,6 @@ export interface IEventNamePropertyMapping {
   [EventName.PUSH]: undefined
   [EventName.REMOVE_TARGET]: undefined
   [EventName.RENAME_TARGET]: undefined
-  [EventName.RESET_WORKSPACE]: undefined
 
   [EventName.GIT_STAGE_ALL]: undefined
   [EventName.GIT_UNSTAGE_ALL]: undefined

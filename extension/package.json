@@ -167,6 +167,12 @@
         "icon": "$(trash)"
       },
       {
+        "title": "%command.discardWorkspaceChanges%",
+        "command": "dvc.discardWorkspaceChanges",
+        "category": "DVC",
+        "icon": "$(discard)"
+      },
+      {
         "title": "%command.experimentGarbageCollect%",
         "command": "dvc.experimentGarbageCollect",
         "category": "DVC"
@@ -304,12 +310,6 @@
         "title": "%command.renameTarget%",
         "command": "dvc.renameTarget",
         "category": "DVC"
-      },
-      {
-        "title": "%command.resetWorkspace%",
-        "command": "dvc.resetWorkspace",
-        "category": "DVC",
-        "icon": "$(discard)"
       },
       {
         "title": "%command.runExperiment%",
@@ -682,7 +682,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.resetWorkspace",
+          "command": "dvc.discardWorkspaceChanges",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -792,7 +792,7 @@
       ],
       "scm/title": [
         {
-          "command": "dvc.resetWorkspace",
+          "command": "dvc.discardWorkspaceChanges",
           "group": "navigation@1",
           "when": "scmProvider == dvc && dvc.commands.available"
         },
