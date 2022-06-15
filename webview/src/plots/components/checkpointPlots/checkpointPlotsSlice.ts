@@ -10,14 +10,15 @@ import {
 import { clearData } from '../../actions'
 import { ReducerName } from '../../constants'
 
+type PlotsById = { [key: string]: CheckpointPlotData }
 export interface CheckpointPlotsState extends CheckpointPlotsData {
   isCollapsed: boolean
   hasData: boolean
   plotsIds: string[]
-  plotsById: { [key: string]: CheckpointPlotData }
+  plotsById: PlotsById
 }
 
-const initialState: CheckpointPlotsState = {
+export const checkpointPlotsInitialState: CheckpointPlotsState = {
   colors: { domain: [], range: [] },
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
@@ -33,12 +34,12 @@ export const checkpointPlotsSlice = createSlice({
     builder
       .addCase(clearData, (_, action) => {
         if (!action.payload || action.payload === ReducerName.checkpoint) {
-          return { ...initialState }
+          return { ...checkpointPlotsInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
-  initialState,
+  initialState: checkpointPlotsInitialState,
   name: ReducerName.checkpoint,
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {
@@ -50,11 +51,13 @@ export const checkpointPlotsSlice = createSlice({
     },
     update: (state, action: PayloadAction<CheckpointPlotsData>) => {
       Object.assign(state, action.payload)
-      state.plotsIds = action.payload.plots.map(plot => plot.title)
+      state.plotsIds = action.payload.plots?.map(plot => plot.title) || []
       state.plotsById = {}
       for (const plot of action.payload.plots) {
         state.plotsById[plot.title] = plot
       }
+      console.log(state.plotsById)
+
       state.hasData = !!action.payload
     }
   }

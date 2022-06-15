@@ -4,13 +4,15 @@ import comparisonTableReducer from './components/comparisonTable/comparisonTable
 import templatePlotsReducer from './components/templatePlots/templatePlotsSlice'
 import webviewReducer from './components/webviewSlice'
 
+export const storeReducers = {
+  checkpoint: checkpointPlotsReducer,
+  comparison: comparisonTableReducer,
+  template: templatePlotsReducer,
+  webview: webviewReducer
+}
+
 export const store = configureStore({
-  reducer: {
-    checkpoint: checkpointPlotsReducer,
-    comparison: comparisonTableReducer,
-    template: templatePlotsReducer,
-    webview: webviewReducer
-  }
+  reducer: storeReducers
 })
 
 export type RootState = ReturnType<typeof store.getState>

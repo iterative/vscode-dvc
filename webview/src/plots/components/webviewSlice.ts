@@ -16,7 +16,7 @@ export interface WebviewState {
   zoomedInPlot: ZoomedInPlotState | undefined
 }
 
-const initialState: WebviewState = {
+export const webviewInitialState: WebviewState = {
   hasData: false,
   hasPlots: false,
   hasSelectedPlots: false,
@@ -29,12 +29,12 @@ export const webviewSlice = createSlice({
     builder
       .addCase(clearData, (_, action) => {
         if (!action.payload || action.payload === ReducerName.webview) {
-          return { ...initialState }
+          return { ...webviewInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
-  initialState,
+  initialState: webviewInitialState,
   name: ReducerName.webview,
   reducers: {
     initialize: state => {
@@ -45,7 +45,7 @@ export const webviewSlice = createSlice({
       action: PayloadAction<ZoomedInPlotState | undefined>
     ) => {
       if (!action.payload) {
-        state.zoomedInPlot = initialState.zoomedInPlot
+        state.zoomedInPlot = webviewInitialState.zoomedInPlot
         return
       }
 
@@ -65,8 +65,11 @@ export const webviewSlice = createSlice({
     updateHasSelectedPlots: (state, action: PayloadAction<boolean>) => {
       state.hasSelectedPlots = action.payload
     },
-    updateSelectedRevisions: (state, action: PayloadAction<Revision[]>) => {
-      state.selectedRevisions = action.payload
+    updateSelectedRevisions: (
+      state,
+      action: PayloadAction<Revision[] | undefined>
+    ) => {
+      state.selectedRevisions = action.payload || []
     }
   }
 })

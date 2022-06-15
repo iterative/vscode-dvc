@@ -14,7 +14,7 @@ export interface TemplatePlotsState extends TemplatePlotsData {
   hasData: boolean
 }
 
-const initialState: TemplatePlotsState = {
+export const templatePlotsInitialState: TemplatePlotsState = {
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
   plots: [],
@@ -26,12 +26,12 @@ export const templatePlotsSlice = createSlice({
     builder
       .addCase(clearData, (_, action) => {
         if (!action.payload || action.payload === ReducerName.template) {
-          return { ...initialState }
+          return { ...templatePlotsInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
-  initialState,
+  initialState: templatePlotsInitialState,
   name: ReducerName.template,
 
   reducers: {

@@ -19,8 +19,16 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   colors
 }) => {
   const { title, values } = useSelector(
-    (state: RootState) => state.checkpoint.plotsById[id]
+    (state: RootState) =>
+      (state.checkpoint.plotsIds.includes(id) &&
+        state.checkpoint.plotsById[id]) || {
+        title: undefined,
+        values: undefined
+      }
   )
+  if (!title) {
+    return null
+  }
   const key = `plot-${title}`
   const spec = createSpec(title, colors)
   const plotProps = {

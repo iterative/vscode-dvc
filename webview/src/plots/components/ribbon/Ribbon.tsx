@@ -1,14 +1,14 @@
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { reorderObjectList } from 'dvc/src/util/array'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
-import { RootState } from '../../store'
-import { performOrderedUpdate } from '../../../util/objects'
-import { IconButton } from '../../../shared/components/button/IconButton'
 import { AllIcons } from '../../../shared/components/Icon'
+import { IconButton } from '../../../shared/components/button/IconButton'
+import { performOrderedUpdate } from '../../../util/objects'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../store'
 
 const MAX_NB_EXP = 7
 
@@ -20,6 +20,7 @@ export const Ribbon: React.FC = () => {
   const reorderId = 'id'
 
   useEffect(() => {
+    debugger
     setOrder(pastOrder => performOrderedUpdate(pastOrder, revisions, reorderId))
   }, [revisions])
 

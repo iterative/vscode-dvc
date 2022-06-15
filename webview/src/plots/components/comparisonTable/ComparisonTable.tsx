@@ -28,7 +28,7 @@ export const ComparisonTable: React.FC = () => {
     column.revision === pinnedColumn.current
 
   const getPinnedColumnRevision = useCallback(
-    () => revisions.find(isPinned) || null,
+    () => revisions?.find(isPinned) || null,
     [revisions]
   )
 
@@ -37,7 +37,7 @@ export const ComparisonTable: React.FC = () => {
       setColumns(() => {
         const acc: Revision[] = []
 
-        for (const column of revisions) {
+        for (const column of revisions || []) {
           if (isPinned(column)) {
             continue
           }

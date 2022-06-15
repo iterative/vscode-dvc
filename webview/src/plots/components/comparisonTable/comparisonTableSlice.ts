@@ -14,7 +14,7 @@ export interface ComparisonTableState extends PlotsComparisonData {
   hasData: boolean
 }
 
-const initialState: ComparisonTableState = {
+export const comparisonTableInitialState: ComparisonTableState = {
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.COMPARISON_TABLE],
   plots: [],
@@ -26,12 +26,12 @@ export const comparisonTableSlice = createSlice({
     builder
       .addCase(clearData, (_, action) => {
         if (!action.payload || action.payload === ReducerName.comparison) {
-          return { ...initialState }
+          return { ...comparisonTableInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
-  initialState,
+  initialState: comparisonTableInitialState,
   name: ReducerName.comparison,
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {
