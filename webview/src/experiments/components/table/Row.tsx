@@ -44,6 +44,64 @@ const experimentMenuOption = (
   } as MessagesMenuOptionProps
 }
 
+const getMultiSelectMenuOptions = (selectedRowsList: RowProp[]) => {
+  return [
+    experimentMenuOption(
+      selectedRowsList
+        .filter(value => value.row.depth === 1)
+        .map(value => value.row.values.id),
+      'Remove Selected Rows',
+      MessageFromWebviewType.REMOVE_EXPERIMENT
+    )
+  ]
+}
+
+const getSingleSelectMenuOptions = (
+  id: string,
+  isWorkspace: boolean,
+  projectHasCheckpoints: boolean,
+  depth: number,
+  queued?: boolean
+) => {
+  const isNotCheckpoint = depth <= 1 || isWorkspace
+  const canApplyOrCreateBranch = queued || isWorkspace || depth <= 0
+
+  const withId = (
+    label: string,
+    type: MessageFromWebviewType,
+    hidden?: boolean
+  ) => experimentMenuOption(id, label, type, hidden)
+
+  return [
+    withId(
+      'Apply to Workspace',
+      MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE,
+      canApplyOrCreateBranch
+    ),
+    withId(
+      'Create new Branch',
+      MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
+      canApplyOrCreateBranch
+    ),
+    withId('Remove', MessageFromWebviewType.REMOVE_EXPERIMENT, depth !== 1),
+    withId(
+      projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
+      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
+      !isNotCheckpoint
+    ),
+    withId(
+      'Modify, Reset and Run',
+      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+      !isNotCheckpoint || !projectHasCheckpoints
+    ),
+    withId(
+      'Modify and Queue',
+      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
+      !isNotCheckpoint
+    )
+  ]
+}
+
 const getContextMenuOptions = (
   id: string,
   isWorkspace: boolean,
@@ -59,60 +117,15 @@ const getContextMenuOptions = (
 
   return cond(
     isFromSelection && selectedRowsList.length > 1,
-    () => {
-      const deletable = selectedRowsList.filter(value => value.row.depth === 1)
-
-      return [
-        experimentMenuOption(
-          deletable.map(value => value.row.values.id),
-          'Remove Selected Rows',
-          MessageFromWebviewType.REMOVE_EXPERIMENT
-        )
-      ]
-    },
-    () => {
-      const isNotCheckpoint = depth <= 1 || isWorkspace
-      const menuOptions: MessagesMenuOptionProps[] = [
-        experimentMenuOption(
-          id,
-          'Apply to Workspace',
-          MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE,
-          queued || isWorkspace || depth <= 0
-        ),
-        experimentMenuOption(
-          id,
-          'Create new Branch',
-          MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
-          queued || isWorkspace || depth <= 0
-        ),
-        experimentMenuOption(
-          id,
-          'Remove',
-          MessageFromWebviewType.REMOVE_EXPERIMENT,
-          depth !== 1
-        ),
-        experimentMenuOption(
-          id,
-          projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
-          MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
-          !isNotCheckpoint
-        ),
-        experimentMenuOption(
-          id,
-          'Modify, Reset and Run',
-          MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
-          !isNotCheckpoint || !projectHasCheckpoints
-        ),
-        experimentMenuOption(
-          id,
-          'Modify and Queue',
-          MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
-          !isNotCheckpoint
-        )
-      ]
-
-      return menuOptions
-    }
+    () => getMultiSelectMenuOptions(selectedRowsList),
+    () =>
+      getSingleSelectMenuOptions(
+        id,
+        isWorkspace,
+        projectHasCheckpoints,
+        depth,
+        queued
+      )
   )
 }
 
