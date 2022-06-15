@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, RelativePattern } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
@@ -156,12 +156,15 @@ export class RepositoryData extends DeferredDisposable {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
 
     this.dispose.track(
-      createFileSystemWatcher(join(this.dvcRoot, '**'), (path: string) => {
-        if (isExcluded(this.dvcRoot, path)) {
-          return
+      createFileSystemWatcher(
+        new RelativePattern(this.dvcRoot, '**'),
+        (path: string) => {
+          if (isExcluded(this.dvcRoot, path)) {
+            return
+          }
+          return this.managedUpdate(path)
         }
-        return this.managedUpdate(path)
-      })
+      )
     )
 
     this.dispose.track(
