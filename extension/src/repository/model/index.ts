@@ -24,13 +24,7 @@ import {
 } from '../../cli/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
-
-type OutputData = {
-  diffFromCache: StatusOutput
-  diffFromHead: DiffOutput
-  tracked?: ListOutput[]
-  untracked: Set<string>
-}
+import { Data } from '../data'
 
 type ModifiedAndNotInCache = {
   [Status.MODIFIED]: Set<string>
@@ -47,6 +41,7 @@ export class RepositoryModel
     added: new Set<string>(),
     deleted: new Set<string>(),
     gitModified: new Set<string>(),
+    hasGitChanges: false,
     modified: new Set<string>(),
     notInCache: new Set<string>(),
     renamed: new Set<string>(),
@@ -84,15 +79,17 @@ export class RepositoryModel
   public setState({
     diffFromCache,
     diffFromHead,
+    hasGitChanges,
     tracked,
     untracked
-  }: OutputData) {
+  }: Data) {
     if (tracked) {
       this.updateTracked(tracked)
     }
     this.updateStatus(diffFromHead, diffFromCache)
 
     this.state.untracked = untracked
+    this.state.hasGitChanges = hasGitChanges
   }
 
   public hasChanges(): boolean {
@@ -101,7 +98,8 @@ export class RepositoryModel
       this.state.deleted.size > 0 ||
       this.state.gitModified.size > 0 ||
       this.state.modified.size > 0 ||
-      this.state.renamed.size > 0
+      this.state.renamed.size > 0 ||
+      this.state.hasGitChanges
     )
   }
 
