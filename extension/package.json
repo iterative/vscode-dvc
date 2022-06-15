@@ -167,6 +167,12 @@
         "icon": "$(trash)"
       },
       {
+        "title": "%command.discardWorkspaceChanges%",
+        "command": "dvc.discardWorkspaceChanges",
+        "category": "DVC",
+        "icon": "$(discard)"
+      },
+      {
         "title": "%command.experimentGarbageCollect%",
         "command": "dvc.experimentGarbageCollect",
         "category": "DVC"
@@ -304,12 +310,6 @@
         "title": "%command.renameTarget%",
         "command": "dvc.renameTarget",
         "category": "DVC"
-      },
-      {
-        "title": "%command.resetWorkspace%",
-        "command": "dvc.resetWorkspace",
-        "category": "DVC",
-        "icon": "$(discard)"
       },
       {
         "title": "%command.runExperiment%",
@@ -682,7 +682,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.resetWorkspace",
+          "command": "dvc.discardWorkspaceChanges",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -792,7 +792,7 @@
       ],
       "scm/title": [
         {
-          "command": "dvc.resetWorkspace",
+          "command": "dvc.discardWorkspaceChanges",
           "group": "navigation@1",
           "when": "scmProvider == dvc && dvc.commands.available"
         },
@@ -1525,7 +1525,7 @@
     "@types/sinon-chai": "^3.2.6",
     "@types/uuid": "^8.3.4",
     "@types/vscode": "^1.64.0",
-    "@vscode/test-electron": "^2.1.3",
+    "@vscode/test-electron": "^2.1.4",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "clean-webpack-plugin": "^4.0.0",
