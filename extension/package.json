@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.0",
+  "version": "0.3.2",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -245,7 +245,7 @@
         "title": "%command.modifyExperimentParamsAndResume%",
         "command": "dvc.modifyExperimentParamsAndResume",
         "category": "DVC",
-        "icon": "$(play)"
+        "icon": "$(debug-continue-small)"
       },
       {
         "title": "%command.modifyExperimentParamsAndRun%",
@@ -257,7 +257,7 @@
         "title": "%command.modifyExperimentParamsResetAndRun%",
         "command": "dvc.modifyExperimentParamsResetAndRun",
         "category": "DVC",
-        "icon": "$(debug-rerun)"
+        "icon": "$(play)"
       },
       {
         "title": "%command.queueExperiment%",
@@ -321,7 +321,7 @@
         "title": "%command.resumeCheckpointExperiment%",
         "command": "dvc.resumeCheckpointExperiment",
         "category": "DVC",
-        "icon": "$(play)"
+        "icon": "$(debug-continue-small)"
       },
       {
         "title": "%command.startExperimentsQueue%",
@@ -333,7 +333,7 @@
         "title": "%command.resetAndRunCheckpointExperiment%",
         "command": "dvc.resetAndRunCheckpointExperiment",
         "category": "DVC",
-        "icon": "$(debug-rerun)"
+        "icon": "$(play)"
       },
       {
         "title": "%command.selectForCompare%",
@@ -434,13 +434,13 @@
         "title": "%command.views.experimentsTree.resumeCheckpointExperiment%",
         "command": "dvc.views.experimentsTree.resumeCheckpointExperiment",
         "category": "DVC",
-        "icon": "$(play)"
+        "icon": "$(debug-continue-small)"
       },
       {
         "title": "%command.views.experimentsTree.resetAndRunCheckpointExperiment%",
         "command": "dvc.views.experimentsTree.resetAndRunCheckpointExperiment",
         "category": "DVC",
-        "icon": "$(debug-rerun)"
+        "icon": "$(play)"
       },
       {
         "title": "%command.views.experimentsTree.selectExperiments%",
@@ -883,22 +883,22 @@
           "when": "dvc.experiment.running && dvc.commands.available"
         },
         {
-          "command": "dvc.resumeCheckpointExperiment",
+          "command": "dvc.resetAndRunCheckpointExperiment",
           "group": "navigation@1",
           "when": "dvc.experiments.webviewActive && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.resumeCheckpointExperiment",
+          "command": "dvc.resetAndRunCheckpointExperiment",
           "group": "navigation@1",
           "when": "dvc.params.fileActive && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.resetAndRunCheckpointExperiment",
+          "command": "dvc.resumeCheckpointExperiment",
           "group": "navigation@2",
           "when": "dvc.experiments.webviewActive && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.resetAndRunCheckpointExperiment",
+          "command": "dvc.resumeCheckpointExperiment",
           "group": "navigation@2",
           "when": "dvc.params.fileActive && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
@@ -1035,12 +1035,12 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.experiment.running && !dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.views.experimentsTree.resumeCheckpointExperiment",
+          "command": "dvc.views.experimentsTree.resetAndRunCheckpointExperiment",
           "group": "1_modify@1",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.views.experimentsTree.resetAndRunCheckpointExperiment",
+          "command": "dvc.views.experimentsTree.resumeCheckpointExperiment",
           "group": "1_modify@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
@@ -1112,12 +1112,12 @@
           "group": "1_run@1"
         },
         {
-          "command": "dvc.resumeCheckpointExperiment",
+          "command": "dvc.resetAndRunCheckpointExperiment",
           "when": "view == dvc.views.experimentsTree && !dvc.experiments.webviewActive && !dvc.experiment.running && dvc.experiment.checkpoints",
           "group": "1_run@1"
         },
         {
-          "command": "dvc.resetAndRunCheckpointExperiment",
+          "command": "dvc.resumeCheckpointExperiment",
           "when": "view == dvc.views.experimentsTree && !dvc.experiments.webviewActive && !dvc.experiment.running && dvc.experiment.checkpoints",
           "group": "1_run@2"
         },
@@ -1127,12 +1127,12 @@
           "group": "navigation@1"
         },
         {
-          "command": "dvc.resumeCheckpointExperiment",
+          "command": "dvc.resetAndRunCheckpointExperiment",
           "when": "view == dvc.views.experimentsTree && dvc.experiments.webviewActive && !dvc.experiment.running && dvc.experiment.checkpoints",
           "group": "navigation@1"
         },
         {
-          "command": "dvc.resetAndRunCheckpointExperiment",
+          "command": "dvc.resumeCheckpointExperiment",
           "when": "view == dvc.views.experimentsTree && dvc.experiments.webviewActive && !dvc.experiment.running && dvc.experiment.checkpoints",
           "group": "navigation@2"
         },
@@ -1341,115 +1341,112 @@
     "walkthroughs": [
       {
         "id": "welcome",
-        "title": "Get Started with DVC",
-        "description": "Your first steps to set up a DVC project with all the powerful tools and features that the DVC extension has to offer!",
+        "title": "Get Started",
+        "description": "Your first steps to build better models faster with experiment tracking and dataset versioning",
         "steps": [
           {
             "id": "dvc.installDVC",
             "title": "Install DVC",
-            "description": "The DVC extension requires DVC to be installed. To install follow the guide shown on [dvc.org](https://dvc.org).\n\n[Install DVC](https://dvc.org/doc/install)\n",
+            "description": "This extension requires DVC to be installed.\n\n[Install DVC](https://dvc.org/doc/install)\n",
             "media": {
               "markdown": "resources/walkthrough/install-dvc.md"
             },
             "completionEvents": [
               "onLink:https://dvc.org",
-              "onLink:https://dvc.org/doc/install"
+              "onLink:https://dvc.org/doc/install",
+              "onCommand:dvc.setupWorkspace"
             ]
           },
           {
-            "id": "dvc.setup",
-            "title": "Setup The Workspace",
-            "description": "Setup the workspace for the DVC extension.\n[Setup The Workspace](command:dvc.setupWorkspace)",
+            "id": "dvc.setupProject",
+            "title": "Setup a DVC Project",
+            "description": "Try an example DVC project or setup a new quickly, and start tracking datasets, models, metrics, and plots\n\n[Example Project](https://github.com/iterative/example-get-started)\n",
             "media": {
-              "markdown": "resources/walkthrough/setup-workspace.md"
+              "markdown": "resources/walkthrough/setup-project.md"
             },
             "completionEvents": [
-              "onCommand:dvc.setupWorkspace"
+              "onLink:https://github.com/iterative/example-get-started",
+              "onLink:https://github.com/iterative/vscode-dvc/tree/main/demo",
+              "onLink:https://dvc.org/doc/dvclive"
             ]
           },
           {
             "id": "dvc.showCommands",
             "title": "Available Commands",
-            "description": "View available commands.\n[View Commands](command:dvc.showCommands)",
+            "description": "See all available commands.\n[View Commands](command:dvc.showCommands)",
             "media": {
               "markdown": "resources/walkthrough/command-palette.md"
             },
             "completionEvents": [
               "onCommand:dvc.showCommands"
-            ],
-            "when": "dvc.commands.available && dvc.project.available"
-          },
-          {
-            "id": "dvc.showOutput",
-            "title": "Output Channel",
-            "description": "View the DVC output channel.\n[View Output](command:dvc.showOutput)",
-            "media": {
-              "markdown": "resources/walkthrough/output-channel.md"
-            },
-            "completionEvents": [
-              "onCommand:dvc.showOutput"
-            ],
-            "when": "dvc.commands.available && dvc.project.available"
-          },
-          {
-            "id": "dvc.scm",
-            "title": "Source Control Management",
-            "description": "Open the SCM view.\n[Show SCM](command:workbench.view.scm)",
-            "media": {
-              "markdown": "resources/walkthrough/source-control-management.md"
-            },
-            "completionEvents": [
-              "onCommand:workbench.view.scm"
-            ],
-            "when": "dvc.commands.available && dvc.project.available"
-          },
-          {
-            "id": "dvc.tracked",
-            "title": "Tracked Resources",
-            "description": "Open the DVC tracked view.\n[Show Tracked](command:dvc.views.trackedExplorerTree.focus)",
-            "media": {
-              "markdown": "resources/walkthrough/tracked-explorer.md"
-            },
-            "completionEvents": [
-              "onCommand:dvc.views.trackedExplorerTree.focus"
-            ],
-            "when": "dvc.commands.available && dvc.project.available"
+            ]
           },
           {
             "id": "dvc.viewContainer",
-            "title": "DVC View Container",
-            "description": "Open the DVC view container.\n[Show Views](command:workbench.view.extension.dvc-views)",
+            "title": "Control from the Side Bar",
+            "description": "Use rich views to quickly access, control, or overview your experiments and plots.\n[Show Views](command:workbench.view.extension.dvc-views)",
             "media": {
               "markdown": "resources/walkthrough/view-container.md"
             },
             "completionEvents": [
               "onCommand:workbench.view.extension.dvc-views"
-            ],
-            "when": "dvc.commands.available && dvc.project.available"
+            ]
           },
           {
             "id": "dvc.experimentsTable",
             "title": "Experiments Table",
-            "description": "Open the experiments table.\n[Show Table](command:dvc.showExperiments)",
+            "description": "Displays your experiments in a customizable table.\n[Show Table](command:dvc.showExperiments)",
             "media": {
               "markdown": "resources/walkthrough/experiments-table.md"
             },
             "completionEvents": [
               "onCommand:dvc.showExperiments"
-            ],
-            "when": "dvc.commands.available && dvc.project.available"
+            ]
+          },
+          {
+            "id": "dvc.runExperiments",
+            "title": "Running Experiments",
+            "description": "Explore a few ways you can run or queue a new experiment.\n[Run an Experiment](command:dvc.modifyExperimentParamsAndRun)",
+            "media": {
+              "markdown": "resources/walkthrough/run-experiments.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.modifyExperimentParamsAndRun"
+            ]
           },
           {
             "id": "dvc.plots",
             "title": "Plots",
-            "description": "Open plots.\n[Show Plots](command:dvc.showPlots)",
+            "description": "Visualize and compare multiple experiments with interactive customizable charts.\n[Show Plots](command:dvc.showPlots)",
             "media": {
               "markdown": "resources/walkthrough/plots.md"
             },
             "completionEvents": [
               "onCommand:dvc.showPlots"
-            ],
-            "when": "dvc.commands.available && dvc.project.available"
+            ]
+          },
+          {
+            "id": "dvc.livePlots",
+            "title": "Live Plot Updates",
+            "description": "Run experiments and track how metrics and plots change in the same plots dashboard.\n[Show Plots](command:dvc.showPlots)",
+            "media": {
+              "markdown": "resources/walkthrough/live-plots.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showPlots"
+            ]
+          },
+          {
+            "id": "dvc.tracked",
+            "title": "Data and Model Management",
+            "description": "Navigate and manage datasets, models, and any large files that are tracked by DVC.\n[Show Tracked](command:dvc.views.trackedExplorerTree.focus)",
+            "media": {
+              "markdown": "resources/walkthrough/dvc-tracked-files.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.views.trackedExplorerTree.focus",
+              "onCommand:workbench.view.scm"
+            ]
           },
           {
             "id": "dvc.learnMore",
@@ -1460,6 +1457,17 @@
             },
             "completionEvents": [
               "onLink:https://dvc.org/doc"
+            ]
+          },
+          {
+            "id": "dvc.troubleshoot",
+            "title": "Troubleshoot & Support",
+            "description": "We are here to help! Ping us and provide the DVC output channel logs.\n[View Output](command:dvc.showOutput)",
+            "media": {
+              "markdown": "resources/walkthrough/troubleshoot.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showOutput"
             ]
           }
         ]
