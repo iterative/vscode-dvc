@@ -784,7 +784,7 @@ describe('App', () => {
 
     const tooltip = screen.getByRole('tooltip')
 
-    expect(tooltip).toHaveTextContent('No filters applied')
+    expect(tooltip.textContent).toBe('No filters applied')
 
     const { columns } = tableDataFixture
     const firstFilterPath = columns[columns.length - 1].path
@@ -802,9 +802,7 @@ describe('App', () => {
       })
     )
     expect(filterIndicator).toHaveTextContent('1')
-    expect(tooltip).toHaveTextContent('1 filter applied')
-    expect(tooltip).toHaveTextContent('No experiments filtered')
-    expect(tooltip).toHaveTextContent('No checkpoints filtered')
+    expect(tooltip.textContent).toBe('1 filter applied')
     fireEvent(
       window,
       new MessageEvent('message', {
