@@ -51,6 +51,17 @@ export const getAllUntracked = async (
   return new Set([...files, ...dirs])
 }
 
+export const getHasChanges = async (
+  repositoryRoot: string
+): Promise<boolean> => {
+  const output = await executeProcess({
+    args: ['status', '-z', '-uall'],
+    cwd: repositoryRoot,
+    executable: 'git'
+  })
+  return !!output
+}
+
 export const gitReset = (cwd: string, ...args: string[]): Promise<string> =>
   executeProcess({
     args: ['reset', ...args],

@@ -68,7 +68,7 @@ export enum RegisteredCommands {
   DELETE_TARGET = 'dvc.deleteTarget',
   MOVE_TARGETS = 'dvc.moveTargets',
 
-  RESET_WORKSPACE = 'dvc.resetWorkspace',
+  DISCARD_WORKSPACE_CHANGES = 'dvc.discardWorkspaceChanges',
 
   TRACKED_EXPLORER_OPEN_FILE = 'dvc.views.trackedExplorerTree.openFile',
   TRACKED_EXPLORER_COMPARE_SELECTED = 'dvc.compareSelected',
