@@ -3,12 +3,7 @@ import { Event, EventEmitter, RelativePattern } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
-import {
-  DOT_GIT,
-  getAllUntracked,
-  getGitRepositoryRoot,
-  getHasChanges
-} from '../../git'
+import { DOT_GIT, getAllUntracked, getGitRepositoryRoot } from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -25,7 +20,6 @@ export type Data = {
   diffFromHead: DiffOutput
   diffFromCache: StatusOutput
   untracked: Set<string>
-  hasGitChanges: boolean
   tracked?: ListOutput[]
 }
 
@@ -103,31 +97,25 @@ export class RepositoryData extends DeferredDisposable {
       this.dvcRoot
     )
 
-    const [diffFromHead, diffFromCache, untracked, hasGitChanges] =
+    const [diffFromHead, diffFromCache, untracked] =
       await this.getPartialUpdateData()
 
     return this.notifyChanged({
       diffFromCache,
       diffFromHead,
-      hasGitChanges,
       tracked,
       untracked
     })
   }
 
   private async partialUpdate() {
-    const [diffFromHead, diffFromCache, untracked, hasGitChanges] =
+    const [diffFromHead, diffFromCache, untracked] =
       await this.getPartialUpdateData()
-    return this.notifyChanged({
-      diffFromCache,
-      diffFromHead,
-      hasGitChanges,
-      untracked
-    })
+    return this.notifyChanged({ diffFromCache, diffFromHead, untracked })
   }
 
   private async getPartialUpdateData(): Promise<
-    [DiffOutput, StatusOutput, Set<string>, boolean]
+    [DiffOutput, StatusOutput, Set<string>]
   > {
     const diffFromCache =
       await this.internalCommands.executeCommand<StatusOutput>(
@@ -140,12 +128,9 @@ export class RepositoryData extends DeferredDisposable {
       this.dvcRoot
     )
 
-    const [untracked, hasGitChanges] = await Promise.all([
-      getAllUntracked(this.dvcRoot),
-      getHasChanges(this.dvcRoot)
-    ])
+    const untracked = await getAllUntracked(this.dvcRoot)
 
-    return [diffFromHead, diffFromCache, untracked, hasGitChanges]
+    return [diffFromHead, diffFromCache, untracked]
   }
 
   private notifyChanged(data: Data) {
