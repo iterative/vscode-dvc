@@ -627,8 +627,7 @@ export class Experiments extends BaseRepository<TableData> {
   private removeExperiment(experimentId: string | string[]) {
     return this.runCommand(
       AvailableCommands.EXPERIMENT_REMOVE,
-      // eslint-disable-next-line unicorn/prefer-spread
-      ...experimentId.slice(0)
+      ...[experimentId].flat()
     )
   }
 
