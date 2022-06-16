@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2022-06-16
+
+### 🐛 Bug Fixes
+
+- Revert "Improve reset the workspace SCM command" [#1910](https://github.com/iterative/vscode-dvc/pull/1910) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.3] - 2022-06-15
 
 ### 🚀 New Features and Enhancements
