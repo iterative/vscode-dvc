@@ -73,7 +73,7 @@ const registerRootCommands = (
   )
 
   internalCommands.registerExternalCommand<Root>(
-    RegisteredCommands.DISCARD_WORKSPACE_CHANGES,
+    RegisteredCommands.RESET_WORKSPACE,
     getResetRootCommand(repositories, internalCommands)
   )
 }

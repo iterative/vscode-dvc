@@ -76,7 +76,6 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
-        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
@@ -85,7 +84,6 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: new Set([join(dvcDemoPath, deleted)]),
         gitModified: new Set([join(dvcDemoPath, output)]),
-        hasGitChanges: true,
         hasRemote: new Set(list.map(entry => join(dvcDemoPath, entry.path))),
         modified: new Set([
           join(dvcDemoPath, rawDataDir),
@@ -124,7 +122,6 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
-        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
@@ -136,7 +133,6 @@ describe('RepositoryState', () => {
           join(dvcDemoPath, rawDataDir),
           join(dvcDemoPath, data)
         ]),
-        hasGitChanges: true,
         hasRemote: new Set([join(dvcDemoPath, data)]),
         modified: emptySet,
         notInCache: emptySet,
@@ -169,7 +165,6 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
-        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
@@ -178,7 +173,6 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
-        hasGitChanges: true,
         hasRemote: new Set([join(dvcDemoPath, data)]),
         modified: new Set([join(dvcDemoPath, rawDataDir)]),
         notInCache: emptySet,
@@ -208,7 +202,6 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
-        hasGitChanges: false,
         untracked: new Set<string>()
       })
 
@@ -216,7 +209,6 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
-        hasGitChanges: false,
         hasRemote: emptySet,
         modified: emptySet,
         notInCache: emptySet,
@@ -359,7 +351,6 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
-        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
@@ -377,7 +368,6 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
-        hasGitChanges: true,
         hasRemote: new Set([
           ...list.map(({ path }) => resolve(dvcDemoPath, path)),
           resolve(dvcDemoPath, 'data', 'MNIST', 'raw')
@@ -551,7 +541,6 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
-        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
@@ -569,7 +558,6 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
-        hasGitChanges: true,
         hasRemote: new Set([
           resolve(dvcDemoPath, 'misclassified.jpg'),
           resolve(dvcDemoPath, 'model.pt'),
