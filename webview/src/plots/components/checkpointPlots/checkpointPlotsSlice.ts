@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
-  CheckpointPlotData,
   CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
@@ -9,22 +8,24 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import { clearData } from '../../actions'
 import { ReducerName } from '../../constants'
-
-type PlotsById = { [key: string]: CheckpointPlotData }
-export interface CheckpointPlotsState extends CheckpointPlotsData {
+import {
+  addCheckpointPlotsWithSnapshots,
+  removeCheckpointPlots
+} from '../plotDataStore'
+export interface CheckpointPlotsState
+  extends Omit<CheckpointPlotsData, 'plots'> {
   isCollapsed: boolean
   hasData: boolean
   plotsIds: string[]
-  plotsById: PlotsById
+  plotsSnapshots: { [key: string]: string }
 }
 
 export const checkpointPlotsInitialState: CheckpointPlotsState = {
   colors: { domain: [], range: [] },
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
-  plots: [],
-  plotsById: {},
   plotsIds: [],
+  plotsSnapshots: {},
   selectedMetrics: [],
   size: DEFAULT_SECTION_SIZES[Section.CHECKPOINT_PLOTS]
 }
@@ -33,14 +34,14 @@ export const checkpointPlotsSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.checkpoint) {
+        if (!action.payload || action.payload === ReducerName.CHECKPOINT) {
           return { ...checkpointPlotsInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
   initialState: checkpointPlotsInitialState,
-  name: ReducerName.checkpoint,
+  name: ReducerName.CHECKPOINT,
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {
       state.size = action.payload
@@ -51,17 +52,17 @@ export const checkpointPlotsSlice = createSlice({
     },
     update: (state, action: PayloadAction<CheckpointPlotsData>) => {
       if (action.payload) {
-        state.plots = action.payload.plots
-        state.colors = action.payload.colors
-        state.selectedMetrics = action.payload.selectedMetrics
-        state.size = action.payload.size
-        state.plotsIds = action.payload?.plots?.map(plot => plot.title) || []
-        state.plotsById = {}
-        for (const plot of action.payload?.plots || []) {
-          state.plotsById[plot.title] = plot
+        const { plots, ...statePayload } = action.payload
+        const plotsIds = plots?.map(plot => plot.title) || []
+        const snapShots = addCheckpointPlotsWithSnapshots(plots)
+        removeCheckpointPlots(plotsIds)
+        return {
+          ...state,
+          ...statePayload,
+          hasData: !!action.payload,
+          plotsIds: plots?.map(plot => plot.title) || [],
+          plotsSnapshots: snapShots
         }
-        state.hasData = true
-        return
       }
       return checkpointPlotsInitialState
     }

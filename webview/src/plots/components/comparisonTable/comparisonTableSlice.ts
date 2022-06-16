@@ -6,8 +6,8 @@ import {
   PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
-import { clearData } from '../../actions'
-import { ReducerName } from '../../constants'
+import { clearData } from '../../../shared/actions'
+import { ReducerName } from '../../../shared/constants'
 
 export interface ComparisonTableState extends PlotsComparisonData {
   isCollapsed: boolean
@@ -25,14 +25,14 @@ export const comparisonTableSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.comparison) {
+        if (!action.payload || action.payload === ReducerName.COMPARISON) {
           return { ...comparisonTableInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
   initialState: comparisonTableInitialState,
-  name: ReducerName.comparison,
+  name: ReducerName.COMPARISON,
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {
       state.size = action.payload
@@ -41,8 +41,11 @@ export const comparisonTableSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<PlotsComparisonData>) => {
-      Object.assign(state, action.payload)
-      state.hasData = !!action.payload
+      return {
+        ...state,
+        ...action.payload,
+        hasData: !!action.payload
+      }
     }
   }
 })

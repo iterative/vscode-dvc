@@ -8,16 +8,18 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import { clearData } from '../../actions'
 import { ReducerName } from '../../constants'
+import { plotDataStore } from '../plotDataStore'
 
-export interface TemplatePlotsState extends TemplatePlotsData {
+export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
   isCollapsed: boolean
   hasData: boolean
+  plotsSnapshot: string
 }
 
 export const templatePlotsInitialState: TemplatePlotsState = {
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
-  plots: [],
+  plotsSnapshot: '',
   size: DEFAULT_SECTION_SIZES[Section.TEMPLATE_PLOTS]
 }
 
@@ -25,15 +27,14 @@ export const templatePlotsSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.template) {
+        if (!action.payload || action.payload === ReducerName.TEMPLATE) {
           return { ...templatePlotsInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
   initialState: templatePlotsInitialState,
-  name: ReducerName.template,
-
+  name: ReducerName.TEMPLATE,
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {
       state.size = action.payload
@@ -42,8 +43,16 @@ export const templatePlotsSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<TemplatePlotsData>) => {
-      Object.assign(state, action.payload)
-      state.hasData = !!action.payload
+      plotDataStore.template = action.payload?.plots
+      if (!action.payload) {
+        return templatePlotsInitialState
+      }
+      return {
+        ...state,
+        hasData: !!action.payload,
+        plotsSnapshot: JSON.stringify(action.payload.plots),
+        size: action.payload.size
+      }
     }
   }
 })

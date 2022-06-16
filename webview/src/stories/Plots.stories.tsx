@@ -23,7 +23,7 @@ import '../shared/style.scss'
 import '../plots/components/styles.module.scss'
 import { store } from '../plots/store'
 import { feedStore } from '../plots/components/App'
-import { clearData } from '../plots/actions'
+import { clearData } from '../shared/actions'
 
 const MockedState: React.FC<{ data: PlotsData }> = ({ children, data }) => {
   const dispatch = useDispatch()

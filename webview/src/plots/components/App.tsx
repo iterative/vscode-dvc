@@ -53,28 +53,28 @@ export const feedStore = (
     dispatch(initialize())
     for (const key of Object.keys(data.data)) {
       switch (key) {
-        case PlotsDataKeys.checkpoint:
+        case PlotsDataKeys.CHECKPOINT:
           dispatch(updateCheckpointPlots(data.data[key] as CheckpointPlotsData))
           continue
-        case PlotsDataKeys.comparison:
+        case PlotsDataKeys.COMPARISON:
           dispatch(updateComparisonTable(data.data[key] as PlotsComparisonData))
           continue
-        case PlotsDataKeys.template:
+        case PlotsDataKeys.TEMPLATE:
           dispatch(updateTemplatePlots(data.data[key] as TemplatePlotsData))
           continue
-        case PlotsDataKeys.sectionCollapsed:
+        case PlotsDataKeys.SECTION_COLLAPSED:
           dispatchCollapsedSections(
             data.data[key] as SectionCollapsed,
             dispatch
           )
           continue
-        case PlotsDataKeys.hasPlots:
+        case PlotsDataKeys.HAS_PLOTS:
           dispatch(updateHasPlots(!!data.data[key]))
           continue
-        case PlotsDataKeys.hasSelectedPlots:
+        case PlotsDataKeys.HAS_SELECTED_PLOTS:
           dispatch(updateHasSelectedPlots(!!data.data[key]))
           continue
-        case PlotsDataKeys.selectedRevisions:
+        case PlotsDataKeys.SELECTED_REVISIONS:
           dispatch(updateSelectedRevisions(data.data[key] as Revision[]))
           continue
         default:

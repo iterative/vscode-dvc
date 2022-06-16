@@ -2,7 +2,7 @@ import cx from 'classnames'
 import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useEffect, useState } from 'react'
-import { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { VisualizationSpec } from 'react-vega'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
   DragDropContainer,
@@ -10,7 +10,6 @@ import {
   WrapperProps
 } from '../../../shared/components/dragDrop/DragDropContainer'
 import { withScale } from '../../../util/styles'
-import { config } from '../constants'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
 import { ZoomablePlot } from '../ZoomablePlot'
@@ -69,12 +68,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   const items = reorderedItems.map((plot: TemplatePlotEntry) => {
     const { id, content, multiView, revisions } = plot
     const nbRevisions = (multiView && revisions?.length) || 1
-    const plotProps = {
-      actions: false,
-      config,
-      renderer: 'svg',
-      spec: { ...content, ...autoSize }
-    } as VegaLiteProps
 
     return (
       <div
@@ -84,7 +77,10 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         id={id}
         style={withScale(nbRevisions)}
       >
-        <ZoomablePlot id={id} plotProps={JSON.stringify(plotProps)} />
+        <ZoomablePlot
+          id={id}
+          spec={{ ...content, ...autoSize } as VisualizationSpec}
+        />
       </div>
     )
   })

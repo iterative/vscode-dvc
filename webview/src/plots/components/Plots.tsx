@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { AddPlots, Welcome } from './GetStarted'
 import { ZoomedInPlot } from './ZoomedInPlot'
@@ -34,15 +34,6 @@ const PlotsContent = () => {
     (state: RootState) => state.template.hasData
   )
 
-  useEffect(() => {
-    const modalOpenClass = 'modal-open'
-    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot)
-
-    return () => {
-      document.body.classList.remove(modalOpenClass)
-    }
-  }, [zoomedInPlot])
-
   if (!hasData) {
     return <EmptyState>Loading Plots...</EmptyState>
   }
@@ -71,13 +62,13 @@ const PlotsContent = () => {
         {hasCheckpointData && <CheckpointPlotsWrapper />}
       </DragDropProvider>
 
-      {zoomedInPlot && (
+      {zoomedInPlot?.plot && (
         <Modal
           onClose={() => {
             dispatch(setZoomedInPlot(undefined))
           }}
         >
-          <ZoomedInPlot props={JSON.parse(zoomedInPlot.plot)} />
+          <ZoomedInPlot props={zoomedInPlot.plot} />
         </Modal>
       )}
     </>
