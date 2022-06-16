@@ -7,7 +7,11 @@ import {
   getFilterId
 } from './filterBy'
 import { collectExperiments, collectMutableRevisions } from './collect'
-import { collectFiltered, ExperimentWithType } from './filterBy/collect'
+import {
+  collectFiltered,
+  collectFilteredCounts,
+  ExperimentWithType
+} from './filterBy/collect'
 import { collectColoredStatus, collectSelected } from './status/collect'
 import { Color, copyOriginalColors } from './status/colors'
 import {
@@ -361,15 +365,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     ])
   }
 
-  public getFilteredExperiments() {
-    const acc: ExperimentWithType[] = []
-
-    for (const experiment of this.getCurrentExperiments()) {
-      const checkpoints = this.getCheckpoints(experiment.id) || []
-      collectFiltered(acc, this.getFilters(), experiment, checkpoints)
-    }
-
-    return acc
+  public getFilteredCounts(hasCheckpoints: boolean) {
+    const filtered = this.getFilteredExperiments()
+    return collectFilteredCounts(filtered, hasCheckpoints)
   }
 
   private getCombinedList() {
@@ -411,6 +409,17 @@ export class ExperimentsModel extends ModelWithPersistence {
       return true
     }
     return !!filterExperiment(filters, row)
+  }
+
+  private getFilteredExperiments() {
+    const acc: ExperimentWithType[] = []
+
+    for (const experiment of this.getCurrentExperiments()) {
+      const checkpoints = this.getCheckpoints(experiment.id) || []
+      collectFiltered(acc, this.getFilters(), experiment, checkpoints)
+    }
+
+    return acc
   }
 
   private getUnfilteredCheckpointsByTip(

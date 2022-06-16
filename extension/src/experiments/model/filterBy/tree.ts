@@ -7,7 +7,7 @@ import {
   TreeView
 } from 'vscode'
 import { getFilterId } from '.'
-import { collectFilteredCounts } from './collect'
+import { collectCombinedFilteredCounts } from './collect'
 import { WorkspaceExperiments } from '../../workspace'
 import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
@@ -154,17 +154,21 @@ export class ExperimentsFilterByTree
   }
 
   private getDescription() {
-    const dvcRoots = this.experiments.getDvcRoots()
-    if (!definedAndNonEmpty(dvcRoots)) {
+    const dvcRoots = this.getDvcRoots()
+    if (
+      dvcRoots.flatMap(dvcRoot =>
+        this.experiments.getRepository(dvcRoot).getFilters()
+      ).length === 0
+    ) {
       return
     }
 
-    const filteredExperiments = dvcRoots.flatMap(dvcRoot =>
-      this.experiments.getRepository(dvcRoot).getFilteredExperiments()
+    const filteredCounts = dvcRoots.flatMap(dvcRoot =>
+      this.experiments.getRepository(dvcRoot).getFilteredCounts()
     )
 
-    const { checkpoints, experiments } =
-      collectFilteredCounts(filteredExperiments)
+    const { experiments, checkpoints } =
+      collectCombinedFilteredCounts(filteredCounts)
 
     const combinedText = joinTruthyItems(
       [
@@ -183,13 +187,14 @@ export class ExperimentsFilterByTree
 
   private getDescriptionText(
     type: 'Experiment' | 'Checkpoint',
-    filteredCount: number
+    filteredCount: number | undefined
   ) {
-    if (!filteredCount) {
+    if (filteredCount === undefined) {
       return
     }
 
     const text = `${filteredCount} ${type}`
+
     if (filteredCount === 1) {
       return text
     }
