@@ -253,12 +253,9 @@ suite('Source Control Management Test Suite', () => {
         'showWarningMessage'
       ).resolves('' as unknown as MessageItem)
 
-      await commands.executeCommand(
-        RegisteredCommands.DISCARD_WORKSPACE_CHANGES,
-        {
-          rootUri
-        }
-      )
+      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
+        rootUri
+      })
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).not.to.be.called
@@ -276,12 +273,9 @@ suite('Source Control Management Test Suite', () => {
         'showWarningMessage'
       ).resolves('Discard Changes' as unknown as MessageItem)
 
-      await commands.executeCommand(
-        RegisteredCommands.DISCARD_WORKSPACE_CHANGES,
-        {
-          rootUri
-        }
-      )
+      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
+        rootUri
+      })
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).to.be.calledOnce

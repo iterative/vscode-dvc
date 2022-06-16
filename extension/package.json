@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.3",
+  "version": "0.3.4",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -167,12 +167,6 @@
         "icon": "$(trash)"
       },
       {
-        "title": "%command.discardWorkspaceChanges%",
-        "command": "dvc.discardWorkspaceChanges",
-        "category": "DVC",
-        "icon": "$(discard)"
-      },
-      {
         "title": "%command.experimentGarbageCollect%",
         "command": "dvc.experimentGarbageCollect",
         "category": "DVC"
@@ -310,6 +304,12 @@
         "title": "%command.renameTarget%",
         "command": "dvc.renameTarget",
         "category": "DVC"
+      },
+      {
+        "title": "%command.resetWorkspace%",
+        "command": "dvc.resetWorkspace",
+        "category": "DVC",
+        "icon": "$(discard)"
       },
       {
         "title": "%command.runExperiment%",
@@ -682,7 +682,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.discardWorkspaceChanges",
+          "command": "dvc.resetWorkspace",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -792,7 +792,7 @@
       ],
       "scm/title": [
         {
-          "command": "dvc.discardWorkspaceChanges",
+          "command": "dvc.resetWorkspace",
           "group": "navigation@1",
           "when": "scmProvider == dvc && dvc.commands.available"
         },
