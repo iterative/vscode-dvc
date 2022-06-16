@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2022-06-16
+
+- no changes
+
 ## [0.3.3] - 2022-06-15
 
 ### 🚀 New Features and Enhancements
