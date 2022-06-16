@@ -49,6 +49,7 @@ import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
+import { standardizePath } from './fileSystem/path'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -336,7 +337,10 @@ export class Extension extends Disposable implements IExtension {
         this.findDvcRoots(workspaceFolder)
       )
     )
-    this.dvcRoots = nestedRoots.flat().sort()
+    this.dvcRoots = nestedRoots
+      .flat()
+      .map(dvcRoot => standardizePath(dvcRoot) as string)
+      .sort()
 
     return this.setProjectAvailability()
   }
