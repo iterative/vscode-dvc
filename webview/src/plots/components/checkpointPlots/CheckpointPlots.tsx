@@ -44,7 +44,9 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   }
 
   const items = order.map(plot => (
-    <CheckpointPlot key={plot} id={plot} colors={colors} />
+    <div key={plot} id={plot}>
+      <CheckpointPlot id={plot} colors={colors} />
+    </div>
   ))
 
   const useVirtualizedGrid = shouldUseVirtualizedGrid(items.length, size)

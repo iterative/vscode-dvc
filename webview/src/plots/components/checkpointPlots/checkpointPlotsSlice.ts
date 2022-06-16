@@ -50,15 +50,20 @@ export const checkpointPlotsSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<CheckpointPlotsData>) => {
-      Object.assign(state, action.payload)
-      state.plotsIds = action.payload.plots?.map(plot => plot.title) || []
-      state.plotsById = {}
-      for (const plot of action.payload.plots) {
-        state.plotsById[plot.title] = plot
+      if (action.payload) {
+        state.plots = action.payload.plots
+        state.colors = action.payload.colors
+        state.selectedMetrics = action.payload.selectedMetrics
+        state.size = action.payload.size
+        state.plotsIds = action.payload?.plots?.map(plot => plot.title) || []
+        state.plotsById = {}
+        for (const plot of action.payload?.plots || []) {
+          state.plotsById[plot.title] = plot
+        }
+        state.hasData = true
+        return
       }
-      console.log(state.plotsById)
-
-      state.hasData = !!action.payload
+      return checkpointPlotsInitialState
     }
   }
 })

@@ -33,6 +33,7 @@ export const ComparisonTable: React.FC = () => {
   )
 
   useEffect(
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     () =>
       setColumns(() => {
         const acc: Revision[] = []

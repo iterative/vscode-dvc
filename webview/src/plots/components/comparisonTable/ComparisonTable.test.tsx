@@ -1,22 +1,24 @@
 /**
  * @jest-environment jsdom
  */
+import { configureStore } from '@reduxjs/toolkit'
 import '@testing-library/jest-dom/extend-expect'
 import {
   cleanup,
   fireEvent,
   render,
+  RenderResult,
   screen,
   within
 } from '@testing-library/react'
-import { Provider, useDispatch } from 'react-redux'
+import { Provider } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import React from 'react'
-import { PlotsComparisonData, Revision } from 'dvc/src/plots/webview/contract'
+import { Revision } from 'dvc/src/plots/webview/contract'
 import { ComparisonTable } from './ComparisonTable'
-import { update } from './comparisonTableSlice'
+import { comparisonTableInitialState } from './comparisonTableSlice'
 import {
   createBubbledEvent,
   dragAndDrop,
@@ -25,10 +27,8 @@ import {
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { DragDropProvider } from '../../../shared/components/dragDrop/DragDropContext'
-import { store } from '../../store'
-import { ReducerName } from '../../constants'
-import { clearData } from '../../actions'
-import { updateSelectedRevisions } from '../webviewSlice'
+import { storeReducers } from '../../store'
+import { webviewInitialState } from '../webviewSlice'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
@@ -45,46 +45,41 @@ describe('ComparisonTable', () => {
     jest.clearAllMocks()
   })
 
-  const MockedState: React.FC<{
-    data: PlotsComparisonData
-    selectedRevisions: Revision[]
-  }> = ({ children, data, selectedRevisions }) => {
-    const dispatch = useDispatch()
-    dispatch(clearData(ReducerName.comparison))
-    dispatch(update(data))
-    dispatch(updateSelectedRevisions(selectedRevisions))
-
-    return <>{children}</>
-  }
-
   const selectedRevisions: Revision[] = plotsRevisionsFixture
   const revisions = selectedRevisions.map(({ revision }) => revision)
   const namedRevisions = selectedRevisions.map(
     ({ revision, group }) => `${revision}${group || ''}`
   )
 
-  interface RenderTableProps extends PlotsComparisonData {
-    revisions: Revision[]
-  }
   const renderTable = (
-    // eslint-disable-next-line unicorn/no-object-as-default-parameter
-    props: RenderTableProps = {
-      ...comparisonTableFixture,
-      revisions: plotsRevisionsFixture
-    }
-  ) =>
-    render(
-      <Provider store={store}>
-        <MockedState
-          data={props}
-          selectedRevisions={revisions as unknown as Revision[]}
+    props = comparisonTableFixture,
+    revisions: Revision[] = plotsRevisionsFixture,
+    renderWith: (ui: React.ReactElement) => RenderResult | void = render
+  ) => {
+    return (
+      renderWith(
+        <Provider
+          store={configureStore({
+            preloadedState: {
+              comparison: {
+                ...comparisonTableInitialState,
+                ...props
+              },
+              webview: {
+                ...webviewInitialState,
+                selectedRevisions: revisions
+              }
+            },
+            reducer: storeReducers
+          })}
         >
           <DragDropProvider>
             <ComparisonTable />
           </DragDropProvider>
-        </MockedState>
-      </Provider>
+        </Provider>
+      ) || {}
     )
+  }
 
   it('should render a table', () => {
     renderTable()
@@ -216,18 +211,7 @@ describe('ComparisonTable', () => {
   })
 
   it('should remove a column if it is not part of the revisions anymore', () => {
-    const { rerender } = render(
-      <Provider store={store}>
-        <MockedState
-          data={comparisonTableFixture}
-          selectedRevisions={plotsRevisionsFixture}
-        >
-          <DragDropProvider>
-            <ComparisonTable />
-          </DragDropProvider>
-        </MockedState>
-      </Provider>
-    )
+    const { rerender } = renderTable() as RenderResult
 
     let headers = getHeaders().map(header => header.textContent)
 
@@ -237,18 +221,7 @@ describe('ComparisonTable', () => {
       ({ revision }) => revision !== revisions[3]
     )
 
-    rerender(
-      <Provider store={store}>
-        <MockedState
-          data={comparisonTableFixture}
-          selectedRevisions={filteredRevisions}
-        >
-          <DragDropProvider>
-            <ComparisonTable />
-          </DragDropProvider>
-        </MockedState>
-      </Provider>
-    )
+    renderTable(comparisonTableFixture, filteredRevisions, rerender)
 
     headers = getHeaders().map(header => header.textContent)
 
@@ -260,36 +233,15 @@ describe('ComparisonTable', () => {
   })
 
   it('should add a new column if there is a new revision', () => {
-    const { rerender } = render(
-      <Provider store={store}>
-        <MockedState
-          data={comparisonTableFixture}
-          selectedRevisions={plotsRevisionsFixture}
-        >
-          <DragDropProvider>
-            <ComparisonTable />
-          </DragDropProvider>
-        </MockedState>
-      </Provider>
-    )
+    const { rerender } = renderTable() as RenderResult
+
     const newRevName = 'newRev'
     const newRevisions = [
       ...selectedRevisions,
       { displayColor: '#000000', revision: newRevName }
     ] as Revision[]
 
-    rerender(
-      <Provider store={store}>
-        <MockedState
-          data={comparisonTableFixture}
-          selectedRevisions={newRevisions}
-        >
-          <DragDropProvider>
-            <ComparisonTable />
-          </DragDropProvider>
-        </MockedState>
-      </Provider>
-    )
+    renderTable(comparisonTableFixture, newRevisions, rerender)
     const headers = getHeaders().map(header => header.textContent)
 
     expect(headers).toStrictEqual([...namedRevisions, newRevName])
@@ -298,16 +250,21 @@ describe('ComparisonTable', () => {
   it('should display a refresh button for each revision that has a missing image', () => {
     const revisionWithNoData = 'missing-data'
 
-    renderTable({
-      ...comparisonTableFixture,
-      plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
-        path,
-        revisions: {
-          ...revisions,
-          [revisionWithNoData]: { revision: revisionWithNoData, url: undefined }
-        }
-      })),
-      revisions: [
+    renderTable(
+      {
+        ...comparisonTableFixture,
+        plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
+          path,
+          revisions: {
+            ...revisions,
+            [revisionWithNoData]: {
+              revision: revisionWithNoData,
+              url: undefined
+            }
+          }
+        }))
+      },
+      [
         ...selectedRevisions,
         {
           displayColor: '#f56565',
@@ -316,7 +273,7 @@ describe('ComparisonTable', () => {
           revision: revisionWithNoData
         }
       ]
-    })
+    )
 
     const refreshButtons = screen.getAllByText('Refresh')
 

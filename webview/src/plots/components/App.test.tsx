@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import { join } from 'dvc/src/test/util/path'
+import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
 import {
@@ -35,12 +36,10 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
+import { storeReducers } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
-import { storeReducers } from '../store'
-import { configureStore } from '@reduxjs/toolkit'
-import { delay } from 'lodash'
 
 jest.mock('../../shared/api')
 
@@ -248,6 +247,7 @@ describe('App', () => {
     sendSetDataMessage({
       checkpoint: null
     })
+
     expect(screen.queryByText('Trends')).not.toBeInTheDocument()
   })
 
@@ -299,7 +299,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
+    expect(screen.getByTestId('plot-summary.json:loss')).toBeInTheDocument()
 
     const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
@@ -314,7 +314,9 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(() => screen.getByTestId('plot-summary.json:loss')).toThrow()
+    expect(
+      screen.queryByTestId('plot-summary.json:loss')
+    ).not.toBeInTheDocument()
 
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
@@ -324,7 +326,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(() => screen.getByTestId('plot-summary.json:loss')).not.toThrow()
+    expect(screen.getByTestId('plot-summary.json:loss')).toBeInTheDocument()
   })
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
@@ -536,7 +538,7 @@ describe('App', () => {
     ])
   })
 
-  it('should not change the metric order in the hover menu by reordering the plots', () => {
+  it('should not change the metric order in the hover menu by reordering the plots', async () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
@@ -580,7 +582,7 @@ describe('App', () => {
       }
     })
 
-    plots = screen.getAllByTestId(/summary\.json/)
+    plots = await screen.findAllByTestId(/summary\.json/)
     expect(plots.map(plot => plot.id)).toStrictEqual(newPlotOrder)
 
     fireEvent.mouseEnter(pickerButton)

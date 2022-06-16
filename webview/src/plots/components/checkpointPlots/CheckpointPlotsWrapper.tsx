@@ -17,7 +17,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
   useEffect(() => {
-    setMetrics(plotsIds)
+    setMetrics([...plotsIds].sort())
     setSelectedPlots(selectedMetrics || [])
   }, [plotsIds, selectedMetrics, setSelectedPlots, setMetrics])
 

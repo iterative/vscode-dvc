@@ -15,7 +15,10 @@ export const performSimpleOrderedUpdate = (
   order: string[],
   items: string[]
 ): string[] => {
-  const newOrder = new Set([...order, ...items])
+  const newOrder = new Set([
+    ...order.filter(orderedItem => items.includes(orderedItem)),
+    ...items
+  ])
   return [...newOrder]
 }
 
