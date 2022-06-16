@@ -32,7 +32,7 @@ const collectCountsWithCheckpoints = (
 
 export const collectFilteredCounts = (
   experiments: { type: ExperimentType }[],
-  hasCheckpoints = true
+  hasCheckpoints: boolean
 ): FilteredCounts => {
   if (!hasCheckpoints) {
     return { experiments: experiments.length }
