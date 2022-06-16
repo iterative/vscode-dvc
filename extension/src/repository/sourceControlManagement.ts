@@ -9,7 +9,7 @@ export type SourceControlManagementState = Record<Status, Set<string>> & {
 }
 
 export interface SourceControlManagementModel {
-  getState: () => SourceControlManagementState
+  getSourceControlManagementState: () => SourceControlManagementState
 }
 
 enum Status {

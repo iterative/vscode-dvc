@@ -1,5 +1,4 @@
 import { dirname, join, resolve } from 'path'
-import omit from 'lodash.omit'
 import {
   collectDeleted,
   collectModifiedAgainstHead,
@@ -8,8 +7,11 @@ import {
   collectTree,
   PathItem
 } from './collect'
-import { SourceControlManagementModel } from '../sourceControlManagement'
-import { DecorationModel } from '../decorationProvider'
+import {
+  SourceControlManagementModel,
+  SourceControlManagementState
+} from '../sourceControlManagement'
+import { DecorationModel, DecorationState } from '../decorationProvider'
 import {
   ChangedType,
   DiffOutput,
@@ -59,16 +61,33 @@ export class RepositoryModel
     this.dvcRoot = dvcRoot
   }
 
-  public getState() {
+  public getDecorationState(): DecorationState {
+    return {
+      added: this.state.added,
+      deleted: this.state.deleted,
+      gitModified: this.state.gitModified,
+      modified: this.state.modified,
+      notInCache: this.state.notInCache,
+      renamed: this.state.renamed,
+      tracked: this.getTracked()
+    }
+  }
+
+  public getSourceControlManagementState(): SourceControlManagementState {
     const acc = []
     for (const relTrackedOut of this.relTrackedOuts) {
       acc.push(join(this.dvcRoot, relTrackedOut))
     }
 
     return {
-      ...omit(this.state, ['trackedLeafs', 'trackedNonLeafs']),
+      added: this.state.added,
+      deleted: this.state.deleted,
+      gitModified: this.state.gitModified,
       hasRemote: new Set([...acc, ...this.state.trackedLeafs]),
-      tracked: this.getTracked()
+      modified: this.state.modified,
+      notInCache: this.state.notInCache,
+      renamed: this.state.renamed,
+      untracked: this.state.untracked
     }
   }
 

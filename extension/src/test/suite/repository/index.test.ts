@@ -28,9 +28,13 @@ suite('Repository Test Suite', () => {
     disposable.dispose()
   })
 
-  const emptyState = disposable
-    .track(new RepositoryModel(dvcDemoPath))
-    .getState()
+  const repositoryModel = disposable.track(new RepositoryModel(dvcDemoPath))
+
+  const emptyState = {
+    ...repositoryModel.getDecorationState(),
+    ...repositoryModel.getSourceControlManagementState()
+  }
+
   const emptySet = new Set<string>()
 
   const logDir = 'logs'
@@ -133,7 +137,6 @@ suite('Repository Test Suite', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
-        hasGitChanges: true,
         hasRemote,
         modified,
         notInCache: emptySet,
@@ -261,7 +264,6 @@ suite('Repository Test Suite', () => {
         added: emptySet,
         deleted,
         gitModified: emptySet,
-        hasGitChanges: false,
         hasRemote,
         modified: emptySet,
         notInCache: emptySet,
@@ -420,7 +422,6 @@ suite('Repository Test Suite', () => {
         added: emptySet,
         deleted,
         gitModified: emptySet,
-        hasGitChanges: false,
         hasRemote,
         modified,
         notInCache,
@@ -429,12 +430,25 @@ suite('Repository Test Suite', () => {
         untracked
       })
 
-      expect(...setDecorationStateSpy.lastCall.args).to.deep.equal(
-        repository.getState()
-      )
-      expect(...setScmStateSpy.lastCall.args).to.deep.equal(
-        repository.getState()
-      )
+      expect(...setDecorationStateSpy.lastCall.args).to.deep.equal({
+        added: emptySet,
+        deleted,
+        gitModified: emptySet,
+        modified,
+        notInCache,
+        renamed: emptySet,
+        tracked
+      })
+      expect(...setScmStateSpy.lastCall.args).to.deep.equal({
+        added: emptySet,
+        deleted,
+        gitModified: emptySet,
+        hasRemote,
+        modified,
+        notInCache,
+        renamed: emptySet,
+        untracked
+      })
       expect(repository.hasChanges()).to.be.true
     })
   })
