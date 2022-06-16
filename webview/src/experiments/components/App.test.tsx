@@ -784,7 +784,7 @@ describe('App', () => {
 
     const tooltip = screen.getByRole('tooltip')
 
-    expect(tooltip.textContent).toBe('No filters applied')
+    expect(tooltip).toHaveTextContent('No filters applied')
 
     const { columns } = tableDataFixture
     const firstFilterPath = columns[columns.length - 1].path
@@ -802,7 +802,10 @@ describe('App', () => {
       })
     )
     expect(filterIndicator).toHaveTextContent('1')
-    expect(tooltip.textContent).toBe('1 filter applied')
+    expect(tooltip).toHaveTextContent('1 filter applied')
+    expect(tooltip).toHaveTextContent('No experiments filtered')
+    expect(tooltip).toHaveTextContent('No checkpoints filtered')
+
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -823,6 +826,45 @@ describe('App', () => {
     expect(tooltip).toHaveTextContent('2 filters applied')
     expect(tooltip).toHaveTextContent('1 experiment filtered')
     expect(tooltip).toHaveTextContent('2 checkpoints filtered')
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filteredCounts: {
+              experiments: 10000
+            },
+            filters: [firstFilterPath, secondFilterPath]
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    expect(filterIndicator).toHaveTextContent('2')
+    expect(tooltip).toHaveTextContent('experiment')
+    expect(tooltip).not.toHaveTextContent('checkpoint')
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filteredCounts: {
+              checkpoints: 10000,
+              experiments: 10000
+            },
+            filters: []
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    expect(filterIndicator).toHaveTextContent('')
+    expect(tooltip).not.toHaveTextContent('experiment')
+    expect(tooltip).not.toHaveTextContent('checkpoint')
   })
 
   it('should send a message to focus the relevant tree when clicked', () => {

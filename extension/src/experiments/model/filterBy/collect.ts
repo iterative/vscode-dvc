@@ -9,11 +9,11 @@ import { Experiment } from '../../webview/contract'
 
 export type ExperimentWithType = Experiment & { type: ExperimentType }
 export type FilteredCounts = {
-  checkpoints: number
+  checkpoints?: number
   experiments: number
 }
 
-export const collectFilteredCounts = (
+const collectCountsWithCheckpoints = (
   experiments: { type: ExperimentType }[]
 ): FilteredCounts => {
   const filtered = { checkpoints: 0, experiments: 0 }
@@ -28,6 +28,40 @@ export const collectFilteredCounts = (
   }
 
   return filtered
+}
+
+export const collectFilteredCounts = (
+  experiments: { type: ExperimentType }[],
+  hasCheckpoints = true
+): FilteredCounts => {
+  if (!hasCheckpoints) {
+    return { experiments: experiments.length }
+  }
+
+  return collectCountsWithCheckpoints(experiments)
+}
+
+const aggregateCounts = (
+  acc: FilteredCounts,
+  experimentCount: number,
+  checkpointCount: number | undefined
+) => {
+  if (experimentCount) {
+    acc.experiments = acc.experiments + experimentCount
+  }
+  if (checkpointCount !== undefined) {
+    acc.checkpoints = (acc.checkpoints || 0) + checkpointCount
+  }
+}
+
+export const collectCombinedFilteredCounts = (
+  filteredCounts: FilteredCounts[]
+): FilteredCounts => {
+  const acc: FilteredCounts = { checkpoints: undefined, experiments: 0 }
+  for (const { experiments, checkpoints } of filteredCounts) {
+    aggregateCounts(acc, experiments, checkpoints)
+  }
+  return acc
 }
 
 export const collectFiltered = (

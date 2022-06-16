@@ -84,7 +84,7 @@ export const Indicators = ({
             <div>{formatCountMessage('filter', filtersCount)}</div>
             {filtersCount ? (
               <>
-                {filteredCounts.experiments ? (
+                {filteredCounts.experiments !== undefined ? (
                   <div>
                     {formatFilteredCountMessage(
                       'experiment',
@@ -92,7 +92,7 @@ export const Indicators = ({
                     )}
                   </div>
                 ) : null}
-                {filteredCounts.checkpoints ? (
+                {filteredCounts.checkpoints !== undefined ? (
                   <div>
                     {formatFilteredCountMessage(
                       'checkpoint',
