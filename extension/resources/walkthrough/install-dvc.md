@@ -1,13 +1,24 @@
 # Install DVC
 
-There are quite a few options for installing `DVC`. This extension supports
-various installation types. See the `Setup The Workspace` step for more details.
+There are a few [options](https://dvc.org/doc/install) for installing `DVC`.
+This extension supports all installation types.
 
-To install the latest version of `DVC` follow your platform specific guide on
-[dvc.org](https://dvc.org/doc/install).
+To verify the installation run `dvc -h` in a
+[Terminal](command:workbench.action.terminal.new).
 
-To verify the installation run `dvc -h` in your terminal of choice.
+If DVC is installed as a global binary or in a Python virtual environment, the
+extension would attempt to detect it automatically. If successful, you'll see a
+DVC icon like this in the status bar:
 
-**Note**: Use `Terminal: Create New Terminal` from the Command Palette to create
-a new
-[integrated terminal](https://code.visualstudio.com/docs/editor/integrated-terminal).
+<p align="center">
+  <img src="images/install-dvc-status-bar-detected.png"
+       alt="DVC icon in the status bar" />
+</p>
+
+If you see instead the crossed circle icon, use the
+[Setup Workspace](command:dvc.setupWorkspace) wizard to manually select the
+right environment:
+
+<p align="center">
+  <img src="images/install-dvc-setup-wizard.png" alt="DVC Setup Wizard" />
+</p>

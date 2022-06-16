@@ -8,10 +8,14 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { Experiment } from '../../webview/contract'
 
 export type ExperimentWithType = Experiment & { type: ExperimentType }
+export type FilteredCounts = {
+  checkpoints: number
+  experiments: number
+}
 
 export const collectFilteredCounts = (
   experiments: { type: ExperimentType }[]
-) => {
+): FilteredCounts => {
   const filtered = { checkpoints: 0, experiments: 0 }
 
   for (const { type } of experiments) {

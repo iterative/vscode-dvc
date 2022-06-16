@@ -36,6 +36,10 @@ export const EventName = Object.assign(
       'views.experimentTable.toggleStatus',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
       'views.experimentsTable.focusChanged',
+    VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE:
+      'views.experimentsTable.focusFiltersTree',
+    VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE:
+      'views.experimentsTable.focusSortsTree',
     VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN: 'views.experimentsTable.columnHidden',
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
@@ -185,6 +189,8 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN]: {
     width: number
   }

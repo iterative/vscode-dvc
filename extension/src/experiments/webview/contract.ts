@@ -1,4 +1,5 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
+import { FilteredCounts } from '../model/filterBy/collect'
 import { SortDefinition } from '../model/sortBy'
 
 export interface MetricOrParamColumns {
@@ -60,6 +61,7 @@ export type TableData = {
   hasRunningExperiment: boolean
   rows: Row[]
   sorts: SortDefinition[]
+  filteredCounts: FilteredCounts
   filters: string[]
 }
 

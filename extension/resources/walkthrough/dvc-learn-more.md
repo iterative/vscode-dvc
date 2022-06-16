@@ -6,9 +6,9 @@
 
 - Browse the [user guide](https://dvc.org/doc/user-guide).
 
-- View all [available commands](https://dvc.org/doc/command-reference).
+- View all [available `dvc` commands](https://dvc.org/doc/command-reference).
 
-- Check out the [DVC github repository](https://github.com/iterative/dvc) or an
+- Check out the [DVC GitHub repository](https://github.com/iterative/dvc) or an
   [example project](https://github.com/iterative/example-get-started).
 
 - Explore our [free course](https://learn.iterative.ai/).

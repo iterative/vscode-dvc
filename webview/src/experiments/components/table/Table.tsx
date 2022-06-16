@@ -107,7 +107,8 @@ export const Table: React.FC<TableProps & WithChanges> = ({
     columns,
     changes,
     hasCheckpoints,
-    hasRunningExperiment
+    hasRunningExperiment,
+    filteredCounts
   } = tableData
 
   return (
@@ -116,6 +117,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
         <TableHead
           instance={instance}
           sorts={sorts}
+          filteredCounts={filteredCounts}
           filters={filters}
           columns={columns}
         />
