@@ -49,10 +49,25 @@ const pluralize = (word: string, number: number | undefined) =>
   number === 1 ? word : `${word}s`
 
 const formatCountMessage = (item: string, count: number | undefined) =>
-  `${count || 'No'} ${pluralize(item, count)} applied`
+  `${count || 'No'} ${pluralize(item, count)} Applied`
 
-const formatFilteredCountMessage = (item: string, filteredCount: number) =>
-  `${filteredCount || 'No'} ${pluralize(item, filteredCount)} filtered`
+const formatFilteredCount = (
+  item: 'Experiment' | 'Checkpoint',
+  filteredCount: number | undefined
+) => {
+  if (filteredCount === undefined) {
+    return
+  }
+  return `${filteredCount} ${pluralize(item, filteredCount)}`
+}
+
+const formatFilteredCountMessage = (filteredCounts: FilteredCounts): string =>
+  `${[
+    formatFilteredCount('Experiment', filteredCounts.experiments),
+    formatFilteredCount('Checkpoint', filteredCounts.checkpoints)
+  ]
+    .filter(Boolean)
+    .join(', ')} Filtered`
 
 export const Indicators = ({
   sorts,
@@ -71,7 +86,7 @@ export const Indicators = ({
         count={sorts?.length}
         aria-label="sorts"
         onClick={focusSortsTree}
-        tooltipContent={formatCountMessage('sort', sortsCount)}
+        tooltipContent={formatCountMessage('Sort', sortsCount)}
       >
         <Icon width={16} height={16} icon={SvgSortPrecedence} />
       </Indicator>
@@ -81,26 +96,9 @@ export const Indicators = ({
         onClick={focusFiltersTree}
         tooltipContent={
           <>
-            <div>{formatCountMessage('filter', filtersCount)}</div>
+            <div>{formatCountMessage('Filter', filtersCount)}</div>
             {filtersCount ? (
-              <>
-                {filteredCounts.experiments ? (
-                  <div>
-                    {formatFilteredCountMessage(
-                      'experiment',
-                      filteredCounts.experiments
-                    )}
-                  </div>
-                ) : null}
-                {filteredCounts.checkpoints ? (
-                  <div>
-                    {formatFilteredCountMessage(
-                      'checkpoint',
-                      filteredCounts.checkpoints
-                    )}
-                  </div>
-                ) : null}
-              </>
+              <div>{formatFilteredCountMessage(filteredCounts)}</div>
             ) : null}
           </>
         }

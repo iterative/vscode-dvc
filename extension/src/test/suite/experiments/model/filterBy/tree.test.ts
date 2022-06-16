@@ -357,7 +357,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should update the description when a filter is added or removed', async () => {
-      const { experiments, internalCommands } = buildExperiments(disposable)
+      const { experiments, experimentsModel, internalCommands } =
+        buildExperiments(disposable)
       await experiments.isReady()
 
       const workspaceExperiments = disposable.track(
@@ -414,14 +415,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
         '3 Experiments, 9 Checkpoints Filtered'
       )
 
-      const tableFilterRemoved = getUpdateEvent()
-      experiments.removeFilter(getFilterId(filter))
-
-      await tableFilterRemoved
-
-      expect(mockTreeView.description).to.be.undefined
-
-      stub(experiments, 'getFilteredExperiments')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(experimentsModel as any, 'getFilteredExperiments')
         .onFirstCall()
         .returns([
           { id: '0ef13xs', type: ExperimentType.CHECKPOINT } as Experiment & {
@@ -434,18 +429,41 @@ suite('Experiments Filter By Tree Test Suite', () => {
             type: ExperimentType
           }
         ])
+        .onThirdCall()
+        .returns([
+          { id: 'exp-1', type: ExperimentType.EXPERIMENT } as Experiment & {
+            type: ExperimentType
+          },
+          { id: 'exp-2', type: ExperimentType.EXPERIMENT } as Experiment & {
+            type: ExperimentType
+          },
+          { id: 'exp-3', type: ExperimentType.EXPERIMENT } as Experiment & {
+            type: ExperimentType
+          }
+        ])
 
       const allButOneCheckpointFilteredEvent = getUpdateEvent()
       workspaceExperiments.experimentsChanged.fire()
       await allButOneCheckpointFilteredEvent
 
-      expect(mockTreeView.description).to.equal('1 Checkpoint Filtered')
+      expect(mockTreeView.description).to.equal(
+        '0 Experiments, 1 Checkpoint Filtered'
+      )
 
       const allButOneExperimentFilteredEvent = getUpdateEvent()
       workspaceExperiments.experimentsChanged.fire()
       await allButOneExperimentFilteredEvent
 
-      expect(mockTreeView.description).to.equal('1 Experiment Filtered')
+      expect(mockTreeView.description).to.equal(
+        '1 Experiment, 0 Checkpoints Filtered'
+      )
+
+      const tableFilterRemoved = getUpdateEvent()
+      experiments.removeFilter(getFilterId(filter))
+
+      await tableFilterRemoved
+
+      expect(mockTreeView.description).to.be.undefined
     })
   })
 })

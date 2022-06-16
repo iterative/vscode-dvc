@@ -167,6 +167,30 @@ suite('Experiments Test Suite', () => {
 
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+  })
+
+  describe('handleMessageFromWebview', () => {
+    const setupExperimentsAndMockCommands = () => {
+      const {
+        columnsModel,
+        experiments,
+        experimentsModel,
+        internalCommands,
+        messageSpy
+      } = buildExperiments(disposable, expShowFixture)
+      const mockExecuteCommand = stub(
+        internalCommands,
+        'executeCommand'
+      ).resolves(undefined)
+
+      return {
+        columnsModel,
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockExecuteCommand
+      }
+    }
 
     it('should handle a column reordered message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -208,7 +232,7 @@ suite('Experiments Test Suite', () => {
         undefined,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column resized message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -242,7 +266,7 @@ suite('Experiments Test Suite', () => {
         { width: mockWidth },
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a toggle experiment message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -310,7 +334,7 @@ suite('Experiments Test Suite', () => {
         mockSortDefinition,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sort removed from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -345,31 +369,7 @@ suite('Experiments Test Suite', () => {
         },
         undefined
       )
-    })
-  })
-
-  describe('handleMessageFromWebview', () => {
-    const setupExperimentsAndMockCommands = () => {
-      const {
-        columnsModel,
-        experiments,
-        experimentsModel,
-        internalCommands,
-        messageSpy
-      } = buildExperiments(disposable, expShowFixture)
-      const mockExecuteCommand = stub(
-        internalCommands,
-        'executeCommand'
-      ).resolves(undefined)
-
-      return {
-        columnsModel,
-        experiments,
-        experimentsModel,
-        messageSpy,
-        mockExecuteCommand
-      }
-    }
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to hide a table column', async () => {
       const { experiments, columnsModel } = buildExperiments(disposable)
