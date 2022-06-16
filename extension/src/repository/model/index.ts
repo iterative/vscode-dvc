@@ -118,6 +118,7 @@ export class RepositoryModel
       this.state.gitModified.size > 0 ||
       this.state.modified.size > 0 ||
       this.state.renamed.size > 0 ||
+      this.state.untracked.size > 0 ||
       this.state.hasGitChanges
     )
   }

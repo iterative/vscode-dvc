@@ -55,7 +55,7 @@ export const getHasChanges = async (
   repositoryRoot: string
 ): Promise<boolean> => {
   const output = await executeProcess({
-    args: ['diff', '--name-status', '-z'],
+    args: ['diff', '--name-only', '-z'],
     cwd: repositoryRoot,
     executable: 'git'
   })
