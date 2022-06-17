@@ -17,7 +17,7 @@
     "url": "https://github.com/iterative/vscode-dvc"
   },
   "bugs": "https://github.com/iterative/vscode-dvc",
-  "homepage": "https://github.com/iterative/vscode-dvc/README.md",
+  "homepage": "https://github.com/iterative/vscode-dvc#readme",
   "keywords": [
     "iterative",
     "data version control",
