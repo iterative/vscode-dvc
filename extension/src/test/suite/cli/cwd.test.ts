@@ -11,6 +11,12 @@ suite('Cwd Test Suite', () => {
       const realpathCwd = getCaseSensitiveCwd(caseInsensitiveCwd)
 
       expect(realpathCwd).to.have.length(dvcDemoPath.length)
+      expect(realpathCwd).not.to.equal(
+        ['win32', 'darwin'].includes(process.platform)
+          ? caseInsensitiveCwd
+          : caseInsensitiveCwd.toLowerCase(),
+        'should behave differently on different systems'
+      )
 
       const caseInsensitiveArray = caseInsensitiveCwd.split(sep)
       const realPathArray = realpathCwd.split(sep)
