@@ -1,6 +1,6 @@
 import { dirname } from 'path'
 import { Args } from './constants'
-import { getCwd } from './cwd'
+import { getCaseSensitiveCwd } from './cwd'
 import { getProcessEnv } from '../env'
 import { joinEnvPath } from '../util/env'
 
@@ -49,7 +49,7 @@ export const getOptions = (
   return {
     args,
     command: [executable, ...args].join(' '),
-    cwd: getCwd(cwd),
+    cwd: getCaseSensitiveCwd(cwd),
     env: getEnv(pythonBinPath),
     executable
   }
