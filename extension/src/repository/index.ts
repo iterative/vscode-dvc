@@ -36,7 +36,10 @@ export class Repository extends DeferredDisposable {
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
     this.sourceControlManagement = this.dispose.track(
-      new SourceControlManagement(this.dvcRoot, this.getState())
+      new SourceControlManagement(
+        this.dvcRoot,
+        this.model.getSourceControlManagementState()
+      )
     )
 
     this.treeDataChanged = treeDataChanged
@@ -45,7 +48,10 @@ export class Repository extends DeferredDisposable {
   }
 
   public getState() {
-    return this.model.getState()
+    return {
+      ...this.model.getDecorationState(),
+      ...this.model.getSourceControlManagementState()
+    }
   }
 
   public getChildren(path: string) {
@@ -89,7 +95,9 @@ export class Repository extends DeferredDisposable {
   }
 
   private setState() {
-    this.sourceControlManagement.setState(this.getState())
-    this.decorationProvider.setState(this.getState())
+    this.sourceControlManagement.setState(
+      this.model.getSourceControlManagementState()
+    )
+    this.decorationProvider.setState(this.model.getDecorationState())
   }
 }

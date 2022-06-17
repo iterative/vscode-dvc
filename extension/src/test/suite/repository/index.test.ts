@@ -28,9 +28,13 @@ suite('Repository Test Suite', () => {
     disposable.dispose()
   })
 
-  const emptyState = disposable
-    .track(new RepositoryModel(dvcDemoPath))
-    .getState()
+  const repositoryModel = disposable.track(new RepositoryModel(dvcDemoPath))
+
+  const emptyState = {
+    ...repositoryModel.getDecorationState(),
+    ...repositoryModel.getSourceControlManagementState()
+  }
+
   const emptySet = new Set<string>()
 
   const logDir = 'logs'
@@ -48,6 +52,7 @@ suite('Repository Test Suite', () => {
         internalCommands,
         mockDiff,
         mockGetAllUntracked,
+        mockGetHasChanges,
         mockListDvcOnlyRecursive,
         mockStatus,
         updatesPaused,
@@ -88,6 +93,7 @@ suite('Repository Test Suite', () => {
         resolve(dvcDemoPath, 'some', 'untracked', 'python.py')
       ])
       mockGetAllUntracked.resolves(untracked)
+      mockGetHasChanges.resolves(true)
 
       const repository = disposable.track(
         new Repository(
@@ -147,6 +153,7 @@ suite('Repository Test Suite', () => {
         internalCommands,
         mockDiff,
         mockGetAllUntracked,
+        mockGetHasChanges,
         mockListDvcOnlyRecursive,
         mockNow,
         mockStatus,
@@ -195,6 +202,7 @@ suite('Repository Test Suite', () => {
           ]
         } as unknown as StatusOutput)
       mockGetAllUntracked.resolves(emptySet)
+      mockGetHasChanges.resolves(false)
 
       const repository = disposable.track(
         new Repository(
@@ -249,6 +257,7 @@ suite('Repository Test Suite', () => {
       expect(mockDiff).to.be.calledTwice
       expect(mockStatus).to.be.calledTwice
       expect(mockGetAllUntracked).to.be.calledTwice
+      expect(mockGetHasChanges).to.be.calledTwice
       expect(mockListDvcOnlyRecursive).to.be.calledTwice
 
       expect(repository.getState()).to.deep.equal({
@@ -281,6 +290,7 @@ suite('Repository Test Suite', () => {
         internalCommands,
         mockDiff,
         mockGetAllUntracked,
+        mockGetHasChanges,
         mockListDvcOnlyRecursive,
         mockNow,
         mockStatus,
@@ -347,6 +357,7 @@ suite('Repository Test Suite', () => {
         .resolves(emptySet)
         .onSecondCall()
         .resolves(untracked)
+      mockGetHasChanges.resolves(false)
 
       const repository = disposable.track(
         new Repository(
@@ -404,6 +415,7 @@ suite('Repository Test Suite', () => {
       expect(mockDiff).to.be.calledTwice
       expect(mockStatus).to.be.calledTwice
       expect(mockGetAllUntracked).to.be.calledTwice
+      expect(mockGetHasChanges).to.be.calledTwice
       expect(mockListDvcOnlyRecursive).to.be.calledTwice
 
       expect(repository.getState()).to.deep.equal({
@@ -418,12 +430,25 @@ suite('Repository Test Suite', () => {
         untracked
       })
 
-      expect(...setDecorationStateSpy.lastCall.args).to.deep.equal(
-        repository.getState()
-      )
-      expect(...setScmStateSpy.lastCall.args).to.deep.equal(
-        repository.getState()
-      )
+      expect(...setDecorationStateSpy.lastCall.args).to.deep.equal({
+        added: emptySet,
+        deleted,
+        gitModified: emptySet,
+        modified,
+        notInCache,
+        renamed: emptySet,
+        tracked
+      })
+      expect(...setScmStateSpy.lastCall.args).to.deep.equal({
+        added: emptySet,
+        deleted,
+        gitModified: emptySet,
+        hasRemote,
+        modified,
+        notInCache,
+        renamed: emptySet,
+        untracked
+      })
       expect(repository.hasChanges()).to.be.true
     })
   })
