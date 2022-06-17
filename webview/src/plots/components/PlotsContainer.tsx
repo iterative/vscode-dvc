@@ -31,12 +31,14 @@ export type BasicContainerProps = Pick<
 >
 
 export const SectionDescription = {
+  // "Trends"
   [Section.CHECKPOINT_PLOTS]:
-    'Linear plots based on data from the experiments table.',
-  [Section.COMPARISON_TABLE]:
-    'A table used to display image plots side by side.',
+    'Real-time graphs based on metrics from the Experiments Table.',
+  // "Images"
+  [Section.COMPARISON_TABLE]: 'Displays image plots side by side.',
+  // "Data Series"
   [Section.TEMPLATE_PLOTS]:
-    'JSON, YAML, CSV or TSV files visualized using Vega pre-defined or custom Vega-Lite templates.'
+    'Graphs of JSON, YAML, CSV, or TSV plot files, visualized using `dvc plots` templates.'
 }
 
 const InfoIcon = () => (
