@@ -1,43 +1,50 @@
 # Plots
 
-Select one or more experiments to visualize them in the
-[`Plots Dashboard`](command:dvc.showPlots). This is the extension's equivalent
-of the `dvc plots show` and `dvc plots diff` commands.
+Select one or more experiments to visualize in the
+[**Plots Dashboard**](command:dvc.showPlots).
 
-💡 If you don't have any DVC [plots] in the project, start writing data points
-into JSON, YAML, CSV or TSV or saving plots as images (`.png`, etc) (check the
-[DVCLive] helper library if you use Python):
+> This is the similar to the [`dvc plots show`] and [`dvc plots diff`] commands.
 
-[plots]: https://dvc.org/doc/command-reference/plots
-[dvclive]: https://dvc.org/doc/dvclive
+[`dvc plots show`]: https://dvc.org/doc/command-reference/plots/show
+[`dvc plots diff`]: https://dvc.org/doc/command-reference/plots/diff
+
+💡 To add [DVC plots] to the project, start writing data series into JSON, YAML,
+CSV, or TSV files; or save your own plot images (`.png`, etc.).
 
 <p align="center">
   <img src="images/plots-dump-with-open-file.png"
        alt="Code to Dump a JSON Plot File" />
-  <img src="images/plots-dump-with-dvclive.png"
-       alt="Code to Dump a JSON Plot File with DVCLive" />
   <img src="images/plots-dump-image.png"
        alt="Code to Dump an Image Plot File" />
 </p>
 
-Use `DVC: Show Plots` from the
-[Command Palette](command:workbench.action.quickOpen?%22>DVC:%20Show%20Plots%22)
-to open up the plots dashboard. The extension will display the following
-sections for selected experiments, that correspond to the different [types of
-plots] supported by DVC:
+If you're using Python, the [DVCLive] helper library can save plots data for
+you!
 
-[types of plots]:
-  https://dvc.org/doc/command-reference/plots#supported-file-formats
+<p align="center">
+  <img src="images/plots-dump-with-dvclive.png"
+       alt="Code to Dump a JSON Plot File with DVCLive" />
+</p>
+
+[dvc plots]: https://dvc.org/doc/start/experiments/visualization
+[dvclive]: https://dvc.org/doc/dvclive
+
+Use
+[`DVC: Show Plots`](command:workbench.action.quickOpen?%22>DVC:%20Show%20Plots%22)
+from the command palette to open the **Plots Dashboard**. It displays the
+following types of plots (for the selected experiments).
+
+## Data Series
 
 <p align="center">
   <img src="images/plots-data-series.png"
        alt="Plots: Data Series" />
 </p>
 
-`Data Series`. JSON, YAML, CSV or TSV files visualized using [templates], which
-may be predefined (e.g. confusion matrix, linear) or custom ([Vega-lite]).
+JSON, YAML, CSV, or TSV files graphed using [plot templates], which may be
+predefined (e.g. confusion matrix, linear) or custom ([Vega-lite] files)
 
-[templates]:
+[plot templates]:
   https://dvc.org/doc/command-reference/plots#plot-templates-data-series-only
 [vega-lite]: https://vega.github.io/vega-lite/
 
@@ -46,21 +53,17 @@ may be predefined (e.g. confusion matrix, linear) or custom ([Vega-lite]).
        alt="Plots: Images" />
 </p>
 
-`Images`. Any image file (e,g `.png`) can be visualized as a plot. They will be
-rendered side by side in the table.
+## Images
 
 <p align="center">
   <img src="images/plots-trends.png"
        alt="Plots: Trends" />
 </p>
 
-`Trends`. Linear plots based on data from the experiments table if you use
-[checkpoints].
+Any image file (e.g. `.jpg` or `.svg`) can be visualized here. They will be
+rendered side by side for the selected experiments.
 
-The plots dashboard can be configured and accessed using using the `Plots` and
-`Experiments` views:
-
-[checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints
+## Trends
 
 <p float="left">
   <img src="images/plots-plots-view-icon.png"
@@ -68,3 +71,12 @@ The plots dashboard can be configured and accessed using using the `Plots` and
   <img src="images/plots-experiments-view-icon.png"
        alt="Experiments View" width="49%" />
 </p>
+
+Real-time graphs based on scalar [metrics] from the **Experiments Table**;
+available when you use [checkpoints]
+
+The **Plots Dashboard** can be configured and accessed from the _Plots_ and
+_Experiments_ side panels in the **DVC view**.
+
+[metrics]: https://dvc.org/doc/command-reference/metrics
+[checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints

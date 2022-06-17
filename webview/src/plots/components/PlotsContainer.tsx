@@ -33,12 +33,13 @@ export type BasicContainerProps = Pick<
 export const SectionDescription = {
   // "Trends"
   [Section.CHECKPOINT_PLOTS]:
-    'Real-time graphs based on metrics from the Experiments Table.',
+    'Real-time graphs based on metrics from the Experiments Table',
   // "Images"
-  [Section.COMPARISON_TABLE]: 'Displays image plots side by side.',
+  [Section.COMPARISON_TABLE]:
+    'Displays image plots side by side across experiments.',
   // "Data Series"
   [Section.TEMPLATE_PLOTS]:
-    'Graphs of JSON, YAML, CSV, or TSV plot files, visualized using `dvc plots` templates.'
+    'Graphs of JSON, YAML, CSV, or TSV plot files, visualized using `dvc plots` templates'
 }
 
 const InfoIcon = () => (
