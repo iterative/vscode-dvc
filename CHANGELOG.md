@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.5] - 2022-06-17
+
+### 🚀 New Features and Enhancements
+
+- Show filtered counts whenever a filter is active [#1913](https://github.com/iterative/vscode-dvc/pull/1913) by [@mattseddon](https://github.com/mattseddon)
+- Improve reset the workspace SCM command [#1915](https://github.com/iterative/vscode-dvc/pull/1915) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix (local) intermittent test failures [#1909](https://github.com/iterative/vscode-dvc/pull/1909) by [@mattseddon](https://github.com/mattseddon)
+- Fix test timeout failures [#1914](https://github.com/iterative/vscode-dvc/pull/1914) by [@mattseddon](https://github.com/mattseddon)
+- Remove getState from Repository [#1916](https://github.com/iterative/vscode-dvc/pull/1916) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.4] - 2022-06-16
 
 ### 🐛 Bug Fixes
