@@ -47,13 +47,6 @@ export class Repository extends DeferredDisposable {
     this.initialize()
   }
 
-  public getState() {
-    return {
-      ...this.model.getDecorationState(),
-      ...this.model.getSourceControlManagementState()
-    }
-  }
-
   public getChildren(path: string) {
     return this.model.getChildren(path)
   }
@@ -67,7 +60,7 @@ export class Repository extends DeferredDisposable {
   }
 
   public getScale() {
-    return { tracked: this.getState().tracked.size }
+    return { tracked: this.model.getDecorationState().tracked.size }
   }
 
   public setExperiments(experiments: Experiments) {
