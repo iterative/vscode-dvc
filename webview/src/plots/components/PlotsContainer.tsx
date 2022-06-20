@@ -39,7 +39,7 @@ export const SectionDescription = {
     'Displays image plots side by side across experiments.',
   // "Data Series"
   [Section.TEMPLATE_PLOTS]:
-    'Graphs of JSON, YAML, CSV, or TSV plot files, visualized using `dvc plots` templates'
+    'Plots of JSON, YAML, CSV, or TSV files, visualized using `dvc plots` templates'
 }
 
 const InfoIcon = () => (
