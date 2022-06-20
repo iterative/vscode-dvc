@@ -3,7 +3,7 @@
 Select one or more experiments to visualize in the
 [**Plots Dashboard**](command:dvc.showPlots).
 
-> This is the similar to the [`dvc plots show`] and [`dvc plots diff`] commands.
+> This is equivalent to the [`dvc plots show`] and [`dvc plots diff`] commands.
 
 [`dvc plots show`]: https://dvc.org/doc/command-reference/plots/show
 [`dvc plots diff`]: https://dvc.org/doc/command-reference/plots/diff
