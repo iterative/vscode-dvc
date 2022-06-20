@@ -63,10 +63,10 @@ rendered side by side for the selected experiments.
 Real-time **Trends** based on scalar [metrics] from the **Experiments Table**
 are available when you use [checkpoints].
 
-The **Plots Dashboard** can be configured and accessed from the _Plots_ and
-_Experiments_ side panels in the **DVC view**.
-
 [metrics]: https://dvc.org/doc/command-reference/metrics
 [checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints
+
+The **Plots Dashboard** can be configured and accessed from the _Plots_ and
+_Experiments_ side panels in the **DVC view**.
 
 > This is equivalent to the [`dvc plots show`] and [`dvc plots diff`] commands.
