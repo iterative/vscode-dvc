@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.6] - 2022-06-20
+
+### 🐛 Bug Fixes
+
+- Fix DVC cwd for Windows [#1921](https://github.com/iterative/vscode-dvc/pull/1921) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.5] - 2022-06-17
 
 ### 🚀 New Features and Enhancements
