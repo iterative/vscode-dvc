@@ -32,7 +32,7 @@ experiments):
        alt="Plots: Data Series" />
 </p>
 
-**Data Series** plots are JSON, YAML, CSV, or TSV files graphed using [plot
+**Data Series** are JSON, YAML, CSV, or TSV files visualized using [plot
 templates], which may be predefined (e.g. confusion matrix, linear) or custom
 ([Vega-lite] files)
 

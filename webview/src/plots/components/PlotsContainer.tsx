@@ -33,7 +33,7 @@ export type BasicContainerProps = Pick<
 export const SectionDescription = {
   // "Trends"
   [Section.CHECKPOINT_PLOTS]:
-    'Real-time graphs based on metrics from the Experiments Table',
+    'Real-time plots based on metrics from the Experiments Table',
   // "Images"
   [Section.COMPARISON_TABLE]:
     'Displays image plots side by side across experiments.',
