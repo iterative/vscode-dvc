@@ -1,14 +1,20 @@
 import React from 'react'
-import { AllIcons, Icon } from '../../../shared/components/Icon'
+import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import styles from '../styles.module.scss'
+import { DropTargetIndicator } from './DropTargetIndicator'
 
-export const DropTarget: React.FC = () => (
+export const DropTarget: React.FC<Props> = ({ children, direction }) => (
   <div className={styles.dropTarget} data-testid="comparison-drop-target">
-    <Icon
-      icon={AllIcons.ELLIPSIS}
-      className={styles.smallDropIcon}
-      width={15}
-      height={15}
-    />
+    {direction === DragEnterDirection.LEFT && (
+      <DropTargetIndicator direction={direction} />
+    )}
+    {children}
+    {direction === DragEnterDirection.RIGHT && (
+      <DropTargetIndicator direction={direction} />
+    )}
   </div>
 )
+
+interface Props {
+  direction: DragEnterDirection
+}

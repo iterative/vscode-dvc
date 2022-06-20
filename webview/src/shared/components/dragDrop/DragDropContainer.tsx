@@ -42,7 +42,8 @@ export const makeTarget = (
   dropTarget: DropTargetInfo,
   handleDragOver: DragEventHandler<HTMLElement>,
   handleOnDrop: DragEventHandler<HTMLElement>,
-  id: string
+  id: string,
+  props?: Partial<{ children: JSX.Element; direction: DragEnterDirection }>
 ) => (
   <dropTarget.wrapperTag
     data-testid="drop-target"
@@ -51,7 +52,7 @@ export const makeTarget = (
     onDrop={handleOnDrop}
     id={`${id}__drop`}
   >
-    {dropTarget.element}
+    {React.cloneElement(dropTarget.element, props)}
   </dropTarget.wrapperTag>
 )
 interface DragDropContainerProps {
@@ -126,7 +127,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     })
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId(id)
-      setDraggedOverId(order[toIdx])
     }, 0)
   }
 
@@ -204,7 +204,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
-      style={(id === draggedId && { display: 'none' }) || draggable.props.style}
+      style={draggable.props.style}
     />
   )
 
@@ -213,11 +213,12 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const item = id && buildItem(id, draggable)
 
     if (id === draggedOverId) {
-      const target = makeTarget(dropTarget, handleDragOver, handleOnDrop, id)
+      const target = makeTarget(dropTarget, handleDragOver, handleOnDrop, id, {
+        children: draggable,
+        direction
+      })
 
-      return direction === DragEnterDirection.RIGHT
-        ? [item, target]
-        : [target, item]
+      return target
     }
 
     return item

@@ -268,12 +268,24 @@ $gap: 20px;
 
 .dropSectionMaximized,
 .dropTarget {
+  position: relative;
   height: auto;
-  opacity: 0.5;
-  border: 3px dashed $accent-color;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  & > th {
+    display: block;
+    width: 100%;
+  }
+}
+
+.dropTargetIndicator {
+  position: absolute;
+  top: 2px;
+  min-height: 32px;
+  border: 2px dotted $accent-color;
 }
 
 .dropIcon {

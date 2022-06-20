@@ -5,6 +5,7 @@ import styles from './styles.module.scss'
 import { DropTarget } from './DropTarget'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 
 export type ComparisonTableColumn = Revision
 
@@ -53,8 +54,8 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           items={items}
           group="comparison"
           dropTarget={{
-            element: <DropTarget />,
-            wrapperTag: 'th'
+            element: <DropTarget direction={DragEnterDirection.AUTO} />,
+            wrapperTag: 'div'
           }}
         />
       </tr>
