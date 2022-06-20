@@ -1416,7 +1416,7 @@
           },
           {
             "id": "dvc.plots",
-            "title": "Plots",
+            "title": "Plots Dashboard",
             "description": "Visualize and compare multiple experiments with interactive customizable charts.\n[Show Plots](command:dvc.showPlots)",
             "media": {
               "markdown": "resources/walkthrough/plots.md"

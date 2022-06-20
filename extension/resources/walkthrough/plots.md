@@ -1,4 +1,4 @@
-# Plots
+# Plots Dashboard
 
 Select one or more experiments to visualize in the
 [**Plots Dashboard**](command:dvc.showPlots). Use
