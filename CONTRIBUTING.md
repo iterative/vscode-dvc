@@ -52,13 +52,15 @@ is provided as a lightweight, convenient testbed to try the extension out with.
 It is not an exhaustive showcase of DVC's features, so testers are encouraged to
 try other DVC repositories -- especially real-world cases!
 
-- Install [Yarn](https://yarnpkg.com/) if needed. Go to the `demo/` directory of
-  this repo (`cd demo`) and run `yarn install` to set up the project.
+- Install [Yarn](https://yarnpkg.com/) if needed. Run `yarn setup:venv` from the
+  root of this repo to set up a virtual Python environment for the demo project
+  (in `demo/.env`).
 
-- Go back to the root of this repo (`cd ..`) and run `yarn setup:venv` to set up
-  a Python virtual environment in the demo project (in `demo/.env`).
+- Go to the `demo/` directory of (`cd demo`) and run `yarn install` to set up
+  the development environment.
 
-  > Go to `demo/` if you want to use DVC from command line (terminal).
+  > Stay in `demo/` if you want to use DVC from command line (terminal) in the
+  > demo project.
 
 - Pull the project data with the extension (**DVC panel** in the _Source Code_
   view) or with `.env/bin/dvc pull` from command line.
