@@ -67,6 +67,6 @@ are available when you use [checkpoints].
 [checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints
 
 The **Plots Dashboard** can be configured and accessed from the _Plots_ and
-_Experiments_ side panels in the **DVC view**.
+_Experiments_ side panels in the [**DVC View**](command:views.dvc-views).
 
 > This is equivalent to the [`dvc plots show`] and [`dvc plots diff`] commands.
