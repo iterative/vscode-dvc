@@ -47,11 +47,13 @@ First, ensure that [Yarn](https://yarnpkg.com/) and
 
 ## The demo project
 
-The demo project was initially forked from
+The [demo project](demo) was initially forked from
 [dvc-checkpoints-mnist](https://github.com/iterative/dvc-checkpoints-mnist/tree/make_checkpoint),
 and is provided as a lightweight, convenient testbed to try the extension out
 with. It is not an exhaustive showcase of DVC's features, so testers are
-encouraged to try other DVC repositories- especially real-world cases!
+encouraged to try other DVC repositories -- especially real-world cases!
+
+- Go to the `demo/` directory of this repo.
 
 - It is recommended that you create the project's virtual environment with
   Python 3.8 as some dependencies are not yet available for Python 3.9
