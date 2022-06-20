@@ -86,11 +86,11 @@ try other DVC repositories -- especially real-world cases!
 
 ## React component development with Storybook
 
-Start Storybook with `yarn storybook` in either the monorepo root or the
-`webview` project, and you can develop the React components this plugin uses
-without requiring VS Code as a dev environment.
+Start Storybook with `yarn storybook` in either the monorepo root or in the
+`webview` project. You can develop the React components this plugin uses without
+requiring VS Code as a dev environment.
 
 There are some discrepancies between the Storybook environment and the
-environment of a real VS Code extension, custom themes being one big one. Always
+environment of a real VS Code extension, custom themes being a big one. Always
 make sure to try out changed components in the full dev environment before
 merging!
