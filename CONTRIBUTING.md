@@ -64,23 +64,23 @@ try other DVC repositories -- especially real-world cases!
   view) or with `.env/bin/dvc pull` from command line.
 
 - In order to run experiments in the demo project (from the **DVC View**), the
-  virtual env should be loaded. This will happen automatically if the Microsoft
-  [Python extension] is installed and setup to use it. Or you can set it up
-  manually with the `dvc.dvcPath` setting (see [Configuration]).
+  virtual env should be loaded through the Microsoft [Python extension] (please
+  install it), having this in `.vscode/settings.json`:
+
+  ```json
+  "python.defaultInterpreterPath": "demo/.env/bin/dvc"
+  ```
 
 [dvc-checkpoints-mnist]:
   https://github.com/iterative/dvc-checkpoints-mnist/tree/make_checkpoint
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
-[configuration]:
-  https://github.com/iterative/vscode-dvc/tree/contrib/demo#configuration
 
 <a id='warning'></a>
 
-> **Warning**  
-> When using any project that relies on an isolated Python environment (`conda`,
-> `venv`, etc.), Microsoft's Python extension is required. It's used by this
-> extension to locate and utilize the required environment.
+> **Warning** : When using any project that relies on an isolated Python
+> environment (`conda`, `venv`, etc.), Microsoft's Python extension is required.
+> It's used by this extension to locate and utilize the required environment.
 
 ## React component development with Storybook
 
