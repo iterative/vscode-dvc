@@ -72,7 +72,7 @@ rendered side by side for the selected experiments.
        alt="Experiments View" width="49%" />
 </p>
 
-Real-time graphs based on scalar [metrics] from the **Experiments Table**;
+Real-time plots based on scalar [metrics] from the **Experiments Table**;
 available when you use [checkpoints]
 
 The **Plots Dashboard** can be configured and accessed from the _Plots_ and
