@@ -47,38 +47,42 @@ First, ensure that [Yarn](https://yarnpkg.com/) and
 
 ## The demo project
 
-The [demo project](demo) was initially forked from
-[dvc-checkpoints-mnist](https://github.com/iterative/dvc-checkpoints-mnist/tree/make_checkpoint),
-and is provided as a lightweight, convenient testbed to try the extension out
-with. It is not an exhaustive showcase of DVC's features, so testers are
-encouraged to try other DVC repositories -- especially real-world cases!
+The [demo project](demo) was initially forked from [dvc-checkpoints-mnist], and
+is provided as a lightweight, convenient testbed to try the extension out with.
+It is not an exhaustive showcase of DVC's features, so testers are encouraged to
+try other DVC repositories -- especially real-world cases!
 
 - Go to the `demo/` directory of this repo.
 
-- Install [Yarn](https://yarnpkg.com/) if needed, and run `yarn install` to
-  setting up the project.
+- Install [Yarn](https://yarnpkg.com/) if needed, and run `yarn install` to set
+  up the project.
 
-- Go back to the root of this repo (not `./demo`) and `yarn setup:venv` to setup
-  the Python virtual environment in the demo project.
+- Go back to the root of this repo (`cd ..`) and run `yarn setup:venv` to set up
+  a Python virtual environment in the demo project (in `demo/.env`).
 
-  > Python 3.8 is recommended, as some dependencies are not yet available for
-  > Python 3.9.
+  > Go to `demo/` if you want to use DVC from command line (terminal).
 
-- Return to `demo/`, activate the virtual environment, and run `dvc pull`.
+- Pull the project data with the extension (DVC panel in the Source Code view)
+  or with `dvc pull` from command line.
 
-- In order to run experiments in our demo project we require the Python virtual
-  environment to be loaded.
+- In order to run experiments in the demo project, the virtual env should be
+  loaded. This will happen automatically if the Microsoft [Python extension] is
+  installed and setup to use the demo's virtual env, or you can set it up
+  manually with the `dvc.dvcPath` setting (see [Configuration]).
 
-- This will happen automatically IF the `ms-python.python` extension is
-  installed within the VS Code instance that you are developing against.
+[dvc-checkpoints-mnist]:
+  https://github.com/iterative/dvc-checkpoints-mnist/tree/make_checkpoint
+[python extension]:
+  https://marketplace.visualstudio.com/items?itemName=ms-python.python
+[configuration]:
+  https://github.com/iterative/vscode-dvc/tree/contrib/demo#configuration
 
 <a id='warning'></a>
 
 > **Warning**  
 > When using any project that relies on an isolated Python environment (`conda`,
-> `venv`, etc.), Microsoft's
-> [Python extension](https://github.com/Microsoft/vscode-python) is required.
-> It's used by this extension to locate and utilize the required environment.
+> `venv`, etc.), Microsoft's Python extension is required. It's used by this
+> extension to locate and utilize the required environment.
 
 ## React component development with Storybook
 
