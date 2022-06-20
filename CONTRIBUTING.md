@@ -52,22 +52,20 @@ is provided as a lightweight, convenient testbed to try the extension out with.
 It is not an exhaustive showcase of DVC's features, so testers are encouraged to
 try other DVC repositories -- especially real-world cases!
 
-- Go to the `demo/` directory of this repo.
-
-- Install [Yarn](https://yarnpkg.com/) if needed, and run `yarn install` to set
-  up the project.
+- Install [Yarn](https://yarnpkg.com/) if needed. Go to the `demo/` directory of
+  this repo (`cd demo`) and run `yarn install` to set up the project.
 
 - Go back to the root of this repo (`cd ..`) and run `yarn setup:venv` to set up
   a Python virtual environment in the demo project (in `demo/.env`).
 
   > Go to `demo/` if you want to use DVC from command line (terminal).
 
-- Pull the project data with the extension (DVC panel in the Source Code view)
-  or with `dvc pull` from command line.
+- Pull the project data with the extension (**DVC panel** in the _Source Code_
+  view) or with `.env/bin/dvc pull` from command line.
 
-- In order to run experiments in the demo project, the virtual env should be
-  loaded. This will happen automatically if the Microsoft [Python extension] is
-  installed and setup to use the demo's virtual env, or you can set it up
+- In order to run experiments in the demo project (from the **DVC View**), the
+  virtual env should be loaded. This will happen automatically if the Microsoft
+  [Python extension] is installed and setup to use it. Or you can set it up
   manually with the `dvc.dvcPath` setting (see [Configuration]).
 
 [dvc-checkpoints-mnist]:
