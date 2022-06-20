@@ -242,6 +242,7 @@ export const RowContent: React.FC<
         tabIndex={0}
         role="row"
         {...clickAndEnterProps(toggleRowSelection)}
+        aria-selected={isRowSelected}
         data-testid={isWorkspace && 'workspace-row'}
       >
         <FirstCell
