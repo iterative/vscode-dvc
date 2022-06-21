@@ -134,6 +134,21 @@ $gap: 4px;
   z-index: 3;
 }
 
+.draggedColumnCell {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background:rgba(0,0,0,0.6);
+    opacity: 1;
+  }
+}
+
 .cell {
   max-height: 100vh;
   width: 100%;

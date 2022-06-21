@@ -1,11 +1,12 @@
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { AllIcons, Icon } from '../../../shared/components/Icon'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
+import { DragDropContext, DragDropContextValue } from '../../../shared/components/dragDrop/DragDropContext'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -21,6 +22,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   pinnedColumn
 }) => {
   const [isShown, setIsShown] = useState(true)
+  const { draggedRef } = useContext<DragDropContextValue>(DragDropContext)
 
   const toggleIsShownState = () => setIsShown(!isShown)
 
@@ -41,13 +43,15 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
         {plots.map((plot: ComparisonPlot) => {
           const isPinned = pinnedColumn === plot.revision
           const missing = !plot?.url
+          const isBeingDragged = draggedRef?.itemId === plot.revision;
 
           return (
             <td
               key={path + plot.revision}
               className={cx({
                 [styles.pinnedColumnCell]: isPinned,
-                [styles.missing]: isShown && missing
+                [styles.missing]: isShown && missing,
+                [styles.draggedColumnCell]: isBeingDragged
               })}
             >
               <div
