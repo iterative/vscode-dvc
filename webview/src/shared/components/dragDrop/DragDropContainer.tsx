@@ -63,6 +63,7 @@ interface DragDropContainerProps {
   group: string
   onDrop?: OnDrop
   dropTarget: DropTargetInfo
+  hideDragged?: boolean
   wrapperComponent?: {
     component: React.FC<WrapperProps>
     props: {
@@ -79,7 +80,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   group,
   onDrop,
   dropTarget,
-  wrapperComponent
+  wrapperComponent,
+  hideDragged = true
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
@@ -204,7 +206,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
-      style={draggable.props.style}
+      style={
+        (id === draggedId && hideDragged && { display: 'none' }) ||
+        draggable.props.style
+      }
     />
   )
 

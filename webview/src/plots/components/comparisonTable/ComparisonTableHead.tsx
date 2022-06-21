@@ -57,6 +57,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
             element: <DropTarget direction={DragEnterDirection.AUTO} />,
             wrapperTag: 'div'
           }}
+          hideDragged={false}
         />
       </tr>
     </thead>
