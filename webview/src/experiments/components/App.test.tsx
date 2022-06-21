@@ -722,7 +722,7 @@ describe('App', () => {
 
       const tooltip = screen.getByRole('tooltip')
 
-      expect(tooltip).toHaveTextContent('No sorts applied')
+      expect(tooltip).toHaveTextContent('No Sorts Applied')
 
       const { columns } = tableDataFixture
       const firstSortPath = columns[columns.length - 1].path
@@ -740,7 +740,7 @@ describe('App', () => {
         })
       )
       expect(sortIndicator).toHaveTextContent('1')
-      expect(tooltip).toHaveTextContent('1 sort applied')
+      expect(tooltip).toHaveTextContent('1 Sort Applied')
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -757,7 +757,7 @@ describe('App', () => {
         })
       )
       expect(sortIndicator).toHaveTextContent('2')
-      expect(tooltip).toHaveTextContent('2 sorts applied')
+      expect(tooltip).toHaveTextContent('2 Sorts Applied')
     })
   })
 
@@ -784,7 +784,7 @@ describe('App', () => {
 
     const tooltip = screen.getByRole('tooltip')
 
-    expect(tooltip.textContent).toBe('No filters applied')
+    expect(tooltip).toHaveTextContent('No Filters Applied')
 
     const { columns } = tableDataFixture
     const firstFilterPath = columns[columns.length - 1].path
@@ -802,7 +802,9 @@ describe('App', () => {
       })
     )
     expect(filterIndicator).toHaveTextContent('1')
-    expect(tooltip.textContent).toBe('1 filter applied')
+    expect(tooltip).toHaveTextContent('1 Filter Applied')
+    expect(tooltip).toHaveTextContent('0 Experiments, 0 Checkpoints Filtered')
+
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -820,9 +822,47 @@ describe('App', () => {
       })
     )
     expect(filterIndicator).toHaveTextContent('2')
-    expect(tooltip).toHaveTextContent('2 filters applied')
-    expect(tooltip).toHaveTextContent('1 experiment filtered')
-    expect(tooltip).toHaveTextContent('2 checkpoints filtered')
+    expect(tooltip).toHaveTextContent('2 Filters Applied')
+    expect(tooltip).toHaveTextContent('1 Experiment, 2 Checkpoints Filtered')
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filteredCounts: {
+              experiments: 10000
+            },
+            filters: [firstFilterPath, secondFilterPath]
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    expect(filterIndicator).toHaveTextContent('2')
+    expect(tooltip).toHaveTextContent('Experiment')
+    expect(tooltip).not.toHaveTextContent('Checkpoint')
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          data: {
+            ...tableDataFixture,
+            filteredCounts: {
+              checkpoints: 10000,
+              experiments: 10000
+            },
+            filters: []
+          },
+          type: MessageToWebviewType.SET_DATA
+        }
+      })
+    )
+    expect(filterIndicator).toHaveTextContent('')
+    expect(tooltip).not.toHaveTextContent('Experiment')
+    expect(tooltip).not.toHaveTextContent('Checkpoint')
   })
 
   it('should send a message to focus the relevant tree when clicked', () => {

@@ -117,7 +117,7 @@ suite('CLI Runner Test Suite', () => {
 
       expect(output.includes(text)).to.be.true
       return completed
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should send an error event if the command fails with an exit code and stderr', async () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendErrorTelemetryEvent')

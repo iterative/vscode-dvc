@@ -167,6 +167,30 @@ suite('Experiments Test Suite', () => {
 
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+  })
+
+  describe('handleMessageFromWebview', () => {
+    const setupExperimentsAndMockCommands = () => {
+      const {
+        columnsModel,
+        experiments,
+        experimentsModel,
+        internalCommands,
+        messageSpy
+      } = buildExperiments(disposable, expShowFixture)
+      const mockExecuteCommand = stub(
+        internalCommands,
+        'executeCommand'
+      ).resolves(undefined)
+
+      return {
+        columnsModel,
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockExecuteCommand
+      }
+    }
 
     it('should handle a column reordered message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -208,7 +232,7 @@ suite('Experiments Test Suite', () => {
         undefined,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column resized message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -242,7 +266,7 @@ suite('Experiments Test Suite', () => {
         { width: mockWidth },
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a toggle experiment message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -310,7 +334,7 @@ suite('Experiments Test Suite', () => {
         mockSortDefinition,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sort removed from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -345,31 +369,7 @@ suite('Experiments Test Suite', () => {
         },
         undefined
       )
-    })
-  })
-
-  describe('handleMessageFromWebview', () => {
-    const setupExperimentsAndMockCommands = () => {
-      const {
-        columnsModel,
-        experiments,
-        experimentsModel,
-        internalCommands,
-        messageSpy
-      } = buildExperiments(disposable, expShowFixture)
-      const mockExecuteCommand = stub(
-        internalCommands,
-        'executeCommand'
-      ).resolves(undefined)
-
-      return {
-        columnsModel,
-        experiments,
-        experimentsModel,
-        messageSpy,
-        mockExecuteCommand
-      }
-    }
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to hide a table column', async () => {
       const { experiments, columnsModel } = buildExperiments(disposable)
@@ -1205,13 +1205,41 @@ suite('Experiments Test Suite', () => {
         )
       })
 
-    it('should set the appropriate context value when a params file is opened', async () => {
+    it('should set the appropriate context value when a params file is open in the active editor/closed', async () => {
+      const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
+      await window.showTextDocument(paramsFile)
+
+      const mockContext: { [key: string]: unknown } = {
+        'dvc.params.fileActive': false
+      }
+
+      const mockSetContextValue = stub(VscodeContext, 'setContextValue')
+      mockSetContextValue.callsFake((key: string, value: unknown) => {
+        mockContext[key] = value
+        return Promise.resolve(undefined)
+      })
+
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
+      expect(
+        mockContext['dvc.params.fileActive'],
+        'should set dvc.params.fileActive to true when a params file is open and the extension starts'
+      ).to.be.true
 
-      const setContextValueSpy = spy(VscodeContext, 'setContextValue')
+      mockSetContextValue.resetHistory()
+
+      const startupEditorClosed = getActiveEditorUpdatedEvent()
+
+      await closeAllEditors()
+      await startupEditorClosed
+
+      expect(
+        mockContext['dvc.params.fileActive'],
+        'should set dvc.params.fileActive to false when the params file in the active editor is closed'
+      ).to.be.false
+
+      mockSetContextValue.resetHistory()
 
       const activeEditorUpdated = getActiveEditorUpdatedEvent()
 
@@ -1220,50 +1248,18 @@ suite('Experiments Test Suite', () => {
 
       const activeEditorClosed = getActiveEditorUpdatedEvent()
 
-      expect(setContextValueSpy).to.be.calledOnce
-      expect(setContextValueSpy).to.be.calledWithExactly(
-        'dvc.params.fileActive',
-        true
-      )
-
-      setContextValueSpy.resetHistory()
+      expect(
+        mockContext['dvc.params.fileActive'],
+        'should set dvc.params.fileActive to true when a params file is in the active editor'
+      ).to.be.true
 
       await closeAllEditors()
       await activeEditorClosed
 
-      expect(setContextValueSpy).to.be.calledOnce
-      expect(setContextValueSpy).to.be.calledWithExactly(
-        'dvc.params.fileActive',
-        false
-      )
-    })
-
-    it('should set the appropriate context value when a params file is open and the extension starts', async () => {
-      const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
-      await window.showTextDocument(paramsFile)
-
-      const setContextValueSpy = spy(VscodeContext, 'setContextValue')
-
-      const { experiments } = buildExperiments(disposable)
-      await experiments.isReady()
-
-      expect(setContextValueSpy).to.be.calledOnce
-      expect(setContextValueSpy).to.be.calledWithExactly(
-        'dvc.params.fileActive',
-        true
-      )
-
-      setContextValueSpy.resetHistory()
-      const activeEditorClosed = getActiveEditorUpdatedEvent()
-
-      await closeAllEditors()
-      await activeEditorClosed
-
-      expect(setContextValueSpy).to.be.calledOnce
-      expect(setContextValueSpy).to.be.calledWithExactly(
-        'dvc.params.fileActive',
-        false
-      )
+      expect(
+        mockContext['dvc.params.fileActive'],
+        'should set dvc.params.fileActive to false when the params file in the active editor is closed again'
+      ).to.be.false
     })
 
     it('should not set a context value when a non-params file is open and the extension starts', async () => {

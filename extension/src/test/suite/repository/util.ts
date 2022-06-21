@@ -1,4 +1,4 @@
-import { stub } from 'sinon'
+import { spy, stub } from 'sinon'
 import { EventEmitter } from 'vscode'
 import { dvcDemoPath } from '../../util'
 import {
@@ -11,6 +11,10 @@ import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
 import * as Time from '../../../util/time'
 import * as Watcher from '../../../fileSystem/watcher'
+import { Repository } from '../../../repository'
+import { InternalCommands } from '../../../commands/internal'
+import { DecorationProvider } from '../../../repository/decorationProvider'
+import { SourceControlManagement } from '../../../repository/sourceControlManagement'
 
 export const buildDependencies = (disposer: Disposer) => {
   const { cliReader, internalCommands } = buildInternalCommands(disposer)
@@ -81,5 +85,35 @@ export const buildRepositoryData = async (disposer: Disposer) => {
     mockGetAllUntracked,
     mockListDvcOnlyRecursive,
     mockStatus
+  }
+}
+
+export const buildRepository = async (
+  disposer: Disposer,
+  internalCommands: InternalCommands,
+  updatesPaused: EventEmitter<boolean>,
+  treeDataChanged: EventEmitter<void>,
+  dvcRoot = dvcDemoPath
+) => {
+  const repository = disposer.track(
+    new Repository(dvcRoot, internalCommands, updatesPaused, treeDataChanged)
+  )
+
+  const setDecorationStateSpy = spy(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (repository as any).decorationProvider as DecorationProvider,
+    'setState'
+  )
+  const setScmStateSpy = spy(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (repository as any).sourceControlManagement as SourceControlManagement,
+    'setState'
+  )
+
+  await repository.isReady()
+  return {
+    repository,
+    setDecorationStateSpy,
+    setScmStateSpy
   }
 }
