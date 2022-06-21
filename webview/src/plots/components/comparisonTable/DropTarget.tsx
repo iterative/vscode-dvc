@@ -5,13 +5,8 @@ import { DropTargetIndicator } from './DropTargetIndicator'
 
 export const DropTarget: React.FC<Props> = ({ children, direction }) => (
   <div className={styles.dropTarget} data-testid="comparison-drop-target">
-    {direction === DragEnterDirection.LEFT && (
-      <DropTargetIndicator direction={direction} />
-    )}
+    <DropTargetIndicator direction={direction} />
     {children}
-    {direction === DragEnterDirection.RIGHT && (
-      <DropTargetIndicator direction={direction} />
-    )}
   </div>
 )
 

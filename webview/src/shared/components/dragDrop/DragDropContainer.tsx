@@ -189,7 +189,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     if (isSameGroup(draggedRef?.group, group)) {
       const { id } = e.currentTarget
       !disabledDropIds.includes(id) &&
-        id === draggedOverId &&
+        id !== draggedId &&
         setDirection(getDragEnterDirection(e))
     }
   }
