@@ -56,7 +56,7 @@ cases!
   root of this repo to set up a virtual Python environment for the demo project
   (in `demo/.env`).
 
-- Important: Open the `demo/` directory of this repo directly in VS Code.
+- Important: Open the `demo/` folder of this repo directly in VS Code.
 
 - Pull the project data with the extension (either from the **DVC Tracked**
   panel in the _File Explorer_ or the **DVC panel** in the _Source Code_ view)
