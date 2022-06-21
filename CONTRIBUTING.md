@@ -47,10 +47,10 @@ First, ensure that [Yarn](https://yarnpkg.com/) and
 
 ## The demo project
 
-The [demo project](demo) was initially forked from [dvc-checkpoints-mnist], and
-is provided as a lightweight, convenient testbed to try the extension out with.
-It is not an exhaustive showcase of DVC's features, so testers are encouraged to
-try other DVC repositories -- especially real-world cases!
+The [demo project](demo) is provided as a lightweight, convenient testbed to try
+the extension out with. It is not an exhaustive showcase of DVC's features, so
+testers are encouraged to try other DVC repositories -- especially real-world
+cases!
 
 - Install [Yarn](https://yarnpkg.com/) if needed. Run `yarn setup:venv` from the
   root of this repo to set up a virtual Python environment for the demo project
@@ -73,8 +73,6 @@ try other DVC repositories -- especially real-world cases!
   "python.defaultInterpreterPath": "demo/.env/bin/dvc"
   ```
 
-[dvc-checkpoints-mnist]:
-  https://github.com/iterative/dvc-checkpoints-mnist/tree/make_checkpoint
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
 
