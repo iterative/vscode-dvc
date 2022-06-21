@@ -1,4 +1,5 @@
 import { act } from 'react-dom/test-utils'
+import { screen } from '@testing-library/react'
 import * as DragDropUtils from '../shared/components/dragDrop/util'
 
 const testStorage = new Map()
@@ -17,6 +18,21 @@ export const createBubbledEvent = (type: string, props = {}) => {
   return event
 }
 
+export const dragOver = (
+  draggedOver: HTMLElement,
+  direction: DragDropUtils.DragEnterDirection
+) => {
+  const clientX =
+    100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
+  const left = 100
+  const right = left + 100
+  const dragOverEvent = createBubbledEvent('dragover', { clientX })
+  jest
+    .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
+    .mockImplementationOnce(() => ({ left, right }))
+  draggedOver.dispatchEvent(dragOverEvent)
+}
+
 export const dragEnter = (
   dragged: HTMLElement,
   draggedOver: HTMLElement,
@@ -31,15 +47,7 @@ export const dragEnter = (
   draggedOver.dispatchEvent(createBubbledEvent('dragenter'))
 
   if (direction !== DragDropUtils.DragEnterDirection.AUTO) {
-    const clientX =
-      100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
-    const left = 100
-    const right = left + 100
-    const dragOverEvent = createBubbledEvent('dragover', { clientX })
-    jest
-      .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
-      .mockImplementationOnce(() => ({ left, right }))
-    draggedOver.dispatchEvent(dragOverEvent)
+    dragOver(draggedOver, direction)
   } else {
     draggedOver.dispatchEvent(createBubbledEvent('dragover'))
   }
@@ -55,9 +63,20 @@ export const dragAndDrop = (
 ) => {
   dragEnter(startingNode, endingNode, direction)
 
+  let targetElement: HTMLElement
+
+  try {
+    targetElement = screen.getByTestId('drop-target')
+  } catch (e) {
+    targetElement = endingNode
+  }
+
+  dragOver(endingNode, direction)
+  dragOver(targetElement, direction)
+
   jest.useFakeTimers()
 
-  endingNode.dispatchEvent(createBubbledEvent('drop'))
+  targetElement.dispatchEvent(createBubbledEvent('drop'))
 
   act(() => {
     jest.advanceTimersByTime(1)

@@ -856,13 +856,10 @@ describe('App', () => {
 
     dragEnter(plots[1], plots[0], DragEnterDirection.LEFT)
 
-    const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
-    expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
-      'plot-drop-target',
-      plots[0].id,
-      plots[1].id,
-      plots[2].id
-    ])
+    const target = screen.getByTestId('drop-target')
+
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(target.nextElementSibling?.id).toStrictEqual(plots[1].id)
   })
 
   it('should show a drop target after a plot on drag enter from the right', () => {
@@ -874,14 +871,10 @@ describe('App', () => {
     const plots = screen.getAllByTestId(/^plot_/)
     dragEnter(plots[0], plots[1], DragEnterDirection.RIGHT)
 
-    const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
+    const target = screen.getByTestId('drop-target')
 
-    expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
-      plots[0].id,
-      plots[1].id,
-      'plot-drop-target',
-      plots[2].id
-    ])
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(target.previousElementSibling?.id).toStrictEqual(plots[0].id)
   })
 
   it('should hide the plot being dragged from the list', () => {
