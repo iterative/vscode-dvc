@@ -56,11 +56,14 @@ cases!
   root of this repo to set up a virtual Python environment for the demo project
   (in `demo/.env`).
 
-- Optional: Go to the `demo/` directory of (`cd demo`) if you want to use DVC
-  from command line (terminal).
+- Important: Open the `demo/` directory of this repo directly in VS Code.
 
-- Pull the project data with the extension (**DVC panel** in the _Source Code_
-  view) or with `.env/bin/dvc pull` from command line.
+- Pull the project data with the extension (either from the **DVC Tracked**
+  panel in the _File Explorer_ or the **DVC panel** in the _Source Code_ view)
+  or by running `dvc pull` from a VS Code _Terminal_.
+
+  > Remember to activate the virtual env first (`source .env/bin/activate`) if
+  > you're using your system's terminal.
 
 - In order to run experiments in the demo project (from the **DVC View**), the
   virtual env should be loaded through the Microsoft [Python extension] (please
