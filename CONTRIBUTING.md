@@ -56,11 +56,8 @@ cases!
   root of this repo to set up a virtual Python environment for the demo project
   (in `demo/.env`).
 
-- Go to the `demo/` directory of (`cd demo`) and run `yarn install` to set up
-  the development environment.
-
-  > Stay in `demo/` if you want to use DVC from command line (terminal) in the
-  > demo project.
+- Optional: Go to the `demo/` directory of (`cd demo`) if you want to use DVC
+  from command line (terminal).
 
 - Pull the project data with the extension (**DVC panel** in the _Source Code_
   view) or with `.env/bin/dvc pull` from command line.
