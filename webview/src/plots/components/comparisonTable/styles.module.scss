@@ -144,9 +144,14 @@ $gap: 4px;
     height: 100%;
     top: 0;
     left: 0;
-    background:rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     opacity: 1;
   }
+}
+
+.draggedColumnCellGhost {
+  background-color: $accent-color;
+  min-width: 302px;
 }
 
 .cell {

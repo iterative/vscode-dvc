@@ -58,6 +58,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
             wrapperTag: 'div'
           }}
           hideDragged={false}
+          draggedImageClassName={styles.draggedColumnCellGhost}
         />
       </tr>
     </thead>

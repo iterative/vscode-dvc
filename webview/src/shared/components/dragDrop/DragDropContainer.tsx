@@ -64,6 +64,7 @@ interface DragDropContainerProps {
   onDrop?: OnDrop
   dropTarget: DropTargetInfo
   hideDragged?: boolean
+  draggedImageClassName?: string
   wrapperComponent?: {
     component: React.FC<WrapperProps>
     props: {
@@ -81,12 +82,14 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   onDrop,
   dropTarget,
   wrapperComponent,
-  hideDragged = true
+  hideDragged = true,
+  draggedImageClassName
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(DragEnterDirection.LEFT)
+  const draggedImage = useRef<HTMLElement | undefined>()
   const { draggedRef, setDraggedRef } =
     useContext<DragDropContextValue>(DragDropContext)
   const draggedOverIdTimeout = useRef<number>(0)
@@ -95,18 +98,37 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     setDraggedOverId('')
     setDraggedId('')
     setDirection(DragEnterDirection.LEFT)
+
+    draggedImage?.current?.remove()
+    draggedImage.current = undefined
   }
 
   useEffect(() => {
-    return () => clearTimeout(draggedOverIdTimeout.current)
+    return () => {
+      clearTimeout(draggedOverIdTimeout.current)
+      draggedImage?.current?.remove()
+      draggedImage.current = undefined
+    }
   }, [])
 
   useEffect(() => {
     cleanup()
   }, [order])
 
+  const setHighlightedDragImageRef = (element: HTMLElement) => {
+    const oldElementClone = element.cloneNode(true) as HTMLElement
+    oldElementClone.style.position = 'absolute'
+    oldElementClone.style.marginLeft = '-999px'
+    draggedImageClassName &&
+      oldElementClone.classList.add(draggedImageClassName)
+
+    document.body.append(oldElementClone)
+    draggedImage.current = oldElementClone
+  }
+
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
+
     const idx = order.indexOf(id)
     let toIdx = idx + 1
     if (toIdx === order.length) {
@@ -116,6 +138,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         toIdx = 0
       }
     }
+
     const itemIndex = idx.toString()
     e.dataTransfer.setData('itemIndex', itemIndex)
     e.dataTransfer.setData('itemId', id)
@@ -127,6 +150,14 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       itemId: id,
       itemIndex
     })
+
+    if (draggedImageClassName) {
+      setHighlightedDragImageRef(e.currentTarget)
+
+      draggedImage.current &&
+        e.dataTransfer?.setDragImage?.(draggedImage.current, 150, 0)
+    }
+
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId(id)
 
