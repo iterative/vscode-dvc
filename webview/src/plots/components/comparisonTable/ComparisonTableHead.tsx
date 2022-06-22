@@ -55,7 +55,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           group="comparison"
           dropTarget={{
             element: <DropTarget direction={DragEnterDirection.AUTO} />,
-            wrapperTag: 'div'
+            wrapperTag: 'th'
           }}
           hideDragged={false}
           draggedImageClassName={styles.draggedColumnCellGhost}
