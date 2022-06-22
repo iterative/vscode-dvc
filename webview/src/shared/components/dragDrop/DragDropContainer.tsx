@@ -194,9 +194,14 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     e.preventDefault()
     if (isSameGroup(draggedRef?.group, group)) {
       const { id } = e.currentTarget
-      !disabledDropIds.includes(id) &&
-        id !== draggedId &&
-        setDirection(getDragEnterDirection(e))
+
+      if (disabledDropIds.includes(id)) {
+        return
+      }
+
+      return hideDragged
+        ? id === draggedOverId && setDirection(getDragEnterDirection(e))
+        : id !== draggedId && setDirection(getDragEnterDirection(e))
     }
   }
 
