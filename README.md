@@ -72,13 +72,13 @@ databases are required.
 ### Learn more about DVC (Data Version Control)
 
 See the DVC documentation to Get Started with [Experiment Versioning] or [Data
-Management]. For deeper learning, try our [free course]!
+Management]. For deeper learning, try our [free course]! [More resources]
 
 [experiment versioning]: https://dvc.org/doc/start/experiments
 [data management]: https://dvc.org/doc/start/data-management
 [free course]: https://learn.iterative.ai/
-
-<!-- [learn more]: extension/resources/walkthrough/dvc-learn-more.md -->
+[more resources]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/dvc-learn-more.md
 
 ## What you get
 
