@@ -173,7 +173,11 @@ const getRowClassNames = (
     styles.tr,
     styles.bodyRow,
     getExperimentTypeClass(original),
-    flatIndex % 2 === 0 || (styles.oddRow && !isRowSelected),
+    cond(
+      flatIndex % 2 !== 0 && !isRowSelected,
+      () => styles.oddRow,
+      () => styles.evenRow
+    ),
     isWorkspace ? styles.workspaceRow : styles.normalRow,
     styles.row,
     isRowSelected && styles.rowSelected,
