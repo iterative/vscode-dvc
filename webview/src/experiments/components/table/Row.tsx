@@ -1,4 +1,4 @@
-import React, { EventHandler, SyntheticEvent } from 'react'
+import React from 'react'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -204,9 +204,7 @@ export const RowContent: React.FC<
   const { displayColor } = original
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
-  const toggleExperiment: EventHandler<SyntheticEvent> = e => {
-    e.preventDefault()
-    e.stopPropagation()
+  const toggleExperiment = () => {
     sendMessage({
       payload: id,
       type: MessageFromWebviewType.TOGGLE_EXPERIMENT

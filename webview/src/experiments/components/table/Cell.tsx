@@ -1,8 +1,9 @@
-import React, { EventHandler, SyntheticEvent } from 'react'
+import React from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
+import { clickAndEnterProps } from '../../../util/props'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -31,7 +32,7 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
 export const FirstCell: React.FC<
   CellProp & {
     bulletColor?: string
-    toggleExperiment: EventHandler<SyntheticEvent>
+    toggleExperiment: () => void
   }
 > = ({ cell, bulletColor, toggleExperiment }) => {
   const { row, isPlaceholder } = cell
@@ -48,12 +49,13 @@ export const FirstCell: React.FC<
       tabIndex={0}
       aria-checked={bulletColor !== undefined}
       role="switch"
-      onClick={toggleExperiment}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          toggleExperiment(e)
-        }
-      }}
+      {...clickAndEnterProps(toggleExperiment)}
+      // onClick={toggleExperiment}
+      // onKeyDown={e => {
+      //   if (e.key === 'Enter' || e.key === ' ') {
+      //     toggleExperiment(e)
+      //   }
+      // }}
     >
       <div className={styles.innerCell}>
         <RowExpansionButton row={row} />
