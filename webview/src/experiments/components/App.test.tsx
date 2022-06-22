@@ -767,44 +767,6 @@ describe('App', () => {
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove')
     })
-
-    it('should not present the Remove experiment option if a non-removable is part of the multi-selection', async () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
-
-      const selectableCheckpointTipCell = screen.getAllByTestId(
-        id =>
-          id.includes('metrics:summary.json:loss') && id.includes('exp-e7a67')
-      )[0]
-      const selectableChildCheckpointCell = screen.getAllByTestId(
-        id => id.includes('metrics:summary.json:loss') && id.includes('1ee5f2e')
-      )[0]
-
-      fireEvent.click(selectableCheckpointTipCell)
-      fireEvent.click(selectableChildCheckpointCell)
-
-      const selectedRows = await screen.findAllByRole('row', { selected: true })
-      expect(selectedRows.length).toBe(2)
-
-      const target = screen.getByText('4fb124a')
-      fireEvent.contextMenu(target, { bubbles: true })
-
-      const menuitems = await screen.findAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).not.toContain('Remove')
-    })
   })
 
   describe('Context Menu Suppression', () => {

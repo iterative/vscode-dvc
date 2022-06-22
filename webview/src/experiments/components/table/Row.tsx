@@ -219,7 +219,10 @@ export const RowContent: React.FC<
   const isRowSelected = !!selectedRows[id]
 
   const toggleRowSelection = React.useCallback(() => {
-    toggleRowSelected?.({ row })
+    const { depth } = row
+    if (depth === 1) {
+      toggleRowSelected?.({ row })
+    }
   }, [row, toggleRowSelected])
 
   return (
