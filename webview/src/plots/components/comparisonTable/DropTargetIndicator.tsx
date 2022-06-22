@@ -7,7 +7,7 @@ export const DropTargetIndicator: React.FC<Props> = ({ direction }) => (
     className={styles.dropTargetIndicator}
     data-testid="comparison-drop-target-indicator"
     style={{
-      [direction.toLowerCase()]: -4
+      [direction.toLowerCase()]: -2
     }}
   />
 )
