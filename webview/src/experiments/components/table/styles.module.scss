@@ -269,8 +269,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
     &.rowSelected {
       background-color: $row-bg-selected-color;
-      border-right: 1px solid $row-border-selected-color;
-      border-left: 1px solid $row-border-selected-color;
     }
   }
 
