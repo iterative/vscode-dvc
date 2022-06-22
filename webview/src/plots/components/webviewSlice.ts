@@ -32,14 +32,14 @@ export const webviewSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.webview) {
+        if (!action.payload || action.payload === ReducerName.WEBVIEW) {
           return { ...webviewInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
   initialState: webviewInitialState,
-  name: ReducerName.webview,
+  name: ReducerName.WEBVIEW,
   reducers: {
     initialize: state => {
       state.hasData = true

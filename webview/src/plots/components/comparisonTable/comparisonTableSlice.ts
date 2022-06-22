@@ -25,14 +25,14 @@ export const comparisonTableSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.comparison) {
+        if (!action.payload || action.payload === ReducerName.COMPARISON) {
           return { ...comparisonTableInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
   initialState: comparisonTableInitialState,
-  name: ReducerName.comparison,
+  name: ReducerName.COMPARISON,
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {
       state.size = action.payload

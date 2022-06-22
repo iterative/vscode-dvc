@@ -35,14 +35,14 @@ export const checkpointPlotsSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.checkpoint) {
+        if (!action.payload || action.payload === ReducerName.CHECKPOINT) {
           return { ...checkpointPlotsInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
   initialState: checkpointPlotsInitialState,
-  name: ReducerName.checkpoint,
+  name: ReducerName.CHECKPOINT,
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {
       state.size = action.payload

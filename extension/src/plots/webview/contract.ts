@@ -122,23 +122,23 @@ export type ComparisonPlot = {
 }
 
 export enum PlotsDataKeys {
-  comparison = 'comparison',
-  checkpoint = 'checkpoint',
-  hasPlots = 'hasPlots',
-  hasSelectedPlots = 'hasSelectedPlots',
-  selectedRevisions = 'selectedRevisions',
-  template = 'template',
-  sectionCollapsed = 'sectionCollapsed'
+  COMPARISON = 'comparison',
+  CHECKPOINT = 'checkpoint',
+  HAS_PLOTS = 'hasPlots',
+  HAS_SELECTED_PLOTS = 'hasSelectedPlots',
+  SELECTED_REVISIONS = 'selectedRevisions',
+  TEMPLATE = 'template',
+  SECTION_COLLAPSED = 'sectionCollapsed'
 }
 
 export type PlotsData =
   | {
-      [PlotsDataKeys.comparison]?: PlotsComparisonData | null
-      [PlotsDataKeys.checkpoint]?: CheckpointPlotsData | null
-      [PlotsDataKeys.hasPlots]?: boolean
-      [PlotsDataKeys.hasSelectedPlots]?: boolean
-      [PlotsDataKeys.selectedRevisions]?: Revision[]
-      [PlotsDataKeys.template]?: TemplatePlotsData | null
-      [PlotsDataKeys.sectionCollapsed]?: SectionCollapsed
+      [PlotsDataKeys.COMPARISON]?: PlotsComparisonData | null
+      [PlotsDataKeys.CHECKPOINT]?: CheckpointPlotsData | null
+      [PlotsDataKeys.HAS_PLOTS]?: boolean
+      [PlotsDataKeys.HAS_SELECTED_PLOTS]?: boolean
+      [PlotsDataKeys.SELECTED_REVISIONS]?: Revision[]
+      [PlotsDataKeys.TEMPLATE]?: TemplatePlotsData | null
+      [PlotsDataKeys.SECTION_COLLAPSED]?: SectionCollapsed
     }
   | undefined

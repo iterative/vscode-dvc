@@ -1,6 +1,6 @@
 export enum ReducerName {
-  checkpoint = 'checkpointPlots',
-  comparison = 'comparisonTable',
-  template = 'templatePlots',
-  webview = 'webview'
+  CHECKPOINT = 'checkpointPlots',
+  COMPARISON = 'comparisonTable',
+  TEMPLATE = 'templatePlots',
+  WEBVIEW = 'webview'
 }

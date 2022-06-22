@@ -27,14 +27,14 @@ export const templatePlotsSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.template) {
+        if (!action.payload || action.payload === ReducerName.TEMPLATE) {
           return { ...templatePlotsInitialState }
         }
       })
       .addDefaultCase(() => {})
   },
   initialState: templatePlotsInitialState,
-  name: ReducerName.template,
+  name: ReducerName.TEMPLATE,
 
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {

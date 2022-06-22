@@ -24,7 +24,7 @@ const MockedState: React.FC<{
   selectedRevisions: Revision[]
 }> = ({ children, data, selectedRevisions }) => {
   const dispatch = useDispatch()
-  dispatch(clearData(ReducerName.comparison))
+  dispatch(clearData(ReducerName.COMPARISON))
   dispatch(update(data))
   dispatch(updateSelectedRevisions(selectedRevisions))
 
