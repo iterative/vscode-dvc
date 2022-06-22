@@ -216,8 +216,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
       style={
-        (id === draggedId && hideDragged && { display: 'none' }) ||
-        draggable.props.style
+        id === draggedId && hideDragged
+          ? { display: 'none' }
+          : draggable.props.style
       }
     />
   )
