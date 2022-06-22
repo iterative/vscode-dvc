@@ -196,12 +196,17 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }
   }
 
+  const handleDragEnd = () => {
+    cleanup()
+    setDraggedRef?.(undefined)
+  }
+
   const buildItem = (id: string, draggable: JSX.Element) => (
     <draggable.type
       key={draggable.key}
       {...draggable.props}
       onDragStart={handleDragStart}
-      onDragEnd={cleanup}
+      onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
