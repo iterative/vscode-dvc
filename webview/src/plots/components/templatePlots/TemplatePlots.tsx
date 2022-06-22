@@ -10,6 +10,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { removeFromPreviousAndAddToNewSection } from './util'
+import { getTemplatePlots } from './templatePlotsSlice'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
@@ -23,7 +24,8 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { plots, size } = useSelector((state: RootState) => state.template)
+  const { size } = useSelector((state: RootState) => state.template)
+  const plots = useSelector(getTemplatePlots)
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = useNbItemsPerRow(size)

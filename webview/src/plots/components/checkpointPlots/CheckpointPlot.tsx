@@ -1,9 +1,8 @@
-import { ColorScale } from 'dvc/src/plots/webview/contract'
-import React from 'react'
+import { CheckpointPlotData, ColorScale } from 'dvc/src/plots/webview/contract'
+import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { createSpec } from './util'
-import { config } from '../constants'
+import { getCheckpointPlot } from './checkpointPlotsSlice'
 import { ZoomablePlot } from '../ZoomablePlot'
 import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
@@ -18,27 +17,22 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   id,
   colors
 }) => {
-  const { title, values } = useSelector(
-    (state: RootState) =>
-      (state.checkpoint.plotsIds.includes(id) &&
-        state.checkpoint.plotsById[id]) || {
-        title: undefined,
-        values: undefined
-      }
+  const { title, values } = useSelector((state: RootState) =>
+    (getCheckpointPlot as (state: RootState, id: string) => CheckpointPlotData)(
+      state,
+      id
+    )
   )
+  const spec = useMemo(
+    () => (title && createSpec(title, colors)) || {},
+    [title, colors]
+  )
+
   if (!title) {
     return null
   }
+
   const key = `plot-${title}`
-  const spec = createSpec(title, colors)
-  const plotProps = {
-    actions: false,
-    config,
-    data: { values },
-    'data-testid': `${key}-vega`,
-    renderer: 'svg',
-    spec
-  } as VegaLiteProps
 
   return (
     <div
@@ -47,7 +41,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
       id={title}
       style={withScale(1)}
     >
-      <ZoomablePlot plotProps={JSON.stringify(plotProps)} id={key} />
+      <ZoomablePlot spec={spec} data={{ values }} id={key} />
     </div>
   )
 }

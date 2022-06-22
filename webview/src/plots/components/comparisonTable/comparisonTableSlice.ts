@@ -41,8 +41,11 @@ export const comparisonTableSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<PlotsComparisonData>) => {
-      Object.assign(state, action.payload)
-      state.hasData = !!action.payload
+      return {
+        ...state,
+        ...action.payload,
+        hasData: !!action.payload
+      }
     }
   }
 })

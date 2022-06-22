@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Revision } from 'dvc/src/plots/webview/contract'
+import { VegaProps } from 'react-vega/lib/Vega'
 import { clearData } from '../actions'
 import { ReducerName } from '../constants'
 
 type ZoomedInPlotState = {
-  plot: string
+  plot: VegaProps | undefined
   id: string
   refresh?: boolean
 }
@@ -21,7 +22,10 @@ export const webviewInitialState: WebviewState = {
   hasPlots: false,
   hasSelectedPlots: false,
   selectedRevisions: [],
-  zoomedInPlot: undefined
+  zoomedInPlot: {
+    id: '',
+    plot: undefined
+  }
 }
 
 export const webviewSlice = createSlice({
@@ -45,7 +49,7 @@ export const webviewSlice = createSlice({
       action: PayloadAction<ZoomedInPlotState | undefined>
     ) => {
       if (!action.payload) {
-        state.zoomedInPlot = webviewInitialState.zoomedInPlot
+        Object.assign(state.zoomedInPlot, webviewInitialState.zoomedInPlot)
         return
       }
 
@@ -53,10 +57,7 @@ export const webviewSlice = createSlice({
         action.payload.id === state.zoomedInPlot?.id ||
         !action.payload.refresh
       ) {
-        state.zoomedInPlot = {
-          id: action.payload.id,
-          plot: action.payload.plot
-        }
+        Object.assign(state.zoomedInPlot, action.payload)
       }
     },
     updateHasPlots: (state, action: PayloadAction<boolean>) => {

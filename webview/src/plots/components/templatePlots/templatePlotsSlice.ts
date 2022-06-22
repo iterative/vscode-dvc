@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
@@ -6,8 +6,10 @@ import {
   Section,
   TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
+import cloneDeep from 'lodash.clonedeep'
 import { clearData } from '../../actions'
 import { ReducerName } from '../../constants'
+import { RootState } from '../../store'
 
 export interface TemplatePlotsState extends TemplatePlotsData {
   isCollapsed: boolean
@@ -42,12 +44,20 @@ export const templatePlotsSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<TemplatePlotsData>) => {
-      Object.assign(state, action.payload)
-      state.hasData = !!action.payload
+      return {
+        ...state,
+        ...action.payload,
+        hasData: !!action.payload
+      }
     }
   }
 })
 
 export const { update, setCollapsed, changeSize } = templatePlotsSlice.actions
+
+export const getTemplatePlots = createSelector(
+  (state: RootState) => state.template.plots,
+  plots => cloneDeep(plots)
+)
 
 export default templatePlotsSlice.reducer

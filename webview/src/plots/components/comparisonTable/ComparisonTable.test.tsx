@@ -67,7 +67,8 @@ describe('ComparisonTable', () => {
               },
               webview: {
                 ...webviewInitialState,
-                selectedRevisions: revisions
+                selectedRevisions: revisions,
+                zoomedInPlot: undefined
               }
             },
             reducer: storeReducers

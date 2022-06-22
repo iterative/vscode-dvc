@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   CheckpointPlotData,
   CheckpointPlotsData,
@@ -7,8 +7,10 @@ import {
   PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
+import cloneDeep from 'lodash.clonedeep'
 import { clearData } from '../../actions'
 import { ReducerName } from '../../constants'
+import { RootState } from '../../store'
 
 type PlotsById = { [key: string]: CheckpointPlotData }
 export interface CheckpointPlotsState extends CheckpointPlotsData {
@@ -51,17 +53,17 @@ export const checkpointPlotsSlice = createSlice({
     },
     update: (state, action: PayloadAction<CheckpointPlotsData>) => {
       if (action.payload) {
-        state.plots = action.payload.plots
-        state.colors = action.payload.colors
-        state.selectedMetrics = action.payload.selectedMetrics
-        state.size = action.payload.size
-        state.plotsIds = action.payload?.plots?.map(plot => plot.title) || []
-        state.plotsById = {}
-        for (const plot of action.payload?.plots || []) {
-          state.plotsById[plot.title] = plot
+        const newState = {
+          ...state,
+          ...action.payload,
+          hasData: true
         }
-        state.hasData = true
-        return
+        newState.plotsIds = action.payload?.plots?.map(plot => plot.title) || []
+        newState.plotsById = {}
+        for (const plot of action.payload?.plots || []) {
+          newState.plotsById[plot.title] = plot
+        }
+        return newState
       }
       return checkpointPlotsInitialState
     }
@@ -69,5 +71,15 @@ export const checkpointPlotsSlice = createSlice({
 })
 
 export const { update, setCollapsed, changeSize } = checkpointPlotsSlice.actions
+
+export const getCheckpointPlot = createSelector(
+  [
+    (state: RootState) => state.checkpoint.plotsById,
+    (state: RootState) => state.checkpoint.plotsIds,
+    (_, id) => id
+  ],
+  (plots, ids, id) =>
+    ids.includes(id) ? cloneDeep(plots[id]) : { title: '', value: [] }
+)
 
 export default checkpointPlotsSlice.reducer

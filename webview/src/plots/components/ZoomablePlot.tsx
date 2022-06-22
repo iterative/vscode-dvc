@@ -1,35 +1,54 @@
 import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import VegaLite from 'react-vega/lib/VegaLite'
+import { PlainObject, VisualizationSpec } from 'react-vega'
+import { Renderers } from 'vega'
+import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
+import { config } from './constants'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
 interface ZoomablePlotProps {
-  plotProps: string
+  spec: VisualizationSpec
+  data?: PlainObject
   id: string
 }
 
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
-  plotProps,
+  spec,
+  data,
   id
 }) => {
-  const parsedProps = JSON.parse(plotProps)
   const dispatch = useDispatch()
-  const previousPlotProps = useRef(parsedProps)
+  const previousSpecsAndData = useRef(JSON.stringify({ data, spec }))
+  const currentPlotProps = useRef<VegaLiteProps>()
+  const newSpecsAndData = JSON.stringify({ data, spec })
+
+  const plotProps: VegaLiteProps = {
+    actions: false,
+    config,
+    data,
+    'data-testid': `${id}-vega`,
+    renderer: 'svg' as unknown as Renderers,
+    spec
+  } as VegaLiteProps
+  currentPlotProps.current = plotProps
+
   useEffect(() => {
-    if (previousPlotProps.current !== plotProps) {
-      dispatch(setZoomedInPlot({ id, plot: plotProps, refresh: true }))
-      previousPlotProps.current = plotProps
+    if (previousSpecsAndData.current !== newSpecsAndData) {
+      dispatch(
+        setZoomedInPlot({ id, plot: currentPlotProps.current, refresh: true })
+      )
+      previousSpecsAndData.current = newSpecsAndData
     }
-  }, [plotProps, id, dispatch])
+  }, [newSpecsAndData, id, dispatch])
 
   const handleOnClick = () => dispatch(setZoomedInPlot({ id, plot: plotProps }))
 
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
       <GripIcon className={styles.plotGripIcon} />
-      <VegaLite {...parsedProps} />
+      {currentPlotProps.current && <VegaLite {...plotProps} />}
     </button>
   )
 }

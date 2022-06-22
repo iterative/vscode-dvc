@@ -36,7 +36,7 @@ const PlotsContent = () => {
 
   useEffect(() => {
     const modalOpenClass = 'modal-open'
-    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot)
+    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot?.plot)
 
     return () => {
       document.body.classList.remove(modalOpenClass)
@@ -71,13 +71,13 @@ const PlotsContent = () => {
         {hasCheckpointData && <CheckpointPlotsWrapper />}
       </DragDropProvider>
 
-      {zoomedInPlot && (
+      {zoomedInPlot?.plot && (
         <Modal
           onClose={() => {
             dispatch(setZoomedInPlot(undefined))
           }}
         >
-          <ZoomedInPlot props={JSON.parse(zoomedInPlot.plot)} />
+          <ZoomedInPlot props={zoomedInPlot.plot} />
         </Modal>
       )}
     </>
