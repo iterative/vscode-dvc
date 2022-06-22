@@ -7,7 +7,7 @@ export const DropTarget: React.FC = () => (
   <div
     data-testid="plot_drop-target"
     id="plot-drop-target"
-    className={cx(styles.plot, styles.dropTarget)}
+    className={cx(styles.plot, styles.dropTarget, styles.borderedDropTarget)}
   >
     <Icon
       icon={AllIcons.GRAPH_LINE}

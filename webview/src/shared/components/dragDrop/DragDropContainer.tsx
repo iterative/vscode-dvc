@@ -129,6 +129,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     })
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId(id)
+
+      if (hideDragged) {
+        setDraggedOverId(order[toIdx])
+      }
     }, 0)
   }
 
@@ -223,10 +227,18 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const item = id && buildItem(id, draggable)
 
     if (id === draggedOverId) {
-      return makeTarget(dropTarget, handleDragOver, handleOnDrop, id, {
+      const target = makeTarget(dropTarget, handleDragOver, handleOnDrop, id, {
         children: draggable,
         direction
       })
+
+      if (hideDragged) {
+        return direction === DragEnterDirection.RIGHT
+          ? [item, target]
+          : [target, item]
+      } else {
+        return target
+      }
     }
 
     return item

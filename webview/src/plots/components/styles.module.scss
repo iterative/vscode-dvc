@@ -281,6 +281,10 @@ $gap: 20px;
   }
 }
 
+.borderedDropTarget {
+  border: 3px dashed $accent-color;
+}
+
 .dropTargetIndicator {
   position: absolute;
   top: 2px;

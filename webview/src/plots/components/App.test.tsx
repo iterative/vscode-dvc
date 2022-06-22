@@ -859,7 +859,7 @@ describe('App', () => {
     const target = screen.getByTestId('drop-target')
 
     // eslint-disable-next-line testing-library/no-node-access
-    expect(target.nextElementSibling?.id).toStrictEqual(plots[1].id)
+    expect(target.nextElementSibling?.id).toStrictEqual(plots[0].id)
   })
 
   it('should show a drop target after a plot on drag enter from the right', () => {
@@ -874,7 +874,7 @@ describe('App', () => {
     const target = screen.getByTestId('drop-target')
 
     // eslint-disable-next-line testing-library/no-node-access
-    expect(target.previousElementSibling?.id).toStrictEqual(plots[0].id)
+    expect(target.previousElementSibling?.id).toStrictEqual(plots[1].id)
   })
 
   it('should hide the plot being dragged from the list', () => {

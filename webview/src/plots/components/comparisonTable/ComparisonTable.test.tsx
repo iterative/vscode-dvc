@@ -285,7 +285,9 @@ describe('ComparisonTable', () => {
 
       expect(headers).toStrictEqual(namedRevisions)
 
-      dragAndDrop(startingNode, endingNode)
+      dragAndDrop(startingNode, endingNode, DragEnterDirection.LEFT, {
+        hideDragged: false
+      })
 
       headers = getHeaders().map(header => header.textContent)
 
@@ -331,7 +333,9 @@ describe('ComparisonTable', () => {
 
       expect(headers).toStrictEqual(expectedOrder)
 
-      dragAndDrop(startingNode, endingNode)
+      dragAndDrop(startingNode, endingNode, DragEnterDirection.LEFT, {
+        hideDragged: false
+      })
 
       expect(headers).toStrictEqual(expectedOrder)
     })

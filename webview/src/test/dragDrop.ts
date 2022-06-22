@@ -59,20 +59,20 @@ export const dragAndDrop = (
   startingNode: HTMLElement,
   endingNode: HTMLElement,
   direction: DragDropUtils.DragEnterDirection = DragDropUtils.DragEnterDirection
-    .LEFT
+    .LEFT,
+  options?: Partial<{ hideDragged: boolean }>
 ) => {
+  const { hideDragged } = { hideDragged: true, ...options }
   dragEnter(startingNode, endingNode, direction)
 
   let targetElement: HTMLElement
 
-  try {
-    targetElement = screen.getByTestId('drop-target')
-  } catch (e) {
+  if (hideDragged) {
     targetElement = endingNode
+  } else {
+    targetElement = screen.getByTestId('drop-target')
+    dragOver(targetElement, direction)
   }
-
-  dragOver(endingNode, direction)
-  dragOver(targetElement, direction)
 
   jest.useFakeTimers()
 
