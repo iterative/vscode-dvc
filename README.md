@@ -158,6 +158,27 @@ These are the VS Code [settings] available for the Extension:
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
 
+## Known limitations
+
+Some DVC features have limited support at the moment in the VS Code extension
+(but you can still use them from an IDE's _Terminal_).
+
+### ML Pipelines
+
+The extension examines [`dvc.yaml` files] to identify tracked data and changes,
+but does not currently provide a graphic interface to write or modify stages.
+
+[`dvc.yaml` files]: https://dvc.org/doc/user-guide/project-structure
+
+### Monorepos
+
+While DVC supports Git monorepos with DVC projects inside [sub-directories], the
+extension may have unexpected behaviors when opening such repos. Please open
+each subdir DVC project directly with VS Code instead.
+
+[sub-directories]:
+  https://dvc.org/doc/command-reference/init#initializing-dvc-in-subdirectories
+
 ## Debugging
 
 ### The DVC Extension
