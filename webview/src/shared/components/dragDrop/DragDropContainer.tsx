@@ -223,12 +223,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const item = id && buildItem(id, draggable)
 
     if (id === draggedOverId) {
-      const target = makeTarget(dropTarget, handleDragOver, handleOnDrop, id, {
+      return makeTarget(dropTarget, handleDragOver, handleOnDrop, id, {
         children: draggable,
         direction
       })
-
-      return target
     }
 
     return item
