@@ -10,13 +10,13 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { removeFromPreviousAndAddToNewSection } from './util'
-import { getTemplatePlots } from './templatePlotsSlice'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 import { RootState } from '../../store'
+import { plotStore } from '../plotStore'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -24,8 +24,9 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { size } = useSelector((state: RootState) => state.template)
-  const plots = useSelector(getTemplatePlots)
+  const { plotsSnapshot, size } = useSelector(
+    (state: RootState) => state.template
+  )
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = useNbItemsPerRow(size)
@@ -33,8 +34,8 @@ export const TemplatePlots: React.FC = () => {
 
   useEffect(() => {
     shouldSendMessage.current = false
-    setSections(plots)
-  }, [plots, setSections])
+    setSections(plotStore.template)
+  }, [plotsSnapshot, setSections])
 
   useEffect(() => {
     if (shouldSendMessage.current) {
