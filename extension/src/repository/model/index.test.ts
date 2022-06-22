@@ -76,15 +76,15 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
+        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toStrictEqual({
+      expect(model.getDecorationState()).toStrictEqual({
         added: emptySet,
         deleted: new Set([join(dvcDemoPath, deleted)]),
         gitModified: new Set([join(dvcDemoPath, output)]),
-        hasRemote: new Set(list.map(entry => join(dvcDemoPath, entry.path))),
         modified: new Set([
           join(dvcDemoPath, rawDataDir),
           join(dvcDemoPath, logDir),
@@ -101,7 +101,23 @@ describe('RepositoryState', () => {
           join(dvcDemoPath, rawDataDir),
           join(dvcDemoPath, logDir),
           join(dvcDemoPath, scalarDir)
+        ])
+      })
+
+      expect(model.getSourceControlManagementState()).toStrictEqual({
+        added: emptySet,
+        deleted: new Set([join(dvcDemoPath, deleted)]),
+        gitModified: new Set([join(dvcDemoPath, output)]),
+        hasRemote: new Set(list.map(entry => join(dvcDemoPath, entry.path))),
+        modified: new Set([
+          join(dvcDemoPath, rawDataDir),
+          join(dvcDemoPath, logDir),
+          join(dvcDemoPath, scalarDir),
+          join(dvcDemoPath, logAcc),
+          join(dvcDemoPath, logLoss)
         ]),
+        notInCache: emptySet,
+        renamed: new Set([join(dvcDemoPath, renamed)]),
         untracked: emptySet
       })
     })
@@ -122,11 +138,30 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
+        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toStrictEqual({
+      expect(model.getDecorationState()).toStrictEqual({
+        added: emptySet,
+        deleted: emptySet,
+        gitModified: new Set([
+          join(dvcDemoPath, rawDataDir),
+          join(dvcDemoPath, data)
+        ]),
+        modified: emptySet,
+        notInCache: emptySet,
+        renamed: emptySet,
+        tracked: new Set([
+          join(dvcDemoPath, data),
+          join(dvcDemoPath, 'data'),
+          join(dvcDemoPath, 'data', 'MNIST'),
+          join(dvcDemoPath, rawDataDir)
+        ])
+      })
+
+      expect(model.getSourceControlManagementState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: new Set([
@@ -137,12 +172,6 @@ describe('RepositoryState', () => {
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        tracked: new Set([
-          join(dvcDemoPath, data),
-          join(dvcDemoPath, 'data'),
-          join(dvcDemoPath, 'data', 'MNIST'),
-          join(dvcDemoPath, rawDataDir)
-        ]),
         untracked: emptySet
       })
     })
@@ -165,15 +194,15 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
+        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toStrictEqual({
+      expect(model.getDecorationState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
-        hasRemote: new Set([join(dvcDemoPath, data)]),
         modified: new Set([join(dvcDemoPath, rawDataDir)]),
         notInCache: emptySet,
         renamed: emptySet,
@@ -182,7 +211,16 @@ describe('RepositoryState', () => {
           join(dvcDemoPath, 'data', 'MNIST'),
           join(dvcDemoPath, data),
           join(dvcDemoPath, rawDataDir)
-        ]),
+        ])
+      })
+      expect(model.getSourceControlManagementState()).toStrictEqual({
+        added: emptySet,
+        deleted: emptySet,
+        gitModified: emptySet,
+        hasRemote: new Set([join(dvcDemoPath, data)]),
+        modified: new Set([join(dvcDemoPath, rawDataDir)]),
+        notInCache: emptySet,
+        renamed: emptySet,
         untracked: emptySet
       })
     })
@@ -202,10 +240,20 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
+        hasGitChanges: false,
         untracked: new Set<string>()
       })
 
-      expect(model.getState()).toStrictEqual({
+      expect(model.getDecorationState()).toStrictEqual({
+        added: emptySet,
+        deleted: emptySet,
+        gitModified: emptySet,
+        modified: emptySet,
+        notInCache: emptySet,
+        renamed: emptySet,
+        tracked: emptySet
+      })
+      expect(model.getSourceControlManagementState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
@@ -213,7 +261,6 @@ describe('RepositoryState', () => {
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        tracked: emptySet,
         untracked: emptySet
       })
     })
@@ -351,6 +398,7 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
+        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
@@ -364,7 +412,26 @@ describe('RepositoryState', () => {
         }
       } as ExperimentsOutput)
 
-      expect(model.getState()).toStrictEqual({
+      expect(model.getDecorationState()).toStrictEqual({
+        added: emptySet,
+        deleted: emptySet,
+        gitModified: emptySet,
+        modified: emptySet,
+        notInCache: new Set([
+          ...diff['not in cache'].map(({ path }) => resolve(dvcDemoPath, path)),
+          ...diff.modified.map(({ path }) => resolve(dvcDemoPath, path))
+        ]),
+        renamed: emptySet,
+        tracked: new Set([
+          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
+          resolve(dvcDemoPath, 'data'),
+          resolve(dvcDemoPath, 'data', 'MNIST'),
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+          resolve(dvcDemoPath, 'logs')
+        ])
+      })
+
+      expect(model.getSourceControlManagementState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
@@ -378,13 +445,6 @@ describe('RepositoryState', () => {
           ...diff.modified.map(({ path }) => resolve(dvcDemoPath, path))
         ]),
         renamed: emptySet,
-        tracked: new Set([
-          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
-          resolve(dvcDemoPath, 'data'),
-          resolve(dvcDemoPath, 'data', 'MNIST'),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-          resolve(dvcDemoPath, 'logs')
-        ]),
         untracked: emptySet
       })
     })
@@ -541,6 +601,7 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
+        hasGitChanges: true,
         tracked: list,
         untracked: new Set<string>()
       })
@@ -554,7 +615,91 @@ describe('RepositoryState', () => {
         }
       } as ExperimentsOutput)
 
-      expect(model.getState()).toStrictEqual({
+      expect(model.getDecorationState()).toStrictEqual({
+        added: emptySet,
+        deleted: emptySet,
+        gitModified: emptySet,
+        modified: emptySet,
+        notInCache: new Set([
+          resolve(dvcDemoPath, 'misclassified.jpg'),
+          resolve(dvcDemoPath, 'model.pt'),
+          resolve(dvcDemoPath, 'predictions.json'),
+          resolve(dvcDemoPath, 'training_metrics'),
+          resolve(dvcDemoPath, 'training_metrics.json'),
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-images-idx3-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-images-idx3-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-labels-idx1-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            't10k-labels-idx1-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-images-idx3-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-images-idx3-ubyte.gz'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-labels-idx1-ubyte'
+          ),
+          resolve(
+            dvcDemoPath,
+            'data',
+            'MNIST',
+            'raw',
+            'train-labels-idx1-ubyte.gz'
+          ),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars'),
+          resolve(dvcDemoPath, 'training_metrics', 'report.html'),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'acc.tsv'),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv')
+        ]),
+        renamed: emptySet,
+        tracked: new Set([
+          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
+          resolve(dvcDemoPath, 'data'),
+          resolve(dvcDemoPath, 'data', 'MNIST'),
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+          resolve(dvcDemoPath, 'training_metrics'),
+          resolve(dvcDemoPath, 'training_metrics', 'scalars')
+        ])
+      })
+
+      expect(model.getSourceControlManagementState()).toStrictEqual({
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
@@ -695,14 +840,6 @@ describe('RepositoryState', () => {
           resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv')
         ]),
         renamed: emptySet,
-        tracked: new Set([
-          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
-          resolve(dvcDemoPath, 'data'),
-          resolve(dvcDemoPath, 'data', 'MNIST'),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-          resolve(dvcDemoPath, 'training_metrics'),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars')
-        ]),
         untracked: emptySet
       })
     })

@@ -13,16 +13,16 @@ import { flattenUnique } from '../util/array'
 export type DecorationState = Record<Status, Set<string>>
 
 export interface DecorationModel {
-  getState: () => DecorationState
+  getDecorationState: () => DecorationState
 }
 
 enum Status {
   ADDED = 'added',
   DELETED = 'deleted',
+  GIT_MODIFIED = 'gitModified',
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'notInCache',
   RENAMED = 'renamed',
-  GIT_MODIFIED = 'gitModified',
   TRACKED = 'tracked'
 }
 
