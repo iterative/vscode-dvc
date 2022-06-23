@@ -1,9 +1,10 @@
 import { Revision } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import styles from './styles.module.scss'
-import { AllIcons, Icon } from '../../../shared/components/Icon'
+import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
+import { Close } from '../../../shared/components/icons'
 
 interface RibbonBlockProps {
   revision: Revision
@@ -38,7 +39,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
       </div>
       <Tooltip content="Clear" placement="bottom" delay={500}>
         <button className={styles.clearButton} onClick={onClear}>
-          <Icon icon={AllIcons.CLOSE} width={12} height={12} />
+          <Icon icon={Close} width={12} height={12} />
         </button>
       </Tooltip>
     </li>

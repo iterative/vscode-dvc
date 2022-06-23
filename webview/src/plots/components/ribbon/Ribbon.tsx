@@ -7,6 +7,7 @@ import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { performOrderedUpdate } from '../../../util/objects'
+
 import { RootState } from '../../store'
 import { Lines, Refresh } from '../../../shared/components/icons'
 
