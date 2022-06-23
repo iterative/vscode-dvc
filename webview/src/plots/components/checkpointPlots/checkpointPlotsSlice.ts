@@ -1,32 +1,31 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
-  CheckpointPlotData,
   CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
   PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
-import cloneDeep from 'lodash.clonedeep'
 import { clearData } from '../../actions'
 import { ReducerName } from '../../constants'
-import { RootState } from '../../store'
-
-type PlotsById = { [key: string]: CheckpointPlotData }
-export interface CheckpointPlotsState extends CheckpointPlotsData {
+import {
+  addCheckpointPlotsWithSnapshots,
+  removeCheckpointPlots
+} from '../plotStore'
+export interface CheckpointPlotsState
+  extends Omit<CheckpointPlotsData, 'plots'> {
   isCollapsed: boolean
   hasData: boolean
   plotsIds: string[]
-  plotsById: PlotsById
+  plotsSnapshots: { [key: string]: string }
 }
 
 export const checkpointPlotsInitialState: CheckpointPlotsState = {
   colors: { domain: [], range: [] },
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
-  plots: [],
-  plotsById: {},
   plotsIds: [],
+  plotsSnapshots: {},
   selectedMetrics: [],
   size: DEFAULT_SECTION_SIZES[Section.CHECKPOINT_PLOTS]
 }
@@ -53,17 +52,17 @@ export const checkpointPlotsSlice = createSlice({
     },
     update: (state, action: PayloadAction<CheckpointPlotsData>) => {
       if (action.payload) {
-        const newState = {
+        const { plots, ...statePayload } = action.payload
+        const plotsIds = plots?.map(plot => plot.title) || []
+        const snapShots = addCheckpointPlotsWithSnapshots(plots)
+        removeCheckpointPlots(plotsIds)
+        return {
           ...state,
-          ...action.payload,
-          hasData: true
+          ...statePayload,
+          hasData: !!action.payload,
+          plotsIds: plots?.map(plot => plot.title) || [],
+          plotsSnapshots: snapShots
         }
-        newState.plotsIds = action.payload?.plots?.map(plot => plot.title) || []
-        newState.plotsById = {}
-        for (const plot of action.payload?.plots || []) {
-          newState.plotsById[plot.title] = plot
-        }
-        return newState
       }
       return checkpointPlotsInitialState
     }
@@ -71,15 +70,5 @@ export const checkpointPlotsSlice = createSlice({
 })
 
 export const { update, setCollapsed, changeSize } = checkpointPlotsSlice.actions
-
-export const getCheckpointPlot = createSelector(
-  [
-    (state: RootState) => state.checkpoint.plotsById,
-    (state: RootState) => state.checkpoint.plotsIds,
-    (_, id) => id
-  ],
-  (plots, ids, id) =>
-    ids.includes(id) ? cloneDeep(plots[id]) : { title: '', value: [] }
-)
 
 export default checkpointPlotsSlice.reducer

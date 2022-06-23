@@ -1,11 +1,11 @@
-import { CheckpointPlotData, ColorScale } from 'dvc/src/plots/webview/contract'
-import React, { useMemo } from 'react'
+import { ColorScale } from 'dvc/src/plots/webview/contract'
+import React, { useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { createSpec } from './util'
-import { getCheckpointPlot } from './checkpointPlotsSlice'
 import { ZoomablePlot } from '../ZoomablePlot'
 import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
+import { plotStore } from '../plotStore'
 import { RootState } from '../../store'
 
 interface CheckpointPlotProps {
@@ -17,20 +17,21 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   id,
   colors
 }) => {
-  const { title, values } = useSelector((state: RootState) =>
-    (getCheckpointPlot as (state: RootState, id: string) => CheckpointPlotData)(
-      state,
-      id
-    )
+  const plotSnapshot = useSelector(
+    (state: RootState) => state.checkpoint.plotsSnapshots[id]
   )
-  const spec = useMemo(
-    () => (title && createSpec(title, colors)) || {},
-    [title, colors]
-  )
+  const [plot, setPlot] = useState(plotStore.checkpoint[id])
+  const spec = useMemo(() => (id && createSpec(id, colors)) || {}, [id, colors])
 
-  if (!title) {
+  useEffect(() => {
+    setPlot(plotStore.checkpoint[id])
+  }, [plotSnapshot, id])
+
+  if (!plot) {
     return null
   }
+
+  const { title, values } = plot
 
   const key = `plot-${title}`
 

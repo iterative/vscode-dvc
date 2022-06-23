@@ -157,8 +157,7 @@ describe('App', () => {
 
   it('should render the empty state when given data with no plots', async () => {
     renderAppWithOptionalData({
-      checkpoint: null,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: null
     })
     const emptyState = await screen.findByText('No Plots to Display.')
 
@@ -170,7 +169,6 @@ describe('App', () => {
       checkpoint: null,
       hasPlots: true,
       hasSelectedPlots: false,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       selectedRevisions: undefined
     })
     const addPlotsButton = await screen.findByText('Add Plots')
@@ -196,8 +194,7 @@ describe('App', () => {
 
   it('should render only checkpoint plots when given a message with only checkpoint plots data', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
@@ -208,8 +205,7 @@ describe('App', () => {
 
   it('should render checkpoint and template plots when given messages with both types of plots data', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     sendSetDataMessage({
@@ -225,8 +221,7 @@ describe('App', () => {
     const expectedSectionName = 'Images'
 
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     sendSetDataMessage({
@@ -238,8 +233,7 @@ describe('App', () => {
 
   it('should remove checkpoint plots given a message showing checkpoint plots as null', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     expect(screen.getByText('Trends')).toBeInTheDocument()
@@ -253,8 +247,7 @@ describe('App', () => {
 
   it('should toggle the checkpoint plots section in state when its header is clicked', async () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     const summaryElement = await screen.findByText('Trends')
@@ -289,7 +282,6 @@ describe('App', () => {
   it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: null
     })
 
@@ -331,8 +323,7 @@ describe('App', () => {
 
   it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     const [pickerButton] = screen.getAllByTestId('icon-menu-item')
@@ -373,8 +364,7 @@ describe('App', () => {
 
   it('should change the size of the plots according to the size picker', async () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     const sizePickerButton = screen.getAllByTestId('icon-menu-item')[1]
@@ -400,8 +390,7 @@ describe('App', () => {
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     const sizeButton = screen.getAllByTestId('icon-menu-item')[1]
@@ -427,8 +416,7 @@ describe('App', () => {
 
   it('should not send a message to the extension with the selected size when the size has not changed', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     const sizeButton = screen.getAllByTestId('icon-menu-item')[1]
@@ -446,8 +434,7 @@ describe('App', () => {
     mockPostMessage.mockClear()
 
     sendSetDataMessage({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     expect(mockPostMessage).not.toBeCalled()
@@ -455,8 +442,7 @@ describe('App', () => {
 
   it('should display the checkpoint plots in the order stored', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     let plots = screen.getAllByTestId(/summary\.json/)
@@ -482,8 +468,7 @@ describe('App', () => {
 
   it('should send a message to the extension when the checkpoint plots are reordered', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     const plots = screen.getAllByTestId(/summary\.json/)
@@ -517,8 +502,7 @@ describe('App', () => {
 
   it('should remove the checkpoint plot from the order if it is removed from the plots', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     let plots = screen.getAllByTestId(/summary\.json/)
@@ -540,8 +524,7 @@ describe('App', () => {
 
   it('should not change the metric order in the hover menu by reordering the plots', async () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
@@ -597,7 +580,6 @@ describe('App', () => {
   it('should not be possible to drag a plot from a section to another', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: templatePlotsFixture
     })
 
@@ -616,7 +598,6 @@ describe('App', () => {
 
   it('should reorder template plots and send a message to the extension on drop', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -656,7 +637,6 @@ describe('App', () => {
 
   it('should render two template plot sections', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -670,7 +650,6 @@ describe('App', () => {
 
   it('should create a new section above the others if the template plot type is different than the first section', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -690,7 +669,6 @@ describe('App', () => {
 
   it('should not create a new section above the others by dragging a template plot from the same type as the first section above it', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -708,7 +686,6 @@ describe('App', () => {
 
   it('should create a new section below the others if the template plot type is different than the last section', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -727,7 +704,6 @@ describe('App', () => {
 
   it('should not create a new section below the others by dragging a template plot from the same type as the last section below it', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -747,7 +723,6 @@ describe('App', () => {
 
   it('should move a template plot from one type in another section of the same type and show two drop targets', async () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -783,7 +758,6 @@ describe('App', () => {
 
   it('should show a drop zone when hovering a new section', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -806,7 +780,6 @@ describe('App', () => {
   it('should not show a drop target when moving an element from a whole different section (comparison to template)', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       selectedRevisions: plotsRevisionsFixture,
       template: complexTemplatePlotsFixture
     })
@@ -825,7 +798,6 @@ describe('App', () => {
 
   it('should prevent default behaviour when dragging over a new section', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -842,7 +814,6 @@ describe('App', () => {
 
   it('should show a drop target before a plot on drag enter from the left', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -861,7 +832,6 @@ describe('App', () => {
 
   it('should show a drop target after a plot on drag enter from the right', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -880,7 +850,6 @@ describe('App', () => {
 
   it('should hide the plot being dragged from the list', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -894,7 +863,6 @@ describe('App', () => {
 
   it('should open a modal with the plot zoomed in when clicking a template plot', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -909,8 +877,7 @@ describe('App', () => {
 
   it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      checkpoint: checkpointPlotsFixture
     })
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -925,7 +892,6 @@ describe('App', () => {
   it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       selectedRevisions: plotsRevisionsFixture
     })
 
@@ -942,7 +908,6 @@ describe('App', () => {
 
   it('should close the zoomed plot modal when clicking the backdrop or the close button', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -961,7 +926,6 @@ describe('App', () => {
 
   it('should not close the zoomed in plot modal when interacting with the plot inside (modal content)', () => {
     renderAppWithOptionalData({
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -977,7 +941,6 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       template: complexTemplatePlotsFixture
     })
 
@@ -1406,7 +1369,7 @@ describe('App', () => {
     it('should show the revisions at the top', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+
         selectedRevisions: plotsRevisionsFixture
       })
 
@@ -1420,7 +1383,7 @@ describe('App', () => {
     it('should send a message with the revision to be removed when clicking the clear button', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+
         selectedRevisions: plotsRevisionsFixture
       })
 
@@ -1439,7 +1402,7 @@ describe('App', () => {
     it('should display the number of experiments selected', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+
         selectedRevisions: plotsRevisionsFixture
       })
 
@@ -1468,7 +1431,7 @@ describe('App', () => {
     it('should send a message to refresh each revision when clicking the refresh all button', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+
         selectedRevisions: plotsRevisionsFixture
       })
 
@@ -1489,7 +1452,7 @@ describe('App', () => {
     it('should not reorder the ribbon when comparison plots are reordered', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+
         selectedRevisions: plotsRevisionsFixture
       })
 
