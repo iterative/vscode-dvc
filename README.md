@@ -51,6 +51,22 @@ databases are required.
   https://dvc.org/doc/user-guide/experiment-management/experiments-overview
 [data versioning]: https://dvc.org/doc/use-cases/versioning-data-and-model-files
 
+## Contents
+
+- [Quick start](#quick-start)
+  - [Learn more about DVC (Data Version Control)](#learn-more-about-dvc-data-version-control)
+- [What you get](#what-you-get)
+- [Useful commands](#useful-commands)
+- [Configuration](#configuration)
+- [Known limitations](#known-limitations)
+  - [ML Pipelines](#ml-pipelines)
+  - [Monorepos](#monorepos)
+- [Debugging](#debugging)
+  - [The DVC Extension](#the-dvc-extension)
+  - [Your DVC project](#your-dvc-project)
+- [Contributing](#contributing)
+- [Data and telemetry](#data-and-telemetry)
+
 ## Quick start
 
 1. [Install DVC](https://dvc.org/doc/install) on your system.
