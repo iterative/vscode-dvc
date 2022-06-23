@@ -425,9 +425,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     display: flex;
     flex-flow: row nowrap;
     text-align: left;
-    cursor: pointer;
     .innerCell {
       justify-content: flex-start;
+
+      .bullet,
+      .cellContents {
+        cursor: pointer;
+      }
     }
   }
 

@@ -254,6 +254,7 @@ export const RowContent: React.FC<
           cell={firstCell}
           bulletColor={displayColor}
           toggleExperiment={toggleExperiment}
+          toggleRowSelection={toggleRowSelection}
         />
         {cells.map(cell => {
           const cellId = `${cell.column.id}___${cell.row.id}`

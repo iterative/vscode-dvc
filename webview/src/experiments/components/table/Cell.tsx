@@ -33,8 +33,9 @@ export const FirstCell: React.FC<
   CellProp & {
     bulletColor?: string
     toggleExperiment: () => void
+    toggleRowSelection: () => void
   }
-> = ({ cell, bulletColor, toggleExperiment }) => {
+> = ({ cell, bulletColor, toggleExperiment, toggleRowSelection }) => {
   const { row, isPlaceholder } = cell
 
   return (
@@ -46,18 +47,24 @@ export const FirstCell: React.FC<
           isPlaceholder && styles.groupPlaceholder
         )
       })}
-      tabIndex={0}
-      aria-checked={bulletColor !== undefined}
-      role="switch"
-      {...clickAndEnterProps(toggleExperiment)}
+      {...clickAndEnterProps(toggleRowSelection)}
     >
       <div className={styles.innerCell}>
         <RowExpansionButton row={row} />
-        <span className={styles.bullet} style={{ color: bulletColor }}>
+        <span
+          className={styles.bullet}
+          style={{ color: bulletColor }}
+          {...clickAndEnterProps(toggleExperiment)}
+        >
           {row.original.queued && <ClockIcon />}
         </span>
         {isPlaceholder ? null : (
-          <div className={styles.cellContents}>{cell.render('Cell')}</div>
+          <div
+            className={styles.cellContents}
+            {...clickAndEnterProps(toggleExperiment)}
+          >
+            {cell.render('Cell')}
+          </div>
         )}
       </div>
     </div>
