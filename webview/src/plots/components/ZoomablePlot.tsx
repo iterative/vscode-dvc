@@ -1,42 +1,54 @@
 import React, { useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
+import { PlainObject, VisualizationSpec } from 'react-vega'
+import { Renderers } from 'vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
+import { config } from './constants'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
-export interface ZoomablePlotProps {
-  renderZoomedInPlot: (
-    plot: VegaLiteProps,
-    id: string,
-    refresh?: boolean
-  ) => void
-}
-
-interface ZoomablePlotOwnProps extends ZoomablePlotProps {
-  plotProps: VegaLiteProps
+interface ZoomablePlotProps {
+  spec: VisualizationSpec
+  data?: PlainObject
   id: string
 }
 
-export const ZoomablePlot: React.FC<ZoomablePlotOwnProps> = ({
-  plotProps,
-  renderZoomedInPlot,
+export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
+  spec,
+  data,
   id
 }) => {
-  const previousPlotProps = useRef(plotProps)
-  useEffect(() => {
-    if (
-      JSON.stringify(previousPlotProps.current) !== JSON.stringify(plotProps)
-    ) {
-      renderZoomedInPlot(plotProps, id, true)
-      previousPlotProps.current = plotProps
-    }
-  }, [plotProps, id, renderZoomedInPlot])
+  const dispatch = useDispatch()
+  const previousSpecsAndData = useRef(JSON.stringify({ data, spec }))
+  const currentPlotProps = useRef<VegaLiteProps>()
+  const newSpecsAndData = JSON.stringify({ data, spec })
 
-  const handleOnClick = () => renderZoomedInPlot(plotProps, id)
+  const plotProps: VegaLiteProps = {
+    actions: false,
+    config,
+    data,
+    'data-testid': `${id}-vega`,
+    renderer: 'svg' as unknown as Renderers,
+    spec
+  } as VegaLiteProps
+  currentPlotProps.current = plotProps
+
+  useEffect(() => {
+    if (previousSpecsAndData.current !== newSpecsAndData) {
+      dispatch(
+        setZoomedInPlot({ id, plot: currentPlotProps.current, refresh: true })
+      )
+      previousSpecsAndData.current = newSpecsAndData
+    }
+  }, [newSpecsAndData, id, dispatch])
+
+  const handleOnClick = () => dispatch(setZoomedInPlot({ id, plot: plotProps }))
 
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
       <GripIcon className={styles.plotGripIcon} />
-      <VegaLite {...plotProps} />
+      {currentPlotProps.current && <VegaLite {...plotProps} />}
     </button>
   )
 }

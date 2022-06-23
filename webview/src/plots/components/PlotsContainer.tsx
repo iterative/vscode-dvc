@@ -1,12 +1,7 @@
 import cx from 'classnames'
-import React, { useContext, useEffect, useState } from 'react'
-import {
-  PlotSize,
-  Section,
-  SectionCollapsed
-} from 'dvc/src/plots/webview/contract'
+import React, { useEffect, useState } from 'react'
+import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { PlotsSizeContext } from './PlotsSizeContext'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
@@ -23,19 +18,17 @@ import {
   Lines
 } from '../../shared/components/icons'
 
-export interface PlotsContainerProps {
-  sectionCollapsed: SectionCollapsed
+export interface CommonPlotsContainerProps {
+  onResize: (size: PlotSize) => void
+}
+
+export interface PlotsContainerProps extends CommonPlotsContainerProps {
+  sectionCollapsed: boolean
   sectionKey: Section
   title: string
-  onResize: (size: PlotSize, section: Section) => void
   currentSize: PlotSize
   menu?: PlotsPickerProps
 }
-
-export type BasicContainerProps = Pick<
-  PlotsContainerProps,
-  'onResize' | 'sectionCollapsed'
->
 
 export const SectionDescription = {
   // "Trends"
@@ -63,9 +56,8 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   menu
 }) => {
   const [size, setSize] = useState<PlotSize>(currentSize)
-  const { changePlotsSizes } = useContext(PlotsSizeContext)
 
-  const open = !sectionCollapsed[sectionKey]
+  const open = !sectionCollapsed
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
@@ -82,8 +74,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     if (size === newSize) {
       return
     }
-    onResize(newSize, sectionKey)
-    changePlotsSizes?.(newSize, sectionKey)
+    sendMessage({
+      payload: { section: sectionKey, size: newSize },
+      type: MessageFromWebviewType.RESIZE_PLOTS
+    })
+    onResize(newSize)
     setSize(newSize)
   }
   const menuItems: IconMenuItemProps[] = [
@@ -119,7 +114,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             e.preventDefault()
             sendMessage({
               payload: {
-                [sectionKey]: !sectionCollapsed[sectionKey]
+                [sectionKey]: !sectionCollapsed
               },
               type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
             })

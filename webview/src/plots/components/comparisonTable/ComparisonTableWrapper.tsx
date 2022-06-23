@@ -1,33 +1,29 @@
-import {
-  PlotsComparisonData,
-  Revision,
-  Section
-} from 'dvc/src/plots/webview/contract'
+import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { ComparisonTable } from './ComparisonTable'
-import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
+import { changeSize } from './comparisonTableSlice'
+import { PlotsContainer } from '../PlotsContainer'
+import { RootState } from '../../store'
 
-interface ComparisonTableWrapper {
-  comparisonTable: PlotsComparisonData
-  revisions: Revision[]
-  basicContainerProps: BasicContainerProps
-}
-
-export const ComparisonTableWrapper: React.FC<ComparisonTableWrapper> = ({
-  comparisonTable,
-  revisions,
-  basicContainerProps
-}) => {
-  const { size, plots } = comparisonTable
+export const ComparisonTableWrapper: React.FC = () => {
+  const dispatch = useDispatch()
+  const { size, isCollapsed } = useSelector(
+    (state: RootState) => state.comparison
+  )
+  const handleResize = (size: PlotSize) => {
+    dispatch(changeSize(size))
+  }
 
   return (
     <PlotsContainer
       title="Images"
       sectionKey={Section.COMPARISON_TABLE}
       currentSize={size}
-      {...basicContainerProps}
+      sectionCollapsed={isCollapsed}
+      onResize={handleResize}
     >
-      <ComparisonTable plots={plots} revisions={revisions} />
+      <ComparisonTable />
     </PlotsContainer>
   )
 }
