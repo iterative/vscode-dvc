@@ -62,9 +62,6 @@ cases!
   panel in the _File Explorer_ or the **DVC panel** in the _Source Code_ view)
   or by running `dvc pull` from a VS Code _Terminal_.
 
-  > Remember to activate the virtual env first (`source .env/bin/activate`) if
-  > you're using your system's terminal.
-
 - In order to run experiments in the demo project (from the **DVC View**), the
   virtual env should be loaded through the Microsoft [Python extension] (please
   install it), having this in `.vscode/settings.json`:
