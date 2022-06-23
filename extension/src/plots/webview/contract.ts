@@ -121,14 +121,24 @@ export type ComparisonPlot = {
   revision: string
 }
 
+export enum PlotsDataKeys {
+  COMPARISON = 'comparison',
+  CHECKPOINT = 'checkpoint',
+  HAS_PLOTS = 'hasPlots',
+  HAS_SELECTED_PLOTS = 'hasSelectedPlots',
+  SELECTED_REVISIONS = 'selectedRevisions',
+  TEMPLATE = 'template',
+  SECTION_COLLAPSED = 'sectionCollapsed'
+}
+
 export type PlotsData =
   | {
-      comparison?: PlotsComparisonData | null
-      checkpoint?: CheckpointPlotsData | null
-      hasPlots?: boolean
-      hasSelectedPlots?: boolean
-      selectedRevisions?: Revision[]
-      template?: TemplatePlotsData | null
-      sectionCollapsed?: SectionCollapsed
+      [PlotsDataKeys.COMPARISON]?: PlotsComparisonData | null
+      [PlotsDataKeys.CHECKPOINT]?: CheckpointPlotsData | null
+      [PlotsDataKeys.HAS_PLOTS]?: boolean
+      [PlotsDataKeys.HAS_SELECTED_PLOTS]?: boolean
+      [PlotsDataKeys.SELECTED_REVISIONS]?: Revision[]
+      [PlotsDataKeys.TEMPLATE]?: TemplatePlotsData | null
+      [PlotsDataKeys.SECTION_COLLAPSED]?: SectionCollapsed
     }
   | undefined

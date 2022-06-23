@@ -1,28 +1,30 @@
-import { Section, TemplatePlotsData } from 'dvc/src/plots/webview/contract'
+import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { TemplatePlots } from './TemplatePlots'
-import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
-import { ZoomablePlotProps } from '../ZoomablePlot'
+import { changeSize } from './templatePlotsSlice'
+import { PlotsContainer } from '../PlotsContainer'
+import { RootState } from '../../store'
 
-interface TemplatePlotsWrapperProps extends ZoomablePlotProps {
-  templatePlots: TemplatePlotsData
-  basicContainerProps: BasicContainerProps
+export const TemplatePlotsWrapper: React.FC = () => {
+  const dispatch = useDispatch()
+  const { size, isCollapsed } = useSelector(
+    (state: RootState) => state.template
+  )
+
+  const handleResize = (size: PlotSize) => {
+    dispatch(changeSize(size))
+  }
+
+  return (
+    <PlotsContainer
+      title="Data Series"
+      sectionKey={Section.TEMPLATE_PLOTS}
+      currentSize={size}
+      sectionCollapsed={isCollapsed}
+      onResize={handleResize}
+    >
+      <TemplatePlots />
+    </PlotsContainer>
+  )
 }
-
-export const TemplatePlotsWrapper: React.FC<TemplatePlotsWrapperProps> = ({
-  templatePlots,
-  basicContainerProps,
-  renderZoomedInPlot
-}) => (
-  <PlotsContainer
-    title="Data Series"
-    sectionKey={Section.TEMPLATE_PLOTS}
-    currentSize={templatePlots.size}
-    {...basicContainerProps}
-  >
-    <TemplatePlots
-      plots={templatePlots.plots}
-      renderZoomedInPlot={renderZoomedInPlot}
-    />
-  </PlotsContainer>
-)
