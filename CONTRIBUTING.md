@@ -62,9 +62,9 @@ cases!
   panel in the _File Explorer_ or the **DVC panel** in the _Source Code_ view)
   or by running `dvc pull` from a VS Code _Terminal_.
 
-- In order to run experiments in the demo project (from the **DVC View**), the
-  virtual env should be loaded through the Microsoft [Python extension] (please
-  install it), having this in `.vscode/settings.json`:
+- In order to [run experiments] in the demo project, the virtual env should be
+  loaded through the Microsoft [Python extension] (please install it), having
+  this in `.vscode/settings.json`:
 
   ```json
   "python.defaultInterpreterPath": "demo/.env/bin/dvc"
@@ -72,6 +72,8 @@ cases!
 
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
+[run experiments]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/run-experiments.md
 
 <a id='warning'></a>
 
