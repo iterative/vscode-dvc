@@ -767,6 +767,36 @@ describe('App', () => {
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove')
     })
+
+    it('should present the Remove option if multiple checkpoint tip rows are selected', async () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRow = screen.getByTestId('timestamp___1.exp-e7a67')
+      fireEvent.click(firstRow)
+
+      const secondRow = screen.getByTestId('timestamp___1.test-branch')
+      fireEvent.click(secondRow)
+
+      const target = await screen.findByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      const menuitems = await screen.findAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Remove Selected Rows')
+    })
   })
 
   describe('Context Menu Suppression', () => {
