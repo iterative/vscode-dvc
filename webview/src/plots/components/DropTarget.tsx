@@ -1,7 +1,8 @@
 import React from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
-import { AllIcons, Icon } from '../../shared/components/Icon'
+import { Icon } from '../../shared/components/Icon'
+import { GraphLine } from '../../shared/components/icons'
 
 export const DropTarget: React.FC = () => (
   <div
@@ -9,11 +10,6 @@ export const DropTarget: React.FC = () => (
     id="plot-drop-target"
     className={cx(styles.plot, styles.dropTarget)}
   >
-    <Icon
-      icon={AllIcons.GRAPH_LINE}
-      className={styles.dropIcon}
-      width={50}
-      height={50}
-    />
+    <Icon icon={GraphLine} className={styles.dropIcon} width={50} height={50} />
   </div>
 )

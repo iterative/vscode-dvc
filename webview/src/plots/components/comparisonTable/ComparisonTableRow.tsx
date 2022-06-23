@@ -3,9 +3,10 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
-import { AllIcons, Icon } from '../../../shared/components/Icon'
+import { Icon } from '../../../shared/components/Icon'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
+import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -29,9 +30,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
       <tr>
         <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
           <button className={styles.rowToggler} onClick={toggleIsShownState}>
-            <Icon
-              icon={isShown ? AllIcons.CHEVRON_DOWN : AllIcons.CHEVRON_RIGHT}
-            />
+            <Icon icon={isShown ? ChevronDown : ChevronRight} />
             {path}
           </button>
         </td>

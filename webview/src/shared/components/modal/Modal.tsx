@@ -1,6 +1,7 @@
 import React, { MouseEvent, useEffect } from 'react'
 import styles from './styles.module.scss'
-import { AllIcons, Icon } from '../Icon'
+import { Icon } from '../Icon'
+import { Close } from '../icons'
 
 interface ModalProps {
   onClose: () => void
@@ -32,7 +33,7 @@ export const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
           onClick={onClose}
           data-testid="modal-close"
         >
-          <Icon icon={AllIcons.CLOSE} width={30} height={30} />
+          <Icon icon={Close} width={30} height={30} />
         </button>
         <div
           className={styles.modalContent}
