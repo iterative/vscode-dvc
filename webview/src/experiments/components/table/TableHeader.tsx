@@ -21,7 +21,7 @@ import {
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
 import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
-import { AllIcons } from '../../../shared/components/Icon'
+import { DownArrow, Lines, UpArrow } from '../../../shared/components/icons'
 
 export enum SortOrder {
   ASCENDING = 'Sort Ascending',
@@ -119,14 +119,12 @@ const getIconMenuItems = (
 ) => [
   {
     hidden: !sortEnabled || sortOrder === SortOrder.NONE,
-    icon:
-      (sortOrder === SortOrder.DESCENDING && AllIcons.DOWN_ARROW) ||
-      AllIcons.UP_ARROW,
+    icon: (sortOrder === SortOrder.DESCENDING && DownArrow) || UpArrow,
     tooltip: 'Table Sorted By'
   },
   {
     hidden: !hasFilter,
-    icon: AllIcons.LINES,
+    icon: Lines,
     tooltip: 'Table Filtered By'
   }
 ]
