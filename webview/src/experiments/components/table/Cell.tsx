@@ -50,12 +50,6 @@ export const FirstCell: React.FC<
       aria-checked={bulletColor !== undefined}
       role="switch"
       {...clickAndEnterProps(toggleExperiment)}
-      // onClick={toggleExperiment}
-      // onKeyDown={e => {
-      //   if (e.key === 'Enter' || e.key === ' ') {
-      //     toggleExperiment(e)
-      //   }
-      // }}
     >
       <div className={styles.innerCell}>
         <RowExpansionButton row={row} />
