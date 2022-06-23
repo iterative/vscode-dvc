@@ -44,7 +44,9 @@ export const CopyButton: React.FC<{
     <button
       title={copyIconTitles[state]}
       className={cx(styles.button, className)}
-      onClick={() => {
+      onClick={e => {
+        e.preventDefault()
+        e.stopPropagation()
         navigator.clipboard
           .writeText(value)
           .then(() => {
