@@ -195,6 +195,10 @@ each subdir DVC project directly with VS Code instead.
 [sub-directories]:
   https://dvc.org/doc/command-reference/init#initializing-dvc-in-subdirectories
 
+## Roadmap
+
+<!-- ... -->
+
 ## Debugging
 
 ### The DVC Extension
