@@ -197,6 +197,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     .nestedRow {
       .experimentCell {
         padding-left: $nested-row-padding;
+
+        .innerCell {
+          .starSwitch {
+            left: calc(($cell-padding + $nested-row-padding) * -1);
+          }
+        }
       }
     }
     &.expandedGroup .nestedRow {
@@ -381,6 +387,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       }
     }
 
+    .innerCell {
+      .starSwitch {
+        visibility: hidden;
+      }
+    }
+
     .innerCell,
     .timestampInnerCell {
       height: 100%;
@@ -431,6 +443,21 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       .bullet,
       .cellContents {
         cursor: pointer;
+      }
+
+      .starSwitch {
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        left: -$cell-padding;
+        outline: none;
+        width: 12px;
+        opacity: 0.4;
+        cursor: pointer;
+
+        &[aria-checked='true'] {
+          opacity: 1;
+        }
       }
     }
   }

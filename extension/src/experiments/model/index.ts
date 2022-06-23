@@ -22,6 +22,7 @@ import {
   UNSELECTED
 } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
+import { STARRED, StarredExperiments } from './stars'
 import { Experiment, Row } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
@@ -56,6 +57,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
+  private starredExperiments: StarredExperiments
 
   private filters: Map<string, FilterDefinition> = new Map()
   private useFiltersForSelection = false
@@ -79,6 +81,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
     this.coloredStatus = this.revive<ColoredStatus>(
       PersistenceKey.EXPERIMENTS_STATUS,
+      {}
+    )
+    this.starredExperiments = this.revive<StarredExperiments>(
+      PersistenceKey.EXPERIMENTS_STARS,
       {}
     )
 
@@ -106,6 +112,19 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.hasRunning = hasRunning
 
     this.setColoredStatus()
+  }
+
+  public toggleStars(ids: string[]) {
+    for (const id of ids) {
+      const current = this.starredExperiments[id]
+
+      if (current) {
+        delete this.starredExperiments[id]
+      } else {
+        this.starredExperiments[id] = STARRED
+      }
+      this.persistStars()
+    }
   }
 
   public toggleStatus(id: string) {
@@ -273,19 +292,19 @@ export class ExperimentsModel extends ModelWithPersistence {
   })[] {
     return [
       {
-        ...this.addSelected(this.workspace),
+        ...this.addSelectedAndStarred(this.workspace),
         hasChildren: false,
         type: ExperimentType.WORKSPACE
       },
       ...this.branches.map(branch => {
         return {
-          ...this.addSelected(branch),
+          ...this.addSelectedAndStarred(branch),
           hasChildren: false,
           type: ExperimentType.BRANCH
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
-        ...this.addSelected(experiment),
+        ...this.addSelectedAndStarred(experiment),
         hasChildren: definedAndNonEmpty(
           this.checkpointsByTip.get(experiment.id)
         ),
@@ -300,7 +319,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperiments().map(experiment => {
       const checkpoints = this.checkpointsByTip
         .get(experiment.id)
-        ?.map(checkpoint => this.addSelected(checkpoint))
+        ?.map(checkpoint => this.addSelectedAndStarred(checkpoint))
       if (!definedAndNonEmpty(checkpoints)) {
         return experiment
       }
@@ -328,24 +347,24 @@ export class ExperimentsModel extends ModelWithPersistence {
     id: string
   ): (Experiment & { type: ExperimentType })[] | undefined {
     return this.checkpointsByTip.get(id)?.map(checkpoint => ({
-      ...this.addSelected(checkpoint),
+      ...this.addSelectedAndStarred(checkpoint),
       type: ExperimentType.CHECKPOINT
     }))
   }
 
   public getRowData() {
     return [
-      this.addSelected(this.workspace),
+      this.addSelectedAndStarred(this.workspace),
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
-        const branchWithSelected = this.addSelected(branch)
+        const branchWithSelectedAndStarred = this.addSelectedAndStarred(branch)
 
         if (!definedAndNonEmpty(experiments)) {
-          return branchWithSelected
+          return branchWithSelectedAndStarred
         }
 
         return {
-          ...branchWithSelected,
+          ...branchWithSelectedAndStarred,
           subRows: this.getSubRows(experiments)
         }
       })
@@ -354,6 +373,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public isSelected(id: string) {
     return !!this.coloredStatus[id]
+  }
+
+  public isStarred(id: string) {
+    return !!this.starredExperiments[id]
   }
 
   public getExperimentCount() {
@@ -387,12 +410,12 @@ export class ExperimentsModel extends ModelWithPersistence {
           filters
         )
         if (!checkpoints) {
-          return this.addSelected(experiment)
+          return this.addSelectedAndStarred(experiment)
         }
         return {
-          ...this.addSelected(experiment),
+          ...this.addSelectedAndStarred(experiment),
           subRows: checkpoints.map(checkpoint => ({
-            ...this.addSelected(checkpoint)
+            ...this.addSelectedAndStarred(checkpoint)
           }))
         }
       })
@@ -505,8 +528,28 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.persist(PersistenceKey.EXPERIMENTS_FILTER_BY, [...this.filters])
   }
 
+  private persistStars() {
+    return this.persist(
+      PersistenceKey.EXPERIMENTS_STARS,
+      this.starredExperiments
+    )
+  }
+
   private persistStatus() {
     return this.persist(PersistenceKey.EXPERIMENTS_STATUS, this.coloredStatus)
+  }
+
+  private addStarred(experiment: Experiment) {
+    const { id } = experiment
+
+    if (!this.isStarred(id)) {
+      return experiment
+    }
+
+    return {
+      ...experiment,
+      starred: true
+    }
   }
 
   private addSelected(experiment: Experiment) {
@@ -522,6 +565,10 @@ export class ExperimentsModel extends ModelWithPersistence {
       displayColor: this.getDisplayColor(id),
       selected
     }
+  }
+
+  private addSelectedAndStarred(experiment: Experiment) {
+    return this.addStarred(this.addSelected(experiment))
   }
 
   private getDisplayColor(id: string) {

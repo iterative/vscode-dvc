@@ -31,9 +31,11 @@ const experimentMenuOption = (
   id: string | string[],
   label: string,
   type: MessageFromWebviewType,
-  hidden?: boolean
+  hidden?: boolean,
+  divider?: boolean
 ) => {
   return {
+    divider,
     hidden,
     id: type,
     label,
@@ -45,13 +47,39 @@ const experimentMenuOption = (
 }
 
 const getMultiSelectMenuOptions = (selectedRowsList: RowProp[]) => {
+  const starStatuses = new Set<boolean | undefined>(
+    selectedRowsList.map(
+      ({
+        row: {
+          original: { starred }
+        }
+      }) => starred
+    )
+  )
+
+  const hideStarsOption = starStatuses.size !== 1
+  const starOptionLabel =
+    ([...starStatuses][0] && 'Unstar Experiments') || 'Star Experiments'
+
+  const removableRowIds = selectedRowsList
+    .filter(value => value.row.depth === 1)
+    .map(value => value.row.values.id)
+
+  const hideRemoveOption = removableRowIds.length !== selectedRowsList.length
+
   return [
     experimentMenuOption(
-      selectedRowsList
-        .filter(value => value.row.depth === 1)
-        .map(value => value.row.values.id),
+      selectedRowsList.map(value => value.row.values.id),
+      starOptionLabel,
+      MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
+      hideStarsOption
+    ),
+    experimentMenuOption(
+      removableRowIds,
       'Remove Selected Rows',
-      MessageFromWebviewType.REMOVE_EXPERIMENT
+      MessageFromWebviewType.REMOVE_EXPERIMENT,
+      hideRemoveOption,
+      !hideStarsOption
     )
   ]
 }
@@ -61,7 +89,8 @@ const getSingleSelectMenuOptions = (
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
   depth: number,
-  queued?: boolean
+  queued?: boolean,
+  starred?: boolean
 ) => {
   const isNotCheckpoint = depth <= 1 || isWorkspace
   const canApplyOrCreateBranch = queued || isWorkspace || depth <= 0
@@ -69,8 +98,9 @@ const getSingleSelectMenuOptions = (
   const withId = (
     label: string,
     type: MessageFromWebviewType,
-    hidden?: boolean
-  ) => experimentMenuOption(id, label, type, hidden)
+    hidden?: boolean,
+    divider?: boolean
+  ) => experimentMenuOption(id, label, type, hidden, divider)
 
   return [
     withId(
@@ -83,7 +113,6 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
       canApplyOrCreateBranch
     ),
-    withId('Remove', MessageFromWebviewType.REMOVE_EXPERIMENT, depth !== 1),
     withId(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
@@ -98,6 +127,18 @@ const getSingleSelectMenuOptions = (
       'Modify and Queue',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
       !isNotCheckpoint
+    ),
+    experimentMenuOption(
+      [id],
+      starred ? 'Unstar Experiment' : 'Star Experiment',
+      MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
+      isWorkspace
+    ),
+    withId(
+      'Remove',
+      MessageFromWebviewType.REMOVE_EXPERIMENT,
+      depth !== 1,
+      true
     )
   ]
 }
@@ -108,7 +149,8 @@ const getContextMenuOptions = (
   projectHasCheckpoints: boolean,
   depth: number,
   selectedRows: Record<string, RowProp | undefined>,
-  queued?: boolean
+  queued?: boolean,
+  starred?: boolean
 ) => {
   const isFromSelection = !!selectedRows[id]
   const selectedRowsList = Object.values(selectedRows).filter(
@@ -124,7 +166,8 @@ const getContextMenuOptions = (
         isWorkspace,
         projectHasCheckpoints,
         depth,
-        queued
+        queued,
+        starred
       )
   )
 }
@@ -132,12 +175,13 @@ const getContextMenuOptions = (
 export const RowContextMenu: React.FC<RowProp> = ({
   projectHasCheckpoints = false,
   row: {
-    original: { queued },
+    original: { queued, starred },
     depth,
     values: { id }
   }
 }) => {
-  const { selectedRows } = React.useContext(RowSelectionContext)
+  const { selectedRows, clearSelectedRows } =
+    React.useContext(RowSelectionContext)
 
   const isWorkspace = id === 'workspace'
 
@@ -148,13 +192,25 @@ export const RowContextMenu: React.FC<RowProp> = ({
       projectHasCheckpoints,
       depth,
       selectedRows,
-      queued
+      queued,
+      starred
     )
-  }, [queued, isWorkspace, depth, id, projectHasCheckpoints, selectedRows])
+  }, [
+    queued,
+    starred,
+    isWorkspace,
+    depth,
+    id,
+    projectHasCheckpoints,
+    selectedRows
+  ])
 
   return (
     (contextMenuOptions.length > 0 && (
-      <MessagesMenu options={contextMenuOptions} />
+      <MessagesMenu
+        options={contextMenuOptions}
+        onOptionSelected={() => clearSelectedRows?.()}
+      />
     )) ||
     null
   )
@@ -211,17 +267,23 @@ export const RowContent: React.FC<
     })
   }
 
+  const toggleStarred = () => {
+    sendMessage({
+      payload: [id],
+      type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+    })
+  }
+
   const { toggleRowSelected, selectedRows } =
     React.useContext(RowSelectionContext)
 
   const isRowSelected = !!selectedRows[id]
 
   const toggleRowSelection = React.useCallback(() => {
-    const { depth } = row
-    if (depth === 1) {
+    if (!isWorkspace) {
       toggleRowSelected?.({ row })
     }
-  }, [row, toggleRowSelected])
+  }, [row, toggleRowSelected, isWorkspace])
 
   return (
     <ContextMenu
@@ -255,6 +317,7 @@ export const RowContent: React.FC<
           bulletColor={displayColor}
           toggleExperiment={toggleExperiment}
           toggleRowSelection={toggleRowSelection}
+          toggleStarred={toggleStarred}
         />
         {cells.map(cell => {
           const cellId = `${cell.column.id}___${cell.row.id}`

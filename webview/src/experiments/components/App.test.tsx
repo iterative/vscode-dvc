@@ -750,7 +750,8 @@ describe('App', () => {
       expect(itemLabels).toStrictEqual([
         'Modify and Resume',
         'Modify, Reset and Run',
-        'Modify and Queue'
+        'Modify and Queue',
+        'Star Experiment'
       ])
     })
 

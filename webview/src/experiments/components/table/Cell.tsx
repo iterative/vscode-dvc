@@ -4,6 +4,7 @@ import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
 import { clickAndEnterProps } from '../../../util/props'
+import { StarFull, StarEmpty } from '../../../shared/components/icons'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -34,9 +35,19 @@ export const FirstCell: React.FC<
     bulletColor?: string
     toggleExperiment: () => void
     toggleRowSelection: () => void
+    toggleStarred: () => void
   }
-> = ({ cell, bulletColor, toggleExperiment, toggleRowSelection }) => {
+> = ({
+  cell,
+  bulletColor,
+  toggleExperiment,
+  toggleRowSelection,
+  toggleStarred
+}) => {
   const { row, isPlaceholder } = cell
+  const {
+    original: { starred, queued }
+  } = row
 
   return (
     <div
@@ -50,13 +61,23 @@ export const FirstCell: React.FC<
       {...clickAndEnterProps(toggleRowSelection)}
     >
       <div className={styles.innerCell}>
+        <div
+          className={styles.starSwitch}
+          role="switch"
+          aria-checked={starred}
+          tabIndex={0}
+          {...clickAndEnterProps(toggleStarred)}
+        >
+          {starred && <StarFull />}
+          {!starred && <StarEmpty />}
+        </div>
         <RowExpansionButton row={row} />
         <span
           className={styles.bullet}
           style={{ color: bulletColor }}
           {...clickAndEnterProps(toggleExperiment)}
         >
-          {row.original.queued && <ClockIcon />}
+          {queued && <ClockIcon />}
         </span>
         {isPlaceholder ? null : (
           <div
