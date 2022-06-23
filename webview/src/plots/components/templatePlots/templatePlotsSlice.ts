@@ -8,7 +8,7 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import { clearData } from '../../actions'
 import { ReducerName } from '../../constants'
-import { plotStore } from '../plotStore'
+import { plotDataStore } from '../plotDataStore'
 
 export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
   isCollapsed: boolean
@@ -43,7 +43,7 @@ export const templatePlotsSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<TemplatePlotsData>) => {
-      plotStore.template = action.payload?.plots
+      plotDataStore.template = action.payload?.plots
       if (!action.payload) {
         return templatePlotsInitialState
       }

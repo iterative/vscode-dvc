@@ -11,7 +11,7 @@ import { ReducerName } from '../../constants'
 import {
   addCheckpointPlotsWithSnapshots,
   removeCheckpointPlots
-} from '../plotStore'
+} from '../plotDataStore'
 export interface CheckpointPlotsState
   extends Omit<CheckpointPlotsData, 'plots'> {
   isCollapsed: boolean

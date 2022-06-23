@@ -16,7 +16,7 @@ import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 import { RootState } from '../../store'
-import { plotStore } from '../plotStore'
+import { plotDataStore } from '../plotDataStore'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -34,7 +34,7 @@ export const TemplatePlots: React.FC = () => {
 
   useEffect(() => {
     shouldSendMessage.current = false
-    setSections(plotStore.template)
+    setSections(plotDataStore.template)
   }, [plotsSnapshot, setSections])
 
   useEffect(() => {

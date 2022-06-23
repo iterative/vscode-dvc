@@ -522,7 +522,7 @@ describe('App', () => {
     ])
   })
 
-  it('should not change the metric order in the hover menu by reordering the plots', async () => {
+  it('should not change the metric order in the hover menu by reordering the plots', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
@@ -565,7 +565,7 @@ describe('App', () => {
       }
     })
 
-    plots = await screen.findAllByTestId(/summary\.json/)
+    plots = screen.getAllByTestId(/summary\.json/)
     expect(plots.map(plot => plot.id)).toStrictEqual(newPlotOrder)
 
     fireEvent.mouseEnter(pickerButton)

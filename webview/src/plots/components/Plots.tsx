@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { AddPlots, Welcome } from './GetStarted'
 import { ZoomedInPlot } from './ZoomedInPlot'
@@ -33,15 +33,6 @@ const PlotsContent = () => {
   const hasTemplateData = useSelector(
     (state: RootState) => state.template.hasData
   )
-
-  useEffect(() => {
-    const modalOpenClass = 'modal-open'
-    document.body.classList.toggle(modalOpenClass, !!zoomedInPlot?.plot)
-
-    return () => {
-      document.body.classList.remove(modalOpenClass)
-    }
-  }, [zoomedInPlot])
 
   if (!hasData) {
     return <EmptyState>Loading Plots...</EmptyState>
