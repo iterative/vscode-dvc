@@ -1,4 +1,5 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
+import { configureStore } from '@reduxjs/toolkit'
 import { fireEvent, within } from '@testing-library/react'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
@@ -13,10 +14,9 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
-import { clearData } from '../plots/actions'
-import { ReducerName } from '../plots/constants'
-import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
-import { store } from '../plots/store'
+import comparisonTableReducer, {
+  update
+} from '../plots/components/comparisonTable/comparisonTableSlice'
 import { updateSelectedRevisions } from '../plots/components/webviewSlice'
 
 const MockedState: React.FC<{
@@ -24,7 +24,6 @@ const MockedState: React.FC<{
   selectedRevisions: Revision[]
 }> = ({ children, data, selectedRevisions }) => {
   const dispatch = useDispatch()
-  dispatch(clearData(ReducerName.COMPARISON))
   dispatch(update(data))
   dispatch(updateSelectedRevisions(selectedRevisions))
 
@@ -38,6 +37,11 @@ export default {
 } as Meta
 
 const Template: Story = ({ plots, revisions }) => {
+  const store = configureStore({
+    reducer: {
+      comparison: comparisonTableReducer
+    }
+  })
   return (
     <Provider store={store}>
       <MockedState
