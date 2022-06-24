@@ -1,36 +1,25 @@
-import {
-  CheckpointPlotData,
-  CheckpointPlotsData,
-  Section
-} from 'dvc/src/plots/webview/contract'
+import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { CheckpointPlots } from './CheckpointPlots'
-import { BasicContainerProps, PlotsContainer } from '../PlotsContainer'
+import { changeSize } from './checkpointPlotsSlice'
+import { PlotsContainer } from '../PlotsContainer'
 import { sendMessage } from '../../../shared/vscode'
-import { ZoomablePlotProps } from '../ZoomablePlot'
+import { RootState } from '../../store'
 
-interface CheckpointPlotsWrapperProps extends ZoomablePlotProps {
-  checkpointPlots: CheckpointPlotsData
-  basicContainerProps: BasicContainerProps
-}
-
-const getMetricsFromPlots = (plots?: CheckpointPlotData[]): string[] =>
-  plots?.map(({ title }) => title).sort() || []
-
-export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
-  checkpointPlots,
-  basicContainerProps,
-  renderZoomedInPlot
-}) => {
+export const CheckpointPlotsWrapper: React.FC = () => {
+  const dispatch = useDispatch()
+  const { plotsIds, size, selectedMetrics, isCollapsed, colors } = useSelector(
+    (state: RootState) => state.checkpoint
+  )
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
   useEffect(() => {
-    const metrics = getMetricsFromPlots(checkpointPlots.plots)
-    setMetrics(metrics)
-    setSelectedPlots(checkpointPlots.selectedMetrics || [])
-  }, [checkpointPlots, setSelectedPlots, setMetrics])
+    setMetrics([...plotsIds].sort())
+    setSelectedPlots(selectedMetrics || [])
+  }, [plotsIds, selectedMetrics, setSelectedPlots, setMetrics])
 
   const setSelectedMetrics = (metrics: string[]) => {
     setSelectedPlots(metrics)
@@ -38,6 +27,10 @@ export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
       payload: metrics,
       type: MessageFromWebviewType.TOGGLE_METRIC
     })
+  }
+
+  const handleResize = (size: PlotSize) => {
+    dispatch(changeSize(size))
   }
 
   return (
@@ -49,16 +42,11 @@ export const CheckpointPlotsWrapper: React.FC<CheckpointPlotsWrapperProps> = ({
         selectedPlots: selectedPlots,
         setSelectedPlots: setSelectedMetrics
       }}
-      currentSize={checkpointPlots.size}
-      {...basicContainerProps}
+      currentSize={size}
+      sectionCollapsed={isCollapsed}
+      onResize={handleResize}
     >
-      <CheckpointPlots
-        plots={checkpointPlots.plots.filter(plot =>
-          selectedPlots?.includes(plot.title)
-        )}
-        colors={checkpointPlots.colors}
-        renderZoomedInPlot={renderZoomedInPlot}
-      />
+      <CheckpointPlots plotsIds={selectedPlots} colors={colors} />
     </PlotsContainer>
   )
 }

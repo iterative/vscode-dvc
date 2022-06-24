@@ -1,20 +1,24 @@
 /**
  * @jest-environment jsdom
  */
+import { configureStore } from '@reduxjs/toolkit'
 import '@testing-library/jest-dom/extend-expect'
 import {
   cleanup,
   fireEvent,
   render,
+  RenderResult,
   screen,
   within
 } from '@testing-library/react'
+import { Provider } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import React from 'react'
 import { Revision } from 'dvc/src/plots/webview/contract'
-import { ComparisonTable, ComparisonTableProps } from './ComparisonTable'
+import { ComparisonTable } from './ComparisonTable'
+import { comparisonTableInitialState } from './comparisonTableSlice'
 import {
   createBubbledEvent,
   dragAndDrop,
@@ -23,6 +27,8 @@ import {
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { DragDropProvider } from '../../../shared/components/dragDrop/DragDropContext'
+import { storeReducers } from '../../store'
+import { webviewInitialState } from '../webviewSlice'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
@@ -39,20 +45,42 @@ describe('ComparisonTable', () => {
     jest.clearAllMocks()
   })
 
-  const basicProps: ComparisonTableProps = {
-    ...comparisonTableFixture,
-    revisions: plotsRevisionsFixture
-  }
-  const revisions = basicProps.revisions.map(({ revision }) => revision)
-  const namedRevisions = basicProps.revisions.map(
+  const selectedRevisions: Revision[] = plotsRevisionsFixture
+  const revisions = selectedRevisions.map(({ revision }) => revision)
+  const namedRevisions = selectedRevisions.map(
     ({ revision, group }) => `${revision}${group || ''}`
   )
-  const renderTable = (props = basicProps) =>
-    render(
-      <DragDropProvider>
-        <ComparisonTable {...props} />
-      </DragDropProvider>
+
+  const renderTable = (
+    props = comparisonTableFixture,
+    revisions: Revision[] = plotsRevisionsFixture,
+    renderWith: (ui: React.ReactElement) => RenderResult | void = render
+  ) => {
+    return (
+      renderWith(
+        <Provider
+          store={configureStore({
+            preloadedState: {
+              comparison: {
+                ...comparisonTableInitialState,
+                ...props
+              },
+              webview: {
+                ...webviewInitialState,
+                selectedRevisions: revisions,
+                zoomedInPlot: undefined
+              }
+            },
+            reducer: storeReducers
+          })}
+        >
+          <DragDropProvider>
+            <ComparisonTable />
+          </DragDropProvider>
+        </Provider>
+      ) || {}
     )
+  }
 
   it('should render a table', () => {
     renderTable()
@@ -67,7 +95,7 @@ describe('ComparisonTable', () => {
 
     const columns = getHeaders()
 
-    expect(columns.length).toBe(basicProps.revisions.length)
+    expect(columns.length).toBe(revisions.length)
   })
 
   it('should show the pinned column first', () => {
@@ -150,13 +178,15 @@ describe('ComparisonTable', () => {
 
     const rows = screen.getAllByRole('row')
 
-    expect(rows.length).toBe(Object.entries(basicProps.plots).length * 2 + 1) // 1 header row and 2 rows per plot
+    expect(rows.length).toBe(
+      Object.entries(comparisonTableFixture.plots).length * 2 + 1
+    ) // 1 header row and 2 rows per plot
   })
 
   it('should display the plots in the rows in the same order as the columns', () => {
     renderTable()
 
-    const [{ path: firstPlotEntry }] = basicProps.plots
+    const [{ path: firstPlotEntry }] = comparisonTableFixture.plots
     const [firstExperiment, secondExperiment] = revisions
 
     const [firstPlot, secondPlot] = screen.getAllByRole('img')
@@ -182,17 +212,17 @@ describe('ComparisonTable', () => {
   })
 
   it('should remove a column if it is not part of the revisions anymore', () => {
-    const { rerender } = renderTable()
+    const { rerender } = renderTable() as RenderResult
 
     let headers = getHeaders().map(header => header.textContent)
 
     expect(headers).toStrictEqual(namedRevisions)
 
-    const filteredRevisions = basicProps.revisions.filter(
+    const filteredRevisions = selectedRevisions.filter(
       ({ revision }) => revision !== revisions[3]
     )
 
-    rerender(<ComparisonTable {...basicProps} revisions={filteredRevisions} />)
+    renderTable(comparisonTableFixture, filteredRevisions, rerender)
 
     headers = getHeaders().map(header => header.textContent)
 
@@ -204,14 +234,15 @@ describe('ComparisonTable', () => {
   })
 
   it('should add a new column if there is a new revision', () => {
-    const { rerender } = renderTable()
+    const { rerender } = renderTable() as RenderResult
+
     const newRevName = 'newRev'
     const newRevisions = [
-      ...basicProps.revisions,
+      ...selectedRevisions,
       { displayColor: '#000000', revision: newRevName }
     ] as Revision[]
 
-    rerender(<ComparisonTable {...basicProps} revisions={newRevisions} />)
+    renderTable(comparisonTableFixture, newRevisions, rerender)
     const headers = getHeaders().map(header => header.textContent)
 
     expect(headers).toStrictEqual([...namedRevisions, newRevName])
@@ -220,24 +251,34 @@ describe('ComparisonTable', () => {
   it('should display a refresh button for each revision that has a missing image', () => {
     const revisionWithNoData = 'missing-data'
 
-    renderTable({
-      ...basicProps,
-      plots: basicProps.plots.map(({ path, revisions }) => ({
-        path,
-        revisions: {
-          ...revisions,
-          [revisionWithNoData]: { revision: revisionWithNoData, url: undefined }
+    renderTable(
+      {
+        ...comparisonTableFixture,
+        plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
+          path,
+          revisions: {
+            ...revisions,
+            [revisionWithNoData]: {
+              revision: revisionWithNoData,
+              url: undefined
+            }
+          }
+        }))
+      },
+      [
+        ...selectedRevisions,
+        {
+          displayColor: '#f56565',
+          group: undefined,
+          id: 'noData',
+          revision: revisionWithNoData
         }
-      })),
-      revisions: [
-        ...basicProps.revisions,
-        { displayColor: '#f56565', revision: revisionWithNoData }
       ]
-    })
+    )
 
     const refreshButtons = screen.getAllByText('Refresh')
 
-    expect(refreshButtons).toHaveLength(basicProps.plots.length)
+    expect(refreshButtons).toHaveLength(comparisonTableFixture.plots.length)
 
     for (const button of refreshButtons) {
       fireEvent.click(button)

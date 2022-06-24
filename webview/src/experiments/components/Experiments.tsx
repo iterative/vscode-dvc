@@ -21,6 +21,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { AddColumns, Welcome } from './GetStarted'
+import { RowSelectionProvider } from './table/RowSelectionContext'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -223,7 +224,9 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <DragDropProvider>
-      <Table instance={instance} tableData={tableData} />
+      <RowSelectionProvider>
+        <Table instance={instance} tableData={tableData} />
+      </RowSelectionProvider>
     </DragDropProvider>
   )
 }

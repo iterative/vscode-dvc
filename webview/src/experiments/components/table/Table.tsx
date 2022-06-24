@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import { RowContent } from './Row'
 import { InstanceProp, RowProp, TableProps, WithChanges } from './interfaces'
+import { RowSelectionContext } from './RowSelectionContext'
+import { useClickOutside } from '../../../shared/hooks/useClickOutside'
 
 export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   row,
@@ -111,9 +113,19 @@ export const Table: React.FC<TableProps & WithChanges> = ({
     filteredCounts
   } = tableData
 
+  const { clearSelectedRows } = React.useContext(RowSelectionContext)
+
+  const tableRef = useRef<HTMLDivElement>(null)
+
+  const clickOutsideHandler = React.useCallback(() => {
+    clearSelectedRows?.()
+  }, [clearSelectedRows])
+
+  useClickOutside(tableRef, clickOutsideHandler)
+
   return (
     <div className={styles.tableContainer}>
-      <div {...getTableProps({ className: styles.table })}>
+      <div {...getTableProps({ className: styles.table })} ref={tableRef}>
         <TableHead
           instance={instance}
           sorts={sorts}

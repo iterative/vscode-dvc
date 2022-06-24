@@ -1,21 +1,22 @@
-import { Revision } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { reorderObjectList } from 'dvc/src/util/array'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
-import { AllIcons } from '../../../shared/components/Icon'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { performOrderedUpdate } from '../../../util/objects'
 
-interface RibbonProps {
-  revisions: Revision[]
-}
+import { RootState } from '../../store'
+import { Lines, Refresh } from '../../../shared/components/icons'
 
 const MAX_NB_EXP = 7
 
-export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
+export const Ribbon: React.FC = () => {
+  const revisions = useSelector(
+    (state: RootState) => state.webview.selectedRevisions
+  )
   const [order, setOrder] = useState<string[]>([])
   const reorderId = 'id'
 
@@ -47,14 +48,14 @@ export const Ribbon: React.FC<RibbonProps> = ({ revisions }) => {
       <li className={styles.buttonWrapper}>
         <IconButton
           onClick={selectRevisions}
-          icon={AllIcons.LINES}
+          icon={Lines}
           text={`${revisions.length} of ${MAX_NB_EXP}`}
         />
       </li>
       <li className={styles.buttonWrapper}>
         <IconButton
           onClick={refreshRevisions}
-          icon={AllIcons.REFRESH}
+          icon={Refresh}
           text="Refresh All"
           appearance="secondary"
         />

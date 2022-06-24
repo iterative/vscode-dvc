@@ -1,10 +1,7 @@
-import {
-  ComparisonPlots,
-  Revision,
-  PlotsComparisonData
-} from 'dvc/src/plots/webview/contract'
+import { ComparisonPlots, Revision } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import {
@@ -14,16 +11,15 @@ import {
 import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
+import { RootState } from '../../store'
 
-export type ComparisonTableProps = Omit<
-  PlotsComparisonData & { revisions: Revision[] },
-  'size'
->
+export const ComparisonTable: React.FC = () => {
+  const { plots } = useSelector((state: RootState) => state.comparison)
 
-export const ComparisonTable: React.FC<ComparisonTableProps> = ({
-  plots,
-  revisions
-}) => {
+  const { selectedRevisions: revisions } = useSelector(
+    (state: RootState) => state.webview
+  )
+
   const pinnedColumn = useRef('')
   const [columns, setColumns] = useState<ComparisonTableColumn[]>([])
   const [comparisonPlots, setComparisonPlots] = useState<ComparisonPlots>([])
@@ -32,16 +28,17 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
     column.revision === pinnedColumn.current
 
   const getPinnedColumnRevision = useCallback(
-    () => revisions.find(isPinned) || null,
+    () => revisions?.find(isPinned) || null,
     [revisions]
   )
 
   useEffect(
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     () =>
       setColumns(() => {
         const acc: Revision[] = []
 
-        for (const column of revisions) {
+        for (const column of revisions || []) {
           if (isPinned(column)) {
             continue
           }

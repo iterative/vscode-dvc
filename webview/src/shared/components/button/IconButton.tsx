@@ -1,8 +1,8 @@
 import React from 'react'
 import { Button, ButtonProps } from './Button'
-import { Icon, IconValues } from '../Icon'
+import { Icon, IconValue } from '../Icon'
 
-export type IconButtonProps = ButtonProps & { icon: IconValues }
+export type IconButtonProps = ButtonProps & { icon: IconValue }
 
 export const IconButton: React.FC<IconButtonProps> = ({
   appearance,
