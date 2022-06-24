@@ -174,30 +174,52 @@ These are the VS Code [settings] available for the Extension:
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
 
-## Known limitations
+## Developer roadmap
 
-Some DVC features have limited support at the moment in the VS Code extension
-(but you can still use them from an IDE's _Terminal_).
+We are working on increasing the amount of DVC features supported by this GUI.
+Remember that you can always use `dvc` commands from the _Integrated Terminal_!
 
-### ML Pipelines
+### Parallel coordinates plot (2022 Q3)
+
+DVC Experiment comparison is easier with interactive [parallel coordinate plots]
+(`dvc exp show --pcp`) from command-line.
+
+[parallel coordinate plots]:
+  https://dvc.org/doc/user-guide/experiment-management/comparing-experiments#parallel-coordinates-plot
+
+### Performance improvements (2022 Q3)
+
+Our extension will be faster and more reliable with better internal usage of DVC
+and more efficient data management.
+
+### ML pipelines (2022 Q4)
 
 The extension examines [`dvc.yaml` files] to identify tracked data and changes,
-but does not currently provide a graphic interface to write or modify stages.
+but it does not currently provide a graphic interface to write or modify stages.
 
 [`dvc.yaml` files]: https://dvc.org/doc/user-guide/project-structure
 
-### Monorepos
+### Remote execution (2022 Q4)
 
-While DVC supports Git monorepos with DVC projects inside [sub-directories], the
-extension may have unexpected behaviors when opening such repos. Please open
-each subdir DVC project directly with VS Code instead.
+DVC Experiments can be run in remote environments. We intend to integrate this
+with VS Code's robust [remote development] features.
 
-[sub-directories]:
-  https://dvc.org/doc/command-reference/init#initializing-dvc-in-subdirectories
+[remote development]: https://code.visualstudio.com/docs/remote/remote-overview
 
-## Roadmap
+### Data registry (2022 Q4)
 
-<!-- ... -->
+DVC [data registries] can help you centralize and secure data management across
+all your ML projects. You'll be able to construct and handle them right from the
+IDE.
+
+[data registries]: https://dvc.org/doc/use-cases/data-registry
+
+### More tools from Iterative.ai (2023)
+
+Expect this extension to become a full-fledged suite for the ecosystem of tools
+from Iterative, such as [CML](https://cml.dev/), [MLEM](https://mlem.ai/) +
+[GTO](https://github.com/iterative/gto) **model registry** management, and
+future surprises!
 
 ## Debugging
 
