@@ -3,13 +3,14 @@ import React, {
   useEffect,
   useState,
   useRef,
-  useContext,
   DragEventHandler
 } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { DragEnterDirection, getDragEnterDirection } from './util'
-import { DragDropContext, DragDropContextValue } from './DragDropContext'
+import { changeRef } from './dragDropSlice'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 import { Any } from '../../../util/objects'
+import { RootState } from '../../../plots/store'
 
 const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
   if (direction === DragEnterDirection.RIGHT) {
@@ -84,9 +85,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(DragEnterDirection.LEFT)
-  const { draggedRef, setDraggedRef } =
-    useContext<DragDropContextValue>(DragDropContext)
+  const { draggedRef } = useSelector((state: RootState) => state.dragAndDrop)
   const draggedOverIdTimeout = useRef<number>(0)
+  const dispatch = useDispatch()
 
   const cleanup = () => {
     setDraggedOverId('')
@@ -119,11 +120,13 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     e.dataTransfer.setData('group', group)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
-    setDraggedRef?.({
-      group,
-      itemId: id,
-      itemIndex
-    })
+    dispatch(
+      changeRef({
+        group,
+        itemId: id,
+        itemIndex
+      })
+    )
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId(id)
       setDraggedOverId(order[toIdx])
@@ -143,7 +146,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     newOrder.splice(droppedIndex, 0, dragged)
 
     setOrder(newOrder)
-    setDraggedRef?.(undefined)
+    dispatch(changeRef(undefined))
 
     onDrop?.(oldDraggedId, e.dataTransfer.getData('group'), group, droppedIndex)
   }

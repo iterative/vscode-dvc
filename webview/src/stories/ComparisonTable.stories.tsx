@@ -13,13 +13,9 @@ import {
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
-import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
-import comparisonTableReducer, {
-  update
-} from '../plots/components/comparisonTable/comparisonTableSlice'
-import webviewReducer, {
-  updateSelectedRevisions
-} from '../plots/components/webviewSlice'
+import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
+import { updateSelectedRevisions } from '../plots/components/webviewSlice'
+import { storeReducers } from '../plots/store'
 
 const MockedState: React.FC<{
   data: PlotsComparisonData
@@ -40,10 +36,7 @@ export default {
 
 const Template: Story = ({ plots, revisions }) => {
   const store = configureStore({
-    reducer: {
-      comparison: comparisonTableReducer,
-      webview: webviewReducer
-    }
+    reducer: storeReducers
   })
   return (
     <Provider store={store}>
@@ -55,9 +48,7 @@ const Template: Story = ({ plots, revisions }) => {
         selectedRevisions={revisions}
       >
         <WebviewWrapper>
-          <DragDropProvider>
-            <ComparisonTable />
-          </DragDropProvider>
+          <ComparisonTable />
         </WebviewWrapper>
       </MockedState>
     </Provider>
