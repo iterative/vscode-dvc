@@ -58,9 +58,13 @@ databases are required.
 - [What you get](#what-you-get)
 - [Useful commands](#useful-commands)
 - [Configuration](#configuration)
-- [Known limitations](#known-limitations)
-  - [ML Pipelines](#ml-pipelines)
-  - [Monorepos](#monorepos)
+- [Developer roadmap](#developer-roadmap)
+  - [Parallel coordinates plot (2022 Q3)](#parallel-coordinates-plot-2022-q3)
+  - [Performance improvements (2022 Q3)](#performance-improvements-2022-q3)
+  - [ML pipelines (2022 Q4)](#ml-pipelines-2022-q4)
+  - [Remote execution (2022 Q4)](#remote-execution-2022-q4)
+  - [Data registry (2022 Q4)](#data-registry-2022-q4)
+  - [More tools from Iterative.ai (2023)](#more-tools-from-iterativeai-2023)
 - [Debugging](#debugging)
   - [The DVC Extension](#the-dvc-extension)
   - [Your DVC project](#your-dvc-project)
@@ -176,13 +180,14 @@ These are the VS Code [settings] available for the Extension:
 
 ## Developer roadmap
 
-We are working on increasing the amount of DVC features supported by this GUI.
-Remember that you can always use `dvc` commands from the _Integrated Terminal_!
+We are working on increasing the quantity and quality of DVC features supported
+by this GUI. Remember that you can always use `dvc` commands from the
+_Integrated Terminal_!
 
 ### Parallel coordinates plot (2022 Q3)
 
 DVC Experiment comparison is easier with interactive [parallel coordinate plots]
-(`dvc exp show --pcp`) from command-line.
+(`dvc exp show --pcp` from command-line).
 
 [parallel coordinate plots]:
   https://dvc.org/doc/user-guide/experiment-management/comparing-experiments#parallel-coordinates-plot
