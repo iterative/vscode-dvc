@@ -6,12 +6,12 @@ import { CheckpointPlots } from './CheckpointPlots'
 import { changeSize } from './checkpointPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { sendMessage } from '../../../shared/vscode'
-import { RootState } from '../../store'
+import { PlotsRootState } from '../../store'
 
 export const CheckpointPlotsWrapper: React.FC = () => {
   const dispatch = useDispatch()
   const { plotsIds, size, selectedMetrics, isCollapsed, colors } = useSelector(
-    (state: RootState) => state.checkpoint
+    (state: PlotsRootState) => state.checkpoint
   )
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])

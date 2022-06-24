@@ -30,12 +30,12 @@ import {
   updateHasSelectedPlots,
   updateSelectedRevisions
 } from './webviewSlice'
-import { AppDispatch } from '../store'
+import { PlotsAppDispatch } from '../store'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
 const dispatchCollapsedSections = (
   sections: SectionCollapsed,
-  dispatch: AppDispatch
+  dispatch: PlotsAppDispatch
 ) => {
   if (sections) {
     dispatch(setCheckpointPlotsCollapsed(sections[Section.CHECKPOINT_PLOTS]))
@@ -46,7 +46,7 @@ const dispatchCollapsedSections = (
 
 export const feedStore = (
   data: MessageToWebview<PlotsData>,
-  dispatch: AppDispatch
+  dispatch: PlotsAppDispatch
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   if (data.data) {

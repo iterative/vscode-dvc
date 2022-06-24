@@ -1,44 +1,66 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { DragDropContextValue } from './DragDropContext'
 import { clearData } from '../../actions'
 import { ReducerName } from '../../constants'
 
-export interface DragDropState extends DragDropContextValue {}
+export type DraggedInfo =
+  | {
+      itemIndex: string
+      itemId: string
+      group?: string
+    }
+  | undefined
+
+export interface DragDropGroupState {
+  draggedId?: string
+  draggedOverId?: string
+}
+
+export type GroupStates = {
+  [group: string]: DragDropGroupState | undefined
+}
+export interface DragDropState {
+  draggedRef: DraggedInfo
+  groupStates?: GroupStates
+}
 
 export const dragDropInitialState: DragDropState = {
   draggedRef: undefined,
-  groupStates: undefined,
-  removeGroupState: undefined,
-  setDraggedRef: undefined,
-  setGroupState: undefined
+  groupStates: undefined
 }
 
 export const dragDropSlice = createSlice({
   extraReducers: builder => {
-    builder
-      .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.dragDrop) {
-          return { ...dragDropInitialState }
-        }
-      })
-      .addDefaultCase(() => {})
+    builder.addCase(clearData, (_, action) => {
+      if (!action.payload || action.payload === ReducerName.DRAG_AND_DROP) {
+        return dragDropInitialState
+      }
+    })
   },
   initialState: dragDropInitialState,
-  name: ReducerName.comparison,
+  name: ReducerName.DRAG_AND_DROP,
   reducers: {
-    changeSize: (state, action: PayloadAction<PlotSize>) => {
-      state.size = action.payload
+    changeRef: (state, action: PayloadAction<DraggedInfo>) => {
+      return {
+        ...state,
+        draggedRef: action.payload
+      }
     },
-    setCollapsed: (state, action: PayloadAction<boolean>) => {
-      state.isCollapsed = action.payload
-    },
-    update: (state, action: PayloadAction<PlotsComparisonData>) => {
-      Object.assign(state, action.payload)
-      state.hasData = !!action.payload
+    setGroupState: (
+      state,
+      action: PayloadAction<{ group: string; handlers: DragDropGroupState }>
+    ) => {
+      const { group, handlers } = action.payload
+      return {
+        ...state,
+        groupStates: {
+          ...state.groupStates,
+          [group]: handlers
+        }
+      }
     }
   }
 })
 
-export const { update, setCollapsed, changeSize } = comparisonTableSlice.actions
+export const { changeRef, setGroupState } = dragDropSlice.actions
 
-export default comparisonTableSlice.reducer
+export default dragDropSlice.reducer

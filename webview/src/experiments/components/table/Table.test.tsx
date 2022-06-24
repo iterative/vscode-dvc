@@ -23,6 +23,9 @@ import {
 } from '../../../test/sort'
 import { dragAndDrop } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
+import { configureStore } from '@reduxjs/toolkit'
+import { storeReducers } from '../../store'
+import { Provider } from 'react-redux'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
@@ -116,12 +119,23 @@ describe('Table', () => {
   }
   const renderTable = (testData = {}, tableInstance = instance) => {
     const tableData = { ...dummyTableData, ...testData }
-    return render(<Table instance={tableInstance} tableData={tableData} />)
+    const store = configureStore({ reducer: storeReducers })
+    return render(
+      <Provider store={store}>
+        <Table instance={tableInstance} tableData={tableData} />
+      </Provider>
+    )
   }
   const renderExperimentsTable = (
     data: TableData = sortingTableDataFixture
   ) => {
-    return render(<ExperimentsTable tableData={data} />)
+    const store = configureStore({ reducer: storeReducers })
+
+    return render(
+      <Provider store={store}>
+        <ExperimentsTable tableData={data} />
+      </Provider>
+    )
   }
 
   beforeAll(() => {
@@ -324,7 +338,7 @@ describe('Table', () => {
           id: 333
         }
       }
-      render(<ExperimentsTable tableData={tableDataWithColumnSetting} />)
+      renderExperimentsTable(tableDataWithColumnSetting)
       const [experimentColumnResizeHandle] = await screen.findAllByRole(
         'separator'
       )

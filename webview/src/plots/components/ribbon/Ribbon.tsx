@@ -8,13 +8,13 @@ import { sendMessage } from '../../../shared/vscode'
 import { AllIcons } from '../../../shared/components/Icon'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { performOrderedUpdate } from '../../../util/objects'
-import { RootState } from '../../store'
+import { PlotsRootState } from '../../store'
 
 const MAX_NB_EXP = 7
 
 export const Ribbon: React.FC = () => {
   const revisions = useSelector(
-    (state: RootState) => state.webview.selectedRevisions
+    (state: PlotsRootState) => state.webview.selectedRevisions
   )
   const [order, setOrder] = useState<string[]>([])
   const reorderId = 'id'

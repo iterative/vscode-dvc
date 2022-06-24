@@ -1,6 +1,8 @@
-import React, { DragEvent, useContext } from 'react'
+import React, { DragEvent } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { DropTargetInfo, makeTarget } from './DragDropContainer'
-import { DragDropContext, DragDropContextValue } from './DragDropContext'
+import { setGroupState } from './dragDropSlice'
+import { ExperimentsRootState } from '../../../experiments/store'
 
 export type OnDrop = (draggedId: string, draggedOverId: string) => void
 export type OnDragStart = (draggedId: string) => void
@@ -27,8 +29,10 @@ export const Draggable: React.FC<DraggableProps> = ({
   onDragOver,
   onDragStart
 }) => {
-  const { groupStates, setGroupState } =
-    useContext<DragDropContextValue>(DragDropContext)
+  const { groupStates } = useSelector(
+    (state: ExperimentsRootState) => state.dragAndDrop
+  )
+  const dispatch = useDispatch()
 
   const groupState = groupStates?.[group] || {}
   const { draggedOverId, draggedId } = groupState
@@ -37,10 +41,15 @@ export const Draggable: React.FC<DraggableProps> = ({
     const { id } = e.currentTarget
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
-    setGroupState?.(group, {
-      ...groupState,
-      draggedId: id
-    })
+    dispatch(
+      setGroupState({
+        group,
+        handlers: {
+          ...groupState,
+          draggedId: id
+        }
+      })
+    )
     onDragStart?.(id)
   }
 
@@ -57,10 +66,15 @@ export const Draggable: React.FC<DraggableProps> = ({
       draggedId &&
       id !== draggedId &&
       id !== draggedOverId &&
-      (setGroupState?.(group, {
-        ...groupState,
-        draggedOverId: id
-      }) ||
+      (dispatch(
+        setGroupState({
+          group,
+          handlers: {
+            ...groupState,
+            draggedOverId: id
+          }
+        })
+      ) ||
         onDragOver?.(draggedId, id))
   }
 
@@ -69,11 +83,16 @@ export const Draggable: React.FC<DraggableProps> = ({
   }
 
   const handleDragEnd = () => {
-    setGroupState?.(group, {
-      ...groupState,
-      draggedId: undefined,
-      draggedOverId: undefined
-    })
+    dispatch(
+      setGroupState({
+        group,
+        handlers: {
+          ...groupState,
+          draggedId: undefined,
+          draggedOverId: undefined
+        }
+      })
+    )
   }
 
   const item = (

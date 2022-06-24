@@ -10,9 +10,8 @@ import { setZoomedInPlot } from './webviewSlice'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
-import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
-import { RootState } from '../store'
+import { PlotsRootState } from '../store'
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const PlotsContent = () => {
@@ -23,15 +22,15 @@ const PlotsContent = () => {
     hasSelectedPlots,
     selectedRevisions,
     zoomedInPlot
-  } = useSelector((state: RootState) => state.webview)
+  } = useSelector((state: PlotsRootState) => state.webview)
   const hasCheckpointData = useSelector(
-    (state: RootState) => state.checkpoint.hasData
+    (state: PlotsRootState) => state.checkpoint.hasData
   )
   const hasComparisonData = useSelector(
-    (state: RootState) => state.comparison.hasData
+    (state: PlotsRootState) => state.comparison.hasData
   )
   const hasTemplateData = useSelector(
-    (state: RootState) => state.template.hasData
+    (state: PlotsRootState) => state.template.hasData
   )
 
   if (!hasData) {
@@ -56,11 +55,9 @@ const PlotsContent = () => {
   return (
     <>
       <Ribbon />
-      <DragDropProvider>
-        {hasTemplateData && <TemplatePlotsWrapper />}
-        {hasComparisonData && <ComparisonTableWrapper />}
-        {hasCheckpointData && <CheckpointPlotsWrapper />}
-      </DragDropProvider>
+      {hasTemplateData && <TemplatePlotsWrapper />}
+      {hasComparisonData && <ComparisonTableWrapper />}
+      {hasCheckpointData && <CheckpointPlotsWrapper />}
 
       {zoomedInPlot?.plot && (
         <Modal

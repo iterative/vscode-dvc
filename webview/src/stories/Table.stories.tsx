@@ -1,14 +1,16 @@
-import React from 'react'
+import { configureStore } from '@reduxjs/toolkit'
 import { Story, Meta } from '@storybook/react/types-6-0'
+import React from 'react'
+import { Provider } from 'react-redux'
 import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import Experiments from '../experiments/components/Experiments'
-
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
+import { storeReducers } from '../experiments/store'
 
 const tableData: TableData = {
   changes: workspaceChangesFixture,
@@ -54,7 +56,12 @@ export default {
 } as Meta
 
 const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
-  return <Experiments tableData={tableData} />
+  const store = configureStore({ reducer: storeReducers })
+  return (
+    <Provider store={store}>
+      <Experiments tableData={tableData} />
+    </Provider>
+  )
 }
 
 export const WithData = Template.bind({})

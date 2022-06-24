@@ -23,13 +23,11 @@ export const comparisonTableInitialState: ComparisonTableState = {
 
 export const comparisonTableSlice = createSlice({
   extraReducers: builder => {
-    builder
-      .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.COMPARISON) {
-          return { ...comparisonTableInitialState }
-        }
-      })
-      .addDefaultCase(() => {})
+    builder.addCase(clearData, (_, action) => {
+      if (!action.payload || action.payload === ReducerName.COMPARISON) {
+        return { ...comparisonTableInitialState }
+      }
+    })
   },
   initialState: comparisonTableInitialState,
   name: ReducerName.COMPARISON,

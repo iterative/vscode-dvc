@@ -12,7 +12,6 @@ import {
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
-import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
 import { clearData } from '../shared/actions'
 import { ReducerName } from '../shared/constants'
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
@@ -48,9 +47,7 @@ const Template: Story = ({ plots, revisions }) => {
         selectedRevisions={revisions}
       >
         <WebviewWrapper>
-          <DragDropProvider>
-            <ComparisonTable />
-          </DragDropProvider>
+          <ComparisonTable />
         </WebviewWrapper>
       </MockedState>
     </Provider>

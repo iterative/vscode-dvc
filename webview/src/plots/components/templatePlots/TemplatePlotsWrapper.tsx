@@ -4,12 +4,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { TemplatePlots } from './TemplatePlots'
 import { changeSize } from './templatePlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
-import { RootState } from '../../store'
+import { PlotsRootState } from '../../store'
 
 export const TemplatePlotsWrapper: React.FC = () => {
   const dispatch = useDispatch()
   const { size, isCollapsed } = useSelector(
-    (state: RootState) => state.template
+    (state: PlotsRootState) => state.template
   )
 
   const handleResize = (size: PlotSize) => {
