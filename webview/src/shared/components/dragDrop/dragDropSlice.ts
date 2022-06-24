@@ -1,6 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { clearData } from '../../actions'
-import { ReducerName } from '../../constants'
 
 export type DraggedInfo =
   | {
@@ -18,15 +16,8 @@ export const dragDropInitialState: DragDropState = {
 }
 
 export const dragDropSlice = createSlice({
-  extraReducers: builder => {
-    builder.addCase(clearData, (_, action) => {
-      if (!action.payload || action.payload === ReducerName.DRAG_AND_DROP) {
-        return dragDropInitialState
-      }
-    })
-  },
   initialState: dragDropInitialState,
-  name: ReducerName.DRAG_AND_DROP,
+  name: 'dragAndDrop',
   reducers: {
     changeRef: (state, action: PayloadAction<DraggedInfo>) => {
       return {

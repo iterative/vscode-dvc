@@ -1,3 +1,4 @@
+import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import { Story, Meta } from '@storybook/react/types-6-0'
@@ -21,14 +22,11 @@ import { Plots } from '../plots/components/Plots'
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
 import '../plots/components/styles.module.scss'
-import { store } from '../plots/store'
 import { feedStore } from '../plots/components/App'
-import { clearData } from '../shared/actions'
+import { storeReducers } from '../plots/store'
 
 const MockedState: React.FC<{ data: PlotsData }> = ({ children, data }) => {
   const dispatch = useDispatch()
-  dispatch(clearData())
-
   const message = { data, type: MessageToWebviewType.SET_DATA }
   feedStore(message, dispatch)
 
@@ -54,6 +52,7 @@ export default {
 const Template: Story<{
   data?: PlotsData
 }> = ({ data }) => {
+  const store = configureStore({ reducer: storeReducers })
   return (
     <Provider store={store}>
       <MockedState data={data}>

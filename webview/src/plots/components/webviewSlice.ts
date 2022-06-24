@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import { VegaProps } from 'react-vega/lib/Vega'
-import { ReducerName } from '../../shared/constants'
-import { clearData } from '../../shared/actions'
 
 type ZoomedInPlotState = {
   plot: VegaProps | undefined
@@ -29,15 +27,8 @@ export const webviewInitialState: WebviewState = {
 }
 
 export const webviewSlice = createSlice({
-  extraReducers: builder => {
-    builder.addCase(clearData, (_, action) => {
-      if (!action.payload || action.payload === ReducerName.WEBVIEW) {
-        return { ...webviewInitialState }
-      }
-    })
-  },
   initialState: webviewInitialState,
-  name: ReducerName.WEBVIEW,
+  name: 'webview',
   reducers: {
     initialize: state => {
       state.hasData = true
