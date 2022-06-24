@@ -672,7 +672,14 @@ describe('App', () => {
   })
 
   describe('Row Context Menu', () => {
-    it('should be available when there is data and no running experiments', async () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+    })
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
+    it('should be available when there is data and no running experiments', () => {
       render(<App />)
 
       fireEvent(
@@ -691,11 +698,12 @@ describe('App', () => {
       const target = screen.getByTestId('workspace-row')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      const menu = await screen.findByTestId('messages-menu')
+      jest.advanceTimersByTime(100)
+      const menu = screen.getByTestId('messages-menu')
       expect(menu).toBeDefined()
     })
 
-    it('should present the correct options for the workspace row with no checkpoints', async () => {
+    it('should present the correct options for the workspace row with no checkpoints', () => {
       render(<App />)
 
       fireEvent(
@@ -711,12 +719,13 @@ describe('App', () => {
       const target = screen.getByTestId('workspace-row')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      const menuitems = await screen.findAllByRole('menuitem')
+      jest.advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual(['Modify and Run', 'Modify and Queue'])
     })
 
-    it('should present the correct options for the main row with checkpoints', async () => {
+    it('should present the correct options for the main row with checkpoints', () => {
       render(<App />)
 
       fireEvent(
@@ -735,7 +744,8 @@ describe('App', () => {
       const target = screen.getByText('main')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      const menuitems = await screen.findAllByRole('menuitem')
+      jest.advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
         'Modify and Resume',
@@ -744,7 +754,7 @@ describe('App', () => {
       ])
     })
 
-    it('should present the Remove experiment option for the checkpoint tips', async () => {
+    it('should present the Remove experiment option for the checkpoint tips', () => {
       render(<App />)
 
       fireEvent(
@@ -763,12 +773,13 @@ describe('App', () => {
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      const menuitems = await screen.findAllByRole('menuitem')
+      jest.advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove')
     })
 
-    it('should present the Remove option if multiple checkpoint tip rows are selected', async () => {
+    it('should present the Remove option if multiple checkpoint tip rows are selected', () => {
       render(<App />)
 
       fireEvent(
@@ -790,10 +801,11 @@ describe('App', () => {
       const secondRow = screen.getByTestId('timestamp___1.test-branch')
       fireEvent.click(secondRow)
 
-      const target = await screen.findByText('4fb124a')
+      const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      const menuitems = await screen.findAllByRole('menuitem')
+      jest.advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected Rows')
     })
