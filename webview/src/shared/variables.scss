@@ -12,6 +12,8 @@ $changed-color: var(--vscode-dvc-workspaceChanged);
 $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $row-bg-alt-color: var(--vscode-sideBar-background);
+$row-bg-selected-color: var(--vscode-list-activeSelectionBackground);
+$row-border-selected-color: var(--vscode-list-focusOutline);
 $header-bg-color: var(--vscode-dropdown-background);
 $header-border-color: var(--vscode-tree-tableColumnsBorder);
 $meta-cell-color: var(--vscode-descriptionForeground);

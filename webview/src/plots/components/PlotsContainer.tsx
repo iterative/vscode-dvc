@@ -5,11 +5,18 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
-import { AllIcons, Icon } from '../../shared/components/Icon'
+import { Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
 import Tooltip from '../../shared/components/tooltip/Tooltip'
+import {
+  ChevronDown,
+  ChevronRight,
+  Dots,
+  Info,
+  Lines
+} from '../../shared/components/icons'
 
 export interface CommonPlotsContainerProps {
   onResize: (size: PlotSize) => void
@@ -24,21 +31,19 @@ export interface PlotsContainerProps extends CommonPlotsContainerProps {
 }
 
 export const SectionDescription = {
+  // "Trends"
   [Section.CHECKPOINT_PLOTS]:
-    'Linear plots based on data from the experiments table.',
+    'Real-time plots based on metrics from the Experiments Table',
+  // "Images"
   [Section.COMPARISON_TABLE]:
-    'A table used to display image plots side by side.',
+    'Displays image plots side by side across experiments.',
+  // "Data Series"
   [Section.TEMPLATE_PLOTS]:
-    'JSON, YAML, CSV or TSV files visualized using Vega pre-defined or custom Vega-Lite templates.'
+    'Plots of JSON, YAML, CSV, or TSV files, visualized using `dvc plots` templates'
 }
 
 const InfoIcon = () => (
-  <Icon
-    icon={AllIcons.INFO}
-    width={16}
-    height={16}
-    className={styles.infoIcon}
-  />
+  <Icon icon={Info} width={16} height={16} className={styles.infoIcon} />
 )
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
@@ -78,7 +83,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   }
   const menuItems: IconMenuItemProps[] = [
     {
-      icon: AllIcons.DOTS,
+      icon: Dots,
       onClickNode: (
         <SizePicker currentSize={size} setSelectedSize={changeSize} />
       ),
@@ -88,7 +93,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   if (menu) {
     menuItems.unshift({
-      icon: AllIcons.LINES,
+      icon: Lines,
       onClickNode: <PlotsPicker {...menu} />,
       tooltip: 'Select Plots'
     })
@@ -116,7 +121,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           }}
         >
           <Icon
-            icon={open ? AllIcons.CHEVRON_DOWN : AllIcons.CHEVRON_RIGHT}
+            icon={open ? ChevronDown : ChevronRight}
             data-testid="plots-container-details-chevron"
             width={20}
             height={20}

@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.4",
+  "version": "0.3.6",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -17,7 +17,7 @@
     "url": "https://github.com/iterative/vscode-dvc"
   },
   "bugs": "https://github.com/iterative/vscode-dvc",
-  "homepage": "https://github.com/iterative/vscode-dvc/README.md",
+  "homepage": "https://github.com/iterative/vscode-dvc#readme",
   "keywords": [
     "iterative",
     "data version control",
@@ -1416,7 +1416,7 @@
           },
           {
             "id": "dvc.plots",
-            "title": "Plots",
+            "title": "Plots Dashboard",
             "description": "Visualize and compare multiple experiments with interactive customizable charts.\n[Show Plots](command:dvc.showPlots)",
             "media": {
               "markdown": "resources/walkthrough/plots.md"

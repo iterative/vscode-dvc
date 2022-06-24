@@ -682,6 +682,134 @@ describe('App', () => {
     })
   })
 
+  describe('Row Context Menu', () => {
+    it('should be available when there is data and no running experiments', async () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const target = screen.getByTestId('workspace-row')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      const menu = await screen.findByTestId('messages-menu')
+      expect(menu).toBeDefined()
+    })
+
+    it('should present the correct options for the workspace row with no checkpoints', async () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: deeplyNestedTableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const target = screen.getByTestId('workspace-row')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      const menuitems = await screen.findAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toStrictEqual(['Modify and Run', 'Modify and Queue'])
+    })
+
+    it('should present the correct options for the main row with checkpoints', async () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const target = screen.getByText('main')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      const menuitems = await screen.findAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toStrictEqual([
+        'Modify and Resume',
+        'Modify, Reset and Run',
+        'Modify and Queue'
+      ])
+    })
+
+    it('should present the Remove experiment option for the checkpoint tips', async () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      const menuitems = await screen.findAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Remove')
+    })
+
+    it('should present the Remove option if multiple checkpoint tip rows are selected', async () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRow = screen.getByTestId('timestamp___1.exp-e7a67')
+      fireEvent.click(firstRow)
+
+      const secondRow = screen.getByTestId('timestamp___1.test-branch')
+      fireEvent.click(secondRow)
+
+      const target = await screen.findByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      const menuitems = await screen.findAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Remove Selected Rows')
+    })
+  })
+
   describe('Context Menu Suppression', () => {
     it('Suppresses the context menu on a table with no data', () => {
       renderTable()

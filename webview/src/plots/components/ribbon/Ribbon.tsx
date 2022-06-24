@@ -5,10 +5,10 @@ import { reorderObjectList } from 'dvc/src/util/array'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
-import { AllIcons } from '../../../shared/components/Icon'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { performOrderedUpdate } from '../../../util/objects'
 import { PlotsRootState } from '../../store'
+import { Lines, Refresh } from '../../../shared/components/icons'
 
 const MAX_NB_EXP = 7
 
@@ -47,14 +47,14 @@ export const Ribbon: React.FC = () => {
       <li className={styles.buttonWrapper}>
         <IconButton
           onClick={selectRevisions}
-          icon={AllIcons.LINES}
+          icon={Lines}
           text={`${revisions.length} of ${MAX_NB_EXP}`}
         />
       </li>
       <li className={styles.buttonWrapper}>
         <IconButton
           onClick={refreshRevisions}
-          icon={AllIcons.REFRESH}
+          icon={Refresh}
           text="Refresh All"
           appearance="secondary"
         />

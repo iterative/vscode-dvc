@@ -1,7 +1,7 @@
 import React from 'react'
 import { ButtonProps } from './Button'
 import { IconButton } from './IconButton'
-import { AllIcons } from '../Icon'
+import { Add } from '../icons'
 
 export const StartButton: React.FC<ButtonProps> = ({
   appearance,
@@ -13,7 +13,7 @@ export const StartButton: React.FC<ButtonProps> = ({
     <IconButton
       appearance={appearance}
       isNested={isNested}
-      icon={AllIcons.ADD}
+      icon={Add}
       onClick={onClick}
       text={text}
     />

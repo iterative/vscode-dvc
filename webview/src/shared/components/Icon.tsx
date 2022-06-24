@@ -1,43 +1,8 @@
-import React from 'react'
-import {
-  Add,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Close,
-  Dots,
-  DownArrow,
-  Ellipsis,
-  GraphLine,
-  Gripper,
-  Info,
-  Lines,
-  Refresh,
-  UpArrow
-} from './icons'
+import React, { SVGProps } from 'react'
 
-export const AllIcons = {
-  ADD: Add,
-  CHECK: Check,
-  CHEVRON_DOWN: ChevronDown,
-  CHEVRON_RIGHT: ChevronRight,
-  CLOSE: Close,
-  DOTS: Dots,
-  DOWN_ARROW: DownArrow,
-  ELLIPSIS: Ellipsis,
-  GRAPH_LINE: GraphLine,
-  GRIPPER: Gripper,
-  INFO: Info,
-  LINES: Lines,
-  REFRESH: Refresh,
-  UP_ARROW: UpArrow
-}
-
-type IconKeys = keyof typeof AllIcons
-export type IconValues = typeof AllIcons[IconKeys]
-
+export type IconValue = (props: SVGProps<SVGSVGElement>) => JSX.Element
 interface IconProps {
-  icon: IconValues
+  icon: IconValue
   className?: string
   width?: number
   height?: number
