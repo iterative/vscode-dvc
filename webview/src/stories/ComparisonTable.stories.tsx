@@ -17,7 +17,9 @@ import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
 import comparisonTableReducer, {
   update
 } from '../plots/components/comparisonTable/comparisonTableSlice'
-import { updateSelectedRevisions } from '../plots/components/webviewSlice'
+import webviewReducer, {
+  updateSelectedRevisions
+} from '../plots/components/webviewSlice'
 
 const MockedState: React.FC<{
   data: PlotsComparisonData
@@ -39,7 +41,8 @@ export default {
 const Template: Story = ({ plots, revisions }) => {
   const store = configureStore({
     reducer: {
-      comparison: comparisonTableReducer
+      comparison: comparisonTableReducer,
+      webview: webviewReducer
     }
   })
   return (
