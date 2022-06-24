@@ -26,6 +26,7 @@ import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
+import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
 const DEFAULT_COLUMN_WIDTH = 90
@@ -222,9 +223,11 @@ export const ExperimentsTable: React.FC<{
   }
 
   return (
-    <RowSelectionProvider>
-      <Table instance={instance} tableData={tableData} />
-    </RowSelectionProvider>
+    <DragDropProvider>
+      <RowSelectionProvider>
+        <Table instance={instance} tableData={tableData} />
+      </RowSelectionProvider>
+    </DragDropProvider>
   )
 }
 

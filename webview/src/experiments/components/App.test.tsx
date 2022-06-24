@@ -41,9 +41,6 @@ import {
 import { getRow } from '../../test/queries'
 import { dragAndDrop } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
-import { configureStore } from '@reduxjs/toolkit'
-import { storeReducers } from '../store'
-import { Provider } from 'react-redux'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -64,17 +61,9 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  const renderTable = () => {
-    const store = configureStore({ reducer: storeReducers })
-    render(
-      <Provider store={store}>
-        <App />
-      </Provider>
-    )
-  }
   describe('Sorting Classes', () => {
     const renderTableWithPlaceholder = () => {
-      renderTable()
+      render(<App />)
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -134,7 +123,7 @@ describe('App', () => {
   })
 
   it('should send a message to the extension on the first render', () => {
-    renderTable()
+    render(<App />)
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.INITIALIZED
     })
@@ -143,14 +132,14 @@ describe('App', () => {
   })
 
   it('should display the loading state before the experiments are shown', async () => {
-    renderTable()
+    render(<App />)
 
     const loadingState = await screen.findByText('Loading Experiments...')
     expect(loadingState).toBeInTheDocument()
   })
 
   it('should show the no columns selected empty state when there are no columns provided', () => {
-    renderTable()
+    render(<App />)
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -166,7 +155,7 @@ describe('App', () => {
   })
 
   it('should show the no experiments empty state when only the workspace is provided', () => {
-    renderTable()
+    render(<App />)
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -182,7 +171,7 @@ describe('App', () => {
   })
 
   it('should show the experiments table', () => {
-    renderTable()
+    render(<App />)
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -206,7 +195,7 @@ describe('App', () => {
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {
-    renderTable()
+    render(<App />)
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -253,7 +242,7 @@ describe('App', () => {
     const checkpointLabel = '22e40e1'
 
     it('should maintain expansion status when rows are reordered', () => {
-      renderTable()
+      render(<App />)
 
       fireEvent(
         window,
@@ -301,7 +290,7 @@ describe('App', () => {
     })
 
     it('should maintain expansion status when the branch changes', () => {
-      renderTable()
+      render(<App />)
 
       fireEvent(
         window,
@@ -354,7 +343,7 @@ describe('App', () => {
     })
 
     it('should not toggle an experiment when using the row expansion button', () => {
-      renderTable()
+      render(<App />)
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -384,7 +373,7 @@ describe('App', () => {
 
   describe('Toggle experiment status', () => {
     it('should send a message to the extension to toggle an experiment when the row is clicked', () => {
-      renderTable()
+      render(<App />)
 
       fireEvent(
         window,
@@ -415,7 +404,7 @@ describe('App', () => {
     })
 
     it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
-      renderTable()
+      render(<App />)
 
       fireEvent(
         window,
@@ -565,7 +554,7 @@ describe('App', () => {
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a header', () => {
       mockedUseIsFullyContained.mockReturnValue(false)
 
-      renderTable()
+      render(<App />)
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -602,7 +591,7 @@ describe('App', () => {
     it('should not show a tooltip after hovering on a header if its content is not overflowing', () => {
       mockedUseIsFullyContained.mockReturnValue(true)
 
-      renderTable()
+      render(<App />)
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -627,7 +616,7 @@ describe('App', () => {
       jest
         .spyOn(window, 'requestAnimationFrame')
         .mockImplementation(cb => window.setTimeout(cb, 1))
-      renderTable()
+      render(<App />)
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -659,7 +648,7 @@ describe('App', () => {
     })
 
     it('should show a tooltip with the full number on number cells', () => {
-      renderTable()
+      render(<App />)
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -812,7 +801,7 @@ describe('App', () => {
 
   describe('Context Menu Suppression', () => {
     it('Suppresses the context menu on a table with no data', () => {
-      renderTable()
+      render(<App />)
       const target = screen.getByText('Loading Experiments...')
       const contextMenuEvent = createEvent.contextMenu(target)
       fireEvent(target, contextMenuEvent)
@@ -820,7 +809,7 @@ describe('App', () => {
     })
 
     it('Suppresses the context menu on a table with data', () => {
-      renderTable()
+      render(<App />)
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -839,7 +828,7 @@ describe('App', () => {
 
   describe('Sort and Filter Indicators', () => {
     it('should show an indicator with the amount of applied sorts', () => {
-      renderTable()
+      render(<App />)
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -901,7 +890,7 @@ describe('App', () => {
   })
 
   it('should show an indicator with the amount of applied filters', () => {
-    renderTable()
+    render(<App />)
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -1005,7 +994,7 @@ describe('App', () => {
   })
 
   it('should send a message to focus the relevant tree when clicked', () => {
-    renderTable()
+    render(<App />)
     fireEvent(
       window,
       new MessageEvent('message', {

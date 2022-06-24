@@ -4,12 +4,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { ComparisonTable } from './ComparisonTable'
 import { changeSize } from './comparisonTableSlice'
 import { PlotsContainer } from '../PlotsContainer'
-import { PlotsRootState } from '../../store'
+import { RootState } from '../../store'
 
 export const ComparisonTableWrapper: React.FC = () => {
   const dispatch = useDispatch()
   const { size, isCollapsed } = useSelector(
-    (state: PlotsRootState) => state.comparison
+    (state: RootState) => state.comparison
   )
   const handleResize = (size: PlotSize) => {
     dispatch(changeSize(size))

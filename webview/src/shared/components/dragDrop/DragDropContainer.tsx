@@ -10,8 +10,7 @@ import { DragEnterDirection, getDragEnterDirection } from './util'
 import { changeRef } from './dragDropSlice'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 import { Any } from '../../../util/objects'
-import { ExperimentsRootState } from '../../../experiments/store'
-import { PlotsRootState } from '../../../plots/store'
+import { RootState } from '../../../plots/store'
 
 const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
   if (direction === DragEnterDirection.RIGHT) {
@@ -86,9 +85,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(DragEnterDirection.LEFT)
-  const { draggedRef } = useSelector(
-    (state: PlotsRootState | ExperimentsRootState) => state.dragAndDrop
-  )
+  const { draggedRef } = useSelector((state: RootState) => state.dragAndDrop)
   const draggedOverIdTimeout = useRef<number>(0)
   const dispatch = useDispatch()
 

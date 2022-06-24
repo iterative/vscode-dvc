@@ -17,5 +17,5 @@ export const store = configureStore({
   reducer: storeReducers
 })
 
-export type PlotsRootState = ReturnType<typeof store.getState>
-export type PlotsAppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

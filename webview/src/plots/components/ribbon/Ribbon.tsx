@@ -7,14 +7,14 @@ import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { performOrderedUpdate } from '../../../util/objects'
-import { PlotsRootState } from '../../store'
+import { RootState } from '../../store'
 import { Lines, Refresh } from '../../../shared/components/icons'
 
 const MAX_NB_EXP = 7
 
 export const Ribbon: React.FC = () => {
   const revisions = useSelector(
-    (state: PlotsRootState) => state.webview.selectedRevisions
+    (state: RootState) => state.webview.selectedRevisions
   )
   const [order, setOrder] = useState<string[]>([])
   const reorderId = 'id'

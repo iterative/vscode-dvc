@@ -6,7 +6,7 @@ import { ZoomablePlot } from '../ZoomablePlot'
 import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { plotDataStore } from '../plotDataStore'
-import { PlotsRootState } from '../../store'
+import { RootState } from '../../store'
 
 interface CheckpointPlotProps {
   id: string
@@ -18,7 +18,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   colors
 }) => {
   const plotSnapshot = useSelector(
-    (state: PlotsRootState) => state.checkpoint.plotsSnapshots[id]
+    (state: RootState) => state.checkpoint.plotsSnapshots[id]
   )
   const [plot, setPlot] = useState(plotDataStore.checkpoint[id])
   const spec = useMemo(() => (id && createSpec(id, colors)) || {}, [id, colors])

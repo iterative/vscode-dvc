@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { TemplatePlotSection } from 'dvc/src/plots/webview/contract'
 import styles from '../styles.module.scss'
 import { getIDWithoutIndex } from '../../../util/ids'
-import { PlotsRootState } from '../../store'
+import { RootState } from '../../store'
 import { Icon } from '../../../shared/components/Icon'
 import { GraphLine } from '../../../shared/components/icons'
 
@@ -25,9 +25,7 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   closestSection,
   acceptedGroups
 }) => {
-  const { draggedRef } = useSelector(
-    (state: PlotsRootState) => state.dragAndDrop
-  )
+  const { draggedRef } = useSelector((state: RootState) => state.dragAndDrop)
   const handleDragLeave = () => {
     setHoveredSection('')
   }
