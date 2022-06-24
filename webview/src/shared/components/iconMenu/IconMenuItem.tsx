@@ -2,11 +2,11 @@ import React from 'react'
 import cx from 'classnames'
 import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
-import { Icon, IconValues } from '../Icon'
+import { Icon, IconValue } from '../Icon'
 import Tooltip from '../tooltip/Tooltip'
 
 export interface IconMenuItemProps {
-  icon: IconValues
+  icon: IconValue
   onClick?: () => void
   onClickNode?: React.ReactNode
   tooltip: string

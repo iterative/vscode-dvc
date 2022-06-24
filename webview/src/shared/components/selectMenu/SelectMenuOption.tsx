@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import styles from './styles.module.scss'
-import { AllIcons, Icon } from '../Icon'
+import { Icon } from '../Icon'
+import { Check } from '../icons'
 
 export interface SelectMenuOptionProps {
   id: string
@@ -41,7 +42,7 @@ export const SelectMenuOption: React.FC<SelectMenuOptionAllProps> = ({
       <div className={styles.itemIcon}>
         {isSelected && (
           <Icon
-            icon={AllIcons.CHECK}
+            icon={Check}
             width={13}
             data-testid="select-menu-option-check"
           />

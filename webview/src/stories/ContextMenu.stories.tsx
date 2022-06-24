@@ -8,8 +8,9 @@ import {
   ContextMenu,
   ContextMenuProps
 } from '../shared/components/contextMenu/ContextMenu'
-import { AllIcons, Icon } from '../shared/components/Icon'
+import { Icon } from '../shared/components/Icon'
 import { MessagesMenu } from '../shared/components/messagesMenu/MessagesMenu'
+import { Lines } from '../shared/components/icons'
 
 export default {
   args: {},
@@ -37,7 +38,7 @@ const Template: Story<ContextMenuProps> = () => {
         }
       >
         <div>
-          <Icon width={15} icon={AllIcons.LINES} />
+          <Icon width={15} icon={Lines} />
         </div>
       </ContextMenu>
     </WebviewWrapper>

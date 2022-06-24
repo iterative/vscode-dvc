@@ -6,22 +6,22 @@ import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 
 import { IconMenu } from '../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../shared/components/iconMenu/IconMenuItem'
-import { AllIcons } from '../shared/components/Icon'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
+import { Dots, DownArrow, Lines, UpArrow } from '../shared/components/icons'
 
 const items: IconMenuItemProps[] = [
   {
-    icon: AllIcons.DOWN_ARROW,
+    icon: DownArrow,
     onClick: () => alert('Move down'),
     tooltip: 'Move Down'
   },
   {
-    icon: AllIcons.UP_ARROW,
+    icon: UpArrow,
     onClick: () => alert('Move up'),
     tooltip: 'Move Up'
   },
   {
-    icon: AllIcons.LINES,
+    icon: Lines,
     onClickNode: (
       <SelectMenu
         options={[
@@ -47,7 +47,7 @@ const items: IconMenuItemProps[] = [
     tooltip: 'Choose metrics'
   },
   {
-    icon: AllIcons.DOTS,
+    icon: Dots,
     onClickNode: (
       <SelectMenu
         options={[

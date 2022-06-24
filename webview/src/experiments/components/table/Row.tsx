@@ -1,15 +1,17 @@
-import React, { EventHandler, SyntheticEvent } from 'react'
+import React from 'react'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { RowProp, WithChanges } from './interfaces'
 import styles from './styles.module.scss'
 import { FirstCell, CellWrapper } from './Cell'
+import { RowSelectionContext } from './RowSelectionContext'
 import { sendMessage } from '../../../shared/vscode'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
-import { pushIf } from '../../../util/array'
+import { clickAndEnterProps } from '../../../util/props'
+import { cond } from '../../../util/helpers'
 
 const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   if (running) {
@@ -26,11 +28,13 @@ const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
 }
 
 const experimentMenuOption = (
-  id: string,
+  id: string | string[],
   label: string,
-  type: MessageFromWebviewType
+  type: MessageFromWebviewType,
+  hidden?: boolean
 ) => {
   return {
+    hidden,
     id: type,
     label,
     message: {
@@ -38,6 +42,91 @@ const experimentMenuOption = (
       type
     }
   } as MessagesMenuOptionProps
+}
+
+const getMultiSelectMenuOptions = (selectedRowsList: RowProp[]) => {
+  return [
+    experimentMenuOption(
+      selectedRowsList
+        .filter(value => value.row.depth === 1)
+        .map(value => value.row.values.id),
+      'Remove Selected Rows',
+      MessageFromWebviewType.REMOVE_EXPERIMENT
+    )
+  ]
+}
+
+const getSingleSelectMenuOptions = (
+  id: string,
+  isWorkspace: boolean,
+  projectHasCheckpoints: boolean,
+  depth: number,
+  queued?: boolean
+) => {
+  const isNotCheckpoint = depth <= 1 || isWorkspace
+  const canApplyOrCreateBranch = queued || isWorkspace || depth <= 0
+
+  const withId = (
+    label: string,
+    type: MessageFromWebviewType,
+    hidden?: boolean
+  ) => experimentMenuOption(id, label, type, hidden)
+
+  return [
+    withId(
+      'Apply to Workspace',
+      MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE,
+      canApplyOrCreateBranch
+    ),
+    withId(
+      'Create new Branch',
+      MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
+      canApplyOrCreateBranch
+    ),
+    withId('Remove', MessageFromWebviewType.REMOVE_EXPERIMENT, depth !== 1),
+    withId(
+      projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
+      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
+      !isNotCheckpoint
+    ),
+    withId(
+      'Modify, Reset and Run',
+      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+      !isNotCheckpoint || !projectHasCheckpoints
+    ),
+    withId(
+      'Modify and Queue',
+      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
+      !isNotCheckpoint
+    )
+  ]
+}
+
+const getContextMenuOptions = (
+  id: string,
+  isWorkspace: boolean,
+  projectHasCheckpoints: boolean,
+  depth: number,
+  selectedRows: Record<string, RowProp | undefined>,
+  queued?: boolean
+) => {
+  const isFromSelection = !!selectedRows[id]
+  const selectedRowsList = Object.values(selectedRows).filter(
+    value => value !== undefined
+  ) as RowProp[]
+
+  return cond(
+    isFromSelection && selectedRowsList.length > 1,
+    () => getMultiSelectMenuOptions(selectedRowsList),
+    () =>
+      getSingleSelectMenuOptions(
+        id,
+        isWorkspace,
+        projectHasCheckpoints,
+        depth,
+        queued
+      )
+  )
 }
 
 export const RowContextMenu: React.FC<RowProp> = ({
@@ -48,62 +137,52 @@ export const RowContextMenu: React.FC<RowProp> = ({
     values: { id }
   }
 }) => {
+  const { selectedRows } = React.useContext(RowSelectionContext)
+
   const isWorkspace = id === 'workspace'
 
   const contextMenuOptions = React.useMemo(() => {
-    const menuOptions: MessagesMenuOptionProps[] = []
+    return getContextMenuOptions(
+      id,
+      isWorkspace,
+      projectHasCheckpoints,
+      depth,
+      selectedRows,
+      queued
+    )
+  }, [queued, isWorkspace, depth, id, projectHasCheckpoints, selectedRows])
 
-    pushIf(menuOptions, !queued && !isWorkspace && depth > 0, [
-      experimentMenuOption(
-        id,
-        'Apply to Workspace',
-        MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
-      ),
-      experimentMenuOption(
-        id,
-        'Create new Branch',
-        MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
-      )
-    ])
+  return (
+    (contextMenuOptions.length > 0 && (
+      <MessagesMenu options={contextMenuOptions} />
+    )) ||
+    null
+  )
+}
 
-    pushIf(menuOptions, depth === 1, [
-      experimentMenuOption(
-        id,
-        'Remove',
-        MessageFromWebviewType.REMOVE_EXPERIMENT
-      )
-    ])
-
-    const isNotCheckpoint = depth <= 1 || isWorkspace
-
-    pushIf(menuOptions, isNotCheckpoint, [
-      experimentMenuOption(
-        id,
-        projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
-        MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
-      )
-    ])
-
-    pushIf(menuOptions, isNotCheckpoint && projectHasCheckpoints, [
-      experimentMenuOption(
-        id,
-        'Modify, Reset and Run',
-        MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN
-      )
-    ])
-
-    pushIf(menuOptions, isNotCheckpoint, [
-      experimentMenuOption(
-        id,
-        'Modify and Queue',
-        MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
-      )
-    ])
-
-    return menuOptions
-  }, [queued, isWorkspace, depth, id, projectHasCheckpoints])
-
-  return <MessagesMenu options={contextMenuOptions} />
+const getRowClassNames = (
+  original: Experiment,
+  flatIndex: number,
+  isRowSelected: boolean,
+  isWorkspace: boolean,
+  className?: string,
+  changes?: string[]
+) => {
+  return cx(
+    className,
+    styles.tr,
+    styles.bodyRow,
+    getExperimentTypeClass(original),
+    cond(
+      flatIndex % 2 !== 0 && !isRowSelected,
+      () => styles.oddRow,
+      () => styles.evenRow
+    ),
+    isWorkspace ? styles.workspaceRow : styles.normalRow,
+    styles.row,
+    isRowSelected && styles.rowSelected,
+    isWorkspace && changes?.length && styles.workspaceWithChanges
+  )
 }
 
 export const RowContent: React.FC<
@@ -125,14 +204,24 @@ export const RowContent: React.FC<
   const { displayColor } = original
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
-  const toggleExperiment: EventHandler<SyntheticEvent> = e => {
-    e.preventDefault()
-    e.stopPropagation()
+  const toggleExperiment = () => {
     sendMessage({
       payload: id,
       type: MessageFromWebviewType.TOGGLE_EXPERIMENT
     })
   }
+
+  const { toggleRowSelected, selectedRows } =
+    React.useContext(RowSelectionContext)
+
+  const isRowSelected = !!selectedRows[id]
+
+  const toggleRowSelection = React.useCallback(() => {
+    const { depth } = row
+    if (depth === 1) {
+      toggleRowSelected?.({ row })
+    }
+  }, [row, toggleRowSelected])
 
   return (
     <ContextMenu
@@ -146,28 +235,27 @@ export const RowContent: React.FC<
     >
       <div
         {...getRowProps({
-          className: cx(
+          className: getRowClassNames(
+            original,
+            flatIndex,
+            isRowSelected,
+            isWorkspace,
             className,
-            styles.tr,
-            styles.bodyRow,
-            getExperimentTypeClass(original),
-            flatIndex % 2 === 0 || styles.oddRow,
-            isWorkspace ? styles.workspaceRow : styles.normalRow,
-            styles.row,
-            isWorkspace && changes?.length && styles.workspaceWithChanges
+            changes
           )
         })}
         tabIndex={0}
         role="row"
-        onClick={toggleExperiment}
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            toggleExperiment(e)
-          }
-        }}
+        {...clickAndEnterProps(toggleRowSelection)}
+        aria-selected={isRowSelected}
         data-testid={isWorkspace && 'workspace-row'}
       >
-        <FirstCell cell={firstCell} bulletColor={displayColor} />
+        <FirstCell
+          cell={firstCell}
+          bulletColor={displayColor}
+          toggleExperiment={toggleExperiment}
+          toggleRowSelection={toggleRowSelection}
+        />
         {cells.map(cell => {
           const cellId = `${cell.column.id}___${cell.row.id}`
           return (
