@@ -26,7 +26,6 @@ import {
 } from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
-import { DragDropProvider } from '../../../shared/components/dragDrop/DragDropContext'
 import { storeReducers } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
 
@@ -74,9 +73,7 @@ describe('ComparisonTable', () => {
             reducer: storeReducers
           })}
         >
-          <DragDropProvider>
-            <ComparisonTable />
-          </DragDropProvider>
+          <ComparisonTable />
         </Provider>
       ) || {}
     )
