@@ -1450,8 +1450,8 @@
           },
           {
             "id": "dvc.learnMore",
-            "title": "Learn more about DVC",
-            "description": "Take a look into DVC's [documentation](https://dvc.org/doc) to learn more about its features and command-line usage. \n[Learn More](https://dvc.org/doc)",
+            "title": "Explore More Resources",
+            "description": "Take a look into our [documentation](https://dvc.org/doc) to learn more about DVC. \n[Learn More](https://dvc.org/doc)",
             "media": {
               "markdown": "resources/walkthrough/dvc-learn-more.md"
             },
