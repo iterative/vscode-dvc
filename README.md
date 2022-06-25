@@ -176,9 +176,10 @@ _Integrated Terminal_!
   corresponding [DVC metafiles]? E.g. `dvc.yaml` and `.dvc` files, param or
   metrics files, even `dvc.lock`
 
-- **Parallel coordinates plot** (2022 Q3)  
+- **More and better plots!** (2022 Q3)  
   DVC Experiment comparison is easier with interactive [parallel coordinate
-  plots] (`dvc exp show --pcp` from command-line).
+  plots], which can be generated from command line with `dvc exp show --pcp`. We
+  plan to incorporate that and brand new IDE-exclusive plots! (TBD)
 
 - **Performance improvements** (2022 Q3)  
   Our extension will be faster and more reliable with better internal usage of
@@ -202,7 +203,7 @@ _Integrated Terminal_!
   Expect this extension to become a full-fledged suite for the ecosystem of
   tools from Iterative, such as [CML](https://cml.dev/),
   [MLEM](https://mlem.ai/) + [GTO](https://github.com/iterative/gto) **model
-  registry** management, and future surprises!
+  registry** management, and future surprises! (TBD)
 
 [dvc metafile]: https://dvc.org/doc/user-guide/project-structure
 [parallel coordinate plots]:
