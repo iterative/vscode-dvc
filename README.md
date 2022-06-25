@@ -171,6 +171,11 @@ We are working on increasing the quantity and quality of DVC features supported
 by this GUI. Remember that you can always use `dvc` commands from the
 _Integrated Terminal_!
 
+- **DVC metafile editor** (2022 Q3) Wouldn't it be cool to manage stages,
+  parameters, metrics, data and model paths, and other metadata in-place inside
+  corresponding [DVC metafiles]? E.g. `dvc.yaml` and `.dvc` files, param or
+  metrics files, even `dvc.lock`
+
 - **Parallel coordinates plot** (2022 Q3)  
   DVC Experiment comparison is easier with interactive [parallel coordinate
   plots] (`dvc exp show --pcp` from command-line).
@@ -199,9 +204,11 @@ _Integrated Terminal_!
   [MLEM](https://mlem.ai/) + [GTO](https://github.com/iterative/gto) **model
   registry** management, and future surprises!
 
+[dvc metafile]: https://dvc.org/doc/user-guide/project-structure
 [parallel coordinate plots]:
   https://dvc.org/doc/user-guide/experiment-management/comparing-experiments#parallel-coordinates-plot
-[`dvc.yaml` files]: https://dvc.org/doc/user-guide/project-structure
+[`dvc.yaml` files]:
+  https://dvc.org/doc/user-guide/project-structure/pipelines-files
 [remote development]: https://code.visualstudio.com/docs/remote/remote-overview
 [data registries]: https://dvc.org/doc/use-cases/data-registry
 
