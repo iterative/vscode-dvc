@@ -171,47 +171,39 @@ We are working on increasing the quantity and quality of DVC features supported
 by this GUI. Remember that you can always use `dvc` commands from the
 _Integrated Terminal_!
 
-### Parallel coordinates plot (2022 Q3)
+- **Parallel coordinates plot** (2022 Q3)  
+  DVC Experiment comparison is easier with interactive [parallel coordinate
+  plots] (`dvc exp show --pcp` from command-line).
 
-DVC Experiment comparison is easier with interactive [parallel coordinate plots]
-(`dvc exp show --pcp` from command-line).
+- **Performance improvements** (2022 Q3)  
+  Our extension will be faster and more reliable with better internal usage of
+  DVC and more efficient data management.
+
+- **ML pipelines** (2022 Q4)  
+  The extension examines [`dvc.yaml` files] to identify tracked data and
+  changes, but it does not currently provide a graphic interface to write or
+  modify stages.
+
+- **Remote execution** (2022 Q4)  
+  DVC Experiments can be run in remote environments. We intend to integrate this
+  with VS Code's robust [remote development] features.
+
+- **Data registry** (2022 Q4)  
+  DVC [data registries] can help you centralize and secure data management
+  across all your ML projects. You'll be able to construct and handle them right
+  from the IDE.
+
+- **More tools from Iterative.ai** (2023)  
+  Expect this extension to become a full-fledged suite for the ecosystem of
+  tools from Iterative, such as [CML](https://cml.dev/),
+  [MLEM](https://mlem.ai/) + [GTO](https://github.com/iterative/gto) **model
+  registry** management, and future surprises!
 
 [parallel coordinate plots]:
   https://dvc.org/doc/user-guide/experiment-management/comparing-experiments#parallel-coordinates-plot
-
-### Performance improvements (2022 Q3)
-
-Our extension will be faster and more reliable with better internal usage of DVC
-and more efficient data management.
-
-### ML pipelines (2022 Q4)
-
-The extension examines [`dvc.yaml` files] to identify tracked data and changes,
-but it does not currently provide a graphic interface to write or modify stages.
-
 [`dvc.yaml` files]: https://dvc.org/doc/user-guide/project-structure
-
-### Remote execution (2022 Q4)
-
-DVC Experiments can be run in remote environments. We intend to integrate this
-with VS Code's robust [remote development] features.
-
 [remote development]: https://code.visualstudio.com/docs/remote/remote-overview
-
-### Data registry (2022 Q4)
-
-DVC [data registries] can help you centralize and secure data management across
-all your ML projects. You'll be able to construct and handle them right from the
-IDE.
-
 [data registries]: https://dvc.org/doc/use-cases/data-registry
-
-### More tools from Iterative.ai (2023)
-
-Expect this extension to become a full-fledged suite for the ecosystem of tools
-from Iterative, such as [CML](https://cml.dev/), [MLEM](https://mlem.ai/) +
-[GTO](https://github.com/iterative/gto) **model registry** management, and
-future surprises!
 
 ## Debugging
 
