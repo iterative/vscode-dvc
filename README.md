@@ -51,25 +51,12 @@ databases are required.
   https://dvc.org/doc/user-guide/experiment-management/experiments-overview
 [data versioning]: https://dvc.org/doc/use-cases/versioning-data-and-model-files
 
-## Contents
+---
 
-- [Quick start](#quick-start)
-  - [Learn more about DVC (Data Version Control)](#learn-more-about-dvc-data-version-control)
-- [What you get](#what-you-get)
-- [Useful commands](#useful-commands)
-- [Configuration](#configuration)
-- [Developer roadmap](#developer-roadmap)
-  - [Parallel coordinates plot (2022 Q3)](#parallel-coordinates-plot-2022-q3)
-  - [Performance improvements (2022 Q3)](#performance-improvements-2022-q3)
-  - [ML pipelines (2022 Q4)](#ml-pipelines-2022-q4)
-  - [Remote execution (2022 Q4)](#remote-execution-2022-q4)
-  - [Data registry (2022 Q4)](#data-registry-2022-q4)
-  - [More tools from Iterative.ai (2023)](#more-tools-from-iterativeai-2023)
-- [Debugging](#debugging)
-  - [The DVC Extension](#the-dvc-extension)
-  - [Your DVC project](#your-dvc-project)
-- [Contributing](#contributing)
-- [Data and telemetry](#data-and-telemetry)
+[Quick start](#quick-start) • [What you get](#what-you-get) •
+[Commands](#useful-commands) • [Configuration](#configuration) •
+[Roadmap](#developer-roadmap) • [Debugging](#debugging) •
+[Contributing](#contributing) • [Telemetry](#data-and-telemetry)
 
 ## Quick start
 
