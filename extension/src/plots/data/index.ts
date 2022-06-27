@@ -9,7 +9,10 @@ import {
 } from '../../util/array'
 import { PlotsModel } from '../model'
 
-export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
+export class PlotsData extends BaseData<{
+  data: PlotsOutput
+  revs: string[]
+}> {
   private model?: PlotsModel
 
   constructor(
@@ -46,8 +49,7 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
       return
     }
 
-    const args = sameContents(revs, ['workspace']) ? [] : revs
-
+    const args = this.getArgs(revs)
     const data = await this.internalCommands.executeCommand<PlotsOutput>(
       AvailableCommands.PLOTS_DIFF,
       this.dvcRoot,
@@ -58,7 +60,7 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
 
     this.compareFiles(files)
 
-    return this.notifyChanged({ data, revs })
+    return this.notifyChanged({ data, revs: args })
   }
 
   public managedUpdate() {
@@ -71,5 +73,16 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
 
   public setModel(model: PlotsModel) {
     this.model = model
+  }
+
+  private getArgs(revs: string[]) {
+    if (
+      this.model &&
+      (sameContents(revs, ['workspace']) || sameContents(revs, []))
+    ) {
+      return this.model.getDefaultRevs()
+    }
+
+    return revs
   }
 }
