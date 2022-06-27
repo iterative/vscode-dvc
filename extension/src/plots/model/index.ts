@@ -96,15 +96,15 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public async transformAndSetPlots(data: PlotsOutput, revs: string[]) {
-    const cliRevisionMapping = this.getCLIRevisionMapping()
+    const cliIdToLabel = this.getCLIIdToLabel()
 
     this.fetchedRevs = new Set([
       ...this.fetchedRevs,
-      ...revs.map(rev => cliRevisionMapping[rev])
+      ...revs.map(rev => cliIdToLabel[rev])
     ])
 
     const [{ comparisonData, revisionData }, templates] = await Promise.all([
-      collectData(data, cliRevisionMapping),
+      collectData(data, cliIdToLabel),
       collectTemplates(data)
     ])
 
@@ -174,8 +174,8 @@ export class PlotsModel extends ModelWithPersistence {
     ])
 
     return this.getSelectedRevisions()
-      .filter(revision => !cachedRevisions.has(revision))
-      .map(rev => this.replaceBranchRevision(rev))
+      .filter(label => !cachedRevisions.has(label))
+      .map(label => this.getCLIId(label))
   }
 
   public getMutableRevisions() {
@@ -339,18 +339,18 @@ export class PlotsModel extends ModelWithPersistence {
     this.fetchedRevs.delete(id)
   }
 
-  private getCLIRevisionMapping() {
+  private getCLIIdToLabel() {
     const mapping: { [shortSha: string]: string } = {}
 
     for (const rev of this.getSelectedRevisions()) {
-      mapping[this.replaceBranchRevision(rev)] = rev
+      mapping[this.getCLIId(rev)] = rev
     }
 
     return mapping
   }
 
-  private replaceBranchRevision(revision: string) {
-    return this.branchRevisions[revision] || revision
+  private getCLIId(label: string) {
+    return this.branchRevisions[label] || label
   }
 
   private getSelectedRevisions() {

@@ -14,7 +14,7 @@ import {
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { getCLIBranchId, replaceBranchRevision } from './util'
+import { getCLIBranchId, replaceBranchCLIId } from './util'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -560,7 +560,7 @@ export const getComparisonWebviewMessage = (
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const revisionsAcc: ComparisonRevisionData = {}
     for (const { url, revisions } of plots) {
-      const revision = replaceBranchRevision(revisions?.[0])
+      const revision = replaceBranchCLIId(revisions?.[0])
       if (!revision) {
         continue
       }

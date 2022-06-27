@@ -9,10 +9,7 @@ import {
 } from '../../util/array'
 import { PlotsModel } from '../model'
 
-export class PlotsData extends BaseData<{
-  data: PlotsOutput
-  revs: string[]
-}> {
+export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
   private model?: PlotsModel
 
   constructor(

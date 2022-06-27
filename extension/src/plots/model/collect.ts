@@ -312,32 +312,39 @@ export const collectMetricOrder = (
 type RevisionPathData = { [path: string]: Record<string, unknown>[] }
 
 export type RevisionData = {
-  [revision: string]: RevisionPathData
+  [label: string]: RevisionPathData
 }
 
 export type ComparisonData = {
-  [revision: string]: {
+  [label: string]: {
     [path: string]: ImagePlot
   }
 }
+
+export type CLIRevisionIdToLabel = { [shortSha: string]: string }
 
 const collectImageData = (
   acc: ComparisonData,
   path: string,
   plot: ImagePlot,
-  mapping: { [sha: string]: string }
+  cliIdToLabel: CLIRevisionIdToLabel
 ) => {
-  const rev = mapping[plot.revisions?.[0] || '']
-
+  const rev = plot.revisions?.[0]
   if (!rev) {
     return
   }
 
-  if (!acc[rev]) {
-    acc[rev] = {}
+  const label = cliIdToLabel[rev]
+
+  if (!label) {
+    return
   }
 
-  acc[rev][path] = plot
+  if (!acc[label]) {
+    acc[label] = {}
+  }
+
+  acc[label][path] = plot
 }
 
 const collectDatapoints = (
@@ -355,16 +362,16 @@ const collectPlotData = (
   acc: RevisionData,
   path: string,
   plot: TemplatePlot,
-  mapping: { [sha: string]: string }
+  cliIdToLabel: CLIRevisionIdToLabel
 ) => {
-  for (const rev of plot.revisions || []) {
-    const label = mapping[rev]
+  for (const id of plot.revisions || []) {
+    const label = cliIdToLabel[id]
     if (!acc[label]) {
       acc[label] = {}
     }
     acc[label][path] = []
 
-    collectDatapoints(acc, path, label, plot.datapoints?.[rev])
+    collectDatapoints(acc, path, label, plot.datapoints?.[id])
   }
 }
 
@@ -377,21 +384,21 @@ const collectPathData = (
   acc: DataAccumulator,
   path: string,
   plots: Plot[],
-  mapping: { [sha: string]: string }
+  cliIdToLabel: CLIRevisionIdToLabel
 ) => {
   for (const plot of plots) {
     if (isImagePlot(plot)) {
-      collectImageData(acc.comparisonData, path, plot, mapping)
+      collectImageData(acc.comparisonData, path, plot, cliIdToLabel)
       continue
     }
 
-    collectPlotData(acc.revisionData, path, plot, mapping)
+    collectPlotData(acc.revisionData, path, plot, cliIdToLabel)
   }
 }
 
 export const collectData = (
   data: PlotsOutput,
-  mapping: { [sha: string]: string }
+  cliIdToLabel: CLIRevisionIdToLabel
 ): DataAccumulator => {
   const acc = {
     comparisonData: {},
@@ -399,7 +406,7 @@ export const collectData = (
   } as DataAccumulator
 
   for (const [path, plots] of Object.entries(data)) {
-    collectPathData(acc, path, plots, mapping)
+    collectPathData(acc, path, plots, cliIdToLabel)
   }
 
   return acc
