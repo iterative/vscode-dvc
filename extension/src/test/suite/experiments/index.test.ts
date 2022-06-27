@@ -788,6 +788,42 @@ suite('Experiments Test Suite', () => {
         undefined
       )
     })
+
+    it("should be able to handle a message to toggle an experiment's star status", async () => {
+      const { experiments, experimentsModel } =
+        setupExperimentsAndMockCommands()
+
+      const experimentsToToggle = ['exp-e7a67']
+
+      const areExperimentsStarred = (expIds: string[]): boolean =>
+        expIds
+          .map(expId =>
+            experimentsModel.getExperiments().find(({ id }) => id === expId)
+          )
+          .every(exp => exp?.starred)
+
+      expect(
+        areExperimentsStarred(experimentsToToggle),
+        'experiments are starred'
+      ).to.be.false
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const toggleSpy = spy(experimentsModel, 'toggleStars')
+
+      mockMessageReceived.fire({
+        payload: experimentsToToggle,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
+
+      expect(toggleSpy).to.be.calledWith(experimentsToToggle)
+      toggleSpy.resetHistory()
+
+      expect(
+        areExperimentsStarred(experimentsToToggle),
+        'experiments have been starred'
+      ).to.be.true
+    })
   })
 
   describe('Sorting', () => {
