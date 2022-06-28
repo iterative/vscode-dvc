@@ -136,7 +136,7 @@ export class ExperimentsTree
     internalCommands.registerExternalCliCommand<ExperimentItem>(
       RegisteredCliCommands.EXPERIMENT_TREE_QUEUE,
       ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.modifyExperimentParamsAndRun(
+        this.experiments.modifyExperimentParamsAndExecute(
           AvailableCommands.EXPERIMENT_QUEUE,
           dvcRoot,
           id
@@ -144,7 +144,7 @@ export class ExperimentsTree
     )
 
     const modifyExperimentParamsAndRun = ({ dvcRoot, id }: ExperimentItem) =>
-      this.experiments.modifyExperimentParamsAndRun(
+      this.experiments.modifyExperimentParamsAndExecute(
         AvailableCommands.EXPERIMENT_RUN,
         dvcRoot,
         id
@@ -163,7 +163,7 @@ export class ExperimentsTree
     internalCommands.registerExternalCliCommand<ExperimentItem>(
       RegisteredCliCommands.EXPERIMENT_TREE_RESET_AND_RUN,
       ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.modifyExperimentParamsAndRun(
+        this.experiments.modifyExperimentParamsAndExecute(
           AvailableCommands.EXPERIMENT_RESET_AND_RUN,
           dvcRoot,
           id

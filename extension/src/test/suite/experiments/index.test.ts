@@ -176,6 +176,7 @@ suite('Experiments Test Suite', () => {
         experiments,
         experimentsModel,
         internalCommands,
+        cliExecutor,
         messageSpy
       } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
@@ -184,6 +185,7 @@ suite('Experiments Test Suite', () => {
       ).resolves(undefined)
 
       return {
+        cliExecutor,
         columnsModel,
         experiments,
         experimentsModel,
@@ -439,33 +441,45 @@ suite('Experiments Test Suite', () => {
       )
     })
 
-    it('should be able to handle a message to apply an experiment to workspace', async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+    it('should be able to handle a message to apply an experiment', async () => {
+      const { experiments, cliExecutor } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
+
+      const mockExperimentApply = stub(cliExecutor, 'experimentApply').resolves(
+        undefined
+      )
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
         type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
       })
 
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_APPLY,
+      expect(mockExperimentApply).to.be.calledOnce
+      expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperimentId
       )
     })
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments, cliExecutor } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
 
       const mockBranch = 'mock-branch-input'
       const inputEvent = getInputBoxEvent(mockBranch)
+
+      const mockExperimentBranch = stub(
+        cliExecutor,
+        'experimentBranch'
+      ).resolves('undefined')
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -477,9 +491,8 @@ suite('Experiments Test Suite', () => {
       })
 
       await inputEvent
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_BRANCH,
+      expect(mockExperimentBranch).to.be.calledOnce
+      expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperimentId,
         mockBranch
@@ -502,7 +515,9 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
-      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      const tableChangePromise = new Promise(resolve =>
+        mockMessageReceived.event(() => resolve(undefined))
+      )
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -534,7 +549,9 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
-      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      const tableChangePromise = new Promise(resolve =>
+        mockMessageReceived.event(() => resolve(undefined))
+      )
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -571,7 +588,9 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
-      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      const tableChangePromise = new Promise(resolve =>
+        mockMessageReceived.event(() => resolve(undefined))
+      )
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -588,21 +607,24 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to remove an experiment', async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments, cliExecutor } = setupExperimentsAndMockCommands()
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
+
+      const mockExperimentRemove = stub(
+        cliExecutor,
+        'experimentRemove'
+      ).resolves(undefined)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
         type: MessageFromWebviewType.REMOVE_EXPERIMENT
       })
 
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_REMOVE,
+      expect(mockExperimentRemove).to.be.calledOnce
+      expect(mockExperimentRemove).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperimentId
       )

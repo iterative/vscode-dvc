@@ -29,7 +29,7 @@ import { splitColumnPath } from './columns/paths'
 import { ResourceLocator } from '../resourceLocator'
 import {
   AvailableCommands,
-  CommandId,
+  CliCommandFromWebviewId,
   InternalCommands
 } from '../commands/internal'
 import { Args } from '../cli/constants'
@@ -43,18 +43,23 @@ import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
-import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
 import { setContextValue } from '../vscode/context'
 import { standardizePath } from '../fileSystem/path'
 import { pickPaths } from '../path/selection/quickPick'
+import { Toast } from '../vscode/toast'
 
 export const ExperimentsScale = {
   ...ColumnType,
   HAS_CHECKPOINTS: 'hasCheckpoints',
   NO_CHECKPOINTS: 'noCheckpoints'
 } as const
+
+export type ModifiedExperimentCommandId =
+  | typeof AvailableCommands.EXPERIMENT_QUEUE
+  | typeof AvailableCommands.EXPERIMENT_RUN
+  | typeof AvailableCommands.EXPERIMENT_RESET_AND_RUN
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
@@ -384,14 +389,24 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelectedExperiments()
   }
 
-  public async modifyExperimentParamsAndRun(
-    commandId: CommandId,
+  public async modifyExperimentParamsAndExecute(
+    commandId: ModifiedExperimentCommandId,
     experimentId?: string
   ) {
     const paramsToModify = await this.pickAndModifyParams(experimentId)
-    if (paramsToModify) {
-      return this.runCommand(commandId, ...paramsToModify)
+    if (!paramsToModify) {
+      return
     }
+
+    const promise = this.internalCommands.executeCommand<string>(
+      commandId,
+      this.dvcRoot,
+      ...paramsToModify
+    )
+    if (commandId === AvailableCommands.EXPERIMENT_QUEUE) {
+      Toast.showOutput(promise)
+    }
+    return promise
   }
 
   public hasRunningExperiment() {
@@ -453,9 +468,14 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private async runCommand(commandId: CommandId, ...args: Args) {
-    await Toast.showOutput(
-      this.internalCommands.executeCommand(commandId, this.dvcRoot, ...args)
+  private async executeCommandAndNotify(
+    commandId: CliCommandFromWebviewId,
+    ...args: Args
+  ) {
+    await this.internalCommands.executeCliFromWebview(
+      commandId,
+      this.dvcRoot,
+      ...args
     )
 
     return this.notifyChanged()
@@ -521,20 +541,11 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
             return this.createBranchFromExperiment(message.payload)
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
-            return this.modifyExperimentParamsAndRun(
-              AvailableCommands.EXPERIMENT_QUEUE,
-              message.payload
-            )
+            return this.modifyExperimentParamsAndQueue(message.payload)
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN:
-            return this.modifyExperimentParamsAndRun(
-              AvailableCommands.EXPERIMENT_RUN,
-              message.payload
-            )
+            return this.modifyExperimentParamsAndRun(message.payload)
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
-            return this.modifyExperimentParamsAndRun(
-              AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-              message.payload
-            )
+            return this.modifyExperimentParamsResetAndRun(message.payload)
 
           case MessageFromWebviewType.REMOVE_EXPERIMENT:
             return this.removeExperiment(message.payload)
@@ -611,23 +622,66 @@ export class Experiments extends BaseRepository<TableData> {
 
   private async createBranchFromExperiment(experimentId: string) {
     const input = await getInput(Title.ENTER_BRANCH_NAME)
-    if (input) {
-      return this.runCommand(
-        AvailableCommands.EXPERIMENT_BRANCH,
-        experimentId,
-        input
-      )
+    if (!input) {
+      return
     }
+    return this.executeCommandAndNotify(
+      AvailableCommands.EXPERIMENT_BRANCH,
+      experimentId,
+      input
+    )
   }
 
   private applyExperimentToWorkspace(experimentId: string) {
-    return this.runCommand(AvailableCommands.EXPERIMENT_APPLY, experimentId)
+    return this.executeCommandAndNotify(
+      AvailableCommands.EXPERIMENT_APPLY,
+      experimentId
+    )
   }
 
   private removeExperiment(experimentId: string | string[]) {
-    return this.runCommand(
+    return this.executeCommandAndNotify(
       AvailableCommands.EXPERIMENT_REMOVE,
       ...[experimentId].flat()
+    )
+  }
+
+  private async modifyExperimentParamsAndQueue(id: string) {
+    await this.modifyExperimentParamsAndExecute(
+      AvailableCommands.EXPERIMENT_QUEUE,
+      id
+    )
+
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_QUEUE,
+      undefined,
+      undefined
+    )
+  }
+
+  private async modifyExperimentParamsAndRun(id: string) {
+    await this.modifyExperimentParamsAndExecute(
+      AvailableCommands.EXPERIMENT_RUN,
+      id
+    )
+
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_RUN,
+      undefined,
+      undefined
+    )
+  }
+
+  private async modifyExperimentParamsResetAndRun(id: string) {
+    await this.modifyExperimentParamsAndExecute(
+      AvailableCommands.EXPERIMENT_RESET_AND_RUN,
+      id
+    )
+
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_RESET_AND_RUN,
+      undefined,
+      undefined
     )
   }
 

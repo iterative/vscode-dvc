@@ -23,7 +23,7 @@ const registerExperimentCwdCommands = (
     RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
     () =>
       experiments.pauseUpdatesThenRun(() =>
-        experiments.modifyExperimentParamsAndRun(
+        experiments.modifyExperimentParamsAndExecute(
           AvailableCommands.EXPERIMENT_QUEUE
         )
       )
@@ -31,7 +31,9 @@ const registerExperimentCwdCommands = (
 
   const modifyExperimentParamsAndRun = () =>
     experiments.pauseUpdatesThenRun(() =>
-      experiments.modifyExperimentParamsAndRun(AvailableCommands.EXPERIMENT_RUN)
+      experiments.modifyExperimentParamsAndExecute(
+        AvailableCommands.EXPERIMENT_RUN
+      )
     )
 
   internalCommands.registerExternalCommand(
@@ -48,7 +50,7 @@ const registerExperimentCwdCommands = (
     RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
     () =>
       experiments.pauseUpdatesThenRun(() =>
-        experiments.modifyExperimentParamsAndRun(
+        experiments.modifyExperimentParamsAndExecute(
           AvailableCommands.EXPERIMENT_RESET_AND_RUN
         )
       )

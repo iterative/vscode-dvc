@@ -1,5 +1,5 @@
 import { EventEmitter, Memento } from 'vscode'
-import { Experiments } from '.'
+import { Experiments, ModifiedExperimentCommandId } from '.'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/constants'
 import { CommandId, InternalCommands } from '../commands/internal'
@@ -121,8 +121,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).autoApplyFilters(enable)
   }
 
-  public async modifyExperimentParamsAndRun(
-    commandId: CommandId,
+  public async modifyExperimentParamsAndExecute(
+    commandId: ModifiedExperimentCommandId,
     overrideRoot?: string,
     overrideId?: string
   ) {
@@ -136,7 +136,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return await repository.modifyExperimentParamsAndRun(commandId, overrideId)
+    await repository.modifyExperimentParamsAndExecute(commandId, overrideId)
   }
 
   public async getCwdThenRun(commandId: CommandId) {

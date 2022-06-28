@@ -28,10 +28,12 @@ export const EventName = Object.assign(
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
+    VIEWS_EXPERIMENTS_TABLE_APPLY: 'views.experimentTable.applyExperiment',
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
       'views.experimentsTable.columnsReordered',
     VIEWS_EXPERIMENTS_TABLE_CREATED: 'views.experimentsTable.created',
+    VIEWS_EXPERIMENTS_TABLE_CREATE_BRANCH: 'views.experimentTable.createBranch',
     VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE:
       'views.experimentTable.toggleStatus',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
@@ -43,10 +45,15 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN: 'views.experimentsTable.columnHidden',
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
+    VIEWS_EXPERIMENTS_TABLE_QUEUE: 'dvc.views.experimentsTable.queueExperiment',
+    VIEWS_EXPERIMENTS_TABLE_REMOVE: 'views.experimentsTable.removeExperiment',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
       'views.experimentsTable.columnSortRemoved',
+    VIEWS_EXPERIMENTS_TABLE_RESET_AND_RUN:
+      'dvc.views.experimentsTable.resetAndRunExperiment',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
       'views.experimentsTable.columnResized',
+    VIEWS_EXPERIMENTS_TABLE_RUN: 'dvc.views.experimentsTable.runExperiment',
     VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS:
       'views.experimentsTable.selectColumns',
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
@@ -187,10 +194,15 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_APPLY]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_CREATE_BRANCH]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_QUEUE]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_RESET_AND_RUN]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN]: {
     width: number
   }
@@ -203,6 +215,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN]: {
     path: string
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_RUN]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE]: {
     path: string

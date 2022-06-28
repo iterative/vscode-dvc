@@ -11,6 +11,7 @@ import { OutputChannel } from '../vscode/outputChannel'
 import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
 import { Disposable } from '../class/dispose'
+import { EventName, IEventNamePropertyMapping } from '../telemetry/constants'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -21,6 +22,16 @@ export const AvailableCommands = Object.assign(
   CliRunnerCommands
 )
 export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
+
+const CliCommandFromWebviewEvent = {
+  [AvailableCommands.EXPERIMENT_BRANCH]:
+    EventName.VIEWS_EXPERIMENTS_TABLE_CREATE_BRANCH,
+  [AvailableCommands.EXPERIMENT_APPLY]: EventName.VIEWS_EXPERIMENTS_TABLE_APPLY,
+  [AvailableCommands.EXPERIMENT_REMOVE]:
+    EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE
+} as const
+
+export type CliCommandFromWebviewId = keyof typeof CliCommandFromWebviewEvent
 
 export class InternalCommands extends Disposable {
   private readonly commands = new Map<string, Command>()
@@ -39,12 +50,26 @@ export class InternalCommands extends Disposable {
     commandId: CommandId,
     ...args: Args
   ): Promise<T> {
-    const command = this.commands.get(commandId)
-    if (!command) {
-      throw new Error(`Unknown command: ${commandId}`)
-    }
+    const command = this.getCommand(commandId)
 
     return command(...args) as Promise<T>
+  }
+
+  public async executeCliFromWebview(
+    commandId: CliCommandFromWebviewId,
+    ...args: Args
+  ) {
+    const name = CliCommandFromWebviewEvent[commandId]
+    const command = this.getCommand(commandId)
+    try {
+      return await Toast.showOutput(
+        this.runAndSendTelemetry(name, command, ...args) as Promise<
+          string | undefined
+        >
+      )
+    } catch {
+      this.offerToShowError()
+    }
   }
 
   public registerCommand(commandId: CommandId, command: Command): void {
@@ -82,13 +107,13 @@ export class InternalCommands extends Disposable {
   }
 
   private async runAndSendTelemetry<T>(
-    name: RegisteredCommands | RegisteredCliCommands,
-    func: (arg: T) => unknown,
-    arg: T
+    name: keyof IEventNamePropertyMapping,
+    func: (...args: T[]) => unknown,
+    ...args: T[]
   ) {
     const stopWatch = new StopWatch()
     try {
-      const res = await func(arg)
+      const res = await func(...args)
       sendTelemetryEvent(name, undefined, {
         duration: stopWatch.getElapsedTime()
       })
@@ -131,5 +156,13 @@ export class InternalCommands extends Disposable {
     if (response === Response.SHOW) {
       return this.outputChannel.show()
     }
+  }
+
+  private getCommand(commandId: CommandId) {
+    const command = this.commands.get(commandId)
+    if (!command) {
+      throw new Error(`Unknown command: ${commandId}`)
+    }
+    return command
   }
 }
