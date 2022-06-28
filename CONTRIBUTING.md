@@ -63,12 +63,12 @@ your changes to the extension.
 - Open the `./demo` project in a VS Code window, for example in the Extension
   Development Host (see previous section) to test changes to this extension.
 
-- Pull the project data with the extension (either from the **DVC Tracked**
+- Pull the project data using the extension (either from the **DVC Tracked**
   panel in the _File Explorer_ or the **DVC panel** for _Source Control_) or by
   running `dvc pull` from a _Terminal_.
 
 - In order to [run experiments] in the demo project, the virtual env should be
-  loaded through the Microsoft [Python extension] (please install it).
+  loaded through the [Python extension] (please install it).
 
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
@@ -83,7 +83,7 @@ your changes to the extension.
 
 ## React component development with Storybook
 
-Start Storybook with `yarn storybook` in either the monorepo root or in the
+Start Storybook with `yarn storybook` in either the root of this repo or in the
 `webview` project. You can develop the React components this plugin uses without
 requiring VS Code as a dev environment.
 
