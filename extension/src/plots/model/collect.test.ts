@@ -22,6 +22,7 @@ import {
   uniqueValues
 } from '../../util/array'
 import { TemplatePlot } from '../webview/contract'
+import { getCLIBranchId } from '../../test/fixtures/plotsDiff/util'
 
 const logsLossPath = join('logs', 'loss.tsv')
 
@@ -226,7 +227,17 @@ describe('collectMetricOrder', () => {
 
 describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
-    const { revisionData, comparisonData } = collectData(plotsDiffFixture)
+    const mapping = {
+      '1ba7bcd': '1ba7bcd',
+      '42b8736': '42b8736',
+      '4fb124a': '4fb124a',
+      '53c3851': 'main',
+      workspace: 'workspace'
+    }
+    const { revisionData, comparisonData } = collectData(
+      plotsDiffFixture,
+      mapping
+    )
     const revisions = ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a']
 
     const values =
@@ -237,7 +248,7 @@ describe('collectData', () => {
     expect(isEmpty(values)).toBeFalsy()
 
     for (const revision of revisions) {
-      const expectedValues = values[revision].map(value => ({
+      const expectedValues = values[getCLIBranchId(revision)].map(value => ({
         ...value,
         rev: revision
       }))
@@ -287,7 +298,13 @@ describe('collectTemplates', () => {
 })
 
 describe('collectWorkspaceRaceConditionData', () => {
-  const { comparisonData, revisionData } = collectData(plotsDiffFixture)
+  const { comparisonData, revisionData } = collectData(plotsDiffFixture, {
+    '1ba7bcd': '1ba7bcd',
+    '42b8736': '42b8736',
+    '4fb124a': '4fb124a',
+    '53c3851': 'main',
+    workspace: 'workspace'
+  })
 
   it('should return no overwrite data if there is no selected checkpoint experiment running in the workspace', () => {
     const { overwriteComparisonData, overwriteRevisionData } =

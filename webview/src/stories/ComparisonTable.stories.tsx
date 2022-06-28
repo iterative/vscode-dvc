@@ -1,15 +1,32 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
+import { configureStore } from '@reduxjs/toolkit'
 import { fireEvent, within } from '@testing-library/react'
 import React from 'react'
-import { ComparisonRevisionData } from 'dvc/src/plots/webview/contract'
-import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import { Provider, useDispatch } from 'react-redux'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import {
-  ComparisonTable,
-  ComparisonTableProps
-} from '../plots/components/comparisonTable/ComparisonTable'
+  ComparisonRevisionData,
+  Revision,
+  PlotsComparisonData,
+  PlotSize
+} from 'dvc/src/plots/webview/contract'
+import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
-import { DragDropProvider } from '../shared/components/dragDrop/DragDropContext'
+import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
+import { updateSelectedRevisions } from '../plots/components/webviewSlice'
+import { storeReducers } from '../plots/store'
+
+const MockedState: React.FC<{
+  data: PlotsComparisonData
+  selectedRevisions: Revision[]
+}> = ({ children, data, selectedRevisions }) => {
+  const dispatch = useDispatch()
+  dispatch(update(data))
+  dispatch(updateSelectedRevisions(selectedRevisions))
+
+  return <>{children}</>
+}
 
 export default {
   args: { ...comparisonTableFixture, revisions: plotsRevisionsFixture },
@@ -17,13 +34,24 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: Story<ComparisonTableProps> = ({ plots, revisions }) => {
+const Template: Story = ({ plots, revisions }) => {
+  const store = configureStore({
+    reducer: storeReducers
+  })
   return (
-    <WebviewWrapper>
-      <DragDropProvider>
-        <ComparisonTable plots={plots} revisions={revisions} />
-      </DragDropProvider>
-    </WebviewWrapper>
+    <Provider store={store}>
+      <MockedState
+        data={{
+          plots,
+          size: PlotSize.REGULAR
+        }}
+        selectedRevisions={revisions}
+      >
+        <WebviewWrapper>
+          <ComparisonTable />
+        </WebviewWrapper>
+      </MockedState>
+    </Provider>
   )
 }
 

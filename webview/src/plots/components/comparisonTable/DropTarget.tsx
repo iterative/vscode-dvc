@@ -1,11 +1,12 @@
 import React from 'react'
-import { AllIcons, Icon } from '../../../shared/components/Icon'
+import { Icon } from '../../../shared/components/Icon'
+import { Ellipsis } from '../../../shared/components/icons'
 import styles from '../styles.module.scss'
 
 export const DropTarget: React.FC = () => (
   <div className={styles.dropTarget} data-testid="comparison-drop-target">
     <Icon
-      icon={AllIcons.ELLIPSIS}
+      icon={Ellipsis}
       className={styles.smallDropIcon}
       width={15}
       height={15}

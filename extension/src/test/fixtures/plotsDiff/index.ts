@@ -14,12 +14,13 @@ import {
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
+import { getCLIBranchId, replaceBranchCLIId } from './util'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
     {
       type: PlotsType.VEGA,
-      revisions: ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a'],
+      revisions: ['workspace', '53c3851', '42b8736', '1ba7bcd', '4fb124a'],
       datapoints: {
         workspace: [
           {
@@ -68,7 +69,7 @@ const basicVega = {
             timestamp: '1641966351758'
           }
         ],
-        main: [
+        '53c3851': [
           {
             loss: '2.298783302307129',
             step: '0',
@@ -361,8 +362,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['main'],
-      url: joinFunc(baseUrl, 'main_plots_acc.png')
+      revisions: ['53c3851'],
+      url: joinFunc(baseUrl, '53c3851_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -388,8 +389,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['main'],
-      url: joinFunc(baseUrl, 'main_plots_heatmap.png')
+      revisions: ['53c3851'],
+      url: joinFunc(baseUrl, '53c3851_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -415,8 +416,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['main'],
-      url: joinFunc(baseUrl, 'main_plots_loss.png')
+      revisions: ['53c3851'],
+      url: joinFunc(baseUrl, '53c3851_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
@@ -468,10 +469,12 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             data: {
               values:
                 expectedRevisions.flatMap(revision =>
-                  originalPlot.datapoints?.[revision].map(values => ({
-                    ...values,
-                    rev: revision
-                  }))
+                  originalPlot.datapoints?.[getCLIBranchId(revision)].map(
+                    values => ({
+                      ...values,
+                      rev: revision
+                    })
+                  )
                 ) || []
             }
           } as TopLevelSpec,
@@ -557,7 +560,7 @@ export const getComparisonWebviewMessage = (
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const revisionsAcc: ComparisonRevisionData = {}
     for (const { url, revisions } of plots) {
-      const revision = revisions?.[0]
+      const revision = replaceBranchCLIId(revisions?.[0])
       if (!revision) {
         continue
       }
