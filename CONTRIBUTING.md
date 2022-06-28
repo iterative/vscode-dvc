@@ -31,7 +31,7 @@ First, ensure that [Yarn](https://yarnpkg.com/) and
   > **Warning**: Having a separate (`.vsix`) version of the extension installed
   > may cause all kinds of chaos in your development environment.
 
-- **Start Debugging** (F5) to open the Extension Development Host, a child
+- **Start Debugging** (F5) to open the [Extension Development Host], a child
   instance of VS Code with the results of the dev servers installed as an
   extension.
 
@@ -46,6 +46,9 @@ First, ensure that [Yarn](https://yarnpkg.com/) and
   > **Note**: We have provided a demo project as part of this repo, but feel
   > free to use any DVC project that you have available.
 
+[extension development host]:
+  https://code.visualstudio.com/api/working-with-extensions/testing-extension
+
 ## The demo project
 
 The [demo project](demo) is provided as a lightweight, convenient testbed to try
@@ -57,7 +60,8 @@ your changes to the extension.
 - Run `yarn setup:venv` from the root of this repo to set up a virtual Python
   environment for the demo project (in `demo/.env`).
 
-- Open the `demo/` folder of this repo directly in VS Code.
+- Open the `./demo` project in a VS Code window, for example in the Extension
+  Development Host (see previous section) to test changes to this extension.
 
 - Pull the project data with the extension (either from the **DVC Tracked**
   panel in the _File Explorer_ or the **DVC panel** for _Source Control_) or by
