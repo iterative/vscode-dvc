@@ -116,7 +116,8 @@ const getSingleSelectMenuOptions = (
     withId(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
-      !isNotCheckpoint
+      !isNotCheckpoint,
+      !canApplyOrCreateBranch
     ),
     withId(
       'Modify, Reset and Run',
@@ -132,7 +133,8 @@ const getSingleSelectMenuOptions = (
       [id],
       starred ? 'Unstar Experiment' : 'Star Experiment',
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
-      isWorkspace
+      isWorkspace,
+      true
     ),
     withId(
       'Remove',
