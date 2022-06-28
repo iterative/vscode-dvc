@@ -293,19 +293,19 @@ export class ExperimentsModel extends ModelWithPersistence {
   })[] {
     return [
       {
-        ...this.addSelectedAndStarred(this.workspace),
+        ...this.addDetails(this.workspace),
         hasChildren: false,
         type: ExperimentType.WORKSPACE
       },
       ...this.branches.map(branch => {
         return {
-          ...this.addSelectedAndStarred(branch),
+          ...this.addDetails(branch),
           hasChildren: false,
           type: ExperimentType.BRANCH
         }
       }),
       ...this.flattenExperiments().map(experiment => ({
-        ...this.addSelectedAndStarred(experiment),
+        ...this.addDetails(experiment),
         hasChildren: definedAndNonEmpty(
           this.checkpointsByTip.get(experiment.id)
         ),
@@ -320,7 +320,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperiments().map(experiment => {
       const checkpoints = this.checkpointsByTip
         .get(experiment.id)
-        ?.map(checkpoint => this.addSelectedAndStarred(checkpoint))
+        ?.map(checkpoint => this.addDetails(checkpoint))
       if (!definedAndNonEmpty(checkpoints)) {
         return experiment
       }
@@ -348,17 +348,17 @@ export class ExperimentsModel extends ModelWithPersistence {
     id: string
   ): (Experiment & { type: ExperimentType })[] | undefined {
     return this.checkpointsByTip.get(id)?.map(checkpoint => ({
-      ...this.addSelectedAndStarred(checkpoint),
+      ...this.addDetails(checkpoint),
       type: ExperimentType.CHECKPOINT
     }))
   }
 
   public getRowData() {
     return [
-      this.addSelectedAndStarred(this.workspace),
+      this.addDetails(this.workspace),
       ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
-        const branchWithSelectedAndStarred = this.addSelectedAndStarred(branch)
+        const branchWithSelectedAndStarred = this.addDetails(branch)
 
         if (!definedAndNonEmpty(experiments)) {
           return branchWithSelectedAndStarred
@@ -411,12 +411,12 @@ export class ExperimentsModel extends ModelWithPersistence {
           filters
         )
         if (!checkpoints) {
-          return this.addSelectedAndStarred(experiment)
+          return this.addDetails(experiment)
         }
         return {
-          ...this.addSelectedAndStarred(experiment),
+          ...this.addDetails(experiment),
           subRows: checkpoints.map(checkpoint => ({
-            ...this.addSelectedAndStarred(checkpoint)
+            ...this.addDetails(checkpoint)
           }))
         }
       })
@@ -568,7 +568,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
   }
 
-  private addSelectedAndStarred(experiment: Experiment) {
+  private addDetails(experiment: Experiment) {
     return this.addStarred(this.addSelected(experiment))
   }
 
