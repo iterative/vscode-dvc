@@ -78,7 +78,7 @@ Management]. For deeper learning, try our [free course]!
 [data management]: https://dvc.org/doc/start/data-management
 [free course]: https://learn.iterative.ai/
 
-<!-- [learn more]: extension/resources/walkthrough/dvc-learn-more.md -->
+<!-- [learn more]: extension/resources/walkthrough/more-resources.md -->
 
 ## What you get
 

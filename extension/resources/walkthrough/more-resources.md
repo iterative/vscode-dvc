@@ -1,4 +1,4 @@
-# Learn more about DVC
+# More Resources
 
 Note that some of DVC features are better or only accessible via command-line.
 

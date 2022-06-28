@@ -47,6 +47,7 @@
     "untracked",
     "venv",
     "virtualenv",
-    "walkthrough"
+    "walkthrough",
+    "walkthroughs"
   ]
 }

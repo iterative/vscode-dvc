@@ -1449,11 +1449,11 @@
             ]
           },
           {
-            "id": "dvc.learnMore",
-            "title": "Learn more about DVC",
-            "description": "Take a look into DVC's [documentation](https://dvc.org/doc) to learn more about its features and command-line usage. \n[Learn More](https://dvc.org/doc)",
+            "id": "dvc.moreResources",
+            "title": "More Resources",
+            "description": "Learn more about this extension and DVC, and find other relevant materials.\n[DVC Docs](https://dvc.org/doc)",
             "media": {
-              "markdown": "resources/walkthrough/dvc-learn-more.md"
+              "markdown": "resources/walkthrough/more-resources.md"
             },
             "completionEvents": [
               "onLink:https://dvc.org/doc"
