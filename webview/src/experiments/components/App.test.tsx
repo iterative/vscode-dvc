@@ -865,6 +865,38 @@ describe('App', () => {
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
       })
     })
+
+    it('should toggle the star status of an experiment by clicking the ctx menu option', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      mockPostMessage.mockReset()
+      const mainRow = getRow('main')
+      fireEvent.contextMenu(mainRow, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+
+      const starOption = screen.getByText('Star Experiment')
+      fireEvent.click(starOption)
+
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: ['main'],
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
+    })
   })
 
   describe('Context Menu Suppression', () => {
