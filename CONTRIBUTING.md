@@ -66,8 +66,8 @@ your changes to this extension.
   panel in the _File Explorer_ or the **DVC panel** in _Source Control_) or by
   running `dvc pull` from _Terminal_.
 
-- In order to [run experiments] in the demo project, the virtual env should be
-  loaded through the [Python extension] (please install it).
+- In order to [run experiments] in the demo project, the [Python extension]
+  should be installed so that the virtual env is activated.
 
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
