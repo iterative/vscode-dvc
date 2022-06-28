@@ -312,31 +312,39 @@ export const collectMetricOrder = (
 type RevisionPathData = { [path: string]: Record<string, unknown>[] }
 
 export type RevisionData = {
-  [revision: string]: RevisionPathData
+  [label: string]: RevisionPathData
 }
 
 export type ComparisonData = {
-  [revision: string]: {
+  [label: string]: {
     [path: string]: ImagePlot
   }
 }
 
+export type CLIRevisionIdToLabel = { [shortSha: string]: string }
+
 const collectImageData = (
   acc: ComparisonData,
   path: string,
-  plot: ImagePlot
+  plot: ImagePlot,
+  cliIdToLabel: CLIRevisionIdToLabel
 ) => {
   const rev = plot.revisions?.[0]
-
   if (!rev) {
     return
   }
 
-  if (!acc[rev]) {
-    acc[rev] = {}
+  const label = cliIdToLabel[rev]
+
+  if (!label) {
+    return
   }
 
-  acc[rev][path] = plot
+  if (!acc[label]) {
+    acc[label] = {}
+  }
+
+  acc[label][path] = plot
 }
 
 const collectDatapoints = (
@@ -353,15 +361,17 @@ const collectDatapoints = (
 const collectPlotData = (
   acc: RevisionData,
   path: string,
-  plot: TemplatePlot
+  plot: TemplatePlot,
+  cliIdToLabel: CLIRevisionIdToLabel
 ) => {
-  for (const rev of plot.revisions || []) {
-    if (!acc[rev]) {
-      acc[rev] = {}
+  for (const id of plot.revisions || []) {
+    const label = cliIdToLabel[id]
+    if (!acc[label]) {
+      acc[label] = {}
     }
-    acc[rev][path] = []
+    acc[label][path] = []
 
-    collectDatapoints(acc, path, rev, plot.datapoints?.[rev])
+    collectDatapoints(acc, path, label, plot.datapoints?.[id])
   }
 }
 
@@ -370,25 +380,33 @@ type DataAccumulator = {
   comparisonData: ComparisonData
 }
 
-const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
+const collectPathData = (
+  acc: DataAccumulator,
+  path: string,
+  plots: Plot[],
+  cliIdToLabel: CLIRevisionIdToLabel
+) => {
   for (const plot of plots) {
     if (isImagePlot(plot)) {
-      collectImageData(acc.comparisonData, path, plot)
+      collectImageData(acc.comparisonData, path, plot, cliIdToLabel)
       continue
     }
 
-    collectPlotData(acc.revisionData, path, plot)
+    collectPlotData(acc.revisionData, path, plot, cliIdToLabel)
   }
 }
 
-export const collectData = (data: PlotsOutput): DataAccumulator => {
+export const collectData = (
+  data: PlotsOutput,
+  cliIdToLabel: CLIRevisionIdToLabel
+): DataAccumulator => {
   const acc = {
     comparisonData: {},
     revisionData: {}
   } as DataAccumulator
 
   for (const [path, plots] of Object.entries(data)) {
-    collectPathData(acc, path, plots)
+    collectPathData(acc, path, plots, cliIdToLabel)
   }
 
   return acc
@@ -543,7 +561,7 @@ export const collectBranchRevisionDetails = (
   const branchRevisions: Record<string, string> = {}
   for (const { id, sha } of branchShas) {
     if (sha) {
-      branchRevisions[id] = sha
+      branchRevisions[id] = shortenForLabel(sha)
     }
   }
   return branchRevisions

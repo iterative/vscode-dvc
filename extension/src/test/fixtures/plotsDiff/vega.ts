@@ -5,7 +5,7 @@ const data = {
     {
       multiView: false,
       type: 'vega',
-      revisions: ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a'],
+      revisions: ['workspace', '53c3851', '42b8736', '1ba7bcd', '4fb124a'],
       datapoints: {
         workspace: [
           {
@@ -54,7 +54,7 @@ const data = {
             timestamp: '1641966351759'
           }
         ],
-        main: [
+        '53c3851': [
           {
             acc: '0.123',
             step: '0',
@@ -323,7 +323,7 @@ const data = {
     {
       multiView: true,
       type: 'vega',
-      revisions: ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a'],
+      revisions: ['workspace', '53c3851', '42b8736', '1ba7bcd', '4fb124a'],
       datapoints: {
         workspace: [
           { actual: 7, predicted: 7 },
@@ -10327,7 +10327,7 @@ const data = {
           { actual: 5, predicted: 0 },
           { actual: 6, predicted: 0 }
         ],
-        main: [
+        '53c3851': [
           { actual: 7, predicted: 7 },
           { actual: 2, predicted: 0 },
           { actual: 1, predicted: 1 },
