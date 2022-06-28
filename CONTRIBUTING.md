@@ -56,8 +56,8 @@ your changes to this extension.
 > **Note**: It is not an exhaustive showcase of DVC's features. Testers are
 > encouraged to try other DVC repositories -- especially real-world cases!
 
-- Run `yarn setup:venv` from the _Terminal_ to set up a Python virtual
-  environment for the demo project (in `demo/.env`).
+- Run `yarn setup:venv` from the _Terminal_ in the root of this repo to set up a
+  Python virtual environment for the demo project (in `demo/.env`).
 
 - Open the `./demo` project in a VS Code window, for example in the _Extension
   Development Host_ (see previous section).
