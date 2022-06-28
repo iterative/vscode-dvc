@@ -205,7 +205,7 @@ _Integrated Terminal_!
   [MLEM](https://mlem.ai/) + [GTO](https://github.com/iterative/gto) **model
   registry** management, and future surprises! (TBD)
 
-[dvc metafile]: https://dvc.org/doc/user-guide/project-structure
+[dvc metafiles]: https://dvc.org/doc/user-guide/project-structure
 [parallel coordinate plots]:
   https://dvc.org/doc/user-guide/experiment-management/comparing-experiments#parallel-coordinates-plot
 [`dvc.yaml` files]:
