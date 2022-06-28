@@ -72,7 +72,7 @@ const getMultiSelectMenuOptions = (selectedRowsList: RowProp[]) => {
   const toggleStarOption = (ids: string[], label: string) =>
     experimentMenuOption(
       ids,
-      label.replace('{qty}', `${ids.length}`),
+      label,
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       ids.length === 0
     )
@@ -80,11 +80,11 @@ const getMultiSelectMenuOptions = (selectedRowsList: RowProp[]) => {
   return [
     toggleStarOption(
       unstarredExperiments.map(value => value.row.values.id),
-      'Star Experiments ({qty})'
+      'Star Experiments'
     ),
     toggleStarOption(
       starredExperiments.map(value => value.row.values.id),
-      'Unstar Experiments ({qty})'
+      'Unstar Experiments'
     ),
     experimentMenuOption(
       removableRowIds,

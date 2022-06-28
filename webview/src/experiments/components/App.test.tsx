@@ -924,7 +924,7 @@ describe('App', () => {
       fireEvent.contextMenu(mainRow, { bubbles: true })
       jest.advanceTimersByTime(100)
 
-      const starOption = screen.getByText('Star Experiments (2)')
+      const starOption = screen.getByText('Star Experiments')
       fireEvent.click(starOption)
 
       expect(mockPostMessage).toBeCalledTimes(1)
