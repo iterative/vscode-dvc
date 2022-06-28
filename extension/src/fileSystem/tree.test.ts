@@ -82,23 +82,24 @@ describe('TrackedTreeView', () => {
       )
       trackedTreeView.initialize(mockedDvcRoots)
 
-      const getRootPathItem = (dvcRoot: string) => ({
-        dvcRoot,
-        isDirectory: true,
-        resourceUri: Uri.file(dvcRoot)
-      })
-
-      mockedGetChildren.mockImplementation(dvcRoot => [
-        getRootPathItem(dvcRoot)
-      ])
-
       const rootElements = await trackedTreeView.getChildren()
 
-      expect(rootElements).toStrictEqual(mockedDvcRoots.map(getRootPathItem))
-      expect(mockedGetRepository).toBeCalledTimes(2)
-      expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
-      expect(mockedGetRepository).toBeCalledWith(mockedOtherRoot)
-      expect(mockedGetChildren).toBeCalledTimes(2)
+      expect(rootElements).toStrictEqual([
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: true,
+          isTracked: true,
+          resourceUri: Uri.file(dvcDemoPath)
+        },
+        {
+          dvcRoot: mockedOtherRoot,
+          isDirectory: true,
+          isTracked: true,
+          resourceUri: Uri.file(mockedOtherRoot)
+        }
+      ])
+      expect(mockedGetRepository).toBeCalledTimes(0)
+      expect(mockedGetChildren).toBeCalledTimes(0)
     })
 
     it('should return directories first in the list of root items', async () => {
