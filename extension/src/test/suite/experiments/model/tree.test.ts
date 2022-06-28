@@ -17,7 +17,10 @@ import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
 import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
-import { RegisteredCommands } from '../../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../../commands/external'
 import { buildPlots, getExpectedCheckpointPlotsData } from '../../plots/util'
 import checkpointPlotsFixture from '../../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
@@ -438,7 +441,10 @@ suite('Experiments Tree Test Suite', () => {
       const experimentsTree = disposable.track(
         new ExperimentsTree(
           workspaceExperiments,
-          { registerExternalCommand: stub() } as unknown as InternalCommands,
+          {
+            registerExternalCliCommand: stub(),
+            registerExternalCommand: stub()
+          } as unknown as InternalCommands,
           {} as ResourceLocator
         )
       )
@@ -488,7 +494,7 @@ suite('Experiments Tree Test Suite', () => {
       ).returns([mockExperiment])
 
       await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TREE_REMOVE,
+        RegisteredCliCommands.EXPERIMENT_TREE_REMOVE,
         mockExperiment
       )
 
@@ -512,11 +518,14 @@ suite('Experiments Tree Test Suite', () => {
         'getSelectedExperimentItems'
       ).returns([])
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
-        dvcRoot: dvcDemoPath,
-        id: mockExperiment,
-        type: ExperimentType.EXPERIMENT
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_TREE_REMOVE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperiment,
+          type: ExperimentType.EXPERIMENT
+        }
+      )
 
       expect(mockExperimentRemove).to.be.calledWithExactly(
         dvcDemoPath,
@@ -556,11 +565,14 @@ suite('Experiments Tree Test Suite', () => {
         }
       ])
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
-        dvcRoot: dvcDemoPath,
-        id: mockExperimentId,
-        type: ExperimentType.EXPERIMENT
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_TREE_REMOVE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperimentId,
+          type: ExperimentType.EXPERIMENT
+        }
+      )
 
       expect(mockExperimentRemove).to.be.calledWithExactly(
         dvcDemoPath,
@@ -579,10 +591,13 @@ suite('Experiments Tree Test Suite', () => {
         `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
       )
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_APPLY, {
-        dvcRoot: dvcDemoPath,
-        id: mockExperiment
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_TREE_APPLY,
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperiment
+        }
+      )
 
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
@@ -599,12 +614,15 @@ suite('Experiments Tree Test Suite', () => {
       )
       const mockShowInputBox = stub(window, 'showInputBox').resolves(undefined)
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_BRANCH, {
-        dvcRoot: dvcDemoPath,
-        id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
-        label: mockCheckpoint,
-        type: ExperimentType.CHECKPOINT
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_TREE_BRANCH,
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
+          label: mockCheckpoint,
+          type: ExperimentType.CHECKPOINT
+        }
+      )
 
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockExperimentBranch).not.to.be.called
@@ -624,12 +642,15 @@ suite('Experiments Tree Test Suite', () => {
       )
       const mockShowInputBox = stub(window, 'showInputBox').resolves(mockBranch)
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_BRANCH, {
-        dvcRoot: dvcDemoPath,
-        id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
-        label: mockCheckpoint,
-        type: ExperimentType.CHECKPOINT
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_TREE_BRANCH,
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
+          label: mockCheckpoint,
+          type: ExperimentType.CHECKPOINT
+        }
+      )
 
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockExperimentBranch).to.be.calledWithExactly(
@@ -682,10 +703,13 @@ suite('Experiments Tree Test Suite', () => {
         .onSecondCall()
         .resolves('0.102')
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_QUEUE, {
-        dvcRoot: dvcDemoPath,
-        id: baseExperimentId
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_TREE_QUEUE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: baseExperimentId
+        }
+      )
 
       expect(mockGetOnlyOrPickProject).not.to.be.called
       expect(getParamsSpy).to.be.calledOnce
@@ -743,7 +767,7 @@ suite('Experiments Tree Test Suite', () => {
         .onSecondCall()
         .resolves('0.82')
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_RUN, {
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_TREE_RUN, {
         dvcRoot: dvcDemoPath,
         id: baseExperimentId
       })
@@ -806,7 +830,7 @@ suite('Experiments Tree Test Suite', () => {
         .resolves('0.82')
 
       await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TREE_RESET_AND_RUN,
+        RegisteredCliCommands.EXPERIMENT_TREE_RESET_AND_RUN,
         {
           dvcRoot: dvcDemoPath,
           id: baseExperimentId

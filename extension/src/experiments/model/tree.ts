@@ -17,7 +17,10 @@ import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty } from '../../util/array'
 import { createTreeView, getRootItem } from '../../vscode/tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
-import { RegisteredCommands } from '../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
 import { Title } from '../../vscode/title'
@@ -109,8 +112,8 @@ export class ExperimentsTree
         this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
     )
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_APPLY,
+    internalCommands.registerExternalCliCommand<ExperimentItem>(
+      RegisteredCliCommands.EXPERIMENT_TREE_APPLY,
       ({ dvcRoot, id, label, type }: ExperimentItem) =>
         this.experiments.runCommand(
           AvailableCommands.EXPERIMENT_APPLY,
@@ -119,20 +122,19 @@ export class ExperimentsTree
         )
     )
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_BRANCH,
-      ({ dvcRoot, id, label, type }: ExperimentItem) => {
+    internalCommands.registerExternalCliCommand<ExperimentItem>(
+      RegisteredCliCommands.EXPERIMENT_TREE_BRANCH,
+      ({ dvcRoot, id, label, type }: ExperimentItem) =>
         this.experiments.getInputAndRun(
           AvailableCommands.EXPERIMENT_BRANCH,
           dvcRoot,
           Title.ENTER_BRANCH_NAME,
           this.getDisplayId(type, label, id)
         )
-      }
     )
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_QUEUE,
+    internalCommands.registerExternalCliCommand<ExperimentItem>(
+      RegisteredCliCommands.EXPERIMENT_TREE_QUEUE,
       ({ dvcRoot, id }: ExperimentItem) =>
         this.experiments.modifyExperimentParamsAndRun(
           AvailableCommands.EXPERIMENT_QUEUE,
@@ -148,18 +150,18 @@ export class ExperimentsTree
         id
       )
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_RUN,
+    internalCommands.registerExternalCliCommand<ExperimentItem>(
+      RegisteredCliCommands.EXPERIMENT_TREE_RUN,
       modifyExperimentParamsAndRun
     )
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_RESUME,
+    internalCommands.registerExternalCliCommand<ExperimentItem>(
+      RegisteredCliCommands.EXPERIMENT_TREE_RESUME,
       modifyExperimentParamsAndRun
     )
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_RESET_AND_RUN,
+    internalCommands.registerExternalCliCommand<ExperimentItem>(
+      RegisteredCliCommands.EXPERIMENT_TREE_RESET_AND_RUN,
       ({ dvcRoot, id }: ExperimentItem) =>
         this.experiments.modifyExperimentParamsAndRun(
           AvailableCommands.EXPERIMENT_RESET_AND_RUN,
@@ -168,8 +170,8 @@ export class ExperimentsTree
         )
     )
 
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_REMOVE,
+    internalCommands.registerExternalCliCommand<ExperimentItem>(
+      RegisteredCliCommands.EXPERIMENT_TREE_REMOVE,
       async experimentItem => {
         const selected = [...this.getSelectedExperimentItems(), experimentItem]
 

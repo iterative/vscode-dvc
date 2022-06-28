@@ -39,6 +39,7 @@ const mockedResourceLocator = {
 } as unknown as ResourceLocator
 
 const mockedInternalCommands = {
+  registerExternalCliCommand: jest.fn(),
   registerExternalCommand: jest.fn()
 } as unknown as InternalCommands
 
