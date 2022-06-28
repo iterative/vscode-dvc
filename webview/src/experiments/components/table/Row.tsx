@@ -47,19 +47,21 @@ const experimentMenuOption = (
 }
 
 const getMultiSelectMenuOptions = (selectedRowsList: RowProp[]) => {
-  const starStatuses = new Set<boolean | undefined>(
-    selectedRowsList.map(
-      ({
-        row: {
-          original: { starred }
-        }
-      }) => starred
-    )
+  const unstarredExperiments = selectedRowsList.filter(
+    ({
+      row: {
+        original: { starred }
+      }
+    }) => !starred
   )
 
-  const hideStarsOption = starStatuses.size !== 1
-  const starOptionLabel =
-    ([...starStatuses][0] && 'Unstar Experiments') || 'Star Experiments'
+  const starredExperiments = selectedRowsList.filter(
+    ({
+      row: {
+        original: { starred }
+      }
+    }) => starred
+  )
 
   const removableRowIds = selectedRowsList
     .filter(value => value.row.depth === 1)
@@ -67,19 +69,29 @@ const getMultiSelectMenuOptions = (selectedRowsList: RowProp[]) => {
 
   const hideRemoveOption = removableRowIds.length !== selectedRowsList.length
 
-  return [
+  const toggleStarOption = (ids: string[], label: string) =>
     experimentMenuOption(
-      selectedRowsList.map(value => value.row.values.id),
-      starOptionLabel,
+      ids,
+      label.replace('{qty}', `${ids.length}`),
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
-      hideStarsOption
+      ids.length === 0
+    )
+
+  return [
+    toggleStarOption(
+      unstarredExperiments.map(value => value.row.values.id),
+      'Star Experiments ({qty})'
+    ),
+    toggleStarOption(
+      starredExperiments.map(value => value.row.values.id),
+      'Unstar Experiments ({qty})'
     ),
     experimentMenuOption(
       removableRowIds,
       'Remove Selected Rows',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
       hideRemoveOption,
-      !hideStarsOption
+      true
     )
   ]
 }

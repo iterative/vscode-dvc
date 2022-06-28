@@ -19,7 +19,7 @@ export const MessagesMenu: React.FC<MessagesMenuProps> = ({
       .filter(({ hidden }) => !hidden)
       .map(option => (
         <MessagesMenuOption
-          key={option.id}
+          key={option.label}
           {...option}
           onOptionSelected={onOptionSelected}
         />
