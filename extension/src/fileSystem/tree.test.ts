@@ -1,8 +1,9 @@
-import { basename, join } from 'path'
+import { basename, join, resolve } from 'path'
 import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { exists, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
+import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 import { InternalCommands } from '../commands/internal'
 import { RegisteredCommands } from '../commands/external'
 import { OutputChannel } from '../vscode/outputChannel'
@@ -44,10 +45,13 @@ const mockedInternalCommands = new InternalCommands({
 const mockedExists = jest.mocked(exists)
 const mockedIsDirectory = jest.mocked(isDirectory)
 
+const mockedGetWorkspaceFolders = jest.mocked(getWorkspaceFolders)
+
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('.')
 jest.mock('../cli/reader')
+jest.mock('../vscode/workspaceFolders')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -102,8 +106,33 @@ describe('TrackedTreeView', () => {
       expect(mockedGetChildren).toBeCalledTimes(0)
     })
 
+    it('should return the single dvc root if it is nested', async () => {
+      const mockedDvcRoots = [dvcDemoPath]
+      mockedGetWorkspaceFolders.mockReturnValueOnce([
+        resolve(dvcDemoPath, '..')
+      ])
+
+      const trackedTreeView = new TrackedExplorerTree(
+        mockedInternalCommands,
+        mockedRepositories
+      )
+      trackedTreeView.initialize(mockedDvcRoots)
+
+      const rootElements = await trackedTreeView.getChildren()
+
+      expect(rootElements).toStrictEqual([
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: true,
+          isTracked: true,
+          resourceUri: Uri.file(dvcDemoPath)
+        }
+      ])
+    })
+
     it('should return directories first in the list of root items', async () => {
       const mockedDvcRoots = [dvcDemoPath]
+      mockedGetWorkspaceFolders.mockReturnValueOnce(mockedDvcRoots)
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
@@ -150,6 +179,7 @@ describe('TrackedTreeView', () => {
 
     it('should get the children for the provided element', async () => {
       const data = Uri.file(join(dvcDemoPath, 'data'))
+      mockedGetWorkspaceFolders.mockReturnValueOnce([dvcDemoPath])
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
