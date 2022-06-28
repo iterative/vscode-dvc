@@ -32,7 +32,7 @@ import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { sum } from '../../util/math'
 
-export type StarredExperiments = Record<string, true | undefined>
+export type StarredExperiments = Record<string, boolean | undefined>
 
 type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
@@ -117,13 +117,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public toggleStars(ids: string[]) {
     for (const id of ids) {
-      const current = this.starredExperiments[id]
-
-      if (current) {
-        delete this.starredExperiments[id]
-      } else {
-        this.starredExperiments[id] = true
-      }
+      this.starredExperiments[id] = !this.starredExperiments[id]
       this.persistStars()
     }
   }
