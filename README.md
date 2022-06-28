@@ -11,6 +11,13 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
+[Quick start](#quick-start) • [What you get](#what-you-get) •
+[Commands](#useful-commands) • [Configuration](#configuration) •
+[Roadmap](#developer-roadmap) • [Debugging](#debugging) •
+[Contributing](#contributing) • [Telemetry](#data-and-telemetry)
+
+---
+
 Run, compare, visualize, and track machine learning experiments right in VS
 Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
@@ -50,13 +57,6 @@ databases are required.
 [dvc experiments]:
   https://dvc.org/doc/user-guide/experiment-management/experiments-overview
 [data versioning]: https://dvc.org/doc/use-cases/versioning-data-and-model-files
-
----
-
-[Quick start](#quick-start) • [What you get](#what-you-get) •
-[Commands](#useful-commands) • [Configuration](#configuration) •
-[Roadmap](#developer-roadmap) • [Debugging](#debugging) •
-[Contributing](#contributing) • [Telemetry](#data-and-telemetry)
 
 ## Quick start
 
