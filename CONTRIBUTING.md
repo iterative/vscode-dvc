@@ -64,12 +64,7 @@ your changes to the extension.
   running `dvc pull` from a _Terminal_.
 
 - In order to [run experiments] in the demo project, the virtual env should be
-  loaded through the Microsoft [Python extension] (please install it), having
-  this in `.vscode/settings.json`:
-
-  ```json
-  "python.defaultInterpreterPath": "demo/.env/bin/python"
-  ```
+  loaded through the Microsoft [Python extension] (please install it).
 
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
