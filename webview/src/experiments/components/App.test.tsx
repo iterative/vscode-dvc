@@ -897,6 +897,42 @@ describe('App', () => {
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
       })
     })
+
+    it('should toggle the star status of multiple experiments by clicking the ctx menu options', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      mockPostMessage.mockReset()
+      const mainRow = getRow('main')
+      fireEvent.click(mainRow)
+
+      const firstTipRow = getRow('4fb124a')
+      fireEvent.click(firstTipRow)
+
+      fireEvent.contextMenu(mainRow, { bubbles: true })
+      jest.advanceTimersByTime(100)
+
+      const starOption = screen.getByText('Star Experiments (2)')
+      fireEvent.click(starOption)
+
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: ['main', 'exp-e7a67'],
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
+    })
   })
 
   describe('Context Menu Suppression', () => {
