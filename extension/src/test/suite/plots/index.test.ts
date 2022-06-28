@@ -64,7 +64,7 @@ suite('Plots Test Suite', () => {
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        'main',
+        '53c3851',
         'workspace'
       )
       mockPlotsDiff.resetHistory()
@@ -160,7 +160,7 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        'main',
+        '9235a02',
         'workspace'
       )
     })
@@ -184,9 +184,9 @@ suite('Plots Test Suite', () => {
               url: join(basePlotsUrl, 'workspace_plots_acc.png')
             },
             {
-              revisions: ['another-branch'],
+              revisions: ['9235a028'],
               type: PlotsType.IMAGE,
-              url: join(basePlotsUrl, 'another-branch_plots_acc.png')
+              url: join(basePlotsUrl, '9235a028_plots_acc.png')
             }
           ]
         })
@@ -220,7 +220,7 @@ suite('Plots Test Suite', () => {
       )
       const plotsSentEvent = new Promise(resolve =>
         mockSendPlots.callsFake(() => {
-          if (isEqual(plotsModel.getMissingRevisions(), [])) {
+          if (isEqual(plotsModel.getMissingRevisions(), ['9235a02'])) {
             resolve(undefined)
           }
         })
@@ -235,7 +235,7 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        'another-branch',
+        '9235a02',
         'workspace'
       )
 
@@ -253,7 +253,7 @@ suite('Plots Test Suite', () => {
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        'main',
+        '53c3851',
         'workspace'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -620,7 +620,7 @@ suite('Plots Test Suite', () => {
         undefined
       )
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'main')
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, '53c3851')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to manually refresh all visible plots from the webview', async () => {
@@ -658,7 +658,7 @@ suite('Plots Test Suite', () => {
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        'main',
+        '53c3851',
         'workspace'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)

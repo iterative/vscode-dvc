@@ -151,7 +151,7 @@ suite('Plots Paths Tree Test Suite', () => {
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        'main',
+        '53c3851',
         'workspace'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
