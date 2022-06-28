@@ -812,6 +812,61 @@ describe('App', () => {
     })
   })
 
+  describe('Star Experiments', () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+    })
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
+    it('should not be available for the workspace experiment', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      mockPostMessage.mockReset()
+      const workspaceRow = screen.getByTestId('workspace-row')
+      const starIcon = within(workspaceRow).getByTestId('star-icon')
+      fireEvent.click(starIcon)
+
+      expect(mockPostMessage).not.toBeCalled()
+    })
+
+    it('should toggle the star status of an experiment by clicking the star icon', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      mockPostMessage.mockReset()
+      const mainRow = getRow('main')
+      const starIcon = within(mainRow).getByTestId('star-icon')
+      fireEvent.click(starIcon)
+
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: ['main'],
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
+    })
+  })
+
   describe('Context Menu Suppression', () => {
     it('Suppresses the context menu on a table with no data', () => {
       render(<App />)

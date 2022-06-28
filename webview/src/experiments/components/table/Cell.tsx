@@ -67,6 +67,7 @@ export const FirstCell: React.FC<
           aria-checked={starred}
           tabIndex={0}
           {...clickAndEnterProps(toggleStarred)}
+          data-testid="star-icon"
         >
           {starred && <StarFull />}
           {!starred && <StarEmpty />}

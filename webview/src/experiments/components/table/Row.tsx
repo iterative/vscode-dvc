@@ -270,10 +270,11 @@ export const RowContent: React.FC<
   }
 
   const toggleStarred = () => {
-    sendMessage({
-      payload: [id],
-      type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
-    })
+    !isWorkspace &&
+      sendMessage({
+        payload: [id],
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
   }
 
   const { toggleRowSelected, selectedRows } =
