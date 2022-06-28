@@ -15,32 +15,31 @@ highly appreciated!
 
 ## Development environment
 
-Setting up a dev environment allows contributors to test their changes to the
-extension. The local repository source is built and loaded into the Extension
-Development Host.
+Setting up a dev environment allows contributors to test changes to this
+extension. The source code is built, and the resulting package loaded into a
+special instance of VS Code.
 
-First, ensure that [Yarn](https://yarnpkg.com/) and
-[Visual Studio Code](https://code.visualstudio.com) are installed.
+First, ensure that [Visual Studio Code](https://code.visualstudio.com) and
+[Yarn](https://yarnpkg.com/) are installed.
 
-- Open this repository's root directory as a project in VS Code.
+- Open this repository as a project in VS Code.
 
 - Run `Tasks: Run Build Task` (Shift + Ctrl/Cmd + `b`) to start the extension
   and Webview dev servers (alternatively, run `yarn dev-server` from the
   _Integrated Terminal_).
 
-  > **Warning**: Having a separate (`.vsix`) version of the extension installed
+  > **Warning**: Having a separate `.vsix` version of this extension installed
   > may cause all kinds of chaos in your development environment.
 
 - **Start Debugging** (F5) to open the [Extension Development Host], a child
-  instance of VS Code with the results of the dev servers installed as an
-  extension.
+  instance of VS Code with the local extension build installed.
 
   > **Note**: using the `Run Extension` command when running the debugger will
   > prevent all other extensions from loading into VS Code. This will improve
   > the performance of VS Code but can cause certain DVC commands to fail if the
-  > project uses an isolated python environment (see [this warning](#warning)).
+  > DVC project uses an isolated Python env (see [this warning](#warning)).
 
-- Open a DVC project in the Extension Development Host. VS Code will remember
+- Open a DVC project in the _Extension Development Host_. VS Code will remember
   the last project opened, so this step only has to be done once.
 
   > **Note**: We have provided a demo project as part of this repo, but feel
@@ -52,20 +51,20 @@ First, ensure that [Yarn](https://yarnpkg.com/) and
 ## The demo project
 
 The [demo project](demo) is provided as a lightweight, convenient testbed to try
-your changes to the extension.
+your changes to this extension.
 
 > **Note**: It is not an exhaustive showcase of DVC's features. Testers are
 > encouraged to try other DVC repositories -- especially real-world cases!
 
-- Run `yarn setup:venv` from the root of this repo to set up a virtual Python
+- Run `yarn setup:venv` from the _Terminal_ to set up a Python virtual
   environment for the demo project (in `demo/.env`).
 
-- Open the `./demo` project in a VS Code window, for example in the Extension
-  Development Host (see previous section) to test changes to this extension.
+- Open the `./demo` project in a VS Code window, for example in the _Extension
+  Development Host_ (see previous section).
 
-- Pull the project data using the extension (either from the **DVC Tracked**
-  panel in the _File Explorer_ or the **DVC panel** for _Source Control_) or by
-  running `dvc pull` from a _Terminal_.
+- Pull the project data using this extension (either from the **DVC Tracked**
+  panel in the _File Explorer_ or the **DVC panel** in _Source Control_) or by
+  running `dvc pull` from _Terminal_.
 
 - In order to [run experiments] in the demo project, the virtual env should be
   loaded through the [Python extension] (please install it).
