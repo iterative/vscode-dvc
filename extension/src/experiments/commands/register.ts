@@ -5,8 +5,9 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
-import { ExperimentItem } from '../model/collect'
 import { Title } from '../../vscode/title'
+
+type ExperimentDetails = { dvcRoot: string; id: string }
 
 const registerExperimentCwdCommands = (
   experiments: WorkspaceExperiments,
@@ -30,7 +31,7 @@ const registerExperimentCwdCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
-    ({ dvcRoot, id }: ExperimentItem) =>
+    ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.pauseUpdatesThenRun(() =>
         experiments.modifyExperimentParamsAndQueue(dvcRoot, id)
       )
@@ -54,7 +55,7 @@ const registerExperimentCwdCommands = (
   const modifyExperimentParamsAndRunFromView = ({
     dvcRoot,
     id
-  }: ExperimentItem) =>
+  }: ExperimentDetails) =>
     experiments.pauseUpdatesThenRun(() =>
       experiments.modifyExperimentParamsAndRun(
         AvailableCommands.EXPERIMENT_RUN,
@@ -85,7 +86,7 @@ const registerExperimentCwdCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
-    ({ dvcRoot, id }: ExperimentItem) =>
+    ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.pauseUpdatesThenRun(() =>
         experiments.modifyExperimentParamsAndRun(
           AvailableCommands.EXPERIMENT_RESET_AND_RUN,
@@ -114,7 +115,7 @@ const registerExperimentNameCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
-    ({ dvcRoot, id }: ExperimentItem) =>
+    ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameThenRun(
         AvailableCommands.EXPERIMENT_APPLY,
         dvcRoot,
@@ -130,13 +131,12 @@ const registerExperimentNameCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
-    ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) => {
-      return experiments.runCommand(
+    ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) =>
+      experiments.runCommand(
         AvailableCommands.EXPERIMENT_REMOVE,
         dvcRoot,
         ...ids
       )
-    }
   )
 
   internalCommands.registerExternalCliCommand(
@@ -160,7 +160,7 @@ const registerExperimentInputCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
-    ({ dvcRoot, id }: ExperimentItem) =>
+    ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
         AvailableCommands.EXPERIMENT_BRANCH,
         Title.ENTER_BRANCH_NAME,
@@ -266,7 +266,7 @@ export const registerExperimentCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_TOGGLE,
-    ({ dvcRoot, id }: ExperimentItem) =>
+    ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
   )
 }
