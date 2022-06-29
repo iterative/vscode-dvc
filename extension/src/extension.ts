@@ -153,11 +153,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.dispose.track(
-      new ExperimentsTree(
-        this.experiments,
-        this.internalCommands,
-        this.resourceLocator
-      )
+      new ExperimentsTree(this.experiments, this.resourceLocator)
     )
 
     this.dispose.track(

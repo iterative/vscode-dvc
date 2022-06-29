@@ -263,4 +263,10 @@ export const registerExperimentCommands = (
     RegisteredCommands.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS,
     (dvcRoot?: string) => experiments.autoApplyFilters(false, dvcRoot)
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_TOGGLE,
+    ({ dvcRoot, id }: ExperimentItem) =>
+      experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
+  )
 }

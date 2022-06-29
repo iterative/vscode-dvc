@@ -22,7 +22,6 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
-import { InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
 
@@ -42,7 +41,6 @@ export class ExperimentsTree
 
   constructor(
     experiments: WorkspaceExperiments,
-    internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {
     super()
@@ -68,7 +66,7 @@ export class ExperimentsTree
     this.experiments = experiments
     this.resourceLocator = resourceLocator
 
-    this.registerCommands(internalCommands)
+    this.registerWorkaroundCommand()
 
     this.updateDescriptionOnChange()
   }
@@ -105,13 +103,7 @@ export class ExperimentsTree
     return Promise.resolve(this.getCheckpoints(dvcRoot, id))
   }
 
-  private registerCommands(internalCommands: InternalCommands) {
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TOGGLE,
-      ({ dvcRoot, id }) =>
-        this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
-    )
-
+  private registerWorkaroundCommand() {
     commands.registerCommand(
       'dvc.views.experimentsTree.removeExperiment',
       async experimentItem => {

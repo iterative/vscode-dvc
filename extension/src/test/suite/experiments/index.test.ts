@@ -272,39 +272,6 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a toggle experiment message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
-
-      const webview = await experiments.showWebview()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockToggleExperimentStatus = stub(
-        experiments,
-        'toggleExperimentStatus'
-      ).returns(copyOriginalColors()[0])
-
-      const mockExperimentId = 'workspace'
-
-      mockMessageReceived.fire({
-        payload: mockExperimentId,
-        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
-      })
-
-      expect(mockToggleExperimentStatus).to.be.calledOnce
-      expect(
-        mockToggleExperimentStatus,
-        'should correctly handle an experiment toggled message'
-      ).to.be.calledWithExactly(mockExperimentId)
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE,
-        undefined,
-        undefined
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should handle a column sorted message from the webview', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
 
@@ -664,8 +631,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it("should be able to handle a message to toggle an experiment's status", async () => {
-      const { experiments, experimentsModel } =
-        setupExperimentsAndMockCommands()
+      const { experiments, experimentsModel } = buildExperiments(disposable)
 
       const experimentToToggle = 'exp-e7a67'
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
@@ -680,6 +646,14 @@ suite('Experiments Test Suite', () => {
         isExperimentSelected(queuedExperiment),
         'queued experiment cannot be selected'
       ).to.be.false
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)

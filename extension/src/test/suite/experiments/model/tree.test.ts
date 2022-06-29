@@ -30,7 +30,6 @@ import { buildMetricOrParamPath } from '../../../../experiments/columns/paths'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, buildSingleRepoExperiments } from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
-import { InternalCommands } from '../../../../commands/internal'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import {
   QuickPickItemWithValue,
@@ -65,7 +64,7 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.eventually.equal(undefined)
     })
 
-    it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experimentsTree.toggleStatus', async () => {
+    it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
       const { plots, messageSpy } = await buildPlots(disposable)
 
       const expectedDomain = [...domain]
@@ -440,14 +439,7 @@ suite('Experiments Tree Test Suite', () => {
       stub(commands, 'registerCommand')
 
       const experimentsTree = disposable.track(
-        new ExperimentsTree(
-          workspaceExperiments,
-          {
-            registerExternalCliCommand: stub(),
-            registerExternalCommand: stub()
-          } as unknown as InternalCommands,
-          {} as ResourceLocator
-        )
+        new ExperimentsTree(workspaceExperiments, {} as ResourceLocator)
       )
 
       const description = '[exp-1234]'

@@ -43,7 +43,7 @@ import { setContextValue } from '../vscode/context'
 import { standardizePath } from '../fileSystem/path'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
-import { RegisteredCliCommands } from '../commands/external'
+import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 
 export const ExperimentsScale = {
   ...ColumnType,
@@ -528,7 +528,10 @@ export class Experiments extends BaseRepository<TableData> {
               message.payload.width
             )
           case MessageFromWebviewType.TOGGLE_EXPERIMENT:
-            return this.setExperimentStatus(message.payload)
+            return commands.executeCommand(
+              RegisteredCommands.EXPERIMENT_TOGGLE,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
           case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
             return this.hideTableColumn(message.payload)
           case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
@@ -597,15 +600,6 @@ export class Experiments extends BaseRepository<TableData> {
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN,
       { width },
-      undefined
-    )
-  }
-
-  private setExperimentStatus(id: string) {
-    this.toggleExperimentStatus(id)
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE,
-      undefined,
       undefined
     )
   }
