@@ -660,7 +660,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to queue an experiment from an existing one with dvc.views.experimentsTree.queueExperiment', async () => {
+    it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
       const baseExperimentId = 'workspace'
 
       const { cliExecutor, experiments, experimentsModel } =
@@ -704,7 +704,7 @@ suite('Experiments Tree Test Suite', () => {
         .resolves('0.102')
 
       await commands.executeCommand(
-        RegisteredCliCommands.EXPERIMENT_TREE_QUEUE,
+        RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
         {
           dvcRoot: dvcDemoPath,
           id: baseExperimentId
@@ -725,7 +725,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to run a new experiment from an existing one with dvc.views.experimentsTree.runExperiment', async () => {
+    it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
       const baseExperimentId = 'workspace'
 
       const { cliRunner, experiments, experimentsModel } =
@@ -767,7 +767,7 @@ suite('Experiments Tree Test Suite', () => {
         .onSecondCall()
         .resolves('0.82')
 
-      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_TREE_RUN, {
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_VIEW_RUN, {
         dvcRoot: dvcDemoPath,
         id: baseExperimentId
       })
@@ -786,7 +786,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experimentsTree.resetRunExperiment', async () => {
+    it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
       const baseExperimentId = 'workspace'
 
       const { cliRunner, experiments, experimentsModel } =
@@ -830,7 +830,7 @@ suite('Experiments Tree Test Suite', () => {
         .resolves('0.82')
 
       await commands.executeCommand(
-        RegisteredCliCommands.EXPERIMENT_TREE_RESET_AND_RUN,
+        RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
         {
           dvcRoot: dvcDemoPath,
           id: baseExperimentId

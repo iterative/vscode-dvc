@@ -5,6 +5,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
+import { ExperimentItem } from '../model/collect'
 import { Title } from '../../vscode/title'
 
 const registerExperimentCwdCommands = (
@@ -19,39 +20,77 @@ const registerExperimentCwdCommands = (
       )
   )
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
     () =>
       experiments.pauseUpdatesThenRun(() =>
-        experiments.modifyExperimentParamsAndExecute(
-          AvailableCommands.EXPERIMENT_QUEUE
-        )
+        experiments.modifyExperimentParamsAndQueue()
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
+    ({ dvcRoot, id }: ExperimentItem) =>
+      experiments.pauseUpdatesThenRun(() =>
+        experiments.modifyExperimentParamsAndQueue(dvcRoot, id)
       )
   )
 
   const modifyExperimentParamsAndRun = () =>
     experiments.pauseUpdatesThenRun(() =>
-      experiments.modifyExperimentParamsAndExecute(
-        AvailableCommands.EXPERIMENT_RUN
+      experiments.modifyExperimentParamsAndRun(AvailableCommands.EXPERIMENT_RUN)
+    )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_RESUME,
+    modifyExperimentParamsAndRun
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
+    modifyExperimentParamsAndRun
+  )
+
+  const modifyExperimentParamsAndRunFromView = ({
+    dvcRoot,
+    id
+  }: ExperimentItem) =>
+    experiments.pauseUpdatesThenRun(() =>
+      experiments.modifyExperimentParamsAndRun(
+        AvailableCommands.EXPERIMENT_RUN,
+        dvcRoot,
+        id
       )
     )
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_RESUME,
-    modifyExperimentParamsAndRun
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_RESUME,
+    modifyExperimentParamsAndRunFromView
   )
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
-    modifyExperimentParamsAndRun
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
+    modifyExperimentParamsAndRunFromView
   )
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
     () =>
       experiments.pauseUpdatesThenRun(() =>
-        experiments.modifyExperimentParamsAndExecute(
+        experiments.modifyExperimentParamsAndRun(
           AvailableCommands.EXPERIMENT_RESET_AND_RUN
+        )
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
+    ({ dvcRoot, id }: ExperimentItem) =>
+      experiments.pauseUpdatesThenRun(() =>
+        experiments.modifyExperimentParamsAndRun(
+          AvailableCommands.EXPERIMENT_RESET_AND_RUN,
+          dvcRoot,
+          id
         )
       )
   )

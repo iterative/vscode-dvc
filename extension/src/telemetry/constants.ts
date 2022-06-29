@@ -45,15 +45,11 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN: 'views.experimentsTable.columnHidden',
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
-    VIEWS_EXPERIMENTS_TABLE_QUEUE: 'dvc.views.experimentsTable.queueExperiment',
     VIEWS_EXPERIMENTS_TABLE_REMOVE: 'views.experimentsTable.removeExperiment',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
       'views.experimentsTable.columnSortRemoved',
-    VIEWS_EXPERIMENTS_TABLE_RESET_AND_RUN:
-      'dvc.views.experimentsTable.resetAndRunExperiment',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
       'views.experimentsTable.columnResized',
-    VIEWS_EXPERIMENTS_TABLE_RUN: 'dvc.views.experimentsTable.runExperiment',
     VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS:
       'views.experimentsTable.selectColumns',
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
@@ -137,12 +133,14 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
   [EventName.EXPERIMENT_TREE_APPLY]: undefined
   [EventName.EXPERIMENT_TREE_BRANCH]: undefined
-  [EventName.EXPERIMENT_TREE_QUEUE]: undefined
   [EventName.EXPERIMENT_TREE_REMOVE]: undefined
-  [EventName.EXPERIMENT_TREE_RESUME]: undefined
-  [EventName.EXPERIMENT_TREE_RUN]: undefined
-  [EventName.EXPERIMENT_TREE_RESET_AND_RUN]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
+
+  [EventName.EXPERIMENT_VIEW_QUEUE]: undefined
+  [EventName.EXPERIMENT_VIEW_RESUME]: undefined
+  [EventName.EXPERIMENT_VIEW_RUN]: undefined
+  [EventName.EXPERIMENT_VIEW_RESET_AND_RUN]: undefined
+
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RESUME]: undefined
@@ -200,9 +198,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATE_BRANCH]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE]: undefined
-  [EventName.VIEWS_EXPERIMENTS_TABLE_QUEUE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE]: undefined
-  [EventName.VIEWS_EXPERIMENTS_TABLE_RESET_AND_RUN]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN]: {
     width: number
   }
@@ -215,7 +211,6 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN]: {
     path: string
   }
-  [EventName.VIEWS_EXPERIMENTS_TABLE_RUN]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE]: {
     path: string

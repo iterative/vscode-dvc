@@ -134,43 +134,6 @@ export class ExperimentsTree
     )
 
     internalCommands.registerExternalCliCommand<ExperimentItem>(
-      RegisteredCliCommands.EXPERIMENT_TREE_QUEUE,
-      ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.modifyExperimentParamsAndExecute(
-          AvailableCommands.EXPERIMENT_QUEUE,
-          dvcRoot,
-          id
-        )
-    )
-
-    const modifyExperimentParamsAndRun = ({ dvcRoot, id }: ExperimentItem) =>
-      this.experiments.modifyExperimentParamsAndExecute(
-        AvailableCommands.EXPERIMENT_RUN,
-        dvcRoot,
-        id
-      )
-
-    internalCommands.registerExternalCliCommand<ExperimentItem>(
-      RegisteredCliCommands.EXPERIMENT_TREE_RUN,
-      modifyExperimentParamsAndRun
-    )
-
-    internalCommands.registerExternalCliCommand<ExperimentItem>(
-      RegisteredCliCommands.EXPERIMENT_TREE_RESUME,
-      modifyExperimentParamsAndRun
-    )
-
-    internalCommands.registerExternalCliCommand<ExperimentItem>(
-      RegisteredCliCommands.EXPERIMENT_TREE_RESET_AND_RUN,
-      ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.modifyExperimentParamsAndExecute(
-          AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-          dvcRoot,
-          id
-        )
-    )
-
-    internalCommands.registerExternalCliCommand<ExperimentItem>(
       RegisteredCliCommands.EXPERIMENT_TREE_REMOVE,
       async experimentItem => {
         const selected = [...this.getSelectedExperimentItems(), experimentItem]

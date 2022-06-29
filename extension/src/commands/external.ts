@@ -13,11 +13,17 @@ export enum RegisteredCliCommands {
 
   EXPERIMENT_TREE_APPLY = 'dvc.views.experimentsTree.applyExperiment',
   EXPERIMENT_TREE_BRANCH = 'dvc.views.experimentsTree.branchExperiment',
-  EXPERIMENT_TREE_QUEUE = 'dvc.views.experimentsTree.queueExperiment',
   EXPERIMENT_TREE_REMOVE = 'dvc.views.experimentsTree.removeExperiment',
-  EXPERIMENT_TREE_RESUME = 'dvc.views.experimentsTree.resumeCheckpointExperiment',
-  EXPERIMENT_TREE_RUN = 'dvc.views.experimentsTree.runExperiment',
-  EXPERIMENT_TREE_RESET_AND_RUN = 'dvc.views.experimentsTree.resetAndRunCheckpointExperiment',
+
+  EXPERIMENT_VIEW_QUEUE = 'dvc.views.experiments.queueExperiment',
+  EXPERIMENT_VIEW_RESUME = 'dvc.views.experiments.resumeCheckpointExperiment',
+  EXPERIMENT_VIEW_RUN = 'dvc.views.experiments.runExperiment',
+  EXPERIMENT_VIEW_RESET_AND_RUN = 'dvc.views.experiments.resetAndRunCheckpointExperiment',
+
+  MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'dvc.modifyExperimentParamsAndQueue',
+  MODIFY_EXPERIMENT_PARAMS_AND_RESUME = 'dvc.modifyExperimentParamsAndResume',
+  MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'dvc.modifyExperimentParamsAndRun',
+  MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'dvc.modifyExperimentParamsResetAndRun',
 
   ADD_TARGET = 'dvc.addTarget',
   CHECKOUT = 'dvc.checkout',
@@ -49,10 +55,6 @@ export enum RegisteredCommands {
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
   EXPERIMENT_TOGGLE = 'dvc.views.experimentsTree.toggleStatus',
-  MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'dvc.modifyExperimentParamsAndQueue',
-  MODIFY_EXPERIMENT_PARAMS_AND_RESUME = 'dvc.modifyExperimentParamsAndResume',
-  MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'dvc.modifyExperimentParamsAndRun',
-  MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'dvc.modifyExperimentParamsResetAndRun',
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
   PLOTS_PATH_TOGGLE = 'dvc.views.plotsPathsTree.toggleStatus',

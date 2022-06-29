@@ -1,5 +1,5 @@
 import { EventEmitter, Memento } from 'vscode'
-import { Experiments, ModifiedExperimentCommandId } from '.'
+import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/constants'
 import { CommandId, InternalCommands } from '../commands/internal'
@@ -121,8 +121,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).autoApplyFilters(enable)
   }
 
-  public async modifyExperimentParamsAndExecute(
-    commandId: ModifiedExperimentCommandId,
+  public async modifyExperimentParamsAndRun(
+    commandId: ModifiedExperimentAndRunCommandId,
     overrideRoot?: string,
     overrideId?: string
   ) {
@@ -136,7 +136,24 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    await repository.modifyExperimentParamsAndExecute(commandId, overrideId)
+    return await repository.modifyExperimentParamsAndRun(commandId, overrideId)
+  }
+
+  public async modifyExperimentParamsAndQueue(
+    overrideRoot?: string,
+    overrideId?: string
+  ) {
+    const cwd = await this.getDvcRoot(overrideRoot)
+    if (!cwd) {
+      return
+    }
+
+    const repository = this.getRepository(cwd)
+    if (!repository) {
+      return
+    }
+
+    return await repository.modifyExperimentParamsAndQueue(overrideId)
   }
 
   public async getCwdThenRun(commandId: CommandId) {

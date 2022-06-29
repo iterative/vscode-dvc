@@ -52,7 +52,7 @@ import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { AvailableCommands, InternalCommands } from '../../../commands/internal'
+import { InternalCommands } from '../../../commands/internal'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -61,6 +61,7 @@ import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
 import { ExperimentFlag } from '../../../cli/constants'
+import { WorkspaceExperiments } from '../../../experiments/workspace'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -500,8 +501,10 @@ suite('Experiments Test Suite', () => {
     })
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments, cliExecutor } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
 
       const mockModifiedParams = [
         '-S',
@@ -510,14 +513,22 @@ suite('Experiments Test Suite', () => {
         'params.yaml:weight_decay=0'
       ]
 
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+      const mockQueueExperiment = stub(
+        cliExecutor,
+        'experimentRunQueue'
+      ).resolves(undefined)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
-      const tableChangePromise = new Promise(resolve =>
-        mockMessageReceived.event(() => resolve(undefined))
-      )
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -525,17 +536,18 @@ suite('Experiments Test Suite', () => {
       })
 
       await tableChangePromise
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_QUEUE,
+      expect(mockQueueExperiment).to.be.calledOnce
+      expect(mockQueueExperiment).to.be.calledWithExactly(
         dvcDemoPath,
         ...mockModifiedParams
       )
     })
 
     it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments, cliRunner } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
 
       const mockModifiedParams = [
         '-S',
@@ -544,14 +556,23 @@ suite('Experiments Test Suite', () => {
         'params.yaml:weight_decay=0'
       ]
 
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+        undefined
+      )
 
       const webview = await experiments.showWebview()
+
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
-      const tableChangePromise = new Promise(resolve =>
-        mockMessageReceived.event(() => resolve(undefined))
-      )
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -559,9 +580,8 @@ suite('Experiments Test Suite', () => {
       })
 
       await tableChangePromise
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_RUN,
+      expect(mockRunExperiment).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledWithExactly(
         dvcDemoPath,
         ...mockModifiedParams
       )
@@ -581,16 +601,23 @@ suite('Experiments Test Suite', () => {
       ]
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
-        undefined
-      )
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
-      const tableChangePromise = new Promise(resolve =>
-        mockMessageReceived.event(() => resolve(undefined))
+      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+        undefined
       )
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,

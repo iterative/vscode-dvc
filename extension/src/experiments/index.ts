@@ -49,6 +49,7 @@ import { setContextValue } from '../vscode/context'
 import { standardizePath } from '../fileSystem/path'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
+import { RegisteredCliCommands } from '../commands/external'
 
 export const ExperimentsScale = {
   ...ColumnType,
@@ -56,8 +57,7 @@ export const ExperimentsScale = {
   NO_CHECKPOINTS: 'noCheckpoints'
 } as const
 
-export type ModifiedExperimentCommandId =
-  | typeof AvailableCommands.EXPERIMENT_QUEUE
+export type ModifiedExperimentAndRunCommandId =
   | typeof AvailableCommands.EXPERIMENT_RUN
   | typeof AvailableCommands.EXPERIMENT_RESET_AND_RUN
 
@@ -389,8 +389,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelectedExperiments()
   }
 
-  public async modifyExperimentParamsAndExecute(
-    commandId: ModifiedExperimentCommandId,
+  public async modifyExperimentParamsAndRun(
+    commandId: ModifiedExperimentAndRunCommandId,
     experimentId?: string
   ) {
     const paramsToModify = await this.pickAndModifyParams(experimentId)
@@ -398,15 +398,28 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    const promise = this.internalCommands.executeCommand<string>(
+    await this.internalCommands.executeCommand<string>(
       commandId,
       this.dvcRoot,
       ...paramsToModify
     )
-    if (commandId === AvailableCommands.EXPERIMENT_QUEUE) {
-      Toast.showOutput(promise)
+    return this.notifyChanged()
+  }
+
+  public async modifyExperimentParamsAndQueue(experimentId?: string) {
+    const paramsToModify = await this.pickAndModifyParams(experimentId)
+    if (!paramsToModify) {
+      return
     }
-    return promise
+
+    await Toast.showOutput(
+      this.internalCommands.executeCommand<string>(
+        AvailableCommands.EXPERIMENT_QUEUE,
+        this.dvcRoot,
+        ...paramsToModify
+      )
+    )
+    return this.notifyChanged()
   }
 
   public hasRunningExperiment() {
@@ -541,11 +554,20 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
             return this.createBranchFromExperiment(message.payload)
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
-            return this.modifyExperimentParamsAndQueue(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN:
-            return this.modifyExperimentParamsAndRun(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
-            return this.modifyExperimentParamsResetAndRun(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
 
           case MessageFromWebviewType.REMOVE_EXPERIMENT:
             return this.removeExperiment(message.payload)
@@ -643,45 +665,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.executeCommandAndNotify(
       AvailableCommands.EXPERIMENT_REMOVE,
       ...[experimentId].flat()
-    )
-  }
-
-  private async modifyExperimentParamsAndQueue(id: string) {
-    await this.modifyExperimentParamsAndExecute(
-      AvailableCommands.EXPERIMENT_QUEUE,
-      id
-    )
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_QUEUE,
-      undefined,
-      undefined
-    )
-  }
-
-  private async modifyExperimentParamsAndRun(id: string) {
-    await this.modifyExperimentParamsAndExecute(
-      AvailableCommands.EXPERIMENT_RUN,
-      id
-    )
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_RUN,
-      undefined,
-      undefined
-    )
-  }
-
-  private async modifyExperimentParamsResetAndRun(id: string) {
-    await this.modifyExperimentParamsAndExecute(
-      AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-      id
-    )
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_RESET_AND_RUN,
-      undefined,
-      undefined
     )
   }
 

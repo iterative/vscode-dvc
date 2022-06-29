@@ -97,7 +97,7 @@ export class InternalCommands extends Disposable {
 
   public registerExternalCommand<T = string | undefined>(
     name: RegisteredCommands,
-    func: (arg: T) => unknown
+    func: (...args: T[]) => unknown
   ): void {
     this.dispose.track(
       commands.registerCommand(name, (arg: T) =>
