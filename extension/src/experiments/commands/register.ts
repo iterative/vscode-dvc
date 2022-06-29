@@ -129,6 +129,17 @@ const registerExperimentNameCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+    ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) => {
+      return experiments.runCommand(
+        AvailableCommands.EXPERIMENT_REMOVE,
+        dvcRoot,
+        ...ids
+      )
+    }
+  )
+
+  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUED,
     () => experiments.getQueuedExpThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )

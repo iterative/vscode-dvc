@@ -640,14 +640,14 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to remove an experiment', async () => {
-      const { experiments, cliExecutor } = setupExperimentsAndMockCommands()
+      const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
 
       const mockExperimentRemove = stub(
-        cliExecutor,
+        CliExecutor.prototype,
         'experimentRemove'
       ).resolves(undefined)
 

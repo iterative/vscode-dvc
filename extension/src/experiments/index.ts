@@ -27,12 +27,7 @@ import { DecorationProvider } from './model/filterBy/decorationProvider'
 import { SortDefinition } from './model/sortBy'
 import { splitColumnPath } from './columns/paths'
 import { ResourceLocator } from '../resourceLocator'
-import {
-  AvailableCommands,
-  CliCommandFromWebviewId,
-  InternalCommands
-} from '../commands/internal'
-import { Args } from '../cli/constants'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -487,19 +482,6 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private async executeCommandAndNotify(
-    commandId: CliCommandFromWebviewId,
-    ...args: Args
-  ) {
-    await this.internalCommands.executeCliFromWebview(
-      commandId,
-      this.dvcRoot,
-      ...args
-    )
-
-    return this.notifyChanged()
-  }
-
   private notifyChanged(data?: ExperimentsOutput) {
     this.decorationProvider.setState(
       this.experiments.getLabels(),
@@ -582,7 +564,10 @@ export class Experiments extends BaseRepository<TableData> {
             )
 
           case MessageFromWebviewType.REMOVE_EXPERIMENT:
-            return this.removeExperiment(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+              { dvcRoot: this.dvcRoot, ids: [message.payload].flat() }
+            )
           case MessageFromWebviewType.SELECT_COLUMNS:
             return this.setColumnsStatus()
 
@@ -652,13 +637,6 @@ export class Experiments extends BaseRepository<TableData> {
       undefined
     )
     return this.notifyChanged()
-  }
-
-  private removeExperiment(experimentId: string | string[]) {
-    return this.executeCommandAndNotify(
-      AvailableCommands.EXPERIMENT_REMOVE,
-      ...[experimentId].flat()
-    )
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {

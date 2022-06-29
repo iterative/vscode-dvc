@@ -437,6 +437,7 @@ suite('Experiments Tree Test Suite', () => {
         onDidCollapseElement: elementCollapsed.event,
         onDidExpandElement: elementExpanded.event
       } as unknown as TreeView<string | ExperimentItem>)
+      stub(commands, 'registerCommand')
 
       const experimentsTree = disposable.track(
         new ExperimentsTree(
@@ -474,7 +475,7 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.calledOnceWith(description, false)
     })
 
-    it('should be able to remove an experiment with dvc.views.experiments.removeExperiment', async () => {
+    it('should be able to remove an experiment with dvc.views.experimentsTree.removeExperiment', async () => {
       const mockExperimentId = 'exp-to-remove'
       const mockExperiment = {
         dvcRoot: dvcDemoPath,
@@ -494,7 +495,7 @@ suite('Experiments Tree Test Suite', () => {
       ).returns([mockExperiment])
 
       await commands.executeCommand(
-        RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+        'dvc.views.experimentsTree.removeExperiment',
         mockExperiment
       )
 
@@ -504,7 +505,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to remove the provided experiment with dvc.views.experiments.removeExperiment (if no experiments are selected)', async () => {
+    it('should be able to remove the provided experiment with dvc.views.experimentsTree.removeExperiment (if no experiments are selected)', async () => {
       const mockExperiment = 'exp-to-remove'
 
       const mockExperimentRemove = stub(
@@ -519,7 +520,7 @@ suite('Experiments Tree Test Suite', () => {
       ).returns([])
 
       await commands.executeCommand(
-        RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+        'dvc.views.experimentsTree.removeExperiment',
         {
           dvcRoot: dvcDemoPath,
           id: mockExperiment,
@@ -533,7 +534,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to remove multiple experiments with dvc.views.experiments.removeExperiment', async () => {
+    it('should be able to remove multiple experiments with dvc.views.experimentsTree.removeExperiment', async () => {
       const mockExperimentId = 'exp-removed'
       const mockQueuedExperimentLabel = 'queued-removed'
 
@@ -566,7 +567,7 @@ suite('Experiments Tree Test Suite', () => {
       ])
 
       await commands.executeCommand(
-        RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+        'dvc.views.experimentsTree.removeExperiment',
         {
           dvcRoot: dvcDemoPath,
           id: mockExperimentId,

@@ -1,4 +1,5 @@
 import {
+  commands,
   Event,
   ThemeIcon,
   TreeDataProvider,
@@ -21,7 +22,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
-import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
 
@@ -111,18 +112,17 @@ export class ExperimentsTree
         this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
     )
 
-    internalCommands.registerExternalCliCommand<ExperimentItem>(
-      RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+    commands.registerCommand(
+      'dvc.views.experimentsTree.removeExperiment',
       async experimentItem => {
         const selected = [...this.getSelectedExperimentItems(), experimentItem]
 
         const deletable = collectDeletable(selected)
 
         for (const [dvcRoot, ids] of Object.entries(deletable)) {
-          await this.experiments.runCommand(
-            AvailableCommands.EXPERIMENT_REMOVE,
-            dvcRoot,
-            ...ids
+          await commands.executeCommand(
+            RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+            { dvcRoot, ids }
           )
         }
       }

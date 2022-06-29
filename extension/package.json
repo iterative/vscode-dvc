@@ -420,6 +420,12 @@
       },
       {
         "title": "%command.views.experiments.removeExperiment%",
+        "command": "dvc.views.experimentsTree.removeExperiment",
+        "category": "DVC",
+        "icon": "$(trash)"
+      },
+      {
+        "title": "%command.views.experiments.removeExperiment%",
         "command": "dvc.views.experiments.removeExperiment",
         "category": "DVC",
         "icon": "$(trash)"
@@ -738,6 +744,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.views.experimentsTree.removeExperiment",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experiments.removeExperiment",
           "when": "false"
         },
@@ -1025,7 +1035,7 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experiments.removeExperiment",
+          "command": "dvc.views.experimentsTree.removeExperiment",
           "group": "inline@3",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
         },
