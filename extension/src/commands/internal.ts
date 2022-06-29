@@ -11,7 +11,6 @@ import { OutputChannel } from '../vscode/outputChannel'
 import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
 import { Disposable } from '../class/dispose'
-import { IEventNamePropertyMapping } from '../telemetry/constants'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -73,7 +72,7 @@ export class InternalCommands extends Disposable {
 
   public registerExternalCommand<T = string | undefined>(
     name: RegisteredCommands,
-    func: (...args: T[]) => unknown
+    func: (arg: T) => unknown
   ): void {
     this.dispose.track(
       commands.registerCommand(name, (arg: T) =>
@@ -83,13 +82,13 @@ export class InternalCommands extends Disposable {
   }
 
   private async runAndSendTelemetry<T>(
-    name: keyof IEventNamePropertyMapping,
-    func: (...args: T[]) => unknown,
-    ...args: T[]
+    name: RegisteredCommands | RegisteredCliCommands,
+    func: (arg: T) => unknown,
+    arg: T
   ) {
     const stopWatch = new StopWatch()
     try {
-      const res = await func(...args)
+      const res = await func(arg)
       sendTelemetryEvent(name, undefined, {
         duration: stopWatch.getElapsedTime()
       })
