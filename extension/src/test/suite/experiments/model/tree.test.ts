@@ -575,7 +575,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to apply an experiment to the workspace with dvc.views.experiments.applyExperiment', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const mockExperiment = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
 
@@ -602,7 +602,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should not create a new branch from an experiment with dvc.views.experiments.branchExperiment if the user cancels', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
       const mockExperimentBranch = stub(
@@ -625,7 +625,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to create a new branch from an experiment with dvc.views.experiments.branchExperiment', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
       const mockCheckpoint = 'e821416'

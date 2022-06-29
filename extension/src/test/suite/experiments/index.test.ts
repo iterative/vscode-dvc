@@ -411,7 +411,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to apply an experiment', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
       const webview = await experiments.showWebview()
@@ -437,7 +437,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
       const mockBranch = 'mock-branch-input'
@@ -474,10 +474,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
-      const { experiments, cliExecutor } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, cliExecutor } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -517,10 +514,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
-      const { experiments, cliRunner } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, cliRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -561,10 +555,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
-      const { experiments, cliRunner } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, cliRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -607,7 +598,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to remove an experiment', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
