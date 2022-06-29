@@ -398,19 +398,19 @@
         "icon": "$(close)"
       },
       {
-        "title": "%command.views.experimentsTree.applyExperiment%",
-        "command": "dvc.views.experimentsTree.applyExperiment",
+        "title": "%command.views.experiments.applyExperiment%",
+        "command": "dvc.views.experiments.applyExperiment",
         "category": "DVC",
         "icon": "$(merge)"
       },
       {
-        "title": "%command.views.experimentsTree.branchExperiment%",
-        "command": "dvc.views.experimentsTree.branchExperiment",
+        "title": "%command.views.experiments.branchExperiment%",
+        "command": "dvc.views.experiments.branchExperiment",
         "category": "DVC",
         "icon": "$(source-control)"
       },
       {
-        "title": "%command.views.experimentsTree.queueExperiment%",
+        "title": "%command.views.experiments.queueExperiment%",
         "command": "dvc.views.experiments.queueExperiment",
         "category": "DVC",
         "icon": {
@@ -419,25 +419,25 @@
         }
       },
       {
-        "title": "%command.views.experimentsTree.removeExperiment%",
-        "command": "dvc.views.experimentsTree.removeExperiment",
+        "title": "%command.views.experiments.removeExperiment%",
+        "command": "dvc.views.experiments.removeExperiment",
         "category": "DVC",
         "icon": "$(trash)"
       },
       {
-        "title": "%command.views.experimentsTree.runExperiment%",
+        "title": "%command.views.experiments.runExperiment%",
         "command": "dvc.views.experiments.runExperiment",
         "category": "DVC",
         "icon": "$(play)"
       },
       {
-        "title": "%command.views.experimentsTree.resumeCheckpointExperiment%",
+        "title": "%command.views.experiments.resumeCheckpointExperiment%",
         "command": "dvc.views.experiments.resumeCheckpointExperiment",
         "category": "DVC",
         "icon": "$(debug-continue-small)"
       },
       {
-        "title": "%command.views.experimentsTree.resetAndRunCheckpointExperiment%",
+        "title": "%command.views.experiments.resetAndRunCheckpointExperiment%",
         "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
         "category": "DVC",
         "icon": "$(play)"
@@ -726,11 +726,11 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.views.experimentsTree.applyExperiment",
+          "command": "dvc.views.experiments.applyExperiment",
           "when": "false"
         },
         {
-          "command": "dvc.views.experimentsTree.branchExperiment",
+          "command": "dvc.views.experiments.branchExperiment",
           "when": "false"
         },
         {
@@ -738,7 +738,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.views.experimentsTree.removeExperiment",
+          "command": "dvc.views.experiments.removeExperiment",
           "when": "false"
         },
         {
@@ -1015,17 +1015,17 @@
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
-          "command": "dvc.views.experimentsTree.applyExperiment",
+          "command": "dvc.views.experiments.applyExperiment",
           "group": "inline@1",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experimentsTree.branchExperiment",
+          "command": "dvc.views.experiments.branchExperiment",
           "group": "inline@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experimentsTree.removeExperiment",
+          "command": "dvc.views.experiments.removeExperiment",
           "group": "inline@3",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
         },

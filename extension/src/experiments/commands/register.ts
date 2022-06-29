@@ -108,12 +108,24 @@ const registerExperimentNameCommands = (
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_APPLY,
-    () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
+    () =>
+      experiments.getCwdAndExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
+    ({ dvcRoot, id }: ExperimentItem) =>
+      experiments.getExpNameThenRun(
+        AvailableCommands.EXPERIMENT_APPLY,
+        dvcRoot,
+        id
+      )
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_REMOVE,
-    () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
+    () =>
+      experiments.getCwdAndExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -125,15 +137,27 @@ const registerExperimentNameCommands = (
 const registerExperimentInputCommands = (
   experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
-): void =>
+): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_BRANCH,
     () =>
-      experiments.getExpNameAndInputThenRun(
+      experiments.getCwdExpNameAndInputThenRun(
         AvailableCommands.EXPERIMENT_BRANCH,
         Title.ENTER_BRANCH_NAME
       )
   )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
+    ({ dvcRoot, id }: ExperimentItem) =>
+      experiments.getExpNameAndInputThenRun(
+        AvailableCommands.EXPERIMENT_BRANCH,
+        Title.ENTER_BRANCH_NAME,
+        dvcRoot,
+        id
+      )
+  )
+}
 
 const registerExperimentQuickPickCommands = (
   experiments: WorkspaceExperiments,

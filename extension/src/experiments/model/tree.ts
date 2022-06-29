@@ -23,7 +23,6 @@ import {
 } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sum } from '../../util/math'
-import { Title } from '../../vscode/title'
 import { Disposable } from '../../class/dispose'
 
 export class ExperimentsTree
@@ -113,28 +112,7 @@ export class ExperimentsTree
     )
 
     internalCommands.registerExternalCliCommand<ExperimentItem>(
-      RegisteredCliCommands.EXPERIMENT_TREE_APPLY,
-      ({ dvcRoot, id, label, type }: ExperimentItem) =>
-        this.experiments.runCommand(
-          AvailableCommands.EXPERIMENT_APPLY,
-          dvcRoot,
-          this.getDisplayId(type, label, id)
-        )
-    )
-
-    internalCommands.registerExternalCliCommand<ExperimentItem>(
-      RegisteredCliCommands.EXPERIMENT_TREE_BRANCH,
-      ({ dvcRoot, id, label, type }: ExperimentItem) =>
-        this.experiments.getInputAndRun(
-          AvailableCommands.EXPERIMENT_BRANCH,
-          dvcRoot,
-          Title.ENTER_BRANCH_NAME,
-          this.getDisplayId(type, label, id)
-        )
-    )
-
-    internalCommands.registerExternalCliCommand<ExperimentItem>(
-      RegisteredCliCommands.EXPERIMENT_TREE_REMOVE,
+      RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
       async experimentItem => {
         const selected = [...this.getSelectedExperimentItems(), experimentItem]
 
@@ -305,10 +283,6 @@ export class ExperimentsTree
 
   private isRoot(element: string | ExperimentItem): element is string {
     return typeof element === 'string'
-  }
-
-  private getDisplayId(type: ExperimentType, label: string, id: string) {
-    return type === ExperimentType.CHECKPOINT ? label : id
   }
 
   private getSelectedExperimentItems() {

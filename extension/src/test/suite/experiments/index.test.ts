@@ -62,6 +62,7 @@ import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
 import { ExperimentFlag } from '../../../cli/constants'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
+import { CliExecutor } from '../../../cli/executor'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -443,18 +444,18 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to apply an experiment', async () => {
-      const { experiments, cliExecutor } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+      await experiments.isReady()
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentId = 'mock-experiment-id'
+      const mockExperimentId = 'exp-e7a67'
 
-      const mockExperimentApply = stub(cliExecutor, 'experimentApply').resolves(
-        undefined
-      )
+      const mockExperimentApply = stub(
+        CliExecutor.prototype,
+        'experimentApply'
+      ).resolves(undefined)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -469,22 +470,27 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { experiments, cliExecutor } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+      await experiments.isReady()
 
       const mockBranch = 'mock-branch-input'
       const inputEvent = getInputBoxEvent(mockBranch)
 
       const mockExperimentBranch = stub(
-        cliExecutor,
+        CliExecutor.prototype,
         'experimentBranch'
       ).resolves('undefined')
 
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentId = 'mock-experiment-id'
+      const mockExperimentId = 'exp-e7a67'
 
       mockMessageReceived.fire({
         payload: mockExperimentId,

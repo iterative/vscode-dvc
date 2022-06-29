@@ -11,9 +11,9 @@ export enum RegisteredCliCommands {
   EXPERIMENT_RESET_AND_RUN = 'dvc.resetAndRunCheckpointExperiment',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
 
-  EXPERIMENT_TREE_APPLY = 'dvc.views.experimentsTree.applyExperiment',
-  EXPERIMENT_TREE_BRANCH = 'dvc.views.experimentsTree.branchExperiment',
-  EXPERIMENT_TREE_REMOVE = 'dvc.views.experimentsTree.removeExperiment',
+  EXPERIMENT_VIEW_APPLY = 'dvc.views.experiments.applyExperiment',
+  EXPERIMENT_VIEW_BRANCH = 'dvc.views.experiments.branchExperiment',
+  EXPERIMENT_VIEW_REMOVE = 'dvc.views.experiments.removeExperiment',
 
   EXPERIMENT_VIEW_QUEUE = 'dvc.views.experiments.queueExperiment',
   EXPERIMENT_VIEW_RESUME = 'dvc.views.experiments.resumeCheckpointExperiment',

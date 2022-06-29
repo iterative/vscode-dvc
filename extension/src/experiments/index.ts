@@ -43,7 +43,6 @@ import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
-import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
 import { setContextValue } from '../vscode/context'
 import { standardizePath } from '../fileSystem/path'
@@ -375,6 +374,13 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getBranchRevisions()
   }
 
+  public getExperimentDisplayName(experimentId: string) {
+    const experiment = this.experiments
+      .getCombinedList()
+      .find(({ id }) => id === experimentId)
+    return experiment?.name || experiment?.label
+  }
+
   public getMutableRevisions() {
     return this.experiments.getMutableRevisions(
       this.checkpoints.hasCheckpoints()
@@ -550,9 +556,15 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.REMOVE_COLUMN_SORT:
             return this.removeColumnSort(message.payload)
           case MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE:
-            return this.applyExperimentToWorkspace(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
           case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
-            return this.createBranchFromExperiment(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
             return commands.executeCommand(
               RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
@@ -640,25 +652,6 @@ export class Experiments extends BaseRepository<TableData> {
       undefined
     )
     return this.notifyChanged()
-  }
-
-  private async createBranchFromExperiment(experimentId: string) {
-    const input = await getInput(Title.ENTER_BRANCH_NAME)
-    if (!input) {
-      return
-    }
-    return this.executeCommandAndNotify(
-      AvailableCommands.EXPERIMENT_BRANCH,
-      experimentId,
-      input
-    )
-  }
-
-  private applyExperimentToWorkspace(experimentId: string) {
-    return this.executeCommandAndNotify(
-      AvailableCommands.EXPERIMENT_APPLY,
-      experimentId
-    )
   }
 
   private removeExperiment(experimentId: string | string[]) {

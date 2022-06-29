@@ -179,7 +179,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return Toast.showOutput(stdout)
   }
 
-  public getExpNameThenRun(commandId: CommandId) {
+  public getCwdAndExpNameThenRun(commandId: CommandId) {
     return this.pickExpThenRun(commandId, cwd =>
       this.pickCurrentExperiment(cwd)
     )
@@ -206,7 +206,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
   }
 
-  public getExpNameAndInputThenRun = async (
+  public getCwdExpNameAndInputThenRun = async (
     commandId: CommandId,
     title: Title
   ) => {
@@ -223,6 +223,21 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getInputAndRun(commandId, cwd, title, experiment.name)
   }
 
+  public getExpNameAndInputThenRun(
+    commandId: CommandId,
+    title: Title,
+    cwd: string,
+    id: string
+  ) {
+    const name = this.getRepository(cwd)?.getExperimentDisplayName(id)
+
+    if (!name) {
+      return
+    }
+
+    return this.getInputAndRun(commandId, cwd, title, name)
+  }
+
   public async getInputAndRun(
     commandId: CommandId,
     cwd: string,
@@ -230,9 +245,20 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     ...args: Args
   ) {
     const input = await getInput(title)
-    if (input) {
-      return this.runCommand(commandId, cwd, ...args, input)
+    if (!input) {
+      return
     }
+    return this.runCommand(commandId, cwd, ...args, input)
+  }
+
+  public getExpNameThenRun(commandId: CommandId, cwd: string, id: string) {
+    const name = this.getRepository(cwd)?.getExperimentDisplayName(id)
+
+    if (!name) {
+      return
+    }
+
+    return this.runCommand(commandId, cwd, name)
   }
 
   public runCommand(commandId: CommandId, cwd: string, ...args: Args) {

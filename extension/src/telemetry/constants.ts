@@ -131,9 +131,9 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_SORT_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
-  [EventName.EXPERIMENT_TREE_APPLY]: undefined
-  [EventName.EXPERIMENT_TREE_BRANCH]: undefined
-  [EventName.EXPERIMENT_TREE_REMOVE]: undefined
+  [EventName.EXPERIMENT_VIEW_APPLY]: undefined
+  [EventName.EXPERIMENT_VIEW_BRANCH]: undefined
+  [EventName.EXPERIMENT_VIEW_REMOVE]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
 
   [EventName.EXPERIMENT_VIEW_QUEUE]: undefined
