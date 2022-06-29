@@ -112,7 +112,7 @@ export class TrackedExplorerTree
     this.repositories.treeDataChanged.fire()
   }
 
-  private async getRootElements() {
+  private getRootElements() {
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
         EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
@@ -126,11 +126,12 @@ export class TrackedExplorerTree
       return this.getRepoChildren(onlyRoot)
     }
 
-    const rootChildren = await Promise.all(
-      this.dvcRoots.map(dvcRoot => this.getRepoChildren(dvcRoot))
-    )
-
-    return rootChildren.flat()
+    return this.dvcRoots.map(dvcRoot => ({
+      dvcRoot,
+      isDirectory: true,
+      isTracked: true,
+      resourceUri: Uri.file(dvcRoot)
+    }))
   }
 
   private getDataPlaceholder({ fsPath }: { fsPath: string }): string {
