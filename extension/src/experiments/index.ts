@@ -176,6 +176,11 @@ export class Experiments extends BaseRepository<TableData> {
     return this.columns.getTerminalNodeStatuses()
   }
 
+  public toggleExperimentStars(ids: string[]) {
+    this.experiments.toggleStars(ids)
+    this.notifyChanged()
+  }
+
   public toggleExperimentStatus(id: string) {
     const selected = this.experiments.isSelected(id)
     if (!selected && !this.experiments.canSelect()) {
@@ -532,6 +537,8 @@ export class Experiments extends BaseRepository<TableData> {
               RegisteredCommands.EXPERIMENT_TOGGLE,
               { dvcRoot: this.dvcRoot, id: message.payload }
             )
+          case MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR:
+            return this.setExperimentStars(message.payload)
           case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
             return this.hideTableColumn(message.payload)
           case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
@@ -600,6 +607,15 @@ export class Experiments extends BaseRepository<TableData> {
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN,
       { width },
+      undefined
+    )
+  }
+
+  private setExperimentStars(ids: string[]) {
+    this.toggleExperimentStars(ids)
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_STARS_TOGGLE,
+      undefined,
       undefined
     )
   }
