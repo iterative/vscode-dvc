@@ -1,4 +1,5 @@
 import { extensions } from 'vscode'
+// eslint-disable-next-line import/default
 import TelemetryReporter from '@vscode/extension-telemetry'
 import { getTelemetryReporter, sendTelemetryEvent } from '.'
 import {
