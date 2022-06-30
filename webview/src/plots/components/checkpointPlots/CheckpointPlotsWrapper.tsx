@@ -39,7 +39,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
       sectionKey={Section.CHECKPOINT_PLOTS}
       menu={{
         plots: metrics,
-        selectedPlots: selectedPlots,
+        selectedPlots,
         setSelectedPlots: setSelectedMetrics
       }}
       currentSize={size}

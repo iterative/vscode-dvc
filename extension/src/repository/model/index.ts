@@ -141,7 +141,7 @@ export class RepositoryModel
   ): PathStatus[] {
     return fileOrStage
       .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
-      .filter(value => value) as PathStatus[]
+      .filter(Boolean) as PathStatus[]
   }
 
   private collectStatuses(acc: ModifiedAndNotInCache, entry: PathStatus) {

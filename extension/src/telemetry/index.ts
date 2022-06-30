@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/default
 import TelemetryReporter from '@vscode/extension-telemetry'
 import {
   EXTENSION_ID,
