@@ -6,7 +6,6 @@ import { ExperimentsTree } from './tree'
 import { getDecoratableUri } from './filterBy/decorationProvider'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
-import { InternalCommands } from '../../commands/internal'
 import { RegisteredCommands } from '../../commands/external'
 
 const mockedCommands = jest.mocked(commands)
@@ -38,10 +37,6 @@ const mockedResourceLocator = {
   getExperimentsResource: mockedGetExperimentsResource
 } as unknown as ResourceLocator
 
-const mockedInternalCommands = {
-  registerExternalCommand: jest.fn()
-} as unknown as InternalCommands
-
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
@@ -63,7 +58,6 @@ describe('ExperimentsTree', () => {
     it('should return an empty array when no experiments exist for any of the multiple repositories', async () => {
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'second/repo'])
@@ -78,7 +72,6 @@ describe('ExperimentsTree', () => {
     it('should return an empty array when no experiments exist for the single repository', async () => {
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
@@ -93,7 +86,6 @@ describe('ExperimentsTree', () => {
       const dvcRoots = ['demo', 'and/mock', 'other/repo']
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
@@ -157,7 +149,6 @@ describe('ExperimentsTree', () => {
       ]
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetExperiments
@@ -235,7 +226,6 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -268,7 +258,7 @@ describe('ExperimentsTree', () => {
           collapsibleState: 0,
           command: {
             arguments: [{ dvcRoot: 'repo', id: 'aaaaaaaaaaaaaaaaa' }],
-            command: 'dvc.views.experimentsTree.toggleStatus',
+            command: 'dvc.views.experiments.toggleStatus',
             title: 'toggle'
           },
           description: undefined,
@@ -282,7 +272,7 @@ describe('ExperimentsTree', () => {
           collapsibleState: 0,
           command: {
             arguments: [{ dvcRoot: 'repo', id: 'bbbbbbbbbbbbbbbbb' }],
-            command: 'dvc.views.experimentsTree.toggleStatus',
+            command: 'dvc.views.experiments.toggleStatus',
             title: 'toggle'
           },
           description: undefined,
@@ -307,7 +297,6 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'other'])
@@ -330,7 +319,6 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -363,7 +351,6 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -396,7 +383,6 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -429,7 +415,6 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -460,7 +445,6 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
-        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])

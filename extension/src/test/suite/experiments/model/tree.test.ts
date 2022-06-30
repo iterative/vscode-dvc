@@ -17,7 +17,10 @@ import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
 import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
-import { RegisteredCommands } from '../../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../../commands/external'
 import { buildPlots, getExpectedCheckpointPlotsData } from '../../plots/util'
 import checkpointPlotsFixture from '../../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
@@ -27,7 +30,6 @@ import { buildMetricOrParamPath } from '../../../../experiments/columns/paths'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, buildSingleRepoExperiments } from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
-import { InternalCommands } from '../../../../commands/internal'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import {
   QuickPickItemWithValue,
@@ -62,7 +64,7 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.eventually.equal(undefined)
     })
 
-    it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experimentsTree.toggleStatus', async () => {
+    it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
       const { plots, messageSpy } = await buildPlots(disposable)
 
       const expectedDomain = [...domain]
@@ -434,13 +436,10 @@ suite('Experiments Tree Test Suite', () => {
         onDidCollapseElement: elementCollapsed.event,
         onDidExpandElement: elementExpanded.event
       } as unknown as TreeView<string | ExperimentItem>)
+      stub(commands, 'registerCommand')
 
       const experimentsTree = disposable.track(
-        new ExperimentsTree(
-          workspaceExperiments,
-          { registerExternalCommand: stub() } as unknown as InternalCommands,
-          {} as ResourceLocator
-        )
+        new ExperimentsTree(workspaceExperiments, {} as ResourceLocator)
       )
 
       const description = '[exp-1234]'
@@ -488,7 +487,7 @@ suite('Experiments Tree Test Suite', () => {
       ).returns([mockExperiment])
 
       await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TREE_REMOVE,
+        'dvc.views.experimentsTree.removeExperiment',
         mockExperiment
       )
 
@@ -512,11 +511,14 @@ suite('Experiments Tree Test Suite', () => {
         'getSelectedExperimentItems'
       ).returns([])
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
-        dvcRoot: dvcDemoPath,
-        id: mockExperiment,
-        type: ExperimentType.EXPERIMENT
-      })
+      await commands.executeCommand(
+        'dvc.views.experimentsTree.removeExperiment',
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperiment,
+          type: ExperimentType.EXPERIMENT
+        }
+      )
 
       expect(mockExperimentRemove).to.be.calledWithExactly(
         dvcDemoPath,
@@ -556,11 +558,14 @@ suite('Experiments Tree Test Suite', () => {
         }
       ])
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_REMOVE, {
-        dvcRoot: dvcDemoPath,
-        id: mockExperimentId,
-        type: ExperimentType.EXPERIMENT
-      })
+      await commands.executeCommand(
+        'dvc.views.experimentsTree.removeExperiment',
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperimentId,
+          type: ExperimentType.EXPERIMENT
+        }
+      )
 
       expect(mockExperimentRemove).to.be.calledWithExactly(
         dvcDemoPath,
@@ -569,8 +574,10 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to apply an experiment to the workspace with dvc.views.experimentsTree.applyExperiment', async () => {
-      const mockExperiment = 'exp-to-apply'
+    it('should be able to apply an experiment to the workspace with dvc.views.experiments.applyExperiment', async () => {
+      const { experiments } = buildExperiments(disposable)
+
+      const mockExperiment = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
 
       const mockExperimentApply = stub(
         CliExecutor.prototype,
@@ -578,40 +585,50 @@ suite('Experiments Tree Test Suite', () => {
       ).resolves(
         `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
       )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_APPLY, {
-        dvcRoot: dvcDemoPath,
-        id: mockExperiment
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperiment
+        }
+      )
 
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment
+        mockExperiment.slice(0, 7)
       )
     })
 
-    it('should not create a new branch from an experiment with dvc.views.experimentsTree.branchExperiment if the user cancels', async () => {
-      const mockCheckpoint = 'a2c44b8'
+    it('should not create a new branch from an experiment with dvc.views.experiments.branchExperiment if the user cancels', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
 
       const mockExperimentBranch = stub(
         CliExecutor.prototype,
         'experimentBranch'
       )
       const mockShowInputBox = stub(window, 'showInputBox').resolves(undefined)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_BRANCH, {
-        dvcRoot: dvcDemoPath,
-        id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
-        label: mockCheckpoint,
-        type: ExperimentType.CHECKPOINT
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
+        }
+      )
 
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockExperimentBranch).not.to.be.called
     })
 
-    it('should be able to create a new branch from an experiment with dvc.views.experimentsTree.branchExperiment', async () => {
-      const mockCheckpoint = 'a2c44b8'
+    it('should be able to create a new branch from an experiment with dvc.views.experiments.branchExperiment', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const mockCheckpoint = 'e821416'
       const mockBranch = 'it-is-a-branch'
 
       const mockExperimentBranch = stub(
@@ -623,13 +640,15 @@ suite('Experiments Tree Test Suite', () => {
              git checkout ${mockBranch}`
       )
       const mockShowInputBox = stub(window, 'showInputBox').resolves(mockBranch)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_BRANCH, {
-        dvcRoot: dvcDemoPath,
-        id: 'a2c44b889aca2b3e2dc6737852fa930f5980270e',
-        label: mockCheckpoint,
-        type: ExperimentType.CHECKPOINT
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361'
+        }
+      )
 
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockExperimentBranch).to.be.calledWithExactly(
@@ -639,7 +658,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to queue an experiment from an existing one with dvc.views.experimentsTree.queueExperiment', async () => {
+    it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
       const baseExperimentId = 'workspace'
 
       const { cliExecutor, experiments, experimentsModel } =
@@ -682,10 +701,13 @@ suite('Experiments Tree Test Suite', () => {
         .onSecondCall()
         .resolves('0.102')
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_QUEUE, {
-        dvcRoot: dvcDemoPath,
-        id: baseExperimentId
-      })
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: baseExperimentId
+        }
+      )
 
       expect(mockGetOnlyOrPickProject).not.to.be.called
       expect(getParamsSpy).to.be.calledOnce
@@ -701,7 +723,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to run a new experiment from an existing one with dvc.views.experimentsTree.runExperiment', async () => {
+    it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
       const baseExperimentId = 'workspace'
 
       const { cliRunner, experiments, experimentsModel } =
@@ -743,7 +765,7 @@ suite('Experiments Tree Test Suite', () => {
         .onSecondCall()
         .resolves('0.82')
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TREE_RUN, {
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_VIEW_RUN, {
         dvcRoot: dvcDemoPath,
         id: baseExperimentId
       })
@@ -762,7 +784,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experimentsTree.resetRunExperiment', async () => {
+    it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
       const baseExperimentId = 'workspace'
 
       const { cliRunner, experiments, experimentsModel } =
@@ -806,7 +828,7 @@ suite('Experiments Tree Test Suite', () => {
         .resolves('0.82')
 
       await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TREE_RESET_AND_RUN,
+        RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
         {
           dvcRoot: dvcDemoPath,
           id: baseExperimentId

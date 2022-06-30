@@ -21,6 +21,7 @@ export interface Experiment extends BaseExperimentFields {
   outs?: MetricOrParamColumns
   displayColor?: string
   selected?: boolean
+  starred?: boolean
   mutable?: boolean
   sha?: string
 }
