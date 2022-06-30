@@ -15,79 +15,81 @@ highly appreciated!
 
 ## Development environment
 
-The development environment allows contributors to test their changes to the
-extension. The local repository source is built and loaded into the Extension
-Development Host.
+Setting up a dev environment allows contributors to test changes to this
+extension. The source code is built, and the resulting package loaded into a
+special instance of VS Code.
 
-First, ensure that [Yarn](https://yarnpkg.com/) and
-[Visual Studio Code](https://code.visualstudio.com) are installed.
+First, ensure that [Visual Studio Code](https://code.visualstudio.com) and
+[Yarn](https://yarnpkg.com/) are installed.
 
-- Open this repository's root directory as a project in VS Code.
+- Open this repository as a project in VS Code and run `yarn install` from the
+  _Integrated Terminal_.
 
-- Run `Tasks: Run Build Task` (Ctrl+Shift+b) to start the extension and webview
-  development servers (alternatively run `yarn dev-server` from the terminal).
+- Run `Tasks: Run Build Task` (Shift + Ctrl/Cmd + `b`) to start the extension
+  and Webview dev servers (alternatively, run `yarn dev-server` from the
+  _Terminal_). The latest build is saved in `extension/dist`.
 
-  > **Warning**: Having a separate (`.vsix`) version of the extension installed
-  > may cause all kinds of chaos in your development environment.
+  > **Warning**: Having a separate `.vsix` version of this extension installed
+  > may cause all kinds of chaos in your dev env.
 
-- Open the Extension Development Host, a child instance of VS Code with the
-  results of the dev servers installed as an extension, with `Start Debugging`
-  (f5).
+- **Start Debugging** (F5) to open the [Extension Development Host], a child
+  instance of VS Code with the local extension build installed.
 
-  > **Note**: using the `Run Extension` command when running the debugger will
-  > prevent all other extensions from loading into VS Code. This will improve
-  > the performance of VS Code but can cause certain DVC commands to fail if the
-  > project uses an isolated python environment (see [this warning](#warning)).
+  > **Note**: using the `Run Extension` configuration when running the debugger
+  > will prevent all other extensions from loading into VS Code. This will
+  > improve the performance of VS Code but can cause certain DVC commands to
+  > fail if the DVC project uses an isolated Python env (see
+  > [this warning](#warning)).
 
-- Open a DVC project in the Extension Development Host. VS Code will remember
+- Open a DVC project in the _Extension Development Host_. VS Code will remember
   the last project opened, so this step only has to be done once.
 
   > **Note**: We have provided a demo project as part of this repo, but feel
   > free to use any DVC project that you have available.
 
-## The demo project
-
-The [demo project](demo) was initially forked from
-[dvc-checkpoints-mnist](https://github.com/iterative/dvc-checkpoints-mnist/tree/make_checkpoint),
-and is provided as a lightweight, convenient testbed to try the extension out
-with. It is not an exhaustive showcase of DVC's features, so testers are
-encouraged to try other DVC repositories -- especially real-world cases!
-
-- Go to the `demo/` directory of this repo.
-
-- It is recommended that you create the project's virtual environment with
-  Python 3.8 as some dependencies are not yet available for Python 3.9
-
-- `yarn install` is a prerequisite for automatically setting up the demo
-  project.
-
-- Run `yarn setup:venv` from the monorepo root (not `./demo`) to automatically
-  setup the Python virtual environment in the demo project.
-
-- Once the environment has been setup you should navigate into the demo folder
-  activate the virtual environment and run `dvc pull`.
-
-- In order to run experiments in our demo project we require the Python virtual
-  environment to be loaded.
-
-- This will happen automatically IF the `ms-python.python` extension is
-  installed within the VS Code instance that you are developing against.
+[extension development host]:
+  https://code.visualstudio.com/api/working-with-extensions/testing-extension
 
 <a id='warning'></a>
 
-> **Warning**  
-> When using any project that relies on an isolated Python environment (`conda`,
-> `venv`, etc.), Microsoft's
-> [Python extension](https://github.com/Microsoft/vscode-python) is required.
+> **Warning**: When using any project that relies on an isolated Python
+> environment (`conda`, `venv`, etc.), Microsoft's Python extension is required.
 > It's used by this extension to locate and utilize the required environment.
+
+## The demo project
+
+The [demo project](demo) is provided as a lightweight, convenient testbed to try
+your changes to this extension.
+
+> **Note**: It is not an exhaustive showcase of DVC's features. Testers are
+> encouraged to try other DVC repositories -- especially real-world cases!
+
+- Run `yarn setup:venv` from the _Terminal_ in the root of this repo to set up a
+  Python virtual environment for the demo project (in `demo/.env`).
+
+- Open the `./demo` project in a VS Code window, for example in the _Extension
+  Development Host_ (see previous section).
+
+- Pull the project data using this extension (either from the **DVC Tracked**
+  panel in the _File Explorer_ or the **DVC panel** in _Source Control_) or by
+  running `dvc pull` from _Terminal_.
+
+- In order to [run experiments] in the demo project, the [Python extension]
+  should be installed so that the virtual env is activated (see
+  [full warning](#warning)).
+
+[python extension]:
+  https://marketplace.visualstudio.com/items?itemName=ms-python.python
+[run experiments]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/run-experiments.md
 
 ## React component development with Storybook
 
-Start Storybook with `yarn storybook` in either the monorepo root or the
-`webview` project, and you can develop the React components this plugin uses
-without requiring VS Code as a dev environment.
+Start Storybook with `yarn storybook` in either the root of this repo or in the
+`webview` project. You can develop the React components this plugin uses without
+requiring VS Code as a dev environment.
 
 There are some discrepancies between the Storybook environment and the
-environment of a real VS Code extension, custom themes being one big one. Always
+environment of a real VS Code extension, custom themes being a big one. Always
 make sure to try out changed components in the full dev environment before
 merging!
