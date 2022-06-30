@@ -9,9 +9,10 @@ import {
   Uri
 } from 'vscode'
 import { exists, relativeWithUri } from '.'
+import { standardizePath } from './path'
 import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
-import { definedAndNonEmpty, uniqueValues } from '../util/array'
+import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 import {
   AvailableCommands,
   CommandId,
@@ -35,6 +36,7 @@ import {
 import { Title } from '../vscode/title'
 import { Disposable } from '../class/dispose'
 import { createTreeView } from '../vscode/tree'
+import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 export class TrackedExplorerTree
   extends Disposable
@@ -112,7 +114,7 @@ export class TrackedExplorerTree
     this.repositories.treeDataChanged.fire()
   }
 
-  private async getRootElements() {
+  private getRootElements() {
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
         EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
@@ -121,16 +123,23 @@ export class TrackedExplorerTree
       this.viewed = true
     }
 
-    if (this.dvcRoots.length === 1) {
+    if (
+      this.dvcRoots.length === 1 &&
+      sameContents(
+        getWorkspaceFolders(),
+        this.dvcRoots.map(dvcRoot => standardizePath(dvcRoot))
+      )
+    ) {
       const [onlyRoot] = this.dvcRoots
       return this.getRepoChildren(onlyRoot)
     }
 
-    const rootChildren = await Promise.all(
-      this.dvcRoots.map(dvcRoot => this.getRepoChildren(dvcRoot))
-    )
-
-    return rootChildren.flat()
+    return this.dvcRoots.map(dvcRoot => ({
+      dvcRoot,
+      isDirectory: true,
+      isTracked: true,
+      resourceUri: Uri.file(dvcRoot)
+    }))
   }
 
   private getDataPlaceholder({ fsPath }: { fsPath: string }): string {

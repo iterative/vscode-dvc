@@ -116,7 +116,7 @@ describe('Experiments', () => {
         name: 'exp-123'
       })
 
-      await workspaceExperiments.getExpNameThenRun(mockedCommandId)
+      await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedPickCurrentExperiment).toBeCalledTimes(1)
@@ -127,7 +127,7 @@ describe('Experiments', () => {
     it('should not call the function if a project is not picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await workspaceExperiments.getExpNameThenRun(mockedCommandId)
+      await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedExpFunc).not.toBeCalled()
@@ -194,7 +194,7 @@ describe('Experiments', () => {
       })
       mockedGetInput.mockResolvedValueOnce('abc123')
 
-      await workspaceExperiments.getExpNameAndInputThenRun(
+      await workspaceExperiments.getCwdExpNameAndInputThenRun(
         mockedCommandId,
         'enter your password please' as Title
       )
@@ -208,7 +208,7 @@ describe('Experiments', () => {
     it('should not call the function or ask for input if a project is not picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await workspaceExperiments.getExpNameAndInputThenRun(
+      await workspaceExperiments.getCwdExpNameAndInputThenRun(
         mockedCommandId,
         'please name the branch' as Title
       )
@@ -226,7 +226,7 @@ describe('Experiments', () => {
       })
       mockedGetInput.mockResolvedValueOnce(undefined)
 
-      await workspaceExperiments.getExpNameAndInputThenRun(
+      await workspaceExperiments.getCwdExpNameAndInputThenRun(
         mockedCommandId,
         'please enter your bank account number and sort code' as Title
       )

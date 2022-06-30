@@ -27,12 +27,7 @@ import { DecorationProvider } from './model/filterBy/decorationProvider'
 import { SortDefinition } from './model/sortBy'
 import { splitColumnPath } from './columns/paths'
 import { ResourceLocator } from '../resourceLocator'
-import {
-  AvailableCommands,
-  CommandId,
-  InternalCommands
-} from '../commands/internal'
-import { Args } from '../cli/constants'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -43,18 +38,22 @@ import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
-import { Toast } from '../vscode/toast'
-import { getInput } from '../vscode/inputBox'
 import { createTypedAccumulator } from '../util/object'
 import { setContextValue } from '../vscode/context'
 import { standardizePath } from '../fileSystem/path'
 import { pickPaths } from '../path/selection/quickPick'
+import { Toast } from '../vscode/toast'
+import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 
 export const ExperimentsScale = {
   ...ColumnType,
   HAS_CHECKPOINTS: 'hasCheckpoints',
   NO_CHECKPOINTS: 'noCheckpoints'
 } as const
+
+export type ModifiedExperimentAndRunCommandId =
+  | typeof AvailableCommands.EXPERIMENT_RUN
+  | typeof AvailableCommands.EXPERIMENT_RESET_AND_RUN
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
@@ -370,6 +369,13 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getBranchRevisions()
   }
 
+  public getExperimentDisplayName(experimentId: string) {
+    const experiment = this.experiments
+      .getCombinedList()
+      .find(({ id }) => id === experimentId)
+    return experiment?.name || experiment?.label
+  }
+
   public getMutableRevisions() {
     return this.experiments.getMutableRevisions(
       this.checkpoints.hasCheckpoints()
@@ -385,13 +391,36 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async modifyExperimentParamsAndRun(
-    commandId: CommandId,
+    commandId: ModifiedExperimentAndRunCommandId,
     experimentId?: string
   ) {
     const paramsToModify = await this.pickAndModifyParams(experimentId)
-    if (paramsToModify) {
-      return this.runCommand(commandId, ...paramsToModify)
+    if (!paramsToModify) {
+      return
     }
+
+    await this.internalCommands.executeCommand<string>(
+      commandId,
+      this.dvcRoot,
+      ...paramsToModify
+    )
+    return this.notifyChanged()
+  }
+
+  public async modifyExperimentParamsAndQueue(experimentId?: string) {
+    const paramsToModify = await this.pickAndModifyParams(experimentId)
+    if (!paramsToModify) {
+      return
+    }
+
+    await Toast.showOutput(
+      this.internalCommands.executeCommand<string>(
+        AvailableCommands.EXPERIMENT_QUEUE,
+        this.dvcRoot,
+        ...paramsToModify
+      )
+    )
+    return this.notifyChanged()
   }
 
   public hasRunningExperiment() {
@@ -453,14 +482,6 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private async runCommand(commandId: CommandId, ...args: Args) {
-    await Toast.showOutput(
-      this.internalCommands.executeCommand(commandId, this.dvcRoot, ...args)
-    )
-
-    return this.notifyChanged()
-  }
-
   private notifyChanged(data?: ExperimentsOutput) {
     this.decorationProvider.setState(
       this.experiments.getLabels(),
@@ -507,7 +528,10 @@ export class Experiments extends BaseRepository<TableData> {
               message.payload.width
             )
           case MessageFromWebviewType.TOGGLE_EXPERIMENT:
-            return this.setExperimentStatus(message.payload)
+            return commands.executeCommand(
+              RegisteredCommands.EXPERIMENT_TOGGLE,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
           case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
             return this.hideTableColumn(message.payload)
           case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
@@ -517,27 +541,36 @@ export class Experiments extends BaseRepository<TableData> {
           case MessageFromWebviewType.REMOVE_COLUMN_SORT:
             return this.removeColumnSort(message.payload)
           case MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE:
-            return this.applyExperimentToWorkspace(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
           case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
-            return this.createBranchFromExperiment(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
+              { dvcRoot: this.dvcRoot, id: message.payload }
+            )
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
-            return this.modifyExperimentParamsAndRun(
-              AvailableCommands.EXPERIMENT_QUEUE,
-              message.payload
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
+              { dvcRoot: this.dvcRoot, id: message.payload }
             )
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN:
-            return this.modifyExperimentParamsAndRun(
-              AvailableCommands.EXPERIMENT_RUN,
-              message.payload
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
+              { dvcRoot: this.dvcRoot, id: message.payload }
             )
           case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
-            return this.modifyExperimentParamsAndRun(
-              AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-              message.payload
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
+              { dvcRoot: this.dvcRoot, id: message.payload }
             )
 
           case MessageFromWebviewType.REMOVE_EXPERIMENT:
-            return this.removeExperiment(message.payload)
+            return commands.executeCommand(
+              RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+              { dvcRoot: this.dvcRoot, ids: [message.payload].flat() }
+            )
           case MessageFromWebviewType.SELECT_COLUMNS:
             return this.setColumnsStatus()
 
@@ -571,15 +604,6 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private setExperimentStatus(id: string) {
-    this.toggleExperimentStatus(id)
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE,
-      undefined,
-      undefined
-    )
-  }
-
   private setColumnsStatus() {
     this.selectColumns()
     sendTelemetryEvent(
@@ -607,28 +631,6 @@ export class Experiments extends BaseRepository<TableData> {
       undefined
     )
     return this.notifyChanged()
-  }
-
-  private async createBranchFromExperiment(experimentId: string) {
-    const input = await getInput(Title.ENTER_BRANCH_NAME)
-    if (input) {
-      return this.runCommand(
-        AvailableCommands.EXPERIMENT_BRANCH,
-        experimentId,
-        input
-      )
-    }
-  }
-
-  private applyExperimentToWorkspace(experimentId: string) {
-    return this.runCommand(AvailableCommands.EXPERIMENT_APPLY, experimentId)
-  }
-
-  private removeExperiment(experimentId: string | string[]) {
-    return this.runCommand(
-      AvailableCommands.EXPERIMENT_REMOVE,
-      ...[experimentId].flat()
-    )
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
