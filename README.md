@@ -11,6 +11,11 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
+[Quick start](#quick-start) • [What you get](#what-you-get) •
+[Commands](#useful-commands) • [Configuration](#configuration) •
+[Roadmap](#developer-roadmap) • [Debugging](#debugging) •
+[Contributing](#contributing) • [Telemetry](#data-and-telemetry)
+
 Run, compare, visualize, and track machine learning experiments right in VS
 Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
@@ -72,13 +77,13 @@ databases are required.
 ### Learn more about DVC (Data Version Control)
 
 See the DVC documentation to Get Started with [Experiment Versioning] or [Data
-Management]. For deeper learning, try our [free course]!
+Management]. For deeper learning, try our [free course]! [More resources]
 
 [experiment versioning]: https://dvc.org/doc/start/experiments
 [data management]: https://dvc.org/doc/start/data-management
 [free course]: https://learn.iterative.ai/
-
-<!-- [learn more]: extension/resources/walkthrough/dvc-learn-more.md -->
+[more resources]:
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/dvc-learn-more.md
 
 ## What you get
 
@@ -157,6 +162,54 @@ These are the VS Code [settings] available for the Extension:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
+
+## Developer roadmap
+
+We are working on increasing the quantity and quality of DVC features supported
+by this GUI. Remember that you can always use `dvc` commands from the
+_Integrated Terminal_!
+
+- **DVC metafile editor** (2022 Q3) Wouldn't it be cool to manage stages,
+  parameters, metrics, data and model paths, and other metadata in-place inside
+  corresponding [DVC metafiles]? E.g. `dvc.yaml` and `.dvc` files, param or
+  metrics files, even `dvc.lock`
+
+- **More and better plots!** (2022 Q3)  
+  DVC Experiment comparison is easier with interactive [parallel coordinate
+  plots], which can be generated from command line with `dvc exp show --pcp`. We
+  plan to incorporate that and brand new IDE-exclusive plots! (TBD)
+
+- **Performance improvements** (2022 Q3)  
+  Our extension will be faster and more reliable with better internal usage of
+  DVC and more efficient data management.
+
+- **ML pipelines** (2022 Q4)  
+  The extension examines [`dvc.yaml` files] to identify tracked data and
+  changes, but it does not currently provide a graphic interface to write or
+  modify stages.
+
+- **Remote execution** (2022 Q4)  
+  DVC Experiments can be run in remote environments. We intend to integrate this
+  with VS Code's robust [remote development] features.
+
+- **Data registry** (2022 Q4)  
+  DVC [data registries] can help you centralize and secure data management
+  across all your ML projects. You'll be able to construct and handle them right
+  from the IDE.
+
+- **More tools from Iterative.ai** (2023)  
+  Expect this extension to become a full-fledged suite for the ecosystem of
+  tools from Iterative, such as [CML](https://cml.dev/),
+  [MLEM](https://mlem.ai/) + [GTO](https://github.com/iterative/gto) **model
+  registry** management, and future surprises! (TBD)
+
+[dvc metafiles]: https://dvc.org/doc/user-guide/project-structure
+[parallel coordinate plots]:
+  https://dvc.org/doc/user-guide/experiment-management/comparing-experiments#parallel-coordinates-plot
+[`dvc.yaml` files]:
+  https://dvc.org/doc/user-guide/project-structure/pipelines-files
+[remote development]: https://code.visualstudio.com/docs/remote/remote-overview
+[data registries]: https://dvc.org/doc/use-cases/data-registry
 
 ## Debugging
 
