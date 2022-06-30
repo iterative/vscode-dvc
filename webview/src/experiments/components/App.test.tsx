@@ -750,7 +750,8 @@ describe('App', () => {
       expect(itemLabels).toStrictEqual([
         'Modify and Resume',
         'Modify, Reset and Run',
-        'Modify and Queue'
+        'Modify and Queue',
+        'Star Experiment'
       ])
     })
 
@@ -808,6 +809,129 @@ describe('App', () => {
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected Rows')
+    })
+  })
+
+  describe('Star Experiments', () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+    })
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
+    it('should not be available for the workspace experiment', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      mockPostMessage.mockReset()
+      const workspaceRow = screen.getByTestId('workspace-row')
+      const starIcon = within(workspaceRow).getByTestId('star-icon')
+      fireEvent.click(starIcon)
+
+      expect(mockPostMessage).not.toBeCalled()
+    })
+
+    it('should toggle the star status of an experiment by clicking the star icon', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      mockPostMessage.mockReset()
+      const mainRow = getRow('main')
+      const starIcon = within(mainRow).getByTestId('star-icon')
+      fireEvent.click(starIcon)
+
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: ['main'],
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
+    })
+
+    it('should toggle the star status of an experiment by clicking the ctx menu option', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      mockPostMessage.mockReset()
+      const mainRow = getRow('main')
+      fireEvent.contextMenu(mainRow, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+
+      const starOption = screen.getByText('Star Experiment')
+      fireEvent.click(starOption)
+
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: ['main'],
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
+    })
+
+    it('should toggle the star status of multiple experiments by clicking the ctx menu options', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      mockPostMessage.mockReset()
+      const mainRow = getRow('main')
+      fireEvent.click(mainRow)
+
+      const firstTipRow = getRow('4fb124a')
+      fireEvent.click(firstTipRow)
+
+      fireEvent.contextMenu(mainRow, { bubbles: true })
+      jest.advanceTimersByTime(100)
+
+      const starOption = screen.getByText('Star Experiments')
+      fireEvent.click(starOption)
+
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: ['main', 'exp-e7a67'],
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
     })
   })
 

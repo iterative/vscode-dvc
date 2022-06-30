@@ -32,6 +32,8 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
       'views.experimentsTable.columnsReordered',
     VIEWS_EXPERIMENTS_TABLE_CREATED: 'views.experimentsTable.created',
+    VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_STARS_TOGGLE:
+      'views.experimentTable.toggleStars',
     VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE:
       'views.experimentTable.toggleStatus',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
@@ -189,6 +191,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_STARS_TOGGLE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE]: undefined
