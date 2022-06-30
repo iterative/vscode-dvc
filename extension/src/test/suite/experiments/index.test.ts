@@ -52,7 +52,7 @@ import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { AvailableCommands, InternalCommands } from '../../../commands/internal'
+import { InternalCommands } from '../../../commands/internal'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -61,6 +61,8 @@ import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
 import { ExperimentFlag } from '../../../cli/constants'
+import { WorkspaceExperiments } from '../../../experiments/workspace'
+import { CliExecutor } from '../../../cli/executor'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -176,6 +178,7 @@ suite('Experiments Test Suite', () => {
         experiments,
         experimentsModel,
         internalCommands,
+        cliExecutor,
         messageSpy
       } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
@@ -184,6 +187,7 @@ suite('Experiments Test Suite', () => {
       ).resolves(undefined)
 
       return {
+        cliExecutor,
         columnsModel,
         experiments,
         experimentsModel,
@@ -264,39 +268,6 @@ suite('Experiments Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN,
         { width: mockWidth },
-        undefined
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should handle a toggle experiment message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
-
-      const webview = await experiments.showWebview()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockToggleExperimentStatus = stub(
-        experiments,
-        'toggleExperimentStatus'
-      ).returns(copyOriginalColors()[0])
-
-      const mockExperimentId = 'workspace'
-
-      mockMessageReceived.fire({
-        payload: mockExperimentId,
-        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
-      })
-
-      expect(mockToggleExperimentStatus).to.be.calledOnce
-      expect(
-        mockToggleExperimentStatus,
-        'should correctly handle an experiment toggled message'
-      ).to.be.calledWithExactly(mockExperimentId)
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE,
-        undefined,
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -439,37 +410,54 @@ suite('Experiments Test Suite', () => {
       )
     })
 
-    it('should be able to handle a message to apply an experiment to workspace', async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+    it('should be able to handle a message to apply an experiment', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentId = 'mock-experiment-id'
+      const mockExperimentId = 'exp-e7a67'
+
+      const mockExperimentApply = stub(
+        CliExecutor.prototype,
+        'experimentApply'
+      ).resolves(undefined)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
         type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
       })
 
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_APPLY,
+      expect(mockExperimentApply).to.be.calledOnce
+      expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperimentId
       )
     })
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
 
       const mockBranch = 'mock-branch-input'
       const inputEvent = getInputBoxEvent(mockBranch)
 
+      const mockExperimentBranch = stub(
+        CliExecutor.prototype,
+        'experimentBranch'
+      ).resolves('undefined')
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentId = 'mock-experiment-id'
+      const mockExperimentId = 'exp-e7a67'
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -477,9 +465,8 @@ suite('Experiments Test Suite', () => {
       })
 
       await inputEvent
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_BRANCH,
+      expect(mockExperimentBranch).to.be.calledOnce
+      expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperimentId,
         mockBranch
@@ -487,8 +474,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments, cliExecutor } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -497,7 +483,17 @@ suite('Experiments Test Suite', () => {
         'params.yaml:weight_decay=0'
       ]
 
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+      const mockQueueExperiment = stub(
+        cliExecutor,
+        'experimentRunQueue'
+      ).resolves(undefined)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -510,17 +506,15 @@ suite('Experiments Test Suite', () => {
       })
 
       await tableChangePromise
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_QUEUE,
+      expect(mockQueueExperiment).to.be.calledOnce
+      expect(mockQueueExperiment).to.be.calledWithExactly(
         dvcDemoPath,
         ...mockModifiedParams
       )
     })
 
     it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments, cliRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -529,11 +523,22 @@ suite('Experiments Test Suite', () => {
         'params.yaml:weight_decay=0'
       ]
 
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
+      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+        undefined
+      )
 
       const webview = await experiments.showWebview()
+
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
+
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
@@ -542,19 +547,15 @@ suite('Experiments Test Suite', () => {
       })
 
       await tableChangePromise
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_RUN,
+      expect(mockRunExperiment).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledWithExactly(
         dvcDemoPath,
         ...mockModifiedParams
       )
     })
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
-      const { experiments, cliRunner } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, cliRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -564,13 +565,22 @@ suite('Experiments Test Suite', () => {
       ]
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
-        undefined
-      )
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
+      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+        undefined
+      )
+
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
@@ -588,29 +598,31 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to remove an experiment', async () => {
-      const { experiments, mockExecuteCommand } =
-        setupExperimentsAndMockCommands()
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
+
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      ).resolves(undefined)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
         type: MessageFromWebviewType.REMOVE_EXPERIMENT
       })
 
-      expect(mockExecuteCommand).to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWithExactly(
-        AvailableCommands.EXPERIMENT_REMOVE,
+      expect(mockExperimentRemove).to.be.calledOnce
+      expect(mockExperimentRemove).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperimentId
       )
     })
 
     it("should be able to handle a message to toggle an experiment's status", async () => {
-      const { experiments, experimentsModel } =
-        setupExperimentsAndMockCommands()
+      const { experiments, experimentsModel } = buildExperiments(disposable)
 
       const experimentToToggle = 'exp-e7a67'
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
@@ -625,6 +637,14 @@ suite('Experiments Test Suite', () => {
         isExperimentSelected(queuedExperiment),
         'queued experiment cannot be selected'
       ).to.be.false
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -767,6 +787,42 @@ suite('Experiments Test Suite', () => {
         undefined,
         undefined
       )
+    })
+
+    it("should be able to handle a message to toggle an experiment's star status", async () => {
+      const { experiments, experimentsModel } =
+        setupExperimentsAndMockCommands()
+
+      const experimentsToToggle = ['exp-e7a67']
+
+      const areExperimentsStarred = (expIds: string[]): boolean =>
+        expIds
+          .map(expId =>
+            experimentsModel.getExperiments().find(({ id }) => id === expId)
+          )
+          .every(exp => exp?.starred)
+
+      expect(
+        areExperimentsStarred(experimentsToToggle),
+        'experiments are starred'
+      ).to.be.false
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const toggleSpy = spy(experimentsModel, 'toggleStars')
+
+      mockMessageReceived.fire({
+        payload: experimentsToToggle,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+      })
+
+      expect(toggleSpy).to.be.calledWith(experimentsToToggle)
+      toggleSpy.resetHistory()
+
+      expect(
+        areExperimentsStarred(experimentsToToggle),
+        'experiments have been starred'
+      ).to.be.true
     })
   })
 

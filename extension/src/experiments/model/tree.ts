@@ -1,4 +1,5 @@
 import {
+  commands,
   Event,
   ThemeIcon,
   TreeDataProvider,
@@ -17,10 +18,11 @@ import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty } from '../../util/array'
 import { createTreeView, getRootItem } from '../../vscode/tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
-import { RegisteredCommands } from '../../commands/external'
-import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
 import { sum } from '../../util/math'
-import { Title } from '../../vscode/title'
 import { Disposable } from '../../class/dispose'
 
 export class ExperimentsTree
@@ -39,7 +41,6 @@ export class ExperimentsTree
 
   constructor(
     experiments: WorkspaceExperiments,
-    internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {
     super()
@@ -65,7 +66,7 @@ export class ExperimentsTree
     this.experiments = experiments
     this.resourceLocator = resourceLocator
 
-    this.registerCommands(internalCommands)
+    this.registerWorkaroundCommand()
 
     this.updateDescriptionOnChange()
   }
@@ -102,84 +103,18 @@ export class ExperimentsTree
     return Promise.resolve(this.getCheckpoints(dvcRoot, id))
   }
 
-  private registerCommands(internalCommands: InternalCommands) {
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TOGGLE,
-      ({ dvcRoot, id }) =>
-        this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
-    )
-
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_APPLY,
-      ({ dvcRoot, id, label, type }: ExperimentItem) =>
-        this.experiments.runCommand(
-          AvailableCommands.EXPERIMENT_APPLY,
-          dvcRoot,
-          this.getDisplayId(type, label, id)
-        )
-    )
-
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_BRANCH,
-      ({ dvcRoot, id, label, type }: ExperimentItem) => {
-        this.experiments.getInputAndRun(
-          AvailableCommands.EXPERIMENT_BRANCH,
-          dvcRoot,
-          Title.ENTER_BRANCH_NAME,
-          this.getDisplayId(type, label, id)
-        )
-      }
-    )
-
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_QUEUE,
-      ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.modifyExperimentParamsAndRun(
-          AvailableCommands.EXPERIMENT_QUEUE,
-          dvcRoot,
-          id
-        )
-    )
-
-    const modifyExperimentParamsAndRun = ({ dvcRoot, id }: ExperimentItem) =>
-      this.experiments.modifyExperimentParamsAndRun(
-        AvailableCommands.EXPERIMENT_RUN,
-        dvcRoot,
-        id
-      )
-
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_RUN,
-      modifyExperimentParamsAndRun
-    )
-
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_RESUME,
-      modifyExperimentParamsAndRun
-    )
-
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_RESET_AND_RUN,
-      ({ dvcRoot, id }: ExperimentItem) =>
-        this.experiments.modifyExperimentParamsAndRun(
-          AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-          dvcRoot,
-          id
-        )
-    )
-
-    internalCommands.registerExternalCommand<ExperimentItem>(
-      RegisteredCommands.EXPERIMENT_TREE_REMOVE,
+  private registerWorkaroundCommand() {
+    commands.registerCommand(
+      'dvc.views.experimentsTree.removeExperiment',
       async experimentItem => {
         const selected = [...this.getSelectedExperimentItems(), experimentItem]
 
         const deletable = collectDeletable(selected)
 
         for (const [dvcRoot, ids] of Object.entries(deletable)) {
-          await this.experiments.runCommand(
-            AvailableCommands.EXPERIMENT_REMOVE,
-            dvcRoot,
-            ...ids
+          await commands.executeCommand(
+            RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+            { dvcRoot, ids }
           )
         }
       }
@@ -340,10 +275,6 @@ export class ExperimentsTree
 
   private isRoot(element: string | ExperimentItem): element is string {
     return typeof element === 'string'
-  }
-
-  private getDisplayId(type: ExperimentType, label: string, id: string) {
-    return type === ExperimentType.CHECKPOINT ? label : id
   }
 
   private getSelectedExperimentItems() {

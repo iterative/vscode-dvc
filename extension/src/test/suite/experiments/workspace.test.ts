@@ -14,10 +14,7 @@ import * as QuickPick from '../../../vscode/quickPick'
 import { CliExecutor } from '../../../cli/executor'
 import { closeAllEditors, mockDuration } from '../util'
 import { dvcDemoPath } from '../../util'
-import {
-  RegisteredCliCommands,
-  RegisteredCommands
-} from '../../../commands/external'
+import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
 import { Param } from '../../../experiments/model/modify/collect'
@@ -188,7 +185,7 @@ suite('Workspace Experiments Test Suite', () => {
         .resolves('0.16')
 
       await commands.executeCommand(
-        RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
+        RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
       )
 
       expect(mockExperimentRunQueue).to.be.calledOnce
@@ -252,7 +249,7 @@ suite('Workspace Experiments Test Suite', () => {
         .resolves(threshold)
 
       await commands.executeCommand(
-        RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_RESUME
+        RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_RESUME
       )
 
       expect(mockExperimentRun).to.be.calledOnce
@@ -316,7 +313,7 @@ suite('Workspace Experiments Test Suite', () => {
         .resolves(threshold)
 
       await commands.executeCommand(
-        RegisteredCommands.MODIFY_EXPERIMENT_PARAMS_AND_RUN
+        RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_RUN
       )
 
       expect(mockExperimentRun).to.be.calledOnce

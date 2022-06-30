@@ -32,6 +32,8 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
       'views.experimentsTable.columnsReordered',
     VIEWS_EXPERIMENTS_TABLE_CREATED: 'views.experimentsTable.created',
+    VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_STARS_TOGGLE:
+      'views.experimentTable.toggleStars',
     VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE:
       'views.experimentTable.toggleStatus',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
@@ -128,14 +130,16 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_SORT_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
-  [EventName.EXPERIMENT_TREE_APPLY]: undefined
-  [EventName.EXPERIMENT_TREE_BRANCH]: undefined
-  [EventName.EXPERIMENT_TREE_QUEUE]: undefined
-  [EventName.EXPERIMENT_TREE_REMOVE]: undefined
-  [EventName.EXPERIMENT_TREE_RESUME]: undefined
-  [EventName.EXPERIMENT_TREE_RUN]: undefined
-  [EventName.EXPERIMENT_TREE_RESET_AND_RUN]: undefined
+  [EventName.EXPERIMENT_VIEW_APPLY]: undefined
+  [EventName.EXPERIMENT_VIEW_BRANCH]: undefined
+  [EventName.EXPERIMENT_VIEW_REMOVE]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
+
+  [EventName.EXPERIMENT_VIEW_QUEUE]: undefined
+  [EventName.EXPERIMENT_VIEW_RESUME]: undefined
+  [EventName.EXPERIMENT_VIEW_RUN]: undefined
+  [EventName.EXPERIMENT_VIEW_RESET_AND_RUN]: undefined
+
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RESUME]: undefined
@@ -187,6 +191,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_STARS_TOGGLE]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE]: undefined

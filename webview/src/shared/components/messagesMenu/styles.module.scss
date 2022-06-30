@@ -1,5 +1,9 @@
 @import '../../../shared/variables.scss';
 
+.messagesMenu {
+  padding: 4px 0;
+}
+
 .item {
   display: flex;
   cursor: pointer;
@@ -7,6 +11,9 @@
   padding: 2px 6px;
   &:hover {
     background-color: $hover-background-color;
+  }
+  &:last-child {
+    padding-bottom: 6px;
   }
 }
 
@@ -18,4 +25,9 @@
 
 .itemIcon {
   width: 13px;
+}
+
+.dividerContainer {
+  padding-right: 6px;
+  padding-left: 6px;
 }

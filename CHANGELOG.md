@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.7] - 2022-06-30
+
+### 🚀 New Features and Enhancements
+
+- Star experiments in table [#1950](https://github.com/iterative/vscode-dvc/pull/1950) by [@wolmir](https://github.com/wolmir)
+
+### 🐛 Bug Fixes
+
+- Patch plots for branches containing path separators [#1949](https://github.com/iterative/vscode-dvc/pull/1949) by [@mattseddon](https://github.com/mattseddon)
+- Show DVC roots in tracked tree when there is more than one DVC project in the workspace [#1951](https://github.com/iterative/vscode-dvc/pull/1951) by [@mattseddon](https://github.com/mattseddon)
+- Show DVC root in tracked tree if there is only a single project nested inside of the workspace [#1952](https://github.com/iterative/vscode-dvc/pull/1952) by [@mattseddon](https://github.com/mattseddon)
+- Show errors when interacting with the CLI from the experiments webview or tree [#1953](https://github.com/iterative/vscode-dvc/pull/1953) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Simplify import of icons [#1941](https://github.com/iterative/vscode-dvc/pull/1941) by [@sroy3](https://github.com/sroy3)
+- Adding Redux to plots [#1832](https://github.com/iterative/vscode-dvc/pull/1832) by [@sroy3](https://github.com/sroy3)
+- Remove clear data action [#1945](https://github.com/iterative/vscode-dvc/pull/1945) by [@sroy3](https://github.com/sroy3)
+- Use Redux for drag and drop state [#1944](https://github.com/iterative/vscode-dvc/pull/1944) by [@sroy3](https://github.com/sroy3)
+
 ## [0.3.6] - 2022-06-20
 
 ### 🐛 Bug Fixes

@@ -2,6 +2,7 @@ export enum PersistenceKey {
   EXPERIMENTS_FILTER_BY = 'experimentsFilterBy:',
   EXPERIMENTS_SORT_BY = 'experimentsSortBy:',
   EXPERIMENTS_STATUS = 'experimentsStatus:',
+  EXPERIMENTS_STARS = 'experimentsStars:',
   METRICS_AND_PARAMS_COLUMN_ORDER = 'columnsColumnOrder:',
   METRICS_AND_PARAMS_COLUMN_WIDTHS = 'columnsColumnWidths:',
   METRICS_AND_PARAMS_STATUS = 'columnsStatus:',
