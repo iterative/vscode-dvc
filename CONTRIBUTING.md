@@ -35,10 +35,11 @@ First, ensure that [Visual Studio Code](https://code.visualstudio.com) and
 - **Start Debugging** (F5) to open the [Extension Development Host], a child
   instance of VS Code with the local extension build installed.
 
-  > **Note**: using the `Run Extension` command when running the debugger will
-  > prevent all other extensions from loading into VS Code. This will improve
-  > the performance of VS Code but can cause certain DVC commands to fail if the
-  > DVC project uses an isolated Python env (see [this warning](#warning)).
+  > **Note**: using the `Run Extension` configuration when running the debugger
+  > will prevent all other extensions from loading into VS Code. This will
+  > improve the performance of VS Code but can cause certain DVC commands to
+  > fail if the DVC project uses an isolated Python env (see
+  > [this warning](#warning)).
 
 - Open a DVC project in the _Extension Development Host_. VS Code will remember
   the last project opened, so this step only has to be done once.
