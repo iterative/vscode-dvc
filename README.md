@@ -83,7 +83,7 @@ Management]. For deeper learning, try our [free course]! [More resources]
 [data management]: https://dvc.org/doc/start/data-management
 [free course]: https://learn.iterative.ai/
 [more resources]:
-  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/dvc-learn-more.md
+  https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/more-resources.md
 
 ## What you get
 
