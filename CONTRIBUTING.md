@@ -22,14 +22,15 @@ special instance of VS Code.
 First, ensure that [Visual Studio Code](https://code.visualstudio.com) and
 [Yarn](https://yarnpkg.com/) are installed.
 
-- Open this repository as a project in VS Code.
+- Open this repository as a project in VS Code and run `yarn install` from the
+  _Integrated Terminal_.
 
 - Run `Tasks: Run Build Task` (Shift + Ctrl/Cmd + `b`) to start the extension
   and Webview dev servers (alternatively, run `yarn dev-server` from the
-  _Integrated Terminal_).
+  _Terminal_). The latest build is saved in `extension/dist`.
 
   > **Warning**: Having a separate `.vsix` version of this extension installed
-  > may cause all kinds of chaos in your development environment.
+  > may cause all kinds of chaos in your dev env.
 
 - **Start Debugging** (F5) to open the [Extension Development Host], a child
   instance of VS Code with the local extension build installed.
