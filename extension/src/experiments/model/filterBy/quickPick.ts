@@ -77,7 +77,7 @@ const addFilterValue = async (path: string, operator: Operator) => {
   }
 
   return {
-    operator: operator,
+    operator,
     path,
     value
   }
@@ -106,7 +106,7 @@ export const pickFilterToAdd = async (
 
   if ([Operator.IS_TRUE, Operator.IS_FALSE].includes(operator)) {
     return {
-      operator: operator,
+      operator,
       path: picked.path,
       value: undefined
     }

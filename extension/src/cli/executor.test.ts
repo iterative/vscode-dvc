@@ -409,7 +409,7 @@ describe('CliExecutor', () => {
 
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['move', target, destination],
-        cwd: cwd,
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })

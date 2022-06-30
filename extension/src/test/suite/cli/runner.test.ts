@@ -105,9 +105,9 @@ suite('CLI Runner Test Suite', () => {
 
       const cliRunner = disposable.track(
         new CliRunner({} as Config, 'echo', {
-          processCompleted: processCompleted,
-          processOutput: processOutput,
-          processStarted: processStarted
+          processCompleted,
+          processOutput,
+          processStarted
         })
       )
 
