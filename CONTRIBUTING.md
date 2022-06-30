@@ -49,6 +49,12 @@ First, ensure that [Visual Studio Code](https://code.visualstudio.com) and
 [extension development host]:
   https://code.visualstudio.com/api/working-with-extensions/testing-extension
 
+<a id='warning'></a>
+
+> **Warning**: When using any project that relies on an isolated Python
+> environment (`conda`, `venv`, etc.), Microsoft's Python extension is required.
+> It's used by this extension to locate and utilize the required environment.
+
 ## The demo project
 
 The [demo project](demo) is provided as a lightweight, convenient testbed to try
@@ -68,18 +74,13 @@ your changes to this extension.
   running `dvc pull` from _Terminal_.
 
 - In order to [run experiments] in the demo project, the [Python extension]
-  should be installed so that the virtual env is activated.
+  should be installed so that the virtual env is activated (see
+  [full warning](#warning)).
 
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [run experiments]:
   https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/run-experiments.md
-
-<a id='warning'></a>
-
-> **Warning**: When using any project that relies on an isolated Python
-> environment (`conda`, `venv`, etc.), Microsoft's Python extension is required.
-> It's used by this extension to locate and utilize the required environment.
 
 ## React component development with Storybook
 
