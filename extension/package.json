@@ -1550,7 +1550,7 @@
     "sinon": "^14.0.0",
     "sinon-chai": "^3.5.0",
     "ts-jest": "^28.0.5",
-    "ts-loader": "^9.2.6",
+    "ts-loader": "^9.3.1",
     "vsce": "^2.9.2",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.73.0",
