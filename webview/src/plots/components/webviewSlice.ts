@@ -30,11 +30,11 @@ export const webviewSlice = createSlice({
   initialState: webviewInitialState,
   name: 'webview',
   reducers: {
-    initialize: state => {
+    initialize: (state: any) => {
       state.hasData = true
     },
     setZoomedInPlot: (
-      state,
+      state: any,
       action: PayloadAction<ZoomedInPlotState | undefined>
     ) => {
       if (!action.payload) {
@@ -49,14 +49,14 @@ export const webviewSlice = createSlice({
         Object.assign(state.zoomedInPlot, action.payload)
       }
     },
-    updateHasPlots: (state, action: PayloadAction<boolean>) => {
+    updateHasPlots: (state: any, action: PayloadAction<boolean>) => {
       state.hasPlots = action.payload
     },
-    updateHasSelectedPlots: (state, action: PayloadAction<boolean>) => {
+    updateHasSelectedPlots: (state: any, action: PayloadAction<boolean>) => {
       state.hasSelectedPlots = action.payload
     },
     updateSelectedRevisions: (
-      state,
+      state: any,
       action: PayloadAction<Revision[] | undefined>
     ) => {
       state.selectedRevisions = action.payload || []
