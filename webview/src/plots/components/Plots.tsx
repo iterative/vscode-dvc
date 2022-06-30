@@ -10,7 +10,6 @@ import { setZoomedInPlot } from './webviewSlice'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
-import { DragDropProvider } from '../../shared/components/dragDrop/DragDropContext'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { RootState } from '../store'
 
@@ -56,11 +55,9 @@ const PlotsContent = () => {
   return (
     <>
       <Ribbon />
-      <DragDropProvider>
-        {hasTemplateData && <TemplatePlotsWrapper />}
-        {hasComparisonData && <ComparisonTableWrapper />}
-        {hasCheckpointData && <CheckpointPlotsWrapper />}
-      </DragDropProvider>
+      {hasTemplateData && <TemplatePlotsWrapper />}
+      {hasComparisonData && <ComparisonTableWrapper />}
+      {hasCheckpointData && <CheckpointPlotsWrapper />}
 
       {zoomedInPlot?.plot && (
         <Modal

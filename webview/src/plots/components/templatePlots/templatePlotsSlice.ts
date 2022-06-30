@@ -6,8 +6,6 @@ import {
   Section,
   TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
-import { clearData } from '../../actions'
-import { ReducerName } from '../../constants'
 import { plotDataStore } from '../plotDataStore'
 
 export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
@@ -24,17 +22,8 @@ export const templatePlotsInitialState: TemplatePlotsState = {
 }
 
 export const templatePlotsSlice = createSlice({
-  extraReducers: builder => {
-    builder
-      .addCase(clearData, (_, action) => {
-        if (!action.payload || action.payload === ReducerName.TEMPLATE) {
-          return { ...templatePlotsInitialState }
-        }
-      })
-      .addDefaultCase(() => {})
-  },
   initialState: templatePlotsInitialState,
-  name: ReducerName.TEMPLATE,
+  name: 'template',
   reducers: {
     changeSize: (state, action: PayloadAction<PlotSize>) => {
       state.size = action.payload

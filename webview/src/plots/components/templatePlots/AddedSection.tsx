@@ -1,10 +1,11 @@
-import React, { DragEvent, useContext } from 'react'
+import React, { DragEvent } from 'react'
+import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { TemplatePlotSection } from 'dvc/src/plots/webview/contract'
 import styles from '../styles.module.scss'
 import { getIDWithoutIndex } from '../../../util/ids'
+import { RootState } from '../../store'
 import { Icon } from '../../../shared/components/Icon'
-import { DragDropContext } from '../../../shared/components/dragDrop/DragDropContext'
 import { GraphLine } from '../../../shared/components/icons'
 
 interface AddedSectionProps {
@@ -24,7 +25,7 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   closestSection,
   acceptedGroups
 }) => {
-  const { draggedRef } = useContext(DragDropContext)
+  const { draggedRef } = useSelector((state: RootState) => state.dragAndDrop)
   const handleDragLeave = () => {
     setHoveredSection('')
   }
