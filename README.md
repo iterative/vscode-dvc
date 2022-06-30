@@ -16,8 +16,6 @@
 [Roadmap](#developer-roadmap) • [Debugging](#debugging) •
 [Contributing](#contributing) • [Telemetry](#data-and-telemetry)
 
----
-
 Run, compare, visualize, and track machine learning experiments right in VS
 Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
