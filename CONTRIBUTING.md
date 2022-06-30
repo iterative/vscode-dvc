@@ -25,8 +25,8 @@ First, ensure that [Visual Studio Code](https://code.visualstudio.com) and
 - Open this repository as a project in VS Code.
 
 - Run `Tasks: Run Build Task` (Shift + Ctrl/Cmd + `b`) to start the extension
-  and Webview dev servers (alternatively, run `yarn dev` from the _Integrated
-  Terminal_).
+  and Webview dev servers (alternatively, run `yarn dev-server` from the
+  _Integrated Terminal_).
 
   > **Warning**: Having a separate `.vsix` version of this extension installed
   > may cause all kinds of chaos in your development environment.
