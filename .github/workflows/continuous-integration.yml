@@ -38,7 +38,7 @@ jobs:
 
       - run: yarn run lint
 
-      - uses: paambaati/codeclimate-action@v3
+      - uses: paambaati/codeclimate-action@v3.0.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
