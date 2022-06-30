@@ -17,8 +17,8 @@
 
 - Read our [Blog] and meet the [Community].
 
-- Check out the [DVC GitHub repository, where you can find and report issues, or
-  [contribute] to the open-source project.
+- Check out the [DVC GitHub repository], where you can find and report issues,
+  or [contribute] to the open-source project.
 
 [hands-on tour]: https://dvc.org/doc/start
 [user guide]: https://dvc.org/doc/user-guide
