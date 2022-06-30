@@ -370,7 +370,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return collectFilteredCounts(filtered, hasCheckpoints)
   }
 
-  private getCombinedList() {
+  public getCombinedList() {
     return [
       this.workspace,
       ...this.branches,
