@@ -60,7 +60,7 @@ databases are required.
 
 1. [Install DVC](https://dvc.org/doc/install) on your system.
 2. Install [this extension] in VS Code.
-3. Follow the **Get Started** page that pops up!
+3. Follow the [Get Started](#useful-commands) walkthrough!
 
 <!-- prettier-ignore -->
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github
