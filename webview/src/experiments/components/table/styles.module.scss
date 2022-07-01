@@ -199,7 +199,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         padding-left: $nested-row-padding;
 
         .innerCell {
-          .starSwitch {
+          .rowActions {
             left: calc(($cell-padding + $nested-row-padding) * -1);
           }
         }
@@ -388,7 +388,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     .innerCell {
-      .starSwitch {
+      .rowActions {
         visibility: hidden;
       }
     }
@@ -445,18 +445,23 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         cursor: pointer;
       }
 
-      .starSwitch {
+      .rowActions {
         display: inline-flex;
         align-items: center;
         position: relative;
         left: -$cell-padding;
-        outline: none;
-        width: 12px;
-        opacity: 0.4;
-        cursor: pointer;
 
-        &[aria-checked='true'] {
-          opacity: 1;
+        .starSwitch {
+          display: inline-flex;
+          align-items: center;
+          width: 14px;
+          margin-left: 8px;
+          opacity: 0.4;
+          cursor: pointer;
+
+          &[aria-checked='true'] {
+            opacity: 1;
+          }
         }
       }
     }

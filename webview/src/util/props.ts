@@ -1,13 +1,17 @@
-import React, { EventHandler, SyntheticEvent } from 'react'
+import React from 'react'
 
-export const clickAndEnterProps: <T>(handler: () => void) => {
-  onClick: EventHandler<SyntheticEvent>
+export type HandlerFunc<T> = (args?: {
+  mouse?: React.MouseEvent<T, MouseEvent>
+}) => void
+
+export const clickAndEnterProps: <T>(handler: HandlerFunc<T>) => {
+  onClick: React.MouseEventHandler<T>
   onKeyDown: React.KeyboardEventHandler<T>
 } = handler => ({
   onClick: e => {
     e.preventDefault()
     e.stopPropagation()
-    handler()
+    handler({ mouse: e })
   },
   onKeyDown: e => {
     e.preventDefault()

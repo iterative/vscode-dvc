@@ -796,11 +796,11 @@ describe('App', () => {
         })
       )
 
-      const firstRow = screen.getByTestId('timestamp___1.exp-e7a67')
-      fireEvent.click(firstRow)
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
 
-      const secondRow = screen.getByTestId('timestamp___1.test-branch')
-      fireEvent.click(secondRow)
+      const secondRowCheckbox = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(secondRowCheckbox)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -915,10 +915,10 @@ describe('App', () => {
       )
 
       mockPostMessage.mockReset()
-      const mainRow = getRow('main')
+      const mainRow = within(getRow('main')).getByRole('checkbox')
       fireEvent.click(mainRow)
 
-      const firstTipRow = getRow('4fb124a')
+      const firstTipRow = within(getRow('4fb124a')).getByRole('checkbox')
       fireEvent.click(firstTipRow)
 
       fireEvent.contextMenu(mainRow, { bubbles: true })
