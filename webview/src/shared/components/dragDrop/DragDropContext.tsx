@@ -33,7 +33,13 @@ export const DragDropContext = createContext<DragDropContextValue>({
   setGroupState: undefined
 })
 
-export const DragDropProvider: React.FC = ({ children }) => {
+type DragDropProviderProps = {
+  children: React.ReactNode
+}
+
+export const DragDropProvider: React.FC<DragDropProviderProps> = ({
+  children
+}) => {
   const [draggedRef, setDraggedRef] = useState<DraggedInfo>(undefined)
 
   const [groupStates, setGroupStates] = useState<GroupStates>({})

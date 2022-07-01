@@ -5,6 +5,7 @@ import { Close } from '../icons'
 
 interface ModalProps {
   onClose: () => void
+  children?: React.ReactNode
 }
 
 export const Modal: React.FC<ModalProps> = ({ onClose, children }) => {

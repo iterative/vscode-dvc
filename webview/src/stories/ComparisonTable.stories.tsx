@@ -20,6 +20,7 @@ import { storeReducers } from '../plots/store'
 const MockedState: React.FC<{
   data: PlotsComparisonData
   selectedRevisions: Revision[]
+  children: React.ReactNode
 }> = ({ children, data, selectedRevisions }) => {
   const dispatch = useDispatch()
   dispatch(update(data))

@@ -3,14 +3,7 @@
  */
 /* eslint-disable sonarjs/no-identical-functions */
 import React from 'react'
-import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor
-} from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { CopyButton } from './CopyButton'
 
@@ -21,10 +14,13 @@ Object.assign(navigator, {
   }
 })
 
-jest.useFakeTimers()
+beforeEach(() => {
+  jest.useFakeTimers()
+})
 
 afterEach(() => {
   cleanup()
+  jest.useRealTimers()
 })
 
 describe('CopyButton', () => {
@@ -38,11 +34,14 @@ describe('CopyButton', () => {
     render(<CopyButton value={exampleCopyText} tooltip={defaultStateTitle} />)
     const copyButtonElement = screen.getByTitle(defaultStateTitle)
 
+    fireEvent.mouseEnter(copyButtonElement)
+
     fireEvent.click(copyButtonElement, {
       bubbles: true,
       cancelable: true
     })
-    await waitFor(() => screen.findByTitle(successStateTitle))
+
+    await screen.findByTitle(successStateTitle)
 
     expect(mockWriteText).toBeCalledWith(exampleCopyText)
     act(() => {
@@ -81,9 +80,12 @@ describe('CopyButton', () => {
       bubbles: true,
       cancelable: true
     })
-    await screen.findByTitle(successStateTitle)
 
-    jest.advanceTimersByTime(500)
+    act(() => {
+      jest.advanceTimersByTime(990)
+    })
+
+    await screen.findByTitle(successStateTitle)
 
     // Click again while still in success state
     mockWriteText.mockResolvedValueOnce(undefined)
@@ -95,7 +97,9 @@ describe('CopyButton', () => {
     await screen.findByTitle(successStateTitle)
 
     // Ensure state hasn't returned to default after it would have from the first click
-    jest.advanceTimersByTime(600)
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
     expect(screen.getByTitle(successStateTitle)).toBeInTheDocument()
   })
 })

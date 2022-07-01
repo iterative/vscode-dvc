@@ -47,6 +47,7 @@ declare module 'react-table' {
 
   export interface Cell {
     isPlaceholder: boolean
+    children?: React.ReactNode
   }
 
   export interface Row<

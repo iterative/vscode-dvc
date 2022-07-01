@@ -25,7 +25,10 @@ import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
 import { storeReducers } from '../plots/store'
 
-const MockedState: React.FC<{ data: PlotsData }> = ({ children, data }) => {
+const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
+  children,
+  data
+}) => {
   const dispatch = useDispatch()
   const message = { data, type: MessageToWebviewType.SET_DATA }
   feedStore(message, dispatch)

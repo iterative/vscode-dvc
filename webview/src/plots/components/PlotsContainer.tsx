@@ -28,6 +28,7 @@ export interface PlotsContainerProps extends CommonPlotsContainerProps {
   title: string
   currentSize: PlotSize
   menu?: PlotsPickerProps
+  children: React.ReactNode
 }
 
 export const SectionDescription = {

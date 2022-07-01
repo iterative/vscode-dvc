@@ -13,7 +13,9 @@ export const RowSelectionContext = createContext<RowSelectionContextValue>({
   toggleRowSelected: undefined
 })
 
-export const RowSelectionProvider: React.FC = ({ children }) => {
+export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
+  children
+}) => {
   const [selectedRows, setSelectedRows] = useState<
     Record<string, RowProp | undefined>
   >({})
