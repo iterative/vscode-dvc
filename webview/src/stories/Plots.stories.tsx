@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import { Story, Meta } from '@storybook/react/types-6-0'
-import { fireEvent, within, waitFor } from '@testing-library/react'
+import { within, waitFor } from '@testing-library/react'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
@@ -201,7 +201,7 @@ ZoomedInPlot.play = async ({ canvasElement }) => {
   const plots = await canvas.findAllByTestId(/^plot_/)
   const plot = await waitFor(() => within(plots[0]).getByRole('button'))
 
-  fireEvent.click(plot)
+  plot.click()
 }
 
 export const MultiviewZoomedInPlot = Template.bind({})
@@ -213,5 +213,5 @@ MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
   const plot = await canvas.findByTestId('plots-section_template-multi_1')
   const plotButton = await waitFor(() => within(plot).getByRole('button'))
 
-  fireEvent.click(plotButton)
+  plotButton.click()
 }
