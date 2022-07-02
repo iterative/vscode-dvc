@@ -637,7 +637,7 @@ describe('App', () => {
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
 
-      expect(tooltip).toHaveTextContent(`Parameter: ${testParamStringValue}`)
+      expect(tooltip).toHaveTextContent(testParamStringValue)
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
@@ -665,9 +665,7 @@ describe('App', () => {
       jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
-      expect(tooltip).toHaveTextContent(
-        `Metric: ${String(testMetricNumberValue)}`
-      )
+      expect(tooltip).toHaveTextContent(String(testMetricNumberValue))
     })
   })
 
