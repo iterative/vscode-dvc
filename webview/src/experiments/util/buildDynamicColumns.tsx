@@ -22,6 +22,26 @@ const UndefinedCell = (
   </div>
 )
 
+const CellTooltip: React.FC<{
+  cell: Cell<Experiment, string | number>
+}> = ({ cell }) => {
+  const { value } = cell
+  return (
+    <div
+      role="textbox"
+      tabIndex={0}
+      onClick={e => {
+        e.stopPropagation()
+      }}
+      onKeyDown={e => {
+        e.stopPropagation()
+      }}
+    >
+      {value}
+    </div>
+  )
+}
+
 const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
   const { value } = cell
   if (value === undefined) {
@@ -38,7 +58,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
   return (
     <Tooltip
       className={tooltipStyles.padded}
-      content={String(value)}
+      content={<CellTooltip cell={cell} />}
       placement="bottom"
       arrow={true}
       delay={[CELL_TOOLTIP_DELAY, 0]}
