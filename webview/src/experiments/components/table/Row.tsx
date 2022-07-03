@@ -10,7 +10,7 @@ import { sendMessage } from '../../../shared/vscode'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
-import { clickAndEnterProps } from '../../../util/props'
+import { HandlerFunc } from '../../../util/props'
 import { cond } from '../../../util/helpers'
 
 const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
@@ -255,14 +255,19 @@ const getRowClassNames = (
   )
 }
 
+export type BatchSelectionProp = {
+  batchRowSelection: (prop: RowProp) => void
+}
+
 export const RowContent: React.FC<
-  RowProp & { className?: string } & WithChanges
+  RowProp & { className?: string } & WithChanges & BatchSelectionProp
 > = ({
   row,
   className,
   changes,
   contextMenuDisabled,
-  projectHasCheckpoints
+  projectHasCheckpoints,
+  batchRowSelection
 }): JSX.Element => {
   const {
     getRowProps,
@@ -294,11 +299,18 @@ export const RowContent: React.FC<
 
   const isRowSelected = !!selectedRows[id]
 
-  const toggleRowSelection = React.useCallback(() => {
-    if (!isWorkspace) {
-      toggleRowSelected?.({ row })
-    }
-  }, [row, toggleRowSelected, isWorkspace])
+  const toggleRowSelection = React.useCallback<HandlerFunc<HTMLElement>>(
+    args => {
+      if (!isWorkspace) {
+        if (args?.mouse?.shiftKey) {
+          batchRowSelection({ row })
+        } else {
+          toggleRowSelected?.({ row })
+        }
+      }
+    },
+    [row, toggleRowSelected, isWorkspace, batchRowSelection]
+  )
 
   return (
     <ContextMenu
@@ -323,13 +335,13 @@ export const RowContent: React.FC<
         })}
         tabIndex={0}
         role="row"
-        {...clickAndEnterProps(toggleRowSelection)}
         aria-selected={isRowSelected}
         data-testid={isWorkspace && 'workspace-row'}
       >
         <FirstCell
           cell={firstCell}
           bulletColor={displayColor}
+          isRowSelected={isRowSelected}
           toggleExperiment={toggleExperiment}
           toggleRowSelection={toggleRowSelection}
           toggleStarred={toggleStarred}
