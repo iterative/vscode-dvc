@@ -4,6 +4,7 @@ import styles from './styles.module.scss'
 
 interface EmptyStateProps {
   isFullScreen?: boolean
+  children: React.ReactNode
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
