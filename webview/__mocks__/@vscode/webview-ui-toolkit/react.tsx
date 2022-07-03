@@ -3,7 +3,7 @@ import React from 'react'
 
 type MockButtonProps = {
   onClick: () => void
-  children: React.ReactChildren
+  children: React.ReactNode
 }
 
 export const VSCodeButton: React.FC<MockButtonProps> = ({

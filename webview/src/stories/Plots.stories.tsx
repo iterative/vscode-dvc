@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import { Story, Meta } from '@storybook/react/types-6-0'
-import { fireEvent, within } from '@testing-library/react'
+import { within, waitFor } from '@testing-library/react'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
@@ -25,7 +25,10 @@ import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
 import { storeReducers } from '../plots/store'
 
-const MockedState: React.FC<{ data: PlotsData }> = ({ children, data }) => {
+const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
+  children,
+  data
+}) => {
   const dispatch = useDispatch()
   const message = { data, type: MessageToWebviewType.SET_DATA }
   feedStore(message, dispatch)
@@ -196,9 +199,9 @@ ZoomedInPlot.parameters = {
 ZoomedInPlot.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement)
   const plots = await canvas.findAllByTestId(/^plot_/)
-  const plot = within(plots[0]).getByRole('button')
+  const plot = await waitFor(() => within(plots[0]).getByRole('button'))
 
-  fireEvent.click(plot)
+  plot.click()
 }
 
 export const MultiviewZoomedInPlot = Template.bind({})
@@ -208,20 +211,7 @@ MultiviewZoomedInPlot.parameters = {
 MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement)
   const plot = await canvas.findByTestId('plots-section_template-multi_1')
-  const plotButton = within(plot).getByRole('button')
+  const plotButton = await waitFor(() => within(plot).getByRole('button'))
 
-  fireEvent.click(plotButton)
-}
-
-export const CheckpointZoomedInPlot = Template.bind({})
-CheckpointZoomedInPlot.parameters = {
-  chromatic: { delay: 500 }
-}
-CheckpointZoomedInPlot.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement)
-  const plot = await canvas.findByText('summary.json:val_accuracy')
-
-  plot.scrollIntoView()
-
-  fireEvent.click(plot)
+  plotButton.click()
 }

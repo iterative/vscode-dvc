@@ -8,6 +8,7 @@ export interface ComparisonTableHeaderProps {
   displayColor: string
   onClicked: () => void
   isPinned?: boolean
+  children?: React.ReactNode
 }
 
 export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({

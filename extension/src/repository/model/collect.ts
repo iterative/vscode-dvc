@@ -227,12 +227,26 @@ const collectRootOrPathItem = (
 }
 
 export const collectSelected = (
-  pathItems: (string | PathItem)[]
+  invokedPathItem: PathItem,
+  selectedPathItems: (string | PathItem)[]
 ): SelectedPathAccumulator => {
-  const selectedPaths = collectSelectedPaths(pathItems)
+  const invokedPath = invokedPathItem.resourceUri.fsPath
+
+  if (
+    !selectedPathItems.some(pathItem => {
+      if (typeof pathItem === 'string') {
+        return pathItem === invokedPath
+      }
+      return pathItem.resourceUri.fsPath === invokedPath
+    })
+  ) {
+    return { [invokedPathItem.dvcRoot]: [invokedPathItem] }
+  }
+
+  const selectedPaths = collectSelectedPaths(selectedPathItems)
   const acc: SelectedPathAccumulator = {}
   const addedPaths = new Set<string>()
-  for (const pathItem of pathItems) {
+  for (const pathItem of selectedPathItems) {
     collectRootOrPathItem(acc, addedPaths, selectedPaths, pathItem)
   }
   return acc

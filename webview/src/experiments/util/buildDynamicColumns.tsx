@@ -107,7 +107,7 @@ const buildDynamicColumns = (
 
       const childColumns = buildDynamicColumns(properties, path)
 
-      const column: ColumnGroup<Experiment> | TableColumn<Experiment> = {
+      return {
         Cell,
         Header,
         accessor: pathArray && buildAccessor(pathArray),
@@ -115,8 +115,7 @@ const buildDynamicColumns = (
         group: type,
         id: path,
         name: label
-      }
-      return column
+      } as ColumnGroup<Experiment> | TableColumn<Experiment>
     })
 
 const findMaxDepth = (columns: ColumnGroup<Experiment>[], depth = 1): number =>
