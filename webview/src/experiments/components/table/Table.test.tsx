@@ -318,11 +318,13 @@ describe('Table', () => {
     })
 
     it('should resize columns and persist new state when a separator is clicked and dragged', async () => {
+      const columnWidths = {
+        id: 333
+      }
+
       const tableDataWithColumnSetting: TableData = {
         ...sortingTableDataFixture,
-        columnWidths: {
-          id: 333
-        }
+        columnWidths
       }
       render(<ExperimentsTable tableData={tableDataWithColumnSetting} />)
       const [experimentColumnResizeHandle] = await screen.findAllByRole(
@@ -330,13 +332,22 @@ describe('Table', () => {
       )
 
       fireEvent.mouseDown(experimentColumnResizeHandle, {
-        bubbles: true,
-        clientX: 0
+        bubbles: true
       })
-      fireEvent.mouseMove(document, {
-        bubbles: true,
-        clientX: 20
+      fireEvent.mouseUp(experimentColumnResizeHandle)
+
+      expect(mockedPostMessage).toBeCalledWith({
+        payload: { id: 'id', width: 333 },
+        type: MessageFromWebviewType.RESIZE_COLUMN
       })
+      mockedPostMessage.mockReset()
+
+      fireEvent.mouseDown(experimentColumnResizeHandle, {
+        bubbles: true
+      })
+
+      columnWidths.id = 353
+
       fireEvent.mouseUp(experimentColumnResizeHandle)
 
       expect(mockedPostMessage).toBeCalledWith({

@@ -214,20 +214,28 @@ describe('collectSelected', () => {
     resourceUri: makeUri('logs', 'loss.tsv')
   }
 
-  it('should return an empty object if no path items are provided', () => {
-    expect(collectSelected([])).toStrictEqual({})
-  })
-
-  it('should return the original item if only one is provided', () => {
-    const selected = collectSelected([logsPathItem])
+  it('should return the original item if no other items are selected', () => {
+    const selected = collectSelected(logsPathItem, [])
 
     expect(selected).toStrictEqual({
       [dvcDemoPath]: [logsPathItem]
     })
   })
 
+  it('should return only the invoked item if it is not included in the selected paths', () => {
+    const selected = collectSelected(lossPathItem, [accPathItem])
+
+    expect(selected).toStrictEqual({
+      [dvcDemoPath]: [lossPathItem]
+    })
+  })
+
   it('should return a root given it is select', () => {
-    const selected = collectSelected([dvcDemoPath, logsPathItem, accPathItem])
+    const selected = collectSelected(logsPathItem, [
+      dvcDemoPath,
+      logsPathItem,
+      accPathItem
+    ])
 
     expect(selected).toStrictEqual({
       [dvcDemoPath]: [dvcDemoPath]
@@ -235,7 +243,7 @@ describe('collectSelected', () => {
   })
 
   it('should return siblings if a parent is not provided', () => {
-    const selected = collectSelected([accPathItem, lossPathItem])
+    const selected = collectSelected(lossPathItem, [accPathItem, lossPathItem])
 
     expect(selected).toStrictEqual({
       [dvcDemoPath]: [accPathItem, lossPathItem]
@@ -243,10 +251,22 @@ describe('collectSelected', () => {
   })
 
   it('should exclude all children from the final list', () => {
-    const selected = collectSelected([lossPathItem, accPathItem, logsPathItem])
+    const selected = collectSelected(logsPathItem, [
+      lossPathItem,
+      accPathItem,
+      logsPathItem
+    ])
 
     expect(selected).toStrictEqual({
       [dvcDemoPath]: [logsPathItem]
+    })
+  })
+
+  it('should not exclude children from the final list if the invoked item is not in the selected list', () => {
+    const selected = collectSelected(accPathItem, [lossPathItem, logsPathItem])
+
+    expect(selected).toStrictEqual({
+      [dvcDemoPath]: [accPathItem]
     })
   })
 
@@ -258,7 +278,7 @@ describe('collectSelected', () => {
       resourceUri: Uri.file(join(__dirname, 'mock', 'path'))
     }
 
-    const selected = collectSelected([
+    const selected = collectSelected(logsPathItem, [
       mockOtherRepoItem,
       {
         dvcRoot: dvcDemoPath,
@@ -271,6 +291,29 @@ describe('collectSelected', () => {
 
     expect(selected).toStrictEqual({
       [__dirname]: [mockOtherRepoItem],
+      [dvcDemoPath]: [logsPathItem]
+    })
+  })
+
+  it('should only return the invoked item if multiple roots are provided but the invoked item is not selected', () => {
+    const mockOtherRepoItem = {
+      dvcRoot: __dirname,
+      isDirectory: true,
+      isTracked: true,
+      resourceUri: Uri.file(join(__dirname, 'mock', 'path'))
+    }
+
+    const selected = collectSelected(logsPathItem, [
+      mockOtherRepoItem,
+      {
+        dvcRoot: dvcDemoPath,
+        isDirectory: false,
+        isTracked: true,
+        resourceUri: makeUri('logs', 'acc.tsv')
+      }
+    ])
+
+    expect(selected).toStrictEqual({
       [dvcDemoPath]: [logsPathItem]
     })
   })

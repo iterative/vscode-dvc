@@ -97,6 +97,7 @@ export const CellWrapper: React.FC<
   CellProp & {
     changes?: string[]
     cellId: string
+    children?: React.ReactNode
   }
 > = ({ cell, cellId, changes }) => (
   <div

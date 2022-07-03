@@ -6,12 +6,12 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
 import {
-  render,
   cleanup,
-  screen,
+  createEvent,
   fireEvent,
-  within,
-  createEvent
+  render,
+  screen,
+  within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
@@ -566,6 +566,7 @@ describe('App', () => {
     })
 
     plots = screen.getAllByTestId(/summary\.json/)
+
     expect(plots.map(plot => plot.id)).toStrictEqual(newPlotOrder)
 
     fireEvent.mouseEnter(pickerButton)
@@ -769,8 +770,13 @@ describe('App', () => {
 
     expect(topDropIcon).not.toBeInTheDocument()
 
-    multiViewPlot.dispatchEvent(createBubbledEvent('dragstart'))
-    topSection.dispatchEvent(createBubbledEvent('dragenter'))
+    act(() => {
+      multiViewPlot.dispatchEvent(createBubbledEvent('dragstart'))
+    })
+
+    act(() => {
+      topSection.dispatchEvent(createBubbledEvent('dragenter'))
+    })
 
     topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
 
