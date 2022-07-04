@@ -15,7 +15,7 @@ suite('Plots Data Test Suite', () => {
   })
 
   afterEach(function () {
-    this.timeout(5000)
+    this.timeout(6000)
     disposable.dispose()
   })
 
