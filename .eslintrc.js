@@ -161,6 +161,7 @@ module.exports = {
     'unicorn/prefer-event-target': 'off',
     'unicorn/prefer-module': 'off',
     'unicorn/prefer-node-protocol': 'off',
+    'unicorn/prefer-top-level-await': 'off',
     'unicorn/prevent-abbreviations': 'off'
   },
   settings: {
