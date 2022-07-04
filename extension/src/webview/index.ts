@@ -140,20 +140,22 @@ export class BaseWebview<T extends WebviewData> {
 
     // TODO make CSP more strict!
     return `
-			  <html>
-				  <head>
-				  <meta charset="UTF-8">
-				  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src ${this.webviewPanel.webview.cspSource} * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src https: ${this.webviewPanel.webview.cspSource}; frame-src *; style-src * 'unsafe-inline'; worker-src * data: blob: data: 'unsafe-inline' 'unsafe-eval'; font-src * 'unsafe-inline' 'unsafe-eval' 'self' data: blob:;">
-				  <style>
-					  html { height: 100%; width: 100%; padding: 0; margin: 0; }
-					  body { height: 100%; width: 100%; padding: 0; margin: 0; }
-				  </style>
-				  </head>
-				  <body>
-					  ${webviewScriptTags}
-				  </body>
-			  </html>
-		  `
+        <html>
+          <head>
+          <meta charset="UTF-8">
+          <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src ${this.webviewPanel.webview.cspSource} * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src https: ${this.webviewPanel.webview.cspSource}; frame-src *; style-src * 'unsafe-inline'; worker-src * data: blob: data: 'unsafe-inline' 'unsafe-eval'; font-src * 'unsafe-inline' 'unsafe-eval' 'self' data: blob:;">
+          <style>
+            html { height: 100%; width: 100%; padding: 0; margin: 0; }
+            body { height: 100%; width: 100%; padding: 0; margin: 0; }
+          </style>
+          </head>
+          <body>
+            <div id="root">
+              ${webviewScriptTags}
+            </div>
+          </body>
+        </html>
+      `
   }
 
   private handleMessage(message: MessageFromWebview) {
