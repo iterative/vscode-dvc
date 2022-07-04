@@ -43,7 +43,7 @@ suite('Extension Test Suite', () => {
   })
 
   afterEach(function () {
-    this.timeout(5000)
+    this.timeout(6000)
     disposable.dispose()
     return Promise.all([
       workspace.getConfiguration().update(dvcPathOption, undefined, false),

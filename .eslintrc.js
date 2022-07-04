@@ -158,8 +158,10 @@ module.exports = {
     'unicorn/no-process-exit': 'off',
     'unicorn/no-useless-undefined': 'off',
     'unicorn/numeric-separators-style': 'off',
+    'unicorn/prefer-event-target': 'off',
     'unicorn/prefer-module': 'off',
     'unicorn/prefer-node-protocol': 'off',
+    'unicorn/prefer-top-level-await': 'off',
     'unicorn/prevent-abbreviations': 'off'
   },
   settings: {

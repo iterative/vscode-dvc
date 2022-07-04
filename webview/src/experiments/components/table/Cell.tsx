@@ -1,5 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
+import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
@@ -33,6 +34,7 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
 export const FirstCell: React.FC<
   CellProp & {
     bulletColor?: string
+    isRowSelected: boolean
     toggleExperiment: () => void
     toggleRowSelection: () => void
     toggleStarred: () => void
@@ -40,6 +42,7 @@ export const FirstCell: React.FC<
 > = ({
   cell,
   bulletColor,
+  isRowSelected,
   toggleExperiment,
   toggleRowSelection,
   toggleStarred
@@ -58,19 +61,24 @@ export const FirstCell: React.FC<
           isPlaceholder && styles.groupPlaceholder
         )
       })}
-      {...clickAndEnterProps(toggleRowSelection)}
     >
       <div className={styles.innerCell}>
-        <div
-          className={styles.starSwitch}
-          role="switch"
-          aria-checked={starred}
-          tabIndex={0}
-          {...clickAndEnterProps(toggleStarred)}
-          data-testid="star-icon"
-        >
-          {starred && <StarFull />}
-          {!starred && <StarEmpty />}
+        <div className={styles.rowActions}>
+          <VSCodeCheckbox
+            {...clickAndEnterProps(toggleRowSelection)}
+            checked={isRowSelected}
+          />
+          <div
+            className={styles.starSwitch}
+            role="switch"
+            aria-checked={starred}
+            tabIndex={0}
+            {...clickAndEnterProps(toggleStarred)}
+            data-testid="star-icon"
+          >
+            {starred && <StarFull />}
+            {!starred && <StarEmpty />}
+          </div>
         </div>
         <RowExpansionButton row={row} />
         <span

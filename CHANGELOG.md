@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.8] - 2022-07-03
+
+### 🚀 New Features and Enhancements
+
+- Only pull selected files if they include the invoked path [#1963](https://github.com/iterative/vscode-dvc/pull/1963) by [@mattseddon](https://github.com/mattseddon)
+- Implement checkbox selection [#1964](https://github.com/iterative/vscode-dvc/pull/1964) by [@wolmir](https://github.com/wolmir)
+
+### 🔨 Maintenance
+
+- Prime the repository for Renovate [#1959](https://github.com/iterative/vscode-dvc/pull/1959) by [@mattseddon](https://github.com/mattseddon)
+- Improve quick start in README [#1962](https://github.com/iterative/vscode-dvc/pull/1962) by [@mattseddon](https://github.com/mattseddon)
+- Upgrade React to v18 [#1965](https://github.com/iterative/vscode-dvc/pull/1965) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.7] - 2022-06-30
 
 ### 🚀 New Features and Enhancements

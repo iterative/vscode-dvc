@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.7",
+  "version": "0.3.8",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -39,7 +39,7 @@
   },
   "engines": {
     "vscode": "^1.64.0",
-    "node": ">=10.2.0"
+    "node": ">=16.13.0"
   },
   "activationEvents": [
     "onStartupFinished",
@@ -1520,7 +1520,7 @@
     "@types/chai-as-promised": "^7.1.4",
     "@types/copy-webpack-plugin": "^10.1.0",
     "@types/fs-extra": "^9.0.13",
-    "@types/jest": "^27.4.1",
+    "@types/jest": "^28.1.4",
     "@types/js-yaml": "^4.0.5",
     "@types/lodash.clonedeep": "^4.5.7",
     "@types/lodash.get": "^4.4.7",
@@ -1530,7 +1530,7 @@
     "@types/lodash.omit": "^4.5.7",
     "@types/mocha": "^9.1.1",
     "@types/mock-require": "^2.0.1",
-    "@types/node": "^16.11.8",
+    "@types/node": "^16.11.43",
     "@types/react-vega": "^7.0.0",
     "@types/sinon-chai": "^3.2.6",
     "@types/uuid": "^8.3.4",
@@ -1543,7 +1543,7 @@
     "fork-ts-checker-webpack-plugin": "^7.2.11",
     "jest": "^28.1.2",
     "jest-environment-node": "^28.1.2",
-    "lint-staged": "^12.3.7",
+    "lint-staged": "^13.0.3",
     "mocha": "^10.0.0",
     "mock-require": "^3.0.3",
     "shx": "^0.3.3",
@@ -1554,7 +1554,7 @@
     "vsce": "^2.9.2",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.73.0",
-    "webpack-cli": "^4.9.2"
+    "webpack-cli": "^4.10.0"
   },
   "peerDependencies": {
     "typescript": "*"
