@@ -364,7 +364,7 @@ suite('Experiments Test Suite', () => {
         { path: mockColumnId },
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to open the source params file from a column path', async () => {
       const { experiments } = setupExperimentsAndMockCommands()
@@ -386,7 +386,7 @@ suite('Experiments Test Suite', () => {
           viewColumn: ViewColumn.Beside
         }
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to open different params files than the default one', async () => {
       const { experiments } = setupExperimentsAndMockCommands()
@@ -408,7 +408,7 @@ suite('Experiments Test Suite', () => {
           viewColumn: ViewColumn.Beside
         }
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to apply an experiment', async () => {
       const { experiments } = buildExperiments(disposable)
@@ -434,7 +434,7 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath,
         mockExperimentId
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
       const { experiments } = buildExperiments(disposable)
@@ -471,7 +471,7 @@ suite('Experiments Test Suite', () => {
         mockExperimentId,
         mockBranch
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
       const { experiments, cliExecutor } = buildExperiments(disposable)
@@ -511,7 +511,7 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath,
         ...mockModifiedParams
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
       const { experiments, cliRunner } = buildExperiments(disposable)
@@ -552,7 +552,7 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath,
         ...mockModifiedParams
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
       const { experiments, cliRunner } = buildExperiments(disposable)
@@ -595,7 +595,7 @@ suite('Experiments Test Suite', () => {
         ExperimentFlag.RESET,
         ...mockModifiedParams
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to remove an experiment', async () => {
       const { experiments } = buildExperiments(disposable)
@@ -619,7 +619,7 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath,
         mockExperimentId
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's status", async () => {
       const { experiments, experimentsModel } = buildExperiments(disposable)
@@ -674,7 +674,7 @@ suite('Experiments Test Suite', () => {
         isExperimentSelected(queuedExperiment),
         'queued experiment cannot be selected'
       ).to.be.false
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select columns', async () => {
       const { columnsModel, experiments, messageSpy } =
@@ -721,7 +721,7 @@ suite('Experiments Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWith(allColumnsUnselected)
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the sorts tree', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -754,7 +754,7 @@ suite('Experiments Test Suite', () => {
         undefined,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the filters tree', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
@@ -787,7 +787,7 @@ suite('Experiments Test Suite', () => {
         undefined,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's star status", async () => {
       const { experiments, experimentsModel } =
@@ -824,7 +824,7 @@ suite('Experiments Test Suite', () => {
         'experiments have been starred'
       ).to.be.true
     })
-  })
+  }).timeout(WEBVIEW_TEST_TIMEOUT)
 
   describe('Sorting', () => {
     it('should be able to sort', async () => {
