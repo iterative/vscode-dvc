@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { configureStore } from '@reduxjs/toolkit'
-import { fireEvent, within } from '@testing-library/react'
+import { within } from '@testing-library/react'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
@@ -20,6 +20,7 @@ import { storeReducers } from '../plots/store'
 const MockedState: React.FC<{
   data: PlotsComparisonData
   selectedRevisions: Revision[]
+  children: React.ReactNode
 }> = ({ children, data, selectedRevisions }) => {
   const dispatch = useDispatch()
   dispatch(update(data))
@@ -66,7 +67,7 @@ WithPinnedColumn.play = async ({ canvasElement }) => {
   const mainHeader = await canvas.findByTestId('main-header')
   const pin = within(mainHeader).getByRole('button')
 
-  fireEvent.click(pin)
+  pin.click()
 }
 
 const removeSingleImage = (

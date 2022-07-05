@@ -23,30 +23,36 @@ export const dragEnter = (
   direction: DragDropUtils.DragEnterDirection
 ) => {
   jest.useFakeTimers()
-  dragged.dispatchEvent(createBubbledEvent('dragstart'))
+  act(() => {
+    dragged.dispatchEvent(createBubbledEvent('dragstart'))
+  })
+
   act(() => {
     jest.advanceTimersByTime(1)
   })
 
-  draggedOver.dispatchEvent(createBubbledEvent('dragenter'))
+  act(() => {
+    draggedOver.dispatchEvent(createBubbledEvent('dragenter'))
+  })
 
-  if (direction !== DragDropUtils.DragEnterDirection.AUTO) {
-    const clientX =
-      100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
-    const left = 100
-    const right = left + 100
-    const dragOverEvent = createBubbledEvent('dragover', { clientX })
-    jest
-      .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
-      .mockImplementationOnce(() => ({ left, right }))
-    draggedOver.dispatchEvent(dragOverEvent)
-  } else {
-    draggedOver.dispatchEvent(createBubbledEvent('dragover'))
-  }
+  act(() => {
+    if (direction !== DragDropUtils.DragEnterDirection.AUTO) {
+      const clientX =
+        100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
+      const left = 100
+      const right = left + 100
+      const dragOverEvent = createBubbledEvent('dragover', { clientX })
+      jest
+        .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
+        .mockImplementationOnce(() => ({ left, right }))
+      draggedOver.dispatchEvent(dragOverEvent)
+    } else {
+      draggedOver.dispatchEvent(createBubbledEvent('dragover'))
+    }
+  })
 
   jest.useRealTimers()
 }
-
 export const dragAndDrop = (
   startingNode: HTMLElement,
   endingNode: HTMLElement,
@@ -56,13 +62,16 @@ export const dragAndDrop = (
   dragEnter(startingNode, endingNode, direction)
 
   jest.useFakeTimers()
-
-  endingNode.dispatchEvent(createBubbledEvent('drop'))
+  act(() => {
+    endingNode.dispatchEvent(createBubbledEvent('drop'))
+  })
 
   act(() => {
     jest.advanceTimersByTime(1)
   })
   jest.useRealTimers()
 
-  startingNode.dispatchEvent(createBubbledEvent('dragend'))
+  act(() => {
+    startingNode.dispatchEvent(createBubbledEvent('dragend'))
+  })
 }

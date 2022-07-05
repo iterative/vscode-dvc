@@ -11,7 +11,7 @@ export const runMocha = async (
   ext: 'ts' | 'js',
   setup: () => Promise<void> | void,
   teardown: () => Promise<void> | void,
-  timeout = 4000
+  timeout = 6000
 ) => {
   await setup()
 

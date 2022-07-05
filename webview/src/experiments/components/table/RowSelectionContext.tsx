@@ -4,16 +4,20 @@ import { RowProp } from './interfaces'
 export interface RowSelectionContextValue {
   selectedRows: Record<string, RowProp | undefined>
   toggleRowSelected: ((row: RowProp) => void) | undefined
+  batchSelection: ((batch: RowProp[]) => void) | undefined
   clearSelectedRows: (() => void) | undefined
 }
 
 export const RowSelectionContext = createContext<RowSelectionContextValue>({
+  batchSelection: undefined,
   clearSelectedRows: undefined,
   selectedRows: {},
   toggleRowSelected: undefined
 })
 
-export const RowSelectionProvider: React.FC = ({ children }) => {
+export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
+  children
+}) => {
   const [selectedRows, setSelectedRows] = useState<
     Record<string, RowProp | undefined>
   >({})
@@ -30,13 +34,33 @@ export const RowSelectionProvider: React.FC = ({ children }) => {
     })
   }
 
+  const batchSelection = (batch: RowProp[]) => {
+    const selectedRowsCopy = { ...selectedRows }
+
+    for (const rowProp of batch) {
+      const {
+        row: {
+          values: { id }
+        }
+      } = rowProp
+      selectedRowsCopy[id] = rowProp
+    }
+
+    setSelectedRows(selectedRowsCopy)
+  }
+
   const clearSelectedRows = () => {
     setSelectedRows({})
   }
 
   return (
     <RowSelectionContext.Provider
-      value={{ clearSelectedRows, selectedRows, toggleRowSelected }}
+      value={{
+        batchSelection,
+        clearSelectedRows,
+        selectedRows,
+        toggleRowSelected
+      }}
     >
       {children}
     </RowSelectionContext.Provider>

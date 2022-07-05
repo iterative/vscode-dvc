@@ -794,11 +794,11 @@ describe('App', () => {
         })
       )
 
-      const firstRow = screen.getByTestId('timestamp___1.exp-e7a67')
-      fireEvent.click(firstRow)
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
 
-      const secondRow = screen.getByTestId('timestamp___1.test-branch')
-      fireEvent.click(secondRow)
+      const secondRowCheckbox = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(secondRowCheckbox)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -807,6 +807,40 @@ describe('App', () => {
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected Rows')
+    })
+
+    it('should allow batch selection of rows by shift-clicking a range of them', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
+
+      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(tailRow, { shiftKey: true })
+
+      const selectedRows = screen.getAllByRole('row', { selected: true })
+      expect(selectedRows.length).toBe(4)
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Star Experiments')
     })
   })
 
@@ -913,10 +947,10 @@ describe('App', () => {
       )
 
       mockPostMessage.mockReset()
-      const mainRow = getRow('main')
+      const mainRow = within(getRow('main')).getByRole('checkbox')
       fireEvent.click(mainRow)
 
-      const firstTipRow = getRow('4fb124a')
+      const firstTipRow = within(getRow('4fb124a')).getByRole('checkbox')
       fireEvent.click(firstTipRow)
 
       fireEvent.contextMenu(mainRow, { bubbles: true })
