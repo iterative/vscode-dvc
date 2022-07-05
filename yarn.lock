@@ -7370,10 +7370,10 @@ eslint-module-utils@^2.7.3:
     debug "^3.2.7"
     find-up "^2.1.0"
 
-eslint-plugin-check-file@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-1.1.0.tgz#0badc657e4e9d92f020ad0a42b34dbdec9704074"
-  integrity sha512-OFLBvqFIDVR0F5gI497UhK/swBZRGq9oJLpChfF3wsh+SxmPP5yzkjOS5gQKj2OupiUMpBrPDcq29zH2j873Nw==
+eslint-plugin-check-file@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-1.2.0.tgz#3d2785756aebc24ccc019440633a1951c80a2858"
+  integrity sha512-sDP0+xALO0XnTZohPFmCDfLGzS4Gv1AlFHGYM6KiPw4JShwN8fZVlmRGo9lnEFZ1LfoYDwEt80SAQeBqEhav3Q==
   dependencies:
     is-glob "^4.0.3"
     micromatch "^4.0.4"
