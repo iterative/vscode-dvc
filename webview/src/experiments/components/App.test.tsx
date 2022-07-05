@@ -842,6 +842,35 @@ describe('App', () => {
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Star Experiments')
     })
+
+    it('should clear the row selection when the Escape key is pressed', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
+
+      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(tailRow, { shiftKey: true })
+
+      const selectedRows = () =>
+        screen.queryAllByRole('row', { selected: true })
+      expect(selectedRows().length).toBe(4)
+
+      fireEvent.keyUp(tailRow, { bubbles: true, key: 'Escape' })
+
+      jest.advanceTimersByTime(100)
+      expect(selectedRows().length).toBe(0)
+    })
   })
 
   describe('Star Experiments', () => {

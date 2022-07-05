@@ -161,7 +161,17 @@ export const Table: React.FC<TableProps & WithChanges> = ({
 
   return (
     <div className={styles.tableContainer}>
-      <div {...getTableProps({ className: styles.table })} ref={tableRef}>
+      <div
+        {...getTableProps({ className: styles.table })}
+        ref={tableRef}
+        tabIndex={0}
+        role="tree"
+        onKeyUp={e => {
+          if (e.key === 'Escape') {
+            clearSelectedRows?.()
+          }
+        }}
+      >
         <TableHead
           instance={instance}
           sorts={sorts}
