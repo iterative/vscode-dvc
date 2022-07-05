@@ -1503,7 +1503,7 @@
     "@hediet/std": "0.6.0",
     "@vscode/extension-telemetry": "0.6.2",
     "appdirs": "1.1.0",
-    "execa": "5.1.1",
+    "execa": "6.1.0",
     "fs-extra": "10.1.0",
     "js-yaml": "4.1.0",
     "lodash.clonedeep": "4.5.0",
