@@ -15,10 +15,10 @@ const title = {
 export const config: Config = {
   axis: {
     domain: false,
-    domainColor: foregroundColor,
     gridColor: foregroundColor,
     gridOpacity: 0.25,
     tickColor: foregroundColor,
+    titleColor: foregroundColor,
     titlePadding: 15
   },
   background: backgroundColor,
