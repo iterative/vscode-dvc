@@ -22,23 +22,23 @@ const UndefinedCell = (
   </div>
 )
 
-const groupLabels: Record<string, string> = {
-  deps: 'Dep',
-  metrics: 'Metric',
-  params: 'Parameter'
-}
-
 const CellTooltip: React.FC<{
   cell: Cell<Experiment, string | number>
 }> = ({ cell }) => {
-  const {
-    column: { group },
-    value
-  } = cell
+  const { value } = cell
   return (
-    <>
-      {groupLabels[group as string]}: {value}
-    </>
+    <div
+      role="textbox"
+      tabIndex={0}
+      onClick={e => {
+        e.stopPropagation()
+      }}
+      onKeyDown={e => {
+        e.stopPropagation()
+      }}
+    >
+      {value}
+    </div>
   )
 }
 
@@ -62,6 +62,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
       placement="bottom"
       arrow={true}
       delay={[CELL_TOOLTIP_DELAY, 0]}
+      interactive={true}
     >
       <div className={styles.innerCell}>
         <CopyButton
