@@ -25,6 +25,9 @@ export const config: Config = {
 
   padding: 20,
   style: {
+    cell: {
+      stroke: foregroundColor
+    },
     'group-title': title,
     'guide-label': {
       fill: foregroundColor,
