@@ -127,7 +127,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
     filteredCounts
   } = tableData
 
-  const { clearSelectedRows, batchSelection, selectedRows } =
+  const { clearSelectedRows, batchSelection, lastSelectedRow } =
     React.useContext(RowSelectionContext)
 
   const tableRef = useRef<HTMLDivElement>(null)
@@ -139,24 +139,22 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   useClickOutside(tableRef, clickOutsideHandler)
 
   const batchRowSelection = React.useCallback(
-    ({ row: { flatIndex } }: RowProp) => {
-      const firstSelection = flatRows.find(
-        ({ values: { id } }) => selectedRows[id]
-      )
+    ({ row: { id } }: RowProp) => {
+      const lastSelectedRowId = lastSelectedRow?.row.id ?? ''
+      const lastIndex =
+        flatRows.findIndex(flatRow => flatRow.id === lastSelectedRowId) || 1
+      const selectedIndex =
+        flatRows.findIndex(flatRow => flatRow.id === id) || 1
+      const rangeStart = Math.min(lastIndex, selectedIndex)
+      const rangeEnd = Math.max(lastIndex, selectedIndex)
 
-      const firstIndex = firstSelection?.flatIndex || 1
+      const batch = flatRows
+        .slice(rangeStart, rangeEnd + 1)
+        .map(row => ({ row }))
 
-      if (flatIndex >= firstIndex) {
-        const batch = flatRows
-          .filter(
-            row => row.flatIndex > firstIndex && row.flatIndex <= flatIndex
-          )
-          .map(row => ({ row }))
-
-        batchSelection?.(batch)
-      }
+      batchSelection?.(batch)
     },
-    [selectedRows, flatRows, batchSelection]
+    [flatRows, batchSelection, lastSelectedRow]
   )
 
   return (
