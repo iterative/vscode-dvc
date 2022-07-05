@@ -1539,7 +1539,7 @@
     "chai": "4.3.6",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
-    "copy-webpack-plugin": "10.2.4",
+    "copy-webpack-plugin": "11.0.0",
     "fork-ts-checker-webpack-plugin": "7.2.11",
     "jest": "28.1.2",
     "jest-environment-node": "28.1.2",
