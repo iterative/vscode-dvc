@@ -14,6 +14,7 @@ export const NestedRow: React.FC<
   instance,
   contextMenuDisabled,
   projectHasCheckpoints,
+  hasRunningExperiment,
   batchRowSelection
 }) => {
   instance.prepareRow(row)
@@ -23,6 +24,7 @@ export const NestedRow: React.FC<
       className={styles.nestedRow}
       contextMenuDisabled={contextMenuDisabled}
       projectHasCheckpoints={projectHasCheckpoints}
+      hasRunningExperiment={hasRunningExperiment}
       batchRowSelection={batchRowSelection}
     />
   )
@@ -35,6 +37,7 @@ export const ExperimentGroup: React.FC<
   instance,
   contextMenuDisabled,
   projectHasCheckpoints,
+  hasRunningExperiment,
   batchRowSelection
 }) => {
   instance.prepareRow(row)
@@ -50,6 +53,7 @@ export const ExperimentGroup: React.FC<
         instance={instance}
         contextMenuDisabled={contextMenuDisabled}
         projectHasCheckpoints={projectHasCheckpoints}
+        hasRunningExperiment={hasRunningExperiment}
         batchRowSelection={batchRowSelection}
       />
       {row.isExpanded &&
@@ -60,6 +64,7 @@ export const ExperimentGroup: React.FC<
             key={row.id}
             contextMenuDisabled={contextMenuDisabled}
             projectHasCheckpoints={projectHasCheckpoints}
+            hasRunningExperiment={hasRunningExperiment}
             batchRowSelection={batchRowSelection}
           />
         ))}
@@ -75,6 +80,7 @@ export const TableBody: React.FC<
   changes,
   contextMenuDisabled,
   projectHasCheckpoints,
+  hasRunningExperiment,
   batchRowSelection
 }) => {
   instance.prepareRow(row)
@@ -93,6 +99,7 @@ export const TableBody: React.FC<
       <RowContent
         row={row}
         projectHasCheckpoints={projectHasCheckpoints}
+        hasRunningExperiment={hasRunningExperiment}
         changes={changes}
         contextMenuDisabled={contextMenuDisabled}
         batchRowSelection={batchRowSelection}
@@ -105,6 +112,7 @@ export const TableBody: React.FC<
             key={subRow.values.id}
             contextMenuDisabled={contextMenuDisabled}
             projectHasCheckpoints={projectHasCheckpoints}
+            hasRunningExperiment={hasRunningExperiment}
             batchRowSelection={batchRowSelection}
           />
         ))}
@@ -183,7 +191,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
             instance={instance}
             key={row.id}
             changes={changes}
-            contextMenuDisabled={hasRunningExperiment}
+            hasRunningExperiment={hasRunningExperiment}
             projectHasCheckpoints={hasCheckpoints}
             batchRowSelection={batchRowSelection}
           />
