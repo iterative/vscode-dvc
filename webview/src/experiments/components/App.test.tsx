@@ -843,6 +843,43 @@ describe('App', () => {
       expect(itemLabels).toContain('Star Experiments')
     })
 
+    it('should present the Clear selected rows option when multiple rows are selected', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
+
+      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(tailRow, { shiftKey: true })
+
+      const selectedRows = () =>
+        screen.queryAllByRole('row', { selected: true })
+      expect(selectedRows().length).toBe(4)
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      const clearOption = screen.getByText('Clear row selection')
+      fireEvent.click(clearOption)
+
+      jest.advanceTimersByTime(100)
+      expect(selectedRows().length).toBe(0)
+    })
+
     it('should clear the row selection when the Escape key is pressed', () => {
       render(<App />)
 

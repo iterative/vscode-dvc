@@ -92,7 +92,13 @@ const getMultiSelectMenuOptions = (selectedRowsList: RowProp[]) => {
       MessageFromWebviewType.REMOVE_EXPERIMENT,
       hideRemoveOption,
       true
-    )
+    ),
+    {
+      divider: true,
+      id: 'clear-selection',
+      keyboardShortcut: 'Esc',
+      label: 'Clear row selection'
+    }
   ]
 }
 
