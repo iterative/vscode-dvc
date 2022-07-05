@@ -1,12 +1,12 @@
 import { Config, FontWeight } from 'vega'
-import { getThemeValue, ThemeProperty } from '../../util/styles'
 
-const foregroundColor = getThemeValue(ThemeProperty.FOREGROUND_COLOR)
+const foregroundColor = 'var(--vscode-editor-foreground)'
 const backgroundColor = 'var(--vscode-editor-foreground-transparency-1)'
 const font = 'var(--vscode-editor-font-family)'
 const fontWeight = 'normal' as FontWeight
 
 const title = {
+  fill: foregroundColor,
   font,
   fontSize: 12,
   fontWeight
@@ -15,44 +15,26 @@ const title = {
 export const config: Config = {
   axis: {
     domain: false,
+    domainColor: foregroundColor,
     gridColor: foregroundColor,
     gridOpacity: 0.25,
-    labelAngle: 0,
     tickColor: foregroundColor,
-    titleColor: foregroundColor,
     titlePadding: 15
   },
   background: backgroundColor,
-  mark: {
-    stroke: foregroundColor
-  },
+
   padding: 20,
-  rule: {
-    stroke: foregroundColor
-  },
   style: {
-    cell: {
-      stroke: foregroundColor
-    },
-    'group-title': {
-      fill: foregroundColor,
-      stroke: foregroundColor,
-      ...title
-    },
+    'group-title': title,
     'guide-label': {
       fill: foregroundColor,
       font,
-      fontWeight,
-      stroke: foregroundColor
+      fontWeight
     },
-    'guide-title': {
-      fill: foregroundColor,
-      stroke: foregroundColor,
-      ...title
-    },
-    rule: {
-      fill: foregroundColor,
-      stroke: foregroundColor
-    }
+    'guide-title': title
+  },
+  title: {
+    color: foregroundColor,
+    subtitleColor: foregroundColor
   }
 }
