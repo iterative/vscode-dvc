@@ -67,17 +67,21 @@ const dismissAllNotifications = () =>
     return openNotifications.length === 0
   })
 
-const waitForViewContainerToLoad = () =>
-  browser.waitUntil(async () => {
+const waitForViewContainerToLoad = async () => {
+  await browser.waitUntil(async () => {
     const dvcIcon = await getDVCActivityBarIcon()
     if (!dvcIcon) {
       return false
     }
 
     const view = await dvcIcon.openView()
+    return !!view
+  })
+
+  return browser.waitUntil(async () => {
     const progressBars = await $$('.monaco-progress-container')
 
-    if (!view) {
+    if (progressBars.length === 0) {
       return false
     }
 
@@ -87,8 +91,9 @@ const waitForViewContainerToLoad = () =>
       }
     }
 
-    return !!view
+    return true
   })
+}
 
 describe('DVC Extension For Visual Studio Code', () => {
   before('should finish loading the extension', async () => {
