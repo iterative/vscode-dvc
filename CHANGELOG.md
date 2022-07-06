@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.9] - 2022-07-06
+
+### 🚀 New Features and Enhancements
+
+- Small table cell tooltip changes [#1967](https://github.com/iterative/vscode-dvc/pull/1967) by [@rogermparent](https://github.com/rogermparent)
+
+### 🐛 Bug Fixes
+
+- Fix plot colors [#1988](https://github.com/iterative/vscode-dvc/pull/1988) by [@rogermparent](https://github.com/rogermparent)
+
+### 🔨 Maintenance
+
+- Increase timeout of integration tests again [#1970](https://github.com/iterative/vscode-dvc/pull/1970) by [@mattseddon](https://github.com/mattseddon)
+- More dependency updates [#1969](https://github.com/iterative/vscode-dvc/pull/1969) by [@mattseddon](https://github.com/mattseddon)
+- Use create root to instantiate React apps [#1971](https://github.com/iterative/vscode-dvc/pull/1971) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.8] - 2022-07-03
 
 ### 🚀 New Features and Enhancements
