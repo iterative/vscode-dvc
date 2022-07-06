@@ -49,14 +49,8 @@ export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
-export type Value =
-  | string
-  | number
-  | boolean
-  | null
-  | number[]
-  | string[]
-  | boolean[]
+type SingleValue = string | number | boolean | null
+export type Value = SingleValue | SingleValue[]
 
 export interface ValueTreeOrError {
   data?: ValueTree

@@ -5,6 +5,7 @@ import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
+import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
 import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
@@ -78,6 +79,9 @@ WithNoRunningExperiments.args = {
     }))
   }
 }
+
+export const WithAllDataTypes = Template.bind({})
+WithAllDataTypes.args = { tableData: dataTypesTableData }
 
 export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = { tableData: deeplyNestedTableData }

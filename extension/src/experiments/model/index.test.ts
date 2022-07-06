@@ -12,6 +12,10 @@ import { buildMockMemento } from '../../test/util'
 import { buildMetricOrParamPath } from '../columns/paths'
 import { Experiment, ColumnType } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
+import {
+  dataTypesOutput,
+  rows as dataTypesRows
+} from '../../test/fixtures/expShow/dataTypes'
 
 jest.mock('vscode')
 
@@ -64,16 +68,22 @@ describe('ExperimentsModel', () => {
     return { data }
   }
 
-  it('should return rows that equal the rows fixture when given the output fixture', () => {
+  it('should return expected rows when given the output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
-  it('should return data that equal the deeply nested output fixture', () => {
+  it('should return expected rows the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(deeplyNestedOutput)
     expect(model.getRowData()).toStrictEqual(deeplyNestedRows)
+  })
+
+  it('should return expected rows the data types output fixture', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(dataTypesOutput)
+    expect(model.getRowData()).toStrictEqual(dataTypesRows)
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', () => {
