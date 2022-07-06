@@ -680,20 +680,22 @@ describe('App', () => {
     })
 
     it('should show a tooltip with the full number on number cells', () => {
-      const testNumber = 1.9293040037155151
       expectTooltipValue({
         cellLabel: '1.9293',
-        expectedTooltipResult: String(testNumber),
-        value: testNumber
+        expectedTooltipResult: '1.9293040037155151',
+        value: 1.9293040037155151
       })
     })
 
-    it('should show a tooltip with false and true', () => {
+    it('should show the right tooltip for true', () => {
       expectTooltipValue({
         cellLabel: 'true',
         expectedTooltipResult: 'true',
         value: true
       })
+    })
+
+    it('should show the right tooltip for false', () => {
       expectTooltipValue({
         cellLabel: 'false',
         expectedTooltipResult: 'false',
@@ -702,10 +704,9 @@ describe('App', () => {
     })
 
     it('should show a tooltip with a stringified array', () => {
-      const stringifiedArray = '[true, false, string, 2]'
       expectTooltipValue({
-        cellLabel: stringifiedArray,
-        expectedTooltipResult: stringifiedArray,
+        cellLabel: '[true, false, string, 2]',
+        expectedTooltipResult: '[true, false, string, 2]',
         value: [true, false, 'string', 2]
       })
     })
