@@ -106,7 +106,7 @@ const getMultiSelectMenuOptions = (
   ]
 }
 
-const getWorkspaceOptions = (
+const getRunResumeOptions = (
   withId: (
     label: string,
     type: MessageFromWebviewType,
@@ -176,7 +176,7 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
       hideApplyAndCreateBranch
     ),
-    ...getWorkspaceOptions(
+    ...getRunResumeOptions(
       withId,
       isWorkspace,
       projectHasCheckpoints,
