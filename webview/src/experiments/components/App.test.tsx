@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders", "expectTooltipValue"] }] */
 import React from 'react'
 import {
   cleanup,
@@ -59,6 +59,85 @@ beforeEach(() => {
 afterEach(() => {
   cleanup()
 })
+
+const sourceFilenames: Record<ColumnType, string> = {
+  [ColumnType.PARAMS]: 'params.yaml',
+  [ColumnType.METRICS]: 'metrics.json',
+  [ColumnType.DEPS]: 'data'
+}
+
+const buildTestColumn = ({
+  name,
+  type: columnType = ColumnType.PARAMS,
+  sourceFilename = sourceFilenames[columnType],
+  ...rest
+}: Partial<Column> & {
+  name: string
+  columnType?: ColumnType
+  sourceFilename?: string
+}): Column => ({
+  hasChildren: false,
+  label: name,
+  parentPath: buildMetricOrParamPath(columnType, sourceFilename),
+  path: buildMetricOrParamPath(columnType, sourceFilename, name),
+  pathArray: [columnType, sourceFilename, name],
+  type: columnType,
+  ...rest
+})
+
+const buildTestData: <T = unknown>(
+  args: {
+    value: T
+    name?: string
+    otherValue?: T
+    types?: string[]
+  } & Partial<Column>
+) => TableData = ({
+  value,
+  name = 'test-param',
+  types = [typeof value],
+  ...rest
+}) => {
+  return {
+    ...tableDataFixture,
+    columns: [
+      {
+        hasChildren: true,
+        label: 'summary.json',
+        parentPath: buildMetricOrParamPath(ColumnType.METRICS),
+        path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
+        type: ColumnType.METRICS
+      },
+      {
+        hasChildren: true,
+        label: 'params.yaml',
+        parentPath: ColumnType.PARAMS,
+        path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
+        type: ColumnType.PARAMS
+      },
+      buildTestColumn({
+        name,
+        types,
+        ...rest
+      })
+    ],
+    rows: [
+      {
+        id: 'workspace',
+        label: 'workspace',
+        params: {
+          'params.yaml': {
+            [name]: value
+          }
+        }
+      },
+      {
+        id: 'main',
+        label: 'main'
+      }
+    ]
+  }
+}
 
 describe('App', () => {
   describe('Sorting Classes', () => {
@@ -456,6 +535,39 @@ describe('App', () => {
   })
 
   describe('Tooltips', () => {
+    const expectTooltipValue: <T>(
+      args: {
+        value: T
+        cellLabel: string
+        expectedTooltipResult: string
+      } & Partial<Column>
+    ) => void = ({ value, cellLabel, expectedTooltipResult, ...rest }) => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: buildTestData({
+              maxStringLength: 5,
+              value,
+              ...rest
+            }),
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testCells = screen.getAllByRole('cell')
+      const testCell = within(testCells[3]).getAllByText(/.+/)?.[0]
+      expect(testCell).toHaveTextContent(cellLabel)
+      fireEvent.mouseEnter(testCell, { bubbles: true })
+
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent(expectedTooltipResult)
+    }
+
     beforeAll(() => {
       jest.useFakeTimers()
     })
@@ -463,93 +575,13 @@ describe('App', () => {
       jest.useRealTimers()
     })
 
-    const testParamName = 'test_param_with_long_name'
-    const testParamPath = buildMetricOrParamPath(
-      ColumnType.PARAMS,
-      'params.yaml',
-      testParamName
-    )
-    const testParamStringValue = 'Test Value'
-    const testMetricNumberValue = 1.9293040037155151
-
-    const testData = {
-      ...tableDataFixture,
-      columns: [
-        {
-          hasChildren: true,
-          label: 'summary.json',
-          parentPath: buildMetricOrParamPath(ColumnType.METRICS),
-          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
-          type: ColumnType.METRICS
-        },
-        {
-          hasChildren: false,
-          label: 'loss',
-          maxNumber: testMetricNumberValue,
-          maxStringLength: 18,
-          minNumber: testMetricNumberValue,
-          parentPath: buildMetricOrParamPath(
-            ColumnType.METRICS,
-            'summary.json'
-          ),
-          path: buildMetricOrParamPath(
-            ColumnType.METRICS,
-            'summary.json',
-            'loss'
-          ),
-          pathArray: [ColumnType.METRICS, 'summary.json', 'loss'],
-          type: ColumnType.METRICS,
-          types: ['number']
-        },
-        {
-          hasChildren: true,
-          label: 'params.yaml',
-          parentPath: ColumnType.PARAMS,
-          path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
-          type: ColumnType.PARAMS
-        },
-        {
-          hasChildren: false,
-          label: testParamName,
-          maxStringLength: 10,
-          parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
-          path: testParamPath,
-          pathArray: [ColumnType.PARAMS, 'params.yaml', testParamName],
-          type: ColumnType.PARAMS,
-          types: ['string']
-        }
-      ],
-      rows: [
-        {
-          id: 'workspace',
-          label: 'workspace',
-          metrics: {
-            'summary.json': {
-              loss: testMetricNumberValue
-            }
-          },
-          params: {
-            'params.yaml': {
-              [testParamName]: testParamStringValue
-            }
-          }
-        },
-        {
-          id: 'main',
-          label: 'main',
-          metrics: {
-            'summary.json': {
-              loss: testMetricNumberValue + 1
-            }
-          },
-          params: {
-            'params.yaml': {
-              [testParamName]: 'Other Value'
-            }
-          }
-        }
-      ]
-    }
+    const testParamName = 'test-param'
+    const testParamStringValue = 'Test String'
+    const testData = buildTestData({
+      maxStringLength: 10,
+      name: testParamName,
+      value: testParamStringValue
+    })
 
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a header', () => {
       mockedUseIsFullyContained.mockReturnValue(false)
@@ -648,24 +680,34 @@ describe('App', () => {
     })
 
     it('should show a tooltip with the full number on number cells', () => {
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: testData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      const testNumber = 1.9293040037155151
+      expectTooltipValue({
+        cellLabel: '1.9293',
+        expectedTooltipResult: String(testNumber),
+        value: testNumber
+      })
+    })
 
-      const testMetricCell = screen.getByText('1.9293')
-      fireEvent.mouseEnter(testMetricCell, { bubbles: true })
+    it('should show a tooltip with false and true', () => {
+      expectTooltipValue({
+        cellLabel: 'true',
+        expectedTooltipResult: 'true',
+        value: true
+      })
+      expectTooltipValue({
+        cellLabel: 'false',
+        expectedTooltipResult: 'false',
+        value: false
+      })
+    })
 
-      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
-      const tooltip = screen.getByRole('tooltip')
-      expect(tooltip).toBeInTheDocument()
-      expect(tooltip).toHaveTextContent(String(testMetricNumberValue))
+    it('should show a tooltip with a stringified array', () => {
+      const stringifiedArray = '[true, false, string, 2]'
+      expectTooltipValue({
+        cellLabel: stringifiedArray,
+        expectedTooltipResult: stringifiedArray,
+        value: [true, false, 'string', 2]
+      })
     })
   })
 
