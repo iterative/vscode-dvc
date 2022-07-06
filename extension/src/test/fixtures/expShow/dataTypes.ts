@@ -18,10 +18,10 @@ export const dataTypesOutput: ExperimentsOutput = {
               false: false,
               zero: 0,
               negative: -123,
-              float: 0.123,
+              float: 1.9293040037155151,
               string: 'string',
               emptyString: '',
-              array: [true, false, 2, 'string']
+              array: [true, false, 'string', 2]
             }
           }
         },
@@ -99,9 +99,9 @@ export const columns: Column[] = [
   {
     hasChildren: false,
     label: 'float',
-    maxNumber: 0.123,
-    maxStringLength: 5,
-    minNumber: 0.123,
+    maxNumber: 1.9293040037155151,
+    maxStringLength: 18,
+    minNumber: 1.9293040037155151,
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:float',
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'float'],
@@ -147,10 +147,10 @@ export const rows: Row[] = [
     label: 'workspace',
     params: {
       'params.yaml': {
-        array: [true, false, 2, 'string'],
+        array: [true, false, 'string', 2],
         emptyString: '',
         false: false,
-        float: 0.123,
+        float: 1.9293040037155151,
         negative: -123,
         string: 'string',
         true: true,
