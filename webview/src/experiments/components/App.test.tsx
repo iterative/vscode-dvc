@@ -746,8 +746,8 @@ describe('App', () => {
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
-        'Modify and Resume',
         'Modify, Reset and Run',
+        'Modify and Resume',
         'Modify and Queue',
         'Star Experiment'
       ])

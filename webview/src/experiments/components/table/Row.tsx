@@ -122,15 +122,15 @@ const getRunResumeOptions = (
 
   return [
     withId(
+      'Modify, Reset and Run',
+      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+      !isNotCheckpoint || !projectHasCheckpoints
+    ),
+    withId(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
       !isNotCheckpoint,
       !hideVaryAndRun
-    ),
-    withId(
-      'Modify, Reset and Run',
-      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
-      !isNotCheckpoint || !projectHasCheckpoints
     ),
     withId(
       'Modify and Queue',
