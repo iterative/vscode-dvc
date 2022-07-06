@@ -843,6 +843,42 @@ describe('App', () => {
       expect(itemLabels).toContain('Star Experiments')
     })
 
+    it('should not include collapsed experiments in the bulk selection', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testBranchContractButton = within(getRow('42b8736')).getByTitle(
+        'Contract Row'
+      )
+      fireEvent.click(testBranchContractButton)
+
+      jest.advanceTimersByTime(100)
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
+
+      const tailRow = within(getRow('22e40e1')).getByRole('checkbox')
+      fireEvent.click(tailRow, { shiftKey: true })
+
+      fireEvent.click(testBranchContractButton)
+
+      jest.advanceTimersByTime(100)
+      expect(getRow('42b8736')).toHaveAttribute('aria-selected', 'true')
+      expect(getRow('2173124')).not.toHaveAttribute('aria-selected', 'true')
+      expect(getRow('9523bde')).not.toHaveAttribute('aria-selected', 'true')
+    })
+
     it('should present the Clear selected rows option when multiple rows are selected', () => {
       render(<App />)
 

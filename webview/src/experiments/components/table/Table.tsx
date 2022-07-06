@@ -156,8 +156,18 @@ export const Table: React.FC<TableProps & WithChanges> = ({
       const rangeStart = Math.min(lastIndex, selectedIndex)
       const rangeEnd = Math.max(lastIndex, selectedIndex)
 
+      const collapsedIds = flatRows
+        .filter(flatRow => !flatRow.isExpanded)
+        .map(flatRow => flatRow.id)
+
       const batch = flatRows
         .slice(rangeStart, rangeEnd + 1)
+        .filter(
+          flatRow =>
+            !collapsedIds.some(collapsedId =>
+              flatRow.id.startsWith(`${collapsedId}.`)
+            )
+        )
         .map(row => ({ row }))
 
       batchSelection?.(batch)
