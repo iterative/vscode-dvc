@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { SyntheticEvent } from 'react'
 import get from 'lodash/get'
 import {
   Column as TableColumn,
@@ -24,17 +24,14 @@ const UndefinedCell = (
 const CellTooltip: React.FC<{
   stringValue: string
 }> = ({ stringValue }) => {
+  const stopPropagation = (e: SyntheticEvent) => e.stopPropagation()
   return (
     <div
       className={styles.cellTooltip}
       role="textbox"
       tabIndex={0}
-      onClick={e => {
-        e.stopPropagation()
-      }}
-      onKeyDown={e => {
-        e.stopPropagation()
-      }}
+      onClick={stopPropagation}
+      onKeyDown={stopPropagation}
     >
       {stringValue}
     </div>
