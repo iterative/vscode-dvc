@@ -843,6 +843,35 @@ describe('App', () => {
       expect(itemLabels).toContain('Star Experiments')
     })
 
+    it('should allow batch selection from the bottom up too', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(tailRow)
+      fireEvent.click(firstRowCheckbox, { shiftKey: true })
+
+      const selectedRows = () => screen.getAllByRole('row', { selected: true })
+      expect(selectedRows()).toHaveLength(4)
+
+      const anotherRow = within(getRow('2173124')).getByRole('checkbox')
+      fireEvent.click(anotherRow, { shiftKey: true })
+      expect(selectedRows()).toHaveLength(5)
+    })
+
     it('should not include collapsed experiments in the bulk selection', () => {
       render(<App />)
 
