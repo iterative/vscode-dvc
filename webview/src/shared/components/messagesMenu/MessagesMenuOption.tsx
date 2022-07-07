@@ -7,16 +7,17 @@ import { sendMessage } from '../../vscode'
 export interface MessagesMenuOptionProps {
   id: string
   label: string
-  message: MessageFromWebview
+  message?: MessageFromWebview
   hidden?: boolean
   divider?: boolean
+  keyboardShortcut?: string
 }
 
 export const MessagesMenuOption: React.FC<
   MessagesMenuOptionProps & { onOptionSelected?: () => void }
-> = ({ label, message, divider, onOptionSelected }) => {
+> = ({ label, message, divider, onOptionSelected, keyboardShortcut }) => {
   const sendTheMessage = () => {
-    sendMessage(message)
+    !!message && sendMessage(message)
     onOptionSelected?.()
   }
 
@@ -44,6 +45,7 @@ export const MessagesMenuOption: React.FC<
         >
           {label}
         </div>
+        {keyboardShortcut && <div>{keyboardShortcut}</div>}
       </div>
     </>
   )
