@@ -68,6 +68,6 @@
   },
   "resolutions": {
     "trim": "1.0.1",
-    "@types/react": "^18.0.14"
+    "@types/react": "18.0.15"
   }
 }
