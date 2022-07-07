@@ -80,6 +80,7 @@ const dismissAllNotifications = () =>
   })
 
 const waitForViewContainerToLoad = async () => {
+  const initialProgressBars = await $$('.monaco-progress-container')
   await browser.waitUntil(async () => {
     const dvcIcon = await getDVCActivityBarIcon()
     if (!dvcIcon) {
@@ -87,17 +88,22 @@ const waitForViewContainerToLoad = async () => {
     }
 
     const view = await dvcIcon.openView()
+
     return !!view
   })
 
   return browser.waitUntil(async () => {
-    const progressBars = await $$('.monaco-progress-container')
+    const numberOfProgressBarsInContainer = 7
+    const currentProgressBars = await $$('.monaco-progress-container')
 
-    if (progressBars.length === 0) {
+    if (
+      currentProgressBars.length <
+      initialProgressBars.length + numberOfProgressBarsInContainer
+    ) {
       return false
     }
 
-    for (const progress of progressBars) {
+    for (const progress of currentProgressBars) {
       if ((await progress.getAttribute('aria-hidden')) !== 'true') {
         return false
       }
@@ -115,6 +121,8 @@ suite('DVC Extension For Visual Studio Code', () => {
 
   // avoid killing exp show after experiments have finished run
   after(() => delay(30000))
+
+  afterEach(() => browser.switchToFrame(null))
 
   describe('Activity Bar', () => {
     it('should show the DVC Icon', async () => {
@@ -142,7 +150,6 @@ suite('DVC Extension For Visual Studio Code', () => {
     })
 
     it('should update with a new row for each checkpoint when an experiment is running', async () => {
-      await browser.switchToFrame(null)
       const workbench = await browser.getWorkbench()
       const epochs = 15
       await workbench.executeCommand('DVC: Reset and Run Experiment')
