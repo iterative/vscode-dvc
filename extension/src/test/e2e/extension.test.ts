@@ -1,63 +1,8 @@
 import { suite, before, describe, it } from 'mocha'
-import {
-  BasePage,
-  IPageDecorator,
-  PageDecorator,
-  ViewControl
-} from 'wdio-vscode-service'
+import { ViewControl } from 'wdio-vscode-service'
+import { ExperimentsWebview } from './pageObjects/experimentsWebview'
+import { PlotsWebview } from './pageObjects/plotsWebview'
 import { delay } from '../../util/time'
-
-const webviewLocators = {
-  expandRowButton: 'button[title="Expand Row"]',
-  graphPoint: '[aria-roledescription=point]',
-  innerFrame: '#active-frame',
-  outerFrame: '.webview.ready',
-  row: '[role=row]',
-  table: '[role=table]',
-  vegaVisualization: 'div[aria-label="Vega visualization"]'
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Webview extends IPageDecorator<typeof webviewLocators> {}
-@PageDecorator(webviewLocators)
-class Webview extends BasePage<
-  typeof webviewLocators,
-  {
-    webview: typeof webviewLocators
-  }
-> {
-  /**
-   * @private locator key to identify locator map (see locators.ts)
-   */
-  public locatorKey = 'webview' as const
-
-  public async open() {
-    const webviewContainer = await this.outerFrame$
-
-    await this.outerFrame$.waitForDisplayed()
-
-    await browser.switchToFrame(webviewContainer)
-    await this.innerFrame$.waitForDisplayed()
-    const webviewInner = await browser.findElement(
-      'css selector',
-      this.locators.innerFrame
-    )
-    return browser.switchToFrame(webviewInner)
-  }
-
-  public async close() {
-    await browser.switchToFrame(null)
-    await browser.switchToFrame(null)
-  }
-
-  public async expandAllRows() {
-    const expandRowButtons = await this.expandRowButton$$
-    for (const button of expandRowButtons) {
-      button.click()
-    }
-    return expandRowButtons.length === 0
-  }
-}
 
 const getDVCActivityBarIcon = async (): Promise<ViewControl> => {
   const workbench = await browser.getWorkbench()
@@ -134,7 +79,7 @@ suite('DVC Extension For Visual Studio Code', () => {
   })
 
   describe('Experiments Table Webview', () => {
-    const webview = new Webview({ webview: webviewLocators })
+    const webview = new ExperimentsWebview('experiments')
 
     it('should load as an editor', async () => {
       const workbench = await browser.getWorkbench()
@@ -186,10 +131,10 @@ suite('DVC Extension For Visual Studio Code', () => {
     before(async () => {
       const workbench = await browser.getWorkbench()
       const editorView = workbench.getEditorView()
-      await editorView.closeAllEditors()
+      return editorView.closeAllEditors()
     })
 
-    const webview = new Webview({ webview: webviewLocators })
+    const webview = new PlotsWebview('plots')
 
     it('should load the plots webview with non-empty plots', async () => {
       const workbench = await browser.getWorkbench()
@@ -211,6 +156,8 @@ suite('DVC Extension For Visual Studio Code', () => {
             (await plot.$$('[aria-roledescription="line mark"]').length)
         ).toBeGreaterThan(0)
       }
+
+      await webview.close()
     })
   })
 })
