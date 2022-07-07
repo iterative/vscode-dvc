@@ -9,10 +9,12 @@ import { delay } from '../../util/time'
 
 const webviewLocators = {
   expandRowButton: 'button[title="Expand Row"]',
+  graphPoint: '[aria-roledescription=point]',
   innerFrame: '#active-frame',
   outerFrame: '.webview.ready',
   row: '[role=row]',
-  table: '[role=table]'
+  table: '[role=table]',
+  vegaVisualization: 'div[aria-label="Vega visualization"]'
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -40,7 +42,7 @@ class Webview extends BasePage<
       'css selector',
       this.locators.innerFrame
     )
-    await browser.switchToFrame(webviewInner)
+    return browser.switchToFrame(webviewInner)
   }
 
   public async close() {
@@ -119,7 +121,7 @@ suite('DVC Extension For Visual Studio Code', () => {
     return dismissAllNotifications()
   })
 
-  // avoid killing exp show after experiments have finished run
+  // avoid killing any background process after experiments have finished run
   after(() => delay(30000))
 
   afterEach(() => browser.switchToFrame(null))
@@ -147,6 +149,8 @@ suite('DVC Extension For Visual Studio Code', () => {
       })
 
       expect(await webview.table$$).toHaveLength(1)
+
+      await webview.close()
     })
 
     it('should update with a new row for each checkpoint when an experiment is running', async () => {
@@ -174,6 +178,39 @@ suite('DVC Extension For Visual Studio Code', () => {
       const finalRows = await webview.row$$
 
       expect(finalRows.length).toStrictEqual(initialRows.length + epochs)
+      await webview.close()
     }).timeout(180000)
+  })
+
+  describe('Plots Webview', () => {
+    before(async () => {
+      const workbench = await browser.getWorkbench()
+      const editorView = workbench.getEditorView()
+      await editorView.closeAllEditors()
+    })
+
+    const webview = new Webview({ webview: webviewLocators })
+
+    it('should load the plots webview with non-empty plots', async () => {
+      const workbench = await browser.getWorkbench()
+      await workbench.executeCommand('DVC: Show Plots')
+
+      await webview.open()
+
+      await browser.waitUntil(async () => {
+        const vegaVisualization = await webview.vegaVisualization$
+        return vegaVisualization.isDisplayed()
+      })
+
+      const plots = await webview.vegaVisualization$$
+
+      expect(plots.length).toBe(6)
+      for (const plot of plots) {
+        expect(
+          (await plot.$$('[aria-roledescription="rect mark"]').length) +
+            (await plot.$$('[aria-roledescription="line mark"]').length)
+        ).toBeGreaterThan(0)
+      }
+    })
   })
 })
