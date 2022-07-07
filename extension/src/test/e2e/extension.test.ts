@@ -90,15 +90,13 @@ suite('DVC Extension For Visual Studio Code', () => {
       await webview.open()
 
       await browser.waitUntil(async () => {
-        const vegaVisualization = await webview.vegaVisualization$
-        return vegaVisualization.isDisplayed()
+        return (await webview.vegaVisualization$$.length) === 6
       })
 
       const plots = await webview.vegaVisualization$$
 
-      expect(plots.length).toBe(6)
-
       for (const plot of plots) {
+        await plot.scrollIntoView()
         const plotNotEmpty = await webview.plotNotEmpty(plot)
         expect(plotNotEmpty).toBe(true)
       }
