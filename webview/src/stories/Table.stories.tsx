@@ -18,6 +18,10 @@ import Experiments from '../experiments/components/Experiments'
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
 import { CELL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
+import {
+  setExperimentsAsSelected,
+  setExperimentsAsStarred
+} from '../test/tableDataFixture'
 
 const tableData: TableData = {
   changes: workspaceChangesFixture,
@@ -35,9 +39,11 @@ const tableData: TableData = {
     ...row,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
+      starred: experiment.starred || experiment.label === '42b8736',
       subRows: experiment.subRows?.map(checkpoint => ({
         ...checkpoint,
-        running: checkpoint.running || checkpoint.label === '23250b3'
+        running: checkpoint.running || checkpoint.label === '23250b3',
+        starred: checkpoint.starred || checkpoint.label === '22e40e1'
       }))
     }))
   })),
@@ -67,6 +73,31 @@ const Template: ComponentStory<typeof Experiments> = ({ tableData }) => {
 }
 
 export const WithData = Template.bind({})
+
+export const WithMiddleStates = Template.bind({})
+const tableDataWithSomeSelectedExperiments = setExperimentsAsSelected(
+  tableData,
+  ['d1343a8', '91116c1', 'e821416']
+)
+WithMiddleStates.args = {
+  tableData: setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
+    'd1343a8',
+    '9523bde',
+    'e821416'
+  ])
+}
+WithMiddleStates.play = async ({ canvasElement }) => {
+  await within(canvasElement).findByText('1ba7bcd')
+  let checkboxes = await within(canvasElement).findAllByRole('checkbox')
+  userEvent.click(checkboxes[10], { bubbles: true })
+  checkboxes = await within(canvasElement).findAllByRole('checkbox')
+  userEvent.click(checkboxes[11], { bubbles: true })
+  const collapseButtons = () =>
+    within(canvasElement).getAllByTitle('Contract Row')
+  userEvent.click(collapseButtons()[1])
+  userEvent.click(collapseButtons()[2])
+  userEvent.click(collapseButtons()[3])
+}
 
 export const WithNoRunningExperiments = Template.bind({})
 WithNoRunningExperiments.args = {

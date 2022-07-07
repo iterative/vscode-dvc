@@ -26,6 +26,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onClickOutside,
     hideOnClick,
     onTrigger,
+    appendTo,
     animation = false,
     className = typeof content === 'string' ? styles.padded : undefined,
     arrow = false
@@ -34,7 +35,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
 ) => (
   <Tippy
     animation={animation}
-    appendTo={'parent'}
+    appendTo={appendTo}
     content={content}
     className={className}
     placement={placement}

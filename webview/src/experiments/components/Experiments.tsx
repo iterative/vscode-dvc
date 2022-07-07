@@ -94,7 +94,8 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] =>
       Header: ExperimentHeader,
       accessor: 'id',
       id: 'id',
-      width: 150
+      minWidth: 250,
+      width: 250
     },
     {
       Cell: ({ value }: { value: string }) => {

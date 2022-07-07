@@ -54,6 +54,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
 }
 
+.hidden {
+  visibility: hidden;
+}
+
 .iconMenu {
   position: absolute;
   left: 0;
@@ -450,17 +454,55 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         align-items: center;
         position: relative;
         left: -$cell-padding;
+        height: 100%;
 
         .starSwitch {
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           width: 14px;
-          margin-left: 8px;
           opacity: 0.4;
           cursor: pointer;
 
           &[aria-checked='true'] {
             opacity: 1;
+          }
+        }
+
+        .indicatorIcon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 1.3rem;
+          height: 100%;
+          padding: 0;
+          margin: 0;
+        }
+
+        .indicatorCount {
+          z-index: 2;
+          &[title='0'] {
+            display: none;
+          }
+        }
+
+        .bullet {
+          flex: 0 0 14px;
+          width: 14px;
+          &.subRunsCount {
+            &::after {
+              border: none;
+            }
+            &::before {
+              margin: 0;
+              vertical-align: middle;
+              border: 1.5px solid $row-bg-color;
+              border-radius: 100%;
+              border-right: 1.5px solid currentColor;
+              border-top: 1.5px solid currentColor;
+              animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
+              background-color: transparent;
+            }
           }
         }
       }
@@ -671,4 +713,27 @@ $badge-size: 0.85rem;
 
 .cellTooltip {
   padding: 2px 6px;
+}
+
+.indicatorCount {
+  &[aria-label='0'] {
+    display: none;
+  }
+}
+
+.experimentCell {
+  .innerCell {
+    .indicatorCount {
+      display: none;
+      .experimentGroup & {
+        display: block;
+        &[aria-label='0'] {
+          display: none;
+        }
+      }
+      .experimentGroup.expandedGroup & {
+        display: none;
+      }
+    }
+  }
 }
