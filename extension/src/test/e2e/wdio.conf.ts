@@ -28,6 +28,7 @@ export const config: Options.Testrunner = {
   maxInstances: 1,
   mochaOpts: {
     bail: true,
+    parallel: false,
     retries: 0,
     timeout: 60000,
     ui: 'bdd'
@@ -35,6 +36,6 @@ export const config: Options.Testrunner = {
   outputDir: join(__dirname, 'logs'),
   reporters: ['spec'],
   services: ['vscode'],
-  specs: ['./src/test/e2e/*.e2e.ts'],
+  specs: ['./src/test/e2e/*.test.ts'],
   waitforTimeout: 10000
 }

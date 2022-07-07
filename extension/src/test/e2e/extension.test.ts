@@ -1,13 +1,17 @@
+import { suite, before, describe, it } from 'mocha'
 import {
   BasePage,
   IPageDecorator,
   PageDecorator,
   ViewControl
 } from 'wdio-vscode-service'
+import { delay } from '../../util/time'
 
 const webviewLocators = {
+  expandRowButton: 'button[title="Expand Row"]',
   innerFrame: '#active-frame',
   outerFrame: '.webview.ready',
+  row: '[role=row]',
   table: '[role=table]'
 }
 
@@ -42,6 +46,14 @@ class Webview extends BasePage<
   public async close() {
     await browser.switchToFrame(null)
     await browser.switchToFrame(null)
+  }
+
+  public async expandAllRows() {
+    const expandRowButtons = await this.expandRowButton$$
+    for (const button of expandRowButtons) {
+      button.click()
+    }
+    return expandRowButtons.length === 0
   }
 }
 
@@ -95,30 +107,66 @@ const waitForViewContainerToLoad = async () => {
   })
 }
 
-describe('DVC Extension For Visual Studio Code', () => {
+suite('DVC Extension For Visual Studio Code', () => {
   before('should finish loading the extension', async () => {
     await waitForViewContainerToLoad()
     return dismissAllNotifications()
   })
 
-  it('should show the DVC Icon in Activity Bar', async () => {
-    const dvcIcon = await getDVCActivityBarIcon()
-    expect(await dvcIcon.getTitle()).toBe('DVC')
+  // avoid killing exp show after experiments have finished run
+  after(() => delay(30000))
+
+  describe('Activity Bar', () => {
+    it('should show the DVC Icon', async () => {
+      const dvcIcon = await getDVCActivityBarIcon()
+      expect(await dvcIcon.getTitle()).toBe('DVC')
+    })
   })
 
-  it('should load the experiments table', async () => {
-    const workbench = await browser.getWorkbench()
-
-    await workbench.executeCommand('DVC: Show Experiments')
-
+  describe('Experiments Table Webview', () => {
     const webview = new Webview({ webview: webviewLocators })
-    await webview.open()
 
-    await browser.waitUntil(async () => {
-      const table = await webview.table$
-      return table.isDisplayed()
+    it('should load as an editor', async () => {
+      const workbench = await browser.getWorkbench()
+
+      await workbench.executeCommand('DVC: Show Experiments')
+
+      await webview.open()
+
+      await browser.waitUntil(async () => {
+        const table = await webview.table$
+        return table.isDisplayed()
+      })
+
+      expect(await webview.table$$).toHaveLength(1)
     })
 
-    expect(await webview.table$$).toHaveLength(1)
+    it('should update with a new row for each checkpoint when an experiment is running', async () => {
+      await browser.switchToFrame(null)
+      const workbench = await browser.getWorkbench()
+      const epochs = 15
+      await workbench.executeCommand('DVC: Reset and Run Experiment')
+
+      await webview.open()
+
+      await browser.waitUntil(() => webview.expandAllRows())
+
+      const initialRows = await webview.row$$
+
+      expect(initialRows.length).toBeGreaterThanOrEqual(4)
+
+      await browser.waitUntil(
+        async () => {
+          await webview.expandAllRows()
+          const currentRows = await webview.row$$
+          return currentRows.length >= initialRows.length + epochs
+        },
+        { timeout: 120000 }
+      )
+
+      const finalRows = await webview.row$$
+
+      expect(finalRows.length).toStrictEqual(initialRows.length + epochs)
+    }).timeout(180000)
   })
 })
