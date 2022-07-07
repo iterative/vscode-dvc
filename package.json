@@ -7,7 +7,8 @@
   "scripts": {
     "format": "yarn turbo run format --parallel",
     "lint": "yarn turbo run lint --parallel",
-    "test:vscode": "yarn turbo run test-vscode-run",
+    "test:e2e": "yarn setup:venv && yarn turbo run test-e2e",
+    "test:vscode": "yarn turbo run test-vscode",
     "test:jest": "yarn turbo run test --parallel",
     "test": "run-p test:*",
     "cover:clean": "rm -rf ./coverage/combined && rm -rf ./extension/coverage rm -rf ./webview/coverage",
