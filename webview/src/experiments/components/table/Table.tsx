@@ -14,6 +14,7 @@ export const NestedRow: React.FC<
   instance,
   contextMenuDisabled,
   projectHasCheckpoints,
+  hasRunningExperiment,
   batchRowSelection
 }) => {
   instance.prepareRow(row)
@@ -23,6 +24,7 @@ export const NestedRow: React.FC<
       className={styles.nestedRow}
       contextMenuDisabled={contextMenuDisabled}
       projectHasCheckpoints={projectHasCheckpoints}
+      hasRunningExperiment={hasRunningExperiment}
       batchRowSelection={batchRowSelection}
     />
   )
@@ -35,6 +37,7 @@ export const ExperimentGroup: React.FC<
   instance,
   contextMenuDisabled,
   projectHasCheckpoints,
+  hasRunningExperiment,
   batchRowSelection
 }) => {
   instance.prepareRow(row)
@@ -50,6 +53,7 @@ export const ExperimentGroup: React.FC<
         instance={instance}
         contextMenuDisabled={contextMenuDisabled}
         projectHasCheckpoints={projectHasCheckpoints}
+        hasRunningExperiment={hasRunningExperiment}
         batchRowSelection={batchRowSelection}
       />
       {row.isExpanded &&
@@ -60,6 +64,7 @@ export const ExperimentGroup: React.FC<
             key={row.id}
             contextMenuDisabled={contextMenuDisabled}
             projectHasCheckpoints={projectHasCheckpoints}
+            hasRunningExperiment={hasRunningExperiment}
             batchRowSelection={batchRowSelection}
           />
         ))}
@@ -75,6 +80,7 @@ export const TableBody: React.FC<
   changes,
   contextMenuDisabled,
   projectHasCheckpoints,
+  hasRunningExperiment,
   batchRowSelection
 }) => {
   instance.prepareRow(row)
@@ -93,6 +99,7 @@ export const TableBody: React.FC<
       <RowContent
         row={row}
         projectHasCheckpoints={projectHasCheckpoints}
+        hasRunningExperiment={hasRunningExperiment}
         changes={changes}
         contextMenuDisabled={contextMenuDisabled}
         batchRowSelection={batchRowSelection}
@@ -105,6 +112,7 @@ export const TableBody: React.FC<
             key={subRow.values.id}
             contextMenuDisabled={contextMenuDisabled}
             projectHasCheckpoints={projectHasCheckpoints}
+            hasRunningExperiment={hasRunningExperiment}
             batchRowSelection={batchRowSelection}
           />
         ))}
@@ -127,7 +135,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
     filteredCounts
   } = tableData
 
-  const { clearSelectedRows, batchSelection, selectedRows } =
+  const { clearSelectedRows, batchSelection, lastSelectedRow } =
     React.useContext(RowSelectionContext)
 
   const tableRef = useRef<HTMLDivElement>(null)
@@ -139,29 +147,47 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   useClickOutside(tableRef, clickOutsideHandler)
 
   const batchRowSelection = React.useCallback(
-    ({ row: { flatIndex } }: RowProp) => {
-      const firstSelection = flatRows.find(
-        ({ values: { id } }) => selectedRows[id]
-      )
+    ({ row: { id } }: RowProp) => {
+      const lastSelectedRowId = lastSelectedRow?.row.id ?? ''
+      const lastIndex =
+        flatRows.findIndex(flatRow => flatRow.id === lastSelectedRowId) || 1
+      const selectedIndex =
+        flatRows.findIndex(flatRow => flatRow.id === id) || 1
+      const rangeStart = Math.min(lastIndex, selectedIndex)
+      const rangeEnd = Math.max(lastIndex, selectedIndex)
 
-      const firstIndex = firstSelection?.flatIndex || 1
+      const collapsedIds = flatRows
+        .filter(flatRow => !flatRow.isExpanded)
+        .map(flatRow => flatRow.id)
 
-      if (flatIndex >= firstIndex) {
-        const batch = flatRows
-          .filter(
-            row => row.flatIndex > firstIndex && row.flatIndex <= flatIndex
-          )
-          .map(row => ({ row }))
+      const batch = flatRows
+        .slice(rangeStart, rangeEnd + 1)
+        .filter(
+          flatRow =>
+            !collapsedIds.some(collapsedId =>
+              flatRow.id.startsWith(`${collapsedId}.`)
+            )
+        )
+        .map(row => ({ row }))
 
-        batchSelection?.(batch)
-      }
+      batchSelection?.(batch)
     },
-    [selectedRows, flatRows, batchSelection]
+    [flatRows, batchSelection, lastSelectedRow]
   )
 
   return (
     <div className={styles.tableContainer}>
-      <div {...getTableProps({ className: styles.table })} ref={tableRef}>
+      <div
+        {...getTableProps({ className: styles.table })}
+        ref={tableRef}
+        tabIndex={0}
+        role="tree"
+        onKeyUp={e => {
+          if (e.key === 'Escape') {
+            clearSelectedRows?.()
+          }
+        }}
+      >
         <TableHead
           instance={instance}
           sorts={sorts}
@@ -175,7 +201,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
             instance={instance}
             key={row.id}
             changes={changes}
-            contextMenuDisabled={hasRunningExperiment}
+            hasRunningExperiment={hasRunningExperiment}
             projectHasCheckpoints={hasCheckpoints}
             batchRowSelection={batchRowSelection}
           />
