@@ -97,11 +97,10 @@ suite('DVC Extension For Visual Studio Code', () => {
       const plots = await webview.vegaVisualization$$
 
       expect(plots.length).toBe(6)
+
       for (const plot of plots) {
-        expect(
-          (await plot.$$('[aria-roledescription="rect mark"]').length) +
-            (await plot.$$('[aria-roledescription="line mark"]').length)
-        ).toBeGreaterThan(0)
+        const plotNotEmpty = await webview.plotNotEmpty(plot)
+        expect(plotNotEmpty).toBe(true)
       }
 
       await webview.close()

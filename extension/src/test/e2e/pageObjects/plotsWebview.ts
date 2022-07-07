@@ -6,4 +6,16 @@ import { plots } from './locators'
 export interface PlotsWebview extends IPageDecorator<typeof plots> {}
 
 @PageDecorator(plots)
-export class PlotsWebview extends BaseWebview {}
+export class PlotsWebview extends BaseWebview {
+  public async plotNotEmpty(plot: WebdriverIO.Element) {
+    return (await this.plotHasRects(plot)) || (await this.plotHasLines(plot))
+  }
+
+  private async plotHasRects(plot: WebdriverIO.Element) {
+    return (await plot.$$('[aria-roledescription="rect mark"]').length) > 0
+  }
+
+  private async plotHasLines(plot: WebdriverIO.Element) {
+    return (await plot.$$('[aria-roledescription="line mark"]').length) > 0
+  }
+}
