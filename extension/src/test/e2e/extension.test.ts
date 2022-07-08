@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { suite, before, describe, it } from 'mocha'
 import {
   closeAllEditors,
@@ -65,15 +66,22 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       expect(initialRows.length).toBeGreaterThanOrEqual(4)
 
+      const screenshotDir = join(__dirname, 'screenshots')
+
       await browser.waitUntil(
         async () => {
           await webview.expandAllRows()
           const currentRows = await webview.row$$
           // eslint-disable-next-line no-console
           console.error(JSON.stringify(currentRows.length))
+
+          await browser.saveScreenshot(
+            join(screenshotDir, `stuck - ${Date.now()}.png`)
+          )
+
           return currentRows.length >= initialRows.length + epochs
         },
-        { timeout: 180000 }
+        { interval: 30000, timeout: 180000 }
       )
 
       const finalRows = await webview.row$$
