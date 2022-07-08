@@ -1,0 +1,36 @@
+name: End-To-End Test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: yarn run install-frozen-lockfile
+
+      - name: Test E2E
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: yarn test:e2e
+          options: '-screen 0 1600x1200x24'
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: screenshots
+          path: |
+            test/screenshots
+            test/logs
