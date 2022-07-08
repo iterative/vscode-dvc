@@ -54,7 +54,7 @@ suite('DVC Extension For Visual Studio Code', () => {
 
     it('should update with a new row for each checkpoint when an experiment is running', async () => {
       const workbench = await browser.getWorkbench()
-      const epochs = 15
+      const epochs = 5
       await workbench.executeCommand('DVC: Reset and Run Experiment')
 
       await webview.open()
