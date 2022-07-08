@@ -10,8 +10,10 @@ export interface ExperimentsWebview
 export class ExperimentsWebview extends BaseWebview {
   public async expandAllRows() {
     const expandRowButtons = await this.expandRowButton$$
+    // eslint-disable-next-line no-console
+    console.error('expand buttons', JSON.stringify(expandRowButtons.length))
     for (const button of expandRowButtons) {
-      button.click()
+      await button.click()
     }
     return expandRowButtons.length === 0
   }
