@@ -18,19 +18,19 @@ import {
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
 
-  it('should return expected columns when given the default output fixture', async () => {
+  it('should return the expected columns when given the default output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
     await model.transformAndSet(outputFixture)
     expect(model.getSelected()).toStrictEqual(columnsFixture)
   })
 
-  it('should return expected columns when given the deeply nested output fixture', async () => {
+  it('should return the expected columns when given the deeply nested output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
     await model.transformAndSet(deeplyNestedOutput)
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
   })
 
-  it('should return expected columns when given the data types output fixture', async () => {
+  it('should return the expected columns when given the data types output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
     await model.transformAndSet(dataTypesOutput)
     expect(model.getSelected()).toStrictEqual(dataTypesColumns)
