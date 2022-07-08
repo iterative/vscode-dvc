@@ -4,6 +4,8 @@ import { Options } from '@wdio/types'
 import { getVenvBinPath } from '../../python/path'
 import { Logger } from '../../common/logger'
 
+const screenshotDir = join(__dirname, 'screenshots')
+
 export const config: Options.Testrunner = {
   after: async function () {
     await browser.switchToFrame(null)
@@ -16,14 +18,13 @@ export const config: Options.Testrunner = {
 
     Logger.log('Capturing screenshot for debugging')
 
-    const screenshotDir = join(__dirname, 'screenshots')
-    mkdirp(screenshotDir)
     await browser.saveScreenshot(
       join(screenshotDir, `${test.parent} - ${test.title}.png`)
     )
   },
   baseUrl: 'http://localhost',
   before: async function () {
+    mkdirp(screenshotDir)
     await browser.setWindowSize(1600, 1200)
   },
   capabilities: [
@@ -60,5 +61,5 @@ export const config: Options.Testrunner = {
   reporters: ['spec'],
   services: ['vscode'],
   specs: ['./src/test/e2e/*.test.ts'],
-  waitforTimeout: 10000
+  waitforTimeout: 60000
 }
