@@ -69,6 +69,8 @@ suite('DVC Extension For Visual Studio Code', () => {
         async () => {
           await webview.expandAllRows()
           const currentRows = await webview.row$$
+          // eslint-disable-next-line no-console
+          console.error(JSON.stringify(currentRows.length))
           return currentRows.length >= initialRows.length + epochs
         },
         { timeout: 180000 }
@@ -78,6 +80,7 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       expect(finalRows.length).toStrictEqual(initialRows.length + epochs)
       await webview.close()
+      await waitForDvcToFinish()
     }).timeout(180000)
   })
 
@@ -91,6 +94,8 @@ suite('DVC Extension For Visual Studio Code', () => {
     it('should load the plots webview with non-empty plots', async () => {
       const workbench = await browser.getWorkbench()
       await workbench.executeCommand('DVC: Show Plots')
+
+      await waitForDvcToFinish()
 
       await webview.open()
 

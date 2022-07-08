@@ -1,9 +1,11 @@
+import { ChainablePromiseArray, ElementArray } from 'webdriverio'
 import { ViewControl } from 'wdio-vscode-service'
 
-const findProgressBars = () => $$('.monaco-progress-container')
+const findProgressBars = (): ChainablePromiseArray<ElementArray> =>
+  $$('.monaco-progress-container')
 
-export const dismissAllNotifications = () =>
-  browser.waitUntil(async () => {
+export const dismissAllNotifications = async (): Promise<void> => {
+  await browser.waitUntil(async () => {
     const workbench = await browser.getWorkbench()
     const notifications = await workbench.getNotifications()
     for (const n of notifications) {
@@ -12,8 +14,9 @@ export const dismissAllNotifications = () =>
     const openNotifications = await workbench.getNotifications()
     return openNotifications.length === 0
   })
+}
 
-const dvcIsWorking = async () => {
+const dvcIsWorking = async (): Promise<boolean> => {
   const workbench = await browser.getWorkbench()
   const statusBar = workbench.getStatusBar()
   const statusBarItems = await statusBar.getItems()
@@ -23,10 +26,11 @@ const dvcIsWorking = async () => {
   )
 }
 
-export const waitForDvcToFinish = () =>
-  browser.waitUntil(async () => !(await dvcIsWorking()), {
+export const waitForDvcToFinish = async (): Promise<void> => {
+  await browser.waitUntil(async () => !(await dvcIsWorking()), {
     timeout: 60000
   })
+}
 
 export const getDVCActivityBarIcon = async (): Promise<ViewControl> => {
   const workbench = await browser.getWorkbench()
@@ -39,7 +43,7 @@ export const getDVCActivityBarIcon = async (): Promise<ViewControl> => {
   return activityBar.getViewControl('DVC') as Promise<ViewControl>
 }
 
-export const waitForViewContainerToLoad = async () => {
+export const waitForViewContainerToLoad = async (): Promise<void> => {
   const initialProgressBars = await findProgressBars()
   await browser.waitUntil(async () => {
     const dvcIcon = await getDVCActivityBarIcon()
@@ -67,7 +71,7 @@ export const waitForViewContainerToLoad = async () => {
   const workbench = await browser.getWorkbench()
   await workbench.executeCommand('DVC: Pull')
 
-  return browser.waitUntil(
+  await browser.waitUntil(
     async () => {
       if (await dvcIsWorking()) {
         return false
@@ -87,7 +91,7 @@ export const waitForViewContainerToLoad = async () => {
   )
 }
 
-export const closeAllEditors = async () => {
+export const closeAllEditors = async (): Promise<void> => {
   const workbench = await browser.getWorkbench()
   const editorView = workbench.getEditorView()
   return editorView.closeAllEditors()
