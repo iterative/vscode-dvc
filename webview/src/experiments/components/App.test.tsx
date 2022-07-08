@@ -155,7 +155,7 @@ describe('App', () => {
       )
     }
 
-    it('should apply the sortingHeaderCellAsc class to) only a top level placeholder', () => {
+    it('should apply the sortingHeaderCellAsc class to only a top level placeholder', () => {
       renderTableWithPlaceholder()
 
       const topPlaceholder = screen.getByTestId(
