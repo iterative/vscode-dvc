@@ -47,19 +47,22 @@ export const waitForViewContainerToLoad = async () => {
     return !!view
   })
 
-  await browser.waitUntil(async () => {
-    if (await dvcIsWorking()) {
-      return false
-    }
+  await browser.waitUntil(
+    async () => {
+      if (await dvcIsWorking()) {
+        return false
+      }
 
-    const numberOfProgressBarsInContainer = 7
-    const currentProgressBars = await findProgressBars()
+      const numberOfProgressBarsInContainer = 7
+      const currentProgressBars = await findProgressBars()
 
-    return !(
-      currentProgressBars.length <
-      initialProgressBars.length + numberOfProgressBarsInContainer
-    )
-  })
+      return !(
+        currentProgressBars.length <
+        initialProgressBars.length + numberOfProgressBarsInContainer
+      )
+    },
+    { timeout: 60000 }
+  )
 
   const workbench = await browser.getWorkbench()
   await workbench.executeCommand('DVC: Pull')
