@@ -1,4 +1,5 @@
 import { ViewControl } from 'wdio-vscode-service'
+import { ElementArray } from 'webdriverio'
 
 export const dismissAllNotifications = () =>
   browser.waitUntil(async () => {
@@ -35,17 +36,22 @@ export const waitForViewContainerToLoad = async () => {
     return !!view
   })
 
-  return browser.waitUntil(async () => {
-    const numberOfProgressBarsInContainer = 7
-    const currentProgressBars = await $$('.monaco-progress-container')
+  let currentProgressBars: ElementArray
 
-    if (
+  await browser.waitUntil(async () => {
+    const numberOfProgressBarsInContainer = 7
+    currentProgressBars = await $$('.monaco-progress-container')
+
+    return !(
       currentProgressBars.length <
       initialProgressBars.length + numberOfProgressBarsInContainer
-    ) {
-      return false
-    }
+    )
+  })
 
+  const workbench = await browser.getWorkbench()
+  await workbench.executeCommand('DVC: Pull')
+
+  return browser.waitUntil(async () => {
     for (const progress of currentProgressBars) {
       if ((await progress.getAttribute('aria-hidden')) !== 'true') {
         return false

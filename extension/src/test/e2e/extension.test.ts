@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { suite, before, describe, it } from 'mocha'
 import {
   closeAllEditors,
@@ -12,17 +11,7 @@ import { delay } from '../../util/time'
 
 suite('DVC Extension For Visual Studio Code', () => {
   before('should finish loading the extension', async () => {
-    const screenshotDir = join(__dirname, 'screenshots')
-    await browser.saveScreenshot(
-      join(screenshotDir, 'startup - before container.png')
-    )
-
     await waitForViewContainerToLoad()
-
-    await browser.saveScreenshot(
-      join(screenshotDir, 'startup - after container.png')
-    )
-
     return dismissAllNotifications()
   })
 
