@@ -51,15 +51,18 @@ export const waitForViewContainerToLoad = async () => {
   const workbench = await browser.getWorkbench()
   await workbench.executeCommand('DVC: Pull')
 
-  return browser.waitUntil(async () => {
-    for (const progress of currentProgressBars) {
-      if ((await progress.getAttribute('aria-hidden')) !== 'true') {
-        return false
+  return browser.waitUntil(
+    async () => {
+      for (const progress of currentProgressBars) {
+        if ((await progress.getAttribute('aria-hidden')) !== 'true') {
+          return false
+        }
       }
-    }
 
-    return true
-  })
+      return true
+    },
+    { timeout: 180000 }
+  )
 }
 
 export const closeAllEditors = async () => {

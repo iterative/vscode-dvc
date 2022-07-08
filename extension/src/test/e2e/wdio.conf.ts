@@ -61,5 +61,5 @@ export const config: Options.Testrunner = {
   reporters: ['spec'],
   services: ['vscode'],
   specs: ['./src/test/e2e/*.test.ts'],
-  waitforTimeout: 60000
+  waitforTimeout: 10000
 }

@@ -10,7 +10,8 @@ import { PlotsWebview } from './pageObjects/plotsWebview'
 import { delay } from '../../util/time'
 
 suite('DVC Extension For Visual Studio Code', () => {
-  before('should finish loading the extension', async () => {
+  before('should finish loading the extension', async function () {
+    this.timeout(180000)
     await waitForViewContainerToLoad()
     return dismissAllNotifications()
   })
