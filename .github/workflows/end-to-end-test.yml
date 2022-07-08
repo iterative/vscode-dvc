@@ -32,5 +32,5 @@ jobs:
         with:
           name: screenshots
           path: |
-            test/screenshots
-            test/logs
+            extension/src/test/e2e/screenshots
+            extension/src/test/e2e/logs

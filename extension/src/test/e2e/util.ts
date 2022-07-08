@@ -1,5 +1,6 @@
 import { ViewControl } from 'wdio-vscode-service'
-import { ElementArray } from 'webdriverio'
+
+const findProgressBars = () => $$('.monaco-progress-container')
 
 export const dismissAllNotifications = () =>
   browser.waitUntil(async () => {
@@ -11,6 +12,16 @@ export const dismissAllNotifications = () =>
     const openNotifications = await workbench.getNotifications()
     return openNotifications.length === 0
   })
+
+export const dvcIsWorking = async () => {
+  const workbench = await browser.getWorkbench()
+  const statusBar = workbench.getStatusBar()
+  const statusBarItems = await statusBar.getItems()
+  return statusBarItems.some(
+    statusBarItem =>
+      statusBarItem.includes('loading~spin') && statusBarItem.includes('DVC')
+  )
+}
 
 export const getDVCActivityBarIcon = async (): Promise<ViewControl> => {
   const workbench = await browser.getWorkbench()
@@ -24,7 +35,7 @@ export const getDVCActivityBarIcon = async (): Promise<ViewControl> => {
 }
 
 export const waitForViewContainerToLoad = async () => {
-  const initialProgressBars = await $$('.monaco-progress-container')
+  const initialProgressBars = await findProgressBars()
   await browser.waitUntil(async () => {
     const dvcIcon = await getDVCActivityBarIcon()
     if (!dvcIcon) {
@@ -36,11 +47,13 @@ export const waitForViewContainerToLoad = async () => {
     return !!view
   })
 
-  let currentProgressBars: ElementArray
-
   await browser.waitUntil(async () => {
+    if (await dvcIsWorking()) {
+      return false
+    }
+
     const numberOfProgressBarsInContainer = 7
-    currentProgressBars = await $$('.monaco-progress-container')
+    const currentProgressBars = await findProgressBars()
 
     return !(
       currentProgressBars.length <
@@ -53,8 +66,14 @@ export const waitForViewContainerToLoad = async () => {
 
   return browser.waitUntil(
     async () => {
+      if (await dvcIsWorking()) {
+        return false
+      }
+
+      const currentProgressBars = await findProgressBars()
+
       for (const progress of currentProgressBars) {
-        if ((await progress.getAttribute('aria-hidden')) !== 'true') {
+        if (await progress.isDisplayed()) {
           return false
         }
       }

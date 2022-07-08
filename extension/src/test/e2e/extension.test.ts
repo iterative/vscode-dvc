@@ -2,12 +2,12 @@ import { suite, before, describe, it } from 'mocha'
 import {
   closeAllEditors,
   dismissAllNotifications,
+  dvcIsWorking,
   getDVCActivityBarIcon,
   waitForViewContainerToLoad
 } from './util'
 import { ExperimentsWebview } from './pageObjects/experimentsWebview'
 import { PlotsWebview } from './pageObjects/plotsWebview'
-import { delay } from '../../util/time'
 
 suite('DVC Extension For Visual Studio Code', () => {
   before('should finish loading the extension', async function () {
@@ -17,7 +17,7 @@ suite('DVC Extension For Visual Studio Code', () => {
   })
 
   // avoid killing any background process after experiments have finished run
-  after(() => delay(30000))
+  after(() => browser.waitUntil(() => !dvcIsWorking()))
 
   afterEach(() => browser.switchToFrame(null))
 
@@ -67,14 +67,14 @@ suite('DVC Extension For Visual Studio Code', () => {
           const currentRows = await webview.row$$
           return currentRows.length >= initialRows.length + epochs
         },
-        { timeout: 600000 }
+        { timeout: 180000 }
       )
 
       const finalRows = await webview.row$$
 
       expect(finalRows.length).toStrictEqual(initialRows.length + epochs)
       await webview.close()
-    }).timeout(600000)
+    }).timeout(180000)
   })
 
   describe('Plots Webview', () => {
