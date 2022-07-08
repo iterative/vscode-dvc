@@ -1,5 +1,6 @@
 import { join, resolve } from 'path'
 import { Options } from '@wdio/types'
+import { getVenvBinPath } from '../../python/path'
 
 export const config: Options.Testrunner = {
   after: async function () {
@@ -17,6 +18,13 @@ export const config: Options.Testrunner = {
       // @ts-expect-error these caps are not typed in WebdriverIO
       'wdio:vscodeOptions': {
         extensionPath: resolve(__dirname, '..', '..', '..'),
+        userSettings: {
+          'dvc.pythonPath': getVenvBinPath(
+            resolve(__dirname, '..', '..', '..', '..', 'demo'),
+            '.env',
+            'python'
+          )
+        },
         verboseLogging: false,
         workspacePath: resolve(__dirname, '..', '..', '..', '..', 'demo')
       }
