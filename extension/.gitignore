@@ -1,5 +1,6 @@
 *.vsix
 .vscode-test
+.wdio-vscode-service
 README.md
 LICENSE
 CHANGELOG.md

@@ -769,8 +769,8 @@ describe('App', () => {
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
-        'Modify and Resume',
         'Modify, Reset and Run',
+        'Modify and Resume',
         'Modify and Queue',
         'Star Experiment'
       ])
@@ -864,6 +864,137 @@ describe('App', () => {
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Star Experiments')
+    })
+
+    it('should allow batch selection from the bottom up too', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(tailRow)
+      fireEvent.click(firstRowCheckbox, { shiftKey: true })
+
+      const selectedRows = () => screen.getAllByRole('row', { selected: true })
+      expect(selectedRows()).toHaveLength(4)
+
+      const anotherRow = within(getRow('2173124')).getByRole('checkbox')
+      fireEvent.click(anotherRow, { shiftKey: true })
+      expect(selectedRows()).toHaveLength(5)
+    })
+
+    it('should not include collapsed experiments in the bulk selection', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testBranchContractButton = within(getRow('42b8736')).getByTitle(
+        'Contract Row'
+      )
+      fireEvent.click(testBranchContractButton)
+
+      jest.advanceTimersByTime(100)
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
+
+      const tailRow = within(getRow('22e40e1')).getByRole('checkbox')
+      fireEvent.click(tailRow, { shiftKey: true })
+
+      fireEvent.click(testBranchContractButton)
+
+      jest.advanceTimersByTime(100)
+      expect(getRow('42b8736')).toHaveAttribute('aria-selected', 'true')
+      expect(getRow('2173124')).not.toHaveAttribute('aria-selected', 'true')
+      expect(getRow('9523bde')).not.toHaveAttribute('aria-selected', 'true')
+    })
+
+    it('should present the Clear selected rows option when multiple rows are selected', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: {
+              ...tableDataFixture,
+              hasRunningExperiment: false
+            },
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
+
+      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(tailRow, { shiftKey: true })
+
+      const selectedRows = () =>
+        screen.queryAllByRole('row', { selected: true })
+      expect(selectedRows().length).toBe(4)
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      const clearOption = screen.getByText('Clear row selection')
+      fireEvent.click(clearOption)
+
+      jest.advanceTimersByTime(100)
+      expect(selectedRows().length).toBe(0)
+    })
+
+    it('should clear the row selection when the Escape key is pressed', () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
+      fireEvent.click(firstRowCheckbox)
+
+      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
+      fireEvent.click(tailRow, { shiftKey: true })
+
+      const selectedRows = () =>
+        screen.queryAllByRole('row', { selected: true })
+      expect(selectedRows().length).toBe(4)
+
+      fireEvent.keyUp(tailRow, { bubbles: true, key: 'Escape' })
+
+      jest.advanceTimersByTime(100)
+      expect(selectedRows().length).toBe(0)
     })
   })
 

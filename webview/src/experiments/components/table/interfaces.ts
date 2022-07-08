@@ -16,6 +16,7 @@ export interface WithChanges {
 export interface RowProp {
   row: Row<Experiment>
   contextMenuDisabled?: boolean
+  hasRunningExperiment?: boolean
   projectHasCheckpoints?: boolean
 }
 

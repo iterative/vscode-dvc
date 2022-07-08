@@ -23,18 +23,21 @@
     },
     "cover-vscode-run": {
       "dependsOn": [
-        "dvc#test-vscode-build",
+        "dvc#test-build",
         "dvc#test",
         "dvc-vscode-webview#build",
         "dvc-vscode-webview#test"
       ],
       "outputs": ["coverage/integration/**"]
     },
-    "test-vscode-build": {
+    "test-build": {
       "outputs": ["dist/**"]
     },
-    "test-vscode-run": {
-      "dependsOn": ["dvc-vscode-webview#build", "dvc#test-vscode-build"]
+    "test-vscode": {
+      "dependsOn": ["dvc-vscode-webview#build", "dvc#test-build"]
+    },
+    "test-e2e": {
+      "dependsOn": ["dvc-vscode-webview#build", "dvc#test-build"]
     },
     "format": {
       "dependsOn": ["^format"],
