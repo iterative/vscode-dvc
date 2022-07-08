@@ -14,8 +14,8 @@ export const dataTypesOutput: ExperimentsOutput = {
         params: {
           'params.yaml': {
             data: {
-              true: true,
-              false: false,
+              bool1: true,
+              bool2: false,
               zero: 0,
               negative: -123,
               float: 1.9293040037155151,
@@ -54,21 +54,21 @@ export const columns: Column[] = [
   },
   {
     hasChildren: false,
-    label: 'true',
+    label: 'bool1',
     maxStringLength: 4,
     parentPath: 'params:params.yaml',
-    path: 'params:params.yaml:true',
-    pathArray: [ColumnType.PARAMS, 'params.yaml', 'true'],
+    path: 'params:params.yaml:bool1',
+    pathArray: [ColumnType.PARAMS, 'params.yaml', 'bool1'],
     type: ColumnType.PARAMS,
     types: ['boolean']
   },
   {
     hasChildren: false,
-    label: 'false',
+    label: 'bool2',
     maxStringLength: 5,
     parentPath: 'params:params.yaml',
-    path: 'params:params.yaml:false',
-    pathArray: [ColumnType.PARAMS, 'params.yaml', 'false'],
+    path: 'params:params.yaml:bool2',
+    pathArray: [ColumnType.PARAMS, 'params.yaml', 'bool2'],
     type: ColumnType.PARAMS,
     types: ['boolean']
   },
@@ -149,11 +149,11 @@ export const rows: Row[] = [
       'params.yaml': {
         array: [true, false, 'string', 2],
         emptyString: '',
-        false: false,
+        bool2: false,
         float: 1.9293040037155151,
         negative: -123,
         string: 'string',
-        true: true,
+        bool1: true,
         zero: 0
       }
     },

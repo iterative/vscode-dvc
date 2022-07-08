@@ -155,7 +155,7 @@ describe('App', () => {
       )
     }
 
-    it('should apply the sortingHeaderCellAsc class to only a top level placeholder', () => {
+    it('should apply the sortingHeaderCellAsc class to) only a top level placeholder', () => {
       renderTableWithPlaceholder()
 
       const topPlaceholder = screen.getByTestId(
@@ -544,11 +544,11 @@ describe('App', () => {
     })
 
     const testParamName = 'test-param'
-    const testParamStringValue = 'Test String'
+    const cellLabel = 'Test String'
     const testData = buildTestData({
       maxStringLength: 10,
       name: testParamName,
-      value: testParamStringValue
+      value: cellLabel
     })
 
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a header', () => {
@@ -613,9 +613,6 @@ describe('App', () => {
     })
 
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a cell', () => {
-      jest
-        .spyOn(window, 'requestAnimationFrame')
-        .mockImplementation(cb => window.setTimeout(cb, 1))
       render(<App />)
       fireEvent(
         window,
@@ -627,7 +624,7 @@ describe('App', () => {
         })
       )
 
-      const testParamCell = screen.getByText(testParamStringValue)
+      const testParamCell = screen.getByText(cellLabel)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
       jest.advanceTimersByTime(CELL_TOOLTIP_DELAY - 1)
@@ -637,37 +634,34 @@ describe('App', () => {
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
 
-      expect(tooltip).toHaveTextContent(testParamStringValue)
+      expect(tooltip).toHaveTextContent(cellLabel)
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(1)
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-
-      jest.mocked(window.requestAnimationFrame).mockRestore()
     })
 
-    it('should show the expected tooltip for all values in the data types fixture', async () => {
-      jest
-        .spyOn(window, 'requestAnimationFrame')
-        .mockImplementation(cb => window.setTimeout(cb, 1))
-      const expectTooltipValue: (args: {
-        cellLabel: string
-        expectedTooltipResult: string
-      }) => Promise<void> = async ({ cellLabel, expectedTooltipResult }) => {
-        const testCell = screen.getAllByText(cellLabel)?.[0]
-        fireEvent.mouseEnter(testCell, { bubbles: true })
-        jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
-        const tooltip = await screen.findByRole('tooltip')
-        expect(tooltip).toHaveTextContent(expectedTooltipResult)
-        jest.useRealTimers()
-        await new Promise(resolve => setTimeout(resolve, 1))
-        fireEvent.mouseLeave(testCell, { bubbles: true })
-        await new Promise(resolve => setTimeout(resolve, 1))
-        jest.useFakeTimers()
-        expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-      }
+    const expectTooltipValue: (args: {
+      cellLabel: string
+      expectedTooltipResult: string
+    }) => void = ({ cellLabel, expectedTooltipResult }) => {
+      const testParamCell = screen.getByText(cellLabel)
+      expect(testParamCell).toBeInTheDocument()
 
+      fireEvent.mouseEnter(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      const tooltip = screen.queryByRole('tooltip')
+      expect(tooltip).toHaveTextContent(expectedTooltipResult)
+
+      fireEvent.mouseLeave(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    }
+
+    it('should show the expected tooltip for all data types', () => {
       render(<App />)
       fireEvent(
         window,
@@ -679,23 +673,22 @@ describe('App', () => {
         })
       )
 
-      await expectTooltipValue({
+      expectTooltipValue({
         cellLabel: '1.9293',
         expectedTooltipResult: '1.9293040037155151'
       })
-      await expectTooltipValue({
+      expectTooltipValue({
         cellLabel: 'true',
         expectedTooltipResult: 'true'
       })
-      await expectTooltipValue({
+      expectTooltipValue({
         cellLabel: 'false',
         expectedTooltipResult: 'false'
       })
-      await expectTooltipValue({
+      expectTooltipValue({
         cellLabel: '[true, false, string, 2]',
         expectedTooltipResult: '[true, false, string, 2]'
       })
-      jest.mocked(window.requestAnimationFrame).mockRestore()
     })
   })
 
