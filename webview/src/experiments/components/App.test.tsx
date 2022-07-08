@@ -643,6 +643,32 @@ describe('App', () => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
+    it('should persist a cell tooltip when it is moused into', () => {
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: testData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      const testParamCell = screen.getByText(testParamStringValue)
+      fireEvent.mouseEnter(testParamCell, { bubbles: true })
+
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+
+      fireEvent.mouseLeave(testParamCell, { bubbles: true })
+      fireEvent.mouseEnter(tooltip, { bubbles: true })
+
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      expect(tooltip).toBeInTheDocument()
+    })
+
     it('should show the expected tooltip for all data types', () => {
       const expectTooltipValue: (args: {
         cellLabel: string
