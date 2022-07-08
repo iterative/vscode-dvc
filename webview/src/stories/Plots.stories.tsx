@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import { Story, Meta } from '@storybook/react/types-6-0'
-import { within, waitFor } from '@testing-library/react'
+import { screen, userEvent, within } from '@storybook/testing-library'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
@@ -196,22 +196,20 @@ export const ZoomedInPlot = Template.bind({})
 ZoomedInPlot.parameters = {
   chromatic: { delay: 300 }
 }
-ZoomedInPlot.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement)
-  const plots = await canvas.findAllByTestId(/^plot_/)
-  const plot = await waitFor(() => within(plots[0]).getByRole('button'))
+ZoomedInPlot.play = async () => {
+  const plots = await screen.findAllByTestId(/^plot_/)
+  const plot = await within(plots[0]).findByRole('button')
 
-  plot.click()
+  userEvent.click(plot)
 }
 
 export const MultiviewZoomedInPlot = Template.bind({})
 MultiviewZoomedInPlot.parameters = {
   chromatic: { delay: 300 }
 }
-MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement)
-  const plot = await canvas.findByTestId('plots-section_template-multi_1')
-  const plotButton = await waitFor(() => within(plot).getByRole('button'))
+MultiviewZoomedInPlot.play = async () => {
+  const plot = await screen.findByTestId('plots-section_template-multi_1')
+  const plotButton = await within(plot).findByRole('button')
 
-  plotButton.click()
+  userEvent.click(plotButton)
 }

@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.2",
+    "@storybook/testing-library": "^0.0.13",
     "@tippyjs/react": "^4.2.6",
     "@vscode/webview-ui-toolkit": "^1.0.0",
     "classnames": "^2.2.6",
