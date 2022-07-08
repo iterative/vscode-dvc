@@ -2,8 +2,8 @@ import { suite, before, describe, it } from 'mocha'
 import {
   closeAllEditors,
   dismissAllNotifications,
-  dvcIsWorking,
   getDVCActivityBarIcon,
+  waitForDvcToFinish,
   waitForViewContainerToLoad
 } from './util'
 import { ExperimentsWebview } from './pageObjects/experimentsWebview'
@@ -16,10 +16,14 @@ suite('DVC Extension For Visual Studio Code', () => {
     return dismissAllNotifications()
   })
 
-  // avoid killing any background process after experiments have finished run
-  after(() => browser.waitUntil(async () => !(await dvcIsWorking())))
+  after(function () {
+    this.timeout(60000)
+    return waitForDvcToFinish()
+  })
 
-  afterEach(() => browser.switchToFrame(null))
+  afterEach(function () {
+    return browser.switchToFrame(null)
+  })
 
   describe('Activity Bar', () => {
     it('should show the DVC Icon', async () => {

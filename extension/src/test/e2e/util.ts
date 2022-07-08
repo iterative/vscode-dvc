@@ -13,7 +13,7 @@ export const dismissAllNotifications = () =>
     return openNotifications.length === 0
   })
 
-export const dvcIsWorking = async () => {
+const dvcIsWorking = async () => {
   const workbench = await browser.getWorkbench()
   const statusBar = workbench.getStatusBar()
   const statusBarItems = await statusBar.getItems()
@@ -22,6 +22,11 @@ export const dvcIsWorking = async () => {
       statusBarItem.includes('loading~spin') && statusBarItem.includes('DVC')
   )
 }
+
+export const waitForDvcToFinish = () =>
+  browser.waitUntil(async () => !(await dvcIsWorking()), {
+    timeout: 60000
+  })
 
 export const getDVCActivityBarIcon = async (): Promise<ViewControl> => {
   const workbench = await browser.getWorkbench()
@@ -57,9 +62,7 @@ export const waitForViewContainerToLoad = async () => {
     )
   })
 
-  await browser.waitUntil(async () => !(await dvcIsWorking()), {
-    timeout: 60000
-  })
+  await waitForDvcToFinish()
 
   const workbench = await browser.getWorkbench()
   await workbench.executeCommand('DVC: Pull')
