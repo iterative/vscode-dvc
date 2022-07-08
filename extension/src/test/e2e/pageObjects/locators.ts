@@ -5,7 +5,6 @@ export const webview = {
 
 export const experiments = {
   ...webview,
-  contractRowButton: 'button[title="Contract Row"]',
   expandRowButton: 'button[title="Expand Row"]',
   row: '[role=row]',
   table: '[role=tree]'
