@@ -67,14 +67,14 @@ suite('DVC Extension For Visual Studio Code', () => {
           const currentRows = await webview.row$$
           return currentRows.length >= initialRows.length + epochs
         },
-        { timeout: 120000 }
+        { timeout: 600000 }
       )
 
       const finalRows = await webview.row$$
 
       expect(finalRows.length).toStrictEqual(initialRows.length + epochs)
       await webview.close()
-    }).timeout(180000)
+    }).timeout(600000)
   })
 
   describe('Plots Webview', () => {
