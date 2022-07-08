@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders", "expectTooltipValue"] }] */
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import React from 'react'
 import {
   cleanup,
@@ -642,26 +642,26 @@ describe('App', () => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
-    const expectTooltipValue: (args: {
-      cellLabel: string
-      expectedTooltipResult: string
-    }) => void = ({ cellLabel, expectedTooltipResult }) => {
-      const testParamCell = screen.getByText(cellLabel)
-      expect(testParamCell).toBeInTheDocument()
-
-      fireEvent.mouseEnter(testParamCell, { bubbles: true })
-
-      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
-      const tooltip = screen.queryByRole('tooltip')
-      expect(tooltip).toHaveTextContent(expectedTooltipResult)
-
-      fireEvent.mouseLeave(testParamCell, { bubbles: true })
-
-      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
-      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-    }
-
     it('should show the expected tooltip for all data types', () => {
+      const expectTooltipValue: (args: {
+        cellLabel: string
+        expectedTooltipResult: string
+      }) => void = ({ cellLabel, expectedTooltipResult }) => {
+        const testParamCell = screen.getByText(cellLabel)
+        expect(testParamCell).toBeInTheDocument()
+
+        fireEvent.mouseEnter(testParamCell, { bubbles: true })
+
+        jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+        const tooltip = screen.queryByRole('tooltip')
+        expect(tooltip).toHaveTextContent(expectedTooltipResult)
+
+        fireEvent.mouseLeave(testParamCell, { bubbles: true })
+
+        jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+        expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+      }
+
       render(<App />)
       fireEvent(
         window,
