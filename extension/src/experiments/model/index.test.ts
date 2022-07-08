@@ -74,13 +74,13 @@ describe('ExperimentsModel', () => {
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
-  it('should return expected rows the deeply nested output fixture', () => {
+  it('should return expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(deeplyNestedOutput)
     expect(model.getRowData()).toStrictEqual(deeplyNestedRows)
   })
 
-  it('should return expected rows the data types output fixture', () => {
+  it('should return expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(dataTypesOutput)
     expect(model.getRowData()).toStrictEqual(dataTypesRows)
