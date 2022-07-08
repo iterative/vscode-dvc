@@ -61,85 +61,6 @@ afterEach(() => {
   cleanup()
 })
 
-const sourceFilenames: Record<ColumnType, string> = {
-  [ColumnType.PARAMS]: 'params.yaml',
-  [ColumnType.METRICS]: 'metrics.json',
-  [ColumnType.DEPS]: 'data'
-}
-
-const buildTestColumn = ({
-  name,
-  type: columnType = ColumnType.PARAMS,
-  sourceFilename = sourceFilenames[columnType],
-  ...rest
-}: Partial<Column> & {
-  name: string
-  columnType?: ColumnType
-  sourceFilename?: string
-}): Column => ({
-  hasChildren: false,
-  label: name,
-  parentPath: buildMetricOrParamPath(columnType, sourceFilename),
-  path: buildMetricOrParamPath(columnType, sourceFilename, name),
-  pathArray: [columnType, sourceFilename, name],
-  type: columnType,
-  ...rest
-})
-
-const buildTestData: <T = unknown>(
-  args: {
-    value: T
-    name?: string
-    otherValue?: T
-    types?: string[]
-  } & Partial<Column>
-) => TableData = ({
-  value,
-  name = 'test-param',
-  types = [typeof value],
-  ...rest
-}) => {
-  return {
-    ...tableDataFixture,
-    columns: [
-      {
-        hasChildren: true,
-        label: 'summary.json',
-        parentPath: buildMetricOrParamPath(ColumnType.METRICS),
-        path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
-        type: ColumnType.METRICS
-      },
-      {
-        hasChildren: true,
-        label: 'params.yaml',
-        parentPath: ColumnType.PARAMS,
-        path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
-        type: ColumnType.PARAMS
-      },
-      buildTestColumn({
-        name,
-        types,
-        ...rest
-      })
-    ],
-    rows: [
-      {
-        id: 'workspace',
-        label: 'workspace',
-        params: {
-          'params.yaml': {
-            [name]: value
-          }
-        }
-      },
-      {
-        id: 'main',
-        label: 'main'
-      }
-    ]
-  }
-}
-
 describe('App', () => {
   describe('Sorting Classes', () => {
     const renderTableWithPlaceholder = () => {
@@ -543,13 +464,93 @@ describe('App', () => {
       jest.useRealTimers()
     })
 
-    const testParamName = 'test-param'
-    const cellLabel = 'Test String'
-    const testData = buildTestData({
-      maxStringLength: 10,
-      name: testParamName,
-      value: cellLabel
-    })
+    const testParamName = 'test_param_with_long_name'
+    const testParamPath = buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      testParamName
+    )
+    const testParamStringValue = 'Test Value'
+    const testMetricNumberValue = 1.9293040037155151
+
+    const testData = {
+      ...tableDataFixture,
+      columns: [
+        {
+          hasChildren: true,
+          label: 'summary.json',
+          parentPath: buildMetricOrParamPath(ColumnType.METRICS),
+          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
+          type: ColumnType.METRICS
+        },
+        {
+          hasChildren: false,
+          label: 'loss',
+          maxNumber: testMetricNumberValue,
+          maxStringLength: 18,
+          minNumber: testMetricNumberValue,
+          parentPath: buildMetricOrParamPath(
+            ColumnType.METRICS,
+            'summary.json'
+          ),
+          path: buildMetricOrParamPath(
+            ColumnType.METRICS,
+            'summary.json',
+            'loss'
+          ),
+          pathArray: [ColumnType.METRICS, 'summary.json', 'loss'],
+          type: ColumnType.METRICS,
+          types: ['number']
+        },
+        {
+          hasChildren: true,
+          label: 'params.yaml',
+          parentPath: ColumnType.PARAMS,
+          path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
+          type: ColumnType.PARAMS
+        },
+        {
+          hasChildren: false,
+          label: testParamName,
+          maxStringLength: 10,
+          parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
+          path: testParamPath,
+          pathArray: [ColumnType.PARAMS, 'params.yaml', testParamName],
+          type: ColumnType.PARAMS,
+          types: ['string']
+        }
+      ],
+      rows: [
+        {
+          id: 'workspace',
+          label: 'workspace',
+          metrics: {
+            'summary.json': {
+              loss: testMetricNumberValue
+            }
+          },
+          params: {
+            'params.yaml': {
+              [testParamName]: testParamStringValue
+            }
+          }
+        },
+        {
+          id: 'main',
+          label: 'main',
+          metrics: {
+            'summary.json': {
+              loss: testMetricNumberValue + 1
+            }
+          },
+          params: {
+            'params.yaml': {
+              [testParamName]: 'Other Value'
+            }
+          }
+        }
+      ]
+    }
 
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a header', () => {
       mockedUseIsFullyContained.mockReturnValue(false)
@@ -624,7 +625,7 @@ describe('App', () => {
         })
       )
 
-      const testParamCell = screen.getByText(cellLabel)
+      const testParamCell = screen.getByText(testParamStringValue)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
       jest.advanceTimersByTime(CELL_TOOLTIP_DELAY - 1)
@@ -634,7 +635,7 @@ describe('App', () => {
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
 
-      expect(tooltip).toHaveTextContent(cellLabel)
+      expect(tooltip).toHaveTextContent(testParamStringValue)
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
