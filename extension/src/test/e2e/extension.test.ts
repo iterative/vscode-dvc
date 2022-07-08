@@ -17,7 +17,7 @@ suite('DVC Extension For Visual Studio Code', () => {
   })
 
   // avoid killing any background process after experiments have finished run
-  after(() => browser.waitUntil(() => !dvcIsWorking()))
+  after(() => browser.waitUntil(async () => !(await dvcIsWorking())))
 
   afterEach(() => browser.switchToFrame(null))
 
