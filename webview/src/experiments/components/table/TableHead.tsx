@@ -1,9 +1,11 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
+import cx from 'classnames'
 import React, { useRef } from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
+import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { Indicators } from './Indicators'
@@ -21,20 +23,22 @@ interface TableHeadProps {
   sorts: SortDefinition[]
   filteredCounts: FilteredCounts
   filters: string[]
+  root: HTMLElement | null
 }
 
-export const TableHead: React.FC<TableHeadProps> = ({
+export const TableHead = ({
   instance: {
     headerGroups,
     setColumnOrder,
     state: { columnOrder },
     allColumns
   },
+  root,
   filteredCounts,
   filters,
   columns,
   sorts
-}) => {
+}: TableHeadProps) => {
   const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
   for (const headerGroup of headerGroups) {
@@ -85,9 +89,14 @@ export const TableHead: React.FC<TableHeadProps> = ({
       type: MessageFromWebviewType.REORDER_COLUMNS
     })
   }
+  const [ref, scrolled] = useInView({
+    root,
+    rootMargin: '-15px 0px 0px 0px',
+    threshold: 1
+  })
 
   return (
-    <div className={styles.thead}>
+    <div className={cx(styles.thead, scrolled && styles.scrolled)} ref={ref}>
       <Indicators
         sorts={sorts}
         filters={filters}

@@ -15,4 +15,13 @@ const mutationObserverMock = jest.fn().mockImplementation(() => {
 })
 global.MutationObserver = mutationObserverMock
 
+const intersectionObserverMock = jest.fn().mockImplementation(() => {
+  return {
+    disconnect: jest.fn(),
+    observe: jest.fn(),
+    unobserve: jest.fn()
+  }
+})
+global.IntersectionObserver = intersectionObserverMock
+
 StyleUtils.getThemeValue = jest.fn().mockImplementation(() => '#ffffff')
