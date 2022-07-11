@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: '16'
           cache: yarn
-      - run: yarn run install-frozen-lockfile
+      - run: yarn install
 
       - name: Setup Python environment
         uses: actions/setup-python@v4
