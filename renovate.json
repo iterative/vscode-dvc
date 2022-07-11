@@ -3,7 +3,7 @@
   "packageRules": [
     {
       "internalChecksFilter": "strict",
-      "matchLanguages": ["javascript", "python"],
+      "matchManagers": ["npm", "pip_requirements"],
       "stabilityDays": 7
     }
   ]
