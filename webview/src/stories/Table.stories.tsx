@@ -1,14 +1,17 @@
 import React from 'react'
-import { Story, Meta } from '@storybook/react/types-6-0'
+import { ComponentStory } from '@storybook/react'
+import { Meta } from '@storybook/react/types-6-0'
 import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
-import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
+import { getAllByRole, within } from '@storybook/testing-library'
+import { findByText } from '@testing-library/react'
+import Experiments from '../experiments/components/Experiments'
 
 const tableData: TableData = {
   changes: workspaceChangesFixture,
@@ -53,7 +56,7 @@ export default {
   title: 'Table'
 } as Meta
 
-const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
+const Template: ComponentStory<typeof Experiments> = ({ tableData }) => {
   return <Experiments tableData={tableData} />
 }
 
@@ -101,5 +104,30 @@ WithNoSortsOrFilters.args = {
     ...tableData,
     filters: [],
     sorts: []
+  }
+}
+
+export const Scrolled = Template.bind({})
+Scrolled.play = async ({ canvasElement }) => {
+  await findByText(canvasElement, '90aea7f')
+  const rows = getAllByRole(canvasElement, 'row')
+  const lastRow = rows[rows.length - 1]
+  const lastRowCells = within(lastRow).getAllByRole('cell')
+  const lastCell = lastRowCells[lastRowCells.length - 1]
+  lastCell.scrollIntoView()
+}
+Scrolled.parameters = {
+  viewport: {
+    defaultViewport: 'scrollable',
+    viewports: {
+      scrollable: {
+        name: 'Scrollable',
+        styles: {
+          height: '400px',
+          width: '800px'
+        },
+        type: 'desktop'
+      }
+    }
   }
 }
