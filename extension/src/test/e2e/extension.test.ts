@@ -40,7 +40,7 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       await workbench.executeCommand('DVC: Show Experiments')
 
-      await webview.open()
+      await webview.focus()
 
       await browser.waitUntil(async () => {
         const table = await webview.table$
@@ -49,7 +49,7 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       expect(await webview.table$$).toHaveLength(1)
 
-      await webview.close()
+      await webview.unfocus()
     })
 
     it('should update with a new row for each checkpoint when an experiment is running', async () => {
@@ -57,7 +57,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       const epochs = 15
       await workbench.executeCommand('DVC: Reset and Run Experiment')
 
-      await webview.open()
+      await webview.focus()
 
       await browser.waitUntil(() => webview.expandAllRows())
 
@@ -71,14 +71,19 @@ suite('DVC Extension For Visual Studio Code', () => {
           const currentRows = await webview.row$$
           return currentRows.length >= initialRows.length + epochs
         },
-        { interval: 30000, timeout: 180000 }
+        { interval: 5000, timeout: 180000 }
       )
+
+      await webview.unfocus()
+      await waitForDvcToFinish()
+      await webview.focus()
 
       const finalRows = await webview.row$$
 
       expect(finalRows.length).toStrictEqual(initialRows.length + epochs)
-      await webview.close()
+      await webview.unfocus()
       await waitForDvcToFinish()
+      await workbench.executeCommand('Terminal: Kill All Terminals')
     }).timeout(180000)
   })
 
@@ -95,7 +100,7 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       await waitForDvcToFinish()
 
-      await webview.open()
+      await webview.focus()
 
       await browser.waitUntil(async () => {
         return (await webview.vegaVisualization$$.length) === 6
@@ -109,7 +114,7 @@ suite('DVC Extension For Visual Studio Code', () => {
         expect(plotNotEmpty).toBe(true)
       }
 
-      await webview.close()
+      await webview.unfocus()
     })
   })
 })
