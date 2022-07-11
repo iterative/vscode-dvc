@@ -3,7 +3,7 @@
   "packageRules": [
     {
       "internalChecksFilter": "strict",
-      "matchManagers": ["npm", "pip_requirements"],
+      "matchDatasources": ["npm", "pypi"],
       "stabilityDays": 7
     }
   ]
