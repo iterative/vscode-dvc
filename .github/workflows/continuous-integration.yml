@@ -19,6 +19,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
@@ -55,3 +60,16 @@ jobs:
           storybookBuildDir: 'webview/storybook-static'
           exitOnceUploaded: true
           autoAcceptChanges: 'main'
+
+      - name: Test E2E
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: yarn test:e2e
+          options: '-screen 0 1600x1200x24'
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: screenshots
+          path: |
+            extension/src/test/e2e/screenshots
+            extension/src/test/e2e/logs
