@@ -205,6 +205,7 @@ MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
   const plot = await within(canvasElement).findByTestId(
     'plots-section_template-multi_1'
   )
+  await within(plot).findByRole('graphics-document')
   const plotButton = await within(plot).findByRole('button')
 
   userEvent.click(plotButton)
