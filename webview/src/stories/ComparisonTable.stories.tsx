@@ -59,9 +59,6 @@ const Template: Story = ({ plots, revisions }) => {
 export const Basic = Template.bind({})
 
 export const WithPinnedColumn = Template.bind({})
-WithPinnedColumn.parameters = {
-  chromatic: { delay: 300 }
-}
 WithPinnedColumn.play = async ({ canvasElement }) => {
   const mainHeader = await within(canvasElement).findByTestId('main-header')
   const pin = within(mainHeader).getByRole('button')

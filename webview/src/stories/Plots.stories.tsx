@@ -193,9 +193,6 @@ VirtualizedPlots.args = {
 VirtualizedPlots.parameters = chromaticParameters
 
 export const ZoomedInPlot = Template.bind({})
-ZoomedInPlot.parameters = {
-  chromatic: { delay: 300 }
-}
 ZoomedInPlot.play = async ({ canvasElement }) => {
   const plots = await within(canvasElement).findAllByTestId(/^plot_/)
   const plot = await within(plots[0]).findByRole('button')
