@@ -25,6 +25,7 @@ import {
   TableData
 } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
+import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
 import { App } from './App'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
@@ -613,9 +614,6 @@ describe('App', () => {
     })
 
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a cell', () => {
-      jest
-        .spyOn(window, 'requestAnimationFrame')
-        .mockImplementation(cb => window.setTimeout(cb, 1))
       render(<App />)
       fireEvent(
         window,
@@ -641,13 +639,11 @@ describe('App', () => {
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(1)
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-
-      jest.mocked(window.requestAnimationFrame).mockRestore()
     })
 
-    it('should show a tooltip with the full number on number cells', () => {
+    it('should persist a cell tooltip when it is moused into', () => {
       render(<App />)
       fireEvent(
         window,
@@ -659,13 +655,67 @@ describe('App', () => {
         })
       )
 
-      const testMetricCell = screen.getByText('1.9293')
-      fireEvent.mouseEnter(testMetricCell, { bubbles: true })
+      const testParamCell = screen.getByText(testParamStringValue)
+      fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
       jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
-      expect(tooltip).toHaveTextContent(String(testMetricNumberValue))
+
+      fireEvent.mouseLeave(testParamCell, { bubbles: true })
+      fireEvent.mouseEnter(tooltip, { bubbles: true })
+
+      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      expect(tooltip).toBeInTheDocument()
+    })
+
+    it('should show the expected tooltip for all data types', () => {
+      const expectTooltipValue: (args: {
+        cellLabel: string
+        expectedTooltipResult: string
+      }) => void = ({ cellLabel, expectedTooltipResult }) => {
+        const testParamCell = screen.getByText(cellLabel)
+        expect(testParamCell).toBeInTheDocument()
+
+        fireEvent.mouseEnter(testParamCell, { bubbles: true })
+
+        jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+        const tooltip = screen.queryByRole('tooltip')
+        expect(tooltip).toHaveTextContent(expectedTooltipResult)
+
+        fireEvent.mouseLeave(testParamCell, { bubbles: true })
+
+        jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+        expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+      }
+
+      render(<App />)
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: dataTypesTableData,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      expectTooltipValue({
+        cellLabel: '1.9293',
+        expectedTooltipResult: '1.9293040037155151'
+      })
+      expectTooltipValue({
+        cellLabel: 'true',
+        expectedTooltipResult: 'true'
+      })
+      expectTooltipValue({
+        cellLabel: 'false',
+        expectedTooltipResult: 'false'
+      })
+      expectTooltipValue({
+        cellLabel: '[true, false, string, 2]',
+        expectedTooltipResult: '[true, false, string, 2]'
+      })
     })
   })
 

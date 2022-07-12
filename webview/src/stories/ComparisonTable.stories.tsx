@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { configureStore } from '@reduxjs/toolkit'
-import { within } from '@testing-library/react'
+import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
@@ -59,15 +59,11 @@ const Template: Story = ({ plots, revisions }) => {
 export const Basic = Template.bind({})
 
 export const WithPinnedColumn = Template.bind({})
-WithPinnedColumn.parameters = {
-  chromatic: { delay: 300 }
-}
 WithPinnedColumn.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement)
-  const mainHeader = await canvas.findByTestId('main-header')
+  const mainHeader = await within(canvasElement).findByTestId('main-header')
   const pin = within(mainHeader).getByRole('button')
 
-  pin.click()
+  userEvent.click(pin)
 }
 
 const removeSingleImage = (

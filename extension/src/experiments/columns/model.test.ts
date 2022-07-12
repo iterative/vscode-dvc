@@ -10,21 +10,32 @@ import {
   deeplyNestedOutput,
   columns as deeplyNestedColumns
 } from '../../test/fixtures/expShow/deeplyNested'
+import {
+  dataTypesOutput,
+  columns as dataTypesColumns
+} from '../../test/fixtures/expShow/dataTypes'
 
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
 
-  it('should return columns that equal the columns fixture when given the output fixture', async () => {
+  it('should return the expected columns when given the default output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
     await model.transformAndSet(outputFixture)
     expect(model.getSelected()).toStrictEqual(columnsFixture)
   })
 
-  it('should return data that equal the deeply nested output fixture', async () => {
+  it('should return the expected columns when given the deeply nested output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
     await model.transformAndSet(deeplyNestedOutput)
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
   })
+
+  it('should return the expected columns when given the data types output fixture', async () => {
+    const model = new ColumnsModel('', buildMockMemento())
+    await model.transformAndSet(dataTypesOutput)
+    expect(model.getSelected()).toStrictEqual(dataTypesColumns)
+  })
+
   describe('persistence', () => {
     const paramsDotYamlPath = buildMetricOrParamPath(
       ColumnType.PARAMS,
