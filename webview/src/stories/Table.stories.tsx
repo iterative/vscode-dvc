@@ -5,10 +5,13 @@ import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
+import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
+import { within, userEvent } from '@storybook/testing-library'
 import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
+import { CELL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 
 const tableData: TableData = {
   changes: workspaceChangesFixture,
@@ -77,6 +80,16 @@ WithNoRunningExperiments.args = {
       }))
     }))
   }
+}
+
+export const WithAllDataTypes = Template.bind({})
+WithAllDataTypes.args = { tableData: dataTypesTableData }
+WithAllDataTypes.play = async ({ canvasElement }) => {
+  const falseCell = await within(canvasElement).findByText('false')
+  userEvent.hover(falseCell, { bubbles: true })
+}
+WithAllDataTypes.parameters = {
+  chromatic: { delay: CELL_TOOLTIP_DELAY }
 }
 
 export const WithDeeplyNestedHeaders = Template.bind({})
