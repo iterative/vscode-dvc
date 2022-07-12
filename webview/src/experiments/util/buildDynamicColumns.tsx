@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { SyntheticEvent } from 'react'
 import get from 'lodash/get'
 import {
   Column as TableColumn,
@@ -13,7 +13,6 @@ import Tooltip, {
   CELL_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/table/styles.module.scss'
-import tooltipStyles from '../../shared/components/tooltip/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
 const UndefinedCell = (
@@ -23,21 +22,18 @@ const UndefinedCell = (
 )
 
 const CellTooltip: React.FC<{
-  cell: Cell<Experiment, string | number>
-}> = ({ cell }) => {
-  const { value } = cell
+  stringValue: string
+}> = ({ stringValue }) => {
+  const stopPropagation = (e: SyntheticEvent) => e.stopPropagation()
   return (
     <div
+      className={styles.cellTooltip}
       role="textbox"
       tabIndex={0}
-      onClick={e => {
-        e.stopPropagation()
-      }}
-      onKeyDown={e => {
-        e.stopPropagation()
-      }}
+      onClick={stopPropagation}
+      onKeyDown={stopPropagation}
     >
-      {value}
+      {stringValue}
     </div>
   )
 }
@@ -57,8 +53,7 @@ const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
 
   return (
     <Tooltip
-      className={tooltipStyles.padded}
-      content={<CellTooltip cell={cell} />}
+      content={<CellTooltip stringValue={stringValue} />}
       placement="bottom"
       arrow={true}
       delay={[CELL_TOOLTIP_DELAY, 0]}
