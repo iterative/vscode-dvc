@@ -8110,10 +8110,10 @@ eslint-module-utils@^2.7.3:
     debug "^3.2.7"
     find-up "^2.1.0"
 
-eslint-plugin-check-file@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-1.2.0.tgz#3d2785756aebc24ccc019440633a1951c80a2858"
-  integrity sha512-sDP0+xALO0XnTZohPFmCDfLGzS4Gv1AlFHGYM6KiPw4JShwN8fZVlmRGo9lnEFZ1LfoYDwEt80SAQeBqEhav3Q==
+eslint-plugin-check-file@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-1.2.1.tgz#96ca65379d4a2c963a52514ac3bc489a3b272ceb"
+  integrity sha512-Ue/KOxOvK78eLOVLPuKxrZ+95iA06PkauwqadkSXVJW7h1ywi6PYRsuevr2BrRbiw8c1DF4NQXMqTlgxvjdzpA==
   dependencies:
     is-glob "^4.0.3"
     micromatch "^4.0.4"
@@ -9052,10 +9052,10 @@ foreground-child@^2.0.0:
     cross-spawn "^7.0.0"
     signal-exit "^3.0.2"
 
-fork-ts-checker-webpack-plugin@7.2.11:
-  version "7.2.11"
-  resolved "https://registry.yarnpkg.com/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-7.2.11.tgz#aff3febbc11544ba3ad0ae4d5aa4055bd15cd26d"
-  integrity sha512-2e5+NyTUTE1Xq4fWo7KFEQblCaIvvINQwUX3jRmEGlgCTc1Ecqw/975EfQrQ0GEraxJTnp8KB9d/c8hlCHUMJA==
+fork-ts-checker-webpack-plugin@7.2.12:
+  version "7.2.12"
+  resolved "https://registry.yarnpkg.com/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-7.2.12.tgz#d15c48745f9092574b41138934aa3de504a39ba1"
+  integrity sha512-SCjmmjPXPgp5XRQ49hXd2Eqth8rz4+ggtOHygTzyaOn32oIIOd8Kw+xKcgXNkFGlZy5l03bHRYTkbQs+TWhaNA==
   dependencies:
     "@babel/code-frame" "^7.16.7"
     chalk "^4.1.2"
