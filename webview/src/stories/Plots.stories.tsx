@@ -204,9 +204,6 @@ ZoomedInPlot.play = async ({ canvasElement }) => {
 }
 
 export const MultiviewZoomedInPlot = Template.bind({})
-MultiviewZoomedInPlot.parameters = {
-  chromatic: { delay: 300 }
-}
 MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
   const plot = await within(canvasElement).findByTestId(
     'plots-section_template-multi_1'
