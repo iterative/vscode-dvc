@@ -3,7 +3,7 @@
   "packageRules": [
     {
       "internalChecksFilter": "strict",
-      "matchLanguages": ["javascript", "python"],
+      "matchDatasources": ["npm", "pypi"],
       "stabilityDays": 7
     }
   ]
