@@ -4,7 +4,7 @@ import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { Config } from '../../config'
 import { exists } from '../../fileSystem'
-import { getVenvBinPath } from '../../python'
+import { getVenvBinPath } from '../../python/path'
 import { dvcDemoPath } from '../util'
 
 const config = {

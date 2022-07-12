@@ -1,4 +1,5 @@
 import { join } from 'path'
+import { getVenvBinPath } from './path'
 import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { createProcessWithOutput } from '../processExecution'
@@ -10,11 +11,6 @@ const installPackages = (cwd: string, pythonBin: string, ...args: string[]) => {
     executable: pythonBin
   })
 }
-
-export const getVenvBinPath = (cwd: string, envDir: string, name: string) =>
-  getProcessPlatform() === 'win32'
-    ? join(cwd, envDir, 'Scripts', `${name}.exe`)
-    : join(cwd, envDir, 'bin', name)
 
 export const setupVenv = async (
   cwd: string,
