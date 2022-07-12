@@ -1,8 +1,23 @@
-import { ChainablePromiseArray, ElementArray } from 'webdriverio'
+import {
+  ChainablePromiseArray,
+  ChainablePromiseElement,
+  ElementArray
+} from 'webdriverio'
 import { ViewControl } from 'wdio-vscode-service'
 
 const findProgressBars = (): ChainablePromiseArray<ElementArray> =>
   $$('.monaco-progress-container')
+
+const findCurrentTreeItems = (): ChainablePromiseArray<ElementArray> =>
+  $$('div[role="treeitem"]')
+
+export const getLabel = (element: WebdriverIO.Element): Promise<string> =>
+  element.getAttribute('aria-label')
+
+export const findDecorationTooltip = (
+  element: WebdriverIO.Element
+): ChainablePromiseElement<WebdriverIO.Element> =>
+  element.$('div[title*="• DVC modified"]')
 
 export const dismissAllNotifications = async (): Promise<void> => {
   await browser.waitUntil(async () => {
@@ -95,4 +110,14 @@ export const closeAllEditors = async (): Promise<void> => {
   const workbench = await browser.getWorkbench()
   const editorView = workbench.getEditorView()
   return editorView.closeAllEditors()
+}
+
+export const findScmTreeItems = async () => {
+  const workspace = await browser.getWorkbench()
+  const activityBar = workspace.getActivityBar()
+  const sourceControlIcon = await activityBar.getViewControl('Source Control')
+
+  await sourceControlIcon?.openView()
+
+  return findCurrentTreeItems()
 }
