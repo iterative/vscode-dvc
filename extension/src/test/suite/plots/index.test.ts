@@ -619,7 +619,7 @@ suite('Plots Test Suite', () => {
         { revisions: 1 },
         undefined
       )
-      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, '53c3851')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -652,7 +652,7 @@ suite('Plots Test Suite', () => {
         { revisions: 5 },
         undefined
       )
-      expect(mockPlotsDiff).to.be.calledOnce
+      expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         '1ba7bcd',
