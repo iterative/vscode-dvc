@@ -193,9 +193,6 @@ VirtualizedPlots.args = {
 VirtualizedPlots.parameters = chromaticParameters
 
 export const ZoomedInPlot = Template.bind({})
-ZoomedInPlot.parameters = {
-  chromatic: { delay: 300 }
-}
 ZoomedInPlot.play = async ({ canvasElement }) => {
   const plots = await within(canvasElement).findAllByTestId(/^plot_/)
   const plot = await within(plots[0]).findByRole('button')
@@ -204,13 +201,11 @@ ZoomedInPlot.play = async ({ canvasElement }) => {
 }
 
 export const MultiviewZoomedInPlot = Template.bind({})
-MultiviewZoomedInPlot.parameters = {
-  chromatic: { delay: 1000 }
-}
 MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
   const plot = await within(canvasElement).findByTestId(
     'plots-section_template-multi_1'
   )
+  await within(plot).findByRole('graphics-document')
   const plotButton = await within(plot).findByRole('button')
 
   userEvent.click(plotButton)
