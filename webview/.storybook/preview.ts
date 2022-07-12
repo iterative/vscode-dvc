@@ -10,7 +10,6 @@ declare global {
   }
 }
 
-window.webviewData = { theme: 'dark' }
 window.acquireVsCodeApi = () =>
   ({
     postMessage: action('postMessage'),
