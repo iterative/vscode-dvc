@@ -9,8 +9,7 @@ import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
-import { getAllByRole, within } from '@storybook/testing-library'
-import { findByText } from '@testing-library/react'
+import { getAllByRole, within, findByText } from '@storybook/testing-library'
 import Experiments from '../experiments/components/Experiments'
 
 const tableData: TableData = {
