@@ -106,7 +106,13 @@ WithNoSortsOrFilters.args = {
   }
 }
 
-export const Scrolled = Template.bind({})
+const Scrolled: ComponentStory<typeof Experiments> = ({ tableData }) => {
+  return (
+    <div style={{ height: 400, width: 600 }}>
+      <Experiments tableData={tableData} />
+    </div>
+  )
+}
 Scrolled.play = async ({ canvasElement }) => {
   await findByText(canvasElement, '90aea7f')
   const rows = getAllByRole(canvasElement, 'row')
@@ -117,7 +123,7 @@ Scrolled.play = async ({ canvasElement }) => {
 }
 Scrolled.parameters = {
   chromatic: {
-    viewports: ['scrollable']
+    viewports: [400]
   },
   viewport: {
     defaultViewport: 'scrollable',
@@ -126,7 +132,7 @@ Scrolled.parameters = {
         name: 'Scrollable',
         styles: {
           height: '400px',
-          width: '800px'
+          width: '600px'
         },
         type: 'desktop'
       }
