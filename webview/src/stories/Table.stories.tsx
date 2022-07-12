@@ -117,7 +117,7 @@ Scrolled.play = async ({ canvasElement }) => {
 }
 Scrolled.parameters = {
   chromatic: {
-    viewports: [400, 800]
+    viewports: ['scrollable']
   },
   viewport: {
     defaultViewport: 'scrollable',
