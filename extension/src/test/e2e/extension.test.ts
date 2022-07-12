@@ -163,6 +163,6 @@ suite('DVC Extension For Visual Studio Code', () => {
       expect(expectedScmItemLabels.sort()).toStrictEqual(
         dvcTreeItemLabels.sort()
       )
-    }).timeout(60000)
+    })
   })
 })
