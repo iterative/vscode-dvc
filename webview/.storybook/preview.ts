@@ -22,5 +22,13 @@ export const parameters = {
   viewport: {
     viewports,
     defaultViewport: 'default'
+  },
+  themes: {
+    default: 'dark',
+    list: [
+      { name: 'dark', class: 'vscode-dark', color: '#222' },
+      { name: 'light', class: 'vscode-light', color: '#EEE' },
+      { name: 'divebar', class: 'vscode-divebar', color: '#E2E' }
+    ]
   }
 }
