@@ -74,7 +74,6 @@
     "sass": "1.53.0",
     "sass-loader": "13.0.2",
     "storybook-addon-designs": "6.3.1",
-    "storybook-addon-themes": "^6.1.0",
     "style-loader": "3.3.1",
     "ts-jest": "28.0.5",
     "ts-loader": "9.3.1",
