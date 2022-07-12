@@ -116,6 +116,9 @@ Scrolled.play = async ({ canvasElement }) => {
   lastCell.scrollIntoView()
 }
 Scrolled.parameters = {
+  chromatic: {
+    viewports: [400, 800]
+  },
   viewport: {
     defaultViewport: 'scrollable',
     viewports: {
