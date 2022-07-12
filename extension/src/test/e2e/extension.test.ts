@@ -125,8 +125,6 @@ suite('DVC Extension For Visual Studio Code', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Source Control View', () => {
     it('should show the expected changes after running an experiment', async () => {
-      const treeItems = await findScmTreeItems()
-
       const expectedScmItemLabels = [
         'demo DVC',
         'training_metrics',
@@ -140,6 +138,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       await browser.waitUntil(
         async () => {
           dvcTreeItemLabels = []
+          const treeItems = await findScmTreeItems()
           for (const treeItem of treeItems) {
             const treeItemLabel = await getLabel(treeItem)
             if (!expectedScmSet.has(treeItemLabel)) {
