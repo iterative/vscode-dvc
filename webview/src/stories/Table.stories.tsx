@@ -123,7 +123,7 @@ WithNoSortsOrFilters.args = {
   }
 }
 
-const Scrolled: ComponentStory<typeof Experiments> = ({ tableData }) => {
+export const Scrolled: ComponentStory<typeof Experiments> = ({ tableData }) => {
   return (
     <div style={{ height: 400, width: 600 }}>
       <Experiments tableData={tableData} />
