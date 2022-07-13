@@ -89,14 +89,17 @@ export const TableHead = ({
       type: MessageFromWebviewType.REORDER_COLUMNS
     })
   }
-  const [ref, scrolled] = useInView({
+  const [ref, needsShadow] = useInView({
     root,
     rootMargin: '-15px 0px 0px 0px',
     threshold: 1
   })
 
   return (
-    <div className={cx(styles.thead, scrolled && styles.scrolled)} ref={ref}>
+    <div
+      className={cx(styles.thead, needsShadow && styles.headWithShadow)}
+      ref={ref}
+    >
       <Indicators
         sorts={sorts}
         filters={filters}

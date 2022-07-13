@@ -617,7 +617,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   top: 0;
   z-index: 4;
 
-  &.scrolled {
+  &.headWithShadow {
     box-shadow: 0 5px 8px -2px var(--vscode-widget-shadow);
   }
 }
