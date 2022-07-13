@@ -17,7 +17,7 @@ export class BaseWebview extends BasePage<
     this.locatorKey = locatorKey
   }
 
-  public async open() {
+  public async focus() {
     const webviewContainer = await this.outerFrame$
 
     await this.outerFrame$.waitForDisplayed()
@@ -31,7 +31,7 @@ export class BaseWebview extends BasePage<
     return browser.switchToFrame(webviewInner)
   }
 
-  public async close() {
+  public async unfocus() {
     await browser.switchToFrame(null)
     await browser.switchToFrame(null)
   }

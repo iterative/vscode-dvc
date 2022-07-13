@@ -1,7 +1,26 @@
+import {
+  ChainablePromiseArray,
+  ChainablePromiseElement,
+  ElementArray
+} from 'webdriverio'
 import { ViewControl } from 'wdio-vscode-service'
 
-export const dismissAllNotifications = () =>
-  browser.waitUntil(async () => {
+const findProgressBars = (): ChainablePromiseArray<ElementArray> =>
+  $$('.monaco-progress-container')
+
+const findCurrentTreeItems = (): ChainablePromiseArray<ElementArray> =>
+  $$('div[role="treeitem"]')
+
+export const getLabel = (element: WebdriverIO.Element): Promise<string> =>
+  element.getAttribute('aria-label')
+
+export const findDecorationTooltip = (
+  element: WebdriverIO.Element
+): ChainablePromiseElement<WebdriverIO.Element> =>
+  element.$('div[title*="• DVC modified"]')
+
+export const dismissAllNotifications = async (): Promise<void> => {
+  await browser.waitUntil(async () => {
     const workbench = await browser.getWorkbench()
     const notifications = await workbench.getNotifications()
     for (const n of notifications) {
@@ -10,6 +29,23 @@ export const dismissAllNotifications = () =>
     const openNotifications = await workbench.getNotifications()
     return openNotifications.length === 0
   })
+}
+
+const dvcIsWorking = async (): Promise<boolean> => {
+  const workbench = await browser.getWorkbench()
+  const statusBar = workbench.getStatusBar()
+  const statusBarItems = await statusBar.getItems()
+  return statusBarItems.some(
+    statusBarItem =>
+      statusBarItem.includes('loading~spin') && statusBarItem.includes('DVC')
+  )
+}
+
+export const waitForDvcToFinish = async (): Promise<void> => {
+  await browser.waitUntil(async () => !(await dvcIsWorking()), {
+    timeout: 60000
+  })
+}
 
 export const getDVCActivityBarIcon = async (): Promise<ViewControl> => {
   const workbench = await browser.getWorkbench()
@@ -22,8 +58,8 @@ export const getDVCActivityBarIcon = async (): Promise<ViewControl> => {
   return activityBar.getViewControl('DVC') as Promise<ViewControl>
 }
 
-export const waitForViewContainerToLoad = async () => {
-  const initialProgressBars = await $$('.monaco-progress-container')
+export const waitForViewContainerToLoad = async (): Promise<void> => {
+  const initialProgressBars = await findProgressBars()
   await browser.waitUntil(async () => {
     const dvcIcon = await getDVCActivityBarIcon()
     if (!dvcIcon) {
@@ -35,29 +71,53 @@ export const waitForViewContainerToLoad = async () => {
     return !!view
   })
 
-  return browser.waitUntil(async () => {
+  await browser.waitUntil(async () => {
     const numberOfProgressBarsInContainer = 7
-    const currentProgressBars = await $$('.monaco-progress-container')
+    const currentProgressBars = await findProgressBars()
 
-    if (
+    return !(
       currentProgressBars.length <
       initialProgressBars.length + numberOfProgressBarsInContainer
-    ) {
-      return false
-    }
+    )
+  })
 
-    for (const progress of currentProgressBars) {
-      if ((await progress.getAttribute('aria-hidden')) !== 'true') {
+  await waitForDvcToFinish()
+
+  const workbench = await browser.getWorkbench()
+  await workbench.executeCommand('DVC: Pull')
+
+  await browser.waitUntil(
+    async () => {
+      if (await dvcIsWorking()) {
         return false
       }
-    }
 
-    return true
-  })
+      const currentProgressBars = await findProgressBars()
+
+      for (const progress of currentProgressBars) {
+        if (await progress.isDisplayed()) {
+          return false
+        }
+      }
+
+      return true
+    },
+    { timeout: 180000 }
+  )
 }
 
-export const closeAllEditors = async () => {
+export const closeAllEditors = async (): Promise<void> => {
   const workbench = await browser.getWorkbench()
   const editorView = workbench.getEditorView()
   return editorView.closeAllEditors()
+}
+
+export const findScmTreeItems = async () => {
+  const workspace = await browser.getWorkbench()
+  const activityBar = workspace.getActivityBar()
+  const sourceControlIcon = await activityBar.getViewControl('Source Control')
+
+  await sourceControlIcon?.openView()
+
+  return findCurrentTreeItems()
 }

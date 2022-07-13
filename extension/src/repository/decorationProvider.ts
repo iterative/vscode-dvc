@@ -63,7 +63,7 @@ export class DecorationProvider
   private static DecorationGitModified: FileDecoration = {
     badge: 'M',
     color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
-    tooltip: 'DVC tracked'
+    tooltip: 'DVC modified'
   }
 
   private static DecorationTracked: FileDecoration = {
