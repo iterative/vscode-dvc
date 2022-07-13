@@ -11,7 +11,7 @@ export class ExperimentsWebview extends BaseWebview {
   public async expandAllRows() {
     const expandRowButtons = await this.expandRowButton$$
     for (const button of expandRowButtons) {
-      button.click()
+      await button.click()
     }
     return expandRowButtons.length === 0
   }
