@@ -660,7 +660,7 @@ html {
   --tag-corner-radius: 2px;
 }
 
-html.vscode-divebar {
+.vscode-divebar {
   // body.vscode-dark
   --background: #141322;
   --contrast-active-border: transparent;
@@ -1397,7 +1397,7 @@ html.vscode-divebar {
   --panel-view-border: #80808059;
   --tag-corner-radius: 2px;
 }
-html.vscode-light {
+.vscode-light {
   // body.vscode-light
   --background: #ffffff;
   --contrast-active-border: transparent;
@@ -2065,7 +2065,7 @@ html.vscode-light {
   --panel-view-border: #80808059;
   --tag-corner-radius: 2px;
 }
-html.vscode-onedarkpro {
+.vscode-onedarkpro {
   // body.vscode-dark
   --contrast-active-border: transparent;
   --font-family: system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
@@ -4141,7 +4141,7 @@ html.vscode-onedarkpro {
   --tag-corner-radius: 2px;
 }
 
-html.vscode-high-contrast-dark {
+.vscode-high-contrast-dark {
   // body.vscode-high-contrast
   --font-family: system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
   --font-weight: normal;
