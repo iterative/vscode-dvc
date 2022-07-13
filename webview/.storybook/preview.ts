@@ -24,13 +24,13 @@ export const parameters = {
     defaultViewport: 'default'
   },
   themes: {
-    default: 'Dark',
+    default: 'Default Dark',
     list: [
-      { name: 'Dark', class: 'vscode-dark', color: '#222' },
-      { name: 'Light', class: 'vscode-light', color: '#EEE' },
-      { name: 'One Dark Pro', class: 'vscode-onedarkpro', color: '#333' },
+      { name: 'Default Dark', class: 'vscode-dark', color: '#222' },
+      { name: 'Default Light', class: 'vscode-light', color: '#EEE' },
       { name: 'Red', class: 'vscode-red', color: '#F22' },
       { name: 'Dive Bar', class: 'vscode-divebar', color: '#E2E' },
+      { name: 'One Dark Pro', class: 'vscode-onedarkpro', color: '#333' },
       {
         name: 'High Contrast Light',
         class: 'vscode-high-contrast-light',
