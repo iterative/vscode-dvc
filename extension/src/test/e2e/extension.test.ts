@@ -1,8 +1,12 @@
+import { join } from 'path'
 import { suite, before, describe, it } from 'mocha'
 import {
   closeAllEditors,
   dismissAllNotifications,
+  findDecorationTooltip,
+  findScmTreeItems,
   getDVCActivityBarIcon,
+  getLabel,
   waitForDvcToFinish,
   waitForViewContainerToLoad
 } from './util'
@@ -115,6 +119,50 @@ suite('DVC Extension For Visual Studio Code', () => {
       }
 
       await webview.unfocus()
+    })
+  })
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  describe('Source Control View', () => {
+    it('should show the expected changes after running an experiment', async () => {
+      const expectedScmItemLabels = [
+        'demo DVC',
+        'training_metrics',
+        'scalars, training_metrics',
+        `acc.tsv, ${join('training_metrics', 'scalars')}`,
+        `loss.tsv, ${join('training_metrics', 'scalars')}`
+      ]
+      const expectedScmSet = new Set(expectedScmItemLabels)
+      let dvcTreeItemLabels: string[] = []
+
+      await browser.waitUntil(
+        async () => {
+          dvcTreeItemLabels = []
+          const treeItems = await findScmTreeItems()
+          for (const treeItem of treeItems) {
+            const treeItemLabel = await getLabel(treeItem)
+            if (!expectedScmSet.has(treeItemLabel)) {
+              continue
+            }
+            dvcTreeItemLabels.push(treeItemLabel)
+            if (treeItemLabel === 'demo DVC') {
+              continue
+            }
+
+            const tooltip = await findDecorationTooltip(treeItem)
+            expect(tooltip).toBeTruthy()
+          }
+          return expectedScmItemLabels.length === dvcTreeItemLabels.length
+        },
+        {
+          interval: 5000,
+          timeout: 60000
+        }
+      )
+
+      expect(expectedScmItemLabels.sort()).toStrictEqual(
+        dvcTreeItemLabels.sort()
+      )
     })
   })
 })
