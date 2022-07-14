@@ -55,8 +55,6 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly columns: ColumnsModel
   private readonly checkpoints: CheckpointsModel
 
-  private readonly webviewMessages: WebviewMessages
-
   private readonly paramsFileFocused = this.dispose.track(
     new EventEmitter<string | undefined>()
   )
@@ -119,14 +117,6 @@ export class Experiments extends BaseRepository<TableData> {
           this.checkpointsChanged.fire()
         }
       })
-    )
-
-    this.webviewMessages = new WebviewMessages(
-      this.dvcRoot,
-      this.experiments,
-      this.columns,
-      () => this.notifyChanged(),
-      () => this.selectColumns()
     )
 
     this.handleMessageFromWebview()
@@ -467,9 +457,17 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private handleMessageFromWebview() {
+    const webviewMessages = new WebviewMessages(
+      this.dvcRoot,
+      this.experiments,
+      this.columns,
+      () => this.notifyChanged(),
+      () => this.selectColumns()
+    )
+
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
-        this.webviewMessages.handleMessageFromWebview(message)
+        webviewMessages.handleMessageFromWebview(message)
       )
     )
   }
