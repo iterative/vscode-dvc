@@ -5,10 +5,9 @@ import {
   ComparisonPlot,
   ComparisonRevisionData,
   PlotsData as TPlotsData,
-  PlotSize,
-  Section,
-  SectionCollapsed
+  Section
 } from './webview/contract'
+import { WebviewMessages } from './webview/messages'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
 import { collectScale } from './paths/collect'
@@ -19,16 +18,9 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import {
-  MessageFromWebviewType,
-  PlotsTemplatesReordered
-} from '../webview/contract'
-import { Logger } from '../common/logger'
 import { definedAndNonEmpty } from '../util/array'
 import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
 import { getModifiedTime, removeDir } from '../fileSystem'
-import { sendTelemetryEvent } from '../telemetry'
-import { EventName } from '../telemetry/constants'
 import { Toast } from '../vscode/toast'
 import { pickPaths } from '../path/selection/quickPick'
 
@@ -75,8 +67,6 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.ensureTempDirRemoved()
 
-    this.handleMessageFromWebview()
-
     this.workspaceState = workspaceState
 
     this.onDidChangePaths = this.pathsChanged.event
@@ -91,6 +81,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.paths = this.dispose.track(
       new PathsModel(this.dvcRoot, this.workspaceState)
     )
+
+    this.handleMessageFromWebview(this.paths, this.plots, this.experiments)
 
     this.data.setModel(this.plots)
 
@@ -243,152 +235,46 @@ export class Plots extends BaseRepository<TPlotsData> {
     }
   }
 
-  private handleMessageFromWebview() {
+  private handleMessageFromWebview(
+    paths: PathsModel,
+    plots: PlotsModel,
+    experiments: Experiments
+  ) {
+    const webviewMessages = new WebviewMessages(
+      paths,
+      plots,
+      experiments,
+      () => this.sendSectionCollapsed(),
+      () => this.sendTemplatePlots(),
+      () => this.sendComparisonPlots(),
+      () => this.sendCheckpointPlotsData(),
+      () => this.selectPlots(),
+      () => this.data.update()
+    )
     this.dispose.track(
-      this.onDidReceivedWebviewMessage(message => {
-        switch (message.type) {
-          case MessageFromWebviewType.TOGGLE_METRIC:
-            return this.setSelectedMetrics(message.payload)
-          case MessageFromWebviewType.RESIZE_PLOTS:
-            return this.setPlotSize(
-              message.payload.section,
-              message.payload.size
-            )
-          case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
-            return this.setSectionCollapsed(message.payload)
-          case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
-            return this.setComparisonOrder(message.payload)
-          case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
-            return this.setTemplateOrder(message.payload)
-          case MessageFromWebviewType.REORDER_PLOTS_METRICS:
-            return this.setMetricOrder(message.payload)
-          case MessageFromWebviewType.SELECT_PLOTS:
-            return this.selectPlotsFromWebview()
-          case MessageFromWebviewType.SELECT_EXPERIMENTS:
-            return this.selectExperimentsFromWebview()
-          case MessageFromWebviewType.REFRESH_REVISION:
-            return this.attemptToRefreshRevData(message.payload)
-          case MessageFromWebviewType.REFRESH_REVISIONS:
-            return this.attemptToRefreshSelectedData(message.payload)
-          case MessageFromWebviewType.TOGGLE_EXPERIMENT:
-            return this.setExperimentStatus(message.payload)
-          default:
-            Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
-        }
-      })
+      this.onDidReceivedWebviewMessage(message =>
+        webviewMessages.handleMessageFromWebview(message)
+      )
     )
   }
 
-  private setSelectedMetrics(metrics: string[]) {
-    this.plots?.setSelectedMetrics(metrics)
-    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
-  }
-
-  private setPlotSize(section: Section, size: PlotSize) {
-    this.plots?.setPlotSize(section, size)
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_SECTION_RESIZED,
-      { section, size },
-      undefined
-    )
-  }
-
-  private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {
-    this.plots?.setSectionCollapsed(collapsed)
+  private sendSectionCollapsed() {
     this.webview?.show({
       sectionCollapsed: this.plots?.getSectionCollapsed()
     })
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_SECTION_TOGGLE,
-      collapsed,
-      undefined
-    )
   }
 
-  private setComparisonOrder(order: string[]) {
-    this.plots?.setComparisonOrder(order)
+  private sendComparisonPlots() {
     this.webview?.show({
       comparison: this.getComparisonPlots(),
       selectedRevisions: this.plots?.getSelectedRevisionDetails()
     })
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
-      undefined,
-      undefined
-    )
   }
 
-  private setTemplateOrder(order: PlotsTemplatesReordered) {
-    this.paths?.setTemplateOrder(order)
+  private sendTemplatePlots() {
     this.webview?.show({
       template: this.getTemplatePlots()
     })
-    sendTelemetryEvent(
-      EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
-      undefined,
-      undefined
-    )
-  }
-
-  private setMetricOrder(order: string[]) {
-    this.plots?.setMetricOrder(order)
-    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
-  }
-
-  private selectPlotsFromWebview() {
-    this.selectPlots()
-    sendTelemetryEvent(EventName.VIEWS_PLOTS_SELECT_PLOTS, undefined, undefined)
-  }
-
-  private selectExperimentsFromWebview() {
-    this.experiments?.selectExperiments()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
-      undefined,
-      undefined
-    )
-  }
-
-  private setExperimentStatus(id: string) {
-    this.experiments?.toggleExperimentStatus(id)
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE,
-      undefined,
-      undefined
-    )
-  }
-
-  private attemptToRefreshRevData(revision: string) {
-    Toast.infoWithOptions(`Attempting to refresh plots data for ${revision}.`)
-    this.plots?.setupManualRefresh(revision)
-    this.data.update()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-      { revisions: 1 },
-      undefined
-    )
-  }
-
-  private attemptToRefreshSelectedData(revisions: string[]) {
-    Toast.infoWithOptions('Attempting to refresh visible plots data.')
-    for (const revision of revisions) {
-      this.plots?.setupManualRefresh(revision)
-    }
-    this.data.update()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-      { revisions: revisions.length },
-      undefined
-    )
-  }
-
-  private sendCheckpointPlotsAndEvent(
-    event:
-      | typeof EventName.VIEWS_REORDER_PLOTS_METRICS
-      | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
-  ) {
-    this.sendCheckpointPlotsData()
-    sendTelemetryEvent(event, undefined, undefined)
   }
 
   private waitForInitialData(experiments: Experiments) {
