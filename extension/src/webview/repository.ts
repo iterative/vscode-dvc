@@ -80,6 +80,10 @@ export abstract class BaseRepository<
     )
   }
 
+  public getWebview() {
+    return this.webview
+  }
+
   private resetWebview() {
     this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.webview)
