@@ -1,12 +1,18 @@
 import React from 'react'
-import { Story, Meta } from '@storybook/react/types-6-0'
+import { ComponentStory } from '@storybook/react'
+import { Meta } from '@storybook/react/types-6-0'
 import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
-import { within, userEvent } from '@storybook/testing-library'
+import {
+  within,
+  userEvent,
+  findByText,
+  getAllByRole
+} from '@storybook/testing-library'
 import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
@@ -56,7 +62,7 @@ export default {
   title: 'Table'
 } as Meta
 
-const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
+const Template: ComponentStory<typeof Experiments> = ({ tableData }) => {
   return <Experiments tableData={tableData} />
 }
 
@@ -114,5 +120,39 @@ WithNoSortsOrFilters.args = {
     ...tableData,
     filters: [],
     sorts: []
+  }
+}
+
+export const Scrolled: ComponentStory<typeof Experiments> = ({ tableData }) => {
+  return (
+    <div style={{ height: 400, width: 600 }}>
+      <Experiments tableData={tableData} />
+    </div>
+  )
+}
+Scrolled.play = async ({ canvasElement }) => {
+  await findByText(canvasElement, '90aea7f')
+  const rows = getAllByRole(canvasElement, 'row')
+  const lastRow = rows[rows.length - 1]
+  const lastRowCells = within(lastRow).getAllByRole('cell')
+  const lastCell = lastRowCells[lastRowCells.length - 1]
+  lastCell.scrollIntoView()
+}
+Scrolled.parameters = {
+  chromatic: {
+    viewports: [400]
+  },
+  viewport: {
+    defaultViewport: 'scrollable',
+    viewports: {
+      scrollable: {
+        name: 'Scrollable',
+        styles: {
+          height: '400px',
+          width: '600px'
+        },
+        type: 'desktop'
+      }
+    }
   }
 }

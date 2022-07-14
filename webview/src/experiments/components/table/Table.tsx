@@ -194,6 +194,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
           filteredCounts={filteredCounts}
           filters={filters}
           columns={columns}
+          root={tableRef.current}
         />
         {rows.map(row => (
           <TableBody
