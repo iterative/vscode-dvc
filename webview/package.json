@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.2",
-    "@storybook/testing-library": "^0.0.13",
     "@tippyjs/react": "^4.2.6",
     "@vscode/webview-ui-toolkit": "^1.0.0",
     "classnames": "^2.2.6",
@@ -39,6 +38,7 @@
     "vega-lite": "^5.2.0"
   },
   "devDependencies": {
+    "@storybook/testing-library": "^0.0.13",
     "@storybook/addon-essentials": "6.5.9",
     "@storybook/addon-interactions": "6.5.9",
     "@storybook/addons": "6.5.9",
@@ -46,6 +46,7 @@
     "@storybook/manager-webpack5": "6.5.9",
     "@storybook/preset-scss": "1.0.3",
     "@storybook/react": "6.5.9",
+    "@storybook/testing-library": "0.0.13",
     "@svgr/cli": "6.2.1",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "13.3.0",
@@ -73,7 +74,8 @@
     "raw-loader": "4.0.2",
     "sass": "1.53.0",
     "sass-loader": "13.0.2",
-    "storybook-addon-designs": "6.3.1",
+    "storybook-addon-designs": "^6.3.1",
+    "storybook-addon-themes": "^6.1.0",
     "style-loader": "3.3.1",
     "ts-jest": "28.0.5",
     "ts-loader": "9.3.1",
