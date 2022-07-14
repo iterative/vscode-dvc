@@ -1,4 +1,5 @@
 {
+  "ignoreDeps": ["dvc", "execa", "@types/vscode"],
   "extends": ["config:base"],
   "packageRules": [
     {
