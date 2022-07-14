@@ -1,13 +1,4 @@
-import { join } from 'path'
-import {
-  commands,
-  Event,
-  EventEmitter,
-  Memento,
-  Uri,
-  ViewColumn,
-  window
-} from 'vscode'
+import { Event, EventEmitter, Memento, window } from 'vscode'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickAndModifyParams } from './model/modify/quickPick'
@@ -23,27 +14,21 @@ import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
+import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/filterBy/decorationProvider'
-import { SortDefinition } from './model/sortBy'
-import { splitColumnPath } from './columns/paths'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
-import { MessageFromWebviewType } from '../webview/contract'
-import { Logger } from '../common/logger'
 import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
-import { sendTelemetryEvent } from '../telemetry'
-import { EventName } from '../telemetry/constants'
 import { createTypedAccumulator } from '../util/object'
 import { setContextValue } from '../vscode/context'
 import { standardizePath } from '../fileSystem/path'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
-import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 
 export const ExperimentsScale = {
   ...ColumnType,
@@ -69,6 +54,8 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
   private readonly checkpoints: CheckpointsModel
+
+  private readonly webviewMessages: WebviewMessages
 
   private readonly paramsFileFocused = this.dispose.track(
     new EventEmitter<string | undefined>()
@@ -134,6 +121,14 @@ export class Experiments extends BaseRepository<TableData> {
       })
     )
 
+    this.webviewMessages = new WebviewMessages(
+      this.dvcRoot,
+      this.experiments,
+      this.columns,
+      () => this.notifyChanged(),
+      () => this.selectColumns()
+    )
+
     this.handleMessageFromWebview()
     this.setupInitialData()
     this.setActiveEditorContext()
@@ -174,11 +169,6 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getColumnsStatuses() {
     return this.columns.getTerminalNodeStatuses()
-  }
-
-  public toggleExperimentStars(ids: string[]) {
-    this.experiments.toggleStars(ids)
-    this.notifyChanged()
   }
 
   public toggleExperimentStatus(id: string) {
@@ -432,51 +422,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.hasRunningExperiment()
   }
 
-  private focusSortsTree() {
-    const commandPromise = commands.executeCommand(
-      'dvc.views.experimentsSortByTree.focus'
-    )
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE,
-      undefined,
-      undefined
-    )
-    return commandPromise
-  }
-
-  private focusFiltersTree() {
-    const commandPromise = commands.executeCommand(
-      'dvc.views.experimentsFilterByTree.focus'
-    )
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE,
-      undefined,
-      undefined
-    )
-    return commandPromise
-  }
-
-  private hideTableColumn(path: string) {
-    this.toggleColumnStatus(path)
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
-      { path },
-      undefined
-    )
-  }
-
-  private async openParamsFileToTheSide(path: string) {
-    const [, fileSegment] = splitColumnPath(path)
-    await window.showTextDocument(Uri.file(join(this.dvcRoot, fileSegment)), {
-      viewColumn: ViewColumn.Beside
-    })
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE,
-      { path },
-      undefined
-    )
-  }
-
   private setupInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
@@ -523,130 +468,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   private handleMessageFromWebview() {
     this.dispose.track(
-      this.onDidReceivedWebviewMessage(message => {
-        switch (message.type) {
-          case MessageFromWebviewType.REORDER_COLUMNS:
-            return this.setColumnOrder(message.payload)
-          case MessageFromWebviewType.RESIZE_COLUMN:
-            return this.setColumnWidth(
-              message.payload.id,
-              message.payload.width
-            )
-          case MessageFromWebviewType.TOGGLE_EXPERIMENT:
-            return commands.executeCommand(
-              RegisteredCommands.EXPERIMENT_TOGGLE,
-              { dvcRoot: this.dvcRoot, id: message.payload }
-            )
-          case MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR:
-            return this.setExperimentStars(message.payload)
-          case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
-            return this.hideTableColumn(message.payload)
-          case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
-            return this.openParamsFileToTheSide(message.payload)
-          case MessageFromWebviewType.SORT_COLUMN:
-            return this.addColumnSort(message.payload)
-          case MessageFromWebviewType.REMOVE_COLUMN_SORT:
-            return this.removeColumnSort(message.payload)
-          case MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE:
-            return commands.executeCommand(
-              RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
-              { dvcRoot: this.dvcRoot, id: message.payload }
-            )
-          case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
-            return commands.executeCommand(
-              RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
-              { dvcRoot: this.dvcRoot, id: message.payload }
-            )
-          case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
-            return commands.executeCommand(
-              RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
-              { dvcRoot: this.dvcRoot, id: message.payload }
-            )
-          case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN:
-            return commands.executeCommand(
-              RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
-              { dvcRoot: this.dvcRoot, id: message.payload }
-            )
-          case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
-            return commands.executeCommand(
-              RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
-              { dvcRoot: this.dvcRoot, id: message.payload }
-            )
-
-          case MessageFromWebviewType.REMOVE_EXPERIMENT:
-            return commands.executeCommand(
-              RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
-              { dvcRoot: this.dvcRoot, ids: [message.payload].flat() }
-            )
-          case MessageFromWebviewType.SELECT_COLUMNS:
-            return this.setColumnsStatus()
-
-          case MessageFromWebviewType.FOCUS_FILTERS_TREE:
-            return this.focusFiltersTree()
-          case MessageFromWebviewType.FOCUS_SORTS_TREE:
-            return this.focusSortsTree()
-
-          default:
-            Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
-        }
-      })
+      this.onDidReceivedWebviewMessage(message =>
+        this.webviewMessages.handleMessageFromWebview(message)
+      )
     )
-  }
-
-  private setColumnOrder(order: string[]) {
-    this.columns.setColumnOrder(order)
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED,
-      undefined,
-      undefined
-    )
-  }
-
-  private setColumnWidth(id: string, width: number) {
-    this.columns.setColumnWidth(id, width)
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN,
-      { width },
-      undefined
-    )
-  }
-
-  private setExperimentStars(ids: string[]) {
-    this.toggleExperimentStars(ids)
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_STARS_TOGGLE,
-      undefined,
-      undefined
-    )
-  }
-
-  private setColumnsStatus() {
-    this.selectColumns()
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS,
-      undefined,
-      undefined
-    )
-  }
-
-  private addColumnSort(sort: SortDefinition) {
-    this.experiments.addSort(sort)
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN,
-      { ...sort },
-      undefined
-    )
-    return this.notifyChanged()
-  }
-
-  private removeColumnSort(path: string) {
-    this.experiments.removeSort(path)
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT,
-      { path },
-      undefined
-    )
-    return this.notifyChanged()
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
