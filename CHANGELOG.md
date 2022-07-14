@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.10] - 2022-07-14
+
+### 🐛 Bug Fixes
+
+- Fix checkbox selection issues [#1986](https://github.com/iterative/vscode-dvc/pull/1986) by [@wolmir](https://github.com/wolmir)
+- Fix non-standard data type tooltips and add tests [#1991](https://github.com/iterative/vscode-dvc/pull/1991) by [@rogermparent](https://github.com/rogermparent)
+
+### 🔨 Maintenance
+
+- Add stability days to Renovate config [#1992](https://github.com/iterative/vscode-dvc/pull/1992) by [@mattseddon](https://github.com/mattseddon)
+- Add e2e tests (wdio-vscode-service) [#1993](https://github.com/iterative/vscode-dvc/pull/1993) by [@mattseddon](https://github.com/mattseddon)
+- Add matchLanguages to Renovate config [#1998](https://github.com/iterative/vscode-dvc/pull/1998) by [@mattseddon](https://github.com/mattseddon)
+- Add internalChecksFilter to Renovate config [#2001](https://github.com/iterative/vscode-dvc/pull/2001) by [@mattseddon](https://github.com/mattseddon)
+- Fix race condition in manual plot refresh (M1 macs) [#2011](https://github.com/iterative/vscode-dvc/pull/2011) by [@mattseddon](https://github.com/mattseddon)
+- Remove flaky test from unit test suite [#2014](https://github.com/iterative/vscode-dvc/pull/2014) by [@mattseddon](https://github.com/mattseddon)
+- Switch from matchLanguages to matchManagers in Renovate Config [#2012](https://github.com/iterative/vscode-dvc/pull/2012) by [@mattseddon](https://github.com/mattseddon)
+- Add e2e tests into CI [#2002](https://github.com/iterative/vscode-dvc/pull/2002) by [@mattseddon](https://github.com/mattseddon)
+- Add end to end test for SCM and file decorations [#2013](https://github.com/iterative/vscode-dvc/pull/2013) by [@mattseddon](https://github.com/mattseddon)
+- Add Julie to CODEOWNERS [#2018](https://github.com/iterative/vscode-dvc/pull/2018) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.9] - 2022-07-06
 
 ### 🚀 New Features and Enhancements
