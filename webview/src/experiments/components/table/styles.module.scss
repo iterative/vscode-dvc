@@ -611,10 +611,15 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 .thead {
   background-color: $bg-color;
   border-bottom: $row-border;
-  box-shadow: 0 5px 8px -2px var(--vscode-widget-shadow);
+  transition: 0.25s all;
+  box-shadow: none;
   position: sticky;
   top: 0;
   z-index: 4;
+
+  &.headWithShadow {
+    box-shadow: 0 5px 8px -2px var(--vscode-widget-shadow);
+  }
 }
 
 .tableIndicators {
