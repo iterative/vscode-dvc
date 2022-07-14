@@ -17,13 +17,13 @@ import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
 
 export class WebviewMessages {
-  private dvcRoot: string
+  private readonly dvcRoot: string
 
-  private experiments: ExperimentsModel
-  private columns: ColumnsModel
+  private readonly experiments: ExperimentsModel
+  private readonly columns: ColumnsModel
 
-  private notifyChanged: () => void
-  private selectColumns: () => void
+  private readonly notifyChanged: () => void
+  private readonly selectColumns: () => void
 
   constructor(
     dvcRoot: string,
