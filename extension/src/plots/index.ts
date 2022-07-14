@@ -243,13 +243,13 @@ export class Plots extends BaseRepository<TPlotsData> {
     const webviewMessages = new WebviewMessages(
       paths,
       plots,
-      this.data,
       experiments,
       () => this.sendSectionCollapsed(),
       () => this.sendTemplatePlots(),
       () => this.sendComparisonPlots(),
       () => this.sendCheckpointPlotsData(),
-      () => this.selectPlots()
+      () => this.selectPlots(),
+      () => this.data.update()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

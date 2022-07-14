@@ -11,12 +11,10 @@ import {
 } from '../../webview/contract'
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
-import { PlotsData } from '../data'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
   private readonly plots: PlotsModel
-  private readonly data: PlotsData
   private readonly experiments: Experiments
 
   private readonly sendSectionCollapsed: () => void
@@ -24,27 +22,28 @@ export class WebviewMessages {
   private readonly sendComparisonPlots: () => void
   private readonly sendCheckpointPlotsData: () => void
   private readonly selectPlots: () => void
+  private readonly updateData: () => void
 
   constructor(
     paths: PathsModel,
     plots: PlotsModel,
-    data: PlotsData,
     experiments: Experiments,
     sendSectionCollapsed: () => void,
     sendTemplatePlots: () => void,
     sendComparisonPlots: () => void,
     sendCheckpointPlotsData: () => void,
-    selectPlots: () => void
+    selectPlots: () => void,
+    updateData: () => void
   ) {
     this.paths = paths
     this.plots = plots
-    this.data = data
     this.experiments = experiments
     this.sendSectionCollapsed = sendSectionCollapsed
     this.sendTemplatePlots = sendTemplatePlots
     this.sendComparisonPlots = sendComparisonPlots
     this.sendCheckpointPlotsData = sendCheckpointPlotsData
     this.selectPlots = selectPlots
+    this.updateData = updateData
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -77,12 +76,12 @@ export class WebviewMessages {
   }
 
   private setSelectedMetrics(metrics: string[]) {
-    this.plots?.setSelectedMetrics(metrics)
+    this.plots.setSelectedMetrics(metrics)
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
   }
 
   private setPlotSize(section: Section, size: PlotSize) {
-    this.plots?.setPlotSize(section, size)
+    this.plots.setPlotSize(section, size)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
       { section, size },
@@ -91,7 +90,7 @@ export class WebviewMessages {
   }
 
   private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {
-    this.plots?.setSectionCollapsed(collapsed)
+    this.plots.setSectionCollapsed(collapsed)
     this.sendSectionCollapsed()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_TOGGLE,
@@ -131,7 +130,7 @@ export class WebviewMessages {
   }
 
   private selectExperimentsFromWebview() {
-    this.experiments?.selectExperiments()
+    this.experiments.selectExperiments()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
       undefined,
@@ -140,7 +139,7 @@ export class WebviewMessages {
   }
 
   private setExperimentStatus(id: string) {
-    this.experiments?.toggleExperimentStatus(id)
+    this.experiments.toggleExperimentStatus(id)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE,
       undefined,
@@ -150,8 +149,8 @@ export class WebviewMessages {
 
   private attemptToRefreshRevData(revision: string) {
     Toast.infoWithOptions(`Attempting to refresh plots data for ${revision}.`)
-    this.plots?.setupManualRefresh(revision)
-    this.data.update()
+    this.plots.setupManualRefresh(revision)
+    this.updateData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
       { revisions: 1 },
@@ -162,9 +161,9 @@ export class WebviewMessages {
   private attemptToRefreshSelectedData(revisions: string[]) {
     Toast.infoWithOptions('Attempting to refresh visible plots data.')
     for (const revision of revisions) {
-      this.plots?.setupManualRefresh(revision)
+      this.plots.setupManualRefresh(revision)
     }
-    this.data.update()
+    this.updateData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
       { revisions: revisions.length },
