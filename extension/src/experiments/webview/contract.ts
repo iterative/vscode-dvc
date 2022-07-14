@@ -6,8 +6,13 @@ export interface MetricOrParamColumns {
   [filename: string]: ValueTree
 }
 
+export interface ValueWithChanges {
+  value: string | number
+  changes?: boolean
+}
+
 export interface DepColumns {
-  [path: string]: string
+  [path: string]: string | ValueWithChanges
 }
 
 export interface Experiment extends BaseExperimentFields {

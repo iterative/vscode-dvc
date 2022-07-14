@@ -1,6 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import { ValueWithChanges } from 'dvc/src/experiments/webview/contract'
 import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
@@ -189,15 +190,24 @@ export const CellWrapper: React.FC<
     cellId: string
     children?: React.ReactNode
   }
-> = ({ cell, cellId, changes }) => (
-  <div
-    {...cell.getCellProps({
-      className: cx(styles.td, cell.isPlaceholder && styles.groupPlaceholder, {
-        [styles.workspaceChange]: changes?.includes(cell.column.id)
-      })
-    })}
-    data-testid={cellId}
-  >
-    {cell.render('Cell')}
-  </div>
-)
+> = ({ cell, cellId, changes }) => {
+  const cellhasChanges = (cell.value as ValueWithChanges)?.changes
+
+  return (
+    <div
+      {...cell.getCellProps({
+        className: cx(
+          styles.td,
+          cell.isPlaceholder && styles.groupPlaceholder,
+          {
+            [styles.workspaceChange]:
+              changes?.includes(cell.column.id) || cellhasChanges
+          }
+        )
+      })}
+      data-testid={cellId}
+    >
+      {cell.render('Cell')}
+    </div>
+  )
+}

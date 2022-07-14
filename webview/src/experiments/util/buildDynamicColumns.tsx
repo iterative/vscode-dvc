@@ -7,7 +7,11 @@ import {
   ColumnInstance,
   Cell
 } from 'react-table'
-import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  Column,
+  ValueWithChanges
+} from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
 import Tooltip, {
   CELL_TOOLTIP_DELAY
@@ -38,17 +42,21 @@ const CellTooltip: React.FC<{
   )
 }
 
-const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
+const Cell: React.FC<
+  Cell<Experiment, string | number | ValueWithChanges>
+> = cell => {
   const { value } = cell
   if (value === undefined) {
     return UndefinedCell
   }
 
-  const stringValue = String(value)
+  const rawValue = (value as ValueWithChanges).value ?? value
+
+  const stringValue = String(rawValue)
 
   const displayValue =
-    typeof value === 'number' && !Number.isInteger(value)
-      ? formatFloat(value as number)
+    typeof rawValue === 'number' && !Number.isInteger(rawValue)
+      ? formatFloat(rawValue as number)
       : stringValue
 
   return (
