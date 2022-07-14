@@ -28,7 +28,7 @@ async function main() {
       () => {
         removeDir(TEMP_DIR)
       },
-      20000
+      30000
     )
   } catch {
     process.exit(1)
