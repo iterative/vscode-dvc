@@ -80,7 +80,7 @@ export abstract class BaseRepository<
     )
   }
 
-  public getWebview() {
+  protected getWebview() {
     return this.webview
   }
 
