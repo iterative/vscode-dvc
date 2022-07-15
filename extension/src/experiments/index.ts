@@ -120,17 +120,7 @@ export class Experiments extends BaseRepository<TableData> {
       })
     )
 
-    this.webviewMessages = new WebviewMessages(
-      this.dvcRoot,
-      this.experiments,
-      this.columns,
-      this.checkpoints,
-      () => this.getWebview(),
-      () => this.notifyChanged(),
-      () => this.selectColumns()
-    )
-
-    this.handleMessageFromWebview()
+    this.webviewMessages = this.createWebviewMessageHandler()
     this.setupInitialData()
     this.setActiveEditorContext()
   }
@@ -447,12 +437,24 @@ export class Experiments extends BaseRepository<TableData> {
     return this.webviewMessages.sendWebviewMessage()
   }
 
-  private handleMessageFromWebview() {
+  private createWebviewMessageHandler() {
+    const webviewMessages = new WebviewMessages(
+      this.dvcRoot,
+      this.experiments,
+      this.columns,
+      this.checkpoints,
+      () => this.getWebview(),
+      () => this.notifyChanged(),
+      () => this.selectColumns()
+    )
+
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
         this.webviewMessages.handleMessageFromWebview(message)
       )
     )
+
+    return webviewMessages
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
