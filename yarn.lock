@@ -17624,10 +17624,10 @@ wdio-chromedriver-service@^7.3.2:
     split2 "^3.2.2"
     tcp-port-used "^1.0.1"
 
-wdio-vscode-service@3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/wdio-vscode-service/-/wdio-vscode-service-3.0.2.tgz#06786f819ae11699c40f5d49c1b7ba453cd294f5"
-  integrity sha512-1DUk0tkg1ltY9dAgz/ke/+AWRt1EKgCq7x2k78/zs+kbBGd/Fqc99sr66TZQ7CThqmYVdxybnmp9J8eIsw6i6g==
+wdio-vscode-service@3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/wdio-vscode-service/-/wdio-vscode-service-3.0.3.tgz#44763a7dc411de1cda0d503d62b472d55ab7ab4e"
+  integrity sha512-wpK9rSlRFQ9424FZb0rN2Bi4BIn84KX+EoyWGGNiFRVNCuwNeWgWM6/Y/NRVIX6C01r/9wgTz7askLhzADl7sQ==
   dependencies:
     "@types/ws" "^8.5.3"
     "@vscode/test-electron" "^2.1.3"
