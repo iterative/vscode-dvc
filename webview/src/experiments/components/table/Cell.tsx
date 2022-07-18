@@ -8,6 +8,7 @@ import ClockIcon from '../../../shared/components/icons/Clock'
 import { clickAndEnterProps } from '../../../util/props'
 import { StarFull, StarEmpty } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
+import { cellHasChanges } from '../../util/buildDynamicColumns'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -189,15 +190,19 @@ export const CellWrapper: React.FC<
     cellId: string
     children?: React.ReactNode
   }
-> = ({ cell, cellId, changes }) => (
-  <div
-    {...cell.getCellProps({
-      className: cx(styles.td, cell.isPlaceholder && styles.groupPlaceholder, {
-        [styles.workspaceChange]: changes?.includes(cell.column.id)
-      })
-    })}
-    data-testid={cellId}
-  >
-    {cell.render('Cell')}
-  </div>
-)
+> = ({ cell, cellId, changes }) => {
+  return (
+    <div
+      {...cell.getCellProps({
+        className: cx(styles.td, {
+          [styles.workspaceChange]: changes?.includes(cell.column.id),
+          [styles.depChange]: cellHasChanges(cell.value),
+          [styles.groupPlaceholder]: cell.isPlaceholder
+        })
+      })}
+      data-testid={cellId}
+    >
+      {cell.render('Cell')}
+    </div>
+  )
+}

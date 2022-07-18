@@ -407,7 +407,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
   }
 
-  .workspaceChange {
+  .workspaceChange,
+  .depChange {
     color: $changed-color;
   }
 
