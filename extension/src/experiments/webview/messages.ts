@@ -156,7 +156,7 @@ export class WebviewMessages {
 
   private setExperimentStars(ids: string[]) {
     this.experiments.toggleStars(ids)
-    this.notifyChanged()
+    this.sendWebviewMessage()
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_STARS_TOGGLE,
       undefined,
