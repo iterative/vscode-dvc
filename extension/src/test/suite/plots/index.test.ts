@@ -116,7 +116,10 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      experiments.setState(updatedExpShowFixture)
+      experiments.setState({
+        expShow: updatedExpShowFixture,
+        queueStatus: 'Worker status: 0 active, 0 idle'
+      })
 
       await dataUpdateEvent
 
@@ -153,7 +156,10 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      experiments.setState(updatedExpShowFixture)
+      experiments.setState({
+        expShow: updatedExpShowFixture,
+        queueStatus: 'Worker status: 0 active, 0 idle'
+      })
 
       await dataUpdateEvent
 
@@ -226,7 +232,10 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      experiments.setState(updatedExpShowFixture)
+      experiments.setState({
+        expShow: updatedExpShowFixture,
+        queueStatus: 'Worker status: 0 active, 0 idle'
+      })
 
       await branchChangedEvent
       await plotsSentEvent
@@ -243,7 +252,10 @@ suite('Plots Test Suite', () => {
         disposable.track(data.onDidUpdate(() => resolve(undefined)))
       )
 
-      experiments.setState(expShowFixture)
+      experiments.setState({
+        expShow: expShowFixture,
+        queueStatus: 'Worker status: 0 active, 0 idle'
+      })
       await dataUpdateEvent
 
       expect(mockPlotsDiff).to.be.calledTwice

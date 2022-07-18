@@ -859,17 +859,20 @@ suite('Experiments Test Suite', () => {
       )
 
       experiments.setState({
-        testBranch: {
-          baseline: {
-            data: { name: 'testBranch', ...buildTestExperiment(10) }
+        expShow: {
+          testBranch: {
+            baseline: {
+              data: { name: 'testBranch', ...buildTestExperiment(10) }
+            },
+            testExp1: { data: buildTestExperiment(2) },
+            testExp2: { data: buildTestExperiment(1) },
+            testExp3: { data: buildTestExperiment(3) }
           },
-          testExp1: { data: buildTestExperiment(2) },
-          testExp2: { data: buildTestExperiment(1) },
-          testExp3: { data: buildTestExperiment(3) }
+          workspace: {
+            baseline: { data: buildTestExperiment(10) }
+          }
         },
-        workspace: {
-          baseline: { data: buildTestExperiment(10) }
-        }
+        queueStatus: 'Worker status: 0 active, 0 idle'
       })
 
       messageSpy.resetHistory()
@@ -1064,7 +1067,10 @@ suite('Experiments Test Suite', () => {
           buildMockData<FileSystemData>()
         )
       )
-      testRepository.setState(expShowFixture)
+      testRepository.setState({
+        expShow: expShowFixture,
+        queueStatus: 'Worker status: 0 active, 0 idle'
+      })
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -1226,7 +1232,10 @@ suite('Experiments Test Suite', () => {
           buildMockData<FileSystemData>()
         )
       )
-      testRepository.setState(expShowFixture)
+      testRepository.setState({
+        expShow: expShowFixture,
+        queueStatus: 'Worker status: 0 active, 0 idle'
+      })
       await testRepository.isReady()
       expect(mementoSpy).to.be.calledWith('experimentsSortBy:test', [])
       expect(mementoSpy).to.be.calledWith('experimentsFilterBy:test', [])

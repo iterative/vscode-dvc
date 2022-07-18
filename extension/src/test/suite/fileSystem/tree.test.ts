@@ -351,7 +351,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
       )
 
       repository.setExperiments(experiments)
-      experiments.setState(expShowFixture)
+      experiments.setState({
+        expShow: expShowFixture,
+        queueStatus: 'Worker status: 0 active, 0 idle'
+      })
 
       stub(WorkspaceRepositories.prototype, 'getRepository').returns(repository)
       stub(WorkspaceRepositories.prototype, 'isReady').resolves(undefined)

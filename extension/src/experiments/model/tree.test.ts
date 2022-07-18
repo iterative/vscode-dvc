@@ -23,7 +23,8 @@ const {
   mockedExperiments,
   mockedGetDvcRoots,
   mockedGetExperiments,
-  mockedGetCheckpoints
+  mockedGetCheckpoints,
+  mockedGetQueueWorkerStatus
 } = buildMockedExperiments()
 
 const mockedClockResource = {
@@ -51,6 +52,7 @@ beforeEach(() => {
       return disposable
     }
   } as unknown as (() => void) & Disposer)
+  mockedGetQueueWorkerStatus.mockReturnValue({ active: 0, idle: 0 })
 })
 
 describe('ExperimentsTree', () => {

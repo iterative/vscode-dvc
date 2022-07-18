@@ -119,6 +119,7 @@ export const autoRegisteredCommands = {
   EXP_SHOW: 'expShow',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
   PLOTS_DIFF: 'plotsDiff',
+  QUEUE_STATUS: 'queueStatus',
   STATUS: 'status'
 } as const
 
@@ -164,6 +165,10 @@ export class CliReader extends Cli {
       TEMP_PLOTS_DIR,
       Flag.SPLIT
     )
+  }
+
+  public queueStatus(cwd: string): Promise<string> {
+    return this.readProcess(cwd, trim, '', Command.QUEUE, SubCommand.STATUS)
   }
 
   public async root(cwd: string): Promise<string | undefined> {

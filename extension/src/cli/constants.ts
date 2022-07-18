@@ -1,4 +1,4 @@
-export const MIN_CLI_VERSION = '2.11.0'
+export const MIN_CLI_VERSION = '2.13.0'
 export const MAX_CLI_VERSION = '3'
 
 export enum Command {
@@ -13,6 +13,7 @@ export enum Command {
   PLOTS = 'plots',
   PULL = 'pull',
   PUSH = 'push',
+  QUEUE = 'queue',
   REMOVE = 'remove',
   ROOT = 'root',
   STATUS = 'status',
@@ -21,7 +22,8 @@ export enum Command {
 }
 
 export enum SubCommand {
-  SHOW = 'show'
+  SHOW = 'show',
+  STATUS = 'status'
 }
 
 export enum Flag {

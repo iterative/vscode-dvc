@@ -48,7 +48,8 @@ export enum ExperimentType {
   BRANCH = 'branch',
   EXPERIMENT = 'experiment',
   CHECKPOINT = 'checkpoint',
-  QUEUED = 'queued'
+  QUEUED = 'queued',
+  WORKER = 'queueWorker'
 }
 
 export class ExperimentsModel extends ModelWithPersistence {

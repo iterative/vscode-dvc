@@ -148,25 +148,58 @@ export class ExperimentsTree
   }
 
   private getExperiments(dvcRoot: string): ExperimentItem[] {
-    return this.experiments
+    const { active, idle } = this.experiments
       .getRepository(dvcRoot)
-      .getExperiments()
-      .map(experiment => ({
-        collapsibleState: experiment.hasChildren
-          ? this.getCollapsibleState(experiment.displayNameOrParent)
-          : TreeItemCollapsibleState.None,
-        command: {
-          arguments: [{ dvcRoot, id: experiment.id }],
-          command: RegisteredCommands.EXPERIMENT_TOGGLE,
-          title: 'toggle'
-        },
-        description: experiment.displayNameOrParent,
+      .getQueueWorkerStatus()
+
+    const workers: ExperimentItem[] = []
+
+    for (let i = 0; i < active; i++) {
+      workers.push({
+        collapsibleState: 0,
+        description: undefined,
         dvcRoot,
-        iconPath: this.getExperimentIcon(experiment),
-        id: experiment.id,
-        label: experiment.label,
-        type: experiment.type
-      }))
+        iconPath: new ThemeIcon('loading~spin'),
+        id: `activeWorker${i}`,
+        label: 'Queue worker',
+        type: ExperimentType.WORKER
+      })
+    }
+
+    for (let i = 0; i < idle; i++) {
+      workers.push({
+        collapsibleState: 0,
+        description: undefined,
+        dvcRoot,
+        iconPath: new ThemeIcon('circle-outline'),
+        id: `idleWorker${i}`,
+        label: 'Queue worker',
+        type: ExperimentType.WORKER
+      })
+    }
+
+    return [
+      ...workers,
+      ...this.experiments
+        .getRepository(dvcRoot)
+        .getExperiments()
+        .map(experiment => ({
+          collapsibleState: experiment.hasChildren
+            ? this.getCollapsibleState(experiment.displayNameOrParent)
+            : TreeItemCollapsibleState.None,
+          command: {
+            arguments: [{ dvcRoot, id: experiment.id }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: experiment.displayNameOrParent,
+          dvcRoot,
+          iconPath: this.getExperimentIcon(experiment),
+          id: experiment.id,
+          label: experiment.label,
+          type: experiment.type
+        }))
+    ]
   }
 
   private setExpanded(element: string | ExperimentItem, expanded: boolean) {

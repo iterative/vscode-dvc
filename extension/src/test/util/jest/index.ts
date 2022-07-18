@@ -34,6 +34,7 @@ export const buildMockedExperiments = () => {
   const mockedGetCheckpoints = jest.fn()
   const mockedGetFilters = jest.fn()
   const mockedGetFilter = jest.fn()
+  const mockedGetQueueWorkerStatus = jest.fn()
   const mockedGetSorts = jest.fn()
   const mockedGetSelectedRevisions = jest.fn()
   const mockedExperiments = {
@@ -47,6 +48,7 @@ export const buildMockedExperiments = () => {
         getExperiments: mockedGetExperiments,
         getFilter: mockedGetFilter,
         getFilters: mockedGetFilters,
+        getQueueWorkerStatus: mockedGetQueueWorkerStatus,
         getSelectedRevisions: mockedGetSelectedRevisions,
         getSorts: mockedGetSorts
       } as unknown as Experiments),
@@ -63,6 +65,7 @@ export const buildMockedExperiments = () => {
     mockedGetExperiments,
     mockedGetFilter,
     mockedGetFilters,
+    mockedGetQueueWorkerStatus,
     mockedGetSelectedRevisions,
     mockedGetSorts
   }

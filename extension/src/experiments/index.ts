@@ -13,6 +13,7 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
+import { QueueModel } from './queue/model'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
@@ -53,6 +54,7 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
   private readonly checkpoints: CheckpointsModel
+  private readonly queue: QueueModel
 
   private readonly paramsFileFocused = this.dispose.track(
     new EventEmitter<string | undefined>()
@@ -100,6 +102,8 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.checkpoints = this.dispose.track(new CheckpointsModel())
 
+    this.queue = new QueueModel()
+
     this.cliData = this.dispose.track(
       cliData || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
     )
@@ -132,13 +136,20 @@ export class Experiments extends BaseRepository<TableData> {
     return this.cliData.forceUpdate()
   }
 
-  public async setState(data: ExperimentsOutput) {
+  public async setState({
+    expShow,
+    queueStatus
+  }: {
+    expShow: ExperimentsOutput
+    queueStatus: string
+  }) {
     await Promise.all([
-      this.columns.transformAndSet(data),
-      this.experiments.transformAndSet(data)
+      this.columns.transformAndSet(expShow),
+      this.experiments.transformAndSet(expShow),
+      this.queue.transformAndSet(queueStatus)
     ])
 
-    return this.notifyChanged(data)
+    return this.notifyChanged(expShow)
   }
 
   public hasCheckpoints() {
@@ -159,6 +170,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getColumnsStatuses() {
     return this.columns.getTerminalNodeStatuses()
+  }
+
+  public getQueueWorkerStatus() {
+    return this.queue.getWorkerStatus()
   }
 
   public toggleExperimentStatus(id: string) {

@@ -23,7 +23,10 @@ import { ExperimentFlag } from '../../cli/constants'
 
 export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
 
-export class ExperimentsData extends BaseData<ExperimentsOutput> {
+export class ExperimentsData extends BaseData<{
+  expShow: ExperimentsOutput
+  queueStatus: string
+}> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -47,8 +50,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     this.managedUpdate(QUEUED_EXPERIMENT_PATH)
   }
 
-  public collectFiles(data: ExperimentsOutput) {
-    return collectFiles(data)
+  public collectFiles({ expShow }: { expShow: ExperimentsOutput }) {
+    return collectFiles(expShow)
   }
 
   public managedUpdate(path?: string) {
@@ -63,17 +66,23 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(...args: ExperimentFlag[]): Promise<void> {
-    const data = await this.internalCommands.executeCommand<ExperimentsOutput>(
-      AvailableCommands.EXP_SHOW,
-      this.dvcRoot,
-      ...args
-    )
+    const [expShow, queueStatus] = await Promise.all([
+      this.internalCommands.executeCommand<ExperimentsOutput>(
+        AvailableCommands.EXP_SHOW,
+        this.dvcRoot,
+        ...args
+      ),
+      this.internalCommands.executeCommand<string>(
+        AvailableCommands.QUEUE_STATUS,
+        this.dvcRoot
+      )
+    ])
 
-    const files = this.collectFiles(data)
+    const files = this.collectFiles({ expShow })
 
     this.compareFiles(files)
 
-    return this.notifyChanged(data)
+    return this.notifyChanged({ expShow, queueStatus })
   }
 
   public forceUpdate() {

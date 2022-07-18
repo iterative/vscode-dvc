@@ -64,7 +64,10 @@ export const buildPlots = async (
     )
   ])
   mockHasCheckpoints(expShow)
-  experiments.setState(expShow)
+  experiments.setState({
+    expShow,
+    queueStatus: 'Worker status: 0 active, 0 idle'
+  })
   plots.setExperiments(experiments)
 
   await plots.isReady()

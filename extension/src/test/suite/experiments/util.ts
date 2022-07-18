@@ -68,7 +68,10 @@ export const buildExperiments = (
 
   mockHasCheckpoints(experimentShowData)
 
-  experiments.setState(experimentShowData)
+  experiments.setState({
+    expShow: experimentShowData,
+    queueStatus: 'Worker status: 0 active, 1 idle'
+  })
 
   return {
     cliExecutor,
@@ -112,7 +115,10 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     updatesPaused,
     resourceLocator
   )
-  experiments.setState(expShowFixture)
+  experiments.setState({
+    expShow: expShowFixture,
+    queueStatus: 'Worker status: 0 active, 0 idle'
+  })
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
 
@@ -134,7 +140,10 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
     resourceLocator
   )
 
-  experiments.setState(expShowFixture)
+  experiments.setState({
+    expShow: expShowFixture,
+    queueStatus: 'Worker status: 0 active, 0 idle'
+  })
 
   return { messageSpy, workspaceExperiments }
 }
