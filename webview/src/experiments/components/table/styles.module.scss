@@ -485,26 +485,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
             display: none;
           }
         }
-
-        .bullet {
-          flex: 0 0 14px;
-          width: 14px;
-          &.subRunsCount {
-            &::after {
-              border: none;
-            }
-            &::before {
-              margin: 0;
-              vertical-align: middle;
-              border: 1.5px solid $row-bg-color;
-              border-radius: 100%;
-              border-right: 1.5px solid currentColor;
-              border-top: 1.5px solid currentColor;
-              animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
-              background-color: transparent;
-            }
-          }
-        }
       }
     }
   }
