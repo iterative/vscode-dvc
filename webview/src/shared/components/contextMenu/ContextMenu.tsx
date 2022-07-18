@@ -61,6 +61,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     content={content}
     onShow={onShow}
     disabled={!content || disabled}
+    appendTo={'parent'}
   >
     {children}
   </Tooltip>
