@@ -124,6 +124,7 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
 
       const expectedTableData: TableData = {
+        activeWorkerCount: 0,
         changes: workspaceChangesFixture,
         columnOrder: [],
         columnWidths: {},
@@ -707,6 +708,7 @@ suite('Experiments Test Suite', () => {
       await tableChangePromise
 
       const allColumnsUnselected: TableData = {
+        activeWorkerCount: 0,
         changes: workspaceChangesFixture,
         columnOrder: [],
         columnWidths: {},

@@ -18,6 +18,7 @@ import { splitColumnPath } from '../columns/paths'
 import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
 import { CheckpointsModel } from '../checkpoints/model'
+import { QueueModel } from '../queue/model'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -25,6 +26,7 @@ export class WebviewMessages {
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
   private readonly checkpoints: CheckpointsModel
+  private readonly queue: QueueModel
 
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
@@ -35,6 +37,7 @@ export class WebviewMessages {
     experiments: ExperimentsModel,
     columns: ColumnsModel,
     checkpoints: CheckpointsModel,
+    queue: QueueModel,
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => void
@@ -43,6 +46,7 @@ export class WebviewMessages {
     this.experiments = experiments
     this.columns = columns
     this.checkpoints = checkpoints
+    this.queue = queue
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
@@ -120,6 +124,7 @@ export class WebviewMessages {
 
   private getWebviewData() {
     return {
+      activeWorkerCount: this.queue.getWorkerStatus().active,
       changes: this.columns.getChanges(),
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),

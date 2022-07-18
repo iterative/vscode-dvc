@@ -102,6 +102,7 @@ describe('Table', () => {
     }
   } as unknown as TableInstance<Experiment>
   const dummyTableData: TableData = {
+    activeWorkerCount: 0,
     changes: [],
     columnOrder: [],
     columnWidths: {},

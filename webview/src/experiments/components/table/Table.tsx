@@ -132,7 +132,8 @@ export const Table: React.FC<TableProps & WithChanges> = ({
     changes,
     hasCheckpoints,
     hasRunningExperiment,
-    filteredCounts
+    filteredCounts,
+    activeWorkerCount
   } = tableData
 
   const { clearSelectedRows, batchSelection, lastSelectedRow } =
@@ -195,6 +196,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
           filters={filters}
           columns={columns}
           root={tableRef.current}
+          activeWorkerCount={activeWorkerCount}
         />
         {rows.map(row => (
           <TableBody

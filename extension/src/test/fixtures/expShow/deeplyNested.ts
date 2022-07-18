@@ -278,6 +278,7 @@ export const rows = [
 ]
 
 const deeplyNestedTableData: TableData = {
+  activeWorkerCount: 0,
   changes: [],
   columnOrder: [],
   columnWidths: {},

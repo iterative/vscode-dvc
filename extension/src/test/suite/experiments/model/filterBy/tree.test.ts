@@ -113,6 +113,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       ]
 
       const filteredTableData: TableData = {
+        activeWorkerCount: 0,
         changes: workspaceChangesFixture,
         columnOrder: [],
         columnWidths: {},
@@ -144,6 +145,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       await tableFilterRemoved
 
       const unfilteredTableData: TableData = {
+        activeWorkerCount: 0,
         changes: workspaceChangesFixture,
         columnOrder: [],
         columnWidths: {},

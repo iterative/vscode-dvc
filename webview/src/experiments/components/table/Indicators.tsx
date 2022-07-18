@@ -8,6 +8,7 @@ import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
 import SvgFilter from '../../../shared/components/icons/Filter'
+import SvgClock from '../../../shared/components/icons/Clock'
 import { sendMessage } from '../../../shared/vscode'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import tooltipStyles from '../../../shared/components/tooltip/styles.module.scss'
@@ -118,11 +119,13 @@ const formatFilteredCountMessage = (filteredCounts: FilteredCounts): string =>
 export const Indicators = ({
   sorts,
   filters,
-  filteredCounts
+  filteredCounts,
+  activeWorkerCount
 }: {
   sorts?: SortDefinition[]
   filters?: string[]
   filteredCounts: FilteredCounts
+  activeWorkerCount: number
 }) => {
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
@@ -151,6 +154,16 @@ export const Indicators = ({
       >
         <Icon width={16} height={16} icon={SvgFilter} />
       </Indicator>
+      activeWorkerCount ?
+      <Indicator
+        count={activeWorkerCount}
+        aria-label="queue-workers"
+        onClick={() => undefined}
+        tooltipContent={'queue workers'}
+      >
+        <Icon width={16} height={16} icon={SvgClock} />
+      </Indicator>
+      : null
     </div>
   )
 }

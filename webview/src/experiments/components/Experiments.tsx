@@ -136,6 +136,7 @@ export const ExperimentsTable: React.FC<{
   const [tableData, columns, defaultColumn, initialState] =
     React.useMemo(() => {
       const tableData: TableData = {
+        activeWorkerCount: 0,
         changes: [],
         columnOrder: [],
         columnWidths: {},

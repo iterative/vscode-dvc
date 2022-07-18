@@ -177,6 +177,7 @@ export const rows: Row[] = [
 ]
 
 export const dataTypesTableData: TableData = {
+  activeWorkerCount: 0,
   changes: [],
   columnOrder: [],
   columnWidths: {},

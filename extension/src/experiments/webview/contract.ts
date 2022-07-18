@@ -58,6 +58,7 @@ export interface Column extends ColumnAggregateData {
 }
 
 export type TableData = {
+  activeWorkerCount: number
   changes: string[]
   columnOrder: string[]
   columns: Column[]

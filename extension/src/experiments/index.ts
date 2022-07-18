@@ -457,6 +457,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments,
       this.columns,
       this.checkpoints,
+      this.queue,
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns()

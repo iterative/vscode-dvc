@@ -24,6 +24,7 @@ interface TableHeadProps {
   filteredCounts: FilteredCounts
   filters: string[]
   root: HTMLElement | null
+  activeWorkerCount: number
 }
 
 export const TableHead = ({
@@ -37,7 +38,8 @@ export const TableHead = ({
   filteredCounts,
   filters,
   columns,
-  sorts
+  sorts,
+  activeWorkerCount
 }: TableHeadProps) => {
   const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
@@ -104,6 +106,7 @@ export const TableHead = ({
         sorts={sorts}
         filters={filters}
         filteredCounts={filteredCounts}
+        activeWorkerCount={activeWorkerCount}
       />
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key

@@ -31,6 +31,7 @@ export const columns = [
 ]
 
 export const tableData: TableData = {
+  activeWorkerCount: 0,
   changes: [],
   columnOrder: [],
   columnWidths: {},

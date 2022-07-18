@@ -24,6 +24,7 @@ import {
 } from '../test/tableDataFixture'
 
 const tableData: TableData = {
+  activeWorkerCount: 0,
   changes: workspaceChangesFixture,
   columnOrder: [],
   columnWidths: {

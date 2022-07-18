@@ -6,8 +6,8 @@ export class QueueModel {
   private idleRegexp = /Worker status:\s\d+\sactive,\s(\d+)\sidle/
 
   public transformAndSet(status: string) {
-    this.activeWorkers = Number(status.match(this.activeRegexp)?.[0] ?? 0)
-    this.idleWorkers = Number(status.match(this.idleRegexp)?.[0] ?? 0)
+    this.activeWorkers = Number(status.match(this.activeRegexp)?.[1] ?? 0)
+    this.idleWorkers = Number(status.match(this.idleRegexp)?.[1] ?? 0)
   }
 
   public getWorkerStatus() {
