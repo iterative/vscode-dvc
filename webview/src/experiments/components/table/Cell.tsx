@@ -198,8 +198,8 @@ export const CellWrapper: React.FC<
           styles.td,
           cell.isPlaceholder && styles.groupPlaceholder,
           {
-            [styles.workspaceChange]:
-              changes?.includes(cell.column.id) || cellHasChanges(cell.value)
+            [styles.workspaceChange]: changes?.includes(cell.column.id),
+            [styles.depChange]: cellHasChanges(cell.value)
           }
         )
       })}
