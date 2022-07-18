@@ -20,18 +20,6 @@ const setContextOnDidChangeParamsFiles = (
     setActiveEditorContext(true)
   })
 
-const setContextForRepository = (
-  setActiveEditorContext: (paramsFileActive: boolean) => void,
-  path: string,
-  getParamsFiles: () => Set<string>
-) => {
-  if (getParamsFiles().has(path)) {
-    setActiveEditorContext(true)
-    return
-  }
-  setActiveEditorContext(false)
-}
-
 const setContextOnDidChangeActiveEditor = (
   setActiveEditorContext: (paramsFileActive: boolean) => void,
   dvcRoot: string,
@@ -48,7 +36,9 @@ const setContextOnDidChangeActiveEditor = (
       return
     }
 
-    return setContextForRepository(setActiveEditorContext, path, getParamsFiles)
+    const isParamsFile = getParamsFiles().has(path)
+
+    setActiveEditorContext(isParamsFile)
   })
 
 export const setContextForEditorTitleIcons = (
