@@ -8,11 +8,11 @@ export interface MetricOrParamColumns {
 
 export interface ValueWithChanges {
   value: string | number
-  changes?: boolean
+  changes: boolean
 }
 
 export interface DepColumns {
-  [path: string]: string | ValueWithChanges
+  [path: string]: ValueWithChanges
 }
 
 export interface Experiment extends BaseExperimentFields {

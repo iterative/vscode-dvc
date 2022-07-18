@@ -1,7 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
-import { ValueWithChanges } from 'dvc/src/experiments/webview/contract'
 import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
@@ -9,6 +8,7 @@ import ClockIcon from '../../../shared/components/icons/Clock'
 import { clickAndEnterProps } from '../../../util/props'
 import { StarFull, StarEmpty } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
+import { cellHasChanges } from '../../util/buildDynamicColumns'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -191,8 +191,6 @@ export const CellWrapper: React.FC<
     children?: React.ReactNode
   }
 > = ({ cell, cellId, changes }) => {
-  const cellhasChanges = (cell.value as ValueWithChanges)?.changes
-
   return (
     <div
       {...cell.getCellProps({
@@ -201,7 +199,7 @@ export const CellWrapper: React.FC<
           cell.isPlaceholder && styles.groupPlaceholder,
           {
             [styles.workspaceChange]:
-              changes?.includes(cell.column.id) || cellhasChanges
+              changes?.includes(cell.column.id) || cellHasChanges(cell.value)
           }
         )
       })}

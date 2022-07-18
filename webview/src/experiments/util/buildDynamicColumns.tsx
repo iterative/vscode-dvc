@@ -19,6 +19,18 @@ import Tooltip, {
 import styles from '../components/table/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
+
+export type CellValue = undefined | string | number | ValueWithChanges
+
+export const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
+  typeof (raw as ValueWithChanges)?.changes === 'boolean'
+
+export const cellValue = (raw: CellValue) =>
+  isValueWithChanges(raw) ? raw.value : raw
+
+export const cellHasChanges = (cellValue: CellValue) =>
+  isValueWithChanges(cellValue) ? cellValue.changes : false
+
 const UndefinedCell = (
   <div className={styles.innerCell}>
     <span className={styles.cellContents}>. . .</span>
@@ -42,16 +54,13 @@ const CellTooltip: React.FC<{
   )
 }
 
-const Cell: React.FC<
-  Cell<Experiment, string | number | ValueWithChanges>
-> = cell => {
+const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
   const { value } = cell
   if (value === undefined) {
     return UndefinedCell
   }
 
-  const rawValue = (value as ValueWithChanges).value ?? value
-
+  const rawValue = cellValue(value)
   const stringValue = String(rawValue)
 
   const displayValue =
