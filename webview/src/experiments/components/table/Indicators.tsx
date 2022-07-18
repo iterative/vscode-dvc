@@ -8,7 +8,6 @@ import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
 import SvgFilter from '../../../shared/components/icons/Filter'
-import SvgClock from '../../../shared/components/icons/Clock'
 import { sendMessage } from '../../../shared/vscode'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import tooltipStyles from '../../../shared/components/tooltip/styles.module.scss'
@@ -159,9 +158,9 @@ export const Indicators = ({
           count={activeWorkerCount}
           aria-label="queue-workers"
           onClick={() => undefined}
-          tooltipContent={'queue workers'}
+          tooltipContent={pluralize('Active Queue Worker', activeWorkerCount)}
         >
-          <Icon width={16} height={16} icon={SvgClock} />
+          <span className={cx(styles.queueWorker)}></span>
         </Indicator>
       ) : null}
     </div>

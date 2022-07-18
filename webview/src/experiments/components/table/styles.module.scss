@@ -656,6 +656,30 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
 $badge-size: 0.85rem;
 
+.queueWorker {
+  color: $fg-color;
+  display: table-header-group;
+  width: 24px;
+  flex: 0 0 24px;
+  text-align: center;
+  position: relative;
+
+  &::before {
+    display: inline-block;
+    position: relative;
+    content: '';
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+    border: 1.5px solid $header-bg-color;
+    border-radius: 100%;
+    border-right: 1.5px solid currentColor;
+    border-top: 1.5px solid currentColor;
+    animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
+    background-color: transparent;
+  }
+}
+
 .indicatorIcon {
   display: inline-block;
   position: relative;
@@ -677,6 +701,7 @@ $badge-size: 0.85rem;
 }
 
 .indicatorCount {
+  z-index: 999;
   position: absolute;
   bottom: 0;
   right: 0;
