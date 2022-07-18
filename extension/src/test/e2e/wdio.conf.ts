@@ -31,7 +31,6 @@ export const config: Options.Testrunner = {
     {
       browserName: 'vscode',
       browserVersion: 'insiders',
-      // @ts-expect-error these caps are not typed in WebdriverIO
       'wdio:vscodeOptions': {
         extensionPath: resolve(__dirname, '..', '..', '..'),
         userSettings: {

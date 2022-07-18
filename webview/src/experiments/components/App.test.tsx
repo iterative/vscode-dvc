@@ -42,6 +42,7 @@ import {
 import { getRow } from '../../test/queries'
 import { dragAndDrop } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
+import { setExperimentsAsStarred } from '../../test/tableDataFixture'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -369,6 +370,129 @@ describe('App', () => {
         keyCode: 13
       })
       expect(mockPostMessage).not.toBeCalled()
+    })
+  })
+
+  describe('Sub-rows middle states indicators', () => {
+    const renderWithAllRowsExpanded = () => {
+      render(<App />)
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: tableDataFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+    }
+
+    const getMiddleStatesTestRow = () => {
+      return getRow('4fb124a')
+    }
+
+    const getCountIndicators = (element: HTMLElement) => {
+      return within(element).queryAllByRole('marquee')
+    }
+
+    const getCountIndicatorById = (row: HTMLElement, rowActionId: string) => {
+      const checkboxRowAction = within(row).getByTestId(rowActionId)
+
+      return within(checkboxRowAction).queryByRole('marquee')
+    }
+
+    const getCheckboxCountIndicator = (row: HTMLElement) => {
+      return getCountIndicatorById(row, 'row-action-checkbox')
+    }
+
+    const clickRowCheckbox = (label: string) => {
+      const checkbox = within(getRow(label)).getByRole('checkbox')
+
+      fireEvent.click(checkbox)
+    }
+
+    const selectSomeSubRows = () => {
+      clickRowCheckbox('d1343a8')
+      clickRowCheckbox('1ee5f2e')
+
+      return 2
+    }
+
+    const starSomeSubRows = () => {
+      const starredFixture = setExperimentsAsStarred(tableDataFixture, [
+        'd1343a8',
+        '1ee5f2e'
+      ])
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            data: starredFixture,
+            type: MessageToWebviewType.SET_DATA
+          }
+        })
+      )
+
+      return 2
+    }
+
+    const toggleExpansion = (row: HTMLElement) => {
+      const expandButton = within(row).getByTitle('Contract Row')
+
+      fireEvent.click(expandButton)
+    }
+
+    it('should be hidden when the parent row is expanded', () => {
+      renderWithAllRowsExpanded()
+      const row = getMiddleStatesTestRow()
+      const indicators = getCountIndicators(row)
+      expect(indicators).toHaveLength(0)
+    })
+
+    describe('Checkbox selection counter', () => {
+      it('should not be visible if no sub-row was checked', () => {
+        renderWithAllRowsExpanded()
+        const row = getMiddleStatesTestRow()
+        const indicator = getCheckboxCountIndicator(row)
+        expect(indicator).not.toBeInTheDocument()
+      })
+
+      it('should display the correct number of checked sub-rows when the parent is collapsed', () => {
+        renderWithAllRowsExpanded()
+        const row = getMiddleStatesTestRow()
+        const numberOfSubrowsSelected = selectSomeSubRows()
+        expect(getCheckboxCountIndicator(row)).not.toBeInTheDocument()
+        toggleExpansion(row)
+        const collapsed = getMiddleStatesTestRow()
+        expect(getCheckboxCountIndicator(collapsed)).toHaveTextContent(
+          `${numberOfSubrowsSelected}`
+        )
+      })
+    })
+
+    describe('Stars counter', () => {
+      it('should not be visible if no sub-row was starred', () => {
+        renderWithAllRowsExpanded()
+        const row = getMiddleStatesTestRow()
+        const indicator = getCountIndicatorById(row, 'row-action-star')
+        expect(indicator).not.toBeInTheDocument()
+      })
+
+      it('should display the correct number of starred sub-rows when the parent is collapsed', () => {
+        renderWithAllRowsExpanded()
+        const row = getMiddleStatesTestRow()
+        const numberOfSubrowsStarred = starSomeSubRows()
+        expect(
+          getCountIndicatorById(row, 'row-action-star')
+        ).not.toBeInTheDocument()
+        toggleExpansion(row)
+        const collapsed = getMiddleStatesTestRow()
+        expect(
+          getCountIndicatorById(collapsed, 'row-action-star')
+        ).toHaveTextContent(`${numberOfSubrowsStarred}`)
+      })
     })
   })
 

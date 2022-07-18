@@ -322,9 +322,12 @@ export const RowContent: React.FC<
     cells: [firstCell, ...cells],
     original,
     flatIndex,
+    isExpanded,
+    subRows,
+    depth,
     values: { id }
   } = row
-  const { displayColor } = original
+  const { displayColor, starred } = original
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
   const toggleExperiment = () => {
@@ -360,6 +363,21 @@ export const RowContent: React.FC<
     [row, toggleRowSelected, isWorkspace, batchRowSelection]
   )
 
+  const subRowStates = React.useMemo(() => {
+    const stars = subRows?.filter(subRow => subRow.original.starred).length ?? 0
+    const plotSelections =
+      subRows?.filter(subRow => subRow.original.selected).length ?? 0
+
+    const selections =
+      subRows?.filter(subRow => selectedRows[subRow.values.id]).length ?? 0
+
+    return {
+      plotSelections,
+      selections,
+      stars
+    }
+  }, [subRows, selectedRows])
+
   return (
     <ContextMenu
       disabled={contextMenuDisabled}
@@ -390,7 +408,10 @@ export const RowContent: React.FC<
         <FirstCell
           cell={firstCell}
           bulletColor={displayColor}
+          starred={starred}
           isRowSelected={isRowSelected}
+          showSubRowStates={!isExpanded && depth > 0}
+          subRowStates={subRowStates}
           toggleExperiment={toggleExperiment}
           toggleRowSelection={toggleRowSelection}
           toggleStarred={toggleStarred}

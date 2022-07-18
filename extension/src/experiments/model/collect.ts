@@ -112,9 +112,10 @@ const getCheckpointTipId = (
 
 const transformColumns = (
   experiment: Experiment,
-  experimentFields: ExperimentFields
+  experimentFields: ExperimentFields,
+  branch?: Experiment
 ) => {
-  const { metrics, params, deps } = extractColumns(experimentFields)
+  const { metrics, params, deps } = extractColumns(experimentFields, branch)
 
   if (metrics) {
     experiment.metrics = metrics
@@ -133,7 +134,8 @@ const transformExperimentData = (
   label: string | undefined,
   sha?: string,
   displayNameOrParent?: string,
-  logicalGroupName?: string
+  logicalGroupName?: string,
+  branch?: Experiment
 ): Experiment => {
   const experiment = {
     id,
@@ -153,7 +155,7 @@ const transformExperimentData = (
     experiment.sha = sha
   }
 
-  transformColumns(experiment, experimentFields)
+  transformColumns(experiment, experimentFields, branch)
 
   return experiment
 }
@@ -162,7 +164,8 @@ const transformExperimentOrCheckpointData = (
   sha: string,
   experimentData: ExperimentFieldsOrError,
   experimentsObject: ExperimentsObject,
-  branchSha: string
+  branchSha: string,
+  branch: Experiment
 ): {
   checkpointTipId?: string
   experiment: Experiment | undefined
@@ -187,7 +190,8 @@ const transformExperimentOrCheckpointData = (
       shortenForLabel(sha),
       sha,
       getDisplayNameOrParent(sha, branchSha, experimentsObject),
-      getLogicalGroupName(sha, branchSha, experimentsObject)
+      getLogicalGroupName(sha, branchSha, experimentsObject),
+      branch
     )
   }
 }
@@ -222,14 +226,17 @@ const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
   experimentsObject: ExperimentsObject,
   branchSha: string,
-  branchName: string
+  branch: Experiment
 ) => {
+  const branchName = branch.label
+
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
     const { checkpointTipId, experiment } = transformExperimentOrCheckpointData(
       sha,
       experimentData,
       experimentsObject,
-      branchSha
+      branchSha,
+      branch
     )
     if (!experiment) {
       continue
@@ -257,7 +264,7 @@ const collectFromBranchesObject = (
     const branch = transformExperimentData(name, experimentFields, name, sha)
 
     if (branch) {
-      collectFromExperimentsObject(acc, experimentsObject, sha, branch.label)
+      collectFromExperimentsObject(acc, experimentsObject, sha, branch)
       collectHasRunningExperiment(acc, branch)
 
       acc.branches.push(branch)
