@@ -73,6 +73,7 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly internalCommands: InternalCommands
+  private readonly webviewMessages: WebviewMessages
 
   constructor(
     dvcRoot: string,
@@ -119,7 +120,7 @@ export class Experiments extends BaseRepository<TableData> {
       })
     )
 
-    this.handleMessageFromWebview()
+    this.webviewMessages = this.createWebviewMessageHandler()
     this.setupInitialData()
     this.setActiveEditorContext()
   }
@@ -339,7 +340,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public sendInitialWebviewData() {
-    return this.sendWebviewData()
+    return this.webviewMessages.sendWebviewMessage()
   }
 
   public getSelectedRevisions() {
@@ -433,43 +434,27 @@ export class Experiments extends BaseRepository<TableData> {
 
   private notifyColumnsChanged() {
     this.columnsChanged.fire()
-    return this.sendWebviewData()
+    return this.webviewMessages.sendWebviewMessage()
   }
 
-  private sendWebviewData() {
-    this.webview?.show(this.getWebviewData())
-  }
-
-  private getWebviewData() {
-    return {
-      changes: this.columns.getChanges(),
-      columnOrder: this.columns.getColumnOrder(),
-      columnWidths: this.columns.getColumnWidths(),
-      columns: this.columns.getSelected(),
-      filteredCounts: this.getFilteredCounts(),
-      filters: this.experiments.getFilterPaths(),
-      hasCheckpoints: this.hasCheckpoints(),
-      hasColumns: this.columns.hasColumns(),
-      hasRunningExperiment: this.experiments.hasRunningExperiment(),
-      rows: this.experiments.getRowData(),
-      sorts: this.experiments.getSorts()
-    }
-  }
-
-  private handleMessageFromWebview() {
+  private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       this.dvcRoot,
       this.experiments,
       this.columns,
+      this.checkpoints,
+      () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns()
     )
 
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
-        webviewMessages.handleMessageFromWebview(message)
+        this.webviewMessages.handleMessageFromWebview(message)
       )
     )
+
+    return webviewMessages
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
