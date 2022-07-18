@@ -1,4 +1,4 @@
-export const MIN_CLI_VERSION = '2.13.0'
+export const MIN_CLI_VERSION = '2.13.0' // will probably be 2.14.0
 export const MAX_CLI_VERSION = '3'
 
 export enum Command {
