@@ -12,6 +12,7 @@ import {
   Column,
   ValueWithChanges
 } from 'dvc/src/experiments/webview/contract'
+import { Value } from 'dvc/src/cli/reader'
 import { formatFloat } from './numberFormatting'
 import Tooltip, {
   CELL_TOOLTIP_DELAY
@@ -20,7 +21,7 @@ import styles from '../components/table/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
 
-export type CellValue = undefined | string | number | ValueWithChanges
+export type CellValue = Value | ValueWithChanges
 
 export const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
   typeof (raw as ValueWithChanges)?.changes === 'boolean'
