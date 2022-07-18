@@ -194,14 +194,11 @@ export const CellWrapper: React.FC<
   return (
     <div
       {...cell.getCellProps({
-        className: cx(
-          styles.td,
-          cell.isPlaceholder && styles.groupPlaceholder,
-          {
-            [styles.workspaceChange]: changes?.includes(cell.column.id),
-            [styles.depChange]: cellHasChanges(cell.value)
-          }
-        )
+        className: cx(styles.td, {
+          [styles.workspaceChange]: changes?.includes(cell.column.id),
+          [styles.depChange]: cellHasChanges(cell.value),
+          [styles.groupPlaceholder]: cell.isPlaceholder
+        })
       })}
       data-testid={cellId}
     >
