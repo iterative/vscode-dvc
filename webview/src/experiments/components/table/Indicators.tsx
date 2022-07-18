@@ -154,16 +154,16 @@ export const Indicators = ({
       >
         <Icon width={16} height={16} icon={SvgFilter} />
       </Indicator>
-      activeWorkerCount ?
-      <Indicator
-        count={activeWorkerCount}
-        aria-label="queue-workers"
-        onClick={() => undefined}
-        tooltipContent={'queue workers'}
-      >
-        <Icon width={16} height={16} icon={SvgClock} />
-      </Indicator>
-      : null
+      {activeWorkerCount ? (
+        <Indicator
+          count={activeWorkerCount}
+          aria-label="queue-workers"
+          onClick={() => undefined}
+          tooltipContent={'queue workers'}
+        >
+          <Icon width={16} height={16} icon={SvgClock} />
+        </Indicator>
+      ) : null}
     </div>
   )
 }

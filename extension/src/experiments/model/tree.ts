@@ -161,7 +161,7 @@ export class ExperimentsTree
         dvcRoot,
         iconPath: new ThemeIcon('loading~spin'),
         id: `activeWorker${i}`,
-        label: 'Queue worker',
+        label: 'queue worker',
         type: ExperimentType.WORKER
       })
     }
@@ -173,7 +173,7 @@ export class ExperimentsTree
         dvcRoot,
         iconPath: new ThemeIcon('circle-outline'),
         id: `idleWorker${i}`,
-        label: 'Queue worker',
+        label: 'queue worker',
         type: ExperimentType.WORKER
       })
     }
