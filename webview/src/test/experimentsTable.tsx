@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/filename-case */
-import { fireEvent, render, within } from '@testing-library/react'
+import { fireEvent, render, within, screen } from '@testing-library/react'
 import React from 'react'
 import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
@@ -37,11 +37,11 @@ export const renderTableWithWorkspaceRowOnly = () => {
   renderTable({ ...tableDataFixture, rows: [tableDataFixture.rows[0]] })
 }
 
-export const renderTableWithSortingdata = () => {
+export const renderTableWithSortingData = () => {
   renderTable(sortingTableDataFixture)
 }
 
-export const renderTableWithoutRuningExperiments = () => {
+export const renderTableWithoutRunningExperiments = () => {
   renderTable({
     ...tableDataFixture,
     hasRunningExperiment: false
@@ -85,3 +85,6 @@ export const contractRow = (label: string) => {
 export const expandRow = (label: string) => {
   toggleExpansion(label, 'Expand')
 }
+
+export const selectedRows = () =>
+  screen.queryAllByRole('row', { selected: true })

@@ -43,10 +43,11 @@ import {
   getCountIndicators,
   renderTable,
   renderTableWithNoColumns,
-  renderTableWithoutRuningExperiments,
+  renderTableWithoutRunningExperiments,
   renderTableWithPlaceholder,
-  renderTableWithSortingdata,
+  renderTableWithSortingData,
   renderTableWithWorkspaceRowOnly,
+  selectedRows,
   setTableData
 } from '../../test/experimentsTable'
 
@@ -163,7 +164,7 @@ describe('App', () => {
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {
-    renderTableWithSortingdata()
+    renderTableWithSortingData()
 
     setTableData({
       ...sortingTableDataFixture,
@@ -642,7 +643,7 @@ describe('App', () => {
     })
 
     it('should be available when there is data and no running experiments', () => {
-      renderTableWithoutRuningExperiments()
+      renderTableWithoutRunningExperiments()
 
       const target = screen.getByTestId('workspace-row')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -665,7 +666,7 @@ describe('App', () => {
     })
 
     it('should present the correct options for the main row with checkpoints', () => {
-      renderTableWithoutRuningExperiments()
+      renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('main')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -682,7 +683,7 @@ describe('App', () => {
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
-      renderTableWithoutRuningExperiments()
+      renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -694,7 +695,7 @@ describe('App', () => {
     })
 
     it('should present the Remove option if multiple checkpoint tip rows are selected', () => {
-      renderTableWithoutRuningExperiments()
+      renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
       clickRowCheckbox('42b8736')
@@ -709,13 +710,12 @@ describe('App', () => {
     })
 
     it('should allow batch selection of rows by shift-clicking a range of them', () => {
-      renderTableWithoutRuningExperiments()
+      renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
       clickRowCheckbox('42b8736', true)
 
-      const selectedRows = screen.getAllByRole('row', { selected: true })
-      expect(selectedRows.length).toBe(4)
+      expect(selectedRows().length).toBe(4)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -727,12 +727,11 @@ describe('App', () => {
     })
 
     it('should allow batch selection from the bottom up too', () => {
-      renderTableWithoutRuningExperiments()
+      renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('42b8736')
       clickRowCheckbox('4fb124a', true)
 
-      const selectedRows = () => screen.getAllByRole('row', { selected: true })
       expect(selectedRows()).toHaveLength(4)
 
       clickRowCheckbox('2173124', true)
@@ -740,7 +739,7 @@ describe('App', () => {
     })
 
     it('should not include collapsed experiments in the bulk selection', () => {
-      renderTableWithoutRuningExperiments()
+      renderTableWithoutRunningExperiments()
 
       contractRow('42b8736')
 
@@ -756,13 +755,11 @@ describe('App', () => {
     })
 
     it('should present the Clear selected rows option when multiple rows are selected', () => {
-      renderTableWithoutRuningExperiments()
+      renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
       clickRowCheckbox('42b8736', true)
 
-      const selectedRows = () =>
-        screen.queryAllByRole('row', { selected: true })
       expect(selectedRows().length).toBe(4)
 
       const target = screen.getByText('4fb124a')
@@ -782,8 +779,6 @@ describe('App', () => {
       clickRowCheckbox('4fb124a')
       clickRowCheckbox('42b8736', true)
 
-      const selectedRows = () =>
-        screen.queryAllByRole('row', { selected: true })
       expect(selectedRows().length).toBe(4)
 
       fireEvent.keyUp(getRow('42b8736'), { bubbles: true, key: 'Escape' })
