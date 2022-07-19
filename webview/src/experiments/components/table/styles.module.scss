@@ -8,6 +8,7 @@ $row-border: 1px solid $border-color;
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
 $workspace-row-edge-margin: $edge-padding - $cell-padding;
+$exp-cell-shadow: 3px 0px 0px var(--vscode-widget-shadow);
 
 // Extendable Silent Rules
 %expandableRowArrow {
@@ -413,9 +414,15 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     min-width: 0;
     position: relative;
   }
+
   .th {
     height: auto;
+
+    &.withExpCellShadow {
+      box-shadow: $exp-cell-shadow;
+    }
   }
+
   .td {
     height: auto;
     font-size: 0.8rem;
@@ -437,6 +444,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     display: flex;
     flex-flow: row nowrap;
     text-align: left;
+
+    &.withExpCellShadow {
+      box-shadow: $exp-cell-shadow;
+    }
+
     .innerCell {
       justify-content: flex-start;
 

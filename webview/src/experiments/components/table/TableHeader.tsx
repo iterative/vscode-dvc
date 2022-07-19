@@ -7,9 +7,11 @@ import {
 import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
+import { useInView } from 'react-intersection-observer'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
+import { WithTableRoot } from './interfaces'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import {
@@ -129,19 +131,100 @@ const getIconMenuItems = (
   }
 ]
 
-const TableHeaderCell: React.FC<{
+const FirstTableHeaderCellWrapper: React.FC<
+  {
+    cellProps: React.HTMLAttributes<HTMLDivElement>
+    children: React.ReactNode
+  } & WithTableRoot
+> = ({ root, cellProps, children }) => {
+  const [ref, needsShadow] = useInView({
+    root,
+    rootMargin: '0px 0px 0px -15px',
+    threshold: 1
+  })
+
+  return (
+    <div
+      {...cellProps}
+      ref={ref}
+      className={cx(
+        cellProps.className,
+        needsShadow && styles.withExpCellShadow
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
+const TableHeaderCellContents: React.FC<{
   column: HeaderGroup<Experiment>
-  columns: HeaderGroup<Experiment>[]
-  hasFilter: boolean
-  orderedColumns: Column[]
   sortOrder: SortOrder
   sortEnabled: boolean
-  menuDisabled?: boolean
-  menuContent?: React.ReactNode
+  hasFilter: boolean
+  isDraggable: boolean
+  menuSuppressed: boolean
   onDragOver: OnDragOver
   onDragStart: OnDragStart
   onDrop: OnDrop
+  canResize: boolean
+  setMenuSuppressed: (menuSuppressed: boolean) => void
+  resizerHeight: string
 }> = ({
+  column,
+  sortEnabled,
+  sortOrder,
+  hasFilter,
+  isDraggable,
+  menuSuppressed,
+  onDragOver,
+  onDragStart,
+  onDrop,
+  canResize,
+  setMenuSuppressed,
+  resizerHeight
+}) => {
+  return (
+    <>
+      <div className={styles.iconMenu}>
+        <IconMenu items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)} />
+      </div>
+      <ColumnDragHandle
+        column={column}
+        disabled={!isDraggable || menuSuppressed}
+        onDragOver={onDragOver}
+        onDragStart={onDragStart}
+        onDrop={onDrop}
+      />
+      {canResize && (
+        <div
+          {...column.getResizerProps()}
+          onMouseEnter={() => setMenuSuppressed(true)}
+          onMouseLeave={() => setMenuSuppressed(false)}
+          className={styles.columnResizer}
+          style={{ height: resizerHeight }}
+        />
+      )}
+    </>
+  )
+}
+
+const TableHeaderCell: React.FC<
+  {
+    column: HeaderGroup<Experiment>
+    columns: HeaderGroup<Experiment>[]
+    hasFilter: boolean
+    orderedColumns: Column[]
+    sortOrder: SortOrder
+    sortEnabled: boolean
+    menuDisabled?: boolean
+    menuContent?: React.ReactNode
+    onDragOver: OnDragOver
+    onDragStart: OnDragStart
+    onDrop: OnDrop
+    isFirst: boolean
+  } & WithTableRoot
+> = ({
   column,
   columns,
   orderedColumns,
@@ -152,10 +235,11 @@ const TableHeaderCell: React.FC<{
   menuDisabled,
   onDragOver,
   onDragStart,
-  onDrop
+  onDrop,
+  root,
+  isFirst
 }) => {
   const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
-
   const isDraggable =
     !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
 
@@ -168,43 +252,46 @@ const TableHeaderCell: React.FC<{
     columns
   )
 
+  const cellProps = {
+    ...column.getHeaderProps(
+      getHeaderPropsArgs(column, sortEnabled, sortOrder)
+    ),
+    'data-testid': `header-${column.id}`,
+    key: column.id,
+    role: 'columnheader',
+    tabIndex: 0
+  }
+
+  const cellContents = (
+    <TableHeaderCellContents
+      column={column}
+      sortOrder={sortOrder}
+      sortEnabled={sortEnabled}
+      hasFilter={hasFilter}
+      isDraggable={isDraggable}
+      menuSuppressed={menuSuppressed}
+      onDragOver={onDragOver}
+      onDragStart={onDragStart}
+      onDrop={onDrop}
+      canResize={canResize}
+      setMenuSuppressed={setMenuSuppressed}
+      resizerHeight={resizerHeight}
+    />
+  )
+
   return (
     <ContextMenu
       content={menuContent}
       disabled={menuDisabled || menuSuppressed}
       trigger={'contextmenu click'}
     >
-      <div
-        {...column.getHeaderProps(
-          getHeaderPropsArgs(column, sortEnabled, sortOrder)
-        )}
-        key={column.id}
-        data-testid={`header-${column.id}`}
-        role={'columnheader'}
-        tabIndex={0}
-      >
-        <div className={styles.iconMenu}>
-          <IconMenu
-            items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)}
-          />
-        </div>
-        <ColumnDragHandle
-          column={column}
-          disabled={!isDraggable || menuSuppressed}
-          onDragOver={onDragOver}
-          onDragStart={onDragStart}
-          onDrop={onDrop}
-        />
-        {canResize && (
-          <div
-            {...column.getResizerProps()}
-            onMouseEnter={() => setMenuSuppressed(true)}
-            onMouseLeave={() => setMenuSuppressed(false)}
-            className={styles.columnResizer}
-            style={{ height: resizerHeight }}
-          />
-        )}
-      </div>
+      {isFirst ? (
+        <FirstTableHeaderCellWrapper cellProps={cellProps} root={root}>
+          {cellContents}
+        </FirstTableHeaderCellWrapper>
+      ) : (
+        <div {...cellProps}>{cellContents}</div>
+      )}
     </ContextMenu>
   )
 }
@@ -218,9 +305,10 @@ interface TableHeaderProps {
   onDragOver: OnDragOver
   onDragStart: OnDragStart
   onDrop: OnDrop
+  isFirst: boolean
 }
 
-export const TableHeader: React.FC<TableHeaderProps> = ({
+export const TableHeader: React.FC<TableHeaderProps & WithTableRoot> = ({
   column,
   columns,
   filters,
@@ -228,7 +316,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   orderedColumns,
   onDragOver,
   onDragStart,
-  onDrop
+  onDrop,
+  root,
+  isFirst
 }) => {
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
@@ -278,6 +368,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragStart={onDragStart}
       onDrop={onDrop}
       menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
+      root={root}
+      isFirst={isFirst}
       menuContent={
         <div>
           <MessagesMenu options={contextMenuOptions} />

@@ -1,8 +1,9 @@
 import React from 'react'
+import { useInView } from 'react-intersection-observer'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
-import { CellProp, RowProp } from './interfaces'
+import { CellProp, WithTableRoot, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
 import { clickAndEnterProps } from '../../../util/props'
 import { StarFull, StarEmpty } from '../../../shared/components/icons'
@@ -31,55 +32,81 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
     <span className={styles.rowArrowContainer} />
   )
 
+const FirstCellRowActions: React.FC<{
+  isRowSelected: boolean
+  toggleRowSelection: () => void
+  starred: boolean | undefined
+  toggleStarred: () => void
+}> = ({ toggleRowSelection, isRowSelected, starred, toggleStarred }) => {
+  return (
+    <div className={styles.rowActions}>
+      <VSCodeCheckbox
+        {...clickAndEnterProps(toggleRowSelection)}
+        checked={isRowSelected}
+      />
+      <div
+        className={styles.starSwitch}
+        role="switch"
+        aria-checked={starred}
+        tabIndex={0}
+        {...clickAndEnterProps(toggleStarred)}
+        data-testid="star-icon"
+      >
+        {starred && <StarFull />}
+        {!starred && <StarEmpty />}
+      </div>
+    </div>
+  )
+}
+
 export const FirstCell: React.FC<
-  CellProp & {
-    bulletColor?: string
-    isRowSelected: boolean
-    toggleExperiment: () => void
-    toggleRowSelection: () => void
-    toggleStarred: () => void
-  }
+  CellProp &
+    WithTableRoot & {
+      bulletColor?: string
+      isRowSelected: boolean
+      toggleExperiment: () => void
+      toggleRowSelection: () => void
+      toggleStarred: () => void
+    }
 > = ({
   cell,
   bulletColor,
   isRowSelected,
   toggleExperiment,
   toggleRowSelection,
-  toggleStarred
+  toggleStarred,
+  root
 }) => {
   const { row, isPlaceholder } = cell
   const {
     original: { starred, queued }
   } = row
 
+  const [ref, needsShadow] = useInView({
+    root,
+    rootMargin: '0px 0px 0px -15px',
+    threshold: 1
+  })
+
   return (
     <div
+      ref={ref}
       {...cell.getCellProps({
         className: cx(
           styles.td,
           styles.experimentCell,
-          isPlaceholder && styles.groupPlaceholder
+          isPlaceholder && styles.groupPlaceholder,
+          needsShadow && styles.withExpCellShadow
         )
       })}
     >
       <div className={styles.innerCell}>
-        <div className={styles.rowActions}>
-          <VSCodeCheckbox
-            {...clickAndEnterProps(toggleRowSelection)}
-            checked={isRowSelected}
-          />
-          <div
-            className={styles.starSwitch}
-            role="switch"
-            aria-checked={starred}
-            tabIndex={0}
-            {...clickAndEnterProps(toggleStarred)}
-            data-testid="star-icon"
-          >
-            {starred && <StarFull />}
-            {!starred && <StarEmpty />}
-          </div>
-        </div>
+        <FirstCellRowActions
+          isRowSelected={isRowSelected}
+          starred={starred}
+          toggleRowSelection={toggleRowSelection}
+          toggleStarred={toggleStarred}
+        />
         <RowExpansionButton row={row} />
         <span
           className={styles.bullet}

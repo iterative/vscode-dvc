@@ -2,7 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { RowProp, WithChanges } from './interfaces'
+import { RowProp, WithChanges, WithTableRoot } from './interfaces'
 import styles from './styles.module.scss'
 import { FirstCell, CellWrapper } from './Cell'
 import { RowSelectionContext } from './RowSelectionContext'
@@ -307,7 +307,9 @@ export type BatchSelectionProp = {
 }
 
 export const RowContent: React.FC<
-  RowProp & { className?: string } & WithChanges & BatchSelectionProp
+  RowProp & { className?: string } & WithChanges &
+    BatchSelectionProp &
+    WithTableRoot
 > = ({
   row,
   className,
@@ -315,7 +317,8 @@ export const RowContent: React.FC<
   contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
-  batchRowSelection
+  batchRowSelection,
+  root
 }): JSX.Element => {
   const {
     getRowProps,
@@ -388,6 +391,7 @@ export const RowContent: React.FC<
         data-testid={isWorkspace && 'workspace-row'}
       >
         <FirstCell
+          root={root}
           cell={firstCell}
           bulletColor={displayColor}
           isRowSelected={isRowSelected}

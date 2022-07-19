@@ -13,6 +13,10 @@ export interface WithChanges {
   changes?: string[]
 }
 
+export interface WithTableRoot {
+  root: HTMLElement | null
+}
+
 export interface RowProp {
   row: Row<Experiment>
   contextMenuDisabled?: boolean

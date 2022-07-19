@@ -117,6 +117,7 @@ export const TableHead = ({
           onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
+          root={root}
         />
       ))}
     </div>

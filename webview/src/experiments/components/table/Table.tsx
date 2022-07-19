@@ -3,23 +3,31 @@ import cx from 'classnames'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import { BatchSelectionProp, RowContent } from './Row'
-import { InstanceProp, RowProp, TableProps, WithChanges } from './interfaces'
+import {
+  InstanceProp,
+  RowProp,
+  TableProps,
+  WithChanges,
+  WithTableRoot
+} from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { useClickOutside } from '../../../shared/hooks/useClickOutside'
 
 export const NestedRow: React.FC<
-  RowProp & InstanceProp & BatchSelectionProp
+  RowProp & InstanceProp & BatchSelectionProp & WithTableRoot
 > = ({
   row,
   instance,
   contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
-  batchRowSelection
+  batchRowSelection,
+  root
 }) => {
   instance.prepareRow(row)
   return (
     <RowContent
+      root={root}
       row={row}
       className={styles.nestedRow}
       contextMenuDisabled={contextMenuDisabled}
@@ -31,14 +39,15 @@ export const NestedRow: React.FC<
 }
 
 export const ExperimentGroup: React.FC<
-  RowProp & InstanceProp & BatchSelectionProp
+  RowProp & InstanceProp & BatchSelectionProp & WithTableRoot
 > = ({
   row,
   instance,
   contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
-  batchRowSelection
+  batchRowSelection,
+  root
 }) => {
   instance.prepareRow(row)
   return (
@@ -49,6 +58,7 @@ export const ExperimentGroup: React.FC<
       )}
     >
       <NestedRow
+        root={root}
         row={row}
         instance={instance}
         contextMenuDisabled={contextMenuDisabled}
@@ -59,6 +69,7 @@ export const ExperimentGroup: React.FC<
       {row.isExpanded &&
         row.subRows.map(row => (
           <NestedRow
+            root={root}
             row={row}
             instance={instance}
             key={row.id}
@@ -73,7 +84,7 @@ export const ExperimentGroup: React.FC<
 }
 
 export const TableBody: React.FC<
-  RowProp & InstanceProp & WithChanges & BatchSelectionProp
+  RowProp & InstanceProp & WithChanges & BatchSelectionProp & WithTableRoot
 > = ({
   row,
   instance,
@@ -81,7 +92,8 @@ export const TableBody: React.FC<
   contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
-  batchRowSelection
+  batchRowSelection,
+  root
 }) => {
   instance.prepareRow(row)
   return (
@@ -97,6 +109,7 @@ export const TableBody: React.FC<
       })}
     >
       <RowContent
+        root={root}
         row={row}
         projectHasCheckpoints={projectHasCheckpoints}
         hasRunningExperiment={hasRunningExperiment}
@@ -107,6 +120,7 @@ export const TableBody: React.FC<
       {row.isExpanded &&
         row.subRows.map(subRow => (
           <ExperimentGroup
+            root={root}
             row={subRow}
             instance={instance}
             key={subRow.values.id}
@@ -205,6 +219,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
             hasRunningExperiment={hasRunningExperiment}
             projectHasCheckpoints={hasCheckpoints}
             batchRowSelection={batchRowSelection}
+            root={tableRef.current}
           />
         ))}
       </div>
