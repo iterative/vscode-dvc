@@ -7,7 +7,12 @@ import {
   ColumnInstance,
   Cell
 } from 'react-table'
-import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  Column,
+  ValueWithChanges
+} from 'dvc/src/experiments/webview/contract'
+import { Value } from 'dvc/src/cli/reader'
 import { formatFloat } from './numberFormatting'
 import Tooltip, {
   CELL_TOOLTIP_DELAY
@@ -15,6 +20,18 @@ import Tooltip, {
 import styles from '../components/table/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
+
+export type CellValue = Value | ValueWithChanges
+
+export const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
+  typeof (raw as ValueWithChanges)?.changes === 'boolean'
+
+export const cellValue = (raw: CellValue) =>
+  isValueWithChanges(raw) ? raw.value : raw
+
+export const cellHasChanges = (cellValue: CellValue) =>
+  isValueWithChanges(cellValue) ? cellValue.changes : false
+
 const UndefinedCell = (
   <div className={styles.innerCell}>
     <span className={styles.cellContents}>. . .</span>
@@ -38,17 +55,18 @@ const CellTooltip: React.FC<{
   )
 }
 
-const Cell: React.FC<Cell<Experiment, string | number>> = cell => {
+const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
   const { value } = cell
   if (value === undefined) {
     return UndefinedCell
   }
 
-  const stringValue = String(value)
+  const rawValue = cellValue(value)
+  const stringValue = String(rawValue)
 
   const displayValue =
-    typeof value === 'number' && !Number.isInteger(value)
-      ? formatFloat(value as number)
+    typeof rawValue === 'number' && !Number.isInteger(rawValue)
+      ? formatFloat(rawValue as number)
       : stringValue
 
   return (

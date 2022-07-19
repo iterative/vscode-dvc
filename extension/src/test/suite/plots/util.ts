@@ -18,6 +18,7 @@ import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
 import { PathsModel } from '../../../plots/paths/model'
 import { Color } from '../../../experiments/model/status/colors'
 import { BaseWorkspaceWebviews } from '../../../webview/workspace'
+import { WebviewMessages } from '../../../plots/webview/messages'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -78,6 +79,9 @@ export const buildPlots = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pathsModel: PathsModel = (plots as any).paths
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const webviewMessages: WebviewMessages = (plots as any).webviewMessages
+
   return {
     data,
     experiments,
@@ -87,7 +91,8 @@ export const buildPlots = async (
     mockRemoveDir,
     pathsModel,
     plots,
-    plotsModel
+    plotsModel,
+    webviewMessages
   }
 }
 

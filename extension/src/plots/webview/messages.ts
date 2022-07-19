@@ -1,4 +1,12 @@
-import { PlotSize, Section, SectionCollapsed } from './contract'
+import isEmpty from 'lodash.isempty'
+import {
+  ComparisonPlot,
+  ComparisonRevisionData,
+  PlotsData as TPlotsData,
+  PlotSize,
+  Section,
+  SectionCollapsed
+} from './contract'
 import { Logger } from '../../common/logger'
 import { Experiments } from '../../experiments'
 import { sendTelemetryEvent } from '../../telemetry'
@@ -11,16 +19,16 @@ import {
 } from '../../webview/contract'
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
+import { BaseWebview } from '../../webview'
+import { getModifiedTime } from '../../fileSystem'
+import { definedAndNonEmpty } from '../../util/array'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
   private readonly plots: PlotsModel
   private readonly experiments: Experiments
 
-  private readonly sendSectionCollapsed: () => void
-  private readonly sendTemplatePlots: () => void
-  private readonly sendComparisonPlots: () => void
-  private readonly sendCheckpointPlotsData: () => void
+  private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
   private readonly selectPlots: () => void
   private readonly updateData: () => void
 
@@ -28,22 +36,34 @@ export class WebviewMessages {
     paths: PathsModel,
     plots: PlotsModel,
     experiments: Experiments,
-    sendSectionCollapsed: () => void,
-    sendTemplatePlots: () => void,
-    sendComparisonPlots: () => void,
-    sendCheckpointPlotsData: () => void,
+    getWebview: () => BaseWebview<TPlotsData> | undefined,
     selectPlots: () => void,
     updateData: () => void
   ) {
     this.paths = paths
     this.plots = plots
     this.experiments = experiments
-    this.sendSectionCollapsed = sendSectionCollapsed
-    this.sendTemplatePlots = sendTemplatePlots
-    this.sendComparisonPlots = sendComparisonPlots
-    this.sendCheckpointPlotsData = sendCheckpointPlotsData
+    this.getWebview = getWebview
     this.selectPlots = selectPlots
     this.updateData = updateData
+  }
+
+  public sendWebviewMessage() {
+    this.getWebview()?.show({
+      checkpoint: this.getCheckpointPlots(),
+      comparison: this.getComparisonPlots(),
+      hasPlots: !!this.paths?.hasPaths(),
+      hasSelectedPlots: definedAndNonEmpty(this.paths.getSelected()),
+      sectionCollapsed: this.plots.getSectionCollapsed(),
+      selectedRevisions: this.plots.getSelectedRevisionDetails(),
+      template: this.getTemplatePlots()
+    })
+  }
+
+  public sendCheckpointPlotsMessage() {
+    this.getWebview()?.show({
+      checkpoint: this.getCheckpointPlots()
+    })
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -176,7 +196,84 @@ export class WebviewMessages {
       | typeof EventName.VIEWS_REORDER_PLOTS_METRICS
       | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
   ) {
-    this.sendCheckpointPlotsData()
+    this.sendCheckpointPlotsMessage()
     sendTelemetryEvent(event, undefined, undefined)
+  }
+
+  private sendSectionCollapsed() {
+    this.getWebview()?.show({
+      sectionCollapsed: this.plots?.getSectionCollapsed()
+    })
+  }
+
+  private sendComparisonPlots() {
+    this.getWebview()?.show({
+      comparison: this.getComparisonPlots(),
+      selectedRevisions: this.plots?.getSelectedRevisionDetails()
+    })
+  }
+
+  private sendTemplatePlots() {
+    this.getWebview()?.show({
+      template: this.getTemplatePlots()
+    })
+  }
+
+  private getTemplatePlots() {
+    const paths = this.paths?.getTemplateOrder()
+    const plots = this.plots?.getTemplatePlots(paths)
+
+    if (!this.plots || !plots || isEmpty(plots)) {
+      return null
+    }
+
+    return {
+      plots,
+      size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
+    }
+  }
+
+  private getComparisonPlots() {
+    const paths = this.paths.getComparisonPaths()
+    const comparison = this.plots.getComparisonPlots(paths)
+    if (!this.plots || !comparison || isEmpty(comparison)) {
+      return null
+    }
+
+    return {
+      plots: comparison.map(({ path, revisions }) => {
+        return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
+      }),
+      size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
+    }
+  }
+
+  private getRevisionsWithCorrectUrls(revisions: ComparisonRevisionData) {
+    const acc: ComparisonRevisionData = {}
+
+    for (const [revision, plot] of Object.entries(revisions)) {
+      const updatedPlot = this.addCorrectUrl(plot)
+      if (!updatedPlot) {
+        continue
+      }
+      acc[revision] = updatedPlot
+    }
+    return acc
+  }
+
+  private addCorrectUrl(plot: ComparisonPlot) {
+    const webview = this.getWebview()
+    if (webview) {
+      return {
+        ...plot,
+        url: plot.url
+          ? `${webview.getWebviewUri(plot.url)}?${getModifiedTime(plot.url)}`
+          : undefined
+      }
+    }
+  }
+
+  private getCheckpointPlots() {
+    return this.plots?.getCheckpointPlots() || null
   }
 }

@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.11] - 2022-07-19
+
+### 🚀 New Features and Enhancements
+
+- Conditional sticky table head shadows [#2010](https://github.com/iterative/vscode-dvc/pull/2010) by [@rogermparent](https://github.com/rogermparent)
+- Show middle state badges for running, starred and checked sub-rows [#2004](https://github.com/iterative/vscode-dvc/pull/2004) by [@wolmir](https://github.com/wolmir)
+- Highlight changed hashes for Deps columns [#2029](https://github.com/iterative/vscode-dvc/pull/2029) by [@wolmir](https://github.com/wolmir)
+
+### 🔨 Maintenance
+
+- Minor Storybook config touch-ups [#2015](https://github.com/iterative/vscode-dvc/pull/2015) by [@rogermparent](https://github.com/rogermparent)
+- Add wdio-vscode-service folder to prettierignore [#2023](https://github.com/iterative/vscode-dvc/pull/2023) by [@mattseddon](https://github.com/mattseddon)
+- Ignore packages in Renovate config [#2021](https://github.com/iterative/vscode-dvc/pull/2021) by [@mattseddon](https://github.com/mattseddon)
+- Increase timeout of scheduled CLI test [#2025](https://github.com/iterative/vscode-dvc/pull/2025) by [@mattseddon](https://github.com/mattseddon)
+- Remove webview message handling from experiments [#2026](https://github.com/iterative/vscode-dvc/pull/2026) by [@mattseddon](https://github.com/mattseddon)
+- Remove webview message handling from plots [#2027](https://github.com/iterative/vscode-dvc/pull/2027) by [@mattseddon](https://github.com/mattseddon)
+- Upgrade Python dependencies [#2024](https://github.com/iterative/vscode-dvc/pull/2024) by [@mattseddon](https://github.com/mattseddon)
+- Change type of cell value as a step towards consolidation [#2054](https://github.com/iterative/vscode-dvc/pull/2054) by [@wolmir](https://github.com/wolmir)
+- Move experiments webview message sending into WebviewMessages [#2030](https://github.com/iterative/vscode-dvc/pull/2030) by [@mattseddon](https://github.com/mattseddon)
+- Move plots webview message sending into WebviewMessages [#2033](https://github.com/iterative/vscode-dvc/pull/2033) by [@mattseddon](https://github.com/mattseddon)
+- Extract set active editor context from experiments [#2038](https://github.com/iterative/vscode-dvc/pull/2038) by [@mattseddon](https://github.com/mattseddon)
+- Do not update trees on star update [#2042](https://github.com/iterative/vscode-dvc/pull/2042) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.10] - 2022-07-14
 
 ### 🐛 Bug Fixes
