@@ -13,17 +13,8 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
-import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested'
-import {
-  MessageFromWebviewType,
-  MessageToWebviewType
-} from 'dvc/src/webview/contract'
-import {
-  Column,
-  ColumnType,
-  Row,
-  TableData
-} from 'dvc/src/experiments/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { Column, ColumnType, Row } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
 import { App } from './App'
@@ -43,6 +34,22 @@ import { getRow } from '../../test/queries'
 import { dragAndDrop } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { setExperimentsAsStarred } from '../../test/tableDataFixture'
+import {
+  clickRowCheckbox,
+  contractRow,
+  expandRow,
+  getCheckboxCountIndicator,
+  getCountIndicatorById,
+  getCountIndicators,
+  renderTable,
+  renderTableWithNoColumns,
+  renderTableWithoutRunningExperiments,
+  renderTableWithPlaceholder,
+  renderTableWithSortingData,
+  renderTableWithWorkspaceRowOnly,
+  selectedRows,
+  setTableData
+} from '../../test/experimentsTable'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -64,19 +71,6 @@ afterEach(() => {
 
 describe('App', () => {
   describe('Sorting Classes', () => {
-    const renderTableWithPlaceholder = () => {
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: deeplyNestedTableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
-    }
-
     it('should apply the sortingHeaderCellAsc class to only a top level placeholder', () => {
       renderTableWithPlaceholder()
 
@@ -141,48 +135,21 @@ describe('App', () => {
   })
 
   it('should show the no columns selected empty state when there are no columns provided', () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: { ...tableDataFixture, columns: [] },
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    renderTableWithNoColumns()
 
     const noColumnsState = screen.queryByText('No Columns Selected.')
     expect(noColumnsState).toBeInTheDocument()
   })
 
   it('should show the no experiments empty state when only the workspace is provided', () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: { ...tableDataFixture, rows: [tableDataFixture.rows[0]] },
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    renderTableWithWorkspaceRowOnly()
 
     const noExperimentsState = screen.queryByText('No Experiments to Display.')
     expect(noExperimentsState).toBeInTheDocument()
   })
 
   it('should show the experiments table', () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: tableDataFixture,
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    renderTable()
 
     screen.queryAllByText('Experiment')
 
@@ -197,18 +164,9 @@ describe('App', () => {
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: sortingTableDataFixture,
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    renderTableWithSortingData()
 
-    const changedData: TableData = {
+    setTableData({
       ...sortingTableDataFixture,
       columns: [
         ...sortingTableDataFixture.columns,
@@ -219,17 +177,7 @@ describe('App', () => {
           path: 'params:D'
         } as Column
       ]
-    }
-
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: changedData,
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    })
 
     const headerB = screen.getByText('B')
     const headerD = screen.getByText('D')
@@ -244,17 +192,7 @@ describe('App', () => {
     const checkpointLabel = '22e40e1'
 
     it('should maintain expansion status when rows are reordered', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable()
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
@@ -266,7 +204,7 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
 
-      const changedData: TableData = {
+      setTableData({
         ...tableDataFixture,
         rows: [
           tableDataFixture.rows[0],
@@ -275,34 +213,14 @@ describe('App', () => {
             subRows: [...(tableDataFixture.rows[1].subRows as Row[])].reverse()
           }
         ]
-      }
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: changedData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      })
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
     })
 
     it('should maintain expansion status when the branch changes', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable()
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
@@ -324,20 +242,11 @@ describe('App', () => {
         name: changedBranchName,
         sha: '99999dfb4aa5fb41915610c3a256b418fc095610'
       }
-      const changedData: TableData = {
+
+      setTableData({
         ...tableDataFixture,
         rows: changedRows
-      }
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: changedData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      })
 
       expect(screen.getByText(changedBranchName)).toBeInTheDocument()
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
@@ -345,16 +254,7 @@ describe('App', () => {
     })
 
     it('should not toggle an experiment when using the row expansion button', () => {
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable()
       const testRow = getRow(experimentLabel)
       const expandButton = within(testRow).getByTitle('Contract Row')
 
@@ -374,42 +274,10 @@ describe('App', () => {
   })
 
   describe('Sub-rows middle states indicators', () => {
-    const renderWithAllRowsExpanded = () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
-    }
+    const testRowLabel = '4fb124a'
 
     const getMiddleStatesTestRow = () => {
-      return getRow('4fb124a')
-    }
-
-    const getCountIndicators = (element: HTMLElement) => {
-      return within(element).queryAllByRole('marquee')
-    }
-
-    const getCountIndicatorById = (row: HTMLElement, rowActionId: string) => {
-      const checkboxRowAction = within(row).getByTestId(rowActionId)
-
-      return within(checkboxRowAction).queryByRole('marquee')
-    }
-
-    const getCheckboxCountIndicator = (row: HTMLElement) => {
-      return getCountIndicatorById(row, 'row-action-checkbox')
-    }
-
-    const clickRowCheckbox = (label: string) => {
-      const checkbox = within(getRow(label)).getByRole('checkbox')
-
-      fireEvent.click(checkbox)
+      return getRow(testRowLabel)
     }
 
     const selectSomeSubRows = () => {
@@ -425,27 +293,13 @@ describe('App', () => {
         '1ee5f2e'
       ])
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: starredFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      setTableData(starredFixture)
 
       return 2
     }
 
-    const toggleExpansion = (row: HTMLElement) => {
-      const expandButton = within(row).getByTitle('Contract Row')
-
-      fireEvent.click(expandButton)
-    }
-
     it('should be hidden when the parent row is expanded', () => {
-      renderWithAllRowsExpanded()
+      renderTable()
       const row = getMiddleStatesTestRow()
       const indicators = getCountIndicators(row)
       expect(indicators).toHaveLength(0)
@@ -453,18 +307,18 @@ describe('App', () => {
 
     describe('Checkbox selection counter', () => {
       it('should not be visible if no sub-row was checked', () => {
-        renderWithAllRowsExpanded()
+        renderTable()
         const row = getMiddleStatesTestRow()
         const indicator = getCheckboxCountIndicator(row)
         expect(indicator).not.toBeInTheDocument()
       })
 
       it('should display the correct number of checked sub-rows when the parent is collapsed', () => {
-        renderWithAllRowsExpanded()
+        renderTable()
         const row = getMiddleStatesTestRow()
         const numberOfSubrowsSelected = selectSomeSubRows()
         expect(getCheckboxCountIndicator(row)).not.toBeInTheDocument()
-        toggleExpansion(row)
+        contractRow(testRowLabel)
         const collapsed = getMiddleStatesTestRow()
         expect(getCheckboxCountIndicator(collapsed)).toHaveTextContent(
           `${numberOfSubrowsSelected}`
@@ -474,20 +328,20 @@ describe('App', () => {
 
     describe('Stars counter', () => {
       it('should not be visible if no sub-row was starred', () => {
-        renderWithAllRowsExpanded()
+        renderTable()
         const row = getMiddleStatesTestRow()
         const indicator = getCountIndicatorById(row, 'row-action-star')
         expect(indicator).not.toBeInTheDocument()
       })
 
       it('should display the correct number of starred sub-rows when the parent is collapsed', () => {
-        renderWithAllRowsExpanded()
+        renderTable()
         const row = getMiddleStatesTestRow()
         const numberOfSubrowsStarred = starSomeSubRows()
         expect(
           getCountIndicatorById(row, 'row-action-star')
         ).not.toBeInTheDocument()
-        toggleExpansion(row)
+        contractRow(testRowLabel)
         const collapsed = getMiddleStatesTestRow()
         expect(
           getCountIndicatorById(collapsed, 'row-action-star')
@@ -498,17 +352,8 @@ describe('App', () => {
 
   describe('Toggle experiment status', () => {
     it('should send a message to the extension to toggle an experiment when the row is clicked', () => {
-      render(<App />)
+      renderTable()
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
       const testClick = (label: string, id = label) => {
         mockPostMessage.mockReset()
 
@@ -529,17 +374,8 @@ describe('App', () => {
     })
 
     it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
-      render(<App />)
+      renderTable()
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
       mockPostMessage.mockClear()
 
       const testRowLabel = screen.getByText('main')
@@ -679,16 +515,7 @@ describe('App', () => {
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a header', () => {
       mockedUseIsFullyContained.mockReturnValue(false)
 
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: testData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable(testData)
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
@@ -716,16 +543,7 @@ describe('App', () => {
     it('should not show a tooltip after hovering on a header if its content is not overflowing', () => {
       mockedUseIsFullyContained.mockReturnValue(true)
 
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: testData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable(testData)
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
@@ -738,16 +556,7 @@ describe('App', () => {
     })
 
     it('should show and hide a tooltip on mouseEnter and mouseLeave of a cell', () => {
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: testData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable(testData)
 
       const testParamCell = screen.getByText(testParamStringValue)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
@@ -768,16 +577,7 @@ describe('App', () => {
     })
 
     it('should persist a cell tooltip when it is moused into', () => {
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: testData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable(testData)
 
       const testParamCell = screen.getByText(testParamStringValue)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
@@ -813,16 +613,7 @@ describe('App', () => {
         expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
       }
 
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: dataTypesTableData,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable(dataTypesTableData)
 
       expectTooltipValue({
         cellLabel: '1.9293',
@@ -852,20 +643,7 @@ describe('App', () => {
     })
 
     it('should be available when there is data and no running experiments', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTableWithoutRunningExperiments()
 
       const target = screen.getByTestId('workspace-row')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -876,17 +654,7 @@ describe('App', () => {
     })
 
     it('should present the correct options for the workspace row with no checkpoints', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: deeplyNestedTableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTableWithPlaceholder()
 
       const target = screen.getByTestId('workspace-row')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -898,20 +666,7 @@ describe('App', () => {
     })
 
     it('should present the correct options for the main row with checkpoints', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('main')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -928,20 +683,7 @@ describe('App', () => {
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -953,26 +695,10 @@ describe('App', () => {
     })
 
     it('should present the Remove option if multiple checkpoint tip rows are selected', () => {
-      render(<App />)
+      renderTableWithoutRunningExperiments()
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
-
-      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
-      fireEvent.click(firstRowCheckbox)
-
-      const secondRowCheckbox = within(getRow('42b8736')).getByRole('checkbox')
-      fireEvent.click(secondRowCheckbox)
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736')
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -984,29 +710,12 @@ describe('App', () => {
     })
 
     it('should allow batch selection of rows by shift-clicking a range of them', () => {
-      render(<App />)
+      renderTableWithoutRunningExperiments()
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736', true)
 
-      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
-      fireEvent.click(firstRowCheckbox)
-
-      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
-      fireEvent.click(tailRow, { shiftKey: true })
-
-      const selectedRows = screen.getAllByRole('row', { selected: true })
-      expect(selectedRows.length).toBe(4)
+      expect(selectedRows().length).toBe(4)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1018,63 +727,26 @@ describe('App', () => {
     })
 
     it('should allow batch selection from the bottom up too', () => {
-      render(<App />)
+      renderTableWithoutRunningExperiments()
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      clickRowCheckbox('42b8736')
+      clickRowCheckbox('4fb124a', true)
 
-      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
-      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
-      fireEvent.click(tailRow)
-      fireEvent.click(firstRowCheckbox, { shiftKey: true })
-
-      const selectedRows = () => screen.getAllByRole('row', { selected: true })
       expect(selectedRows()).toHaveLength(4)
 
-      const anotherRow = within(getRow('2173124')).getByRole('checkbox')
-      fireEvent.click(anotherRow, { shiftKey: true })
+      clickRowCheckbox('2173124', true)
       expect(selectedRows()).toHaveLength(5)
     })
 
     it('should not include collapsed experiments in the bulk selection', () => {
-      render(<App />)
+      renderTableWithoutRunningExperiments()
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
-
-      const testBranchContractButton = within(getRow('42b8736')).getByTitle(
-        'Contract Row'
-      )
-      fireEvent.click(testBranchContractButton)
+      contractRow('42b8736')
 
       jest.advanceTimersByTime(100)
-      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
-      fireEvent.click(firstRowCheckbox)
-
-      const tailRow = within(getRow('22e40e1')).getByRole('checkbox')
-      fireEvent.click(tailRow, { shiftKey: true })
-
-      fireEvent.click(testBranchContractButton)
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('22e40e1', true)
+      expandRow('42b8736')
 
       jest.advanceTimersByTime(100)
       expect(getRow('42b8736')).toHaveAttribute('aria-selected', 'true')
@@ -1083,29 +755,11 @@ describe('App', () => {
     })
 
     it('should present the Clear selected rows option when multiple rows are selected', () => {
-      render(<App />)
+      renderTableWithoutRunningExperiments()
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736', true)
 
-      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
-      fireEvent.click(firstRowCheckbox)
-
-      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
-      fireEvent.click(tailRow, { shiftKey: true })
-
-      const selectedRows = () =>
-        screen.queryAllByRole('row', { selected: true })
       expect(selectedRows().length).toBe(4)
 
       const target = screen.getByText('4fb124a')
@@ -1120,29 +774,14 @@ describe('App', () => {
     })
 
     it('should clear the row selection when the Escape key is pressed', () => {
-      render(<App />)
+      renderTable()
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736', true)
 
-      const firstRowCheckbox = within(getRow('4fb124a')).getByRole('checkbox')
-      fireEvent.click(firstRowCheckbox)
-
-      const tailRow = within(getRow('42b8736')).getByRole('checkbox')
-      fireEvent.click(tailRow, { shiftKey: true })
-
-      const selectedRows = () =>
-        screen.queryAllByRole('row', { selected: true })
       expect(selectedRows().length).toBe(4)
 
-      fireEvent.keyUp(tailRow, { bubbles: true, key: 'Escape' })
+      fireEvent.keyUp(getRow('42b8736'), { bubbles: true, key: 'Escape' })
 
       jest.advanceTimersByTime(100)
       expect(selectedRows().length).toBe(0)
@@ -1158,17 +797,7 @@ describe('App', () => {
     })
 
     it('should not be available for the workspace experiment', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable()
 
       mockPostMessage.mockReset()
       const workspaceRow = screen.getByTestId('workspace-row')
@@ -1179,17 +808,7 @@ describe('App', () => {
     })
 
     it('should toggle the star status of an experiment by clicking the star icon', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable()
 
       mockPostMessage.mockReset()
       const mainRow = getRow('main')
@@ -1204,20 +823,7 @@ describe('App', () => {
     })
 
     it('should toggle the star status of an experiment by clicking the ctx menu option', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable()
 
       mockPostMessage.mockReset()
       const mainRow = getRow('main')
@@ -1236,27 +842,13 @@ describe('App', () => {
     })
 
     it('should toggle the star status of multiple experiments by clicking the ctx menu options', () => {
-      render(<App />)
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              hasRunningExperiment: false
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable()
 
       mockPostMessage.mockReset()
       const mainRow = within(getRow('main')).getByRole('checkbox')
       fireEvent.click(mainRow)
 
-      const firstTipRow = within(getRow('4fb124a')).getByRole('checkbox')
-      fireEvent.click(firstTipRow)
+      clickRowCheckbox('4fb124a')
 
       fireEvent.contextMenu(mainRow, { bubbles: true })
       jest.advanceTimersByTime(100)
@@ -1282,16 +874,7 @@ describe('App', () => {
     })
 
     it('Suppresses the context menu on a table with data', () => {
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: tableDataFixture,
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable()
       const target = screen.getAllByRole('row')[0]
       const contextMenuEvent = createEvent.contextMenu(target)
       fireEvent(target, contextMenuEvent)
@@ -1301,19 +884,10 @@ describe('App', () => {
 
   describe('Sort and Filter Indicators', () => {
     it('should show an indicator with the amount of applied sorts', () => {
-      render(<App />)
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              sorts: []
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      renderTable({
+        ...tableDataFixture,
+        sorts: []
+      })
       const sortIndicator = screen.getByLabelText('sorts')
       expect(sortIndicator).toHaveTextContent('')
 
@@ -1328,54 +902,29 @@ describe('App', () => {
       const { columns } = tableDataFixture
       const firstSortPath = columns[columns.length - 1].path
       const secondSortPath = columns[columns.length - 2].path
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              sorts: [{ descending: true, path: firstSortPath }]
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      setTableData({
+        ...tableDataFixture,
+        sorts: [{ descending: true, path: firstSortPath }]
+      })
       expect(sortIndicator).toHaveTextContent('1')
       expect(tooltip).toHaveTextContent('1 Sort Applied')
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            data: {
-              ...tableDataFixture,
-              sorts: [
-                { descending: true, path: firstSortPath },
-                { descending: false, path: secondSortPath }
-              ]
-            },
-            type: MessageToWebviewType.SET_DATA
-          }
-        })
-      )
+      setTableData({
+        ...tableDataFixture,
+        sorts: [
+          { descending: true, path: firstSortPath },
+          { descending: false, path: secondSortPath }
+        ]
+      })
       expect(sortIndicator).toHaveTextContent('2')
       expect(tooltip).toHaveTextContent('2 Sorts Applied')
     })
   })
 
   it('should show an indicator with the amount of applied filters', () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: {
-            ...tableDataFixture,
-            filters: []
-          },
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    renderTable({
+      ...tableDataFixture,
+      filters: []
+    })
     const filterIndicator = screen.getByLabelText('filters')
     expect(filterIndicator).toHaveTextContent('')
 
@@ -1390,93 +939,52 @@ describe('App', () => {
     const { columns } = tableDataFixture
     const firstFilterPath = columns[columns.length - 1].path
     const secondFilterPath = columns[columns.length - 2].path
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: {
-            ...tableDataFixture,
-            filters: [firstFilterPath]
-          },
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    setTableData({
+      ...tableDataFixture,
+      filters: [firstFilterPath]
+    })
     expect(filterIndicator).toHaveTextContent('1')
     expect(tooltip).toHaveTextContent('1 Filter Applied')
     expect(tooltip).toHaveTextContent('0 Experiments, 0 Checkpoints Filtered')
 
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: {
-            ...tableDataFixture,
-            filteredCounts: {
-              checkpoints: 2,
-              experiments: 1
-            },
-            filters: [firstFilterPath, secondFilterPath]
-          },
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    setTableData({
+      ...tableDataFixture,
+      filteredCounts: {
+        checkpoints: 2,
+        experiments: 1
+      },
+      filters: [firstFilterPath, secondFilterPath]
+    })
     expect(filterIndicator).toHaveTextContent('2')
     expect(tooltip).toHaveTextContent('2 Filters Applied')
     expect(tooltip).toHaveTextContent('1 Experiment, 2 Checkpoints Filtered')
 
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: {
-            ...tableDataFixture,
-            filteredCounts: {
-              experiments: 10000
-            },
-            filters: [firstFilterPath, secondFilterPath]
-          },
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    setTableData({
+      ...tableDataFixture,
+      filteredCounts: {
+        experiments: 10000
+      },
+      filters: [firstFilterPath, secondFilterPath]
+    })
     expect(filterIndicator).toHaveTextContent('2')
     expect(tooltip).toHaveTextContent('Experiment')
     expect(tooltip).not.toHaveTextContent('Checkpoint')
 
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: {
-            ...tableDataFixture,
-            filteredCounts: {
-              checkpoints: 10000,
-              experiments: 10000
-            },
-            filters: []
-          },
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    setTableData({
+      ...tableDataFixture,
+      filteredCounts: {
+        checkpoints: 10000,
+        experiments: 10000
+      },
+      filters: []
+    })
     expect(filterIndicator).toHaveTextContent('')
     expect(tooltip).not.toHaveTextContent('Experiment')
     expect(tooltip).not.toHaveTextContent('Checkpoint')
   })
 
   it('should send a message to focus the relevant tree when clicked', () => {
-    render(<App />)
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          data: tableDataFixture,
-          type: MessageToWebviewType.SET_DATA
-        }
-      })
-    )
+    renderTable()
     mockPostMessage.mockClear()
     fireEvent.click(screen.getByLabelText('sorts'))
     expect(mockPostMessage).toBeCalledWith({
