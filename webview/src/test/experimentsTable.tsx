@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/filename-case */
 import { fireEvent, render, within, screen } from '@testing-library/react'
 import React from 'react'
 import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested'

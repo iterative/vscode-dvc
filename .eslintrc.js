@@ -53,7 +53,7 @@ module.exports = {
       }
     },
     {
-      files: ['**/util/*.tsx'],
+      files: ['**/util/*.tsx', '**/test/*.tsx'],
       rules: {
         'unicorn/filename-case': 'off'
       }
