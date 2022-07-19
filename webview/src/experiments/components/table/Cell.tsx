@@ -5,10 +5,12 @@ import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
+import ErrorIcon from '../../../shared/components/icons/Error'
 import { clickAndEnterProps } from '../../../util/props'
 import { StarFull, StarEmpty } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
+import Tooltip from '../../../shared/components/tooltip/Tooltip'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -136,7 +138,7 @@ export const FirstCell: React.FC<
 > = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
   const { row, isPlaceholder } = cell
   const {
-    original: { queued }
+    original: { error, queued }
   } = row
 
   const {
@@ -172,12 +174,23 @@ export const FirstCell: React.FC<
           {queued && <ClockIcon />}
         </span>
         {isPlaceholder ? null : (
-          <div
-            className={styles.cellContents}
-            {...clickAndEnterProps(toggleExperiment)}
+          <Tooltip
+            content={
+              <div className={styles.errorTooltip}>
+                <ErrorIcon className={styles.errorIcon} />
+                {error}
+              </div>
+            }
+            placement={'bottom'}
+            disabled={!error}
           >
-            {cell.render('Cell')}
-          </div>
+            <div
+              className={cx(styles.cellContents, error && styles.error)}
+              {...clickAndEnterProps(toggleExperiment)}
+            >
+              {cell.render('Cell')}
+            </div>
+          </Tooltip>
         )}
       </div>
     </div>

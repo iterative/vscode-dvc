@@ -104,6 +104,11 @@ const Header: React.FC<{ column: TableColumn<Experiment> }> = ({
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow => {
     const value = get(originalRow, pathArray)
+
+    if (originalRow.error && value === undefined) {
+      return '!'
+    }
+
     if (!Array.isArray(value)) {
       return value
     }

@@ -1,6 +1,7 @@
 import {
   commands,
   Event,
+  MarkdownString,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -10,7 +11,7 @@ import {
 } from 'vscode'
 import { ExperimentType } from '.'
 import { collectDeletable, ExperimentItem } from './collect'
-import { getDecoratableUri } from './filterBy/decorationProvider'
+import { getDecoratableUri } from './decorationProvider'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
@@ -76,12 +77,24 @@ export class ExperimentsTree
       return getRootItem(element)
     }
 
-    const { label, collapsibleState, iconPath, command, description, type } =
-      element
+    const {
+      label,
+      collapsibleState,
+      iconPath,
+      command,
+      description,
+      type,
+      tooltip
+    } = element
     const item = new TreeItem(getDecoratableUri(label), collapsibleState)
-    item.iconPath = iconPath
+    if (iconPath) {
+      item.iconPath = iconPath
+    }
     item.description = description
     item.contextValue = type
+    if (tooltip) {
+      item.tooltip = tooltip
+    }
     if (command) {
       item.command = command
     }
@@ -165,6 +178,7 @@ export class ExperimentsTree
         iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
         label: experiment.label,
+        tooltip: this.getTooltip(experiment.error),
         type: experiment.type
       }))
   }
@@ -228,6 +242,7 @@ export class ExperimentsTree
       ),
       id: checkpoint.id,
       label: checkpoint.label,
+      tooltip: this.getTooltip(checkpoint.error),
       type: checkpoint.type
     }))
   }
@@ -279,5 +294,13 @@ export class ExperimentsTree
 
   private getSelectedExperimentItems() {
     return [...this.view.selection]
+  }
+
+  private getTooltip(error: string | undefined) {
+    if (!error) {
+      return
+    }
+
+    return new MarkdownString(`$(error) ${error}`, true)
   }
 }
