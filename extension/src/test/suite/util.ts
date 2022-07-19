@@ -165,6 +165,9 @@ export const buildDependencies = (
   const mockPlotsDiff = stub(cliReader, 'plotsDiff').resolves(plotsDiff)
 
   const mockExperimentShow = stub(cliReader, 'expShow').resolves(expShow)
+  const mockQueueStatus = stub(cliReader, 'queueStatus').resolves(
+    'Worker status: 0 active, 0 idle'
+  )
 
   const updatesPaused = disposer.track(new EventEmitter<boolean>())
 
@@ -181,6 +184,7 @@ export const buildDependencies = (
     mockCreateFileSystemWatcher,
     mockExperimentShow,
     mockPlotsDiff,
+    mockQueueStatus,
     resourceLocator,
     updatesPaused
   }

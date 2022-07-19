@@ -239,6 +239,9 @@ suite('Extension Test Suite', () => {
       const mockExpShow = stub(CliReader.prototype, 'expShow').resolves(
         expShowFixture
       )
+      stub(CliReader.prototype, 'queueStatus').resolves(
+        'Worker status: 0 active, 0 idle'
+      )
 
       const mockList = stub(
         CliReader.prototype,
@@ -455,6 +458,9 @@ suite('Extension Test Suite', () => {
       stub(CliReader.prototype, 'expShow').resolves({
         workspace: { baseline: {} }
       })
+      stub(CliReader.prototype, 'queueStatus').resolves(
+        'Worker status: 0 active, 0 idle'
+      )
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([])
       stub(CliReader.prototype, 'root').resolves('.')
       stub(CliReader.prototype, 'diff').resolves({})

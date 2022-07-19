@@ -21,6 +21,8 @@ import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 
+const defaultQueueStatus = 'Worker status: 0 active, 0 idle'
+
 const hasCheckpoints = (data: ExperimentsOutput) => {
   const [experimentsWithBaseline] = Object.values(omit(data, 'workspace'))
   const [firstExperiment] = Object.values(
@@ -117,7 +119,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
   )
   experiments.setState({
     expShow: expShowFixture,
-    queueStatus: 'Worker status: 0 active, 0 idle'
+    queueStatus: defaultQueueStatus
   })
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
@@ -142,7 +144,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
 
   experiments.setState({
     expShow: expShowFixture,
-    queueStatus: 'Worker status: 0 active, 0 idle'
+    queueStatus: defaultQueueStatus
   })
 
   return { messageSpy, workspaceExperiments }
@@ -156,7 +158,15 @@ export const buildExperimentsDataDependencies = (disposer: Disposer) => {
 
   const { cliReader, internalCommands } = buildInternalCommands(disposer)
   const mockExperimentShow = stub(cliReader, 'expShow').resolves(expShowFixture)
-  return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
+  const mockQueueStatus = stub(cliReader, 'queueStatus').resolves(
+    defaultQueueStatus
+  )
+  return {
+    internalCommands,
+    mockCreateFileSystemWatcher,
+    mockExperimentShow,
+    mockQueueStatus
+  }
 }
 
 export const buildExperimentsData = (disposer: Disposer) => {
