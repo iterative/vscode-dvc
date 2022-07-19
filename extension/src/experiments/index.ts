@@ -1,4 +1,5 @@
-import { Event, EventEmitter, Memento, window } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
+import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
 import { pickAndModifyParams } from './model/modify/quickPick'
@@ -25,8 +26,6 @@ import { FileSystemData } from '../fileSystem/data'
 import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { createTypedAccumulator } from '../util/object'
-import { setContextValue } from '../vscode/context'
-import { standardizePath } from '../fileSystem/path'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 
@@ -73,6 +72,7 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly internalCommands: InternalCommands
+  private readonly webviewMessages: WebviewMessages
 
   constructor(
     dvcRoot: string,
@@ -119,9 +119,9 @@ export class Experiments extends BaseRepository<TableData> {
       })
     )
 
-    this.handleMessageFromWebview()
+    this.webviewMessages = this.createWebviewMessageHandler()
     this.setupInitialData()
-    this.setActiveEditorContext()
+    this.watchActiveEditor()
   }
 
   public update() {
@@ -339,7 +339,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public sendInitialWebviewData() {
-    return this.sendWebviewData()
+    return this.webviewMessages.sendWebviewMessage()
   }
 
   public getSelectedRevisions() {
@@ -433,43 +433,27 @@ export class Experiments extends BaseRepository<TableData> {
 
   private notifyColumnsChanged() {
     this.columnsChanged.fire()
-    return this.sendWebviewData()
+    return this.webviewMessages.sendWebviewMessage()
   }
 
-  private sendWebviewData() {
-    this.webview?.show(this.getWebviewData())
-  }
-
-  private getWebviewData() {
-    return {
-      changes: this.columns.getChanges(),
-      columnOrder: this.columns.getColumnOrder(),
-      columnWidths: this.columns.getColumnWidths(),
-      columns: this.columns.getSelected(),
-      filteredCounts: this.getFilteredCounts(),
-      filters: this.experiments.getFilterPaths(),
-      hasCheckpoints: this.hasCheckpoints(),
-      hasColumns: this.columns.hasColumns(),
-      hasRunningExperiment: this.experiments.hasRunningExperiment(),
-      rows: this.experiments.getRowData(),
-      sorts: this.experiments.getSorts()
-    }
-  }
-
-  private handleMessageFromWebview() {
+  private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       this.dvcRoot,
       this.experiments,
       this.columns,
+      this.checkpoints,
+      () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns()
     )
 
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
-        webviewMessages.handleMessageFromWebview(message)
+        this.webviewMessages.handleMessageFromWebview(message)
       )
     )
+
+    return webviewMessages
   }
 
   private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
@@ -513,43 +497,13 @@ export class Experiments extends BaseRepository<TableData> {
     return experiment?.id
   }
 
-  private setActiveEditorContext() {
-    const setActiveEditorContext = (active: boolean) => {
-      setContextValue('dvc.params.fileActive', active)
-      const activeDvcRoot = active ? this.dvcRoot : undefined
-      this.paramsFileFocused.fire(activeDvcRoot)
-    }
-
-    this.dispose.track(
-      this.onDidChangeColumns(() => {
-        const path = standardizePath(window.activeTextEditor?.document.fileName)
-        if (!path) {
-          return
-        }
-
-        if (!this.columns.getParamsFiles().has(path)) {
-          return
-        }
-        setActiveEditorContext(true)
-      })
-    )
-
-    this.dispose.track(
-      window.onDidChangeActiveTextEditor(event => {
-        const path = standardizePath(event?.document.fileName)
-        if (!path) {
-          setActiveEditorContext(false)
-          return
-        }
-
-        if (path.includes(this.dvcRoot)) {
-          if (this.columns.getParamsFiles().has(path)) {
-            setActiveEditorContext(true)
-            return
-          }
-          setActiveEditorContext(false)
-        }
-      })
+  private watchActiveEditor() {
+    setContextForEditorTitleIcons(
+      this.dvcRoot,
+      this.dispose,
+      () => this.columns.getParamsFiles(),
+      this.paramsFileFocused,
+      this.onDidChangeColumns
     )
   }
 }

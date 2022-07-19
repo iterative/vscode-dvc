@@ -3,6 +3,7 @@ import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
+import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
@@ -10,43 +11,88 @@ import SvgFilter from '../../../shared/components/icons/Filter'
 import { sendMessage } from '../../../shared/vscode'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import tooltipStyles from '../../../shared/components/tooltip/styles.module.scss'
+import { pluralize } from '../../../util/strings'
 
-const Indicator = ({
+export type IndicatorTooltipProps = Pick<TippyProps, 'children'> & {
+  tooltipContent: ReactNode
+}
+
+export const IndicatorTooltip: React.FC<IndicatorTooltipProps> = ({
+  children,
+  tooltipContent
+}) => {
+  const wrapperRef = React.useRef<HTMLDivElement>(null)
+  return (
+    <Tooltip
+      placement="bottom-start"
+      disabled={!tooltipContent}
+      content={tooltipContent}
+      className={tooltipStyles.padded}
+      ref={wrapperRef}
+    >
+      {children}
+    </Tooltip>
+  )
+}
+
+export type CounterBadgeProps = {
+  count?: number
+}
+
+export const CounterBadge: React.FC<CounterBadgeProps> = ({ count }) => {
+  return count ? (
+    <span
+      className={styles.indicatorCount}
+      role={'marquee'}
+      aria-label={`${count}`}
+    >
+      {count}
+    </span>
+  ) : null
+}
+
+export const Indicator = ({
   children,
   count,
   'aria-label': ariaLabel,
   tooltipContent,
   onClick
-}: {
-  children: ReactNode
-  count?: number
-  'aria-label'?: string
-  onClick?: MouseEventHandler
-  tooltipContent: ReactNode
-}) => (
-  <Tooltip
-    placement="bottom-start"
-    content={tooltipContent}
-    className={tooltipStyles.padded}
-  >
+}: IndicatorTooltipProps &
+  CounterBadgeProps & {
+    'aria-label'?: string
+    onClick?: MouseEventHandler
+  }) => (
+  <IndicatorTooltip tooltipContent={tooltipContent}>
     <button
       className={cx(styles.indicatorIcon, count && styles.indicatorWithCount)}
       aria-label={ariaLabel}
       onClick={onClick}
     >
       {children}
-      {count ? <span className={styles.indicatorCount}>{count}</span> : null}
+      <CounterBadge count={count} />
     </button>
-  </Tooltip>
+  </IndicatorTooltip>
+)
+
+export const IndicatorWithJustTheCounter = ({
+  count,
+  'aria-label': ariaLabel,
+  tooltipContent
+}: CounterBadgeProps &
+  IndicatorTooltipProps & {
+    'aria-label'?: string
+  }) => (
+  <IndicatorTooltip tooltipContent={tooltipContent}>
+    <span aria-label={ariaLabel}>
+      <CounterBadge count={count} />
+    </span>
+  </IndicatorTooltip>
 )
 
 const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
 const focusSortsTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_SORTS_TREE })
-
-const pluralize = (word: string, number: number | undefined) =>
-  number === 1 ? word : `${word}s`
 
 const formatCountMessage = (item: string, count: number | undefined) =>
   `${count || 'No'} ${pluralize(item, count)} Applied`

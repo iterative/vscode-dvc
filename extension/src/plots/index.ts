@@ -1,12 +1,6 @@
 import { join } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
-import isEmpty from 'lodash.isempty'
-import {
-  ComparisonPlot,
-  ComparisonRevisionData,
-  PlotsData as TPlotsData,
-  Section
-} from './webview/contract'
+import { PlotsData as TPlotsData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
@@ -20,7 +14,7 @@ import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { definedAndNonEmpty } from '../util/array'
 import { ExperimentsOutput, TEMP_PLOTS_DIR } from '../cli/reader'
-import { getModifiedTime, removeDir } from '../fileSystem'
+import { removeDir } from '../fileSystem'
 import { Toast } from '../vscode/toast'
 import { pickPaths } from '../path/selection/quickPick'
 
@@ -40,6 +34,8 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private readonly data: PlotsData
   private readonly workspaceState: Memento
+
+  private webviewMessages?: WebviewMessages
 
   constructor(
     dvcRoot: string,
@@ -82,7 +78,11 @@ export class Plots extends BaseRepository<TPlotsData> {
       new PathsModel(this.dvcRoot, this.workspaceState)
     )
 
-    this.handleMessageFromWebview(this.paths, this.plots, this.experiments)
+    this.webviewMessages = this.createWebviewMessageHandler(
+      this.paths,
+      this.plots,
+      this.experiments
+    )
 
     this.data.setModel(this.plots)
 
@@ -144,16 +144,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.fetchMissingOrSendPlots()
   }
 
-  private sendCheckpointPlotsData() {
-    this.webview?.show({
-      checkpoint: this.getCheckpointPlots()
-    })
-  }
-
-  private getCheckpointPlots() {
-    return this.plots?.getCheckpointPlots() || null
-  }
-
   private async fetchMissingOrSendPlots() {
     await this.isReady()
 
@@ -161,81 +151,14 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.paths?.hasPaths() &&
       definedAndNonEmpty(this.plots?.getUnfetchedRevisions())
     ) {
-      this.sendCheckpointPlotsData()
+      this.webviewMessages?.sendCheckpointPlotsMessage()
       return this.data.managedUpdate()
     }
 
-    return this.sendPlots()
+    return this.webviewMessages?.sendWebviewMessage()
   }
 
-  private sendPlots() {
-    this.webview?.show({
-      checkpoint: this.getCheckpointPlots(),
-      comparison: this.getComparisonPlots(),
-      hasPlots: !!this.paths?.hasPaths(),
-      hasSelectedPlots: definedAndNonEmpty(this.paths?.getSelected()),
-      sectionCollapsed: this.plots?.getSectionCollapsed(),
-      selectedRevisions: this.plots?.getSelectedRevisionDetails(),
-      template: this.getTemplatePlots()
-    })
-  }
-
-  private getTemplatePlots() {
-    const paths = this.paths?.getTemplateOrder()
-    const plots = this.plots?.getTemplatePlots(paths)
-
-    if (!this.plots || !plots || isEmpty(plots)) {
-      return null
-    }
-
-    return {
-      plots,
-      size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
-    }
-  }
-
-  private getComparisonPlots() {
-    const paths = this.paths?.getComparisonPaths()
-    const comparison = this.plots?.getComparisonPlots(paths)
-    if (!this.plots || !comparison || isEmpty(comparison)) {
-      return null
-    }
-
-    return {
-      plots: comparison.map(({ path, revisions }) => {
-        return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
-      }),
-      size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
-    }
-  }
-
-  private getRevisionsWithCorrectUrls(revisions: ComparisonRevisionData) {
-    const acc: ComparisonRevisionData = {}
-
-    for (const [revision, plot] of Object.entries(revisions)) {
-      const updatedPlot = this.addCorrectUrl(plot)
-      if (!updatedPlot) {
-        continue
-      }
-      acc[revision] = updatedPlot
-    }
-    return acc
-  }
-
-  private addCorrectUrl(plot: ComparisonPlot) {
-    if (this.webview) {
-      return {
-        ...plot,
-        url: plot.url
-          ? `${this.webview.getWebviewUri(plot.url)}?${getModifiedTime(
-              plot.url
-            )}`
-          : undefined
-      }
-    }
-  }
-
-  private handleMessageFromWebview(
+  private createWebviewMessageHandler(
     paths: PathsModel,
     plots: PlotsModel,
     experiments: Experiments
@@ -244,10 +167,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       paths,
       plots,
       experiments,
-      () => this.sendSectionCollapsed(),
-      () => this.sendTemplatePlots(),
-      () => this.sendComparisonPlots(),
-      () => this.sendCheckpointPlotsData(),
+      () => this.getWebview(),
       () => this.selectPlots(),
       () => this.data.update()
     )
@@ -256,25 +176,7 @@ export class Plots extends BaseRepository<TPlotsData> {
         webviewMessages.handleMessageFromWebview(message)
       )
     )
-  }
-
-  private sendSectionCollapsed() {
-    this.webview?.show({
-      sectionCollapsed: this.plots?.getSectionCollapsed()
-    })
-  }
-
-  private sendComparisonPlots() {
-    this.webview?.show({
-      comparison: this.getComparisonPlots(),
-      selectedRevisions: this.plots?.getSelectedRevisionDetails()
-    })
-  }
-
-  private sendTemplatePlots() {
-    this.webview?.show({
-      template: this.getTemplatePlots()
-    })
+    return webviewMessages
   }
 
   private waitForInitialData(experiments: Experiments) {

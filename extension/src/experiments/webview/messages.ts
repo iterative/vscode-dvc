@@ -1,4 +1,5 @@
 import { commands, Uri, ViewColumn, window } from 'vscode'
+import { TableData } from './contract'
 import {
   RegisteredCliCommands,
   RegisteredCommands
@@ -7,6 +8,7 @@ import { Logger } from '../../common/logger'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { join } from '../../test/util/path'
+import { BaseWebview } from '../../webview'
 import {
   MessageFromWebview,
   MessageFromWebviewType
@@ -15,13 +17,16 @@ import { ColumnsModel } from '../columns/model'
 import { splitColumnPath } from '../columns/paths'
 import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
+import { CheckpointsModel } from '../checkpoints/model'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
 
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
+  private readonly checkpoints: CheckpointsModel
 
+  private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
   private readonly selectColumns: () => void
 
@@ -29,14 +34,23 @@ export class WebviewMessages {
     dvcRoot: string,
     experiments: ExperimentsModel,
     columns: ColumnsModel,
+    checkpoints: CheckpointsModel,
+    getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => void
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
     this.columns = columns
+    this.checkpoints = checkpoints
+    this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
+  }
+
+  public sendWebviewMessage() {
+    const webview = this.getWebview()
+    webview?.show(this.getWebviewData())
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -104,6 +118,24 @@ export class WebviewMessages {
     }
   }
 
+  private getWebviewData() {
+    return {
+      changes: this.columns.getChanges(),
+      columnOrder: this.columns.getColumnOrder(),
+      columnWidths: this.columns.getColumnWidths(),
+      columns: this.columns.getSelected(),
+      filteredCounts: this.experiments.getFilteredCounts(
+        this.checkpoints.hasCheckpoints()
+      ),
+      filters: this.experiments.getFilterPaths(),
+      hasCheckpoints: this.checkpoints.hasCheckpoints(),
+      hasColumns: this.columns.hasColumns(),
+      hasRunningExperiment: this.experiments.hasRunningExperiment(),
+      rows: this.experiments.getRowData(),
+      sorts: this.experiments.getSorts()
+    }
+  }
+
   private setColumnOrder(order: string[]) {
     this.columns.setColumnOrder(order)
     sendTelemetryEvent(
@@ -124,7 +156,7 @@ export class WebviewMessages {
 
   private setExperimentStars(ids: string[]) {
     this.experiments.toggleStars(ids)
-    this.notifyChanged()
+    this.sendWebviewMessage()
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_STARS_TOGGLE,
       undefined,

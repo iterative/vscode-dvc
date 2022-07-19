@@ -167,12 +167,11 @@ suite('Plots Test Suite', () => {
 
     it('should re-fetch data when moving between branches', async () => {
       const mockNow = getMockNow()
-      const { data, experiments, mockPlotsDiff, plots, plotsModel } =
+      const { data, experiments, mockPlotsDiff, plotsModel, webviewMessages } =
         await buildPlots(disposable, plotsDiffFixture)
       mockPlotsDiff.resetHistory()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockSendPlots = stub(plots as any, 'sendPlots')
+      const mockSendPlots = stub(webviewMessages, 'sendWebviewMessage')
 
       mockPlotsDiff
         .onFirstCall()
