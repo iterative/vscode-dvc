@@ -58,10 +58,7 @@ export const ColumnDragHandle: React.FC<{
         id={column.id}
         disabled={disabled}
         group={'experiment-table'}
-        dropTarget={{
-          element: DropTarget,
-          wrapperTag: 'div'
-        }}
+        dropTarget={DropTarget}
         onDragOver={onDragOver}
         onDragStart={onDragStart}
         onDrop={onDrop}

@@ -52,10 +52,8 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           disabledDropIds={[pinnedColumn]}
           items={items}
           group="comparison"
-          dropTarget={{
-            element: <DropTarget />,
-            wrapperTag: 'th'
-          }}
+          dropTarget={<DropTarget />}
+          shouldShowOnDrag
         />
       </tr>
     </thead>
