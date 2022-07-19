@@ -5,25 +5,25 @@ import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 import { TableHeader } from './TableHeader'
 import styles from './styles.module.scss'
-import { WithTableRoot } from './interfaces'
 import {
   OnDragOver,
   OnDragStart,
   OnDrop
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
 
-export const MergedHeaderGroups: React.FC<
-  {
-    headerGroup: HeaderGroup<Experiment>
-    columns: HeaderGroup<Experiment>[]
-    sorts: SortDefinition[]
-    filters: string[]
-    orderedColumns: Column[]
-    onDragUpdate: OnDragOver
-    onDragStart: OnDragStart
-    onDragEnd: OnDrop
-  } & WithTableRoot
-> = ({
+export const MergedHeaderGroups: React.FC<{
+  headerGroup: HeaderGroup<Experiment>
+  columns: HeaderGroup<Experiment>[]
+  sorts: SortDefinition[]
+  filters: string[]
+  orderedColumns: Column[]
+  onDragUpdate: OnDragOver
+  onDragStart: OnDragStart
+  onDragEnd: OnDrop
+  isFirst: boolean
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
+  root: HTMLElement | null
+}> = ({
   headerGroup,
   sorts,
   filters,
@@ -32,7 +32,9 @@ export const MergedHeaderGroups: React.FC<
   onDragUpdate,
   onDragEnd,
   onDragStart,
-  root
+  root,
+  isFirst,
+  setExpColumnNeedsShadow
 }) => {
   return (
     <div
@@ -42,7 +44,8 @@ export const MergedHeaderGroups: React.FC<
     >
       {headerGroup.headers.map((column: HeaderGroup<Experiment>, ind) => (
         <TableHeader
-          isFirst={ind === 0}
+          isFirst={isFirst && ind === 0}
+          setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           key={column.id}
           orderedColumns={orderedColumns}
           column={column}

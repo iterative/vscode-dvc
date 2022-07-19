@@ -24,6 +24,7 @@ interface TableHeadProps {
   filteredCounts: FilteredCounts
   filters: string[]
   root: HTMLElement | null
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
 }
 
 export const TableHead = ({
@@ -37,7 +38,8 @@ export const TableHead = ({
   filteredCounts,
   filters,
   columns,
-  sorts
+  sorts,
+  setExpColumnNeedsShadow
 }: TableHeadProps) => {
   const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
@@ -105,7 +107,7 @@ export const TableHead = ({
         filters={filters}
         filteredCounts={filteredCounts}
       />
-      {headerGroups.map(headerGroup => (
+      {headerGroups.map((headerGroup, ind) => (
         // eslint-disable-next-line react/jsx-key
         <MergedHeaderGroups
           {...headerGroup.getHeaderGroupProps()}
@@ -118,6 +120,8 @@ export const TableHead = ({
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
           root={root}
+          isFirst={ind === 0}
+          setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />
       ))}
     </div>

@@ -1,10 +1,9 @@
 import React from 'react'
-import { useInView } from 'react-intersection-observer'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
-import { CellProp, WithTableRoot, RowProp } from './interfaces'
+import { CellProp, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
 import { clickAndEnterProps } from '../../../util/props'
 import { StarFull, StarEmpty } from '../../../shared/components/icons'
@@ -130,38 +129,27 @@ export const RowActions: React.FC<RowActionsProps> = ({
 
 export const FirstCell: React.FC<
   CellProp &
-    RowActionsProps &
-    WithTableRoot & {
+    RowActionsProps & {
       bulletColor?: string
       toggleExperiment: () => void
-      isRowSelected: boolean
-      toggleRowSelection: () => void
-      toggleStarred: () => void
     }
-> = ({ cell, bulletColor, toggleExperiment, root, ...rowActionsProps }) => {
+> = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
   const { row, isPlaceholder } = cell
   const {
     original: { queued }
   } = row
+
   const {
     subRowStates: { plotSelections }
   } = rowActionsProps
 
-  const [ref, needsShadow] = useInView({
-    root,
-    rootMargin: '0px 0px 0px -15px',
-    threshold: 1
-  })
-
   return (
     <div
-      ref={ref}
       {...cell.getCellProps({
         className: cx(
           styles.td,
           styles.experimentCell,
-          isPlaceholder && styles.groupPlaceholder,
-          needsShadow && styles.withExpCellShadow
+          isPlaceholder && styles.groupPlaceholder
         )
       })}
     >

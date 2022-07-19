@@ -4,14 +4,13 @@ import {
   Column,
   ColumnType
 } from 'dvc/src/experiments/webview/contract'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
-import { WithTableRoot } from './interfaces'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import {
@@ -131,30 +130,22 @@ const getIconMenuItems = (
   }
 ]
 
-const FirstTableHeaderCellWrapper: React.FC<
-  {
-    cellProps: React.HTMLAttributes<HTMLDivElement>
-    children: React.ReactNode
-  } & WithTableRoot
-> = ({ root, cellProps, children }) => {
+const FirstTableHeaderCellWrapper: React.FC<{
+  children: React.ReactNode
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
+  root: HTMLElement | null
+}> = ({ root, setExpColumnNeedsShadow, children }) => {
   const [ref, needsShadow] = useInView({
     root,
     rootMargin: '0px 0px 0px -15px',
     threshold: 1
   })
 
-  return (
-    <div
-      {...cellProps}
-      ref={ref}
-      className={cx(
-        cellProps.className,
-        needsShadow && styles.withExpCellShadow
-      )}
-    >
-      {children}
-    </div>
-  )
+  useEffect(() => {
+    setExpColumnNeedsShadow(needsShadow)
+  }, [needsShadow, setExpColumnNeedsShadow])
+
+  return <div ref={ref}>{children}</div>
 }
 
 const TableHeaderCellContents: React.FC<{
@@ -209,22 +200,22 @@ const TableHeaderCellContents: React.FC<{
   )
 }
 
-const TableHeaderCell: React.FC<
-  {
-    column: HeaderGroup<Experiment>
-    columns: HeaderGroup<Experiment>[]
-    hasFilter: boolean
-    orderedColumns: Column[]
-    sortOrder: SortOrder
-    sortEnabled: boolean
-    menuDisabled?: boolean
-    menuContent?: React.ReactNode
-    onDragOver: OnDragOver
-    onDragStart: OnDragStart
-    onDrop: OnDrop
-    isFirst: boolean
-  } & WithTableRoot
-> = ({
+const TableHeaderCell: React.FC<{
+  column: HeaderGroup<Experiment>
+  columns: HeaderGroup<Experiment>[]
+  hasFilter: boolean
+  orderedColumns: Column[]
+  sortOrder: SortOrder
+  sortEnabled: boolean
+  menuDisabled?: boolean
+  menuContent?: React.ReactNode
+  onDragOver: OnDragOver
+  onDragStart: OnDragStart
+  onDrop: OnDrop
+  isFirst: boolean
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
+  root: HTMLElement | null
+}> = ({
   column,
   columns,
   orderedColumns,
@@ -237,7 +228,8 @@ const TableHeaderCell: React.FC<
   onDragStart,
   onDrop,
   root,
-  isFirst
+  isFirst,
+  setExpColumnNeedsShadow
 }) => {
   const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
   const isDraggable =
@@ -251,16 +243,6 @@ const TableHeaderCell: React.FC<
     column,
     columns
   )
-
-  const cellProps = {
-    ...column.getHeaderProps(
-      getHeaderPropsArgs(column, sortEnabled, sortOrder)
-    ),
-    'data-testid': `header-${column.id}`,
-    key: column.id,
-    role: 'columnheader',
-    tabIndex: 0
-  }
 
   const cellContents = (
     <TableHeaderCellContents
@@ -285,13 +267,26 @@ const TableHeaderCell: React.FC<
       disabled={menuDisabled || menuSuppressed}
       trigger={'contextmenu click'}
     >
-      {isFirst ? (
-        <FirstTableHeaderCellWrapper cellProps={cellProps} root={root}>
-          {cellContents}
-        </FirstTableHeaderCellWrapper>
-      ) : (
-        <div {...cellProps}>{cellContents}</div>
-      )}
+      <div
+        {...column.getHeaderProps(
+          getHeaderPropsArgs(column, sortEnabled, sortOrder)
+        )}
+        data-testid={`header-${column.id}`}
+        key={column.id}
+        role="columnheader"
+        tabIndex={0}
+      >
+        {isFirst ? (
+          <FirstTableHeaderCellWrapper
+            setExpColumnNeedsShadow={setExpColumnNeedsShadow}
+            root={root}
+          >
+            {cellContents}
+          </FirstTableHeaderCellWrapper>
+        ) : (
+          cellContents
+        )}
+      </div>
     </ContextMenu>
   )
 }
@@ -306,9 +301,11 @@ interface TableHeaderProps {
   onDragStart: OnDragStart
   onDrop: OnDrop
   isFirst: boolean
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
+  root: HTMLElement | null
 }
 
-export const TableHeader: React.FC<TableHeaderProps & WithTableRoot> = ({
+export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
   filters,
@@ -318,7 +315,8 @@ export const TableHeader: React.FC<TableHeaderProps & WithTableRoot> = ({
   onDragStart,
   onDrop,
   root,
-  isFirst
+  isFirst,
+  setExpColumnNeedsShadow
 }) => {
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
@@ -370,6 +368,7 @@ export const TableHeader: React.FC<TableHeaderProps & WithTableRoot> = ({
       menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
       root={root}
       isFirst={isFirst}
+      setExpColumnNeedsShadow={setExpColumnNeedsShadow}
       menuContent={
         <div>
           <MessagesMenu options={contextMenuOptions} />

@@ -8,7 +8,6 @@ $row-border: 1px solid $border-color;
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
 $workspace-row-edge-margin: $edge-padding - $cell-padding;
-$exp-cell-shadow: 3px 0px 0px var(--vscode-widget-shadow);
 
 // Extendable Silent Rules
 %expandableRowArrow {
@@ -283,6 +282,14 @@ $exp-cell-shadow: 3px 0px 0px var(--vscode-widget-shadow);
     }
   }
 
+  .table.withExpColumnShadow {
+    .tr:not(.rowSelected) {
+      & > *:first-child {
+        box-shadow: 3px 0px 0px var(--vscode-widget-shadow);
+      }
+    }
+  }
+
   .bodyRow {
     &:not(.rowSelected) {
       & > *:first-child {
@@ -419,15 +426,9 @@ $exp-cell-shadow: 3px 0px 0px var(--vscode-widget-shadow);
     min-width: 0;
     position: relative;
   }
-
   .th {
     height: auto;
-
-    &.withExpCellShadow {
-      box-shadow: $exp-cell-shadow;
-    }
   }
-
   .td {
     height: auto;
     font-size: 0.8rem;
@@ -449,11 +450,6 @@ $exp-cell-shadow: 3px 0px 0px var(--vscode-widget-shadow);
     display: flex;
     flex-flow: row nowrap;
     text-align: left;
-
-    &.withExpCellShadow {
-      box-shadow: $exp-cell-shadow;
-    }
-
     .innerCell {
       justify-content: flex-start;
 
