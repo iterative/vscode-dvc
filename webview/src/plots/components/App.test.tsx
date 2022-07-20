@@ -742,7 +742,7 @@ describe('App', () => {
 
     dragEnter(
       anotherSingleViewPlot,
-      movedSingleViewPlot,
+      CSS.escape(movedSingleViewPlot.id),
       DragEnterDirection.LEFT
     )
 
@@ -793,7 +793,7 @@ describe('App', () => {
     const headers = screen.getAllByRole('columnheader')
     const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
 
-    dragEnter(headers[1], bottomSection, DragEnterDirection.LEFT)
+    dragEnter(headers[1], bottomSection.id, DragEnterDirection.LEFT)
 
     const bottomDropIcon = screen.queryByTestId(
       `${NewSectionBlock.BOTTOM}_drop-icon`
@@ -825,7 +825,7 @@ describe('App', () => {
 
     const plots = screen.getAllByTestId(/^plot_/)
 
-    dragEnter(plots[1], plots[0], DragEnterDirection.LEFT)
+    dragEnter(plots[1], CSS.escape(plots[0].id), DragEnterDirection.LEFT)
 
     const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
     expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
@@ -842,7 +842,7 @@ describe('App', () => {
     })
 
     const plots = screen.getAllByTestId(/^plot_/)
-    dragEnter(plots[0], plots[1], DragEnterDirection.RIGHT)
+    dragEnter(plots[0], CSS.escape(plots[1].id), DragEnterDirection.RIGHT)
 
     const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
 
@@ -862,7 +862,7 @@ describe('App', () => {
     const plots = screen.getAllByTestId(/^plot_/)
     expect(plots[1].style.display).not.toBe('none')
 
-    dragEnter(plots[1], plots[1], DragEnterDirection.LEFT)
+    dragEnter(plots[1], CSS.escape(plots[1].id), DragEnterDirection.LEFT)
 
     expect(plots[1].style.display).toBe('none')
   })

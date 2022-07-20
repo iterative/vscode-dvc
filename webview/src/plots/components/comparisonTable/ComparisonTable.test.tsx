@@ -380,7 +380,7 @@ describe('ComparisonTable', () => {
       pinSecondColumn()
       const [endingNode, startingNode] = getHeaders()
 
-      dragEnter(startingNode, endingNode, DragEnterDirection.LEFT)
+      dragEnter(startingNode, endingNode.id, DragEnterDirection.LEFT)
 
       const headers = getHeaders()
 

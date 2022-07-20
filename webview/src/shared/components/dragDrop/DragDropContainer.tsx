@@ -107,8 +107,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
     const idx = order.indexOf(id)
-    let toIdx = idx + 1
-    if (toIdx === order.length) {
+    let toIdx = shouldShowOnDrag ? idx : idx + 1
+    if (!shouldShowOnDrag && toIdx === order.length) {
       toIdx = idx - 1
 
       if (toIdx === -1) {
@@ -153,6 +153,12 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
+    draggedOverIdTimeout.current = window.setTimeout(() => {
+      setDraggedId('')
+    }, 0)
+    if (e.dataTransfer.getData('itemId') === draggedOverId) {
+      return
+    }
     const newOrder = [...order]
     const oldDraggedId = e.dataTransfer.getData('itemId')
     const isNew = !order.includes(draggedId)
@@ -167,9 +173,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
     const orderIdxChanged = droppedIndex + orderIdxChange
     const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
-    draggedOverIdTimeout.current = window.setTimeout(() => {
-      setDraggedId('')
-    }, 0)
 
     if (isEnabled && isSameGroup(e.dataTransfer.getData('group'), group)) {
       applyDrop(e, orderIdxChanged, draggedIndex, newOrder, oldDraggedId)
@@ -210,13 +213,14 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
-      className={cx(draggable.props.className, {
-        [styles.hiddenOnDrag]: !shouldShowOnDrag && id === draggedId
-      })}
+      style={
+        (!shouldShowOnDrag && id === draggedId && { display: 'none' }) ||
+        draggable.props.style
+      }
     />
   )
 
-  const wrappedItems = items.map(draggable => {
+  const wrappedItems = items.flatMap(draggable => {
     const { id } = draggable.props
     const item = id && buildItem(id, draggable)
 
@@ -237,7 +241,11 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         targetClassName
       )
       const Tag = item.type
-      const itemWithTag = shouldShowOnDrag ? <div {...item.props} /> : item
+      const itemWithTag = shouldShowOnDrag ? (
+        <div key="item" {...item.props} />
+      ) : (
+        item
+      )
       const block =
         direction === DragEnterDirection.RIGHT
           ? [itemWithTag, target]

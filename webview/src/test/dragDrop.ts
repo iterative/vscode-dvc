@@ -19,7 +19,7 @@ export const createBubbledEvent = (type: string, props = {}) => {
 
 export const dragEnter = (
   dragged: HTMLElement,
-  draggedOver: HTMLElement,
+  draggedOverId: string,
   direction: DragDropUtils.DragEnterDirection
 ) => {
   jest.useFakeTimers()
@@ -31,9 +31,14 @@ export const dragEnter = (
     jest.advanceTimersByTime(1)
   })
 
+  let draggedOver =
+    (draggedOverId && document.querySelector(`#${draggedOverId}`)) || null
+
   act(() => {
-    draggedOver.dispatchEvent(createBubbledEvent('dragenter'))
+    draggedOver?.dispatchEvent(createBubbledEvent('dragenter'))
   })
+  draggedOver =
+    (draggedOverId && document.querySelector(`#${draggedOverId}`)) || null
 
   act(() => {
     if (direction !== DragDropUtils.DragEnterDirection.AUTO) {
@@ -45,9 +50,10 @@ export const dragEnter = (
       jest
         .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
         .mockImplementationOnce(() => ({ left, right }))
-      draggedOver.dispatchEvent(dragOverEvent)
+      draggedOver?.dispatchEvent(dragOverEvent)
+      jest.advanceTimersByTime(1)
     } else {
-      draggedOver.dispatchEvent(createBubbledEvent('dragover'))
+      draggedOver?.dispatchEvent(createBubbledEvent('dragover'))
     }
   })
 
@@ -59,19 +65,28 @@ export const dragAndDrop = (
   direction: DragDropUtils.DragEnterDirection = DragDropUtils.DragEnterDirection
     .LEFT
 ) => {
-  dragEnter(startingNode, endingNode, direction)
+  // When showing element on drag, the dragged over element is being recreacted to be wrapped in another element, thus the endingNode does not exist as is in the document
+  // CSS.escape is needed for weird ids in the experiments table (ex.: :loss)
+  const endingNodeId = CSS.escape(endingNode.id)
+  dragEnter(startingNode, endingNodeId, direction)
 
   jest.useFakeTimers()
   act(() => {
-    endingNode.dispatchEvent(createBubbledEvent('drop'))
+    jest.advanceTimersByTime(1)
+  })
+  act(() => {
+    const endingNodeWithId =
+      (endingNodeId && document.querySelector(`#${endingNodeId}`)) || null
+    endingNodeWithId?.dispatchEvent(createBubbledEvent('drop'))
   })
 
   act(() => {
     jest.advanceTimersByTime(1)
   })
-  jest.useRealTimers()
 
   act(() => {
     startingNode.dispatchEvent(createBubbledEvent('dragend'))
   })
+
+  jest.useRealTimers()
 }

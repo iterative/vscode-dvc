@@ -182,7 +182,12 @@ describe('App', () => {
     const headerB = screen.getByText('B')
     const headerD = screen.getByText('D')
 
-    dragAndDrop(headerB, headerD, DragEnterDirection.AUTO)
+    dragAndDrop(
+      headerB,
+      // eslint-disable-next-line testing-library/no-node-access
+      headerD.parentElement?.parentElement || headerD,
+      DragEnterDirection.AUTO
+    )
 
     await expectHeaders(['A', 'C', 'D', 'B'])
   })
