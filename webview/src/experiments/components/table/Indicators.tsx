@@ -1,6 +1,4 @@
 import React, { MouseEventHandler, ReactNode } from 'react'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
-import { Row } from 'react-table'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -123,26 +121,8 @@ const formatFilteredCountMessage = (filteredCounts: FilteredCounts): string =>
     .filter(Boolean)
     .join(', ')} Filtered`
 
-const addToSelected = (
-  selectedForPlotsCount: number,
-  row: Row<Experiment>
-): number => selectedForPlotsCount + (row.original?.selected ? 1 : 0)
-
-const getSelectedForPlotsCount = (rows: Row<Experiment>[] = []): number => {
-  let selectedForPlotsCount = 0
-
-  for (const row of rows) {
-    selectedForPlotsCount = addToSelected(selectedForPlotsCount, row)
-
-    selectedForPlotsCount =
-      selectedForPlotsCount + getSelectedForPlotsCount(row.subRows)
-  }
-
-  return selectedForPlotsCount
-}
-
 export const Indicators = ({
-  rows,
+  selectedForPlotsCount,
   sorts,
   filters,
   filteredCounts
@@ -150,12 +130,10 @@ export const Indicators = ({
   sorts?: SortDefinition[]
   filters?: string[]
   filteredCounts: FilteredCounts
-  rows: Row<Experiment>[]
+  selectedForPlotsCount: number
 }) => {
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
-
-  const selectedForPlotsCount = getSelectedForPlotsCount(rows)
 
   return (
     <div className={styles.tableIndicators}>
