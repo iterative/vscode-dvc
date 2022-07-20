@@ -1,4 +1,6 @@
 import React, { MouseEventHandler, ReactNode } from 'react'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
+import { Row } from 'react-table'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -8,6 +10,7 @@ import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
 import SvgFilter from '../../../shared/components/icons/Filter'
+import SvgGraphScatter from '../../../shared/components/icons/GraphScatter'
 import { sendMessage } from '../../../shared/vscode'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import tooltipStyles from '../../../shared/components/tooltip/styles.module.scss'
@@ -94,8 +97,11 @@ const focusFiltersTree = () =>
 const focusSortsTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_SORTS_TREE })
 
-const formatCountMessage = (item: string, count: number | undefined) =>
-  `${count || 'No'} ${pluralize(item, count)} Applied`
+const formatCountMessage = (
+  item: string,
+  count: number | undefined,
+  descriptor = 'Applied'
+) => `${count || 'No'} ${pluralize(item, count)} ${descriptor}`
 
 const formatFilteredCount = (
   item: 'Experiment' | 'Checkpoint',
@@ -116,6 +122,7 @@ const formatFilteredCountMessage = (filteredCounts: FilteredCounts): string =>
     .join(', ')} Filtered`
 
 export const Indicators = ({
+  rows,
   sorts,
   filters,
   filteredCounts
@@ -123,11 +130,41 @@ export const Indicators = ({
   sorts?: SortDefinition[]
   filters?: string[]
   filteredCounts: FilteredCounts
+  rows: Row<Experiment>[]
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
+
+  let numberSelected = 0
+
+  for (const row of rows) {
+    const { selected } = row.original
+    if (selected) {
+      numberSelected = numberSelected + 1
+    }
+    for (const subRow of row.subRows || []) {
+      const { selected } = subRow.original
+      if (selected) {
+        numberSelected = numberSelected + 1
+      }
+    }
+  }
+
   return (
     <div className={styles.tableIndicators}>
+      <Indicator
+        count={numberSelected}
+        aria-label="selected for plots"
+        onClick={focusSortsTree}
+        tooltipContent={formatCountMessage(
+          'Experiment',
+          numberSelected,
+          'Selected for Plotting'
+        )}
+      >
+        <Icon width={16} height={16} icon={SvgGraphScatter} />
+      </Indicator>
       <Indicator
         count={sorts?.length}
         aria-label="sorts"

@@ -31,7 +31,8 @@ export const TableHead = ({
     headerGroups,
     setColumnOrder,
     state: { columnOrder },
-    allColumns
+    allColumns,
+    rows
   },
   root,
   filteredCounts,
@@ -101,6 +102,7 @@ export const TableHead = ({
       ref={ref}
     >
       <Indicators
+        rows={rows}
         sorts={sorts}
         filters={filters}
         filteredCounts={filteredCounts}
