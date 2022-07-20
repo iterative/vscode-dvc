@@ -897,7 +897,9 @@ describe('App', () => {
 
       const tooltip = screen.getByRole('tooltip')
 
-      expect(tooltip).toHaveTextContent('5 Experiments Selected for Plotting')
+      expect(tooltip).toHaveTextContent(
+        '5 Experiments Selected for Plotting (Max 7)'
+      )
 
       setTableData({
         ...tableDataFixture,
@@ -908,7 +910,9 @@ describe('App', () => {
       })
 
       expect(selectedForPlotsIndicator).toHaveTextContent('')
-      expect(tooltip).toHaveTextContent('No Experiments Selected for Plotting')
+      expect(tooltip).toHaveTextContent(
+        'No Experiments Selected for Plotting (Max 7)'
+      )
 
       setTableData({
         ...tableDataFixture,
@@ -934,7 +938,9 @@ describe('App', () => {
       })
 
       expect(selectedForPlotsIndicator).toHaveTextContent('1')
-      expect(tooltip).toHaveTextContent('1 Experiment Selected for Plotting')
+      expect(tooltip).toHaveTextContent(
+        '1 Experiment Selected for Plotting (Max 7)'
+      )
     })
 
     it('should show an indicator with the amount of applied sorts', () => {

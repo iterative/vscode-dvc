@@ -166,7 +166,7 @@ export const Indicators = ({
         tooltipContent={formatCountMessage(
           'Experiment',
           selectedForPlotsCount,
-          'Selected for Plotting'
+          'Selected for Plotting (Max 7)'
         )}
       >
         <Icon width={16} height={16} icon={SvgGraphScatter} />
