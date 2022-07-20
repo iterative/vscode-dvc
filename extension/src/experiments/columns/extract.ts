@@ -66,15 +66,17 @@ const extractDeps = (
   return acc
 }
 
-export const extractColumns = (
-  experiment: ExperimentFields,
-  branch?: Experiment
-): {
+type Columns = {
   error?: string
   deps: DepColumns | undefined
   metrics: MetricOrParamColumns | undefined
   params: MetricOrParamColumns | undefined
-} => {
+}
+
+export const extractColumns = (
+  experiment: ExperimentFields,
+  branch?: Experiment
+): Columns => {
   const metricsData = extractMetricsOrParams(experiment.metrics)
   const paramsData = extractMetricsOrParams(experiment.params)
 
@@ -83,12 +85,7 @@ export const extractColumns = (
     ...(paramsData?.errors || [])
   ].join('\n')
 
-  const columns: {
-    error?: string
-    deps: DepColumns | undefined
-    metrics: MetricOrParamColumns | undefined
-    params: MetricOrParamColumns | undefined
-  } = {
+  const columns: Columns = {
     deps: extractDeps(experiment.deps, branch),
     metrics: metricsData?.columns,
     params: paramsData?.columns
