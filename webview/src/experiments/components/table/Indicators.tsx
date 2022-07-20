@@ -123,6 +123,25 @@ const formatFilteredCountMessage = (filteredCounts: FilteredCounts): string =>
     .filter(Boolean)
     .join(', ')} Filtered`
 
+const addToSelected = (
+  selectedForPlotsCount: number,
+  row: Row<Experiment>
+): number => selectedForPlotsCount + (row.original?.selected ? 1 : 0)
+
+const getSelectedForPlotsCount = (rows: Row<Experiment>[]): number => {
+  let selectedForPlotsCount = 0
+
+  for (const row of rows) {
+    selectedForPlotsCount = addToSelected(selectedForPlotsCount, row)
+
+    for (const subRow of row.subRows || []) {
+      selectedForPlotsCount = addToSelected(selectedForPlotsCount, subRow)
+    }
+  }
+
+  return selectedForPlotsCount
+}
+
 export const Indicators = ({
   rows,
   sorts,
@@ -133,35 +152,21 @@ export const Indicators = ({
   filters?: string[]
   filteredCounts: FilteredCounts
   rows: Row<Experiment>[]
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
 
-  let numberSelected = 0
-
-  for (const row of rows) {
-    const { selected } = row.original
-    if (selected) {
-      numberSelected = numberSelected + 1
-    }
-    for (const subRow of row.subRows || []) {
-      const { selected } = subRow.original
-      if (selected) {
-        numberSelected = numberSelected + 1
-      }
-    }
-  }
+  const selectedForPlotsCount = getSelectedForPlotsCount(rows)
 
   return (
     <div className={styles.tableIndicators}>
       <Indicator
-        count={numberSelected}
+        count={selectedForPlotsCount}
         aria-label="selected for plots"
         onClick={openPlotsWebview}
         tooltipContent={formatCountMessage(
           'Experiment',
-          numberSelected,
+          selectedForPlotsCount,
           'Selected for Plotting'
         )}
       >
