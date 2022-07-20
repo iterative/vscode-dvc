@@ -271,12 +271,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         z-index: 3;
 
         &:after {
-          content: ' ';
+          content: '';
           height: 100%;
           position: absolute;
           top: 0;
           width: 6px;
           right: 0;
+          transition: box-shadow 0.25s;
         }
       }
 
