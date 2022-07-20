@@ -128,15 +128,14 @@ const addToSelected = (
   row: Row<Experiment>
 ): number => selectedForPlotsCount + (row.original?.selected ? 1 : 0)
 
-const getSelectedForPlotsCount = (rows: Row<Experiment>[]): number => {
+const getSelectedForPlotsCount = (rows: Row<Experiment>[] = []): number => {
   let selectedForPlotsCount = 0
 
   for (const row of rows) {
     selectedForPlotsCount = addToSelected(selectedForPlotsCount, row)
 
-    for (const subRow of row.subRows || []) {
-      selectedForPlotsCount = addToSelected(selectedForPlotsCount, subRow)
-    }
+    selectedForPlotsCount =
+      selectedForPlotsCount + getSelectedForPlotsCount(row.subRows)
   }
 
   return selectedForPlotsCount

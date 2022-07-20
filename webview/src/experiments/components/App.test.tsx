@@ -909,6 +909,32 @@ describe('App', () => {
 
       expect(selectedForPlotsIndicator).toHaveTextContent('')
       expect(tooltip).toHaveTextContent('No Experiments Selected for Plotting')
+
+      setTableData({
+        ...tableDataFixture,
+        rows: [
+          { ...tableDataFixture.rows[0], selected: false },
+          {
+            ...tableDataFixture.rows[1],
+            selected: false,
+            subRows: [
+              {
+                ...(tableDataFixture.rows[1]?.subRows?.[0] as Row),
+                selected: false,
+                subRows: [
+                  {
+                    ...(tableDataFixture.rows[1]?.subRows?.[1] as Row),
+                    selected: true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      })
+
+      expect(selectedForPlotsIndicator).toHaveTextContent('1')
+      expect(tooltip).toHaveTextContent('1 Experiment Selected for Plotting')
     })
 
     it('should show an indicator with the amount of applied sorts', () => {
