@@ -16,6 +16,7 @@ import {
   OnDragOver,
   OnDragStart
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
+import { getSelectedForPlotsCount } from '../../util/rows'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -31,7 +32,8 @@ export const TableHead = ({
     headerGroups,
     setColumnOrder,
     state: { columnOrder },
-    allColumns
+    allColumns,
+    rows
   },
   root,
   filteredCounts,
@@ -95,12 +97,15 @@ export const TableHead = ({
     threshold: 1
   })
 
+  const selectedForPlotsCount = getSelectedForPlotsCount(rows)
+
   return (
     <div
       className={cx(styles.thead, needsShadow && styles.headWithShadow)}
       ref={ref}
     >
       <Indicators
+        selectedForPlotsCount={selectedForPlotsCount}
         sorts={sorts}
         filters={filters}
         filteredCounts={filteredCounts}
