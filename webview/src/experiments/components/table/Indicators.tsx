@@ -8,6 +8,7 @@ import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
 import SvgFilter from '../../../shared/components/icons/Filter'
+import SvgGraphScatter from '../../../shared/components/icons/GraphScatter'
 import { sendMessage } from '../../../shared/vscode'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import tooltipStyles from '../../../shared/components/tooltip/styles.module.scss'
@@ -93,9 +94,14 @@ const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
 const focusSortsTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_SORTS_TREE })
+const openPlotsWebview = () =>
+  sendMessage({ type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW })
 
-const formatCountMessage = (item: string, count: number | undefined) =>
-  `${count || 'No'} ${pluralize(item, count)} Applied`
+const formatCountMessage = (
+  item: string,
+  count: number | undefined,
+  descriptor = 'Applied'
+) => `${count || 'No'} ${pluralize(item, count)} ${descriptor}`
 
 const formatFilteredCount = (
   item: 'Experiment' | 'Checkpoint',
@@ -116,6 +122,7 @@ const formatFilteredCountMessage = (filteredCounts: FilteredCounts): string =>
     .join(', ')} Filtered`
 
 export const Indicators = ({
+  selectedForPlotsCount,
   sorts,
   filters,
   filteredCounts
@@ -123,11 +130,25 @@ export const Indicators = ({
   sorts?: SortDefinition[]
   filters?: string[]
   filteredCounts: FilteredCounts
+  selectedForPlotsCount: number
 }) => {
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
+
   return (
     <div className={styles.tableIndicators}>
+      <Indicator
+        count={selectedForPlotsCount}
+        aria-label="selected for plots"
+        onClick={openPlotsWebview}
+        tooltipContent={formatCountMessage(
+          'Experiment',
+          selectedForPlotsCount,
+          'Selected for Plotting (Max 7)'
+        )}
+      >
+        <Icon width={16} height={16} icon={SvgGraphScatter} />
+      </Indicator>
       <Indicator
         count={sorts?.length}
         aria-label="sorts"
