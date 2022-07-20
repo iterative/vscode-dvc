@@ -1,16 +1,15 @@
 import React from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import { ErrorTooltip } from './Errors'
 import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import ClockIcon from '../../../shared/components/icons/Clock'
-import ErrorIcon from '../../../shared/components/icons/Error'
 import { clickAndEnterProps } from '../../../util/props'
 import { StarFull, StarEmpty } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
-import Tooltip from '../../../shared/components/tooltip/Tooltip'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -174,23 +173,14 @@ export const FirstCell: React.FC<
           {queued && <ClockIcon />}
         </span>
         {isPlaceholder ? null : (
-          <Tooltip
-            content={
-              <div className={styles.errorTooltip}>
-                <ErrorIcon className={styles.errorIcon} />
-                {error}
-              </div>
-            }
-            placement={'bottom'}
-            disabled={!error}
-          >
+          <ErrorTooltip error={error}>
             <div
               className={cx(styles.cellContents, error && styles.error)}
               {...clickAndEnterProps(toggleExperiment)}
             >
               {cell.render('Cell')}
             </div>
-          </Tooltip>
+          </ErrorTooltip>
         )}
       </div>
     </div>
@@ -199,6 +189,7 @@ export const FirstCell: React.FC<
 
 export const CellWrapper: React.FC<
   CellProp & {
+    error?: string
     changes?: string[]
     cellId: string
     children?: React.ReactNode

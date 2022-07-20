@@ -541,6 +541,19 @@ suite('Workspace Experiments Test Suite', () => {
               id: 'exp-83425',
               name: 'exp-83425'
             }
+          },
+          {
+            description: undefined,
+            label: '489fd8b',
+            value: {
+              id: '489fd8bdaa709f7330aac342e051a9431c625481',
+              name: '489fd8b'
+            }
+          },
+          {
+            description: '[exp-f13bca]',
+            label: 'f0f9186',
+            value: { id: 'exp-f13bca', name: 'exp-f13bca' }
           }
         ],
         {

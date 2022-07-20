@@ -1,6 +1,11 @@
 import { join } from '../../util/path'
 import { ExperimentsOutput } from '../../../cli/reader'
 
+export const errorShas = [
+  '489fd8bdaa709f7330aac342e051a9431c625481',
+  'f0f918662b4f8c47819ca154a23029bf9b47d4f3'
+]
+
 const data: ExperimentsOutput = {
   workspace: {
     baseline: {
@@ -1545,13 +1550,13 @@ const data: ExperimentsOutput = {
         timestamp: '2020-12-29T15:26:36'
       }
     },
-    '489fd8bdaa709f7330aac342e051a9431c625481': {
+    [errorShas[0]]: {
       error: {
         type: 'YAMLFileCorruptedError',
         msg: "unable to read: 'params.yaml', YAML file structure is corrupted"
       }
     },
-    f0f918662b4f8c47819ca154a23029bf9b47d4f3: {
+    [errorShas[1]]: {
       data: {
         deps: {
           [join('data', 'data.xml')]: {
