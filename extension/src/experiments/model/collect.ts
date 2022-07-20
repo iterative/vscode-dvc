@@ -125,7 +125,10 @@ const transformColumns = (
   experimentFields: ExperimentFields,
   branch?: Experiment
 ) => {
-  const { metrics, params, deps } = extractColumns(experimentFields, branch)
+  const { error, metrics, params, deps } = extractColumns(
+    experimentFields,
+    branch
+  )
 
   if (metrics) {
     experiment.metrics = metrics
@@ -135,6 +138,9 @@ const transformColumns = (
   }
   if (deps) {
     experiment.deps = deps
+  }
+  if (error) {
+    experiment.error = error
   }
 }
 
@@ -190,7 +196,8 @@ const transformExperimentOrCheckpointData = (
 } => {
   const experimentFields = experimentData.data
   if (!experimentFields) {
-    return { experiment: undefined }
+    const error = experimentData?.error?.msg
+    return { experiment: { error, id: sha, label: shortenForLabel(sha) } }
   }
 
   const checkpointTipId = getCheckpointTipId(

@@ -1545,6 +1545,119 @@ const data: ExperimentsOutput = {
         timestamp: '2020-12-29T15:26:36'
       }
     },
+    '489fd8bdaa709f7330aac342e051a9431c625481': {
+      error: {
+        type: 'YAMLFileCorruptedError',
+        msg: "unable to read: 'params.yaml', YAML file structure is corrupted"
+      }
+    },
+    f0f918662b4f8c47819ca154a23029bf9b47d4f3: {
+      data: {
+        deps: {
+          [join('data', 'data.xml')]: {
+            hash: '22a1a2931c8370d3aeedd7183606fd7f',
+            size: 14445097,
+            nfiles: null
+          },
+          [join('src', 'prepare.py')]: {
+            hash: 'f09ea0c15980b43010257ccb9f0055e2',
+            size: 1576,
+            nfiles: null
+          },
+          [join('data', 'prepared')]: {
+            hash: '153aad06d376b6595932470e459ef42a.dir',
+            size: 8437363,
+            nfiles: 2
+          },
+          [join('src', 'featurization.py')]: {
+            hash: 'e0265fc22f056a4b86d85c3056bc2894',
+            size: 2490,
+            nfiles: null
+          },
+          [join('data', 'features')]: {
+            hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
+            size: 2232588,
+            nfiles: 2
+          },
+          [join('src', 'train.py')]: {
+            hash: 'c3961d777cfbd7727f9fde4851896006',
+            size: 967,
+            nfiles: null
+          },
+          'model.pkl': {
+            hash: '46865edbf3d62fc5c039dd9d2b0567a4',
+            size: 1763725,
+            nfiles: null
+          },
+          [join('src', 'evaluate.py')]: {
+            hash: '44e714021a65edf881b1716e791d7f59',
+            size: 2346,
+            nfiles: null
+          }
+        },
+        executor: null,
+        metrics: {
+          'summary.json': {
+            error: {
+              type: 'JSONFileCorruptedError',
+              msg: "unable to read: 'summary.json', JSON file structure is corrupted"
+            }
+          }
+        },
+        name: 'exp-f13bca',
+        outs: {
+          [join('data', 'prepared')]: {
+            hash: '153aad06d376b6595932470e459ef42a.dir',
+            size: 8437363,
+            nfiles: 2,
+            use_cache: true,
+            is_data_source: false
+          },
+          [join('data', 'features')]: {
+            hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
+            size: 2232588,
+            nfiles: 2,
+            use_cache: true,
+            is_data_source: false
+          },
+          'model.pkl': {
+            hash: '46865edbf3d62fc5c039dd9d2b0567a4',
+            size: 1763725,
+            nfiles: null,
+            use_cache: true,
+            is_data_source: false
+          },
+          [join('data', 'data.xml')]: {
+            hash: '22a1a2931c8370d3aeedd7183606fd7f',
+            size: 14445097,
+            nfiles: null,
+            use_cache: true,
+            is_data_source: true
+          }
+        },
+        params: {
+          'params.yaml': {
+            data: {
+              code_names: [0, 1],
+              epochs: 5,
+              learning_rate: 2.1e-7,
+              dvc_logs_dir: 'dvc_logs',
+              log_file: 'logs.csv',
+              dropout: 0.124,
+              process: { threshold: 0.85 }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
+          }
+        },
+        queued: false,
+        running: false,
+        timestamp: '2020-12-29T15:26:36'
+      }
+    },
     '90aea7f2482117a55dfcadcdb901aaa6610fbbc9': {
       data: {
         deps: {
