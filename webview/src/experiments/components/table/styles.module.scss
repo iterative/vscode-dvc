@@ -269,7 +269,15 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         position: sticky;
         left: 0;
         z-index: 3;
-        border-right: 2px solid var(--editor-foreground-transparency-4);
+
+        &:after {
+          content: ' ';
+          height: 100%;
+          position: absolute;
+          top: 0;
+          width: 6px;
+          right: 0;
+        }
       }
 
       &.oddRow > *:first-child {
@@ -283,10 +291,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
 
   .table.withExpColumnShadow {
-    .tr:not(.rowSelected) {
-      & > *:first-child {
-        box-shadow: 3px 0px 0px var(--vscode-widget-shadow);
-      }
+    .tr:not(.rowSelected) > *:first-child:after {
+      box-shadow: 3px 0px 3px var(--vscode-widget-shadow);
     }
   }
 
@@ -317,6 +323,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
     & > *:first-child {
       background-color: $header-bg-color;
+    }
+
+    &:not(.rowSelected) > *:first-child:after {
+      right: -2px;
     }
 
     &:last-child,
