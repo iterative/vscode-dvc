@@ -96,6 +96,8 @@ const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
 const focusSortsTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_SORTS_TREE })
+const openPlotsWebview = () =>
+  sendMessage({ type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW })
 
 const formatCountMessage = (
   item: string,
@@ -156,7 +158,7 @@ export const Indicators = ({
       <Indicator
         count={numberSelected}
         aria-label="selected for plots"
-        onClick={focusSortsTree}
+        onClick={openPlotsWebview}
         tooltipContent={formatCountMessage(
           'Experiment',
           numberSelected,

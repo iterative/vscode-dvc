@@ -16,6 +16,7 @@ export enum MessageFromWebviewType {
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
+  OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
@@ -144,6 +145,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }
+  | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA
