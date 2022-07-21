@@ -157,6 +157,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       setDraggedId('')
     }, 0)
     if (e.dataTransfer.getData('itemId') === draggedOverId) {
+      dispatch(changeRef(undefined))
       return
     }
     const newOrder = [...order]
@@ -203,12 +204,17 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }
   }
 
+  const handleDragEnd = () => {
+    dispatch(changeRef(undefined))
+    cleanup()
+  }
+
   const buildItem = (id: string, draggable: JSX.Element) => (
     <draggable.type
       key={draggable.key}
       {...draggable.props}
       onDragStart={handleDragStart}
-      onDragEnd={cleanup}
+      onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}

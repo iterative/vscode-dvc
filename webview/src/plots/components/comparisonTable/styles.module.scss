@@ -163,3 +163,7 @@ $gap: 4px;
   height: 100%;
   border-right: 2px dashed $accent-color;
 }
+
+.draggedColumn {
+  opacity: 0.4;
+}
