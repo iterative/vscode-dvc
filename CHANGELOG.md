@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.12] - 2022-07-20
+
+### 🚀 New Features and Enhancements
+
+- Add selected for plotting indicator to experiments webview [#2065](https://github.com/iterative/vscode-dvc/pull/2065) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Introduce the latest DVC version extension is tested with [#2067](https://github.com/iterative/vscode-dvc/pull/2067) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Move some App.test.tsx helpers to utils [#2056](https://github.com/iterative/vscode-dvc/pull/2056) by [@wolmir](https://github.com/wolmir)
+- Exclude integration and e2e test folders from unit test discovery [#2061](https://github.com/iterative/vscode-dvc/pull/2061) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.11] - 2022-07-19
 
 ### 🚀 New Features and Enhancements

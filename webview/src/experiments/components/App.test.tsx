@@ -882,7 +882,67 @@ describe('App', () => {
     })
   })
 
-  describe('Sort and Filter Indicators', () => {
+  describe('Header Indicators', () => {
+    it('should show an indicator with the amount of experiments selected for plotting', () => {
+      renderTable({
+        ...tableDataFixture
+      })
+      const selectedForPlotsIndicator =
+        screen.getByLabelText('selected for plots')
+      expect(selectedForPlotsIndicator).toHaveTextContent('5')
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(selectedForPlotsIndicator)
+
+      const tooltip = screen.getByRole('tooltip')
+
+      expect(tooltip).toHaveTextContent(
+        '5 Experiments Selected for Plotting (Max 7)'
+      )
+
+      setTableData({
+        ...tableDataFixture,
+        rows: [
+          { ...tableDataFixture.rows[0], selected: false },
+          { ...tableDataFixture.rows[1], selected: false, subRows: [] }
+        ]
+      })
+
+      expect(selectedForPlotsIndicator).toHaveTextContent('')
+      expect(tooltip).toHaveTextContent(
+        'No Experiments Selected for Plotting (Max 7)'
+      )
+
+      setTableData({
+        ...tableDataFixture,
+        rows: [
+          { ...tableDataFixture.rows[0], selected: false },
+          {
+            ...tableDataFixture.rows[1],
+            selected: false,
+            subRows: [
+              {
+                ...(tableDataFixture.rows[1]?.subRows?.[0] as Row),
+                selected: false,
+                subRows: [
+                  {
+                    ...(tableDataFixture.rows[1]?.subRows?.[1] as Row),
+                    selected: true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      })
+
+      expect(selectedForPlotsIndicator).toHaveTextContent('1')
+      expect(tooltip).toHaveTextContent(
+        '1 Experiment Selected for Plotting (Max 7)'
+      )
+    })
+
     it('should show an indicator with the amount of applied sorts', () => {
       renderTable({
         ...tableDataFixture,
@@ -994,6 +1054,12 @@ describe('App', () => {
     fireEvent.click(screen.getByLabelText('filters'))
     expect(mockPostMessage).toBeCalledWith({
       type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+    })
+
+    mockPostMessage.mockClear()
+    fireEvent.click(screen.getByLabelText('selected for plots'))
+    expect(mockPostMessage).toBeCalledWith({
+      type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
     })
   })
 })

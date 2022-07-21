@@ -113,6 +113,9 @@ export class WebviewMessages {
       case MessageFromWebviewType.FOCUS_SORTS_TREE:
         return this.focusSortsTree()
 
+      case MessageFromWebviewType.OPEN_PLOTS_WEBVIEW:
+        return commands.executeCommand(RegisteredCommands.PLOTS_SHOW)
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
