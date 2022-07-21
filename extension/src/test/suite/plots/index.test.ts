@@ -7,7 +7,7 @@ import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
-import expShowFixture from '../../fixtures/expShow/output'
+import expShowFixtureWithoutErrors from '../../fixtures/expShow/noErrors'
 import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
@@ -91,25 +91,28 @@ suite('Plots Test Suite', () => {
       )
       mockPlotsDiff.resetHistory()
 
-      const updatedExpShowFixture = merge(cloneDeep(expShowFixture), {
-        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
-          checkpoint: {
-            data: {
-              checkpoint_tip: 'experiment',
-              queued: false,
-              running: false
-            }
-          },
-          experiment: {
-            data: {
-              checkpoint_tip: 'experiment',
-              name: 'exp-e1new',
-              queued: false,
-              running: true
+      const updatedExpShowFixture = merge(
+        cloneDeep(expShowFixtureWithoutErrors),
+        {
+          '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
+            checkpoint: {
+              data: {
+                checkpoint_tip: 'experiment',
+                queued: false,
+                running: false
+              }
+            },
+            experiment: {
+              data: {
+                checkpoint_tip: 'experiment',
+                name: 'exp-e1new',
+                queued: false,
+                running: true
+              }
             }
           }
         }
-      })
+      )
 
       const dataUpdateEvent = new Promise(resolve =>
         disposable.track(data.onDidUpdate(() => resolve(undefined)))
@@ -135,9 +138,9 @@ suite('Plots Test Suite', () => {
       const committedExperiment = {
         baseline: merge(
           cloneDeep(
-            expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
-              '4fb124aebddb2adf1545030907687fa9a4c80e70'
-            ]
+            expShowFixtureWithoutErrors[
+              '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
+            ]['4fb124aebddb2adf1545030907687fa9a4c80e70']
           ),
           { data: { name: 'main' } }
         )
@@ -195,9 +198,9 @@ suite('Plots Test Suite', () => {
       const differentBranch = {
         baseline: merge(
           cloneDeep(
-            expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
-              '4fb124aebddb2adf1545030907687fa9a4c80e70'
-            ]
+            expShowFixtureWithoutErrors[
+              '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
+            ]['4fb124aebddb2adf1545030907687fa9a4c80e70']
           ),
           { data: { name: 'another-branch' } }
         )
@@ -243,7 +246,7 @@ suite('Plots Test Suite', () => {
         disposable.track(data.onDidUpdate(() => resolve(undefined)))
       )
 
-      experiments.setState(expShowFixture)
+      experiments.setState(expShowFixtureWithoutErrors)
       await dataUpdateEvent
 
       expect(mockPlotsDiff).to.be.calledTwice

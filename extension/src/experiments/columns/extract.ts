@@ -1,4 +1,9 @@
-import { Deps, ExperimentFields, ValueTreeRoot } from '../../cli/reader'
+import {
+  Deps,
+  ExperimentFields,
+  ValueTreeOrError,
+  ValueTreeRoot
+} from '../../cli/reader'
 import { shortenForLabel } from '../../util/string'
 import {
   DepColumns,
@@ -6,20 +11,35 @@ import {
   MetricOrParamColumns
 } from '../webview/contract'
 
-const extractMetricsOrParams = (
-  columns?: ValueTreeRoot
-): MetricOrParamColumns | undefined => {
-  if (!columns) {
+const extractFileMetricsOrParams = (
+  acc: { columns: MetricOrParamColumns; errors: string[] },
+  file: string,
+  dataOrError: ValueTreeOrError
+) => {
+  const data = dataOrError?.data
+  const error = dataOrError?.error?.msg
+  if (error) {
+    acc.errors.push(error)
+  }
+  if (!data) {
     return
   }
-  const acc: MetricOrParamColumns = {}
+  acc.columns[file] = data
+}
 
-  for (const [file, dataOrError] of Object.entries(columns)) {
-    const data = dataOrError?.data
-    if (!data) {
-      continue
-    }
-    acc[file] = data
+const extractMetricsOrParams = (
+  valueTreeRoot?: ValueTreeRoot
+): { columns: MetricOrParamColumns; errors: string[] } | undefined => {
+  if (!valueTreeRoot) {
+    return
+  }
+  const acc: { columns: MetricOrParamColumns; errors: string[] } = {
+    columns: {},
+    errors: []
+  }
+
+  for (const [file, dataOrError] of Object.entries(valueTreeRoot)) {
+    extractFileMetricsOrParams(acc, file, dataOrError)
   }
 
   return acc
@@ -46,15 +66,34 @@ const extractDeps = (
   return acc
 }
 
-export const extractColumns = (
-  experiment: ExperimentFields,
-  branch?: Experiment
-): {
+type Columns = {
+  error?: string
   deps: DepColumns | undefined
   metrics: MetricOrParamColumns | undefined
   params: MetricOrParamColumns | undefined
-} => ({
-  deps: extractDeps(experiment.deps, branch),
-  metrics: extractMetricsOrParams(experiment.metrics),
-  params: extractMetricsOrParams(experiment.params)
-})
+}
+
+export const extractColumns = (
+  experiment: ExperimentFields,
+  branch?: Experiment
+): Columns => {
+  const metricsData = extractMetricsOrParams(experiment.metrics)
+  const paramsData = extractMetricsOrParams(experiment.params)
+
+  const error = [
+    ...(metricsData?.errors || []),
+    ...(paramsData?.errors || [])
+  ].join('\n')
+
+  const columns: Columns = {
+    deps: extractDeps(experiment.deps, branch),
+    metrics: metricsData?.columns,
+    params: paramsData?.columns
+  }
+
+  if (error) {
+    columns.error = error
+  }
+
+  return columns
+}

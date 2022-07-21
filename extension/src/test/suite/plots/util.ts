@@ -1,7 +1,7 @@
 import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
-import expShowFixture from '../../fixtures/expShow/output'
+import expShowFixtureWithoutErrors from '../../fixtures/expShow/noErrors'
 import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
 import { Plots } from '../../../plots'
 import { buildMockMemento, dvcDemoPath } from '../../util'
@@ -23,7 +23,7 @@ import { WebviewMessages } from '../../../plots/webview/messages'
 export const buildPlots = async (
   disposer: Disposer,
   plotsDiff = {},
-  expShow = expShowFixture
+  expShow = expShowFixtureWithoutErrors
 ) => {
   const {
     internalCommands,

@@ -327,7 +327,7 @@ export const RowContent: React.FC<
     depth,
     values: { id }
   } = row
-  const { displayColor, starred } = original
+  const { displayColor, error, starred } = original
   const isWorkspace = id === 'workspace'
   const changesIfWorkspace = isWorkspace ? changes : undefined
   const toggleExperiment = () => {
@@ -422,6 +422,7 @@ export const RowContent: React.FC<
             <CellWrapper
               cell={cell}
               changes={changesIfWorkspace}
+              error={error}
               key={cellId}
               cellId={cellId}
             />

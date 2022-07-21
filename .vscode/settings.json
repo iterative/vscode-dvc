@@ -15,6 +15,7 @@
     "conda",
     "datapoint",
     "datapoints",
+    "Decoratable",
     "dvcignore",
     "DVCLIVE",
     "DVCPATH",

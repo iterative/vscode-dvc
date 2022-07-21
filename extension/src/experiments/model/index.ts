@@ -310,6 +310,14 @@ export class ExperimentsModel extends ModelWithPersistence {
     ]
   }
 
+  public getErrors() {
+    return new Set(
+      this.getCombinedList()
+        .filter(({ error }) => error)
+        .map(({ label }) => label)
+    )
+  }
+
   public getExperimentsWithCheckpoints(): ExperimentWithCheckpoints[] {
     return this.getExperiments().map(experiment => {
       const checkpoints = this.checkpointsByTip
