@@ -4,9 +4,10 @@ import {
   Column,
   ColumnType
 } from 'dvc/src/experiments/webview/contract'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
+import { useInView } from 'react-intersection-observer'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
@@ -126,6 +127,76 @@ const getIconMenuItems = (
   }
 ]
 
+const FirstTableHeaderCellWrapper: React.FC<{
+  children: React.ReactNode
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
+  root: HTMLElement | null
+}> = ({ root, setExpColumnNeedsShadow, children }) => {
+  const [ref, needsShadow] = useInView({
+    root,
+    rootMargin: '0px 0px 0px -15px',
+    threshold: 1
+  })
+
+  useEffect(() => {
+    setExpColumnNeedsShadow(needsShadow)
+  }, [needsShadow, setExpColumnNeedsShadow])
+
+  return <div ref={ref}>{children}</div>
+}
+
+const TableHeaderCellContents: React.FC<{
+  column: HeaderGroup<Experiment>
+  sortOrder: SortOrder
+  sortEnabled: boolean
+  hasFilter: boolean
+  isDraggable: boolean
+  menuSuppressed: boolean
+  onDragOver: OnDragOver
+  onDragStart: OnDragStart
+  onDrop: OnDrop
+  canResize: boolean
+  setMenuSuppressed: (menuSuppressed: boolean) => void
+  resizerHeight: string
+}> = ({
+  column,
+  sortEnabled,
+  sortOrder,
+  hasFilter,
+  isDraggable,
+  menuSuppressed,
+  onDragOver,
+  onDragStart,
+  onDrop,
+  canResize,
+  setMenuSuppressed,
+  resizerHeight
+}) => {
+  return (
+    <>
+      <div className={styles.iconMenu}>
+        <IconMenu items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)} />
+      </div>
+      <ColumnDragHandle
+        column={column}
+        disabled={!isDraggable || menuSuppressed}
+        onDragOver={onDragOver}
+        onDragStart={onDragStart}
+        onDrop={onDrop}
+      />
+      {canResize && (
+        <div
+          {...column.getResizerProps()}
+          onMouseEnter={() => setMenuSuppressed(true)}
+          onMouseLeave={() => setMenuSuppressed(false)}
+          className={styles.columnResizer}
+          style={{ height: resizerHeight }}
+        />
+      )}
+    </>
+  )
+}
+
 const TableHeaderCell: React.FC<{
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
@@ -138,6 +209,9 @@ const TableHeaderCell: React.FC<{
   onDragOver: OnDragOver
   onDragStart: OnDragStart
   onDrop: OnDrop
+  isFirst: boolean
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
+  root: HTMLElement | null
 }> = ({
   column,
   columns,
@@ -149,10 +223,12 @@ const TableHeaderCell: React.FC<{
   menuDisabled,
   onDragOver,
   onDragStart,
-  onDrop
+  onDrop,
+  root,
+  isFirst,
+  setExpColumnNeedsShadow
 }) => {
   const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
-
   const isDraggable =
     !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
 
@@ -165,6 +241,23 @@ const TableHeaderCell: React.FC<{
     columns
   )
 
+  const cellContents = (
+    <TableHeaderCellContents
+      column={column}
+      sortOrder={sortOrder}
+      sortEnabled={sortEnabled}
+      hasFilter={hasFilter}
+      isDraggable={isDraggable}
+      menuSuppressed={menuSuppressed}
+      onDragOver={onDragOver}
+      onDragStart={onDragStart}
+      onDrop={onDrop}
+      canResize={canResize}
+      setMenuSuppressed={setMenuSuppressed}
+      resizerHeight={resizerHeight}
+    />
+  )
+
   return (
     <ContextMenu
       content={menuContent}
@@ -175,31 +268,20 @@ const TableHeaderCell: React.FC<{
         {...column.getHeaderProps(
           getHeaderPropsArgs(column, sortEnabled, sortOrder)
         )}
-        key={column.id}
         data-testid={`header-${column.id}`}
-        role={'columnheader'}
+        key={column.id}
+        role="columnheader"
         tabIndex={0}
       >
-        <div className={styles.iconMenu}>
-          <IconMenu
-            items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)}
-          />
-        </div>
-        <ColumnDragHandle
-          column={column}
-          disabled={!isDraggable || menuSuppressed}
-          onDragOver={onDragOver}
-          onDragStart={onDragStart}
-          onDrop={onDrop}
-        />
-        {canResize && (
-          <div
-            {...column.getResizerProps()}
-            onMouseEnter={() => setMenuSuppressed(true)}
-            onMouseLeave={() => setMenuSuppressed(false)}
-            className={styles.columnResizer}
-            style={{ height: resizerHeight }}
-          />
+        {isFirst ? (
+          <FirstTableHeaderCellWrapper
+            setExpColumnNeedsShadow={setExpColumnNeedsShadow}
+            root={root}
+          >
+            {cellContents}
+          </FirstTableHeaderCellWrapper>
+        ) : (
+          cellContents
         )}
       </div>
     </ContextMenu>
@@ -215,6 +297,9 @@ interface TableHeaderProps {
   onDragOver: OnDragOver
   onDragStart: OnDragStart
   onDrop: OnDrop
+  isFirst: boolean
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
+  root: HTMLElement | null
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
@@ -225,7 +310,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   orderedColumns,
   onDragOver,
   onDragStart,
-  onDrop
+  onDrop,
+  root,
+  isFirst,
+  setExpColumnNeedsShadow
 }) => {
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
@@ -275,6 +363,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragStart={onDragStart}
       onDrop={onDrop}
       menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
+      root={root}
+      isFirst={isFirst}
+      setExpColumnNeedsShadow={setExpColumnNeedsShadow}
       menuContent={
         <div>
           <MessagesMenu options={contextMenuOptions} />

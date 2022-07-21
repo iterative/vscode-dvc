@@ -16,6 +16,8 @@ import {
   OnDragOver,
   OnDragStart
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
+import { getSelectedForPlotsCount } from '../../util/rows'
+import { isFirstInArr } from '../../util/isFirstInArr'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -24,6 +26,7 @@ interface TableHeadProps {
   filteredCounts: FilteredCounts
   filters: string[]
   root: HTMLElement | null
+  setExpColumnNeedsShadow: (needsShadow: boolean) => void
 }
 
 export const TableHead = ({
@@ -31,13 +34,15 @@ export const TableHead = ({
     headerGroups,
     setColumnOrder,
     state: { columnOrder },
-    allColumns
+    allColumns,
+    rows
   },
   root,
   filteredCounts,
   filters,
   columns,
-  sorts
+  sorts,
+  setExpColumnNeedsShadow
 }: TableHeadProps) => {
   const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
@@ -95,17 +100,20 @@ export const TableHead = ({
     threshold: 1
   })
 
+  const selectedForPlotsCount = getSelectedForPlotsCount(rows)
+
   return (
     <div
       className={cx(styles.thead, needsShadow && styles.headWithShadow)}
       ref={ref}
     >
       <Indicators
+        selectedForPlotsCount={selectedForPlotsCount}
         sorts={sorts}
         filters={filters}
         filteredCounts={filteredCounts}
       />
-      {headerGroups.map(headerGroup => (
+      {headerGroups.map((headerGroup, ind) => (
         // eslint-disable-next-line react/jsx-key
         <MergedHeaderGroups
           {...headerGroup.getHeaderGroupProps()}
@@ -117,6 +125,9 @@ export const TableHead = ({
           onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
+          root={root}
+          isFirst={isFirstInArr(ind)}
+          setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />
       ))}
     </div>

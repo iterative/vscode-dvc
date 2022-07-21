@@ -1,9 +1,10 @@
 import { isVersionCompatible, extractSemver, ParsedSemver } from './version'
-import { MIN_CLI_VERSION } from './constants'
+import { MIN_CLI_VERSION, LATEST_TESTED_CLI_VERSION } from './constants'
 import { Toast } from '../vscode/toast'
 
 jest.mock('./constants', () => ({
   ...jest.requireActual('./constants'),
+  LATEST_TESTED_CLI_VERSION: '2.11.1',
   MIN_CLI_VERSION: '2.9.4'
 }))
 jest.mock('../vscode/config')
@@ -50,6 +51,12 @@ describe('isVersionCompatible', () => {
     patch: minPatch
   } = extractSemver(MIN_CLI_VERSION) as ParsedSemver
 
+  const {
+    major: latestTestedMajor,
+    minor: latestTestedMinor,
+    patch: latestTestedPatch
+  } = extractSemver(LATEST_TESTED_CLI_VERSION) as ParsedSemver
+
   it('should be compatible and not send a toast message if the provided version matches the min version', () => {
     const isCompatible = isVersionCompatible(MIN_CLI_VERSION)
 
@@ -57,24 +64,65 @@ describe('isVersionCompatible', () => {
     expect(mockedWarnWithOptions).not.toBeCalled()
   })
 
-  it('should be compatible and not send a toast for a version with the same minor and higher patch', () => {
+  it('should be compatible and not send a toast for a version with the same minor and higher patch as the min compatible version', () => {
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
     const isCompatible = isVersionCompatible(
-      [minMajor, minMinor, minPatch + 10000].join(',')
+      [minMajor, minMinor, minPatch + 10000].join('.')
     )
 
     expect(isCompatible).toBe(true)
     expect(mockedWarnWithOptions).not.toBeCalled()
   })
 
-  it('should be compatible but send a toast for a version with a higher minor but lower patch', () => {
+  it('should be compatible and not send a toast for a version with the same minor and higher patch as the latest tested version', () => {
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
-    const isCompatible = isVersionCompatible('2.10.0')
+    const isCompatible = isVersionCompatible(
+      [latestTestedMajor, latestTestedMinor, latestTestedPatch + 10000].join(
+        '.'
+      )
+    )
 
     expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).not.toBeCalled()
+  })
+
+  it('should be compatible and not send a toast for a major and minor version in between the min compatible and the latest tested', () => {
+    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+    expect(minMinor + 1).toBeLessThan(latestTestedMinor)
+    expect(minMajor).toStrictEqual(latestTestedMajor)
+
+    const isCompatible = isVersionCompatible(
+      [minMajor, minMinor + 1, 0].join('.')
+    )
+
+    expect(isCompatible).toBe(true)
+    expect(mockedWarnWithOptions).not.toBeCalled()
+  })
+
+  it('should be compatible and send a toast for a version with a minor higher as the latest tested minor and any patch', () => {
+    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+    expect(0).toBeLessThan(latestTestedPatch)
+
+    let isCompatible = isVersionCompatible(
+      [latestTestedMajor, latestTestedMinor + 1, 0].join('.')
+    )
+    expect(isCompatible).toBe(true)
+
+    isCompatible = isVersionCompatible(
+      [latestTestedMajor, latestTestedMinor + 1, latestTestedPatch + 1000].join(
+        '.'
+      )
+    )
+    expect(isCompatible).toBe(true)
+
+    isCompatible = isVersionCompatible(
+      [latestTestedMajor, latestTestedMinor + 1, latestTestedPatch].join('.')
+    )
+    expect(isCompatible).toBe(true)
+
+    expect(mockedWarnWithOptions).toBeCalledTimes(3)
   })
 
   it('should not be compatible and send a toast message if the provided version is a patch version before the minimum expected version', () => {
@@ -122,9 +170,12 @@ describe('isVersionCompatible', () => {
   it('should not be compatible and send a toast message if the provided version is malformed', () => {
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
 
-    const isCompatible = isVersionCompatible('not a valid version')
-
+    let isCompatible = isVersionCompatible('not a valid version')
     expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+
+    isCompatible = isVersionCompatible('1,2,3')
+    expect(isCompatible).toBe(false)
+
+    expect(mockedWarnWithOptions).toBeCalledTimes(2)
   })
 })
