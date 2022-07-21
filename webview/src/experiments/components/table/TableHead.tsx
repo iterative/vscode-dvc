@@ -17,6 +17,7 @@ import {
   OnDragStart
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
 import { getSelectedForPlotsCount } from '../../util/rows'
+import { isFirstInArr } from '../../util/isFirstInArr'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -125,7 +126,7 @@ export const TableHead = ({
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
           root={root}
-          isFirst={ind === 0}
+          isFirst={isFirstInArr(ind)}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />
       ))}
