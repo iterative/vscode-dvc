@@ -400,5 +400,50 @@ describe('ComparisonTable', () => {
 
       expect(dragOverEvent.preventDefault).toHaveBeenCalled()
     })
+
+    it('should show the header being dragged in its original position until the drop', () => {
+      renderTable()
+
+      const [endingNode, startingNode] = getHeaders()
+
+      dragEnter(startingNode, endingNode.id, DragEnterDirection.LEFT)
+
+      const [, draggedHeader] = getHeaders()
+
+      expect(draggedHeader.isSameNode(startingNode)).toBe(true)
+    })
+
+    it('should wrap the drop target with the header we are dragging over', () => {
+      renderTable()
+
+      const [endingNode, startingNode] = getHeaders()
+
+      dragEnter(startingNode, endingNode.id, DragEnterDirection.LEFT)
+
+      const [headerWrapper] = getHeaders()
+
+      expect(headerWrapper.childElementCount).toBe(2)
+      expect(headerWrapper.contains(endingNode)).toBe(true)
+    })
+
+    it('should not change the order when dropping a header in its own spot', () => {
+      renderTable()
+
+      const [startingAndEndingNode, secondEndingNode] = getHeaders()
+
+      dragAndDrop(
+        startingAndEndingNode,
+        startingAndEndingNode,
+        DragEnterDirection.RIGHT
+      )
+      expect(mockPostMessage).not.toHaveBeenCalled()
+
+      dragAndDrop(
+        startingAndEndingNode,
+        secondEndingNode,
+        DragEnterDirection.RIGHT
+      )
+      expect(mockPostMessage).toHaveBeenCalled()
+    })
   })
 })
