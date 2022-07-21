@@ -889,7 +889,7 @@ describe('App', () => {
       })
       const selectedForPlotsIndicator =
         screen.getByLabelText('selected for plots')
-      expect(selectedForPlotsIndicator).toHaveTextContent('5')
+      expect(selectedForPlotsIndicator).toHaveTextContent('7')
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
@@ -898,7 +898,7 @@ describe('App', () => {
       const tooltip = screen.getByRole('tooltip')
 
       expect(tooltip).toHaveTextContent(
-        '5 Experiments Selected for Plotting (Max 7)'
+        '7 Experiments Selected for Plotting (Max 7)'
       )
 
       setTableData({
