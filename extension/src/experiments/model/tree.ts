@@ -1,7 +1,6 @@
 import {
   commands,
   Event,
-  MarkdownString,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -25,6 +24,7 @@ import {
 } from '../../commands/external'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
+import { getMarkdownString } from '../../vscode/markdownString'
 
 export class ExperimentsTree
   extends Disposable
@@ -301,6 +301,6 @@ export class ExperimentsTree
       return
     }
 
-    return new MarkdownString(`$(error) ${error}`, true)
+    return getMarkdownString(`$(error) ${error}`)
   }
 }

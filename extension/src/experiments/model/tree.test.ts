@@ -1,12 +1,20 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { commands, ThemeIcon, TreeItem, Uri, window } from 'vscode'
+import {
+  commands,
+  MarkdownString,
+  ThemeIcon,
+  TreeItem,
+  Uri,
+  window
+} from 'vscode'
 import { ExperimentType } from '.'
 import { ExperimentsTree } from './tree'
 import { getDecoratableUri } from './decorationProvider'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
+import { getMarkdownString } from '../../vscode/markdownString'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -18,6 +26,8 @@ const mockedTreeItem = jest.mocked(TreeItem)
 const mockedThemeIcon = jest.mocked(ThemeIcon)
 
 const mockedDisposable = jest.mocked(Disposable)
+
+const mockedGetMarkdownString = jest.mocked(getMarkdownString)
 
 const {
   mockedExperiments,
@@ -38,6 +48,7 @@ const mockedResourceLocator = {
 } as unknown as ResourceLocator
 
 jest.mock('vscode')
+jest.mock('../../vscode/markdownString')
 jest.mock('@hediet/std/disposable')
 
 beforeEach(() => {
@@ -111,6 +122,9 @@ describe('ExperimentsTree', () => {
         Uri.file(join('path', 'to', 'resources', `${name}-${color}.svg`))
 
       mockedGetExperimentsResource.mockImplementation(getMockedUri)
+      mockedGetMarkdownString.mockImplementationOnce(
+        str => str as unknown as MarkdownString
+      )
 
       const experiments = [
         {
@@ -119,7 +133,6 @@ describe('ExperimentsTree', () => {
           id: 'exp-12345',
           label: '90aea7f',
           selected: true,
-          tooltip: undefined,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -129,17 +142,26 @@ describe('ExperimentsTree', () => {
           label: 'f0778b3',
           running: true,
           selected: true,
-          tooltip: undefined,
           type: ExperimentType.EXPERIMENT
         },
         {
-          displayColor: '#4063e2',
+          displayColor: undefined,
           hasChildren: false,
           id: 'exp-abcdef',
           label: 'e350702',
           running: false,
           selected: false,
-          tooltip: undefined,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          displayColor: undefined,
+          error:
+            "unable to read: 'params.yaml', YAML file structure is corrupted",
+          hasChildren: false,
+          id: '139eabc',
+          label: '139eabc',
+          running: false,
+          selected: false,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -147,7 +169,6 @@ describe('ExperimentsTree', () => {
           id: 'f81f1b5',
           label: 'f81f1b5',
           queued: true,
-          tooltip: undefined,
           type: ExperimentType.QUEUED
         }
       ]
@@ -203,10 +224,26 @@ describe('ExperimentsTree', () => {
           },
           description: undefined,
           dvcRoot: 'repo',
-          iconPath: getMockedUri('circle-outline', '#4063e2'),
+          iconPath: { id: 'circle-outline' },
           id: 'exp-abcdef',
           label: 'e350702',
           tooltip: undefined,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: '139eabc' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: undefined,
+          dvcRoot: 'repo',
+          iconPath: { id: 'circle-outline' },
+          id: '139eabc',
+          label: '139eabc',
+          tooltip:
+            "$(error) unable to read: 'params.yaml', YAML file structure is corrupted",
           type: ExperimentType.EXPERIMENT
         },
         {
