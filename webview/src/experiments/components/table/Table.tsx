@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
@@ -137,6 +137,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
 
   const { clearSelectedRows, batchSelection, lastSelectedRow } =
     React.useContext(RowSelectionContext)
+  const [expColumnNeedsShadow, setExpColumnNeedsShadow] = useState(false)
 
   const tableRef = useRef<HTMLDivElement>(null)
 
@@ -178,7 +179,12 @@ export const Table: React.FC<TableProps & WithChanges> = ({
   return (
     <div className={styles.tableContainer}>
       <div
-        {...getTableProps({ className: styles.table })}
+        {...getTableProps({
+          className: cx(
+            styles.table,
+            expColumnNeedsShadow && styles.withExpColumnShadow
+          )
+        })}
         ref={tableRef}
         tabIndex={0}
         role="tree"
@@ -195,6 +201,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
           filters={filters}
           columns={columns}
           root={tableRef.current}
+          setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />
         {rows.map(row => (
           <TableBody
