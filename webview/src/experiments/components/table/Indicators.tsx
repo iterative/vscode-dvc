@@ -6,9 +6,11 @@ import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
-import SvgSortPrecedence from '../../../shared/components/icons/SortPrecedence'
-import SvgFilter from '../../../shared/components/icons/Filter'
-import SvgGraphScatter from '../../../shared/components/icons/GraphScatter'
+import {
+  Filter,
+  GraphScatter,
+  SortPrecedence
+} from '../../../shared/components/icons'
 import { sendMessage } from '../../../shared/vscode'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import tooltipStyles from '../../../shared/components/tooltip/styles.module.scss'
@@ -147,7 +149,7 @@ export const Indicators = ({
           'Selected for Plotting (Max 7)'
         )}
       >
-        <Icon width={16} height={16} icon={SvgGraphScatter} />
+        <Icon width={16} height={16} icon={GraphScatter} />
       </Indicator>
       <Indicator
         count={sorts?.length}
@@ -155,7 +157,7 @@ export const Indicators = ({
         onClick={focusSortsTree}
         tooltipContent={formatCountMessage('Sort', sortsCount)}
       >
-        <Icon width={16} height={16} icon={SvgSortPrecedence} />
+        <Icon width={16} height={16} icon={SortPrecedence} />
       </Indicator>
       <Indicator
         count={filters?.length}
@@ -170,7 +172,7 @@ export const Indicators = ({
           </>
         }
       >
-        <Icon width={16} height={16} icon={SvgFilter} />
+        <Icon width={16} height={16} icon={Filter} />
       </Indicator>
     </div>
   )
