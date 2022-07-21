@@ -220,48 +220,44 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     />
   )
 
+  const createItemWithDropTarget = (id: string, item: JSX.Element) => {
+    const isEnteringRight = direction === DragEnterDirection.RIGHT
+    const targetClassName = shouldShowOnDrag
+      ? cx(styles.dropTargetWhenShowingOnDrag, {
+          [styles.dropTargetWhenShowingOnDragLeft]: !isEnteringRight,
+          [styles.dropTargetWhenShowingOnDragRight]: isEnteringRight
+        })
+      : undefined
+    const target = makeTarget(
+      dropTarget,
+      handleDragOver,
+      handleOnDrop,
+      id,
+      targetClassName
+    )
+    const itemWithTag = shouldShowOnDrag ? (
+      <div key="item" {...item.props} />
+    ) : (
+      item
+    )
+    const block = isEnteringRight
+      ? [itemWithTag, target]
+      : [target, itemWithTag]
+
+    return shouldShowOnDrag ? (
+      <item.type key={item.key} className={styles.newBlockWhenShowingOnDrag}>
+        {block}
+      </item.type>
+    ) : (
+      block
+    )
+  }
+
   const wrappedItems = items.flatMap(draggable => {
     const { id } = draggable.props
     const item = id && buildItem(id, draggable)
 
-    if (id === draggedOverId) {
-      const targetClassName = shouldShowOnDrag
-        ? cx(styles.dropTargetWhenShowingOnDrag, {
-            [styles.dropTargetWhenShowingOnDragLeft]:
-              direction === DragEnterDirection.LEFT,
-            [styles.dropTargetWhenShowingOnDragRight]:
-              direction === DragEnterDirection.RIGHT
-          })
-        : undefined
-      const target = makeTarget(
-        dropTarget,
-        handleDragOver,
-        handleOnDrop,
-        id,
-        targetClassName
-      )
-      const Tag = item.type
-      const itemWithTag = shouldShowOnDrag ? (
-        <div key="item" {...item.props} />
-      ) : (
-        item
-      )
-      const block =
-        direction === DragEnterDirection.RIGHT
-          ? [itemWithTag, target]
-          : [target, itemWithTag]
-
-      if (shouldShowOnDrag) {
-        return (
-          <Tag key={draggable.key} className={styles.newBlockWhenShowingOnDrag}>
-            {block}
-          </Tag>
-        )
-      }
-      return block
-    }
-
-    return item
+    return id === draggedOverId ? createItemWithDropTarget(id, item) : item
   })
 
   const Wrapper = wrapperComponent?.component

@@ -1,4 +1,5 @@
 import { act } from 'react-dom/test-utils'
+import { idToNodeNode } from './nodes'
 import * as DragDropUtils from '../shared/components/dragDrop/util'
 
 const testStorage = new Map()
@@ -31,14 +32,12 @@ export const dragEnter = (
     jest.advanceTimersByTime(1)
   })
 
-  let draggedOver =
-    (draggedOverId && document.querySelector(`#${draggedOverId}`)) || null
+  let draggedOver = idToNodeNode(draggedOverId)
 
   act(() => {
     draggedOver?.dispatchEvent(createBubbledEvent('dragenter'))
   })
-  draggedOver =
-    (draggedOverId && document.querySelector(`#${draggedOverId}`)) || null
+  draggedOver = idToNodeNode(draggedOverId)
 
   act(() => {
     if (direction !== DragDropUtils.DragEnterDirection.AUTO) {
@@ -66,25 +65,15 @@ export const dragAndDrop = (
     .LEFT
 ) => {
   // When showing element on drag, the dragged over element is being recreacted to be wrapped in another element, thus the endingNode does not exist as is in the document
-  // CSS.escape is needed for weird ids in the experiments table (ex.: :loss)
-  const endingNodeId = CSS.escape(endingNode.id)
+  const endingNodeId = endingNode.id
   dragEnter(startingNode, endingNodeId, direction)
 
   jest.useFakeTimers()
   act(() => {
     jest.advanceTimersByTime(1)
-  })
-  act(() => {
-    const endingNodeWithId =
-      (endingNodeId && document.querySelector(`#${endingNodeId}`)) || null
+    const endingNodeWithId = idToNodeNode(endingNodeId)
     endingNodeWithId?.dispatchEvent(createBubbledEvent('drop'))
-  })
-
-  act(() => {
     jest.advanceTimersByTime(1)
-  })
-
-  act(() => {
     startingNode.dispatchEvent(createBubbledEvent('dragend'))
   })
 
