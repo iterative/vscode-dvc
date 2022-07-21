@@ -1,5 +1,5 @@
 import { act } from 'react-dom/test-utils'
-import { idToNodeNode } from './nodes'
+import { idToNode } from './nodes'
 import * as DragDropUtils from '../shared/components/dragDrop/util'
 
 const testStorage = new Map()
@@ -32,12 +32,12 @@ export const dragEnter = (
     jest.advanceTimersByTime(1)
   })
 
-  let draggedOver = idToNodeNode(draggedOverId)
+  let draggedOver = idToNode(draggedOverId)
 
   act(() => {
     draggedOver?.dispatchEvent(createBubbledEvent('dragenter'))
   })
-  draggedOver = idToNodeNode(draggedOverId)
+  draggedOver = idToNode(draggedOverId)
 
   act(() => {
     if (direction !== DragDropUtils.DragEnterDirection.AUTO) {
@@ -71,7 +71,7 @@ export const dragAndDrop = (
   jest.useFakeTimers()
   act(() => {
     jest.advanceTimersByTime(1)
-    const endingNodeWithId = idToNodeNode(endingNodeId)
+    const endingNodeWithId = idToNode(endingNodeId)
     endingNodeWithId?.dispatchEvent(createBubbledEvent('drop'))
     jest.advanceTimersByTime(1)
     startingNode.dispatchEvent(createBubbledEvent('dragend'))
