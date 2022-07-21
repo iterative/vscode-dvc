@@ -34,14 +34,14 @@ export const cellValue = (raw: CellValue) =>
 export const cellHasChanges = (cellValue: CellValue) =>
   isValueWithChanges(cellValue) ? cellValue.changes : false
 
-const UndefinedCell: React.FC = () => (
-  <div className={styles.innerCell}>
-    <span className={styles.cellContents}>. . .</span>
-  </div>
-)
-
 const CellContents: React.FC<{ displayValue: string }> = ({ displayValue }) => (
   <span className={styles.cellContents}>{displayValue}</span>
+)
+
+const UndefinedCell: React.FC = () => (
+  <div className={styles.innerCell}>
+    <CellContents displayValue={'...'} />
+  </div>
 )
 
 const ErrorCell: React.FC<{ error: string }> = ({ error }) => (
