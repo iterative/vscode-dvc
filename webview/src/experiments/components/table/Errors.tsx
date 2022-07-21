@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './styles.module.scss'
-import ErrorIcon from '../../../shared/components/icons/Error'
+import { Error } from '../../../shared/components/icons'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 
 export const ErrorTooltip: React.FC<{
@@ -10,7 +10,7 @@ export const ErrorTooltip: React.FC<{
   <Tooltip
     content={
       <div className={styles.errorTooltip}>
-        <ErrorIcon className={styles.errorIcon} />
+        <Error className={styles.errorIcon} />
         {error}
       </div>
     }
