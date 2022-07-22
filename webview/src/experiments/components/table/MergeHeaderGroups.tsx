@@ -10,7 +10,6 @@ import {
   OnDragStart,
   OnDrop
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
-import { isFirstInArr } from '../../util/isFirstInArr'
 
 export const MergedHeaderGroups: React.FC<{
   headerGroup: HeaderGroup<Experiment>
@@ -21,7 +20,7 @@ export const MergedHeaderGroups: React.FC<{
   onDragUpdate: OnDragOver
   onDragStart: OnDragStart
   onDragEnd: OnDrop
-  isFirst: boolean
+  firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({
@@ -34,7 +33,7 @@ export const MergedHeaderGroups: React.FC<{
   onDragEnd,
   onDragStart,
   root,
-  isFirst,
+  firstExpColumnCellId,
   setExpColumnNeedsShadow
 }) => {
   return (
@@ -43,9 +42,9 @@ export const MergedHeaderGroups: React.FC<{
         className: cx(styles.tr, styles.headRow)
       })}
     >
-      {headerGroup.headers.map((column: HeaderGroup<Experiment>, ind) => (
+      {headerGroup.headers.map((column: HeaderGroup<Experiment>) => (
         <TableHeader
-          isFirst={isFirst && isFirstInArr(ind)}
+          firstExpColumnCellId={firstExpColumnCellId}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           key={column.id}
           orderedColumns={orderedColumns}

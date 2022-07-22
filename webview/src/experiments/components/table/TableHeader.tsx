@@ -130,7 +130,7 @@ const getIconMenuItems = (
   }
 ]
 
-const FirstTableHeaderCellWrapper: React.FC<{
+const WithExpColumnNeedsShadowUpdates: React.FC<{
   children: React.ReactNode
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
@@ -212,7 +212,7 @@ const TableHeaderCell: React.FC<{
   onDragOver: OnDragOver
   onDragStart: OnDragStart
   onDrop: OnDrop
-  isFirst: boolean
+  firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({
@@ -228,7 +228,7 @@ const TableHeaderCell: React.FC<{
   onDragStart,
   onDrop,
   root,
-  isFirst,
+  firstExpColumnCellId,
   setExpColumnNeedsShadow
 }) => {
   const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
@@ -276,13 +276,13 @@ const TableHeaderCell: React.FC<{
         role="columnheader"
         tabIndex={0}
       >
-        {isFirst ? (
-          <FirstTableHeaderCellWrapper
+        {firstExpColumnCellId === column.id ? (
+          <WithExpColumnNeedsShadowUpdates
             setExpColumnNeedsShadow={setExpColumnNeedsShadow}
             root={root}
           >
             {cellContents}
-          </FirstTableHeaderCellWrapper>
+          </WithExpColumnNeedsShadowUpdates>
         ) : (
           cellContents
         )}
@@ -300,7 +300,7 @@ interface TableHeaderProps {
   onDragOver: OnDragOver
   onDragStart: OnDragStart
   onDrop: OnDrop
-  isFirst: boolean
+  firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }
@@ -315,7 +315,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   onDragStart,
   onDrop,
   root,
-  isFirst,
+  firstExpColumnCellId,
   setExpColumnNeedsShadow
 }) => {
   const baseColumn = column.placeholderOf || column
@@ -367,7 +367,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDrop={onDrop}
       menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
       root={root}
-      isFirst={isFirst}
+      firstExpColumnCellId={firstExpColumnCellId}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
       menuContent={
         <div>
