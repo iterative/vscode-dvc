@@ -5,9 +5,8 @@ import { ErrorTooltip } from './Errors'
 import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
-import ClockIcon from '../../../shared/components/icons/Clock'
 import { clickAndEnterProps } from '../../../util/props'
-import { StarFull, StarEmpty } from '../../../shared/components/icons'
+import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
 
@@ -170,7 +169,7 @@ export const FirstCell: React.FC<
               plotSelections
             )} selected for plots.`}
           />
-          {queued && <ClockIcon />}
+          {queued && <Clock />}
         </span>
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>
