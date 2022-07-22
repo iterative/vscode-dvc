@@ -1,4 +1,5 @@
 import React, { SyntheticEvent } from 'react'
+import cx from 'classnames'
 import get from 'lodash/get'
 import {
   Column as TableColumn,
@@ -20,6 +21,7 @@ import Tooltip, {
 import styles from '../components/table/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
+import { ErrorTooltip } from '../components/table/Errors'
 
 export type CellValue = Value | ValueWithChanges
 
@@ -32,10 +34,22 @@ export const cellValue = (raw: CellValue) =>
 export const cellHasChanges = (cellValue: CellValue) =>
   isValueWithChanges(cellValue) ? cellValue.changes : false
 
-const UndefinedCell = (
+const CellContents: React.FC<{ displayValue: string }> = ({ displayValue }) => (
+  <span className={styles.cellContents}>{displayValue}</span>
+)
+
+const UndefinedCell: React.FC = () => (
   <div className={styles.innerCell}>
-    <span className={styles.cellContents}>. . .</span>
+    <CellContents displayValue={'...'} />
   </div>
+)
+
+const ErrorCell: React.FC<{ error: string }> = ({ error }) => (
+  <ErrorTooltip error={error}>
+    <div className={cx(styles.innerCell, styles.error)}>
+      <CellContents displayValue={'!'} />
+    </div>
+  </ErrorTooltip>
 )
 
 const CellTooltip: React.FC<{
@@ -56,9 +70,19 @@ const CellTooltip: React.FC<{
 }
 
 const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
-  const { value } = cell
+  const {
+    value,
+    row: {
+      original: { error }
+    }
+  } = cell
+
+  if (error && value === undefined) {
+    return <ErrorCell error={error} />
+  }
+
   if (value === undefined) {
-    return UndefinedCell
+    return <UndefinedCell />
   }
 
   const rawValue = cellValue(value)
@@ -83,7 +107,7 @@ const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
           className={styles.copyButton}
           tooltip="Copy cell contents"
         />
-        <span className={styles.cellContents}>{displayValue}</span>
+        <CellContents displayValue={displayValue} />
       </div>
     </Tooltip>
   )
@@ -104,6 +128,7 @@ const Header: React.FC<{ column: TableColumn<Experiment> }> = ({
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow => {
     const value = get(originalRow, pathArray)
+
     if (!Array.isArray(value)) {
       return value
     }

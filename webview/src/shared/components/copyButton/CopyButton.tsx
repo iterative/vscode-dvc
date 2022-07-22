@@ -1,8 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
-import CopyIcon from '../icons/Copy'
-import CheckIcon from '../icons/Check'
+import { Copy, Check } from '../icons'
 
 const enum CopyButtonState {
   DEFAULT,
@@ -13,8 +12,8 @@ const enum CopyButtonState {
 const FailureIcon = () => <span>&#10005;</span>
 
 const copyIconComponents: Record<CopyButtonState, FC> = {
-  [CopyButtonState.DEFAULT]: CopyIcon,
-  [CopyButtonState.SUCCESS]: CheckIcon,
+  [CopyButtonState.DEFAULT]: Copy,
+  [CopyButtonState.SUCCESS]: Check,
   [CopyButtonState.FAILURE]: FailureIcon
 }
 

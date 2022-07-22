@@ -1295,6 +1295,99 @@ const data: Row[] = [
         timestamp: '2020-12-29T15:27:02'
       },
       {
+        displayColor: colorsList[5],
+        id: '489fd8bdaa709f7330aac342e051a9431c625481',
+        label: '489fd8b',
+        error:
+          "unable to read: 'params.yaml', YAML file structure is corrupted",
+        selected: true
+      },
+      {
+        deps: {
+          [join('data', 'data.xml')]: valueWithNoChanges(
+            '22a1a2931c8370d3aeedd7183606fd7f'
+          ),
+          [join('src', 'prepare.py')]: valueWithNoChanges(
+            'f09ea0c15980b43010257ccb9f0055e2'
+          ),
+          [join('data', 'prepared')]: valueWithNoChanges(
+            '153aad06d376b6595932470e459ef42a.dir'
+          ),
+          [join('src', 'featurization.py')]: valueWithNoChanges(
+            'e0265fc22f056a4b86d85c3056bc2894'
+          ),
+          [join('data', 'features')]: valueWithNoChanges(
+            'f35d4cc2c552ac959ae602162b8543f3.dir'
+          ),
+          [join('src', 'train.py')]: valueWithNoChanges(
+            'c3961d777cfbd7727f9fde4851896006'
+          ),
+          'model.pkl': valueWithNoChanges('46865edbf3d62fc5c039dd9d2b0567a4'),
+          [join('src', 'evaluate.py')]: valueWithNoChanges(
+            '44e714021a65edf881b1716e791d7f59'
+          )
+        },
+        displayColor: colorsList[6],
+        displayNameOrParent: '[exp-f13bca]',
+        executor: null,
+        id: 'exp-f13bca',
+        error:
+          "unable to read: 'summary.json', JSON file structure is corrupted",
+        label: 'f0f9186',
+        logicalGroupName: '[exp-f13bca]',
+        name: 'exp-f13bca',
+        outs: {
+          [join('data', 'prepared')]: {
+            hash: '153aad06d376b6595932470e459ef42a.dir',
+            size: 8437363,
+            nfiles: 2,
+            use_cache: true,
+            is_data_source: false
+          },
+          [join('data', 'features')]: {
+            hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
+            size: 2232588,
+            nfiles: 2,
+            use_cache: true,
+            is_data_source: false
+          },
+          'model.pkl': {
+            hash: '46865edbf3d62fc5c039dd9d2b0567a4',
+            size: 1763725,
+            nfiles: null,
+            use_cache: true,
+            is_data_source: false
+          },
+          [join('data', 'data.xml')]: {
+            hash: '22a1a2931c8370d3aeedd7183606fd7f',
+            size: 14445097,
+            nfiles: null,
+            use_cache: true,
+            is_data_source: true
+          }
+        },
+        metrics: {},
+        params: {
+          'params.yaml': {
+            code_names: [0, 1],
+            epochs: 5,
+            learning_rate: 2.1e-7,
+            dvc_logs_dir: 'dvc_logs',
+            log_file: 'logs.csv',
+            dropout: 0.124,
+            process: { threshold: 0.85 }
+          },
+          [join('nested', 'params.yaml')]: {
+            test: true
+          }
+        },
+        queued: false,
+        running: false,
+        selected: true,
+        sha: 'f0f918662b4f8c47819ca154a23029bf9b47d4f3',
+        timestamp: '2020-12-29T15:26:36'
+      },
+      {
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'

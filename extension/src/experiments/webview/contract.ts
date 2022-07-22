@@ -16,19 +16,20 @@ export interface DepColumns {
 }
 
 export interface Experiment extends BaseExperimentFields {
+  deps?: DepColumns
+  displayColor?: string
+  displayNameOrParent?: string
+  error?: string
   id: string
   label: string
-  displayNameOrParent?: string
   logicalGroupName?: string
-  params?: MetricOrParamColumns
   metrics?: MetricOrParamColumns
-  deps?: DepColumns
-  outs?: MetricOrParamColumns
-  displayColor?: string
-  selected?: boolean
-  starred?: boolean
   mutable?: boolean
+  outs?: MetricOrParamColumns
+  params?: MetricOrParamColumns
+  selected?: boolean
   sha?: string
+  starred?: boolean
 }
 
 export interface Row extends Experiment {

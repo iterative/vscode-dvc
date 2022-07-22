@@ -1,12 +1,12 @@
 import React from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import { ErrorTooltip } from './Errors'
 import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
-import ClockIcon from '../../../shared/components/icons/Clock'
 import { clickAndEnterProps } from '../../../util/props'
-import { StarFull, StarEmpty } from '../../../shared/components/icons'
+import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
 
@@ -136,7 +136,7 @@ export const FirstCell: React.FC<
 > = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
   const { row, isPlaceholder } = cell
   const {
-    original: { queued }
+    original: { error, queued }
   } = row
 
   const {
@@ -169,15 +169,17 @@ export const FirstCell: React.FC<
               plotSelections
             )} selected for plots.`}
           />
-          {queued && <ClockIcon />}
+          {queued && <Clock />}
         </span>
         {isPlaceholder ? null : (
-          <div
-            className={styles.cellContents}
-            {...clickAndEnterProps(toggleExperiment)}
-          >
-            {cell.render('Cell')}
-          </div>
+          <ErrorTooltip error={error}>
+            <div
+              className={cx(styles.cellContents, error && styles.error)}
+              {...clickAndEnterProps(toggleExperiment)}
+            >
+              {cell.render('Cell')}
+            </div>
+          </ErrorTooltip>
         )}
       </div>
     </div>
@@ -186,6 +188,7 @@ export const FirstCell: React.FC<
 
 export const CellWrapper: React.FC<
   CellProp & {
+    error?: string
     changes?: string[]
     cellId: string
     children?: React.ReactNode
