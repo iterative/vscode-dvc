@@ -1,5 +1,5 @@
 import React, { DragEvent, useContext } from 'react'
-import { DropTargetInfo, makeTarget } from './DragDropContainer'
+import { makeTarget } from './DragDropContainer'
 import { DragDropContext, DragDropContextValue } from './DragDropContext'
 
 export type OnDrop = (draggedId: string, draggedOverId: string) => void
@@ -10,7 +10,7 @@ export interface DraggableProps {
   id: string
   group: string
   disabled: boolean
-  dropTarget: DropTargetInfo
+  dropTarget: JSX.Element
   children: JSX.Element
   onDrop?: OnDrop
   onDragStart?: OnDragStart

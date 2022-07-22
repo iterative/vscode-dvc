@@ -2,11 +2,13 @@ import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useState } from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
+import { RootState } from '../../store'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -21,6 +23,9 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   nbColumns,
   pinnedColumn
 }) => {
+  const draggedId = useSelector(
+    (state: RootState) => state.dragAndDrop.draggedRef?.itemId
+  )
   const [isShown, setIsShown] = useState(true)
 
   const toggleIsShownState = () => setIsShown(!isShown)
@@ -46,7 +51,8 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
               key={path + plot.revision}
               className={cx({
                 [styles.pinnedColumnCell]: isPinned,
-                [styles.missing]: isShown && missing
+                [styles.missing]: isShown && missing,
+                [styles.draggedColumn]: draggedId === plot.revision
               })}
             >
               <div

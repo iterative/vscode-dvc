@@ -1,16 +1,19 @@
 /**
  * @jest-environment jsdom
  */
+import { configureStore } from '@reduxjs/toolkit'
 import { join } from 'dvc/src/test/util/path'
 import React from 'react'
 import { render, cleanup, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import { Provider } from 'react-redux'
 import {
   ComparisonTableRow,
   ComparisonTableRowProps
 } from './ComparisonTableRow'
 import styles from '../styles.module.scss'
+import { storeReducers } from '../../store'
 
 jest.mock('../../../shared/api')
 
@@ -32,9 +35,15 @@ describe('ComparisonTableRow', () => {
 
   const renderRow = (props = basicProps) =>
     render(
-      <table>
-        <ComparisonTableRow {...props} />
-      </table>
+      <Provider
+        store={configureStore({
+          reducer: storeReducers
+        })}
+      >
+        <table>
+          <ComparisonTableRow {...props} />
+        </table>
+      </Provider>
     )
 
   it('should render a row toggler', () => {
