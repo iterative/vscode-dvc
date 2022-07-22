@@ -23,6 +23,7 @@ import {
 } from '../../../test/sort'
 import { dragAndDrop } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
+import { getParentElement } from '../../../test/nodes'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
@@ -273,9 +274,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('B'),
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText('C').parentElement?.parentElement ||
-          screen.getByText('C'),
+        getParentElement(screen.getByText('C'), 2),
         DragEnterDirection.AUTO
       )
 
@@ -283,9 +282,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('A'),
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText('B').parentElement?.parentElement ||
-          screen.getByText('B'),
+        getParentElement(screen.getByText('B'), 2),
         DragEnterDirection.AUTO
       )
 
@@ -374,9 +371,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('process'),
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText('loss').parentElement?.parentElement ||
-          screen.getByText('loss'),
+        getParentElement(screen.getByText('loss'), 2),
         DragEnterDirection.AUTO
       )
 
@@ -388,9 +383,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('summary.json'),
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText('test').parentElement?.parentElement ||
-          screen.getByText('test'),
+        getParentElement(screen.getByText('test'), 2),
         DragEnterDirection.AUTO
       )
 
