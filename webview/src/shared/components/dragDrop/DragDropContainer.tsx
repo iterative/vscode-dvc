@@ -4,7 +4,8 @@ import React, {
   useEffect,
   useState,
   useRef,
-  DragEventHandler
+  DragEventHandler,
+  CSSProperties
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DragEnterDirection, getDragEnterDirection } from './util'
@@ -13,6 +14,8 @@ import styles from './styles.module.scss'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 import { Any } from '../../../util/objects'
 import { RootState } from '../../../plots/store'
+import { getStyleProperty } from '../../../util/styles'
+import { idToNode } from '../../../util/helpers'
 
 const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
   if (direction === DragEnterDirection.RIGHT) {
@@ -69,6 +72,7 @@ interface DragDropContainerProps {
     }
   }
   shouldShowOnDrag?: boolean
+  ghostElemStyle?: CSSProperties
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -80,7 +84,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   onDrop,
   dropTarget,
   wrapperComponent,
-  shouldShowOnDrag
+  shouldShowOnDrag,
+  ghostElemStyle
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
@@ -103,6 +108,25 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   useEffect(() => {
     cleanup()
   }, [order])
+
+  const createGhostStyle = (e: DragEvent<HTMLElement>) => {
+    if (ghostElemStyle) {
+      for (const [rule, value] of Object.entries(ghostElemStyle)) {
+        const prop = getStyleProperty(rule)
+        e.currentTarget.style[prop] = value
+      }
+    }
+  }
+
+  const resetDraggedStyle = (id: string) => {
+    const elem = idToNode(id)
+    if (elem && ghostElemStyle) {
+      for (const [rule] of Object.entries(ghostElemStyle)) {
+        const prop = getStyleProperty(rule)
+        elem.style[prop] = ''
+      }
+    }
+  }
 
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
@@ -128,9 +152,12 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         itemIndex
       })
     )
+
+    createGhostStyle(e)
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId(id)
       setDraggedOverId(order[toIdx])
+      resetDraggedStyle(id)
     }, 0)
   }
 

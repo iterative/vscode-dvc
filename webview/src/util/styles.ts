@@ -9,7 +9,8 @@ export const withScale = (scale: number) =>
 export enum ThemeProperty {
   BACKGROUND_COLOR = '--vscode-editor-background',
   FOREGROUND_COLOR = '--vscode-editor-foreground',
-  MENU_BACKGROUND = '--vscode-menu-background'
+  MENU_BACKGROUND = '--vscode-menu-background',
+  ACCENT_COLOR = '--button-primary-background'
 }
 
 export const getThemeValue = (property: ThemeProperty) =>
@@ -21,3 +22,6 @@ export const alphaToHex = (color: string, alpha: number): string => {
     .toString(16)
     .slice(-2)}`
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getStyleProperty = (propAsString: string) => propAsString as any
