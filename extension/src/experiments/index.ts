@@ -16,7 +16,7 @@ import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
-import { DecorationProvider } from './model/filterBy/decorationProvider'
+import { DecorationProvider } from './model/decorationProvider'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
@@ -425,7 +425,8 @@ export class Experiments extends BaseRepository<TableData> {
   private notifyChanged(data?: ExperimentsOutput) {
     this.decorationProvider.setState(
       this.experiments.getLabels(),
-      this.experiments.getLabelsToDecorate()
+      this.experiments.getLabelsToDecorate(),
+      this.experiments.getErrors()
     )
     this.experimentsChanged.fire(data)
     this.notifyColumnsChanged()

@@ -95,7 +95,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
               )
             })
             .map(experiment =>
-              experiment.queued
+              experiment.queued || experiment.error
                 ? experiment
                 : {
                     ...experiment,

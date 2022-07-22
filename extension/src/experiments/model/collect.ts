@@ -1,4 +1,9 @@
-import { ThemeIcon, TreeItemCollapsibleState, Uri } from 'vscode'
+import {
+  MarkdownString,
+  ThemeIcon,
+  TreeItemCollapsibleState,
+  Uri
+} from 'vscode'
 import omit from 'lodash.omit'
 import { ExperimentType } from '.'
 import { ExperimentsAccumulator } from './accumulator'
@@ -29,6 +34,7 @@ export type ExperimentItem = {
   collapsibleState: TreeItemCollapsibleState
   type: ExperimentType
   iconPath: ThemeIcon | Uri | Resource
+  tooltip: MarkdownString | undefined
 }
 
 type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
@@ -40,8 +46,12 @@ export const isCheckpoint = (
 
 const getExperimentId = (
   sha: string,
-  experimentsFields: ExperimentFields
+  experimentsFields?: ExperimentFields
 ): string => {
+  if (!experimentsFields) {
+    return sha
+  }
+
   const { name, checkpoint_tip } = experimentsFields
 
   if (isCheckpoint(checkpoint_tip, sha)) {
@@ -115,7 +125,10 @@ const transformColumns = (
   experimentFields: ExperimentFields,
   branch?: Experiment
 ) => {
-  const { metrics, params, deps } = extractColumns(experimentFields, branch)
+  const { error, metrics, params, deps } = extractColumns(
+    experimentFields,
+    branch
+  )
 
   if (metrics) {
     experiment.metrics = metrics
@@ -126,21 +139,28 @@ const transformColumns = (
   if (deps) {
     experiment.deps = deps
   }
+  if (error) {
+    experiment.error = error
+  }
 }
 
 const transformExperimentData = (
   id: string,
-  experimentFields: ExperimentFields,
+  experimentFieldsOrError: ExperimentFieldsOrError,
   label: string | undefined,
   sha?: string,
   displayNameOrParent?: string,
   logicalGroupName?: string,
   branch?: Experiment
 ): Experiment => {
+  const data = experimentFieldsOrError.data || {}
+
+  const error = experimentFieldsOrError.error
+
   const experiment = {
     id,
     label,
-    ...omit(experimentFields, Object.values(ColumnType))
+    ...omit(data, Object.values(ColumnType))
   } as Experiment
 
   if (displayNameOrParent) {
@@ -155,7 +175,11 @@ const transformExperimentData = (
     experiment.sha = sha
   }
 
-  transformColumns(experiment, experimentFields, branch)
+  if (error) {
+    experiment.error = error.msg
+  }
+
+  transformColumns(experiment, data, branch)
 
   return experiment
 }
@@ -172,7 +196,8 @@ const transformExperimentOrCheckpointData = (
 } => {
   const experimentFields = experimentData.data
   if (!experimentFields) {
-    return { experiment: undefined }
+    const error = experimentData?.error?.msg
+    return { experiment: { error, id: sha, label: shortenForLabel(sha) } }
   }
 
   const checkpointTipId = getCheckpointTipId(
@@ -186,7 +211,7 @@ const transformExperimentOrCheckpointData = (
     checkpointTipId,
     experiment: transformExperimentData(
       id,
-      experimentFields,
+      experimentData,
       shortenForLabel(sha),
       sha,
       getDisplayNameOrParent(sha, branchSha, experimentsObject),
@@ -254,14 +279,8 @@ const collectFromBranchesObject = (
   for (const [sha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
   )) {
-    const experimentFields = baseline.data
-    if (!experimentFields) {
-      continue
-    }
-
-    const name = experimentFields.name as string
-
-    const branch = transformExperimentData(name, experimentFields, name, sha)
+    const name = baseline.data?.name || sha
+    const branch = transformExperimentData(name, baseline, name, sha)
 
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject, sha, branch)
@@ -278,10 +297,11 @@ export const collectExperiments = (
   const { workspace, ...branchesObject } = data
   const workspaceId = 'workspace'
 
-  const workspaceFields = workspace.baseline.data
-  const workspaceBaseline = workspaceFields
-    ? transformExperimentData(workspaceId, workspaceFields, workspaceId)
-    : undefined
+  const workspaceBaseline = transformExperimentData(
+    workspaceId,
+    workspace.baseline,
+    workspaceId
+  )
 
   const acc = new ExperimentsAccumulator(workspaceBaseline)
 
