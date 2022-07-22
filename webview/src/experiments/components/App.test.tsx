@@ -50,6 +50,7 @@ import {
   selectedRows,
   setTableData
 } from '../../test/experimentsTable'
+import { getParentElement } from '../../test/nodes'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -182,12 +183,7 @@ describe('App', () => {
     const headerB = screen.getByText('B')
     const headerD = screen.getByText('D')
 
-    dragAndDrop(
-      headerB,
-      // eslint-disable-next-line testing-library/no-node-access
-      headerD.parentElement?.parentElement || headerD,
-      DragEnterDirection.AUTO
-    )
+    dragAndDrop(headerB, getParentElement(headerD, 2), DragEnterDirection.AUTO)
 
     await expectHeaders(['A', 'C', 'D', 'B'])
   })
