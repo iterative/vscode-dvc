@@ -1,10 +1,12 @@
 import React from 'react'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { DropTarget } from './DropTarget'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import { RootState } from '../../store'
 
 export type ComparisonTableColumn = Revision
 
@@ -21,6 +23,10 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
+  const draggedId = useSelector(
+    (state: RootState) => state.dragAndDrop.draggedRef?.itemId
+  )
+
   const items = columns.map(({ revision, displayColor, group }) => {
     const isPinned = revision === pinnedColumn
     return (
@@ -28,7 +34,8 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
         key={revision}
         id={revision}
         className={cx(styles.comparisonTableHeader, {
-          [styles.pinnedColumnHeader]: isPinned
+          [styles.pinnedColumnHeader]: isPinned,
+          [styles.draggedColumn]: draggedId === revision
         })}
       >
         <ComparisonTableHeader
