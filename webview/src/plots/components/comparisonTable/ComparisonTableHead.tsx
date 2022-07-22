@@ -60,6 +60,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           items={items}
           group="comparison"
           dropTarget={<DropTarget />}
+          ghostElemClass={styles.ghostElem}
           shouldShowOnDrag
         />
       </tr>
