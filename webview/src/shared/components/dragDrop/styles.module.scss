@@ -1,0 +1,18 @@
+.newBlockWhenShowingOnDrag {
+  position: relative;
+}
+
+.dropTargetWhenShowingOnDrag {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  z-index: 2;
+}
+
+.dropTargetWhenShowingOnDragLeft {
+  left: -2px;
+}
+
+.dropTargetWhenShowingOnDragRight {
+  right: -2px;
+}
