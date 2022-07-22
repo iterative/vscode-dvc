@@ -273,7 +273,9 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('B'),
-        screen.getByText('C'),
+        // eslint-disable-next-line testing-library/no-node-access
+        screen.getByText('C').parentElement?.parentElement ||
+          screen.getByText('C'),
         DragEnterDirection.AUTO
       )
 
@@ -281,7 +283,9 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('A'),
-        screen.getByText('B'),
+        // eslint-disable-next-line testing-library/no-node-access
+        screen.getByText('B').parentElement?.parentElement ||
+          screen.getByText('B'),
         DragEnterDirection.AUTO
       )
 
@@ -370,7 +374,9 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('process'),
-        screen.getByText('loss'),
+        // eslint-disable-next-line testing-library/no-node-access
+        screen.getByText('loss').parentElement?.parentElement ||
+          screen.getByText('loss'),
         DragEnterDirection.AUTO
       )
 
@@ -382,7 +388,9 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('summary.json'),
-        screen.getByText('test'),
+        // eslint-disable-next-line testing-library/no-node-access
+        screen.getByText('test').parentElement?.parentElement ||
+          screen.getByText('test'),
         DragEnterDirection.AUTO
       )
 
