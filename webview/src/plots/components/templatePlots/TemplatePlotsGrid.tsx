@@ -92,10 +92,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       items={items as JSX.Element[]}
       group={groupId}
       onDrop={onDropInSection}
-      dropTarget={{
-        element: <DropTarget />,
-        wrapperTag: 'div'
-      }}
+      dropTarget={<DropTarget />}
       wrapperComponent={
         useVirtualizedGrid
           ? {
