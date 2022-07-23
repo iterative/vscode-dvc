@@ -70,6 +70,20 @@ const noRunningExperiments = {
   }))
 }
 
+const noRunningExperimentsNoCheckpoints = {
+  ...noRunningExperiments,
+  hasCheckpoints: false,
+  rows: rowsFixture.map(row => ({
+    ...row,
+    running: false,
+    subRows: row.subRows?.map(experiment => ({
+      ...experiment,
+      running: false,
+      subRows: []
+    }))
+  }))
+}
+
 export default {
   args: {
     tableData
@@ -121,17 +135,29 @@ WithNoRunningExperiments.args = {
   tableData: noRunningExperiments
 }
 
-export const WithContextMenu = Template.bind({})
-WithContextMenu.args = {
-  tableData: noRunningExperiments
-}
-WithContextMenu.play = async ({ canvasElement }) => {
+const contextMenuPlay = async ({
+  canvasElement
+}: {
+  canvasElement: HTMLElement
+}) => {
   const experiment = await within(canvasElement).findByText('[exp-e7a67]')
   userEvent.click(experiment, {
     bubbles: true,
     button: 2
   })
 }
+
+export const WithContextMenu = Template.bind({})
+WithContextMenu.args = {
+  tableData: noRunningExperiments
+}
+WithContextMenu.play = contextMenuPlay
+
+export const WithContextMenuNoCheckpoints = Template.bind({})
+WithContextMenuNoCheckpoints.args = {
+  tableData: noRunningExperimentsNoCheckpoints
+}
+WithContextMenuNoCheckpoints.play = contextMenuPlay
 
 export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = { tableData: dataTypesTableData }
