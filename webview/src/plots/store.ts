@@ -5,7 +5,7 @@ import templatePlotsReducer from './components/templatePlots/templatePlotsSlice'
 import webviewReducer from './components/webviewSlice'
 import dragAndDropReducer from '../shared/components/dragDrop/dragDropSlice'
 
-export const storeReducers = {
+export const plotsReducers = {
   checkpoint: checkpointPlotsReducer,
   comparison: comparisonTableReducer,
   dragAndDrop: dragAndDropReducer,
@@ -13,9 +13,9 @@ export const storeReducers = {
   webview: webviewReducer
 }
 
-export const store = configureStore({
-  reducer: storeReducers
+export const plotsStore = configureStore({
+  reducer: plotsReducers
 })
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type PlotsState = ReturnType<typeof plotsStore.getState>
+export type PlotsDispatch = typeof plotsStore.dispatch

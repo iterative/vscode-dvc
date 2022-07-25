@@ -1,6 +1,6 @@
 import { act } from 'react-dom/test-utils'
-import { idToNode } from './nodes'
 import * as DragDropUtils from '../shared/components/dragDrop/util'
+import { idToNode } from '../util/helpers'
 
 const testStorage = new Map()
 
