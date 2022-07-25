@@ -7,6 +7,7 @@ import { DropTarget } from './DropTarget'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 import { PlotsState } from '../../store'
+import { getThemeValue, ThemeProperty } from '../../../util/styles'
 
 export type ComparisonTableColumn = Revision
 
@@ -60,6 +61,10 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           items={items}
           group="comparison"
           dropTarget={<DropTarget />}
+          ghostElemStyle={{
+            backgroundColor: getThemeValue(ThemeProperty.ACCENT_COLOR),
+            color: getThemeValue(ThemeProperty.BACKGROUND_COLOR)
+          }}
           shouldShowOnDrag
         />
       </tr>
