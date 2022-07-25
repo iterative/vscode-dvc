@@ -3,7 +3,13 @@
  */
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import '@testing-library/jest-dom/extend-expect'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  queries,
+  render,
+  screen
+} from '@testing-library/react'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
@@ -23,7 +29,7 @@ import {
 } from '../../../test/sort'
 import { dragAndDrop } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
-import { getParentElement } from '../../../test/nodes'
+import { customQueries } from '../../../test/queries'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
@@ -122,7 +128,9 @@ describe('Table', () => {
   const renderExperimentsTable = (
     data: TableData = sortingTableDataFixture
   ) => {
-    return render(<ExperimentsTable tableData={data} />)
+    return render(<ExperimentsTable tableData={data} />, {
+      queries: { ...queries, ...customQueries }
+    })
   }
 
   beforeAll(() => {
@@ -268,13 +276,13 @@ describe('Table', () => {
 
   describe('Columns order', () => {
     it('should move a column from its current position to its new position', async () => {
-      renderExperimentsTable()
+      const { getDraggableHeaderFromText } = renderExperimentsTable()
 
       await expectHeaders(['A', 'B', 'C'])
 
       dragAndDrop(
         screen.getByText('B'),
-        getParentElement(screen.getByText('C'), 2),
+        getDraggableHeaderFromText('C'),
         DragEnterDirection.AUTO
       )
 
@@ -282,7 +290,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('A'),
-        getParentElement(screen.getByText('B'), 2),
+        getDraggableHeaderFromText('B'),
         DragEnterDirection.AUTO
       )
 
@@ -358,7 +366,9 @@ describe('Table', () => {
     })
 
     it('should move all the columns from a group from their current position to their new position', async () => {
-      renderExperimentsTable({ ...tableDataFixture })
+      const { getDraggableHeaderFromText } = renderExperimentsTable({
+        ...tableDataFixture
+      })
 
       let headers = await getHeaders()
 
@@ -371,7 +381,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('process'),
-        getParentElement(screen.getByText('loss'), 2),
+        getDraggableHeaderFromText('loss'),
         DragEnterDirection.AUTO
       )
 
@@ -383,7 +393,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('summary.json'),
-        getParentElement(screen.getByText('test'), 2),
+        getDraggableHeaderFromText('test'),
         DragEnterDirection.AUTO
       )
 

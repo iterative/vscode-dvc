@@ -50,7 +50,6 @@ import {
   selectedRows,
   setTableData
 } from '../../test/experimentsTable'
-import { getParentElement } from '../../test/nodes'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -165,7 +164,7 @@ describe('App', () => {
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {
-    renderTableWithSortingData()
+    const { getDraggableHeaderFromText } = renderTableWithSortingData()
 
     setTableData({
       ...sortingTableDataFixture,
@@ -181,9 +180,9 @@ describe('App', () => {
     })
 
     const headerB = screen.getByText('B')
-    const headerD = screen.getByText('D')
+    const headerD = getDraggableHeaderFromText('D')
 
-    dragAndDrop(headerB, getParentElement(headerD, 2), DragEnterDirection.AUTO)
+    dragAndDrop(headerB, headerD, DragEnterDirection.AUTO)
 
     await expectHeaders(['A', 'C', 'D', 'B'])
   })
