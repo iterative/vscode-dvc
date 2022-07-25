@@ -15,7 +15,7 @@ import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonT
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
 import { updateSelectedRevisions } from '../plots/components/webviewSlice'
-import { storeReducers } from '../plots/store'
+import { plotsReducers } from '../plots/store'
 
 const MockedState: React.FC<{
   data: PlotsComparisonData
@@ -37,7 +37,7 @@ export default {
 
 const Template: Story = ({ plots, revisions }) => {
   const store = configureStore({
-    reducer: storeReducers
+    reducer: plotsReducers
   })
   return (
     <Provider store={store}>

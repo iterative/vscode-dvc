@@ -17,6 +17,7 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import React from 'react'
 import { Revision } from 'dvc/src/plots/webview/contract'
+import { act } from 'react-dom/test-utils'
 import { ComparisonTable } from './ComparisonTable'
 import { comparisonTableInitialState } from './comparisonTableSlice'
 import {
@@ -26,8 +27,9 @@ import {
 } from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
-import { storeReducers } from '../../store'
+import { plotsReducers } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
+import { getThemeValue, hexToRGB, ThemeProperty } from '../../../util/styles'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
@@ -70,7 +72,7 @@ describe('ComparisonTable', () => {
                 zoomedInPlot: undefined
               }
             },
-            reducer: storeReducers
+            reducer: plotsReducers
           })}
         >
           <ComparisonTable />
@@ -444,6 +446,34 @@ describe('ComparisonTable', () => {
         DragEnterDirection.RIGHT
       )
       expect(mockPostMessage).toHaveBeenCalled()
+    })
+
+    it('should add and remove the style for the ghost header being dragged', () => {
+      jest.useFakeTimers()
+
+      renderTable()
+
+      const [header] = getHeaders()
+
+      act(() => {
+        header.dispatchEvent(createBubbledEvent('dragstart'))
+      })
+
+      expect(header.style.backgroundColor).toBe(
+        hexToRGB(getThemeValue(ThemeProperty.ACCENT_COLOR))
+      )
+      expect(header.style.color).toBe(
+        hexToRGB(getThemeValue(ThemeProperty.BACKGROUND_COLOR))
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(1)
+      })
+
+      expect(header.style.backgroundColor).toBe('')
+      expect(header.style.color).toBe('')
+
+      jest.useRealTimers()
     })
   })
 })
