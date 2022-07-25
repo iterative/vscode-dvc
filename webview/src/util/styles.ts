@@ -25,3 +25,9 @@ export const alphaToHex = (color: string, alpha: number): string => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getStyleProperty = (propAsString: string) => propAsString as any
+
+export const hexToRGB = (hex: string) =>
+  `rgb(${Number.parseInt(hex.slice(1, 3), 16)}, ${Number.parseInt(
+    hex.slice(4, 6),
+    16
+  )}, ${Number.parseInt(hex.slice(-2), 16)})`
