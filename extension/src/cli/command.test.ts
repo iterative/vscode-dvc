@@ -15,9 +15,9 @@ describe('getCommandString', () => {
 
   it('should give the correct command string given an isolated python env is in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv')
-    const commandString = getCommandString(pythonBinPath, 'dvc', Command.DIFF)
+    const commandString = getCommandString(pythonBinPath, 'dvc', Command.PULL)
     expect(commandString).toStrictEqual(
-      `${join(pythonBinPath, 'python')} dvc diff`
+      `${join(pythonBinPath, 'python')} dvc pull`
     )
   })
 
