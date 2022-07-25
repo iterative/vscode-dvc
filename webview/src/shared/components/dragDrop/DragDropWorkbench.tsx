@@ -1,6 +1,8 @@
-import React, { DragEvent, useContext } from 'react'
+import React, { DragEvent } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { makeTarget } from './DragDropContainer'
-import { DragDropContext, DragDropContextValue } from './DragDropContext'
+import { setGroup } from './dragDropSlice'
+import { ExperimentsState } from '../../../experiments/store'
 
 export type OnDrop = (draggedId: string, draggedOverId: string) => void
 export type OnDragStart = (draggedId: string) => void
@@ -26,21 +28,33 @@ export const Draggable: React.FC<DraggableProps> = ({
   onDrop,
   onDragOver,
   onDragStart
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
-  const { groupStates, setGroupState } =
-    useContext<DragDropContextValue>(DragDropContext)
+  const groupStates = useSelector(
+    (state: ExperimentsState) => state.dragAndDrop.groups
+  )
+  const dispatch = useDispatch()
 
-  const groupState = groupStates?.[group] || {}
+  const groupState = groupStates[group] || {}
   const { draggedOverId, draggedId } = groupState
+
+  const modifyGroup = (id: string) => {
+    dispatch(
+      setGroup({
+        group: {
+          ...groupState,
+          draggedId: id
+        },
+        id: group
+      })
+    )
+  }
 
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
-    setGroupState?.(group, {
-      ...groupState,
-      draggedId: id
-    })
+    modifyGroup(id)
     onDragStart?.(id)
   }
 
@@ -52,16 +66,14 @@ export const Draggable: React.FC<DraggableProps> = ({
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    const { id } = e.currentTarget
-    !disabled &&
-      draggedId &&
-      id !== draggedId &&
-      id !== draggedOverId &&
-      (setGroupState?.(group, {
-        ...groupState,
-        draggedOverId: id
-      }) ||
-        onDragOver?.(draggedId, id))
+    if (!disabled && draggedId) {
+      const { id } = e.currentTarget
+
+      if (id !== draggedId && id !== draggedOverId) {
+        modifyGroup(id)
+        onDragOver?.(draggedId, id)
+      }
+    }
   }
 
   const handleDragOver = (e: DragEvent<HTMLElement>) => {
@@ -69,11 +81,16 @@ export const Draggable: React.FC<DraggableProps> = ({
   }
 
   const handleDragEnd = () => {
-    setGroupState?.(group, {
-      ...groupState,
-      draggedId: undefined,
-      draggedOverId: undefined
-    })
+    dispatch(
+      setGroup({
+        group: {
+          ...groupState,
+          draggedId: undefined,
+          draggedOverId: undefined
+        },
+        id: group
+      })
+    )
   }
 
   const item = (

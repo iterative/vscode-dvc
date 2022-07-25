@@ -3,7 +3,9 @@
  */
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import '@testing-library/jest-dom/extend-expect'
+import { configureStore } from '@reduxjs/toolkit'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { Provider } from 'react-redux'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
@@ -14,7 +16,6 @@ import { Table } from './Table'
 import styles from './styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnOrder'
-
 import { vsCodeApi } from '../../../shared/api'
 import {
   expectHeaders,
@@ -23,6 +24,7 @@ import {
 } from '../../../test/sort'
 import { dragAndDrop } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
+import { experimentsReducers } from '../../store'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
@@ -116,12 +118,20 @@ describe('Table', () => {
   }
   const renderTable = (testData = {}, tableInstance = instance) => {
     const tableData = { ...dummyTableData, ...testData }
-    return render(<Table instance={tableInstance} tableData={tableData} />)
+    return render(
+      <Provider store={configureStore({ reducer: experimentsReducers })}>
+        <Table instance={tableInstance} tableData={tableData} />
+      </Provider>
+    )
   }
   const renderExperimentsTable = (
     data: TableData = sortingTableDataFixture
   ) => {
-    return render(<ExperimentsTable tableData={data} />)
+    return render(
+      <Provider store={configureStore({ reducer: experimentsReducers })}>
+        <ExperimentsTable tableData={data} />
+      </Provider>
+    )
   }
 
   beforeAll(() => {
@@ -330,7 +340,11 @@ describe('Table', () => {
         ...sortingTableDataFixture,
         columnWidths
       }
-      render(<ExperimentsTable tableData={tableDataWithColumnSetting} />)
+      render(
+        <Provider store={configureStore({ reducer: experimentsReducers })}>
+          <ExperimentsTable tableData={tableDataWithColumnSetting} />
+        </Provider>
+      )
       const [experimentColumnResizeHandle] = await screen.findAllByRole(
         'separator'
       )

@@ -1,11 +1,14 @@
+import { configureStore } from '@reduxjs/toolkit'
 import { fireEvent, render, within, screen } from '@testing-library/react'
 import React from 'react'
+import { Provider } from 'react-redux'
 import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { tableData as sortingTableDataFixture } from './sort'
 import { getRow } from './queries'
 import { App } from '../experiments/components/App'
+import { experimentsReducers } from '../experiments/store'
 
 export const setTableData = (data = tableDataFixture) => {
   fireEvent(
@@ -20,7 +23,11 @@ export const setTableData = (data = tableDataFixture) => {
 }
 
 export const renderTable = (data = tableDataFixture) => {
-  render(<App />)
+  render(
+    <Provider store={configureStore({ reducer: experimentsReducers })}>
+      <App />
+    </Provider>
+  )
   setTableData(data)
 }
 
