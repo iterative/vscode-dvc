@@ -16,7 +16,7 @@ import { DropTarget } from '../DropTarget'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
-import { RootState } from '../../store'
+import { PlotsState } from '../../store'
 
 interface CheckpointPlotsProps {
   plotsIds: string[]
@@ -28,7 +28,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   colors
 }) => {
   const [order, setOrder] = useState(plotsIds)
-  const { size } = useSelector((state: RootState) => state.checkpoint)
+  const { size } = useSelector((state: PlotsState) => state.checkpoint)
   const nbItemsPerRow = useNbItemsPerRow(size)
 
   useEffect(() => {

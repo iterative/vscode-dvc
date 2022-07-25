@@ -8,7 +8,7 @@ import { Icon } from '../../../shared/components/Icon'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
-import { RootState } from '../../store'
+import { PlotsState } from '../../store'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -24,7 +24,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   pinnedColumn
 }) => {
   const draggedId = useSelector(
-    (state: RootState) => state.dragAndDrop.draggedRef?.itemId
+    (state: PlotsState) => state.dragAndDrop.draggedRef?.itemId
   )
   const [isShown, setIsShown] = useState(true)
 

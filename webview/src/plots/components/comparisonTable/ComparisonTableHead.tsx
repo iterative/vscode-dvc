@@ -6,7 +6,7 @@ import styles from './styles.module.scss'
 import { DropTarget } from './DropTarget'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
-import { RootState } from '../../store'
+import { PlotsState } from '../../store'
 
 export type ComparisonTableColumn = Revision
 
@@ -24,7 +24,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setPinnedColumn
 }) => {
   const draggedId = useSelector(
-    (state: RootState) => state.dragAndDrop.draggedRef?.itemId
+    (state: PlotsState) => state.dragAndDrop.draggedRef?.itemId
   )
 
   const items = columns.map(({ revision, displayColor, group }) => {
