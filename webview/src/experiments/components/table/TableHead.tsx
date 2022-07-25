@@ -17,7 +17,6 @@ import {
   OnDragStart
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
 import { getSelectedForPlotsCount } from '../../util/rows'
-import { isFirstInArr } from '../../util/isFirstInArr'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -102,6 +101,8 @@ export const TableHead = ({
 
   const selectedForPlotsCount = getSelectedForPlotsCount(rows)
 
+  const firstExpColumnCellId = headerGroups[0].headers[0].id
+
   return (
     <div
       className={cx(styles.thead, needsShadow && styles.headWithShadow)}
@@ -113,7 +114,7 @@ export const TableHead = ({
         filters={filters}
         filteredCounts={filteredCounts}
       />
-      {headerGroups.map((headerGroup, ind) => (
+      {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
         <MergedHeaderGroups
           {...headerGroup.getHeaderGroupProps()}
@@ -126,7 +127,7 @@ export const TableHead = ({
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
           root={root}
-          isFirst={isFirstInArr(ind)}
+          firstExpColumnCellId={firstExpColumnCellId}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />
       ))}
