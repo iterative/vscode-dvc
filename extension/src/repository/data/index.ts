@@ -1,14 +1,8 @@
 import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
-import { isAnyDvcYaml } from '../../fileSystem'
-import {
-  DOT_GIT,
-  getAllUntracked,
-  getGitRepositoryRoot,
-  getHasChanges
-} from '../../git'
+import { DataStatusOutput } from '../../cli/reader'
+import { DOT_GIT, getGitRepositoryRoot, getHasChanges } from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -20,13 +14,11 @@ import {
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
+import { Flag } from '../../cli/constants'
 
 export type Data = {
-  diffFromHead: DiffOutput
-  diffFromCache: StatusOutput
-  untracked: Set<string>
+  dataStatus: DataStatusOutput
   hasGitChanges: boolean
-  tracked?: ListOutput[]
 }
 
 export const isExcluded = (dvcRoot: string, path: string) =>
@@ -60,11 +52,10 @@ export class RepositoryData extends DeferredDisposable {
 
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager(
-        updatesPaused,
-        { name: 'partialUpdate', process: () => this.partialUpdate() },
-        { name: 'fullUpdate', process: () => this.fullUpdate() }
-      )
+      new ProcessManager(updatesPaused, {
+        name: 'update',
+        process: () => this.update()
+      })
     )
 
     this.internalCommands = internalCommands
@@ -74,16 +65,9 @@ export class RepositoryData extends DeferredDisposable {
     this.initialize()
   }
 
-  public async managedUpdate(path?: string) {
+  public async managedUpdate() {
     await this.isReady()
-    if (
-      isAnyDvcYaml(path) ||
-      this.processManager.isOngoingOrQueued('fullUpdate')
-    ) {
-      return this.processManager.run('fullUpdate')
-    }
-
-    return this.processManager.run('partialUpdate')
+    return this.processManager.run('update')
   }
 
   private initialize() {
@@ -94,56 +78,23 @@ export class RepositoryData extends DeferredDisposable {
         this.deferred.resolve()
       })
     )
-    return this.fullUpdate()
+    return this.update()
   }
 
-  private async fullUpdate() {
-    const tracked = await this.internalCommands.executeCommand<ListOutput[]>(
-      AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
-      this.dvcRoot
-    )
-
-    const { diffFromHead, diffFromCache, hasGitChanges, untracked } =
-      await this.getPartialUpdateData()
-
-    return this.notifyChanged({
-      diffFromCache,
-      diffFromHead,
-      hasGitChanges,
-      tracked,
-      untracked
-    })
-  }
-
-  private async partialUpdate() {
-    const { diffFromHead, diffFromCache, untracked, hasGitChanges } =
-      await this.getPartialUpdateData()
-    return this.notifyChanged({
-      diffFromCache,
-      diffFromHead,
-      hasGitChanges,
-      untracked
-    })
-  }
-
-  private async getPartialUpdateData() {
-    const diffFromCache =
-      await this.internalCommands.executeCommand<StatusOutput>(
-        AvailableCommands.STATUS,
-        this.dvcRoot
+  private async update() {
+    const dataStatus =
+      await this.internalCommands.executeCommand<DataStatusOutput>(
+        AvailableCommands.DATA_STATUS,
+        this.dvcRoot,
+        Flag.UNCHANGED
       )
 
-    const diffFromHead = await this.internalCommands.executeCommand<DiffOutput>(
-      AvailableCommands.DIFF,
-      this.dvcRoot
-    )
+    const hasGitChanges = await getHasChanges(this.dvcRoot)
 
-    const [untracked, hasGitChanges] = await Promise.all([
-      getAllUntracked(this.dvcRoot),
-      getHasChanges(this.dvcRoot)
-    ])
-
-    return { diffFromCache, diffFromHead, hasGitChanges, untracked }
+    return this.notifyChanged({
+      dataStatus,
+      hasGitChanges
+    })
   }
 
   private notifyChanged(data: Data) {
@@ -160,7 +111,7 @@ export class RepositoryData extends DeferredDisposable {
           if (isExcluded(this.dvcRoot, path)) {
             return
           }
-          return this.managedUpdate(path)
+          return this.managedUpdate()
         }
       )
     )
@@ -172,7 +123,7 @@ export class RepositoryData extends DeferredDisposable {
           if (!path) {
             return
           }
-          return this.managedUpdate(path)
+          return this.managedUpdate()
         }
       )
     )

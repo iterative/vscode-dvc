@@ -1,37 +1,20 @@
-import { dirname, join, resolve } from 'path'
+import { Uri } from 'vscode'
 import {
-  collectDeleted,
-  collectModifiedAgainstHead,
-  collectTrackedNonLeafs,
-  collectTrackedOuts,
+  collectDecorationState,
+  collectTracked,
   collectTree,
   PathItem
 } from './collect'
 import {
   SourceControlManagementModel,
-  SourceControlManagementState
+  SourceControlManagementState,
+  Status
 } from '../sourceControlManagement'
 import { DecorationModel, DecorationState } from '../decorationProvider'
-import {
-  ChangedType,
-  DiffOutput,
-  ExperimentsOutput,
-  ListOutput,
-  PathOutput,
-  PathStatus,
-  StageOrFileStatuses,
-  Status,
-  StatusesOrAlwaysChanged,
-  StatusOutput
-} from '../../cli/reader'
+import { DataStatusOutput } from '../../cli/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'
-
-type ModifiedAndNotInCache = {
-  [Status.MODIFIED]: Set<string>
-  [Status.NOT_IN_CACHE]: Set<string>
-}
 
 export class RepositoryModel
   extends Disposable
@@ -39,21 +22,21 @@ export class RepositoryModel
 {
   private readonly dvcRoot: string
 
-  private state = {
-    added: new Set<string>(),
-    deleted: new Set<string>(),
-    gitModified: new Set<string>(),
-    hasGitChanges: false,
-    modified: new Set<string>(),
-    notInCache: new Set<string>(),
-    renamed: new Set<string>(),
-    trackedLeafs: new Set<string>(),
-    trackedNonLeafs: new Set<string>(),
-    untracked: new Set<string>()
-  }
+  private hasGitChanges = false
+  private committedAdded = new Set<string>()
+  private committedDeleted = new Set<string>()
+  private committedModified = new Set<string>()
+  private committedRenamed = new Set<string>()
+  private notInCache = new Set<string>()
+  private uncommittedAdded = new Set<string>()
+  private uncommittedDeleted = new Set<string>()
+  private uncommittedModified = new Set<string>()
+  private uncommittedRenamed = new Set<string>()
+  private untracked = new Set<string>()
+
+  private tracked = new Set<string>()
 
   private tree = new Map<string, PathItem[]>()
-  private relTrackedOuts = new Set<string>()
 
   constructor(dvcRoot: string) {
     super()
@@ -63,31 +46,56 @@ export class RepositoryModel
 
   public getDecorationState(): DecorationState {
     return {
-      added: this.state.added,
-      deleted: this.state.deleted,
-      gitModified: this.state.gitModified,
-      modified: this.state.modified,
-      notInCache: this.state.notInCache,
-      renamed: this.state.renamed,
-      tracked: this.getTracked()
+      committedAdded: this.committedAdded,
+      committedDeleted: this.committedDeleted,
+      committedModified: this.committedModified,
+      committedRenamed: this.committedRenamed,
+      notInCache: this.notInCache,
+      tracked: this.getTracked(),
+      uncommittedAdded: this.uncommittedAdded,
+      uncommittedDeleted: this.uncommittedDeleted,
+      uncommittedModified: this.uncommittedModified,
+      uncommittedRenamed: this.uncommittedRenamed
     }
   }
 
   public getSourceControlManagementState(): SourceControlManagementState {
-    const acc = []
-    for (const relTrackedOut of this.relTrackedOuts) {
-      acc.push(join(this.dvcRoot, relTrackedOut))
-    }
-
     return {
-      added: this.state.added,
-      deleted: this.state.deleted,
-      gitModified: this.state.gitModified,
-      hasRemote: new Set([...acc, ...this.state.trackedLeafs]),
-      modified: this.state.modified,
-      notInCache: this.state.notInCache,
-      renamed: this.state.renamed,
-      untracked: this.state.untracked
+      committed: [
+        ...this.getResourceStates(this.committedAdded, Status.COMMITTED_ADDED),
+        ...this.getResourceStates(
+          this.committedDeleted,
+          Status.COMMITTED_DELETED
+        ),
+        ...this.getResourceStates(
+          this.committedModified,
+          Status.COMMITTED_MODIFIED
+        ),
+        ...this.getResourceStates(
+          this.committedRenamed,
+          Status.COMMITTED_RENAMED
+        )
+      ],
+      notInCache: this.getResourceStates(this.notInCache, Status.NOT_IN_CACHE),
+      uncommitted: [
+        ...this.getResourceStates(
+          this.uncommittedAdded,
+          Status.UNCOMMITTED_ADDED
+        ),
+        ...this.getResourceStates(
+          this.uncommittedDeleted,
+          Status.UNCOMMITTED_DELETED
+        ),
+        ...this.getResourceStates(
+          this.uncommittedModified,
+          Status.UNCOMMITTED_MODIFIED
+        ),
+        ...this.getResourceStates(
+          this.uncommittedRenamed,
+          Status.UNCOMMITTED_RENAMED
+        )
+      ],
+      untracked: this.getResourceStates(this.untracked, Status.UNTRACKED)
     }
   }
 
@@ -95,219 +103,84 @@ export class RepositoryModel
     return this.tree.get(path) || []
   }
 
-  public setState({
-    diffFromCache,
-    diffFromHead,
-    hasGitChanges,
-    tracked,
-    untracked
-  }: Data) {
-    if (tracked) {
-      this.updateTracked(tracked)
-    }
-    this.updateStatus(diffFromHead, diffFromCache)
+  public setState({ dataStatus, hasGitChanges }: Data) {
+    this.collectTracked(dataStatus)
 
-    this.state.untracked = untracked
-    this.state.hasGitChanges = hasGitChanges
+    this.collectState(dataStatus)
+
+    this.hasGitChanges = hasGitChanges
   }
 
   public hasChanges(): boolean {
     return !!(
-      this.state.added.size > 0 ||
-      this.state.deleted.size > 0 ||
-      this.state.gitModified.size > 0 ||
-      this.state.modified.size > 0 ||
-      this.state.renamed.size > 0 ||
-      this.state.untracked.size > 0 ||
-      this.state.hasGitChanges
+      this.committedAdded.size > 0 ||
+      this.committedDeleted.size > 0 ||
+      this.committedModified.size > 0 ||
+      this.committedRenamed.size > 0 ||
+      this.notInCache.size > 0 ||
+      this.uncommittedAdded.size > 0 ||
+      this.uncommittedDeleted.size > 0 ||
+      this.uncommittedModified.size > 0 ||
+      this.uncommittedRenamed.size > 0 ||
+      this.untracked.size > 0 ||
+      this.hasGitChanges
     )
   }
 
-  public transformAndSetExperiments(data: ExperimentsOutput) {
-    const relTrackedOuts = collectTrackedOuts(data)
+  private collectTracked(dataStatus: DataStatusOutput): void {
+    const tracked = collectTracked(this.dvcRoot, dataStatus)
 
-    if (!sameContents([...relTrackedOuts], [...this.relTrackedOuts])) {
-      this.relTrackedOuts = relTrackedOuts
-      this.collectTree()
+    if (!sameContents([...tracked], [...this.getTracked()])) {
+      this.tracked = tracked
+      this.tree = collectTree(this.dvcRoot, this.tracked)
     }
   }
 
-  private getAbsolutePath(path: string): string {
-    return resolve(this.dvcRoot, path)
-  }
-
-  private getChangedOutsStatuses(
-    fileOrStage: StatusesOrAlwaysChanged[]
-  ): PathStatus[] {
-    return fileOrStage
-      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
-      .filter(Boolean) as PathStatus[]
-  }
-
-  private collectStatuses(acc: ModifiedAndNotInCache, entry: PathStatus) {
-    Object.entries(entry)
-      .filter(([, status]) =>
-        [Status.NOT_IN_CACHE, Status.MODIFIED].includes(status)
-      )
-      .map(([relativePath, status]) => {
-        const absolutePath = this.getAbsolutePath(relativePath)
-
-        if (!this.isTracked(absolutePath)) {
-          return
-        }
-
-        acc[status as Status.NOT_IN_CACHE | Status.MODIFIED].add(absolutePath)
-      })
-  }
-
-  private collectModifiedAndNotInCache(
-    statusOutput: StatusOutput
-  ): ModifiedAndNotInCache {
-    const acc: ModifiedAndNotInCache = {
-      [Status.MODIFIED]: new Set(),
-      [Status.NOT_IN_CACHE]: new Set()
-    }
-
-    for (const entry of Object.values(statusOutput)) {
-      const statuses = this.getChangedOutsStatuses(entry)
-      statuses.map(entry => this.collectStatuses(acc, entry))
-    }
-
-    return acc
-  }
-
-  private mapToTrackedPaths(diff: PathOutput[] = []): string[] {
-    return diff
-      .map(entry => this.getAbsolutePath(entry.path))
-      .filter(path => this.isTracked(path))
-  }
-
-  private getStateFromDiff(diff?: PathOutput[]): Set<string> {
-    return new Set<string>(this.mapToTrackedPaths(diff))
-  }
-
-  private pathInSet = (path: string, set?: Set<string>): boolean =>
-    !this.pathNotInSet(path, set)
-
-  private pathNotInSet = (
-    path: string,
-    set: Set<string> = new Set()
-  ): boolean => {
-    while (this.dvcRoot !== path) {
-      if (set.has(path)) {
-        return false
-      }
-      path = dirname(path)
-    }
-    return true
-  }
-
-  private filterStatuses(
-    paths: string[],
-    filter: (path: string) => boolean
-  ): Set<string> {
-    return new Set(paths.filter(filter))
-  }
-
-  private getAllModifiedAgainstCache(
-    modifiedAgainstHead: string[],
-    modifiedAgainstCache: Set<string>
-  ): Set<string> {
-    return new Set<string>([
-      ...this.filterStatuses(modifiedAgainstHead, path =>
-        this.pathInSet(path, modifiedAgainstCache)
-      ),
-      ...modifiedAgainstCache
-    ])
-  }
-
-  private setComplexStatuses(
-    diffOutput: DiffOutput,
-    statusOutput: StatusOutput
-  ): void {
-    const modifiedAgainstHead = collectModifiedAgainstHead(
-      this.dvcRoot,
-      diffOutput.modified || [],
-      this.getTracked()
-    )
-
+  private collectState(dataStatus: DataStatusOutput) {
     const {
-      [Status.MODIFIED]: modifiedAgainstCache,
-      [Status.NOT_IN_CACHE]: notInCache
-    } = this.collectModifiedAndNotInCache(statusOutput)
+      committedAdded,
+      committedDeleted,
+      committedModified,
+      committedRenamed,
+      notInCache,
+      uncommittedAdded,
+      uncommittedDeleted,
+      uncommittedModified,
+      uncommittedRenamed,
+      untracked
+    } = collectDecorationState(this.dvcRoot, dataStatus)
 
-    this.state.gitModified = this.filterStatuses(modifiedAgainstHead, path =>
-      this.pathNotInSet(path, new Set([...notInCache, ...modifiedAgainstCache]))
-    )
-
-    this.state.modified = this.getAllModifiedAgainstCache(
-      modifiedAgainstHead,
-      modifiedAgainstCache
-    )
-
-    const deletedWithChildren = collectDeleted(
-      this.getStateFromDiff(diffOutput[Status.DELETED]),
-      this.getTracked()
-    )
-
-    this.state.notInCache = new Set([
-      ...this.getStateFromDiff(diffOutput[Status.NOT_IN_CACHE]),
-      ...this.filterStatuses(
-        [...deletedWithChildren, ...modifiedAgainstHead],
-        path => this.pathInSet(path, notInCache)
-      )
-    ])
-
-    this.state.deleted = new Set(
-      [...deletedWithChildren].filter(path => !this.state.notInCache.has(path))
-    )
-  }
-
-  private updateStatus(
-    diffOutput: DiffOutput,
-    statusOutput: StatusOutput
-  ): void {
-    this.state.added = this.getStateFromDiff(diffOutput.added)
-    this.state.renamed = new Set(
-      diffOutput.renamed
-        ?.map(renamed => this.getAbsolutePath(renamed?.path?.new))
-        .filter(path => this.isTracked(path))
-    )
-
-    this.setComplexStatuses(diffOutput, statusOutput)
-  }
-
-  private updateTracked(listOutput: ListOutput[]): void {
-    const trackedLeafs = new Set(
-      listOutput.map(tracked => join(this.dvcRoot, tracked.path))
-    )
-    const trackedNonLeafs = collectTrackedNonLeafs(this.dvcRoot, trackedLeafs)
-
-    if (
-      !sameContents(
-        [...trackedNonLeafs, ...trackedLeafs],
-        [...this.getTracked()]
-      )
-    ) {
-      this.state.trackedNonLeafs = trackedNonLeafs
-      this.state.trackedLeafs = trackedLeafs
-      this.collectTree()
-    }
+    this.committedAdded = committedAdded
+    this.committedDeleted = committedDeleted
+    this.committedModified = committedModified
+    this.committedRenamed = committedRenamed
+    this.notInCache = notInCache
+    this.uncommittedAdded = uncommittedAdded
+    this.uncommittedDeleted = uncommittedDeleted
+    this.uncommittedModified = uncommittedModified
+    this.uncommittedRenamed = uncommittedRenamed
+    this.untracked = untracked
   }
 
   private getTracked() {
-    return new Set([...this.state.trackedNonLeafs, ...this.state.trackedLeafs])
+    return this.tracked
   }
 
   private isTracked(path: string) {
     return this.getTracked().has(path)
   }
 
-  private collectTree() {
-    this.tree = collectTree(
-      this.dvcRoot,
-      this.state.trackedLeafs,
-      this.relTrackedOuts
-    )
+  private getResourceStates(paths: Set<string>, contextValue: Status) {
+    return [...paths].map(path => this.getResourceState(path, contextValue))
+  }
+
+  private getResourceState(path: string, contextValue: Status) {
+    return {
+      contextValue,
+      dvcRoot: this.dvcRoot,
+      isDirectory: !!this.tree.get(path), // these are needed because commands operate on both the SCM and Tracked Tree
+      isTracked: this.isTracked(path),
+      resourceUri: Uri.file(path)
+    }
   }
 }

@@ -1,11 +1,12 @@
-export const MIN_CLI_VERSION = '0.68.0'
-export const LATEST_TESTED_CLI_VERSION = '2.13.0'
+export const MIN_CLI_VERSION = '2.15.0'
+export const LATEST_TESTED_CLI_VERSION = '2.15.0'
 export const MAX_CLI_VERSION = '3'
 
 export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',
   COMMIT = 'commit',
+  DATA = 'data',
   DIFF = 'diff',
   EXPERIMENT = 'exp',
   INITIALIZE = 'init',
@@ -22,18 +23,23 @@ export enum Command {
 }
 
 export enum SubCommand {
+  STATUS = 'status',
   SHOW = 'show'
 }
 
 export enum Flag {
   FORCE = '-f',
+  GRANULAR = '--granular',
   OUTPUT_PATH = '-o',
   RECURSIVE = '-R',
   SHOW_JSON = '--show-json',
   SUBDIRECTORY = '--subdir',
   SET_PARAM = '-S',
   SPLIT = '--split',
-  VERSION = '--version'
+  UNCHANGED = '--unchanged',
+  UNTRACKED = '--untracked',
+  VERSION = '--version',
+  WITH_DIRS = '--with-dirs'
 }
 
 export enum ExperimentSubCommand {
@@ -59,13 +65,8 @@ export enum GcPreserveFlag {
   WORKSPACE = '--workspace'
 }
 
-export enum ListFlag {
-  LOCAL_REPO = '.',
-  DVC_ONLY = '--dvc-only'
-}
-
 type Target = string
 
-type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag
+type Flags = Flag | ExperimentFlag | GcPreserveFlag
 
 export type Args = (Command | Target | ExperimentSubCommand | Flags)[]

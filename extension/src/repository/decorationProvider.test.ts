@@ -32,7 +32,7 @@ describe('DecorationProvider', () => {
     ]
 
     decorationProvider.setState({
-      added: new Set(addedPaths),
+      committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
     } as DecorationState)
     expect(mockedDecorationsChangedFire).toBeCalledWith(
@@ -51,14 +51,14 @@ describe('DecorationProvider', () => {
     const subsetOfAddedPaths = [join('some', 'path', 'to', 'decorate')]
 
     decorationProvider.setState({
-      added: new Set(addedPaths),
+      committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
     } as DecorationState)
 
     mockedDecorationsChangedFire.mockClear()
 
     decorationProvider.setState({
-      added: new Set(subsetOfAddedPaths),
+      committedAdded: new Set(subsetOfAddedPaths),
       tracked: new Set(subsetOfAddedPaths)
     } as DecorationState)
 
@@ -79,9 +79,9 @@ describe('DecorationProvider', () => {
     const dataCsv = join(dataDir, 'data.csv')
     const prepared = join(dataDir, 'prepared')
 
-    const added = new Set([dataCsv])
-    const deleted = new Set([model])
-    const modified = new Set([features])
+    const committedAdded = new Set([dataCsv])
+    const committedDeleted = new Set([model])
+    const uncommittedModified = new Set([features])
     const notInCache = new Set([dataXml, prepared])
     const tracked = new Set([
       dataDir,
@@ -97,31 +97,47 @@ describe('DecorationProvider', () => {
     const emptySet = new Set<string>()
 
     const initialState = {
-      added,
-      deleted,
-      gitModified: emptySet,
-      modified,
+      committedAdded,
+      committedDeleted,
+      committedModified: emptySet,
+      committedRenamed: emptySet,
       notInCache: emptySet,
-      renamed: emptySet,
-      tracked: emptySet
+      tracked: emptySet,
+      uncommittedAdded: emptySet,
+      uncommittedDeleted: emptySet,
+      uncommittedModified,
+      uncommittedRenamed: emptySet
     }
 
     const updatedState = {
-      added,
-      deleted,
-      gitModified: emptySet,
-      modified: emptySet,
+      committedAdded,
+      committedDeleted,
+      committedModified: emptySet,
+      committedRenamed: emptySet,
       notInCache,
-      renamed: emptySet,
-      tracked
+      tracked,
+      uncommittedAdded: emptySet,
+      uncommittedDeleted: emptySet,
+      uncommittedModified: emptySet,
+      uncommittedRenamed: emptySet
     }
 
-    expect(initialState.added).toStrictEqual(updatedState.added)
-    expect(initialState.deleted).toStrictEqual(updatedState.deleted)
-    expect(initialState.renamed).toStrictEqual(updatedState.renamed)
-    expect(initialState.gitModified).toStrictEqual(updatedState.gitModified)
+    expect(initialState.committedAdded).toStrictEqual(
+      updatedState.committedAdded
+    )
+    expect(initialState.committedDeleted).toStrictEqual(
+      updatedState.committedDeleted
+    )
+    expect(initialState.committedRenamed).toStrictEqual(
+      updatedState.committedRenamed
+    )
+    expect(initialState.committedModified).toStrictEqual(
+      updatedState.committedModified
+    )
 
-    expect(initialState.modified).not.toStrictEqual(updatedState.modified)
+    expect(initialState.uncommittedModified).not.toStrictEqual(
+      updatedState.uncommittedModified
+    )
     expect(initialState.notInCache).not.toStrictEqual(updatedState.notInCache)
     expect(initialState.tracked).not.toStrictEqual(updatedState.tracked)
 
@@ -133,9 +149,9 @@ describe('DecorationProvider', () => {
 
     expect(mockedDecorationsChangedFire).toBeCalledWith(
       [
-        ...added,
-        ...deleted,
-        ...modified,
+        ...committedAdded,
+        ...committedDeleted,
+        ...uncommittedModified,
         ...notInCache,
         dataDir,
         logAcc,

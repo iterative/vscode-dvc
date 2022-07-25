@@ -5,7 +5,6 @@ import { RepositoryModel } from './model'
 import { SourceControlManagement } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
-import { Experiments } from '../experiments'
 
 export const RepositoryScale = {
   TRACKED: 'tracked'
@@ -51,8 +50,8 @@ export class Repository extends DeferredDisposable {
     return this.model.getChildren(path)
   }
 
-  public update(path?: string) {
-    return this.data.managedUpdate(path)
+  public update() {
+    return this.data.managedUpdate()
   }
 
   public hasChanges(): boolean {
@@ -61,17 +60,6 @@ export class Repository extends DeferredDisposable {
 
   public getScale() {
     return { tracked: this.model.getDecorationState().tracked.size }
-  }
-
-  public setExperiments(experiments: Experiments) {
-    this.dispose.track(
-      experiments.onDidChangeExperiments(data => {
-        if (data) {
-          this.model.transformAndSetExperiments(data)
-          this.setState()
-        }
-      })
-    )
   }
 
   private async initialize() {

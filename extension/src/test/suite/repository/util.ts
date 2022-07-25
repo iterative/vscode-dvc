@@ -15,6 +15,7 @@ import { Repository } from '../../../repository'
 import { InternalCommands } from '../../../commands/internal'
 import { DecorationProvider } from '../../../repository/decorationProvider'
 import { SourceControlManagement } from '../../../repository/sourceControlManagement'
+import { DataStatusOutput } from '../../../cli/reader'
 
 export const buildDependencies = (disposer: Disposer) => {
   const { cliReader, internalCommands } = buildInternalCommands(disposer)
@@ -24,10 +25,7 @@ export const buildDependencies = (disposer: Disposer) => {
     'createFileSystemWatcher'
   ).returns(mockDisposable)
 
-  const mockListDvcOnlyRecursive = stub(cliReader, 'listDvcOnlyRecursive')
-  const mockStatus = stub(cliReader, 'status')
-  const mockDiff = stub(cliReader, 'diff')
-  const mockGetAllUntracked = stub(Git, 'getAllUntracked')
+  const mockDataStatus = stub(cliReader, 'dataStatus')
   const mockGetHasChanges = stub(Git, 'getHasChanges')
   const mockNow = stub(Time, 'getCurrentEpoch')
 
@@ -38,12 +36,9 @@ export const buildDependencies = (disposer: Disposer) => {
   return {
     internalCommands,
     mockCreateFileSystemWatcher,
-    mockDiff,
-    mockGetAllUntracked,
+    mockDataStatus,
     mockGetHasChanges,
-    mockListDvcOnlyRecursive,
     mockNow,
-    mockStatus,
     onDidChangeTreeData,
     treeDataChanged,
     updatesPaused
@@ -54,37 +49,25 @@ export const buildRepositoryData = async (disposer: Disposer) => {
   const {
     internalCommands,
     mockCreateFileSystemWatcher,
-    mockDiff,
-    mockGetAllUntracked,
-    mockListDvcOnlyRecursive,
+    mockDataStatus,
     mockNow,
-    mockStatus,
     updatesPaused
   } = buildDependencies(disposer)
 
-  mockDiff.resolves({})
-  mockGetAllUntracked.resolves(new Set())
-  mockListDvcOnlyRecursive.resolves([])
+  mockDataStatus.resolves({} as DataStatusOutput)
   mockNow.returns(FIRST_TRUTHY_TIME)
-  mockStatus.resolves({})
 
   const data = disposer.track(
     new RepositoryData(dvcDemoPath, internalCommands, updatesPaused)
   )
   await data.isReady()
 
-  mockDiff.resetHistory()
-  mockGetAllUntracked.resetHistory()
-  mockListDvcOnlyRecursive.resetHistory()
-  mockStatus.resetHistory()
+  mockDataStatus.resetHistory()
 
   return {
     data,
     mockCreateFileSystemWatcher,
-    mockDiff,
-    mockGetAllUntracked,
-    mockListDvcOnlyRecursive,
-    mockStatus
+    mockDataStatus
   }
 }
 

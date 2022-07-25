@@ -1,44 +1,43 @@
-import { basename, extname } from 'path'
 import { scm, SourceControl, SourceControlResourceGroup, Uri } from 'vscode'
 import { PathItem } from './model/collect'
-import { isDirectory } from '../fileSystem'
 import { Disposable } from '../class/dispose'
 
-export type SourceControlManagementState = Record<Status, Set<string>> & {
-  hasRemote: Set<string>
+export type SourceControlManagementState = {
+  committed: ResourceState[]
+  uncommitted: ResourceState[]
+  untracked: ResourceState[]
+  notInCache: ResourceState[]
 }
 
 export interface SourceControlManagementModel {
   getSourceControlManagementState: () => SourceControlManagementState
 }
 
-enum Status {
-  ADDED = 'added',
-  DELETED = 'deleted',
-  GIT_MODIFIED = 'gitModified',
-  MODIFIED = 'modified',
+export enum Status {
+  COMMITTED_ADDED = 'committedAdded',
+  COMMITTED_DELETED = 'committedDeleted',
+  COMMITTED_MODIFIED = 'committedModified',
+  COMMITTED_RENAMED = 'committedRenamed',
   NOT_IN_CACHE = 'notInCache',
-  RENAMED = 'renamed',
+  UNCOMMITTED_ADDED = 'uncommittedAdded',
+  UNCOMMITTED_DELETED = 'uncommittedDeleted',
+  UNCOMMITTED_MODIFIED = 'uncommittedModified',
+  UNCOMMITTED_RENAMED = 'uncommittedRenamed',
   UNTRACKED = 'untracked'
 }
-
-const gitCommitReady = [Status.ADDED, Status.GIT_MODIFIED, Status.RENAMED]
 
 type ResourceState = PathItem & {
   contextValue: Status
 }
 
 export class SourceControlManagement extends Disposable {
-  private readonly dvcRoot: string
-
-  private changedResourceGroup: SourceControlResourceGroup
-  private gitCommitReadyResourceGroup: SourceControlResourceGroup
+  private committedResourceGroup: SourceControlResourceGroup
+  private uncommittedResourceGroup: SourceControlResourceGroup
+  private untrackedResourceGroup: SourceControlResourceGroup
   private notInCacheResourceGroup: SourceControlResourceGroup
 
   constructor(dvcRoot: string, state: SourceControlManagementState) {
     super()
-
-    this.dvcRoot = dvcRoot
 
     const scmView = this.dispose.track(
       scm.createSourceControl('dvc', 'DVC', Uri.file(dvcRoot))
@@ -46,18 +45,18 @@ export class SourceControlManagement extends Disposable {
 
     scmView.inputBox.visible = false
 
-    this.changedResourceGroup = this.createResourceGroup(
+    this.committedResourceGroup = this.createResourceGroup(
       dvcRoot,
       scmView,
-      'changes',
-      'Changes'
+      'committed',
+      'Committed'
     )
 
-    this.gitCommitReadyResourceGroup = this.createResourceGroup(
+    this.uncommittedResourceGroup = this.createResourceGroup(
       dvcRoot,
       scmView,
-      'gitCommitReady',
-      'Ready For Git Commit'
+      'uncommitted',
+      'Uncommitted'
     )
 
     this.notInCacheResourceGroup = this.createResourceGroup(
@@ -67,32 +66,26 @@ export class SourceControlManagement extends Disposable {
       'Not In Cache'
     )
 
+    this.untrackedResourceGroup = this.createResourceGroup(
+      dvcRoot,
+      scmView,
+      'untracked',
+      'Untracked'
+    )
+
     this.setState(state)
   }
 
   public setState(state: SourceControlManagementState) {
-    this.changedResourceGroup.resourceStates = this.collectResourceStates(
-      state,
-      Object.values(Status).filter(
-        status => ![...gitCommitReady, Status.NOT_IN_CACHE].includes(status)
-      )
-    )
+    const { committed, uncommitted, untracked, notInCache } = state
 
-    this.gitCommitReadyResourceGroup.resourceStates =
-      this.collectResourceStates(state, gitCommitReady)
+    this.committedResourceGroup.resourceStates = committed
 
-    this.notInCacheResourceGroup.resourceStates = this.collectResourceStates(
-      state,
-      [Status.NOT_IN_CACHE]
-    )
-  }
+    this.notInCacheResourceGroup.resourceStates = notInCache
 
-  public getState() {
-    return {
-      changes: this.changedResourceGroup.resourceStates,
-      gitCommitReady: this.gitCommitReadyResourceGroup.resourceStates,
-      notInCache: this.notInCacheResourceGroup.resourceStates
-    }
+    this.uncommittedResourceGroup.resourceStates = uncommitted
+
+    this.untrackedResourceGroup.resourceStates = untracked
   }
 
   private createResourceGroup(
@@ -109,39 +102,5 @@ export class SourceControlManagement extends Disposable {
 
     Object.assign(resourceGroup, { rootUri: Uri.file(dvcRoot) })
     return resourceGroup
-  }
-
-  private collectResourceStates(
-    state: SourceControlManagementState,
-    validStatuses: Status[]
-  ) {
-    const acc: ResourceState[] = []
-    for (const entry of Object.entries(state)) {
-      const [status, resources] = entry as [Status, Set<string>]
-      if (validStatuses.includes(status)) {
-        acc.push(...this.getResourceStates(status, resources, state))
-      }
-    }
-    return acc
-  }
-
-  private getResourceStates(
-    contextValue: Status,
-    paths: Set<string>,
-    state: SourceControlManagementState
-  ): ResourceState[] {
-    return [...paths]
-      .filter(
-        path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
-      )
-      .map(path => {
-        return {
-          contextValue,
-          dvcRoot: this.dvcRoot,
-          isDirectory: isDirectory(path),
-          isTracked: state.hasRemote.has(path),
-          resourceUri: Uri.file(path)
-        }
-      })
   }
 }

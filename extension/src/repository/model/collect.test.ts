@@ -19,16 +19,13 @@ describe('collectTree', () => {
       makeAbsPath('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
       makeAbsPath('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
       makeAbsPath('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+      makeAbsPath('data', 'MNIST', 'raw'),
       makeAbsPath('logs', 'acc.tsv'),
       makeAbsPath('logs', 'loss.tsv'),
       makeAbsPath('model.pt')
     ])
 
-    const treeData = collectTree(
-      dvcDemoPath,
-      paths,
-      new Set([join('data', 'MNIST', 'raw')])
-    )
+    const treeData = collectTree(dvcDemoPath, paths)
 
     expect(treeData).toStrictEqual(
       new Map([

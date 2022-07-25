@@ -14,7 +14,7 @@ import { mockHasCheckpoints } from './experiments/util'
 import { WEBVIEW_TEST_TIMEOUT } from './timeouts'
 import { Disposable } from '../../extension'
 import * as Python from '../../extensions/python'
-import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
+import { CliReader } from '../../cli/reader'
 import expShowFixture from '../fixtures/expShow/output'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
@@ -240,45 +240,38 @@ suite('Extension Test Suite', () => {
         expShowFixture
       )
 
-      const mockList = stub(
-        CliReader.prototype,
-        'listDvcOnlyRecursive'
-      ).resolves([
-        { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
-        { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
-        { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
-        { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz') },
-        { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte') },
-        { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz') },
-        { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte') },
-        { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz') },
-        { path: join('logs', 'acc.tsv') },
-        { path: join('logs', 'loss.tsv') },
-        { path: 'model.pt' }
-      ] as ListOutput[])
-
       stub(CliReader.prototype, 'root').resolves('.')
 
-      const mockDiff = stub(CliReader.prototype, 'diff').resolves({
-        modified: [
-          { path: 'model.pt' },
-          { path: 'logs' },
-          { path: 'data/MNIST/raw' }
-        ]
+      const mockDataStatus = stub(CliReader.prototype, 'dataStatus').resolves({
+        committed: {
+          added: [],
+          deleted: [],
+          modified: [],
+          renamed: []
+        },
+        not_in_cache: [],
+        unchanged: [
+          join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+          join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
+          join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
+          join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
+          join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
+          join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
+          join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
+          join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+          join('logs', 'acc.tsv'),
+          join('logs', 'loss.tsv')
+        ],
+        uncommitted: {
+          added: [],
+          deleted: [],
+          modified: ['model.pt', join('data', 'MNIST', 'raw'), 'logs'],
+          renamed: []
+        },
+        untracked: []
       })
 
       stub(CliReader.prototype, 'plotsDiff').resolves(plotsDiffFixture)
-
-      const mockStatus = stub(CliReader.prototype, 'status').resolves({
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-        ],
-        train: [
-          { 'changed deps': { 'data/MNIST': 'modified' } },
-          { 'changed outs': { logs: 'modified', 'model.pt': 'modified' } },
-          'always changed'
-        ]
-      } as unknown as StatusOutput)
 
       const mockWorkspaceExperimentsReady = stub(
         WorkspaceExperiments.prototype,
@@ -306,10 +299,8 @@ suite('Extension Test Suite', () => {
         mockCanRunCli,
         'should have checked to see if the cli could be run with the given execution details'
       ).to.have.been.called
-      expect(mockList, 'should have updated the repository data').to.have.been
-        .called
-      expect(mockDiff).to.have.been.called
-      expect(mockStatus).to.have.been.called
+      expect(mockDataStatus, 'should have updated the repository data').to.have
+        .been.called
       expect(mockExpShow, 'should have updated the experiments data').to.have
         .been.called
 
@@ -332,7 +323,7 @@ suite('Extension Test Suite', () => {
           params: 9,
           pythonPathUsed: false,
           templates: 3,
-          tracked: 15,
+          tracked: 13,
           workspaceFolderCount: 1
         },
         match.has('duration')
@@ -455,11 +446,9 @@ suite('Extension Test Suite', () => {
       stub(CliReader.prototype, 'expShow').resolves({
         workspace: { baseline: {} }
       })
-      stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([])
       stub(CliReader.prototype, 'root').resolves('.')
-      stub(CliReader.prototype, 'diff').resolves({})
+      stub(CliReader.prototype, 'dataStatus').resolves({})
       stub(CliReader.prototype, 'plotsDiff').resolves({})
-      stub(CliReader.prototype, 'status').resolves({})
 
       const mockVersion = stub(CliReader.prototype, 'version')
         .onFirstCall()

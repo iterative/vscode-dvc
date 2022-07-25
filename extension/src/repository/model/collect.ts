@@ -1,10 +1,11 @@
-import { dirname, join, relative, resolve } from 'path'
+import { join, relative } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
-import { ExperimentsOutput, PathOutput } from '../../cli/reader'
-import { isSameOrChild, relativeWithUri } from '../../fileSystem'
+import { DataStatusOutput } from '../../cli/reader'
+import { relativeWithUri } from '../../fileSystem'
 import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
+import { DecorationState } from '../decorationProvider'
 
 export type PathItem = Resource & {
   isDirectory: boolean
@@ -34,12 +35,13 @@ const transformToAbsTree = (
 
 export const collectTree = (
   dvcRoot: string,
-  absLeafs: Set<string>,
-  trackedRelPaths = new Set<string>()
+  tracked: Set<string>
 ): Map<string, PathItem[]> => {
   const relTree = new Map<string, Set<string>>()
 
-  for (const absLeaf of absLeafs) {
+  const trackedRelPaths = new Set<string>()
+
+  for (const absLeaf of tracked) {
     const relPath = relative(dvcRoot, absLeaf)
     const relPathArray = getPathArray(relPath)
 
@@ -52,86 +54,6 @@ export const collectTree = (
   }
 
   return transformToAbsTree(dvcRoot, relTree, trackedRelPaths)
-}
-
-const collectMissingParents = (acc: string[], absPath: string) => {
-  if (acc.length === 0) {
-    return
-  }
-
-  const prevAbsPath = acc.slice(-1)[0]
-  if (!isSameOrChild(prevAbsPath, absPath)) {
-    return
-  }
-
-  let dir = dirname(absPath)
-  while (dir !== prevAbsPath) {
-    acc.push(dir)
-    dir = dirname(dir)
-  }
-}
-
-export const collectModifiedAgainstHead = (
-  dvcRoot: string,
-  modified: PathOutput[],
-  tracked: Set<string>
-): string[] => {
-  const acc: string[] = []
-
-  for (const { path } of modified) {
-    const absPath = resolve(dvcRoot, path)
-    if (!tracked.has(absPath)) {
-      continue
-    }
-
-    collectMissingParents(acc, absPath)
-    acc.push(absPath)
-  }
-
-  return acc
-}
-
-const collectAbsPath = (
-  acc: Set<string>,
-  absLeafs: Set<string>,
-  dvcRoot: string,
-  absPath: string
-) => {
-  const relPathArray = getPathArray(relative(dvcRoot, absPath))
-
-  for (let reverseIdx = relPathArray.length; reverseIdx > 0; reverseIdx--) {
-    const absPath = join(dvcRoot, getPath(relPathArray, reverseIdx))
-    if (acc.has(absPath) || absLeafs.has(absPath)) {
-      continue
-    }
-
-    acc.add(absPath)
-  }
-}
-
-export const collectTrackedNonLeafs = (
-  dvcRoot: string,
-  absLeafs = new Set<string>()
-): Set<string> => {
-  const acc = new Set<string>()
-
-  for (const absPath of absLeafs) {
-    collectAbsPath(acc, absLeafs, dvcRoot, absPath)
-  }
-
-  return acc
-}
-
-export const collectTrackedOuts = (data: ExperimentsOutput): Set<string> => {
-  const acc = new Set<string>()
-  for (const [relPath, { use_cache }] of Object.entries(
-    data.workspace.baseline.data?.outs || {}
-  )) {
-    if (use_cache) {
-      acc.add(relPath)
-    }
-  }
-  return acc
 }
 
 export const collectTrackedPaths = async (
@@ -252,32 +174,59 @@ export const collectSelected = (
   return acc
 }
 
-const isUncollectedChild = (
-  deleted: Set<string>,
-  deletedPath: string,
-  trackedPath: string
-): boolean => {
-  return !deleted.has(trackedPath) && isSameOrChild(deletedPath, trackedPath)
-}
+const getAbsPath = (dvcRoot: string, relPath: string): string =>
+  join(dvcRoot, relPath)
 
-const collectIfDeletedChild = (
-  deleted: Set<string>,
-  deletedPath: string,
-  trackedPath: string
-): void => {
-  if (isUncollectedChild(deleted, deletedPath, trackedPath)) {
-    deleted.add(trackedPath)
-  }
-}
-
-export const collectDeleted = (
-  deleted: Set<string>,
-  tracked: Set<string>
+export const collectTracked = (
+  dvcRoot: string,
+  dataStatus: DataStatusOutput
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Set<string> => {
-  for (const trackedPath of tracked) {
-    for (const deletedPath of deleted) {
-      collectIfDeletedChild(deleted, deletedPath, trackedPath)
+  const { committed, not_in_cache, uncommitted, unchanged } = dataStatus
+
+  const tracked = new Set<string>(
+    [...(unchanged || []), ...(not_in_cache || [])].map(path =>
+      getAbsPath(dvcRoot, path)
+    )
+  )
+
+  for (const paths of [
+    ...Object.values(committed || {}),
+    ...Object.values(uncommitted || {})
+  ]) {
+    for (const path of paths) {
+      typeof path === 'string'
+        ? tracked.add(join(dvcRoot, path))
+        : tracked.add(join(dvcRoot, path.new))
     }
   }
-  return deleted
+
+  return tracked
+}
+
+const getSet = (dvcRoot: string, relPaths?: string[]): Set<string> =>
+  new Set((relPaths || []).map(relPath => getAbsPath(dvcRoot, relPath)))
+
+export const collectDecorationState = (
+  dvcRoot: string,
+  dataStatus: DataStatusOutput
+): Omit<DecorationState, 'tracked'> & { untracked: Set<string> } => {
+  return {
+    committedAdded: getSet(dvcRoot, dataStatus.committed?.added),
+    committedDeleted: getSet(dvcRoot, dataStatus.committed?.deleted),
+    committedModified: getSet(dvcRoot, dataStatus.committed?.modified),
+    committedRenamed: getSet(
+      dvcRoot,
+      dataStatus.committed?.renamed?.map(relPath => relPath.new)
+    ),
+    notInCache: getSet(dvcRoot, dataStatus.not_in_cache),
+    uncommittedAdded: getSet(dvcRoot, dataStatus.uncommitted?.added),
+    uncommittedDeleted: getSet(dvcRoot, dataStatus.uncommitted?.deleted),
+    uncommittedModified: getSet(dvcRoot, dataStatus.uncommitted?.modified),
+    uncommittedRenamed: getSet(
+      dvcRoot,
+      dataStatus.uncommitted?.renamed?.map(relPath => relPath.new)
+    ),
+    untracked: getSet(dvcRoot, dataStatus.untracked)
+  }
 }
