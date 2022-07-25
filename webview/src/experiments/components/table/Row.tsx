@@ -120,17 +120,21 @@ const getRunResumeOptions = (
 ) => {
   const isNotCheckpoint = depth <= 1 || isWorkspace
 
+  const resetNeedsSeparator = !hideVaryAndRun && projectHasCheckpoints
+  const runNeedsSeparator = !hideVaryAndRun && !projectHasCheckpoints
+
   return [
     withId(
       'Modify, Reset and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
-      !isNotCheckpoint || !projectHasCheckpoints
+      !isNotCheckpoint || !projectHasCheckpoints,
+      resetNeedsSeparator
     ),
     withId(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
       !isNotCheckpoint,
-      !hideVaryAndRun
+      runNeedsSeparator
     ),
     withId(
       'Modify and Queue',

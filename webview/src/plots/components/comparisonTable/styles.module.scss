@@ -157,3 +157,13 @@ $gap: 4px;
 .experimentName {
   color: $meta-cell-color;
 }
+
+.dropTarget {
+  width: 2px;
+  height: 100%;
+  border-right: 2px dashed $accent-color;
+}
+
+.draggedColumn {
+  opacity: 0.4;
+}

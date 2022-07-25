@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, {
   DragEvent,
   useEffect,
@@ -8,6 +9,7 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux'
 import { DragEnterDirection, getDragEnterDirection } from './util'
 import { changeRef } from './dragDropSlice'
+import styles from './styles.module.scss'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 import { Any } from '../../../util/objects'
 import { RootState } from '../../../plots/store'
@@ -34,26 +36,23 @@ export type OnDrop = (
   position: number
 ) => void
 
-export type DropTargetInfo = {
-  element: JSX.Element
-  wrapperTag: 'div' | 'th'
-}
-
 export const makeTarget = (
-  dropTarget: DropTargetInfo,
+  dropTarget: JSX.Element,
   handleDragOver: DragEventHandler<HTMLElement>,
   handleOnDrop: DragEventHandler<HTMLElement>,
-  id: string
+  id: string,
+  className?: string
 ) => (
-  <dropTarget.wrapperTag
+  <div
     data-testid="drop-target"
     key="drop-target"
     onDragOver={handleDragOver}
     onDrop={handleOnDrop}
     id={`${id}__drop`}
+    className={className}
   >
-    {dropTarget.element}
-  </dropTarget.wrapperTag>
+    {dropTarget}
+  </div>
 )
 interface DragDropContainerProps {
   order: string[]
@@ -62,13 +61,14 @@ interface DragDropContainerProps {
   items: JSX.Element[] // Every item must have a id prop for drag and drop to work
   group: string
   onDrop?: OnDrop
-  dropTarget: DropTargetInfo
+  dropTarget: JSX.Element
   wrapperComponent?: {
     component: React.FC<WrapperProps>
     props: {
       [key: string]: Any
     }
   }
+  shouldShowOnDrag?: boolean
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -79,7 +79,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   group,
   onDrop,
   dropTarget,
-  wrapperComponent
+  wrapperComponent,
+  shouldShowOnDrag
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
@@ -106,8 +107,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
     const idx = order.indexOf(id)
-    let toIdx = idx + 1
-    if (toIdx === order.length) {
+    let toIdx = shouldShowOnDrag ? idx : idx + 1
+    if (!shouldShowOnDrag && toIdx === order.length) {
       toIdx = idx - 1
 
       if (toIdx === -1) {
@@ -152,6 +153,13 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
+    draggedOverIdTimeout.current = window.setTimeout(() => {
+      setDraggedId('')
+    }, 0)
+    if (e.dataTransfer.getData('itemId') === draggedOverId) {
+      dispatch(changeRef(undefined))
+      return
+    }
     const newOrder = [...order]
     const oldDraggedId = e.dataTransfer.getData('itemId')
     const isNew = !order.includes(draggedId)
@@ -166,7 +174,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
     const orderIdxChanged = droppedIndex + orderIdxChange
     const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
-    setDraggedId('')
 
     if (isEnabled && isSameGroup(e.dataTransfer.getData('group'), group)) {
       applyDrop(e, orderIdxChanged, draggedIndex, newOrder, oldDraggedId)
@@ -197,33 +204,66 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }
   }
 
+  const handleDragEnd = () => {
+    dispatch(changeRef(undefined))
+    cleanup()
+  }
+
   const buildItem = (id: string, draggable: JSX.Element) => (
     <draggable.type
       key={draggable.key}
       {...draggable.props}
       onDragStart={handleDragStart}
-      onDragEnd={cleanup}
+      onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
       draggable={!disabledDropIds.includes(id)}
-      style={(id === draggedId && { display: 'none' }) || draggable.props.style}
+      style={
+        (!shouldShowOnDrag && id === draggedId && { display: 'none' }) ||
+        draggable.props.style
+      }
     />
   )
+
+  const createItemWithDropTarget = (id: string, item: JSX.Element) => {
+    const isEnteringRight = direction === DragEnterDirection.RIGHT
+    const targetClassName = shouldShowOnDrag
+      ? cx(styles.dropTargetWhenShowingOnDrag, {
+          [styles.dropTargetWhenShowingOnDragLeft]: !isEnteringRight,
+          [styles.dropTargetWhenShowingOnDragRight]: isEnteringRight
+        })
+      : undefined
+    const target = makeTarget(
+      dropTarget,
+      handleDragOver,
+      handleOnDrop,
+      id,
+      targetClassName
+    )
+    const itemWithTag = shouldShowOnDrag ? (
+      <div key="item" {...item.props} />
+    ) : (
+      item
+    )
+    const block = isEnteringRight
+      ? [itemWithTag, target]
+      : [target, itemWithTag]
+
+    return shouldShowOnDrag ? (
+      <item.type key={item.key} className={styles.newBlockWhenShowingOnDrag}>
+        {block}
+      </item.type>
+    ) : (
+      block
+    )
+  }
 
   const wrappedItems = items.flatMap(draggable => {
     const { id } = draggable.props
     const item = id && buildItem(id, draggable)
 
-    if (id === draggedOverId) {
-      const target = makeTarget(dropTarget, handleDragOver, handleOnDrop, id)
-
-      return direction === DragEnterDirection.RIGHT
-        ? [item, target]
-        : [target, item]
-    }
-
-    return item
+    return id === draggedOverId ? createItemWithDropTarget(id, item) : item
   })
 
   const Wrapper = wrapperComponent?.component
