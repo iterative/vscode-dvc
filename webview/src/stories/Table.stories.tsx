@@ -53,6 +53,37 @@ const tableData: TableData = {
   ]
 }
 
+const noRunningExperiments = {
+  ...tableData,
+  hasRunningExperiment: false,
+  rows: rowsFixture.map(row => ({
+    ...row,
+    running: false,
+    subRows: row.subRows?.map(experiment => ({
+      ...experiment,
+      running: false,
+      subRows: experiment.subRows?.map(checkpoint => ({
+        ...checkpoint,
+        running: false
+      }))
+    }))
+  }))
+}
+
+const noRunningExperimentsNoCheckpoints = {
+  ...noRunningExperiments,
+  hasCheckpoints: false,
+  rows: rowsFixture.map(row => ({
+    ...row,
+    running: false,
+    subRows: row.subRows?.map(experiment => ({
+      ...experiment,
+      running: false,
+      subRows: []
+    }))
+  }))
+}
+
 export default {
   args: {
     tableData
@@ -101,23 +132,32 @@ WithMiddleStates.play = async ({ canvasElement }) => {
 
 export const WithNoRunningExperiments = Template.bind({})
 WithNoRunningExperiments.args = {
-  tableData: {
-    ...tableData,
-    hasRunningExperiment: false,
-    rows: rowsFixture.map(row => ({
-      ...row,
-      running: false,
-      subRows: row.subRows?.map(experiment => ({
-        ...experiment,
-        running: false,
-        subRows: experiment.subRows?.map(checkpoint => ({
-          ...checkpoint,
-          running: false
-        }))
-      }))
-    }))
-  }
+  tableData: noRunningExperiments
 }
+
+const contextMenuPlay = async ({
+  canvasElement
+}: {
+  canvasElement: HTMLElement
+}) => {
+  const experiment = await within(canvasElement).findByText('[exp-e7a67]')
+  userEvent.click(experiment, {
+    bubbles: true,
+    button: 2
+  })
+}
+
+export const WithContextMenu = Template.bind({})
+WithContextMenu.args = {
+  tableData: noRunningExperiments
+}
+WithContextMenu.play = contextMenuPlay
+
+export const WithContextMenuNoCheckpoints = Template.bind({})
+WithContextMenuNoCheckpoints.args = {
+  tableData: noRunningExperimentsNoCheckpoints
+}
+WithContextMenuNoCheckpoints.play = contextMenuPlay
 
 export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = { tableData: dataTypesTableData }
