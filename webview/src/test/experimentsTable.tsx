@@ -1,12 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { fireEvent, render, within, screen } from '@testing-library/react'
+import {
+  fireEvent,
+  render,
+  within,
+  screen,
+  queries
+} from '@testing-library/react'
 import React from 'react'
 import { Provider } from 'react-redux'
 import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { tableData as sortingTableDataFixture } from './sort'
-import { getRow } from './queries'
+import { customQueries, getRow } from './queries'
 import { App } from '../experiments/components/App'
 import { experimentsReducers } from '../experiments/store'
 
@@ -26,9 +32,11 @@ export const renderTable = (data = tableDataFixture) => {
   render(
     <Provider store={configureStore({ reducer: experimentsReducers })}>
       <App />
-    </Provider>
-  )
+    </Provider>, {
+    queries: { ...queries, ...customQueries }
+  })
   setTableData(data)
+  return renderedTable
 }
 
 export const renderTableWithPlaceholder = () => {
@@ -44,7 +52,7 @@ export const renderTableWithWorkspaceRowOnly = () => {
 }
 
 export const renderTableWithSortingData = () => {
-  renderTable(sortingTableDataFixture)
+  return renderTable(sortingTableDataFixture)
 }
 
 export const renderTableWithoutRunningExperiments = () => {

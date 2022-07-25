@@ -4,7 +4,13 @@
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import '@testing-library/jest-dom/extend-expect'
 import { configureStore } from '@reduxjs/toolkit'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  queries,
+  render,
+  screen
+} from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -25,6 +31,7 @@ import {
 import { dragAndDrop } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { experimentsReducers } from '../../store'
+import { customQueries } from '../../../test/queries'
 
 jest.mock('../../../shared/api')
 const { postMessage } = vsCodeApi
@@ -130,8 +137,9 @@ describe('Table', () => {
     return render(
       <Provider store={configureStore({ reducer: experimentsReducers })}>
         <ExperimentsTable tableData={data} />
-      </Provider>
-    )
+      </Provider>, {
+      queries: { ...queries, ...customQueries }
+    })
   }
 
   beforeAll(() => {
@@ -277,15 +285,13 @@ describe('Table', () => {
 
   describe('Columns order', () => {
     it('should move a column from its current position to its new position', async () => {
-      renderExperimentsTable()
+      const { getDraggableHeaderFromText } = renderExperimentsTable()
 
       await expectHeaders(['A', 'B', 'C'])
 
       dragAndDrop(
         screen.getByText('B'),
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText('C').parentElement?.parentElement ||
-          screen.getByText('C'),
+        getDraggableHeaderFromText('C'),
         DragEnterDirection.AUTO
       )
 
@@ -293,9 +299,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('A'),
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText('B').parentElement?.parentElement ||
-          screen.getByText('B'),
+        getDraggableHeaderFromText('B'),
         DragEnterDirection.AUTO
       )
 
@@ -375,7 +379,9 @@ describe('Table', () => {
     })
 
     it('should move all the columns from a group from their current position to their new position', async () => {
-      renderExperimentsTable({ ...tableDataFixture })
+      const { getDraggableHeaderFromText } = renderExperimentsTable({
+        ...tableDataFixture
+      })
 
       let headers = await getHeaders()
 
@@ -388,9 +394,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('process'),
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText('loss').parentElement?.parentElement ||
-          screen.getByText('loss'),
+        getDraggableHeaderFromText('loss'),
         DragEnterDirection.AUTO
       )
 
@@ -402,9 +406,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('summary.json'),
-        // eslint-disable-next-line testing-library/no-node-access
-        screen.getByText('test').parentElement?.parentElement ||
-          screen.getByText('test'),
+        getDraggableHeaderFromText('test'),
         DragEnterDirection.AUTO
       )
 
