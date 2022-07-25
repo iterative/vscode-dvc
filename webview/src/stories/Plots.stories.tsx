@@ -23,7 +23,7 @@ import './test-vscode-styles.scss'
 import '../shared/style.scss'
 import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
-import { storeReducers } from '../plots/store'
+import { plotsReducers } from '../plots/store'
 
 const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
   children,
@@ -55,7 +55,7 @@ export default {
 const Template: Story<{
   data?: PlotsData
 }> = ({ data }) => {
-  const store = configureStore({ reducer: storeReducers })
+  const store = configureStore({ reducer: plotsReducers })
   return (
     <Provider store={store}>
       <MockedState data={data}>

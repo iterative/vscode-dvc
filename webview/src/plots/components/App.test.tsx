@@ -36,7 +36,7 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
-import { storeReducers } from '../store'
+import { plotsReducers } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
@@ -113,7 +113,7 @@ describe('App', () => {
   }
 
   const renderAppWithOptionalData = (data?: PlotsData) => {
-    const store = configureStore({ reducer: storeReducers })
+    const store = configureStore({ reducer: plotsReducers })
     render(
       <Provider store={store}>
         <App />

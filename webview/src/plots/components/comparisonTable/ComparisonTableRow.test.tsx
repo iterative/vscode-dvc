@@ -13,7 +13,7 @@ import {
   ComparisonTableRowProps
 } from './ComparisonTableRow'
 import styles from '../styles.module.scss'
-import { storeReducers } from '../../store'
+import { plotsReducers } from '../../store'
 
 jest.mock('../../../shared/api')
 
@@ -37,7 +37,7 @@ describe('ComparisonTableRow', () => {
     render(
       <Provider
         store={configureStore({
-          reducer: storeReducers
+          reducer: plotsReducers
         })}
       >
         <table>

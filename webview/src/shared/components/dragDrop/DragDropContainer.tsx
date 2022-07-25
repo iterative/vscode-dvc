@@ -13,7 +13,7 @@ import { changeRef } from './dragDropSlice'
 import styles from './styles.module.scss'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 import { Any } from '../../../util/objects'
-import { RootState } from '../../../plots/store'
+import { PlotsState } from '../../../plots/store'
 import { getStyleProperty } from '../../../util/styles'
 import { idToNode } from '../../../util/helpers'
 
@@ -91,7 +91,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(DragEnterDirection.LEFT)
-  const { draggedRef } = useSelector((state: RootState) => state.dragAndDrop)
+  const { draggedRef } = useSelector((state: PlotsState) => state.dragAndDrop)
   const draggedOverIdTimeout = useRef<number>(0)
   const dispatch = useDispatch()
 

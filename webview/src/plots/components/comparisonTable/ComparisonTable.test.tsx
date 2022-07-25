@@ -27,7 +27,7 @@ import {
 } from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
-import { storeReducers } from '../../store'
+import { plotsReducers } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
 import { getThemeValue, hexToRGB, ThemeProperty } from '../../../util/styles'
 
@@ -72,7 +72,7 @@ describe('ComparisonTable', () => {
                 zoomedInPlot: undefined
               }
             },
-            reducer: storeReducers
+            reducer: plotsReducers
           })}
         >
           <ComparisonTable />

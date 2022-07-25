@@ -4,11 +4,11 @@ import { Provider } from 'react-redux'
 import '../shared/style.scss'
 import { App } from './components/App'
 import '../util/wdyr'
-import { store } from './store'
+import { plotsStore } from './store'
 
 const root = ReactDOM.createRoot(document.querySelector('#root') as HTMLElement)
 root.render(
-  <Provider store={store}>
+  <Provider store={plotsStore}>
     <App />
   </Provider>
 )
