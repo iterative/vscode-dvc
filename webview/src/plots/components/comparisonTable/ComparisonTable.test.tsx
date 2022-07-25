@@ -26,7 +26,7 @@ import {
 } from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
-import { storeReducers } from '../../store'
+import { plotsReducers } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
@@ -70,7 +70,7 @@ describe('ComparisonTable', () => {
                 zoomedInPlot: undefined
               }
             },
-            reducer: storeReducers
+            reducer: plotsReducers
           })}
         >
           <ComparisonTable />

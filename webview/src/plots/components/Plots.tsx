@@ -11,7 +11,7 @@ import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
-import { RootState } from '../store'
+import { PlotsState } from '../store'
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const PlotsContent = () => {
@@ -22,15 +22,15 @@ const PlotsContent = () => {
     hasSelectedPlots,
     selectedRevisions,
     zoomedInPlot
-  } = useSelector((state: RootState) => state.webview)
+  } = useSelector((state: PlotsState) => state.webview)
   const hasCheckpointData = useSelector(
-    (state: RootState) => state.checkpoint.hasData
+    (state: PlotsState) => state.checkpoint.hasData
   )
   const hasComparisonData = useSelector(
-    (state: RootState) => state.comparison.hasData
+    (state: PlotsState) => state.comparison.hasData
   )
   const hasTemplateData = useSelector(
-    (state: RootState) => state.template.hasData
+    (state: PlotsState) => state.template.hasData
   )
 
   if (!hasData) {

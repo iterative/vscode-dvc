@@ -11,13 +11,13 @@ import {
 import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
-import { RootState } from '../../store'
+import { PlotsState } from '../../store'
 
 export const ComparisonTable: React.FC = () => {
-  const { plots } = useSelector((state: RootState) => state.comparison)
+  const { plots } = useSelector((state: PlotsState) => state.comparison)
 
   const { selectedRevisions: revisions } = useSelector(
-    (state: RootState) => state.webview
+    (state: PlotsState) => state.webview
   )
 
   const pinnedColumn = useRef('')

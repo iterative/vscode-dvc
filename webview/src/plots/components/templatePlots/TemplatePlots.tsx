@@ -15,7 +15,7 @@ import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
-import { RootState } from '../../store'
+import { PlotsState } from '../../store'
 import { plotDataStore } from '../plotDataStore'
 
 export enum NewSectionBlock {
@@ -25,7 +25,7 @@ export enum NewSectionBlock {
 
 export const TemplatePlots: React.FC = () => {
   const { plotsSnapshot, size } = useSelector(
-    (state: RootState) => state.template
+    (state: PlotsState) => state.template
   )
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
