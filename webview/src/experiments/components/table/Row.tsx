@@ -412,13 +412,21 @@ export const RowContent: React.FC<
         <FirstCell
           cell={firstCell}
           bulletColor={displayColor}
-          starred={starred}
-          isRowSelected={isRowSelected}
+          rowSelection={{
+            checked: isRowSelected,
+            showSubRowsIndicator: !isExpanded && depth > 0,
+            subRowsChecked: subRowStates.selections,
+            toggleAction: toggleRowSelection
+          }}
+          experimentStar={{
+            checked: starred,
+            showSubRowsIndicator: !isExpanded && depth > 0,
+            subRowsChecked: subRowStates.stars,
+            toggleAction: toggleStarred
+          }}
           showSubRowStates={!isExpanded && depth > 0}
           subRowStates={subRowStates}
           toggleExperiment={toggleExperiment}
-          toggleRowSelection={toggleRowSelection}
-          toggleStarred={toggleStarred}
         />
         {cells.map(cell => {
           const cellId = `${cell.column.id}___${cell.row.id}`

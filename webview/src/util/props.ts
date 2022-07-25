@@ -4,7 +4,7 @@ export type HandlerFunc<T> = (args?: {
   mouse?: React.MouseEvent<T, MouseEvent>
 }) => void
 
-export const clickAndEnterProps: <T>(handler: HandlerFunc<T>) => {
+export const onClickOrEnter: <T>(handler: HandlerFunc<T>) => {
   onClick: React.MouseEventHandler<T>
   onKeyDown: React.KeyboardEventHandler<T>
 } = handler => ({

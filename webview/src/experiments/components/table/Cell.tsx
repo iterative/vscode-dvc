@@ -1,140 +1,109 @@
-import React from 'react'
+import React, { FC } from 'react'
 import cx from 'classnames'
-import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import { Cell } from 'react-table'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { ErrorTooltip } from './Errors'
-import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
+import { IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
-import { CellProp, RowProp } from './interfaces'
-import { clickAndEnterProps } from '../../../util/props'
-import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
+import { CellProp } from './interfaces'
+import { RowExpansionButton } from './RowExpansionButton'
+import { RowActions, RowActionsProps } from './RowActions'
+import { onClickOrEnter } from '../../../util/props'
+import { Clock } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
 
-const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
-  row.canExpand ? (
-    <button
-      title={`${row.isExpanded ? 'Contract' : 'Expand'} Row`}
-      className={styles.rowArrowContainer}
-      onClick={e => {
-        e.preventDefault()
-        e.stopPropagation()
-        row.toggleRowExpanded()
-      }}
-      onKeyDown={e => {
-        e.stopPropagation()
-      }}
-    >
-      <span
-        className={
-          row.isExpanded ? styles.expandedRowArrow : styles.contractedRowArrow
-        }
-      />
-    </button>
-  ) : (
-    <span className={styles.rowArrowContainer} />
-  )
+const PlotSelectionsIndicator: FC<{ plotSelections: number }> = ({
+  plotSelections
+}) => (
+  <IndicatorWithJustTheCounter
+    aria-label={'Sub-rows selected for plots'}
+    count={plotSelections}
+    tooltipContent={`${plotSelections} ${pluralize(
+      'sub-row',
+      plotSelections
+    )} selected for plots.`}
+  />
+)
 
-export type RowActionsProps = {
-  isRowSelected: boolean
-  showSubRowStates: boolean
-  starred?: boolean
-  subRowStates: {
-    selections: number
-    stars: number
-    plotSelections: number
-  }
-  toggleRowSelection: () => void
-  toggleStarred: () => void
+type BulletIndicatorsProps = {
+  plotSelections: number
+  queued?: boolean
 }
 
-export type RowActionProps = {
-  showSubRowStates: boolean
-  subRowsAffected: number
-  actionAppliedLabel: string
-  children: React.ReactElement
-  hidden?: boolean
-  testId?: string
+const BulletIndicators: FC<BulletIndicatorsProps> = ({
+  plotSelections,
+  queued
+}) => (
+  <>
+    <PlotSelectionsIndicator plotSelections={plotSelections} />
+    {queued && <Clock />}
+  </>
+)
+
+type BulletProps = BulletIndicatorsProps & {
+  bulletColor?: string
+  toggleExperiment: () => void
 }
 
-export const RowAction: React.FC<RowActionProps> = ({
-  showSubRowStates,
-  subRowsAffected,
-  actionAppliedLabel,
-  children,
-  hidden,
-  testId
-}) => {
-  const count = (showSubRowStates && subRowsAffected) || 0
+const Bullet: FC<BulletProps> = ({
+  bulletColor,
+  toggleExperiment,
+  ...bulletIndicatorsProps
+}) => (
+  <span
+    className={styles.bullet}
+    style={{ color: bulletColor }}
+    {...onClickOrEnter(toggleExperiment)}
+  >
+    <BulletIndicators {...bulletIndicatorsProps} />
+  </span>
+)
 
-  return (
+type CellErrorWrapperProps = {
+  error?: string
+  toggleExperiment: () => void
+  children?: React.ReactNode
+}
+
+const CellErrorWrapper: FC<CellErrorWrapperProps> = ({
+  error,
+  toggleExperiment,
+  children
+}) => (
+  <ErrorTooltip error={error}>
     <div
-      className={cx(styles.rowActions, hidden && styles.hidden)}
-      data-testid={testId}
+      className={cx(styles.cellContents, error && styles.error)}
+      {...onClickOrEnter(toggleExperiment)}
     >
-      <Indicator
-        count={count}
-        tooltipContent={
-          count &&
-          `${count} ${pluralize('sub-row', count)} ${actionAppliedLabel}.`
-        }
-      >
-        {children}
-      </Indicator>
+      {children}
     </div>
-  )
-}
+  </ErrorTooltip>
+)
 
-export const RowActions: React.FC<RowActionsProps> = ({
-  isRowSelected,
-  showSubRowStates,
-  starred,
-  subRowStates: { selections, stars },
-  toggleRowSelection,
-  toggleStarred
+type CellContentsProps = CellProp & CellErrorWrapperProps
+
+const CellContents: FC<CellContentsProps> = ({
+  cell: { isPlaceholder, render },
+  ...errorProps
+}) =>
+  isPlaceholder ? null : (
+    <CellErrorWrapper {...errorProps}>{render('Cell')}</CellErrorWrapper>
+  )
+
+type InnerCellProps = CellProp &
+  RowActionsProps & {
+    bulletColor?: string
+    toggleExperiment: () => void
+  }
+
+const InnerCell: FC<InnerCellProps> = ({
+  cell,
+  bulletColor,
+  toggleExperiment,
+  ...rowActionsProps
 }) => {
-  return (
-    <>
-      <RowAction
-        showSubRowStates={showSubRowStates}
-        subRowsAffected={selections}
-        actionAppliedLabel={'selected'}
-        testId={'row-action-checkbox'}
-      >
-        <VSCodeCheckbox
-          {...clickAndEnterProps(toggleRowSelection)}
-          checked={isRowSelected}
-        />
-      </RowAction>
-      <RowAction
-        showSubRowStates={showSubRowStates}
-        subRowsAffected={stars}
-        actionAppliedLabel={'starred'}
-        testId={'row-action-star'}
-      >
-        <div
-          className={styles.starSwitch}
-          role="switch"
-          aria-checked={starred}
-          tabIndex={0}
-          {...clickAndEnterProps(toggleStarred)}
-          data-testid="star-icon"
-        >
-          {starred && <StarFull />}
-          {!starred && <StarEmpty />}
-        </div>
-      </RowAction>
-    </>
-  )
-}
-
-export const FirstCell: React.FC<
-  CellProp &
-    RowActionsProps & {
-      bulletColor?: string
-      toggleExperiment: () => void
-    }
-> = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
-  const { row, isPlaceholder } = cell
+  const { row } = cell
   const {
     original: { error, queued }
   } = row
@@ -142,69 +111,90 @@ export const FirstCell: React.FC<
   const {
     subRowStates: { plotSelections }
   } = rowActionsProps
-
   return (
-    <div
-      {...cell.getCellProps({
-        className: cx(
-          styles.td,
-          styles.experimentCell,
-          isPlaceholder && styles.groupPlaceholder
-        )
-      })}
-    >
-      <div className={styles.innerCell}>
-        <RowActions {...rowActionsProps} />
-        <RowExpansionButton row={row} />
-        <span
-          className={styles.bullet}
-          style={{ color: bulletColor }}
-          {...clickAndEnterProps(toggleExperiment)}
-        >
-          <IndicatorWithJustTheCounter
-            aria-label={'Sub-rows selected for plots'}
-            count={plotSelections}
-            tooltipContent={`${plotSelections} ${pluralize(
-              'sub-row',
-              plotSelections
-            )} selected for plots.`}
-          />
-          {queued && <Clock />}
-        </span>
-        {isPlaceholder ? null : (
-          <ErrorTooltip error={error}>
-            <div
-              className={cx(styles.cellContents, error && styles.error)}
-              {...clickAndEnterProps(toggleExperiment)}
-            >
-              {cell.render('Cell')}
-            </div>
-          </ErrorTooltip>
-        )}
-      </div>
+    <div className={styles.innerCell}>
+      <RowActions {...rowActionsProps} />
+      <RowExpansionButton {...row} />
+      <Bullet
+        bulletColor={bulletColor}
+        queued={queued}
+        toggleExperiment={toggleExperiment}
+        plotSelections={plotSelections}
+      />
+      <CellContents
+        toggleExperiment={toggleExperiment}
+        error={error}
+        cell={cell}
+      />
     </div>
   )
 }
 
-export const CellWrapper: React.FC<
-  CellProp & {
-    error?: string
-    changes?: string[]
-    cellId: string
-    children?: React.ReactNode
-  }
-> = ({ cell, cellId, changes }) => {
+const getFirstCellProps = (cell: Cell<Experiment>) =>
+  cell.getCellProps({
+    className: cx(
+      styles.td,
+      styles.experimentCell,
+      cell.isPlaceholder && styles.groupPlaceholder
+    )
+  })
+
+export const FirstCell: FC<InnerCellProps> = props => {
+  const { cell } = props
+
   return (
-    <div
-      {...cell.getCellProps({
-        className: cx(styles.td, {
-          [styles.workspaceChange]: changes?.includes(cell.column.id),
-          [styles.depChange]: cellHasChanges(cell.value),
-          [styles.groupPlaceholder]: cell.isPlaceholder
-        })
-      })}
-      data-testid={cellId}
-    >
+    <div {...getFirstCellProps(cell)}>
+      <InnerCell {...props} />
+    </div>
+  )
+}
+
+interface CellStyleAssertions {
+  hasWorkspaceChanges?: boolean
+  hasDependencyChanges: boolean
+  isPlaceholder: boolean
+}
+
+const cellClassnames = ({
+  hasWorkspaceChanges,
+  hasDependencyChanges,
+  isPlaceholder
+}: CellStyleAssertions) => ({
+  [styles.workspaceChange]: hasWorkspaceChanges,
+  [styles.depChange]: hasDependencyChanges,
+  [styles.groupPlaceholder]: isPlaceholder
+})
+
+type CellWrapperProps = CellProp & {
+  error?: string
+  changes?: string[]
+  cellId: string
+  children?: React.ReactNode
+}
+
+const getCellAssertions = (cell: Cell<Experiment>, changes?: string[]) => {
+  return {
+    hasDependencyChanges: cellHasChanges(cell.value),
+    hasWorkspaceChanges: changes?.includes(cell.column.id),
+    isPlaceholder: cell.isPlaceholder
+  }
+}
+
+const getCellProps = (cell: Cell<Experiment>, changes?: string[]) => {
+  const cellAssertions: CellStyleAssertions = getCellAssertions(cell, changes)
+
+  return cell.getCellProps({
+    className: cx(styles.td, cellClassnames(cellAssertions))
+  })
+}
+
+export const CellWrapper: FC<CellWrapperProps> = ({
+  cell,
+  cellId,
+  changes
+}) => {
+  return (
+    <div {...getCellProps(cell, changes)} data-testid={cellId}>
       {cell.render('Cell')}
     </div>
   )
