@@ -137,9 +137,11 @@ describe('Table', () => {
     return render(
       <Provider store={configureStore({ reducer: experimentsReducers })}>
         <ExperimentsTable tableData={data} />
-      </Provider>, {
-      queries: { ...queries, ...customQueries }
-    })
+      </Provider>,
+      {
+        queries: { ...queries, ...customQueries }
+      }
+    )
   }
 
   beforeAll(() => {

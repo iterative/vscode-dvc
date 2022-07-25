@@ -29,12 +29,14 @@ export const setTableData = (data = tableDataFixture) => {
 }
 
 export const renderTable = (data = tableDataFixture) => {
-  render(
+  const renderedTable = render(
     <Provider store={configureStore({ reducer: experimentsReducers })}>
       <App />
-    </Provider>, {
-    queries: { ...queries, ...customQueries }
-  })
+    </Provider>,
+    {
+      queries: { ...queries, ...customQueries }
+    }
+  )
   setTableData(data)
   return renderedTable
 }
