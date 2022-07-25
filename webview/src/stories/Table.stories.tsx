@@ -203,9 +203,11 @@ WithNoSortsOrFilters.args = {
 
 export const Scrolled: ComponentStory<typeof Experiments> = ({ tableData }) => {
   return (
-    <div style={{ height: 400, width: 600 }}>
-      <Experiments tableData={tableData} />
-    </div>
+    <Provider store={configureStore({ reducer: experimentsReducers })}>
+      <div style={{ height: 400, width: 600 }}>
+        <Experiments tableData={tableData} />
+      </div>
+    </Provider>
   )
 }
 Scrolled.play = async ({ canvasElement }) => {
