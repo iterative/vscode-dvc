@@ -841,12 +841,34 @@
         {
           "command": "dvc.checkoutTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available"
         },
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available"
+        },
+        {
+          "command": "dvc.pullTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == notInCache && dvc.commands.available"
+        }
+      ],
+      "scm/resourceFolder/context": [
+        {
+          "command": "dvc.addTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == untracked && dvc.commands.available"
+        },
+        {
+          "command": "dvc.checkoutTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available"
+        },
+        {
+          "command": "dvc.commitTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available"
         },
         {
           "command": "dvc.pullTarget",

@@ -1,3 +1,4 @@
+import { basename, extname } from 'path'
 import { Uri } from 'vscode'
 import {
   collectDecorationState,
@@ -176,7 +177,11 @@ export class RepositoryModel
   }
 
   private getResourceStates(paths: Set<string>, contextValue: Status) {
-    return [...paths].map(path => this.getResourceState(path, contextValue))
+    return [...paths]
+      .filter(
+        path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
+      )
+      .map(path => this.getResourceState(path, contextValue))
   }
 
   private getResourceState(path: string, contextValue: Status) {
