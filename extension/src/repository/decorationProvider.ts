@@ -52,7 +52,7 @@ export class DecorationProvider
   }
 
   private static DecorationCommittedRenamed: FileDecoration = {
-    badge: 'D',
+    badge: 'R',
     color: new ThemeColor('gitDecoration.renamedResourceForeground'),
     tooltip: 'DVC Committed Renamed'
   }
@@ -64,7 +64,7 @@ export class DecorationProvider
   }
 
   private static DecorationUncommittedAdded: FileDecoration = {
-    badge: 'D',
+    badge: 'A',
     color: new ThemeColor('gitDecoration.untrackedResourceForeground'),
     tooltip: 'DVC Uncommitted Added'
   }
@@ -88,7 +88,7 @@ export class DecorationProvider
   }
 
   private static DecorationTracked: FileDecoration = {
-    tooltip: 'DVC tracked'
+    tooltip: 'DVC Tracked'
   }
 
   public readonly onDidChangeFileDecorations: Event<Uri[]>
