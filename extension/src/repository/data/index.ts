@@ -2,7 +2,12 @@ import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DataStatusOutput } from '../../cli/reader'
-import { DOT_GIT, getGitRepositoryRoot, getHasChanges } from '../../git'
+import {
+  DOT_GIT,
+  getAllUntracked,
+  getGitRepositoryRoot,
+  getHasChanges
+} from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -19,6 +24,7 @@ import { Flag } from '../../cli/constants'
 export type Data = {
   dataStatus: DataStatusOutput
   hasGitChanges: boolean
+  untracked: Set<string>
 }
 
 export const isExcluded = (dvcRoot: string, path: string) =>
@@ -89,11 +95,15 @@ export class RepositoryData extends DeferredDisposable {
         Flag.UNCHANGED
       )
 
-    const hasGitChanges = await getHasChanges(this.dvcRoot)
+    const [untracked, hasGitChanges] = await Promise.all([
+      getAllUntracked(this.dvcRoot),
+      getHasChanges(this.dvcRoot)
+    ])
 
     return this.notifyChanged({
       dataStatus,
-      hasGitChanges
+      hasGitChanges,
+      untracked
     })
   }
 

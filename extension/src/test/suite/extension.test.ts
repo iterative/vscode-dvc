@@ -267,8 +267,7 @@ suite('Extension Test Suite', () => {
           deleted: [],
           modified: ['model.pt', join('data', 'MNIST', 'raw'), 'logs'],
           renamed: []
-        },
-        untracked: []
+        }
       })
 
       stub(CliReader.prototype, 'plotsDiff').resolves(plotsDiffFixture)

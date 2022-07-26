@@ -27,6 +27,7 @@ export const buildDependencies = (disposer: Disposer) => {
 
   const mockDataStatus = stub(cliReader, 'dataStatus')
   const mockGetHasChanges = stub(Git, 'getHasChanges')
+  const mockGetAllUntracked = stub(Git, 'getAllUntracked')
   const mockNow = stub(Time, 'getCurrentEpoch')
 
   const treeDataChanged = disposer.track(new EventEmitter<void>())
@@ -37,6 +38,7 @@ export const buildDependencies = (disposer: Disposer) => {
     internalCommands,
     mockCreateFileSystemWatcher,
     mockDataStatus,
+    mockGetAllUntracked,
     mockGetHasChanges,
     mockNow,
     onDidChangeTreeData,
@@ -50,11 +52,13 @@ export const buildRepositoryData = async (disposer: Disposer) => {
     internalCommands,
     mockCreateFileSystemWatcher,
     mockDataStatus,
+    mockGetAllUntracked,
     mockNow,
     updatesPaused
   } = buildDependencies(disposer)
 
   mockDataStatus.resolves({} as DataStatusOutput)
+  mockGetAllUntracked.resolves(new Set())
   mockNow.returns(FIRST_TRUTHY_TIME)
 
   const data = disposer.track(
@@ -67,7 +71,8 @@ export const buildRepositoryData = async (disposer: Disposer) => {
   return {
     data,
     mockCreateFileSystemWatcher,
-    mockDataStatus
+    mockDataStatus,
+    mockGetAllUntracked
   }
 }
 

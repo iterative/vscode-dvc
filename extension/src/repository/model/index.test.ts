@@ -64,7 +64,8 @@ describe('RepositoryModel', () => {
       const model = new RepositoryModel(dvcDemoPath)
       model.setState({
         dataStatus,
-        hasGitChanges: true
+        hasGitChanges: true,
+        untracked: new Set()
       })
 
       expect(model.getDecorationState()).toStrictEqual({
@@ -135,7 +136,8 @@ describe('RepositoryModel', () => {
       const model = new RepositoryModel(dvcDemoPath)
       model.setState({
         dataStatus,
-        hasGitChanges: true
+        hasGitChanges: true,
+        untracked: new Set()
       })
 
       expect(model.getDecorationState()).toStrictEqual({

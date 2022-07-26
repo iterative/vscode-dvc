@@ -35,19 +35,20 @@ suite('Repository Test Suite', () => {
       const {
         internalCommands,
         mockDataStatus,
+        mockGetAllUntracked,
         mockGetHasChanges,
         updatesPaused,
         treeDataChanged
       } = buildDependencies(disposable)
 
-      const untracked = join('some', 'untracked', 'python.py')
-
       mockDataStatus.resolves({
         uncommitted: {
           modified: [model, logDir, logAcc, logLoss, dataDir, dataset]
-        },
-        untracked: [untracked]
+        }
       })
+
+      const untracked = join('python.py')
+      mockGetAllUntracked.resolves(new Set([untracked]))
 
       mockGetHasChanges.resolves(true)
 
@@ -68,6 +69,7 @@ suite('Repository Test Suite', () => {
       ])
 
       expect(mockDataStatus).to.be.calledWith(dvcDemoPath)
+      expect(mockGetAllUntracked).to.be.calledWith(dvcDemoPath)
 
       expect(setDecorationStateSpy.lastCall.firstArg).to.deep.equal({
         committedAdded: emptySet,
@@ -135,7 +137,7 @@ suite('Repository Test Suite', () => {
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: false,
-            resourceUri: Uri.file(join(dvcDemoPath, untracked))
+            resourceUri: Uri.file(untracked)
           }
         ]
       })
@@ -149,13 +151,14 @@ suite('Repository Test Suite', () => {
       const features = join(dataDir, 'features')
       const dataXml = join(dataDir, 'data.xml')
       const prepared = join(dataDir, 'prepared')
-      const untrackedGo = join('some', 'untracked', 'go.go')
-      const untrackedPerl = join('some', 'untracked', 'perl.pl')
-      const untrackedPython = join('some', 'untracked', 'python.py')
+      const untrackedGo = join('untracked', 'go.go')
+      const untrackedPerl = join('untracked', 'perl.pl')
+      const untrackedPython = join('untracked', 'python.py')
 
       const {
         internalCommands,
         mockDataStatus,
+        mockGetAllUntracked,
         mockGetHasChanges,
         mockNow,
         onDidChangeTreeData,
@@ -195,10 +198,14 @@ suite('Repository Test Suite', () => {
           committed: {},
           not_in_cache: [dataXml, prepared],
           unchanged: [dataDir, logAcc, logDir, logLoss],
-          uncommitted: { deleted: [model], modified: [features] },
-          untracked: [untrackedGo, untrackedPerl, untrackedPython]
+          uncommitted: { deleted: [model], modified: [features] }
         })
       mockGetHasChanges.resolves(false)
+      mockGetAllUntracked
+        .onFirstCall()
+        .resolves(new Set())
+        .onSecondCall()
+        .resolves(new Set(untracked))
 
       const { repository, setDecorationStateSpy, setScmStateSpy } =
         await buildRepository(

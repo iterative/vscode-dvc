@@ -33,7 +33,6 @@ export enum Flag {
   SET_PARAM = '-S',
   SPLIT = '--split',
   UNCHANGED = '--unchanged',
-  UNTRACKED = '--untracked',
   VERSION = '--version',
   WITH_DIRS = '--with-dirs'
 }

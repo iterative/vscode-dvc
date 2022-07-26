@@ -17,6 +17,7 @@ import { DataStatusOutput } from '../../cli/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'
+import { isDirectory } from '../../fileSystem'
 
 export class RepositoryModel
   extends Disposable
@@ -97,7 +98,17 @@ export class RepositoryModel
           Status.UNCOMMITTED_RENAMED
         )
       ],
-      untracked: this.getResourceStates(this.untracked, Status.UNTRACKED)
+      untracked: [...this.untracked]
+        .filter(
+          path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
+        )
+        .map(path => ({
+          contextValue: Status.UNTRACKED,
+          dvcRoot: this.dvcRoot,
+          isDirectory: isDirectory(path),
+          isTracked: false,
+          resourceUri: Uri.file(path)
+        }))
     }
   }
 
@@ -105,12 +116,13 @@ export class RepositoryModel
     return this.tree.get(path) || []
   }
 
-  public setState({ dataStatus, hasGitChanges }: Data) {
+  public setState({ dataStatus, hasGitChanges, untracked }: Data) {
     this.collectTracked(dataStatus)
 
     this.collectState(dataStatus)
 
     this.hasGitChanges = hasGitChanges
+    this.untracked = untracked
   }
 
   public hasChanges(): boolean {
@@ -148,8 +160,7 @@ export class RepositoryModel
       uncommittedAdded,
       uncommittedDeleted,
       uncommittedModified,
-      uncommittedRenamed,
-      untracked
+      uncommittedRenamed
     } = collectDecorationState(this.dvcRoot, dataStatus)
 
     this.committedAdded = committedAdded
@@ -161,7 +172,6 @@ export class RepositoryModel
     this.uncommittedDeleted = uncommittedDeleted
     this.uncommittedModified = uncommittedModified
     this.uncommittedRenamed = uncommittedRenamed
-    this.untracked = untracked
   }
 
   private getTracked() {
@@ -177,18 +187,14 @@ export class RepositoryModel
   }
 
   private getResourceStates(paths: Set<string>, contextValue: Status) {
-    return [...paths]
-      .filter(
-        path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
-      )
-      .map(path => this.getResourceState(path, contextValue))
+    return [...paths].map(path => this.getResourceState(path, contextValue))
   }
 
   private getResourceState(path: string, contextValue: Status) {
     return {
       contextValue,
       dvcRoot: this.dvcRoot,
-      isDirectory: !!this.tree.get(path), // these are needed because commands operate on both the SCM and Tracked Tree
+      isDirectory: !!this.tree.get(path),
       isTracked: this.isTracked(path),
       resourceUri: Uri.file(path)
     }

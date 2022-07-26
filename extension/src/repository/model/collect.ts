@@ -209,13 +209,15 @@ export const collectTracked = (
   return tracked
 }
 
+// when we have a modified directory and a subdirectory contains changes we need to project modified down
+
 const getSet = (dvcRoot: string, relPaths?: string[]): Set<string> =>
   new Set((relPaths || []).map(relPath => getAbsPath(dvcRoot, relPath)))
 
 export const collectDecorationState = (
   dvcRoot: string,
   dataStatus: DataStatusOutput
-): Omit<DecorationState, 'tracked'> & { untracked: Set<string> } => {
+): Omit<DecorationState, 'tracked'> => {
   return {
     committedAdded: getSet(dvcRoot, dataStatus.committed?.added),
     committedDeleted: getSet(dvcRoot, dataStatus.committed?.deleted),
@@ -231,8 +233,7 @@ export const collectDecorationState = (
     uncommittedRenamed: getSet(
       dvcRoot,
       dataStatus.uncommitted?.renamed?.map(relPath => relPath.new)
-    ),
-    untracked: getSet(dvcRoot, dataStatus.untracked)
+    )
   }
 }
 

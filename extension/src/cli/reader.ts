@@ -20,7 +20,6 @@ export type DataStatusOutput = {
     modified?: string[]
     renamed?: { new: string; old: string }[]
   }
-  untracked?: string[]
 }
 
 type SingleValue = string | number | boolean | null
@@ -107,7 +106,6 @@ export class CliReader extends Cli {
       SubCommand.STATUS,
       Flag.WITH_DIRS,
       Flag.GRANULAR,
-      Flag.UNTRACKED,
       ...args
     )
   }
