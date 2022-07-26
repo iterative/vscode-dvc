@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.13] - 2022-07-26
+
+### 🚀 New Features and Enhancements
+
+- Add conditional shadow to sticky experiments column [#2062](https://github.com/iterative/vscode-dvc/pull/2062) by [@julieg18](https://github.com/julieg18)
+- Highlight experiments with errors [#2072](https://github.com/iterative/vscode-dvc/pull/2072) by [@mattseddon](https://github.com/mattseddon)
+- Comparison table drag and drop feedback [#2064](https://github.com/iterative/vscode-dvc/pull/2064) by [@sroy3](https://github.com/sroy3)
+- Change the style of the comparison drag and drop feedback [#2077](https://github.com/iterative/vscode-dvc/pull/2077) by [@sroy3](https://github.com/sroy3)
+- Style the ghost image of the comparison table dragged item [#2088](https://github.com/iterative/vscode-dvc/pull/2088) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Move divider to top of group in experiments table context menu [#2083](https://github.com/iterative/vscode-dvc/pull/2083) by [@mattseddon](https://github.com/mattseddon)
+- Fix cell tooltip position on table column resize [#2087](https://github.com/iterative/vscode-dvc/pull/2087) by [@julieg18](https://github.com/julieg18)
+- Fix `yarn build` by reverting "chore(deps): update dependency vsce to v2.9.3" [#2101](https://github.com/iterative/vscode-dvc/pull/2101) by [@julieg18](https://github.com/julieg18)
+- Undo failed release attempt by reverting "Update version and CHANGELOG for release" [#2104](https://github.com/iterative/vscode-dvc/pull/2104) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Standardize how the webviews access icons [#2079](https://github.com/iterative/vscode-dvc/pull/2079) by [@mattseddon](https://github.com/mattseddon)
+- Add more resolutions for security advisories in dev dependencies [#2082](https://github.com/iterative/vscode-dvc/pull/2082) by [@mattseddon](https://github.com/mattseddon)
+- Refactor experiments column conditional shadow logic [#2085](https://github.com/iterative/vscode-dvc/pull/2085) by [@julieg18](https://github.com/julieg18)
+- Add getParentelem helper for tests [#2086](https://github.com/iterative/vscode-dvc/pull/2086) by [@sroy3](https://github.com/sroy3)
+- Avoid name clashing when naming redux objects [#2095](https://github.com/iterative/vscode-dvc/pull/2095) by [@sroy3](https://github.com/sroy3)
+- Do not use turbo cache on main [#2098](https://github.com/iterative/vscode-dvc/pull/2098) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.12] - 2022-07-20
 
 ### 🚀 New Features and Enhancements
