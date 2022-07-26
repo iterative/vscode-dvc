@@ -2,6 +2,7 @@ import { Uri } from 'vscode'
 import {
   collectDecorationState,
   collectTracked,
+  collectTrackedDecorations,
   collectTree,
   PathItem
 } from './collect'
@@ -51,7 +52,7 @@ export class RepositoryModel
       committedModified: this.committedModified,
       committedRenamed: this.committedRenamed,
       notInCache: this.notInCache,
-      tracked: this.getTracked(),
+      tracked: this.getTrackedDecorations(),
       uncommittedAdded: this.uncommittedAdded,
       uncommittedDeleted: this.uncommittedDeleted,
       uncommittedModified: this.uncommittedModified,
@@ -164,6 +165,10 @@ export class RepositoryModel
 
   private getTracked() {
     return this.tracked
+  }
+
+  private getTrackedDecorations() {
+    return collectTrackedDecorations(this.tracked)
   }
 
   private isTracked(path: string) {

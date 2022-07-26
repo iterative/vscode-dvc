@@ -1,10 +1,15 @@
-import { join, relative } from 'path'
+import { join, relative, resolve } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 import { DataStatusOutput } from '../../cli/reader'
 import { relativeWithUri } from '../../fileSystem'
-import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
+import {
+  getDirectChild,
+  getParent,
+  getPath,
+  getPathArray
+} from '../../fileSystem/util'
 import { DecorationState } from '../decorationProvider'
 
 export type PathItem = Resource & {
@@ -175,7 +180,7 @@ export const collectSelected = (
 }
 
 const getAbsPath = (dvcRoot: string, relPath: string): string =>
-  join(dvcRoot, relPath)
+  resolve(dvcRoot, relPath)
 
 export const collectTracked = (
   dvcRoot: string,
@@ -196,8 +201,8 @@ export const collectTracked = (
   ]) {
     for (const path of paths) {
       typeof path === 'string'
-        ? tracked.add(join(dvcRoot, path))
-        : tracked.add(join(dvcRoot, path.new))
+        ? tracked.add(resolve(dvcRoot, path))
+        : tracked.add(resolve(dvcRoot, path.new))
     }
   }
 
@@ -229,4 +234,24 @@ export const collectDecorationState = (
     ),
     untracked: getSet(dvcRoot, dataStatus.untracked)
   }
+}
+
+export const collectTrackedDecorations = (
+  tracked: Set<string>
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+): Set<string> => {
+  const acc = new Set<string>(tracked)
+  for (const path of tracked) {
+    const pathArray = getPathArray(path)
+    const parent = getParent(pathArray, pathArray.length)
+    if (!parent || tracked.has(parent)) {
+      continue
+    }
+    const grandParent = getParent(pathArray, pathArray.length - 1)
+
+    if (grandParent && tracked.has(grandParent)) {
+      acc.add(parent)
+    }
+  }
+  return acc
 }

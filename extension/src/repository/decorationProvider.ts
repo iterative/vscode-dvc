@@ -123,8 +123,10 @@ export class DecorationProvider
   }
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
+    const path = uri.fsPath
+
     const decoration = Object.keys(this.decorationMapping).find(status => {
-      if (this.state[status as Status]?.has(uri.fsPath)) {
+      if (this.state[status as Status]?.has(path)) {
         return status
       }
     }) as Status
@@ -132,7 +134,7 @@ export class DecorationProvider
     if (decoration) {
       return this.decorationMapping[decoration]
     }
-    if (this.state.tracked?.has(uri.fsPath)) {
+    if (this.state.tracked?.has(path)) {
       return DecorationProvider.DecorationTracked
     }
   }

@@ -1,6 +1,10 @@
 import { join } from 'path'
 import { Uri } from 'vscode'
-import { collectSelected, collectTree } from './collect'
+import {
+  collectSelected,
+  collectTrackedDecorations,
+  collectTree
+} from './collect'
 import { dvcDemoPath } from '../../test/util'
 
 const makeUri = (...paths: string[]): Uri =>
@@ -313,5 +317,31 @@ describe('collectSelected', () => {
     expect(selected).toStrictEqual({
       [dvcDemoPath]: [logsPathItem]
     })
+  })
+})
+
+describe('collectTrackedDecorations', () => {
+  it('should fill in missing parents', () => {
+    const tracked = new Set<string>([
+      'training_metrics/scalars/loss.tsv',
+      'training_metrics',
+      'training_metrics/scalars/acc.tsv',
+      'data/MNIST/raw/t10k-labels-idx1-ubyte.gz',
+      'model.pt',
+      'data/MNIST/raw',
+      'data/MNIST/raw/train-labels-idx1-ubyte.gz',
+      'data/MNIST/raw/t10k-labels-idx1-ubyte',
+      'misclassified.jpg',
+      'data/MNIST/raw/t10k-images-idx3-ubyte.gz',
+      'data/MNIST/raw/train-images-idx3-ubyte',
+      'data/MNIST/raw/t10k-images-idx3-ubyte',
+      'predictions.json',
+      'data/MNIST/raw/train-labels-idx1-ubyte',
+      'data/MNIST/raw/train-images-idx3-ubyte.gz'
+    ])
+    const trackedWithMissingParents = collectTrackedDecorations(tracked)
+    expect(trackedWithMissingParents).toStrictEqual(
+      new Set([...tracked, 'training_metrics/scalars'])
+    )
   })
 })
