@@ -1,4 +1,6 @@
+import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
+import { Provider } from 'react-redux'
 import { ComponentStory } from '@storybook/react'
 import { Meta } from '@storybook/react/types-6-0'
 import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
@@ -22,6 +24,7 @@ import {
   setExperimentsAsSelected,
   setExperimentsAsStarred
 } from '../test/tableDataFixture'
+import { experimentsReducers } from '../experiments/store'
 
 const tableData: TableData = {
   changes: workspaceChangesFixture,
@@ -100,7 +103,11 @@ export default {
 } as Meta
 
 const Template: ComponentStory<typeof Experiments> = ({ tableData }) => {
-  return <Experiments tableData={tableData} />
+  return (
+    <Provider store={configureStore({ reducer: experimentsReducers })}>
+      <Experiments tableData={tableData} />
+    </Provider>
+  )
 }
 
 export const WithData = Template.bind({})
@@ -196,9 +203,11 @@ WithNoSortsOrFilters.args = {
 
 export const Scrolled: ComponentStory<typeof Experiments> = ({ tableData }) => {
   return (
-    <div style={{ height: 400, width: 600 }}>
-      <Experiments tableData={tableData} />
-    </div>
+    <Provider store={configureStore({ reducer: experimentsReducers })}>
+      <div style={{ height: 400, width: 600 }}>
+        <Experiments tableData={tableData} />
+      </div>
+    </Provider>
   )
 }
 Scrolled.play = async ({ canvasElement }) => {
