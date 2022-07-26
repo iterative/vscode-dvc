@@ -167,3 +167,9 @@ $gap: 4px;
 .draggedColumn {
   opacity: 0.4;
 }
+
+.ghostElem {
+  background-color: $accent-color;
+  opacity: 1;
+  color: $bg-color;
+}
