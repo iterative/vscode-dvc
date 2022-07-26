@@ -2,8 +2,8 @@ import { basename, extname } from 'path'
 import { Uri } from 'vscode'
 import {
   collectDecorationState,
+  collectMissingParents,
   collectTracked,
-  collectTrackedDecorations,
   collectTree,
   PathItem
 } from './collect'
@@ -122,7 +122,7 @@ export class RepositoryModel
     this.collectState(dataStatus)
 
     this.hasGitChanges = hasGitChanges
-    this.untracked = untracked
+    this.untracked = collectMissingParents(this.dvcRoot, untracked)
   }
 
   public hasChanges(): boolean {
@@ -179,7 +179,7 @@ export class RepositoryModel
   }
 
   private getTrackedDecorations() {
-    return collectTrackedDecorations(this.tracked)
+    return collectMissingParents(this.dvcRoot, this.tracked)
   }
 
   private isTracked(path: string) {

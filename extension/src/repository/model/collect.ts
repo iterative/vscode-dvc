@@ -4,12 +4,7 @@ import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 import { DataStatusOutput } from '../../cli/reader'
 import { relativeWithUri } from '../../fileSystem'
-import {
-  getDirectChild,
-  getParent,
-  getPath,
-  getPathArray
-} from '../../fileSystem/util'
+import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
 import { DecorationState } from '../decorationProvider'
 
 export type PathItem = Resource & {
@@ -209,8 +204,6 @@ export const collectTracked = (
   return tracked
 }
 
-// when we have a modified directory and a subdirectory contains changes we need to project modified down
-
 const getSet = (dvcRoot: string, relPaths?: string[]): Set<string> =>
   new Set((relPaths || []).map(relPath => getAbsPath(dvcRoot, relPath)))
 
@@ -237,22 +230,45 @@ export const collectDecorationState = (
   }
 }
 
-export const collectTrackedDecorations = (
-  tracked: Set<string>
+// when we have an untracked, added, modified or deleted directory and a subdirectory contains changes we need to project a status down
+const addMissingParents = (
+  dvcRoot: string,
+  pathArray: string[],
+  original: Set<string>,
+  withParents: Set<string>
   // eslint-disable-next-line sonarjs/cognitive-complexity
-): Set<string> => {
-  const acc = new Set<string>(tracked)
-  for (const path of tracked) {
-    const pathArray = getPathArray(path)
-    const parent = getParent(pathArray, pathArray.length)
-    if (!parent || tracked.has(parent)) {
-      continue
-    }
-    const grandParent = getParent(pathArray, pathArray.length - 1)
+) => {
+  const parents = new Set<string>()
 
-    if (grandParent && tracked.has(grandParent)) {
-      acc.add(parent)
+  for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
+    const path = getPath(pathArray, reverseIdx)
+
+    if (path === dvcRoot) {
+      return
     }
+
+    if (original.has(path) || withParents.has(path)) {
+      for (const parent of parents) {
+        withParents.add(parent)
+      }
+      return
+    }
+
+    parents.add(path)
   }
-  return acc
+}
+
+export const collectMissingParents = (
+  dvcRoot: string,
+  original: Set<string>
+): Set<string> => {
+  const withParents = new Set<string>()
+
+  for (const path of original) {
+    withParents.add(path)
+    const pathArray = getPathArray(path)
+    addMissingParents(dvcRoot, pathArray.slice(0, -1), original, withParents)
+  }
+
+  return withParents
 }

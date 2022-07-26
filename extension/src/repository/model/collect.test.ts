@@ -1,10 +1,6 @@
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { Uri } from 'vscode'
-import {
-  collectSelected,
-  collectTrackedDecorations,
-  collectTree
-} from './collect'
+import { collectMissingParents, collectSelected, collectTree } from './collect'
 import { dvcDemoPath } from '../../test/util'
 
 const makeUri = (...paths: string[]): Uri =>
@@ -320,33 +316,57 @@ describe('collectSelected', () => {
   })
 })
 
-describe('collectTrackedDecorations', () => {
-  it('should fill in missing parents', () => {
+describe('collectMissingParents', () => {
+  it('should collect missing untracked parents', () => {
+    const untracked = new Set([
+      resolve(dvcDemoPath, 'data/'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
+    ])
+
+    const untrackedWithMissingParents = collectMissingParents(
+      dvcDemoPath,
+      untracked
+    )
+    expect(untrackedWithMissingParents).toStrictEqual(
+      new Set([
+        ...untracked,
+        resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+        resolve(dvcDemoPath, 'data', 'MNIST')
+      ])
+    )
+  })
+
+  it('should collect missing tracked parents', () => {
     const tracked = new Set<string>([
-      join('training_metrics', 'scalars', 'loss.tsv'),
-      'training_metrics',
-      join('training_metrics', 'scalars', 'acc.tsv'),
-      join(
+      resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv'),
+      resolve(dvcDemoPath, 'training_metrics'),
+      resolve(dvcDemoPath, 'training_metrics', 'scalars', 'acc.tsv'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
+      resolve(dvcDemoPath, 'model.pt'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+      resolve(
+        dvcDemoPath,
         'data',
         'MNIST',
         'raw',
-        't10k-labels-idx1-ubyte.gz',
-        'model.pt',
-        join('data', 'MNIST', 'raw'),
-        join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
-        join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
-        'misclassified.jpg'
+        'train-labels-idx1-ubyte.gz'
       ),
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
-      'predictions.json',
-      join('data/MNIST/raw/train-labels-idx1-ubyte'),
-      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
+      resolve(dvcDemoPath, 'misclassified.jpg'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      resolve(dvcDemoPath, 'predictions.json'),
+      resolve(dvcDemoPath, 'data/MNIST/raw/train-labels-idx1-ubyte'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
     ])
-    const trackedWithMissingParents = collectTrackedDecorations(tracked)
+    const trackedWithMissingParents = collectMissingParents(
+      dvcDemoPath,
+      tracked
+    )
     expect(trackedWithMissingParents).toStrictEqual(
-      new Set([...tracked, join('training_metrics', 'scalars')])
+      new Set([...tracked, resolve(dvcDemoPath, 'training_metrics', 'scalars')])
     )
   })
 })
