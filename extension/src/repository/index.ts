@@ -55,7 +55,7 @@ export class Repository extends DeferredDisposable {
   }
 
   public hasChanges(): boolean {
-    return this.model.hasChanges()
+    return this.model.getHasChanges()
   }
 
   public getScale() {

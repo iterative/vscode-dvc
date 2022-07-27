@@ -233,7 +233,7 @@ const collectMissingParents = (originalMapping: {
 const removeTrailingSlash = (path: string): string =>
   path.endsWith(sep) ? path.slice(0, -1) : path
 
-export const collectState = (
+export const collectDataStatus = (
   dvcRoot: string,
   dataStatus: DataStatusOutput & { untracked?: string[] }
 ): DecorationState & {

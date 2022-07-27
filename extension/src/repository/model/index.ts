@@ -1,8 +1,9 @@
 import { basename, extname, relative } from 'path'
 import { Uri } from 'vscode'
-import { collectState, collectTree, PathItem } from './collect'
+import { collectDataStatus, collectTree, PathItem } from './collect'
 import {
   SourceControlManagementModel,
+  SourceControlManagementResource,
   SourceControlManagementState,
   SourceControlManagementStatus
 } from '../sourceControlManagement'
@@ -19,7 +20,7 @@ export class RepositoryModel
 {
   private readonly dvcRoot: string
 
-  private hasGitChanges = false
+  private hasChanges = false
   private committedAdded = new Set<string>()
   private committedDeleted = new Set<string>()
   private committedModified = new Set<string>()
@@ -59,46 +60,28 @@ export class RepositoryModel
 
   public getSourceControlManagementState(): SourceControlManagementState {
     return {
-      committed: [
-        ...this.getScmResources(
-          this.committedAdded,
-          SourceControlManagementStatus.COMMITTED_ADDED
-        ),
-        ...this.getScmResources(
+      committed: this.getScmResourceGroup({
+        [SourceControlManagementStatus.COMMITTED_ADDED]: this.committedAdded,
+        [SourceControlManagementStatus.COMMITTED_DELETED]:
           this.committedDeleted,
-          SourceControlManagementStatus.COMMITTED_DELETED
-        ),
-        ...this.getScmResources(
+        [SourceControlManagementStatus.COMMITTED_MODIFIED]:
           this.committedModified,
-          SourceControlManagementStatus.COMMITTED_MODIFIED
-        ),
-        ...this.getScmResources(
-          this.committedRenamed,
-          SourceControlManagementStatus.COMMITTED_RENAMED
-        )
-      ],
+        [SourceControlManagementStatus.COMMITTED_RENAMED]: this.committedRenamed
+      } as Record<SourceControlManagementStatus, Set<string>>),
       notInCache: this.getScmResources(
-        this.notInCache,
-        SourceControlManagementStatus.NOT_IN_CACHE
+        SourceControlManagementStatus.NOT_IN_CACHE,
+        this.notInCache
       ),
-      uncommitted: [
-        ...this.getScmResources(
+      uncommitted: this.getScmResourceGroup({
+        [SourceControlManagementStatus.UNCOMMITTED_ADDED]:
           this.uncommittedAdded,
-          SourceControlManagementStatus.UNCOMMITTED_ADDED
-        ),
-        ...this.getScmResources(
+        [SourceControlManagementStatus.UNCOMMITTED_DELETED]:
           this.uncommittedDeleted,
-          SourceControlManagementStatus.UNCOMMITTED_DELETED
-        ),
-        ...this.getScmResources(
+        [SourceControlManagementStatus.UNCOMMITTED_MODIFIED]:
           this.uncommittedModified,
-          SourceControlManagementStatus.UNCOMMITTED_MODIFIED
-        ),
-        ...this.getScmResources(
-          this.uncommittedRenamed,
-          SourceControlManagementStatus.UNCOMMITTED_RENAMED
-        )
-      ],
+        [SourceControlManagementStatus.UNCOMMITTED_RENAMED]:
+          this.uncommittedRenamed
+      } as Record<SourceControlManagementStatus, Set<string>>),
       untracked: [...this.untracked]
         .filter(
           path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
@@ -118,17 +101,13 @@ export class RepositoryModel
   }
 
   public setState({ dataStatus, hasGitChanges, untracked }: Data) {
-    const tracked = this.collectState({
+    const tracked = this.collectDataStatus({
       ...dataStatus,
       untracked: [...untracked].map(path => relative(this.dvcRoot, path))
     })
     this.collectTree(tracked)
 
-    this.hasGitChanges = hasGitChanges
-  }
-
-  public hasChanges(): boolean {
-    return !!(
+    this.hasChanges = !!(
       this.committedAdded.size > 0 ||
       this.committedDeleted.size > 0 ||
       this.committedModified.size > 0 ||
@@ -139,8 +118,12 @@ export class RepositoryModel
       this.uncommittedModified.size > 0 ||
       this.uncommittedRenamed.size > 0 ||
       this.untracked.size > 0 ||
-      this.hasGitChanges
+      hasGitChanges
     )
+  }
+
+  public getHasChanges(): boolean {
+    return this.hasChanges
   }
 
   private collectTree(tracked: Set<string>): void {
@@ -150,7 +133,7 @@ export class RepositoryModel
     }
   }
 
-  private collectState(
+  private collectDataStatus(
     dataStatus: DataStatusOutput & { untracked?: string[] }
   ) {
     const {
@@ -166,7 +149,7 @@ export class RepositoryModel
       uncommittedModified,
       uncommittedRenamed,
       untracked
-    } = collectState(this.dvcRoot, dataStatus)
+    } = collectDataStatus(this.dvcRoot, dataStatus)
 
     this.committedAdded = committedAdded
     this.committedDeleted = committedDeleted
@@ -191,16 +174,31 @@ export class RepositoryModel
     return this.getTracked().has(path)
   }
 
-  private getScmResources(
-    paths: Set<string>,
-    contextValue: SourceControlManagementStatus
+  private getScmResourceGroup(
+    resourceGroupMapping: Record<SourceControlManagementStatus, Set<string>>
   ) {
-    return [...paths].map(path => this.getScmResource(path, contextValue))
+    const resourceGroup: SourceControlManagementResource[] = []
+    for (const [contextValue, paths] of Object.entries(resourceGroupMapping)) {
+      resourceGroup.push(
+        ...this.getScmResources(
+          contextValue as SourceControlManagementStatus,
+          paths
+        )
+      )
+    }
+    return resourceGroup
+  }
+
+  private getScmResources(
+    contextValue: SourceControlManagementStatus,
+    paths: Set<string>
+  ) {
+    return [...paths].map(path => this.getScmResource(contextValue, path))
   }
 
   private getScmResource(
-    path: string,
-    contextValue: SourceControlManagementStatus
+    contextValue: SourceControlManagementStatus,
+    path: string
   ) {
     return {
       contextValue,

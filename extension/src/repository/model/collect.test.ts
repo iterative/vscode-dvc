@@ -1,6 +1,6 @@
 import { join, resolve, sep } from 'path'
 import { Uri } from 'vscode'
-import { collectSelected, collectState, collectTree } from './collect'
+import { collectSelected, collectDataStatus, collectTree } from './collect'
 import { dvcDemoPath } from '../../test/util'
 
 const makeUri = (...paths: string[]): Uri =>
@@ -325,7 +325,7 @@ describe('collectState', () => {
     ]
 
     const { untracked: untrackedWithMissingParents, trackedDecorations } =
-      collectState(dvcDemoPath, {
+      collectDataStatus(dvcDemoPath, {
         untracked
       })
     expect(untrackedWithMissingParents).toStrictEqual(
@@ -356,7 +356,7 @@ describe('collectState', () => {
       join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
       join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
     ]
-    const { trackedDecorations: trackedWithMissingParents } = collectState(
+    const { trackedDecorations: trackedWithMissingParents } = collectDataStatus(
       dvcDemoPath,
       {
         unchanged: tracked

@@ -26,7 +26,7 @@ export enum SourceControlManagementStatus {
   UNTRACKED = 'untracked'
 }
 
-type SourceControlManagementResource = PathItem & {
+export type SourceControlManagementResource = PathItem & {
   contextValue: SourceControlManagementStatus
 }
 
