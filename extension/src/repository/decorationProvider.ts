@@ -7,23 +7,18 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
+import { BaseDataStatus } from './constants'
 import { Disposable } from '../class/dispose'
 import { flattenUnique } from '../util/array'
 
-export type DecorationState = Record<DecorationStatus, Set<string>>
+export const DecorationDataStatus = Object.assign({}, BaseDataStatus, {
+  TRACKED: 'tracked'
+} as const)
 
-enum DecorationStatus {
-  COMMITTED_ADDED = 'committedAdded',
-  COMMITTED_DELETED = 'committedDeleted',
-  COMMITTED_MODIFIED = 'committedModified',
-  COMMITTED_RENAMED = 'committedRenamed',
-  NOT_IN_CACHE = 'notInCache',
-  UNCOMMITTED_ADDED = 'uncommittedAdded',
-  UNCOMMITTED_DELETED = 'uncommittedDeleted',
-  UNCOMMITTED_MODIFIED = 'uncommittedModified',
-  UNCOMMITTED_RENAMED = 'uncommittedRenamed',
-  TRACKED = 'tracked'
-}
+type DecorationStatus =
+  typeof DecorationDataStatus[keyof typeof DecorationDataStatus]
+
+export type DecorationState = Record<DecorationStatus, Set<string>>
 
 export class DecorationProvider
   extends Disposable

@@ -3,6 +3,7 @@ import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 import { DataStatusOutput } from '../../cli/reader'
+import { DecorationDataStatus } from '../decorationProvider'
 import { relativeWithUri } from '../../fileSystem'
 import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
 
@@ -176,21 +177,20 @@ export const collectSelected = (
 const getAbsPath = (dvcRoot: string, relPath: string): string =>
   resolve(dvcRoot, relPath)
 
-enum Status {
-  COMMITTED_ADDED = 'committedAdded',
-  COMMITTED_DELETED = 'committedDeleted',
-  COMMITTED_MODIFIED = 'committedModified',
-  COMMITTED_RENAMED = 'committedRenamed',
-  NOT_IN_CACHE = 'notInCache',
-  UNCOMMITTED_ADDED = 'uncommittedAdded',
-  UNCOMMITTED_DELETED = 'uncommittedDeleted',
-  UNCOMMITTED_MODIFIED = 'uncommittedModified',
-  UNCOMMITTED_RENAMED = 'uncommittedRenamed',
-  TRACKED_DECORATIONS = 'trackedDecorations',
-  TRACKED = 'tracked',
-  UNCHANGED = 'unchanged',
-  UNTRACKED = 'untracked'
-}
+export const UndecoratedDataStatus = {
+  TRACKED_DECORATIONS: 'trackedDecorations',
+  UNCHANGED: 'unchanged',
+  UNTRACKED: 'untracked'
+} as const
+
+const AvailableDataStatus = Object.assign(
+  {} as const,
+  DecorationDataStatus,
+  UndecoratedDataStatus
+)
+
+export type Status =
+  typeof AvailableDataStatus[keyof typeof AvailableDataStatus]
 
 type DataStatusMapping = { [path: string]: Status }
 
@@ -241,7 +241,7 @@ const addToTracked = (
   absPath: string,
   status: Status
 ) => {
-  if (status === Status.UNTRACKED) {
+  if (status === AvailableDataStatus.UNTRACKED) {
     return
   }
 
@@ -263,42 +263,52 @@ const transformDataStatusOutput = (
     }
   }
 
-  collectStatus(dataStatus.committed?.added, Status.COMMITTED_ADDED)
-  collectStatus(dataStatus.committed?.deleted, Status.COMMITTED_DELETED)
-  collectStatus(dataStatus.committed?.modified, Status.COMMITTED_MODIFIED)
+  collectStatus(
+    dataStatus.committed?.added,
+    AvailableDataStatus.COMMITTED_ADDED
+  )
+  collectStatus(
+    dataStatus.committed?.deleted,
+    AvailableDataStatus.COMMITTED_DELETED
+  )
+  collectStatus(
+    dataStatus.committed?.modified,
+    AvailableDataStatus.COMMITTED_MODIFIED
+  )
   collectStatus(
     dataStatus.committed?.renamed?.map(({ new: path }) => path),
-    Status.COMMITTED_RENAMED
+    AvailableDataStatus.COMMITTED_RENAMED
   )
-  collectStatus(dataStatus.uncommitted?.added, Status.UNCOMMITTED_ADDED)
-  collectStatus(dataStatus.uncommitted?.deleted, Status.UNCOMMITTED_DELETED)
-  collectStatus(dataStatus.uncommitted?.modified, Status.UNCOMMITTED_MODIFIED)
+  collectStatus(
+    dataStatus.uncommitted?.added,
+    AvailableDataStatus.UNCOMMITTED_ADDED
+  )
+  collectStatus(
+    dataStatus.uncommitted?.deleted,
+    AvailableDataStatus.UNCOMMITTED_DELETED
+  )
+  collectStatus(
+    dataStatus.uncommitted?.modified,
+    AvailableDataStatus.UNCOMMITTED_MODIFIED
+  )
   collectStatus(
     dataStatus.uncommitted?.renamed?.map(({ new: path }) => path),
-    Status.UNCOMMITTED_RENAMED
+    AvailableDataStatus.UNCOMMITTED_RENAMED
   )
-  collectStatus(dataStatus.not_in_cache, Status.NOT_IN_CACHE)
-  collectStatus(dataStatus.unchanged, Status.UNCHANGED)
-  collectStatus(dataStatus.untracked, Status.UNTRACKED)
+  collectStatus(dataStatus.not_in_cache, AvailableDataStatus.NOT_IN_CACHE)
+  collectStatus(dataStatus.unchanged, AvailableDataStatus.UNCHANGED)
+  collectStatus(dataStatus.untracked, AvailableDataStatus.UNTRACKED)
 
   return { dataStatusMapping, tracked }
 }
 
-const getInitialDataStatus = (tracked: Set<string>): DataStatus => ({
-  committedAdded: new Set<string>(),
-  committedDeleted: new Set<string>(),
-  committedModified: new Set<string>(),
-  committedRenamed: new Set<string>(),
-  notInCache: new Set<string>(),
-  tracked,
-  trackedDecorations: new Set<string>(),
-  unchanged: new Set<string>(),
-  uncommittedAdded: new Set<string>(),
-  uncommittedDeleted: new Set<string>(),
-  uncommittedModified: new Set<string>(),
-  uncommittedRenamed: new Set<string>(),
-  untracked: new Set<string>()
-})
+const getInitialDataStatus = (tracked: Set<string>): DataStatus => {
+  const initialDataStatus = {} as DataStatus
+  for (const status of Object.values(AvailableDataStatus)) {
+    initialDataStatus[status] = new Set<string>()
+  }
+  return { ...initialDataStatus, tracked }
+}
 
 export const collectDataStatus = (
   dvcRoot: string,

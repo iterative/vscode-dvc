@@ -2,10 +2,7 @@ import { EventEmitter } from 'vscode'
 import { DecorationProvider, DecorationState } from './decorationProvider'
 import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
-import {
-  SourceControlManagement,
-  SourceControlManagementState
-} from './sourceControlManagement'
+import { SourceControlManagement, SCMState } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
 
@@ -85,7 +82,7 @@ export class Repository extends DeferredDisposable {
     sourceControlManagementState
   }: {
     decorationState: DecorationState
-    sourceControlManagementState: SourceControlManagementState
+    sourceControlManagementState: SCMState
   }) {
     this.sourceControlManagement.setState(sourceControlManagementState)
     this.decorationProvider.setState(decorationState)

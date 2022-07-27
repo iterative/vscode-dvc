@@ -1,11 +1,19 @@
 import { basename, extname, relative } from 'path'
 import { Uri } from 'vscode'
-import { collectDataStatus, collectTree, PathItem } from './collect'
-import { DecorationState } from '../decorationProvider'
+import omit from 'lodash.omit'
 import {
-  SourceControlManagementResource,
-  SourceControlManagementState,
-  SourceControlManagementStatus
+  collectDataStatus,
+  collectTree,
+  DataStatus,
+  PathItem,
+  UndecoratedDataStatus
+} from './collect'
+import {
+  SourceControlDataStatus,
+  SourceControlResource,
+  SourceControlResourceGroupData,
+  SCMState,
+  SourceControlStatus
 } from '../sourceControlManagement'
 import { DataStatusOutput } from '../../cli/reader'
 import { Disposable } from '../../class/dispose'
@@ -42,20 +50,7 @@ export class RepositoryModel extends Disposable {
       untracked: [...untracked].map(path => relative(this.dvcRoot, path))
     })
     this.collectTree(data.tracked)
-
-    this.hasChanges = !!(
-      hasGitChanges ||
-      data.committedAdded.size > 0 ||
-      data.committedDeleted.size > 0 ||
-      data.committedModified.size > 0 ||
-      data.committedRenamed.size > 0 ||
-      data.notInCache.size > 0 ||
-      data.uncommittedAdded.size > 0 ||
-      data.uncommittedDeleted.size > 0 ||
-      data.uncommittedModified.size > 0 ||
-      data.uncommittedRenamed.size > 0 ||
-      untracked.size > 0
-    )
+    this.collectHasChanges(data, hasGitChanges)
 
     return {
       decorationState: this.getDecorationState(data),
@@ -74,29 +69,26 @@ export class RepositoryModel extends Disposable {
     }
   }
 
-  private getDecorationState({
-    committedAdded,
-    committedDeleted,
-    committedModified,
-    committedRenamed,
-    notInCache,
-    tracked,
-    uncommittedAdded,
-    uncommittedDeleted,
-    uncommittedModified,
-    uncommittedRenamed
-  }: DecorationState) {
+  private collectHasChanges(data: DataStatus, hasGitChanges: boolean) {
+    this.hasChanges = !!(
+      hasGitChanges ||
+      data.committedAdded.size > 0 ||
+      data.committedDeleted.size > 0 ||
+      data.committedModified.size > 0 ||
+      data.committedRenamed.size > 0 ||
+      data.notInCache.size > 0 ||
+      data.uncommittedAdded.size > 0 ||
+      data.uncommittedDeleted.size > 0 ||
+      data.uncommittedModified.size > 0 ||
+      data.uncommittedRenamed.size > 0 ||
+      data.untracked.size > 0
+    )
+  }
+
+  private getDecorationState(data: DataStatus) {
     return {
-      committedAdded,
-      committedDeleted,
-      committedModified,
-      committedRenamed,
-      notInCache,
-      tracked,
-      uncommittedAdded,
-      uncommittedDeleted,
-      uncommittedModified,
-      uncommittedRenamed
+      ...omit(data, ...Object.values(UndecoratedDataStatus)),
+      tracked: data.trackedDecorations
     }
   }
 
@@ -111,27 +103,16 @@ export class RepositoryModel extends Disposable {
     uncommittedModified,
     uncommittedRenamed,
     untracked
-  }: {
-    committedAdded: Set<string>
-    committedDeleted: Set<string>
-    committedModified: Set<string>
-    committedRenamed: Set<string>
-    notInCache: Set<string>
-    uncommittedAdded: Set<string>
-    uncommittedDeleted: Set<string>
-    uncommittedModified: Set<string>
-    uncommittedRenamed: Set<string>
-    untracked: Set<string>
-  }): SourceControlManagementState {
+  }: SourceControlResourceGroupData): SCMState {
     return {
       committed: this.getScmResourceGroup({
         committedAdded,
         committedDeleted,
         committedModified,
         committedRenamed
-      } as Record<SourceControlManagementStatus, Set<string>>),
+      } as SourceControlResourceGroupData),
       notInCache: this.getScmResourceGroup({ notInCache } as Record<
-        SourceControlManagementStatus,
+        SourceControlStatus,
         Set<string>
       >),
       uncommitted: this.getScmResourceGroup({
@@ -139,13 +120,13 @@ export class RepositoryModel extends Disposable {
         uncommittedDeleted,
         uncommittedModified,
         uncommittedRenamed
-      } as Record<SourceControlManagementStatus, Set<string>>),
+      } as SourceControlResourceGroupData),
       untracked: [...untracked]
         .filter(
           path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
         )
         .map(path => ({
-          contextValue: SourceControlManagementStatus.UNTRACKED,
+          contextValue: SourceControlDataStatus.UNTRACKED,
           dvcRoot: this.dvcRoot,
           isDirectory: isDirectory(path),
           isTracked: false,
@@ -169,31 +150,25 @@ export class RepositoryModel extends Disposable {
   }
 
   private getScmResourceGroup(
-    resourceGroupMapping: Record<SourceControlManagementStatus, Set<string>>
+    resourceGroupMapping: SourceControlResourceGroupData
   ) {
-    const resourceGroup: SourceControlManagementResource[] = []
+    const resourceGroup: SourceControlResource[] = []
     for (const [contextValue, paths] of Object.entries(resourceGroupMapping)) {
       resourceGroup.push(
-        ...this.getScmResources(
-          contextValue as SourceControlManagementStatus,
-          paths
-        )
+        ...this.getScmResources(contextValue as SourceControlStatus, paths)
       )
     }
     return resourceGroup
   }
 
   private getScmResources(
-    contextValue: SourceControlManagementStatus,
+    contextValue: SourceControlStatus,
     paths: Set<string>
   ) {
     return [...paths].map(path => this.getScmResource(contextValue, path))
   }
 
-  private getScmResource(
-    contextValue: SourceControlManagementStatus,
-    path: string
-  ) {
+  private getScmResource(contextValue: SourceControlStatus, path: string) {
     return {
       contextValue,
       dvcRoot: this.dvcRoot,

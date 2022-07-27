@@ -7,7 +7,7 @@ import { buildDependencies, buildRepository } from './util'
 import { Disposable } from '../../../extension'
 import { dvcDemoPath } from '../../util'
 import { bypassProcessManagerDebounce, FIRST_TRUTHY_TIME } from '../util'
-import { SourceControlManagementStatus } from '../../../repository/sourceControlManagement'
+import { SourceControlDataStatus } from '../../../repository/sourceControlManagement'
 
 suite('Repository Test Suite', () => {
   const disposable = Disposable.fn()
@@ -89,42 +89,42 @@ suite('Repository Test Suite', () => {
         notInCache: [],
         uncommitted: [
           {
-            contextValue: SourceControlManagementStatus.UNCOMMITTED_MODIFIED,
+            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
             resourceUri: Uri.file(join(dvcDemoPath, model))
           },
           {
-            contextValue: SourceControlManagementStatus.UNCOMMITTED_MODIFIED,
+            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: true,
             isTracked: true,
             resourceUri: Uri.file(join(dvcDemoPath, logDir))
           },
           {
-            contextValue: SourceControlManagementStatus.UNCOMMITTED_MODIFIED,
+            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
             resourceUri: Uri.file(join(dvcDemoPath, logAcc))
           },
           {
-            contextValue: SourceControlManagementStatus.UNCOMMITTED_MODIFIED,
+            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
             resourceUri: Uri.file(join(dvcDemoPath, logLoss))
           },
           {
-            contextValue: SourceControlManagementStatus.UNCOMMITTED_MODIFIED,
+            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: true,
             isTracked: true,
             resourceUri: Uri.file(join(dvcDemoPath, dataDir))
           },
           {
-            contextValue: SourceControlManagementStatus.UNCOMMITTED_MODIFIED,
+            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
@@ -133,7 +133,7 @@ suite('Repository Test Suite', () => {
         ],
         untracked: [
           {
-            contextValue: SourceControlManagementStatus.UNTRACKED,
+            contextValue: SourceControlDataStatus.UNTRACKED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: false,
@@ -264,7 +264,7 @@ suite('Repository Test Suite', () => {
       expect(setScmStateSpy.lastCall.firstArg).to.deep.equal({
         committed: [],
         notInCache: [...notInCache].map(path => ({
-          contextValue: SourceControlManagementStatus.NOT_IN_CACHE,
+          contextValue: SourceControlDataStatus.NOT_IN_CACHE,
           dvcRoot: dvcDemoPath,
           isDirectory: false,
           isTracked: true,
@@ -272,14 +272,14 @@ suite('Repository Test Suite', () => {
         })),
         uncommitted: [
           ...[...uncommittedDeleted].map(path => ({
-            contextValue: SourceControlManagementStatus.UNCOMMITTED_DELETED,
+            contextValue: SourceControlDataStatus.UNCOMMITTED_DELETED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
             resourceUri: Uri.file(path)
           })),
           ...[...uncommittedModified].map(path => ({
-            contextValue: SourceControlManagementStatus.UNCOMMITTED_MODIFIED,
+            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
@@ -287,7 +287,7 @@ suite('Repository Test Suite', () => {
           }))
         ],
         untracked: untracked.map(path => ({
-          contextValue: SourceControlManagementStatus.UNTRACKED,
+          contextValue: SourceControlDataStatus.UNTRACKED,
           dvcRoot: dvcDemoPath,
           isDirectory: false,
           isTracked: false,

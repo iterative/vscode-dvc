@@ -1,30 +1,30 @@
 import { scm, SourceControl, SourceControlResourceGroup, Uri } from 'vscode'
+import { BaseDataStatus } from './constants'
 import { PathItem } from './model/collect'
 import { Disposable } from '../class/dispose'
 
-export type SourceControlManagementState = {
-  committed: SourceControlManagementResource[]
-  uncommitted: SourceControlManagementResource[]
-  untracked: SourceControlManagementResource[]
-  notInCache: SourceControlManagementResource[]
+export type SCMState = {
+  committed: SourceControlResource[]
+  uncommitted: SourceControlResource[]
+  untracked: SourceControlResource[]
+  notInCache: SourceControlResource[]
 }
 
-export enum SourceControlManagementStatus {
-  COMMITTED_ADDED = 'committedAdded',
-  COMMITTED_DELETED = 'committedDeleted',
-  COMMITTED_MODIFIED = 'committedModified',
-  COMMITTED_RENAMED = 'committedRenamed',
-  NOT_IN_CACHE = 'notInCache',
-  UNCOMMITTED_ADDED = 'uncommittedAdded',
-  UNCOMMITTED_DELETED = 'uncommittedDeleted',
-  UNCOMMITTED_MODIFIED = 'uncommittedModified',
-  UNCOMMITTED_RENAMED = 'uncommittedRenamed',
-  UNTRACKED = 'untracked'
+export const SourceControlDataStatus = Object.assign({}, BaseDataStatus, {
+  UNTRACKED: 'untracked'
+} as const)
+
+export type SourceControlStatus =
+  typeof SourceControlDataStatus[keyof typeof SourceControlDataStatus]
+
+export type SourceControlResource = PathItem & {
+  contextValue: SourceControlStatus
 }
 
-export type SourceControlManagementResource = PathItem & {
-  contextValue: SourceControlManagementStatus
-}
+export type SourceControlResourceGroupData = Record<
+  SourceControlStatus,
+  Set<string>
+>
 
 export class SourceControlManagement extends Disposable {
   private committedResourceGroup: SourceControlResourceGroup
@@ -32,7 +32,7 @@ export class SourceControlManagement extends Disposable {
   private untrackedResourceGroup: SourceControlResourceGroup
   private notInCacheResourceGroup: SourceControlResourceGroup
 
-  constructor(dvcRoot: string, state: SourceControlManagementState) {
+  constructor(dvcRoot: string, state: SCMState) {
     super()
 
     const scmView = this.dispose.track(
@@ -72,7 +72,7 @@ export class SourceControlManagement extends Disposable {
     this.setState(state)
   }
 
-  public setState(state: SourceControlManagementState) {
+  public setState(state: SCMState) {
     const { committed, uncommitted, untracked, notInCache } = state
 
     this.committedResourceGroup.resourceStates = committed
