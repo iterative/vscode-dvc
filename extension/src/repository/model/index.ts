@@ -1,6 +1,6 @@
 import { basename, extname, relative } from 'path'
 import { Uri } from 'vscode'
-import { collectState, collectTracked, collectTree, PathItem } from './collect'
+import { collectState, collectTree, PathItem } from './collect'
 import {
   SourceControlManagementModel,
   SourceControlManagementState,
@@ -118,12 +118,11 @@ export class RepositoryModel
   }
 
   public setState({ dataStatus, hasGitChanges, untracked }: Data) {
-    this.collectTracked(dataStatus)
-
-    this.collectState({
+    const tracked = this.collectState({
       ...dataStatus,
       untracked: [...untracked].map(path => relative(this.dvcRoot, path))
     })
+    this.collectTree(tracked)
 
     this.hasGitChanges = hasGitChanges
   }
@@ -144,9 +143,7 @@ export class RepositoryModel
     )
   }
 
-  private collectTracked(dataStatus: DataStatusOutput): void {
-    const tracked = collectTracked(this.dvcRoot, dataStatus)
-
+  private collectTree(tracked: Set<string>): void {
     if (!sameContents([...tracked], [...this.getTracked()])) {
       this.tracked = tracked
       this.tree = collectTree(this.dvcRoot, this.tracked)
@@ -162,6 +159,7 @@ export class RepositoryModel
       committedModified,
       committedRenamed,
       notInCache,
+      tracked,
       trackedDecorations,
       uncommittedAdded,
       uncommittedDeleted,
@@ -181,6 +179,8 @@ export class RepositoryModel
     this.uncommittedModified = uncommittedModified
     this.uncommittedRenamed = uncommittedRenamed
     this.untracked = untracked
+
+    return tracked
   }
 
   private getTracked() {
