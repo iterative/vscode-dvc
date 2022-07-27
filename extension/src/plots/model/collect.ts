@@ -354,7 +354,7 @@ const collectDatapoints = (
   values: Record<string, unknown>[] = []
 ) => {
   for (const value of values) {
-    ;(acc[rev][path] as unknown[]).push({ ...value, rev })
+    ;(acc[rev][path] as unknown[]).push({ ...value })
   }
 }
 
