@@ -1,4 +1,4 @@
-import { join, relative, resolve } from 'path'
+import { join, relative, resolve, sep } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
@@ -258,7 +258,7 @@ const collectMissingParents = (originalMapping: {
 }
 
 const removeTrailingSlash = (path: string): string =>
-  path.endsWith('/') ? path.slice(0, -1) : path
+  path.endsWith(sep) ? path.slice(0, -1) : path
 
 export const collectState = (
   dvcRoot: string,
