@@ -128,6 +128,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       const expectedScmItemLabels = [
         'demo DVC',
         'training_metrics',
+        'scalars, training_metrics',
         `acc.tsv, ${join('training_metrics', 'scalars')}`,
         `loss.tsv, ${join('training_metrics', 'scalars')}`
       ]
