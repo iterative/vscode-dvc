@@ -1,6 +1,7 @@
 import { basename, extname, relative } from 'path'
 import { Uri } from 'vscode'
 import { collectDataStatus, collectTree, PathItem } from './collect'
+import { DecorationState } from '../decorationProvider'
 import {
   SourceControlManagementResource,
   SourceControlManagementState,
@@ -42,46 +43,22 @@ export class RepositoryModel extends Disposable {
     })
     this.collectTree(data.tracked)
 
-    const {
-      committedAdded,
-      committedDeleted,
-      committedModified,
-      committedRenamed,
-      notInCache,
-      tracked,
-      uncommittedAdded,
-      uncommittedDeleted,
-      uncommittedModified,
-      uncommittedRenamed
-    } = data
-
     this.hasChanges = !!(
-      committedAdded.size > 0 ||
-      committedDeleted.size > 0 ||
-      committedModified.size > 0 ||
-      committedRenamed.size > 0 ||
-      notInCache.size > 0 ||
-      uncommittedAdded.size > 0 ||
-      uncommittedDeleted.size > 0 ||
-      uncommittedModified.size > 0 ||
-      uncommittedRenamed.size > 0 ||
-      untracked.size > 0 ||
-      hasGitChanges
+      hasGitChanges ||
+      data.committedAdded.size > 0 ||
+      data.committedDeleted.size > 0 ||
+      data.committedModified.size > 0 ||
+      data.committedRenamed.size > 0 ||
+      data.notInCache.size > 0 ||
+      data.uncommittedAdded.size > 0 ||
+      data.uncommittedDeleted.size > 0 ||
+      data.uncommittedModified.size > 0 ||
+      data.uncommittedRenamed.size > 0 ||
+      untracked.size > 0
     )
 
     return {
-      decorationState: {
-        committedAdded,
-        committedDeleted,
-        committedModified,
-        committedRenamed,
-        notInCache,
-        tracked,
-        uncommittedAdded,
-        uncommittedDeleted,
-        uncommittedModified,
-        uncommittedRenamed
-      },
+      decorationState: this.getDecorationState(data),
       sourceControlManagementState: this.getSourceControlManagementState(data)
     }
   }
@@ -94,6 +71,32 @@ export class RepositoryModel extends Disposable {
     if (!sameContents([...tracked], [...this.getTracked()])) {
       this.tracked = tracked
       this.tree = collectTree(this.dvcRoot, this.tracked)
+    }
+  }
+
+  private getDecorationState({
+    committedAdded,
+    committedDeleted,
+    committedModified,
+    committedRenamed,
+    notInCache,
+    tracked,
+    uncommittedAdded,
+    uncommittedDeleted,
+    uncommittedModified,
+    uncommittedRenamed
+  }: DecorationState) {
+    return {
+      committedAdded,
+      committedDeleted,
+      committedModified,
+      committedRenamed,
+      notInCache,
+      tracked,
+      uncommittedAdded,
+      uncommittedDeleted,
+      uncommittedModified,
+      uncommittedRenamed
     }
   }
 
