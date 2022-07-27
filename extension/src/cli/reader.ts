@@ -5,21 +5,18 @@ import { retry } from './retry'
 import { trim, trimAndSplit } from '../util/stdout'
 import { Plot } from '../plots/webview/contract'
 
+type Changes = {
+  added?: string[]
+  deleted?: string[]
+  modified?: string[]
+  renamed?: { new: string; old: string }[]
+}
+
 export type DataStatusOutput = {
-  committed?: {
-    added?: string[]
-    deleted?: string[]
-    modified?: string[]
-    renamed?: { new: string; old: string }[]
-  }
+  committed?: Changes
   not_in_cache?: string[]
   unchanged?: string[]
-  uncommitted?: {
-    added?: string[]
-    deleted?: string[]
-    modified?: string[]
-    renamed?: { new: string; old: string }[]
-  }
+  uncommitted?: Changes
 }
 
 type SingleValue = string | number | boolean | null
