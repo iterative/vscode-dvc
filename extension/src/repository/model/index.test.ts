@@ -62,13 +62,13 @@ describe('RepositoryModel', () => {
       ]
 
       const model = new RepositoryModel(dvcDemoPath)
-      model.setState({
+      const { decorationState, sourceControlManagementState } = model.setState({
         dataStatus,
         hasGitChanges: true,
         untracked: new Set()
       })
 
-      expect(model.getDecorationState()).toStrictEqual({
+      expect(decorationState).toStrictEqual({
         committedAdded: emptySet,
         committedDeleted: new Set([join(dvcDemoPath, deleted)]),
         committedModified: new Set([join(dvcDemoPath, output)]),
@@ -87,7 +87,7 @@ describe('RepositoryModel', () => {
         uncommittedRenamed: emptySet
       })
 
-      expect(model.getSourceControlManagementState()).toStrictEqual({
+      expect(sourceControlManagementState).toStrictEqual({
         committed: [
           {
             contextValue: SourceControlManagementStatus.COMMITTED_DELETED,
@@ -134,13 +134,13 @@ describe('RepositoryModel', () => {
       }
 
       const model = new RepositoryModel(dvcDemoPath)
-      model.setState({
+      const { decorationState, sourceControlManagementState } = model.setState({
         dataStatus,
         hasGitChanges: true,
         untracked: new Set()
       })
 
-      expect(model.getDecorationState()).toStrictEqual({
+      expect(decorationState).toStrictEqual({
         committedAdded: emptySet,
         committedDeleted: emptySet,
         committedModified: emptySet,
@@ -156,7 +156,7 @@ describe('RepositoryModel', () => {
         uncommittedRenamed: emptySet
       })
 
-      expect(model.getSourceControlManagementState()).toStrictEqual({
+      expect(sourceControlManagementState).toStrictEqual({
         committed: [],
         notInCache: [],
         uncommitted: [],

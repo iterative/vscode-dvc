@@ -9,10 +9,6 @@ export type SourceControlManagementState = {
   notInCache: SourceControlManagementResource[]
 }
 
-export interface SourceControlManagementModel {
-  getSourceControlManagementState: () => SourceControlManagementState
-}
-
 export enum SourceControlManagementStatus {
   COMMITTED_ADDED = 'committedAdded',
   COMMITTED_DELETED = 'committedDeleted',

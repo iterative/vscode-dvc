@@ -12,10 +12,6 @@ import { flattenUnique } from '../util/array'
 
 export type DecorationState = Record<DecorationStatus, Set<string>>
 
-export interface DecorationModel {
-  getDecorationState: () => DecorationState
-}
-
 enum DecorationStatus {
   COMMITTED_ADDED = 'committedAdded',
   COMMITTED_DELETED = 'committedDeleted',

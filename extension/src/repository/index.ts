@@ -1,8 +1,11 @@
 import { EventEmitter } from 'vscode'
-import { DecorationProvider } from './decorationProvider'
+import { DecorationProvider, DecorationState } from './decorationProvider'
 import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
-import { SourceControlManagement } from './sourceControlManagement'
+import {
+  SourceControlManagement,
+  SourceControlManagementState
+} from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
 
@@ -35,10 +38,12 @@ export class Repository extends DeferredDisposable {
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
     this.sourceControlManagement = this.dispose.track(
-      new SourceControlManagement(
-        this.dvcRoot,
-        this.model.getSourceControlManagementState()
-      )
+      new SourceControlManagement(this.dvcRoot, {
+        committed: [],
+        notInCache: [],
+        uncommitted: [],
+        untracked: []
+      })
     )
 
     this.treeDataChanged = treeDataChanged
@@ -59,14 +64,14 @@ export class Repository extends DeferredDisposable {
   }
 
   public getScale() {
-    return { tracked: this.model.getDecorationState().tracked.size }
+    return { tracked: this.model.getScale() }
   }
 
   private async initialize() {
     this.dispose.track(
       this.data.onDidUpdate(data => {
-        this.model.setState(data)
-        this.setState()
+        const state = this.model.setState(data)
+        this.setState(state)
         this.treeDataChanged.fire()
       })
     )
@@ -75,10 +80,14 @@ export class Repository extends DeferredDisposable {
     return this.deferred.resolve()
   }
 
-  private setState() {
-    this.sourceControlManagement.setState(
-      this.model.getSourceControlManagementState()
-    )
-    this.decorationProvider.setState(this.model.getDecorationState())
+  private setState({
+    decorationState,
+    sourceControlManagementState
+  }: {
+    decorationState: DecorationState
+    sourceControlManagementState: SourceControlManagementState
+  }) {
+    this.sourceControlManagement.setState(sourceControlManagementState)
+    this.decorationProvider.setState(decorationState)
   }
 }
