@@ -342,11 +342,12 @@ export const collectDataStatus = (
     dataStatusOutput
   )
 
-  const dataStatusAccumulator = collectMissingAncestors(dataStatusMapping)
+  const dataStatusWithMissingAncestors =
+    collectMissingAncestors(dataStatusMapping)
 
   const dataStatus = getInitialDataStatus(tracked)
 
-  for (const [path, status] of Object.entries(dataStatusAccumulator)) {
+  for (const [path, status] of Object.entries(dataStatusWithMissingAncestors)) {
     const absPath = getAbsPath(dvcRoot, path)
     dataStatus[status].add(absPath)
 
