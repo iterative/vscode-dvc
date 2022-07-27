@@ -1,5 +1,5 @@
 import React, { MouseEventHandler, ReactNode } from 'react'
-import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
+import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
@@ -15,6 +15,7 @@ import { sendMessage } from '../../../shared/vscode'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import tooltipStyles from '../../../shared/components/tooltip/styles.module.scss'
 import { pluralize } from '../../../util/strings'
+import { ExperimentsState } from '../../store'
 
 export type IndicatorTooltipProps = Pick<TippyProps, 'children'> & {
   tooltipContent: ReactNode
@@ -124,16 +125,17 @@ const formatFilteredCountMessage = (filteredCounts: FilteredCounts): string =>
     .join(', ')} Filtered`
 
 export const Indicators = ({
-  selectedForPlotsCount,
-  sorts,
-  filters,
-  filteredCounts
+  selectedForPlotsCount
 }: {
-  sorts?: SortDefinition[]
-  filters?: string[]
-  filteredCounts: FilteredCounts
   selectedForPlotsCount: number
 }) => {
+  const filters = useSelector(
+    (state: ExperimentsState) => state.tableData.filters
+  )
+  const sorts = useSelector((state: ExperimentsState) => state.tableData.sorts)
+  const filteredCounts = useSelector(
+    (state: ExperimentsState) => state.tableData.filteredCounts
+  )
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
 

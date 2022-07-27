@@ -1,11 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { ComponentStory } from '@storybook/react'
-import { Meta } from '@storybook/react/types-6-0'
+import { Meta, Story } from '@storybook/react/types-6-0'
 import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
-import { TableData } from 'dvc/src/experiments/webview/contract'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
@@ -25,8 +23,9 @@ import {
   setExperimentsAsStarred
 } from '../test/tableDataFixture'
 import { experimentsReducers } from '../experiments/store'
+import { TableDataState } from '../experiments/components/table/tableDataSlice'
 
-const tableData: TableData = {
+const tableData: TableDataState = {
   changes: workspaceChangesFixture,
   columnOrder: [],
   columnWidths: {
@@ -37,6 +36,7 @@ const tableData: TableData = {
   filters: ['params:params.yaml:lr'],
   hasCheckpoints: true,
   hasColumns: true,
+  hasData: true,
   hasRunningExperiment: true,
   rows: rowsFixture.map(row => ({
     ...row,
@@ -102,10 +102,15 @@ export default {
   title: 'Table'
 } as Meta
 
-const Template: ComponentStory<typeof Experiments> = ({ tableData }) => {
+const Template: Story<{ tableData: TableDataState }> = ({ tableData }) => {
   return (
-    <Provider store={configureStore({ reducer: experimentsReducers })}>
-      <Experiments tableData={tableData} />
+    <Provider
+      store={configureStore({
+        preloadedState: { tableData },
+        reducer: experimentsReducers
+      })}
+    >
+      <Experiments />
     </Provider>
   )
 }
@@ -167,7 +172,7 @@ WithContextMenuNoCheckpoints.args = {
 WithContextMenuNoCheckpoints.play = contextMenuPlay
 
 export const WithAllDataTypes = Template.bind({})
-WithAllDataTypes.args = { tableData: dataTypesTableData }
+WithAllDataTypes.args = { tableData: { ...dataTypesTableData, hasData: true } }
 WithAllDataTypes.play = async ({ canvasElement }) => {
   const falseCell = await within(canvasElement).findByText('false')
   userEvent.hover(falseCell, { bubbles: true })
@@ -177,7 +182,9 @@ WithAllDataTypes.parameters = {
 }
 
 export const WithDeeplyNestedHeaders = Template.bind({})
-WithDeeplyNestedHeaders.args = { tableData: deeplyNestedTableData }
+WithDeeplyNestedHeaders.args = {
+  tableData: { ...deeplyNestedTableData, hasData: true }
+}
 
 export const LoadingData = Template.bind({})
 LoadingData.args = { tableData: undefined }
@@ -201,11 +208,18 @@ WithNoSortsOrFilters.args = {
   }
 }
 
-export const Scrolled: ComponentStory<typeof Experiments> = ({ tableData }) => {
+export const Scrolled: Story<{ tableData: TableDataState }> = ({
+  tableData
+}) => {
   return (
-    <Provider store={configureStore({ reducer: experimentsReducers })}>
+    <Provider
+      store={configureStore({
+        preloadedState: { tableData },
+        reducer: experimentsReducers
+      })}
+    >
       <div style={{ height: 400, width: 600 }}>
-        <Experiments tableData={tableData} />
+        <Experiments />
       </div>
     </Provider>
   )
