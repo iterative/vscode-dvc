@@ -204,52 +204,37 @@ export const collectTracked = (
   return tracked
 }
 
-const getSet = (dvcRoot: string, relPaths?: string[]): Set<string> =>
-  new Set((relPaths || []).map(relPath => getAbsPath(dvcRoot, relPath)))
-
-export const collectDecorationState = (
-  dvcRoot: string,
-  dataStatus: DataStatusOutput
-): Omit<DecorationState, 'tracked'> => {
-  return {
-    committedAdded: getSet(dvcRoot, dataStatus.committed?.added),
-    committedDeleted: getSet(dvcRoot, dataStatus.committed?.deleted),
-    committedModified: getSet(dvcRoot, dataStatus.committed?.modified),
-    committedRenamed: getSet(
-      dvcRoot,
-      dataStatus.committed?.renamed?.map(relPath => relPath.new)
-    ),
-    notInCache: getSet(dvcRoot, dataStatus.not_in_cache),
-    uncommittedAdded: getSet(dvcRoot, dataStatus.uncommitted?.added),
-    uncommittedDeleted: getSet(dvcRoot, dataStatus.uncommitted?.deleted),
-    uncommittedModified: getSet(dvcRoot, dataStatus.uncommitted?.modified),
-    uncommittedRenamed: getSet(
-      dvcRoot,
-      dataStatus.uncommitted?.renamed?.map(relPath => relPath.new)
-    )
-  }
+enum DataStatus {
+  COMMITTED_ADDED = 'committedAdded',
+  COMMITTED_DELETED = 'committedDeleted',
+  COMMITTED_MODIFIED = 'committedModified',
+  COMMITTED_RENAMED = 'committedRenamed',
+  NOT_IN_CACHE = 'notInCache',
+  UNCOMMITTED_ADDED = 'uncommittedAdded',
+  UNCOMMITTED_DELETED = 'uncommittedDeleted',
+  UNCOMMITTED_MODIFIED = 'uncommittedModified',
+  UNCOMMITTED_RENAMED = 'uncommittedRenamed',
+  UNCHANGED = 'unchanged',
+  UNTRACKED = 'untracked'
 }
 
-// when we have an untracked, added, modified or deleted directory and a subdirectory contains changes we need to project a status down
+type DataStatusAccumulator = { [path: string]: DataStatus }
+
 const addMissingParents = (
-  dvcRoot: string,
   pathArray: string[],
-  original: Set<string>,
-  withParents: Set<string>
+  original: DataStatusAccumulator,
+  withParents: DataStatusAccumulator
   // eslint-disable-next-line sonarjs/cognitive-complexity
-) => {
+): void => {
   const parents = new Set<string>()
 
   for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
     const path = getPath(pathArray, reverseIdx)
 
-    if (path === dvcRoot) {
-      return
-    }
-
-    if (original.has(path) || withParents.has(path)) {
+    const status = original[path] || withParents[path]
+    if (status) {
       for (const parent of parents) {
-        withParents.add(parent)
+        withParents[parent] = status
       }
       return
     }
@@ -258,17 +243,104 @@ const addMissingParents = (
   }
 }
 
-export const collectMissingParents = (
-  dvcRoot: string,
-  original: Set<string>
-): Set<string> => {
-  const withParents = new Set<string>()
+const collectMissingParents = (originalMapping: {
+  [path: string]: DataStatus
+}): DataStatusAccumulator => {
+  const withParents: DataStatusAccumulator = {}
 
-  for (const path of original) {
-    withParents.add(path)
+  for (const [path, status] of Object.entries(originalMapping)) {
+    withParents[path] = status
     const pathArray = getPathArray(path)
-    addMissingParents(dvcRoot, pathArray.slice(0, -1), original, withParents)
+    addMissingParents(pathArray.slice(0, -1), originalMapping, withParents)
   }
 
   return withParents
+}
+
+const removeTrailingSlash = (path: string): string =>
+  path.endsWith('/') ? path.slice(0, -1) : path
+
+export const collectState = (
+  dvcRoot: string,
+  dataStatus: DataStatusOutput & { untracked?: string[] }
+): Omit<DecorationState, 'tracked'> & {
+  trackedDecorations: Set<string>
+  untracked: Set<string>
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+} => {
+  const acc: DataStatusAccumulator = {}
+
+  for (const path of dataStatus.committed?.added || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.COMMITTED_ADDED
+  }
+
+  for (const path of dataStatus.committed?.deleted || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.COMMITTED_DELETED
+  }
+
+  for (const path of dataStatus.committed?.modified || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.COMMITTED_MODIFIED
+  }
+
+  for (const path of dataStatus.committed?.renamed || []) {
+    acc[path.new] = DataStatus.COMMITTED_RENAMED
+  }
+
+  for (const path of dataStatus.uncommitted?.added || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.UNCOMMITTED_ADDED
+  }
+
+  for (const path of dataStatus.uncommitted?.deleted || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.UNCOMMITTED_DELETED
+  }
+
+  for (const path of dataStatus.uncommitted?.modified || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.UNCOMMITTED_MODIFIED
+  }
+
+  for (const path of dataStatus.uncommitted?.renamed || []) {
+    acc[path.new] = DataStatus.UNCOMMITTED_RENAMED
+  }
+
+  for (const path of dataStatus.not_in_cache || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.NOT_IN_CACHE
+  }
+
+  for (const path of dataStatus.unchanged || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.UNCHANGED
+  }
+
+  for (const path of dataStatus.untracked || []) {
+    acc[removeTrailingSlash(path)] = DataStatus.UNTRACKED
+  }
+
+  const patched = collectMissingParents(acc)
+
+  const acc1 = {
+    committedAdded: new Set<string>(),
+    committedDeleted: new Set<string>(),
+    committedModified: new Set<string>(),
+    committedRenamed: new Set<string>(),
+    notInCache: new Set<string>(),
+    trackedDecorations: new Set<string>(),
+    unchanged: new Set<string>(),
+    uncommittedAdded: new Set<string>(),
+    uncommittedDeleted: new Set<string>(),
+    uncommittedModified: new Set<string>(),
+    uncommittedRenamed: new Set<string>(),
+    untracked: new Set<string>()
+  }
+
+  for (const [path, status] of Object.entries(patched)) {
+    const absPath = getAbsPath(dvcRoot, path)
+    acc1[status].add(absPath)
+
+    if (status === DataStatus.UNTRACKED) {
+      continue
+    }
+
+    acc1.trackedDecorations.add(absPath)
+  }
+
+  return acc1
 }

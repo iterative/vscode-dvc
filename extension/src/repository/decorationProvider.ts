@@ -10,13 +10,13 @@ import {
 import { Disposable } from '../class/dispose'
 import { flattenUnique } from '../util/array'
 
-export type DecorationState = Record<Status, Set<string>>
+export type DecorationState = Record<DecorationStatus, Set<string>>
 
 export interface DecorationModel {
   getDecorationState: () => DecorationState
 }
 
-enum Status {
+enum DecorationStatus {
   COMMITTED_ADDED = 'committedAdded',
   COMMITTED_DELETED = 'committedDeleted',
   COMMITTED_MODIFIED = 'committedModified',
@@ -96,18 +96,19 @@ export class DecorationProvider
 
   private state: DecorationState
 
-  private readonly decorationMapping: Partial<Record<Status, FileDecoration>> =
-    {
-      committedAdded: DecorationProvider.DecorationCommittedAdded,
-      committedDeleted: DecorationProvider.DecorationCommittedDeleted,
-      committedModified: DecorationProvider.DecorationCommittedModified,
-      committedRenamed: DecorationProvider.DecorationCommittedRenamed,
-      notInCache: DecorationProvider.DecorationNotInCache,
-      uncommittedAdded: DecorationProvider.DecorationUncommittedAdded,
-      uncommittedDeleted: DecorationProvider.DecorationUncommittedDeleted,
-      uncommittedModified: DecorationProvider.DecorationUncommittedModified,
-      uncommittedRenamed: DecorationProvider.DecorationUncommittedRenamed
-    }
+  private readonly decorationMapping: Partial<
+    Record<DecorationStatus, FileDecoration>
+  > = {
+    committedAdded: DecorationProvider.DecorationCommittedAdded,
+    committedDeleted: DecorationProvider.DecorationCommittedDeleted,
+    committedModified: DecorationProvider.DecorationCommittedModified,
+    committedRenamed: DecorationProvider.DecorationCommittedRenamed,
+    notInCache: DecorationProvider.DecorationNotInCache,
+    uncommittedAdded: DecorationProvider.DecorationUncommittedAdded,
+    uncommittedDeleted: DecorationProvider.DecorationUncommittedDeleted,
+    uncommittedModified: DecorationProvider.DecorationUncommittedModified,
+    uncommittedRenamed: DecorationProvider.DecorationUncommittedRenamed
+  }
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
     super()
@@ -126,10 +127,10 @@ export class DecorationProvider
     const path = uri.fsPath
 
     const decoration = Object.keys(this.decorationMapping).find(status => {
-      if (this.state[status as Status]?.has(path)) {
+      if (this.state[status as DecorationStatus]?.has(path)) {
         return status
       }
-    }) as Status
+    }) as DecorationStatus
 
     if (decoration) {
       return this.decorationMapping[decoration]

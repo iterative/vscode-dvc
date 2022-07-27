@@ -3,7 +3,7 @@ import { Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { RepositoryModel } from '.'
 import { dvcDemoPath } from '../../test/util'
-import { Status } from '../sourceControlManagement'
+import { SourceControlManagementStatus } from '../sourceControlManagement'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -90,21 +90,21 @@ describe('RepositoryModel', () => {
       expect(model.getSourceControlManagementState()).toStrictEqual({
         committed: [
           {
-            contextValue: Status.COMMITTED_DELETED,
+            contextValue: SourceControlManagementStatus.COMMITTED_DELETED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
             resourceUri: Uri.file(join(dvcDemoPath, deleted))
           },
           {
-            contextValue: Status.COMMITTED_MODIFIED,
+            contextValue: SourceControlManagementStatus.COMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
             resourceUri: Uri.file(join(dvcDemoPath, output))
           },
           {
-            contextValue: Status.COMMITTED_RENAMED,
+            contextValue: SourceControlManagementStatus.COMMITTED_RENAMED,
             dvcRoot: dvcDemoPath,
             isDirectory: false,
             isTracked: true,
@@ -114,7 +114,7 @@ describe('RepositoryModel', () => {
         notInCache: [],
         uncommitted: [rawDataDir, logDir, scalarDir, logAcc, logLoss].map(
           path => ({
-            contextValue: Status.UNCOMMITTED_MODIFIED,
+            contextValue: SourceControlManagementStatus.UNCOMMITTED_MODIFIED,
             dvcRoot: dvcDemoPath,
             isDirectory: [rawDataDir, logDir, scalarDir].includes(path),
             isTracked: true,

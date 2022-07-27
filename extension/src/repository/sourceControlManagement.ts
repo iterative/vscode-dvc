@@ -3,17 +3,17 @@ import { PathItem } from './model/collect'
 import { Disposable } from '../class/dispose'
 
 export type SourceControlManagementState = {
-  committed: ResourceState[]
-  uncommitted: ResourceState[]
-  untracked: ResourceState[]
-  notInCache: ResourceState[]
+  committed: SourceControlManagementResource[]
+  uncommitted: SourceControlManagementResource[]
+  untracked: SourceControlManagementResource[]
+  notInCache: SourceControlManagementResource[]
 }
 
 export interface SourceControlManagementModel {
   getSourceControlManagementState: () => SourceControlManagementState
 }
 
-export enum Status {
+export enum SourceControlManagementStatus {
   COMMITTED_ADDED = 'committedAdded',
   COMMITTED_DELETED = 'committedDeleted',
   COMMITTED_MODIFIED = 'committedModified',
@@ -26,8 +26,8 @@ export enum Status {
   UNTRACKED = 'untracked'
 }
 
-type ResourceState = PathItem & {
-  contextValue: Status
+type SourceControlManagementResource = PathItem & {
+  contextValue: SourceControlManagementStatus
 }
 
 export class SourceControlManagement extends Disposable {

@@ -1,6 +1,6 @@
-import { join, resolve } from 'path'
+import { join, resolve, sep } from 'path'
 import { Uri } from 'vscode'
-import { collectMissingParents, collectSelected, collectTree } from './collect'
+import { collectSelected, collectState, collectTree } from './collect'
 import { dvcDemoPath } from '../../test/util'
 
 const makeUri = (...paths: string[]): Uri =>
@@ -316,57 +316,57 @@ describe('collectSelected', () => {
   })
 })
 
-describe('collectMissingParents', () => {
+describe('collectState', () => {
   it('should collect missing untracked parents', () => {
-    const untracked = new Set([
-      resolve(dvcDemoPath, 'data/'),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
-    ])
+    const untracked = [
+      'data' + sep,
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
+    ]
 
-    const untrackedWithMissingParents = collectMissingParents(
-      dvcDemoPath,
-      untracked
-    )
+    const { untracked: untrackedWithMissingParents, trackedDecorations } =
+      collectState(dvcDemoPath, {
+        untracked
+      })
     expect(untrackedWithMissingParents).toStrictEqual(
       new Set([
-        ...untracked,
+        ...untracked.map(path => resolve(dvcDemoPath, path)),
         resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
         resolve(dvcDemoPath, 'data', 'MNIST')
       ])
     )
+    expect(trackedDecorations).toStrictEqual(new Set())
   })
 
   it('should collect missing tracked parents', () => {
-    const tracked = new Set<string>([
-      resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv'),
-      resolve(dvcDemoPath, 'training_metrics'),
-      resolve(dvcDemoPath, 'training_metrics', 'scalars', 'acc.tsv'),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
-      resolve(dvcDemoPath, 'model.pt'),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-      resolve(
-        dvcDemoPath,
-        'data',
-        'MNIST',
-        'raw',
-        'train-labels-idx1-ubyte.gz'
-      ),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
-      resolve(dvcDemoPath, 'misclassified.jpg'),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
-      resolve(dvcDemoPath, 'predictions.json'),
-      resolve(dvcDemoPath, 'data/MNIST/raw/train-labels-idx1-ubyte'),
-      resolve(dvcDemoPath, 'data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
-    ])
-    const trackedWithMissingParents = collectMissingParents(
+    const tracked = [
+      join('training_metrics', 'scalars', 'loss.tsv'),
+      'training_metrics' + sep,
+      join('training_metrics', 'scalars', 'acc.tsv'),
+      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
+      join('model.pt'),
+      join('data', 'MNIST', 'raw'),
+      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
+      'misclassified.jpg',
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      'predictions.json',
+      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
+      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
+    ]
+    const { trackedDecorations: trackedWithMissingParents } = collectState(
       dvcDemoPath,
-      tracked
+      {
+        unchanged: tracked
+      }
     )
     expect(trackedWithMissingParents).toStrictEqual(
-      new Set([...tracked, resolve(dvcDemoPath, 'training_metrics', 'scalars')])
+      new Set([
+        ...tracked.map(path => resolve(dvcDemoPath, path)),
+        resolve(dvcDemoPath, 'training_metrics', 'scalars')
+      ])
     )
   })
 })

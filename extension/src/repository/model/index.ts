@@ -1,16 +1,10 @@
-import { basename, extname } from 'path'
+import { basename, extname, relative } from 'path'
 import { Uri } from 'vscode'
-import {
-  collectDecorationState,
-  collectMissingParents,
-  collectTracked,
-  collectTree,
-  PathItem
-} from './collect'
+import { collectState, collectTracked, collectTree, PathItem } from './collect'
 import {
   SourceControlManagementModel,
   SourceControlManagementState,
-  Status
+  SourceControlManagementStatus
 } from '../sourceControlManagement'
 import { DecorationModel, DecorationState } from '../decorationProvider'
 import { DataStatusOutput } from '../../cli/reader'
@@ -38,6 +32,7 @@ export class RepositoryModel
   private untracked = new Set<string>()
 
   private tracked = new Set<string>()
+  private trackedDecorations = new Set<string>()
 
   private tree = new Map<string, PathItem[]>()
 
@@ -54,7 +49,7 @@ export class RepositoryModel
       committedModified: this.committedModified,
       committedRenamed: this.committedRenamed,
       notInCache: this.notInCache,
-      tracked: this.getTrackedDecorations(),
+      tracked: this.trackedDecorations,
       uncommittedAdded: this.uncommittedAdded,
       uncommittedDeleted: this.uncommittedDeleted,
       uncommittedModified: this.uncommittedModified,
@@ -65,37 +60,43 @@ export class RepositoryModel
   public getSourceControlManagementState(): SourceControlManagementState {
     return {
       committed: [
-        ...this.getResourceStates(this.committedAdded, Status.COMMITTED_ADDED),
-        ...this.getResourceStates(
+        ...this.getScmResources(
+          this.committedAdded,
+          SourceControlManagementStatus.COMMITTED_ADDED
+        ),
+        ...this.getScmResources(
           this.committedDeleted,
-          Status.COMMITTED_DELETED
+          SourceControlManagementStatus.COMMITTED_DELETED
         ),
-        ...this.getResourceStates(
+        ...this.getScmResources(
           this.committedModified,
-          Status.COMMITTED_MODIFIED
+          SourceControlManagementStatus.COMMITTED_MODIFIED
         ),
-        ...this.getResourceStates(
+        ...this.getScmResources(
           this.committedRenamed,
-          Status.COMMITTED_RENAMED
+          SourceControlManagementStatus.COMMITTED_RENAMED
         )
       ],
-      notInCache: this.getResourceStates(this.notInCache, Status.NOT_IN_CACHE),
+      notInCache: this.getScmResources(
+        this.notInCache,
+        SourceControlManagementStatus.NOT_IN_CACHE
+      ),
       uncommitted: [
-        ...this.getResourceStates(
+        ...this.getScmResources(
           this.uncommittedAdded,
-          Status.UNCOMMITTED_ADDED
+          SourceControlManagementStatus.UNCOMMITTED_ADDED
         ),
-        ...this.getResourceStates(
+        ...this.getScmResources(
           this.uncommittedDeleted,
-          Status.UNCOMMITTED_DELETED
+          SourceControlManagementStatus.UNCOMMITTED_DELETED
         ),
-        ...this.getResourceStates(
+        ...this.getScmResources(
           this.uncommittedModified,
-          Status.UNCOMMITTED_MODIFIED
+          SourceControlManagementStatus.UNCOMMITTED_MODIFIED
         ),
-        ...this.getResourceStates(
+        ...this.getScmResources(
           this.uncommittedRenamed,
-          Status.UNCOMMITTED_RENAMED
+          SourceControlManagementStatus.UNCOMMITTED_RENAMED
         )
       ],
       untracked: [...this.untracked]
@@ -103,7 +104,7 @@ export class RepositoryModel
           path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
         )
         .map(path => ({
-          contextValue: Status.UNTRACKED,
+          contextValue: SourceControlManagementStatus.UNTRACKED,
           dvcRoot: this.dvcRoot,
           isDirectory: isDirectory(path),
           isTracked: false,
@@ -119,10 +120,12 @@ export class RepositoryModel
   public setState({ dataStatus, hasGitChanges, untracked }: Data) {
     this.collectTracked(dataStatus)
 
-    this.collectState(dataStatus)
+    this.collectState({
+      ...dataStatus,
+      untracked: [...untracked].map(path => relative(this.dvcRoot, path))
+    })
 
     this.hasGitChanges = hasGitChanges
-    this.untracked = collectMissingParents(this.dvcRoot, untracked)
   }
 
   public hasChanges(): boolean {
@@ -150,47 +153,55 @@ export class RepositoryModel
     }
   }
 
-  private collectState(dataStatus: DataStatusOutput) {
+  private collectState(
+    dataStatus: DataStatusOutput & { untracked?: string[] }
+  ) {
     const {
       committedAdded,
       committedDeleted,
       committedModified,
       committedRenamed,
       notInCache,
+      trackedDecorations,
       uncommittedAdded,
       uncommittedDeleted,
       uncommittedModified,
-      uncommittedRenamed
-    } = collectDecorationState(this.dvcRoot, dataStatus)
+      uncommittedRenamed,
+      untracked
+    } = collectState(this.dvcRoot, dataStatus)
 
     this.committedAdded = committedAdded
     this.committedDeleted = committedDeleted
     this.committedModified = committedModified
     this.committedRenamed = committedRenamed
     this.notInCache = notInCache
+    this.trackedDecorations = trackedDecorations
     this.uncommittedAdded = uncommittedAdded
     this.uncommittedDeleted = uncommittedDeleted
     this.uncommittedModified = uncommittedModified
     this.uncommittedRenamed = uncommittedRenamed
+    this.untracked = untracked
   }
 
   private getTracked() {
     return this.tracked
   }
 
-  private getTrackedDecorations() {
-    return collectMissingParents(this.dvcRoot, this.tracked)
-  }
-
   private isTracked(path: string) {
     return this.getTracked().has(path)
   }
 
-  private getResourceStates(paths: Set<string>, contextValue: Status) {
-    return [...paths].map(path => this.getResourceState(path, contextValue))
+  private getScmResources(
+    paths: Set<string>,
+    contextValue: SourceControlManagementStatus
+  ) {
+    return [...paths].map(path => this.getScmResource(path, contextValue))
   }
 
-  private getResourceState(path: string, contextValue: Status) {
+  private getScmResource(
+    path: string,
+    contextValue: SourceControlManagementStatus
+  ) {
     return {
       contextValue,
       dvcRoot: this.dvcRoot,
