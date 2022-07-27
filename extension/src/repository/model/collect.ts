@@ -1,11 +1,16 @@
-import { join, relative, resolve, sep } from 'path'
+import { join, relative, resolve } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 import { DataStatusOutput } from '../../cli/reader'
 import { DecorationDataStatus } from '../decorationProvider'
 import { relativeWithUri } from '../../fileSystem'
-import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
+import {
+  getDirectChild,
+  getPath,
+  getPathArray,
+  removeTrailingSlash
+} from '../../fileSystem/util'
 
 export type PathItem = Resource & {
   isDirectory: boolean
@@ -196,45 +201,63 @@ type DataStatusMapping = { [path: string]: Status }
 
 export type DataStatus = Record<Status, Set<string>>
 
-const addMissingParents = (
+const getStatus = (
+  path: string,
+  original: DataStatusMapping,
+  withMissingAncestors: DataStatusMapping
+) => original[path] || withMissingAncestors[path]
+
+const addMissingWithAncestorStatus = (
+  withMissingAncestors: DataStatusMapping,
+  missingAncestors: Set<string>,
+  status: Status
+): void => {
+  for (const ancestor of missingAncestors) {
+    withMissingAncestors[ancestor] = status
+  }
+}
+
+const addMissingAncestors = (
   pathArray: string[],
   original: DataStatusMapping,
-  withParents: DataStatusMapping
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  withMissingAncestors: DataStatusMapping
 ): void => {
-  const parents = new Set<string>()
+  const missingAncestors = new Set<string>()
 
   for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
     const path = getPath(pathArray, reverseIdx)
 
-    const status = original[path] || withParents[path]
+    const status = getStatus(path, original, withMissingAncestors)
     if (status) {
-      for (const parent of parents) {
-        withParents[parent] = status
-      }
+      addMissingWithAncestorStatus(
+        withMissingAncestors,
+        missingAncestors,
+        status
+      )
       return
     }
 
-    parents.add(path)
+    missingAncestors.add(path)
   }
 }
 
-const collectMissingParents = (originalMapping: {
+const collectMissingAncestors = (originalMapping: {
   [path: string]: Status
 }): DataStatusMapping => {
-  const withParents: DataStatusMapping = {}
+  const withMissingAncestors: DataStatusMapping = {}
 
   for (const [path, status] of Object.entries(originalMapping)) {
-    withParents[path] = status
+    withMissingAncestors[path] = status
     const pathArray = getPathArray(path)
-    addMissingParents(pathArray.slice(0, -1), originalMapping, withParents)
+    addMissingAncestors(
+      pathArray.slice(0, -1),
+      originalMapping,
+      withMissingAncestors
+    )
   }
 
-  return withParents
+  return withMissingAncestors
 }
-
-const removeTrailingSlash = (path: string): string =>
-  path.endsWith(sep) ? path.slice(0, -1) : path
 
 const addToTracked = (
   tracked: Set<string>,
@@ -319,7 +342,7 @@ export const collectDataStatus = (
     dataStatusOutput
   )
 
-  const dataStatusAccumulator = collectMissingParents(dataStatusMapping)
+  const dataStatusAccumulator = collectMissingAncestors(dataStatusMapping)
 
   const dataStatus = getInitialDataStatus(tracked)
 
