@@ -126,17 +126,27 @@ describe('Table', () => {
   const renderTable = (testData = {}, tableInstance = instance) => {
     const tableData = { ...dummyTableData, ...testData }
     return render(
-      <Provider store={configureStore({ reducer: experimentsReducers })}>
-        <Table instance={tableInstance} tableData={tableData} />
+      <Provider
+        store={configureStore({
+          preloadedState: { tableData },
+          reducer: experimentsReducers
+        })}
+      >
+        <Table instance={tableInstance} />
       </Provider>
     )
   }
   const renderExperimentsTable = (
-    data: TableData = sortingTableDataFixture
+    tableData: TableData = sortingTableDataFixture
   ) => {
     return render(
-      <Provider store={configureStore({ reducer: experimentsReducers })}>
-        <ExperimentsTable tableData={data} />
+      <Provider
+        store={configureStore({
+          preloadedState: { tableData },
+          reducer: experimentsReducers
+        })}
+      >
+        <ExperimentsTable />
       </Provider>,
       {
         queries: { ...queries, ...customQueries }
@@ -347,8 +357,13 @@ describe('Table', () => {
         columnWidths
       }
       render(
-        <Provider store={configureStore({ reducer: experimentsReducers })}>
-          <ExperimentsTable tableData={tableDataWithColumnSetting} />
+        <Provider
+          store={configureStore({
+            preloadedState: { tableData: tableDataWithColumnSetting },
+            reducer: experimentsReducers
+          })}
+        >
+          <ExperimentsTable />
         </Provider>
       )
       const [experimentColumnResizeHandle] = await screen.findAllByRole(

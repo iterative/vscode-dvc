@@ -1,11 +1,6 @@
-import React, { useCallback } from 'react'
-import {
-  Column,
-  Row,
-  TableData,
-  InitiallyUndefinedTableData,
-  ColumnType
-} from 'dvc/src/experiments/webview/contract'
+import React, { useCallback, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { Column, Row, ColumnType } from 'dvc/src/experiments/webview/contract'
 import {
   Row as TableRow,
   Column as TableColumn,
@@ -27,6 +22,7 @@ import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import { ExperimentsState } from '../store'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
@@ -124,55 +120,37 @@ const reportResizedColumn = (state: TableState<Row>) => {
   }
 }
 
-export const ExperimentsTable: React.FC<{
-  tableData: InitiallyUndefinedTableData
-}> = ({ tableData: initiallyUndefinedTableData }) => {
+const defaultColumn: Partial<TableColumn<Row>> = {
+  minWidth: MINIMUM_COLUMN_WIDTH,
+  width: DEFAULT_COLUMN_WIDTH
+}
+
+export const ExperimentsTable: React.FC = () => {
+  const {
+    columns: columnsData,
+    columnOrder,
+    columnWidths,
+    hasColumns,
+    rows: data
+  } = useSelector((state: ExperimentsState) => state.tableData)
+  const columns = getColumns(columnsData)
+  const initialState = {
+    columnOrder,
+    columnResizing: {
+      columnWidths
+    }
+  } as Partial<TableState<Row>>
+
   const getRowId = useCallback(
     (experiment: Row, relativeIndex: number, parent?: TableRow<Row>) =>
       parent ? [parent.id, experiment.id].join('.') : String(relativeIndex),
     []
   )
-  const [tableData, columns, defaultColumn, initialState] =
-    React.useMemo(() => {
-      const tableData: TableData = {
-        changes: [],
-        columnOrder: [],
-        columnWidths: {},
-        columns: [],
-        filteredCounts: {
-          checkpoints: 0,
-          experiments: 0
-        },
-        filters: [],
-        hasCheckpoints: false,
-        hasColumns: false,
-        hasRunningExperiment: false,
-        rows: [],
-        sorts: [],
-        ...initiallyUndefinedTableData
-      }
-
-      const initialState = {
-        columnOrder: tableData.columnOrder,
-        columnResizing: {
-          columnWidths: tableData.columnWidths
-        }
-      } as Partial<TableState<Row>>
-
-      const defaultColumn: Partial<TableColumn<Row>> = {
-        minWidth: MINIMUM_COLUMN_WIDTH,
-        width: DEFAULT_COLUMN_WIDTH
-      }
-
-      const columns = getColumns(tableData.columns)
-      return [tableData, columns, defaultColumn, initialState]
-    }, [initiallyUndefinedTableData])
-
-  const { hasColumns, rows: data } = tableData
 
   const instance = useTable<Row>(
     {
       autoResetExpanded: false,
+      autoResetHiddenColumns: false,
       autoResetResize: false,
       columns,
       data,
@@ -206,7 +184,7 @@ export const ExperimentsTable: React.FC<{
 
   const { toggleAllRowsExpanded } = instance
 
-  React.useEffect(() => {
+  useEffect(() => {
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
 
@@ -224,18 +202,17 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <RowSelectionProvider>
-      <Table instance={instance} tableData={tableData} />
+      <Table instance={instance} />
     </RowSelectionProvider>
   )
 }
 
-const Experiments: React.FC<{
-  tableData?: TableData | null
-}> = ({ tableData }) => {
+const Experiments: React.FC = () => {
+  const { hasData } = useSelector((state: ExperimentsState) => state.tableData)
   return (
     <WebviewWrapper className={styles.experiments}>
-      {tableData ? (
-        <ExperimentsTable tableData={tableData} />
+      {hasData ? (
+        <ExperimentsTable />
       ) : (
         <EmptyState>Loading Experiments...</EmptyState>
       )}

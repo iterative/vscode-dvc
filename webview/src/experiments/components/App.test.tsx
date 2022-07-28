@@ -2,12 +2,10 @@
  * @jest-environment jsdom
  */
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
-import React from 'react'
 import {
   cleanup,
   createEvent,
   fireEvent,
-  render,
   screen,
   within
 } from '@testing-library/react'
@@ -17,7 +15,6 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Column, ColumnType, Row } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
-import { App } from './App'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
@@ -119,7 +116,7 @@ describe('App', () => {
   })
 
   it('should send a message to the extension on the first render', () => {
-    render(<App />)
+    renderTable(undefined, true)
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.INITIALIZED
     })
@@ -128,7 +125,7 @@ describe('App', () => {
   })
 
   it('should display the loading state before the experiments are shown', async () => {
-    render(<App />)
+    renderTable(undefined, true)
 
     const loadingState = await screen.findByText('Loading Experiments...')
     expect(loadingState).toBeInTheDocument()
@@ -866,7 +863,7 @@ describe('App', () => {
 
   describe('Context Menu Suppression', () => {
     it('Suppresses the context menu on a table with no data', () => {
-      render(<App />)
+      renderTable(undefined, true)
       const target = screen.getByText('Loading Experiments...')
       const contextMenuEvent = createEvent.contextMenu(target)
       fireEvent(target, contextMenuEvent)

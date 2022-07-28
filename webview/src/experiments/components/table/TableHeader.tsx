@@ -1,10 +1,10 @@
-import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import {
   Experiment,
   Column,
   ColumnType
 } from 'dvc/src/experiments/webview/contract'
 import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
@@ -13,6 +13,7 @@ import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
+import { ExperimentsState } from '../../store'
 import {
   Draggable,
   OnDragOver,
@@ -291,8 +292,6 @@ const TableHeaderCell: React.FC<{
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
-  sorts: SortDefinition[]
-  filters: string[]
   orderedColumns: Column[]
   onDragOver: OnDragOver
   onDragStart: OnDragStart
@@ -305,8 +304,6 @@ interface TableHeaderProps {
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
-  filters,
-  sorts,
   orderedColumns,
   onDragOver,
   onDragStart,
@@ -315,6 +312,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   firstExpColumnCellId,
   setExpColumnNeedsShadow
 }) => {
+  const { filters, sorts } = useSelector(
+    (state: ExperimentsState) => state.tableData
+  )
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
 
