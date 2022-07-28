@@ -4,6 +4,89 @@ import { collectSelected, collectDataStatus, collectTree } from './collect'
 import { dvcDemoPath } from '../../test/util'
 import { makeAbsPathSet } from '../../test/util/path'
 
+describe('collectDataStatus', () => {
+  it('should collect missing untracked parents', () => {
+    const untracked = [
+      'data' + sep,
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
+    ]
+
+    const { untracked: untrackedWithMissingParents, trackedDecorations } =
+      collectDataStatus(dvcDemoPath, {
+        untracked
+      })
+    expect(untrackedWithMissingParents).toStrictEqual(
+      makeAbsPathSet(
+        dvcDemoPath,
+        ...untracked,
+        join('data', 'MNIST', 'raw'),
+        join('data', 'MNIST')
+      )
+    )
+    expect(trackedDecorations).toStrictEqual(new Set())
+  })
+
+  it('should collect missing tracked parents', () => {
+    const tracked = [
+      join('training_metrics', 'scalars', 'loss.tsv'),
+      'training_metrics' + sep,
+      join('training_metrics', 'scalars', 'acc.tsv'),
+      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
+      join('model.pt'),
+      join('data', 'MNIST', 'raw'),
+      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
+      'misclassified.jpg',
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      'predictions.json',
+      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
+      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
+    ]
+    const { trackedDecorations: trackedWithMissingParents } = collectDataStatus(
+      dvcDemoPath,
+      {
+        unchanged: tracked
+      }
+    )
+    expect(trackedWithMissingParents).toStrictEqual(
+      makeAbsPathSet(
+        dvcDemoPath,
+        ...tracked,
+        join('training_metrics', 'scalars')
+      )
+    )
+  })
+
+  it('should return only not in cache when provided with duplicate paths', () => {
+    const not_in_cache = ['model.pt', 'misclassified.jpg', 'predictions.json']
+
+    const duplicates = {
+      committed: {
+        modified: ['model.pt', 'misclassified.jpg', 'predictions.json']
+      },
+      not_in_cache,
+      uncommitted: {
+        deleted: not_in_cache
+      }
+    }
+
+    const { committedModified, notInCache, uncommittedDeleted, tracked } =
+      collectDataStatus(dvcDemoPath, duplicates)
+
+    const absNotInCache = new Set(
+      not_in_cache.map(path => join(dvcDemoPath, path))
+    )
+
+    expect(committedModified).toStrictEqual(new Set())
+    expect(uncommittedDeleted).toStrictEqual(new Set())
+    expect(notInCache).toStrictEqual(absNotInCache)
+    expect(tracked).toStrictEqual(absNotInCache)
+  })
+})
+
 const makeUri = (...paths: string[]): Uri =>
   Uri.file(join(dvcDemoPath, ...paths))
 
@@ -314,88 +397,5 @@ describe('collectSelected', () => {
     expect(selected).toStrictEqual({
       [dvcDemoPath]: [logsPathItem]
     })
-  })
-})
-
-describe('collectDataStatus', () => {
-  it('should collect missing untracked parents', () => {
-    const untracked = [
-      'data' + sep,
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
-    ]
-
-    const { untracked: untrackedWithMissingParents, trackedDecorations } =
-      collectDataStatus(dvcDemoPath, {
-        untracked
-      })
-    expect(untrackedWithMissingParents).toStrictEqual(
-      makeAbsPathSet(
-        dvcDemoPath,
-        ...untracked,
-        join('data', 'MNIST', 'raw'),
-        join('data', 'MNIST')
-      )
-    )
-    expect(trackedDecorations).toStrictEqual(new Set())
-  })
-
-  it('should collect missing tracked parents', () => {
-    const tracked = [
-      join('training_metrics', 'scalars', 'loss.tsv'),
-      'training_metrics' + sep,
-      join('training_metrics', 'scalars', 'acc.tsv'),
-      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
-      join('model.pt'),
-      join('data', 'MNIST', 'raw'),
-      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
-      'misclassified.jpg',
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
-      'predictions.json',
-      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
-      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
-    ]
-    const { trackedDecorations: trackedWithMissingParents } = collectDataStatus(
-      dvcDemoPath,
-      {
-        unchanged: tracked
-      }
-    )
-    expect(trackedWithMissingParents).toStrictEqual(
-      makeAbsPathSet(
-        dvcDemoPath,
-        ...tracked,
-        join('training_metrics', 'scalars')
-      )
-    )
-  })
-
-  it('should return only not in cache when provided with duplicate paths', () => {
-    const not_in_cache = ['model.pt', 'misclassified.jpg', 'predictions.json']
-
-    const duplicates = {
-      committed: {
-        modified: ['model.pt', 'misclassified.jpg', 'predictions.json']
-      },
-      not_in_cache,
-      uncommitted: {
-        deleted: not_in_cache
-      }
-    }
-
-    const { committedModified, notInCache, uncommittedDeleted, tracked } =
-      collectDataStatus(dvcDemoPath, duplicates)
-
-    const absNotInCache = new Set(
-      not_in_cache.map(path => join(dvcDemoPath, path))
-    )
-
-    expect(committedModified).toStrictEqual(new Set())
-    expect(uncommittedDeleted).toStrictEqual(new Set())
-    expect(notInCache).toStrictEqual(absNotInCache)
-    expect(tracked).toStrictEqual(absNotInCache)
   })
 })
