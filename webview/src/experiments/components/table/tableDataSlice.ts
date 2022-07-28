@@ -33,35 +33,30 @@ export const tableDataSlice = createSlice({
   reducers: {
     update: (state, action: PayloadAction<TableData>) => {
       if (action.payload) {
-        const columns = keepEqualOldReferencesInArray(
-          state.columns,
-          action.payload.columns
-        ) as Column[]
-        const rows = keepEqualOldReferencesInArray(
-          state.rows,
-          action.payload.rows
-        ) as Row[]
-        const sorts = keepEqualOldReferencesInArray(
-          state.sorts,
-          action.payload.sorts
-        ) as SortDefinition[]
-        const columnWidths = keepReferenceIfEqual(
-          state.columnWidths,
-          action.payload.columnWidths
-        ) as Record<string, number>
-        const filteredCounts = keepReferenceIfEqual(
-          state.filteredCounts,
-          action.payload.filteredCounts
-        ) as FilteredCounts
         return {
           ...state,
           ...action.payload,
-          columnWidths,
-          columns,
-          filteredCounts,
+          columnWidths: keepReferenceIfEqual(
+            state.columnWidths,
+            action.payload.columnWidths
+          ) as Record<string, number>,
+          columns: keepEqualOldReferencesInArray(
+            state.columns,
+            action.payload.columns
+          ) as Column[],
+          filteredCounts: keepReferenceIfEqual(
+            state.filteredCounts,
+            action.payload.filteredCounts
+          ) as FilteredCounts,
           hasData: true,
-          rows,
-          sorts
+          rows: keepEqualOldReferencesInArray(
+            state.rows,
+            action.payload.rows
+          ) as Row[],
+          sorts: keepEqualOldReferencesInArray(
+            state.sorts,
+            action.payload.sorts
+          ) as SortDefinition[]
         }
       }
       return tableDataInitialState
