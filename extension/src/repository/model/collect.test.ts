@@ -1,7 +1,8 @@
-import { join, resolve, sep } from 'path'
+import { join, sep } from 'path'
 import { Uri } from 'vscode'
 import { collectSelected, collectDataStatus, collectTree } from './collect'
 import { dvcDemoPath } from '../../test/util'
+import { makeAbsPathSet } from '../../test/util/path'
 
 const makeUri = (...paths: string[]): Uri =>
   Uri.file(join(dvcDemoPath, ...paths))
@@ -329,11 +330,12 @@ describe('collectDataStatus', () => {
         untracked
       })
     expect(untrackedWithMissingParents).toStrictEqual(
-      new Set([
-        ...untracked.map(path => resolve(dvcDemoPath, path)),
-        resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-        resolve(dvcDemoPath, 'data', 'MNIST')
-      ])
+      makeAbsPathSet(
+        dvcDemoPath,
+        ...untracked,
+        join('data', 'MNIST', 'raw'),
+        join('data', 'MNIST')
+      )
     )
     expect(trackedDecorations).toStrictEqual(new Set())
   })
@@ -363,10 +365,11 @@ describe('collectDataStatus', () => {
       }
     )
     expect(trackedWithMissingParents).toStrictEqual(
-      new Set([
-        ...tracked.map(path => resolve(dvcDemoPath, path)),
-        resolve(dvcDemoPath, 'training_metrics', 'scalars')
-      ])
+      makeAbsPathSet(
+        dvcDemoPath,
+        ...tracked,
+        join('training_metrics', 'scalars')
+      )
     )
   })
 

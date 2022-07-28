@@ -4,6 +4,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { RepositoryModel } from '.'
 import { dvcDemoPath } from '../../test/util'
 import { SourceControlDataStatus } from '../sourceControlManagement'
+import { makeAbsPathSet } from '../../test/util/path'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -59,32 +60,32 @@ describe('RepositoryModel', () => {
 
       expect(decorationState).toStrictEqual({
         committedAdded: emptySet,
-        committedDeleted: new Set([join(dvcDemoPath, deleted)]),
-        committedModified: new Set([join(dvcDemoPath, output)]),
-        committedRenamed: new Set([join(dvcDemoPath, renamed)]),
+        committedDeleted: makeAbsPathSet(dvcDemoPath, deleted),
+        committedModified: makeAbsPathSet(dvcDemoPath, output),
+        committedRenamed: makeAbsPathSet(dvcDemoPath, renamed),
         notInCache: emptySet,
-        tracked: new Set(
-          [
-            predictions,
-            deleted,
-            output,
-            renamed,
-            rawDataDir,
-            logDir,
-            scalarDir,
-            logAcc,
-            logLoss
-          ].map(path => join(dvcDemoPath, path))
+        tracked: makeAbsPathSet(
+          dvcDemoPath,
+          predictions,
+          deleted,
+          output,
+          renamed,
+          rawDataDir,
+          logDir,
+          scalarDir,
+          logAcc,
+          logLoss
         ),
         uncommittedAdded: emptySet,
         uncommittedDeleted: emptySet,
-        uncommittedModified: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, logDir),
-          join(dvcDemoPath, scalarDir),
-          join(dvcDemoPath, logAcc),
-          join(dvcDemoPath, logLoss)
-        ]),
+        uncommittedModified: makeAbsPathSet(
+          dvcDemoPath,
+          rawDataDir,
+          logDir,
+          scalarDir,
+          logAcc,
+          logLoss
+        ),
         uncommittedRenamed: emptySet
       })
 
@@ -148,10 +149,7 @@ describe('RepositoryModel', () => {
         committedModified: emptySet,
         committedRenamed: emptySet,
         notInCache: emptySet,
-        tracked: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, data)
-        ]),
+        tracked: makeAbsPathSet(dvcDemoPath, rawDataDir, data),
         uncommittedAdded: emptySet,
         uncommittedDeleted: emptySet,
         uncommittedModified: emptySet,

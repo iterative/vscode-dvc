@@ -179,9 +179,6 @@ export const collectSelected = (
   return acc
 }
 
-const getAbsPath = (dvcRoot: string, relPath: string): string =>
-  resolve(dvcRoot, relPath)
-
 export const UndecoratedDataStatus = {
   TRACKED_DECORATIONS: 'trackedDecorations',
   UNCHANGED: 'unchanged',
@@ -282,7 +279,7 @@ const transformDataStatusOutput = (
   const collectStatus = (paths: string[] | undefined, status: Status) => {
     for (const path of paths || []) {
       dataStatusMapping[removeTrailingSlash(path)] = status
-      addToTracked(tracked, getAbsPath(dvcRoot, path), status)
+      addToTracked(tracked, resolve(dvcRoot, path), status)
     }
   }
 
@@ -348,7 +345,7 @@ export const collectDataStatus = (
   const dataStatus = getInitialDataStatus(tracked)
 
   for (const [path, status] of Object.entries(dataStatusWithMissingAncestors)) {
-    const absPath = getAbsPath(dvcRoot, path)
+    const absPath = resolve(dvcRoot, path)
     dataStatus[status].add(absPath)
 
     addToTracked(dataStatus.trackedDecorations, absPath, status)

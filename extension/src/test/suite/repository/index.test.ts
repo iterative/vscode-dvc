@@ -8,6 +8,7 @@ import { Disposable } from '../../../extension'
 import { dvcDemoPath } from '../../util'
 import { bypassProcessManagerDebounce, FIRST_TRUTHY_TIME } from '../util'
 import { SourceControlDataStatus } from '../../../repository/sourceControlManagement'
+import { makeAbsPathSet } from '../../util/path'
 
 suite('Repository Test Suite', () => {
   const disposable = Disposable.fn()
@@ -59,14 +60,15 @@ suite('Repository Test Suite', () => {
         treeDataChanged
       )
 
-      const modified = new Set([
-        resolve(dvcDemoPath, model),
-        resolve(dvcDemoPath, logDir),
-        resolve(dvcDemoPath, logAcc),
-        resolve(dvcDemoPath, logLoss),
-        resolve(dvcDemoPath, dataDir),
-        resolve(dvcDemoPath, dataset)
-      ])
+      const modified = makeAbsPathSet(
+        dvcDemoPath,
+        model,
+        logDir,
+        logAcc,
+        logLoss,
+        dataDir,
+        dataset
+      )
 
       expect(mockDataStatus).to.be.calledWith(dvcDemoPath)
       expect(mockGetAllUntracked).to.be.calledWith(dvcDemoPath)
@@ -168,22 +170,20 @@ suite('Repository Test Suite', () => {
 
       mockNow.resolves(FIRST_TRUTHY_TIME)
 
-      const uncommittedDeleted = new Set([join(dvcDemoPath, model)])
-      const uncommittedModified = new Set([join(dvcDemoPath, features)])
-      const notInCache = new Set([
-        join(dvcDemoPath, dataXml),
-        join(dvcDemoPath, prepared)
-      ])
-      const tracked = new Set([
-        resolve(dvcDemoPath, dataDir),
-        resolve(dvcDemoPath, prepared),
-        resolve(dvcDemoPath, dataXml),
-        resolve(dvcDemoPath, features),
-        resolve(dvcDemoPath, logAcc),
-        resolve(dvcDemoPath, logDir),
-        resolve(dvcDemoPath, logLoss),
-        resolve(dvcDemoPath, model)
-      ])
+      const uncommittedDeleted = makeAbsPathSet(dvcDemoPath, model)
+      const uncommittedModified = makeAbsPathSet(dvcDemoPath, features)
+      const notInCache = makeAbsPathSet(dvcDemoPath, dataXml, prepared)
+      const tracked = makeAbsPathSet(
+        dvcDemoPath,
+        dataDir,
+        prepared,
+        dataXml,
+        features,
+        logAcc,
+        logDir,
+        logLoss,
+        model
+      )
       const untracked = [
         resolve(dvcDemoPath, untrackedGo),
         resolve(dvcDemoPath, untrackedPerl),
