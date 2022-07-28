@@ -49,18 +49,6 @@ describe('RepositoryModel', () => {
         untracked: []
       }
 
-      const list = [
-        predictions,
-        deleted,
-        output,
-        renamed,
-        rawDataDir,
-        logDir,
-        scalarDir,
-        logAcc,
-        logLoss
-      ]
-
       const model = new RepositoryModel(dvcDemoPath)
       const { decorationState, sourceControlManagementState } =
         model.transformAndSet({
@@ -75,7 +63,19 @@ describe('RepositoryModel', () => {
         committedModified: new Set([join(dvcDemoPath, output)]),
         committedRenamed: new Set([join(dvcDemoPath, renamed)]),
         notInCache: emptySet,
-        tracked: new Set(list.map(path => join(dvcDemoPath, path))),
+        tracked: new Set(
+          [
+            predictions,
+            deleted,
+            output,
+            renamed,
+            rawDataDir,
+            logDir,
+            scalarDir,
+            logAcc,
+            logLoss
+          ].map(path => join(dvcDemoPath, path))
+        ),
         uncommittedAdded: emptySet,
         uncommittedDeleted: emptySet,
         uncommittedModified: new Set([
