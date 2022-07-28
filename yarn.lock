@@ -3642,7 +3642,16 @@
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-4.0.5.tgz#738dd390a6ecc5442f35e7f03fa1431353f7e138"
   integrity sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==
 
-"@types/jsdom@16.2.14", "@types/jsdom@^16.2.4":
+"@types/jsdom@16.2.15":
+  version "16.2.15"
+  resolved "https://registry.yarnpkg.com/@types/jsdom/-/jsdom-16.2.15.tgz#6c09990ec43b054e49636cba4d11d54367fc90d6"
+  integrity sha512-nwF87yjBKuX/roqGYerZZM0Nv1pZDMAT5YhOHYeM/72Fic+VEqJh4nyoqoapzJnW3pUlfxPY5FhgsJtM+dRnQQ==
+  dependencies:
+    "@types/node" "*"
+    "@types/parse5" "^6.0.3"
+    "@types/tough-cookie" "*"
+
+"@types/jsdom@^16.2.4":
   version "16.2.14"
   resolved "https://registry.yarnpkg.com/@types/jsdom/-/jsdom-16.2.14.tgz#26fe9da6a8870715b154bb84cd3b2e53433d8720"
   integrity sha512-6BAy1xXEmMuHeAJ4Fv4yXKwBDTGTOseExKE3OaHiNycdHdZw59KfYzrt0DkDluvwmik1HRt6QS7bImxUmpSy+w==
@@ -3823,7 +3832,7 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/parse5@*":
+"@types/parse5@*", "@types/parse5@^6.0.3":
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/@types/parse5/-/parse5-6.0.3.tgz#705bb349e789efa06f43f128cef51240753424cb"
   integrity sha512-SuT16Q1K51EAVPz1K29DJ/sXjhSQ0zjvsypYJ6tlwVsRV9jwW5Adq2ch8Dq8kDBCkYnELS7N7VNCSB5nC56t/g==
@@ -17707,10 +17716,10 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
-vsce@2.9.2:
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/vsce/-/vsce-2.9.2.tgz#be5d2ca5899f31ba84225d6b19ea1376589df897"
-  integrity sha512-xyLqL4U82BilUX1t6Ym2opQEa2tLGWYjbgB7+ETeNVXlIJz5sWBJjQJSYJVFOKJSpiOtQclolu88cj7oY6vvPQ==
+vsce@2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/vsce/-/vsce-2.10.0.tgz#19a9f070ec319e26d4f23567f32826f48fc694aa"
+  integrity sha512-b+wB3XMapEi368g64klSM6uylllZdNutseqbNY+tUoHYSy6g2NwnlWuAGKDQTYc0IqfDUjUFRQBpPgA89Q+Fyw==
   dependencies:
     azure-devops-node-api "^11.0.1"
     chalk "^2.4.2"
