@@ -5,6 +5,7 @@ import { dvcDemoPath } from '../../test/util'
 import { makeAbsPathSet } from '../../test/util/path'
 
 describe('collectDataStatus', () => {
+  const emptySet = new Set()
   it('should collect missing untracked parents', () => {
     const untracked = [
       'data' + sep,
@@ -12,10 +13,13 @@ describe('collectDataStatus', () => {
       join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
     ]
 
-    const { untracked: untrackedWithMissingParents, trackedDecorations } =
-      collectDataStatus(dvcDemoPath, {
-        untracked
-      })
+    const {
+      untracked: untrackedWithMissingParents,
+      tracked,
+      trackedDecorations
+    } = collectDataStatus(dvcDemoPath, {
+      untracked
+    })
     expect(untrackedWithMissingParents).toStrictEqual(
       makeAbsPathSet(
         dvcDemoPath,
@@ -24,7 +28,8 @@ describe('collectDataStatus', () => {
         join('data', 'MNIST')
       )
     )
-    expect(trackedDecorations).toStrictEqual(new Set())
+    expect(tracked).toStrictEqual(emptySet)
+    expect(trackedDecorations).toStrictEqual(emptySet)
   })
 
   it('should collect missing tracked parents', () => {
@@ -76,12 +81,10 @@ describe('collectDataStatus', () => {
     const { committedModified, notInCache, uncommittedDeleted, tracked } =
       collectDataStatus(dvcDemoPath, duplicates)
 
-    const absNotInCache = new Set(
-      not_in_cache.map(path => join(dvcDemoPath, path))
-    )
+    const absNotInCache = makeAbsPathSet(dvcDemoPath, ...not_in_cache)
 
-    expect(committedModified).toStrictEqual(new Set())
-    expect(uncommittedDeleted).toStrictEqual(new Set())
+    expect(committedModified).toStrictEqual(emptySet)
+    expect(uncommittedDeleted).toStrictEqual(emptySet)
     expect(notInCache).toStrictEqual(absNotInCache)
     expect(tracked).toStrictEqual(absNotInCache)
   })
