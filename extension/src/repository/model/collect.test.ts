@@ -316,7 +316,7 @@ describe('collectSelected', () => {
   })
 })
 
-describe('collectState', () => {
+describe('collectDataStatus', () => {
   it('should collect missing untracked parents', () => {
     const untracked = [
       'data' + sep,
@@ -368,5 +368,31 @@ describe('collectState', () => {
         resolve(dvcDemoPath, 'training_metrics', 'scalars')
       ])
     )
+  })
+
+  it('should return only not in cache when provided with duplicate paths', () => {
+    const not_in_cache = ['model.pt', 'misclassified.jpg', 'predictions.json']
+
+    const duplicates = {
+      committed: {
+        modified: ['model.pt', 'misclassified.jpg', 'predictions.json']
+      },
+      not_in_cache,
+      uncommitted: {
+        deleted: not_in_cache
+      }
+    }
+
+    const { committedModified, notInCache, uncommittedDeleted, tracked } =
+      collectDataStatus(dvcDemoPath, duplicates)
+
+    const absNotInCache = new Set(
+      not_in_cache.map(path => join(dvcDemoPath, path))
+    )
+
+    expect(committedModified).toStrictEqual(new Set())
+    expect(uncommittedDeleted).toStrictEqual(new Set())
+    expect(notInCache).toStrictEqual(absNotInCache)
+    expect(tracked).toStrictEqual(absNotInCache)
   })
 })
