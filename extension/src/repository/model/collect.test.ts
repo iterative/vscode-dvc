@@ -6,6 +6,83 @@ import { makeAbsPathSet } from '../../test/util/path'
 
 describe('collectDataStatus', () => {
   const emptySet = new Set()
+
+  it('should map path to the right sets', () => {
+    const committedAdded = ['CA1', 'CA2', 'CA3']
+    const committedDeleted = ['CD-A', 'CD-B']
+    const committedModified = ['CM1', 'CM2', 'CM3']
+    const committedRenamed = ['CR1']
+
+    const uncommittedAdded = [join('some', 'nested', 'UA-XYZ')]
+    const uncommittedDeleted = ['UD-C', 'UD-D']
+    const uncommittedModified = ['UM']
+    const uncommittedRenamed = ['UR1']
+
+    const unchanged = ['A', 'B', 'C', 'D', join('E', 'F', 'G'), 'H']
+    const untracked = [join('A1', 'B2', 'C3'), join('D4', 'E5', 'F6')]
+
+    const data = collectDataStatus(dvcDemoPath, {
+      committed: {
+        added: committedAdded,
+        deleted: committedDeleted,
+        modified: committedModified,
+        renamed: committedRenamed.map(path => ({
+          new: path,
+          old: join('dir', 'path')
+        }))
+      },
+      unchanged,
+      uncommitted: {
+        added: uncommittedAdded,
+        deleted: uncommittedDeleted,
+        modified: uncommittedModified,
+        renamed: uncommittedRenamed.map(path => ({
+          new: path,
+          old: join('dir', 'path')
+        }))
+      },
+      untracked
+    })
+
+    expect(data).toStrictEqual({
+      committedAdded: makeAbsPathSet(dvcDemoPath, ...committedAdded),
+      committedDeleted: makeAbsPathSet(dvcDemoPath, ...committedDeleted),
+      committedModified: makeAbsPathSet(dvcDemoPath, ...committedModified),
+      committedRenamed: makeAbsPathSet(dvcDemoPath, ...committedRenamed),
+      notInCache: emptySet,
+      tracked: makeAbsPathSet(
+        dvcDemoPath,
+        ...committedAdded,
+        ...committedDeleted,
+        ...committedModified,
+        ...committedRenamed,
+        ...uncommittedAdded,
+        ...uncommittedDeleted,
+        ...uncommittedModified,
+        ...uncommittedRenamed,
+        ...unchanged
+      ),
+      trackedDecorations: makeAbsPathSet(
+        dvcDemoPath,
+        ...committedAdded,
+        ...committedDeleted,
+        ...committedModified,
+        ...committedRenamed,
+        ...uncommittedAdded,
+        ...uncommittedDeleted,
+        ...uncommittedModified,
+        ...uncommittedRenamed,
+        ...unchanged
+      ),
+      unchanged: makeAbsPathSet(dvcDemoPath, ...unchanged),
+      uncommittedAdded: makeAbsPathSet(dvcDemoPath, ...uncommittedAdded),
+      uncommittedDeleted: makeAbsPathSet(dvcDemoPath, ...uncommittedDeleted),
+      uncommittedModified: makeAbsPathSet(dvcDemoPath, ...uncommittedModified),
+      uncommittedRenamed: makeAbsPathSet(dvcDemoPath, ...uncommittedRenamed),
+      untracked: makeAbsPathSet(dvcDemoPath, ...untracked)
+    })
+  })
+
   it('should collect missing untracked parents', () => {
     const untracked = [
       'data' + sep,
