@@ -44,7 +44,7 @@ export class RepositoryModel extends Disposable {
     return this.tree.get(path) || []
   }
 
-  public setState({ dataStatus, hasGitChanges, untracked }: Data) {
+  public transformAndSet({ dataStatus, hasGitChanges, untracked }: Data) {
     const data = this.collectDataStatus({
       ...dataStatus,
       untracked: [...untracked].map(path => relative(this.dvcRoot, path))

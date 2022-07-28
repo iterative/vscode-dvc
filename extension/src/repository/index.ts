@@ -67,9 +67,8 @@ export class Repository extends DeferredDisposable {
   private async initialize() {
     this.dispose.track(
       this.data.onDidUpdate(data => {
-        const state = this.model.setState(data)
-        this.setState(state)
-        this.treeDataChanged.fire()
+        const scmAndDecorationState = this.model.transformAndSet(data)
+        this.notifyChanged(scmAndDecorationState)
       })
     )
 
@@ -77,13 +76,14 @@ export class Repository extends DeferredDisposable {
     return this.deferred.resolve()
   }
 
-  private setState({
+  private notifyChanged({
     decorationState,
     sourceControlManagementState
   }: {
     decorationState: DecorationState
     sourceControlManagementState: SCMState
   }) {
+    this.treeDataChanged.fire()
     this.sourceControlManagement.setState(sourceControlManagementState)
     this.decorationProvider.setState(decorationState)
   }

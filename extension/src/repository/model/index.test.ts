@@ -23,7 +23,7 @@ beforeEach(() => {
 describe('RepositoryModel', () => {
   const emptySet = new Set()
 
-  describe('setState', () => {
+  describe('transformAndSet', () => {
     it('should correctly process the output of data status', () => {
       const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
       const logDir = 'logs'
@@ -62,11 +62,12 @@ describe('RepositoryModel', () => {
       ]
 
       const model = new RepositoryModel(dvcDemoPath)
-      const { decorationState, sourceControlManagementState } = model.setState({
-        dataStatus,
-        hasGitChanges: true,
-        untracked: new Set()
-      })
+      const { decorationState, sourceControlManagementState } =
+        model.transformAndSet({
+          dataStatus,
+          hasGitChanges: true,
+          untracked: new Set()
+        })
 
       expect(decorationState).toStrictEqual({
         committedAdded: emptySet,
@@ -134,11 +135,12 @@ describe('RepositoryModel', () => {
       }
 
       const model = new RepositoryModel(dvcDemoPath)
-      const { decorationState, sourceControlManagementState } = model.setState({
-        dataStatus,
-        hasGitChanges: true,
-        untracked: new Set()
-      })
+      const { decorationState, sourceControlManagementState } =
+        model.transformAndSet({
+          dataStatus,
+          hasGitChanges: true,
+          untracked: new Set()
+        })
 
       expect(decorationState).toStrictEqual({
         committedAdded: emptySet,
