@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { TableData } from 'dvc/src/experiments/webview/contract'
+import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
+import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
+import { Column, Row, TableData } from 'dvc/src/experiments/webview/contract'
+import { keepEqualOldReferencesInArray } from '../../../util/array'
+import { keepReferenceIfEqual } from '../../../util/objects'
 
 export interface TableDataState extends TableData {
   hasData?: boolean
@@ -29,10 +33,35 @@ export const tableDataSlice = createSlice({
   reducers: {
     update: (state, action: PayloadAction<TableData>) => {
       if (action.payload) {
+        const columns = keepEqualOldReferencesInArray(
+          state.columns,
+          action.payload.columns
+        ) as Column[]
+        const rows = keepEqualOldReferencesInArray(
+          state.rows,
+          action.payload.rows
+        ) as Row[]
+        const sorts = keepEqualOldReferencesInArray(
+          state.sorts,
+          action.payload.sorts
+        ) as SortDefinition[]
+        const columnWidths = keepReferenceIfEqual(
+          state.columnWidths,
+          action.payload.columnWidths
+        ) as Record<string, number>
+        const filteredCounts = keepReferenceIfEqual(
+          state.filteredCounts,
+          action.payload.filteredCounts
+        ) as FilteredCounts
         return {
           ...state,
           ...action.payload,
-          hasData: true
+          columnWidths,
+          columns,
+          filteredCounts,
+          hasData: true,
+          rows,
+          sorts
         }
       }
       return tableDataInitialState
