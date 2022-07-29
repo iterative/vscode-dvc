@@ -1,13 +1,8 @@
 import { basename, extname, relative } from 'path'
 import { Uri } from 'vscode'
 import omit from 'lodash.omit'
-import {
-  collectDataStatus,
-  collectTree,
-  DataStatus,
-  PathItem,
-  UndecoratedDataStatus
-} from './collect'
+import { collectDataStatus, collectTree, DataStatus, PathItem } from './collect'
+import { UndecoratedDataStatus } from '../constants'
 import {
   SourceControlDataStatus,
   SourceControlResource,

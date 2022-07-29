@@ -1,3 +1,12 @@
+export const DiscardedStatus = {
+  UNCHANGED: 'unchanged'
+} as const
+
+export const UndecoratedDataStatus = {
+  TRACKED_DECORATIONS: 'trackedDecorations',
+  UNTRACKED: 'untracked'
+} as const
+
 export const BaseDataStatus = {
   COMMITTED_ADDED: 'committedAdded',
   COMMITTED_DELETED: 'committedDeleted',

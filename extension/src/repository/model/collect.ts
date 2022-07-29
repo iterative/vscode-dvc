@@ -11,15 +11,7 @@ import {
   getPathArray,
   removeTrailingSlash
 } from '../../fileSystem/util'
-
-const DiscardedStatus = {
-  UNCHANGED: 'unchanged'
-} as const
-
-export const UndecoratedDataStatus = {
-  TRACKED_DECORATIONS: 'trackedDecorations',
-  UNTRACKED: 'untracked'
-} as const
+import { DiscardedStatus, UndecoratedDataStatus } from '../constants'
 
 const AvailableDataStatus = Object.assign(
   {} as const,
