@@ -74,7 +74,6 @@ describe('collectDataStatus', () => {
         ...uncommittedRenamed,
         ...unchanged
       ),
-      unchanged: makeAbsPathSet(dvcDemoPath, ...unchanged),
       uncommittedAdded: makeAbsPathSet(dvcDemoPath, ...uncommittedAdded),
       uncommittedDeleted: makeAbsPathSet(dvcDemoPath, ...uncommittedDeleted),
       uncommittedModified: makeAbsPathSet(dvcDemoPath, ...uncommittedModified),

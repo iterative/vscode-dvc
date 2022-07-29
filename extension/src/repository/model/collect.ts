@@ -12,9 +12,12 @@ import {
   removeTrailingSlash
 } from '../../fileSystem/util'
 
+const DiscardedStatus = {
+  UNCHANGED: 'unchanged'
+} as const
+
 export const UndecoratedDataStatus = {
   TRACKED_DECORATIONS: 'trackedDecorations',
-  UNCHANGED: 'unchanged',
   UNTRACKED: 'untracked'
 } as const
 
@@ -24,10 +27,19 @@ const AvailableDataStatus = Object.assign(
   UndecoratedDataStatus
 )
 
+const ExtendedDataStatus = Object.assign(
+  {} as const,
+  AvailableDataStatus,
+  DiscardedStatus
+)
+
+export type ExtendedStatus =
+  typeof ExtendedDataStatus[keyof typeof ExtendedDataStatus]
+
 export type Status =
   typeof AvailableDataStatus[keyof typeof AvailableDataStatus]
 
-type DataStatusMapping = { [path: string]: Status }
+type DataStatusMapping = { [path: string]: ExtendedStatus }
 
 export type DataStatus = Record<Status, Set<string>>
 
@@ -40,7 +52,7 @@ const getStatus = (
 const addMissingWithAncestorStatus = (
   withMissingAncestors: DataStatusMapping,
   missingAncestors: Set<string>,
-  status: Status
+  status: ExtendedStatus
 ): void => {
   for (const ancestor of missingAncestors) {
     withMissingAncestors[ancestor] = status
@@ -72,7 +84,7 @@ const addMissingAncestors = (
 }
 
 const collectMissingAncestors = (originalMapping: {
-  [path: string]: Status
+  [path: string]: ExtendedStatus
 }): DataStatusMapping => {
   const withMissingAncestors: DataStatusMapping = {}
 
@@ -92,9 +104,9 @@ const collectMissingAncestors = (originalMapping: {
 const addToTracked = (
   tracked: Set<string>,
   absPath: string,
-  status: Status
+  status: ExtendedStatus
 ) => {
-  if (status === AvailableDataStatus.UNTRACKED) {
+  if (status === ExtendedDataStatus.UNTRACKED) {
     return
   }
 
@@ -105,23 +117,20 @@ const createIterable = (
   dataStatus: DataStatusOutput & { untracked?: string[] }
 ) =>
   Object.entries({
-    [AvailableDataStatus.COMMITTED_ADDED]: dataStatus.committed?.added,
-    [AvailableDataStatus.COMMITTED_DELETED]: dataStatus.committed?.deleted,
-    [AvailableDataStatus.COMMITTED_MODIFIED]: dataStatus.committed?.modified,
-
-    [AvailableDataStatus.COMMITTED_RENAMED]: dataStatus.committed?.renamed?.map(
+    [ExtendedDataStatus.COMMITTED_ADDED]: dataStatus.committed?.added,
+    [ExtendedDataStatus.COMMITTED_DELETED]: dataStatus.committed?.deleted,
+    [ExtendedDataStatus.COMMITTED_MODIFIED]: dataStatus.committed?.modified,
+    [ExtendedDataStatus.COMMITTED_RENAMED]: dataStatus.committed?.renamed?.map(
       ({ new: path }) => path
     ),
-    [AvailableDataStatus.UNCOMMITTED_ADDED]: dataStatus.uncommitted?.added,
-    [AvailableDataStatus.UNCOMMITTED_DELETED]: dataStatus.uncommitted?.deleted,
-    [AvailableDataStatus.UNCOMMITTED_MODIFIED]:
-      dataStatus.uncommitted?.modified,
-    [AvailableDataStatus.UNCOMMITTED_RENAMED]:
+    [ExtendedDataStatus.UNCOMMITTED_ADDED]: dataStatus.uncommitted?.added,
+    [ExtendedDataStatus.UNCOMMITTED_DELETED]: dataStatus.uncommitted?.deleted,
+    [ExtendedDataStatus.UNCOMMITTED_MODIFIED]: dataStatus.uncommitted?.modified,
+    [ExtendedDataStatus.UNCOMMITTED_RENAMED]:
       dataStatus.uncommitted?.renamed?.map(({ new: path }) => path),
-
-    [AvailableDataStatus.NOT_IN_CACHE]: dataStatus.not_in_cache,
-    [AvailableDataStatus.UNCHANGED]: dataStatus.unchanged,
-    [AvailableDataStatus.UNTRACKED]: dataStatus.untracked
+    [ExtendedDataStatus.NOT_IN_CACHE]: dataStatus.not_in_cache,
+    [ExtendedDataStatus.UNCHANGED]: dataStatus.unchanged,
+    [ExtendedDataStatus.UNTRACKED]: dataStatus.untracked
   })
 
 const transformDataStatusOutput = (
@@ -132,7 +141,10 @@ const transformDataStatusOutput = (
 
   const tracked = new Set<string>()
 
-  const collectStatus = (status: Status, paths: string[] | undefined) => {
+  const collectStatus = (
+    status: ExtendedStatus,
+    paths: string[] | undefined
+  ) => {
     for (const path of paths || []) {
       dataStatusMapping[removeTrailingSlash(path)] = status
       addToTracked(tracked, resolve(dvcRoot, path), status)
@@ -140,7 +152,7 @@ const transformDataStatusOutput = (
   }
 
   for (const [key, data] of createIterable(dataStatus)) {
-    collectStatus(key as Status, data)
+    collectStatus(key as ExtendedStatus, data)
   }
 
   return { dataStatusMapping, tracked }
@@ -170,7 +182,9 @@ export const collectDataStatus = (
 
   for (const [path, status] of Object.entries(dataStatusWithMissingAncestors)) {
     const absPath = resolve(dvcRoot, path)
-    dataStatus[status].add(absPath)
+    if (status !== DiscardedStatus.UNCHANGED) {
+      dataStatus[status].add(absPath)
+    }
 
     addToTracked(dataStatus.trackedDecorations, absPath, status)
   }
