@@ -28,7 +28,7 @@ export const setTableData = (data = tableDataFixture) => {
   )
 }
 
-export const renderTable = (data = tableDataFixture) => {
+export const renderTable = (data = tableDataFixture, noData?: boolean) => {
   const renderedTable = render(
     <Provider store={configureStore({ reducer: experimentsReducers })}>
       <App />
@@ -37,7 +37,7 @@ export const renderTable = (data = tableDataFixture) => {
       queries: { ...queries, ...customQueries }
     }
   )
-  setTableData(data)
+  !noData && setTableData(data)
   return renderedTable
 }
 

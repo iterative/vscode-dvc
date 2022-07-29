@@ -1,8 +1,9 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { RowProp, WithChanges } from './interfaces'
+import { RowProp } from './interfaces'
 import styles from './styles.module.scss'
 import { FirstCell, CellWrapper } from './Cell'
 import { RowSelectionContext } from './RowSelectionContext'
@@ -12,6 +13,7 @@ import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMe
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
 import { HandlerFunc } from '../../../util/props'
 import { cond } from '../../../util/helpers'
+import { ExperimentsState } from '../../store'
 
 const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   if (running) {
@@ -311,16 +313,18 @@ export type BatchSelectionProp = {
 }
 
 export const RowContent: React.FC<
-  RowProp & { className?: string } & WithChanges & BatchSelectionProp
+  RowProp & { className?: string } & BatchSelectionProp
 > = ({
   row,
   className,
-  changes,
   contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
   batchRowSelection
 }): JSX.Element => {
+  const changes = useSelector(
+    (state: ExperimentsState) => state.tableData.changes
+  )
   const {
     getRowProps,
     cells: [firstCell, ...cells],

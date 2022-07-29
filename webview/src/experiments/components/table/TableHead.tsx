@@ -1,15 +1,15 @@
-import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
 import cx from 'classnames'
 import React, { useRef } from 'react'
+import { useSelector } from 'react-redux'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { Indicators } from './Indicators'
 import { useColumnOrder } from '../../hooks/useColumnOrder'
+import { ExperimentsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
 import { leafColumnIds, reorderColumnIds } from '../../util/columns'
 import {
@@ -17,13 +17,8 @@ import {
   OnDragStart
 } from '../../../shared/components/dragDrop/DragDropWorkbench'
 import { getSelectedForPlotsCount } from '../../util/rows'
-
 interface TableHeadProps {
   instance: TableInstance<Experiment>
-  columns: Column[]
-  sorts: SortDefinition[]
-  filteredCounts: FilteredCounts
-  filters: string[]
   root: HTMLElement | null
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
 }
@@ -37,12 +32,11 @@ export const TableHead = ({
     rows
   },
   root,
-  filteredCounts,
-  filters,
-  columns,
-  sorts,
   setExpColumnNeedsShadow
 }: TableHeadProps) => {
+  const columns = useSelector(
+    (state: ExperimentsState) => state.tableData.columns
+  )
   const orderedColumns = useColumnOrder(columns, columnOrder)
   const allHeaders: HeaderGroup<Experiment>[] = []
   for (const headerGroup of headerGroups) {
@@ -108,12 +102,7 @@ export const TableHead = ({
       className={cx(styles.thead, needsShadow && styles.headWithShadow)}
       ref={ref}
     >
-      <Indicators
-        selectedForPlotsCount={selectedForPlotsCount}
-        sorts={sorts}
-        filters={filters}
-        filteredCounts={filteredCounts}
-      />
+      <Indicators selectedForPlotsCount={selectedForPlotsCount} />
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
         <MergedHeaderGroups
@@ -121,8 +110,6 @@ export const TableHead = ({
           orderedColumns={orderedColumns}
           headerGroup={headerGroup}
           columns={allHeaders}
-          sorts={sorts}
-          filters={filters}
           onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}

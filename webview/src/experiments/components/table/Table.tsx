@@ -1,11 +1,13 @@
 import React, { useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import { BatchSelectionProp, RowContent } from './Row'
-import { InstanceProp, RowProp, TableProps, WithChanges } from './interfaces'
+import { InstanceProp, RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { useClickOutside } from '../../../shared/hooks/useClickOutside'
+import { ExperimentsState } from '../../store'
 
 export const NestedRow: React.FC<
   RowProp & InstanceProp & BatchSelectionProp
@@ -73,11 +75,10 @@ export const ExperimentGroup: React.FC<
 }
 
 export const TableBody: React.FC<
-  RowProp & InstanceProp & WithChanges & BatchSelectionProp
+  RowProp & InstanceProp & BatchSelectionProp
 > = ({
   row,
   instance,
-  changes,
   contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
@@ -100,7 +101,6 @@ export const TableBody: React.FC<
         row={row}
         projectHasCheckpoints={projectHasCheckpoints}
         hasRunningExperiment={hasRunningExperiment}
-        changes={changes}
         contextMenuDisabled={contextMenuDisabled}
         batchRowSelection={batchRowSelection}
       />
@@ -120,20 +120,14 @@ export const TableBody: React.FC<
   )
 }
 
-export const Table: React.FC<TableProps & WithChanges> = ({
-  instance,
-  tableData
-}) => {
+export const Table: React.FC<InstanceProp> = ({ instance }) => {
   const { getTableProps, rows, flatRows } = instance
-  const {
-    filters,
-    sorts,
-    columns,
-    changes,
-    hasCheckpoints,
-    hasRunningExperiment,
-    filteredCounts
-  } = tableData
+  const hasCheckpoints = useSelector(
+    (state: ExperimentsState) => state.tableData.hasCheckpoints
+  )
+  const hasRunningExperiment = useSelector(
+    (state: ExperimentsState) => state.tableData.hasRunningExperiment
+  )
 
   const { clearSelectedRows, batchSelection, lastSelectedRow } =
     React.useContext(RowSelectionContext)
@@ -196,10 +190,6 @@ export const Table: React.FC<TableProps & WithChanges> = ({
       >
         <TableHead
           instance={instance}
-          sorts={sorts}
-          filteredCounts={filteredCounts}
-          filters={filters}
-          columns={columns}
           root={tableRef.current}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />
@@ -208,7 +198,6 @@ export const Table: React.FC<TableProps & WithChanges> = ({
             row={row}
             instance={instance}
             key={row.id}
-            changes={changes}
             hasRunningExperiment={hasRunningExperiment}
             projectHasCheckpoints={hasCheckpoints}
             batchRowSelection={batchRowSelection}
