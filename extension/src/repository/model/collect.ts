@@ -101,6 +101,29 @@ const addToTracked = (
   tracked.add(absPath)
 }
 
+const createIterable = (
+  dataStatus: DataStatusOutput & { untracked?: string[] }
+) =>
+  Object.entries({
+    [AvailableDataStatus.COMMITTED_ADDED]: dataStatus.committed?.added,
+    [AvailableDataStatus.COMMITTED_DELETED]: dataStatus.committed?.deleted,
+    [AvailableDataStatus.COMMITTED_MODIFIED]: dataStatus.committed?.modified,
+
+    [AvailableDataStatus.COMMITTED_RENAMED]: dataStatus.committed?.renamed?.map(
+      ({ new: path }) => path
+    ),
+    [AvailableDataStatus.UNCOMMITTED_ADDED]: dataStatus.uncommitted?.added,
+    [AvailableDataStatus.UNCOMMITTED_DELETED]: dataStatus.uncommitted?.deleted,
+    [AvailableDataStatus.UNCOMMITTED_MODIFIED]:
+      dataStatus.uncommitted?.modified,
+    [AvailableDataStatus.UNCOMMITTED_RENAMED]:
+      dataStatus.uncommitted?.renamed?.map(({ new: path }) => path),
+
+    [AvailableDataStatus.NOT_IN_CACHE]: dataStatus.not_in_cache,
+    [AvailableDataStatus.UNCHANGED]: dataStatus.unchanged,
+    [AvailableDataStatus.UNTRACKED]: dataStatus.untracked
+  })
+
 const transformDataStatusOutput = (
   dvcRoot: string,
   dataStatus: DataStatusOutput & { untracked?: string[] }
@@ -109,48 +132,16 @@ const transformDataStatusOutput = (
 
   const tracked = new Set<string>()
 
-  const collectStatus = (paths: string[] | undefined, status: Status) => {
+  const collectStatus = (status: Status, paths: string[] | undefined) => {
     for (const path of paths || []) {
       dataStatusMapping[removeTrailingSlash(path)] = status
       addToTracked(tracked, resolve(dvcRoot, path), status)
     }
   }
 
-  collectStatus(
-    dataStatus.committed?.added,
-    AvailableDataStatus.COMMITTED_ADDED
-  )
-  collectStatus(
-    dataStatus.committed?.deleted,
-    AvailableDataStatus.COMMITTED_DELETED
-  )
-  collectStatus(
-    dataStatus.committed?.modified,
-    AvailableDataStatus.COMMITTED_MODIFIED
-  )
-  collectStatus(
-    dataStatus.committed?.renamed?.map(({ new: path }) => path),
-    AvailableDataStatus.COMMITTED_RENAMED
-  )
-  collectStatus(
-    dataStatus.uncommitted?.added,
-    AvailableDataStatus.UNCOMMITTED_ADDED
-  )
-  collectStatus(
-    dataStatus.uncommitted?.deleted,
-    AvailableDataStatus.UNCOMMITTED_DELETED
-  )
-  collectStatus(
-    dataStatus.uncommitted?.modified,
-    AvailableDataStatus.UNCOMMITTED_MODIFIED
-  )
-  collectStatus(
-    dataStatus.uncommitted?.renamed?.map(({ new: path }) => path),
-    AvailableDataStatus.UNCOMMITTED_RENAMED
-  )
-  collectStatus(dataStatus.not_in_cache, AvailableDataStatus.NOT_IN_CACHE)
-  collectStatus(dataStatus.unchanged, AvailableDataStatus.UNCHANGED)
-  collectStatus(dataStatus.untracked, AvailableDataStatus.UNTRACKED)
+  for (const [key, data] of createIterable(dataStatus)) {
+    collectStatus(key as Status, data)
+  }
 
   return { dataStatusMapping, tracked }
 }
