@@ -156,6 +156,8 @@ suite('Repository Test Suite', () => {
       const untrackedGo = join('untracked', 'go.go')
       const untrackedPerl = join('untracked', 'perl.pl')
       const untrackedPython = join('untracked', 'python.py')
+      const unaddableDotDvc = join(dataDir, 'data.xml.dvc')
+      const unaddableDotGitignore = join(dataDir, '.gitignore')
 
       const {
         internalCommands,
@@ -205,7 +207,13 @@ suite('Repository Test Suite', () => {
         .onFirstCall()
         .resolves(new Set())
         .onSecondCall()
-        .resolves(new Set(untracked))
+        .resolves(
+          new Set([
+            ...untracked,
+            resolve(dvcDemoPath, unaddableDotDvc),
+            resolve(dvcDemoPath, unaddableDotGitignore)
+          ])
+        )
 
       const { repository, setDecorationStateSpy, setScmStateSpy } =
         await buildRepository(
