@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal'
 import { reorderObjectList } from 'dvc/src/util/array'
 
 export const performOrderedUpdate = (
@@ -22,6 +23,9 @@ export const performSimpleOrderedUpdate = (
   return [...newOrder]
 }
 
-type BaseType = string | number | boolean | Object | undefined | null
+export type BaseType = string | number | boolean | Object | undefined | null
 
 export type Any = BaseType | BaseType[]
+
+export const keepReferenceIfEqual = (old: BaseType, recent: BaseType) =>
+  isEqual(old, recent) ? old : recent
