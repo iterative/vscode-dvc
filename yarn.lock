@@ -3205,22 +3205,22 @@
     "@svgr/babel-plugin-transform-react-native-svg" "^6.3.1"
     "@svgr/babel-plugin-transform-svg-component" "^6.3.1"
 
-"@svgr/cli@6.3.0":
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/@svgr/cli/-/cli-6.3.0.tgz#c2902bd99880a8226847c7485afa78f875e7b98f"
-  integrity sha512-ZmZ8lXUNZ/y+3qmWybpJR/dVc/hDRY3LzqDnDxyyt5thhuI1uZhzrKJY6TtOV6wZ0eqoPmpWysNKSNIxyUCztw==
+"@svgr/cli@6.3.1":
+  version "6.3.1"
+  resolved "https://registry.yarnpkg.com/@svgr/cli/-/cli-6.3.1.tgz#adf7829be868320049d6b068b4107f92388a21ae"
+  integrity sha512-DRIZg24ykYmZ2zw3dK0oUbzNLP+6/0rUPKCGL3K709GJCYih/WWaP8c/1s7w+kR5H9wR9wa5ebr/rDPdQXbTOQ==
   dependencies:
-    "@svgr/core" "^6.3.0"
-    "@svgr/plugin-jsx" "^6.3.0"
-    "@svgr/plugin-prettier" "^6.3.0"
-    "@svgr/plugin-svgo" "^6.3.0"
+    "@svgr/core" "^6.3.1"
+    "@svgr/plugin-jsx" "^6.3.1"
+    "@svgr/plugin-prettier" "^6.3.1"
+    "@svgr/plugin-svgo" "^6.3.1"
     camelcase "^6.2.0"
     chalk "^4.1.2"
     commander "^9.3.0"
     dashify "^2.0.0"
     glob "^8.0.3"
 
-"@svgr/core@^6.3.0":
+"@svgr/core@^6.3.1":
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/@svgr/core/-/core-6.3.1.tgz#752adf49d8d5473b15d76ca741961de093f715bd"
   integrity sha512-Sm3/7OdXbQreemf9aO25keerZSbnKMpGEfmH90EyYpj1e8wMD4TuwJIb3THDSgRMWk1kYJfSRulELBy4gVgZUA==
@@ -3237,7 +3237,7 @@
     "@babel/types" "^7.18.4"
     entities "^4.3.0"
 
-"@svgr/plugin-jsx@^6.3.0", "@svgr/plugin-jsx@^6.3.1":
+"@svgr/plugin-jsx@^6.3.1":
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/@svgr/plugin-jsx/-/plugin-jsx-6.3.1.tgz#de7b2de824296b836d6b874d498377896e367f50"
   integrity sha512-r9+0mYG3hD4nNtUgsTXWGYJomv/bNd7kC16zvsM70I/bGeoCi/3lhTmYqeN6ChWX317OtQCSZZbH4wq9WwoXbw==
@@ -3247,7 +3247,7 @@
     "@svgr/hast-util-to-babel-ast" "^6.3.1"
     svg-parser "^2.0.4"
 
-"@svgr/plugin-prettier@^6.3.0":
+"@svgr/plugin-prettier@^6.3.1":
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/@svgr/plugin-prettier/-/plugin-prettier-6.3.1.tgz#1e5a783261afa75e46a9b1aa850fe96afe7cd6f7"
   integrity sha512-ao+oyTDw1ouvS4l8Ibto3O4G7EsuebtAwALB0NsBpjC+pqFkJ1WoKmDw7YFG9jMZgwE/3m0Ry1Xdc48gYIff2g==
@@ -3255,7 +3255,7 @@
     deepmerge "^4.2.2"
     prettier "^2.7.1"
 
-"@svgr/plugin-svgo@^6.3.0":
+"@svgr/plugin-svgo@^6.3.1":
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/@svgr/plugin-svgo/-/plugin-svgo-6.3.1.tgz#3c1ff2efaed10e5c5d35a6cae7bacaedc18b5d4a"
   integrity sha512-yJIjTDKPYqzFVjmsbH5EdIwEsmKxjxdXSGJVLeUgwZOZPAkNQmD1v7LDbOdOKbR44FG8465Du+zWPdbYGnbMbw==
