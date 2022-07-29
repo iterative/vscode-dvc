@@ -7,7 +7,7 @@ import { makeAbsPathSet } from '../../test/util/path'
 describe('collectDataStatus', () => {
   const emptySet = new Set()
 
-  it('should map path to the right sets', () => {
+  it('should transform the data status output into the correct shape', () => {
     const committedAdded = ['CA1', 'CA2', 'CA3']
     const committedDeleted = ['CD-A', 'CD-B']
     const committedModified = ['CM1', 'CM2', 'CM3']
