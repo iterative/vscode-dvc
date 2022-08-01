@@ -234,21 +234,23 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     />
   )
 
-  const createItemWithDropTarget = (id: string, item: JSX.Element) => {
-    const isEnteringRight = direction === DragEnterDirection.RIGHT
-    const targetClassName = shouldShowOnDrag
+  const getDropTargetClassNames = (isEnteringRight: boolean) =>
+    shouldShowOnDrag
       ? cx(styles.dropTargetWhenShowingOnDrag, {
           [styles.dropTargetWhenShowingOnDragLeft]: !isEnteringRight,
           [styles.dropTargetWhenShowingOnDragRight]: isEnteringRight
         })
       : undefined
+
+  const createItemWithDropTarget = (id: string, item: JSX.Element) => {
+    const isEnteringRight = direction === DragEnterDirection.RIGHT
     const target = (
       <DropTarget
         key="drop-target"
         onDragOver={handleDragOver}
         onDrop={handleOnDrop}
         id={id}
-        className={targetClassName}
+        className={getDropTargetClassNames(isEnteringRight)}
       >
         {dropTarget}
       </DropTarget>

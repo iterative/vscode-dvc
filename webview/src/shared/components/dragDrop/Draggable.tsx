@@ -26,13 +26,12 @@ export const Draggable: React.FC<DraggableProps> = ({
   onDrop,
   onDragEnter,
   onDragStart
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
-  const groupStates = useSelector(
-    (state: ExperimentsState) => state.dragAndDrop.groups
+  const groupState = useSelector(
+    (state: ExperimentsState) => state.dragAndDrop.groups[group] || {}
   )
   const dispatch = useDispatch()
-
-  const groupState = groupStates[group] || {}
   const { draggedOverId, draggedId } = groupState
 
   const modifyGroup = (id: string) => {
