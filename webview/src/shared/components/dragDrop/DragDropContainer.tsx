@@ -4,13 +4,13 @@ import React, {
   useEffect,
   useState,
   useRef,
-  DragEventHandler,
   CSSProperties
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DragEnterDirection, getDragEnterDirection } from './util'
 import { changeRef } from './dragDropSlice'
 import styles from './styles.module.scss'
+import { DropTarget } from './DropTarget'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 import { Any } from '../../../util/objects'
 import { PlotsState } from '../../../plots/store'
@@ -38,25 +38,6 @@ export type OnDrop = (
   groupId: string,
   position: number
 ) => void
-
-export const makeTarget = (
-  dropTarget: JSX.Element,
-  handleDragOver: DragEventHandler<HTMLElement>,
-  handleOnDrop: DragEventHandler<HTMLElement>,
-  id: string,
-  className?: string
-) => (
-  <div
-    data-testid="drop-target"
-    key="drop-target"
-    onDragOver={handleDragOver}
-    onDrop={handleOnDrop}
-    id={`${id}__drop`}
-    className={className}
-  >
-    {dropTarget}
-  </div>
-)
 interface DragDropContainerProps {
   order: string[]
   setOrder: (order: string[]) => void
@@ -261,12 +242,16 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
           [styles.dropTargetWhenShowingOnDragRight]: isEnteringRight
         })
       : undefined
-    const target = makeTarget(
-      dropTarget,
-      handleDragOver,
-      handleOnDrop,
-      id,
-      targetClassName
+    const target = (
+      <DropTarget
+        key="drop-target"
+        onDragOver={handleDragOver}
+        onDrop={handleOnDrop}
+        id={id}
+        className={targetClassName}
+      >
+        {dropTarget}
+      </DropTarget>
     )
     const itemWithTag = shouldShowOnDrag ? (
       <div key="item" {...item.props} />

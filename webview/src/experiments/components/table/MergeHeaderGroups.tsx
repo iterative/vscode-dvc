@@ -4,19 +4,15 @@ import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 import { TableHeader } from './TableHeader'
 import styles from './styles.module.scss'
-import {
-  OnDragOver,
-  OnDragStart,
-  OnDrop
-} from '../../../shared/components/dragDrop/DragDropWorkbench'
+import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
 
 export const MergedHeaderGroups: React.FC<{
   headerGroup: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   orderedColumns: Column[]
-  onDragUpdate: OnDragOver
-  onDragStart: OnDragStart
-  onDragEnd: OnDrop
+  onDragUpdate: DragFunction
+  onDragStart: DragFunction
+  onDragEnd: DragFunction
   firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
@@ -45,7 +41,7 @@ export const MergedHeaderGroups: React.FC<{
           orderedColumns={orderedColumns}
           column={column}
           columns={columns}
-          onDragOver={onDragUpdate}
+          onDragEnter={onDragUpdate}
           onDragStart={onDragStart}
           onDrop={onDragEnd}
           root={root}
