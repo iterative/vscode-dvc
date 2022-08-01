@@ -1,6 +1,6 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import cx from 'classnames'
-import React, { useRef } from 'react'
+import React, { DragEvent, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -12,10 +12,7 @@ import { useColumnOrder } from '../../hooks/useColumnOrder'
 import { ExperimentsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
 import { leafColumnIds, reorderColumnIds } from '../../util/columns'
-import {
-  OnDragOver,
-  OnDragStart
-} from '../../../shared/components/dragDrop/DragDropWorkbench'
+import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
 import { getSelectedForPlotsCount } from '../../util/rows'
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -46,8 +43,10 @@ export const TableHead = ({
   const fullColumnOrder = useRef<string[]>()
   const draggingIds = useRef<string[]>()
 
-  const onDragStart: OnDragStart = draggedId => {
-    const displacerHeader = allHeaders.find(header => header.id === draggedId)
+  const onDragStart: DragFunction = ({ currentTarget }) => {
+    const displacerHeader = allHeaders.find(
+      header => header.id === currentTarget.id
+    )
     if (displacerHeader) {
       draggingIds.current = leafColumnIds(displacerHeader)
       fullColumnOrder.current = allColumns.map(({ id }) => id)
@@ -65,10 +64,10 @@ export const TableHead = ({
     displacedHeader && cb(displacedHeader)
   }
 
-  const onDragUpdate: OnDragOver = (_, draggedOverId: string) => {
+  const onDragUpdate = (e: DragEvent<HTMLElement>) => {
     const displacer = draggingIds.current
     displacer &&
-      findDisplacedHeader(draggedOverId, displacedHeader => {
+      findDisplacedHeader(e.currentTarget.id, displacedHeader => {
         const displaced = leafColumnIds(displacedHeader)
         if (!displaced.some(id => displacer.includes(id))) {
           fullColumnOrder.current &&

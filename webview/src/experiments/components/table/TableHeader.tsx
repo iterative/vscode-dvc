@@ -16,10 +16,8 @@ import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import { ExperimentsState } from '../../store'
 import {
   Draggable,
-  OnDragOver,
-  OnDragStart,
-  OnDrop
-} from '../../../shared/components/dragDrop/DragDropWorkbench'
+  DragFunction
+} from '../../../shared/components/dragDrop/Draggable'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
 import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
@@ -40,10 +38,10 @@ const possibleOrders = {
 export const ColumnDragHandle: React.FC<{
   disabled: boolean
   column: HeaderGroup<Experiment>
-  onDragOver: OnDragOver
-  onDragStart: OnDragStart
-  onDrop: OnDrop
-}> = ({ disabled, column, onDragOver, onDragStart, onDrop }) => {
+  onDragEnter: DragFunction
+  onDragStart: DragFunction
+  onDrop: DragFunction
+}> = ({ disabled, column, onDragEnter, onDragStart, onDrop }) => {
   const DropTarget = <span>{column?.name}</span>
 
   return (
@@ -61,7 +59,7 @@ export const ColumnDragHandle: React.FC<{
         disabled={disabled}
         group={'experiment-table'}
         dropTarget={DropTarget}
-        onDragOver={onDragOver}
+        onDragEnter={onDragEnter}
         onDragStart={onDragStart}
         onDrop={onDrop}
       >
@@ -153,9 +151,9 @@ const TableHeaderCellContents: React.FC<{
   hasFilter: boolean
   isDraggable: boolean
   menuSuppressed: boolean
-  onDragOver: OnDragOver
-  onDragStart: OnDragStart
-  onDrop: OnDrop
+  onDragEnter: DragFunction
+  onDragStart: DragFunction
+  onDrop: DragFunction
   canResize: boolean
   setMenuSuppressed: (menuSuppressed: boolean) => void
   resizerHeight: string
@@ -166,7 +164,7 @@ const TableHeaderCellContents: React.FC<{
   hasFilter,
   isDraggable,
   menuSuppressed,
-  onDragOver,
+  onDragEnter,
   onDragStart,
   onDrop,
   canResize,
@@ -181,7 +179,7 @@ const TableHeaderCellContents: React.FC<{
       <ColumnDragHandle
         column={column}
         disabled={!isDraggable || menuSuppressed}
-        onDragOver={onDragOver}
+        onDragEnter={onDragEnter}
         onDragStart={onDragStart}
         onDrop={onDrop}
       />
@@ -207,9 +205,9 @@ const TableHeaderCell: React.FC<{
   sortEnabled: boolean
   menuDisabled?: boolean
   menuContent?: React.ReactNode
-  onDragOver: OnDragOver
-  onDragStart: OnDragStart
-  onDrop: OnDrop
+  onDragEnter: DragFunction
+  onDragStart: DragFunction
+  onDrop: DragFunction
   firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
@@ -222,7 +220,7 @@ const TableHeaderCell: React.FC<{
   sortEnabled,
   menuContent,
   menuDisabled,
-  onDragOver,
+  onDragEnter,
   onDragStart,
   onDrop,
   root,
@@ -250,7 +248,7 @@ const TableHeaderCell: React.FC<{
       hasFilter={hasFilter}
       isDraggable={isDraggable}
       menuSuppressed={menuSuppressed}
-      onDragOver={onDragOver}
+      onDragEnter={onDragEnter}
       onDragStart={onDragStart}
       onDrop={onDrop}
       canResize={canResize}
@@ -293,9 +291,9 @@ interface TableHeaderProps {
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   orderedColumns: Column[]
-  onDragOver: OnDragOver
-  onDragStart: OnDragStart
-  onDrop: OnDrop
+  onDragEnter: DragFunction
+  onDragStart: DragFunction
+  onDrop: DragFunction
   firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
@@ -305,7 +303,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
   orderedColumns,
-  onDragOver,
+  onDragEnter,
   onDragStart,
   onDrop,
   root,
@@ -359,7 +357,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       sortOrder={sortOrder}
       sortEnabled={isSortable}
       hasFilter={hasFilter}
-      onDragOver={onDragOver}
+      onDragEnter={onDragEnter}
       onDragStart={onDragStart}
       onDrop={onDrop}
       menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}

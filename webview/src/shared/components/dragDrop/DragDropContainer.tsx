@@ -4,13 +4,13 @@ import React, {
   useEffect,
   useState,
   useRef,
-  DragEventHandler,
   CSSProperties
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DragEnterDirection, getDragEnterDirection } from './util'
 import { changeRef } from './dragDropSlice'
 import styles from './styles.module.scss'
+import { DropTarget } from './DropTarget'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
 import { Any } from '../../../util/objects'
 import { PlotsState } from '../../../plots/store'
@@ -38,25 +38,6 @@ export type OnDrop = (
   groupId: string,
   position: number
 ) => void
-
-export const makeTarget = (
-  dropTarget: JSX.Element,
-  handleDragOver: DragEventHandler<HTMLElement>,
-  handleOnDrop: DragEventHandler<HTMLElement>,
-  id: string,
-  className?: string
-) => (
-  <div
-    data-testid="drop-target"
-    key="drop-target"
-    onDragOver={handleDragOver}
-    onDrop={handleOnDrop}
-    id={`${id}__drop`}
-    className={className}
-  >
-    {dropTarget}
-  </div>
-)
 interface DragDropContainerProps {
   order: string[]
   setOrder: (order: string[]) => void
@@ -253,20 +234,26 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     />
   )
 
-  const createItemWithDropTarget = (id: string, item: JSX.Element) => {
-    const isEnteringRight = direction === DragEnterDirection.RIGHT
-    const targetClassName = shouldShowOnDrag
+  const getDropTargetClassNames = (isEnteringRight: boolean) =>
+    shouldShowOnDrag
       ? cx(styles.dropTargetWhenShowingOnDrag, {
           [styles.dropTargetWhenShowingOnDragLeft]: !isEnteringRight,
           [styles.dropTargetWhenShowingOnDragRight]: isEnteringRight
         })
       : undefined
-    const target = makeTarget(
-      dropTarget,
-      handleDragOver,
-      handleOnDrop,
-      id,
-      targetClassName
+
+  const createItemWithDropTarget = (id: string, item: JSX.Element) => {
+    const isEnteringRight = direction === DragEnterDirection.RIGHT
+    const target = (
+      <DropTarget
+        key="drop-target"
+        onDragOver={handleDragOver}
+        onDrop={handleOnDrop}
+        id={id}
+        className={getDropTargetClassNames(isEnteringRight)}
+      >
+        {dropTarget}
+      </DropTarget>
     )
     const itemWithTag = shouldShowOnDrag ? (
       <div key="item" {...item.props} />
