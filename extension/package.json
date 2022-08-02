@@ -553,11 +553,11 @@
         },
         {
           "command": "dvc.applyExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.branchExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.checkout",
@@ -597,7 +597,7 @@
         },
         {
           "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.findInFolder",
@@ -641,31 +641,31 @@
         },
         {
           "command": "dvc.modifyExperimentParamsAndQueue",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.modifyExperimentParamsAndRun",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.experiment.checkpoints && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.modifyExperimentParamsAndResume",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.modifyExperimentParamsResetAndRun",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.queueExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.removeExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.removeExperimentQueue",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running "
         },
         {
           "command": "dvc.removeExperimentsTableFilters",
@@ -677,7 +677,7 @@
         },
         {
           "command": "dvc.removeQueuedExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.removeTarget",
@@ -693,19 +693,19 @@
         },
         {
           "command": "dvc.runExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.experiment.checkpoints && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resumeCheckpointExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.startExperimentsQueue",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.commands.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.selectForCompare",
