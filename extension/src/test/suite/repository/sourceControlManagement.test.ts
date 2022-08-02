@@ -297,5 +297,24 @@ suite('Source Control Management Test Suite', () => {
         executable: 'git'
       })
     })
+
+    it('should not reset the workspace if there is another user initiated command running', async () => {
+      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
+
+      stub(CliExecutor.prototype, 'isExecutorRunning').returns(true)
+
+      await commands.executeCommand(
+        RegisteredCommands.DISCARD_WORKSPACE_CHANGES,
+        {
+          rootUri
+        }
+      )
+
+      expect(mockCheckout).not.to.be.called
+      expect(mockGitReset).not.to.be.called
+    })
   })
 })

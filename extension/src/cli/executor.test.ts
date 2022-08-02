@@ -8,11 +8,13 @@ import { createProcess } from '../processExecution'
 import { getMockedProcess } from '../test/util/jest'
 import { getProcessEnv } from '../env'
 import { Config } from '../config'
+import { setContextValue } from '../vscode/context'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../processExecution')
 jest.mock('../env')
+jest.mock('../vscode/context')
 
 const mockedDisposable = jest.mocked(Disposable)
 
@@ -23,6 +25,8 @@ const mockedEnv = {
   DVC_NO_ANALYTICS: 'true',
   PATH: '/some/special/path'
 }
+
+const mockedSetContextValue = jest.mocked(setContextValue)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -582,6 +586,13 @@ describe('CliExecutor', () => {
         env: mockedEnv,
         executable: 'dvc'
       })
+
+      expect(mockedSetContextValue).toBeCalledTimes(2)
+      expect(mockedSetContextValue).toBeCalledWith('dvc.commands.running', true)
+      expect(mockedSetContextValue).toHaveBeenLastCalledWith(
+        'dvc.commands.running',
+        false
+      )
     })
   })
 })
