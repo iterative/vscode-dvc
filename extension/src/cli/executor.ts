@@ -20,7 +20,7 @@ export const autoRegisteredCommands = {
   EXPERIMENT_REMOVE: 'experimentRemove',
   EXPERIMENT_REMOVE_QUEUE: 'experimentRemoveQueue',
   INIT: 'init',
-  IS_EXECUTOR_RUNNING: 'isExecutorRunning',
+  IS_SCM_COMMAND_RUNNING: 'isScmCommandRunning',
   MOVE: 'move',
   PULL: 'pull',
   PUSH: 'push',
@@ -33,7 +33,7 @@ export class CliExecutor extends Cli {
     this
   )
 
-  private isRunning = false
+  private scmCommandRunning = false
 
   public add(cwd: string, target: string) {
     return this.blockAndExecuteProcess(cwd, Command.ADD, target)
@@ -101,8 +101,8 @@ export class CliExecutor extends Cli {
     )
   }
 
-  public isExecutorRunning() {
-    return this.isRunning
+  public isScmCommandRunning() {
+    return this.scmCommandRunning
   }
 
   public init(cwd: string) {
@@ -130,7 +130,7 @@ export class CliExecutor extends Cli {
   }
 
   private executeExperimentProcess(cwd: string, ...args: Args) {
-    return this.blockAndExecuteProcess(cwd, Command.EXPERIMENT, ...args)
+    return this.executeProcess(cwd, Command.EXPERIMENT, ...args)
   }
 
   private async blockAndExecuteProcess(cwd: string, ...args: Args) {
@@ -141,7 +141,7 @@ export class CliExecutor extends Cli {
   }
 
   private setRunning(running: boolean) {
-    this.isRunning = running
-    setContextValue('dvc.commands.running', running)
+    this.scmCommandRunning = running
+    setContextValue('dvc.scm.command.running', running)
   }
 }

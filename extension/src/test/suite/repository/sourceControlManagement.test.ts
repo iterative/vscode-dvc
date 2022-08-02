@@ -304,7 +304,7 @@ suite('Source Control Management Test Suite', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
-      stub(CliExecutor.prototype, 'isExecutorRunning').returns(true)
+      stub(CliExecutor.prototype, 'isScmCommandRunning').returns(true)
 
       await commands.executeCommand(
         RegisteredCommands.DISCARD_WORKSPACE_CHANGES,

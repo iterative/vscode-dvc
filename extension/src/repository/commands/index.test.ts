@@ -28,7 +28,7 @@ mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
 const mockedIsExecutorRunning = jest.fn()
 
 mockedInternalCommands.registerCommand(
-  'isExecutorRunning',
+  'isScmCommandRunning',
   mockedIsExecutorRunning
 )
 

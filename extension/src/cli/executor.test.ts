@@ -588,9 +588,12 @@ describe('CliExecutor', () => {
       })
 
       expect(mockedSetContextValue).toBeCalledTimes(2)
-      expect(mockedSetContextValue).toBeCalledWith('dvc.commands.running', true)
+      expect(mockedSetContextValue).toBeCalledWith(
+        'dvc.scm.command.running',
+        true
+      )
       expect(mockedSetContextValue).toHaveBeenLastCalledWith(
-        'dvc.commands.running',
+        'dvc.scm.command.running',
         false
       )
     })

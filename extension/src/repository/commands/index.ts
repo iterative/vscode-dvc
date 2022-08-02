@@ -49,7 +49,7 @@ const shouldTitleCommandReturnNoop = async (
   return (
     !cwd ||
     (await internalCommands.executeCommand<boolean>(
-      AvailableCommands.IS_EXECUTOR_RUNNING
+      AvailableCommands.IS_SCM_COMMAND_RUNNING
     ))
   )
 }
