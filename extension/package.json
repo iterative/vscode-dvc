@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.13",
+  "version": "0.3.14",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -561,7 +561,7 @@
         },
         {
           "command": "dvc.checkout",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.checkCLICompatible",
@@ -573,7 +573,7 @@
         },
         {
           "command": "dvc.commit",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.commitTarget",
@@ -613,7 +613,7 @@
         },
         {
           "command": "dvc.init",
-          "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
+          "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.moveTargets",
@@ -625,7 +625,7 @@
         },
         {
           "command": "dvc.pull",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.pullTarget",
@@ -633,7 +633,7 @@
         },
         {
           "command": "dvc.push",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.pushTarget",
@@ -689,7 +689,7 @@
         },
         {
           "command": "dvc.discardWorkspaceChanges",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.runExperiment",
@@ -836,34 +836,34 @@
         {
           "command": "dvc.addTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == untracked && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == untracked && dvc.commands.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.checkoutTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.pullTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == notInCache && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == notInCache && dvc.commands.available && !dvc.scm.command.running"
         }
       ],
       "scm/resourceGroup/context": [
         {
           "command": "dvc.checkout",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.commit",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && dvc.commands.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.gitStageAll",
@@ -942,17 +942,17 @@
         {
           "command": "dvc.moveTargets",
           "group": "1_DVC@1",
-          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^dirData$/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^dirData$/ && !dvc.scm.command.running"
         },
         {
           "command": "dvc.pullTarget",
           "group": "1_DVC@2",
-          "when": "view == dvc.views.trackedExplorerTree"
+          "when": "view == dvc.views.trackedExplorerTree && !dvc.scm.command.running"
         },
         {
           "command": "dvc.pushTarget",
           "group": "1_DVC@3",
-          "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual && !dvc.scm.command.running"
         },
         {
           "command": "dvc.compareSelected",
@@ -992,7 +992,7 @@
         {
           "command": "dvc.removeTarget",
           "group": "7_modification@2",
-          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/ && !dvc.scm.command.running"
         },
         {
           "command": "dvc.addExperimentsTableSort",
