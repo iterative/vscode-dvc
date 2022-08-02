@@ -25,11 +25,11 @@ mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
   mockedFunc(...args)
 )
 
-const mockedIsExecutorRunning = jest.fn()
+const mockedIsScmCommandRunning = jest.fn()
 
 mockedInternalCommands.registerCommand(
   'isScmCommandRunning',
-  mockedIsExecutorRunning
+  mockedIsScmCommandRunning
 )
 
 const TRY_FORCE = 'Use `-f|--force` to force.'
@@ -189,7 +189,7 @@ describe('getSimpleResourceCommand', () => {
 describe('getRootCommand', () => {
   it('should return a function that returns early if a cwd is not provided', async () => {
     mockedGetCwd.mockResolvedValueOnce(undefined)
-    mockedIsExecutorRunning.mockResolvedValueOnce(false)
+    mockedIsScmCommandRunning.mockResolvedValueOnce(false)
     const stdout = 'I cannot run without a cwd'
     mockedFunc.mockResolvedValueOnce(stdout)
 
@@ -207,7 +207,7 @@ describe('getRootCommand', () => {
 
   it('should return a function that only calls the first function if it succeeds', async () => {
     mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
-    mockedIsExecutorRunning.mockResolvedValueOnce(false)
+    mockedIsScmCommandRunning.mockResolvedValueOnce(false)
     const stdout = 'all went well, congrats'
     mockedFunc.mockResolvedValueOnce(stdout)
 
@@ -228,7 +228,7 @@ describe('getRootCommand', () => {
 
   it('should return a function that throws an error if the underlying function fails without a force prompt', async () => {
     mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
-    mockedIsExecutorRunning.mockResolvedValueOnce(false)
+    mockedIsScmCommandRunning.mockResolvedValueOnce(false)
     const stderr = 'I deed'
     mockedFunc.mockRejectedValueOnce({ stderr })
 
@@ -249,7 +249,7 @@ describe('getRootCommand', () => {
 
   it('should return a function that calls warnOfConsequences if the first function fails with a force prompt', async () => {
     mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
-    mockedIsExecutorRunning.mockResolvedValueOnce(false)
+    mockedIsScmCommandRunning.mockResolvedValueOnce(false)
     const stderr = `I deed, but ${TRY_FORCE}`
     const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
@@ -271,7 +271,7 @@ describe('getRootCommand', () => {
 
   it('should return a function that does not call the force func if the user selects cancel', async () => {
     mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
-    mockedIsExecutorRunning.mockResolvedValueOnce(false)
+    mockedIsScmCommandRunning.mockResolvedValueOnce(false)
     const stderr = `You don't have to do this, but ${TRY_FORCE}`
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({ stderr })
@@ -293,7 +293,7 @@ describe('getRootCommand', () => {
 
   it('should return a function that does not call the force func if no stderr is returned in the underlying error', async () => {
     mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
-    mockedIsExecutorRunning.mockResolvedValueOnce(false)
+    mockedIsScmCommandRunning.mockResolvedValueOnce(false)
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({})
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
@@ -315,7 +315,7 @@ describe('getRootCommand', () => {
 
   it('should return a function that calls the force function if the first function fails with a force prompt and the user responds with force', async () => {
     mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
-    mockedIsExecutorRunning.mockResolvedValueOnce(false)
+    mockedIsScmCommandRunning.mockResolvedValueOnce(false)
     const stderr = `I can fix this... maybe, but ${TRY_FORCE}`
     const forcedStdout = 'ok, nw I forced it'
     const userApproves = 'Force'
@@ -342,7 +342,7 @@ describe('getRootCommand', () => {
 
   it('should return a function that returns early if another user initiated command is running', async () => {
     mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
-    mockedIsExecutorRunning.mockResolvedValueOnce(true)
+    mockedIsScmCommandRunning.mockResolvedValueOnce(true)
 
     const commandToRegister = getRootCommand(
       mockedRepositories,

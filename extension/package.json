@@ -665,7 +665,7 @@
         },
         {
           "command": "dvc.removeExperimentQueue",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running "
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.removeExperimentsTableFilters",
