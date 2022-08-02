@@ -103,6 +103,7 @@ export class CliReader extends Cli {
       SubCommand.STATUS,
       Flag.WITH_DIRS,
       Flag.GRANULAR,
+      Flag.UNCHANGED,
       ...args
     )
   }

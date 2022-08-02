@@ -19,7 +19,6 @@ import {
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
-import { Flag } from '../../cli/constants'
 
 export type Data = {
   dataStatus: DataStatusOutput
@@ -91,8 +90,7 @@ export class RepositoryData extends DeferredDisposable {
     const dataStatus =
       await this.internalCommands.executeCommand<DataStatusOutput>(
         AvailableCommands.DATA_STATUS,
-        this.dvcRoot,
-        Flag.UNCHANGED
+        this.dvcRoot
       )
 
     const [untracked, hasGitChanges] = await Promise.all([
