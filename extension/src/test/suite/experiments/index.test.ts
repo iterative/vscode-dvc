@@ -1248,10 +1248,13 @@ suite('Experiments Test Suite', () => {
         .getSelectedExperiments()
         .map(({ displayColor, id }) => ({ displayColor, id }))
       expect(selected).to.deep.equal([
-        { displayColor: colors[1], id: 'test-branch' },
         {
           displayColor: colors[0],
           id: 'exp-83425'
+        },
+        {
+          displayColor: colors[1],
+          id: 'test-branch'
         }
       ])
     })
