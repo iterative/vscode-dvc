@@ -16,7 +16,8 @@ mock('vscode', {
   EventEmitter: MockEventEmitter,
   Uri: {
     file: URI.file
-  }
+  },
+  commands: { executeCommand: () => undefined }
 })
 
 mock('@hediet/std/disposable', {
