@@ -17,7 +17,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   left: 0;
   display: inline-block;
   position: absolute;
-  border: 2px solid var(--vscode-descriptionForeground);
+  border: 2px solid $watermark-color;
   opacity: 0.5;
   border-top: unset;
   border-left: unset;
@@ -278,7 +278,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .table.withExpColumnShadow {
     .tr:not(.rowSelected) > *:first-child:after {
-      box-shadow: 3px 0px 3px var(--vscode-widget-shadow);
+      box-shadow: 3px 0px 3px $shadow;
     }
   }
 
@@ -365,7 +365,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     background-color: $row-bg-color;
 
     &.withShadow {
-      box-shadow: 0 5px 8px -2px var(--vscode-widget-shadow);
+      box-shadow: 0 5px 8px -2px $shadow;
     }
 
     .innerCell {

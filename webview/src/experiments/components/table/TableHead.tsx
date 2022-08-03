@@ -1,5 +1,4 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import cx from 'classnames'
 import React, { DragEvent, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { HeaderGroup, TableInstance } from 'react-table'
@@ -102,7 +101,7 @@ export const TableHead = ({
   }, [setTableHeadHeight])
 
   return (
-    <div className={cx(styles.thead)} ref={wrapper}>
+    <div className={styles.thead} ref={wrapper}>
       <Indicators selectedForPlotsCount={selectedForPlotsCount} />
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
