@@ -21,7 +21,8 @@ export const sameContents = (
   otherArray: (null | string | number | undefined)[]
 ) => isEqual(array.sort(), otherArray.sort())
 
-export const reorderObjectList = <T extends { [key: string]: unknown }>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const reorderObjectList = <T extends { [key: string]: any }>(
   order: string[],
   items: T[],
   compareKey: string

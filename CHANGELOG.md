@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.15] - 2022-08-03
+
+### 🚀 New Features and Enhancements
+
+- Hide remove all buttons from trees when there is nothing to remove [#2131](https://github.com/iterative/vscode-dvc/pull/2131) by [@mattseddon](https://github.com/mattseddon)
+- Plot experiments in the order they were selected [#2137](https://github.com/iterative/vscode-dvc/pull/2137) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update CODEOWNERS [#2132](https://github.com/iterative/vscode-dvc/pull/2132) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.14] - 2022-08-02
 
 ### 🐛 Bug Fixes
