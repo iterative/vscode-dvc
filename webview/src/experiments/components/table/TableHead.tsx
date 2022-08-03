@@ -42,6 +42,14 @@ export const TableHead = ({
 
   const fullColumnOrder = useRef<string[]>()
   const draggingIds = useRef<string[]>()
+  const wrapper = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const wrapperHeight = wrapper.current?.getBoundingClientRect().height
+    if (wrapperHeight) {
+      setTableHeadHeight(wrapperHeight)
+    }
+  }, [setTableHeadHeight])
 
   const onDragStart: DragFunction = ({ currentTarget }) => {
     const displacerHeader = allHeaders.find(
@@ -90,15 +98,6 @@ export const TableHead = ({
   const selectedForPlotsCount = getSelectedForPlotsCount(rows)
 
   const firstExpColumnCellId = headerGroups[0].headers[0].id
-
-  const wrapper = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const wrapperHeight = wrapper.current?.getBoundingClientRect().height
-    if (wrapperHeight) {
-      setTableHeadHeight(wrapperHeight)
-    }
-  }, [setTableHeadHeight])
 
   return (
     <div className={styles.thead} ref={wrapper}>
