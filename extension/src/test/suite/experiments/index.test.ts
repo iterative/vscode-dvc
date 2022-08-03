@@ -1247,7 +1247,10 @@ suite('Experiments Test Suite', () => {
       const selected = testRepository
         .getSelectedExperiments()
         .map(({ displayColor, id }) => ({ displayColor, id }))
-      expect(selected).to.deep.equal([
+      expect(
+        selected,
+        'should retain the order that the experiments were selected in'
+      ).to.deep.equal([
         {
           displayColor: colors[0],
           id: 'exp-83425'
