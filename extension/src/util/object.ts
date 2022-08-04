@@ -26,3 +26,7 @@ export const createTypedAccumulator = <T extends string>(
   }
   return acc
 }
+
+type BaseType = string | number | boolean | Object | undefined | null
+
+export type Any = BaseType | BaseType[]

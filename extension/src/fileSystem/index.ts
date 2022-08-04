@@ -102,6 +102,14 @@ export const loadJson = <T>(path: string): T | undefined => {
   }
 }
 
+export const loadText = (path: string): string | undefined => {
+  try {
+    return readFileSync(path).toString()
+  } catch {
+    Logger.error(`failed to load text from ${path}`)
+  }
+}
+
 export const writeJson = <T extends Record<string, unknown>>(
   path: string,
   obj: T

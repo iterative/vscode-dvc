@@ -1,0 +1,50 @@
+{
+  "scopeName": "source.yaml",
+  "patterns": [{ "include": "#expression" }],
+  "repository": {
+    "expression": {
+      "patterns": [
+        { "include": "#cmd" },
+        { "include": "#metrics" },
+        { "include": "#deps" },
+        { "include": "#outs" },
+        { "include": "#schemakeywords" },
+        { "include": "#props" },
+        { "include": "#items" },
+        { "include": "#params" }
+      ]
+    },
+    "cmd": {
+      "match": "cmd:",
+      "name": "support.function"
+    },
+    "schemakeywords": {
+      "match": "stages:|foreach:|do:|vars:",
+      "name": "keyword.control"
+    },
+    "metrics": {
+      "match": "metrics:",
+      "name": "storage.type"
+    },
+    "params": {
+      "match": "params:",
+      "name": "variable.parameter"
+    },
+    "deps": {
+      "match": "deps:",
+      "name": "entity.name.type"
+    },
+    "items": {
+      "match": "\\-[a-zA-Z]+:",
+      "name": "string.quoted.single"
+    },
+    "props": {
+      "match": "featurize:|train:|evaluate:|prepare:|.+json:",
+      "name": "variable.other"
+    },
+    "outs": {
+      "match": "outs:",
+      "name": "entity.name.function"
+    }
+  }
+}

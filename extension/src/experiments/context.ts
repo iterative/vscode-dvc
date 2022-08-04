@@ -36,7 +36,7 @@ const setContextOnDidChangeActiveEditor = (
       return
     }
 
-    const isParamsFile = getParamsFiles().has(path)
+    const isParamsFile = getParamsFiles().has(path) || path.includes('dvc.yaml')
 
     setActiveEditorContext(isParamsFile)
   })

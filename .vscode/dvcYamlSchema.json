@@ -1,0 +1,472 @@
+{
+  "title": "dvc.yaml",
+  "type": "object",
+  "properties": {
+    "vars": {
+      "title": "Variables",
+      "description": "Variables for the parametrization",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Vars"
+        }
+      ]
+    },
+    "stages": {
+      "title": "Stages",
+      "description": "List of stages",
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/ForeachDo"
+          },
+          {
+            "$ref": "#/definitions/Stage"
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "VarDecl": {
+      "title": "VarDecl",
+      "type": "object"
+    },
+    "Vars": {
+      "title": "Vars",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "#/definitions/VarDecl"
+          }
+        ]
+      }
+    },
+    "DepModel": {
+      "title": "DepModel",
+      "description": "A dependency for the stage",
+      "type": "string"
+    },
+    "Dependencies": {
+      "title": "Dependencies",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/DepModel"
+      },
+      "uniqueItems": true
+    },
+    "CustomParamFileKeys": {
+      "title": "CustomParamFileKeys",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "uniqueItems": true
+      }
+    },
+    "Param": {
+      "title": "Param",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/CustomParamFileKeys"
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "null"
+          }
+        }
+      ]
+    },
+    "Params": {
+      "title": "Params",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Param"
+      },
+      "uniqueItems": true
+    },
+    "OutFlags": {
+      "title": "OutFlags",
+      "type": "object",
+      "properties": {
+        "cache": {
+          "title": "Cache",
+          "description": "Cache output by DVC",
+          "default": true,
+          "type": "boolean"
+        },
+        "persist": {
+          "title": "Persist",
+          "description": "Persist output between runs",
+          "default": false,
+          "type": "boolean"
+        },
+        "checkpoint": {
+          "title": "Checkpoint",
+          "description": "Indicate that the output is associated with in-code checkpoints",
+          "default": false,
+          "type": "boolean"
+        },
+        "desc": {
+          "title": "Description",
+          "description": "User description for the output",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Out": {
+      "title": "Out",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/OutFlags"
+          }
+        }
+      ]
+    },
+    "Outs": {
+      "title": "Outs",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Out"
+      },
+      "uniqueItems": true
+    },
+    "PlotFlags": {
+      "title": "PlotFlags",
+      "type": "object",
+      "properties": {
+        "cache": {
+          "title": "Cache",
+          "description": "Cache output by DVC",
+          "default": true,
+          "type": "boolean"
+        },
+        "persist": {
+          "title": "Persist",
+          "description": "Persist output between runs",
+          "default": false,
+          "type": "boolean"
+        },
+        "checkpoint": {
+          "title": "Checkpoint",
+          "description": "Indicate that the output is associated with in-code checkpoints",
+          "default": false,
+          "type": "boolean"
+        },
+        "desc": {
+          "title": "Description",
+          "description": "User description for the output",
+          "type": "string"
+        },
+        "x": {
+          "title": "X",
+          "description": "Default field name to use as x-axis data",
+          "type": "string"
+        },
+        "y": {
+          "title": "Y",
+          "description": "Default field name to use as y-axis data",
+          "type": "string"
+        },
+        "x_label": {
+          "title": "X Label",
+          "description": "Default label for the x-axis",
+          "type": "string"
+        },
+        "y_label": {
+          "title": "Y Label",
+          "description": "Default label for the y-axis",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "description": "Default plot title",
+          "type": "string"
+        },
+        "header": {
+          "title": "Header",
+          "description": "Whether the target CSV or TSV has a header or not",
+          "default": false,
+          "type": "boolean"
+        },
+        "template": {
+          "title": "Template",
+          "description": "Default plot template",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Plot": {
+      "title": "Plot",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/PlotFlags"
+          }
+        }
+      ]
+    },
+    "Plots": {
+      "title": "Plots",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Plot"
+      },
+      "uniqueItems": true
+    },
+    "LiveFlags": {
+      "title": "LiveFlags",
+      "type": "object",
+      "properties": {
+        "cache": {
+          "title": "Cache",
+          "description": "Cache output by DVC",
+          "default": true,
+          "type": "boolean"
+        },
+        "persist": {
+          "title": "Persist",
+          "description": "Persist output between runs",
+          "default": false,
+          "type": "boolean"
+        },
+        "checkpoint": {
+          "title": "Checkpoint",
+          "description": "Indicate that the output is associated with in-code checkpoints",
+          "default": false,
+          "type": "boolean"
+        },
+        "desc": {
+          "title": "Description",
+          "description": "User description for the output",
+          "type": "string"
+        },
+        "x": {
+          "title": "X",
+          "description": "Default field name to use as x-axis data",
+          "type": "string"
+        },
+        "y": {
+          "title": "Y",
+          "description": "Default field name to use as y-axis data",
+          "type": "string"
+        },
+        "x_label": {
+          "title": "X Label",
+          "description": "Default label for the x-axis",
+          "type": "string"
+        },
+        "y_label": {
+          "title": "Y Label",
+          "description": "Default label for the y-axis",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "description": "Default plot title",
+          "type": "string"
+        },
+        "header": {
+          "title": "Header",
+          "description": "Whether the target CSV or TSV has a header or not",
+          "default": false,
+          "type": "boolean"
+        },
+        "template": {
+          "title": "Template",
+          "description": "Default plot template",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "description": "Signals dvclive to dump latest metrics file",
+          "default": true,
+          "type": "boolean"
+        },
+        "html": {
+          "title": "Html",
+          "description": "Signals dvclive to produce training report",
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Live": {
+      "title": "Live",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/LiveFlags"
+      },
+      "maxProperties": 1
+    },
+    "Stage": {
+      "title": "Stage",
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "title": "Cmd",
+          "description": "Command to run",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "wdir": {
+          "title": "Wdir",
+          "description": "Working directory",
+          "type": "string"
+        },
+        "deps": {
+          "title": "Deps",
+          "description": "Dependencies for the stage",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Dependencies"
+            }
+          ]
+        },
+        "params": {
+          "title": "Params",
+          "description": "Params for the stage",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Params"
+            }
+          ]
+        },
+        "outs": {
+          "title": "Outs",
+          "description": "Outputs of the stage",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Outs"
+            }
+          ]
+        },
+        "metrics": {
+          "title": "Metrics",
+          "description": "Metrics of the stage",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Outs"
+            }
+          ]
+        },
+        "plots": {
+          "title": "Plots",
+          "description": "Plots of the stage",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Plots"
+            }
+          ]
+        },
+        "live": {
+          "title": "Dvclive",
+          "description": "Declare output as dvclive",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Live"
+            }
+          ]
+        },
+        "frozen": {
+          "title": "Frozen",
+          "description": "Assume stage as unchanged",
+          "default": false,
+          "type": "boolean"
+        },
+        "always_changed": {
+          "title": "Always Changed",
+          "description": "Assume stage as always changed",
+          "default": false,
+          "type": "boolean"
+        },
+        "vars": {
+          "title": "Vars",
+          "description": "Variables for the parametrization",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Vars"
+            }
+          ]
+        },
+        "desc": {
+          "title": "Desc",
+          "description": "Description of the stage",
+          "type": "string"
+        },
+        "meta": {
+          "title": "Meta",
+          "description": "Additional information/metadata"
+        }
+      },
+      "required": ["cmd"],
+      "additionalProperties": false
+    },
+    "ForeachDo": {
+      "title": "ForeachDo",
+      "type": "object",
+      "properties": {
+        "foreach": {
+          "title": "Foreach",
+          "description": "Iterable to loop through in foreach. Can be a parametrized string, list or a dictionary.\n\nThe stages will be generated by iterating through this data, by substituting\ndata in the `do` block.",
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\${.*?}$"
+            },
+            {
+              "type": "array",
+              "items": {}
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "do": {
+          "title": "Do",
+          "description": "Parametrized stage definition that'll be substituted over for each of the\nvalue from the foreach data.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Stage"
+            }
+          ]
+        }
+      },
+      "required": ["foreach", "do"],
+      "additionalProperties": false
+    }
+  }
+}

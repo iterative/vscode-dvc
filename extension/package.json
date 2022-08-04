@@ -31,7 +31,8 @@
     "Machine Learning",
     "Data Science",
     "Visualization",
-    "SCM Providers"
+    "SCM Providers",
+    "Snippets"
   ],
   "galleryBanner": {
     "color": "#333",
@@ -53,6 +54,12 @@
     }
   },
   "contributes": {
+    "snippets": [
+      {
+        "language": "yaml",
+        "path": "./snippets.json"
+      }
+    ],
     "colors": [
       {
         "id": "dvc.deps",
@@ -316,6 +323,12 @@
         "command": "dvc.runExperiment",
         "category": "DVC",
         "icon": "$(play)"
+      },
+      {
+        "title": "%command.addStage%",
+        "command": "dvc.addStage",
+        "category": "DVC",
+        "icon": "$(database)"
       },
       {
         "title": "%command.resumeCheckpointExperiment%",
@@ -878,6 +891,11 @@
       ],
       "editor/title": [
         {
+          "command": "dvc.addStage",
+          "group": "navigation@0",
+          "when": "dvc.params.fileActive && !dvc.experiment.running && dvc.commands.available && !dvc.experiment.checkpoints"
+        },
+        {
           "command": "dvc.runExperiment",
           "group": "navigation@0",
           "when": "dvc.params.fileActive && !dvc.experiment.running && dvc.commands.available && !dvc.experiment.checkpoints"
@@ -1262,6 +1280,11 @@
       ],
       "dvc-views": [
         {
+          "id": "dvc.views.pipelineStagesTree",
+          "name": "Stages",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
@@ -1514,7 +1537,8 @@
     "lodash.merge": "4.6.2",
     "lodash.omit": "4.5.0",
     "tree-kill": "1.2.2",
-    "uuid": "8.3.2"
+    "uuid": "8.3.2",
+    "yaml-ast-parser": "^0.0.43"
   },
   "devDependencies": {
     "@types/chai": "4.3.1",

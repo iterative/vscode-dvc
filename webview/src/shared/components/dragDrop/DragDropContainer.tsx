@@ -12,10 +12,10 @@ import { changeRef, setDraggedOverGroup } from './dragDropSlice'
 import styles from './styles.module.scss'
 import { DropTarget } from './DropTarget'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
-import { Any } from '../../../util/objects'
 import { PlotsState } from '../../../plots/store'
 import { getStyleProperty } from '../../../util/styles'
 import { idToNode } from '../../../util/helpers'
+import { Any } from 'dvc/src/util/object'
 
 const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
   if (direction === DragEnterDirection.RIGHT) {

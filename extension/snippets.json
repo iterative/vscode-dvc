@@ -1,0 +1,40 @@
+{
+  "Basic": {
+    "prefix": ["basic"],
+    "body": ["${1:name}:", "\tcmd: $0"],
+    "description": "A minimal stage."
+  },
+  "Simple": {
+    "prefix": ["simple"],
+    "body": [
+      "${1:name}:",
+      "\tcmd: $2",
+      "\tdeps:",
+      "\t\t- ${3:input}",
+      "\touts:",
+      "\t\t- ${4:output}"
+    ],
+    "description": "A simple stage."
+  },
+  "Complete": {
+    "prefix": ["complete"],
+    "body": [
+      "${1:name}:",
+      "\tcmd: $2",
+      "\tdeps:",
+      "\t\t- ${3:input}",
+      "\tparams:",
+      "\t\t- ${4:param}",
+      "\tmetrics:",
+      "\t\t- ${5:scores.json}",
+      "\touts:",
+      "\t\t- ${6:output}"
+    ],
+    "description": "A complete stage."
+  },
+  "For Each": {
+    "prefix": ["foreach"],
+    "body": ["foreach:", "\t- $1", "do:", "\t- $2"],
+    "description": "A complete stage."
+  }
+}

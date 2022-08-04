@@ -1,4 +1,11 @@
-import { commands, env, Event, EventEmitter, ExtensionContext } from 'vscode'
+import {
+  commands,
+  env,
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  languages
+} from 'vscode'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
@@ -49,6 +56,13 @@ import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
+import {
+  DvcYamlCodeLensProvider,
+  DvcYamlCompletionProvider,
+  DvcYamlDocumentLinkProvider,
+  DvcYamlHoverProvider,
+  DvcYamlRenameProvider
+} from './dvcYaml'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -432,7 +446,34 @@ export class Extension extends Disposable implements IExtension {
 let extension: undefined | Extension
 export function activate(context: ExtensionContext): void {
   extension = new Extension(context)
-  context.subscriptions.push(extension)
+  const dvcYamlSelector = {
+    language: 'yaml'
+  }
+
+  context.subscriptions.push(
+    extension,
+    languages.registerDocumentLinkProvider(
+      dvcYamlSelector,
+      new DvcYamlDocumentLinkProvider()
+    ),
+    languages.registerCompletionItemProvider(
+      dvcYamlSelector,
+      new DvcYamlCompletionProvider(),
+      '.'
+    ),
+    languages.registerHoverProvider(
+      dvcYamlSelector,
+      new DvcYamlHoverProvider()
+    ),
+    languages.registerCodeLensProvider(
+      dvcYamlSelector,
+      new DvcYamlCodeLensProvider()
+    ),
+    languages.registerRenameProvider(
+      dvcYamlSelector,
+      new DvcYamlRenameProvider()
+    )
+  )
 }
 
 export function deactivate(): void {
