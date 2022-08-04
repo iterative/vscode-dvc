@@ -3,7 +3,7 @@
 @import '../../../shared/variables.scss';
 
 $nested-row-padding: 1.35rem;
-$row-border: 0.5px solid $border-color;
+$row-border: 1px solid $border-color;
 
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
@@ -314,7 +314,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     &:not(.rowSelected) > *:first-child:after {
-      right: -2px;
+      right: -1px;
     }
 
     &:last-child,
@@ -395,12 +395,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
   .th {
     height: auto;
+    background-color: $header-bg-color;
   }
   .td {
     height: auto;
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
+    background-color: $row-bg-color;
     border-right: $row-border;
     border-left: $row-border;
     border-color: transparent;
@@ -500,14 +502,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    border-right: 0.5px solid $header-border-color;
+    border-right: 1px solid $header-border-color;
   }
 
   .headerCell {
     @extend .placeholderHeaderCell;
     color: $header-fg-color;
     text-align: center;
-    border-bottom: 0.5px solid $header-border-color;
+    border-bottom: 1px solid $header-border-color;
     padding: 0.31rem $cell-padding;
 
     &.leafHeader {
