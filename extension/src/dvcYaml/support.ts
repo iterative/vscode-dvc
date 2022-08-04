@@ -18,9 +18,35 @@ export interface DvcYamlSupportWorkspace {
   findFiles(relativePaths: string[]): Promise<DvcYamlSupportFile[] | undefined>
 }
 
-class SymbolFileChecker {
-  private symbolFiles: string[] = ['params.yaml']
+class StringFileChecker {
+  protected symbolFiles: string[] = ['params.yaml']
 
+  protected checkStringForFiles(str: string): void {
+    if (str.includes('.yaml') || str.includes('.json')) {
+      this.symbolFiles.push(str.split(':')[0])
+    }
+  }
+}
+
+class StagesFileChecker extends StringFileChecker {
+  protected checkStagesForFiles(dvcYaml: DvcYAML) {
+    const stages = dvcYaml.stages ?? {}
+
+    for (const stage of Object.values(stages)) {
+      isStage(stage) && this.checkMetricsForFiles(stage)
+    }
+  }
+
+  private checkMetricsForFiles(stage: Stage) {
+    for (const metric of stage.metrics ?? []) {
+      this.checkStringForFiles(
+        typeof metric === 'string' ? metric : keys(metric)[0]
+      )
+    }
+  }
+}
+
+class SymbolFileChecker extends StagesFileChecker {
   public check(dvcYaml: DvcYAML) {
     this.checkStagesForFiles(dvcYaml)
     this.checkVarsForFiles(dvcYaml)
@@ -28,7 +54,7 @@ class SymbolFileChecker {
     return [...new Set(this.symbolFiles)]
   }
 
-  public checkVarsForFiles(dvcYaml: DvcYAML) {
+  private checkVarsForFiles(dvcYaml: DvcYAML) {
     const vars = dvcYaml.vars ?? []
 
     for (const dvcVar of vars) {
@@ -37,33 +63,52 @@ class SymbolFileChecker {
       }
     }
   }
-
-  public checkStagesForFiles(dvcYaml: DvcYAML) {
-    const stages = dvcYaml.stages ?? {}
-
-    for (const stage of Object.values(stages)) {
-      isStage(stage) && this.checkMetricsForFiles(stage)
-    }
-  }
-
-  public checkMetricsForFiles(stage: Stage) {
-    for (const metric of stage.metrics ?? []) {
-      this.checkStringForFiles(
-        typeof metric === 'string' ? metric : keys(metric)[0]
-      )
-    }
-  }
-
-  public checkStringForFiles(str: string): void {
-    if (str.includes('.yaml') || str.includes('.json')) {
-      this.symbolFiles.push(str.split(':')[0])
-    }
-  }
 }
 
 export interface DvcYamlCompletionItem {
   label: string
   completion: string
+}
+
+class SymbolsCompletionsProvider {
+  private parsedFiles: Record<string, Any>[] = []
+
+  constructor(parsedFiles: Record<string, Any>[]) {
+    this.parsedFiles = parsedFiles
+  }
+
+  public provideCompletionsForSymbols(cleanLine: string) {
+    const pathArray = toPath(cleanLine)
+
+    switch (pathArray.length) {
+      case 0:
+        return []
+      case 1:
+        return this.getTopLevelSymbols(pathArray[0])
+      default:
+        return this.getClosestCompletePaths(pathArray)
+    }
+  }
+
+  private getTopLevelSymbols(fragment: string) {
+    return this.parsedFiles
+      .flatMap(dict => keys(dict))
+      .filter(key => key.startsWith(fragment))
+      .map(label => ({ completion: label, label }))
+  }
+
+  private getClosestCompletePaths(pathArray: string[]) {
+    const tail = pathArray.pop() ?? ''
+    const topPath = pathArray
+    const topValues = this.parsedFiles.map(dict => get(dict, topPath))
+    const topKeys = topValues
+      .flatMap(value => keys(value))
+      .filter(key => key.startsWith(tail))
+
+    return topKeys.map(key => {
+      return { completion: `${topPath.join('.')}.${key}`, label: key }
+    })
+  }
 }
 
 export class DvcYamlSupport {
@@ -76,7 +121,7 @@ export class DvcYamlSupport {
     this.symbolFileChecker = new SymbolFileChecker()
   }
 
-  async init(dvcYaml: string): Promise<void> {
+  async init(dvcYaml: string) {
     if (this.parsedFiles.length > 0) {
       return
     }
@@ -100,40 +145,9 @@ export class DvcYamlSupport {
     const segmentOfInterest = currentLine.match(/[\w.]+$/)?.[0]
 
     return segmentOfInterest
-      ? this.provideCompletionsForSymbols(segmentOfInterest)
+      ? new SymbolsCompletionsProvider(
+          this.parsedFiles
+        ).provideCompletionsForSymbols(segmentOfInterest)
       : []
-  }
-
-  private getTopLevelSymbols(fragment: string) {
-    return this.parsedFiles
-      .flatMap(dict => keys(dict))
-      .filter(key => key.startsWith(fragment))
-      .map(label => ({ completion: label, label }))
-  }
-
-  private getClosestCompletePaths(pathArray: string[]) {
-    const tail = pathArray.pop() ?? ''
-    const topPath = pathArray
-    const topValues = this.parsedFiles.map(dict => get(dict, topPath))
-    const topKeys = topValues
-      .flatMap(value => keys(value))
-      .filter(key => key.startsWith(tail))
-
-    return topKeys.map(key => {
-      return { completion: `${topPath.join('.')}.${key}`, label: key }
-    })
-  }
-
-  private provideCompletionsForSymbols(cleanLine: string) {
-    const pathArray = toPath(cleanLine)
-
-    switch (pathArray.length) {
-      case 0:
-        return []
-      case 1:
-        return this.getTopLevelSymbols(pathArray[0])
-      default:
-        return this.getClosestCompletePaths(pathArray)
-    }
   }
 }
