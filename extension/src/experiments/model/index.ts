@@ -23,7 +23,11 @@ import {
 } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
 import { Experiment, Row } from '../webview/contract'
-import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  reorderListSubset,
+  reorderObjectList
+} from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { setContextValue } from '../../vscode/context'
 import { hasKey } from '../../util/object'
@@ -592,6 +596,10 @@ export class ExperimentsModel extends ModelWithPersistence {
       }
     }
 
-    return acc
+    return reorderObjectList<SelectedExperimentWithColor>(
+      copyOriginalColors(),
+      acc,
+      'displayColor'
+    )
   }
 }

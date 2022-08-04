@@ -7,6 +7,8 @@ import { commands, EventEmitter } from 'vscode'
 import { CliRunner } from '../../cli/runner'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { Context } from '../../context'
+import { FilterDefinition } from '../../experiments/model/filterBy'
+import { SortDefinition } from '../../experiments/model/sortBy'
 
 suite('Context Test Suite', () => {
   const disposable = Disposable.fn()
@@ -58,6 +60,18 @@ suite('Context Test Suite', () => {
     }
   }
 
+  const buildMockExperiments = (
+    filters: FilterDefinition[] = [],
+    sorts: SortDefinition[] = [],
+    experimentRunning = false
+  ) => {
+    return {
+      getFilters: () => filters,
+      getSorts: () => sorts,
+      hasRunningExperiment: () => experimentRunning
+    }
+  }
+
   beforeEach(() => {
     restore()
   })
@@ -105,10 +119,10 @@ suite('Context Test Suite', () => {
       mockGetDvcRoots.returns([mockDvcRoot, mockOtherDvcRoot])
       mockGetRepository.callsFake(dvcRoot => {
         if (dvcRoot === mockDvcRoot) {
-          return { hasRunningExperiment: () => true }
+          return buildMockExperiments([], [], true)
         }
         if (dvcRoot === mockOtherDvcRoot) {
-          return { hasRunningExperiment: () => false }
+          return buildMockExperiments()
         }
       })
 
@@ -137,9 +151,7 @@ suite('Context Test Suite', () => {
 
       const mockDvcRoot = resolve('first', 'root')
       mockGetDvcRoots.returns([mockDvcRoot])
-      mockGetRepository.callsFake(() => {
-        return { hasRunningExperiment: () => false }
-      })
+      mockGetRepository.callsFake(() => buildMockExperiments())
 
       experimentsChanged.fire()
       await experimentsChangedEvent
@@ -148,6 +160,98 @@ suite('Context Test Suite', () => {
         'setContext',
         'dvc.experiment.running',
         false
+      )
+    })
+
+    it('should set the dvc.experiments.filtered context correctly depending on whether there are filters applied', async () => {
+      const {
+        executeCommandSpy,
+        experimentsChanged,
+        mockGetDvcRoots,
+        mockGetRepository,
+        onDidChangeExperiments
+      } = buildContext(false)
+
+      const firstExperimentsChangedEvent = new Promise(resolve =>
+        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
+      )
+
+      const mockDvcRoot = resolve('mock', 'root')
+      mockGetDvcRoots.returns([mockDvcRoot])
+      mockGetRepository.callsFake(() => buildMockExperiments())
+
+      experimentsChanged.fire()
+      await firstExperimentsChangedEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiments.filtered',
+        false
+      )
+
+      executeCommandSpy.resetHistory()
+      mockGetRepository.resetBehavior()
+      mockGetRepository.callsFake(() =>
+        buildMockExperiments([{} as FilterDefinition])
+      )
+
+      const secondExperimentsChangedEvent = new Promise(resolve =>
+        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
+      )
+
+      experimentsChanged.fire()
+      await secondExperimentsChangedEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiments.filtered',
+        true
+      )
+    })
+
+    it('should set the dvc.experiments.sorted context correctly depending on whether there are sorts applied', async () => {
+      const {
+        executeCommandSpy,
+        experimentsChanged,
+        mockGetDvcRoots,
+        mockGetRepository,
+        onDidChangeExperiments
+      } = buildContext(false)
+
+      const firstExperimentsChangedEvent = new Promise(resolve =>
+        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
+      )
+
+      const mockDvcRoot = resolve('mock', 'root')
+      mockGetDvcRoots.returns([mockDvcRoot])
+      mockGetRepository.callsFake(() => buildMockExperiments())
+
+      experimentsChanged.fire()
+      await firstExperimentsChangedEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiments.sorted',
+        false
+      )
+
+      executeCommandSpy.resetHistory()
+      mockGetRepository.resetBehavior()
+      mockGetRepository.callsFake(() =>
+        buildMockExperiments([], [{} as SortDefinition])
+      )
+
+      const secondExperimentsChangedEvent = new Promise(resolve =>
+        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
+      )
+
+      experimentsChanged.fire()
+      await secondExperimentsChangedEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiments.sorted',
+        true
       )
     })
   })
