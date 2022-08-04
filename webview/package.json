@@ -39,7 +39,7 @@
     "vega-lite": "^5.2.0"
   },
   "devDependencies": {
-    "@storybook/testing-library": "^0.0.13",
+    "@storybook/testing-library": "0.0.13",
     "@storybook/addon-essentials": "6.5.9",
     "@storybook/addon-interactions": "6.5.9",
     "@storybook/addons": "6.5.9",
