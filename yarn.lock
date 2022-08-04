@@ -18117,10 +18117,10 @@ wdio-chromedriver-service@^7.3.2:
     split2 "^3.2.2"
     tcp-port-used "^1.0.1"
 
-wdio-vscode-service@4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/wdio-vscode-service/-/wdio-vscode-service-4.0.3.tgz#17e09806e8eeec5404c89fd68b6efa9a29a54833"
-  integrity sha512-o82f+yyTSJN3KS77zDb5VoMrDQOP0mtWlLATlr3K3uAF7ZSR+ay6GSmjdeBEoQd2rMoBu8ckzhfGQu+Fo1Zr2Q==
+wdio-vscode-service@4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/wdio-vscode-service/-/wdio-vscode-service-4.0.4.tgz#3da87d21d895cfe0383e98dee407ae99755eef44"
+  integrity sha512-Cx/JEpS7dXV1HHl+sRxgsrwOIDO8U9ZvpBwAen3gJlaH4bEXamNmZLRDZ57xPLq37DpI1qpqf1vKNvGsPMOroA==
   dependencies:
     "@fastify/cors" "^7.0.0"
     "@fastify/static" "^5.0.2"
