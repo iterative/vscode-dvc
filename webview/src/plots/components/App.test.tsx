@@ -3,7 +3,7 @@
  */
 import { join } from 'dvc/src/test/util/path'
 import { configureStore } from '@reduxjs/toolkit'
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { Provider } from 'react-redux'
 import {
   cleanup,
@@ -981,19 +981,29 @@ describe('App', () => {
     const [templateInfo, comparisonInfo, checkpointInfo] =
       screen.getAllByTestId('info-tooltip-toggle')
 
+    const getSectionText = (sectionNode: ReactElement) =>
+      // eslint-disable-next-line testing-library/no-node-access
+      sectionNode.props.children || ''
+
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
     expect(
-      screen.getByText(SectionDescription[Section.TEMPLATE_PLOTS])
+      screen.getByText(
+        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
+      )
     ).toBeInTheDocument()
 
     fireEvent.mouseEnter(comparisonInfo, { bubbles: true })
     expect(
-      screen.getByText(SectionDescription[Section.COMPARISON_TABLE])
+      screen.getByText(
+        getSectionText(SectionDescription[Section.COMPARISON_TABLE])
+      )
     ).toBeInTheDocument()
 
     fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
     expect(
-      screen.getByText(SectionDescription[Section.CHECKPOINT_PLOTS])
+      screen.getByText(
+        getSectionText(SectionDescription[Section.CHECKPOINT_PLOTS])
+      )
     ).toBeInTheDocument()
   })
 
