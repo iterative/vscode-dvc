@@ -23,7 +23,7 @@ import {
   WorkspaceEdit
 } from 'vscode'
 import { DvcYamlSupport, DvcYamlSupportWorkspace } from './support'
-import { loadText } from '../fileSystem'
+import { loadText, loadYaml } from '../fileSystem'
 import { findFiles } from '../fileSystem/workspace'
 
 export class DvcYamlDocumentLinkProvider implements DocumentLinkProvider {
@@ -42,7 +42,7 @@ export class DvcYamlDocumentLinkProvider implements DocumentLinkProvider {
 
 export class DvcYamlCompletionProvider implements CompletionItemProvider {
   private supportWorkspace: DvcYamlSupportWorkspace
-  private support: DvcYamlSupport
+  private support: DvcYamlSupport | null = null
 
   constructor() {
     this.supportWorkspace = {
@@ -56,8 +56,6 @@ export class DvcYamlCompletionProvider implements CompletionItemProvider {
         }))
       }
     }
-
-    this.support = new DvcYamlSupport(this.supportWorkspace)
   }
 
   async provideCompletionItems(
@@ -66,7 +64,9 @@ export class DvcYamlCompletionProvider implements CompletionItemProvider {
     token: CancellationToken,
     context: CompletionContext
   ) {
-    await this.support.init(document.getText())
+    this.support = new DvcYamlSupport(this.supportWorkspace, document.getText())
+
+    await this.support.init()
     const currentLine = document
       .lineAt(position)
       .text.slice(0, position.character)

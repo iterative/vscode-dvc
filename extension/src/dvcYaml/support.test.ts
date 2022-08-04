@@ -11,8 +11,8 @@ const testSpecificYaml = async (yamlTxt: string, expectedFiles: string[]) => {
     findFiles: jest.fn()
   }
 
-  const support = new DvcYamlSupport(mockWorkspace)
-  await support.init(yamlTxt)
+  const support = new DvcYamlSupport(mockWorkspace, yamlTxt)
+  await support.init()
 
   expect(mockWorkspace.findFiles).toBeCalledWith(expectedFiles)
 }
@@ -46,8 +46,8 @@ describe('DvcYamlSupport', () => {
         }
       }
 
-      const support = new DvcYamlSupport(mockWorkspace)
-      await support.init(getStartedDvcYaml)
+      const support = new DvcYamlSupport(mockWorkspace, dvcYamlWithVars)
+      await support.init()
 
       expect(support.provideCompletions('feat')).toStrictEqual([
         {
@@ -78,6 +78,19 @@ describe('DvcYamlSupport', () => {
       }
       expect(support.provideCompletions('featurize.n')).toStrictEqual([
         { completion: 'featurize.ngrams', label: 'ngrams' }
+      ])
+
+      expect(support.provideCompletions('mod')).toStrictEqual([
+        { completion: 'models', label: 'models' },
+        { completion: 'model', label: 'model' }
+      ])
+
+      expect(support.provideCompletions('models.')).toStrictEqual([
+        { completion: 'models.us', label: 'us' }
+      ])
+
+      expect(support.provideCompletions('models.us.')).toStrictEqual([
+        { completion: 'models.us.threshold', label: 'threshold' }
       ])
     })
   })

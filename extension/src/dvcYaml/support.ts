@@ -5,7 +5,8 @@ import {
   DvcYAML,
   isStage,
   parseDvcYaml,
-  Stage
+  Stage,
+  Var
 } from '../fileSystem/dvcYaml/dvcYaml'
 import { Any } from '../util/object'
 
@@ -70,14 +71,8 @@ export interface DvcYamlCompletionItem {
   completion: string
 }
 
-class SymbolsCompletionsProvider {
-  private parsedFiles: Record<string, Any>[] = []
-
-  constructor(parsedFiles: Record<string, Any>[]) {
-    this.parsedFiles = parsedFiles
-  }
-
-  public provideCompletionsForSymbols(cleanLine: string) {
+abstract class SymbolsCompletionProvider {
+  public provideCompletions(cleanLine: string) {
     const pathArray = toPath(cleanLine)
 
     switch (pathArray.length) {
@@ -90,14 +85,69 @@ class SymbolsCompletionsProvider {
     }
   }
 
-  private getTopLevelSymbols(fragment: string) {
+  protected abstract getTopLevelSymbols(
+    symbolPrefix: string
+  ): DvcYamlCompletionItem[]
+
+  protected abstract getClosestCompletePaths(
+    incompletePath: string[]
+  ): DvcYamlCompletionItem[]
+}
+
+class InternalSymbolsCompletionsProvider extends SymbolsCompletionProvider {
+  private dvcYaml: DvcYAML
+  private internalVars: Var[]
+
+  constructor(dvcYaml: DvcYAML) {
+    super()
+    this.dvcYaml = dvcYaml
+    this.internalVars = [...(dvcYaml.vars ?? [])]
+    const stages = dvcYaml.stages ?? {}
+
+    for (const item of Object.values(stages)) {
+      isStage(item) && item.vars && this.internalVars.push(...item.vars)
+    }
+  }
+
+  protected getTopLevelSymbols(fragment: string) {
+    return this.internalVars
+      .flatMap(entry => (typeof entry === 'string' ? entry : keys(entry)))
+      .filter(key => key.startsWith(fragment))
+      .map(label => ({ completion: label, label }))
+  }
+
+  protected getClosestCompletePaths(pathArray: string[]) {
+    const tail = pathArray.pop() ?? ''
+    const topPath = pathArray
+    const topValues = this.internalVars
+      .filter(entry => typeof entry !== 'string')
+      .map(dict => get(dict, topPath))
+    const topKeys = topValues
+      .flatMap(value => keys(value))
+      .filter(key => key.startsWith(tail))
+
+    return topKeys.map(key => {
+      return { completion: `${topPath.join('.')}.${key}`, label: key }
+    })
+  }
+}
+
+class ExternalSymbolsCompletionsProvider extends SymbolsCompletionProvider {
+  private parsedFiles: Record<string, Any>[] = []
+
+  constructor(parsedFiles: Record<string, Any>[]) {
+    super()
+    this.parsedFiles = parsedFiles
+  }
+
+  protected getTopLevelSymbols(fragment: string) {
     return this.parsedFiles
       .flatMap(dict => keys(dict))
       .filter(key => key.startsWith(fragment))
       .map(label => ({ completion: label, label }))
   }
 
-  private getClosestCompletePaths(pathArray: string[]) {
+  protected getClosestCompletePaths(pathArray: string[]) {
     const tail = pathArray.pop() ?? ''
     const topPath = pathArray
     const topValues = this.parsedFiles.map(dict => get(dict, topPath))
@@ -115,19 +165,22 @@ export class DvcYamlSupport {
   private readonly workspace: DvcYamlSupportWorkspace
   private parsedFiles: Record<string, Any>[] = []
   private symbolFileChecker: SymbolFileChecker
+  private dvcYaml: DvcYAML
 
-  constructor(workspace: DvcYamlSupportWorkspace) {
+  constructor(workspace: DvcYamlSupportWorkspace, dvcYaml: string) {
     this.workspace = workspace
     this.symbolFileChecker = new SymbolFileChecker()
+
+    this.dvcYaml = parseDvcYaml(dvcYaml)
   }
 
-  async init(dvcYaml: string) {
+  async init() {
     if (this.parsedFiles.length > 0) {
       return
     }
 
     const files = await this.workspace.findFiles(
-      this.symbolFileChecker.check(parseDvcYaml(dvcYaml))
+      this.symbolFileChecker.check(this.dvcYaml)
     )
 
     this.parsedFiles =
@@ -144,10 +197,18 @@ export class DvcYamlSupport {
   provideCompletions(currentLine: string): DvcYamlCompletionItem[] {
     const segmentOfInterest = currentLine.match(/[\w.]+$/)?.[0]
 
-    return segmentOfInterest
-      ? new SymbolsCompletionsProvider(
-          this.parsedFiles
-        ).provideCompletionsForSymbols(segmentOfInterest)
-      : []
+    return segmentOfInterest ? this.gatherCompletions(segmentOfInterest) : []
+  }
+
+  private gatherCompletions(line: string) {
+    const external = new ExternalSymbolsCompletionsProvider(
+      this.parsedFiles
+    ).provideCompletions(line)
+
+    const internal = new InternalSymbolsCompletionsProvider(
+      this.dvcYaml
+    ).provideCompletions(line)
+
+    return [...external, ...internal]
   }
 }
