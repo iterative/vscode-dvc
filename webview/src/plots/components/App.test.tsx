@@ -25,7 +25,8 @@ import {
   PlotSize,
   Section,
   TemplatePlotGroup,
-  TemplatePlotsData
+  TemplatePlotsData,
+  TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -36,6 +37,7 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
+import { CheckpointPlotsById, plotDataStore } from './plotDataStore'
 import { plotsReducers } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
@@ -139,6 +141,8 @@ describe('App', () => {
     jest
       .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
       .mockImplementation(() => heightToSuppressVegaError)
+    plotDataStore.checkpoint = {} as CheckpointPlotsById
+    plotDataStore.template = [] as TemplatePlotSection[]
   })
 
   afterEach(() => {
@@ -208,7 +212,7 @@ describe('App', () => {
     })
   })
 
-  it('should render only checkpoint other sections given a message with only checkpoint plots data', () => {
+  it('should render other sections given a message with only checkpoint plots data', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
@@ -217,6 +221,18 @@ describe('App', () => {
     expect(screen.getByText('Trends')).toBeInTheDocument()
     expect(screen.getByText('Data Series')).toBeInTheDocument()
     expect(screen.getByText('Images')).toBeInTheDocument()
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
+  })
+
+  it('should render checkpoint even when there is no checkpoint plots data', () => {
+    renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('Trends')).toBeInTheDocument()
+    expect(screen.getByText('No Metrics Selected')).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -248,6 +264,7 @@ describe('App', () => {
   })
 
   it('should toggle the checkpoint plots section in state when its header is clicked', async () => {
+    // Fails when other test above
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
@@ -279,16 +296,6 @@ describe('App', () => {
     expect(
       screen.queryByLabelText('Vega visualization')
     ).not.toBeInTheDocument()
-  })
-
-  it('should render checkpoint even when there is no checkpoint plots data', () => {
-    renderAppWithOptionalData({
-      template: templatePlotsFixture
-    })
-
-    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.getByText('Data Series')).toBeInTheDocument()
   })
 
   it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {

@@ -52,7 +52,7 @@ export const TemplatePlots: React.FC = () => {
   }, [sections])
 
   if (!sections || sections.length === 0) {
-    return <EmptyState isFullScreen={false}>No Plots to Show</EmptyState>
+    return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
   }
 
   const setSectionEntries = (index: number, entries: TemplatePlotEntry[]) => {
