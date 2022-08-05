@@ -25,7 +25,8 @@ import {
   PlotSize,
   Section,
   TemplatePlotGroup,
-  TemplatePlotsData
+  TemplatePlotsData,
+  TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -36,6 +37,7 @@ import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
+import { CheckpointPlotsById, plotDataStore } from './plotDataStore'
 import { plotsReducers } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
@@ -68,40 +70,13 @@ const originalOffsetWidth = Object.getOwnPropertyDescriptor(
   'offsetWidth'
 )?.value
 
-beforeAll(() => {
-  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-    configurable: true,
-    value: 50
-  })
-  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
-    configurable: true,
-    value: 50
-  })
-})
-
-beforeEach(() => {
-  jest.clearAllMocks()
-  jest
-    .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
-    .mockImplementation(() => heightToSuppressVegaError)
-})
-
-afterEach(() => {
-  cleanup()
-})
-
-afterAll(() => {
-  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-    configurable: true,
-    value: originalOffsetHeight
-  })
-  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-    configurable: true,
-    value: originalOffsetWidth
-  })
-})
-
 describe('App', () => {
+  const sectionPosition = {
+    [Section.CHECKPOINT_PLOTS]: 2,
+    [Section.TEMPLATE_PLOTS]: 0,
+    [Section.COMPARISON_TABLE]: 1
+  }
+
   const sendSetDataMessage = (data: PlotsData) => {
     const message = new MessageEvent('message', {
       data: {
@@ -113,7 +88,8 @@ describe('App', () => {
   }
 
   const renderAppWithOptionalData = (data?: PlotsData) => {
-    const store = configureStore({ reducer: plotsReducers })
+    const store = configureStore({ reducer: { ...plotsReducers } })
+
     render(
       <Provider store={store}>
         <App />
@@ -139,6 +115,50 @@ describe('App', () => {
       }
     ]
   } as TemplatePlotsData
+
+  const getCheckpointMenuItem = (position: number) =>
+    within(
+      screen.getAllByTestId('plots-container')[
+        sectionPosition[Section.CHECKPOINT_PLOTS]
+      ]
+    ).getAllByTestId('icon-menu-item')[position]
+
+  const getCheckpointSizePickerButton = () => getCheckpointMenuItem(1)
+
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 50
+    })
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 50
+    })
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest
+      .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+      .mockImplementation(() => heightToSuppressVegaError)
+    plotDataStore.checkpoint = {} as CheckpointPlotsById
+    plotDataStore.template = [] as TemplatePlotSection[]
+  })
+
+  afterEach(() => {
+    cleanup()
+  })
+
+  afterAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: originalOffsetHeight
+    })
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: originalOffsetWidth
+    })
+  })
 
   it('should send the initialized message on first render', () => {
     renderAppWithOptionalData()
@@ -192,29 +212,27 @@ describe('App', () => {
     })
   })
 
-  it('should render only checkpoint plots when given a message with only checkpoint plots data', () => {
+  it('should render other sections given a message with only checkpoint plots data', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
-    })
-
-    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.queryByText('Data Series')).not.toBeInTheDocument()
-    expect(screen.queryByText('Images')).not.toBeInTheDocument()
-  })
-
-  it('should render checkpoint and template plots when given messages with both types of plots data', () => {
-    renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    sendSetDataMessage({
-      template: templatePlotsFixture
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Trends')).toBeInTheDocument()
     expect(screen.getByText('Data Series')).toBeInTheDocument()
+    expect(screen.getByText('Images')).toBeInTheDocument()
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
+  })
+
+  it('should render checkpoint even when there is no checkpoint plots data', () => {
+    renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('Trends')).toBeInTheDocument()
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -281,8 +299,7 @@ describe('App', () => {
 
   it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      template: null
+      checkpoint: checkpointPlotsFixture
     })
 
     const summaryElement = await screen.findByText('Trends')
@@ -293,7 +310,7 @@ describe('App', () => {
 
     expect(screen.getByTestId('plot-summary.json:loss')).toBeInTheDocument()
 
-    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    const pickerButton = getCheckpointMenuItem(0)
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -326,7 +343,7 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture
     })
 
-    const [pickerButton] = screen.getAllByTestId('icon-menu-item')
+    const pickerButton = getCheckpointMenuItem(0)
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -366,8 +383,13 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
+    const position = sectionPosition[Section.CHECKPOINT_PLOTS]
+    const getWrapper = async () => {
+      const wrappers = await screen.findAllByTestId('plots-wrapper')
+      return wrappers[position]
+    }
 
-    const sizePickerButton = screen.getAllByTestId('icon-menu-item')[1]
+    const sizePickerButton = getCheckpointSizePickerButton()
     fireEvent.mouseEnter(sizePickerButton)
     fireEvent.click(sizePickerButton)
 
@@ -376,15 +398,15 @@ describe('App', () => {
     const largeButton = screen.getByText('Large')
 
     fireEvent.click(smallButton)
-    let wrapper = await screen.findByTestId('plots-wrapper')
+    let wrapper = await getWrapper()
     expect(wrapper).toHaveClass('smallPlots')
 
     fireEvent.click(regularButton)
-    wrapper = await screen.findByTestId('plots-wrapper')
+    wrapper = await getWrapper()
     expect(wrapper).toHaveClass('regularPlots')
 
     fireEvent.click(largeButton)
-    wrapper = await screen.findByTestId('plots-wrapper')
+    wrapper = await getWrapper()
     expect(wrapper).toHaveClass('largePlots')
   })
 
@@ -393,7 +415,7 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture
     })
 
-    const sizeButton = screen.getAllByTestId('icon-menu-item')[1]
+    const sizeButton = getCheckpointSizePickerButton()
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 
@@ -419,7 +441,7 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture
     })
 
-    const sizeButton = screen.getAllByTestId('icon-menu-item')[1]
+    const sizeButton = getCheckpointSizePickerButton()
     fireEvent.mouseEnter(sizeButton)
     fireEvent.click(sizeButton)
 
@@ -527,7 +549,12 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture
     })
 
-    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
+    const [pickerButton] = within(
+      screen.getAllByTestId('plots-container')[
+        sectionPosition[Section.CHECKPOINT_PLOTS]
+      ]
+    ).queryAllByTestId('icon-menu-item')
+
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
@@ -1015,32 +1042,43 @@ describe('App', () => {
   })
 
   describe('Virtualization', () => {
-    const changeSize = async (size: string, buttonPosition: number) => {
+    const changeSize = async (
+      size: string,
+      buttonPosition: number,
+      wrapper: HTMLElement
+    ) => {
       const sizePickerButton =
-        screen.getAllByTestId('icon-menu-item')[buttonPosition]
+        within(wrapper).getAllByTestId('icon-menu-item')[buttonPosition]
       fireEvent.mouseEnter(sizePickerButton)
       fireEvent.click(sizePickerButton)
 
-      const sizeButton = await screen.findByText(size)
+      const sizeButton = await within(wrapper).findByText(size)
 
       fireEvent.click(sizeButton)
-      await screen.findByTestId('plots-wrapper')
+      await screen.findAllByTestId('plots-wrapper')
       fireEvent.click(sizePickerButton)
-      await screen.findByTestId('plots-wrapper')
+      await screen.findAllByTestId('plots-wrapper')
     }
 
     const renderAppAndChangeSize = async (
       data: PlotsData,
       size: string,
-      buttonPosition: number
+      section: Section
     ) => {
       renderAppWithOptionalData({
         ...data,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED
       })
-      await screen.findByTestId('plots-wrapper')
 
-      await changeSize(size, buttonPosition)
+      const sectionButtonPosition = {
+        [Section.CHECKPOINT_PLOTS]: 1,
+        [Section.TEMPLATE_PLOTS]: 0,
+        [Section.COMPARISON_TABLE]: 0
+      }
+      const wrappers = await screen.findAllByTestId('plots-container')
+      const wrapper = wrappers[sectionPosition[section]]
+
+      await changeSize(size, sectionButtonPosition[section], wrapper)
     }
 
     const createCheckpointPlots = (nbOfPlots: number) => {
@@ -1070,7 +1108,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(11) },
           'Large',
-          1
+          Section.CHECKPOINT_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1079,7 +1117,7 @@ describe('App', () => {
           checkpoint: createCheckpointPlots(50)
         })
 
-        await screen.findByTestId('plots-wrapper')
+        await screen.findAllByTestId('plots-wrapper')
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
@@ -1088,7 +1126,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(10) },
           'Large',
-          1
+          Section.CHECKPOINT_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1097,7 +1135,7 @@ describe('App', () => {
           checkpoint: createCheckpointPlots(1)
         })
 
-        await screen.findByTestId('plots-wrapper')
+        await screen.findAllByTestId('plots-wrapper')
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
@@ -1106,7 +1144,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(11) },
           'Large',
-          0
+          Section.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1115,7 +1153,7 @@ describe('App', () => {
           template: manyTemplatePlots(50)
         })
 
-        await screen.findByTestId('plots-wrapper')
+        await screen.findAllByTestId('plots-wrapper')
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
@@ -1124,7 +1162,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(10) },
           'Large',
-          0
+          Section.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1133,7 +1171,7 @@ describe('App', () => {
           template: manyTemplatePlots(1)
         })
 
-        await screen.findByTestId('plots-wrapper')
+        await screen.findAllByTestId('plots-wrapper')
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
@@ -1142,8 +1180,11 @@ describe('App', () => {
         const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
-          // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Large', 1)
+          await renderAppAndChangeSize(
+            { checkpoint },
+            'Large',
+            Section.CHECKPOINT_PLOTS
+          )
         })
 
         it('should render one large plot per row per 1000px of screen when the screen is larger than 2000px', () => {
@@ -1195,7 +1236,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(16) },
           'Regular',
-          1
+          Section.CHECKPOINT_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1205,7 +1246,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
           'Regular',
-          1
+          Section.CHECKPOINT_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1215,7 +1256,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(16) },
           'Regular',
-          0
+          Section.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1225,7 +1266,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
           'Regular',
-          0
+          Section.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1235,8 +1276,11 @@ describe('App', () => {
         const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
-          // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Regular', 1)
+          await renderAppAndChangeSize(
+            { checkpoint },
+            'Regular',
+            Section.CHECKPOINT_PLOTS
+          )
         })
 
         it('should render one regular plot per row per 800px of screen when the screen is larger than 2000px', () => {
@@ -1288,7 +1332,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(21) },
           'Small',
-          1
+          Section.CHECKPOINT_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1298,7 +1342,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(20) },
           'Small',
-          1
+          Section.CHECKPOINT_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1308,7 +1352,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
           'Small',
-          0
+          Section.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1318,7 +1362,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
           'Small',
-          0
+          Section.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1328,8 +1372,11 @@ describe('App', () => {
         const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
-          // eslint-disable-next-line testing-library/no-render-in-setup
-          await renderAppAndChangeSize({ checkpoint }, 'Small', 1)
+          await renderAppAndChangeSize(
+            { checkpoint },
+            'Small',
+            Section.CHECKPOINT_PLOTS
+          )
         })
 
         it('should render one small plot per row per 500px of screen when the screen is larger than 2000px', () => {
@@ -1503,7 +1550,6 @@ describe('App', () => {
     it('should not reorder the ribbon when comparison plots are reordered', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
-
         selectedRevisions: plotsRevisionsFixture
       })
 

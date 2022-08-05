@@ -3,7 +3,7 @@ import {
   TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
 
-type CheckpointPlotsById = { [key: string]: CheckpointPlotData }
+export type CheckpointPlotsById = { [key: string]: CheckpointPlotData }
 
 export const plotDataStore = {
   checkpoint: {} as CheckpointPlotsById,
