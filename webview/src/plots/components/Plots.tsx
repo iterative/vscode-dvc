@@ -55,9 +55,9 @@ const PlotsContent = () => {
   return (
     <>
       <Ribbon />
-      {hasTemplateData && <TemplatePlotsWrapper />}
-      {hasComparisonData && <ComparisonTableWrapper />}
-      {hasCheckpointData && <CheckpointPlotsWrapper />}
+      <TemplatePlotsWrapper />
+      <ComparisonTableWrapper />
+      <CheckpointPlotsWrapper />
 
       {zoomedInPlot?.plot && (
         <Modal

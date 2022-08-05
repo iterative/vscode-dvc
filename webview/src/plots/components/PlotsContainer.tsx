@@ -114,7 +114,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   )
 
   return (
-    <div className={styles.plotsContainerWrapper}>
+    <div className={styles.plotsContainerWrapper} data-testid="plots-container">
       <details open={open} className={styles.plotsContainer}>
         <summary
           onClick={e => {
