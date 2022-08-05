@@ -17,6 +17,7 @@ import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 import { PlotsState } from '../../store'
 import { plotDataStore } from '../plotDataStore'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -38,7 +39,7 @@ export const TemplatePlots: React.FC = () => {
   }, [plotsSnapshot, setSections])
 
   useEffect(() => {
-    if (shouldSendMessage.current) {
+    if (sections && shouldSendMessage.current) {
       sendMessage({
         payload: sections.map(section => ({
           group: section.group,
@@ -49,6 +50,10 @@ export const TemplatePlots: React.FC = () => {
     }
     shouldSendMessage.current = true
   }, [sections])
+
+  if (!sections || sections.length === 0) {
+    return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
+  }
 
   const setSectionEntries = (index: number, entries: TemplatePlotEntry[]) => {
     setSections(sections => {
