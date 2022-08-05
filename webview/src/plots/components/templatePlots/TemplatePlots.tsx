@@ -5,7 +5,7 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import React, { DragEvent, useState, useEffect, useRef } from 'react'
 import cx from 'classnames'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
@@ -17,6 +17,7 @@ import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 import { PlotsState } from '../../store'
 import { plotDataStore } from '../plotDataStore'
+import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -31,6 +32,7 @@ export const TemplatePlots: React.FC = () => {
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = useNbItemsPerRow(size)
   const shouldSendMessage = useRef(true)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     shouldSendMessage.current = false
@@ -126,6 +128,10 @@ export const TemplatePlots: React.FC = () => {
     setSections(updatedSections)
   }
 
+  const handleEnteringSection = (groupId: string) => {
+    dispatch(setDraggedOverGroup(groupId))
+  }
+
   const newDropSection = {
     acceptedGroups: Object.values(TemplatePlotGroup),
     hoveredSection,
@@ -162,6 +168,7 @@ export const TemplatePlots: React.FC = () => {
               id={groupId}
               data-testid={`plots-section_${groupId}`}
               className={classes}
+              onDragEnter={() => handleEnteringSection(groupId)}
             >
               <TemplatePlotsGrid
                 entries={section.entries}

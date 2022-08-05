@@ -18,9 +18,11 @@ export type GroupStates = {
 export interface DragDropState {
   draggedRef: DraggedInfo
   groups: GroupStates
+  draggedOverGroup: string
 }
 
 export const dragDropInitialState: DragDropState = {
+  draggedOverGroup: '',
   draggedRef: undefined,
   groups: {}
 }
@@ -35,6 +37,12 @@ export const dragDropSlice = createSlice({
         draggedRef: action.payload
       }
     },
+    setDraggedOverGroup: (state, action: PayloadAction<string>) => {
+      return {
+        ...state,
+        draggedOverGroup: action.payload
+      }
+    },
     setGroup: (
       state,
       action: PayloadAction<{ id: string; group: DragDropGroupState }>
@@ -47,6 +55,7 @@ export const dragDropSlice = createSlice({
   }
 })
 
-export const { changeRef, setGroup } = dragDropSlice.actions
+export const { changeRef, setGroup, setDraggedOverGroup } =
+  dragDropSlice.actions
 
 export default dragDropSlice.reducer
