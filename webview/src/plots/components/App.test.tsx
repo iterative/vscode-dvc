@@ -872,12 +872,14 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
+    const movingPlotId = join('plot_other', 'plot.tsv')
+
     const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+    const aSingleViewPlot = screen.getByTestId(movingPlotId)
 
     dragAndDrop(aSingleViewPlot, bottomSection)
 
-    const movedPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+    const movedPlot = screen.getByTestId(movingPlotId)
     const otherSingleSection = screen.getByTestId(join('plot_logs', 'loss.tsv'))
 
     dragEnter(movedPlot, otherSingleSection.id, DragEnterDirection.LEFT)
