@@ -33,15 +33,20 @@ export const CheckpointPlotsWrapper: React.FC = () => {
     dispatch(changeSize(size))
   }
 
+  const menu =
+    plotsIds.length > 0
+      ? {
+          plots: metrics,
+          selectedPlots,
+          setSelectedPlots: setSelectedMetrics
+        }
+      : undefined
+
   return (
     <PlotsContainer
       title="Trends"
       sectionKey={Section.CHECKPOINT_PLOTS}
-      menu={{
-        plots: metrics,
-        selectedPlots,
-        setSelectedPlots: setSelectedMetrics
-      }}
+      menu={menu}
       currentSize={size}
       sectionCollapsed={isCollapsed}
       onResize={handleResize}

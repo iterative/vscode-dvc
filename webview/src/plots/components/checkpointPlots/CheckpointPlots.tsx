@@ -28,7 +28,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   colors
 }) => {
   const [order, setOrder] = useState(plotsIds)
-  const { size } = useSelector((state: PlotsState) => state.checkpoint)
+  const { size, hasData } = useSelector((state: PlotsState) => state.checkpoint)
   const nbItemsPerRow = useNbItemsPerRow(size)
 
   useEffect(() => {
@@ -41,6 +41,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       payload: order,
       type: MessageFromWebviewType.REORDER_PLOTS_METRICS
     })
+  }
+
+  if (!hasData) {
+    return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
   }
 
   const items = order.map(plot => (
