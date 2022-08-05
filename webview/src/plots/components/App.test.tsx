@@ -232,7 +232,7 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.getByText('No Metrics Selected')).toBeInTheDocument()
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -264,7 +264,6 @@ describe('App', () => {
   })
 
   it('should toggle the checkpoint plots section in state when its header is clicked', async () => {
-    // Fails when other test above
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
@@ -1146,7 +1145,6 @@ describe('App', () => {
         const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
-          // eslint-disable-next-line testing-library/no-render-in-setup
           await renderAppAndChangeSize(
             { checkpoint },
             'Large',
@@ -1243,7 +1241,6 @@ describe('App', () => {
         const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
-          // eslint-disable-next-line testing-library/no-render-in-setup
           await renderAppAndChangeSize(
             { checkpoint },
             'Regular',
@@ -1340,7 +1337,6 @@ describe('App', () => {
         const checkpoint = createCheckpointPlots(25)
 
         beforeEach(async () => {
-          // eslint-disable-next-line testing-library/no-render-in-setup
           await renderAppAndChangeSize(
             { checkpoint },
             'Small',
