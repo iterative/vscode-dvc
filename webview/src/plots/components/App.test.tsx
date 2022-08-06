@@ -894,6 +894,43 @@ describe('App', () => {
     expect(plots[1].style.display).toBe('none')
   })
 
+  it('should remove the drop target after exiting a section after dragging in and out of it', () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    const movingPlotId = join('plot_other', 'plot.tsv')
+
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+    const aSingleViewPlot = screen.getByTestId(movingPlotId)
+
+    dragAndDrop(aSingleViewPlot, bottomSection)
+
+    const movedPlot = screen.getByTestId(movingPlotId)
+    const otherSingleSection = screen.getByTestId(join('plot_logs', 'loss.tsv'))
+
+    dragEnter(movedPlot, otherSingleSection.id, DragEnterDirection.LEFT)
+
+    const topSection = screen.getByTestId('plots-section_template-single_0')
+
+    let topSectionPlots = within(topSection)
+      .getAllByTestId(/^plot_/)
+      .map(plot => plot.id)
+    expect(topSectionPlots.includes('plot-drop-target')).toBe(true)
+
+    const previousSection = screen.getByTestId(
+      'plots-section_template-single_2'
+    )
+    act(() => {
+      previousSection.dispatchEvent(createBubbledEvent('dragenter'))
+    })
+
+    topSectionPlots = within(topSection)
+      .getAllByTestId(/^plot_/)
+      .map(plot => plot.id)
+    expect(topSectionPlots.includes('plot-drop-target')).toBe(false)
+  })
+
   it('should open a modal with the plot zoomed in when clicking a template plot', () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
