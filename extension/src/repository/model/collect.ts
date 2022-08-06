@@ -33,7 +33,7 @@ export type Status =
 
 type DataStatusMapping = { [path: string]: ExtendedStatus }
 
-export type DataStatus = Record<Status, Set<string>>
+export type DataStatusAccumulator = Record<Status, Set<string>>
 
 const getStatus = (
   path: string,
@@ -105,33 +105,37 @@ const addToTracked = (
   tracked.add(absPath)
 }
 
-const createIterable = (
-  dataStatus: DataStatusOutput & { untracked?: string[] }
-) =>
-  Object.entries({
-    [ExtendedDataStatus.COMMITTED_ADDED]: dataStatus.committed?.added,
-    [ExtendedDataStatus.COMMITTED_DELETED]: dataStatus.committed?.deleted,
-    [ExtendedDataStatus.COMMITTED_MODIFIED]: dataStatus.committed?.modified,
-    [ExtendedDataStatus.COMMITTED_RENAMED]: dataStatus.committed?.renamed?.map(
-      ({ new: path }) => path
-    ),
-    [ExtendedDataStatus.UNCOMMITTED_ADDED]: dataStatus.uncommitted?.added,
-    [ExtendedDataStatus.UNCOMMITTED_DELETED]: dataStatus.uncommitted?.deleted,
-    [ExtendedDataStatus.UNCOMMITTED_MODIFIED]: dataStatus.uncommitted?.modified,
+const createIterableStatusGroups = (
+  dataStatusOutput: DataStatusOutput & { untracked?: string[] }
+) => [
+  {
+    [ExtendedDataStatus.COMMITTED_ADDED]: dataStatusOutput.committed?.added,
+    [ExtendedDataStatus.COMMITTED_DELETED]: dataStatusOutput.committed?.deleted,
+    [ExtendedDataStatus.COMMITTED_MODIFIED]:
+      dataStatusOutput.committed?.modified,
+    [ExtendedDataStatus.COMMITTED_RENAMED]:
+      dataStatusOutput.committed?.renamed?.map(({ new: path }) => path)
+  },
+  {
+    [ExtendedDataStatus.UNCOMMITTED_ADDED]: dataStatusOutput.uncommitted?.added,
+    [ExtendedDataStatus.UNCOMMITTED_DELETED]:
+      dataStatusOutput.uncommitted?.deleted,
+    [ExtendedDataStatus.UNCOMMITTED_MODIFIED]:
+      dataStatusOutput.uncommitted?.modified,
     [ExtendedDataStatus.UNCOMMITTED_RENAMED]:
-      dataStatus.uncommitted?.renamed?.map(({ new: path }) => path),
-    [ExtendedDataStatus.NOT_IN_CACHE]: dataStatus.not_in_cache,
-    [ExtendedDataStatus.UNCHANGED]: dataStatus.unchanged,
-    [ExtendedDataStatus.UNTRACKED]: dataStatus.untracked
-  })
+      dataStatusOutput.uncommitted?.renamed?.map(({ new: path }) => path)
+  },
+  { [ExtendedDataStatus.NOT_IN_CACHE]: dataStatusOutput.not_in_cache },
+  { [ExtendedDataStatus.UNCHANGED]: dataStatusOutput.unchanged },
+  { [ExtendedDataStatus.UNTRACKED]: dataStatusOutput.untracked }
+]
 
-const transformDataStatusOutput = (
+const transformPartialOutput = (
+  acc: { tracked: Set<string> },
   dvcRoot: string,
-  dataStatus: DataStatusOutput & { untracked?: string[] }
-) => {
+  dataStatus: Partial<Record<ExtendedStatus, string[] | undefined>>
+): DataStatusMapping => {
   const dataStatusMapping: DataStatusMapping = {}
-
-  const tracked = new Set<string>()
 
   const collectStatus = (
     status: ExtendedStatus,
@@ -139,49 +143,58 @@ const transformDataStatusOutput = (
   ) => {
     for (const path of paths || []) {
       dataStatusMapping[removeTrailingSlash(path)] = status
-      addToTracked(tracked, resolve(dvcRoot, path), status)
+      addToTracked(acc.tracked, resolve(dvcRoot, path), status)
     }
   }
 
-  for (const [key, data] of createIterable(dataStatus)) {
+  for (const [key, data] of Object.entries(dataStatus)) {
     collectStatus(key as ExtendedStatus, data)
   }
 
-  return { dataStatusMapping, tracked }
+  return dataStatusMapping
 }
 
-const getInitialDataStatus = (tracked: Set<string>): DataStatus => {
-  const initialDataStatus = {} as DataStatus
+const getDataStatusAccumulator = (): DataStatusAccumulator => {
+  const acc = {} as DataStatusAccumulator
   for (const status of Object.values(AvailableDataStatus)) {
-    initialDataStatus[status] = new Set<string>()
+    acc[status] = new Set<string>()
   }
-  return { ...initialDataStatus, tracked }
+  return acc
+}
+
+const collectStatusGroup = (
+  acc: DataStatusAccumulator,
+  dvcRoot: string,
+  partialOutput: Partial<Record<ExtendedStatus, string[] | undefined>>
+) => {
+  const dataStatusMapping = transformPartialOutput(acc, dvcRoot, partialOutput)
+
+  const dataStatusWithMissingAncestors =
+    collectMissingAncestors(dataStatusMapping)
+
+  for (const [path, status] of Object.entries(dataStatusWithMissingAncestors)) {
+    const absPath = resolve(dvcRoot, path)
+    if (status !== DiscardedStatus.UNCHANGED) {
+      acc[status].add(absPath)
+    }
+
+    addToTracked(acc.trackedDecorations, absPath, status)
+  }
 }
 
 export const collectDataStatus = (
   dvcRoot: string,
   dataStatusOutput: DataStatusOutput & { untracked?: string[] }
-): DataStatus => {
-  const { dataStatusMapping, tracked } = transformDataStatusOutput(
-    dvcRoot,
-    dataStatusOutput
-  )
+): DataStatusAccumulator => {
+  const statusGroups = createIterableStatusGroups(dataStatusOutput)
 
-  const dataStatusWithMissingAncestors =
-    collectMissingAncestors(dataStatusMapping)
+  const acc = getDataStatusAccumulator()
 
-  const dataStatus = getInitialDataStatus(tracked)
-
-  for (const [path, status] of Object.entries(dataStatusWithMissingAncestors)) {
-    const absPath = resolve(dvcRoot, path)
-    if (status !== DiscardedStatus.UNCHANGED) {
-      dataStatus[status].add(absPath)
-    }
-
-    addToTracked(dataStatus.trackedDecorations, absPath, status)
+  for (const partialOutput of statusGroups) {
+    collectStatusGroup(acc, dvcRoot, partialOutput)
   }
 
-  return dataStatus
+  return acc
 }
 
 export type PathItem = Resource & {

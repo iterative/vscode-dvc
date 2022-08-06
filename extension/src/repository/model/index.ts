@@ -1,7 +1,12 @@
 import { basename, extname, relative } from 'path'
 import { Uri } from 'vscode'
 import omit from 'lodash.omit'
-import { collectDataStatus, collectTree, DataStatus, PathItem } from './collect'
+import {
+  collectDataStatus,
+  collectTree,
+  DataStatusAccumulator,
+  PathItem
+} from './collect'
 import { UndecoratedDataStatus } from '../constants'
 import {
   SourceControlDataStatus,
@@ -64,7 +69,10 @@ export class RepositoryModel extends Disposable {
     }
   }
 
-  private collectHasChanges(data: DataStatus, hasGitChanges: boolean) {
+  private collectHasChanges(
+    data: DataStatusAccumulator,
+    hasGitChanges: boolean
+  ) {
     this.hasChanges = !!(
       hasGitChanges ||
       data.committedAdded.size > 0 ||
@@ -80,7 +88,7 @@ export class RepositoryModel extends Disposable {
     )
   }
 
-  private getDecorationState(data: DataStatus) {
+  private getDecorationState(data: DataStatusAccumulator) {
     return {
       ...omit(data, ...Object.values(UndecoratedDataStatus)),
       tracked: data.trackedDecorations
