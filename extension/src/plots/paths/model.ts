@@ -32,9 +32,12 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public setTemplateOrder(templateOrder?: TemplateOrder) {
+    const filter = (type: PathType, plotPath: PlotPath) =>
+      !!plotPath.type?.has(type)
+
     this.templateOrder = collectTemplateOrder(
-      this.getPathsByType(PathType.TEMPLATE_SINGLE),
-      this.getPathsByType(PathType.TEMPLATE_MULTI),
+      this.getPathsByType(PathType.TEMPLATE_SINGLE, filter),
+      this.getPathsByType(PathType.TEMPLATE_MULTI, filter),
       templateOrder || this.templateOrder
     )
 
@@ -51,7 +54,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public getTemplateOrder(): TemplateOrder {
-    return this.templateOrder
+    return collectTemplateOrder(
+      this.getPathsByType(PathType.TEMPLATE_SINGLE),
+      this.getPathsByType(PathType.TEMPLATE_MULTI),
+      this.templateOrder
+    )
   }
 
   public getComparisonPaths() {
@@ -62,11 +69,13 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.data.length > 0
   }
 
-  private getPathsByType(type: PathType) {
+  private getPathsByType(
+    type: PathType,
+    filter = (type: PathType, plotPath: PlotPath) =>
+      !!(plotPath.type?.has(type) && this.status[plotPath.path])
+  ) {
     return this.data
-      .filter(
-        plotPath => plotPath.type?.has(type) && this.status[plotPath.path]
-      )
+      .filter(plotPath => filter(type, plotPath))
       .map(({ path }) => path)
   }
 }

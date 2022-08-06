@@ -7,6 +7,7 @@ import {
   Flag,
   GcPreserveFlag
 } from './constants'
+import { setContextValue } from '../vscode/context'
 
 export const autoRegisteredCommands = {
   ADD: 'add',
@@ -19,6 +20,7 @@ export const autoRegisteredCommands = {
   EXPERIMENT_REMOVE: 'experimentRemove',
   EXPERIMENT_REMOVE_QUEUE: 'experimentRemoveQueue',
   INIT: 'init',
+  IS_SCM_COMMAND_RUNNING: 'isScmCommandRunning',
   MOVE: 'move',
   PULL: 'pull',
   PUSH: 'push',
@@ -31,16 +33,18 @@ export class CliExecutor extends Cli {
     this
   )
 
+  private scmCommandRunning = false
+
   public add(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.ADD, target)
+    return this.blockAndExecuteProcess(cwd, Command.ADD, target)
   }
 
   public checkout(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.CHECKOUT, ...args)
+    return this.blockAndExecuteProcess(cwd, Command.CHECKOUT, ...args)
   }
 
   public commit(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.COMMIT, ...args)
+    return this.blockAndExecuteProcess(cwd, Command.COMMIT, ...args)
   }
 
   public experimentApply(cwd: string, experimentName: string) {
@@ -97,27 +101,47 @@ export class CliExecutor extends Cli {
     )
   }
 
+  public isScmCommandRunning() {
+    return this.scmCommandRunning
+  }
+
   public init(cwd: string) {
-    return this.executeProcess(cwd, Command.INITIALIZE, Flag.SUBDIRECTORY)
+    return this.blockAndExecuteProcess(
+      cwd,
+      Command.INITIALIZE,
+      Flag.SUBDIRECTORY
+    )
   }
 
   public move(cwd: string, target: string, destination: string) {
-    return this.executeProcess(cwd, Command.MOVE, target, destination)
+    return this.blockAndExecuteProcess(cwd, Command.MOVE, target, destination)
   }
 
   public pull(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.PULL, ...args)
+    return this.blockAndExecuteProcess(cwd, Command.PULL, ...args)
   }
 
   public push(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.PUSH, ...args)
+    return this.blockAndExecuteProcess(cwd, Command.PUSH, ...args)
   }
 
   public remove(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.REMOVE, ...args)
+    return this.blockAndExecuteProcess(cwd, Command.REMOVE, ...args)
   }
 
   private executeExperimentProcess(cwd: string, ...args: Args) {
     return this.executeProcess(cwd, Command.EXPERIMENT, ...args)
+  }
+
+  private async blockAndExecuteProcess(cwd: string, ...args: Args) {
+    this.setRunning(true)
+    const output = await this.executeProcess(cwd, ...args)
+    this.setRunning(false)
+    return output
+  }
+
+  private setRunning(running: boolean) {
+    this.scmCommandRunning = running
+    setContextValue('dvc.scm.command.running', running)
   }
 }

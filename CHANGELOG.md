@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.15] - 2022-08-03
+
+### 🚀 New Features and Enhancements
+
+- Hide remove all buttons from trees when there is nothing to remove [#2131](https://github.com/iterative/vscode-dvc/pull/2131) by [@mattseddon](https://github.com/mattseddon)
+- Plot experiments in the order they were selected [#2137](https://github.com/iterative/vscode-dvc/pull/2137) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update CODEOWNERS [#2132](https://github.com/iterative/vscode-dvc/pull/2132) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.3.14] - 2022-08-02
+
+### 🐛 Bug Fixes
+
+- Block users from attempting to run concurrent SCM commands [#2128](https://github.com/iterative/vscode-dvc/pull/2128) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Redux for experiments table drag and drop [#2097](https://github.com/iterative/vscode-dvc/pull/2097) by [@sroy3](https://github.com/sroy3)
+- Upgrade vsce [#2108](https://github.com/iterative/vscode-dvc/pull/2108) by [@mattseddon](https://github.com/mattseddon)
+- Table data in redux [#2112](https://github.com/iterative/vscode-dvc/pull/2112) by [@sroy3](https://github.com/sroy3)
+- Keep old reference in the state if they have not changed [#2114](https://github.com/iterative/vscode-dvc/pull/2114) by [@sroy3](https://github.com/sroy3)
+- Upgrade wdio-vscode-service [#2124](https://github.com/iterative/vscode-dvc/pull/2124) by [@mattseddon](https://github.com/mattseddon)
+- Simplify drag and drop integrations [#2126](https://github.com/iterative/vscode-dvc/pull/2126) by [@sroy3](https://github.com/sroy3)
+
 ## [0.3.13] - 2022-07-26
 
 ### 🚀 New Features and Enhancements

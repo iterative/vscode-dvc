@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DragEnterDirection, getDragEnterDirection } from './util'
-import { changeRef } from './dragDropSlice'
+import { changeRef, setDraggedOverGroup } from './dragDropSlice'
 import styles from './styles.module.scss'
 import { DropTarget } from './DropTarget'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
@@ -72,7 +72,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(DragEnterDirection.LEFT)
-  const { draggedRef } = useSelector((state: PlotsState) => state.dragAndDrop)
+  const { draggedRef, draggedOverGroup } = useSelector(
+    (state: PlotsState) => state.dragAndDrop
+  )
   const draggedOverIdTimeout = useRef<number>(0)
   const dispatch = useDispatch()
 
@@ -198,6 +200,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       ) {
         setDraggedOverId(id)
         setDirection(getDragEnterDirection(e))
+        dispatch(setDraggedOverGroup(group))
       }
     }
   }
@@ -244,17 +247,19 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const createItemWithDropTarget = (id: string, item: JSX.Element) => {
     const isEnteringRight = direction === DragEnterDirection.RIGHT
-    const target = (
-      <DropTarget
-        key="drop-target"
-        onDragOver={handleDragOver}
-        onDrop={handleOnDrop}
-        id={id}
-        className={getDropTargetClassNames(isEnteringRight)}
-      >
-        {dropTarget}
-      </DropTarget>
-    )
+    const target =
+      draggedOverGroup === group || draggedRef?.group === group ? (
+        <DropTarget
+          key="drop-target"
+          onDragOver={handleDragOver}
+          onDrop={handleOnDrop}
+          id={id}
+          className={getDropTargetClassNames(isEnteringRight)}
+        >
+          {dropTarget}
+        </DropTarget>
+      ) : null
+
     const itemWithTag = shouldShowOnDrag ? (
       <div key="item" {...item.props} />
     ) : (

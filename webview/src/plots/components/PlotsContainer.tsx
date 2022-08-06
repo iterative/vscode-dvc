@@ -33,14 +33,20 @@ export interface PlotsContainerProps extends CommonPlotsContainerProps {
 
 export const SectionDescription = {
   // "Trends"
-  [Section.CHECKPOINT_PLOTS]:
-    'Real-time plots based on metrics from the Experiments Table',
+  [Section.CHECKPOINT_PLOTS]: (
+    <span>Real-time plots based on metrics from the Experiments Table</span>
+  ),
   // "Images"
-  [Section.COMPARISON_TABLE]:
-    'Displays image plots side by side across experiments.',
+  [Section.COMPARISON_TABLE]: (
+    <span>Displays image plots side by side across experiments.</span>
+  ),
   // "Data Series"
-  [Section.TEMPLATE_PLOTS]:
-    'Plots of JSON, YAML, CSV, or TSV files, visualized using `dvc plots` templates'
+  [Section.TEMPLATE_PLOTS]: (
+    <span>
+      Plots of JSON, YAML, CSV, or TSV files, visualized using `dvc plots`
+      templates
+    </span>
+  )
 }
 
 const InfoIcon = () => (
@@ -108,7 +114,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   )
 
   return (
-    <div className={styles.plotsContainerWrapper}>
+    <div className={styles.plotsContainerWrapper} data-testid="plots-container">
       <details open={open} className={styles.plotsContainer}>
         <summary
           onClick={e => {
@@ -130,7 +136,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           />
 
           {title}
-          <Tooltip content={tooltipContent} placement="bottom-end">
+          <Tooltip content={tooltipContent} placement="bottom-end" interactive>
             <div
               className={styles.infoTooltipToggle}
               data-testid="info-tooltip-toggle"

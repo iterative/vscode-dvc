@@ -42,6 +42,18 @@ export type Root = { rootUri: Uri }
 
 type RootCommand = (context?: Root) => Promise<string | undefined>
 
+const shouldTitleCommandReturnNoop = async (
+  cwd: string | undefined,
+  internalCommands: InternalCommands
+): Promise<boolean> => {
+  return (
+    !cwd ||
+    (await internalCommands.executeCommand<boolean>(
+      AvailableCommands.IS_SCM_COMMAND_RUNNING
+    ))
+  )
+}
+
 export const getRootCommand =
   (
     repositories: WorkspaceRepositories,
@@ -51,11 +63,11 @@ export const getRootCommand =
   async context => {
     const cwd = await repositories.getCwd(context?.rootUri)
 
-    if (!cwd) {
+    if (await shouldTitleCommandReturnNoop(cwd, internalCommands)) {
       return
     }
 
-    return tryThenMaybeForce(internalCommands, commandId, cwd)
+    return tryThenMaybeForce(internalCommands, commandId, cwd as string)
   }
 
 export const getStageAllCommand =
@@ -91,11 +103,15 @@ export const getCommitRootCommand =
   async context => {
     const cwd = await repositories.getCwdWithChanges(context?.rootUri)
 
-    if (!cwd) {
+    if (await shouldTitleCommandReturnNoop(cwd, internalCommands)) {
       return
     }
 
-    await tryThenMaybeForce(internalCommands, AvailableCommands.COMMIT, cwd)
+    await tryThenMaybeForce(
+      internalCommands,
+      AvailableCommands.COMMIT,
+      cwd as string
+    )
     return commands.executeCommand('workbench.scm.focus')
   }
 
@@ -107,7 +123,7 @@ export const getResetRootCommand =
   async context => {
     const cwd = await repositories.getCwdWithChanges(context?.rootUri)
 
-    if (!cwd) {
+    if (await shouldTitleCommandReturnNoop(cwd, internalCommands)) {
       return
     }
 
@@ -122,11 +138,11 @@ export const getResetRootCommand =
       return
     }
 
-    await gitResetWorkspace(cwd)
+    await gitResetWorkspace(cwd as string)
 
     return internalCommands.executeCommand(
       AvailableCommands.CHECKOUT,
-      cwd,
+      cwd as string,
       Flag.FORCE
     )
   }
