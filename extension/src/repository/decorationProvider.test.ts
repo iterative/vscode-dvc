@@ -162,7 +162,7 @@ describe('DecorationProvider', () => {
     )
   })
 
-  it('should provide decorations based on the expected priority', () => {
+  it('should provide a single decoration which is based on a set priority', () => {
     const logs = new Set([logDir, logAcc, logLoss])
 
     const initialState = {
