@@ -4,13 +4,18 @@ import {
   ColumnType
 } from 'dvc/src/experiments/webview/contract'
 import React, { useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
+import {
+  changeFocusedColumnIds,
+  initialBorderIds,
+  changeIsColumnResizing
+} from './focusedColumnSlice'
 import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import { ExperimentsState } from '../../store'
@@ -22,6 +27,7 @@ import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMe
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
 import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
 import { DownArrow, Lines, UpArrow } from '../../../shared/components/icons'
+import { getFirstColumnId, getLastColumnId } from '../../util/headerCell'
 
 export enum SortOrder {
   ASCENDING = 'Sort Ascending',
@@ -171,6 +177,7 @@ const TableHeaderCellContents: React.FC<{
   setMenuSuppressed,
   resizerHeight
 }) => {
+  const dispatch = useDispatch()
   return (
     <>
       <div className={styles.iconMenu}>
@@ -184,9 +191,16 @@ const TableHeaderCellContents: React.FC<{
         onDrop={onDrop}
       />
       {canResize && (
+        /* eslint-disable jsx-a11y/no-static-element-interactions */
         <div
           {...column.getResizerProps()}
-          onMouseEnter={() => setMenuSuppressed(true)}
+          onMouseDownCapture={() => {
+            dispatch(changeIsColumnResizing(true))
+          }}
+          onMouseUp={() => dispatch(changeIsColumnResizing(false))}
+          onMouseEnter={() => {
+            setMenuSuppressed(true)
+          }}
           onMouseLeave={() => setMenuSuppressed(false)}
           className={styles.columnResizer}
           style={{ height: resizerHeight }}
@@ -228,6 +242,7 @@ const TableHeaderCell: React.FC<{
   setExpColumnNeedsShadow
 }) => {
   const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
+  const dispatch = useDispatch()
   const isDraggable =
     !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
 
@@ -271,6 +286,15 @@ const TableHeaderCell: React.FC<{
         key={column.id}
         role="columnheader"
         tabIndex={0}
+        onMouseEnter={() => {
+          dispatch(
+            changeFocusedColumnIds({
+              leftColumnBorderId: getFirstColumnId(column),
+              rightColumnBorderId: getLastColumnId(column)
+            })
+          )
+        }}
+        onMouseLeave={() => dispatch(changeFocusedColumnIds(initialBorderIds))}
       >
         {firstExpColumnCellId === column.id ? (
           <WithExpColumnNeedsShadowUpdates

@@ -407,8 +407,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     border-left: $row-border;
     border-color: transparent;
 
-    &.withCellXBorder {
-      border-color: $border-color;
+    &.withCellLeftBorder {
+      border-left-color: $border-color;
+    }
+
+    &.withCellRightBorder {
+      border-right-color: $border-color;
     }
 
     &:hover {

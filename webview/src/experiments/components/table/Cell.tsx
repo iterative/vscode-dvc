@@ -6,7 +6,7 @@ import { ErrorTooltip } from './Errors'
 import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
-import { changeFocusedColumnId } from './focusedColumnSlice'
+import { changeFocusedColumnIds, initialBorderIds } from './focusedColumnSlice'
 import { clickAndEnterProps } from '../../../util/props'
 import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
@@ -138,7 +138,7 @@ export const FirstCell: React.FC<
     }
 > = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
   const dispatch = useDispatch()
-  const focusedColumn = useSelector(
+  const focusedColumnIds = useSelector(
     (state: ExperimentsState) => state.focusedColumn
   )
   const { row, isPlaceholder, column } = cell
@@ -155,11 +155,21 @@ export const FirstCell: React.FC<
       {...cell.getCellProps({
         className: cx(styles.td, styles.experimentCell, {
           [styles.groupPlaceholder]: isPlaceholder,
-          [styles.withCellXBorder]: focusedColumn === column.id
+          [styles.withCellRightBorder]:
+            focusedColumnIds.rightColumnBorderId === column.id,
+          [styles.withCellLeftBorder]:
+            focusedColumnIds.leftColumnBorderId === column.id
         })
       })}
-      onMouseEnter={() => dispatch(changeFocusedColumnId(column.id))}
-      onMouseLeave={() => dispatch(changeFocusedColumnId(''))}
+      onMouseEnter={() =>
+        dispatch(
+          changeFocusedColumnIds({
+            leftColumnBorderId: column.id,
+            rightColumnBorderId: column.id
+          })
+        )
+      }
+      onMouseLeave={() => dispatch(changeFocusedColumnIds(initialBorderIds))}
     >
       <div className={styles.innerCell}>
         <RowActions {...rowActionsProps} />
@@ -203,7 +213,7 @@ export const CellWrapper: React.FC<
   }
 > = ({ cell, cellId, changes }) => {
   const dispatch = useDispatch()
-  const focusedColumn = useSelector(
+  const focusedColumnIds = useSelector(
     (state: ExperimentsState) => state.focusedColumn
   )
   return (
@@ -213,12 +223,22 @@ export const CellWrapper: React.FC<
           [styles.workspaceChange]: changes?.includes(cell.column.id),
           [styles.depChange]: cellHasChanges(cell.value),
           [styles.groupPlaceholder]: cell.isPlaceholder,
-          [styles.withCellXBorder]: focusedColumn === cell.column.id
+          [styles.withCellRightBorder]:
+            focusedColumnIds.rightColumnBorderId === cell.column.id,
+          [styles.withCellLeftBorder]:
+            focusedColumnIds.leftColumnBorderId === cell.column.id
         })
       })}
       data-testid={cellId}
-      onMouseEnter={() => dispatch(changeFocusedColumnId(cell.column.id))}
-      onMouseLeave={() => dispatch(changeFocusedColumnId(''))}
+      onMouseEnter={() =>
+        dispatch(
+          changeFocusedColumnIds({
+            leftColumnBorderId: cell.column.id,
+            rightColumnBorderId: cell.column.id
+          })
+        )
+      }
+      onMouseLeave={() => dispatch(changeFocusedColumnIds(initialBorderIds))}
     >
       {cell.render('Cell')}
     </div>
