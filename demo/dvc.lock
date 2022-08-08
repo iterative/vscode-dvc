@@ -17,18 +17,18 @@ stages:
         weight_decay: 0
     outs:
     - path: misclassified.jpg
-      md5: b1990a0b845a07cc1d794e59c2763091
-      size: 30695
+      md5: d2c30bb7e93624f3263b7c7e34273512
+      size: 31192
     - path: model.pt
-      md5: 14c0e5aab5ed2f9f6a1a3db042d11cc8
+      md5: 372db9e0412a1989a9117b579eb26a63
       size: 439383
     - path: predictions.json
-      md5: 923675a799f42d2495ed0df4f90aa831
+      md5: d3591a3e1bb30537fdd0d024a2eea346
       size: 310000
     - path: training_metrics
-      md5: 000d694e874e01547259b477c3f66b1e.dir
-      size: 823
+      md5: e36d75580a4261b645cddda277a9b515.dir
+      size: 885
       nfiles: 2
     - path: training_metrics.json
-      md5: 030194fa592ad186d70b29335175eec3
+      md5: 8f61c8ae04f616d05a666b677610a1e1
       size: 69
