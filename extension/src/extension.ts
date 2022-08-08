@@ -459,7 +459,8 @@ export function activate(context: ExtensionContext): void {
     languages.registerCompletionItemProvider(
       dvcYamlSelector,
       new DvcYamlCompletionProvider(),
-      '.'
+      '.',
+      '/'
     ),
     languages.registerHoverProvider(
       dvcYamlSelector,

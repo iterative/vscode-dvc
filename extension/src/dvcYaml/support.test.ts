@@ -8,7 +8,8 @@ import {
 
 const testSpecificYaml = async (yamlTxt: string, expectedFiles: string[]) => {
   const mockWorkspace: DvcYamlSupportWorkspace = {
-    findFiles: jest.fn()
+    findFiles: jest.fn(),
+    findPaths: jest.fn()
   }
 
   const support = new DvcYamlSupport(mockWorkspace, yamlTxt)
@@ -34,7 +35,7 @@ describe('DvcYamlSupport', () => {
   })
 
   describe('completions', () => {
-    it('should give suggestions based on the params.yaml contents', async () => {
+    it('should give suggestions based on the referenced file contents', async () => {
       const mockWorkspace: DvcYamlSupportWorkspace = {
         findFiles() {
           return Promise.resolve([
@@ -43,7 +44,8 @@ describe('DvcYamlSupport', () => {
               path: 'params.yaml'
             }
           ])
-        }
+        },
+        findPaths: jest.fn()
       }
 
       const support = new DvcYamlSupport(mockWorkspace, dvcYamlWithVars)

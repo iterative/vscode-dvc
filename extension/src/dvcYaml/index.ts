@@ -5,6 +5,7 @@ import {
   CodeLensProvider,
   CompletionContext,
   CompletionItem,
+  CompletionItemKind,
   CompletionItemProvider,
   CompletionList,
   DocumentLink,
@@ -19,6 +20,7 @@ import {
   SnippetString,
   TextDocument,
   Uri,
+  workspace,
   WorkspaceEdit
 } from 'vscode'
 import { DvcYamlSupport, DvcYamlSupportWorkspace } from './support'
@@ -53,6 +55,14 @@ export class DvcYamlCompletionProvider implements CompletionItemProvider {
           contents: `${loadText(path)}`,
           path
         }))
+      },
+      findPaths: async pathFragment => {
+        const absolutePaths = await workspace.findFiles(
+          `{**/${pathFragment}*,**/${pathFragment}*/*}`,
+          '**/{.venv,.env}/**'
+        )
+
+        return absolutePaths.map(path => workspace.asRelativePath(path, false))
       }
     }
   }
@@ -69,12 +79,16 @@ export class DvcYamlCompletionProvider implements CompletionItemProvider {
     const currentLine = document
       .lineAt(position)
       .text.slice(0, position.character)
-    const items = this.support.provideCompletions(currentLine)
+
+    const items = await this.support.provideCompletions(currentLine)
 
     const completions: CompletionItem[] = []
 
     for (const item of items) {
       const completion = new CompletionItem(item.label)
+      completion.kind = item.isFsPath
+        ? CompletionItemKind.File
+        : CompletionItemKind.Field
       completion.insertText = new SnippetString(`${item.completion}`)
       completion.filterText = item.completion
       completions.push(completion)

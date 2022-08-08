@@ -17,6 +17,7 @@ export interface DvcYamlSupportFile {
 
 export interface DvcYamlSupportWorkspace {
   findFiles(relativePaths: string[]): Promise<DvcYamlSupportFile[] | undefined>
+  findPaths(pathFragment: string): Promise<string[] | undefined>
 }
 
 class StringFileChecker {
@@ -69,6 +70,7 @@ class SymbolFileChecker extends StagesFileChecker {
 export interface DvcYamlCompletionItem {
   label: string
   completion: string
+  isFsPath?: boolean
 }
 
 abstract class SymbolsCompletionProvider {
@@ -183,16 +185,37 @@ export class DvcYamlSupport {
       this.symbolFileChecker.check(this.dvcYaml)
     )
 
-    this.parsedFiles =
-      files?.map(({ path, contents }) => {
-        return path.endsWith('.json') ? JSON.parse(contents) : load(contents)
-      }) ?? []
+    for (const { path, contents } of files ?? []) {
+      if (contents) {
+        this.parsedFiles.push(
+          path.endsWith('.json') ? JSON.parse(contents) : load(contents)
+        )
+      }
+    }
   }
 
-  provideCompletions(currentLine: string): DvcYamlCompletionItem[] {
-    const segmentOfInterest = currentLine.match(/[\w.]+$/)?.[0]
+  async provideCompletions(
+    currentLine: string
+  ): Promise<DvcYamlCompletionItem[]> {
+    const potentialProperty = currentLine.match(/[\w.]+$/)?.[0]
+    const potentialFsReference = currentLine.match(/[\w./]+$/)?.[0]
 
-    return segmentOfInterest ? this.gatherCompletions(segmentOfInterest) : []
+    const searchResults = await this.workspace.findPaths(
+      potentialFsReference ?? ''
+    )
+
+    const fsPathCompletions =
+      searchResults?.map(fsPath => ({
+        completion: fsPath,
+        isFsPath: true,
+        label: fsPath
+      })) || []
+
+    const dataPathCompletions = potentialProperty
+      ? this.gatherCompletions(potentialProperty)
+      : []
+
+    return [...dataPathCompletions, ...fsPathCompletions]
   }
 
   private gatherCompletions(line: string) {
