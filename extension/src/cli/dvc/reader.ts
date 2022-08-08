@@ -6,7 +6,7 @@ import { typeCheckCommands } from '..'
 import { trim, trimAndSplit } from '../../util/stdout'
 import { Plot } from '../../plots/webview/contract'
 
-type Changes = {
+export type Changes = {
   added?: string[]
   deleted?: string[]
   modified?: string[]
