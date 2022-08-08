@@ -141,7 +141,7 @@ describe('collectDataStatus', () => {
     )
   })
 
-  it('should not deduplicate path when they are shown as both not in cache and deleted', () => {
+  it('should not deduplicate paths when they are shown as both not in cache and deleted', () => {
     const not_in_cache = ['model.pt', 'misclassified.jpg', 'predictions.json']
 
     const duplicates = {
@@ -163,7 +163,7 @@ describe('collectDataStatus', () => {
     expect(tracked).toStrictEqual(absNotInCache)
   })
 
-  it('should not deduplicate path when they are shown as both committed and uncommitted', () => {
+  it('should not deduplicate paths when they are shown as both committed and uncommitted', () => {
     const data = join('data', 'MNIST', 'raw')
     const paths = [
       join(data, 't10k-images-idx3-ubyte'),
