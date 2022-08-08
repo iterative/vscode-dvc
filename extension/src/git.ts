@@ -95,3 +95,13 @@ export const gitStageAll = async (cwd: string) => {
     executable: 'git'
   })
 }
+
+export const gitPushBranch = (
+  cwd: string,
+  branchName: string
+): Promise<string> =>
+  executeProcess({
+    args: ['push', '-u', 'origin', branchName],
+    cwd,
+    executable: 'git'
+  })

@@ -6,6 +6,9 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import { Title } from '../../vscode/title'
+import { getInput } from '../../vscode/inputBox'
+import { gitPushBranch } from '../../git'
+import { tryThenMaybeForce } from '../../cli/actions'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -167,6 +170,33 @@ const registerExperimentInputCommands = (
         dvcRoot,
         id
       )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE,
+    async ({ dvcRoot, id }: ExperimentDetails) => {
+      const name = experiments
+        .getRepository(dvcRoot)
+        ?.getExperimentDisplayName(id)
+
+      if (!name) {
+        return
+      }
+
+      const input = await getInput(Title.ENTER_BRANCH_NAME)
+      if (!input) {
+        return
+      }
+
+      await internalCommands.executeCommand(AvailableCommands.EXPERIMENT_APPLY)
+      await internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_BRANCH,
+        name,
+        input
+      )
+      await tryThenMaybeForce(internalCommands, AvailableCommands.PUSH, dvcRoot)
+      return gitPushBranch(dvcRoot, input)
+    }
   )
 }
 
