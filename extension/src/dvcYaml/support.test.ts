@@ -40,7 +40,7 @@ describe('DvcYamlSupport', () => {
           return Promise.resolve([
             {
               contents: paramsYaml,
-              type: 'YAML'
+              path: 'params.yaml'
             }
           ])
         }

@@ -5,7 +5,6 @@ import {
   CodeLensProvider,
   CompletionContext,
   CompletionItem,
-  CompletionItemKind,
   CompletionItemProvider,
   CompletionList,
   DocumentLink,
@@ -23,7 +22,7 @@ import {
   WorkspaceEdit
 } from 'vscode'
 import { DvcYamlSupport, DvcYamlSupportWorkspace } from './support'
-import { loadText, loadYaml } from '../fileSystem'
+import { loadText } from '../fileSystem'
 import { findFiles } from '../fileSystem/workspace'
 
 export class DvcYamlDocumentLinkProvider implements DocumentLinkProvider {
@@ -52,7 +51,7 @@ export class DvcYamlCompletionProvider implements CompletionItemProvider {
         const goodPaths = await findFiles(globPattern)
         return goodPaths.map(path => ({
           contents: `${loadText(path)}`,
-          type: path.endsWith('.json') ? 'JSON' : 'YAML'
+          path
         }))
       }
     }

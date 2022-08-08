@@ -11,8 +11,8 @@ import {
 import { Any } from '../util/object'
 
 export interface DvcYamlSupportFile {
+  path: string
   contents: string
-  type: 'JSON' | 'YAML'
 }
 
 export interface DvcYamlSupportWorkspace {
@@ -184,13 +184,8 @@ export class DvcYamlSupport {
     )
 
     this.parsedFiles =
-      files?.map(({ type, contents }) => {
-        switch (type) {
-          case 'JSON':
-            return JSON.parse(contents)
-          case 'YAML':
-            return load(contents)
-        }
+      files?.map(({ path, contents }) => {
+        return path.endsWith('.json') ? JSON.parse(contents) : load(contents)
       }) ?? []
   }
 
