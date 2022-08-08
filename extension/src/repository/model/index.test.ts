@@ -25,17 +25,23 @@ describe('RepositoryModel', () => {
   const emptySet = new Set()
 
   describe('transformAndSet', () => {
-    it('should correctly process the output of data status', () => {
-      const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
-      const logDir = 'logs'
-      const scalarDir = join(logDir, 'scalar')
-      const logAcc = join(scalarDir, 'acc.tsv')
-      const logLoss = join(scalarDir, 'loss.tsv')
-      const output = 'model.pt'
-      const predictions = 'predictions.json'
-      const rawDataDir = join('data', 'MNIST', 'raw')
-      const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
+    const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
+    const logDir = 'logs'
+    const scalarDir = join(logDir, 'scalar')
+    const logAcc = join(scalarDir, 'acc.tsv')
+    const logLoss = join(scalarDir, 'loss.tsv')
+    const output = 'model.pt'
+    const predictions = 'predictions.json'
+    const rawDataDir = join('data', 'MNIST', 'raw')
+    const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
+    const notInCacheDeleted = join(
+      'data',
+      'MNIST',
+      'raw',
+      'train-labels-idx9-ubyte'
+    )
 
+    it('should correctly process the output of data status', () => {
       const dataStatus = {
         committed: {
           deleted: [deleted],
@@ -123,6 +129,62 @@ describe('RepositoryModel', () => {
             resourceUri: Uri.file(join(dvcDemoPath, path))
           })
         ),
+        untracked: []
+      })
+    })
+
+    it('should set the context value of resources that are both uncommitted and not in cache to notInCache', () => {
+      const notInCache = [
+        rawDataDir,
+        logDir,
+        scalarDir,
+        logAcc,
+        logLoss,
+        notInCacheDeleted
+      ]
+
+      const dataStatus = {
+        not_in_cache: notInCache,
+        uncommitted: {
+          deleted: notInCache
+        }
+      }
+
+      const model = new RepositoryModel(dvcDemoPath)
+      const { decorationState, sourceControlManagementState } =
+        model.transformAndSet({
+          dataStatus,
+          hasGitChanges: false,
+          untracked: new Set()
+        })
+
+      const absNotInCache = makeAbsPathSet(dvcDemoPath, ...notInCache)
+
+      expect(decorationState).toStrictEqual({
+        committedAdded: emptySet,
+        committedDeleted: emptySet,
+        committedModified: emptySet,
+        committedRenamed: emptySet,
+        notInCache: absNotInCache,
+        tracked: absNotInCache,
+        uncommittedAdded: emptySet,
+        uncommittedDeleted: absNotInCache,
+        uncommittedModified: emptySet,
+        uncommittedRenamed: emptySet
+      })
+
+      const notInCacheScm = notInCache.map(path => ({
+        contextValue: SourceControlDataStatus.NOT_IN_CACHE,
+        dvcRoot: dvcDemoPath,
+        isDirectory: [rawDataDir, logDir, scalarDir].includes(path),
+        isTracked: true,
+        resourceUri: Uri.file(join(dvcDemoPath, path))
+      }))
+
+      expect(sourceControlManagementState).toStrictEqual({
+        committed: [],
+        notInCache: notInCacheScm,
+        uncommitted: notInCacheScm,
         untracked: []
       })
     })

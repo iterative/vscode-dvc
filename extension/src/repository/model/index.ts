@@ -108,22 +108,25 @@ export class RepositoryModel extends Disposable {
     untracked
   }: SourceControlResourceGroupData): SCMState {
     return {
-      committed: this.getScmResourceGroup({
-        committedAdded,
-        committedDeleted,
-        committedModified,
-        committedRenamed
-      } as SourceControlResourceGroupData),
-      notInCache: this.getScmResourceGroup({ notInCache } as Record<
-        SourceControlStatus,
-        Set<string>
-      >),
-      uncommitted: this.getScmResourceGroup({
-        uncommittedAdded,
-        uncommittedDeleted,
-        uncommittedModified,
-        uncommittedRenamed
-      } as SourceControlResourceGroupData),
+      committed: this.getScmResourceGroup(
+        {
+          committedAdded,
+          committedDeleted,
+          committedModified,
+          committedRenamed
+        },
+        notInCache
+      ),
+      notInCache: this.getScmResourceGroup({ notInCache }),
+      uncommitted: this.getScmResourceGroup(
+        {
+          uncommittedAdded,
+          uncommittedDeleted,
+          uncommittedModified,
+          uncommittedRenamed
+        },
+        notInCache
+      ),
       untracked: [...untracked]
         .filter(
           path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
@@ -153,12 +156,17 @@ export class RepositoryModel extends Disposable {
   }
 
   private getScmResourceGroup(
-    resourceGroupMapping: SourceControlResourceGroupData
+    resourceGroupMapping: Partial<SourceControlResourceGroupData>,
+    notInCache?: Set<string>
   ) {
     const resourceGroup: SourceControlResource[] = []
     for (const [contextValue, paths] of Object.entries(resourceGroupMapping)) {
       resourceGroup.push(
-        ...this.getScmResources(contextValue as SourceControlStatus, paths)
+        ...this.getScmResources(
+          contextValue as SourceControlStatus,
+          paths,
+          notInCache
+        )
       )
     }
     return resourceGroup
@@ -166,9 +174,17 @@ export class RepositoryModel extends Disposable {
 
   private getScmResources(
     contextValue: SourceControlStatus,
-    paths: Set<string>
+    paths: Set<string>,
+    notInCache: Set<string> | undefined
   ) {
-    return [...paths].map(path => this.getScmResource(contextValue, path))
+    return [...paths].map(path =>
+      this.getScmResource(
+        notInCache?.has(path)
+          ? SourceControlDataStatus.NOT_IN_CACHE
+          : contextValue,
+        path
+      )
+    )
   }
 
   private getScmResource(contextValue: SourceControlStatus, path: string) {
