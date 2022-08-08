@@ -2,6 +2,7 @@ import { join } from 'path'
 import { EventEmitter, Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { DecorationProvider, DecorationState } from './decorationProvider'
+import { standardizePath } from '../fileSystem/path'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -24,15 +25,15 @@ beforeEach(() => {
 
 describe('DecorationProvider', () => {
   const dvcRoot = __dirname
-  const model = join(dvcRoot, 'model.pt')
-  const dataDir = join(dvcRoot, 'data')
-  const features = join(dataDir, 'features')
-  const logDir = join(dvcRoot, 'logs')
-  const logAcc = join(logDir, 'acc.tsv')
-  const logLoss = join(logDir, 'loss.tsv')
-  const dataXml = join(dataDir, 'data.xml')
-  const dataCsv = join(dataDir, 'data.csv')
-  const prepared = join(dataDir, 'prepared')
+  const model = standardizePath(join(dvcRoot, 'model.pt')) as string
+  const dataDir = standardizePath(join(dvcRoot, 'data')) as string
+  const features = standardizePath(join(dataDir, 'features')) as string
+  const logDir = standardizePath(join(dvcRoot, 'logs')) as string
+  const logAcc = standardizePath(join(logDir, 'acc.tsv')) as string
+  const logLoss = standardizePath(join(logDir, 'loss.tsv')) as string
+  const dataXml = standardizePath(join(dataDir, 'data.xml')) as string
+  const dataCsv = standardizePath(join(dataDir, 'data.csv')) as string
+  const prepared = standardizePath(join(dataDir, 'prepared')) as string
 
   const emptySet = new Set<string>()
 
