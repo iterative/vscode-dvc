@@ -380,19 +380,6 @@ describe('Table', () => {
         type: MessageFromWebviewType.RESIZE_COLUMN
       })
       mockedPostMessage.mockReset()
-
-      fireEvent.mouseDown(experimentColumnResizeHandle, {
-        bubbles: true
-      })
-
-      columnWidths.id = 353
-
-      fireEvent.mouseUp(experimentColumnResizeHandle)
-
-      expect(mockedPostMessage).toBeCalledWith({
-        payload: { id: 'id', width: 353 },
-        type: MessageFromWebviewType.RESIZE_COLUMN
-      })
     })
 
     it('should move all the columns from a group from their current position to their new position', async () => {
