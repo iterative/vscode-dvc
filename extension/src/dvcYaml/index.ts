@@ -1,78 +1,24 @@
-import { join } from 'path'
 import {
-  CancellationToken,
-  CodeLens,
-  CodeLensProvider,
-  CompletionContext,
   CompletionItem,
   CompletionItemKind,
   CompletionItemProvider,
   CompletionList,
-  DocumentLink,
-  DocumentLinkProvider,
-  Event,
-  Hover,
-  HoverProvider,
   Position,
-  ProviderResult,
-  Range,
-  RenameProvider,
   SnippetString,
-  TextDocument,
-  Uri,
-  workspace,
-  WorkspaceEdit
+  TextDocument
 } from 'vscode'
 import { DvcYamlSupport, DvcYamlSupportWorkspace } from './support'
-import { loadText } from '../fileSystem'
-import { findFiles } from '../fileSystem/workspace'
-
-export class DvcYamlDocumentLinkProvider implements DocumentLinkProvider {
-  async provideDocumentLinks(
-    document: TextDocument,
-    token: CancellationToken
-  ): Promise<DocumentLink[]> {
-    const docs = await findFiles(join('src', 'prepare.py'))
-    const link = new DocumentLink(
-      new Range(new Position(2, 16), new Position(2, 30)),
-      Uri.file(docs[0])
-    )
-    return [link]
-  }
-}
+import { CompletionsWorkspace } from './workspace'
 
 export class DvcYamlCompletionProvider implements CompletionItemProvider {
   private supportWorkspace: DvcYamlSupportWorkspace
   private support: DvcYamlSupport | null = null
 
   constructor() {
-    this.supportWorkspace = {
-      findFiles: async paths => {
-        const globPattern = `{${paths.join(',')}}`
-
-        const goodPaths = await findFiles(globPattern)
-        return goodPaths.map(path => ({
-          contents: `${loadText(path)}`,
-          path
-        }))
-      },
-      findPaths: async pathFragment => {
-        const absolutePaths = await workspace.findFiles(
-          `{**/${pathFragment}*,**/${pathFragment}*/*}`,
-          '**/{.venv,.env}/**'
-        )
-
-        return absolutePaths.map(path => workspace.asRelativePath(path, false))
-      }
-    }
+    this.supportWorkspace = new CompletionsWorkspace()
   }
 
-  async provideCompletionItems(
-    document: TextDocument,
-    position: Position,
-    token: CancellationToken,
-    context: CompletionContext
-  ) {
+  async provideCompletionItems(document: TextDocument, position: Position) {
     this.support = new DvcYamlSupport(this.supportWorkspace, document.getText())
 
     await this.support.init()
@@ -95,36 +41,5 @@ export class DvcYamlCompletionProvider implements CompletionItemProvider {
     }
 
     return new CompletionList(completions)
-  }
-}
-
-export class DvcYamlHoverProvider implements HoverProvider {
-  provideHover(
-    document: TextDocument,
-    position: Position,
-    token: CancellationToken
-  ): ProviderResult<Hover> {
-    return null
-  }
-}
-
-export class DvcYamlCodeLensProvider implements CodeLensProvider {
-  onDidChangeCodeLenses?: Event<void> | undefined
-  provideCodeLenses(
-    document: TextDocument,
-    token: CancellationToken
-  ): ProviderResult<CodeLens[]> {
-    return null
-  }
-}
-
-export class DvcYamlRenameProvider implements RenameProvider {
-  provideRenameEdits(
-    document: TextDocument,
-    position: Position,
-    newName: string,
-    token: CancellationToken
-  ): ProviderResult<WorkspaceEdit> {
-    return null
   }
 }

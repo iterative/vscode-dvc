@@ -56,13 +56,7 @@ import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
-import {
-  DvcYamlCodeLensProvider,
-  DvcYamlCompletionProvider,
-  DvcYamlDocumentLinkProvider,
-  DvcYamlHoverProvider,
-  DvcYamlRenameProvider
-} from './dvcYaml'
+import { DvcYamlCompletionProvider } from './dvcYaml'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -452,27 +446,11 @@ export function activate(context: ExtensionContext): void {
 
   context.subscriptions.push(
     extension,
-    languages.registerDocumentLinkProvider(
-      dvcYamlSelector,
-      new DvcYamlDocumentLinkProvider()
-    ),
     languages.registerCompletionItemProvider(
       dvcYamlSelector,
       new DvcYamlCompletionProvider(),
       '.',
       '/'
-    ),
-    languages.registerHoverProvider(
-      dvcYamlSelector,
-      new DvcYamlHoverProvider()
-    ),
-    languages.registerCodeLensProvider(
-      dvcYamlSelector,
-      new DvcYamlCodeLensProvider()
-    ),
-    languages.registerRenameProvider(
-      dvcYamlSelector,
-      new DvcYamlRenameProvider()
     )
   )
 }
