@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DragEnterDirection, getDragEnterDirection } from './util'
-import { changeRef } from './dragDropSlice'
+import { changeRef, setDraggedOverGroup } from './dragDropSlice'
 import styles from './styles.module.scss'
 import { DropTarget } from './DropTarget'
 import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
@@ -54,6 +54,7 @@ interface DragDropContainerProps {
   }
   shouldShowOnDrag?: boolean
   ghostElemStyle?: CSSProperties
+  parentDraggedOver?: boolean
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -66,13 +67,16 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   dropTarget,
   wrapperComponent,
   shouldShowOnDrag,
-  ghostElemStyle
+  ghostElemStyle,
+  parentDraggedOver
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const [draggedOverId, setDraggedOverId] = useState('')
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(DragEnterDirection.LEFT)
-  const { draggedRef } = useSelector((state: PlotsState) => state.dragAndDrop)
+  const { draggedRef, draggedOverGroup } = useSelector(
+    (state: PlotsState) => state.dragAndDrop
+  )
   const draggedOverIdTimeout = useRef<number>(0)
   const dispatch = useDispatch()
 
@@ -126,16 +130,16 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     e.dataTransfer.setData('group', group)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
-    dispatch(
-      changeRef({
-        group,
-        itemId: id,
-        itemIndex
-      })
-    )
 
     createGhostStyle(e)
     draggedOverIdTimeout.current = window.setTimeout(() => {
+      dispatch(
+        changeRef({
+          group,
+          itemId: id,
+          itemIndex
+        })
+      )
       setDraggedId(id)
       setDraggedOverId(order[toIdx])
       resetDraggedStyle(id)
@@ -198,6 +202,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       ) {
         setDraggedOverId(id)
         setDirection(getDragEnterDirection(e))
+        dispatch(setDraggedOverGroup(group))
       }
     }
   }
@@ -242,19 +247,25 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         })
       : undefined
 
+  const getTarget = (id: string, isEnteringRight: boolean) => (
+    <DropTarget
+      key="drop-target"
+      onDragOver={handleDragOver}
+      onDrop={handleOnDrop}
+      id={id}
+      className={getDropTargetClassNames(isEnteringRight)}
+    >
+      {dropTarget}
+    </DropTarget>
+  )
+
   const createItemWithDropTarget = (id: string, item: JSX.Element) => {
     const isEnteringRight = direction === DragEnterDirection.RIGHT
-    const target = (
-      <DropTarget
-        key="drop-target"
-        onDragOver={handleDragOver}
-        onDrop={handleOnDrop}
-        id={id}
-        className={getDropTargetClassNames(isEnteringRight)}
-      >
-        {dropTarget}
-      </DropTarget>
-    )
+    const target =
+      draggedOverGroup === group || draggedRef?.group === group
+        ? getTarget(id, isEnteringRight)
+        : null
+
     const itemWithTag = shouldShowOnDrag ? (
       <div key="item" {...item.props} />
     ) : (
@@ -279,6 +290,18 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
     return id === draggedOverId ? createItemWithDropTarget(id, item) : item
   })
+
+  if (
+    draggedRef &&
+    isSameGroup(draggedRef.group, group) &&
+    draggedRef.itemId !== draggedId &&
+    !draggedOverId &&
+    parentDraggedOver &&
+    wrappedItems.length > 0
+  ) {
+    const lastId = wrappedItems[wrappedItems.length - 1].id
+    wrappedItems.push(getTarget(lastId, false))
+  }
 
   const Wrapper = wrapperComponent?.component
   return Wrapper ? (
