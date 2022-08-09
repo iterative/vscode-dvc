@@ -218,7 +218,19 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async addFilter() {
-    const columns = this.columns.getTerminalNodes()
+    const columns = this.columns.getTerminalNodes() as {
+      label: string
+      path: string
+      types: string[] | undefined
+    }[]
+
+    if (columns?.length) {
+      columns.push({
+        label: '$(star-full)',
+        path: 'starred',
+        types: ['boolean']
+      })
+    }
     const filterToAdd = await pickFilterToAdd(columns)
     if (!filterToAdd) {
       return

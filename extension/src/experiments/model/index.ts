@@ -456,7 +456,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     sha: string,
     filters: FilterDefinition[]
   ) {
-    const checkpoints = this.checkpointsByTip.get(sha)
+    const checkpoints = this.checkpointsByTip
+      .get(sha)
+      ?.map(checkpoint => this.addDetails(checkpoint))
     if (!checkpoints) {
       return
     }
@@ -477,12 +479,14 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   private splitExperimentsByQueued(getQueued = false) {
-    return this.flattenExperiments().filter(({ queued }) => {
-      if (getQueued) {
-        return queued
-      }
-      return !queued
-    })
+    return this.flattenExperiments()
+      .map(exp => this.addDetails(exp))
+      .filter(({ queued }) => {
+        if (getQueued) {
+          return queued
+        }
+        return !queued
+      })
   }
 
   private flattenCheckpoints() {
@@ -549,13 +553,9 @@ export class ExperimentsModel extends ModelWithPersistence {
   private addStarred(experiment: Experiment) {
     const { id } = experiment
 
-    if (!this.isStarred(id)) {
-      return experiment
-    }
-
     return {
       ...experiment,
-      starred: true
+      starred: !!this.isStarred(id)
     }
   }
 
