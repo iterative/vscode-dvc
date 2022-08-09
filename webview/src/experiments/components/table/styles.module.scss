@@ -573,6 +573,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   z-index: 1;
   touch-action: none;
   cursor: col-resize;
+  padding: 0;
+  border-width: 0;
+  background: transparent;
 
   &:hover::after {
     content: '';

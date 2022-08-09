@@ -191,8 +191,7 @@ const TableHeaderCellContents: React.FC<{
         onDrop={onDrop}
       />
       {canResize && (
-        /* eslint-disable jsx-a11y/no-static-element-interactions */
-        <div
+        <button
           {...column.getResizerProps()}
           // the mousedowncapture event is used instead of mousedown since
           // .getResizerProps() adds a mousedown handler
