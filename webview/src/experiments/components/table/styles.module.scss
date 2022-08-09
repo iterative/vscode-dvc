@@ -402,14 +402,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
-    background-color: $row-bg-color;
-    border-right: $row-border;
-    border-left: $row-border;
-    border-color: transparent;
-
-    &.withCellXBorder {
-      border-color: $border-color;
-    }
 
     &:hover {
       background-color: $hover-background-color;

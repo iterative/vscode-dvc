@@ -1,17 +1,14 @@
 import React from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
-import { useDispatch, useSelector } from 'react-redux'
 import { ErrorTooltip } from './Errors'
 import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
-import { changeFocusedColumnId } from './focusedColumnSlice'
 import { clickAndEnterProps } from '../../../util/props'
 import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
-import { ExperimentsState } from '../../store'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   row.canExpand ? (
@@ -137,11 +134,7 @@ export const FirstCell: React.FC<
       toggleExperiment: () => void
     }
 > = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
-  const dispatch = useDispatch()
-  const focusedColumn = useSelector(
-    (state: ExperimentsState) => state.focusedColumn
-  )
-  const { row, isPlaceholder, column } = cell
+  const { row, isPlaceholder } = cell
   const {
     original: { error, queued }
   } = row
@@ -153,13 +146,12 @@ export const FirstCell: React.FC<
   return (
     <div
       {...cell.getCellProps({
-        className: cx(styles.td, styles.experimentCell, {
-          [styles.groupPlaceholder]: isPlaceholder,
-          [styles.withCellXBorder]: focusedColumn === column.id
-        })
+        className: cx(
+          styles.td,
+          styles.experimentCell,
+          isPlaceholder && styles.groupPlaceholder
+        )
       })}
-      onMouseEnter={() => dispatch(changeFocusedColumnId(column.id))}
-      onMouseLeave={() => dispatch(changeFocusedColumnId(''))}
     >
       <div className={styles.innerCell}>
         <RowActions {...rowActionsProps} />
@@ -202,23 +194,16 @@ export const CellWrapper: React.FC<
     children?: React.ReactNode
   }
 > = ({ cell, cellId, changes }) => {
-  const dispatch = useDispatch()
-  const focusedColumn = useSelector(
-    (state: ExperimentsState) => state.focusedColumn
-  )
   return (
     <div
       {...cell.getCellProps({
         className: cx(styles.td, {
           [styles.workspaceChange]: changes?.includes(cell.column.id),
           [styles.depChange]: cellHasChanges(cell.value),
-          [styles.groupPlaceholder]: cell.isPlaceholder,
-          [styles.withCellXBorder]: focusedColumn === cell.column.id
+          [styles.groupPlaceholder]: cell.isPlaceholder
         })
       })}
       data-testid={cellId}
-      onMouseEnter={() => dispatch(changeFocusedColumnId(cell.column.id))}
-      onMouseLeave={() => dispatch(changeFocusedColumnId(''))}
     >
       {cell.render('Cell')}
     </div>
