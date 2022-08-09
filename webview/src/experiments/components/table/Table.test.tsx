@@ -9,7 +9,8 @@ import {
   fireEvent,
   queries,
   render,
-  screen
+  screen,
+  within
 } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
@@ -419,6 +420,38 @@ describe('Table', () => {
       expect(headers.indexOf('accuracy')).toBeGreaterThan(
         headers.indexOf('test')
       )
+    })
+  })
+  describe('Focused Column', () => {
+    it('should add styles on body column hover', async () => {
+      renderExperimentsTable()
+
+      const [firstColumnBodyCell, secondColumnBodyCell] =
+        await screen.findAllByRole('cell')
+
+      fireEvent.mouseOver(firstColumnBodyCell)
+
+      expect(firstColumnBodyCell).toHaveClass(styles.withCellRightBorder)
+      expect(firstColumnBodyCell).toHaveClass(styles.withCellLeftBorder)
+      expect(secondColumnBodyCell).not.toHaveClass(styles.withCellRightBorder)
+      expect(secondColumnBodyCell).not.toHaveClass(styles.withCellLeftBorder)
+    })
+    it('should add styles on head column hover', async () => {
+      renderExperimentsTable()
+
+      const [firstHeaderRow] = await screen.findAllByRole('row')
+      const [firstColumnHeaderCell] = await within(
+        firstHeaderRow
+      ).findAllByRole('columnheader')
+      const [firstColumnBodyCell, secondColumnBodyCell] =
+        await screen.findAllByRole('cell')
+
+      fireEvent.mouseOver(firstColumnHeaderCell)
+
+      expect(firstColumnBodyCell).toHaveClass(styles.withCellRightBorder)
+      expect(firstColumnBodyCell).toHaveClass(styles.withCellLeftBorder)
+      expect(secondColumnBodyCell).not.toHaveClass(styles.withCellRightBorder)
+      expect(secondColumnBodyCell).not.toHaveClass(styles.withCellLeftBorder)
     })
   })
 })
