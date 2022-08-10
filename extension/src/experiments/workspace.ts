@@ -72,6 +72,14 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).addFilter()
   }
 
+  public async addStarredFilter(overrideRoot?: string) {
+    const dvcRoot = await this.getDvcRoot(overrideRoot)
+    if (!dvcRoot) {
+      return
+    }
+    return this.getRepository(dvcRoot).addStarredFilter()
+  }
+
   public async removeFilters() {
     const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
     if (!dvcRoot) {

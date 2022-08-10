@@ -112,6 +112,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_BRANCH]: undefined
   [EventName.EXPERIMENT_COLUMNS_SELECT]: undefined
   [EventName.EXPERIMENT_FILTER_ADD]: undefined
+  [EventName.EXPERIMENT_FILTER_ADD_STARRED]: undefined
   [EventName.EXPERIMENT_FILTER_REMOVE]: undefined
   [EventName.EXPERIMENT_FILTERS_REMOVE]: undefined
   [EventName.EXPERIMENT_FILTERS_REMOVE_ALL]: undefined
