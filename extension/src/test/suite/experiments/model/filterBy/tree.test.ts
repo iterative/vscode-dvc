@@ -528,6 +528,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
       )
 
       expect(mockAddFilter).to.be.calledWith(starredFilter)
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
+    })
   })
 })
