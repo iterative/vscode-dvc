@@ -4,7 +4,8 @@ import { getInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
-import { ColumnLike, pickFromColumnLikes } from '../../columns/quickPick'
+import { ColumnLike } from '../../columns/like'
+import { pickFromColumnLikes } from '../../columns/quickPick'
 
 export const operators = [
   {

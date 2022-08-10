@@ -1,7 +1,8 @@
-import { ColumnLike } from './quickPick'
 import { Column } from '../webview/contract'
 
-const starredColumnLike = {
+export type ColumnLike = { label: string; path: string; types?: string[] }
+
+const starredColumnLike: ColumnLike = {
   label: '$(star-full)',
   path: 'starred',
   types: ['boolean']
