@@ -52,6 +52,7 @@ export enum RegisteredCommands {
   EXPERIMENT_SELECT = 'dvc.views.experimentsTree.selectExperiments',
   EXPERIMENT_SHOW = 'dvc.showExperiments',
   EXPERIMENT_SORT_ADD = 'dvc.addExperimentsTableSort',
+  EXPERIMENT_SORT_ADD_STARRED = 'dvc.addStarredExperimentsTableSort',
   EXPERIMENT_SORT_REMOVE = 'dvc.views.experimentsSortByTree.removeSort',
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
