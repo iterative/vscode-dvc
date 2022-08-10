@@ -1,4 +1,5 @@
 import { Event, EventEmitter, Memento } from 'vscode'
+import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
@@ -219,10 +220,13 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async addFilter() {
     const columns = this.columns.getTerminalNodes()
-    const filterToAdd = await pickFilterToAdd(columns)
+    const columnLikes = addStarredToColumns(columns)
+
+    const filterToAdd = await pickFilterToAdd(columnLikes)
     if (!filterToAdd) {
       return
     }
+
     this.experiments.addFilter(filterToAdd)
     return this.notifyChanged()
   }
@@ -335,7 +339,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getCheckpoints(id: string) {
-    return this.experiments.getCheckpoints(id)
+    return this.experiments.getCheckpointsWithType(id)
   }
 
   public sendInitialWebviewData() {
