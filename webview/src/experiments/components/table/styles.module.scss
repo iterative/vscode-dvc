@@ -253,6 +253,16 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .tr {
     position: relative;
 
+    &:hover:not(.rowSelected) {
+      .td {
+        background-color: $row-hover-background-color;
+
+        &:hover {
+          background-color: $cell-hover-background-color;
+        }
+      }
+    }
+
     &:not(.rowSelected) {
       & > *:first-child {
         position: sticky;
@@ -403,10 +413,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     line-height: 2rem;
     align-items: center;
 
-    &:hover {
-      background-color: $hover-background-color;
-    }
-
     &:first-child {
       .innerCell {
         padding-left: $edge-padding;
@@ -423,26 +429,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     display: flex;
     flex-flow: row nowrap;
     text-align: left;
-
-    &:before {
-      position: absolute;
-      content: '';
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      z-index: -1;
-      background-color: $hover-background-color;
-      opacity: 0;
-    }
-
-    &:hover {
-      background-color: $row-bg-color;
-
-      &:before {
-        opacity: 1;
-      }
-    }
 
     .innerCell {
       justify-content: flex-start;
