@@ -191,7 +191,9 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async addSort() {
     const columns = this.columns.getTerminalNodes()
-    const sortToAdd = await pickSortToAdd(columns)
+    const columnLikes = addStarredToColumns(columns)
+
+    const sortToAdd = await pickSortToAdd(columnLikes)
     if (!sortToAdd) {
       return
     }
