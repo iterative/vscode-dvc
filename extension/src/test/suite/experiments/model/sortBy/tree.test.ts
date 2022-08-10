@@ -18,6 +18,7 @@ import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths
 import { RegisteredCommands } from '../../../../../commands/external'
 import { ExperimentsOutput } from '../../../../../cli/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
+import { starredSort } from '../../../../../experiments/model/sortBy/constants'
 
 suite('Experiments Sort By Tree Test Suite', () => {
   const testData = {
@@ -287,5 +288,26 @@ suite('Experiments Sort By Tree Test Suite', () => {
         'should not call get repository in removeSorts without a root'
       ).not.to.be.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should provide a shortcut to sort by starred experiments', async () => {
+      const { experiments, experimentsModel } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getFocusedOrOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      const mockAddFilter = stub(experimentsModel, 'addSort')
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_SORT_ADD_STARRED
+      )
+
+      expect(mockAddFilter).to.be.calledWith(starredSort)
+    })
   })
 })

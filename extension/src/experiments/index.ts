@@ -10,6 +10,7 @@ import {
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { tooManySelected } from './model/status'
+import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { CheckpointsModel } from './checkpoints/model'
@@ -199,6 +200,11 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
     this.experiments.addSort(sortToAdd)
+    return this.notifyChanged()
+  }
+
+  public addStarredSort() {
+    this.experiments.addSort(starredSort)
     return this.notifyChanged()
   }
 

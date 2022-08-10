@@ -204,6 +204,11 @@ const registerExperimentQuickPickCommands = (
   )
 
   internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_SORT_ADD_STARRED,
+    (dvcRoot?: string) => experiments.addStarredSort(dvcRoot)
+  )
+
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SORTS_REMOVE,
     () => experiments.removeSorts()
   )
