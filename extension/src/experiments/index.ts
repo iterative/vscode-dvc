@@ -220,12 +220,13 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async addFilter() {
     const columns = this.columns.getTerminalNodes()
-
     const columnLikes = addStarredToColumns(columns)
+
     const filterToAdd = await pickFilterToAdd(columnLikes)
     if (!filterToAdd) {
       return
     }
+
     this.experiments.addFilter(filterToAdd)
     return this.notifyChanged()
   }
