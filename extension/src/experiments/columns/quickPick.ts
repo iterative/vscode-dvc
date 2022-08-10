@@ -1,23 +1,23 @@
+import { ColumnLike } from './like'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickOptionsWithTitle,
   quickPickValue
 } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
-import { Column } from '../webview/contract'
 
-export const pickFromColumns = (
-  columns: Column[] | undefined,
+export const pickFromColumnLikes = (
+  columnLikes: ColumnLike[] | undefined,
   quickPickOptions: QuickPickOptionsWithTitle
-) => {
-  if (!definedAndNonEmpty(columns)) {
+): Thenable<ColumnLike | undefined> => {
+  if (!definedAndNonEmpty(columnLikes)) {
     return Toast.showError('There are no columns to select from.')
   }
-  return quickPickValue<Column>(
-    columns.map(column => ({
-      description: column.path,
-      label: column.label,
-      value: column
+  return quickPickValue<ColumnLike>(
+    columnLikes.map(columnLike => ({
+      description: columnLike.path,
+      label: columnLike.label,
+      value: columnLike
     })),
     quickPickOptions
   )

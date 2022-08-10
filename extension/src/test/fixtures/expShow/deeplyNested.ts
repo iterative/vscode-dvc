@@ -242,7 +242,8 @@ export const rows = [
       }
     },
     displayColor: '#945dd6',
-    selected: true
+    selected: true,
+    starred: false
   },
   {
     id: 'main',
@@ -273,7 +274,8 @@ export const rows = [
       }
     },
     displayColor: '#13adc7',
-    selected: true
+    selected: true,
+    starred: false
   }
 ]
 
