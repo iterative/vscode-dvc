@@ -44,6 +44,7 @@ export enum RegisteredCommands {
   EXPERIMENT_COLUMNS_SELECT = 'dvc.views.experimentsColumnsTree.selectColumns',
   EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS = 'dvc.views.experimentsTree.disableAutoApplyFilters',
   EXPERIMENT_FILTER_ADD = 'dvc.addExperimentsTableFilter',
+  EXPERIMENT_FILTER_ADD_STARRED = 'dvc.addStarredExperimentsTableFilter',
   EXPERIMENT_FILTER_REMOVE = 'dvc.views.experimentsFilterByTree.removeFilter',
   EXPERIMENT_FILTERS_REMOVE = 'dvc.removeExperimentsTableFilters',
   EXPERIMENT_FILTERS_REMOVE_ALL = 'dvc.views.experimentsFilterByTree.removeAllFilters',

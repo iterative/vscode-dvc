@@ -3,6 +3,7 @@
   "description": "Machine learning experiment management with tracking, plots, and data versioning.",
   "command.addExperimentsTableFilter": "Add Filter To Experiments Table",
   "command.addExperimentsTableSort": "Add Or Update Sort On Experiments Table",
+  "command.addStarredExperimentsTableFilter": "Filter Experiments Table to Starred",
   "command.addTarget": "Add Target",
   "command.applyExperiment": "Apply Experiment To Workspace",
   "command.branchExperiment": "Create New Branch From Experiment",

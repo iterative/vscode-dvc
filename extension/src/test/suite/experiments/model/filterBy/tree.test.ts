@@ -33,6 +33,7 @@ import {
   ExperimentsFilterByTree,
   FilterItem
 } from '../../../../../experiments/model/filterBy/tree'
+import { starredFilter } from '../../../../../experiments/model/filterBy/constants'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -479,12 +480,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      const starredFilter = {
-        operator: Operator.IS_TRUE,
-        path: 'starred',
-        value: undefined
-      }
-
       await addFilterViaQuickInput(experiments, starredFilter)
 
       const [workspace, main] = rowsFixture
@@ -513,5 +508,26 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith(filteredTableData)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should provide a shortcut to filter to starred experiments', async () => {
+      const { experiments, experimentsModel } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getFocusedOrOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      const mockAddFilter = stub(experimentsModel, 'addFilter')
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED
+      )
+
+      expect(mockAddFilter).to.be.calledWith(starredFilter)
+    })
   })
 })

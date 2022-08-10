@@ -101,6 +101,12 @@
         "icon": "$(add)"
       },
       {
+        "title": "%command.addStarredExperimentsTableFilter%",
+        "command": "dvc.addStarredExperimentsTableFilter",
+        "category": "DVC",
+        "icon": "$(star-full)"
+      },
+      {
         "title": "%command.addTarget%",
         "command": "dvc.addTarget",
         "category": "DVC",
@@ -545,6 +551,10 @@
         },
         {
           "command": "dvc.addExperimentsTableSort",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.addStarredExperimentsTableFilter",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1015,6 +1025,11 @@
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
+          "command": "dvc.addStarredExperimentsTableFilter",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem != dvcRoot"
@@ -1222,9 +1237,14 @@
           "group": "navigation@1"
         },
         {
+          "command": "dvc.addStarredExperimentsTableFilter",
+          "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation@2"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.experiments.filtered",
-          "group": "navigation@2"
+          "group": "navigation@3"
         },
         {
           "command": "dvc.showPlots",

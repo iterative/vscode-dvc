@@ -189,6 +189,11 @@ const registerExperimentQuickPickCommands = (
   )
 
   internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
+    (dvcRoot?: string) => experiments.addStarredFilter(dvcRoot)
+  )
+
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTERS_REMOVE,
     () => experiments.removeFilters()
   )
