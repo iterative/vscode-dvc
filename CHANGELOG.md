@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.16] - 2022-08-10
+
+### 🚀 New Features and Enhancements
+
+- Links in section description tooltips [#2140](https://github.com/iterative/vscode-dvc/pull/2140) by [@sroy3](https://github.com/sroy3)
+- Retain plot order when toggling off/on [#2147](https://github.com/iterative/vscode-dvc/pull/2147) by [@mattseddon](https://github.com/mattseddon)
+- All plots sections visible [#2145](https://github.com/iterative/vscode-dvc/pull/2145) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Patch e2e tests [#2143](https://github.com/iterative/vscode-dvc/pull/2143) by [@mattseddon](https://github.com/mattseddon)
+- Remove drop target when leaving a section [#2149](https://github.com/iterative/vscode-dvc/pull/2149) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Split up `Table.tsx` [#2165](https://github.com/iterative/vscode-dvc/pull/2165) by [@julieg18](https://github.com/julieg18)
+
 ## [0.3.15] - 2022-08-03
 
 ### 🚀 New Features and Enhancements
