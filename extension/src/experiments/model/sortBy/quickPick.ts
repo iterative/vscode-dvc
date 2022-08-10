@@ -3,10 +3,10 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
+import { ColumnLike } from '../../columns/like'
 import { pickFromColumnLikes } from '../../columns/quickPick'
-import { Column } from '../../webview/contract'
 
-export const pickSortToAdd = async (columns: Column[]) => {
+export const pickSortToAdd = async (columns: ColumnLike[] | undefined) => {
   const picked = await pickFromColumnLikes(columns, {
     title: Title.SELECT_PARAM_OR_METRIC_SORT
   })
