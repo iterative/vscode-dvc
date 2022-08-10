@@ -4,7 +4,7 @@ import { getInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
-import { pickFromColumnLikes } from '../../columns/quickPick'
+import { ColumnLike, pickFromColumnLikes } from '../../columns/quickPick'
 
 export const operators = [
   {
@@ -83,9 +83,7 @@ const addFilterValue = async (path: string, operator: Operator) => {
 }
 
 export const pickFilterToAdd = async (
-  columns:
-    | { label: string; path: string; types: string[] | undefined }[]
-    | undefined
+  columns: ColumnLike[] | undefined
 ): Promise<FilterDefinition | undefined> => {
   const picked = await pickFromColumnLikes(columns, {
     title: Title.SELECT_PARAM_OR_METRIC_FILTER

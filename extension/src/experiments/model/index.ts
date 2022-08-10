@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import omit from 'lodash.omit'
 import { SortDefinition, sortExperiments } from './sortBy'
 import {
   FilterDefinition,
