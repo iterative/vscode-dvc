@@ -1249,7 +1249,7 @@
         {
           "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "when": "view == dvc.views.experimentsSortByTree && dvc.experiments.sorted",
-          "group": "navigation@2"
+          "group": "navigation@3"
         },
         {
           "command": "dvc.addExperimentsTableFilter",

@@ -301,13 +301,13 @@ suite('Experiments Sort By Tree Test Suite', () => {
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      const mockAddFilter = stub(experimentsModel, 'addSort')
+      const mockAddSort = stub(experimentsModel, 'addSort')
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_SORT_ADD_STARRED
       )
 
-      expect(mockAddFilter).to.be.calledWith(starredSort)
+      expect(mockAddSort).to.be.calledWith(starredSort)
     })
   })
 })
