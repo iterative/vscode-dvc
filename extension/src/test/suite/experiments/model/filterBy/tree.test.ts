@@ -465,5 +465,53 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(mockTreeView.description).to.be.undefined
     })
+
+    it('should be able to filter to starred experiments', async () => {
+      const { experiments, messageSpy } = buildExperiments(disposable)
+
+      await experiments.isReady()
+      await experiments.showWebview()
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getFocusedOrOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      const starredFilter = {
+        operator: Operator.IS_TRUE,
+        path: 'starred',
+        value: undefined
+      }
+
+      await addFilterViaQuickInput(experiments, starredFilter)
+
+      const [workspace, main] = rowsFixture
+
+      const filteredRows = [
+        workspace,
+        {
+          ...main,
+          subRows: []
+        }
+      ]
+
+      const filteredTableData: TableData = {
+        changes: workspaceChangesFixture,
+        columnOrder: [],
+        columnWidths: {},
+        columns: columnsFixture,
+        filteredCounts: { checkpoints: 9, experiments: 5 },
+        filters: ['starred'],
+        hasCheckpoints: true,
+        hasColumns: true,
+        hasRunningExperiment: true,
+        rows: filteredRows,
+        sorts: []
+      }
+
+      expect(messageSpy).to.be.calledWith(filteredTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 })
