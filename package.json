@@ -35,7 +35,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "5.32.0",
     "@typescript-eslint/parser": "5.32.0",
-    "@vscode/codicons": "0.0.31",
+    "@vscode/codicons": "0.0.32",
     "eslint": "8.21.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-config-prettier-standard": "4.0.1",
