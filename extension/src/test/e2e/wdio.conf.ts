@@ -33,7 +33,7 @@ export const config: Options.Testrunner = {
   capabilities: [
     {
       browserName: 'vscode',
-      browserVersion: 'stable',
+      browserVersion: 'insiders',
       'wdio:vscodeOptions': {
         extensionPath,
         userSettings: {
