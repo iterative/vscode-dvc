@@ -5,6 +5,9 @@ import { getVenvBinPath } from '../../python/path'
 import { Logger } from '../../common/logger'
 
 const screenshotDir = join(__dirname, 'screenshots')
+const logsDir = join(__dirname, 'logs')
+const extensionPath = resolve(__dirname, '..', '..', '..')
+const dvcDemoPath = resolve(extensionPath, '..', 'demo')
 
 export const config: Options.Testrunner = {
   after: async function () {
@@ -32,16 +35,12 @@ export const config: Options.Testrunner = {
       browserName: 'vscode',
       browserVersion: 'stable',
       'wdio:vscodeOptions': {
-        extensionPath: resolve(__dirname, '..', '..', '..'),
+        extensionPath,
         userSettings: {
-          'dvc.pythonPath': getVenvBinPath(
-            resolve(__dirname, '..', '..', '..', '..', 'demo'),
-            '.env',
-            'python'
-          )
+          'dvc.pythonPath': getVenvBinPath(dvcDemoPath, '.env', 'python')
         },
         verboseLogging: false,
-        workspacePath: resolve(__dirname, '..', '..', '..', '..', 'demo')
+        workspacePath: dvcDemoPath
       }
     }
   ],
@@ -56,7 +55,7 @@ export const config: Options.Testrunner = {
     timeout: 60000,
     ui: 'bdd'
   },
-  outputDir: join(__dirname, 'logs'),
+  outputDir: logsDir,
   reporters: ['spec'],
   services: ['vscode'],
   specs: ['./src/test/e2e/*.test.ts'],

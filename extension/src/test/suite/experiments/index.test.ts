@@ -888,7 +888,8 @@ suite('Experiments Test Suite', () => {
             id: 'workspace',
             label: 'workspace',
             params: { 'params.yaml': { test: 10 } },
-            selected: true
+            selected: true,
+            starred: false
           },
           {
             displayColor: colors[1],
@@ -898,6 +899,7 @@ suite('Experiments Test Suite', () => {
             params: { 'params.yaml': { test: 10 } },
             selected: true,
             sha: 'testBranch',
+            starred: false,
             subRows: [
               {
                 displayColor: colors[2],
@@ -905,7 +907,8 @@ suite('Experiments Test Suite', () => {
                 label: 'testExp',
                 params: { 'params.yaml': { test: 2 } },
                 selected: true,
-                sha: 'testExp1'
+                sha: 'testExp1',
+                starred: false
               },
               {
                 displayColor: colors[3],
@@ -913,7 +916,8 @@ suite('Experiments Test Suite', () => {
                 label: 'testExp',
                 params: { 'params.yaml': { test: 1 } },
                 selected: true,
-                sha: 'testExp2'
+                sha: 'testExp2',
+                starred: false
               },
               {
                 displayColor: colors[4],
@@ -921,7 +925,8 @@ suite('Experiments Test Suite', () => {
                 label: 'testExp',
                 params: { 'params.yaml': { test: 3 } },
                 selected: true,
-                sha: 'testExp3'
+                sha: 'testExp3',
+                starred: false
               }
             ]
           }
@@ -963,7 +968,8 @@ suite('Experiments Test Suite', () => {
             id: 'workspace',
             label: 'workspace',
             params: { 'params.yaml': { test: 10 } },
-            selected: true
+            selected: true,
+            starred: false
           },
           {
             displayColor: colors[1],
@@ -973,6 +979,7 @@ suite('Experiments Test Suite', () => {
             params: { 'params.yaml': { test: 10 } },
             selected: true,
             sha: 'testBranch',
+            starred: false,
             subRows: [
               {
                 displayColor: colors[3],
@@ -980,7 +987,8 @@ suite('Experiments Test Suite', () => {
                 label: 'testExp',
                 params: { 'params.yaml': { test: 1 } },
                 selected: true,
-                sha: 'testExp2'
+                sha: 'testExp2',
+                starred: false
               },
               {
                 displayColor: colors[2],
@@ -988,7 +996,8 @@ suite('Experiments Test Suite', () => {
                 label: 'testExp',
                 params: { 'params.yaml': { test: 2 } },
                 selected: true,
-                sha: 'testExp1'
+                sha: 'testExp1',
+                starred: false
               },
               {
                 displayColor: colors[4],
@@ -996,7 +1005,8 @@ suite('Experiments Test Suite', () => {
                 label: 'testExp',
                 params: { 'params.yaml': { test: 3 } },
                 selected: true,
-                sha: 'testExp3'
+                sha: 'testExp3',
+                starred: false
               }
             ]
           }

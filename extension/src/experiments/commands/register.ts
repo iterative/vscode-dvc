@@ -189,6 +189,11 @@ const registerExperimentQuickPickCommands = (
   )
 
   internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
+    (dvcRoot?: string) => experiments.addStarredFilter(dvcRoot)
+  )
+
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTERS_REMOVE,
     () => experiments.removeFilters()
   )
@@ -196,6 +201,11 @@ const registerExperimentQuickPickCommands = (
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SORT_ADD,
     (dvcRoot?: string) => experiments.addSort(dvcRoot)
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_SORT_ADD_STARRED,
+    (dvcRoot?: string) => experiments.addStarredSort(dvcRoot)
   )
 
   internalCommands.registerExternalCommand(

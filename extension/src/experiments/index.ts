@@ -1,4 +1,5 @@
 import { Event, EventEmitter, Memento } from 'vscode'
+import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
 import { pickExperiments } from './model/quickPicks'
@@ -9,6 +10,7 @@ import {
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { tooManySelected } from './model/status'
+import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { CheckpointsModel } from './checkpoints/model'
@@ -17,6 +19,7 @@ import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
+import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
@@ -190,11 +193,18 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async addSort() {
     const columns = this.columns.getTerminalNodes()
-    const sortToAdd = await pickSortToAdd(columns)
+    const columnLikes = addStarredToColumns(columns)
+
+    const sortToAdd = await pickSortToAdd(columnLikes)
     if (!sortToAdd) {
       return
     }
     this.experiments.addSort(sortToAdd)
+    return this.notifyChanged()
+  }
+
+  public addStarredSort() {
+    this.experiments.addSort(starredSort)
     return this.notifyChanged()
   }
 
@@ -219,11 +229,19 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async addFilter() {
     const columns = this.columns.getTerminalNodes()
-    const filterToAdd = await pickFilterToAdd(columns)
+    const columnLikes = addStarredToColumns(columns)
+
+    const filterToAdd = await pickFilterToAdd(columnLikes)
     if (!filterToAdd) {
       return
     }
+
     this.experiments.addFilter(filterToAdd)
+    return this.notifyChanged()
+  }
+
+  public addStarredFilter() {
+    this.experiments.addFilter(starredFilter)
     return this.notifyChanged()
   }
 
@@ -335,7 +353,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getCheckpoints(id: string) {
-    return this.experiments.getCheckpoints(id)
+    return this.experiments.getCheckpointsWithType(id)
   }
 
   public sendInitialWebviewData() {
