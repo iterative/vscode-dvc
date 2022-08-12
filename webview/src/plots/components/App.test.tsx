@@ -784,6 +784,30 @@ describe('App', () => {
     ])
   })
 
+  it('should show a drop target at the end of the section when moving a plot from one section to another but not over any other plot', async () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+    dragAndDrop(aSingleViewPlot, bottomSection)
+
+    await screen.findByTestId('plots-section_template-single_2')
+    const anotherSingleViewPlot = screen.getByTestId(
+      join('plot_logs', 'loss.tsv')
+    )
+
+    dragEnter(
+      anotherSingleViewPlot,
+      'plots-section_template-single_0',
+      DragEnterDirection.RIGHT
+    )
+
+    expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
+  })
+
   it('should show a drop zone when hovering a new section', () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
