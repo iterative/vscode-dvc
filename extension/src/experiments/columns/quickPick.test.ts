@@ -1,4 +1,4 @@
-import { pickFromColumns } from './quickPick'
+import { pickFromColumnLikes } from './quickPick'
 import { appendColumnToPath, buildMetricOrParamPath } from './paths'
 import { quickPickValue } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
@@ -17,34 +17,25 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('pickFromColumns', () => {
+describe('pickFromColumnLikes', () => {
   const params = ColumnType.PARAMS
   const paramsYaml = 'params.yaml'
   const paramsYamlPath = buildMetricOrParamPath(params, paramsYaml)
   const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epochs')
   const epochsParam = {
-    hasChildren: false,
     label: 'epochs',
-    maxNumber: 5,
-    maxStringLength: 1,
-    minNumber: 2,
-    parentPath: paramsYamlPath,
     path: epochsParamPath,
-    type: ColumnType.PARAMS,
     types: ['number']
   }
 
   const paramsYamlParam = {
-    hasChildren: true,
     label: paramsYaml,
-    parentPath: params,
-    path: paramsYamlPath,
-    type: ColumnType.PARAMS
+    path: paramsYamlPath
   }
   const exampleColumns = [epochsParam, paramsYamlParam]
 
   it('should return early if no columns are provided', async () => {
-    const picked = await pickFromColumns([], {
+    const picked = await pickFromColumnLikes([], {
       title: "can't pick from no columns" as Title
     })
     expect(picked).toBeUndefined()
@@ -54,7 +45,7 @@ describe('pickFromColumns', () => {
 
   it('should invoke a QuickPick with the correct options', async () => {
     const title = 'Test title' as Title
-    await pickFromColumns(exampleColumns, { title })
+    await pickFromColumnLikes(exampleColumns, { title })
     expect(mockedQuickPickValue).toBeCalledWith(
       [
         {

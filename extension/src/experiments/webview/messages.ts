@@ -165,6 +165,7 @@ export class WebviewMessages {
       undefined,
       undefined
     )
+    return this.notifyChanged()
   }
 
   private setColumnsStatus() {

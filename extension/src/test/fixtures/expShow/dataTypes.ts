@@ -160,6 +160,7 @@ export const rows: Row[] = [
     queued: false,
     running: false,
     selected: true,
+    starred: false,
     timestamp: null
   },
   {
@@ -172,6 +173,7 @@ export const rows: Row[] = [
     running: false,
     selected: true,
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+    starred: false,
     timestamp: '2020-11-21T19:58:22'
   }
 ]
