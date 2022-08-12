@@ -292,9 +292,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   })
 
   if (
-    draggedRef &&
-    isSameGroup(draggedRef.group, group) &&
-    draggedRef.itemId !== draggedId &&
+    isSameGroup(draggedRef?.group, group) &&
+    draggedRef?.itemId !== draggedId &&
     !draggedOverId &&
     parentDraggedOver &&
     wrappedItems.length > 0
