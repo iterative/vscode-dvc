@@ -125,9 +125,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       }
     }
     const itemIndex = idx.toString()
-    e.dataTransfer.setData('itemIndex', itemIndex)
-    e.dataTransfer.setData('itemId', id)
-    e.dataTransfer.setData('group', group)
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
 
@@ -147,7 +144,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const applyDrop = (
-    e: DragEvent<HTMLElement>,
     droppedIndex: number,
     draggedIndex: number,
     newOrder: string[],
@@ -161,34 +157,38 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     setOrder(newOrder)
     dispatch(changeRef(undefined))
 
-    onDrop?.(oldDraggedId, e.dataTransfer.getData('group'), group, droppedIndex)
+    onDrop?.(oldDraggedId, draggedRef?.group || '', group, droppedIndex)
   }
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
+    if (!draggedRef) {
+      return
+    }
+    const dragged = draggedRef.itemId
+
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId('')
     }, 0)
-    if (e.dataTransfer.getData('itemId') === draggedOverId) {
+    if (dragged === draggedOverId) {
       dispatch(changeRef(undefined))
       return
     }
     const newOrder = [...order]
-    const oldDraggedId = e.dataTransfer.getData('itemId')
-    const isNew = !order.includes(draggedId)
+    const isNew = !order.includes(dragged)
     if (isNew) {
-      newOrder.push(draggedId)
+      newOrder.push(dragged)
     }
     const draggedIndex = isNew
       ? newOrder.length - 1
-      : getIDIndex(e.dataTransfer.getData('itemIndex'))
+      : getIDIndex(draggedRef.itemIndex)
 
     const droppedIndex = order.indexOf(e.currentTarget.id.split('__')[0])
     const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
     const orderIdxChanged = droppedIndex + orderIdxChange
     const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
 
-    if (isEnabled && isSameGroup(e.dataTransfer.getData('group'), group)) {
-      applyDrop(e, orderIdxChanged, draggedIndex, newOrder, oldDraggedId)
+    if (isEnabled && isSameGroup(draggedRef.group, group)) {
+      applyDrop(orderIdxChanged, draggedIndex, newOrder, dragged)
     }
   }
 

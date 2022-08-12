@@ -32,6 +32,9 @@ export const TemplatePlots: React.FC = () => {
   const draggedOverGroup = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedOverGroup
   )
+  const draggedRef = useSelector(
+    (state: PlotsState) => state.dragAndDrop.draggedRef
+  )
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = useNbItemsPerRow(size)
@@ -79,8 +82,11 @@ export const TemplatePlots: React.FC = () => {
   }
 
   const handleDropInNewSection = (e: DragEvent<HTMLElement>) => {
-    const draggedSectionId = getIDIndex(e.dataTransfer.getData('group'))
-    const draggedId = e.dataTransfer.getData('itemId')
+    if (!draggedRef) {
+      return
+    }
+    const draggedSectionId = getIDIndex(draggedRef.group)
+    const draggedId = draggedRef.itemId
 
     const updatedSections = removeFromPreviousAndAddToNewSection(
       sections,

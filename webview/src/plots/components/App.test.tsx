@@ -797,13 +797,7 @@ describe('App', () => {
 
     expect(topDropIcon).not.toBeInTheDocument()
 
-    act(() => {
-      multiViewPlot.dispatchEvent(createBubbledEvent('dragstart'))
-    })
-
-    act(() => {
-      topSection.dispatchEvent(createBubbledEvent('dragenter'))
-    })
+    dragEnter(multiViewPlot, topSection.id, DragEnterDirection.LEFT)
 
     topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
 

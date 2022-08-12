@@ -4,7 +4,7 @@ export type DraggedInfo =
   | {
       itemIndex: string
       itemId: string
-      group?: string
+      group: string
     }
   | undefined
 export interface DragDropGroupState {
