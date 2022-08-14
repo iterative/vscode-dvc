@@ -3601,10 +3601,10 @@
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.0.tgz#23509ebc1fa32f1b4d50d6a66c4032d5b8eaabdc"
   integrity sha512-/ceqdqeRraGolFTcfoXNiqjyQhZzbINDngeoAq9GoHa8PPK1yNzTaxWjA6BFWp5Ua9JpXEMSS4s5i9tS0hOJtw==
 
-"@types/chai@4.3.1":
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.1.tgz#e2c6e73e0bdeb2521d00756d099218e9f5d90a04"
-  integrity sha512-/zPMqDkzSZ8t3VtxOa4KPq7uzzW978M9Tvh+j7GHKuo6k6GTLxPJ4J5gE5cjfJ26pnXst0N5Hax8Sr0T2Mi9zQ==
+"@types/chai@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.2.tgz#29b4afe85a0bb85f3d39a586f25038a8d78229b2"
+  integrity sha512-TNeRJV5O1L0s7NM4Xg9q8HPbLnyAMQ9twPMul53hWRld//NnjV/VSw7InBCNrPJyWBPhyoSLlzR2mR9Fq5nJTg==
 
 "@types/classnames@2.3.1":
   version "2.3.1"
