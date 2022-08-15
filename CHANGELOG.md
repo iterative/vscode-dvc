@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.17] - 2022-08-14
+
+### 🚀 New Features and Enhancements
+
+- Add option to filter experiments to starred [#2164](https://github.com/iterative/vscode-dvc/pull/2164) by [@mattseddon](https://github.com/mattseddon)
+- Add option to sort by starred experiments [#2169](https://github.com/iterative/vscode-dvc/pull/2169) by [@mattseddon](https://github.com/mattseddon)
+- Add shortcut to filter experiments to starred [#2170](https://github.com/iterative/vscode-dvc/pull/2170) by [@mattseddon](https://github.com/mattseddon)
+- Add shortcut to sort experiments by starred [#2171](https://github.com/iterative/vscode-dvc/pull/2171) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Larger drop zones when dragging a plot to another section [#2180](https://github.com/iterative/vscode-dvc/pull/2180) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Rename experiments columns tree test file [#2168](https://github.com/iterative/vscode-dvc/pull/2168) by [@mattseddon](https://github.com/mattseddon)
+- Revert end to end tests back to insiders [#2173](https://github.com/iterative/vscode-dvc/pull/2173) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.16] - 2022-08-10
 
 ### 🚀 New Features and Enhancements
