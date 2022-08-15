@@ -1557,7 +1557,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@types/chai": "4.3.2",
+    "@types/chai": "4.3.3",
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "9.0.13",
