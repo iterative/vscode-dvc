@@ -286,7 +286,7 @@ describe('setup', () => {
     expect(mockedInitialize).not.toBeCalled()
   })
 
-  it('should try to select the python interpreter if the workspace contains a DVC project, the cli cannot be found and the user selects select the python interpreter', async () => {
+  it('should try to select the python interpreter if the workspace contains a DVC project, the cli cannot be found and the user decides to select the python interpreter', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
