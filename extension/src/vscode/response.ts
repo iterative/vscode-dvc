@@ -7,6 +7,7 @@ export enum Response {
   NEVER = "Don't Show Again",
   NO = 'No',
   SELECT_MOST_RECENT = 'Select Most Recent',
+  SELECT_INTERPRETER = 'Select Python Interpreter',
   SETUP_WORKSPACE = 'Setup The Workspace',
   SHOW = 'Show',
   TURN_OFF = 'Turn Off',

@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { extensions, Extension } from 'vscode'
+import { extensions, Extension, commands } from 'vscode'
 import { setup, setupWorkspace } from './setup'
 import { flushPromises } from './test/util/jest'
 import {
@@ -25,6 +25,9 @@ jest.mock('./vscode/toast')
 jest.mock('./vscode/workspaceFolders')
 
 const mockedExtensions = jest.mocked(extensions)
+const mockedCommands = jest.mocked(commands)
+const mockedExecuteCommand = jest.fn()
+mockedCommands.executeCommand = mockedExecuteCommand
 
 const mockedCanRunCli = jest.fn()
 const mockedHasRoots = jest.fn()
@@ -277,6 +280,25 @@ describe('setup', () => {
     expect(mockedGetConfigValue).toBeCalledTimes(1)
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
     expect(mockedSetupWorkspace).toBeCalledTimes(1)
+    expect(mockedExecuteCommand).not.toBeCalled()
+    expect(mockedSetUserConfigValue).not.toBeCalled()
+    expect(mockedResetMembers).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
+  })
+
+  it('should try to select the python interpreter if the workspace contains a DVC project, the cli cannot be found and the user selects select the python interpreter', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedWarnWithOptions.mockResolvedValueOnce(Response.SELECT_INTERPRETER)
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedGetConfigValue).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedSetupWorkspace).toBeCalledTimes(0)
+    expect(mockedExecuteCommand).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).not.toBeCalled()
     expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
@@ -294,6 +316,7 @@ describe('setup', () => {
     expect(mockedGetConfigValue).toBeCalledTimes(1)
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
     expect(mockedSetupWorkspace).not.toBeCalled()
+    expect(mockedExecuteCommand).not.toBeCalled()
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()

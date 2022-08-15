@@ -15,7 +15,10 @@ import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { Response } from './vscode/response'
 import { getSelectTitle, Title } from './vscode/title'
 import { Toast } from './vscode/toast'
-import { isPythonExtensionInstalled } from './extensions/python'
+import {
+  isPythonExtensionInstalled,
+  selectPythonInterpreter
+} from './extensions/python'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -166,15 +169,19 @@ const warnUserCLIInaccessible = async (
     return
   }
   const response = await Toast.warnWithOptions(
-    'An error was thrown when trying to access the CLI.',
+    'An error was thrown when trying to access the CLI. Please ensure the correct interpreter is set for auto Python environment activation.',
     Response.SETUP_WORKSPACE,
+    Response.SELECT_INTERPRETER,
     Response.NEVER
   )
-  if (response === Response.SETUP_WORKSPACE) {
-    extension.setupWorkspace()
-  }
-  if (response === Response.NEVER) {
-    setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
+
+  switch (response) {
+    case Response.SELECT_INTERPRETER:
+      return selectPythonInterpreter()
+    case Response.SETUP_WORKSPACE:
+      return extension.setupWorkspace()
+    case Response.NEVER:
+      return setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
   }
 }
 
