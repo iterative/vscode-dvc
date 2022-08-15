@@ -21,7 +21,8 @@ $meta-cell-color: var(--vscode-descriptionForeground);
 
 $hover-background-color: var(--vscode-list-hoverBackground);
 $row-hover-background-color: var(--vscode-list-hoverBackground);
-$cell-hover-background-color: $border-color;
+$cell-hover-background-color: var(--vscode-dropdown-background);
+
 $accent-color: var(--button-primary-background);
 
 $indicator-badge-foreground: var(--vscode-activityBarBadge-foreground);
