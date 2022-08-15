@@ -22,3 +22,6 @@ right environment:
 <p align="center">
   <img src="images/install-dvc-setup-wizard.png" alt="DVC Setup Wizard" />
 </p>
+
+> **Note**: The correct Python interpreter must be set for the current workspace
+> when relying on the Python extension for auto environment activation.
