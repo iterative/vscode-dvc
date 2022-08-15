@@ -40,7 +40,7 @@ const evaluateBoolean = (
 ): boolean =>
   typeof valueToEvaluate === 'boolean' && valueToEvaluate === filterValue
 
-const evaluate = <T>(
+const evaluate = <T extends string | number | boolean>(
   valueToEvaluate: T,
   operator: Operator,
   filterValue: T

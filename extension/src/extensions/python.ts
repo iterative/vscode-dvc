@@ -1,4 +1,4 @@
-import { Event, Uri } from 'vscode'
+import { commands, Event, Uri } from 'vscode'
 import { executeProcess } from '../processExecution'
 import { getExtensionAPI, isInstalled } from '../vscode/extensions'
 
@@ -54,3 +54,7 @@ export const getOnDidChangePythonExecutionDetails = async () => {
 }
 
 export const isPythonExtensionInstalled = () => isInstalled(PYTHON_EXTENSION_ID)
+
+export const selectPythonInterpreter = () => {
+  commands.executeCommand('python.setInterpreter')
+}

@@ -622,7 +622,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   @extend %baseInnerCell;
   @extend %truncateLeftParent;
   line-height: normal;
-  text-align: right;
+  text-align: left;
 }
 
 .timestampDate {
@@ -638,6 +638,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   @extend %headerCellPadding;
   overflow-x: hidden;
   text-overflow: ellipsis;
+  text-align: left;
 }
 
 .thead {
