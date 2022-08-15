@@ -16,6 +16,7 @@ import { Response } from './vscode/response'
 import { getSelectTitle, Title } from './vscode/title'
 import { Toast } from './vscode/toast'
 import {
+  getPythonBinPath,
   isPythonExtensionInstalled,
   selectPythonInterpreter
 } from './extensions/python'
@@ -162,17 +163,40 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
+const getToastText = async (
+  isPythonExtensionInstalled: boolean
+): Promise<string> => {
+  const text = 'An error was thrown when trying to access the CLI.'
+  if (!isPythonExtensionInstalled) {
+    return text
+  }
+  const binPath = await getPythonBinPath()
+
+  return (
+    text +
+    ` For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${binPath}. `
+  )
+}
+
+const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
+  return isPythonExtensionInstalled
+    ? [Response.SETUP_WORKSPACE, Response.SELECT_INTERPRETER, Response.NEVER]
+    : [Response.SETUP_WORKSPACE, Response.NEVER]
+}
+
 const warnUserCLIInaccessible = async (
   extension: IExtension
 ): Promise<void> => {
   if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
     return
   }
+
+  const isMsPythonInstalled = isPythonExtensionInstalled()
+  const warningText = await getToastText(isMsPythonInstalled)
+
   const response = await Toast.warnWithOptions(
-    'An error was thrown when trying to access the CLI. Please ensure the correct interpreter is set for auto Python environment activation.',
-    Response.SETUP_WORKSPACE,
-    Response.SELECT_INTERPRETER,
-    Response.NEVER
+    warningText,
+    ...getToastOptions(isMsPythonInstalled)
   )
 
   switch (response) {
