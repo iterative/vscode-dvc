@@ -54,7 +54,7 @@
     "@types/jest": "28.1.6",
     "@types/jsdom": "20.0.0",
     "@types/node": "16.11.47",
-    "@types/react": "18.0.16",
+    "@types/react": "18.0.17",
     "@types/react-dom": "18.0.6",
     "@types/react-measure": "2.0.8",
     "@types/react-table": "7.7.12",
