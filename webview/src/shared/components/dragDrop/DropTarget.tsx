@@ -1,27 +1,16 @@
-import React, { DragEventHandler } from 'react'
+import React, { HTMLAttributes } from 'react'
 
-interface DropTargetProps {
+interface DropTargetProps extends HTMLAttributes<HTMLDivElement> {
   children: JSX.Element
-  onDragOver: DragEventHandler<HTMLElement>
-  onDrop: DragEventHandler<HTMLElement>
   id: string
-  className?: string
 }
 
 export const DropTarget: React.FC<DropTargetProps> = ({
   children,
-  onDragOver,
-  onDrop,
   id,
-  className
+  ...props
 }) => (
-  <div
-    data-testid="drop-target"
-    onDragOver={onDragOver}
-    onDrop={onDrop}
-    id={`${id}__drop`}
-    className={className}
-  >
+  <div data-testid="drop-target" id={`${id}__drop`} {...props}>
     {children}
   </div>
 )

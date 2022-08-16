@@ -19,6 +19,8 @@ import { PlotsState } from '../../store'
 import { plotDataStore } from '../plotDataStore'
 import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { reorderObjectList } from 'dvc/src/util/array'
+import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -120,7 +122,7 @@ export const TemplatePlots: React.FC = () => {
     draggedId: string,
     draggedGroup: string,
     groupId: string,
-    position: number
+    position?: number
   ) => {
     if (draggedGroup === groupId) {
       return
@@ -169,11 +171,45 @@ export const TemplatePlots: React.FC = () => {
 
         const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
 
-        const classes = cx({
+        const classes = cx(styles.sectionWrapper, {
           [styles.multiViewPlotsGrid]: isMultiView,
           [styles.singleViewPlotsGrid]: !isMultiView,
           [styles.noBigGrid]: !useVirtualizedGrid
         })
+
+        const handleDropAtTheEnd = () => {
+          handleEnteringSection('')
+          if (!draggedRef) {
+            return
+          }
+          const isExactGroup = draggedRef.group === groupId
+          const isSimilarGroup = isSameGroup(draggedRef.group, groupId)
+
+          if (isExactGroup) {
+            const order = section.entries.map(s => s.id)
+            const draggedIndex = parseInt(draggedRef.itemIndex, 10)
+            order.splice(draggedIndex, 1)
+            order.push(draggedRef.itemId)
+            const updatedSections = [...sections]
+            updatedSections[i] = {
+              ...sections[i],
+              entries: reorderObjectList<TemplatePlotEntry>(
+                order,
+                section.entries,
+                'id'
+              )
+            }
+            setSections(updatedSections)
+          } else if (isSimilarGroup) {
+            const dropSectionLength = section.entries.length
+            handleDropInSection(
+              draggedRef.itemId,
+              draggedRef.group,
+              groupId,
+              dropSectionLength
+            )
+          }
+        }
 
         return (
           section.entries.length > 0 && (
@@ -183,6 +219,8 @@ export const TemplatePlots: React.FC = () => {
               data-testid={`plots-section_${groupId}`}
               className={classes}
               onDragEnter={() => handleEnteringSection(groupId)}
+              onDragOver={(e: DragEvent) => e.preventDefault()}
+              onDropCapture={handleDropAtTheEnd}
             >
               <TemplatePlotsGrid
                 entries={section.entries}
