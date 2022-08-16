@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.18] - 2022-08-15
+
+### 🚀 New Features and Enhancements
+
+- Left align timestamp column text [#2191](https://github.com/iterative/vscode-dvc/pull/2191) by [@julieg18](https://github.com/julieg18)
+- Add select python interpreter option to setup workspace toast message [#2186](https://github.com/iterative/vscode-dvc/pull/2186) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Handle dep being added under the current commit [#2187](https://github.com/iterative/vscode-dvc/pull/2187) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.3.17] - 2022-08-14
+
+### 🚀 New Features and Enhancements
+
+- Add option to filter experiments to starred [#2164](https://github.com/iterative/vscode-dvc/pull/2164) by [@mattseddon](https://github.com/mattseddon)
+- Add option to sort by starred experiments [#2169](https://github.com/iterative/vscode-dvc/pull/2169) by [@mattseddon](https://github.com/mattseddon)
+- Add shortcut to filter experiments to starred [#2170](https://github.com/iterative/vscode-dvc/pull/2170) by [@mattseddon](https://github.com/mattseddon)
+- Add shortcut to sort experiments by starred [#2171](https://github.com/iterative/vscode-dvc/pull/2171) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Larger drop zones when dragging a plot to another section [#2180](https://github.com/iterative/vscode-dvc/pull/2180) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Rename experiments columns tree test file [#2168](https://github.com/iterative/vscode-dvc/pull/2168) by [@mattseddon](https://github.com/mattseddon)
+- Revert end to end tests back to insiders [#2173](https://github.com/iterative/vscode-dvc/pull/2173) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.3.16] - 2022-08-10
+
+### 🚀 New Features and Enhancements
+
+- Links in section description tooltips [#2140](https://github.com/iterative/vscode-dvc/pull/2140) by [@sroy3](https://github.com/sroy3)
+- Retain plot order when toggling off/on [#2147](https://github.com/iterative/vscode-dvc/pull/2147) by [@mattseddon](https://github.com/mattseddon)
+- All plots sections visible [#2145](https://github.com/iterative/vscode-dvc/pull/2145) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Patch e2e tests [#2143](https://github.com/iterative/vscode-dvc/pull/2143) by [@mattseddon](https://github.com/mattseddon)
+- Remove drop target when leaving a section [#2149](https://github.com/iterative/vscode-dvc/pull/2149) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Split up `Table.tsx` [#2165](https://github.com/iterative/vscode-dvc/pull/2165) by [@julieg18](https://github.com/julieg18)
+
 ## [0.3.15] - 2022-08-03
 
 ### 🚀 New Features and Enhancements

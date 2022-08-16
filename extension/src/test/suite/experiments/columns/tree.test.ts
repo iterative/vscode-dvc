@@ -14,7 +14,7 @@ import { buildExperiments } from '../util'
 import { Status } from '../../../../path/selection/model'
 import { ColumnType } from '../../../../experiments/webview/contract'
 
-suite('Experiments Metrics And Params Tree Test Suite', () => {
+suite('Experiments Columns Tree Test Suite', () => {
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()
 

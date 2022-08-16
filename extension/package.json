@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.15",
+  "version": "0.3.18",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -99,6 +99,18 @@
         "command": "dvc.addExperimentsTableSort",
         "category": "DVC",
         "icon": "$(add)"
+      },
+      {
+        "title": "%command.addStarredExperimentsTableFilter%",
+        "command": "dvc.addStarredExperimentsTableFilter",
+        "category": "DVC",
+        "icon": "$(star-full)"
+      },
+      {
+        "title": "%command.addStarredExperimentsTableSort%",
+        "command": "dvc.addStarredExperimentsTableSort",
+        "category": "DVC",
+        "icon": "$(star-full)"
       },
       {
         "title": "%command.addTarget%",
@@ -545,6 +557,14 @@
         },
         {
           "command": "dvc.addExperimentsTableSort",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.addStarredExperimentsTableFilter",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.addStarredExperimentsTableSort",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1000,6 +1020,11 @@
           "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
+          "command": "dvc.addStarredExperimentsTableSort",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "group": "inline",
           "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem != dvcRoot"
@@ -1011,6 +1036,11 @@
         },
         {
           "command": "dvc.addExperimentsTableFilter",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.addStarredExperimentsTableFilter",
           "group": "inline",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
         },
@@ -1212,9 +1242,14 @@
           "group": "navigation@1"
         },
         {
+          "command": "dvc.addStarredExperimentsTableSort",
+          "when": "view == dvc.views.experimentsSortByTree",
+          "group": "navigation@2"
+        },
+        {
           "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "when": "view == dvc.views.experimentsSortByTree && dvc.experiments.sorted",
-          "group": "navigation@2"
+          "group": "navigation@3"
         },
         {
           "command": "dvc.addExperimentsTableFilter",
@@ -1222,9 +1257,14 @@
           "group": "navigation@1"
         },
         {
+          "command": "dvc.addStarredExperimentsTableFilter",
+          "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation@2"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.experiments.filtered",
-          "group": "navigation@2"
+          "group": "navigation@3"
         },
         {
           "command": "dvc.showPlots",
@@ -1517,7 +1557,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@types/chai": "4.3.1",
+    "@types/chai": "4.3.3",
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "9.0.13",

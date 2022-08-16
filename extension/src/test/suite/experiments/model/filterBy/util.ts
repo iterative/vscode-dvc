@@ -5,13 +5,14 @@ import { FilterDefinition } from '../../../../../experiments/model/filterBy'
 import { experimentsUpdatedEvent } from '../../../util'
 import { Experiments } from '../../../../../experiments'
 import { RegisteredCommands } from '../../../../../commands/external'
+import { addStarredToColumns } from '../../../../../experiments/columns/like'
 
 export const mockQuickInputFilter = (
   fixtureFilter: FilterDefinition,
   mockShowQuickPick = stub(window, 'showQuickPick'),
   mockShowInputBox = stub(window, 'showInputBox')
 ) => {
-  const column = columnsFixture.find(
+  const column = addStarredToColumns(columnsFixture)?.find(
     column => column.path === fixtureFilter.path
   )
   mockShowQuickPick

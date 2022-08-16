@@ -43,14 +43,21 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   const isHovered = hoveredSection === id
 
   return (
-    <div className={cx(styles.singleViewPlotsGrid, styles.noBigGrid)}>
+    <div
+      id={id}
+      data-testid={id}
+      onDragEnter={handleDragEnter}
+      onDragExit={handleDragLeave}
+      onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
+      onDrop={onDrop}
+      draggable
+      className={cx(
+        styles.singleViewPlotsGrid,
+        styles.noBigGrid,
+        styles.dropSectionWrapper
+      )}
+    >
       <div
-        id={id}
-        data-testid={id}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
-        onDrop={onDrop}
         className={cx(styles.dropSection, {
           [styles.dropSectionMaximized]: isHovered,
           [styles.plot]: isHovered

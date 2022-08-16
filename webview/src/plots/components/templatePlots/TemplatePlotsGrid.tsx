@@ -23,6 +23,7 @@ interface TemplatePlotsGridProps {
   setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
   useVirtualizedGrid?: boolean
   nbItemsPerRow: number
+  parentDraggedOver?: boolean
 }
 
 const autoSize = {
@@ -38,7 +39,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   multiView,
   setSectionEntries,
   useVirtualizedGrid,
-  nbItemsPerRow
+  nbItemsPerRow,
+  parentDraggedOver
 }) => {
   const [order, setOrder] = useState<string[]>([])
 
@@ -101,6 +103,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
             }
           : undefined
       }
+      parentDraggedOver={parentDraggedOver}
     />
   )
 }
