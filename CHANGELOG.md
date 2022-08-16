@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.18] - 2022-08-15
+
+### 🚀 New Features and Enhancements
+
+- Left align timestamp column text [#2191](https://github.com/iterative/vscode-dvc/pull/2191) by [@julieg18](https://github.com/julieg18)
+- Add select python interpreter option to setup workspace toast message [#2186](https://github.com/iterative/vscode-dvc/pull/2186) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Handle dep being added under the current commit [#2187](https://github.com/iterative/vscode-dvc/pull/2187) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.17] - 2022-08-14
 
 ### 🚀 New Features and Enhancements
