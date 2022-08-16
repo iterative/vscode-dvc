@@ -3,6 +3,7 @@ import { Cli, typeCheckCommands } from '.'
 import {
   Args,
   Command,
+  EMPTY_REPO_ERROR,
   ExperimentFlag,
   Flag,
   ListFlag,
@@ -108,6 +109,10 @@ export interface ExperimentsOutput {
   }
 }
 
+const defaultExperimentsOutput: ExperimentsOutput = {
+  workspace: { baseline: {} }
+}
+
 export interface PlotsOutput {
   [path: string]: Plot[]
 }
@@ -132,9 +137,11 @@ export class CliReader extends Cli {
     cwd: string,
     ...flags: ExperimentFlag[]
   ): Promise<ExperimentsOutput> {
-    return this.readProcessJson<ExperimentsOutput>(
+    return this.readProcessJsonWithKnownErrors<ExperimentsOutput>(
       cwd,
       Command.EXPERIMENT,
+      defaultExperimentsOutput,
+      [EMPTY_REPO_ERROR],
       SubCommand.SHOW,
       ...flags
     )
@@ -155,10 +162,12 @@ export class CliReader extends Cli {
   }
 
   public plotsDiff(cwd: string, ...revisions: string[]): Promise<PlotsOutput> {
-    return this.readProcessJson<PlotsOutput>(
+    return this.readProcessJsonWithKnownErrors<PlotsOutput>(
       cwd,
       Command.PLOTS,
-      'diff',
+      {},
+      [EMPTY_REPO_ERROR],
+      Command.DIFF,
       ...revisions,
       Flag.OUTPUT_PATH,
       TEMP_PLOTS_DIR,
@@ -184,11 +193,15 @@ export class CliReader extends Cli {
     cwd: string,
     formatter: typeof trimAndSplit | typeof JSON.parse | typeof trim,
     defaultValue: string,
+    nonRetryErrors: string[],
     ...args: Args
   ): Promise<T> {
     const output =
-      (await retry(() => this.executeProcess(cwd, ...args), args.join(' '))) ||
-      defaultValue
+      (await retry(
+        () => this.executeProcess(cwd, ...args),
+        args.join(' '),
+        nonRetryErrors
+      )) || defaultValue
     if (!formatter) {
       return output as unknown as T
     }
@@ -200,6 +213,25 @@ export class CliReader extends Cli {
       cwd,
       JSON.parse,
       '{}',
+      [],
+      command,
+      ...args,
+      Flag.SHOW_JSON
+    )
+  }
+
+  private readProcessJsonWithKnownErrors<T>(
+    cwd: string,
+    command: Command,
+    defaultValue: T,
+    nonRetryErrors: string[],
+    ...args: Args
+  ) {
+    return this.readProcess<T>(
+      cwd,
+      JSON.parse,
+      JSON.stringify(defaultValue),
+      nonRetryErrors,
       command,
       ...args,
       Flag.SHOW_JSON
