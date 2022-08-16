@@ -126,7 +126,15 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       height: 4px;
       vertical-align: middle;
       border: 1px solid currentColor;
-      background-color: inherit;
+      background-color: $bg-color;
+    }
+
+    .unselectedExperiment:hover & {
+      background-color: $row-hover-background-color;
+    }
+
+    .unselectedExperiment .experimentCell:hover & {
+      background-color: $cell-hover-background-color;
     }
 
     .workspaceWithChanges.unselectedExperiment & {
@@ -145,7 +153,19 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       border-right: 1.5px solid currentColor;
       border-top: 1.5px solid currentColor;
       animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
-      background-color: inherit;
+      background-color: $bg-color;
+    }
+
+    .runningExperiment:hover & {
+      background-color: $row-hover-background-color;
+      border-left-color: $row-hover-background-color;
+      border-bottom-color: $row-hover-background-color;
+    }
+
+    .runningExperiment .experimentCell:hover & {
+      background-color: $cell-hover-background-color;
+      border-left-color: $cell-hover-background-color;
+      border-bottom-color: $cell-hover-background-color;
     }
 
     .workspaceWithChanges.runningExperiment & {
@@ -254,12 +274,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     position: relative;
 
     &:hover:not(.rowSelected) {
-      .td {
+      .td:not(.experimentCell),
+      .experimentCell:before {
         background-color: $row-hover-background-color;
+      }
 
-        &:hover {
-          background-color: $cell-hover-background-color;
-        }
+      .td:hover:not(.experimentCell),
+      .experimentCell:hover:before {
+        background-color: $cell-hover-background-color;
       }
     }
 
@@ -709,6 +731,17 @@ $badge-size: 0.85rem;
 }
 
 .experimentCell {
+  &:before {
+    content: '';
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    position: absolute;
+    background-color: transparent;
+  }
+
   .innerCell {
     .indicatorCount {
       display: none;
