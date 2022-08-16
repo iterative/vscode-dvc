@@ -126,7 +126,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       height: 4px;
       vertical-align: middle;
       border: 1px solid currentColor;
-      background-color: $bg-color;
+      background-color: inherit;
     }
 
     .workspaceWithChanges.unselectedExperiment & {
@@ -145,7 +145,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       border-right: 1.5px solid currentColor;
       border-top: 1.5px solid currentColor;
       animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
-      background-color: $bg-color;
+      background-color: inherit;
     }
 
     .workspaceWithChanges.runningExperiment & {
