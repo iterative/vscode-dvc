@@ -21,6 +21,7 @@ import { plotDataStore } from '../plotDataStore'
 import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
+import { changeOrderWithDraggedInfo } from '../../../util/array'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -185,15 +186,13 @@ export const TemplatePlots: React.FC = () => {
 
           if (draggedRef.group === groupId) {
             const order = section.entries.map(s => s.id)
-            const draggedIndex = Number.parseInt(draggedRef.itemIndex, 10)
             const updatedSections = [...sections]
 
-            order.splice(draggedIndex, 1)
-            order.push(draggedRef.itemId)
+            const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
             updatedSections[i] = {
               ...sections[i],
               entries: reorderObjectList<TemplatePlotEntry>(
-                order,
+                newOrder,
                 section.entries,
                 'id'
               )
@@ -217,7 +216,7 @@ export const TemplatePlots: React.FC = () => {
             className={classes}
             onDragEnter={() => handleEnteringSection(groupId)}
             onDragOver={(e: DragEvent) => e.preventDefault()}
-            onDropCapture={handleDropAtTheEnd}
+            onDrop={handleDropAtTheEnd}
           >
             <TemplatePlotsGrid
               entries={section.entries}

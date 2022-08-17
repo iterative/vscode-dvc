@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { DragEvent, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { ColorScale } from 'dvc/src/plots/webview/contract'
@@ -17,6 +17,7 @@ import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/Virt
 import { shouldUseVirtualizedGrid } from '../util'
 import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 import { PlotsState } from '../../store'
+import { changeOrderWithDraggedInfo } from '../../../util/array'
 
 interface CheckpointPlotsProps {
   plotsIds: string[]
@@ -29,7 +30,11 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
 }) => {
   const [order, setOrder] = useState(plotsIds)
   const { size, hasData } = useSelector((state: PlotsState) => state.checkpoint)
+  const [onSection, setOnSection] = useState(false)
   const nbItemsPerRow = useNbItemsPerRow(size)
+  const draggedRef = useSelector(
+    (state: PlotsState) => state.dragAndDrop.draggedRef
+  )
 
   useEffect(() => {
     setOrder(pastOrder => performSimpleOrderedUpdate(pastOrder, plotsIds))
@@ -55,11 +60,24 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
 
   const useVirtualizedGrid = shouldUseVirtualizedGrid(items.length, size)
 
+  const handleDropAtTheEnd = () => {
+    setMetricOrder(changeOrderWithDraggedInfo(order, draggedRef))
+  }
+
+  const handleDragOver = (e: DragEvent) => {
+    e.preventDefault()
+    setOnSection(true)
+  }
+
   return items.length > 0 ? (
     <div
       className={cx(styles.singleViewPlotsGrid, {
         [styles.noBigGrid]: !useVirtualizedGrid
       })}
+      onDragEnter={() => setOnSection(true)}
+      onDragLeave={() => setOnSection(false)}
+      onDragOver={handleDragOver}
+      onDrop={handleDropAtTheEnd}
     >
       <DragDropContainer
         order={order}
@@ -76,6 +94,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
               }
             : undefined
         }
+        parentDraggedOver={onSection}
       />
     </div>
   ) : (

@@ -173,6 +173,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
+    e.stopPropagation()
     if (!draggedRef) {
       return
     }
@@ -207,7 +208,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const setIsHovering = () => {
     setHoveringSomething(true)
     isHovering.current = true
-    clearTimeout(hoveringTimeout.current)
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
