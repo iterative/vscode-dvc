@@ -79,7 +79,7 @@ export interface BaseExperimentFields {
   checkpoint_parent?: string
 }
 
-type Dep = { hash: string; size: number; nfiles: null | number }
+type Dep = { hash: null | string; size: null | number; nfiles: null | number }
 type Out = Dep & { use_cache: boolean; is_data_source: boolean }
 
 export type Deps = RelPathObject<Dep>
