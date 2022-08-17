@@ -204,9 +204,14 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }
   }
 
-  const handleDragEnter = (e: DragEvent<HTMLElement>) => {
+  const setIsHovering = () => {
     setHoveringSomething(true)
     isHovering.current = true
+    clearTimeout(hoveringTimeout.current)
+  }
+
+  const handleDragEnter = (e: DragEvent<HTMLElement>) => {
+    setIsHovering()
 
     if (isSameGroup(draggedRef?.group, group)) {
       const { id } = e.currentTarget
@@ -224,9 +229,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const handleDragOver = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
-    if (draggedOverGroup === e.currentTarget.id) {
-      setHoveringSomething(true)
-      isHovering.current = true
+    if (e.currentTarget.id.includes(draggedOverId)) {
+      setIsHovering()
     }
     if (isSameGroup(draggedRef?.group, group)) {
       const { id } = e.currentTarget
@@ -318,18 +322,17 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const { id } = draggable.props
     const item = id && buildItem(id, draggable)
 
-    return id === draggedOverId && hoveringSomething
+    return id === draggedOverId && (hoveringSomething || !parentDraggedOver)
       ? createItemWithDropTarget(id, item)
       : item
   })
 
-  const lastId = wrappedItems[wrappedItems.length - 1].props.id
-
   if (
     isSameGroup(draggedRef?.group, group) &&
-    (draggedOverId.includes(lastId) || !hoveringSomething) &&
+    !hoveringSomething &&
     parentDraggedOver
   ) {
+    const lastId = wrappedItems[wrappedItems.length - 1].props.id
     wrappedItems.push(getTarget(lastId, false))
   }
 

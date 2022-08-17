@@ -7,6 +7,7 @@ import React, { DragEvent, useState, useEffect, useRef } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { reorderObjectList } from 'dvc/src/util/array'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { removeFromPreviousAndAddToNewSection } from './util'
@@ -19,7 +20,6 @@ import { PlotsState } from '../../store'
 import { plotDataStore } from '../plotDataStore'
 import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import { reorderObjectList } from 'dvc/src/util/array'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
 
 export enum NewSectionBlock {
@@ -182,15 +182,14 @@ export const TemplatePlots: React.FC = () => {
           if (!draggedRef) {
             return
           }
-          const isExactGroup = draggedRef.group === groupId
-          const isSimilarGroup = isSameGroup(draggedRef.group, groupId)
 
-          if (isExactGroup) {
+          if (draggedRef.group === groupId) {
             const order = section.entries.map(s => s.id)
-            const draggedIndex = parseInt(draggedRef.itemIndex, 10)
+            const draggedIndex = Number.parseInt(draggedRef.itemIndex, 10)
+            const updatedSections = [...sections]
+
             order.splice(draggedIndex, 1)
             order.push(draggedRef.itemId)
-            const updatedSections = [...sections]
             updatedSections[i] = {
               ...sections[i],
               entries: reorderObjectList<TemplatePlotEntry>(
@@ -200,41 +199,38 @@ export const TemplatePlots: React.FC = () => {
               )
             }
             setSections(updatedSections)
-          } else if (isSimilarGroup) {
-            const dropSectionLength = section.entries.length
+          } else if (isSameGroup(draggedRef.group, groupId)) {
             handleDropInSection(
               draggedRef.itemId,
               draggedRef.group,
               groupId,
-              dropSectionLength
+              section.entries.length
             )
           }
         }
 
         return (
-          section.entries.length > 0 && (
-            <div
-              key={groupId}
-              id={groupId}
-              data-testid={`plots-section_${groupId}`}
-              className={classes}
-              onDragEnter={() => handleEnteringSection(groupId)}
-              onDragOver={(e: DragEvent) => e.preventDefault()}
-              onDropCapture={handleDropAtTheEnd}
-            >
-              <TemplatePlotsGrid
-                entries={section.entries}
-                groupId={groupId}
-                groupIndex={i}
-                onDropInSection={handleDropInSection}
-                multiView={isMultiView}
-                setSectionEntries={setSectionEntries}
-                useVirtualizedGrid={useVirtualizedGrid}
-                nbItemsPerRow={nbItemsPerRow}
-                parentDraggedOver={draggedOverGroup === groupId}
-              />
-            </div>
-          )
+          <div
+            key={groupId}
+            id={groupId}
+            data-testid={`plots-section_${groupId}`}
+            className={classes}
+            onDragEnter={() => handleEnteringSection(groupId)}
+            onDragOver={(e: DragEvent) => e.preventDefault()}
+            onDropCapture={handleDropAtTheEnd}
+          >
+            <TemplatePlotsGrid
+              entries={section.entries}
+              groupId={groupId}
+              groupIndex={i}
+              onDropInSection={handleDropInSection}
+              multiView={isMultiView}
+              setSectionEntries={setSectionEntries}
+              useVirtualizedGrid={useVirtualizedGrid}
+              nbItemsPerRow={nbItemsPerRow}
+              parentDraggedOver={draggedOverGroup === groupId}
+            />
+          </div>
         )
       })}
       <AddedSection

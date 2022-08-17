@@ -801,8 +801,8 @@ describe('App', () => {
 
     dragEnter(
       anotherSingleViewPlot,
-      'plots-section_template-single_0',
-      DragEnterDirection.RIGHT
+      'template-single_0',
+      DragEnterDirection.LEFT
     )
 
     expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
