@@ -129,8 +129,20 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       background-color: $bg-color;
     }
 
+    .unselectedExperiment:not(.rowSelected):hover & {
+      background-color: $row-hover-background-color;
+    }
+
+    .unselectedExperiment:not(.rowSelected) .experimentCell:hover & {
+      background-color: $cell-hover-background-color;
+    }
+
     .workspaceWithChanges.unselectedExperiment & {
       border: 1px solid $changed-color;
+    }
+
+    .rowSelected.unselectedExperiment & {
+      background-color: $row-bg-selected-color;
     }
 
     .queuedExperiment & {
@@ -148,9 +160,27 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       background-color: $bg-color;
     }
 
+    .runningExperiment:not(.rowSelected):hover & {
+      background-color: $row-hover-background-color;
+      border-left-color: $row-hover-background-color;
+      border-bottom-color: $row-hover-background-color;
+    }
+
+    .runningExperiment:not(.rowSelected) .experimentCell:hover & {
+      background-color: $cell-hover-background-color;
+      border-left-color: $cell-hover-background-color;
+      border-bottom-color: $cell-hover-background-color;
+    }
+
     .workspaceWithChanges.runningExperiment & {
       border-right-color: $changed-color;
       border-top-color: $changed-color;
+    }
+
+    .rowSelected.runningExperiment & {
+      background-color: $row-bg-selected-color;
+      border-left-color: $row-bg-selected-color;
+      border-bottom-color: $row-bg-selected-color;
     }
   }
 }
@@ -254,12 +284,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     position: relative;
 
     &:hover:not(.rowSelected) {
-      .td {
+      .td:not(.experimentCell),
+      .experimentCell:before {
         background-color: $row-hover-background-color;
+      }
 
-        &:hover {
-          background-color: $cell-hover-background-color;
-        }
+      .td:hover:not(.experimentCell),
+      .experimentCell:hover:before {
+        background-color: $cell-hover-background-color;
       }
     }
 
@@ -709,6 +741,17 @@ $badge-size: 0.85rem;
 }
 
 .experimentCell {
+  &:before {
+    content: '';
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    position: absolute;
+    background-color: transparent;
+  }
+
   .innerCell {
     .indicatorCount {
       display: none;
