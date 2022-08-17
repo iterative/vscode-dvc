@@ -10,6 +10,7 @@ import {
   deeplyNestedOutput,
   rows as deeplyNestedRows
 } from '../../test/fixtures/expShow/deeplyNested'
+import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps'
 import { buildMockMemento } from '../../test/util'
 import { buildMetricOrParamPath } from '../columns/paths'
 import { Experiment, ColumnType } from '../webview/contract'
@@ -157,6 +158,13 @@ describe('ExperimentsModel', () => {
       }
     }
     expect(changed).toStrictEqual([shaWithChange])
+  })
+
+  it('should handle deps have all null properties (never been committed)', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(uncommittedDepsFixture)
+    const [workspace] = model.getExperiments()
+    expect(workspace.deps).toStrictEqual({})
   })
 
   it('should return the expected rows when given the deeply nested output fixture', () => {
