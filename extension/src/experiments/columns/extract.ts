@@ -56,10 +56,12 @@ const extractDeps = (
   const acc: DepColumns = {}
 
   for (const [path, { hash }] of Object.entries(columns)) {
-    const value = shortenForLabel(hash)
-    acc[path] = {
-      changes: !!value && !!branch && branch?.deps?.[path]?.value !== value,
-      value
+    const value = shortenForLabel<string | null>(hash)
+    if (value) {
+      acc[path] = {
+        changes: !!branch && branch?.deps?.[path]?.value !== value,
+        value
+      }
     }
   }
 

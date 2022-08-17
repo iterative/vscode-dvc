@@ -1,1 +1,8 @@
-export const shortenForLabel = (str: string): string => str.slice(0, 7)
+export const shortenForLabel = <T extends string | null>(
+  strOrNull: T
+): T | string => {
+  if (typeof strOrNull === 'string') {
+    return strOrNull?.slice(0, 7)
+  }
+  return strOrNull
+}
