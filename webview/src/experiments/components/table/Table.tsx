@@ -21,6 +21,7 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
   const { clearSelectedRows, batchSelection, lastSelectedRow } =
     React.useContext(RowSelectionContext)
   const [expColumnNeedsShadow, setExpColumnNeedsShadow] = useState(false)
+  const [tableHeadHeight, setTableHeadHeight] = useState(55)
 
   const tableRef = useRef<HTMLDivElement>(null)
 
@@ -81,9 +82,12 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
           instance={instance}
           root={tableRef.current}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
+          setTableHeadHeight={setTableHeadHeight}
         />
         {rows.map(row => (
           <TableBody
+            tableHeaderHeight={tableHeadHeight}
+            root={tableRef.current}
             row={row}
             instance={instance}
             key={row.id}

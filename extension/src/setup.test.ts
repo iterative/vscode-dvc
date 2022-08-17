@@ -1,5 +1,5 @@
-import { resolve } from 'path'
-import { extensions, Extension } from 'vscode'
+import { join, resolve } from 'path'
+import { extensions, Extension, commands } from 'vscode'
 import { setup, setupWorkspace } from './setup'
 import { flushPromises } from './test/util/jest'
 import {
@@ -16,6 +16,8 @@ import {
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { Toast } from './vscode/toast'
 import { Response } from './vscode/response'
+import { VscodePython } from './extensions/python'
+import { executeProcess } from './processExecution'
 
 jest.mock('vscode')
 jest.mock('./vscode/config')
@@ -23,8 +25,34 @@ jest.mock('./vscode/resourcePicker')
 jest.mock('./vscode/quickPick')
 jest.mock('./vscode/toast')
 jest.mock('./vscode/workspaceFolders')
+jest.mock('./processExecution')
 
 const mockedExtensions = jest.mocked(extensions)
+const mockedCommands = jest.mocked(commands)
+const mockedExecuteCommand = jest.fn()
+mockedCommands.executeCommand = mockedExecuteCommand
+
+const mockedExecuteProcess = jest.mocked(executeProcess)
+
+const mockedGetExtension = jest.fn()
+mockedExtensions.getExtension = mockedGetExtension
+
+const mockedReady = jest.fn()
+
+const mockedSettings = {
+  getExecutionDetails: () => ({
+    execCommand: [join('some', 'bin', 'path')]
+  })
+}
+
+const mockedVscodePythonAPI = {
+  ready: mockedReady,
+  settings: mockedSettings
+} as unknown as VscodePython
+
+const mockedVscodePython = {
+  activate: () => Promise.resolve(mockedVscodePythonAPI)
+}
 
 const mockedCanRunCli = jest.fn()
 const mockedHasRoots = jest.fn()
@@ -256,8 +284,14 @@ describe('setup', () => {
     mockedHasRoots.mockReturnValueOnce(true)
     mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+    mockedExecuteProcess.mockImplementation(({ executable }) =>
+      Promise.resolve(executable)
+    )
+    mockedReady.mockResolvedValue(true)
+    mockedGetExtension.mockReturnValue(mockedVscodePython)
 
     await setup(extension)
+    await flushPromises()
     expect(mockedSetRoots).toBeCalledTimes(1)
     expect(mockedGetConfigValue).toBeCalledTimes(1)
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
@@ -270,6 +304,11 @@ describe('setup', () => {
     mockedHasRoots.mockReturnValueOnce(true)
     mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
     mockedWarnWithOptions.mockResolvedValueOnce(Response.SETUP_WORKSPACE)
+    mockedExecuteProcess.mockImplementation(({ executable }) =>
+      Promise.resolve(executable)
+    )
+    mockedReady.mockResolvedValue(true)
+    mockedGetExtension.mockReturnValue(mockedVscodePython)
 
     await setup(extension)
     await flushPromises()
@@ -277,6 +316,30 @@ describe('setup', () => {
     expect(mockedGetConfigValue).toBeCalledTimes(1)
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
     expect(mockedSetupWorkspace).toBeCalledTimes(1)
+    expect(mockedExecuteCommand).not.toBeCalled()
+    expect(mockedSetUserConfigValue).not.toBeCalled()
+    expect(mockedResetMembers).toBeCalledTimes(1)
+    expect(mockedInitialize).not.toBeCalled()
+  })
+
+  it('should try to select the python interpreter if the workspace contains a DVC project, the cli cannot be found and the user decides to select the python interpreter', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedWarnWithOptions.mockResolvedValueOnce(Response.SELECT_INTERPRETER)
+    mockedExecuteProcess.mockImplementation(({ executable }) =>
+      Promise.resolve(executable)
+    )
+    mockedReady.mockResolvedValue(true)
+    mockedGetExtension.mockReturnValue(mockedVscodePython)
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedGetConfigValue).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedSetupWorkspace).toBeCalledTimes(0)
+    expect(mockedExecuteCommand).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).not.toBeCalled()
     expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
@@ -287,6 +350,11 @@ describe('setup', () => {
     mockedHasRoots.mockReturnValueOnce(true)
     mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
     mockedWarnWithOptions.mockResolvedValueOnce(Response.NEVER)
+    mockedExecuteProcess.mockImplementation(({ executable }) =>
+      Promise.resolve(executable)
+    )
+    mockedReady.mockResolvedValue(true)
+    mockedGetExtension.mockReturnValue(mockedVscodePython)
 
     await setup(extension)
     await flushPromises()
@@ -294,6 +362,7 @@ describe('setup', () => {
     expect(mockedGetConfigValue).toBeCalledTimes(1)
     expect(mockedWarnWithOptions).toBeCalledTimes(1)
     expect(mockedSetupWorkspace).not.toBeCalled()
+    expect(mockedExecuteCommand).not.toBeCalled()
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedResetMembers).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
