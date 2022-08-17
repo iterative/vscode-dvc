@@ -79,7 +79,7 @@ export interface BaseExperimentFields {
   checkpoint_parent?: string
 }
 
-type Dep = { hash: string; size: number; nfiles: null | number }
+type Dep = { hash: null | string; size: null | number; nfiles: null | number }
 type Out = Dep & { use_cache: boolean; is_data_source: boolean }
 
 export type Deps = RelPathObject<Dep>
@@ -108,6 +108,10 @@ export interface ExperimentsOutput {
   }
 }
 
+const defaultExperimentsOutput: ExperimentsOutput = {
+  workspace: { baseline: {} }
+}
+
 export interface PlotsOutput {
   [path: string]: Plot[]
 }
@@ -132,11 +136,14 @@ export class CliReader extends Cli {
     cwd: string,
     ...flags: ExperimentFlag[]
   ): Promise<ExperimentsOutput> {
-    return this.readProcessJson<ExperimentsOutput>(
+    return this.readProcess<ExperimentsOutput>(
       cwd,
+      JSON.parse,
+      JSON.stringify(defaultExperimentsOutput),
       Command.EXPERIMENT,
       SubCommand.SHOW,
-      ...flags
+      ...flags,
+      Flag.SHOW_JSON
     )
   }
 
@@ -158,7 +165,7 @@ export class CliReader extends Cli {
     return this.readProcessJson<PlotsOutput>(
       cwd,
       Command.PLOTS,
-      'diff',
+      Command.DIFF,
       ...revisions,
       Flag.OUTPUT_PATH,
       TEMP_PLOTS_DIR,

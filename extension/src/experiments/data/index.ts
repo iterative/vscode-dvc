@@ -48,7 +48,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public collectFiles(data: ExperimentsOutput) {
-    return collectFiles(data)
+    return collectFiles(data, this.collectedFiles)
   }
 
   public managedUpdate(path?: string) {
