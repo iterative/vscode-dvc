@@ -268,7 +268,14 @@ export class ExperimentsTree
 
   private getDescription() {
     const dvcRoots = this.experiments.getDvcRoots()
-    if (!definedAndNonEmpty(dvcRoots)) {
+
+    const total = sum(
+      dvcRoots.map(dvcRoot =>
+        this.experiments.getRepository(dvcRoot).getExperimentCount()
+      )
+    )
+
+    if (!total) {
       return
     }
 
@@ -276,12 +283,6 @@ export class ExperimentsTree
       dvcRoots.map(
         dvcRoot =>
           this.experiments.getRepository(dvcRoot).getSelectedRevisions().length
-      )
-    )
-
-    const total = sum(
-      dvcRoots.map(dvcRoot =>
-        this.experiments.getRepository(dvcRoot).getExperimentCount()
       )
     )
 
