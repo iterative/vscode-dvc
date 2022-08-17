@@ -159,8 +159,12 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     droppedIndex: number,
     draggedIndex: number,
     newOrder: string[],
-    oldDraggedId: string
+    oldDraggedId: string,
+    isNew: boolean
   ) => {
+    if (isNew && draggedRef) {
+      newOrder.push(draggedRef.itemId)
+    }
     const dragged = newOrder[draggedIndex]
 
     newOrder.splice(draggedIndex, 1)
@@ -177,23 +181,15 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     if (!draggedRef) {
       return
     }
-    const dragged = draggedRef.itemId
-
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId('')
     }, 0)
-    if (dragged === draggedOverId) {
+    if (draggedRef.itemId === draggedOverId) {
       dispatch(changeRef(undefined))
       return
     }
-    const newOrder = [...order]
-    const isNew = !order.includes(dragged)
-    if (isNew) {
-      newOrder.push(dragged)
-    }
-    const draggedIndex = isNew
-      ? newOrder.length - 1
-      : getIDIndex(draggedRef.itemIndex)
+    const isNew = !order.includes(draggedRef.itemId)
+    const draggedIndex = isNew ? order.length : getIDIndex(draggedRef.itemIndex)
 
     const droppedIndex = order.indexOf(e.currentTarget.id.split('__')[0])
     const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
@@ -201,7 +197,13 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
 
     if (isEnabled && isSameGroup(draggedRef.group, group)) {
-      applyDrop(orderIdxChanged, draggedIndex, newOrder, dragged)
+      applyDrop(
+        orderIdxChanged,
+        draggedIndex,
+        [...order],
+        draggedRef.itemId,
+        isNew
+      )
     }
   }
 
@@ -229,7 +231,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const handleDragOver = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
-    if (e.currentTarget.id.includes(draggedOverId)) {
+    if (draggedOverId && e.currentTarget.id.includes(draggedOverId)) {
       setIsHovering()
     }
     if (isSameGroup(draggedRef?.group, group)) {
@@ -332,8 +334,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     !hoveringSomething &&
     parentDraggedOver
   ) {
-    const lastId = wrappedItems[wrappedItems.length - 1].props.id
-    wrappedItems.push(getTarget(lastId, false))
+    wrappedItems.push(
+      getTarget(wrappedItems[wrappedItems.length - 1].props.id, false)
+    )
   }
 
   const Wrapper = wrapperComponent?.component

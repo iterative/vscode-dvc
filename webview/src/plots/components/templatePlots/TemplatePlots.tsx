@@ -208,6 +208,11 @@ export const TemplatePlots: React.FC = () => {
           }
         }
 
+        const handleDragOver = (e: DragEvent) => {
+          e.preventDefault()
+          handleEnteringSection(groupId)
+        }
+
         return (
           <div
             key={groupId}
@@ -215,7 +220,7 @@ export const TemplatePlots: React.FC = () => {
             data-testid={`plots-section_${groupId}`}
             className={classes}
             onDragEnter={() => handleEnteringSection(groupId)}
-            onDragOver={(e: DragEvent) => e.preventDefault()}
+            onDragOver={handleDragOver}
             onDrop={handleDropAtTheEnd}
           >
             <TemplatePlotsGrid
