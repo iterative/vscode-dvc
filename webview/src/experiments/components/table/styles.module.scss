@@ -129,16 +129,20 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       background-color: $bg-color;
     }
 
-    .unselectedExperiment:hover & {
+    .unselectedExperiment:not(.rowSelected):hover & {
       background-color: $row-hover-background-color;
     }
 
-    .unselectedExperiment .experimentCell:hover & {
+    .unselectedExperiment:not(.rowSelected) .experimentCell:hover & {
       background-color: $cell-hover-background-color;
     }
 
     .workspaceWithChanges.unselectedExperiment & {
       border: 1px solid $changed-color;
+    }
+
+    .rowSelected.unselectedExperiment & {
+      background-color: $row-bg-selected-color;
     }
 
     .queuedExperiment & {
@@ -156,13 +160,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       background-color: $bg-color;
     }
 
-    .runningExperiment:hover & {
+    .runningExperiment:not(.rowSelected):hover & {
       background-color: $row-hover-background-color;
       border-left-color: $row-hover-background-color;
       border-bottom-color: $row-hover-background-color;
     }
 
-    .runningExperiment .experimentCell:hover & {
+    .runningExperiment:not(.rowSelected) .experimentCell:hover & {
       background-color: $cell-hover-background-color;
       border-left-color: $cell-hover-background-color;
       border-bottom-color: $cell-hover-background-color;
@@ -171,6 +175,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     .workspaceWithChanges.runningExperiment & {
       border-right-color: $changed-color;
       border-top-color: $changed-color;
+    }
+
+    .rowSelected.runningExperiment & {
+      background-color: $row-bg-selected-color;
+      border-left-color: $row-bg-selected-color;
+      border-bottom-color: $row-bg-selected-color;
     }
   }
 }
