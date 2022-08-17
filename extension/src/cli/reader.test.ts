@@ -79,7 +79,7 @@ describe('CliReader', () => {
       })
     })
 
-    it('should return the default output if the cli returns an empty repo error', async () => {
+    it('should return the default output if the cli returns an unexpected error (255 exit code)', async () => {
       const cwd = __dirname
       const error = new Error('unexpected error - something something')
       ;(error as MaybeConsoleError).exitCode = UNEXPECTED_ERROR_CODE
