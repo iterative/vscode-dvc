@@ -1,22 +1,15 @@
+import { UNEXPECTED_ERROR_CODE } from './constants'
+import { MaybeConsoleError } from './error'
 import { delay } from '../util/time'
 import { Logger } from '../common/logger'
 
-const isNonRetryError = (
-  errorMessage: string,
-  nonRetryErrors: string[]
-): boolean => {
-  for (const partialErrorMessage of nonRetryErrors) {
-    if (errorMessage.includes(partialErrorMessage)) {
-      return true
-    }
-  }
-  return false
+const isUnexpectedError = (error: unknown): boolean => {
+  return (error as MaybeConsoleError).exitCode === UNEXPECTED_ERROR_CODE
 }
 
 export const retry = async (
   getNewPromise: () => Promise<string>,
   args: string,
-  nonRetryErrors: string[],
   waitBeforeRetry = 500
 ): Promise<string> => {
   try {
@@ -25,11 +18,11 @@ export const retry = async (
     const errorMessage = (error as Error).message
     Logger.error(`${args} failed with ${errorMessage} retrying...`)
 
-    if (isNonRetryError(errorMessage, nonRetryErrors)) {
+    if (isUnexpectedError(error)) {
       return ''
     }
 
     await delay(waitBeforeRetry)
-    return retry(getNewPromise, args, nonRetryErrors, waitBeforeRetry * 2)
+    return retry(getNewPromise, args, waitBeforeRetry * 2)
   }
 }

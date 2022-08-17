@@ -2,7 +2,8 @@ import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { CliResult, CliStarted } from '.'
-import { EMPTY_REPO_ERROR } from './constants'
+import { UNEXPECTED_ERROR_CODE } from './constants'
+import { MaybeConsoleError } from './error'
 import { CliReader, ExperimentsOutput } from './reader'
 import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
@@ -80,8 +81,10 @@ describe('CliReader', () => {
 
     it('should return the default output if the cli returns an empty repo error', async () => {
       const cwd = __dirname
+      const error = new Error('unexpected error - something something')
+      ;(error as MaybeConsoleError).exitCode = UNEXPECTED_ERROR_CODE
       mockedCreateProcess.mockImplementationOnce(() => {
-        throw new Error(EMPTY_REPO_ERROR)
+        throw error
       })
 
       const cliOutput = await cliReader.expShow(cwd)

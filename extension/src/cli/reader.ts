@@ -3,7 +3,6 @@ import { Cli, typeCheckCommands } from '.'
 import {
   Args,
   Command,
-  EMPTY_REPO_ERROR,
   ExperimentFlag,
   Flag,
   ListFlag,
@@ -137,13 +136,14 @@ export class CliReader extends Cli {
     cwd: string,
     ...flags: ExperimentFlag[]
   ): Promise<ExperimentsOutput> {
-    return this.readProcessJsonWithKnownErrors<ExperimentsOutput>(
+    return this.readProcess<ExperimentsOutput>(
       cwd,
+      JSON.parse,
+      JSON.stringify(defaultExperimentsOutput),
       Command.EXPERIMENT,
-      defaultExperimentsOutput,
-      [EMPTY_REPO_ERROR],
       SubCommand.SHOW,
-      ...flags
+      ...flags,
+      Flag.SHOW_JSON
     )
   }
 
@@ -162,11 +162,9 @@ export class CliReader extends Cli {
   }
 
   public plotsDiff(cwd: string, ...revisions: string[]): Promise<PlotsOutput> {
-    return this.readProcessJsonWithKnownErrors<PlotsOutput>(
+    return this.readProcessJson<PlotsOutput>(
       cwd,
       Command.PLOTS,
-      {},
-      [EMPTY_REPO_ERROR],
       Command.DIFF,
       ...revisions,
       Flag.OUTPUT_PATH,
@@ -193,15 +191,11 @@ export class CliReader extends Cli {
     cwd: string,
     formatter: typeof trimAndSplit | typeof JSON.parse | typeof trim,
     defaultValue: string,
-    nonRetryErrors: string[],
     ...args: Args
   ): Promise<T> {
     const output =
-      (await retry(
-        () => this.executeProcess(cwd, ...args),
-        args.join(' '),
-        nonRetryErrors
-      )) || defaultValue
+      (await retry(() => this.executeProcess(cwd, ...args), args.join(' '))) ||
+      defaultValue
     if (!formatter) {
       return output as unknown as T
     }
@@ -213,25 +207,6 @@ export class CliReader extends Cli {
       cwd,
       JSON.parse,
       '{}',
-      [],
-      command,
-      ...args,
-      Flag.SHOW_JSON
-    )
-  }
-
-  private readProcessJsonWithKnownErrors<T>(
-    cwd: string,
-    command: Command,
-    defaultValue: T,
-    nonRetryErrors: string[],
-    ...args: Args
-  ) {
-    return this.readProcess<T>(
-      cwd,
-      JSON.parse,
-      JSON.stringify(defaultValue),
-      nonRetryErrors,
       command,
       ...args,
       Flag.SHOW_JSON
