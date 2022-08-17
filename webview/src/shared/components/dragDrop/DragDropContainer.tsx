@@ -166,7 +166,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       newOrder.push(draggedRef.itemId)
     }
     const dragged = newOrder[draggedIndex]
-
     newOrder.splice(draggedIndex, 1)
     newOrder.splice(droppedIndex, 0, dragged)
 
@@ -184,26 +183,20 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     draggedOverIdTimeout.current = window.setTimeout(() => {
       setDraggedId('')
     }, 0)
-    if (draggedRef.itemId === draggedOverId) {
+    const dragged = draggedRef.itemId
+    if (dragged === draggedOverId) {
       dispatch(changeRef(undefined))
       return
     }
-    const isNew = !order.includes(draggedRef.itemId)
+    const isNew = !order.includes(dragged)
     const draggedIndex = isNew ? order.length : getIDIndex(draggedRef.itemIndex)
-
     const droppedIndex = order.indexOf(e.currentTarget.id.split('__')[0])
     const orderIdxChange = orderIdxTune(direction, droppedIndex > draggedIndex)
     const orderIdxChanged = droppedIndex + orderIdxChange
     const isEnabled = !disabledDropIds.includes(order[orderIdxChanged])
 
     if (isEnabled && isSameGroup(draggedRef.group, group)) {
-      applyDrop(
-        orderIdxChanged,
-        draggedIndex,
-        [...order],
-        draggedRef.itemId,
-        isNew
-      )
+      applyDrop(orderIdxChanged, draggedIndex, [...order], dragged, isNew)
     }
   }
 
@@ -214,7 +207,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
     setIsHovering()
-
     if (isSameGroup(draggedRef?.group, group)) {
       const { id } = e.currentTarget
       if (
@@ -297,10 +289,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const createItemWithDropTarget = (id: string, item: JSX.Element) => {
     const isEnteringRight = direction === DragEnterDirection.RIGHT
-    const target =
+    const isSameGroup =
       draggedOverGroup === group || draggedRef?.group === group
-        ? getTarget(id, isEnteringRight)
-        : null
+    const target = isSameGroup ? getTarget(id, isEnteringRight) : null
 
     const itemWithTag = shouldShowOnDrag ? (
       <div key="item" {...item.props} />
@@ -334,9 +325,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     !hoveringSomething &&
     parentDraggedOver
   ) {
-    wrappedItems.push(
-      getTarget(wrappedItems[wrappedItems.length - 1].props.id, false)
-    )
+    const lastId = wrappedItems[wrappedItems.length - 1].props.id
+    wrappedItems.push(getTarget(lastId, false))
   }
 
   const Wrapper = wrapperComponent?.component
