@@ -109,8 +109,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const createGhostStyle = (e: DragEvent<HTMLElement>) => {
     if (ghostElemStyle) {
       for (const [rule, value] of Object.entries(ghostElemStyle)) {
-        const prop = getStyleProperty(rule)
-        e.currentTarget.style[prop] = value
+        e.currentTarget.style[getStyleProperty(rule)] = value
       }
     }
   }
@@ -119,8 +118,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const elem = idToNode(id)
     if (elem && ghostElemStyle) {
       for (const [rule] of Object.entries(ghostElemStyle)) {
-        const prop = getStyleProperty(rule)
-        elem.style[prop] = ''
+        elem.style[getStyleProperty(rule)] = ''
       }
     }
   }
@@ -136,7 +134,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         toIdx = 0
       }
     }
-    const itemIndex = idx.toString()
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
 
@@ -146,7 +143,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         changeRef({
           group,
           itemId: id,
-          itemIndex
+          itemIndex: idx.toString()
         })
       )
       setDraggedId(id)
