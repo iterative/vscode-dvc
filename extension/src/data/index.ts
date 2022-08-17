@@ -16,8 +16,8 @@ export abstract class BaseData<
   protected readonly dvcRoot: string
   protected readonly processManager: ProcessManager
   protected readonly internalCommands: InternalCommands
+  protected collectedFiles: string[] = []
 
-  private collectedFiles: string[] = []
   private readonly staticFiles: string[]
 
   private readonly updated: EventEmitter<T> = this.dispose.track(
