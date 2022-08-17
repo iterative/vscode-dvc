@@ -808,6 +808,68 @@ describe('App', () => {
     expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
   })
 
+  it('should show a drop target at the end of the section when moving a plot inside of one section but not over any other plot', () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+    dragEnter(aSingleViewPlot, 'template-single_0', DragEnterDirection.LEFT)
+
+    expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
+  })
+
+  it('should drop a plot at the end of the section when moving a plot inside of one section but not over any other plot', () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+    const topSection = screen.getByTestId('plots-section_template-single_0')
+
+    dragAndDrop(aSingleViewPlot, topSection)
+    const plots = within(topSection).getAllByTestId(/^plot_/)
+
+    expect(plots.map(plot => plot.id)).toStrictEqual([
+      join('logs', 'loss.tsv'),
+      join('other', 'plot.tsv')
+    ])
+  })
+
+  it('should show a drop target at the end of the checkpoint plots when moving a plot inside the section but not over any other plot', () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    const plots = screen.getAllByTestId(/summary\.json/)
+
+    dragEnter(plots[0], 'checkpoint-plots', DragEnterDirection.LEFT)
+
+    expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
+  })
+
+  it('should show a drop a plot at the end of the checkpoint plots when moving a plot inside the section but not over any other plot', () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    const plots = screen.getAllByTestId(/summary\.json/)
+
+    dragAndDrop(plots[0], screen.getByTestId('checkpoint-plots'))
+
+    const expectedOrder = [
+      'summary.json:accuracy',
+      'summary.json:val_loss',
+      'summary.json:val_accuracy',
+      'summary.json:loss'
+    ]
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual(expectedOrder)
+  })
+
   it('should show a drop zone when hovering a new section', () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture

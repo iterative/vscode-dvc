@@ -71,6 +71,8 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
 
   return items.length > 0 ? (
     <div
+      data-testid="checkpoint-plots"
+      id="checkpoint-plots"
       className={cx(styles.singleViewPlotsGrid, {
         [styles.noBigGrid]: !useVirtualizedGrid
       })}
