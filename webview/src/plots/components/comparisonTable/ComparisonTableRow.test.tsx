@@ -96,14 +96,31 @@ describe('ComparisonTableRow', () => {
     const rowToggler = screen.getByText(basicProps.path)
     const [row] = screen.getAllByTestId('row-images')
 
-    createWindowTextSelection(rowToggler, 5)
+    createWindowTextSelection(basicProps.path, 5)
     fireEvent.click(rowToggler)
 
-    expect(row).toHaveClass(styles.cellHidden)
+    expect(row).not.toHaveClass(styles.cellHidden)
 
     clearSelection()
     fireEvent.click(rowToggler)
 
+    expect(row).toHaveClass(styles.cellHidden)
+
+    createWindowTextSelection(basicProps.path, 0)
+    fireEvent.click(rowToggler)
+
     expect(row).not.toHaveClass(styles.cellHidden)
+  })
+
+  it('should toggle the row if some other path is selected', () => {
+    renderRow()
+
+    const rowToggler = screen.getByText(basicProps.path)
+    const [row] = screen.getAllByTestId('row-images')
+
+    createWindowTextSelection('other/path/img.gif', 5)
+    fireEvent.click(rowToggler)
+
+    expect(row).toHaveClass(styles.cellHidden)
   })
 })
