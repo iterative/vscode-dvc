@@ -9,6 +9,7 @@ import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
+import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -33,13 +34,18 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   return (
     <tbody>
       <tr>
-        <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
-          <button className={styles.rowToggler} onClick={toggleIsShownState}>
-            <Icon icon={isShown ? ChevronDown : ChevronRight} />
-            {path}
-          </button>
+        <td
+          className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
+          colSpan={nbColumns}
+        >
+          <div className={styles.rowPath}>
+            <button className={styles.rowToggler} onClick={toggleIsShownState}>
+              <Icon icon={isShown ? ChevronDown : ChevronRight} />
+              {path}
+            </button>
+            <CopyButton value={path} className={styles.copyButton} />
+          </div>
         </td>
-        {nbColumns > 1 && <td colSpan={nbColumns - 1}></td>}
       </tr>
       <tr>
         {plots.map((plot: ComparisonPlot) => {
