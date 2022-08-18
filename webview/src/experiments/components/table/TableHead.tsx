@@ -49,7 +49,7 @@ export const TableHead = ({
     if (wrapperHeight) {
       setTableHeadHeight(wrapperHeight)
     }
-  }, [setTableHeadHeight])
+  }, [setTableHeadHeight, headerGroups])
 
   const onDragStart: DragFunction = ({ currentTarget }) => {
     const displacerHeader = allHeaders.find(
