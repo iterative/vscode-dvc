@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect } from 'react'
+import cx from 'classnames'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Column, Row, ColumnType } from 'dvc/src/experiments/webview/contract'
 import {
@@ -133,6 +134,7 @@ export const ExperimentsTable: React.FC = () => {
     hasColumns,
     rows: data
   } = useSelector((state: ExperimentsState) => state.tableData)
+  const [isResizing, setIsResizing] = useState(false)
   const columns = getColumns(columnsData)
   const initialState = {
     columnOrder,
@@ -161,8 +163,12 @@ export const ExperimentsTable: React.FC = () => {
     },
     hooks => {
       hooks.stateReducers.push((state, action) => {
+        if (action.type === 'columnStartResizing') {
+          setIsResizing(true)
+        }
         if (action.type === 'columnDoneResizing') {
           reportResizedColumn(state)
+          setIsResizing(false)
         }
         return state
       })
@@ -201,9 +207,14 @@ export const ExperimentsTable: React.FC = () => {
   }
 
   return (
-    <RowSelectionProvider>
-      <Table instance={instance} />
-    </RowSelectionProvider>
+    <div
+      data-testid="table-wrapper"
+      className={cx({ [styles.noSelect]: isResizing })}
+    >
+      <RowSelectionProvider>
+        <Table instance={instance} />
+      </RowSelectionProvider>
+    </div>
   )
 }
 

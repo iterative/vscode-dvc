@@ -767,3 +767,7 @@ $badge-size: 0.85rem;
     }
   }
 }
+
+.noSelect {
+  user-select: none;
+}
