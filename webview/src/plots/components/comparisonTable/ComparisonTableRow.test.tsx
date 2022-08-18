@@ -14,6 +14,10 @@ import {
 } from './ComparisonTableRow'
 import styles from '../styles.module.scss'
 import { plotsReducers } from '../../store'
+import {
+  clearSelection,
+  createWindowTextSelection
+} from '../../../test/selection'
 
 jest.mock('../../../shared/api')
 
@@ -67,27 +71,39 @@ describe('ComparisonTableRow', () => {
     renderRow()
 
     const rowToggler = screen.getByText(basicProps.path)
-    const [plot] = screen.getAllByAltText(
-      /(Plot of path\/to\/the-file\/image\.png)/
-    )
+    const [row] = screen.getAllByTestId('row-images')
 
-    /* eslint-disable testing-library/no-node-access */
-    expect(plot.parentElement).not.toHaveClass(styles.cellHidden)
+    expect(row).not.toHaveClass(styles.cellHidden)
 
     fireEvent.click(rowToggler, {
       bubbles: true,
       cancelable: true
     })
 
-    /* eslint-disable testing-library/no-node-access */
-    expect(plot.parentElement).toHaveClass(styles.cellHidden)
+    expect(row).toHaveClass(styles.cellHidden)
 
     fireEvent.click(rowToggler, {
       bubbles: true,
       cancelable: true
     })
 
-    /* eslint-disable testing-library/no-node-access */
-    expect(plot.parentElement).not.toHaveClass(styles.cellHidden)
+    expect(row).not.toHaveClass(styles.cellHidden)
+  })
+
+  it('should not toggle the row if the path was selected', () => {
+    renderRow()
+
+    const rowToggler = screen.getByText(basicProps.path)
+    const [row] = screen.getAllByTestId('row-images')
+
+    createWindowTextSelection(rowToggler, 5)
+    fireEvent.click(rowToggler)
+
+    expect(row).toHaveClass(styles.cellHidden)
+
+    clearSelection()
+    fireEvent.click(rowToggler)
+
+    expect(row).not.toHaveClass(styles.cellHidden)
   })
 })

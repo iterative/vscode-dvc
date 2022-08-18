@@ -29,7 +29,16 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   )
   const [isShown, setIsShown] = useState(true)
 
-  const toggleIsShownState = () => setIsShown(!isShown)
+  const toggleIsShownState = () => {
+    const selection = window.getSelection()
+    if (
+      selection?.focusNode?.nodeValue === path &&
+      selection.anchorOffset !== selection.focusOffset
+    ) {
+      return
+    }
+    setIsShown(!isShown)
+  }
 
   return (
     <tbody>
@@ -62,6 +71,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
               })}
             >
               <div
+                data-testid="row-images"
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
                 {missing ? (
