@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.20] - 2022-08-18
+
+### 🚀 New Features and Enhancements
+
+- Show min tested version in toast warning message [#2209](https://github.com/iterative/vscode-dvc/pull/2209) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix sticky workspace row obscuring branch [#2212](https://github.com/iterative/vscode-dvc/pull/2212) by [@mattseddon](https://github.com/mattseddon)
+- Make drop zones larger when dragging in the same section [#2206](https://github.com/iterative/vscode-dvc/pull/2206) by [@sroy3](https://github.com/sroy3)
+
 ## [0.3.19] - 2022-08-18
 
 ### 🚀 New Features and Enhancements
