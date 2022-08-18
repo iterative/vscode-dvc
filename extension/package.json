@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.17",
+  "version": "0.3.18",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {

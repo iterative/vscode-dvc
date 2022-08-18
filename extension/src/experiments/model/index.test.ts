@@ -1,3 +1,5 @@
+/* eslint-disable sort-keys-fix/sort-keys-fix */
+import { join } from 'path'
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
 import { copyOriginalColors } from './status/colors'
@@ -8,6 +10,7 @@ import {
   deeplyNestedOutput,
   rows as deeplyNestedRows
 } from '../../test/fixtures/expShow/deeplyNested'
+import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps'
 import { buildMockMemento } from '../../test/util'
 import { buildMetricOrParamPath } from '../columns/paths'
 import { Experiment, ColumnType } from '../webview/contract'
@@ -72,6 +75,96 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
+  })
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  it('should handle a new dep file being introduced in the workspace', () => {
+    const newDep = join('data', '.ldb_workspace')
+    const shaWithChange = '060985f9883e99cad9efbd5e0c0d1797aa54f23a'
+    const existingDep = {
+      'train.py': {
+        hash: '5ca8bcdcff40d2eea929628131aa53c6',
+        size: 3741,
+        nfiles: null
+      }
+    }
+
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet({
+      workspace: {
+        baseline: {
+          data: {
+            executor: null,
+            params: { 'params.yaml': { data: { epochs: 100 } } },
+            queued: false,
+            running: false,
+            timestamp: null
+          }
+        }
+      },
+      '0e7fbf190b78e7f8fdae6531bae123739e2db99b': {
+        baseline: {
+          data: {
+            deps: existingDep,
+            executor: null,
+            name: 'main',
+            params: { 'params.yaml': { data: { epochs: 100 } } },
+            queued: false,
+            running: false,
+            timestamp: '2022-08-10T19:40:14'
+          }
+        },
+        [shaWithChange]: {
+          data: {
+            deps: {
+              ...existingDep,
+              [newDep]: {
+                hash: '3f2d494f913d08ab7b52927137b9b04c.dir',
+                nfiles: 9737,
+                size: 311710
+              }
+            },
+            executor: null,
+            name: 'exp-750e4',
+            queued: false,
+            running: false,
+            timestamp: '2022-08-11T23:04:39'
+          }
+        },
+        '46ce5efeba777f70a3f87177f9177995243ac828': {
+          data: {
+            deps: existingDep,
+            executor: null,
+            name: 'exp-d6ddc',
+            params: { 'params.yaml': { data: { epochs: 100 } } },
+            queued: false,
+            running: false,
+            timestamp: '2022-08-11T22:55:46'
+          }
+        }
+      }
+    })
+
+    const experiments = model.getExperiments()
+
+    const changed: string[] = []
+    for (const { deps, sha } of experiments) {
+      if (sha && deps) {
+        for (const { changes } of Object.values(deps)) {
+          if (changes) {
+            changed.push(sha)
+          }
+        }
+      }
+    }
+    expect(changed).toStrictEqual([shaWithChange])
+  })
+
+  it('should handle deps have all null properties (never been committed)', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(uncommittedDepsFixture)
+    const [workspace] = model.getExperiments()
+    expect(workspace.deps).toStrictEqual({})
   })
 
   it('should return the expected rows when given the deeply nested output fixture', () => {

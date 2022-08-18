@@ -2,7 +2,9 @@ import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { CliResult, CliStarted } from '.'
-import { CliReader } from './reader'
+import { UNEXPECTED_ERROR_CODE } from './constants'
+import { MaybeConsoleError } from './error'
+import { CliReader, ExperimentsOutput } from './reader'
 import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
 import { getProcessEnv } from '../env'
@@ -75,6 +77,39 @@ describe('CliReader', () => {
         env: mockedEnv,
         executable: 'dvc'
       })
+    })
+
+    it('should return the default output if the cli returns an unexpected error (255 exit code)', async () => {
+      const cwd = __dirname
+      const error = new Error('unexpected error - something something')
+      ;(error as MaybeConsoleError).exitCode = UNEXPECTED_ERROR_CODE
+      mockedCreateProcess.mockImplementationOnce(() => {
+        throw error
+      })
+
+      const cliOutput = await cliReader.expShow(cwd)
+      expect(cliOutput).toStrictEqual({ workspace: { baseline: {} } })
+    })
+
+    it('should retry the cli given any other type of error', async () => {
+      const cwd = __dirname
+      const mockOutput: ExperimentsOutput = {
+        workspace: {
+          baseline: {
+            data: { params: { 'params.yaml': { data: { epochs: 100000000 } } } }
+          }
+        }
+      }
+      mockedCreateProcess.mockImplementationOnce(() => {
+        throw new Error('error that should be retried')
+      })
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess(JSON.stringify(mockOutput))
+      )
+
+      const cliOutput = await cliReader.expShow(cwd)
+      expect(cliOutput).toStrictEqual(mockOutput)
+      expect(mockedCreateProcess).toBeCalledTimes(2)
     })
   })
 
