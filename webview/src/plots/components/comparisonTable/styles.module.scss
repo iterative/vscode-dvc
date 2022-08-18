@@ -94,6 +94,7 @@ $gap: 4px;
   color: $fg-color;
   text-align: left;
   display: flex;
+  user-select: text;
 
   svg {
     fill: $fg-color;
