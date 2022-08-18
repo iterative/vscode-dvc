@@ -6,7 +6,8 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import { Title } from '../../vscode/title'
-import { Args } from '../../cli/constants'
+import { gitPushBranch } from '../../git'
+import { Toast } from '../../vscode/toast'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -150,19 +151,19 @@ const registerExperimentInputCommands = (
   experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
 ): void => {
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_BRANCH,
-    () =>
-      experiments.getCwdExpNameAndInputThenRun(
-        Title.ENTER_BRANCH_NAME,
-        (cwd, ...args: Args) =>
-          experiments.runCommand(
-            AvailableCommands.EXPERIMENT_BRANCH,
-            cwd,
-            ...args
-          )
-      )
-  )
+  // internalCommands.registerExternalCliCommand(
+  //   RegisteredCliCommands.EXPERIMENT_BRANCH,
+  //   () =>
+  //     experiments.getCwdExpNameAndInputThenRun(
+  //       Title.ENTER_BRANCH_NAME,
+  //       (cwd, ...args: Args) =>
+  //         experiments.runCommand(
+  //           AvailableCommands.EXPERIMENT_BRANCH,
+  //           cwd,
+  //           ...args
+  //         )
+  //     )
+  // )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
@@ -171,12 +172,22 @@ const registerExperimentInputCommands = (
         Title.ENTER_BRANCH_NAME,
         dvcRoot,
         id,
-        (...args: Args) =>
-          experiments.runCommand(
+        async (name: string, input: string) => {
+          await experiments.runCommand(
             AvailableCommands.EXPERIMENT_BRANCH,
             dvcRoot,
-            ...args
+            name,
+            input
           )
+          await experiments.runCommand(
+            AvailableCommands.EXPERIMENT_APPLY,
+            dvcRoot,
+            name
+          )
+          await experiments.runCommand(AvailableCommands.PUSH, dvcRoot)
+          const std = gitPushBranch(dvcRoot, input)
+          return Toast.showOutput(std)
+        }
       )
   )
 }
