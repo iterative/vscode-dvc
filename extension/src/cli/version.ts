@@ -36,7 +36,7 @@ const warnIfAheadOfLatestTested = (
   ) as ParsedSemver
 
   if (currentMajor === latestTestedMajor && currentMinor > latestTestedMinor) {
-    Toast.warnWithOptions(`The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with. 
+    Toast.warnWithOptions(`The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). 
 		This could lead to unexpected behaviour. 
 		Please upgrade to the most recent version of the extension and reload this window.`)
   }
