@@ -133,10 +133,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       background-color: $row-hover-background-color;
     }
 
-    .unselectedExperiment:not(.rowSelected) .experimentCell:hover & {
-      background-color: $cell-hover-background-color;
-    }
-
     .workspaceWithChanges.unselectedExperiment & {
       border: 1px solid $changed-color;
     }
@@ -164,12 +160,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       background-color: $row-hover-background-color;
       border-left-color: $row-hover-background-color;
       border-bottom-color: $row-hover-background-color;
-    }
-
-    .runningExperiment:not(.rowSelected) .experimentCell:hover & {
-      background-color: $cell-hover-background-color;
-      border-left-color: $cell-hover-background-color;
-      border-bottom-color: $cell-hover-background-color;
     }
 
     .workspaceWithChanges.runningExperiment & {
@@ -289,9 +279,17 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         background-color: $row-hover-background-color;
       }
 
-      .td:hover:not(.experimentCell),
-      .experimentCell:hover:before {
-        background-color: $cell-hover-background-color;
+      .td:hover {
+        border-right-color: $border-color;
+        border-left-color: $border-color;
+
+        &:first-child:before {
+          border-right-color: $border-color;
+        }
+
+        &:last-child {
+          border-right-color: transparent;
+        }
       }
     }
 
@@ -444,6 +442,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
 
     &:first-child {
       .innerCell {
@@ -461,6 +461,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     display: flex;
     flex-flow: row nowrap;
     text-align: left;
+    border-right: none;
+    border-left: none;
+
+    &:before {
+      border-right: 1px solid transparent;
+    }
 
     .innerCell {
       justify-content: flex-start;
