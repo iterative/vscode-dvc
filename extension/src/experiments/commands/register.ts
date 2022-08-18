@@ -6,6 +6,7 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import { Title } from '../../vscode/title'
+import { Args } from '../../cli/constants'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -153,8 +154,13 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_BRANCH,
     () =>
       experiments.getCwdExpNameAndInputThenRun(
-        AvailableCommands.EXPERIMENT_BRANCH,
-        Title.ENTER_BRANCH_NAME
+        Title.ENTER_BRANCH_NAME,
+        (cwd, ...args: Args) =>
+          experiments.runCommand(
+            AvailableCommands.EXPERIMENT_BRANCH,
+            cwd,
+            ...args
+          )
       )
   )
 
@@ -162,10 +168,15 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
-        AvailableCommands.EXPERIMENT_BRANCH,
         Title.ENTER_BRANCH_NAME,
         dvcRoot,
-        id
+        id,
+        (...args: Args) =>
+          experiments.runCommand(
+            AvailableCommands.EXPERIMENT_BRANCH,
+            dvcRoot,
+            ...args
+          )
       )
   )
 }
