@@ -808,7 +808,7 @@ describe('App', () => {
     expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
   })
 
-  it('should show a drop target at the end of the section when moving a plot inside of one section but not over any other plot', () => {
+  it('should show a drop target at the end of the template plots section when moving a plot inside of one section but not over any other plot', () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
     })
@@ -820,7 +820,7 @@ describe('App', () => {
     expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
   })
 
-  it('should drop a plot at the end of the section when moving a plot inside of one section but not over any other plot', () => {
+  it('should drop a plot at the end of the template plots section when moving a plot inside of one section but not over any other plot', () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
     })
