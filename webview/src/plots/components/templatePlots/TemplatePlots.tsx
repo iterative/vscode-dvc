@@ -7,6 +7,7 @@ import React, { DragEvent, useState, useEffect, useRef } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { reorderObjectList } from 'dvc/src/util/array'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { removeFromPreviousAndAddToNewSection } from './util'
@@ -19,6 +20,8 @@ import { PlotsState } from '../../store'
 import { plotDataStore } from '../plotDataStore'
 import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
+import { changeOrderWithDraggedInfo } from '../../../util/array'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -120,7 +123,7 @@ export const TemplatePlots: React.FC = () => {
     draggedId: string,
     draggedGroup: string,
     groupId: string,
-    position: number
+    position?: number
   ) => {
     if (draggedGroup === groupId) {
       return
@@ -169,34 +172,69 @@ export const TemplatePlots: React.FC = () => {
 
         const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
 
-        const classes = cx({
+        const classes = cx(styles.sectionWrapper, {
           [styles.multiViewPlotsGrid]: isMultiView,
           [styles.singleViewPlotsGrid]: !isMultiView,
           [styles.noBigGrid]: !useVirtualizedGrid
         })
 
+        const handleDropAtTheEnd = () => {
+          handleEnteringSection('')
+          if (!draggedRef) {
+            return
+          }
+
+          if (draggedRef.group === groupId) {
+            const order = section.entries.map(s => s.id)
+            const updatedSections = [...sections]
+
+            const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
+            updatedSections[i] = {
+              ...sections[i],
+              entries: reorderObjectList<TemplatePlotEntry>(
+                newOrder,
+                section.entries,
+                'id'
+              )
+            }
+            setSections(updatedSections)
+          } else if (isSameGroup(draggedRef.group, groupId)) {
+            handleDropInSection(
+              draggedRef.itemId,
+              draggedRef.group,
+              groupId,
+              section.entries.length
+            )
+          }
+        }
+
+        const handleDragOver = (e: DragEvent) => {
+          e.preventDefault()
+          handleEnteringSection(groupId)
+        }
+
         return (
-          section.entries.length > 0 && (
-            <div
-              key={groupId}
-              id={groupId}
-              data-testid={`plots-section_${groupId}`}
-              className={classes}
-              onDragEnter={() => handleEnteringSection(groupId)}
-            >
-              <TemplatePlotsGrid
-                entries={section.entries}
-                groupId={groupId}
-                groupIndex={i}
-                onDropInSection={handleDropInSection}
-                multiView={isMultiView}
-                setSectionEntries={setSectionEntries}
-                useVirtualizedGrid={useVirtualizedGrid}
-                nbItemsPerRow={nbItemsPerRow}
-                parentDraggedOver={draggedOverGroup === groupId}
-              />
-            </div>
-          )
+          <div
+            key={groupId}
+            id={groupId}
+            data-testid={`plots-section_${groupId}`}
+            className={classes}
+            onDragEnter={() => handleEnteringSection(groupId)}
+            onDragOver={handleDragOver}
+            onDrop={handleDropAtTheEnd}
+          >
+            <TemplatePlotsGrid
+              entries={section.entries}
+              groupId={groupId}
+              groupIndex={i}
+              onDropInSection={handleDropInSection}
+              multiView={isMultiView}
+              setSectionEntries={setSectionEntries}
+              useVirtualizedGrid={useVirtualizedGrid}
+              nbItemsPerRow={nbItemsPerRow}
+              parentDraggedOver={draggedOverGroup === groupId}
+            />
+          </div>
         )
       })}
       <AddedSection
