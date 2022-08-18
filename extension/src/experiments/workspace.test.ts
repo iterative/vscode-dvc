@@ -12,6 +12,7 @@ import { buildMockMemento } from '../test/util'
 import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
+import { Args } from '../cli/constants'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -185,7 +186,7 @@ describe('Experiments', () => {
     })
   })
 
-  describe('getExpNameAndInputThenRun', () => {
+  describe('getCwdExpNameAndInputThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked and an input provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedPickCurrentExperiment.mockResolvedValueOnce({
@@ -195,8 +196,9 @@ describe('Experiments', () => {
       mockedGetInput.mockResolvedValueOnce('abc123')
 
       await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        mockedCommandId,
-        'enter your password please' as Title
+        'enter your password please' as Title,
+        (cwd: string, ...args: Args) =>
+          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args)
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -209,8 +211,9 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
       await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        mockedCommandId,
-        'please name the branch' as Title
+        'please name the branch' as Title,
+        (cwd: string, ...args: Args) =>
+          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args)
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -227,8 +230,9 @@ describe('Experiments', () => {
       mockedGetInput.mockResolvedValueOnce(undefined)
 
       await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        mockedCommandId,
-        'please enter your bank account number and sort code' as Title
+        'please enter your bank account number and sort code' as Title,
+        (cwd: string, ...args: Args) =>
+          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args)
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)

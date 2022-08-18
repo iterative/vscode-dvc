@@ -222,10 +222,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
   }
 
-  public getCwdExpNameAndInputThenRun = async (
-    commandId: CommandId,
-    title: Title
-  ) => {
+  public async getCwdExpNameAndInputThenRun(
+    title: Title,
+    runCommand: (cwd: string, ...args: Args) => Promise<void>
+  ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
@@ -236,14 +236,14 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!experiment) {
       return
     }
-    return this.getInputAndRun(commandId, cwd, title, experiment.name)
+    return this.getInputAndRun(runCommand, title, cwd, experiment.name)
   }
 
   public getExpNameAndInputThenRun(
-    commandId: CommandId,
     title: Title,
     cwd: string,
-    id: string
+    id: string,
+    runCommand: (...args: Args) => Promise<void>
   ) {
     const name = this.getRepository(cwd)?.getExperimentDisplayName(id)
 
@@ -251,20 +251,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return this.getInputAndRun(commandId, cwd, title, name)
-  }
-
-  public async getInputAndRun(
-    commandId: CommandId,
-    cwd: string,
-    title: Title,
-    ...args: Args
-  ) {
-    const input = await getInput(title)
-    if (!input) {
-      return
-    }
-    return this.runCommand(commandId, cwd, ...args, input)
+    return this.getInputAndRun(runCommand, title, name)
   }
 
   public getExpNameThenRun(commandId: CommandId, cwd: string, id: string) {
@@ -358,6 +345,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     return this.runCommand(commandId, cwd, experiment.name)
+  }
+
+  private async getInputAndRun(
+    runCommand: (...args: Args) => Promise<void>,
+    title: Title,
+    ...args: Args
+  ) {
+    const input = await getInput(title)
+    if (!input) {
+      return
+    }
+    return runCommand(...args, input)
   }
 
   private pickCurrentExperiment(cwd: string) {
