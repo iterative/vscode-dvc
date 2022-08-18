@@ -1059,4 +1059,22 @@ describe('App', () => {
       type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
     })
   })
+
+  it('should disable text selection while resizing', async () => {
+    renderTable()
+
+    expect(document.body).not.toHaveClass(styles.noSelect)
+
+    const [experimentColumnResizeHandle] = await screen.findAllByRole(
+      'separator'
+    )
+
+    fireEvent.mouseDown(experimentColumnResizeHandle)
+
+    expect(document.body).toHaveClass(styles.noSelect)
+
+    fireEvent.mouseUp(experimentColumnResizeHandle)
+
+    expect(document.body).not.toHaveClass(styles.noSelect)
+  })
 })
