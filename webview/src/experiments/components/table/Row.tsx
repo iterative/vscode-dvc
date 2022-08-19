@@ -115,13 +115,12 @@ const getRunResumeOptions = (
     hidden?: boolean,
     divider?: boolean
   ) => MessagesMenuOptionProps,
-  isWorkspace: boolean,
   projectHasCheckpoints: boolean,
   hideVaryAndRun: boolean,
   depth: number
 ) => {
-  const isNotCheckpoint = depth <= 1 || isWorkspace
-  const isExperiment = depth === 1
+  const isCheckpoint = depth > 1
+  const isNotExperiment = depth !== 1
 
   const resetNeedsSeparator = !hideVaryAndRun && projectHasCheckpoints
   const runNeedsSeparator = !hideVaryAndRun && !projectHasCheckpoints
@@ -130,24 +129,24 @@ const getRunResumeOptions = (
     withId(
       'Modify, Reset and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
-      !isNotCheckpoint || !projectHasCheckpoints,
+      isCheckpoint || !projectHasCheckpoints,
       resetNeedsSeparator
     ),
     withId(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
-      !isNotCheckpoint,
+      isCheckpoint,
       runNeedsSeparator
     ),
     withId(
       'Modify and Queue',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
-      !isNotCheckpoint
+      isCheckpoint
     ),
     withId(
       'Share Experiment',
       MessageFromWebviewType.SHARE_EXPERIMENT,
-      !isExperiment,
+      isNotExperiment,
       true
     )
   ]
@@ -191,7 +190,6 @@ const getSingleSelectMenuOptions = (
     ),
     ...getRunResumeOptions(
       withId,
-      isWorkspace,
       projectHasCheckpoints,
       hideApplyAndCreateBranch,
       depth
