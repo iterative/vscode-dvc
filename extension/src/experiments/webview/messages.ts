@@ -116,6 +116,12 @@ export class WebviewMessages {
       case MessageFromWebviewType.OPEN_PLOTS_WEBVIEW:
         return commands.executeCommand(RegisteredCommands.PLOTS_SHOW)
 
+      case MessageFromWebviewType.SHARE_EXPERIMENT:
+        return commands.executeCommand(
+          RegisteredCliCommands.EXPERIMENT_VIEW_SHARE,
+          { dvcRoot: this.dvcRoot, id: message.payload }
+        )
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }

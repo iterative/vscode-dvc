@@ -35,6 +35,7 @@ export enum MessageFromWebviewType {
   SELECT_EXPERIMENTS = 'select-experiments',
   SELECT_COLUMNS = 'select-columns',
   SELECT_PLOTS = 'select-plots',
+  SHARE_EXPERIMENT = 'share-experiment',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   VARY_EXPERIMENT_PARAMS_AND_QUEUE = 'vary-experiment-params-and-queue',
@@ -146,6 +147,10 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }
   | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }
+  | {
+      type: MessageFromWebviewType.SHARE_EXPERIMENT
+      payload: string
+    }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA
