@@ -679,6 +679,27 @@ describe('App', () => {
       ])
     })
 
+    it('should present the correct option for an experiment with checkpoints', () => {
+      renderTableWithoutRunningExperiments()
+
+      const target = screen.getByText('[exp-e7a67]')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toStrictEqual([
+        'Apply to Workspace',
+        'Create new Branch',
+        'Share as Branch',
+        'Modify, Reset and Run',
+        'Modify and Resume',
+        'Modify and Queue',
+        'Star Experiment',
+        'Remove'
+      ])
+    })
+
     it('should present the Remove experiment option for the checkpoint tips', () => {
       renderTableWithoutRunningExperiments()
 

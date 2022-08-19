@@ -63,6 +63,8 @@ import { Title } from '../../../vscode/title'
 import { ExperimentFlag } from '../../../cli/constants'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { CliExecutor } from '../../../cli/executor'
+import * as Git from '../../../git'
+import { shortenForLabel } from '../../../util/string'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -473,6 +475,65 @@ suite('Experiments Test Suite', () => {
         mockExperimentId,
         mockBranch
       )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to share an experiment as a new branch', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testCheckpointId = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
+      const testCheckpointLabel = shortenForLabel(testCheckpointId)
+      const mockBranch = 'it-is-a-branch-shared-to-the-remote'
+      const inputEvent = getInputBoxEvent(mockBranch)
+
+      const mockExperimentBranch = stub(
+        CliExecutor.prototype,
+        'experimentBranch'
+      ).resolves(
+        `Git branch '${mockBranch}' has been created from experiment '${testCheckpointId}'.        
+       To switch to the new branch run:
+             git checkout ${mockBranch}`
+      )
+      const mockExperimentApply = stub(
+        CliExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${testCheckpointId}' have been applied to your current workspace.`
+      )
+      const mockPush = stub(CliExecutor.prototype, 'push').resolves(
+        '10 files updated.'
+      )
+      const mockGitPush = stub(Git, 'gitPushBranch')
+      const branchPushedToRemote = new Promise(resolve =>
+        mockGitPush.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(`${mockBranch} pushed to remote`)
+        })
+      )
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: testCheckpointId,
+        type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
+      })
+
+      await inputEvent
+      await branchPushedToRemote
+      expect(mockExperimentBranch).to.be.calledWithExactly(
+        dvcDemoPath,
+        testCheckpointLabel,
+        mockBranch
+      )
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        testCheckpointLabel
+      )
+      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {

@@ -115,12 +115,11 @@ const getRunResumeOptions = (
     hidden?: boolean,
     divider?: boolean
   ) => MessagesMenuOptionProps,
-  isWorkspace: boolean,
   projectHasCheckpoints: boolean,
   hideVaryAndRun: boolean,
   depth: number
 ) => {
-  const isNotCheckpoint = depth <= 1 || isWorkspace
+  const isCheckpoint = depth > 1
 
   const resetNeedsSeparator = !hideVaryAndRun && projectHasCheckpoints
   const runNeedsSeparator = !hideVaryAndRun && !projectHasCheckpoints
@@ -129,19 +128,19 @@ const getRunResumeOptions = (
     withId(
       'Modify, Reset and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
-      !isNotCheckpoint || !projectHasCheckpoints,
+      isCheckpoint || !projectHasCheckpoints,
       resetNeedsSeparator
     ),
     withId(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
-      !isNotCheckpoint,
+      isCheckpoint,
       runNeedsSeparator
     ),
     withId(
       'Modify and Queue',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
-      !isNotCheckpoint
+      isCheckpoint
     )
   ]
 }
@@ -155,7 +154,7 @@ const getSingleSelectMenuOptions = (
   queued?: boolean,
   starred?: boolean
 ) => {
-  const hideApplyAndCreateBranch = queued || isWorkspace || depth <= 0
+  const isNotExperimentOrCheckpoint = queued || isWorkspace || depth <= 0
 
   const withId = (
     label: string,
@@ -175,18 +174,22 @@ const getSingleSelectMenuOptions = (
     withId(
       'Apply to Workspace',
       MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE,
-      hideApplyAndCreateBranch
+      isNotExperimentOrCheckpoint
     ),
     withId(
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
-      hideApplyAndCreateBranch
+      isNotExperimentOrCheckpoint
+    ),
+    withId(
+      'Share as Branch',
+      MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH,
+      isNotExperimentOrCheckpoint
     ),
     ...getRunResumeOptions(
       withId,
-      isWorkspace,
       projectHasCheckpoints,
-      hideApplyAndCreateBranch,
+      isNotExperimentOrCheckpoint,
       depth
     ),
     experimentMenuOption(

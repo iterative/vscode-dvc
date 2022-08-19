@@ -6,6 +6,9 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import { Title } from '../../vscode/title'
+import { gitPushBranch } from '../../git'
+import { Toast } from '../../vscode/toast'
+import { Args } from '../../cli/constants'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -153,7 +156,12 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_BRANCH,
     () =>
       experiments.getCwdExpNameAndInputThenRun(
-        AvailableCommands.EXPERIMENT_BRANCH,
+        (cwd, ...args: Args) =>
+          experiments.runCommand(
+            AvailableCommands.EXPERIMENT_BRANCH,
+            cwd,
+            ...args
+          ),
         Title.ENTER_BRANCH_NAME
       )
   )
@@ -162,7 +170,38 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
-        AvailableCommands.EXPERIMENT_BRANCH,
+        (name: string, input: string) =>
+          experiments.runCommand(
+            AvailableCommands.EXPERIMENT_BRANCH,
+            dvcRoot,
+            name,
+            input
+          ),
+        Title.ENTER_BRANCH_NAME,
+        dvcRoot,
+        id
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
+    ({ dvcRoot, id }: ExperimentDetails) =>
+      experiments.getExpNameAndInputThenRun(
+        async (name: string, input: string) => {
+          await experiments.runCommand(
+            AvailableCommands.EXPERIMENT_BRANCH,
+            dvcRoot,
+            name,
+            input
+          )
+          await experiments.runCommand(
+            AvailableCommands.EXPERIMENT_APPLY,
+            dvcRoot,
+            name
+          )
+          await experiments.runCommand(AvailableCommands.PUSH, dvcRoot)
+          return Toast.showOutput(gitPushBranch(dvcRoot, input))
+        },
         Title.ENTER_BRANCH_NAME,
         dvcRoot,
         id

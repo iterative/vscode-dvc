@@ -67,6 +67,7 @@
   "command.views.experiments.runExperiment": "Modify Param(s) and Run",
   "command.views.experiments.resumeCheckpointExperiment": "Modify Param(s) and Resume",
   "command.views.experiments.resetAndRunCheckpointExperiment": "Modify Param(s), Reset and Run",
+  "command.views.experiments.shareExperimentAsBranch": "Share as Branch",
   "command.views.experimentsTree.selectExperiments": "Select Experiments to Display in Plots",
   "command.views.plotsPathsTree.selectPlots": "Select Plots to Display",
   "command.views.plotsPathsTree.refreshPlots": "Refresh Plots for Selected Experiments",
