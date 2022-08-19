@@ -130,7 +130,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     .unselectedExperiment:not(.rowSelected):hover & {
-      background-color: $row-hover-background-color;
+      background-image: linear-gradient(
+          $row-hover-background-color,
+          $row-hover-background-color
+        ),
+        linear-gradient($bg-color, $bg-color);
     }
 
     .workspaceWithChanges.unselectedExperiment & {
@@ -138,7 +142,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     .rowSelected.unselectedExperiment & {
-      background-color: $row-bg-selected-color;
+      background-image: linear-gradient(
+          $row-bg-selected-color,
+          $row-bg-selected-color
+        ),
+        linear-gradient($bg-color, $bg-color);
     }
 
     .queuedExperiment & {
@@ -157,7 +165,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     .runningExperiment:not(.rowSelected):hover & {
-      background-color: $row-hover-background-color;
+      background-image: linear-gradient(
+          $row-hover-background-color,
+          $row-hover-background-color
+        ),
+        linear-gradient($bg-color, $bg-color);
       border-left-color: $row-hover-background-color;
       border-bottom-color: $row-hover-background-color;
     }
@@ -168,7 +180,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     .rowSelected.runningExperiment & {
-      background-color: $row-bg-selected-color;
+      background-image: linear-gradient(
+          $row-bg-selected-color,
+          $row-bg-selected-color
+        ),
+        linear-gradient($bg-color, $bg-color);
       border-left-color: $row-bg-selected-color;
       border-bottom-color: $row-bg-selected-color;
     }
