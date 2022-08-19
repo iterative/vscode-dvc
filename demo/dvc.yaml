@@ -2,21 +2,21 @@ stages:
   train:
     cmd: python train.py
     deps:
-      - data/MNIST/raw
-      - train.py
+    - data/MNIST
+    - train.py
     params:
-      - params.yaml:
+    - params.yaml:
     outs:
-      - model.pt:
-          checkpoint: true
+    - model.pt:
+        checkpoint: true
     metrics:
       - training_metrics.json:
           persist: true
           cache: false
     plots:
-      - training_metrics
-      - misclassified.jpg
-      - predictions.json:
-          template: confusion
-          x: actual
-          y: predicted
+    - training_metrics
+    - misclassified.jpg
+    - predictions.json:
+        template: confusion
+        x: actual
+        y: predicted
