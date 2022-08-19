@@ -182,7 +182,7 @@ const getSingleSelectMenuOptions = (
       isNotExperimentOrCheckpoint
     ),
     withId(
-      'Share Experiment',
+      'Share',
       MessageFromWebviewType.SHARE_EXPERIMENT,
       isNotExperimentOrCheckpoint
     ),
