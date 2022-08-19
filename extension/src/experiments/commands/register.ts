@@ -163,15 +163,6 @@ const registerExperimentInputCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH,
-    () =>
-      experiments.getCwdExpNameAndInputThenRun(
-        getShareExperimentAsBranchCommand(experiments),
-        Title.ENTER_BRANCH_NAME
-      )
-  )
-
-  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
@@ -179,6 +170,15 @@ const registerExperimentInputCommands = (
         Title.ENTER_BRANCH_NAME,
         dvcRoot,
         id
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH,
+    () =>
+      experiments.getCwdExpNameAndInputThenRun(
+        getShareExperimentAsBranchCommand(experiments),
+        Title.ENTER_BRANCH_NAME
       )
   )
 

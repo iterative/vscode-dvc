@@ -12,7 +12,7 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
 import { CliExecutor } from '../../../cli/executor'
-import { closeAllEditors, mockDuration } from '../util'
+import { closeAllEditors, getInputBoxEvent, mockDuration } from '../util'
 import { dvcDemoPath } from '../../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
@@ -26,6 +26,7 @@ import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
 import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
+import * as Git from '../../../git'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -561,6 +562,113 @@ suite('Workspace Experiments Test Suite', () => {
           title: Title.SELECT_EXPERIMENT
         }
       )
+    })
+  })
+
+  describe('dvc.branchExperiment', () => {
+    it('should be able to create a branch from an experiment', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testExperiment = 'exp-83425'
+      const mockBranch = 'brunch'
+      const inputEvent = getInputBoxEvent(mockBranch)
+
+      stub(window, 'showQuickPick').resolves({
+        value: { id: testExperiment, name: testExperiment }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
+
+      const mockExperimentBranch = stub(
+        CliExecutor.prototype,
+        'experimentBranch'
+      ).resolves(
+        `Git branch '${mockBranch}' has been created from experiment '${testExperiment}'.        
+     To switch to the new branch run:
+           git checkout ${mockBranch}`
+      )
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_BRANCH)
+
+      await inputEvent
+      expect(mockExperimentBranch).to.be.calledWithExactly(
+        dvcDemoPath,
+        testExperiment,
+        mockBranch
+      )
+    })
+  })
+
+  describe('dvc.shareExperimentAsBranch', () => {
+    it('should be able to share an experiment as a branch', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testExperiment = 'exp-83425'
+      const mockBranch = 'more-brunch'
+      const inputEvent = getInputBoxEvent(mockBranch)
+
+      stub(window, 'showQuickPick').resolves({
+        value: { id: testExperiment, name: testExperiment }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
+
+      const mockExperimentBranch = stub(
+        CliExecutor.prototype,
+        'experimentBranch'
+      ).resolves(
+        `Git branch '${mockBranch}' has been created from experiment '${testExperiment}'.
+     To switch to the new branch run:
+           git checkout ${mockBranch}`
+      )
+      const mockExperimentApply = stub(
+        CliExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${testExperiment}' have been applied to your current workspace.`
+      )
+      const mockPush = stub(CliExecutor.prototype, 'push').resolves(
+        '10 files updated.'
+      )
+      const mockGitPush = stub(Git, 'gitPushBranch')
+      const branchPushedToRemote = new Promise(resolve =>
+        mockGitPush.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(`${mockBranch} pushed to remote`)
+        })
+      )
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH
+      )
+
+      await inputEvent
+      await branchPushedToRemote
+      expect(mockExperimentBranch).to.be.calledWithExactly(
+        dvcDemoPath,
+        testExperiment,
+        mockBranch
+      )
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        testExperiment
+      )
+      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
     })
   })
 
