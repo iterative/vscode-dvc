@@ -118,7 +118,7 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH:
         return commands.executeCommand(
-          RegisteredCliCommands.EXPERIMENT_VIEW_SHARE,
+          RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
 

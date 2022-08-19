@@ -461,8 +461,8 @@
         "icon": "$(play)"
       },
       {
-        "title": "%command.views.experiments.shareExperiment%",
-        "command": "dvc.views.experiments.shareExperiment",
+        "title": "%command.views.experiments.shareExperimentAsBranch%",
+        "command": "dvc.views.experiments.shareExperimentAsBranch",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
@@ -790,7 +790,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.views.experiments.shareExperiment",
+          "command": "dvc.views.experiments.shareExperimentAsBranch",
           "when": "false"
         },
         {
@@ -1080,7 +1080,7 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experiments.shareExperiment",
+          "command": "dvc.views.experiments.shareExperimentAsBranch",
           "group": "1_share@1",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
         },
