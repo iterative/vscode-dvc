@@ -135,6 +135,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_VIEW_APPLY]: undefined
   [EventName.EXPERIMENT_VIEW_BRANCH]: undefined
   [EventName.EXPERIMENT_VIEW_REMOVE]: undefined
+  [EventName.EXPERIMENT_VIEW_SHARE]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
 
   [EventName.EXPERIMENT_VIEW_QUEUE]: undefined
