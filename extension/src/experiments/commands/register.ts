@@ -8,6 +8,7 @@ import {
 import { Title } from '../../vscode/title'
 import { gitPushBranch } from '../../git'
 import { Toast } from '../../vscode/toast'
+import { Args } from '../../cli/constants'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -151,22 +152,22 @@ const registerExperimentInputCommands = (
   experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
 ): void => {
-  // internalCommands.registerExternalCliCommand(
-  //   RegisteredCliCommands.EXPERIMENT_BRANCH,
-  //   () =>
-  //     experiments.getCwdExpNameAndInputThenRun(
-  //       Title.ENTER_BRANCH_NAME,
-  //       (cwd, ...args: Args) =>
-  //         experiments.runCommand(
-  //           AvailableCommands.EXPERIMENT_BRANCH,
-  //           cwd,
-  //           ...args
-  //         )
-  //     )
-  // )
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_BRANCH,
+    () =>
+      experiments.getCwdExpNameAndInputThenRun(
+        Title.ENTER_BRANCH_NAME,
+        (cwd, ...args: Args) =>
+          experiments.runCommand(
+            AvailableCommands.EXPERIMENT_BRANCH,
+            cwd,
+            ...args
+          )
+      )
+  )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
+    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
         Title.ENTER_BRANCH_NAME,
