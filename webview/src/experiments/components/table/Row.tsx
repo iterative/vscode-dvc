@@ -121,6 +121,7 @@ const getRunResumeOptions = (
   depth: number
 ) => {
   const isNotCheckpoint = depth <= 1 || isWorkspace
+  const isExperiment = depth === 1
 
   const resetNeedsSeparator = !hideVaryAndRun && projectHasCheckpoints
   const runNeedsSeparator = !hideVaryAndRun && !projectHasCheckpoints
@@ -142,6 +143,12 @@ const getRunResumeOptions = (
       'Modify and Queue',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
       !isNotCheckpoint
+    ),
+    withId(
+      'Share Experiment',
+      MessageFromWebviewType.SHARE_EXPERIMENT,
+      !isExperiment,
+      true
     )
   ]
 }
