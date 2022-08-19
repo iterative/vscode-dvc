@@ -9,6 +9,7 @@ import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
+import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -28,16 +29,28 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   )
   const [isShown, setIsShown] = useState(true)
 
-  const toggleIsShownState = () => setIsShown(!isShown)
+  const toggleIsShownState = () => {
+    const selection = window.getSelection()
+    if (
+      selection?.focusNode?.nodeValue === path &&
+      selection.anchorOffset !== selection.focusOffset
+    ) {
+      return
+    }
+    setIsShown(!isShown)
+  }
 
   return (
     <tbody>
       <tr>
         <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
-          <button className={styles.rowToggler} onClick={toggleIsShownState}>
-            <Icon icon={isShown ? ChevronDown : ChevronRight} />
-            {path}
-          </button>
+          <div className={styles.rowPath}>
+            <button className={styles.rowToggler} onClick={toggleIsShownState}>
+              <Icon icon={isShown ? ChevronDown : ChevronRight} />
+              {path}
+            </button>
+            <CopyButton value={path} className={styles.copyButton} />
+          </div>
         </td>
         {nbColumns > 1 && <td colSpan={nbColumns - 1}></td>}
       </tr>
@@ -56,6 +69,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
               })}
             >
               <div
+                data-testid="row-images"
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
                 {missing ? (
