@@ -182,8 +182,8 @@ const getSingleSelectMenuOptions = (
       isNotExperimentOrCheckpoint
     ),
     withId(
-      'Share',
-      MessageFromWebviewType.SHARE_EXPERIMENT,
+      'Share as Branch',
+      MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH,
       isNotExperimentOrCheckpoint
     ),
     ...getRunResumeOptions(

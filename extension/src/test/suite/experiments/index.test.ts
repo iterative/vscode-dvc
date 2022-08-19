@@ -518,7 +518,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: testCheckpointId,
-        type: MessageFromWebviewType.SHARE_EXPERIMENT
+        type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
       })
 
       await inputEvent
