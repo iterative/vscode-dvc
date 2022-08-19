@@ -203,8 +203,7 @@ const registerExperimentInputCommands = (
             name
           )
           await experiments.runCommand(AvailableCommands.PUSH, dvcRoot)
-          const std = gitPushBranch(dvcRoot, input)
-          return Toast.showOutput(std)
+          return Toast.showOutput(gitPushBranch(dvcRoot, input))
         }
       )
   )

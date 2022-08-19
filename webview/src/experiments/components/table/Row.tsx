@@ -120,7 +120,6 @@ const getRunResumeOptions = (
   depth: number
 ) => {
   const isCheckpoint = depth > 1
-  const isNotExperiment = depth !== 1
 
   const resetNeedsSeparator = !hideVaryAndRun && projectHasCheckpoints
   const runNeedsSeparator = !hideVaryAndRun && !projectHasCheckpoints
@@ -142,12 +141,6 @@ const getRunResumeOptions = (
       'Modify and Queue',
       MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
       isCheckpoint
-    ),
-    withId(
-      'Share Experiment',
-      MessageFromWebviewType.SHARE_EXPERIMENT,
-      isNotExperiment,
-      true
     )
   ]
 }
@@ -161,7 +154,7 @@ const getSingleSelectMenuOptions = (
   queued?: boolean,
   starred?: boolean
 ) => {
-  const hideApplyAndCreateBranch = queued || isWorkspace || depth <= 0
+  const isNotExperimentOrCheckpoint = queued || isWorkspace || depth <= 0
 
   const withId = (
     label: string,
@@ -181,17 +174,22 @@ const getSingleSelectMenuOptions = (
     withId(
       'Apply to Workspace',
       MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE,
-      hideApplyAndCreateBranch
+      isNotExperimentOrCheckpoint
     ),
     withId(
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
-      hideApplyAndCreateBranch
+      isNotExperimentOrCheckpoint
+    ),
+    withId(
+      'Share Experiment',
+      MessageFromWebviewType.SHARE_EXPERIMENT,
+      isNotExperimentOrCheckpoint
     ),
     ...getRunResumeOptions(
       withId,
       projectHasCheckpoints,
-      hideApplyAndCreateBranch,
+      isNotExperimentOrCheckpoint,
       depth
     ),
     experimentMenuOption(

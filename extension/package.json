@@ -1102,7 +1102,7 @@
         {
           "command": "dvc.views.experiments.shareExperiment",
           "group": "2_share@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",
