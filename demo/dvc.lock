@@ -3,32 +3,32 @@ stages:
   train:
     cmd: python train.py
     deps:
-    - path: data/MNIST
-      md5: 0aed307494600d178fbdc0d000d6db38.dir
-      size: 66544866
-      nfiles: 10
+    - path: data/MNIST/raw
+      md5: 8c257df187855c681f88bde92d721ccd.dir
+      size: 66544770
+      nfiles: 8
     - path: train.py
       md5: 90f29a92c178927514c7f4d61a984a8a
       size: 4865
     params:
       params.yaml:
         epochs: 15
-        lr: 0.003
+        lr: 0.0039
         weight_decay: 0
     outs:
     - path: misclassified.jpg
-      md5: 5edd7dd13144d95ef72e270570d9d338
-      size: 32829
+      md5: 6e9b9927a0f48f138b6ab75db7e61776
+      size: 19348
     - path: model.pt
-      md5: 38126781764ca9fb04496ca2c2173056
+      md5: 85d1b2f51fa38a058b11293e56e687da
       size: 439383
     - path: predictions.json
-      md5: 0aa0e279e904572c28c1203ebfa41b29
+      md5: ed1328b0d645f4d60e5b9b5196d66f5d
       size: 310000
     - path: training_metrics
-      md5: 5abc8d18d6b57bd513acf95e55e2755a.dir
-      size: 947
+      md5: 4a46d2f5aeceb1511fce3679d422ab4c.dir
+      size: 101
       nfiles: 2
     - path: training_metrics.json
-      md5: 2a592caac70651d359b2331ff674beec
-      size: 69
+      md5: b2b2fcf0639a92f8ff28a935b6156573
+      size: 68
