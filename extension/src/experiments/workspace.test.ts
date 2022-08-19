@@ -196,9 +196,9 @@ describe('Experiments', () => {
       mockedGetInput.mockResolvedValueOnce('abc123')
 
       await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        'enter your password please' as Title,
         (cwd: string, ...args: Args) =>
-          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args)
+          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
+        'enter your password please' as Title
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -211,9 +211,9 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
       await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        'please name the branch' as Title,
         (cwd: string, ...args: Args) =>
-          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args)
+          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
+        'please name the branch' as Title
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -230,9 +230,9 @@ describe('Experiments', () => {
       mockedGetInput.mockResolvedValueOnce(undefined)
 
       await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        'please enter your bank account number and sort code' as Title,
         (cwd: string, ...args: Args) =>
-          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args)
+          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
+        'please enter your bank account number and sort code' as Title
       )
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)

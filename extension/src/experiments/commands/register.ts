@@ -156,13 +156,13 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_BRANCH,
     () =>
       experiments.getCwdExpNameAndInputThenRun(
-        Title.ENTER_BRANCH_NAME,
         (cwd, ...args: Args) =>
           experiments.runCommand(
             AvailableCommands.EXPERIMENT_BRANCH,
             cwd,
             ...args
-          )
+          ),
+        Title.ENTER_BRANCH_NAME
       )
   )
 
@@ -170,16 +170,16 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
-        Title.ENTER_BRANCH_NAME,
-        dvcRoot,
-        id,
         (name: string, input: string) =>
           experiments.runCommand(
             AvailableCommands.EXPERIMENT_BRANCH,
             dvcRoot,
             name,
             input
-          )
+          ),
+        Title.ENTER_BRANCH_NAME,
+        dvcRoot,
+        id
       )
   )
 
@@ -187,9 +187,6 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
-        Title.ENTER_BRANCH_NAME,
-        dvcRoot,
-        id,
         async (name: string, input: string) => {
           await experiments.runCommand(
             AvailableCommands.EXPERIMENT_BRANCH,
@@ -204,7 +201,10 @@ const registerExperimentInputCommands = (
           )
           await experiments.runCommand(AvailableCommands.PUSH, dvcRoot)
           return Toast.showOutput(gitPushBranch(dvcRoot, input))
-        }
+        },
+        Title.ENTER_BRANCH_NAME,
+        dvcRoot,
+        id
       )
   )
 }

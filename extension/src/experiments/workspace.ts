@@ -223,8 +223,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public async getCwdExpNameAndInputThenRun(
-    title: Title,
-    runCommand: (cwd: string, ...args: Args) => Promise<void>
+    runCommand: (cwd: string, ...args: Args) => Promise<void>,
+    title: Title
   ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
@@ -240,10 +240,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public getExpNameAndInputThenRun(
+    runCommand: (...args: Args) => Promise<void>,
     title: Title,
     cwd: string,
-    id: string,
-    runCommand: (...args: Args) => Promise<void>
+    id: string
   ) {
     const name = this.getRepository(cwd)?.getExperimentDisplayName(id)
 
