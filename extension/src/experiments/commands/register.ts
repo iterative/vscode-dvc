@@ -167,6 +167,29 @@ const registerExperimentInputCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH,
+    () =>
+      experiments.getCwdExpNameAndInputThenRun(
+        async (cwd: string, name: string, input: string) => {
+          await experiments.runCommand(
+            AvailableCommands.EXPERIMENT_BRANCH,
+            cwd,
+            name,
+            input
+          )
+          await experiments.runCommand(
+            AvailableCommands.EXPERIMENT_APPLY,
+            cwd,
+            name
+          )
+          await experiments.runCommand(AvailableCommands.PUSH, cwd)
+          return Toast.showOutput(gitPushBranch(cwd, input))
+        },
+        Title.ENTER_BRANCH_NAME
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(

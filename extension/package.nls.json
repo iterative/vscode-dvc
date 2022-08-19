@@ -48,6 +48,7 @@
   "command.resetAndRunCheckpointExperiment": "Reset and Run Experiment",
   "command.selectForCompare": "Select for Compare",
   "command.setupWorkspace": "Setup The Workspace",
+  "command.shareExperimentAsBranch": "Share Experiment as Branch",
   "command.showCommands": "Show Commands",
   "command.showExperiments": "Show Experiments",
   "command.showOutput": "Show DVC Output",
