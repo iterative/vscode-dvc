@@ -251,7 +251,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return this.getInputAndRun(runCommand, title, name)
+    return this.getInputAndRun(runCommand, title, cwd, name)
   }
 
   public getExpNameThenRun(commandId: CommandId, cwd: string, id: string) {

@@ -9,6 +9,7 @@ export enum RegisteredCliCommands {
   EXPERIMENT_RUN = 'dvc.runExperiment',
   EXPERIMENT_RUN_QUEUED = 'dvc.startExperimentsQueue',
   EXPERIMENT_RESET_AND_RUN = 'dvc.resetAndRunCheckpointExperiment',
+  EXPERIMENT_SHARE_AS_BRANCH = 'dvc.shareExperimentAsBranch',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
 
   EXPERIMENT_VIEW_APPLY = 'dvc.views.experiments.applyExperiment',
