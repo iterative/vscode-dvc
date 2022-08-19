@@ -477,43 +477,6 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should be able to handle a message to share an experiment to the remote as a branch', async () => {
-      const { experiments } = buildExperiments(disposable)
-      await experiments.isReady()
-
-      const mockBranch = 'mock-branch-input'
-      const inputEvent = getInputBoxEvent(mockBranch)
-
-      const mockExperimentBranch = stub(
-        CliExecutor.prototype,
-        'experimentBranch'
-      ).resolves('undefined')
-
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentId = 'exp-e7a67'
-
-      mockMessageReceived.fire({
-        payload: mockExperimentId,
-        type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
-      })
-
-      await inputEvent
-      expect(mockExperimentBranch).to.be.calledOnce
-      expect(mockExperimentBranch).to.be.calledWithExactly(
-        dvcDemoPath,
-        mockExperimentId,
-        mockBranch
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should handle a message to share an experiment as a new branch', async () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
