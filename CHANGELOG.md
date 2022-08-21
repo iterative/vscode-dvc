@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.21] - 2022-08-21
+
+### 🚀 New Features and Enhancements
+
+- Add a copy button for comparison table rows [#2216](https://github.com/iterative/vscode-dvc/pull/2216) by [@sroy3](https://github.com/sroy3)
+- Share an experiment from context menus [#2219](https://github.com/iterative/vscode-dvc/pull/2219) by [@mattseddon](https://github.com/mattseddon)
+- Share an experiment from command palette [#2221](https://github.com/iterative/vscode-dvc/pull/2221) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Disable selection on resize [#2214](https://github.com/iterative/vscode-dvc/pull/2214) by [@sroy3](https://github.com/sroy3)
+- Update cell hover styles [#2198](https://github.com/iterative/vscode-dvc/pull/2198) by [@julieg18](https://github.com/julieg18)
+
 ## [0.3.20] - 2022-08-18
 
 ### 🚀 New Features and Enhancements
