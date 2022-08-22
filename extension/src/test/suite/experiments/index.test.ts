@@ -63,8 +63,8 @@ import { Title } from '../../../vscode/title'
 import { ExperimentFlag } from '../../../cli/constants'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { CliExecutor } from '../../../cli/executor'
-import * as Git from '../../../git'
 import { shortenForLabel } from '../../../util/string'
+import { GitExecutor } from '../../../cli/git/executor'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -503,7 +503,7 @@ suite('Experiments Test Suite', () => {
       const mockPush = stub(CliExecutor.prototype, 'push').resolves(
         '10 files updated.'
       )
-      const mockGitPush = stub(Git, 'gitPushBranch')
+      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
       const branchPushedToRemote = new Promise(resolve =>
         mockGitPush.callsFake(() => {
           resolve(undefined)

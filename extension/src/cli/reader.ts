@@ -1,5 +1,6 @@
 import { join } from 'path'
-import { Cli, typeCheckCommands } from '.'
+import { typeCheckCommands } from '.'
+import { DvcCli } from './dvc'
 import {
   Args,
   Command,
@@ -126,7 +127,7 @@ export const autoRegisteredCommands = {
   STATUS: 'status'
 } as const
 
-export class CliReader extends Cli {
+export class CliReader extends DvcCli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this
@@ -175,7 +176,7 @@ export class CliReader extends Cli {
 
   public async root(cwd: string): Promise<string | undefined> {
     try {
-      return await this.executeProcess(cwd, Command.ROOT)
+      return await this.executeDvcProcess(cwd, Command.ROOT)
     } catch {}
   }
 
@@ -184,7 +185,7 @@ export class CliReader extends Cli {
   }
 
   public version(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Flag.VERSION)
+    return this.executeDvcProcess(cwd, Flag.VERSION)
   }
 
   private async readProcess<T = string>(
@@ -194,8 +195,10 @@ export class CliReader extends Cli {
     ...args: Args
   ): Promise<T> {
     const output =
-      (await retry(() => this.executeProcess(cwd, ...args), args.join(' '))) ||
-      defaultValue
+      (await retry(
+        () => this.executeDvcProcess(cwd, ...args),
+        args.join(' ')
+      )) || defaultValue
     if (!formatter) {
       return output as unknown as T
     }

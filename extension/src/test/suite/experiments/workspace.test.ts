@@ -26,7 +26,7 @@ import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
 import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
-import * as Git from '../../../git'
+import { GitExecutor } from '../../../cli/git/executor'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -636,7 +636,7 @@ suite('Workspace Experiments Test Suite', () => {
       const mockPush = stub(CliExecutor.prototype, 'push').resolves(
         '10 files updated.'
       )
-      const mockGitPush = stub(Git, 'gitPushBranch')
+      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
       const branchPushedToRemote = new Promise(resolve =>
         mockGitPush.callsFake(() => {
           resolve(undefined)

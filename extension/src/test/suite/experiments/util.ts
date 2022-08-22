@@ -4,7 +4,6 @@ import omit from 'lodash.omit'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
-import * as Git from '../../../git'
 import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
@@ -47,6 +46,7 @@ export const buildExperiments = (
     cliExecutor,
     cliReader,
     cliRunner,
+    gitReader,
     internalCommands,
     messageSpy,
     mockExperimentShow,
@@ -79,6 +79,7 @@ export const buildExperiments = (
     experiments,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     experimentsModel: (experiments as any).experiments as ExperimentsModel,
+    gitReader,
     internalCommands,
     messageSpy,
     mockExperimentShow,
@@ -91,12 +92,13 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
   const {
     internalCommands,
     experiments: mockExperiments,
+    gitReader,
     messageSpy,
     updatesPaused,
     resourceLocator
   } = buildExperiments(disposer, expShowFixture, 'other/dvc/root')
 
-  stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
+  stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(
       internalCommands,
@@ -117,10 +119,15 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {
-  const { internalCommands, messageSpy, updatesPaused, resourceLocator } =
-    buildDependencies(disposer)
+  const {
+    internalCommands,
+    gitReader,
+    messageSpy,
+    updatesPaused,
+    resourceLocator
+  } = buildDependencies(disposer)
 
-  stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
+  stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(
       internalCommands,
