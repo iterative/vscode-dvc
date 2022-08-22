@@ -84,17 +84,17 @@ export class WebviewMessages {
           RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
-      case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
+      case MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
-      case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN:
+      case MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
-      case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
+      case MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
           { dvcRoot: this.dvcRoot, id: message.payload }
