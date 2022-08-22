@@ -565,7 +565,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
-        type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
+        type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
       })
 
       await tableChangePromise
@@ -606,7 +606,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
-        type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
+        type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN
       })
 
       await tableChangePromise
@@ -648,7 +648,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
-        type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN
+        type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN
       })
 
       await tableChangePromise
