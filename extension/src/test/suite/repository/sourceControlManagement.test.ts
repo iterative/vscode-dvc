@@ -13,7 +13,7 @@ import {
 } from '../../../commands/external'
 import { WorkspaceRepositories } from '../../../repository/workspace'
 import { Cli } from '../../../cli'
-import * as Git from '../../../git'
+import { GitCli } from '../../../cli/git'
 
 suite('Source Control Management Test Suite', () => {
   const disposable = Disposable.fn()
@@ -205,7 +205,10 @@ suite('Source Control Management Test Suite', () => {
 
     it('should stage all git tracked files', async () => {
       const gitRoot = resolve(dvcDemoPath, '..')
-      const mockGit = stub(Git, 'getGitRepositoryRoot').resolves(gitRoot)
+      const mockGetGitRepositoryRoot = stub(
+        GitCli.prototype,
+        'getGitRepositoryRoot'
+      ).resolves(gitRoot)
       const mockExecuteProcess = stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Cli.prototype as any,
@@ -216,7 +219,7 @@ suite('Source Control Management Test Suite', () => {
         rootUri
       })
 
-      expect(mockGit).to.be.calledOnce
+      expect(mockGetGitRepositoryRoot).to.be.calledOnce
       expect(mockExecuteProcess).to.be.calledOnce
       expect(mockExecuteProcess).to.be.calledWith({
         args: ['add', '.'],

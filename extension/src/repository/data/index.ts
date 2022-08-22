@@ -3,7 +3,6 @@ import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
-import { getGitRepositoryRoot } from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -153,7 +152,10 @@ export class RepositoryData extends DeferredDisposable {
   }
 
   private async watchWorkspace() {
-    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
+    const gitRoot = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_REPOSITORY_ROOT,
+      this.dvcRoot
+    )
 
     this.dispose.track(
       createFileSystemWatcher(

@@ -10,7 +10,6 @@ import {
   createFileSystemWatcher,
   getRelativePattern
 } from '../../fileSystem/watcher'
-import { getGitRepositoryRoot } from '../../git'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/reader'
 import { BaseData } from '../../data'
@@ -77,7 +76,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   private async watchExpGitRefs(): Promise<void> {
-    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
+    const gitRoot = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_REPOSITORY_ROOT,
+      this.dvcRoot
+    )
     const watchedRelPaths = [
       DOT_GIT_HEAD,
       EXPERIMENTS_GIT_REFS,

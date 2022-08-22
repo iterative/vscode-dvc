@@ -1,16 +1,18 @@
 import { resolve } from 'path'
+import { GitCli } from '.'
 import { Command, Flag } from './constants'
 import { getOptions } from './options'
-import { Cli, typeCheckCommands } from '..'
+import { typeCheckCommands } from '..'
 import { trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
+  GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
   GIT_LIST_UNTRACKED: 'listUntracked'
 } as const
 
-export class GitReader extends Cli {
+export class GitReader extends GitCli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this

@@ -1,7 +1,7 @@
+import { GitCli } from '.'
 import { Command, Commit, DEFAULT_REMOTE, Flag } from './constants'
 import { getOptions } from './options'
-import { typeCheckCommands, Cli } from '..'
-import { getGitRepositoryRoot } from '../../git'
+import { typeCheckCommands } from '..'
 
 export const autoRegisteredCommands = {
   GIT_PUSH_BRANCH: 'pushBranch',
@@ -10,7 +10,7 @@ export const autoRegisteredCommands = {
   GIT_UNSTAGE_ALL: 'reset'
 } as const
 
-export class GitExecutor extends Cli {
+export class GitExecutor extends GitCli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this
@@ -37,7 +37,7 @@ export class GitExecutor extends Cli {
   }
 
   public async stageAll(cwd: string) {
-    const gitRoot = await getGitRepositoryRoot(cwd)
+    const gitRoot = await this.getGitRepositoryRoot(cwd)
     const options = getOptions(gitRoot, Command.ADD, Flag.DOT)
 
     return this.executeProcess(options)
