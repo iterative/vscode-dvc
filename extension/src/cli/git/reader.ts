@@ -38,7 +38,7 @@ export class GitReader extends GitCli {
     return new Set([...files, ...dirs])
   }
 
-  private getUntrackedDirectories = async (cwd: string): Promise<string[]> => {
+  private async getUntrackedDirectories(cwd: string): Promise<string[]> {
     const options = getOptions(
       cwd,
       Command.LS_FILES,
@@ -54,7 +54,7 @@ export class GitReader extends GitCli {
     )
   }
 
-  private getUntrackedFiles = async (cwd: string): Promise<string[]> => {
+  private async getUntrackedFiles(cwd: string): Promise<string[]> {
     const options = getOptions(
       cwd,
       Command.LS_FILES,
