@@ -86,11 +86,11 @@ const getMultiSelectMenuOptions = (
   return [
     toggleStarOption(
       unstarredExperiments.map(value => value.row.values.id),
-      'Star Experiments'
+      'Star'
     ),
     toggleStarOption(
       starredExperiments.map(value => value.row.values.id),
-      'Unstar Experiments'
+      'Unstar'
     ),
     experimentMenuOption(
       removableRowIds,
@@ -127,19 +127,19 @@ const getRunResumeOptions = (
   return [
     withId(
       'Modify, Reset and Run',
-      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
       isCheckpoint || !projectHasCheckpoints,
       resetNeedsSeparator
     ),
     withId(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
-      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN,
+      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
       isCheckpoint,
       runNeedsSeparator
     ),
     withId(
       'Modify and Queue',
-      MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE,
+      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
       isCheckpoint
     )
   ]
@@ -194,7 +194,7 @@ const getSingleSelectMenuOptions = (
     ),
     experimentMenuOption(
       [id],
-      starred ? 'Unstar Experiment' : 'Star Experiment',
+      starred ? 'Unstar' : 'Star',
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       isWorkspace,
       !hasRunningExperiment
