@@ -7,7 +7,6 @@ import {
   mockDisposable
 } from '../util'
 import { Disposer } from '../../../extension'
-import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
 import * as Time from '../../../util/time'
 import * as Watcher from '../../../fileSystem/watcher'
@@ -17,7 +16,8 @@ import { DecorationProvider } from '../../../repository/decorationProvider'
 import { SourceControlManagement } from '../../../repository/sourceControlManagement'
 
 export const buildDependencies = (disposer: Disposer) => {
-  const { cliReader, internalCommands } = buildInternalCommands(disposer)
+  const { cliReader, gitReader, internalCommands } =
+    buildInternalCommands(disposer)
 
   const mockCreateFileSystemWatcher = stub(
     Watcher,
@@ -27,8 +27,8 @@ export const buildDependencies = (disposer: Disposer) => {
   const mockListDvcOnlyRecursive = stub(cliReader, 'listDvcOnlyRecursive')
   const mockStatus = stub(cliReader, 'status')
   const mockDiff = stub(cliReader, 'diff')
-  const mockGetAllUntracked = stub(Git, 'getAllUntracked')
-  const mockGetHasChanges = stub(Git, 'getHasChanges')
+  const mockGetAllUntracked = stub(gitReader, 'listUntracked')
+  const mockGetHasChanges = stub(gitReader, 'hasChanges')
   const mockNow = stub(Time, 'getCurrentEpoch')
 
   const treeDataChanged = disposer.track(new EventEmitter<void>())

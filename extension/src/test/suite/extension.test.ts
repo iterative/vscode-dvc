@@ -31,6 +31,7 @@ import { QuickPickItemWithValue } from '../../vscode/quickPick'
 import { MIN_CLI_VERSION } from '../../cli/constants'
 import * as WorkspaceFolders from '../../vscode/workspaceFolders'
 import { CliExecutor } from '../../cli/executor'
+import { GitReader } from '../../cli/git/reader'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -285,6 +286,9 @@ suite('Extension Test Suite', () => {
         'isReady'
       )
 
+      stub(GitReader.prototype, 'hasChanges').resolves(false)
+      stub(GitReader.prototype, 'listUntracked').resolves(new Set())
+
       const workspaceExperimentsAreReady = new Promise(resolve =>
         mockWorkspaceExperimentsReady.callsFake(async () => {
           await mockWorkspaceExperimentsReady.wrappedMethod()
@@ -460,6 +464,8 @@ suite('Extension Test Suite', () => {
       stub(CliReader.prototype, 'diff').resolves({})
       stub(CliReader.prototype, 'plotsDiff').resolves({})
       stub(CliReader.prototype, 'status').resolves({})
+      stub(GitReader.prototype, 'hasChanges').resolves(false)
+      stub(GitReader.prototype, 'listUntracked').resolves(new Set())
 
       const mockVersion = stub(CliReader.prototype, 'version')
         .onFirstCall()

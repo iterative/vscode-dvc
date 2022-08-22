@@ -3,12 +3,7 @@ import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
-import {
-  DOT_GIT,
-  getAllUntracked,
-  getGitRepositoryRoot,
-  getHasChanges
-} from '../../git'
+import { DOT_GIT, getGitRepositoryRoot } from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -139,8 +134,14 @@ export class RepositoryData extends DeferredDisposable {
     )
 
     const [untracked, hasGitChanges] = await Promise.all([
-      getAllUntracked(this.dvcRoot),
-      getHasChanges(this.dvcRoot)
+      this.internalCommands.executeCommand<Set<string>>(
+        AvailableCommands.GIT_LIST_UNTRACKED,
+        this.dvcRoot
+      ),
+      this.internalCommands.executeCommand<boolean>(
+        AvailableCommands.GIT_HAS_CHANGES,
+        this.dvcRoot
+      )
     ])
 
     return { diffFromCache, diffFromHead, hasGitChanges, untracked }

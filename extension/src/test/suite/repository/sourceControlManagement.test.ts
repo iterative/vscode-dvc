@@ -11,8 +11,9 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
-import * as ProcessExecution from '../../../processExecution'
 import { WorkspaceRepositories } from '../../../repository/workspace'
+import { Cli } from '../../../cli'
+import * as Git from '../../../git'
 
 suite('Source Control Management Test Suite', () => {
   const disposable = Disposable.fn()
@@ -204,23 +205,20 @@ suite('Source Control Management Test Suite', () => {
 
     it('should stage all git tracked files', async () => {
       const gitRoot = resolve(dvcDemoPath, '..')
-      const mockGit = stub(ProcessExecution, 'executeProcess')
-        .onFirstCall()
-        .resolves(gitRoot)
-        .onSecondCall()
-        .resolves('')
+      const mockGit = stub(Git, 'getGitRepositoryRoot').resolves(gitRoot)
+      const mockExecuteProcess = stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Cli.prototype as any,
+        'executeProcess'
+      ).resolves('')
 
       await commands.executeCommand(RegisteredCommands.GIT_STAGE_ALL, {
         rootUri
       })
 
-      expect(mockGit).to.be.calledTwice
-      expect(mockGit).to.be.calledWith({
-        args: ['rev-parse', '--show-toplevel'],
-        cwd: dvcDemoPath,
-        executable: 'git'
-      })
-      expect(mockGit).to.be.calledWith({
+      expect(mockGit).to.be.calledOnce
+      expect(mockExecuteProcess).to.be.calledOnce
+      expect(mockExecuteProcess).to.be.calledWith({
         args: ['add', '.'],
         cwd: gitRoot,
         executable: 'git'
@@ -228,14 +226,15 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should unstage all git tracked files', async () => {
-      const mockGit = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
 
       await commands.executeCommand(RegisteredCommands.GIT_UNSTAGE_ALL, {
         rootUri
       })
 
-      expect(mockGit).to.be.calledOnce
-      expect(mockGit).to.be.calledWith({
+      expect(mockExecuteProcess).to.be.calledOnce
+      expect(mockExecuteProcess).to.be.calledWith({
         args: ['reset'],
         cwd: dvcDemoPath,
         executable: 'git'
@@ -244,7 +243,9 @@ suite('Source Control Management Test Suite', () => {
 
     it('should not reset the workspace if the user does not confirm', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
-      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
@@ -262,12 +263,14 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).not.to.be.called
-      expect(mockGitReset).not.to.be.called
+      expect(mockExecuteProcess).not.to.be.called
     })
 
     it('should reset the workspace if the user confirms they want to', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
-      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
@@ -285,13 +288,13 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).to.be.calledOnce
-      expect(mockGitReset).to.be.calledTwice
-      expect(mockGitReset).to.be.calledWith({
+      expect(mockExecuteProcess).to.be.calledTwice
+      expect(mockExecuteProcess).to.be.calledWith({
         args: ['reset', '--hard', 'HEAD'],
         cwd: dvcDemoPath,
         executable: 'git'
       })
-      expect(mockGitReset).to.be.calledWith({
+      expect(mockExecuteProcess).to.be.calledWith({
         args: ['clean', '-f', '-d', '-q'],
         cwd: dvcDemoPath,
         executable: 'git'
@@ -300,7 +303,8 @@ suite('Source Control Management Test Suite', () => {
 
     it('should not reset the workspace if there is another user initiated command running', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
-      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
@@ -314,7 +318,7 @@ suite('Source Control Management Test Suite', () => {
       )
 
       expect(mockCheckout).not.to.be.called
-      expect(mockGitReset).not.to.be.called
+      expect(mockExecuteProcess).not.to.be.called
     })
   })
 })

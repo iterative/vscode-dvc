@@ -1,6 +1,4 @@
 import { AvailableCommands } from '../../commands/internal'
-import { gitPushBranch } from '../../git'
-import { Toast } from '../../vscode/toast'
 import { WorkspaceExperiments } from '../workspace'
 
 export const getBranchExperimentCommand =
@@ -23,5 +21,5 @@ export const getShareExperimentAsBranchCommand =
 
     await experiments.runCommand(AvailableCommands.PUSH, cwd)
 
-    return Toast.showOutput(gitPushBranch(cwd, input))
+    return experiments.runCommand(AvailableCommands.GIT_PUSH_BRANCH, cwd, input)
   }

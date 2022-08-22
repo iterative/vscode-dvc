@@ -27,7 +27,6 @@ describe('getOptions', () => {
     const options = getOptions(undefined, '', cwd, Command.CHECKOUT, Flag.FORCE)
     expect(options).toStrictEqual({
       args: ['checkout', '-f'],
-      command: 'dvc checkout -f',
       cwd,
       env: mockedEnv,
       executable: 'dvc'
@@ -39,7 +38,6 @@ describe('getOptions', () => {
     const options = getOptions(pythonBinPath, '', cwd, Command.DIFF)
     expect(options).toStrictEqual({
       args: ['-m', 'dvc', 'diff'],
-      command: `${pythonBinPath} -m dvc diff`,
       cwd,
       env: {
         DVCLIVE_OPEN: 'false',
@@ -56,7 +54,6 @@ describe('getOptions', () => {
     const options = getOptions(pythonBinPath, cliPath, cwd, Command.DIFF)
     expect(options).toStrictEqual({
       args: ['diff'],
-      command: `${cliPath} diff`,
       cwd,
       env: {
         DVCLIVE_OPEN: 'false',

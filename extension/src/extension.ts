@@ -50,6 +50,7 @@ import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
+import { GitReader } from './cli/git/reader'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -65,6 +66,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly cliReader: CliReader
   private readonly cliRunner: CliRunner
   private readonly gitExecutor: GitExecutor
+  private readonly gitReader: GitReader
   private readonly status: Status
   private cliAccessible = false
   private cliCompatible: boolean | undefined
@@ -99,23 +101,24 @@ export class Extension extends Disposable implements IExtension {
     this.cliExecutor = this.dispose.track(new CliExecutor(this.config))
     this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
+
     this.gitExecutor = this.dispose.track(new GitExecutor())
+    this.gitReader = this.dispose.track(new GitReader())
+
+    const clis = [
+      this.cliExecutor,
+      this.cliReader,
+      this.cliRunner,
+      this.gitExecutor,
+      this.gitReader
+    ]
 
     const outputChannel = this.dispose.track(
-      new OutputChannel(
-        [this.cliExecutor, this.cliReader, this.cliRunner, this.gitExecutor],
-        context.extension.packageJSON.version
-      )
+      new OutputChannel(clis, context.extension.packageJSON.version)
     )
 
     this.internalCommands = this.dispose.track(
-      new InternalCommands(
-        outputChannel,
-        this.cliExecutor,
-        this.cliReader,
-        this.cliRunner,
-        this.gitExecutor
-      )
+      new InternalCommands(outputChannel, ...clis)
     )
 
     this.status = this.dispose.track(

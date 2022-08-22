@@ -30,6 +30,7 @@ import { MessageFromWebview } from '../../webview/contract'
 import { PlotsData } from '../../plots/webview/contract'
 import { TableData } from '../../experiments/webview/contract'
 import { CliExecutor } from '../../cli/executor'
+import { GitReader } from '../../cli/git/reader'
 
 export const mockDisposable = {
   dispose: stub()
@@ -131,16 +132,23 @@ export const buildInternalCommands = (disposer: Disposer) => {
   const cliReader = disposer.track(new CliReader(config))
   const cliRunner = disposer.track(new CliRunner(config))
   const cliExecutor = disposer.track(new CliExecutor(config))
+  const gitReader = disposer.track(new GitReader())
 
   const outputChannel = disposer.track(
     new OutputChannel([cliReader], '1', 'test output')
   )
 
   const internalCommands = disposer.track(
-    new InternalCommands(outputChannel, cliExecutor, cliReader, cliRunner)
+    new InternalCommands(
+      outputChannel,
+      cliExecutor,
+      cliReader,
+      cliRunner,
+      gitReader
+    )
   )
 
-  return { cliExecutor, cliReader, cliRunner, internalCommands }
+  return { cliExecutor, cliReader, cliRunner, gitReader, internalCommands }
 }
 
 export const buildMockData = <T extends ExperimentsData | FileSystemData>() =>
@@ -154,7 +162,7 @@ export const buildDependencies = (
   expShow = expShowFixture,
   plotsDiff = plotsDiffFixture
 ) => {
-  const { cliExecutor, cliReader, cliRunner, internalCommands } =
+  const { cliExecutor, cliReader, cliRunner, gitReader, internalCommands } =
     buildInternalCommands(disposer)
 
   const mockCreateFileSystemWatcher = stub(
@@ -176,6 +184,7 @@ export const buildDependencies = (
     cliExecutor,
     cliReader,
     cliRunner,
+    gitReader,
     internalCommands,
     messageSpy,
     mockCreateFileSystemWatcher,

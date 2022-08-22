@@ -1,7 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
-import { ExecutionOptions } from './options'
 import { CliError, MaybeConsoleError } from './error'
-import { createProcess } from '../processExecution'
+import { getCommandString } from './command'
+import { createProcess, ProcessOptions } from '../processExecution'
 import { StopWatch } from '../util/time'
 import { Disposable } from '../class/dispose'
 
@@ -69,12 +69,9 @@ export class Cli extends Disposable implements ICli {
     this.onDidStartProcess = this.processStarted.event
   }
 
-  protected async executeProcess(
-    cwd: string,
-    command: string,
-    options: ExecutionOptions
-  ): Promise<string> {
-    const baseEvent: CliEvent = { command, cwd, pid: undefined }
+  protected async executeProcess(options: ProcessOptions): Promise<string> {
+    const command = getCommandString(options)
+    const baseEvent: CliEvent = { command, cwd: options.cwd, pid: undefined }
     const stopWatch = new StopWatch()
     try {
       const process = this.dispose.track(createProcess(options))
@@ -106,7 +103,7 @@ export class Cli extends Disposable implements ICli {
 
   private processCliError(
     error: MaybeConsoleError,
-    options: ExecutionOptions,
+    options: ProcessOptions,
     baseEvent: CliEvent,
     duration: number
   ) {

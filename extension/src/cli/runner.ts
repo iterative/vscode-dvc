@@ -7,6 +7,7 @@ import {
   ExperimentSubCommand
 } from './constants'
 import { getOptions } from './options'
+import { getCommandString } from './command'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
@@ -166,7 +167,8 @@ export class CliRunner extends Disposable implements ICli {
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const { command, ...options } = this.getOptions(cwd, args)
+    const options = this.getOptions(cwd, args)
+    const command = getCommandString(options)
     const stopWatch = new StopWatch()
     const process = this.dispose.track(createProcess(options))
     const baseEvent = { command, cwd, pid: process.pid }
