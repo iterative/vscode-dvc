@@ -86,11 +86,11 @@ const getMultiSelectMenuOptions = (
   return [
     toggleStarOption(
       unstarredExperiments.map(value => value.row.values.id),
-      'Star Experiments'
+      'Star'
     ),
     toggleStarOption(
       starredExperiments.map(value => value.row.values.id),
-      'Unstar Experiments'
+      'Unstar'
     ),
     experimentMenuOption(
       removableRowIds,
@@ -194,7 +194,7 @@ const getSingleSelectMenuOptions = (
     ),
     experimentMenuOption(
       [id],
-      starred ? 'Unstar Experiment' : 'Star Experiment',
+      starred ? 'Unstar' : 'Star',
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       isWorkspace,
       !hasRunningExperiment

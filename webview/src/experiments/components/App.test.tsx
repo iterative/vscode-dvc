@@ -675,7 +675,7 @@ describe('App', () => {
         'Modify, Reset and Run',
         'Modify and Resume',
         'Modify and Queue',
-        'Star Experiment'
+        'Star'
       ])
     })
 
@@ -695,7 +695,7 @@ describe('App', () => {
         'Modify, Reset and Run',
         'Modify and Resume',
         'Modify and Queue',
-        'Star Experiment',
+        'Star',
         'Remove'
       ])
     })
@@ -741,7 +741,7 @@ describe('App', () => {
       jest.advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toContain('Star Experiments')
+      expect(itemLabels).toContain('Star')
     })
 
     it('should allow batch selection from the bottom up too', () => {
@@ -806,7 +806,7 @@ describe('App', () => {
     })
   })
 
-  describe('Star Experiments', () => {
+  describe('Star', () => {
     beforeAll(() => {
       jest.useFakeTimers()
     })
@@ -849,7 +849,7 @@ describe('App', () => {
 
       jest.advanceTimersByTime(100)
 
-      const starOption = screen.getByText('Star Experiment')
+      const starOption = screen.getByText('Star')
       fireEvent.click(starOption)
 
       expect(mockPostMessage).toBeCalledTimes(1)
@@ -871,7 +871,7 @@ describe('App', () => {
       fireEvent.contextMenu(mainRow, { bubbles: true })
       jest.advanceTimersByTime(100)
 
-      const starOption = screen.getByText('Star Experiments')
+      const starOption = screen.getByText('Star')
       fireEvent.click(starOption)
 
       expect(mockPostMessage).toBeCalledTimes(1)
