@@ -1,7 +1,7 @@
 import { UNEXPECTED_ERROR_CODE } from './constants'
-import { MaybeConsoleError } from './error'
-import { delay } from '../util/time'
-import { Logger } from '../common/logger'
+import { MaybeConsoleError } from '../error'
+import { delay } from '../../util/time'
+import { Logger } from '../../common/logger'
 
 const isUnexpectedError = (error: unknown): boolean => {
   return (error as MaybeConsoleError)?.exitCode === UNEXPECTED_ERROR_CODE

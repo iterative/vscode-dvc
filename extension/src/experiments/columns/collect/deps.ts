@@ -8,7 +8,7 @@ import {
 } from './util'
 import { buildDepPath } from '../paths'
 import { ColumnType } from '../../webview/contract'
-import { ExperimentFields } from '../../../cli/reader'
+import { ExperimentFields } from '../../../cli/dvc/reader'
 import { getPathArray } from '../../../fileSystem/util'
 import { shortenForLabel } from '../../../util/string'
 

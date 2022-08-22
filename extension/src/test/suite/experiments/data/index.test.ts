@@ -22,7 +22,7 @@ import {
   InternalCommands
 } from '../../../../commands/internal'
 import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
-import { ExperimentFlag } from '../../../../cli/constants'
+import { ExperimentFlag } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { DOT_GIT_HEAD } from '../../../../cli/git/constants'
 

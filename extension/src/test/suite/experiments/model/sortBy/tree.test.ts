@@ -16,7 +16,7 @@ import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { ExperimentsOutput } from '../../../../../cli/reader'
+import { ExperimentsOutput } from '../../../../../cli/dvc/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { starredSort } from '../../../../../experiments/model/sortBy/constants'
 

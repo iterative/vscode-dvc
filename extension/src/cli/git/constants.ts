@@ -38,3 +38,5 @@ export enum Commit {
 }
 
 export const DEFAULT_REMOTE = 'origin'
+
+export type Args = (Command | Flag | Commit | typeof DEFAULT_REMOTE)[]

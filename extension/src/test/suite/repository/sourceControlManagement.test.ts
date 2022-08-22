@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
-import { CliExecutor } from '../../../cli/executor'
+import { DvcExecutor } from '../../../cli/dvc/executor'
 import { closeAllEditors } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
@@ -32,7 +32,7 @@ suite('Source Control Management Test Suite', () => {
 
   describe('SourceControlManagement', () => {
     it('should be able to run dvc.addTarget without error', async () => {
-      const mockAdd = stub(CliExecutor.prototype, 'add').resolves('')
+      const mockAdd = stub(DvcExecutor.prototype, 'add').resolves('')
 
       await commands.executeCommand(RegisteredCliCommands.ADD_TARGET, {
         dvcRoot: dvcDemoPath,
@@ -43,7 +43,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should not prompt to force if dvc.checkout fails without a prompt error', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout').rejects(
+      const mockCheckout = stub(DvcExecutor.prototype, 'checkout').rejects(
         'This is not a error that we would ask the user if they want to try and force'
       )
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
@@ -58,7 +58,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should be able to run dvc.checkoutTarget without error', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
 
       await commands.executeCommand(RegisteredCliCommands.CHECKOUT_TARGET, {
         dvcRoot: dvcDemoPath,
@@ -69,7 +69,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should prompt to force if dvc.checkoutTarget fails', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout')
+      const mockCheckout = stub(DvcExecutor.prototype, 'checkout')
         .onFirstCall()
         .rejects({
           stderr: 'Use `-f` to force.'
@@ -93,7 +93,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should not run dvc commit if there are no changes in the repository', async () => {
-      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
+      const mockCommit = stub(DvcExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(false)
@@ -105,7 +105,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should focus the git commit text input box after running dvc commit', async () => {
-      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
+      const mockCommit = stub(DvcExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
@@ -118,7 +118,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should prompt to force if dvc.commit fails', async () => {
-      const mockCommit = stub(CliExecutor.prototype, 'commit')
+      const mockCommit = stub(DvcExecutor.prototype, 'commit')
         .onFirstCall()
         .rejects({
           stderr: 'Use `-f` to force.'
@@ -141,7 +141,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should be able to run dvc.commitTarget without error', async () => {
-      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
+      const mockCommit = stub(DvcExecutor.prototype, 'commit').resolves('')
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT_TARGET, {
         dvcRoot: dvcDemoPath,
@@ -152,7 +152,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should prompt to force if dvc.commitTarget fails', async () => {
-      const mockCommit = stub(CliExecutor.prototype, 'commit')
+      const mockCommit = stub(DvcExecutor.prototype, 'commit')
         .onFirstCall()
         .rejects({
           stderr: 'Use `-f` to force.'
@@ -176,7 +176,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should not prompt to force if dvc.pull fails without a prompt error', async () => {
-      const mockPull = stub(CliExecutor.prototype, 'pull')
+      const mockPull = stub(DvcExecutor.prototype, 'pull')
         .onFirstCall()
         .rejects('The remote has gone away')
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
@@ -190,7 +190,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should not prompt to force if dvc.push fails without a prompt error', async () => {
-      const mockPush = stub(CliExecutor.prototype, 'push').rejects(
+      const mockPush = stub(DvcExecutor.prototype, 'push').rejects(
         'The remote has gone away'
       )
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
@@ -245,7 +245,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should not reset the workspace if the user does not confirm', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
 
@@ -270,7 +270,7 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should reset the workspace if the user confirms they want to', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
 
@@ -305,13 +305,13 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should not reset the workspace if there is another user initiated command running', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
-      stub(CliExecutor.prototype, 'isScmCommandRunning').returns(true)
+      stub(DvcExecutor.prototype, 'isScmCommandRunning').returns(true)
 
       await commands.executeCommand(
         RegisteredCommands.DISCARD_WORKSPACE_CHANGES,

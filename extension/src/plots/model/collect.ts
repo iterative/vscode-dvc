@@ -20,7 +20,7 @@ import {
   PlotsOutput,
   Value,
   ValueTree
-} from '../../cli/reader'
+} from '../../cli/dvc/reader'
 import { extractColumns } from '../../experiments/columns/extract'
 import {
   decodeColumn,

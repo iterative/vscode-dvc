@@ -10,7 +10,7 @@ import {
   ListOutput,
   Status,
   StatusOutput
-} from '../../../cli/reader'
+} from '../../../cli/dvc/reader'
 import { bypassProcessManagerDebounce, FIRST_TRUTHY_TIME } from '../util'
 
 suite('Repository Test Suite', () => {

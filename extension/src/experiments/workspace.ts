@@ -1,7 +1,7 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import { TableData } from './webview/contract'
-import { Args } from '../cli/constants'
+import { Args } from '../cli/dvc/constants'
 import { CommandId, InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'

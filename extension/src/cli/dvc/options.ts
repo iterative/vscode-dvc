@@ -1,9 +1,9 @@
 import { dirname } from 'path'
 import { Args } from './constants'
 import { getCaseSensitiveCwd } from './cwd'
-import { getProcessEnv } from '../env'
-import { joinEnvPath } from '../util/env'
-import { ProcessOptions } from '../processExecution'
+import { getProcessEnv } from '../../env'
+import { joinEnvPath } from '../../util/env'
+import { ProcessOptions } from '../../processExecution'
 
 type ExecutionOptions = ProcessOptions & {
   env: NodeJS.ProcessEnv

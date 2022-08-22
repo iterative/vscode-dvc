@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { commands, EventEmitter } from 'vscode'
-import { CliRunner } from '../../cli/runner'
+import { DvcRunner } from '../../cli/dvc/runner'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { Context } from '../../context'
 import { FilterDefinition } from '../../experiments/model/filterBy'
@@ -29,11 +29,11 @@ suite('Context Test Suite', () => {
       update: stub()
     })
 
-    const mockCliRunner = {
+    const mockdvcRunner = {
       isExperimentRunning: () => runnerRunning,
       onDidCompleteProcess,
       onDidStartProcess
-    } as unknown as CliRunner
+    } as unknown as DvcRunner
     const mockExperiments = {
       getDvcRoots: mockGetDvcRoots,
       getRepository: mockGetRepository,
@@ -41,17 +41,17 @@ suite('Context Test Suite', () => {
     } as unknown as WorkspaceExperiments
 
     const context = disposable.track(
-      new Context(mockExperiments, mockCliRunner)
+      new Context(mockExperiments, mockdvcRunner)
     )
 
     return {
       context,
       executeCommandSpy,
       experimentsChanged,
-      mockCliRunner,
       mockExperiments,
       mockGetDvcRoots,
       mockGetRepository,
+      mockdvcRunner,
       onDidChangeExperiments,
       onDidCompleteProcess,
       onDidStartProcess,

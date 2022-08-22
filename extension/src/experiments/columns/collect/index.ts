@@ -10,7 +10,7 @@ import {
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
   ExperimentsOutput
-} from '../../../cli/reader'
+} from '../../../cli/dvc/reader'
 import { standardizePath } from '../../../fileSystem/path'
 
 const collectFromExperiment = (

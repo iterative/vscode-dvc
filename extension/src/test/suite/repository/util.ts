@@ -16,7 +16,7 @@ import { DecorationProvider } from '../../../repository/decorationProvider'
 import { SourceControlManagement } from '../../../repository/sourceControlManagement'
 
 export const buildDependencies = (disposer: Disposer) => {
-  const { cliReader, gitReader, internalCommands } =
+  const { dvcReader, gitReader, internalCommands } =
     buildInternalCommands(disposer)
 
   const mockCreateFileSystemWatcher = stub(
@@ -24,9 +24,9 @@ export const buildDependencies = (disposer: Disposer) => {
     'createFileSystemWatcher'
   ).returns(mockDisposable)
 
-  const mockListDvcOnlyRecursive = stub(cliReader, 'listDvcOnlyRecursive')
-  const mockStatus = stub(cliReader, 'status')
-  const mockDiff = stub(cliReader, 'diff')
+  const mockListDvcOnlyRecursive = stub(dvcReader, 'listDvcOnlyRecursive')
+  const mockStatus = stub(dvcReader, 'status')
+  const mockDiff = stub(dvcReader, 'diff')
   const mockGetAllUntracked = stub(gitReader, 'listUntracked')
   const mockGetHasChanges = stub(gitReader, 'hasChanges')
   const mockNow = stub(Time, 'getCurrentEpoch')

@@ -15,7 +15,7 @@ import {
 } from 'vscode'
 import { Disposable } from '../../../extension'
 import * as Workspace from '../../../fileSystem/workspace'
-import { CliExecutor } from '../../../cli/executor'
+import { DvcExecutor } from '../../../cli/dvc/executor'
 import {
   activeTextEditorChangedEvent,
   closeAllEditors,
@@ -246,7 +246,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       stub(path, 'relative').returns(relPath)
 
       const mockDeleteTarget = stub(Workspace, 'deleteTarget').resolves(true)
-      const mockRemove = stub(CliExecutor.prototype, 'remove').resolves(
+      const mockRemove = stub(DvcExecutor.prototype, 'remove').resolves(
         'target destroyed!'
       )
 
@@ -262,7 +262,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const relPath = join('mock', 'data', 'MNIST', 'raw')
       stub(path, 'relative').returns(relPath)
 
-      const mockMove = stub(CliExecutor.prototype, 'move').resolves(
+      const mockMove = stub(DvcExecutor.prototype, 'move').resolves(
         'target moved to new destination'
       )
 
@@ -283,12 +283,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
     })
 
     it('should pull the correct target(s) when asked to dvc.pullTarget a non-tracked directory', async () => {
-      const { cliReader, experiments, internalCommands, updatesPaused } =
+      const { dvcReader, experiments, internalCommands, updatesPaused } =
         buildExperiments(disposable)
 
       await experiments.isReady()
 
-      stub(cliReader, 'listDvcOnlyRecursive').resolves([
+      stub(dvcReader, 'listDvcOnlyRecursive').resolves([
         {
           isdir: false,
           isexec: false,
@@ -332,8 +332,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
           path: 'model.pkl'
         }
       ])
-      stub(cliReader, 'status').resolves({})
-      stub(cliReader, 'diff').resolves({})
+      stub(dvcReader, 'status').resolves({})
+      stub(dvcReader, 'diff').resolves({})
 
       const repository = disposable.track(
         new Repository(
@@ -360,7 +360,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         (TrackedExplorerTree as any).prototype,
         'getSelectedPathItems'
       ).returns([])
-      const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
+      const mockPull = stub(DvcExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
 
@@ -384,7 +384,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const relPath = 'data'
       stub(path, 'relative').returns(relPath)
 
-      const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
+      const mockPull = stub(DvcExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
       stub(
@@ -406,7 +406,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       stub(path, 'relative').returns(relPath)
 
-      const mockPull = stub(CliExecutor.prototype, 'pull')
+      const mockPull = stub(DvcExecutor.prototype, 'pull')
         .onFirstCall()
         .rejects({
           stderr: "Use '-f' to force."
@@ -439,7 +439,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const relPath = join('data', 'MNIST')
       stub(path, 'relative').returns(relPath)
 
-      const mockPush = stub(CliExecutor.prototype, 'push').resolves(
+      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
         'target pushed'
       )
 
@@ -461,7 +461,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const relPath = join('data', 'MNIST')
       stub(path, 'relative').returns(relPath)
 
-      const mockPush = stub(CliExecutor.prototype, 'push')
+      const mockPush = stub(DvcExecutor.prototype, 'push')
         .onFirstCall()
         .rejects({
           stderr: "I AM AN ERROR. Use '-f' to force."

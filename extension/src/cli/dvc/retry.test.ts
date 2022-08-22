@@ -1,10 +1,10 @@
 import { retry } from './retry'
-import { delay } from '../util/time'
+import { delay } from '../../util/time'
 
 const mockedDelay = jest.mocked(delay)
 
-jest.mock('../util/time')
-jest.mock('../common/logger')
+jest.mock('../../util/time')
+jest.mock('../../common/logger')
 
 beforeEach(() => {
   jest.resetAllMocks()

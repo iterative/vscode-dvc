@@ -1,6 +1,6 @@
 import { commands, Uri } from 'vscode'
-import { tryThenMaybeForce } from '../../cli/actions'
-import { Flag } from '../../cli/constants'
+import { tryThenMaybeForce } from '../../cli/dvc/actions'
+import { Flag } from '../../cli/dvc/constants'
 import {
   AvailableCommands,
   CommandId,

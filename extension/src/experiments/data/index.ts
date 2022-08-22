@@ -11,9 +11,9 @@ import {
   getRelativePattern
 } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/dvc/reader'
 import { BaseData } from '../../data'
-import { ExperimentFlag } from '../../cli/constants'
+import { ExperimentFlag } from '../../cli/dvc/constants'
 import { DOT_GIT, DOT_GIT_HEAD, HEADS_GIT_REFS } from '../../cli/git/constants'
 
 export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')

@@ -2,9 +2,9 @@ import { commands } from 'vscode'
 import { RegisteredCliCommands, RegisteredCommands } from './external'
 import { ICli } from '../cli'
 import { Args } from '../cli/constants'
-import { autoRegisteredCommands as CliExecutorCommands } from '../cli/executor'
-import { autoRegisteredCommands as CliReaderCommands } from '../cli/reader'
-import { autoRegisteredCommands as CliRunnerCommands } from '../cli/runner'
+import { autoRegisteredCommands as CliExecutorCommands } from '../cli/dvc/executor'
+import { autoRegisteredCommands as CliReaderCommands } from '../cli/dvc/reader'
+import { autoRegisteredCommands as dvcRunnerCommands } from '../cli/dvc/runner'
 import { autoRegisteredCommands as GitExecutorCommands } from '../cli/git/executor'
 import { autoRegisteredCommands as GitReaderCommands } from '../cli/git/reader'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
@@ -20,7 +20,7 @@ export const AvailableCommands = Object.assign(
   {} as const,
   CliExecutorCommands,
   CliReaderCommands,
-  CliRunnerCommands,
+  dvcRunnerCommands,
   GitExecutorCommands,
   GitReaderCommands
 )
@@ -116,8 +116,8 @@ export class InternalCommands extends Disposable {
       }
       this.registerCommand(
         commandId,
-        (dvcRoot: string, ...args: Args): Promise<string> =>
-          (cli[commandId as keyof typeof cli] as Function)(dvcRoot, ...args)
+        (...args: Args): Promise<string> =>
+          (cli[commandId as keyof typeof cli] as Function)(...args)
       )
     }
   }

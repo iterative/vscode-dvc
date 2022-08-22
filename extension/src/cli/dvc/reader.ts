@@ -1,6 +1,5 @@
 import { join } from 'path'
-import { typeCheckCommands } from '.'
-import { DvcCli } from './dvc'
+import { DvcCli } from '.'
 import {
   Args,
   Command,
@@ -10,8 +9,9 @@ import {
   SubCommand
 } from './constants'
 import { retry } from './retry'
-import { trim, trimAndSplit } from '../util/stdout'
-import { Plot } from '../plots/webview/contract'
+import { typeCheckCommands } from '..'
+import { trim, trimAndSplit } from '../../util/stdout'
+import { Plot } from '../../plots/webview/contract'
 
 export type PathOutput = { path: string }
 
@@ -127,7 +127,7 @@ export const autoRegisteredCommands = {
   STATUS: 'status'
 } as const
 
-export class CliReader extends DvcCli {
+export class DvcReader extends DvcCli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this
