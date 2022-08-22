@@ -6,7 +6,7 @@ import {
   PlotPath,
   TemplateOrder
 } from './collect'
-import { PlotsOutput } from '../../cli/reader'
+import { PlotsOutput } from '../../cli/dvc/reader'
 import { PathSelectionModel } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 

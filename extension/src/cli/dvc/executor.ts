@@ -1,5 +1,4 @@
-import { typeCheckCommands } from '.'
-import { DvcCli } from './dvc'
+import { DvcCli } from '.'
 import {
   Args,
   Command,
@@ -8,7 +7,8 @@ import {
   Flag,
   GcPreserveFlag
 } from './constants'
-import { setContextValue } from '../vscode/context'
+import { typeCheckCommands } from '..'
+import { setContextValue } from '../../vscode/context'
 
 export const autoRegisteredCommands = {
   ADD: 'add',
@@ -28,7 +28,7 @@ export const autoRegisteredCommands = {
   REMOVE: 'remove'
 } as const
 
-export class CliExecutor extends DvcCli {
+export class DvcExecutor extends DvcCli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this

@@ -1,10 +1,10 @@
 import { Param } from './collect'
 import { quickPickManyValues } from '../../../vscode/quickPick'
 import { getInput } from '../../../vscode/inputBox'
-import { Flag } from '../../../cli/constants'
+import { Flag } from '../../../cli/dvc/constants'
 import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
-import { Value } from '../../../cli/reader'
+import { Value } from '../../../cli/dvc/reader'
 
 const standardizeValue = (value: Value): string =>
   typeof value === 'object' ? JSON.stringify(value) : `${value}`

@@ -23,7 +23,7 @@ import {
   Status,
   StatusesOrAlwaysChanged,
   StatusOutput
-} from '../../cli/reader'
+} from '../../cli/dvc/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'

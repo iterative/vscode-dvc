@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { collectChanges, collectColumns, collectParamsFiles } from './collect'
 import { Column, ColumnType } from '../webview/contract'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/dvc/reader'
 import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel } from '../../path/selection/model'
 

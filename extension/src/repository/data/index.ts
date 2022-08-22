@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
+import { DiffOutput, ListOutput, StatusOutput } from '../../cli/dvc/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
 import { ProcessManager } from '../../processManager'
 import {

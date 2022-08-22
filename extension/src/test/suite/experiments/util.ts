@@ -12,7 +12,7 @@ import {
   buildMockData,
   mockDisposable
 } from '../util'
-import { ExperimentsOutput } from '../../../cli/reader'
+import { ExperimentsOutput } from '../../../cli/dvc/reader'
 import { ExperimentsData } from '../../../experiments/data'
 import { CheckpointsModel } from '../../../experiments/checkpoints/model'
 import { FileSystemData } from '../../../fileSystem/data'
@@ -43,9 +43,9 @@ export const buildExperiments = (
   dvcRoot = dvcDemoPath
 ) => {
   const {
-    cliExecutor,
-    cliReader,
-    cliRunner,
+    dvcExecutor,
+    dvcReader,
+    dvcRunner,
     gitReader,
     internalCommands,
     messageSpy,
@@ -71,11 +71,11 @@ export const buildExperiments = (
   experiments.setState(experimentShowData)
 
   return {
-    cliExecutor,
-    cliReader,
-    cliRunner,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,
     columnsModel: (experiments as any).columns as ColumnsModel,
+    dvcExecutor,
+    dvcReader,
+    dvcRunner,
     experiments,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     experimentsModel: (experiments as any).experiments as ExperimentsModel,
@@ -152,8 +152,8 @@ export const buildExperimentsDataDependencies = (disposer: Disposer) => {
     'createFileSystemWatcher'
   ).returns(mockDisposable)
 
-  const { cliReader, internalCommands } = buildInternalCommands(disposer)
-  const mockExperimentShow = stub(cliReader, 'expShow').resolves(expShowFixture)
+  const { dvcReader, internalCommands } = buildInternalCommands(disposer)
+  const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
   return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
 }
 

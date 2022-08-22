@@ -1,10 +1,10 @@
 import { join } from 'path'
 import { getOptions } from './options'
 import { Command, Flag } from './constants'
-import { getProcessEnv } from '../env'
-import { joinEnvPath } from '../util/env'
+import { getProcessEnv } from '../../env'
+import { joinEnvPath } from '../../util/env'
 
-jest.mock('../env')
+jest.mock('../../env')
 
 const mockedPATH = '/some/special/path'
 

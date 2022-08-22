@@ -1,9 +1,9 @@
 import { Args, Flag } from './constants'
 import { Prompt } from './output'
-import { MaybeConsoleError } from './error'
-import { warnOfConsequences } from '../vscode/modal'
-import { CommandId, InternalCommands } from '../commands/internal'
-import { Response } from '../vscode/response'
+import { MaybeConsoleError } from '../error'
+import { warnOfConsequences } from '../../vscode/modal'
+import { CommandId, InternalCommands } from '../../commands/internal'
+import { Response } from '../../vscode/response'
 
 const offerToForce = async (
   stderr: string,

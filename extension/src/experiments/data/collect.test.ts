@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { collectFiles } from './collect'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/dvc/reader'
 import expShowFixture from '../../test/fixtures/expShow/output'
 
 describe('collectFiles', () => {

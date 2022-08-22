@@ -60,9 +60,9 @@ import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
-import { ExperimentFlag } from '../../../cli/constants'
+import { ExperimentFlag } from '../../../cli/dvc/constants'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
-import { CliExecutor } from '../../../cli/executor'
+import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 
@@ -182,7 +182,7 @@ suite('Experiments Test Suite', () => {
         experiments,
         experimentsModel,
         internalCommands,
-        cliExecutor,
+        dvcExecutor,
         messageSpy
       } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
@@ -191,8 +191,8 @@ suite('Experiments Test Suite', () => {
       ).resolves(undefined)
 
       return {
-        cliExecutor,
         columnsModel,
+        dvcExecutor,
         experiments,
         experimentsModel,
         messageSpy,
@@ -423,7 +423,7 @@ suite('Experiments Test Suite', () => {
       const mockExperimentId = 'exp-e7a67'
 
       const mockExperimentApply = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentApply'
       ).resolves(undefined)
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
@@ -448,7 +448,7 @@ suite('Experiments Test Suite', () => {
       const inputEvent = getInputBoxEvent(mockBranch)
 
       const mockExperimentBranch = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentBranch'
       ).resolves('undefined')
 
@@ -487,7 +487,7 @@ suite('Experiments Test Suite', () => {
       const inputEvent = getInputBoxEvent(mockBranch)
 
       const mockExperimentBranch = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
         `Git branch '${mockBranch}' has been created from experiment '${testCheckpointId}'.        
@@ -495,12 +495,12 @@ suite('Experiments Test Suite', () => {
              git checkout ${mockBranch}`
       )
       const mockExperimentApply = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
         `Changes for experiment '${testCheckpointId}' have been applied to your current workspace.`
       )
-      const mockPush = stub(CliExecutor.prototype, 'push').resolves(
+      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
         '10 files updated.'
       )
       const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
@@ -537,7 +537,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
-      const { experiments, cliExecutor } = buildExperiments(disposable)
+      const { experiments, dvcExecutor } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -554,7 +554,7 @@ suite('Experiments Test Suite', () => {
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
       const mockQueueExperiment = stub(
-        cliExecutor,
+        dvcExecutor,
         'experimentRunQueue'
       ).resolves(undefined)
 
@@ -577,7 +577,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
-      const { experiments, cliRunner } = buildExperiments(disposable)
+      const { experiments, dvcRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -593,7 +593,7 @@ suite('Experiments Test Suite', () => {
       ).returns(dvcDemoPath)
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+      const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
       )
 
@@ -618,7 +618,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
-      const { experiments, cliRunner } = buildExperiments(disposable)
+      const { experiments, dvcRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -640,7 +640,7 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
-      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+      const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
       )
 
@@ -668,7 +668,7 @@ suite('Experiments Test Suite', () => {
       const mockExperimentId = 'mock-experiment-id'
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       ).resolves(undefined)
 

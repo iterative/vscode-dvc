@@ -1,10 +1,7 @@
-import { Command, Commit, DEFAULT_REMOTE, Flag } from './constants'
+import { Args } from './constants'
 import { ProcessOptions } from '../../processExecution'
 
-export const getOptions = (
-  cwd: string,
-  ...args: (Command | Flag | Commit | typeof DEFAULT_REMOTE)[]
-): ProcessOptions => ({
+export const getOptions = (cwd: string, ...args: Args): ProcessOptions => ({
   args,
   cwd,
   executable: 'git'

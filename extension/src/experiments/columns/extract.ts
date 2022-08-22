@@ -3,7 +3,7 @@ import {
   ExperimentFields,
   ValueTreeOrError,
   ValueTreeRoot
-} from '../../cli/reader'
+} from '../../cli/dvc/reader'
 import { shortenForLabel } from '../../util/string'
 import {
   DepColumns,

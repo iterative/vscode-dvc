@@ -29,7 +29,7 @@ import {
   Section,
   TemplatePlotGroup
 } from '../../../plots/webview/contract'
-import { TEMP_PLOTS_DIR } from '../../../cli/reader'
+import { TEMP_PLOTS_DIR } from '../../../cli/dvc/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList } from '../../../util/array'

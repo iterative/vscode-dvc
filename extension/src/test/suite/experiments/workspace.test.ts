@@ -11,12 +11,12 @@ import { Disposable } from '../../../extension'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
-import { CliExecutor } from '../../../cli/executor'
+import { DvcExecutor } from '../../../cli/dvc/executor'
 import { closeAllEditors, getInputBoxEvent, mockDuration } from '../util'
 import { dvcDemoPath } from '../../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
-import { CliRunner } from '../../../cli/runner'
+import { DvcRunner } from '../../../cli/dvc/runner'
 import { Param } from '../../../experiments/model/modify/collect'
 import {
   QuickPickItemWithValue,
@@ -141,10 +141,10 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyExperimentParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
-      const { cliExecutor, experiments } = buildExperiments(disposable)
+      const { dvcExecutor, experiments } = buildExperiments(disposable)
 
       const mockExperimentRunQueue = stub(
-        cliExecutor,
+        dvcExecutor,
         'experimentRunQueue'
       ).resolves('true')
 
@@ -205,7 +205,7 @@ suite('Workspace Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
 
       const mockExperimentRun = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
@@ -269,7 +269,7 @@ suite('Workspace Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
 
       const mockExperimentRun = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
@@ -331,7 +331,7 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.queueExperiment', () => {
     it('should be able to queue an experiment', async () => {
       const mockExperimentRunQueue = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRunQueue'
       ).resolves('true')
 
@@ -348,7 +348,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      stub(CliExecutor.prototype, 'experimentRunQueue').resolves('true')
+      stub(DvcExecutor.prototype, 'experimentRunQueue').resolves('true')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
@@ -382,7 +382,7 @@ suite('Workspace Experiments Test Suite', () => {
         undefined
       )
 
-      stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
+      stub(DvcExecutor.prototype, 'experimentRunQueue').callsFake(() => {
         throw new Error(mockErrorMessage)
       })
 
@@ -409,7 +409,7 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.runExperiment', () => {
     it('should be able to run an experiment', async () => {
       const mockRunExperiment = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
@@ -429,7 +429,7 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.resumeCheckpointExperiment', () => {
     it('should be able to run an experiment', async () => {
       const mockRunExperiment = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
@@ -449,7 +449,7 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
       const mockRunExperimentReset = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperimentReset'
       ).resolves(undefined)
 
@@ -471,7 +471,7 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.startExperimentsQueue', () => {
     it('should be able to execute all experiments in the run queue', async () => {
       const mockRunExperimentQueue = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperimentQueue'
       ).resolves(undefined)
 
@@ -509,7 +509,7 @@ suite('Workspace Experiments Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
         value: { id: selectedExperiment, name: selectedExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
-      const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
+      const mockExperimentApply = stub(DvcExecutor.prototype, 'experimentApply')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
 
@@ -579,7 +579,7 @@ suite('Workspace Experiments Test Suite', () => {
       } as QuickPickItemWithValue<{ id: string; name: string }>)
 
       const mockExperimentBranch = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
         `Git branch '${mockBranch}' has been created from experiment '${testExperiment}'.        
@@ -620,7 +620,7 @@ suite('Workspace Experiments Test Suite', () => {
       } as QuickPickItemWithValue<{ id: string; name: string }>)
 
       const mockExperimentBranch = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
         `Git branch '${mockBranch}' has been created from experiment '${testExperiment}'.
@@ -628,12 +628,12 @@ suite('Workspace Experiments Test Suite', () => {
            git checkout ${mockBranch}`
       )
       const mockExperimentApply = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
         `Changes for experiment '${testExperiment}' have been applied to your current workspace.`
       )
-      const mockPush = stub(CliExecutor.prototype, 'push').resolves(
+      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
         '10 files updated.'
       )
       const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
@@ -695,7 +695,7 @@ suite('Workspace Experiments Test Suite', () => {
         value: { id: mockExperiment, name: mockExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       )
 
@@ -723,7 +723,7 @@ suite('Workspace Experiments Test Suite', () => {
       ).returns(experiments)
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       )
 
@@ -758,7 +758,7 @@ suite('Workspace Experiments Test Suite', () => {
         value: { id: mockExperiment, name: mockExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       )
 

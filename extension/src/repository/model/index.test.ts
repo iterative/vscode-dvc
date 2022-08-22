@@ -1,7 +1,11 @@
 import { join, resolve, sep } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { RepositoryModel } from '.'
-import { ExperimentsOutput, ListOutput, StatusOutput } from '../../cli/reader'
+import {
+  ExperimentsOutput,
+  ListOutput,
+  StatusOutput
+} from '../../cli/dvc/reader'
 import { dvcDemoPath } from '../../test/util'
 
 jest.mock('@hediet/std/disposable')

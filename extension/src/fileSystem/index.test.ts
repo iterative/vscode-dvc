@@ -12,7 +12,7 @@ const {
   getModifiedTime
 } = FileSystem
 
-jest.mock('../cli/reader')
+jest.mock('../cli/dvc/reader')
 
 beforeEach(() => {
   jest.resetAllMocks()

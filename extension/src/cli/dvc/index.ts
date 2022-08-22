@@ -1,8 +1,8 @@
 import { EventEmitter } from 'vscode'
+import { Args } from './constants'
+import { getOptions } from './options'
 import { Cli, CliResult, CliStarted } from '..'
 import { Config } from '../../config'
-import { Args } from '../constants'
-import { getOptions } from '../options'
 
 export class DvcCli extends Cli {
   public autoRegisteredCommands: string[] = []

@@ -4,7 +4,7 @@ import { restore, spy, stub } from 'sinon'
 import { window, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../config'
-import { CliRunner } from '../../../cli/runner'
+import { DvcRunner } from '../../../cli/dvc/runner'
 import { CliResult, CliStarted } from '../../../cli'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
@@ -21,43 +21,43 @@ suite('CLI Runner Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('CliRunner', () => {
+  describe('dvcRunner', () => {
     it('should only be able to run a single command at a time', async () => {
-      const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
+      const dvcRunner = disposable.track(new DvcRunner({} as Config, 'sleep'))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
 
-      await cliRunner.run(cwd, '3')
-      await cliRunner.run(cwd, '1000')
+      await dvcRunner.run(cwd, '3')
+      await dvcRunner.run(cwd, '1000')
 
       expect(windowErrorMessageSpy).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to stop a started command', async () => {
-      const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
+      const dvcRunner = disposable.track(new DvcRunner({} as Config, 'sleep'))
       const cwd = __dirname
 
       const onDidCompleteProcess = (): Promise<void> =>
         new Promise(resolve =>
-          disposable.track(cliRunner.onDidCompleteProcess(() => resolve()))
+          disposable.track(dvcRunner.onDidCompleteProcess(() => resolve()))
         )
 
-      await cliRunner.run(cwd, '100000000000000000000000')
+      await dvcRunner.run(cwd, '100000000000000000000000')
 
       const completed = onDidCompleteProcess()
 
-      expect(cliRunner.isExperimentRunning()).to.be.true
+      expect(dvcRunner.isExperimentRunning()).to.be.true
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const closeSpy = spy((cliRunner as any).pseudoTerminal, 'close')
+      const closeSpy = spy((dvcRunner as any).pseudoTerminal, 'close')
 
-      await cliRunner.stop()
+      await dvcRunner.stop()
       expect(closeSpy).to.be.calledOnce
 
       await completed
 
-      expect(cliRunner.isExperimentRunning()).to.be.false
+      expect(dvcRunner.isExperimentRunning()).to.be.false
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
@@ -103,15 +103,15 @@ suite('CLI Runner Test Suite', () => {
 
       const cwd = __dirname
 
-      const cliRunner = disposable.track(
-        new CliRunner({} as Config, 'echo', {
+      const dvcRunner = disposable.track(
+        new DvcRunner({} as Config, 'echo', {
           processCompleted,
           processOutput,
           processStarted
         })
       )
 
-      cliRunner.run(cwd, text)
+      dvcRunner.run(cwd, text)
 
       const [, output] = await Promise.all([started, eventStream])
 
@@ -122,12 +122,12 @@ suite('CLI Runner Test Suite', () => {
     it('should send an error event if the command fails with an exit code and stderr', async () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendErrorTelemetryEvent')
 
-      const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
+      const dvcRunner = disposable.track(new DvcRunner({} as Config, 'sleep'))
 
       const cwd = __dirname
 
-      await cliRunner.run(cwd, '1', '&&', 'then', 'die')
-      const process = cliRunner.getRunningProcess()
+      await dvcRunner.run(cwd, '1', '&&', 'then', 'die')
+      const process = dvcRunner.getRunningProcess()
 
       const processCompleted = new Promise(resolve =>
         process?.on('close', () => resolve(undefined))
