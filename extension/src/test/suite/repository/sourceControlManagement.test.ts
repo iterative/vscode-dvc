@@ -212,7 +212,7 @@ suite('Source Control Management Test Suite', () => {
         'executeProcess'
       ).resolves('')
 
-      await commands.executeCommand(RegisteredCommands.GIT_STAGE_ALL, {
+      await commands.executeCommand(RegisteredCliCommands.GIT_STAGE_ALL, {
         rootUri
       })
 
@@ -229,7 +229,7 @@ suite('Source Control Management Test Suite', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
 
-      await commands.executeCommand(RegisteredCommands.GIT_UNSTAGE_ALL, {
+      await commands.executeCommand(RegisteredCliCommands.GIT_UNSTAGE_ALL, {
         rootUri
       })
 

@@ -38,7 +38,10 @@ export enum RegisteredCliCommands {
   PUSH = 'dvc.push',
   PUSH_TARGET = 'dvc.pushTarget',
   REMOVE_TARGET = 'dvc.removeTarget',
-  RENAME_TARGET = 'dvc.renameTarget'
+  RENAME_TARGET = 'dvc.renameTarget',
+
+  GIT_STAGE_ALL = 'dvc.gitStageAll',
+  GIT_UNSTAGE_ALL = 'dvc.gitUnstageAll'
 }
 
 export enum RegisteredCommands {
@@ -83,8 +86,5 @@ export enum RegisteredCommands {
   TRACKED_EXPLORER_COPY_REL_FILE_PATH = 'dvc.copyRelativeFilePath',
   TRACKED_EXPLORER_FIND_IN_FOLDER = 'dvc.findInFolder',
   TRACKED_EXPLORER_OPEN_TO_THE_SIDE = 'dvc.openToTheSide',
-  TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare',
-
-  GIT_STAGE_ALL = 'dvc.gitStageAll',
-  GIT_UNSTAGE_ALL = 'dvc.gitUnstageAll'
+  TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare'
 }
