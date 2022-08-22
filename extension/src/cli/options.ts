@@ -5,7 +5,7 @@ import { getProcessEnv } from '../env'
 import { joinEnvPath } from '../util/env'
 import { ProcessOptions } from '../processExecution'
 
-export type ExecutionOptions = ProcessOptions & {
+type ExecutionOptions = ProcessOptions & {
   env: NodeJS.ProcessEnv
 }
 

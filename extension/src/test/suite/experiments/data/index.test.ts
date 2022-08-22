@@ -16,11 +16,12 @@ import {
   QUEUED_EXPERIMENT_PATH
 } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
-import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
+import { getGitRepositoryRoot } from '../../../../git'
 import { InternalCommands } from '../../../../commands/internal'
 import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
 import { ExperimentFlag } from '../../../../cli/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
+import { DOT_GIT_HEAD } from '../../../../cli/git/constants'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()

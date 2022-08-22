@@ -10,16 +10,12 @@ import {
   createFileSystemWatcher,
   getRelativePattern
 } from '../../fileSystem/watcher'
-import {
-  DOT_GIT,
-  DOT_GIT_HEAD,
-  HEADS_GIT_REFS,
-  getGitRepositoryRoot
-} from '../../git'
+import { getGitRepositoryRoot } from '../../git'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/reader'
 import { BaseData } from '../../data'
 import { ExperimentFlag } from '../../cli/constants'
+import { DOT_GIT, DOT_GIT_HEAD, HEADS_GIT_REFS } from '../../cli/git/constants'
 
 export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
 

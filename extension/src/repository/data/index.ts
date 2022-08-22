@@ -3,7 +3,7 @@ import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
-import { DOT_GIT, getGitRepositoryRoot } from '../../git'
+import { getGitRepositoryRoot } from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -15,6 +15,7 @@ import {
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
+import { DOT_GIT } from '../../cli/git/constants'
 
 export type Data = {
   diffFromHead: DiffOutput

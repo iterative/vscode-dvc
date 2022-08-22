@@ -7,9 +7,10 @@ import { buildRepositoryData } from '../util'
 import { Disposable } from '../../../../extension'
 import { dvcDemoPath } from '../../../util'
 import { fireWatcher } from '../../../../fileSystem/watcher'
-import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
+import { getGitRepositoryRoot } from '../../../../git'
 import { RepositoryData } from '../../../../repository/data'
 import { InternalCommands } from '../../../../commands/internal'
+import { DOT_GIT_HEAD } from '../../../../cli/git/constants'
 
 suite('Repository Data Test Suite', () => {
   const disposable = Disposable.fn()
