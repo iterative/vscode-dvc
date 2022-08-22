@@ -1,47 +1,10 @@
 import { Event, EventEmitter } from 'vscode'
-import { ExecutionOptions } from './options'
-import { CliError, MaybeConsoleError } from './error'
-import { createProcess } from '../processExecution'
-import { StopWatch } from '../util/time'
-import { Disposable } from '../class/dispose'
-
-export type CliEvent = {
-  command: string
-  cwd: string
-  pid: number | undefined
-}
-
-export type CliResult = CliEvent & {
-  stderr?: string
-  duration: number
-  exitCode: number | null
-}
-
-export type CliStarted = CliEvent
-
-export interface ICli {
-  autoRegisteredCommands: string[]
-
-  processCompleted: EventEmitter<CliResult>
-  onDidCompleteProcess: Event<CliResult>
-
-  processStarted: EventEmitter<CliStarted>
-  onDidStartProcess: Event<CliStarted>
-}
-
-export const typeCheckCommands = (
-  autoRegisteredCommands: Record<string, string>,
-  against: ICli
-) =>
-  Object.values(autoRegisteredCommands).map(value => {
-    if (typeof against[value as keyof typeof against] !== 'function') {
-      throw new TypeError(
-        `${against.constructor.name} tried to register an internal command that does not exist. ` +
-          'If you are a user and see this message then something has gone very wrong.'
-      )
-    }
-    return value
-  })
+import { CliEvent, CliResult, CliStarted, ICli } from '..'
+import { Disposable } from '../../class/dispose'
+import { createProcess } from '../../processExecution'
+import { StopWatch } from '../../util/time'
+import { CliError, MaybeConsoleError } from '../error'
+import { ExecutionOptions } from '../options'
 
 export class Cli extends Disposable implements ICli {
   public autoRegisteredCommands: string[] = []
@@ -69,7 +32,7 @@ export class Cli extends Disposable implements ICli {
     this.onDidStartProcess = this.processStarted.event
   }
 
-  protected async executeProcess(
+  public async executeProcess(
     cwd: string,
     command: string,
     options: ExecutionOptions

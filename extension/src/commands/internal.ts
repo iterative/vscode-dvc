@@ -5,6 +5,7 @@ import { Args } from '../cli/constants'
 import { autoRegisteredCommands as CliExecutorCommands } from '../cli/executor'
 import { autoRegisteredCommands as CliReaderCommands } from '../cli/reader'
 import { autoRegisteredCommands as CliRunnerCommands } from '../cli/runner'
+import { autoRegisteredCommands as GitExecutorCommands } from '../cli/git/executor'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
@@ -18,7 +19,8 @@ export const AvailableCommands = Object.assign(
   {} as const,
   CliExecutorCommands,
   CliReaderCommands,
-  CliRunnerCommands
+  CliRunnerCommands,
+  GitExecutorCommands
 )
 export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
 

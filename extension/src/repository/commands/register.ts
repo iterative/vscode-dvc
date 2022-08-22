@@ -39,12 +39,12 @@ const registerResourceGroupCommands = (
 ) => {
   internalCommands.registerExternalCommand<Root>(
     RegisteredCommands.GIT_STAGE_ALL,
-    getStageAllCommand(repositories)
+    getStageAllCommand(repositories, internalCommands)
   )
 
   internalCommands.registerExternalCommand<Root>(
     RegisteredCommands.GIT_UNSTAGE_ALL,
-    getUnstageAllCommand(repositories)
+    getUnstageAllCommand(repositories, internalCommands)
   )
 }
 

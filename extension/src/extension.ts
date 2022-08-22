@@ -49,6 +49,7 @@ import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
+import { GitExecutor } from './cli/git/executor'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -63,6 +64,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
   private readonly cliRunner: CliRunner
+  private readonly gitExecutor: GitExecutor
   private readonly status: Status
   private cliAccessible = false
   private cliCompatible: boolean | undefined
@@ -97,10 +99,11 @@ export class Extension extends Disposable implements IExtension {
     this.cliExecutor = this.dispose.track(new CliExecutor(this.config))
     this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
+    this.gitExecutor = this.dispose.track(new GitExecutor())
 
     const outputChannel = this.dispose.track(
       new OutputChannel(
-        [this.cliExecutor, this.cliReader, this.cliRunner],
+        [this.cliExecutor, this.cliReader, this.cliRunner, this.gitExecutor],
         context.extension.packageJSON.version
       )
     )
@@ -110,7 +113,8 @@ export class Extension extends Disposable implements IExtension {
         outputChannel,
         this.cliExecutor,
         this.cliReader,
-        this.cliRunner
+        this.cliRunner,
+        this.gitExecutor
       )
     )
 

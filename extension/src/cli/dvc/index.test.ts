@@ -1,17 +1,18 @@
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { Cli, CliResult, CliStarted, typeCheckCommands } from '.'
-import { Command } from './constants'
-import { getProcessEnv } from '../env'
-import { createProcess } from '../processExecution'
-import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
-import { Config } from '../config'
-import { joinEnvPath } from '../util/env'
+import { DvcCli } from '.'
+import { CliResult, CliStarted, typeCheckCommands } from '..'
+import { Command } from '../constants'
+import { getProcessEnv } from '../../env'
+import { createProcess } from '../../processExecution'
+import { getFailingMockedProcess, getMockedProcess } from '../../test/util/jest'
+import { Config } from '../../config'
+import { joinEnvPath } from '../../util/env'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
-jest.mock('../env')
-jest.mock('../processExecution')
+jest.mock('../../env')
+jest.mock('../../processExecution')
 
 const mockedDisposable = jest.mocked(Disposable)
 
@@ -31,7 +32,7 @@ beforeEach(() => {
 })
 
 describe('typeCheckCommands', () => {
-  const cli = { func: jest.fn() } as unknown as Cli
+  const cli = { func: jest.fn() } as unknown as DvcCli
   it('should throw an error when the command is not on the class', () => {
     expect(() =>
       typeCheckCommands(
@@ -51,7 +52,7 @@ describe('typeCheckCommands', () => {
   })
 })
 
-describe('executeProcess', () => {
+describe('executeDvcProcess', () => {
   it('should pass the correct details to the underlying process given no path to the cli or python binary path', async () => {
     const existingPath = joinEnvPath(
       '/Users/robot/some/path',
@@ -62,7 +63,7 @@ describe('executeProcess', () => {
     const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
     mockedCreateProcess.mockReturnValueOnce(getMockedProcess('done'))
-    const cli = new Cli(
+    const cli = new DvcCli(
       {
         getCliPath: () => undefined,
         pythonBinPath: undefined
@@ -79,7 +80,7 @@ describe('executeProcess', () => {
       }
     )
 
-    await cli.executeProcess(cwd, ...args)
+    await cli.executeDvcProcess(cwd, ...args)
 
     expect(mockedCreateProcess).toBeCalledWith({
       args,
@@ -101,7 +102,7 @@ describe('executeProcess', () => {
     const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
     mockedCreateProcess.mockReturnValueOnce(getFailingMockedProcess('I DEED'))
-    const cli = new Cli(
+    const cli = new DvcCli(
       {
         getCliPath: () => '/some/path/to/dvc',
         pythonBinPath
@@ -118,7 +119,7 @@ describe('executeProcess', () => {
       }
     )
 
-    await expect(cli.executeProcess(cwd, ...args)).rejects.toThrow()
+    await expect(cli.executeDvcProcess(cwd, ...args)).rejects.toThrow()
 
     expect(mockedCreateProcess).toBeCalledWith({
       args,
