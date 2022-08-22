@@ -5,7 +5,7 @@ import { createProcess, ProcessOptions } from '../processExecution'
 import { StopWatch } from '../util/time'
 import { Disposable } from '../class/dispose'
 
-export type CliEvent = {
+type CliEvent = {
   command: string
   cwd: string
   pid: number | undefined
