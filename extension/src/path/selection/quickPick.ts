@@ -5,7 +5,7 @@ import {
   quickPickManyValues
 } from '../../vscode/quickPick'
 import { Title } from '../../vscode/title'
-import { Column } from '../../experiments/webview/contract'
+import { Column, ColumnType } from '../../experiments/webview/contract'
 import { PlotPath } from '../../plots/paths/collect'
 
 type PathType = PlotPath | Column
@@ -15,7 +15,7 @@ type PathWithSelected<T extends PathType> = T & {
 }
 
 const getItem = <T extends PathType>(element: PathWithSelected<T>) => ({
-  label: element.path,
+  label: element.type === ColumnType.TIMESTAMP ? element.label : element.path,
   picked: element.selected,
   value: element
 })
@@ -41,7 +41,6 @@ export const pickPaths = <T extends PathType>(
   if (!definedAndNonEmpty(paths)) {
     return Toast.showError(`There are no ${type} to select.`)
   }
-
   const items = collectItems(paths)
 
   return quickPickManyValues<PathWithSelected<T>>(items, {

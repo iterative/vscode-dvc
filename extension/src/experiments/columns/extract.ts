@@ -73,6 +73,7 @@ type Columns = {
   deps: DepColumns | undefined
   metrics: MetricOrParamColumns | undefined
   params: MetricOrParamColumns | undefined
+  timestamp: string | null | undefined
 }
 
 export const extractColumns = (
@@ -90,7 +91,8 @@ export const extractColumns = (
   const columns: Columns = {
     deps: extractDeps(experiment.deps, branch),
     metrics: metricsData?.columns,
-    params: paramsData?.columns
+    params: paramsData?.columns,
+    timestamp: experiment?.timestamp
   }
 
   if (error) {

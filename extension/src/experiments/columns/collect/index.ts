@@ -1,6 +1,7 @@
 import { join } from 'path'
 import { ColumnAccumulator } from './util'
 import { collectDepChanges, collectDeps } from './deps'
+import { collectTimestamp } from './timestamp'
 import {
   collectMetricAndParamChanges,
   collectMetricsAndParams
@@ -19,6 +20,7 @@ const collectFromExperiment = (
 ) => {
   const { data } = experiment
   if (data) {
+    collectTimestamp(acc)
     collectMetricsAndParams(acc, data)
     collectDeps(acc, data)
   }

@@ -95,8 +95,7 @@ const data: Row[] = [
     queued: false,
     running: true,
     selected: true,
-    starred: false,
-    timestamp: null
+    starred: false
   },
   {
     deps: {

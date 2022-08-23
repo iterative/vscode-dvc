@@ -45,7 +45,8 @@ export interface ColumnAggregateData {
 export enum ColumnType {
   METRICS = 'metrics',
   PARAMS = 'params',
-  DEPS = 'deps'
+  DEPS = 'deps',
+  TIMESTAMP = 'timestamp'
 }
 
 export interface Column extends ColumnAggregateData {

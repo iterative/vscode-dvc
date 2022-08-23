@@ -1,5 +1,6 @@
 import { ColumnsModel } from './model'
 import { appendColumnToPath, buildMetricOrParamPath } from './paths'
+import { timestampColumn } from './collect/timestamp'
 import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -61,6 +62,7 @@ describe('ColumnsModel', () => {
       const model = new ColumnsModel(exampleDvcRoot, buildMockMemento())
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
+        timestampColumn,
         {
           hasChildren: true,
           label: 'params.yaml',
@@ -93,6 +95,7 @@ describe('ColumnsModel', () => {
       )
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
+        timestampColumn,
         {
           hasChildren: true,
           label: 'params.yaml',

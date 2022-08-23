@@ -1,5 +1,6 @@
 import { join } from 'path'
 import { collectChanges, collectColumns } from '.'
+import { timestampColumn } from './timestamp'
 import { buildDepPath, buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
 import outputFixture from '../../../test/fixtures/expShow/output'
@@ -335,6 +336,7 @@ describe('collectColumns', () => {
     })
 
     expect(columns.map(({ path }) => path)).toStrictEqual([
+      timestampColumn.path,
       buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
       buildMetricOrParamPath(
         ColumnType.PARAMS,
@@ -419,6 +421,7 @@ describe('collectColumns', () => {
   it('should collect all params and metrics from the test fixture', () => {
     expect(collectColumns(outputFixture).map(({ path }) => path)).toStrictEqual(
       [
+        timestampColumn.path,
         buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
         buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'loss'),
         buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'accuracy'),
