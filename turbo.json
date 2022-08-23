@@ -7,7 +7,7 @@
       "outputs": ["dist/**"]
     },
     "dvc#build": {
-      "dependsOn": ["dvc-vscode-webview#build"],
+      "dependsOn": ["dvc-vscode-webview#build", "dvc-vscode-lsp#build"],
       "outputs": ["dist/**", "./dvc.vsix"]
     },
     "package": {

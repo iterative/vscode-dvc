@@ -2,7 +2,8 @@
   "private": true,
   "workspaces": [
     "./extension",
-    "./webview"
+    "./webview",
+    "./languageServer"
   ],
   "scripts": {
     "format": "yarn turbo run format --parallel",

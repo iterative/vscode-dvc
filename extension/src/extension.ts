@@ -1,4 +1,18 @@
-import { commands, env, Event, EventEmitter, ExtensionContext } from 'vscode'
+import * as path from 'path'
+import {
+  commands,
+  env,
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  workspace
+} from 'vscode'
+import {
+  LanguageClient,
+  LanguageClientOptions,
+  ServerOptions,
+  TransportKind
+} from 'vscode-languageclient/node'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
@@ -437,15 +451,79 @@ export class Extension extends Disposable implements IExtension {
 }
 
 let extension: undefined | Extension
+let client: LanguageClient
+
 export function activate(context: ExtensionContext): void {
   extension = new Extension(context)
   context.subscriptions.push(extension)
+  // The server is implemented in node
+  const serverModule = context.asAbsolutePath(
+    path.join('..', 'languageServer', 'dist', 'server.js')
+  )
+  // The debug options for the server
+  // --inspect=6009: runs the server in Node's Inspector mode so VS Code can attach to the server for debugging
+  const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] }
+
+  // If the extension is launched in debug mode then the debug server options are used
+  // Otherwise the run options are used
+  const serverOptions: ServerOptions = {
+    run: { module: serverModule, transport: TransportKind.ipc },
+    debug: {
+      module: serverModule,
+      transport: TransportKind.ipc,
+      options: debugOptions
+    }
+  }
+
+  /**
+   * let myVar.be()
+   */
+
+  // Options to control the language client
+  const clientOptions: LanguageClientOptions = {
+    documentSelector: [
+      {
+        language: 'yaml'
+      },
+      {
+        language: 'python'
+      },
+      {
+        language: 'json'
+      },
+      {
+        language: 'toml'
+      }
+    ],
+
+    synchronize: {
+      // Notify the server about file changes to '.clientrc files contained in the workspace
+      fileEvents: workspace.createFileSystemWatcher(
+        '**/*.{yaml,dvc,dvc.lock,json,toml}'
+      )
+    }
+  }
+
+  // Create the language client and start the client.
+  client = new LanguageClient(
+    'languageServerExample',
+    'Language Server Example',
+    serverOptions,
+    clientOptions
+  )
+
+  // Start the client. This will also launch the server
+  client.start()
 }
 
-export function deactivate(): void {
+export function deactivate(): Thenable<void> | undefined {
   if (extension) {
     extension.dispose()
   }
+  if (!client) {
+    return undefined
+  }
+  return client.stop()
 }
 
 export { Disposer, Disposable } from '@hediet/std/disposable'
