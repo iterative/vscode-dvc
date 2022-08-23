@@ -64,7 +64,7 @@ describe('GitExecutor', () => {
 
       await gitExecutor.pushBranch(cwd)
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push', '--set-upstream', 'origin'],
+        args: ['push', '--set-upstream', 'origin', 'HEAD'],
         cwd,
         executable: 'git'
       })

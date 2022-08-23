@@ -19,9 +19,9 @@ export class GitExecutor extends GitCli {
 
   public pushBranch(cwd: string, branchName?: string) {
     const args: Args = [Command.PUSH, Flag.SET_UPSTREAM, DEFAULT_REMOTE]
-    if (branchName) {
-      args.push(branchName as Commit)
-    }
+
+    args.push((branchName || Commit.HEAD) as Commit)
+
     const options = getOptions(cwd, ...args)
 
     return this.executeProcess(options)
