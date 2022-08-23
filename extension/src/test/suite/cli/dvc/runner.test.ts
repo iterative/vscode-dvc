@@ -9,6 +9,7 @@ import { CliResult, CliStarted } from '../../../../cli'
 import * as Telemetry from '../../../../telemetry'
 import { EventName } from '../../../../telemetry/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
+import { spyOnPrivateMemberMethod } from '../../util'
 
 suite('DVC Runner Test Suite', () => {
   const disposable = Disposable.fn()
@@ -49,8 +50,11 @@ suite('DVC Runner Test Suite', () => {
 
       expect(dvcRunner.isExperimentRunning()).to.be.true
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const closeSpy = spy((dvcRunner as any).pseudoTerminal, 'close')
+      const closeSpy = spyOnPrivateMemberMethod(
+        dvcRunner,
+        'pseudoTerminal',
+        'close'
+      )
 
       await dvcRunner.stop()
       expect(closeSpy).to.be.calledOnce

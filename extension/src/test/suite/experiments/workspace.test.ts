@@ -5,10 +5,10 @@ import { window, commands, QuickPickItem, Uri } from 'vscode'
 import {
   buildExperiments,
   buildMultiRepoExperiments,
-  buildSingleRepoExperiments
+  buildSingleRepoExperiments,
+  stubWorkspaceExperimentsGetters
 } from './util'
 import { Disposable } from '../../../extension'
-import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
 import { DvcExecutor } from '../../../cli/dvc/executor'
@@ -148,13 +148,7 @@ suite('Workspace Experiments Test Suite', () => {
         'experimentRunQueue'
       ).resolves('true')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -209,13 +203,7 @@ suite('Workspace Experiments Test Suite', () => {
         'runExperiment'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -273,13 +261,7 @@ suite('Workspace Experiments Test Suite', () => {
         'runExperiment'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -335,11 +317,7 @@ suite('Workspace Experiments Test Suite', () => {
         'experimentRunQueue'
       ).resolves('true')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -352,11 +330,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       const queueExperiment = commands.executeCommand(
         RegisteredCliCommands.QUEUE_EXPERIMENT
@@ -388,11 +362,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -413,11 +383,7 @@ suite('Workspace Experiments Test Suite', () => {
         'runExperiment'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN)
 
@@ -433,11 +399,7 @@ suite('Workspace Experiments Test Suite', () => {
         'runExperiment'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RESUME)
 
@@ -453,11 +415,7 @@ suite('Workspace Experiments Test Suite', () => {
         'runExperimentReset'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(
         RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN
@@ -475,11 +433,7 @@ suite('Workspace Experiments Test Suite', () => {
         'runExperimentQueue'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN_QUEUED)
 
@@ -496,16 +450,8 @@ suite('Workspace Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getRepository'
-      ).returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
       const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
         value: { id: selectedExperiment, name: selectedExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
@@ -587,13 +533,7 @@ suite('Workspace Experiments Test Suite', () => {
            git checkout ${mockBranch}`
       )
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_BRANCH)
 
@@ -644,13 +584,7 @@ suite('Workspace Experiments Test Suite', () => {
         })
       )
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(
         RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH
@@ -680,16 +614,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getRepository'
-      ).returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(window, 'showQuickPick').resolves({
         value: { id: mockExperiment, name: mockExperiment }
@@ -711,16 +636,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getRepository'
-      ).returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
@@ -743,16 +659,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getRepository'
-      ).returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(window, 'showQuickPick').resolves({
         value: { id: mockExperiment, name: mockExperiment }

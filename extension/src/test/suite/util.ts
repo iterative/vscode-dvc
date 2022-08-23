@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { resolve } from 'path'
 import { SinonSpy, SinonStub, spy, stub } from 'sinon'
 import {
@@ -197,7 +198,6 @@ export const buildDependencies = (
 
 export const getMessageReceivedEmitter = (
   webview: BaseWebview<PlotsData | TableData>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): EventEmitter<MessageFromWebview> => (webview as any).messageReceived
 
 export const getInputBoxEvent = (mockInputValue: string) => {
@@ -209,3 +209,30 @@ export const getInputBoxEvent = (mockInputValue: string) => {
     })
   )
 }
+
+export const stubPrivateMethod = <T>(
+  classWithPrivateMethod: T,
+  method: string
+) => stub(classWithPrivateMethod as any, method)
+
+export const stubPrivatePrototypeMethod = <T extends { prototype: unknown }>(
+  classWithPrivateMethod: T,
+  method: string
+) => stubPrivateMethod(classWithPrivateMethod.prototype, method)
+
+export const stubPrivateMemberMethod = <T>(
+  classWithPrivateMember: T,
+  memberName: string,
+  method: string
+) => stubPrivateMethod((classWithPrivateMember as any)[memberName], method)
+
+export const spyOnPrivateMethod = <T>(
+  classWithPrivateMember: T,
+  method: string
+) => spy(classWithPrivateMember as any, method)
+
+export const spyOnPrivateMemberMethod = <T>(
+  classWithPrivateMember: T,
+  memberName: string,
+  method: string
+) => spy((classWithPrivateMember as any)[memberName], method)
