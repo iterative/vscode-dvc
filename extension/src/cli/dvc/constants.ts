@@ -30,8 +30,8 @@ export enum SubCommand {
 export enum Flag {
   FORCE = '-f',
   GRANULAR = '--granular',
+  JSON = '--json',
   OUTPUT_PATH = '-o',
-  SHOW_JSON = '--show-json',
   SUBDIRECTORY = '--subdir',
   SET_PARAM = '-S',
   SPLIT = '--split',

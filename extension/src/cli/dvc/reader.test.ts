@@ -28,7 +28,7 @@ const mockedEnv = {
   DVC_NO_ANALYTICS: 'true',
   PATH: '/all/of/the/goodies:/in/my/path'
 }
-const SHOW_JSON = '--show-json'
+const JSON_FLAG = '--json'
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -72,7 +72,7 @@ describe('CliReader', () => {
       const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual(expShowFixture)
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['exp', 'show', SHOW_JSON],
+        args: ['exp', 'show', JSON_FLAG],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -144,7 +144,7 @@ describe('CliReader', () => {
           '--with-dirs',
           '--granular',
           '--unchanged',
-          SHOW_JSON
+          JSON_FLAG
         ],
         cwd,
         env: mockedEnv,
@@ -179,7 +179,7 @@ describe('CliReader', () => {
           '-o',
           join('.dvc', 'tmp', 'plots'),
           '--split',
-          SHOW_JSON
+          JSON_FLAG
         ],
         cwd,
         env: mockedEnv,

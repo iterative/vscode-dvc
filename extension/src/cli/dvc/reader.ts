@@ -124,7 +124,7 @@ export class DvcReader extends DvcCli {
       Command.EXPERIMENT,
       SubCommand.SHOW,
       ...flags,
-      Flag.SHOW_JSON
+      Flag.JSON
     )
   }
 
@@ -174,7 +174,7 @@ export class DvcReader extends DvcCli {
       '{}',
       command,
       ...args,
-      Flag.SHOW_JSON
+      Flag.JSON
     )
   }
 }
