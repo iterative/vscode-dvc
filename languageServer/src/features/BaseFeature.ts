@@ -5,7 +5,7 @@ import {
   TextDocuments,
   _Connection
 } from 'vscode-languageserver'
-import { Position, TextDocument } from 'vscode-languageserver-textdocument'
+import { TextDocument } from 'vscode-languageserver-textdocument'
 import { parse } from 'yaml'
 
 export interface Utilities {
@@ -88,10 +88,7 @@ export abstract class BaseFeature {
     return this
   }
 
-  protected queryPaths(
-    resultObj: { [key: string]: string },
-    options: Partial<JSONPathOptions> = {}
-  ): this {
+  protected queryPaths(resultObj: { [key: string]: string }): this {
     return this.query(resultObj, { resultType: 'path' })
   }
 

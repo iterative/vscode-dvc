@@ -9,7 +9,6 @@ export class StageCompletions extends BaseFeature {
   protected setup(): void {
     this.connection?.onCompletion(
       (params: TextDocumentPositionParams): CompletionItem[] => {
-        // eslint-disable-next-line no-useless-escape
         const stageNames = this.query({
           dvcYamls: '$.workspace[?(@.uri.match(/dvc.yaml$/))]',
           stages: '$.dvcYamls[*].parsed.stages.*~'
@@ -17,8 +16,8 @@ export class StageCompletions extends BaseFeature {
 
         return stageNames.map(stage => {
           return {
-            label: stage,
-            kind: CompletionItemKind.Method
+            kind: CompletionItemKind.Method,
+            label: stage
           }
         })
       }
