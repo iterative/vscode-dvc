@@ -13,10 +13,14 @@ import {
   Operator
 } from '../../../../../experiments/model/filterBy'
 import { buildMockMemento, dvcDemoPath } from '../../../../util'
-import { experimentsUpdatedEvent } from '../../../util'
+import {
+  experimentsUpdatedEvent,
+  stubPrivateMethod,
+  stubPrivatePrototypeMethod
+} from '../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { buildExperiments } from '../../util'
+import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
 import {
   ColumnType,
   Experiment,
@@ -60,12 +64,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       await experiments.isReady()
       await experiments.showWebview()
 
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getFocusedOrOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const accuracyPath = buildMetricOrParamPath(
         ColumnType.METRICS,
@@ -169,12 +168,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getFocusedOrOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const lossPath = buildMetricOrParamPath(
         ColumnType.METRICS,
@@ -237,8 +231,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       mockShowInputBox.resetHistory()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
+      stubPrivatePrototypeMethod(WorkspaceExperiments, 'getDvcRoots').returns([
         dvcDemoPath
       ])
       stub(WorkspaceExperiments.prototype, 'isReady').resolves(undefined)
@@ -270,12 +263,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       }
       const filterId = getFilterId(filter)
 
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getFocusedOrOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await addFilterViaQuickInput(experiments, filter)
 
@@ -327,8 +315,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     it('should handle the user exiting from the choose repository quick pick', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
+      stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([
         dvcDemoPath,
         'mockRoot'
       ])
@@ -416,8 +403,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         '3 Experiments, 9 Checkpoints Filtered'
       )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(experimentsModel as any, 'getFilteredExperiments')
+      stubPrivateMethod(experimentsModel, 'getFilteredExperiments')
         .onFirstCall()
         .returns([
           { id: '0ef13xs', type: ExperimentType.CHECKPOINT } as Experiment & {
@@ -473,12 +459,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       await experiments.isReady()
       await experiments.showWebview()
 
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getFocusedOrOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await addFilterViaQuickInput(experiments, starredFilter)
 
@@ -514,12 +495,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getFocusedOrOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockAddFilter = stub(experimentsModel, 'addFilter')
 

@@ -171,3 +171,22 @@ export const buildExperimentsData = (disposer: Disposer) => {
 
   return { data, mockCreateFileSystemWatcher, mockExperimentShow }
 }
+
+export const stubWorkspaceExperimentsGetters = (
+  dvcRoot: string,
+  experiments?: Experiments
+) => {
+  const mockGetOnlyOrPickProject = stub(
+    WorkspaceExperiments.prototype,
+    'getOnlyOrPickProject'
+  ).resolves(dvcRoot)
+  let mockGetRepository
+  if (experiments) {
+    mockGetRepository = stub(
+      WorkspaceExperiments.prototype,
+      'getRepository'
+    ).returns(experiments)
+  }
+
+  return [mockGetOnlyOrPickProject, mockGetRepository]
+}
