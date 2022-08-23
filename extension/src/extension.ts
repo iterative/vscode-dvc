@@ -475,10 +475,6 @@ export function activate(context: ExtensionContext): void {
     }
   }
 
-  /**
-   * let myVar.be()
-   */
-
   // Options to control the language client
   const clientOptions: LanguageClientOptions = {
     documentSelector: [
@@ -506,8 +502,8 @@ export function activate(context: ExtensionContext): void {
 
   // Create the language client and start the client.
   client = new LanguageClient(
-    'languageServerExample',
-    'Language Server Example',
+    'dvc-vscode-lsp',
+    'DVC Language Server',
     serverOptions,
     clientOptions
   )

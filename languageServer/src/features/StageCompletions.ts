@@ -5,7 +5,7 @@ import {
 } from 'vscode-languageserver/node'
 import { BaseFeature } from './BaseFeature'
 
-export class CompletionsExample extends BaseFeature {
+export class StageCompletions extends BaseFeature {
   protected setup(): void {
     this.connection?.onCompletion(
       (params: TextDocumentPositionParams): CompletionItem[] => {

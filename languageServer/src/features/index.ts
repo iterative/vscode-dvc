@@ -1,7 +1,3 @@
-import { CompletionsExample } from './CompletionsExample'
-// import { DeclarationsExample } from './DeclarationsExample'
+import { StageCompletions } from './StageCompletions'
 
-export const features = [
-  new CompletionsExample()
-  // new DeclarationsExample()
-]
+export const features = [new StageCompletions()]
