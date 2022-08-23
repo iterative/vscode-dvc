@@ -72,7 +72,7 @@ describe('GitExecutor', () => {
   })
 
   describe('stageAndCommit', () => {
-    it('should call createProcess with the correct parameters to stage all file and then commit', async () => {
+    it('should call createProcess with the correct parameters to stage all files and then commit', async () => {
       const cwd = __dirname
       const message = 'best experiment'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(cwd))
