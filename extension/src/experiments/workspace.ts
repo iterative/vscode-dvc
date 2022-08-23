@@ -1,7 +1,7 @@
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import { TableData } from './webview/contract'
-import { Args } from '../cli/constants'
+import { Args } from '../cli/dvc/constants'
 import { CommandId, InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
@@ -221,10 +221,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
   }
 
-  public getCwdExpNameAndInputThenRun = async (
-    commandId: CommandId,
+  public async getCwdExpNameAndInputThenRun(
+    runCommand: (cwd: string, ...args: Args) => Promise<void>,
     title: Title
-  ) => {
+  ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
@@ -235,11 +235,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!experiment) {
       return
     }
-    return this.getInputAndRun(commandId, cwd, title, experiment.name)
+    return this.getInputAndRun(runCommand, title, cwd, experiment.name)
   }
 
   public getExpNameAndInputThenRun(
-    commandId: CommandId,
+    runCommand: (...args: Args) => Promise<void>,
     title: Title,
     cwd: string,
     id: string
@@ -250,20 +250,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return this.getInputAndRun(commandId, cwd, title, name)
-  }
-
-  public async getInputAndRun(
-    commandId: CommandId,
-    cwd: string,
-    title: Title,
-    ...args: Args
-  ) {
-    const input = await getInput(title)
-    if (!input) {
-      return
-    }
-    return this.runCommand(commandId, cwd, ...args, input)
+    return this.getInputAndRun(runCommand, title, cwd, name)
   }
 
   public getExpNameThenRun(commandId: CommandId, cwd: string, id: string) {
@@ -357,6 +344,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     return this.runCommand(commandId, cwd, experiment.name)
+  }
+
+  private async getInputAndRun(
+    runCommand: (...args: Args) => Promise<void>,
+    title: Title,
+    ...args: Args
+  ) {
+    const input = await getInput(title)
+    if (!input) {
+      return
+    }
+    return runCommand(...args, input)
   }
 
   private pickCurrentExperiment(cwd: string) {

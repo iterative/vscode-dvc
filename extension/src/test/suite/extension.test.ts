@@ -14,7 +14,7 @@ import { mockHasCheckpoints } from './experiments/util'
 import { WEBVIEW_TEST_TIMEOUT } from './timeouts'
 import { Disposable } from '../../extension'
 import * as Python from '../../extensions/python'
-import { CliReader } from '../../cli/reader'
+import { DvcReader } from '../../cli/dvc/reader'
 import expShowFixture from '../fixtures/expShow/output'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
@@ -28,9 +28,10 @@ import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
-import { MIN_CLI_VERSION } from '../../cli/constants'
+import { MIN_CLI_VERSION } from '../../cli/dvc/constants'
 import * as WorkspaceFolders from '../../vscode/workspaceFolders'
-import { CliExecutor } from '../../cli/executor'
+import { DvcExecutor } from '../../cli/dvc/executor'
+import { GitReader } from '../../cli/git/reader'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -56,7 +57,7 @@ suite('Extension Test Suite', () => {
   describe('dvc.setupWorkspace', () => {
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(Python, 'isPythonExtensionInstalled').returns(true)
-      stub(CliReader.prototype, 'version').rejects('do not run setup')
+      stub(DvcReader.prototype, 'version').rejects('do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
@@ -87,7 +88,7 @@ suite('Extension Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
-      stub(CliReader.prototype, 'version').rejects('still do not run setup')
+      stub(DvcReader.prototype, 'version').rejects('still do not run setup')
       stub(Python, 'isPythonExtensionInstalled').returns(true)
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -197,7 +198,7 @@ suite('Extension Test Suite', () => {
         'createFileSystemWatcher'
       )
 
-      const mockCanRunCli = stub(CliReader.prototype, 'version')
+      const mockCanRunCli = stub(DvcReader.prototype, 'version')
         .onFirstCall()
         .resolves(MIN_CLI_VERSION)
         .onSecondCall()
@@ -236,13 +237,13 @@ suite('Extension Test Suite', () => {
         .resolves([Uri.file(resolve('path', 'to', 'dvc'))])
 
       mockHasCheckpoints(expShowFixture)
-      const mockExpShow = stub(CliReader.prototype, 'expShow').resolves(
+      const mockExpShow = stub(DvcReader.prototype, 'expShow').resolves(
         expShowFixture
       )
 
-      stub(CliReader.prototype, 'root').resolves('.')
+      stub(DvcReader.prototype, 'root').resolves('.')
 
-      const mockDataStatus = stub(CliReader.prototype, 'dataStatus').resolves({
+      const mockDataStatus = stub(DvcReader.prototype, 'dataStatus').resolves({
         committed: {
           added: [],
           deleted: [],
@@ -270,12 +271,15 @@ suite('Extension Test Suite', () => {
         }
       })
 
-      stub(CliReader.prototype, 'plotsDiff').resolves(plotsDiffFixture)
+      stub(DvcReader.prototype, 'plotsDiff').resolves(plotsDiffFixture)
 
       const mockWorkspaceExperimentsReady = stub(
         WorkspaceExperiments.prototype,
         'isReady'
       )
+
+      stub(GitReader.prototype, 'hasChanges').resolves(false)
+      stub(GitReader.prototype, 'listUntracked').resolves(new Set())
 
       const workspaceExperimentsAreReady = new Promise(resolve =>
         mockWorkspaceExperimentsReady.callsFake(async () => {
@@ -391,7 +395,7 @@ suite('Extension Test Suite', () => {
 
   describe('dvc.init', () => {
     it('should be able to run dvc.init without error', async () => {
-      const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
+      const mockInit = stub(DvcExecutor.prototype, 'init').resolves('')
       const mockSetup = stub(Setup, 'setup')
       const mockSetupCalled = new Promise(resolve =>
         mockSetup.callsFake(() => {
@@ -442,14 +446,16 @@ suite('Extension Test Suite', () => {
     })
 
     it('should set the dvc.cli.incompatible context value', async () => {
-      stub(CliReader.prototype, 'expShow').resolves({
+      stub(DvcReader.prototype, 'expShow').resolves({
         workspace: { baseline: {} }
       })
-      stub(CliReader.prototype, 'root').resolves('.')
-      stub(CliReader.prototype, 'dataStatus').resolves({})
-      stub(CliReader.prototype, 'plotsDiff').resolves({})
+      stub(DvcReader.prototype, 'root').resolves('.')
+      stub(DvcReader.prototype, 'dataStatus').resolves({})
+      stub(DvcReader.prototype, 'plotsDiff').resolves({})
+      stub(GitReader.prototype, 'hasChanges').resolves(false)
+      stub(GitReader.prototype, 'listUntracked').resolves(new Set())
 
-      const mockVersion = stub(CliReader.prototype, 'version')
+      const mockVersion = stub(DvcReader.prototype, 'version')
         .onFirstCall()
         .resolves('1.0.0')
         .onSecondCall()

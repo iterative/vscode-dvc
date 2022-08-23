@@ -1,9 +1,10 @@
 import { join } from 'path'
-import { Cli, typeCheckCommands } from '.'
+import { DvcCli } from '.'
 import { Args, Command, ExperimentFlag, Flag, SubCommand } from './constants'
 import { retry } from './retry'
-import { trim, trimAndSplit } from '../util/stdout'
-import { Plot } from '../plots/webview/contract'
+import { typeCheckCommands } from '..'
+import { trim, trimAndSplit } from '../../util/stdout'
+import { Plot } from '../../plots/webview/contract'
 
 type Changes = {
   added?: string[]
@@ -49,7 +50,7 @@ export interface BaseExperimentFields {
   checkpoint_parent?: string
 }
 
-type Dep = { hash: string; size: number; nfiles: null | number }
+type Dep = { hash: null | string; size: null | number; nfiles: null | number }
 type Out = Dep & { use_cache: boolean; is_data_source: boolean }
 
 export type Deps = RelPathObject<Dep>
@@ -78,6 +79,10 @@ export interface ExperimentsOutput {
   }
 }
 
+const defaultExperimentsOutput: ExperimentsOutput = {
+  workspace: { baseline: {} }
+}
+
 export interface PlotsOutput {
   [path: string]: Plot[]
 }
@@ -90,7 +95,7 @@ export const autoRegisteredCommands = {
   PLOTS_DIFF: 'plotsDiff'
 } as const
 
-export class CliReader extends Cli {
+export class DvcReader extends DvcCli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this
@@ -112,11 +117,14 @@ export class CliReader extends Cli {
     cwd: string,
     ...flags: ExperimentFlag[]
   ): Promise<ExperimentsOutput> {
-    return this.readProcessJson<ExperimentsOutput>(
+    return this.readProcess<ExperimentsOutput>(
       cwd,
+      JSON.parse,
+      JSON.stringify(defaultExperimentsOutput),
       Command.EXPERIMENT,
       SubCommand.SHOW,
-      ...flags
+      ...flags,
+      Flag.SHOW_JSON
     )
   }
 
@@ -124,7 +132,7 @@ export class CliReader extends Cli {
     return this.readProcessJson<PlotsOutput>(
       cwd,
       Command.PLOTS,
-      'diff',
+      SubCommand.DIFF,
       ...revisions,
       Flag.OUTPUT_PATH,
       TEMP_PLOTS_DIR,
@@ -134,12 +142,12 @@ export class CliReader extends Cli {
 
   public async root(cwd: string): Promise<string | undefined> {
     try {
-      return await this.executeProcess(cwd, Command.ROOT)
+      return await this.executeDvcProcess(cwd, Command.ROOT)
     } catch {}
   }
 
   public version(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Flag.VERSION)
+    return this.executeDvcProcess(cwd, Flag.VERSION)
   }
 
   private async readProcess<T = string>(
@@ -149,8 +157,10 @@ export class CliReader extends Cli {
     ...args: Args
   ): Promise<T> {
     const output =
-      (await retry(() => this.executeProcess(cwd, ...args), args.join(' '))) ||
-      defaultValue
+      (await retry(
+        () => this.executeDvcProcess(cwd, ...args),
+        args.join(' ')
+      )) || defaultValue
     if (!formatter) {
       return output as unknown as T
     }

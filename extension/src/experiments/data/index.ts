@@ -10,16 +10,11 @@ import {
   createFileSystemWatcher,
   getRelativePattern
 } from '../../fileSystem/watcher'
-import {
-  DOT_GIT,
-  DOT_GIT_HEAD,
-  HEADS_GIT_REFS,
-  getGitRepositoryRoot
-} from '../../git'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/dvc/reader'
 import { BaseData } from '../../data'
-import { ExperimentFlag } from '../../cli/constants'
+import { ExperimentFlag } from '../../cli/dvc/constants'
+import { DOT_GIT, DOT_GIT_HEAD, HEADS_GIT_REFS } from '../../cli/git/constants'
 
 export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
 
@@ -48,7 +43,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public collectFiles(data: ExperimentsOutput) {
-    return collectFiles(data)
+    return collectFiles(data, this.collectedFiles)
   }
 
   public managedUpdate(path?: string) {
@@ -81,7 +76,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   private async watchExpGitRefs(): Promise<void> {
-    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
+    const gitRoot = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_REPOSITORY_ROOT,
+      this.dvcRoot
+    )
     const watchedRelPaths = [
       DOT_GIT_HEAD,
       EXPERIMENTS_GIT_REFS,

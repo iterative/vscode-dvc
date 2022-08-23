@@ -1,4 +1,4 @@
-import { ExperimentsOutput } from '../../../cli/reader'
+import { ExperimentsOutput } from '../../../cli/dvc/reader'
 import {
   Column,
   ColumnType,

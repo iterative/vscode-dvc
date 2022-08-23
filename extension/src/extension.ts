@@ -1,10 +1,10 @@
 import { commands, env, Event, EventEmitter, ExtensionContext } from 'vscode'
-import { CliExecutor } from './cli/executor'
-import { CliRunner } from './cli/runner'
-import { CliReader } from './cli/reader'
+import { DvcExecutor } from './cli/dvc/executor'
+import { DvcRunner } from './cli/dvc/runner'
+import { DvcReader } from './cli/dvc/reader'
 import { Config } from './config'
 import { Context } from './context'
-import { isVersionCompatible } from './cli/version'
+import { isVersionCompatible } from './cli/dvc/version'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
@@ -49,6 +49,8 @@ import { PlotsPathsTree } from './plots/paths/tree'
 import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
+import { GitExecutor } from './cli/git/executor'
+import { GitReader } from './cli/git/reader'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -60,9 +62,11 @@ export class Extension extends Disposable implements IExtension {
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
   private readonly trackedExplorerTree: TrackedExplorerTree
-  private readonly cliExecutor: CliExecutor
-  private readonly cliReader: CliReader
-  private readonly cliRunner: CliRunner
+  private readonly dvcExecutor: DvcExecutor
+  private readonly dvcReader: DvcReader
+  private readonly dvcRunner: DvcRunner
+  private readonly gitExecutor: GitExecutor
+  private readonly gitReader: GitReader
   private readonly status: Status
   private cliAccessible = false
   private cliCompatible: boolean | undefined
@@ -94,28 +98,31 @@ export class Extension extends Disposable implements IExtension {
 
     this.config = this.dispose.track(new Config())
 
-    this.cliExecutor = this.dispose.track(new CliExecutor(this.config))
-    this.cliReader = this.dispose.track(new CliReader(this.config))
-    this.cliRunner = this.dispose.track(new CliRunner(this.config))
+    this.dvcExecutor = this.dispose.track(new DvcExecutor(this.config))
+    this.dvcReader = this.dispose.track(new DvcReader(this.config))
+    this.dvcRunner = this.dispose.track(new DvcRunner(this.config))
+
+    this.gitExecutor = this.dispose.track(new GitExecutor())
+    this.gitReader = this.dispose.track(new GitReader())
+
+    const clis = [
+      this.dvcExecutor,
+      this.dvcReader,
+      this.dvcRunner,
+      this.gitExecutor,
+      this.gitReader
+    ]
 
     const outputChannel = this.dispose.track(
-      new OutputChannel(
-        [this.cliExecutor, this.cliReader, this.cliRunner],
-        context.extension.packageJSON.version
-      )
+      new OutputChannel(clis, context.extension.packageJSON.version)
     )
 
     this.internalCommands = this.dispose.track(
-      new InternalCommands(
-        outputChannel,
-        this.cliExecutor,
-        this.cliReader,
-        this.cliRunner
-      )
+      new InternalCommands(outputChannel, ...clis)
     )
 
     this.status = this.dispose.track(
-      new Status([this.cliExecutor, this.cliReader, this.cliRunner])
+      new Status([this.dvcExecutor, this.dvcReader, this.dvcRunner])
     )
 
     this.experiments = this.dispose.track(
@@ -134,7 +141,7 @@ export class Extension extends Disposable implements IExtension {
       new WorkspaceRepositories(this.internalCommands)
     )
 
-    this.dispose.track(new Context(this.experiments, this.cliRunner))
+    this.dispose.track(new Context(this.experiments, this.dvcRunner))
 
     this.dispose.track(
       new ExperimentsColumnsTree(
@@ -219,9 +226,9 @@ export class Extension extends Disposable implements IExtension {
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
         const stopWatch = new StopWatch()
-        const wasRunning = this.cliRunner.isExperimentRunning()
+        const wasRunning = this.dvcRunner.isExperimentRunning()
         try {
-          const stopped = await this.cliRunner.stop()
+          const stopped = await this.dvcRunner.stop()
           sendTelemetryEvent(
             RegisteredCommands.STOP_EXPERIMENT,
             { stopped, wasRunning },
@@ -255,7 +262,7 @@ export class Extension extends Disposable implements IExtension {
       async () => {
         const root = getFirstWorkspaceFolder()
         if (root) {
-          await this.cliExecutor.init(root)
+          await this.dvcExecutor.init(root)
           this.workspaceChanged.fire()
         }
       }
@@ -319,7 +326,7 @@ export class Extension extends Disposable implements IExtension {
   public async canRunCli(cwd: string) {
     await this.config.isReady()
     setContextValue('dvc.cli.incompatible', undefined)
-    const version = await this.cliReader.version(cwd)
+    const version = await this.dvcReader.version(cwd)
     const compatible = isVersionCompatible(version)
     this.cliCompatible = compatible
     setContextValue('dvc.cli.incompatible', !compatible)
@@ -394,7 +401,7 @@ export class Extension extends Disposable implements IExtension {
     }
 
     await this.config.isReady()
-    return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
+    return findAbsoluteDvcRootPath(cwd, this.dvcReader.root(cwd))
   }
 
   private async getEventProperties() {

@@ -161,8 +161,12 @@ export const ExperimentsTable: React.FC = () => {
     },
     hooks => {
       hooks.stateReducers.push((state, action) => {
+        if (action.type === 'columnStartResizing') {
+          document.body.classList.add(styles.noSelect)
+        }
         if (action.type === 'columnDoneResizing') {
           reportResizedColumn(state)
+          document.body.classList.remove(styles.noSelect)
         }
         return state
       })

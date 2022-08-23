@@ -25,10 +25,10 @@ suite('Plots Data Test Suite', () => {
     mutableRevisions: string[] = [],
     defaultRevs: string[] = []
   ) => {
-    const { internalCommands, updatesPaused, mockPlotsDiff, cliRunner } =
+    const { internalCommands, updatesPaused, mockPlotsDiff, dvcRunner } =
       buildDependencies(disposable)
 
-    stub(cliRunner, 'isExperimentRunning').returns(experimentIsRunning)
+    stub(dvcRunner, 'isExperimentRunning').returns(experimentIsRunning)
 
     const data = disposable.track(
       new PlotsData(dvcDemoPath, internalCommands, updatesPaused)

@@ -2,7 +2,7 @@ import { join, sep } from 'path'
 import { describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
-import { cliReader, initializeDemoRepo, initializeEmptyRepo } from './util'
+import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 
 suite('data status --with-dirs --granular --unchanged --show-json', () => {
@@ -10,7 +10,7 @@ suite('data status --with-dirs --granular --unchanged --show-json', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
 
-      const output = await cliReader.dataStatus(dvcDemoPath)
+      const output = await dvcReader.dataStatus(dvcDemoPath)
 
       const demoRepoTrackedData = [
         join('data', 'MNIST', 'raw') + sep,
@@ -56,7 +56,7 @@ suite('data status --with-dirs --granular --unchanged --show-json', () => {
   describe('Empty Repository', () => {
     it('should return the expected output', async () => {
       await initializeEmptyRepo()
-      const output = await cliReader.dataStatus(TEMP_DIR)
+      const output = await dvcReader.dataStatus(TEMP_DIR)
 
       expect(output).to.deep.equal({})
     })

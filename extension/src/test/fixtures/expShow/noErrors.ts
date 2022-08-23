@@ -1,4 +1,7 @@
-import { ExperimentFieldsOrError, ExperimentsOutput } from '../../../cli/reader'
+import {
+  ExperimentFieldsOrError,
+  ExperimentsOutput
+} from '../../../cli/dvc/reader'
 import expShowFixture, { errorShas } from './output'
 
 const excludeErrors = (): ExperimentsOutput => {

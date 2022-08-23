@@ -17,7 +17,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   left: 0;
   display: inline-block;
   position: absolute;
-  border: 2px solid $fg-color;
+  border: 2px solid $watermark-color;
+  opacity: 0.5;
   border-top: unset;
   border-left: unset;
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
@@ -128,12 +129,24 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       background-color: $bg-color;
     }
 
-    .unselectedExperiment.oddRow & {
-      background-color: $row-bg-alt-color;
+    .unselectedExperiment:not(.rowSelected):hover & {
+      background-image: linear-gradient(
+          $row-hover-background-color,
+          $row-hover-background-color
+        ),
+        linear-gradient($bg-color, $bg-color);
     }
 
     .workspaceWithChanges.unselectedExperiment & {
       border: 1px solid $changed-color;
+    }
+
+    .rowSelected.unselectedExperiment & {
+      background-image: linear-gradient(
+          $row-bg-selected-color,
+          $row-bg-selected-color
+        ),
+        linear-gradient($bg-color, $bg-color);
     }
 
     .queuedExperiment & {
@@ -150,17 +163,30 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
       background-color: $bg-color;
     }
-    .runningExperiment.oddRow & {
-      background-color: $row-bg-alt-color;
+
+    .runningExperiment:not(.rowSelected):hover & {
+      background-image: linear-gradient(
+          $row-hover-background-color,
+          $row-hover-background-color
+        ),
+        linear-gradient($bg-color, $bg-color);
+      border-left-color: $row-hover-background-color;
+      border-bottom-color: $row-hover-background-color;
     }
+
     .workspaceWithChanges.runningExperiment & {
       border-right-color: $changed-color;
       border-top-color: $changed-color;
     }
 
-    .runningExperiment.oddRow > .experimentCell & {
-      border-left: 1.5px solid $row-bg-alt-color;
-      border-bottom: 1.5px solid $row-bg-alt-color;
+    .rowSelected.runningExperiment & {
+      background-image: linear-gradient(
+          $row-bg-selected-color,
+          $row-bg-selected-color
+        ),
+        linear-gradient($bg-color, $bg-color);
+      border-left-color: $row-bg-selected-color;
+      border-bottom-color: $row-bg-selected-color;
     }
   }
 }
@@ -181,7 +207,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   transform: rotate(45deg);
   right: 1px;
   bottom: 2px;
-  border-color: $fg-color;
 }
 
 .contractedRowArrow {
@@ -264,6 +289,26 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .tr {
     position: relative;
 
+    &:hover:not(.rowSelected) {
+      .td:not(.experimentCell),
+      .experimentCell:before {
+        background-color: $row-hover-background-color;
+      }
+
+      .td:hover {
+        border-right-color: $border-color;
+        border-left-color: $border-color;
+
+        &:first-child:before {
+          border-right-color: $border-color;
+        }
+
+        &:last-child {
+          border-right-color: transparent;
+        }
+      }
+    }
+
     &:not(.rowSelected) {
       & > *:first-child {
         position: sticky;
@@ -280,10 +325,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
           transition: box-shadow 0.25s;
         }
       }
-
-      &.oddRow > *:first-child {
-        background-color: $row-bg-alt-color;
-      }
     }
 
     &.rowSelected {
@@ -293,11 +334,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .table.withExpColumnShadow {
     .tr:not(.rowSelected) > *:first-child:after {
-      box-shadow: 3px 0px 3px var(--vscode-widget-shadow);
+      box-shadow: 3px 0px 3px $shadow;
     }
   }
 
   .bodyRow {
+    border-bottom: $row-border;
+
     &:not(.rowSelected) {
       & > *:first-child {
         background-color: $row-bg-color;
@@ -327,7 +370,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     &:not(.rowSelected) > *:first-child:after {
-      right: -2px;
+      right: -1px;
     }
 
     &:last-child,
@@ -370,44 +413,15 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
   }
 
-  .rowGroup {
-    margin: 0.5rem 0;
-  }
-  .normalRowGroup {
-    border-top: $row-border;
-    border-bottom: $row-border;
-    .oddRow {
-      background-color: $row-bg-alt-color;
-    }
-    .td {
-      &:first-child {
-        border-left: $row-border;
-      }
-
-      &:last-child {
-        border-right: $row-border;
-      }
-    }
-  }
   .workspaceRowGroup {
     border: none;
+    position: sticky;
+    top: var(--table-head-height);
+    z-index: 4;
+    background-color: $row-bg-color;
 
-    .td {
-      &:first-child {
-        padding-left: $workspace-row-edge-margin;
-        .innerCell {
-          padding-left: $cell-padding;
-          border-left: $row-border;
-        }
-      }
-
-      &:last-child {
-        padding-right: $workspace-row-edge-margin;
-        .innerCell {
-          padding-right: $cell-padding;
-          border-right: $row-border;
-        }
-      }
+    &.withShadow {
+      box-shadow: 0 5px 8px -2px $shadow;
     }
 
     .innerCell {
@@ -421,8 +435,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       height: 100%;
       width: 100%;
       background-color: none;
-      border-top: $row-border;
-      border-bottom: $row-border;
     }
   }
 
@@ -439,12 +451,16 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
   .th {
     height: auto;
+    background-color: $header-bg-color;
   }
   .td {
     height: auto;
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
+
     &:first-child {
       .innerCell {
         padding-left: $edge-padding;
@@ -461,6 +477,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     display: flex;
     flex-flow: row nowrap;
     text-align: left;
+    border-right: none;
+    border-left: none;
+
+    &:before {
+      border-right: 1px solid transparent;
+    }
+
     .innerCell {
       justify-content: flex-start;
 
@@ -511,14 +534,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    border-right: 2px solid $header-border-color;
+    border-right: 1px solid $header-border-color;
   }
 
   .headerCell {
     @extend .placeholderHeaderCell;
     color: $header-fg-color;
     text-align: center;
-    border-bottom: 2px solid $header-border-color;
+    border-bottom: 1px solid $header-border-color;
     padding: 0.31rem $cell-padding;
 
     &.leafHeader {
@@ -570,7 +593,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .columnResizer {
-  right: -5px;
+  right: -4px;
   width: 10px;
   height: 500%;
   position: absolute;
@@ -679,11 +702,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   box-shadow: none;
   position: sticky;
   top: 0;
-  z-index: 4;
-
-  &.headWithShadow {
-    box-shadow: 0 5px 8px -2px var(--vscode-widget-shadow);
-  }
+  z-index: 5;
 }
 
 .tableIndicators {
@@ -744,6 +763,17 @@ $badge-size: 0.85rem;
 }
 
 .experimentCell {
+  &:before {
+    content: '';
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    position: absolute;
+    background-color: transparent;
+  }
+
   .innerCell {
     .indicatorCount {
       display: none;
@@ -758,4 +788,8 @@ $badge-size: 0.85rem;
       }
     }
   }
+}
+
+.noSelect {
+  user-select: none;
 }

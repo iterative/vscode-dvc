@@ -5,12 +5,10 @@ import {
 
 const remove = (section: TemplatePlotSection, entryId: string) => {
   const entries = section.entries.filter(({ id }) => id !== entryId)
-  return entries.length > 0
-    ? {
-        entries,
-        group: section.group
-      }
-    : null
+  return {
+    entries,
+    group: section.group
+  }
 }
 
 const add = (
@@ -27,6 +25,9 @@ const add = (
   return { entries, group: section.group }
 }
 
+const cleanup = (section: TemplatePlotSection) =>
+  section.entries.length > 0 ? section : null
+
 export const removeFromPreviousAndAddToNewSection = (
   sections: TemplatePlotSection[],
   oldSectionIndex: number,
@@ -34,14 +35,17 @@ export const removeFromPreviousAndAddToNewSection = (
   newGroupIndex?: number,
   entry?: TemplatePlotEntry,
   position?: number
-) =>
-  sections
-    .map((section, i) => {
-      if (i === oldSectionIndex) {
-        return remove(section, entryId)
-      } else if (i === newGroupIndex && entry) {
-        return add(section, entry, position)
-      }
-      return section
-    })
+) => {
+  const newSections = sections.map((section, i) => {
+    if (i === oldSectionIndex) {
+      return remove(section, entryId)
+    } else if (i === newGroupIndex && entry) {
+      return add(section, entry, position)
+    }
+    return section
+  })
+
+  return newSections
+    .map(section => cleanup(section))
     .filter(Boolean) as TemplatePlotSection[]
+}

@@ -36,7 +36,7 @@ import {
   QuickPickOptionsWithTitle
 } from '../../../../vscode/quickPick'
 import { Response } from '../../../../vscode/response'
-import { CliExecutor } from '../../../../cli/executor'
+import { DvcExecutor } from '../../../../cli/dvc/executor'
 import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ColumnType } from '../../../../experiments/webview/contract'
@@ -476,7 +476,7 @@ suite('Experiments Tree Test Suite', () => {
       }
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       ).resolves('')
 
@@ -501,7 +501,7 @@ suite('Experiments Tree Test Suite', () => {
       const mockExperiment = 'exp-to-remove'
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       ).resolves('')
 
@@ -531,7 +531,7 @@ suite('Experiments Tree Test Suite', () => {
       const mockQueuedExperimentLabel = 'queued-removed'
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       ).resolves('')
 
@@ -580,7 +580,7 @@ suite('Experiments Tree Test Suite', () => {
       const mockExperiment = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
 
       const mockExperimentApply = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
         `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
@@ -606,7 +606,7 @@ suite('Experiments Tree Test Suite', () => {
       await experiments.isReady()
 
       const mockExperimentBranch = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentBranch'
       )
       const mockShowInputBox = stub(window, 'showInputBox').resolves(undefined)
@@ -632,7 +632,7 @@ suite('Experiments Tree Test Suite', () => {
       const mockBranch = 'it-is-a-branch'
 
       const mockExperimentBranch = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
         `Git branch '${mockBranch}' has been created from experiment '${mockCheckpoint}'.        
@@ -661,13 +661,13 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
       const baseExperimentId = 'workspace'
 
-      const { cliExecutor, experiments, experimentsModel } =
+      const { dvcExecutor, experiments, experimentsModel } =
         buildExperiments(disposable)
 
       await experiments.isReady()
 
       const mockExperimentRunQueue = stub(
-        cliExecutor,
+        dvcExecutor,
         'experimentRunQueue'
       ).resolves('true')
 
@@ -726,12 +726,12 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
       const baseExperimentId = 'workspace'
 
-      const { cliRunner, experiments, experimentsModel } =
+      const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)
 
       await experiments.isReady()
 
-      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+      const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
       )
 
@@ -787,13 +787,13 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
       const baseExperimentId = 'workspace'
 
-      const { cliRunner, experiments, experimentsModel } =
+      const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)
 
       await experiments.isReady()
 
       const mockRunExperimentReset = stub(
-        cliRunner,
+        dvcRunner,
         'runExperimentReset'
       ).resolves(undefined)
 

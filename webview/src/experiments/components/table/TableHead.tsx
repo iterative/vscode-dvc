@@ -1,10 +1,8 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import cx from 'classnames'
-import React, { DragEvent, useRef } from 'react'
+import React, { DragEvent, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { Indicators } from './Indicators'
@@ -18,6 +16,7 @@ interface TableHeadProps {
   instance: TableInstance<Experiment>
   root: HTMLElement | null
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
+  setTableHeadHeight: (height: number) => void
 }
 
 export const TableHead = ({
@@ -29,7 +28,8 @@ export const TableHead = ({
     rows
   },
   root,
-  setExpColumnNeedsShadow
+  setExpColumnNeedsShadow,
+  setTableHeadHeight
 }: TableHeadProps) => {
   const columns = useSelector(
     (state: ExperimentsState) => state.tableData.columns
@@ -42,6 +42,14 @@ export const TableHead = ({
 
   const fullColumnOrder = useRef<string[]>()
   const draggingIds = useRef<string[]>()
+  const wrapper = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const wrapperHeight = wrapper.current?.getBoundingClientRect().height
+    if (wrapperHeight) {
+      setTableHeadHeight(wrapperHeight)
+    }
+  }, [setTableHeadHeight, headerGroups])
 
   const onDragStart: DragFunction = ({ currentTarget }) => {
     const displacerHeader = allHeaders.find(
@@ -86,21 +94,13 @@ export const TableHead = ({
       type: MessageFromWebviewType.REORDER_COLUMNS
     })
   }
-  const [ref, needsShadow] = useInView({
-    root,
-    rootMargin: '-15px 0px 0px 0px',
-    threshold: 1
-  })
 
   const selectedForPlotsCount = getSelectedForPlotsCount(rows)
 
   const firstExpColumnCellId = headerGroups[0].headers[0].id
 
   return (
-    <div
-      className={cx(styles.thead, needsShadow && styles.headWithShadow)}
-      ref={ref}
-    >
+    <div className={styles.thead} ref={wrapper}>
       <Indicators selectedForPlotsCount={selectedForPlotsCount} />
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key

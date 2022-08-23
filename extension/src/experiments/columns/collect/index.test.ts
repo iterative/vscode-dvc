@@ -5,7 +5,8 @@ import { Column, ColumnType } from '../../webview/contract'
 import outputFixture from '../../../test/fixtures/expShow/output'
 import columnsFixture from '../../../test/fixtures/expShow/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
-import { ExperimentsOutput } from '../../../cli/reader'
+import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
+import { ExperimentsOutput } from '../../../cli/dvc/reader'
 
 describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {
@@ -475,6 +476,15 @@ describe('collectColumns', () => {
         buildDepPath('model.pkl'),
         buildDepPath('src', 'evaluate.py')
       ]
+    )
+  })
+
+  it('should mark new dep files as changes', () => {
+    const changes = collectChanges(uncommittedDepsFixture)
+    expect(changes).toStrictEqual(
+      Object.keys(uncommittedDepsFixture.workspace.baseline.data?.deps || {})
+        .map(dep => `deps:${dep}`)
+        .sort()
     )
   })
 })

@@ -7,7 +7,6 @@ import {
   mockDisposable
 } from '../util'
 import { Disposer } from '../../../extension'
-import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
 import * as Time from '../../../util/time'
 import * as Watcher from '../../../fileSystem/watcher'
@@ -15,19 +14,21 @@ import { Repository } from '../../../repository'
 import { InternalCommands } from '../../../commands/internal'
 import { DecorationProvider } from '../../../repository/decorationProvider'
 import { SourceControlManagement } from '../../../repository/sourceControlManagement'
-import { DataStatusOutput } from '../../../cli/reader'
+import { DataStatusOutput } from '../../../cli/dvc/reader'
 
 export const buildDependencies = (disposer: Disposer) => {
-  const { cliReader, internalCommands } = buildInternalCommands(disposer)
+  const { dvcReader, gitReader, internalCommands } =
+    buildInternalCommands(disposer)
 
   const mockCreateFileSystemWatcher = stub(
     Watcher,
     'createFileSystemWatcher'
   ).returns(mockDisposable)
 
-  const mockDataStatus = stub(cliReader, 'dataStatus')
-  const mockGetHasChanges = stub(Git, 'getHasChanges')
-  const mockGetAllUntracked = stub(Git, 'getAllUntracked')
+  const mockDataStatus = stub(dvcReader, 'dataStatus')
+  const mockGetAllUntracked = stub(gitReader, 'listUntracked')
+  const mockGetHasChanges = stub(gitReader, 'hasChanges')
+
   const mockNow = stub(Time, 'getCurrentEpoch')
 
   const treeDataChanged = disposer.track(new EventEmitter<void>())

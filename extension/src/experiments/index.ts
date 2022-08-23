@@ -22,7 +22,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput } from '../cli/reader'
+import { ExperimentsOutput } from '../cli/dvc/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { FileSystemData } from '../fileSystem/data'
@@ -277,6 +277,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getExperimentCount() {
+    if (!this.columns.hasColumns()) {
+      return 0
+    }
+
     return this.experiments.getExperimentCount()
   }
 

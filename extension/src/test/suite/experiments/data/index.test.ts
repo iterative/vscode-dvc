@@ -1,4 +1,4 @@
-import { join, sep } from 'path'
+import { join, resolve, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
@@ -16,11 +16,15 @@ import {
   QUEUED_EXPERIMENT_PATH
 } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
-import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
-import { InternalCommands } from '../../../../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../../../../commands/internal'
 import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
-import { ExperimentFlag } from '../../../../cli/constants'
+import { ExperimentFlag } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
+import { DOT_GIT_HEAD } from '../../../../cli/git/constants'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -148,13 +152,20 @@ suite('Experiments Data Test Suite', () => {
 
     it('should watch the .git directory for updates', async () => {
       const mockNow = getMockNow()
+      const gitRoot = resolve(dvcDemoPath, '..')
+
+      const mockExecuteCommand = (command: CommandId) => {
+        if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
+          return Promise.resolve(gitRoot)
+        }
+      }
 
       const data = disposable.track(
         new ExperimentsData(
           dvcDemoPath,
           {
             dispose: stub(),
-            executeCommand: stub()
+            executeCommand: mockExecuteCommand
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>())
         )
@@ -162,8 +173,6 @@ suite('Experiments Data Test Suite', () => {
 
       await data.isReady()
       bypassProcessManagerDebounce(mockNow)
-
-      const gitRoot = await getGitRepositoryRoot(dvcDemoPath)
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
       const dataUpdatedEvent = new Promise(resolve =>

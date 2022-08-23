@@ -1,10 +1,10 @@
 import { join } from 'path'
 import { getOptions } from './options'
 import { Command, Flag } from './constants'
-import { getProcessEnv } from '../env'
-import { joinEnvPath } from '../util/env'
+import { getProcessEnv } from '../../env'
+import { joinEnvPath } from '../../util/env'
 
-jest.mock('../env')
+jest.mock('../../env')
 
 const mockedPATH = '/some/special/path'
 
@@ -27,7 +27,6 @@ describe('getOptions', () => {
     const options = getOptions(undefined, '', cwd, Command.CHECKOUT, Flag.FORCE)
     expect(options).toStrictEqual({
       args: ['checkout', '-f'],
-      command: 'dvc checkout -f',
       cwd,
       env: mockedEnv,
       executable: 'dvc'
@@ -39,7 +38,6 @@ describe('getOptions', () => {
     const options = getOptions(pythonBinPath, '', cwd, Command.PULL)
     expect(options).toStrictEqual({
       args: ['-m', 'dvc', 'pull'],
-      command: `${pythonBinPath} -m dvc pull`,
       cwd,
       env: {
         DVCLIVE_OPEN: 'false',
@@ -56,7 +54,6 @@ describe('getOptions', () => {
     const options = getOptions(pythonBinPath, cliPath, cwd, Command.PULL)
     expect(options).toStrictEqual({
       args: ['pull'],
-      command: `${cliPath} pull`,
       cwd,
       env: {
         DVCLIVE_OPEN: 'false',

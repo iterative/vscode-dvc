@@ -1,4 +1,4 @@
-import { GcPreserveFlag } from '../cli/constants'
+import { GcPreserveFlag } from '../cli/dvc/constants'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'

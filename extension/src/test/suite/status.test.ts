@@ -5,7 +5,8 @@ import { window, workspace, EventEmitter, StatusBarItem } from 'vscode'
 import { closeAllEditors } from './util'
 import { Disposable } from '../../extension'
 import { Status } from '../../status'
-import { Cli, CliResult, CliStarted } from '../../cli'
+import { CliResult, CliStarted } from '../../cli'
+import { DvcCli } from '../../cli/dvc'
 import { Config } from '../../config'
 import { RegisteredCommands } from '../../commands/external'
 import { Title } from '../../vscode/title'
@@ -36,7 +37,7 @@ suite('Status Test Suite', () => {
       const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
       const cli = disposable.track(
-        new Cli({} as Config, { processCompleted, processStarted })
+        new DvcCli({} as Config, { processCompleted, processStarted })
       )
       const mockStatusBarItem = {
         command: undefined,
@@ -117,7 +118,7 @@ suite('Status Test Suite', () => {
       const cwd = __dirname
 
       const cli = disposable.track(
-        new Cli({} as Config, { processCompleted, processStarted })
+        new DvcCli({} as Config, { processCompleted, processStarted })
       )
       const mockStatusBarItem = {
         dispose: fake(),

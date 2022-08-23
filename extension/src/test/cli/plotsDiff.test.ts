@@ -1,7 +1,7 @@
 import { describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
-import { cliReader, initializeDemoRepo, initializeEmptyRepo } from './util'
+import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 import {
   ImagePlot,
@@ -15,7 +15,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
-      const output = await cliReader.plotsDiff(dvcDemoPath)
+      const output = await dvcReader.plotsDiff(dvcDemoPath)
 
       expect(output, 'should be an object').to.be.an('object')
 
@@ -87,7 +87,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
   describe('Empty Repository', () => {
     it('should return the expected output', async () => {
       await initializeEmptyRepo()
-      const output = await cliReader.plotsDiff(TEMP_DIR)
+      const output = await dvcReader.plotsDiff(TEMP_DIR)
 
       expect(output).deep.equal({})
     })

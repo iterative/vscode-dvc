@@ -1,13 +1,6 @@
 import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { DataStatusOutput } from '../../cli/reader'
-import {
-  DOT_GIT,
-  getAllUntracked,
-  getGitRepositoryRoot,
-  getHasChanges
-} from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -19,6 +12,8 @@ import {
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
+import { DOT_GIT } from '../../cli/git/constants'
+import { DataStatusOutput } from '../../cli/dvc/reader'
 
 export type Data = {
   dataStatus: DataStatusOutput
@@ -87,15 +82,19 @@ export class RepositoryData extends DeferredDisposable {
   }
 
   private async update() {
-    const dataStatus =
-      await this.internalCommands.executeCommand<DataStatusOutput>(
+    const [dataStatus, hasGitChanges, untracked] = await Promise.all([
+      this.internalCommands.executeCommand<DataStatusOutput>(
         AvailableCommands.DATA_STATUS,
         this.dvcRoot
+      ),
+      this.internalCommands.executeCommand<boolean>(
+        AvailableCommands.GIT_HAS_CHANGES,
+        this.dvcRoot
+      ),
+      this.internalCommands.executeCommand<Set<string>>(
+        AvailableCommands.GIT_LIST_UNTRACKED,
+        this.dvcRoot
       )
-
-    const [untracked, hasGitChanges] = await Promise.all([
-      getAllUntracked(this.dvcRoot),
-      getHasChanges(this.dvcRoot)
     ])
 
     return this.notifyChanged({
@@ -110,7 +109,10 @@ export class RepositoryData extends DeferredDisposable {
   }
 
   private async watchWorkspace() {
-    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
+    const gitRoot = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_REPOSITORY_ROOT,
+      this.dvcRoot
+    )
 
     this.dispose.track(
       createFileSystemWatcher(

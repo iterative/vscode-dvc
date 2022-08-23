@@ -35,11 +35,12 @@ export enum MessageFromWebviewType {
   SELECT_EXPERIMENTS = 'select-experiments',
   SELECT_COLUMNS = 'select-columns',
   SELECT_PLOTS = 'select-plots',
+  SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
-  VARY_EXPERIMENT_PARAMS_AND_QUEUE = 'vary-experiment-params-and-queue',
-  VARY_EXPERIMENT_PARAMS_AND_RUN = 'vary-experiment-params-and-run',
-  VARY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'vary-experiment-params-reset-and-run'
+  MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
+  MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
+  MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run'
 }
 
 export type ColumnResizePayload = {
@@ -90,15 +91,15 @@ export type MessageFromWebview =
       payload: string
     }
   | {
-      type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE
+      type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
       payload: string
     }
   | {
-      type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN
+      type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN
       payload: string
     }
   | {
-      type: MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN
+      type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN
       payload: string
     }
   | {
@@ -146,6 +147,10 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }
   | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }
+  | {
+      type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
+      payload: string
+    }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

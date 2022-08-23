@@ -50,7 +50,7 @@ const mockedGetWorkspaceFolders = jest.mocked(getWorkspaceFolders)
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('.')
-jest.mock('../cli/reader')
+jest.mock('../cli/dvc/reader')
 jest.mock('../vscode/workspaceFolders')
 
 beforeEach(() => {

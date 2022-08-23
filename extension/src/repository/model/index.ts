@@ -10,7 +10,7 @@ import {
   SCMState,
   SourceControlStatus
 } from '../sourceControlManagement'
-import { DataStatusOutput } from '../../cli/reader'
+import { DataStatusOutput } from '../../cli/dvc/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'

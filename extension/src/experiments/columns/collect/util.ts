@@ -1,5 +1,5 @@
 import { Column, ColumnType } from '../../webview/contract'
-import { Value } from '../../../cli/reader'
+import { Value } from '../../../cli/dvc/reader'
 
 export type ColumnAccumulator = Record<string, Column>
 

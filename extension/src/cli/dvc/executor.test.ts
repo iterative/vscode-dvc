@@ -1,20 +1,20 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { CliResult, CliStarted } from '.'
 import { Flag, GcPreserveFlag } from './constants'
-import { CliExecutor } from './executor'
-import { createProcess } from '../processExecution'
-import { getMockedProcess } from '../test/util/jest'
-import { getProcessEnv } from '../env'
-import { Config } from '../config'
-import { setContextValue } from '../vscode/context'
+import { DvcExecutor } from './executor'
+import { CliResult, CliStarted } from '..'
+import { createProcess } from '../../processExecution'
+import { getMockedProcess } from '../../test/util/jest'
+import { getProcessEnv } from '../../env'
+import { Config } from '../../config'
+import { setContextValue } from '../../vscode/context'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
-jest.mock('../processExecution')
-jest.mock('../env')
-jest.mock('../vscode/context')
+jest.mock('../../processExecution')
+jest.mock('../../env')
+jest.mock('../../vscode/context')
 
 const mockedDisposable = jest.mocked(Disposable)
 
@@ -43,7 +43,7 @@ describe('CliExecutor', () => {
     }
   } as unknown as (() => void) & Disposer)
 
-  const cliExecutor = new CliExecutor(
+  const dvcExecutor = new DvcExecutor(
     {
       getCliPath: () => undefined,
       pythonBinPath: undefined
@@ -77,7 +77,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.add(cwd, relPath)
+      const output = await dvcExecutor.add(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -95,7 +95,7 @@ describe('CliExecutor', () => {
       const stdout = 'M       model.pt\nM       logs/\n'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.checkout(fsPath)
+      const output = await dvcExecutor.checkout(fsPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -111,7 +111,7 @@ describe('CliExecutor', () => {
       const stdout = 'M       model.pt\nM       logs/\n'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.checkout(fsPath, Flag.FORCE)
+      const output = await dvcExecutor.checkout(fsPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -130,7 +130,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.checkout(cwd, relPath)
+      const output = await dvcExecutor.checkout(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -149,7 +149,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.checkout(cwd, relPath, Flag.FORCE)
+      const output = await dvcExecutor.checkout(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -167,7 +167,7 @@ describe('CliExecutor', () => {
       const stdout = updatingLockFile
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.commit(cwd)
+      const output = await dvcExecutor.commit(cwd)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -183,7 +183,7 @@ describe('CliExecutor', () => {
       const stdout = updatingLockFile
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.commit(cwd, Flag.FORCE)
+      const output = await dvcExecutor.commit(cwd, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -205,7 +205,7 @@ describe('CliExecutor', () => {
       const stdout = updatingLockFile
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.commit(cwd, relPath)
+      const output = await dvcExecutor.commit(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -227,7 +227,7 @@ describe('CliExecutor', () => {
       const stdout = updatingLockFile
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.commit(cwd, relPath, Flag.FORCE)
+      const output = await dvcExecutor.commit(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -245,7 +245,7 @@ describe('CliExecutor', () => {
       const stdout = 'Test output that will be passed along'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.experimentApply(cwd, 'exp-test')
+      const output = await dvcExecutor.experimentApply(cwd, 'exp-test')
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -266,7 +266,7 @@ describe('CliExecutor', () => {
         '\t\tgit checkout some-branch'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.experimentBranch(
+      const output = await dvcExecutor.experimentBranch(
         cwd,
         'exp-0898f',
         'some-branch'
@@ -291,7 +291,7 @@ describe('CliExecutor', () => {
         "Removed 45 experiments. To remove unused cache files use 'dvc gc'. "
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.experimentGarbageCollect(
+      const output = await dvcExecutor.experimentGarbageCollect(
         cwd,
         GcPreserveFlag.WORKSPACE,
         GcPreserveFlag.QUEUED
@@ -313,7 +313,7 @@ describe('CliExecutor', () => {
       const stdout = ''
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.experimentRemove(cwd, 'exp-dfd12')
+      const output = await dvcExecutor.experimentRemove(cwd, 'exp-dfd12')
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -331,7 +331,7 @@ describe('CliExecutor', () => {
       const stdout = ''
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.experimentRemoveQueue(cwd)
+      const output = await dvcExecutor.experimentRemoveQueue(cwd)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -349,7 +349,7 @@ describe('CliExecutor', () => {
       const stdout = "Queued experiment 'bbf5c01' for future execution."
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.experimentRunQueue(cwd)
+      const output = await dvcExecutor.experimentRunQueue(cwd)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -384,7 +384,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.init(fsPath)
+      const output = await dvcExecutor.init(fsPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -408,7 +408,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.move(cwd, target, destination)
+      const output = await dvcExecutor.move(cwd, target, destination)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -427,7 +427,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.pull(cwd)
+      const output = await dvcExecutor.pull(cwd)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -444,7 +444,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.pull(cwd, Flag.FORCE)
+      const output = await dvcExecutor.pull(cwd, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -462,7 +462,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.pull(cwd, relPath)
+      const output = await dvcExecutor.pull(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -480,7 +480,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.pull(cwd, relPath, Flag.FORCE)
+      const output = await dvcExecutor.pull(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -499,7 +499,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.push(cwd)
+      const output = await dvcExecutor.push(cwd)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -515,7 +515,7 @@ describe('CliExecutor', () => {
       const stdout = everythingUpToDate
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.push(cwd, Flag.FORCE)
+      const output = await dvcExecutor.push(cwd, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -533,7 +533,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.push(cwd, relPath)
+      const output = await dvcExecutor.push(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -551,7 +551,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.push(cwd, relPath, Flag.FORCE)
+      const output = await dvcExecutor.push(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
@@ -572,7 +572,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await cliExecutor.remove(cwd, relPath)
+      const output = await dvcExecutor.remove(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({

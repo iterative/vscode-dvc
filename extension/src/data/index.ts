@@ -4,7 +4,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
+import { ExperimentsOutput, PlotsOutput } from '../cli/dvc/reader'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 
@@ -16,8 +16,8 @@ export abstract class BaseData<
   protected readonly dvcRoot: string
   protected readonly processManager: ProcessManager
   protected readonly internalCommands: InternalCommands
+  protected collectedFiles: string[] = []
 
-  private collectedFiles: string[] = []
   private readonly staticFiles: string[]
 
   private readonly updated: EventEmitter<T> = this.dispose.track(

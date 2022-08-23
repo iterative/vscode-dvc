@@ -1,10 +1,10 @@
 import { retry } from './retry'
-import { delay } from '../util/time'
+import { delay } from '../../util/time'
 
 const mockedDelay = jest.mocked(delay)
 
-jest.mock('../util/time')
-jest.mock('../common/logger')
+jest.mock('../../util/time')
+jest.mock('../../common/logger')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -17,7 +17,7 @@ describe('retry', () => {
 
     const promiseRefresher = jest.fn().mockImplementation(() => promise())
 
-    const output = await retry<string>(promiseRefresher, 'Definitely did not')
+    const output = await retry(promiseRefresher, 'Definitely did not')
 
     expect(output).toStrictEqual(returnValue)
 
@@ -45,7 +45,7 @@ describe('retry', () => {
       .fn()
       .mockImplementation(() => unreliablePromise())
 
-    await retry<string>(promiseRefresher, 'Data update')
+    await retry(promiseRefresher, 'Data update')
 
     expect(promiseRefresher).toBeCalledTimes(4)
     expect(mockedDelay).toBeCalledTimes(3)

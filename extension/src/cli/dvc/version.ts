@@ -3,7 +3,7 @@ import {
   LATEST_TESTED_CLI_VERSION,
   MIN_CLI_VERSION
 } from './constants'
-import { Toast } from '../vscode/toast'
+import { Toast } from '../../vscode/toast'
 
 export type ParsedSemver = { major: number; minor: number; patch: number }
 
@@ -36,7 +36,7 @@ const warnIfAheadOfLatestTested = (
   ) as ParsedSemver
 
   if (currentMajor === latestTestedMajor && currentMinor > latestTestedMinor) {
-    Toast.warnWithOptions(`The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with. 
+    Toast.warnWithOptions(`The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). 
 		This could lead to unexpected behaviour. 
 		Please upgrade to the most recent version of the extension and reload this window.`)
   }

@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.21] - 2022-08-21
+
+### 🚀 New Features and Enhancements
+
+- Add a copy button for comparison table rows [#2216](https://github.com/iterative/vscode-dvc/pull/2216) by [@sroy3](https://github.com/sroy3)
+- Share an experiment from context menus [#2219](https://github.com/iterative/vscode-dvc/pull/2219) by [@mattseddon](https://github.com/mattseddon)
+- Share an experiment from command palette [#2221](https://github.com/iterative/vscode-dvc/pull/2221) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Disable selection on resize [#2214](https://github.com/iterative/vscode-dvc/pull/2214) by [@sroy3](https://github.com/sroy3)
+- Update cell hover styles [#2198](https://github.com/iterative/vscode-dvc/pull/2198) by [@julieg18](https://github.com/julieg18)
+
+## [0.3.20] - 2022-08-18
+
+### 🚀 New Features and Enhancements
+
+- Show min tested version in toast warning message [#2209](https://github.com/iterative/vscode-dvc/pull/2209) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix sticky workspace row obscuring branch [#2212](https://github.com/iterative/vscode-dvc/pull/2212) by [@mattseddon](https://github.com/mattseddon)
+- Make drop zones larger when dragging in the same section [#2206](https://github.com/iterative/vscode-dvc/pull/2206) by [@sroy3](https://github.com/sroy3)
+
+## [0.3.19] - 2022-08-18
+
+### 🚀 New Features and Enhancements
+
+- Update table styles [#2133](https://github.com/iterative/vscode-dvc/pull/2133) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Improve table styles [#2197](https://github.com/iterative/vscode-dvc/pull/2197) by [@julieg18](https://github.com/julieg18)
+- Do not retry CLI process when unexpected error is received [#2200](https://github.com/iterative/vscode-dvc/pull/2200) by [@mattseddon](https://github.com/mattseddon)
+- Handle newly introduced deps (before dvc commit) [#2202](https://github.com/iterative/vscode-dvc/pull/2202) by [@mattseddon](https://github.com/mattseddon)
+- Fix experiment table live updates in non-checkpoint experiments [#2203](https://github.com/iterative/vscode-dvc/pull/2203) by [@mattseddon](https://github.com/mattseddon)
+- Fix partially hidden header context menus [#2204](https://github.com/iterative/vscode-dvc/pull/2204) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Bump min tested DVC version to 2.18.1 [#2207](https://github.com/iterative/vscode-dvc/pull/2207) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.18] - 2022-08-15
 
 ### 🚀 New Features and Enhancements
