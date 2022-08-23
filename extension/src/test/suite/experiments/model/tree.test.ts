@@ -15,7 +15,12 @@ import { addFilterViaQuickInput } from './filterBy/util'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
-import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
+import {
+  experimentsUpdatedEvent,
+  getFirstArgOfLastCall,
+  spyOnPrivateMethod,
+  stubPrivatePrototypeMethod
+} from '../../util'
 import { dvcDemoPath } from '../../../util'
 import {
   RegisteredCliCommands,
@@ -28,7 +33,11 @@ import expShowFixture from '../../../fixtures/expShow/output'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { buildMetricOrParamPath } from '../../../../experiments/columns/paths'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
-import { buildExperiments, buildSingleRepoExperiments } from '../util'
+import {
+  buildExperiments,
+  buildSingleRepoExperiments,
+  stubWorkspaceExperimentsGetters
+} from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import {
@@ -444,9 +453,8 @@ suite('Experiments Tree Test Suite', () => {
 
       const description = '[exp-1234]'
 
-      const setExpandedSpy = spy(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        experimentsTree as any,
+      const setExpandedSpy = spyOnPrivateMethod(
+        experimentsTree,
         'setExperimentExpanded'
       )
 
@@ -480,9 +488,8 @@ suite('Experiments Tree Test Suite', () => {
         'experimentRemove'
       ).resolves('')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ExperimentsTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
         'getSelectedExperimentItems'
       ).returns([mockExperiment])
 
@@ -505,9 +512,8 @@ suite('Experiments Tree Test Suite', () => {
         'experimentRemove'
       ).resolves('')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ExperimentsTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
         'getSelectedExperimentItems'
       ).returns([])
 
@@ -535,9 +541,8 @@ suite('Experiments Tree Test Suite', () => {
         'experimentRemove'
       ).resolves('')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ExperimentsTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
         'getSelectedExperimentItems'
       ).returns([
         dvcDemoPath,
@@ -671,12 +676,10 @@ suite('Experiments Tree Test Suite', () => {
         'experimentRunQueue'
       ).resolves('true')
 
-      const mockGetOnlyOrPickProject = stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
+      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
+        '',
+        experiments
       )
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
 
@@ -735,12 +738,10 @@ suite('Experiments Tree Test Suite', () => {
         undefined
       )
 
-      const mockGetOnlyOrPickProject = stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
+      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
+        '',
+        experiments
       )
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
 
@@ -797,12 +798,10 @@ suite('Experiments Tree Test Suite', () => {
         'runExperimentReset'
       ).resolves(undefined)
 
-      const mockGetOnlyOrPickProject = stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
+      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
+        '',
+        experiments
       )
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
 
