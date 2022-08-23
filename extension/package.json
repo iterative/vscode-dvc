@@ -473,6 +473,12 @@
         "icon": "$(repo-push)"
       },
       {
+        "title": "%command.views.experiments.shareExperimentAsCommit%",
+        "command": "dvc.views.experiments.shareExperimentAsCommit",
+        "category": "DVC",
+        "icon": "$(repo-push)"
+      },
+      {
         "title": "%command.views.experimentsTree.selectExperiments%",
         "command": "dvc.views.experimentsTree.selectExperiments",
         "category": "DVC",
@@ -804,6 +810,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.views.experiments.shareExperimentAsCommit",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "false"
         },
@@ -1090,8 +1100,13 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experiments.shareExperimentAsBranch",
+          "command": "dvc.views.experiments.shareExperimentAsCommit",
           "group": "1_share@1",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
+        },
+        {
+          "command": "dvc.views.experiments.shareExperimentAsBranch",
+          "group": "1_share@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
         },
         {

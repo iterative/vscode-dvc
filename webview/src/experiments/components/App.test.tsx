@@ -691,6 +691,7 @@ describe('App', () => {
       expect(itemLabels).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
+        'Commit and Share',
         'Share as Branch',
         'Modify, Reset and Run',
         'Modify and Resume',
