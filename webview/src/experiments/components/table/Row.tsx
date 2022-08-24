@@ -182,6 +182,11 @@ const getSingleSelectMenuOptions = (
       isNotExperimentOrCheckpoint
     ),
     withId(
+      'Commit and Share',
+      MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT,
+      isNotExperimentOrCheckpoint
+    ),
+    withId(
       'Share as Branch',
       MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH,
       isNotExperimentOrCheckpoint

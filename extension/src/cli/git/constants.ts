@@ -10,6 +10,7 @@ export const HEADS_GIT_REFS = join(GIT_REFS, 'heads')
 export enum Command {
   ADD = 'add',
   CLEAN = 'clean',
+  COMMIT = 'commit',
   DIFF = 'diff',
   LS_FILES = 'ls-files',
   PUSH = 'push',
@@ -24,6 +25,7 @@ export enum Flag {
   EXCLUDE_STANDARD = '--exclude-standard',
   FORCE = '-f',
   HARD = '--hard',
+  MESSAGE = '-m',
   NAME_ONLY = '--name-only',
   NO_EMPTY_DIRECTORY = '--no-empty-directory',
   OTHERS = '--others',

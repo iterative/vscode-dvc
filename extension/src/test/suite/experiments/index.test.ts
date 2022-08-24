@@ -531,6 +531,62 @@ suite('Experiments Test Suite', () => {
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message to share an experiment as a commit', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testCheckpointId = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
+      const testCheckpointLabel = shortenForLabel(testCheckpointId)
+      const mockCommitMessage =
+        'this is the very best version that I could come up with'
+      const inputEvent = getInputBoxEvent(mockCommitMessage)
+
+      const mockExperimentApply = stub(
+        DvcExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${testCheckpointId}' have been applied to your current workspace.`
+      )
+      const mockStageAndCommit = stub(
+        GitExecutor.prototype,
+        'stageAndCommit'
+      ).resolves(`[current-branch 67effdbc] ${mockCommitMessage}`)
+
+      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
+        '100000 files updated.'
+      )
+      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
+      const branchPushedToRemote = new Promise(resolve =>
+        mockGitPush.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('current-branch pushed to remote')
+        })
+      )
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: testCheckpointId,
+        type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
+      })
+
+      await inputEvent
+      await branchPushedToRemote
+      expect(mockStageAndCommit).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockCommitMessage
+      )
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        testCheckpointLabel
+      )
+      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
       const { experiments, dvcExecutor } = buildExperiments(disposable)
 

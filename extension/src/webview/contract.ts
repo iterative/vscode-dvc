@@ -36,6 +36,7 @@ export enum MessageFromWebviewType {
   SELECT_COLUMNS = 'select-columns',
   SELECT_PLOTS = 'select-plots',
   SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
+  SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
@@ -149,6 +150,10 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }
   | {
       type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
       payload: string
     }
 
