@@ -51,7 +51,7 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
-import { DVCLanguageClient } from './language-client'
+import { DVCLanguageClient } from './lsp-client/language-client'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands

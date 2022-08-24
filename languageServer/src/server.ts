@@ -2,7 +2,6 @@ import {
   createConnection,
   TextDocuments,
   ProposedFeatures,
-  InitializeParams,
   TextDocumentSyncKind,
   InitializeResult,
   ServerCapabilities,
@@ -22,7 +21,7 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument)
 
 connection.onRequest(() => null)
 
-connection.onInitialize((params: InitializeParams) => {
+connection.onInitialize(() => {
   const documentSelector = [
     {
       language: 'yaml'
@@ -42,61 +41,61 @@ connection.onInitialize((params: InitializeParams) => {
   ]
 
   const textDocumentSync: Required<TextDocumentSyncOptions> = {
-    openClose: true,
     change: TextDocumentSyncKind.Full,
+    openClose: true,
+    save: true,
     willSave: false,
-    willSaveWaitUntil: false,
-    save: true
+    willSaveWaitUntil: false
   }
 
   const serverCapabilities: ServerCapabilities = {
-    textDocumentSync,
     completionProvider: {
       resolveProvider: true,
       triggerCharacters: ['.']
+    },
+    declarationProvider: {
+      documentSelector
+    },
+    definitionProvider: true,
+    codeActionProvider: true,
+    documentHighlightProvider: true,
+    codeLensProvider: {
+      resolveProvider: true
+    },
+    hoverProvider: true,
+    colorProvider: true,
+    implementationProvider: true,
+    documentFormattingProvider: false,
+    textDocumentSync,
+    documentLinkProvider: {
+      resolveProvider: true
     },
     workspace: {
       workspaceFolders: {
         supported: true
       }
     },
-    hoverProvider: true,
+    documentOnTypeFormattingProvider: undefined,
     signatureHelpProvider: {
       triggerCharacters,
       retriggerCharacters: triggerCharacters
     },
-    declarationProvider: {
-      documentSelector
-    },
-    definitionProvider: true,
-    typeDefinitionProvider: true,
-    implementationProvider: true,
-    referencesProvider: true,
-    documentHighlightProvider: true,
-    documentSymbolProvider: true,
-    codeActionProvider: true,
-    codeLensProvider: {
-      resolveProvider: true
-    },
-    documentLinkProvider: {
-      resolveProvider: true
-    },
-    colorProvider: true,
-    workspaceSymbolProvider: true,
-    documentFormattingProvider: false,
     documentRangeFormattingProvider: false,
-    documentOnTypeFormattingProvider: undefined,
-    renameProvider: true,
-    foldingRangeProvider: false,
-    selectionRangeProvider: false,
+    callHierarchyProvider: true,
+    typeDefinitionProvider: true,
+    documentSymbolProvider: true,
+    referencesProvider: true,
     executeCommandProvider: {
       commands: supportedServerCommands
     },
-    callHierarchyProvider: true,
+    experimental: undefined,
+    foldingRangeProvider: false,
     linkedEditingRangeProvider: false,
-    semanticTokensProvider: undefined,
     monikerProvider: false,
-    experimental: undefined
+    renameProvider: true,
+    workspaceSymbolProvider: true,
+    selectionRangeProvider: false,
+    semanticTokensProvider: undefined
   }
 
   const result: InitializeResult = {

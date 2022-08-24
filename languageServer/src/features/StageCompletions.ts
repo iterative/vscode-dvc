@@ -9,6 +9,8 @@ export class StageCompletions extends BaseFeature {
   protected setup(): void {
     this.connection?.onCompletion(
       (params: TextDocumentPositionParams): CompletionItem[] => {
+        this.setTextDocumentPositionParams(params)
+
         const stageNames = this.query({
           dvcYamls: '$.workspace[?(@.uri.match(/dvc.yaml$/))]',
           stages: '$.dvcYamls[*].parsed.stages.*~'
