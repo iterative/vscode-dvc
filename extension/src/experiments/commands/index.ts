@@ -31,11 +31,6 @@ export const getShareExperimentAsCommitCommand =
     await Toast.showProgress('Commit and Share experiment', async progress => {
       progress.report({ increment: 0 })
 
-      progress.report({
-        increment: 5,
-        message: 'applying experiment to workspace...'
-      })
-
       const experimentApplied = await internalCommands.executeCommand(
         AvailableCommands.EXPERIMENT_APPLY,
         cwd,
@@ -43,13 +38,8 @@ export const getShareExperimentAsCommitCommand =
       )
 
       progress.report({
-        increment: 20,
+        increment: 25,
         message: experimentApplied
-      })
-
-      progress.report({
-        increment: 5,
-        message: 'committing to Git...'
       })
 
       const gitCommitted = await internalCommands.executeCommand(
@@ -59,13 +49,8 @@ export const getShareExperimentAsCommitCommand =
       )
 
       progress.report({
-        increment: 20,
+        increment: 25,
         message: gitCommitted
-      })
-
-      progress.report({
-        increment: 5,
-        message: 'pushing data to DVC remote...'
       })
 
       const pushed = await internalCommands.executeCommand(
@@ -74,7 +59,7 @@ export const getShareExperimentAsCommitCommand =
       )
 
       progress.report({
-        increment: 20,
+        increment: 25,
         message: pushed
       })
 
@@ -82,11 +67,6 @@ export const getShareExperimentAsCommitCommand =
         AvailableCommands.GIT_PUSH_BRANCH,
         cwd
       )
-
-      progress.report({
-        increment: 5,
-        message: 'pushing branch to Git remote...'
-      })
 
       progress.report({
         increment: 25,
