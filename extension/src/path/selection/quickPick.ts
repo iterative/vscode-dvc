@@ -5,7 +5,7 @@ import {
   quickPickManyValues
 } from '../../vscode/quickPick'
 import { Title } from '../../vscode/title'
-import { Column, ColumnType } from '../../experiments/webview/contract'
+import { Column } from '../../experiments/webview/contract'
 import { PlotPath } from '../../plots/paths/collect'
 
 type PathType = PlotPath | Column
@@ -15,7 +15,7 @@ type PathWithSelected<T extends PathType> = T & {
 }
 
 const getItem = <T extends PathType>(element: PathWithSelected<T>) => ({
-  label: element.type === ColumnType.TIMESTAMP ? element.label : element.path,
+  label: element.path,
   picked: element.selected,
   value: element
 })

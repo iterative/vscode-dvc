@@ -3,3 +3,4 @@ dist
 .wdio-vscode-service
 coverage
 src/test/fixtures/plotsDiff/vega.ts
+CHANGELOG.md

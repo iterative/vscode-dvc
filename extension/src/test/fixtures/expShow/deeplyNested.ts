@@ -249,7 +249,7 @@ export const rows = [
   {
     id: 'main',
     label: 'main',
-    timestamp: '2020-11-21T19:58:22',
+    Timestamp: '2020-11-21T19:58:22',
     queued: false,
     running: false,
     executor: null,

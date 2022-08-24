@@ -79,10 +79,7 @@ describe('ExperimentsColumnsTree', () => {
     .map(column => ({
       ...column,
       descendantStatuses: [],
-      label:
-        column.type === ColumnType.TIMESTAMP
-          ? timestampColumn.label
-          : getLabel(column.path),
+      label: getLabel(column.path),
       status: Status.SELECTED
     }))
 

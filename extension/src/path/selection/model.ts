@@ -1,9 +1,8 @@
 import { Memento } from 'vscode'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
-import { Column, ColumnType } from '../../experiments/webview/contract'
+import { Column } from '../../experiments/webview/contract'
 import { PlotPath } from '../../plots/paths/collect'
-import { timestampColumn } from '../../experiments/columns/collect/timestamp'
 
 export enum Status {
   SELECTED = 2,
@@ -77,15 +76,13 @@ export abstract class PathSelectionModel<
 
   public setSelected(elements: (T & { selected: boolean })[]) {
     const terminalNodes = this.getTerminalNodes()
-    terminalNodes.map(({ path, selected, type }) => {
+    terminalNodes.map(({ path, selected }) => {
       const selectedElement = elements.find(
         ({ path: selectedPath }) => path === selectedPath
       )
 
       if (!!selectedElement !== !!selected) {
-        const statusPath =
-          type === ColumnType.TIMESTAMP ? timestampColumn.parentPath : path
-        this.toggleStatus(statusPath)
+        this.toggleStatus(path)
       }
     })
   }
