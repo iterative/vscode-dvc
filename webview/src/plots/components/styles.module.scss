@@ -280,6 +280,11 @@ $gap: 20px;
   align-items: center;
 }
 
+.rowDropTarget {
+  width: 100%;
+  padding: 20px;
+}
+
 .dropIcon {
   border-radius: 100%;
   border: 3px solid $accent-color;

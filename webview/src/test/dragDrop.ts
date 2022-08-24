@@ -45,10 +45,12 @@ export const dragEnter = (
         100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
       const left = 100
       const right = left + 100
+      const top = 0
+      const bottom = 0
       const dragOverEvent = createBubbledEvent('dragover', { clientX })
       jest
         .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
-        .mockImplementationOnce(() => ({ left, right }))
+        .mockImplementationOnce(() => ({ bottom, left, right, top }))
       draggedOver?.dispatchEvent(dragOverEvent)
       jest.advanceTimersByTime(1)
     } else {

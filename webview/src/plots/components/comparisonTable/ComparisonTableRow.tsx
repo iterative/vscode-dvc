@@ -31,7 +31,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   const toggleIsShownState = () => setIsShown(!isShown)
 
   return (
-    <tbody>
+    <>
       <tr>
         <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
           <button className={styles.rowToggler} onClick={toggleIsShownState}>
@@ -81,6 +81,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           )
         })}
       </tr>
-    </tbody>
+    </>
   )
 }
