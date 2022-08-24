@@ -198,7 +198,7 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
-        getShareExperimentAsCommitCommand(experiments),
+        getShareExperimentAsCommitCommand(internalCommands),
         Title.ENTER_COMMIT_MESSAGE,
         dvcRoot,
         id

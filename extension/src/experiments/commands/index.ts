@@ -1,4 +1,5 @@
-import { AvailableCommands } from '../../commands/internal'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { Toast } from '../../vscode/toast'
 import { WorkspaceExperiments } from '../workspace'
 
 export const getBranchExperimentCommand =
@@ -25,17 +26,73 @@ export const getShareExperimentAsBranchCommand =
   }
 
 export const getShareExperimentAsCommitCommand =
-  (experiments: WorkspaceExperiments) =>
+  (internalCommands: InternalCommands) =>
   async (cwd: string, name: string, input: string) => {
-    await experiments.runCommand(AvailableCommands.EXPERIMENT_APPLY, cwd, name)
+    await Toast.showProgress('Commit and Share experiment', async progress => {
+      progress.report({ increment: 0 })
 
-    await experiments.runCommand(
-      AvailableCommands.GIT_STAGE_AND_COMMIT,
-      cwd,
-      input
-    )
+      progress.report({
+        increment: 5,
+        message: 'applying experiment to workspace...'
+      })
 
-    await experiments.runCommand(AvailableCommands.PUSH, cwd)
+      const experimentApplied = await internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_APPLY,
+        cwd,
+        name
+      )
 
-    return experiments.runCommand(AvailableCommands.GIT_PUSH_BRANCH, cwd)
+      progress.report({
+        increment: 20,
+        message: experimentApplied
+      })
+
+      progress.report({
+        increment: 5,
+        message: 'committing to Git...'
+      })
+
+      const gitCommitted = await internalCommands.executeCommand(
+        AvailableCommands.GIT_STAGE_AND_COMMIT,
+        cwd,
+        input
+      )
+
+      progress.report({
+        increment: 20,
+        message: gitCommitted
+      })
+
+      progress.report({
+        increment: 5,
+        message: 'pushing data to DVC remote...'
+      })
+
+      const pushed = await internalCommands.executeCommand(
+        AvailableCommands.PUSH,
+        cwd
+      )
+
+      progress.report({
+        increment: 20,
+        message: pushed
+      })
+
+      const branchPushed = internalCommands.executeCommand(
+        AvailableCommands.GIT_PUSH_BRANCH,
+        cwd
+      )
+
+      progress.report({
+        increment: 5,
+        message: 'pushing branch to Git remote...'
+      })
+
+      progress.report({
+        increment: 25,
+        message: await branchPushed
+      })
+
+      return branchPushed
+    })
   }
