@@ -13,22 +13,63 @@ export const getBranchExperimentCommand =
     )
 
 export const getShareExperimentAsBranchCommand =
-  (experiments: WorkspaceExperiments) =>
+  (internalCommands: InternalCommands) =>
   async (cwd: string, name: string, input: string) => {
-    const branchCommand = getBranchExperimentCommand(experiments)
-    await branchCommand(cwd, name, input)
+    await Toast.showProgress('Sharing Branch', async progress => {
+      progress.report({ increment: 0 })
 
-    await experiments.runCommand(AvailableCommands.EXPERIMENT_APPLY, cwd, name)
+      const branchCreated = await internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_BRANCH,
+        cwd,
+        name,
+        input
+      )
 
-    await experiments.runCommand(AvailableCommands.PUSH, cwd)
+      progress.report({
+        increment: 25,
+        message: branchCreated
+      })
 
-    return experiments.runCommand(AvailableCommands.GIT_PUSH_BRANCH, cwd, input)
+      const experimentApplied = await internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_APPLY,
+        cwd,
+        name
+      )
+
+      progress.report({
+        increment: 25,
+        message: experimentApplied
+      })
+
+      const pushed = await internalCommands.executeCommand(
+        AvailableCommands.PUSH,
+        cwd
+      )
+
+      progress.report({
+        increment: 25,
+        message: pushed
+      })
+
+      const branchPushed = internalCommands.executeCommand(
+        AvailableCommands.GIT_PUSH_BRANCH,
+        cwd,
+        input
+      )
+
+      progress.report({
+        increment: 25,
+        message: await branchPushed
+      })
+
+      return branchPushed
+    })
   }
 
 export const getShareExperimentAsCommitCommand =
   (internalCommands: InternalCommands) =>
   async (cwd: string, name: string, input: string) => {
-    await Toast.showProgress('Commit and Share experiment', async progress => {
+    await Toast.showProgress('Sharing Commit', async progress => {
       progress.report({ increment: 0 })
 
       const experimentApplied = await internalCommands.executeCommand(

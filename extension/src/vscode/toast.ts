@@ -47,12 +47,12 @@ export class Toast {
     return Toast.waitForResponse(Level.INFORMATION, message, ...items)
   }
 
-  static showProgress(initialText: string, callback: ProgressCallback) {
+  static showProgress(title: string, callback: ProgressCallback) {
     return window.withProgress(
       {
         cancellable: false,
         location: ProgressLocation.Notification,
-        title: initialText
+        title
       },
       callback
     )
