@@ -41,6 +41,7 @@ export const pickPaths = <T extends PathType>(
   if (!definedAndNonEmpty(paths)) {
     return Toast.showError(`There are no ${type} to select.`)
   }
+
   const items = collectItems(paths)
 
   return quickPickManyValues<PathWithSelected<T>>(items, {

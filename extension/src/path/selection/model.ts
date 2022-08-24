@@ -76,7 +76,7 @@ export abstract class PathSelectionModel<
 
   public setSelected(elements: (T & { selected: boolean })[]) {
     const terminalNodes = this.getTerminalNodes()
-    terminalNodes.map(({ path, selected }) => {
+    for (const { path, selected } of terminalNodes) {
       const selectedElement = elements.find(
         ({ path: selectedPath }) => path === selectedPath
       )
@@ -84,7 +84,7 @@ export abstract class PathSelectionModel<
       if (!!selectedElement !== !!selected) {
         this.toggleStatus(path)
       }
-    })
+    }
   }
 
   protected setNewStatuses(data: { path: string }[]) {
