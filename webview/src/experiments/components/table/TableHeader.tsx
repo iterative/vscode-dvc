@@ -228,8 +228,7 @@ const TableHeaderCell: React.FC<{
   setExpColumnNeedsShadow
 }) => {
   const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
-  const isDraggable =
-    !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
+  const isDraggable = !column.placeholderOf && !['id'].includes(column.id)
 
   const isPlaceholder = !!column.placeholderOf
   const canResize = column.canResize && !isPlaceholder

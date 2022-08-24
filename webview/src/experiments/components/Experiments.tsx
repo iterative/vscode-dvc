@@ -111,9 +111,10 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] => {
         )
       },
       Header: TimestampHeader,
-      accessor: 'timestamp',
+      accessor: 'Timestamp',
       group: ColumnType.TIMESTAMP,
       id: 'timestamp',
+      name: 'Timestamp',
       width: 100
     })
   }

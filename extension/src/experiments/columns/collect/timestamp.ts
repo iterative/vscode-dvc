@@ -4,8 +4,8 @@ import { ColumnType } from '../../webview/contract'
 export const timestampColumn = {
   hasChildren: false,
   label: 'Timestamp',
-  parentPath: 'timestamp',
-  path: 'timestamp:timestamp',
+  parentPath: ColumnType.TIMESTAMP,
+  path: 'Timestamp',
   type: ColumnType.TIMESTAMP
 }
 

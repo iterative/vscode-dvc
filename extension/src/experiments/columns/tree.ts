@@ -1,4 +1,3 @@
-import { timestampColumn } from './collect/timestamp'
 import {
   BasePathSelectionTree,
   PathSelectionItem
@@ -27,11 +26,7 @@ export class ExperimentsColumnsTree extends BasePathSelectionTree<WorkspaceExper
     internalCommands.registerExternalCommand<PathSelectionItem>(
       RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
       ({ dvcRoot, path }) =>
-        this.workspace
-          .getRepository(dvcRoot)
-          .toggleColumnStatus(
-            path === timestampColumn.path ? timestampColumn.parentPath : path
-          )
+        this.workspace.getRepository(dvcRoot).toggleColumnStatus(path)
     )
   }
 
