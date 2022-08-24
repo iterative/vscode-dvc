@@ -1,5 +1,5 @@
 import { GitCli } from '.'
-import { Command, Commit, DEFAULT_REMOTE, Flag } from './constants'
+import { Args, Command, Commit, DEFAULT_REMOTE, Flag } from './constants'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 
@@ -7,6 +7,7 @@ export const autoRegisteredCommands = {
   GIT_PUSH_BRANCH: 'pushBranch',
   GIT_RESET_WORKSPACE: 'resetWorkspace',
   GIT_STAGE_ALL: 'stageAll',
+  GIT_STAGE_AND_COMMIT: 'stageAndCommit',
   GIT_UNSTAGE_ALL: 'reset'
 } as const
 
@@ -15,6 +16,16 @@ export class GitExecutor extends GitCli {
     autoRegisteredCommands,
     this
   )
+
+  public pushBranch(cwd: string, branchName?: string) {
+    const args: Args = [Command.PUSH, Flag.SET_UPSTREAM, DEFAULT_REMOTE]
+
+    args.push((branchName || Commit.HEAD) as Commit)
+
+    const options = getOptions(cwd, ...args)
+
+    return this.executeProcess(options)
+  }
 
   public reset(cwd: string, ...args: (Flag | Commit)[]) {
     const options = getOptions(cwd, Command.RESET, ...args)
@@ -43,14 +54,11 @@ export class GitExecutor extends GitCli {
     return this.executeProcess(options)
   }
 
-  public pushBranch(cwd: string, branchName: string) {
-    const options = getOptions(
-      cwd,
-      Command.PUSH,
-      Flag.SET_UPSTREAM,
-      DEFAULT_REMOTE,
-      branchName as Commit
-    )
+  public async stageAndCommit(cwd: string, message: string) {
+    await this.stageAll(cwd)
+
+    const args = [Command.COMMIT, Flag.MESSAGE, message] as Args
+    const options = getOptions(cwd, ...args)
 
     return this.executeProcess(options)
   }

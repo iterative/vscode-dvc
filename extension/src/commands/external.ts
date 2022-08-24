@@ -16,6 +16,7 @@ export enum RegisteredCliCommands {
   EXPERIMENT_VIEW_BRANCH = 'dvc.views.experiments.branchExperiment',
   EXPERIMENT_VIEW_REMOVE = 'dvc.views.experiments.removeExperiment',
   EXPERIMENT_VIEW_SHARE_AS_BRANCH = 'dvc.views.experiments.shareExperimentAsBranch',
+  EXPERIMENT_VIEW_SHARE_AS_COMMIT = 'dvc.views.experiments.shareExperimentAsCommit',
 
   EXPERIMENT_VIEW_QUEUE = 'dvc.views.experiments.queueExperiment',
   EXPERIMENT_VIEW_RESUME = 'dvc.views.experiments.resumeCheckpointExperiment',
