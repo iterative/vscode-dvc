@@ -47,7 +47,7 @@ export const getShareExperimentAsBranchCommand =
         25
       )
 
-      return Toast.runCommandAndIncrementProgress(
+      await Toast.runCommandAndIncrementProgress(
         () =>
           internalCommands.executeCommand(
             AvailableCommands.GIT_PUSH_BRANCH,
@@ -57,6 +57,8 @@ export const getShareExperimentAsBranchCommand =
         progress,
         25
       )
+
+      return Toast.delayProgressClosing()
     })
   }
 
@@ -94,7 +96,7 @@ export const getShareExperimentAsCommitCommand =
         25
       )
 
-      return Toast.runCommandAndIncrementProgress(
+      await Toast.runCommandAndIncrementProgress(
         () =>
           internalCommands.executeCommand(
             AvailableCommands.GIT_PUSH_BRANCH,
@@ -103,5 +105,7 @@ export const getShareExperimentAsCommitCommand =
         progress,
         25
       )
+
+      return Toast.delayProgressClosing()
     })
   }

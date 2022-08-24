@@ -1,5 +1,6 @@
 import { CancellationToken, Progress, ProgressLocation, window } from 'vscode'
 import { Response } from './response'
+import { delay } from '../util/time'
 
 enum Level {
   INFORMATION = 'Information',
@@ -72,6 +73,10 @@ export class Toast {
       increment,
       message: stdout
     })
+  }
+
+  static delayProgressClosing() {
+    return delay(5000)
   }
 
   private static waitForResponse(
