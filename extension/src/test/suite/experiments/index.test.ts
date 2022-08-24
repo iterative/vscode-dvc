@@ -563,7 +563,7 @@ suite('Experiments Test Suite', () => {
         })
       )
 
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
