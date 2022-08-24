@@ -18,51 +18,45 @@ export const getShareExperimentAsBranchCommand =
     await Toast.showProgress('Sharing Branch', async progress => {
       progress.report({ increment: 0 })
 
-      const branchCreated = await internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_BRANCH,
-        cwd,
-        name,
-        input
+      await Toast.runCommandAndIncrementProgress(
+        () =>
+          internalCommands.executeCommand(
+            AvailableCommands.EXPERIMENT_BRANCH,
+            cwd,
+            name,
+            input
+          ),
+        progress,
+        25
       )
 
-      progress.report({
-        increment: 25,
-        message: branchCreated
-      })
-
-      const experimentApplied = await internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_APPLY,
-        cwd,
-        name
+      await Toast.runCommandAndIncrementProgress(
+        () =>
+          internalCommands.executeCommand(
+            AvailableCommands.EXPERIMENT_APPLY,
+            cwd,
+            name
+          ),
+        progress,
+        25
       )
 
-      progress.report({
-        increment: 25,
-        message: experimentApplied
-      })
-
-      const pushed = await internalCommands.executeCommand(
-        AvailableCommands.PUSH,
-        cwd
+      await Toast.runCommandAndIncrementProgress(
+        () => internalCommands.executeCommand(AvailableCommands.PUSH, cwd),
+        progress,
+        25
       )
 
-      progress.report({
-        increment: 25,
-        message: pushed
-      })
-
-      const branchPushed = internalCommands.executeCommand(
-        AvailableCommands.GIT_PUSH_BRANCH,
-        cwd,
-        input
+      return Toast.runCommandAndIncrementProgress(
+        () =>
+          internalCommands.executeCommand(
+            AvailableCommands.GIT_PUSH_BRANCH,
+            cwd,
+            input
+          ),
+        progress,
+        25
       )
-
-      progress.report({
-        increment: 25,
-        message: await branchPushed
-      })
-
-      return branchPushed
     })
   }
 
@@ -72,48 +66,42 @@ export const getShareExperimentAsCommitCommand =
     await Toast.showProgress('Sharing Commit', async progress => {
       progress.report({ increment: 0 })
 
-      const experimentApplied = await internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_APPLY,
-        cwd,
-        name
+      await Toast.runCommandAndIncrementProgress(
+        () =>
+          internalCommands.executeCommand(
+            AvailableCommands.EXPERIMENT_APPLY,
+            cwd,
+            name
+          ),
+        progress,
+        25
       )
 
-      progress.report({
-        increment: 25,
-        message: experimentApplied
-      })
-
-      const gitCommitted = await internalCommands.executeCommand(
-        AvailableCommands.GIT_STAGE_AND_COMMIT,
-        cwd,
-        input
+      await Toast.runCommandAndIncrementProgress(
+        () =>
+          internalCommands.executeCommand(
+            AvailableCommands.GIT_STAGE_AND_COMMIT,
+            cwd,
+            input
+          ),
+        progress,
+        25
       )
 
-      progress.report({
-        increment: 25,
-        message: gitCommitted
-      })
-
-      const pushed = await internalCommands.executeCommand(
-        AvailableCommands.PUSH,
-        cwd
+      await Toast.runCommandAndIncrementProgress(
+        () => internalCommands.executeCommand(AvailableCommands.PUSH, cwd),
+        progress,
+        25
       )
 
-      progress.report({
-        increment: 25,
-        message: pushed
-      })
-
-      const branchPushed = internalCommands.executeCommand(
-        AvailableCommands.GIT_PUSH_BRANCH,
-        cwd
+      return Toast.runCommandAndIncrementProgress(
+        () =>
+          internalCommands.executeCommand(
+            AvailableCommands.GIT_PUSH_BRANCH,
+            cwd
+          ),
+        progress,
+        25
       )
-
-      progress.report({
-        increment: 25,
-        message: await branchPushed
-      })
-
-      return branchPushed
     })
   }

@@ -58,6 +58,22 @@ export class Toast {
     )
   }
 
+  static async runCommandAndIncrementProgress(
+    command: () => Promise<string>,
+    progress: Progress<{
+      message?: string | undefined
+      increment?: number | undefined
+    }>,
+    increment: number
+  ) {
+    const stdout = await command()
+
+    progress.report({
+      increment,
+      message: stdout
+    })
+  }
+
   private static waitForResponse(
     level: Level,
     message: string,
