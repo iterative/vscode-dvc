@@ -1,10 +1,11 @@
-import { spy, stub } from 'sinon'
+import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
 import { dvcDemoPath } from '../../util'
 import {
   buildInternalCommands,
   FIRST_TRUTHY_TIME,
-  mockDisposable
+  mockDisposable,
+  spyOnPrivateMemberMethod
 } from '../util'
 import { Disposer } from '../../../extension'
 import { RepositoryData } from '../../../repository/data'
@@ -12,8 +13,6 @@ import * as Time from '../../../util/time'
 import * as Watcher from '../../../fileSystem/watcher'
 import { Repository } from '../../../repository'
 import { InternalCommands } from '../../../commands/internal'
-import { DecorationProvider } from '../../../repository/decorationProvider'
-import { SourceControlManagement } from '../../../repository/sourceControlManagement'
 
 export const buildDependencies = (disposer: Disposer) => {
   const { dvcReader, gitReader, internalCommands } =
@@ -99,14 +98,14 @@ export const buildRepository = async (
     new Repository(dvcRoot, internalCommands, updatesPaused, treeDataChanged)
   )
 
-  const setDecorationStateSpy = spy(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (repository as any).decorationProvider as DecorationProvider,
+  const setDecorationStateSpy = spyOnPrivateMemberMethod(
+    repository,
+    'decorationProvider',
     'setState'
   )
-  const setScmStateSpy = spy(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (repository as any).sourceControlManagement as SourceControlManagement,
+  const setScmStateSpy = spyOnPrivateMemberMethod(
+    repository,
+    'sourceControlManagement',
     'setState'
   )
 

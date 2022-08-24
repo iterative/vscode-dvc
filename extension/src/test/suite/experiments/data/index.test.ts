@@ -8,7 +8,8 @@ import expShowFixture from '../../../fixtures/expShow/output'
 import {
   bypassProcessManagerDebounce,
   getFirstArgOfCall,
-  getMockNow
+  getMockNow,
+  stubPrivateMemberMethod
 } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import {
@@ -191,9 +192,9 @@ suite('Experiments Data Test Suite', () => {
 
       await data.isReady()
       bypassProcessManagerDebounce(mockNow)
-      const mockIsOngoingOrQueued = stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (data as any).processManager,
+      const mockIsOngoingOrQueued = stubPrivateMemberMethod(
+        data,
+        'processManager',
         'isOngoingOrQueued'
       ).returns(false)
 

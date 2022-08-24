@@ -2,15 +2,16 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { window, Event, EventEmitter } from 'vscode'
-import { Disposable, Disposer } from '../../../extension'
-import { Config } from '../../../config'
-import { DvcRunner } from '../../../cli/dvc/runner'
-import { CliResult, CliStarted } from '../../../cli'
-import * as Telemetry from '../../../telemetry'
-import { EventName } from '../../../telemetry/constants'
-import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
+import { Disposable, Disposer } from '../../../../extension'
+import { Config } from '../../../../config'
+import { DvcRunner } from '../../../../cli/dvc/runner'
+import { CliResult, CliStarted } from '../../../../cli'
+import * as Telemetry from '../../../../telemetry'
+import { EventName } from '../../../../telemetry/constants'
+import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
+import { spyOnPrivateMemberMethod } from '../../util'
 
-suite('CLI Runner Test Suite', () => {
+suite('DVC Runner Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -21,7 +22,7 @@ suite('CLI Runner Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('dvcRunner', () => {
+  describe('DvcRunner', () => {
     it('should only be able to run a single command at a time', async () => {
       const dvcRunner = disposable.track(new DvcRunner({} as Config, 'sleep'))
 
@@ -49,8 +50,11 @@ suite('CLI Runner Test Suite', () => {
 
       expect(dvcRunner.isExperimentRunning()).to.be.true
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const closeSpy = spy((dvcRunner as any).pseudoTerminal, 'close')
+      const closeSpy = spyOnPrivateMemberMethod(
+        dvcRunner,
+        'pseudoTerminal',
+        'close'
+      )
 
       await dvcRunner.stop()
       expect(closeSpy).to.be.calledOnce

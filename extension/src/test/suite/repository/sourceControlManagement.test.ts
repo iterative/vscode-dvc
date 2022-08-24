@@ -5,7 +5,7 @@ import { stub, restore, spy } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { DvcExecutor } from '../../../cli/dvc/executor'
-import { closeAllEditors } from '../util'
+import { closeAllEditors, stubPrivatePrototypeMethod } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
   RegisteredCliCommands,
@@ -95,8 +95,9 @@ suite('Source Control Management Test Suite', () => {
     it('should not run dvc commit if there are no changes in the repository', async () => {
       const mockCommit = stub(DvcExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(false)
+      stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
+        false
+      )
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
@@ -107,8 +108,9 @@ suite('Source Control Management Test Suite', () => {
     it('should focus the git commit text input box after running dvc commit', async () => {
       const mockCommit = stub(DvcExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
+      stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
+        true
+      )
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
@@ -129,8 +131,10 @@ suite('Source Control Management Test Suite', () => {
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
+
+      stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
+        true
+      )
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
@@ -209,9 +213,8 @@ suite('Source Control Management Test Suite', () => {
         GitCli.prototype,
         'getGitRepositoryRoot'
       ).resolves(gitRoot)
-      const mockExecuteProcess = stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Cli.prototype as any,
+      const mockExecuteProcess = stubPrivatePrototypeMethod(
+        Cli,
         'executeProcess'
       ).resolves('')
 
@@ -229,8 +232,10 @@ suite('Source Control Management Test Suite', () => {
     })
 
     it('should unstage all git tracked files', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
+      const mockExecuteProcess = stubPrivatePrototypeMethod(
+        Cli,
+        'executeProcess'
+      )
 
       await commands.executeCommand(RegisteredCliCommands.GIT_UNSTAGE_ALL, {
         rootUri
@@ -246,11 +251,14 @@ suite('Source Control Management Test Suite', () => {
 
     it('should not reset the workspace if the user does not confirm', async () => {
       const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
+      const mockExecuteProcess = stubPrivatePrototypeMethod(
+        Cli,
+        'executeProcess'
+      )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
+      stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
+        true
+      )
 
       const mockShowWarningMessage = stub(
         window,
@@ -271,11 +279,14 @@ suite('Source Control Management Test Suite', () => {
 
     it('should reset the workspace if the user confirms they want to', async () => {
       const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
+      const mockExecuteProcess = stubPrivatePrototypeMethod(
+        Cli,
+        'executeProcess'
+      )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
+      stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
+        true
+      )
 
       const mockShowWarningMessage = stub(
         window,
@@ -306,10 +317,14 @@ suite('Source Control Management Test Suite', () => {
 
     it('should not reset the workspace if there is another user initiated command running', async () => {
       const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockExecuteProcess = stub(Cli.prototype as any, 'executeProcess')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
+      const mockExecuteProcess = stubPrivatePrototypeMethod(
+        Cli,
+        'executeProcess'
+      )
+
+      stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
+        true
+      )
 
       stub(DvcExecutor.prototype, 'isScmCommandRunning').returns(true)
 
