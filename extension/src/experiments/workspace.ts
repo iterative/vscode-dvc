@@ -240,7 +240,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public getExpNameAndInputThenRun(
-    runCommand: (...args: Args) => Promise<void>,
+    runCommand: (...args: Args) => Promise<void> | void,
     title: Title,
     cwd: string,
     id: string
@@ -348,7 +348,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   private async getInputAndRun(
-    runCommand: (...args: Args) => Promise<void>,
+    runCommand: (...args: Args) => Promise<void> | void,
     title: Title,
     ...args: Args
   ) {
