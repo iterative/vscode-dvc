@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { ColumnType, TableData } from 'dvc/src/experiments/webview/contract'
 
-export const defaultColumns = ['Experiment']
+export const defaultColumn = 'Experiment'
 
 export const commonColumnFields = {
   hasChildren: false,
@@ -60,7 +60,7 @@ export const getHeaders = async () => {
 
 export const expectHeaders = async (expectedHeaderNames: string[]) => {
   expect(await getHeaders()).toStrictEqual([
-    ...defaultColumns,
+    defaultColumn,
     ...expectedHeaderNames
   ])
 }
