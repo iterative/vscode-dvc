@@ -49,6 +49,16 @@ $gap: 20px;
   background-color: $fg-color;
   padding: 10px;
   display: none;
+
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input {
+    accent-color: $accent-color;
+  }
 }
 
 :global(.vega-embed) {
