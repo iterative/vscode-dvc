@@ -1,6 +1,6 @@
 import { ColumnsModel } from './model'
 import { appendColumnToPath, buildMetricOrParamPath } from './paths'
-import { timestampColumn } from './collect/timestamp'
+import { timestampColumn } from './constants'
 import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'

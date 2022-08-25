@@ -1,5 +1,5 @@
 import { ColumnLike } from './like'
-import { timestampColumn } from './collect/timestamp'
+import { timestampColumn } from './constants'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickOptionsWithTitle,

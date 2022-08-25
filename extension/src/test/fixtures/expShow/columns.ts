@@ -4,7 +4,7 @@ import {
   buildDepPath,
   buildMetricOrParamPath
 } from '../../../experiments/columns/paths'
-import { timestampColumn } from '../../../experiments/columns/collect/timestamp'
+import { timestampColumn } from '../../../experiments/columns/constants'
 
 const nestedParamsFile = join('nested', 'params.yaml')
 

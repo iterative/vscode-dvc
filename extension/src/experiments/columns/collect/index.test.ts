@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { collectChanges, collectColumns } from '.'
-import { timestampColumn } from './timestamp'
+import { timestampColumn } from '../constants'
 import { buildDepPath, buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
 import outputFixture from '../../../test/fixtures/expShow/output'
@@ -68,7 +68,7 @@ describe('collectColumns', () => {
         baseline: {}
       }
     })
-    expect(columns).toStrictEqual([])
+    expect(columns).toStrictEqual([timestampColumn])
   })
 
   const exampleBigNumber = 3000000000

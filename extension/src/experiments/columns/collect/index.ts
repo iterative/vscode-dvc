@@ -1,7 +1,6 @@
 import { join } from 'path'
 import { ColumnAccumulator } from './util'
 import { collectDepChanges, collectDeps } from './deps'
-import { collectTimestamp } from './timestamp'
 import {
   collectMetricAndParamChanges,
   collectMetricsAndParams
@@ -13,6 +12,7 @@ import {
   ExperimentsOutput
 } from '../../../cli/dvc/reader'
 import { standardizePath } from '../../../fileSystem/path'
+import { timestampColumn } from '../constants'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -20,7 +20,6 @@ const collectFromExperiment = (
 ) => {
   const { data } = experiment
   if (data) {
-    collectTimestamp(acc)
     collectMetricsAndParams(acc, data)
     collectDeps(acc, data)
   }
@@ -39,6 +38,8 @@ const collectFromBranch = (
 
 export const collectColumns = (data: ExperimentsOutput): Column[] => {
   const acc: ColumnAccumulator = {}
+
+  acc.timestamp = timestampColumn
 
   const { workspace, ...rest } = data
   collectFromBranch(acc, workspace)

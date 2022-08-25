@@ -1,5 +1,5 @@
 import { ExperimentsOutput } from '../../../cli/dvc/reader'
-import { timestampColumn } from '../../../experiments/columns/collect/timestamp'
+import { timestampColumn } from '../../../experiments/columns/constants'
 import {
   Column,
   ColumnType,

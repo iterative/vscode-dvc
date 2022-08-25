@@ -8,7 +8,7 @@ import {
   buildMetricOrParamPath,
   splitColumnPath
 } from './paths'
-import { timestampColumn } from './collect/timestamp'
+import { timestampColumn } from './constants'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
