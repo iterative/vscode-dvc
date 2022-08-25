@@ -606,6 +606,61 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
+  describe('dvc.shareExperimentAsCommit', () => {
+    it('should be able to share an experiment as a commit', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testExperiment = 'exp-83425'
+      const mockCommit = 'this is the best experiment ever!'
+      const inputEvent = getInputBoxEvent(mockCommit)
+
+      stub(window, 'showQuickPick').resolves({
+        value: { id: testExperiment, name: testExperiment }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
+
+      const mockExperimentApply = stub(
+        DvcExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${testExperiment}' have been applied to your current workspace.`
+      )
+      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
+        '191232423 files updated.'
+      )
+      const mockStageAndCommit = stub(
+        GitExecutor.prototype,
+        'stageAndCommit'
+      ).resolves('')
+      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
+      const branchPushedToRemote = new Promise(resolve =>
+        mockGitPush.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(`${mockCommit} pushed to remote`)
+        })
+      )
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_SHARE_AS_COMMIT
+      )
+
+      await inputEvent
+      await branchPushedToRemote
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        testExperiment
+      )
+      expect(mockStageAndCommit).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockCommit
+      )
+      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
+    })
+  })
+
   describe('dvc.removeExperiment', () => {
     it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
       const mockExperiment = 'exp-to-remove'
