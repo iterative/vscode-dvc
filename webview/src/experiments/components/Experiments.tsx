@@ -113,7 +113,7 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] => {
       Header: TimestampHeader,
       accessor: 'Timestamp',
       group: ColumnType.TIMESTAMP,
-      id: 'timestamp',
+      id: 'Timestamp',
       name: 'Timestamp',
       width: 100
     })

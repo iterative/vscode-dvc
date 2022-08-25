@@ -71,7 +71,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         id: 'hide-column',
         label: 'Hide Column',
         message: {
-          payload: isTimestamp && column.name ? column.name : column.id,
+          payload: column.id,
           type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
         }
       },
