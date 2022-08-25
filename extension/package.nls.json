@@ -49,6 +49,7 @@
   "command.selectForCompare": "Select for Compare",
   "command.setupWorkspace": "Setup The Workspace",
   "command.shareExperimentAsBranch": "Share Experiment as Branch",
+  "command.shareExperimentAsCommit": "Commit and Share Experiment",
   "command.showCommands": "Show Commands",
   "command.showExperiments": "Show Experiments",
   "command.showOutput": "Show DVC Output",

@@ -195,6 +195,15 @@ const registerExperimentInputCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_SHARE_AS_COMMIT,
+    () =>
+      experiments.getCwdExpNameAndInputThenRun(
+        getShareExperimentAsCommitCommand(internalCommands),
+        Title.ENTER_COMMIT_MESSAGE
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(

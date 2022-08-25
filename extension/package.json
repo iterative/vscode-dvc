@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.21",
+  "version": "0.3.22",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -360,6 +360,12 @@
       {
         "title": "%command.shareExperimentAsBranch%",
         "command": "dvc.shareExperimentAsBranch",
+        "category": "DVC",
+        "icon": "$(repo-push)"
+      },
+      {
+        "title": "%command.shareExperimentAsCommit%",
+        "command": "dvc.shareExperimentAsCommit",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
@@ -755,6 +761,10 @@
         },
         {
           "command": "dvc.shareExperimentAsBranch",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+        },
+        {
+          "command": "dvc.shareExperimentAsCommit",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
