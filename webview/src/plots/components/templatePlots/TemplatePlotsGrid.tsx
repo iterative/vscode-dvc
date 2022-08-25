@@ -67,6 +67,9 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     }
 
     for (const panel of Object.values(panels)) {
+      panel.removeEventListener('mouseenter', addDisabled)
+      panel.removeEventListener('mouseleave', removeDisabled)
+      panel.removeEventListener('click', disableClick)
       panel.addEventListener('mouseenter', addDisabled)
       panel.addEventListener('mouseleave', removeDisabled)
       panel.addEventListener('click', disableClick)
