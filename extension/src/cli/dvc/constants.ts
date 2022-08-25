@@ -1,5 +1,5 @@
 export const MIN_CLI_VERSION = '2.11.0'
-export const LATEST_TESTED_CLI_VERSION = '2.18.1'
+export const LATEST_TESTED_CLI_VERSION = '2.20.1'
 export const MAX_CLI_VERSION = '3'
 
 export const UNEXPECTED_ERROR_CODE = 255
