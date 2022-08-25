@@ -364,6 +364,12 @@
         "icon": "$(repo-push)"
       },
       {
+        "title": "%command.shareExperimentAsCommit%",
+        "command": "dvc.shareExperimentAsCommit",
+        "category": "DVC",
+        "icon": "$(repo-push)"
+      },
+      {
         "title": "%command.showCommands",
         "command": "dvc.showCommands",
         "category": "DVC"
@@ -755,6 +761,10 @@
         },
         {
           "command": "dvc.shareExperimentAsBranch",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+        },
+        {
+          "command": "dvc.shareExperimentAsCommit",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
