@@ -42,7 +42,7 @@ $gap: 20px;
   width: 100%;
 }
 
-:global(.vega-bindings) {
+:global(.vega-bindings):not(:empty) {
   position: absolute;
   bottom: 0;
   width: 100%;
