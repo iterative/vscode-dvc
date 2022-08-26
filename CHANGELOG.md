@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.23] - 2022-08-25
+
+### 🚀 New Features and Enhancements
+
+- Add commit and share experiment command to the palette [#2259](https://github.com/iterative/vscode-dvc/pull/2259) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Display the smoothness slider correctly [#2257](https://github.com/iterative/vscode-dvc/pull/2257) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Bump min tested DVC version to 2.20.1 [#2261](https://github.com/iterative/vscode-dvc/pull/2261) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.22] - 2022-08-24
 
 ### 🚀 New Features and Enhancements
