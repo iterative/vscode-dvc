@@ -67,7 +67,9 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return this.data.filter(element =>
       path
         ? element.parentPath === path
-        : Object.values<string>(ColumnType).includes(element.parentPath)
+        : Object.values<string>(ColumnType).includes(
+            element.parentPath || element.type
+          )
     )
   }
 
