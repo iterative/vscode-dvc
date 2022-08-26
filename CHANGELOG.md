@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.24] - 2022-08-26
+
+### 🚀 New Features and Enhancements
+
+- Make timestamp column hideable and draggable [#2239](https://github.com/iterative/vscode-dvc/pull/2239) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Split up `Cell.tsx` and `Row.tsx` files [#2264](https://github.com/iterative/vscode-dvc/pull/2264) by [@julieg18](https://github.com/julieg18)
+
 ## [0.3.23] - 2022-08-25
 
 ### 🚀 New Features and Enhancements
