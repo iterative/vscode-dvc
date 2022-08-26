@@ -5,7 +5,7 @@ import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 
-suite('data status --with-dirs --granular --unchanged --show-json', () => {
+suite('data status --granular --unchanged --show-json', () => {
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
