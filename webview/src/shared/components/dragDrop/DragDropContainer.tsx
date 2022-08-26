@@ -5,7 +5,8 @@ import React, {
   useState,
   useRef,
   CSSProperties,
-  useCallback
+  useCallback,
+  useLayoutEffect
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DragEnterDirection, getDragEnterDirection } from './util'
@@ -57,6 +58,7 @@ interface DragDropContainerProps {
   ghostElemStyle?: CSSProperties
   parentDraggedOver?: boolean
   vertical?: boolean
+  onLayoutChange?: () => void
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -71,7 +73,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   shouldShowOnDrag,
   ghostElemStyle,
   parentDraggedOver,
-  vertical
+  vertical,
+  onLayoutChange
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const defaultDragEnterDirection = vertical
@@ -113,6 +116,10 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   useEffect(() => {
     cleanup()
   }, [order, cleanup])
+
+  useLayoutEffect(() => {
+    onLayoutChange?.()
+  })
 
   if (items.length === 0) {
     return null
@@ -260,6 +267,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const buildItem = (id: string, draggable: JSX.Element) => (
     <draggable.type
       key={draggable.key}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ref={(draggable as any).ref}
       {...draggable.props}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
@@ -309,7 +318,11 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const isSameGroup =
       draggedOverGroup === group || draggedRef?.group === group
     const target = isSameGroup
-      ? getTarget(id, isEnteringAfter, <item.type />)
+      ? getTarget(
+          id,
+          isEnteringAfter,
+          shouldShowOnDrag ? <div /> : <item.type />
+        )
       : null
 
     const itemWithTag = shouldShowOnDrag ? (

@@ -1,7 +1,13 @@
 import { ComparisonPlots, Revision } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { useSelector } from 'react-redux'
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  createRef
+} from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import {
@@ -9,6 +15,7 @@ import {
   ComparisonTableHead
 } from './ComparisonTableHead'
 import { RowDropTarget } from './RowDropTarget'
+import { changeRowHeight, DEFAULT_ROW_HEIGHT } from './comparisonTableSlice'
 import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
@@ -36,6 +43,9 @@ export const ComparisonTable: React.FC = () => {
     [revisions]
   )
 
+  const dispatch = useDispatch()
+  const firstRowRef = createRef<HTMLTableSectionElement>()
+
   useEffect(
     // eslint-disable-next-line sonarjs/cognitive-complexity
     () =>
@@ -60,6 +70,12 @@ export const ComparisonTable: React.FC = () => {
     setComparisonPlots(plots)
     setRowsOrder(plots.map(({ path }) => path))
   }, [plots])
+
+  const onLayoutChange = () => {
+    const firstRowHeight =
+      firstRowRef.current?.getBoundingClientRect().height || DEFAULT_ROW_HEIGHT
+    dispatch(changeRowHeight(firstRowHeight))
+  }
 
   if (!plots || plots.length === 0) {
     return <EmptyState isFullScreen={false}>No Images to Compare</EmptyState>
@@ -87,14 +103,14 @@ export const ComparisonTable: React.FC = () => {
     )
   }
 
-  const rows = rowsOrder.map(path => {
+  const rows = rowsOrder.map((path, i) => {
     const plot = comparisonPlots.find(p => p.path === path)
     if (!plot) {
       return
     }
     const revs = plot.revisions
     return (
-      <tbody key={path} id={path}>
+      <tbody key={path} id={path} ref={i === 0 ? firstRowRef : undefined}>
         <ComparisonTableRow
           path={path}
           plots={columns.map(column => ({
@@ -125,6 +141,8 @@ export const ComparisonTable: React.FC = () => {
         setOrder={setRowsOrder}
         group="comparison-table"
         dropTarget={<RowDropTarget colSpan={columns.length} />}
+        onLayoutChange={onLayoutChange}
+        vertical
       />
     </table>
   )

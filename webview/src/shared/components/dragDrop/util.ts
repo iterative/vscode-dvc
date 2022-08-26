@@ -39,7 +39,7 @@ export const getDragEnterDirection = (
       : DragEnterDirection.RIGHT
   }
 
-  const cursorLocationY = e.clientX
+  const cursorLocationY = e.clientY
 
   const distanceFromTop = Math.abs(cursorLocationY - top)
   const distanceFromBottom = Math.abs(cursorLocationY - bottom)
