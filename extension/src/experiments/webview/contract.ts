@@ -30,7 +30,7 @@ export interface Experiment extends BaseExperimentFields {
   selected?: boolean
   sha?: string
   starred?: boolean
-  Timestamp?: string
+  Created?: string
 }
 
 export interface Row extends Experiment {

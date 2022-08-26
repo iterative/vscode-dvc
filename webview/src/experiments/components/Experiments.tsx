@@ -54,7 +54,7 @@ const ExperimentHeader = () => (
 )
 
 const TimestampHeader = () => (
-  <div className={styles.timestampHeader}>Timestamp</div>
+  <div className={styles.timestampHeader}>Created</div>
 )
 
 const DateCellContents: React.FC<{ value: string }> = ({ value }) => {
@@ -111,10 +111,10 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] => {
         )
       },
       Header: TimestampHeader,
-      accessor: 'Timestamp',
+      accessor: 'Created',
       group: ColumnType.TIMESTAMP,
-      id: 'Timestamp',
-      name: 'Timestamp',
+      id: 'Created',
+      name: 'Created',
       width: 100
     })
   }
