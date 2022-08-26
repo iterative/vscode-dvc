@@ -12,9 +12,11 @@ export const BaseDataStatus = {
   COMMITTED_DELETED: 'committedDeleted',
   COMMITTED_MODIFIED: 'committedModified',
   COMMITTED_RENAMED: 'committedRenamed',
+  COMMITTED_UNKNOWN: 'committedUnknown',
   NOT_IN_CACHE: 'notInCache',
   UNCOMMITTED_ADDED: 'uncommittedAdded',
   UNCOMMITTED_DELETED: 'uncommittedDeleted',
   UNCOMMITTED_MODIFIED: 'uncommittedModified',
-  UNCOMMITTED_RENAMED: 'uncommittedRenamed'
+  UNCOMMITTED_RENAMED: 'uncommittedRenamed',
+  UNCOMMITTED_UNKNOWN: 'uncommittedUnknown'
 } as const

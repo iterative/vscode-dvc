@@ -114,7 +114,8 @@ const mapChangesToGroup = (
   [ExtendedDataStatus[`${type}_MODIFIED`]]: changes?.modified,
   [ExtendedDataStatus[`${type}_RENAMED`]]: changes?.renamed?.map(
     ({ new: path }) => path
-  )
+  ),
+  [ExtendedDataStatus[`${type}_UNKNOWN`]]: changes?.unknown
 })
 
 const mapGroupedStatuses = (

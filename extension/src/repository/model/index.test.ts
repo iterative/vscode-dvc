@@ -69,6 +69,7 @@ describe('RepositoryModel', () => {
         committedDeleted: makeAbsPathSet(dvcDemoPath, deleted),
         committedModified: makeAbsPathSet(dvcDemoPath, output),
         committedRenamed: makeAbsPathSet(dvcDemoPath, renamed),
+        committedUnknown: emptySet,
         notInCache: emptySet,
         tracked: makeAbsPathSet(
           dvcDemoPath,
@@ -92,7 +93,8 @@ describe('RepositoryModel', () => {
           logAcc,
           logLoss
         ),
-        uncommittedRenamed: emptySet
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
       })
 
       expect(sourceControlManagementState).toStrictEqual({
@@ -165,12 +167,14 @@ describe('RepositoryModel', () => {
         committedDeleted: emptySet,
         committedModified: emptySet,
         committedRenamed: emptySet,
+        committedUnknown: emptySet,
         notInCache: absNotInCache,
         tracked: absNotInCache,
         uncommittedAdded: emptySet,
         uncommittedDeleted: absNotInCache,
         uncommittedModified: emptySet,
-        uncommittedRenamed: emptySet
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
       })
 
       const notInCacheScm = notInCache.map(path => ({
@@ -210,12 +214,14 @@ describe('RepositoryModel', () => {
         committedDeleted: emptySet,
         committedModified: emptySet,
         committedRenamed: emptySet,
+        committedUnknown: emptySet,
         notInCache: emptySet,
         tracked: makeAbsPathSet(dvcDemoPath, rawDataDir, data),
         uncommittedAdded: emptySet,
         uncommittedDeleted: emptySet,
         uncommittedModified: emptySet,
-        uncommittedRenamed: emptySet
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
       })
 
       expect(sourceControlManagementState).toStrictEqual({

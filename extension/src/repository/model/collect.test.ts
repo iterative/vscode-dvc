@@ -8,15 +8,19 @@ describe('collectDataStatus', () => {
   const emptySet = new Set()
 
   it('should transform the data status output into the correct shape', () => {
+    const unknown = ['X1', 'X2', 'X3']
+
     const committedAdded = ['CA1', 'CA2', 'CA3']
     const committedDeleted = ['CD-A', 'CD-B']
     const committedModified = ['CM1', 'CM2', 'CM3']
     const committedRenamed = ['CR1']
+    const committedUnknown = unknown
 
     const uncommittedAdded = [join('some', 'nested', 'UA-XYZ')]
     const uncommittedDeleted = ['UD-C', 'UD-D']
     const uncommittedModified = ['UM']
     const uncommittedRenamed = ['UR1']
+    const uncommittedUnknown = unknown
 
     const unchanged = ['A', 'B', 'C', 'D', join('E', 'F', 'G'), 'H']
     const untracked = [join('A1', 'B2', 'C3'), join('D4', 'E5', 'F6')]
@@ -29,7 +33,8 @@ describe('collectDataStatus', () => {
         renamed: committedRenamed.map(path => ({
           new: path,
           old: join('dir', 'path')
-        }))
+        })),
+        unknown: committedUnknown
       },
       unchanged,
       uncommitted: {
@@ -39,7 +44,8 @@ describe('collectDataStatus', () => {
         renamed: uncommittedRenamed.map(path => ({
           new: path,
           old: join('dir', 'path')
-        }))
+        })),
+        unknown: uncommittedUnknown
       },
       untracked
     })
@@ -49,6 +55,7 @@ describe('collectDataStatus', () => {
       committedDeleted: makeAbsPathSet(dvcDemoPath, ...committedDeleted),
       committedModified: makeAbsPathSet(dvcDemoPath, ...committedModified),
       committedRenamed: makeAbsPathSet(dvcDemoPath, ...committedRenamed),
+      committedUnknown: makeAbsPathSet(dvcDemoPath, ...unknown),
       notInCache: emptySet,
       tracked: makeAbsPathSet(
         dvcDemoPath,
@@ -60,7 +67,8 @@ describe('collectDataStatus', () => {
         ...uncommittedDeleted,
         ...uncommittedModified,
         ...uncommittedRenamed,
-        ...unchanged
+        ...unchanged,
+        ...unknown
       ),
       trackedDecorations: makeAbsPathSet(
         dvcDemoPath,
@@ -68,16 +76,19 @@ describe('collectDataStatus', () => {
         ...committedDeleted,
         ...committedModified,
         ...committedRenamed,
+        ...committedUnknown,
         ...uncommittedAdded,
         ...uncommittedDeleted,
         ...uncommittedModified,
         ...uncommittedRenamed,
+        ...uncommittedUnknown,
         ...unchanged
       ),
       uncommittedAdded: makeAbsPathSet(dvcDemoPath, ...uncommittedAdded),
       uncommittedDeleted: makeAbsPathSet(dvcDemoPath, ...uncommittedDeleted),
       uncommittedModified: makeAbsPathSet(dvcDemoPath, ...uncommittedModified),
       uncommittedRenamed: makeAbsPathSet(dvcDemoPath, ...uncommittedRenamed),
+      uncommittedUnknown: makeAbsPathSet(dvcDemoPath, ...unknown),
       untracked: makeAbsPathSet(dvcDemoPath, ...untracked)
     })
   })

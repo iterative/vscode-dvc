@@ -20,12 +20,16 @@ type DecorationStatus =
 
 export type DecorationState = Record<DecorationStatus, Set<string>>
 
+const IGNORED_DECORATION = 'gitDecoration.ignoredResourceForeground'
+
 const decorationPriority: DecorationStatus[] = [
   DecorationDataStatus.NOT_IN_CACHE,
+  DecorationDataStatus.UNCOMMITTED_UNKNOWN,
   DecorationDataStatus.UNCOMMITTED_ADDED,
   DecorationDataStatus.UNCOMMITTED_DELETED,
   DecorationDataStatus.UNCOMMITTED_MODIFIED,
   DecorationDataStatus.UNCOMMITTED_RENAMED,
+  DecorationDataStatus.COMMITTED_UNKNOWN,
   DecorationDataStatus.COMMITTED_ADDED,
   DecorationDataStatus.COMMITTED_DELETED,
   DecorationDataStatus.COMMITTED_MODIFIED,
@@ -61,9 +65,15 @@ export class DecorationProvider
     tooltip: 'DVC Committed Renamed'
   }
 
+  private static DecorationCommittedUnknown: FileDecoration = {
+    badge: 'X',
+    color: new ThemeColor(IGNORED_DECORATION),
+    tooltip: 'DVC Committed Unknown'
+  }
+
   private static DecorationNotInCache: FileDecoration = {
     badge: 'NC',
-    color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
+    color: new ThemeColor(IGNORED_DECORATION),
     tooltip: 'DVC Not In Cache'
   }
 
@@ -91,6 +101,12 @@ export class DecorationProvider
     tooltip: 'DVC Uncommitted Renamed'
   }
 
+  private static DecorationUncommittedUnknown: FileDecoration = {
+    badge: 'X',
+    color: new ThemeColor(IGNORED_DECORATION),
+    tooltip: 'DVC Uncommitted Unknown'
+  }
+
   private static DecorationTracked: FileDecoration = {
     tooltip: 'DVC Tracked'
   }
@@ -107,12 +123,14 @@ export class DecorationProvider
     committedDeleted: DecorationProvider.DecorationCommittedDeleted,
     committedModified: DecorationProvider.DecorationCommittedModified,
     committedRenamed: DecorationProvider.DecorationCommittedRenamed,
+    committedUnknown: DecorationProvider.DecorationCommittedUnknown,
     notInCache: DecorationProvider.DecorationNotInCache,
     tracked: DecorationProvider.DecorationTracked,
     uncommittedAdded: DecorationProvider.DecorationUncommittedAdded,
     uncommittedDeleted: DecorationProvider.DecorationUncommittedDeleted,
     uncommittedModified: DecorationProvider.DecorationUncommittedModified,
-    uncommittedRenamed: DecorationProvider.DecorationUncommittedRenamed
+    uncommittedRenamed: DecorationProvider.DecorationUncommittedRenamed,
+    uncommittedUnknown: DecorationProvider.DecorationUncommittedUnknown
   }
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
