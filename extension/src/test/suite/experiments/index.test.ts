@@ -11,7 +11,7 @@ import {
   QuickPickItem,
   ViewColumn
 } from 'vscode'
-import { buildExperiments } from './util'
+import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
 import rowsFixture from '../../fixtures/expShow/rows'
@@ -61,7 +61,6 @@ import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
 import { ExperimentFlag } from '../../../cli/dvc/constants'
-import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
@@ -426,7 +425,8 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(undefined)
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -452,12 +452,7 @@ suite('Experiments Test Suite', () => {
         'experimentBranch'
       ).resolves('undefined')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -511,7 +506,7 @@ suite('Experiments Test Suite', () => {
         })
       )
 
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -536,6 +531,62 @@ suite('Experiments Test Suite', () => {
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message to share an experiment as a commit', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testCheckpointId = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
+      const testCheckpointLabel = shortenForLabel(testCheckpointId)
+      const mockCommitMessage =
+        'this is the very best version that I could come up with'
+      const inputEvent = getInputBoxEvent(mockCommitMessage)
+
+      const mockExperimentApply = stub(
+        DvcExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${testCheckpointId}' have been applied to your current workspace.`
+      )
+      const mockStageAndCommit = stub(
+        GitExecutor.prototype,
+        'stageAndCommit'
+      ).resolves(`[current-branch 67effdbc] ${mockCommitMessage}`)
+
+      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
+        '100000 files updated.'
+      )
+      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
+      const branchPushedToRemote = new Promise(resolve =>
+        mockGitPush.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('current-branch pushed to remote')
+        })
+      )
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: testCheckpointId,
+        type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
+      })
+
+      await inputEvent
+      await branchPushedToRemote
+      expect(mockStageAndCommit).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockCommitMessage
+      )
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        testCheckpointLabel
+      )
+      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
       const { experiments, dvcExecutor } = buildExperiments(disposable)
 
@@ -546,12 +597,8 @@ suite('Experiments Test Suite', () => {
         'params.yaml:weight_decay=0'
       ]
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
       const mockQueueExperiment = stub(
         dvcExecutor,
@@ -586,12 +633,8 @@ suite('Experiments Test Suite', () => {
         'params.yaml:weight_decay=0'
       ]
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
@@ -629,13 +672,7 @@ suite('Experiments Test Suite', () => {
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -701,13 +738,7 @@ suite('Experiments Test Suite', () => {
         'queued experiment cannot be selected'
       ).to.be.false
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)

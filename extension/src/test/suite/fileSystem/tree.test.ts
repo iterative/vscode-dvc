@@ -20,7 +20,8 @@ import {
   activeTextEditorChangedEvent,
   buildDependencies,
   closeAllEditors,
-  getActiveTextEditorFilename
+  getActiveTextEditorFilename,
+  stubPrivatePrototypeMethod
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
@@ -312,9 +313,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       stub(WorkspaceRepositories.prototype, 'getRepository').returns(repository)
       stub(WorkspaceRepositories.prototype, 'isReady').resolves(undefined)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (TrackedExplorerTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        TrackedExplorerTree,
         'getSelectedPathItems'
       ).returns([])
       const mockPull = stub(DvcExecutor.prototype, 'pull').resolves(
@@ -344,9 +344,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockPull = stub(DvcExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (TrackedExplorerTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        TrackedExplorerTree,
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
@@ -375,9 +374,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (TrackedExplorerTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        TrackedExplorerTree,
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
@@ -400,9 +398,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target pushed'
       )
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (TrackedExplorerTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        TrackedExplorerTree,
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
@@ -430,9 +427,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (TrackedExplorerTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        TrackedExplorerTree,
         'getSelectedPathItems'
       ).returns([])
 

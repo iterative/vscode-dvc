@@ -121,6 +121,11 @@ export class WebviewMessages {
           RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
+      case MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT:
+        return commands.executeCommand(
+          RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
+          { dvcRoot: this.dvcRoot, id: message.payload }
+        )
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)

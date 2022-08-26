@@ -1,6 +1,7 @@
 import {
   getBranchExperimentCommand,
-  getShareExperimentAsBranchCommand
+  getShareExperimentAsBranchCommand,
+  getShareExperimentAsCommitCommand
 } from '.'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
@@ -177,7 +178,7 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH,
     () =>
       experiments.getCwdExpNameAndInputThenRun(
-        getShareExperimentAsBranchCommand(experiments),
+        getShareExperimentAsBranchCommand(internalCommands),
         Title.ENTER_BRANCH_NAME
       )
   )
@@ -186,8 +187,28 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
-        getShareExperimentAsBranchCommand(experiments),
+        getShareExperimentAsBranchCommand(internalCommands),
         Title.ENTER_BRANCH_NAME,
+        dvcRoot,
+        id
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_SHARE_AS_COMMIT,
+    () =>
+      experiments.getCwdExpNameAndInputThenRun(
+        getShareExperimentAsCommitCommand(internalCommands),
+        Title.ENTER_COMMIT_MESSAGE
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
+    ({ dvcRoot, id }: ExperimentDetails) =>
+      experiments.getExpNameAndInputThenRun(
+        getShareExperimentAsCommitCommand(internalCommands),
+        Title.ENTER_COMMIT_MESSAGE,
         dvcRoot,
         id
       )

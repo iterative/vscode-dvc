@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.21",
+  "version": "0.3.23",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -364,6 +364,12 @@
         "icon": "$(repo-push)"
       },
       {
+        "title": "%command.shareExperimentAsCommit%",
+        "command": "dvc.shareExperimentAsCommit",
+        "category": "DVC",
+        "icon": "$(repo-push)"
+      },
+      {
         "title": "%command.showCommands",
         "command": "dvc.showCommands",
         "category": "DVC"
@@ -469,6 +475,12 @@
       {
         "title": "%command.views.experiments.shareExperimentAsBranch%",
         "command": "dvc.views.experiments.shareExperimentAsBranch",
+        "category": "DVC",
+        "icon": "$(repo-push)"
+      },
+      {
+        "title": "%command.views.experiments.shareExperimentAsCommit%",
+        "command": "dvc.views.experiments.shareExperimentAsCommit",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
@@ -752,6 +764,10 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
+          "command": "dvc.shareExperimentAsCommit",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+        },
+        {
           "command": "dvc.showExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
@@ -801,6 +817,10 @@
         },
         {
           "command": "dvc.views.experiments.shareExperimentAsBranch",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experiments.shareExperimentAsCommit",
           "when": "false"
         },
         {
@@ -1090,8 +1110,13 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experiments.shareExperimentAsBranch",
+          "command": "dvc.views.experiments.shareExperimentAsCommit",
           "group": "1_share@1",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
+        },
+        {
+          "command": "dvc.views.experiments.shareExperimentAsBranch",
+          "group": "1_share@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(checkpoint|experiment)$/ && !dvc.experiment.running"
         },
         {
@@ -1602,10 +1627,10 @@
     "@types/uuid": "8.3.4",
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.1.5",
-    "@wdio/cli": "7.20.9",
-    "@wdio/local-runner": "7.20.9",
-    "@wdio/mocha-framework": "7.20.7",
-    "@wdio/spec-reporter": "7.20.8",
+    "@wdio/cli": "7.23.0",
+    "@wdio/local-runner": "7.23.0",
+    "@wdio/mocha-framework": "7.23.0",
+    "@wdio/spec-reporter": "7.23.0",
     "chai": "4.3.6",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
@@ -1623,8 +1648,8 @@
     "ts-loader": "9.3.1",
     "vsce": "2.10.0",
     "vscode-uri": "3.0.3",
-    "wdio-vscode-service": "4.0.4",
-    "webdriverio": "7.20.9",
+    "wdio-vscode-service": "4.0.5",
+    "webdriverio": "7.23.0",
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0"
   },

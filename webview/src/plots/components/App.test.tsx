@@ -11,6 +11,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
@@ -18,6 +19,7 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
+import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
   DEFAULT_SECTION_COLLAPSED,
@@ -124,6 +126,45 @@ describe('App', () => {
     ).getAllByTestId('icon-menu-item')[position]
 
   const getCheckpointSizePickerButton = () => getCheckpointMenuItem(1)
+
+  const changeSize = async (
+    size: string,
+    buttonPosition: number,
+    wrapper: HTMLElement
+  ) => {
+    const sizePickerButton =
+      within(wrapper).getAllByTestId('icon-menu-item')[buttonPosition]
+    fireEvent.mouseEnter(sizePickerButton)
+    fireEvent.click(sizePickerButton)
+
+    const sizeButton = await within(wrapper).findByText(size)
+
+    fireEvent.click(sizeButton)
+    await screen.findAllByTestId('plots-wrapper')
+    fireEvent.click(sizePickerButton)
+    await screen.findAllByTestId('plots-wrapper')
+  }
+
+  const renderAppAndChangeSize = async (
+    data: PlotsData,
+    size: string,
+    section: Section
+  ) => {
+    renderAppWithOptionalData({
+      ...data,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+    })
+
+    const sectionButtonPosition = {
+      [Section.CHECKPOINT_PLOTS]: 1,
+      [Section.TEMPLATE_PLOTS]: 0,
+      [Section.COMPARISON_TABLE]: 0
+    }
+    const wrappers = await screen.findAllByTestId('plots-container')
+    const wrapper = wrappers[sectionPosition[section]]
+
+    await changeSize(size, sectionButtonPosition[section], wrapper)
+  }
 
   beforeAll(() => {
     Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
@@ -1124,45 +1165,6 @@ describe('App', () => {
   })
 
   describe('Virtualization', () => {
-    const changeSize = async (
-      size: string,
-      buttonPosition: number,
-      wrapper: HTMLElement
-    ) => {
-      const sizePickerButton =
-        within(wrapper).getAllByTestId('icon-menu-item')[buttonPosition]
-      fireEvent.mouseEnter(sizePickerButton)
-      fireEvent.click(sizePickerButton)
-
-      const sizeButton = await within(wrapper).findByText(size)
-
-      fireEvent.click(sizeButton)
-      await screen.findAllByTestId('plots-wrapper')
-      fireEvent.click(sizePickerButton)
-      await screen.findAllByTestId('plots-wrapper')
-    }
-
-    const renderAppAndChangeSize = async (
-      data: PlotsData,
-      size: string,
-      section: Section
-    ) => {
-      renderAppWithOptionalData({
-        ...data,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-      })
-
-      const sectionButtonPosition = {
-        [Section.CHECKPOINT_PLOTS]: 1,
-        [Section.TEMPLATE_PLOTS]: 0,
-        [Section.COMPARISON_TABLE]: 0
-      }
-      const wrappers = await screen.findAllByTestId('plots-container')
-      const wrapper = wrappers[sectionPosition[section]]
-
-      await changeSize(size, sectionButtonPosition[section], wrapper)
-    }
-
     const createCheckpointPlots = (nbOfPlots: number) => {
       const plots = []
       for (let i = 0; i < nbOfPlots; i++) {
@@ -1658,6 +1660,97 @@ describe('App', () => {
         ...expectedRevisions,
         'new-revision'
       ])
+    })
+  })
+
+  describe('Vega panels', () => {
+    const smoothId = join('template', 'smooth.tsv')
+    const withVegaPanels = {
+      ...templatePlotsFixture,
+      plots: [
+        {
+          entries: [
+            ...templatePlotsFixture.plots[0].entries,
+            {
+              ...templatePlotsFixture.plots[0].entries[0],
+              content: { ...smoothTemplatePlotContent },
+              id: smoothId
+            }
+          ],
+          group: TemplatePlotGroup.SINGLE_VIEW
+        } as TemplatePlotSection
+      ]
+    }
+
+    const waitForVega = async (smoothPlot: HTMLElement) => {
+      await waitFor(() =>
+        // eslint-disable-next-line testing-library/no-node-access
+        expect(smoothPlot.querySelectorAll('.marks')[0]).toBeInTheDocument()
+      )
+    }
+
+    const getPanel = (smoothPlot: HTMLElement) =>
+      // eslint-disable-next-line testing-library/no-node-access
+      smoothPlot.querySelector('.vega-bindings')
+
+    it('should disable a template plot from drag and drop when hovering a vega panel', async () => {
+      await renderAppAndChangeSize(
+        { template: withVegaPanels },
+        'Small',
+        Section.TEMPLATE_PLOTS
+      )
+
+      const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
+
+      await waitForVega(smoothPlot)
+
+      const panel = getPanel(smoothPlot)
+      expect(panel).toBeInTheDocument()
+
+      expect(smoothPlot.draggable).toBe(true)
+
+      panel && fireEvent.mouseEnter(panel)
+
+      expect(smoothPlot.draggable).toBe(false)
+    })
+
+    it('should re-enable a template plot for drag and drop when the mouse leaves a vega panel', async () => {
+      await renderAppAndChangeSize(
+        { template: withVegaPanels },
+        'Small',
+        Section.TEMPLATE_PLOTS
+      )
+
+      const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
+
+      await waitForVega(smoothPlot)
+
+      const panel = getPanel(smoothPlot)
+      expect(panel).toBeInTheDocument()
+
+      panel && fireEvent.mouseEnter(panel)
+      panel && fireEvent.mouseLeave(panel)
+      expect(smoothPlot.draggable).toBe(true)
+    })
+
+    it('should disable zooming the template plot when clicking inside the vega panel', async () => {
+      await renderAppAndChangeSize(
+        { template: withVegaPanels },
+        'Small',
+        Section.TEMPLATE_PLOTS
+      )
+
+      const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
+
+      await waitForVega(smoothPlot)
+
+      const panel = getPanel(smoothPlot) || smoothPlot
+      expect(panel).toBeInTheDocument()
+
+      const clickEvent = createEvent.click(panel)
+      clickEvent.stopPropagation = jest.fn()
+      fireEvent(panel, clickEvent)
+      expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
     })
   })
 })

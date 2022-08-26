@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.23] - 2022-08-25
+
+### 🚀 New Features and Enhancements
+
+- Add commit and share experiment command to the palette [#2259](https://github.com/iterative/vscode-dvc/pull/2259) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Display the smoothness slider correctly [#2257](https://github.com/iterative/vscode-dvc/pull/2257) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Bump min tested DVC version to 2.20.1 [#2261](https://github.com/iterative/vscode-dvc/pull/2261) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.3.22] - 2022-08-24
+
+### 🚀 New Features and Enhancements
+
+- Add Git cli calls into output channel [#2225](https://github.com/iterative/vscode-dvc/pull/2225) by [@mattseddon](https://github.com/mattseddon)
+- Add commit and share experiment to context menus [#2237](https://github.com/iterative/vscode-dvc/pull/2237) by [@mattseddon](https://github.com/mattseddon)
+- Switch experiment sharing to progress api [#2245](https://github.com/iterative/vscode-dvc/pull/2245) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Show spinner in the status bar when extension is running Git [#2249](https://github.com/iterative/vscode-dvc/pull/2249) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Replace vary with modify in variable names [#2227](https://github.com/iterative/vscode-dvc/pull/2227) by [@mattseddon](https://github.com/mattseddon)
+- Remove experiments from star/unstar text in experiments table [#2228](https://github.com/iterative/vscode-dvc/pull/2228) by [@mattseddon](https://github.com/mattseddon)
+- Rename DVC CLI files and classes [#2226](https://github.com/iterative/vscode-dvc/pull/2226) by [@mattseddon](https://github.com/mattseddon)
+- Add test utils for dealing with private class methods [#2233](https://github.com/iterative/vscode-dvc/pull/2233) by [@mattseddon](https://github.com/mattseddon)
+- Move integration test files into new structure [#2236](https://github.com/iterative/vscode-dvc/pull/2236) by [@mattseddon](https://github.com/mattseddon)
+- Split up `TableHeader.tsx`  [#2250](https://github.com/iterative/vscode-dvc/pull/2250) by [@julieg18](https://github.com/julieg18)
+- Add CHANGELOG to prettierignore [#2246](https://github.com/iterative/vscode-dvc/pull/2246) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.21] - 2022-08-21
 
 ### 🚀 New Features and Enhancements
