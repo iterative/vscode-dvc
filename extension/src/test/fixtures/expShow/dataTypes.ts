@@ -1,4 +1,5 @@
 import { ExperimentsOutput } from '../../../cli/dvc/reader'
+import { timestampColumn } from '../../../experiments/columns/constants'
 import {
   Column,
   ColumnType,
@@ -45,6 +46,7 @@ export const dataTypesOutput: ExperimentsOutput = {
 }
 
 export const columns: Column[] = [
+  timestampColumn,
   {
     hasChildren: true,
     label: 'params.yaml',
@@ -160,8 +162,7 @@ export const rows: Row[] = [
     queued: false,
     running: false,
     selected: true,
-    starred: false,
-    timestamp: null
+    starred: false
   },
   {
     displayColor: '#13adc7',
@@ -174,7 +175,7 @@ export const rows: Row[] = [
     selected: true,
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     starred: false,
-    timestamp: '2020-11-21T19:58:22'
+    Timestamp: '2020-11-21T19:58:22'
   }
 ]
 

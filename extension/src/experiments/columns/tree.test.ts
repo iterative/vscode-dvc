@@ -8,6 +8,7 @@ import {
   buildMetricOrParamPath,
   splitColumnPath
 } from './paths'
+import { timestampColumn } from './constants'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
@@ -101,7 +102,7 @@ describe('ExperimentsColumnsTree', () => {
       )
     })
 
-    it('should return the params and metrics if there is only a single repository and no path is provided', async () => {
+    it('should return the params, metrics, and timestamp if there is only a single repository and no path is provided', async () => {
       const experimentsColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
         mockedInternalCommands,
@@ -115,6 +116,14 @@ describe('ExperimentsColumnsTree', () => {
       const children = await experimentsColumnsTree.getChildren()
 
       expect(children).toStrictEqual([
+        {
+          collapsibleState: 0,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: timestampColumn.label,
+          path: timestampColumn.path
+        },
         {
           collapsibleState: 1,
           description: undefined,
@@ -194,6 +203,14 @@ describe('ExperimentsColumnsTree', () => {
       const processPath = appendColumnToPath(paramsPath, 'process')
 
       expect(children).toStrictEqual([
+        {
+          collapsibleState: 0,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          label: timestampColumn.label,
+          path: timestampColumn.path
+        },
         {
           collapsibleState: 1,
           description: undefined,

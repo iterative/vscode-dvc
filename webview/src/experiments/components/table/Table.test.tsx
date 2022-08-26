@@ -323,7 +323,7 @@ describe('Table', () => {
 
       dragAndDrop(
         screen.getByText('B'),
-        screen.getByText('Timestamp'),
+        screen.getByText('Experiment'),
         DragEnterDirection.AUTO
       )
 

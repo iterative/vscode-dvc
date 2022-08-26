@@ -71,8 +71,8 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     )
   }
 
-  public hasColumns() {
-    return this.data.length > 0
+  public hasNonDefaultColumns() {
+    return this.data.length > 1
   }
 
   private async transformAndSetColumns(data: ExperimentsOutput) {

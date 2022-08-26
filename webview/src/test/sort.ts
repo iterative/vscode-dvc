@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { ColumnType, TableData } from 'dvc/src/experiments/webview/contract'
 
-export const defaultColumns = ['Experiment', 'Timestamp']
+export const defaultColumn = 'Experiment'
 
 export const commonColumnFields = {
   hasChildren: false,
@@ -54,13 +54,13 @@ export const tableData: TableData = {
 }
 
 export const getHeaders = async () => {
-  const renderedHeader = await screen.findAllByTestId('rendered-header')
-  return renderedHeader.map(header => header.textContent)
+  const renderedHeaders = await screen.findAllByTestId('rendered-header')
+  return renderedHeaders.map(header => header.textContent)
 }
 
 export const expectHeaders = async (expectedHeaderNames: string[]) => {
   expect(await getHeaders()).toStrictEqual([
-    ...defaultColumns,
+    defaultColumn,
     ...expectedHeaderNames
   ])
 }

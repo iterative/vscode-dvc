@@ -20,7 +20,7 @@ const getEpoch = (timestamp: string | null | undefined) =>
   new Date(timestamp || 0).getTime()
 
 const compareTimestamps = (a: Experiment, b: Experiment) =>
-  getEpoch(b.timestamp) - getEpoch(a.timestamp)
+  getEpoch(b.Timestamp) - getEpoch(a.Timestamp)
 
 export const limitToMaxSelected = (experiments: Experiment[]) =>
   experiments
