@@ -1,4 +1,5 @@
 import { join } from 'path'
+import isEmpty from 'lodash.isempty'
 import { DvcCli } from '.'
 import {
   Args,
@@ -133,19 +134,20 @@ export class DvcReader extends DvcCli {
     this
   )
 
-  public expShow(
+  public async expShow(
     cwd: string,
     ...flags: ExperimentFlag[]
   ): Promise<ExperimentsOutput> {
-    return this.readProcess<ExperimentsOutput>(
+    const output = await this.readProcessJson<ExperimentsOutput | {}>(
       cwd,
-      JSON.parse,
-      JSON.stringify(defaultExperimentsOutput),
       Command.EXPERIMENT,
       SubCommand.SHOW,
-      ...flags,
-      Flag.SHOW_JSON
+      ...flags
     )
+
+    return isEmpty(output)
+      ? defaultExperimentsOutput
+      : (output as ExperimentsOutput)
   }
 
   public diff(cwd: string): Promise<DiffOutput> {

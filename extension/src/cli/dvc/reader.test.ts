@@ -62,7 +62,7 @@ describe('CliReader', () => {
     }
   )
 
-  describe('experimentShow', () => {
+  describe('expShow', () => {
     it('should match the expected output', async () => {
       const cwd = __dirname
       mockedCreateProcess.mockReturnValueOnce(
@@ -86,6 +86,16 @@ describe('CliReader', () => {
       mockedCreateProcess.mockImplementationOnce(() => {
         throw error
       })
+
+      const cliOutput = await dvcReader.expShow(cwd)
+      expect(cliOutput).toStrictEqual({ workspace: { baseline: {} } })
+    })
+
+    it('should return the default output if the cli returns an empty object (no commits)', async () => {
+      const cwd = __dirname
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess(JSON.stringify({}))
+      )
 
       const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual({ workspace: { baseline: {} } })
