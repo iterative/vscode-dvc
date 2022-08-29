@@ -35,6 +35,9 @@ const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
 export const isSameGroup = (group1?: string, group2?: string) =>
   getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
 
+const isExactGroup = (group1?: string, group1Alt?: string, group2?: string) =>
+  group1 === group2 || group1Alt === group2
+
 const setStyle = (elem: HTMLElement, style: CSSProperties, reset?: boolean) => {
   for (const [rule, value] of Object.entries(style)) {
     elem.style[getStyleProperty(rule)] = reset ? '' : value
@@ -136,19 +139,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     return null
   }
 
-  const createGhostStyle = (e: DragEvent<HTMLElement>) => {
-    if (ghostElemStyle) {
-      setStyle(e.currentTarget, ghostElemStyle)
-    }
-  }
-
-  const resetDraggedStyle = (id: string) => {
-    const elem = idToNode(id)
-    if (elem && ghostElemStyle) {
-      setStyle(elem, ghostElemStyle, true)
-    }
-  }
-
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const { id } = e.currentTarget
     const idx = order.indexOf(id)
@@ -163,7 +153,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.dropEffect = 'move'
 
-    createGhostStyle(e)
+    ghostElemStyle && setStyle(e.currentTarget, ghostElemStyle)
     draggedOverIdTimeout.current = window.setTimeout(() => {
       dispatch(
         changeRef({
@@ -174,7 +164,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       )
       setDraggedId(id)
       setDraggedOverId(order[toIdx])
-      resetDraggedStyle(id)
+      const elem = idToNode(id)
+      ghostElemStyle && elem && setStyle(elem, ghostElemStyle, true)
     }, 0)
   }
 
@@ -319,9 +310,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const createItemWithDropTarget = (id: string, item: JSX.Element) => {
     const isEnteringAfter = AFTER_DIRECTIONS.has(direction)
-    const isSameGroup =
-      draggedOverGroup === group || draggedRef?.group === group
-    const target = isSameGroup
+    const target = isExactGroup(draggedOverGroup, draggedRef?.group, group)
       ? getTarget(
           id,
           isEnteringAfter,
