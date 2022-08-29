@@ -189,7 +189,7 @@ const uncommitNotInCache = (
   absPath: string,
   status: ExtendedStatus
 ): ExtendedStatus => {
-  if (!acc.notInCache.has(absPath) || !status.startsWith('committed')) {
+  if (!status.startsWith('committed') || !acc.notInCache.has(absPath)) {
     return status
   }
   return ('un' + status) as ExtendedStatus
