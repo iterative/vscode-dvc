@@ -2,7 +2,7 @@ import { dirname, join, relative, resolve } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
-import { ExperimentsOutput, PathOutput } from '../../cli/reader'
+import { ExperimentsOutput, PathOutput } from '../../cli/dvc/reader'
 import { isSameOrChild, relativeWithUri } from '../../fileSystem'
 import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
 

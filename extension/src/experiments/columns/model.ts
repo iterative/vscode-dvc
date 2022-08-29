@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { collectChanges, collectColumns, collectParamsFiles } from './collect'
 import { Column, ColumnType } from '../webview/contract'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/dvc/reader'
 import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel } from '../../path/selection/model'
 
@@ -67,12 +67,14 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return this.data.filter(element =>
       path
         ? element.parentPath === path
-        : Object.values<string>(ColumnType).includes(element.parentPath)
+        : Object.values<string>(ColumnType).includes(
+            element.parentPath || element.type
+          )
     )
   }
 
-  public hasColumns() {
-    return this.data.length > 0
+  public hasNonDefaultColumns() {
+    return this.data.length > 1
   }
 
   private async transformAndSetColumns(data: ExperimentsOutput) {

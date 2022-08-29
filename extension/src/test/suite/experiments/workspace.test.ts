@@ -5,18 +5,18 @@ import { window, commands, QuickPickItem, Uri } from 'vscode'
 import {
   buildExperiments,
   buildMultiRepoExperiments,
-  buildSingleRepoExperiments
+  buildSingleRepoExperiments,
+  stubWorkspaceExperimentsGetters
 } from './util'
 import { Disposable } from '../../../extension'
-import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
-import { CliExecutor } from '../../../cli/executor'
-import { closeAllEditors, mockDuration } from '../util'
+import { DvcExecutor } from '../../../cli/dvc/executor'
+import { closeAllEditors, getInputBoxEvent, mockDuration } from '../util'
 import { dvcDemoPath } from '../../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
-import { CliRunner } from '../../../cli/runner'
+import { DvcRunner } from '../../../cli/dvc/runner'
 import { Param } from '../../../experiments/model/modify/collect'
 import {
   QuickPickItemWithValue,
@@ -26,6 +26,7 @@ import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
 import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
+import { GitExecutor } from '../../../cli/git/executor'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -140,20 +141,14 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyExperimentParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
-      const { cliExecutor, experiments } = buildExperiments(disposable)
+      const { dvcExecutor, experiments } = buildExperiments(disposable)
 
       const mockExperimentRunQueue = stub(
-        cliExecutor,
+        dvcExecutor,
         'experimentRunQueue'
       ).resolves('true')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -204,17 +199,11 @@ suite('Workspace Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
 
       const mockExperimentRun = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -268,17 +257,11 @@ suite('Workspace Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
 
       const mockExperimentRun = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -330,15 +313,11 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.queueExperiment', () => {
     it('should be able to queue an experiment', async () => {
       const mockExperimentRunQueue = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRunQueue'
       ).resolves('true')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -347,15 +326,11 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      stub(CliExecutor.prototype, 'experimentRunQueue').resolves('true')
+      stub(DvcExecutor.prototype, 'experimentRunQueue').resolves('true')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       const queueExperiment = commands.executeCommand(
         RegisteredCliCommands.QUEUE_EXPERIMENT
@@ -381,17 +356,13 @@ suite('Workspace Experiments Test Suite', () => {
         undefined
       )
 
-      stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
+      stub(DvcExecutor.prototype, 'experimentRunQueue').callsFake(() => {
         throw new Error(mockErrorMessage)
       })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -408,15 +379,11 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.runExperiment', () => {
     it('should be able to run an experiment', async () => {
       const mockRunExperiment = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN)
 
@@ -428,15 +395,11 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.resumeCheckpointExperiment', () => {
     it('should be able to run an experiment', async () => {
       const mockRunExperiment = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RESUME)
 
@@ -448,15 +411,11 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
       const mockRunExperimentReset = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperimentReset'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(
         RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN
@@ -470,15 +429,11 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.startExperimentsQueue', () => {
     it('should be able to execute all experiments in the run queue', async () => {
       const mockRunExperimentQueue = stub(
-        CliRunner.prototype,
+        DvcRunner.prototype,
         'runExperimentQueue'
       ).resolves(undefined)
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN_QUEUED)
 
@@ -495,20 +450,12 @@ suite('Workspace Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getRepository'
-      ).returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
       const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
         value: { id: selectedExperiment, name: selectedExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
-      const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
+      const mockExperimentApply = stub(DvcExecutor.prototype, 'experimentApply')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
 
@@ -564,6 +511,156 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
+  describe('dvc.branchExperiment', () => {
+    it('should be able to create a branch from an experiment', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testExperiment = 'exp-83425'
+      const mockBranch = 'brunch'
+      const inputEvent = getInputBoxEvent(mockBranch)
+
+      stub(window, 'showQuickPick').resolves({
+        value: { id: testExperiment, name: testExperiment }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
+
+      const mockExperimentBranch = stub(
+        DvcExecutor.prototype,
+        'experimentBranch'
+      ).resolves(
+        `Git branch '${mockBranch}' has been created from experiment '${testExperiment}'.        
+     To switch to the new branch run:
+           git checkout ${mockBranch}`
+      )
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_BRANCH)
+
+      await inputEvent
+      expect(mockExperimentBranch).to.be.calledWithExactly(
+        dvcDemoPath,
+        testExperiment,
+        mockBranch
+      )
+    })
+  })
+
+  describe('dvc.shareExperimentAsBranch', () => {
+    it('should be able to share an experiment as a branch', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testExperiment = 'exp-83425'
+      const mockBranch = 'more-brunch'
+      const inputEvent = getInputBoxEvent(mockBranch)
+
+      stub(window, 'showQuickPick').resolves({
+        value: { id: testExperiment, name: testExperiment }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
+
+      const mockExperimentBranch = stub(
+        DvcExecutor.prototype,
+        'experimentBranch'
+      ).resolves(
+        `Git branch '${mockBranch}' has been created from experiment '${testExperiment}'.
+     To switch to the new branch run:
+           git checkout ${mockBranch}`
+      )
+      const mockExperimentApply = stub(
+        DvcExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${testExperiment}' have been applied to your current workspace.`
+      )
+      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
+        '10 files updated.'
+      )
+      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
+      const branchPushedToRemote = new Promise(resolve =>
+        mockGitPush.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(`${mockBranch} pushed to remote`)
+        })
+      )
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH
+      )
+
+      await inputEvent
+      await branchPushedToRemote
+      expect(mockExperimentBranch).to.be.calledWithExactly(
+        dvcDemoPath,
+        testExperiment,
+        mockBranch
+      )
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        testExperiment
+      )
+      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
+    })
+  })
+
+  describe('dvc.shareExperimentAsCommit', () => {
+    it('should be able to share an experiment as a commit', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const testExperiment = 'exp-83425'
+      const mockCommit = 'this is the best experiment ever!'
+      const inputEvent = getInputBoxEvent(mockCommit)
+
+      stub(window, 'showQuickPick').resolves({
+        value: { id: testExperiment, name: testExperiment }
+      } as QuickPickItemWithValue<{ id: string; name: string }>)
+
+      const mockExperimentApply = stub(
+        DvcExecutor.prototype,
+        'experimentApply'
+      ).resolves(
+        `Changes for experiment '${testExperiment}' have been applied to your current workspace.`
+      )
+      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
+        '191232423 files updated.'
+      )
+      const mockStageAndCommit = stub(
+        GitExecutor.prototype,
+        'stageAndCommit'
+      ).resolves('')
+      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
+      const branchPushedToRemote = new Promise(resolve =>
+        mockGitPush.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(`${mockCommit} pushed to remote`)
+        })
+      )
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      await commands.executeCommand(
+        RegisteredCliCommands.EXPERIMENT_SHARE_AS_COMMIT
+      )
+
+      await inputEvent
+      await branchPushedToRemote
+      expect(mockExperimentApply).to.be.calledWithExactly(
+        dvcDemoPath,
+        testExperiment
+      )
+      expect(mockStageAndCommit).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockCommit
+      )
+      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
+    })
+  })
+
   describe('dvc.removeExperiment', () => {
     it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
       const mockExperiment = 'exp-to-remove'
@@ -572,22 +669,13 @@ suite('Workspace Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getRepository'
-      ).returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(window, 'showQuickPick').resolves({
         value: { id: mockExperiment, name: mockExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       )
 
@@ -603,19 +691,10 @@ suite('Workspace Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getRepository'
-      ).returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       )
 
@@ -635,22 +714,13 @@ suite('Workspace Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
-      ).returns(dvcDemoPath)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getRepository'
-      ).returns(experiments)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(window, 'showQuickPick').resolves({
         value: { id: mockExperiment, name: mockExperiment }
       } as QuickPickItemWithValue<{ id: string; name: string }>)
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       )
 

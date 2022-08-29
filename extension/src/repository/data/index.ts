@@ -1,14 +1,8 @@
 import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { DiffOutput, ListOutput, StatusOutput } from '../../cli/reader'
+import { DiffOutput, ListOutput, StatusOutput } from '../../cli/dvc/reader'
 import { isAnyDvcYaml } from '../../fileSystem'
-import {
-  DOT_GIT,
-  getAllUntracked,
-  getGitRepositoryRoot,
-  getHasChanges
-} from '../../git'
 import { ProcessManager } from '../../processManager'
 import {
   createFileSystemWatcher,
@@ -20,6 +14,7 @@ import {
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
+import { DOT_GIT } from '../../cli/git/constants'
 
 export type Data = {
   diffFromHead: DiffOutput
@@ -139,8 +134,14 @@ export class RepositoryData extends DeferredDisposable {
     )
 
     const [untracked, hasGitChanges] = await Promise.all([
-      getAllUntracked(this.dvcRoot),
-      getHasChanges(this.dvcRoot)
+      this.internalCommands.executeCommand<Set<string>>(
+        AvailableCommands.GIT_LIST_UNTRACKED,
+        this.dvcRoot
+      ),
+      this.internalCommands.executeCommand<boolean>(
+        AvailableCommands.GIT_HAS_CHANGES,
+        this.dvcRoot
+      )
     ])
 
     return { diffFromCache, diffFromHead, hasGitChanges, untracked }
@@ -151,7 +152,10 @@ export class RepositoryData extends DeferredDisposable {
   }
 
   private async watchWorkspace() {
-    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
+    const gitRoot = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_REPOSITORY_ROOT,
+      this.dvcRoot
+    )
 
     this.dispose.track(
       createFileSystemWatcher(

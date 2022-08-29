@@ -13,7 +13,7 @@ import {
   ValueTreeNode,
   ValueTreeOrError,
   ValueTreeRoot
-} from '../../../cli/reader'
+} from '../../../cli/dvc/reader'
 import { buildMetricOrParamPath, METRIC_PARAM_SEPARATOR } from '../paths'
 
 const collectMetricOrParam = (

@@ -1,3 +1,8 @@
+import {
+  getBranchExperimentCommand,
+  getShareExperimentAsBranchCommand,
+  getShareExperimentAsCommitCommand
+} from '.'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
@@ -153,7 +158,7 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_BRANCH,
     () =>
       experiments.getCwdExpNameAndInputThenRun(
-        AvailableCommands.EXPERIMENT_BRANCH,
+        getBranchExperimentCommand(experiments),
         Title.ENTER_BRANCH_NAME
       )
   )
@@ -162,8 +167,48 @@ const registerExperimentInputCommands = (
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getExpNameAndInputThenRun(
-        AvailableCommands.EXPERIMENT_BRANCH,
+        getBranchExperimentCommand(experiments),
         Title.ENTER_BRANCH_NAME,
+        dvcRoot,
+        id
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH,
+    () =>
+      experiments.getCwdExpNameAndInputThenRun(
+        getShareExperimentAsBranchCommand(internalCommands),
+        Title.ENTER_BRANCH_NAME
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
+    ({ dvcRoot, id }: ExperimentDetails) =>
+      experiments.getExpNameAndInputThenRun(
+        getShareExperimentAsBranchCommand(internalCommands),
+        Title.ENTER_BRANCH_NAME,
+        dvcRoot,
+        id
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_SHARE_AS_COMMIT,
+    () =>
+      experiments.getCwdExpNameAndInputThenRun(
+        getShareExperimentAsCommitCommand(internalCommands),
+        Title.ENTER_COMMIT_MESSAGE
+      )
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
+    ({ dvcRoot, id }: ExperimentDetails) =>
+      experiments.getExpNameAndInputThenRun(
+        getShareExperimentAsCommitCommand(internalCommands),
+        Title.ENTER_COMMIT_MESSAGE,
         dvcRoot,
         id
       )

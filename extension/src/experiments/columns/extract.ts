@@ -3,7 +3,7 @@ import {
   ExperimentFields,
   ValueTreeOrError,
   ValueTreeRoot
-} from '../../cli/reader'
+} from '../../cli/dvc/reader'
 import { shortenForLabel } from '../../util/string'
 import {
   DepColumns,
@@ -73,6 +73,7 @@ type Columns = {
   deps: DepColumns | undefined
   metrics: MetricOrParamColumns | undefined
   params: MetricOrParamColumns | undefined
+  Created: string | null | undefined
 }
 
 export const extractColumns = (
@@ -88,6 +89,7 @@ export const extractColumns = (
   ].join('\n')
 
   const columns: Columns = {
+    Created: experiment?.timestamp,
     deps: extractDeps(experiment.deps, branch),
     metrics: metricsData?.columns,
     params: paramsData?.columns

@@ -43,10 +43,46 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   parentDraggedOver
 }) => {
   const [order, setOrder] = useState<string[]>([])
+  const [disabledDrag, setDisabledDrag] = useState('')
 
   useEffect(() => {
     setOrder(entries.map(({ id }) => id))
   }, [entries])
+
+  useEffect(() => {
+    const panels = document.querySelectorAll('.vega-bindings')
+    const addDisabled = (e: Event) => {
+      setDisabledDrag(
+        (e.currentTarget as HTMLFormElement).parentElement?.parentElement
+          ?.parentElement?.id || ''
+      )
+    }
+
+    const removeDisabled = () => {
+      setDisabledDrag('')
+    }
+
+    const disableClick = (e: Event) => {
+      e.stopPropagation()
+    }
+
+    for (const panel of Object.values(panels)) {
+      panel.removeEventListener('mouseenter', addDisabled)
+      panel.removeEventListener('mouseleave', removeDisabled)
+      panel.removeEventListener('click', disableClick)
+      panel.addEventListener('mouseenter', addDisabled)
+      panel.addEventListener('mouseleave', removeDisabled)
+      panel.addEventListener('click', disableClick)
+    }
+
+    return () => {
+      for (const panel of Object.values(panels)) {
+        panel.removeEventListener('mouseenter', addDisabled)
+        panel.removeEventListener('mouseleave', removeDisabled)
+        panel.removeEventListener('click', disableClick)
+      }
+    }
+  })
 
   const setEntriesOrder = (order: string[]) => {
     setOrder(order)
@@ -104,6 +140,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           : undefined
       }
       parentDraggedOver={parentDraggedOver}
+      disabledDropIds={[disabledDrag]}
     />
   )
 }

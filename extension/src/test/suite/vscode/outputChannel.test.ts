@@ -4,7 +4,8 @@ import { EventEmitter, window, OutputChannel as VSOutputChannel } from 'vscode'
 import { restore, stub, fake } from 'sinon'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import { Disposable } from '../../../extension'
-import { Cli, CliResult, CliStarted } from '../../../cli'
+import { CliResult, CliStarted } from '../../../cli'
+import { DvcCli } from '../../../cli/dvc'
 import { Config } from '../../../config'
 
 suite('Output Channel Test Suite', () => {
@@ -27,7 +28,7 @@ suite('Output Channel Test Suite', () => {
       const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
       const cli = disposable.track(
-        new Cli({} as Config, { processCompleted, processStarted })
+        new DvcCli({} as Config, { processCompleted, processStarted })
       )
       const mockAppend = fake()
       const mockOutputChannel = stub(window, 'createOutputChannel').returns({
@@ -65,7 +66,7 @@ suite('Output Channel Test Suite', () => {
       const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
       const cli = disposable.track(
-        new Cli({} as Config, { processCompleted, processStarted })
+        new DvcCli({} as Config, { processCompleted, processStarted })
       )
       const mockAppend = fake()
       const mockOutputChannel = stub(window, 'createOutputChannel').returns({

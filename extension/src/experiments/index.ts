@@ -1,4 +1,5 @@
 import { Event, EventEmitter, Memento } from 'vscode'
+import omit from 'lodash.omit'
 import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
@@ -22,7 +23,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput } from '../cli/reader'
+import { ExperimentsOutput } from '../cli/dvc/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { FileSystemData } from '../fileSystem/data'
@@ -33,7 +34,7 @@ import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 
 export const ExperimentsScale = {
-  ...ColumnType,
+  ...omit(ColumnType, 'TIMESTAMP'),
   HAS_CHECKPOINTS: 'hasCheckpoints',
   NO_CHECKPOINTS: 'noCheckpoints'
 } as const
@@ -182,7 +183,9 @@ export class Experiments extends BaseRepository<TableData> {
     const acc = createTypedAccumulator(ExperimentsScale)
 
     for (const { type } of this.columns.getTerminalNodes()) {
-      acc[type] = acc[type] + 1
+      if (type in acc) {
+        acc[<keyof typeof acc>type] = acc[<keyof typeof acc>type] + 1
+      }
     }
     const checkpointType = this.hasCheckpoints()
       ? ExperimentsScale.HAS_CHECKPOINTS
@@ -277,7 +280,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getExperimentCount() {
-    if (!this.columns.hasColumns()) {
+    if (!this.columns.hasNonDefaultColumns()) {
       return 0
     }
 
@@ -349,7 +352,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getExperiments() {
-    if (!this.columns.hasColumns()) {
+    if (!this.columns.hasNonDefaultColumns()) {
       return []
     }
 
@@ -365,7 +368,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getSelectedRevisions() {
-    if (!this.columns.hasColumns()) {
+    if (!this.columns.hasNonDefaultColumns()) {
       return []
     }
 

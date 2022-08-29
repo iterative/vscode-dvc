@@ -16,7 +16,7 @@ describe('InternalCommands', () => {
   describe('executeCommand', () => {
     it('should throw an error if we try to run a non-registered command', () => {
       expect(() =>
-        internalCommands.executeCommand('not a command' as CommandId)
+        internalCommands.executeCommand('not a command' as CommandId, __dirname)
       ).toThrow()
     })
   })

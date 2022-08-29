@@ -9,11 +9,15 @@ export enum RegisteredCliCommands {
   EXPERIMENT_RUN = 'dvc.runExperiment',
   EXPERIMENT_RUN_QUEUED = 'dvc.startExperimentsQueue',
   EXPERIMENT_RESET_AND_RUN = 'dvc.resetAndRunCheckpointExperiment',
+  EXPERIMENT_SHARE_AS_BRANCH = 'dvc.shareExperimentAsBranch',
+  EXPERIMENT_SHARE_AS_COMMIT = 'dvc.shareExperimentAsCommit',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
 
   EXPERIMENT_VIEW_APPLY = 'dvc.views.experiments.applyExperiment',
   EXPERIMENT_VIEW_BRANCH = 'dvc.views.experiments.branchExperiment',
   EXPERIMENT_VIEW_REMOVE = 'dvc.views.experiments.removeExperiment',
+  EXPERIMENT_VIEW_SHARE_AS_BRANCH = 'dvc.views.experiments.shareExperimentAsBranch',
+  EXPERIMENT_VIEW_SHARE_AS_COMMIT = 'dvc.views.experiments.shareExperimentAsCommit',
 
   EXPERIMENT_VIEW_QUEUE = 'dvc.views.experiments.queueExperiment',
   EXPERIMENT_VIEW_RESUME = 'dvc.views.experiments.resumeCheckpointExperiment',
@@ -36,7 +40,10 @@ export enum RegisteredCliCommands {
   PUSH = 'dvc.push',
   PUSH_TARGET = 'dvc.pushTarget',
   REMOVE_TARGET = 'dvc.removeTarget',
-  RENAME_TARGET = 'dvc.renameTarget'
+  RENAME_TARGET = 'dvc.renameTarget',
+
+  GIT_STAGE_ALL = 'dvc.gitStageAll',
+  GIT_UNSTAGE_ALL = 'dvc.gitUnstageAll'
 }
 
 export enum RegisteredCommands {
@@ -81,8 +88,5 @@ export enum RegisteredCommands {
   TRACKED_EXPLORER_COPY_REL_FILE_PATH = 'dvc.copyRelativeFilePath',
   TRACKED_EXPLORER_FIND_IN_FOLDER = 'dvc.findInFolder',
   TRACKED_EXPLORER_OPEN_TO_THE_SIDE = 'dvc.openToTheSide',
-  TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare',
-
-  GIT_STAGE_ALL = 'dvc.gitStageAll',
-  GIT_UNSTAGE_ALL = 'dvc.gitUnstageAll'
+  TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare'
 }

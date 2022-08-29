@@ -15,7 +15,12 @@ import { addFilterViaQuickInput } from './filterBy/util'
 import { Disposable } from '../../../../extension'
 import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
-import { experimentsUpdatedEvent, getFirstArgOfLastCall } from '../../util'
+import {
+  experimentsUpdatedEvent,
+  getFirstArgOfLastCall,
+  spyOnPrivateMethod,
+  stubPrivatePrototypeMethod
+} from '../../util'
 import { dvcDemoPath } from '../../../util'
 import {
   RegisteredCliCommands,
@@ -28,7 +33,11 @@ import expShowFixture from '../../../fixtures/expShow/output'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { buildMetricOrParamPath } from '../../../../experiments/columns/paths'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
-import { buildExperiments, buildSingleRepoExperiments } from '../util'
+import {
+  buildExperiments,
+  buildSingleRepoExperiments,
+  stubWorkspaceExperimentsGetters
+} from '../util'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import {
@@ -36,7 +45,7 @@ import {
   QuickPickOptionsWithTitle
 } from '../../../../vscode/quickPick'
 import { Response } from '../../../../vscode/response'
-import { CliExecutor } from '../../../../cli/executor'
+import { DvcExecutor } from '../../../../cli/dvc/executor'
 import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ColumnType } from '../../../../experiments/webview/contract'
@@ -444,9 +453,8 @@ suite('Experiments Tree Test Suite', () => {
 
       const description = '[exp-1234]'
 
-      const setExpandedSpy = spy(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        experimentsTree as any,
+      const setExpandedSpy = spyOnPrivateMethod(
+        experimentsTree,
         'setExperimentExpanded'
       )
 
@@ -476,13 +484,12 @@ suite('Experiments Tree Test Suite', () => {
       }
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       ).resolves('')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ExperimentsTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
         'getSelectedExperimentItems'
       ).returns([mockExperiment])
 
@@ -501,13 +508,12 @@ suite('Experiments Tree Test Suite', () => {
       const mockExperiment = 'exp-to-remove'
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       ).resolves('')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ExperimentsTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
         'getSelectedExperimentItems'
       ).returns([])
 
@@ -531,13 +537,12 @@ suite('Experiments Tree Test Suite', () => {
       const mockQueuedExperimentLabel = 'queued-removed'
 
       const mockExperimentRemove = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentRemove'
       ).resolves('')
 
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ExperimentsTree as any).prototype,
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
         'getSelectedExperimentItems'
       ).returns([
         dvcDemoPath,
@@ -580,7 +585,7 @@ suite('Experiments Tree Test Suite', () => {
       const mockExperiment = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
 
       const mockExperimentApply = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
         `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
@@ -606,7 +611,7 @@ suite('Experiments Tree Test Suite', () => {
       await experiments.isReady()
 
       const mockExperimentBranch = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentBranch'
       )
       const mockShowInputBox = stub(window, 'showInputBox').resolves(undefined)
@@ -632,7 +637,7 @@ suite('Experiments Tree Test Suite', () => {
       const mockBranch = 'it-is-a-branch'
 
       const mockExperimentBranch = stub(
-        CliExecutor.prototype,
+        DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
         `Git branch '${mockBranch}' has been created from experiment '${mockCheckpoint}'.        
@@ -661,22 +666,20 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
       const baseExperimentId = 'workspace'
 
-      const { cliExecutor, experiments, experimentsModel } =
+      const { dvcExecutor, experiments, experimentsModel } =
         buildExperiments(disposable)
 
       await experiments.isReady()
 
       const mockExperimentRunQueue = stub(
-        cliExecutor,
+        dvcExecutor,
         'experimentRunQueue'
       ).resolves('true')
 
-      const mockGetOnlyOrPickProject = stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
+      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
+        '',
+        experiments
       )
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
 
@@ -726,21 +729,19 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
       const baseExperimentId = 'workspace'
 
-      const { cliRunner, experiments, experimentsModel } =
+      const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)
 
       await experiments.isReady()
 
-      const mockRunExperiment = stub(cliRunner, 'runExperiment').resolves(
+      const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
       )
 
-      const mockGetOnlyOrPickProject = stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
+      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
+        '',
+        experiments
       )
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
 
@@ -787,22 +788,20 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
       const baseExperimentId = 'workspace'
 
-      const { cliRunner, experiments, experimentsModel } =
+      const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)
 
       await experiments.isReady()
 
       const mockRunExperimentReset = stub(
-        cliRunner,
+        dvcRunner,
         'runExperimentReset'
       ).resolves(undefined)
 
-      const mockGetOnlyOrPickProject = stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getOnlyOrPickProject'
+      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
+        '',
+        experiments
       )
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
 

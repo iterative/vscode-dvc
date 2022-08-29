@@ -1,4 +1,4 @@
-import { Value, ValueTree } from '../../../cli/reader'
+import { Value, ValueTree } from '../../../cli/dvc/reader'
 import { appendColumnToPath } from '../../columns/paths'
 import { MetricOrParamColumns } from '../../webview/contract'
 

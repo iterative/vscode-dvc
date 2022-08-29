@@ -2,6 +2,65 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.24] - 2022-08-26
+
+### 🚀 New Features and Enhancements
+
+- Make timestamp column hideable and draggable [#2239](https://github.com/iterative/vscode-dvc/pull/2239) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Split up `Cell.tsx` and `Row.tsx` files [#2264](https://github.com/iterative/vscode-dvc/pull/2264) by [@julieg18](https://github.com/julieg18)
+
+## [0.3.23] - 2022-08-25
+
+### 🚀 New Features and Enhancements
+
+- Add commit and share experiment command to the palette [#2259](https://github.com/iterative/vscode-dvc/pull/2259) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Display the smoothness slider correctly [#2257](https://github.com/iterative/vscode-dvc/pull/2257) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Bump min tested DVC version to 2.20.1 [#2261](https://github.com/iterative/vscode-dvc/pull/2261) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.3.22] - 2022-08-24
+
+### 🚀 New Features and Enhancements
+
+- Add Git cli calls into output channel [#2225](https://github.com/iterative/vscode-dvc/pull/2225) by [@mattseddon](https://github.com/mattseddon)
+- Add commit and share experiment to context menus [#2237](https://github.com/iterative/vscode-dvc/pull/2237) by [@mattseddon](https://github.com/mattseddon)
+- Switch experiment sharing to progress api [#2245](https://github.com/iterative/vscode-dvc/pull/2245) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Show spinner in the status bar when extension is running Git [#2249](https://github.com/iterative/vscode-dvc/pull/2249) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Replace vary with modify in variable names [#2227](https://github.com/iterative/vscode-dvc/pull/2227) by [@mattseddon](https://github.com/mattseddon)
+- Remove experiments from star/unstar text in experiments table [#2228](https://github.com/iterative/vscode-dvc/pull/2228) by [@mattseddon](https://github.com/mattseddon)
+- Rename DVC CLI files and classes [#2226](https://github.com/iterative/vscode-dvc/pull/2226) by [@mattseddon](https://github.com/mattseddon)
+- Add test utils for dealing with private class methods [#2233](https://github.com/iterative/vscode-dvc/pull/2233) by [@mattseddon](https://github.com/mattseddon)
+- Move integration test files into new structure [#2236](https://github.com/iterative/vscode-dvc/pull/2236) by [@mattseddon](https://github.com/mattseddon)
+- Split up `TableHeader.tsx`  [#2250](https://github.com/iterative/vscode-dvc/pull/2250) by [@julieg18](https://github.com/julieg18)
+- Add CHANGELOG to prettierignore [#2246](https://github.com/iterative/vscode-dvc/pull/2246) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.3.21] - 2022-08-21
+
+### 🚀 New Features and Enhancements
+
+- Add a copy button for comparison table rows [#2216](https://github.com/iterative/vscode-dvc/pull/2216) by [@sroy3](https://github.com/sroy3)
+- Share an experiment from context menus [#2219](https://github.com/iterative/vscode-dvc/pull/2219) by [@mattseddon](https://github.com/mattseddon)
+- Share an experiment from command palette [#2221](https://github.com/iterative/vscode-dvc/pull/2221) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Disable selection on resize [#2214](https://github.com/iterative/vscode-dvc/pull/2214) by [@sroy3](https://github.com/sroy3)
+- Update cell hover styles [#2198](https://github.com/iterative/vscode-dvc/pull/2198) by [@julieg18](https://github.com/julieg18)
+
 ## [0.3.20] - 2022-08-18
 
 ### 🚀 New Features and Enhancements

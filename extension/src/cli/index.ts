@@ -1,9 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
-import { Args } from './constants'
-import { ExecutionOptions, getOptions } from './options'
 import { CliError, MaybeConsoleError } from './error'
-import { createProcess } from '../processExecution'
-import { Config } from '../config'
+import { getCommandString } from './command'
+import { createProcess, ProcessOptions } from '../processExecution'
 import { StopWatch } from '../util/time'
 import { Disposable } from '../class/dispose'
 
@@ -54,18 +52,11 @@ export class Cli extends Disposable implements ICli {
   public readonly processStarted: EventEmitter<CliStarted>
   public readonly onDidStartProcess: Event<CliStarted>
 
-  protected readonly config: Config
-
-  constructor(
-    config: Config,
-    emitters?: {
-      processStarted: EventEmitter<CliStarted>
-      processCompleted: EventEmitter<CliResult>
-    }
-  ) {
+  constructor(emitters?: {
+    processStarted: EventEmitter<CliStarted>
+    processCompleted: EventEmitter<CliResult>
+  }) {
     super()
-
-    this.config = config
 
     this.processCompleted =
       emitters?.processCompleted ||
@@ -78,9 +69,9 @@ export class Cli extends Disposable implements ICli {
     this.onDidStartProcess = this.processStarted.event
   }
 
-  public async executeProcess(cwd: string, ...args: Args): Promise<string> {
-    const { command, ...options } = this.getOptions(cwd, ...args)
-    const baseEvent: CliEvent = { command, cwd, pid: undefined }
+  protected async executeProcess(options: ProcessOptions): Promise<string> {
+    const command = getCommandString(options)
+    const baseEvent: CliEvent = { command, cwd: options.cwd, pid: undefined }
     const stopWatch = new StopWatch()
     try {
       const process = this.dispose.track(createProcess(options))
@@ -110,18 +101,9 @@ export class Cli extends Disposable implements ICli {
     }
   }
 
-  private getOptions(cwd: string, ...args: Args) {
-    return getOptions(
-      this.config.pythonBinPath,
-      this.config.getCliPath(),
-      cwd,
-      ...args
-    )
-  }
-
   private processCliError(
     error: MaybeConsoleError,
-    options: ExecutionOptions,
+    options: ProcessOptions,
     baseEvent: CliEvent,
     duration: number
   ) {

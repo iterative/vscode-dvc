@@ -15,7 +15,7 @@ import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
 import checkpointPlotsFixture from '../../test/fixtures/expShow/checkpointPlots'
-import { ExperimentsOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/dvc/reader'
 import {
   definedAndNonEmpty,
   sameContents,

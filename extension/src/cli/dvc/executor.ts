@@ -1,4 +1,4 @@
-import { Cli, typeCheckCommands } from '.'
+import { DvcCli } from '.'
 import {
   Args,
   Command,
@@ -7,7 +7,8 @@ import {
   Flag,
   GcPreserveFlag
 } from './constants'
-import { setContextValue } from '../vscode/context'
+import { typeCheckCommands } from '..'
+import { setContextValue } from '../../vscode/context'
 
 export const autoRegisteredCommands = {
   ADD: 'add',
@@ -27,7 +28,7 @@ export const autoRegisteredCommands = {
   REMOVE: 'remove'
 } as const
 
-export class CliExecutor extends Cli {
+export class DvcExecutor extends DvcCli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this
@@ -130,12 +131,12 @@ export class CliExecutor extends Cli {
   }
 
   private executeExperimentProcess(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.EXPERIMENT, ...args)
+    return this.executeDvcProcess(cwd, Command.EXPERIMENT, ...args)
   }
 
   private async blockAndExecuteProcess(cwd: string, ...args: Args) {
     this.setRunning(true)
-    const output = await this.executeProcess(cwd, ...args)
+    const output = await this.executeDvcProcess(cwd, ...args)
     this.setRunning(false)
     return output
   }

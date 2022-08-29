@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { commands } from 'vscode'
 import { Disposable } from '../../../extension'
-import { CliExecutor } from '../../../cli/executor'
+import { DvcExecutor } from '../../../cli/dvc/executor'
 import { RegisteredCliCommands } from '../../../commands/external'
 import { WorkspaceRepositories } from '../../../repository/workspace'
 import * as QuickPick from '../../../vscode/quickPick'
@@ -26,7 +26,7 @@ suite('Workspace Repositories Test Suite', () => {
 
   describe('WorkspaceRepositories', () => {
     it('should be able to run commit from the Command Palette with multiple roots in the workspace', async () => {
-      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
+      const mockCommit = stub(DvcExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       stub(WorkspaceRepositories.prototype, 'getDvcRoots').returns([
@@ -55,7 +55,7 @@ suite('Workspace Repositories Test Suite', () => {
     })
 
     it('should be able to run checkout from the Command Palette with multiple roots in the workspace', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
 
       stub(WorkspaceRepositories.prototype, 'getDvcRoots').returns([
         dvcDemoPath,
@@ -73,7 +73,7 @@ suite('Workspace Repositories Test Suite', () => {
     })
 
     it('should not run pull from the Command Palette if the user fails to select from multiple roots in the workspace', async () => {
-      const mockPull = stub(CliExecutor.prototype, 'pull').resolves('')
+      const mockPull = stub(DvcExecutor.prototype, 'pull').resolves('')
 
       stub(WorkspaceRepositories.prototype, 'getDvcRoots').returns([
         dvcDemoPath,

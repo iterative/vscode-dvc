@@ -1,34 +1,33 @@
-import { spy, stub } from 'sinon'
+import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
 import { dvcDemoPath } from '../../util'
 import {
   buildInternalCommands,
   FIRST_TRUTHY_TIME,
-  mockDisposable
+  mockDisposable,
+  spyOnPrivateMemberMethod
 } from '../util'
 import { Disposer } from '../../../extension'
-import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
 import * as Time from '../../../util/time'
 import * as Watcher from '../../../fileSystem/watcher'
 import { Repository } from '../../../repository'
 import { InternalCommands } from '../../../commands/internal'
-import { DecorationProvider } from '../../../repository/decorationProvider'
-import { SourceControlManagement } from '../../../repository/sourceControlManagement'
 
 export const buildDependencies = (disposer: Disposer) => {
-  const { cliReader, internalCommands } = buildInternalCommands(disposer)
+  const { dvcReader, gitReader, internalCommands } =
+    buildInternalCommands(disposer)
 
   const mockCreateFileSystemWatcher = stub(
     Watcher,
     'createFileSystemWatcher'
   ).returns(mockDisposable)
 
-  const mockListDvcOnlyRecursive = stub(cliReader, 'listDvcOnlyRecursive')
-  const mockStatus = stub(cliReader, 'status')
-  const mockDiff = stub(cliReader, 'diff')
-  const mockGetAllUntracked = stub(Git, 'getAllUntracked')
-  const mockGetHasChanges = stub(Git, 'getHasChanges')
+  const mockListDvcOnlyRecursive = stub(dvcReader, 'listDvcOnlyRecursive')
+  const mockStatus = stub(dvcReader, 'status')
+  const mockDiff = stub(dvcReader, 'diff')
+  const mockGetAllUntracked = stub(gitReader, 'listUntracked')
+  const mockGetHasChanges = stub(gitReader, 'hasChanges')
   const mockNow = stub(Time, 'getCurrentEpoch')
 
   const treeDataChanged = disposer.track(new EventEmitter<void>())
@@ -99,14 +98,14 @@ export const buildRepository = async (
     new Repository(dvcRoot, internalCommands, updatesPaused, treeDataChanged)
   )
 
-  const setDecorationStateSpy = spy(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (repository as any).decorationProvider as DecorationProvider,
+  const setDecorationStateSpy = spyOnPrivateMemberMethod(
+    repository,
+    'decorationProvider',
     'setState'
   )
-  const setScmStateSpy = spy(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (repository as any).sourceControlManagement as SourceControlManagement,
+  const setScmStateSpy = spyOnPrivateMemberMethod(
+    repository,
+    'sourceControlManagement',
     'setState'
   )
 

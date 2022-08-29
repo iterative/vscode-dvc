@@ -1,27 +1,27 @@
 import { Disposable } from './class/dispose'
-import { CliRunner } from './cli/runner'
+import { DvcRunner } from './cli/dvc/runner'
 import { Experiments } from './experiments'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { setContextValue } from './vscode/context'
 
 export class Context extends Disposable {
   private readonly experiments: WorkspaceExperiments
-  private readonly cliRunner: CliRunner
+  private readonly dvcRunner: DvcRunner
 
-  constructor(experiments: WorkspaceExperiments, cliRunner: CliRunner) {
+  constructor(experiments: WorkspaceExperiments, dvcRunner: DvcRunner) {
     super()
 
     this.experiments = experiments
-    this.cliRunner = cliRunner
+    this.dvcRunner = dvcRunner
 
     this.dispose.track(
-      this.cliRunner.onDidStartProcess(() => {
+      this.dvcRunner.onDidStartProcess(() => {
         this.setIsExperimentRunning()
       })
     )
 
     this.dispose.track(
-      this.cliRunner.onDidCompleteProcess(({ cwd }) =>
+      this.dvcRunner.onDidCompleteProcess(({ cwd }) =>
         this.experiments.getRepository(cwd).update()
       )
     )
@@ -56,7 +56,7 @@ export class Context extends Disposable {
 
   private setIsExperimentRunning(repositories: Experiments[] = []) {
     const contextKey = 'dvc.experiment.running'
-    if (this.cliRunner.isExperimentRunning()) {
+    if (this.dvcRunner.isExperimentRunning()) {
       setContextValue(contextKey, true)
       return
     }

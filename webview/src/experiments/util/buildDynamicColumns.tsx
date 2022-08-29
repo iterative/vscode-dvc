@@ -13,7 +13,7 @@ import {
   Column,
   ValueWithChanges
 } from 'dvc/src/experiments/webview/contract'
-import { Value } from 'dvc/src/cli/reader'
+import { Value } from 'dvc/src/cli/dvc/reader'
 import { formatFloat } from './numberFormatting'
 import Tooltip, {
   CELL_TOOLTIP_DELAY

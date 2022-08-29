@@ -1,13 +1,12 @@
 import { commands, Uri } from 'vscode'
-import { tryThenMaybeForce } from '../../cli/actions'
-import { Flag } from '../../cli/constants'
+import { tryThenMaybeForce } from '../../cli/dvc/actions'
+import { Flag } from '../../cli/dvc/constants'
 import {
   AvailableCommands,
   CommandId,
   InternalCommands
 } from '../../commands/internal'
 import { relativeWithUri } from '../../fileSystem'
-import { gitReset, gitResetWorkspace, gitStageAll } from '../../git'
 import { warnOfConsequences } from '../../vscode/modal'
 import { Response } from '../../vscode/response'
 import { WorkspaceRepositories } from '../workspace'
@@ -71,7 +70,10 @@ export const getRootCommand =
   }
 
 export const getStageAllCommand =
-  (repositories: WorkspaceRepositories): RootCommand =>
+  (
+    repositories: WorkspaceRepositories,
+    internalCommands: InternalCommands
+  ): RootCommand =>
   async context => {
     const cwd = await repositories.getCwd(context?.rootUri)
 
@@ -79,12 +81,15 @@ export const getStageAllCommand =
       return
     }
 
-    await gitStageAll(cwd)
+    await internalCommands.executeCommand(AvailableCommands.GIT_STAGE_ALL, cwd)
     return commands.executeCommand('workbench.scm.focus')
   }
 
 export const getUnstageAllCommand =
-  (repositories: WorkspaceRepositories): RootCommand =>
+  (
+    repositories: WorkspaceRepositories,
+    internalCommands: InternalCommands
+  ): RootCommand =>
   async context => {
     const cwd = await repositories.getCwd(context?.rootUri)
 
@@ -92,7 +97,10 @@ export const getUnstageAllCommand =
       return
     }
 
-    return gitReset(cwd)
+    return internalCommands.executeCommand(
+      AvailableCommands.GIT_UNSTAGE_ALL,
+      cwd
+    )
   }
 
 export const getCommitRootCommand =
@@ -138,7 +146,10 @@ export const getResetRootCommand =
       return
     }
 
-    await gitResetWorkspace(cwd as string)
+    await internalCommands.executeCommand(
+      AvailableCommands.GIT_RESET_WORKSPACE,
+      cwd as string
+    )
 
     return internalCommands.executeCommand(
       AvailableCommands.CHECKOUT,

@@ -4,7 +4,6 @@ import omit from 'lodash.omit'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
-import * as Git from '../../../git'
 import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
@@ -13,7 +12,7 @@ import {
   buildMockData,
   mockDisposable
 } from '../util'
-import { ExperimentsOutput } from '../../../cli/reader'
+import { ExperimentsOutput } from '../../../cli/dvc/reader'
 import { ExperimentsData } from '../../../experiments/data'
 import { CheckpointsModel } from '../../../experiments/checkpoints/model'
 import { FileSystemData } from '../../../fileSystem/data'
@@ -44,9 +43,10 @@ export const buildExperiments = (
   dvcRoot = dvcDemoPath
 ) => {
   const {
-    cliExecutor,
-    cliReader,
-    cliRunner,
+    dvcExecutor,
+    dvcReader,
+    dvcRunner,
+    gitReader,
     internalCommands,
     messageSpy,
     mockExperimentShow,
@@ -71,14 +71,15 @@ export const buildExperiments = (
   experiments.setState(experimentShowData)
 
   return {
-    cliExecutor,
-    cliReader,
-    cliRunner,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,
     columnsModel: (experiments as any).columns as ColumnsModel,
+    dvcExecutor,
+    dvcReader,
+    dvcRunner,
     experiments,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     experimentsModel: (experiments as any).experiments as ExperimentsModel,
+    gitReader,
     internalCommands,
     messageSpy,
     mockExperimentShow,
@@ -91,12 +92,13 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
   const {
     internalCommands,
     experiments: mockExperiments,
+    gitReader,
     messageSpy,
     updatesPaused,
     resourceLocator
   } = buildExperiments(disposer, expShowFixture, 'other/dvc/root')
 
-  stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
+  stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(
       internalCommands,
@@ -117,10 +119,15 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {
-  const { internalCommands, messageSpy, updatesPaused, resourceLocator } =
-    buildDependencies(disposer)
+  const {
+    internalCommands,
+    gitReader,
+    messageSpy,
+    updatesPaused,
+    resourceLocator
+  } = buildDependencies(disposer)
 
-  stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
+  stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(
       internalCommands,
@@ -145,8 +152,8 @@ export const buildExperimentsDataDependencies = (disposer: Disposer) => {
     'createFileSystemWatcher'
   ).returns(mockDisposable)
 
-  const { cliReader, internalCommands } = buildInternalCommands(disposer)
-  const mockExperimentShow = stub(cliReader, 'expShow').resolves(expShowFixture)
+  const { dvcReader, internalCommands } = buildInternalCommands(disposer)
+  const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
   return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
 }
 
@@ -163,4 +170,23 @@ export const buildExperimentsData = (disposer: Disposer) => {
   )
 
   return { data, mockCreateFileSystemWatcher, mockExperimentShow }
+}
+
+export const stubWorkspaceExperimentsGetters = (
+  dvcRoot: string,
+  experiments?: Experiments
+) => {
+  const mockGetOnlyOrPickProject = stub(
+    WorkspaceExperiments.prototype,
+    'getOnlyOrPickProject'
+  ).resolves(dvcRoot)
+  let mockGetRepository
+  if (experiments) {
+    mockGetRepository = stub(
+      WorkspaceExperiments.prototype,
+      'getRepository'
+    ).returns(experiments)
+  }
+
+  return [mockGetOnlyOrPickProject, mockGetRepository]
 }
