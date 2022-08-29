@@ -116,15 +116,14 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
-    if (isSelecting([title, SectionDescription[sectionKey].props.children])) {
-      return
+    if (!isSelecting([title, SectionDescription[sectionKey].props.children])) {
+      sendMessage({
+        payload: {
+          [sectionKey]: !sectionCollapsed
+        },
+        type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      })
     }
-    sendMessage({
-      payload: {
-        [sectionKey]: !sectionCollapsed
-      },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
-    })
   }
 
   return (
