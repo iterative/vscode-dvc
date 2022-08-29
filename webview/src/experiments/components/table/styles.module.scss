@@ -333,8 +333,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
 
   .table.withExpColumnShadow {
-    .tr:not(.rowSelected) > *:first-child:after {
-      box-shadow: 3px 0px 3px $shadow;
+    .tr:not(.rowSelected) > *:first-child {
+      &:after {
+        box-shadow: 3px 0px 3px $shadow;
+      }
+
+      &:hover:before {
+        border-right-width: 0;
+      }
     }
   }
 
@@ -422,6 +428,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
     &.withShadow {
       box-shadow: 0 5px 8px -2px $shadow;
+    }
+
+    .td {
+      line-height: 3rem;
     }
 
     .innerCell {
@@ -535,6 +545,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .placeholderHeaderCell {
     background-color: $header-bg-color;
     border-right: 1px solid $header-border-color;
+
+    &:last-child {
+      border-right: none;
+    }
   }
 
   .headerCell {
@@ -609,7 +623,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     left: 50%;
     width: 2px;
     height: 100%;
-    background-color: $header-fg-color;
+    background-color: $header-resizer-color;
     opacity: 0.5;
   }
 }
