@@ -18,6 +18,14 @@ export const createBubbledEvent = (type: string, props = {}) => {
   return event
 }
 
+const getAxis = (direction: DragDropUtils.DragEnterDirection) =>
+  [
+    DragDropUtils.DragEnterDirection.LEFT,
+    DragDropUtils.DragEnterDirection.RIGHT
+  ].includes(direction)
+    ? 'clientX'
+    : 'clientY'
+
 export const dragEnter = (
   dragged: HTMLElement,
   draggedOverId: string,
@@ -41,16 +49,30 @@ export const dragEnter = (
 
   act(() => {
     if (direction !== DragDropUtils.DragEnterDirection.AUTO) {
-      const clientX =
-        100 + (direction === DragDropUtils.DragEnterDirection.LEFT ? 1 : 51)
       const left = 100
       const right = left + 100
-      const top = 0
-      const bottom = 0
-      const dragOverEvent = createBubbledEvent('dragover', { clientX })
+      const top = 100
+      const bottom = top + 100
+
       jest
         .spyOn(DragDropUtils, 'getEventCurrentTargetDistances')
         .mockImplementationOnce(() => ({ bottom, left, right, top }))
+
+      const clientPositionAxis = getAxis(direction)
+
+      const clientPosition =
+        100 +
+        ([
+          DragDropUtils.DragEnterDirection.LEFT,
+          DragDropUtils.DragEnterDirection.TOP
+        ].includes(direction)
+          ? 1
+          : 51)
+
+      const dragOverEvent = createBubbledEvent('dragover', {
+        [clientPositionAxis]: clientPosition
+      })
+
       draggedOver?.dispatchEvent(dragOverEvent)
       jest.advanceTimersByTime(1)
     } else {
