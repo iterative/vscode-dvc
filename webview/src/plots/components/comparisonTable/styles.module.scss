@@ -90,11 +90,11 @@ $gap: 4px;
 
 .rowToggler {
   border: none;
-  width: 100%;
   background: none;
   color: $fg-color;
   text-align: left;
   display: flex;
+  user-select: text;
 
   svg {
     fill: $fg-color;
@@ -172,4 +172,19 @@ $gap: 4px;
   background-color: $accent-color;
   opacity: 1;
   color: $bg-color;
+}
+
+.copyButton {
+  display: none;
+}
+
+.rowPath {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  &:hover .copyButton {
+    display: inline;
+    font-size: 0.8125rem;
+  }
 }

@@ -1,17 +1,13 @@
 import { dirname } from 'path'
 import { Args } from './constants'
 import { getCaseSensitiveCwd } from './cwd'
-import { getProcessEnv } from '../env'
-import { joinEnvPath } from '../util/env'
+import { getProcessEnv } from '../../env'
+import { joinEnvPath } from '../../util/env'
+import { ProcessOptions } from '../../processExecution'
 
-export type ExecutionOptions = {
-  executable: string
-  args: Args
-  cwd: string
+type ExecutionOptions = ProcessOptions & {
   env: NodeJS.ProcessEnv
 }
-
-export type ExecutionDetails = ExecutionOptions & { command: string }
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string => {
   const python = pythonBinPath ? dirname(pythonBinPath) : ''
@@ -43,12 +39,11 @@ export const getOptions = (
   cliPath: string,
   cwd: string,
   ...originalArgs: Args
-): ExecutionDetails => {
+): ExecutionOptions => {
   const executable = getExecutable(pythonBinPath, cliPath)
   const args = getArgs(pythonBinPath, cliPath, ...originalArgs)
   return {
     args,
-    command: [executable, ...args].join(' '),
     cwd: getCaseSensitiveCwd(cwd),
     env: getEnv(pythonBinPath),
     executable

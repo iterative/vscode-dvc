@@ -4,7 +4,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
+import { ExperimentsOutput, PlotsOutput } from '../cli/dvc/reader'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 

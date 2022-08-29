@@ -1,4 +1,4 @@
-import { ExecutionOptions } from './options'
+import { ProcessOptions } from '../processExecution'
 
 export interface MaybeConsoleError extends Error {
   stderr?: string
@@ -6,13 +6,13 @@ export interface MaybeConsoleError extends Error {
 }
 
 interface CliProcessErrorArgs {
-  options: ExecutionOptions
+  options: ProcessOptions
   baseError: MaybeConsoleError
   message?: string
 }
 
 export class CliError extends Error {
-  public readonly options?: ExecutionOptions
+  public readonly options?: ProcessOptions
   public readonly baseError: Error
   public readonly stderr?: string
   public readonly exitCode: number | null

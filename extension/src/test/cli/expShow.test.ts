@@ -3,7 +3,7 @@ import isEmpty from 'lodash.isempty'
 import omit from 'lodash.omit'
 import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
-import { cliReader, initializeDemoRepo, initializeEmptyRepo } from './util'
+import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 
 suite('exp show --show-json', () => {
@@ -11,7 +11,7 @@ suite('exp show --show-json', () => {
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
-      const output = await cliReader.expShow(dvcDemoPath)
+      const output = await dvcReader.expShow(dvcDemoPath)
 
       expect(output.workspace, 'should have a workspace key').not.to.be
         .undefined
@@ -76,7 +76,7 @@ suite('exp show --show-json', () => {
   describe('Empty Repository', () => {
     it('should return the expected output', async () => {
       await initializeEmptyRepo()
-      const output = await cliReader.expShow(TEMP_DIR)
+      const output = await dvcReader.expShow(TEMP_DIR)
 
       expect(
         Object.keys(output),

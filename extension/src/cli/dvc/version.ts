@@ -3,7 +3,7 @@ import {
   LATEST_TESTED_CLI_VERSION,
   MIN_CLI_VERSION
 } from './constants'
-import { Toast } from '../vscode/toast'
+import { Toast } from '../../vscode/toast'
 
 export type ParsedSemver = { major: number; minor: number; patch: number }
 

@@ -1,6 +1,7 @@
 export enum Title {
   CHOOSE_RESOURCES = 'Choose Resources to Add to the Dataset',
   ENTER_BRANCH_NAME = 'Enter a Name for the New Branch',
+  ENTER_COMMIT_MESSAGE = 'Enter a Commit Message',
   ENTER_FILTER_VALUE = 'Enter a Filter Value',
   ENTER_RELATIVE_DESTINATION = 'Enter a Destination Relative to the Root',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',

@@ -24,7 +24,7 @@ import {
   Section,
   SectionCollapsed
 } from '../webview/contract'
-import { ExperimentsOutput, PlotsOutput } from '../../cli/reader'
+import { ExperimentsOutput, PlotsOutput } from '../../cli/dvc/reader'
 import { Experiments } from '../../experiments'
 import { getColorScale } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'

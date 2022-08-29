@@ -1,14 +1,14 @@
 import { isVersionCompatible, extractSemver, ParsedSemver } from './version'
 import { MIN_CLI_VERSION, LATEST_TESTED_CLI_VERSION } from './constants'
-import { Toast } from '../vscode/toast'
+import { Toast } from '../../vscode/toast'
 
 jest.mock('./constants', () => ({
   ...jest.requireActual('./constants'),
   LATEST_TESTED_CLI_VERSION: '2.11.1',
   MIN_CLI_VERSION: '2.9.4'
 }))
-jest.mock('../vscode/config')
-jest.mock('../vscode/toast')
+jest.mock('../../vscode/config')
+jest.mock('../../vscode/toast')
 
 const mockedToast = jest.mocked(Toast)
 const mockedWarnWithOptions = jest.fn()

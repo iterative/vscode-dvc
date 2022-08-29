@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
@@ -7,9 +7,13 @@ import { buildRepositoryData } from '../util'
 import { Disposable } from '../../../../extension'
 import { dvcDemoPath } from '../../../util'
 import { fireWatcher } from '../../../../fileSystem/watcher'
-import { DOT_GIT_HEAD, getGitRepositoryRoot } from '../../../../git'
 import { RepositoryData } from '../../../../repository/data'
-import { InternalCommands } from '../../../../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../../../../commands/internal'
+import { DOT_GIT_HEAD } from '../../../../cli/git/constants'
 
 suite('Repository Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -122,19 +126,25 @@ suite('Repository Data Test Suite', () => {
     })
 
     it('should watch the .git index and HEAD for updates', async () => {
+      const gitRoot = resolve(dvcDemoPath, '..')
+
+      const mockExecuteCommand = (command: CommandId) => {
+        if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
+          return Promise.resolve(gitRoot)
+        }
+      }
+
       const data = disposable.track(
         new RepositoryData(
           dvcDemoPath,
           {
             dispose: stub(),
-            executeCommand: stub()
+            executeCommand: mockExecuteCommand
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter())
         )
       )
       await data.isReady()
-
-      const gitRoot = await getGitRepositoryRoot(dvcDemoPath)
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
       const dataUpdatedEvent = new Promise(resolve =>

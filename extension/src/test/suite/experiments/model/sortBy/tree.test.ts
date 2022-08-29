@@ -11,12 +11,12 @@ import {
   ColumnType
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
-import { buildExperiments } from '../../util'
+import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { ExperimentsOutput } from '../../../../../cli/reader'
+import { ExperimentsOutput } from '../../../../../cli/dvc/reader'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { starredSort } from '../../../../../experiments/model/sortBy/constants'
 
@@ -158,16 +158,8 @@ suite('Experiments Sort By Tree Test Suite', () => {
             get(exp, selector)
           )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
-        dvcDemoPath
-      ])
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getFocusedOrOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([dvcDemoPath])
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       // Setup done, perform the test
 
@@ -261,8 +253,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
     it('should handle the user exiting from the choose repository quick pick', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
+      stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([
         dvcDemoPath,
         'mockRoot'
       ])
@@ -294,12 +285,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
-        'getFocusedOrOnlyOrPickProject'
-      ).returns(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockAddSort = stub(experimentsModel, 'addSort')
 

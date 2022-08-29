@@ -6,7 +6,9 @@ import { userEvent, within } from '@storybook/testing-library'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
-  PlotSize
+  PlotSize,
+  TemplatePlotGroup,
+  TemplatePlotSection
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import checkpointPlotsFixture, {
@@ -16,6 +18,7 @@ import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
+import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import { chromaticParameters } from './util'
 import { Plots } from '../plots/components/Plots'
 
@@ -210,3 +213,24 @@ MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
 
   userEvent.click(plotButton)
 }
+
+export const SmoothTemplate = Template.bind({})
+SmoothTemplate.args = {
+  data: {
+    template: {
+      ...templatePlotsFixture,
+      plots: [
+        {
+          entries: [
+            ...templatePlotsFixture.plots[0].entries.map(plot => ({
+              ...plot,
+              content: { ...smoothTemplatePlotContent }
+            }))
+          ],
+          group: TemplatePlotGroup.SINGLE_VIEW
+        } as unknown as TemplatePlotSection
+      ]
+    }
+  }
+}
+SmoothTemplate.parameters = chromaticParameters

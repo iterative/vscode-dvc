@@ -1,8 +1,8 @@
 import { sep } from 'path'
 import { describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { dvcDemoPath } from '../../util'
-import { getCaseSensitiveCwd } from '../../../cli/cwd'
+import { dvcDemoPath } from '../../../util'
+import { getCaseSensitiveCwd } from '../../../../cli/dvc/cwd'
 
 suite('Cwd Test Suite', () => {
   describe('getCaseSensitiveCwd', () => {

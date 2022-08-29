@@ -1,11 +1,20 @@
-import { window } from 'vscode'
+import { CancellationToken, Progress, ProgressLocation, window } from 'vscode'
 import { Response } from './response'
+import { delay } from '../util/time'
 
 enum Level {
   INFORMATION = 'Information',
   ERROR = 'Error',
   WARNING = 'Warning'
 }
+
+type ProgressCallback = (
+  progress: Progress<{
+    message?: string | undefined
+    increment?: number | undefined
+  }>,
+  token: CancellationToken
+) => Thenable<unknown>
 
 export class Toast {
   static async showOutput(stdout: Promise<string | undefined>) {
@@ -37,6 +46,37 @@ export class Toast {
 
   static infoWithOptions(message: string, ...items: Response[]) {
     return Toast.waitForResponse(Level.INFORMATION, message, ...items)
+  }
+
+  static showProgress(title: string, callback: ProgressCallback) {
+    return window.withProgress(
+      {
+        cancellable: false,
+        location: ProgressLocation.Notification,
+        title
+      },
+      callback
+    )
+  }
+
+  static async runCommandAndIncrementProgress(
+    command: () => Promise<string>,
+    progress: Progress<{
+      message?: string | undefined
+      increment?: number | undefined
+    }>,
+    increment: number
+  ) {
+    const stdout = await command()
+
+    progress.report({
+      increment,
+      message: stdout
+    })
+  }
+
+  static delayProgressClosing() {
+    return delay(5000)
   }
 
   private static waitForResponse(

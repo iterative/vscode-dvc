@@ -3,25 +3,16 @@ import {
   Column,
   ColumnType
 } from 'dvc/src/experiments/webview/contract'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import { HeaderGroup } from 'react-table'
-import cx from 'classnames'
-import { useInView } from 'react-intersection-observer'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
-import styles from './styles.module.scss'
-import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
-import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
+import { TableHeaderCell } from './TableHeaderCell'
 import { ExperimentsState } from '../../store'
-import {
-  Draggable,
-  DragFunction
-} from '../../../shared/components/dragDrop/Draggable'
+import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
-import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
-import { DownArrow, Lines, UpArrow } from '../../../shared/components/icons'
 
 export enum SortOrder {
   ASCENDING = 'Sort Ascending',
@@ -34,258 +25,6 @@ const possibleOrders = {
   true: SortOrder.DESCENDING,
   undefined: SortOrder.NONE
 } as const
-
-export const ColumnDragHandle: React.FC<{
-  disabled: boolean
-  column: HeaderGroup<Experiment>
-  onDragEnter: DragFunction
-  onDragStart: DragFunction
-  onDrop: DragFunction
-}> = ({ disabled, column, onDragEnter, onDragStart, onDrop }) => {
-  const DropTarget = <span>{column?.name}</span>
-
-  return (
-    <span
-      data-testid="rendered-header"
-      className={cx(styles.cellContents)}
-      onKeyDown={e => {
-        e.stopPropagation()
-      }}
-      role={'columnheader'}
-      tabIndex={0}
-    >
-      <Draggable
-        id={column.id}
-        disabled={disabled}
-        group={'experiment-table'}
-        dropTarget={DropTarget}
-        onDragEnter={onDragEnter}
-        onDragStart={onDragStart}
-        onDrop={onDrop}
-      >
-        <span>{column?.render('Header')}</span>
-      </Draggable>
-    </span>
-  )
-}
-
-const calcResizerHeight = (
-  isPlaceholder: boolean,
-  orderedColumns: Column[],
-  column: HeaderGroup<Experiment>,
-  columns: HeaderGroup<Experiment>[]
-) => {
-  const nbUpperLevels = isPlaceholder
-    ? 0
-    : countUpperLevels(orderedColumns, column, columns, 0)
-  return 100 + nbUpperLevels * 92 + '%'
-}
-
-const getHeaderPropsArgs = (
-  column: HeaderGroup<Experiment>,
-  sortEnabled: boolean,
-  sortOrder: SortOrder
-) => {
-  return {
-    className: cx(
-      styles.th,
-      column.placeholderOf ? styles.placeholderHeaderCell : styles.headerCell,
-      {
-        [styles.paramHeaderCell]: column.group === ColumnType.PARAMS,
-        [styles.metricHeaderCell]: column.group === ColumnType.METRICS,
-        [styles.depHeaderCell]: column.group === ColumnType.DEPS,
-        [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-        [styles.leafHeader]: column.headers === undefined,
-        [styles.menuEnabled]: sortEnabled,
-        [styles.sortingHeaderCellAsc]:
-          sortOrder === SortOrder.ASCENDING && !column.parent?.placeholderOf,
-        [styles.sortingHeaderCellDesc]:
-          sortOrder === SortOrder.DESCENDING && !column.placeholderOf
-      }
-    ),
-    style: {
-      position: undefined
-    }
-  }
-}
-
-const getIconMenuItems = (
-  sortEnabled: boolean,
-  sortOrder: SortOrder,
-  hasFilter: boolean
-) => [
-  {
-    hidden: !sortEnabled || sortOrder === SortOrder.NONE,
-    icon: (sortOrder === SortOrder.DESCENDING && DownArrow) || UpArrow,
-    tooltip: 'Table Sorted By'
-  },
-  {
-    hidden: !hasFilter,
-    icon: Lines,
-    tooltip: 'Table Filtered By'
-  }
-]
-
-const WithExpColumnNeedsShadowUpdates: React.FC<{
-  children: React.ReactNode
-  setExpColumnNeedsShadow: (needsShadow: boolean) => void
-  root: HTMLElement | null
-}> = ({ root, setExpColumnNeedsShadow, children }) => {
-  const [ref, needsShadow] = useInView({
-    root,
-    rootMargin: '0px 0px 0px -15px',
-    threshold: 1
-  })
-
-  useEffect(() => {
-    setExpColumnNeedsShadow(needsShadow)
-  }, [needsShadow, setExpColumnNeedsShadow])
-
-  return <div ref={ref}>{children}</div>
-}
-
-const TableHeaderCellContents: React.FC<{
-  column: HeaderGroup<Experiment>
-  sortOrder: SortOrder
-  sortEnabled: boolean
-  hasFilter: boolean
-  isDraggable: boolean
-  menuSuppressed: boolean
-  onDragEnter: DragFunction
-  onDragStart: DragFunction
-  onDrop: DragFunction
-  canResize: boolean
-  setMenuSuppressed: (menuSuppressed: boolean) => void
-  resizerHeight: string
-}> = ({
-  column,
-  sortEnabled,
-  sortOrder,
-  hasFilter,
-  isDraggable,
-  menuSuppressed,
-  onDragEnter,
-  onDragStart,
-  onDrop,
-  canResize,
-  setMenuSuppressed,
-  resizerHeight
-}) => {
-  return (
-    <>
-      <div className={styles.iconMenu}>
-        <IconMenu items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)} />
-      </div>
-      <ColumnDragHandle
-        column={column}
-        disabled={!isDraggable || menuSuppressed}
-        onDragEnter={onDragEnter}
-        onDragStart={onDragStart}
-        onDrop={onDrop}
-      />
-      {canResize && (
-        <div
-          {...column.getResizerProps()}
-          onMouseEnter={() => setMenuSuppressed(true)}
-          onMouseLeave={() => setMenuSuppressed(false)}
-          className={styles.columnResizer}
-          style={{ height: resizerHeight }}
-        />
-      )}
-    </>
-  )
-}
-
-const TableHeaderCell: React.FC<{
-  column: HeaderGroup<Experiment>
-  columns: HeaderGroup<Experiment>[]
-  hasFilter: boolean
-  orderedColumns: Column[]
-  sortOrder: SortOrder
-  sortEnabled: boolean
-  menuDisabled?: boolean
-  menuContent?: React.ReactNode
-  onDragEnter: DragFunction
-  onDragStart: DragFunction
-  onDrop: DragFunction
-  firstExpColumnCellId: string
-  setExpColumnNeedsShadow: (needsShadow: boolean) => void
-  root: HTMLElement | null
-}> = ({
-  column,
-  columns,
-  orderedColumns,
-  hasFilter,
-  sortOrder,
-  sortEnabled,
-  menuContent,
-  menuDisabled,
-  onDragEnter,
-  onDragStart,
-  onDrop,
-  root,
-  firstExpColumnCellId,
-  setExpColumnNeedsShadow
-}) => {
-  const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
-  const isDraggable =
-    !column.placeholderOf && !['id', 'timestamp'].includes(column.id)
-
-  const isPlaceholder = !!column.placeholderOf
-  const canResize = column.canResize && !isPlaceholder
-  const resizerHeight = calcResizerHeight(
-    isPlaceholder,
-    orderedColumns,
-    column,
-    columns
-  )
-
-  const cellContents = (
-    <TableHeaderCellContents
-      column={column}
-      sortOrder={sortOrder}
-      sortEnabled={sortEnabled}
-      hasFilter={hasFilter}
-      isDraggable={isDraggable}
-      menuSuppressed={menuSuppressed}
-      onDragEnter={onDragEnter}
-      onDragStart={onDragStart}
-      onDrop={onDrop}
-      canResize={canResize}
-      setMenuSuppressed={setMenuSuppressed}
-      resizerHeight={resizerHeight}
-    />
-  )
-
-  return (
-    <ContextMenu
-      content={menuContent}
-      disabled={menuDisabled || menuSuppressed}
-      trigger={'contextmenu click'}
-    >
-      <div
-        {...column.getHeaderProps(
-          getHeaderPropsArgs(column, sortEnabled, sortOrder)
-        )}
-        data-testid={`header-${column.id}`}
-        key={column.id}
-        role="columnheader"
-        tabIndex={0}
-      >
-        {firstExpColumnCellId === column.id ? (
-          <WithExpColumnNeedsShadowUpdates
-            setExpColumnNeedsShadow={setExpColumnNeedsShadow}
-            root={root}
-          >
-            {cellContents}
-          </WithExpColumnNeedsShadowUpdates>
-        ) : (
-          cellContents
-        )}
-      </div>
-    </ContextMenu>
-  )
-}
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
@@ -319,15 +58,16 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   const hasFilter = !!(column.id && filters.includes(column.id))
   const isSortable =
     !column.placeholderOf &&
-    !['id', 'timestamp'].includes(column.id) &&
+    !['id', 'Created'].includes(column.id) &&
     !column.columns
+  const isTimestamp = column.group === ColumnType.TIMESTAMP
 
   const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
 
   const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = [
       {
-        hidden: !!column.headers,
+        hidden: !isTimestamp && !!column.headers,
         id: 'hide-column',
         label: 'Hide Column',
         message: {
@@ -347,7 +87,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     ]
 
     return menuOptions
-  }, [column])
+  }, [column, isTimestamp])
 
   return (
     <TableHeaderCell
@@ -360,51 +100,57 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragEnter={onDragEnter}
       onDragStart={onDragStart}
       onDrop={onDrop}
-      menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
+      menuDisabled={
+        !isSortable && !isTimestamp && column.group !== ColumnType.PARAMS
+      }
       root={root}
       firstExpColumnCellId={firstExpColumnCellId}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
       menuContent={
         <div>
           <MessagesMenu options={contextMenuOptions} />
-          <VSCodeDivider />
-          <MessagesMenu
-            options={[
-              {
-                hidden: sortOrder === SortOrder.ASCENDING,
-                id: SortOrder.ASCENDING,
-                label: SortOrder.ASCENDING,
-                message: {
-                  payload: {
-                    descending: false,
-                    path: column.id
+          {!isTimestamp && (
+            <>
+              <VSCodeDivider />
+              <MessagesMenu
+                options={[
+                  {
+                    hidden: sortOrder === SortOrder.ASCENDING,
+                    id: SortOrder.ASCENDING,
+                    label: SortOrder.ASCENDING,
+                    message: {
+                      payload: {
+                        descending: false,
+                        path: column.id
+                      },
+                      type: MessageFromWebviewType.SORT_COLUMN
+                    }
                   },
-                  type: MessageFromWebviewType.SORT_COLUMN
-                }
-              },
-              {
-                hidden: sortOrder === SortOrder.DESCENDING,
-                id: SortOrder.DESCENDING,
-                label: SortOrder.DESCENDING,
-                message: {
-                  payload: {
-                    descending: true,
-                    path: column.id
+                  {
+                    hidden: sortOrder === SortOrder.DESCENDING,
+                    id: SortOrder.DESCENDING,
+                    label: SortOrder.DESCENDING,
+                    message: {
+                      payload: {
+                        descending: true,
+                        path: column.id
+                      },
+                      type: MessageFromWebviewType.SORT_COLUMN
+                    }
                   },
-                  type: MessageFromWebviewType.SORT_COLUMN
-                }
-              },
-              {
-                hidden: sortOrder === SortOrder.NONE,
-                id: SortOrder.NONE,
-                label: SortOrder.NONE,
-                message: {
-                  payload: column.id,
-                  type: MessageFromWebviewType.REMOVE_COLUMN_SORT
-                }
-              }
-            ]}
-          />
+                  {
+                    hidden: sortOrder === SortOrder.NONE,
+                    id: SortOrder.NONE,
+                    label: SortOrder.NONE,
+                    message: {
+                      payload: column.id,
+                      type: MessageFromWebviewType.REMOVE_COLUMN_SORT
+                    }
+                  }
+                ]}
+              />
+            </>
+          )}
         </div>
       }
     />

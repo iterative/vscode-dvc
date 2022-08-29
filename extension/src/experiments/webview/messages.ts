@@ -84,17 +84,17 @@ export class WebviewMessages {
           RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
-      case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_QUEUE:
+      case MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
-      case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_AND_RUN:
+      case MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
-      case MessageFromWebviewType.VARY_EXPERIMENT_PARAMS_RESET_AND_RUN:
+      case MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
           { dvcRoot: this.dvcRoot, id: message.payload }
@@ -116,6 +116,17 @@ export class WebviewMessages {
       case MessageFromWebviewType.OPEN_PLOTS_WEBVIEW:
         return commands.executeCommand(RegisteredCommands.PLOTS_SHOW)
 
+      case MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH:
+        return commands.executeCommand(
+          RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
+          { dvcRoot: this.dvcRoot, id: message.payload }
+        )
+      case MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT:
+        return commands.executeCommand(
+          RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
+          { dvcRoot: this.dvcRoot, id: message.payload }
+        )
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -132,7 +143,7 @@ export class WebviewMessages {
       ),
       filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
-      hasColumns: this.columns.hasColumns(),
+      hasColumns: this.columns.hasNonDefaultColumns(),
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()

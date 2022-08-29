@@ -14,7 +14,7 @@ import {
   ExperimentFields,
   ExperimentsBranchOutput,
   ExperimentsOutput
-} from '../../cli/reader'
+} from '../../cli/dvc/reader'
 import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
 import { RegisteredCommands } from '../../commands/external'
@@ -125,11 +125,14 @@ const transformColumns = (
   experimentFields: ExperimentFields,
   branch?: Experiment
 ) => {
-  const { error, metrics, params, deps } = extractColumns(
+  const { error, metrics, params, deps, Created } = extractColumns(
     experimentFields,
     branch
   )
 
+  if (Created) {
+    experiment.Created = Created
+  }
   if (metrics) {
     experiment.metrics = metrics
   }

@@ -37,14 +37,14 @@ const registerResourceGroupCommands = (
   repositories: WorkspaceRepositories,
   internalCommands: InternalCommands
 ) => {
-  internalCommands.registerExternalCommand<Root>(
-    RegisteredCommands.GIT_STAGE_ALL,
-    getStageAllCommand(repositories)
+  internalCommands.registerExternalCliCommand<Root>(
+    RegisteredCliCommands.GIT_STAGE_ALL,
+    getStageAllCommand(repositories, internalCommands)
   )
 
-  internalCommands.registerExternalCommand<Root>(
-    RegisteredCommands.GIT_UNSTAGE_ALL,
-    getUnstageAllCommand(repositories)
+  internalCommands.registerExternalCliCommand<Root>(
+    RegisteredCliCommands.GIT_UNSTAGE_ALL,
+    getUnstageAllCommand(repositories, internalCommands)
   )
 }
 

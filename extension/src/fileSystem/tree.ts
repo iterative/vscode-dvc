@@ -18,7 +18,7 @@ import {
   CommandId,
   InternalCommands
 } from '../commands/internal'
-import { tryThenMaybeForce } from '../cli/actions'
+import { tryThenMaybeForce } from '../cli/dvc/actions'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'

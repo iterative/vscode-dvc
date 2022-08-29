@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { TEMP_DIR, ENV_DIR } from './constants'
-import { CliExecutor } from '../../cli/executor'
-import { CliReader } from '../../cli/reader'
+import { DvcExecutor } from '../../cli/dvc/executor'
+import { DvcReader } from '../../cli/dvc/reader'
 import { Config } from '../../config'
 import { exists } from '../../fileSystem'
 import { getVenvBinPath } from '../../python/path'
@@ -12,13 +12,13 @@ const config = {
   pythonBinPath: getVenvBinPath(TEMP_DIR, ENV_DIR, 'python')
 } as Config
 
-export const cliReader = new CliReader(config)
-export const cliExecutor = new CliExecutor(config)
+export const dvcReader = new DvcReader(config)
+export const dvcExecutor = new DvcExecutor(config)
 
 let demoInitialized: Promise<string>
 export const initializeDemoRepo = (): Promise<string> => {
   if (!demoInitialized) {
-    demoInitialized = cliExecutor.pull(dvcDemoPath)
+    demoInitialized = dvcExecutor.pull(dvcDemoPath)
   }
   return demoInitialized
 }
@@ -28,5 +28,5 @@ export const initializeEmptyRepo = (): Promise<string> => {
     return Promise.resolve('')
   }
 
-  return cliExecutor.init(TEMP_DIR)
+  return dvcExecutor.init(TEMP_DIR)
 }

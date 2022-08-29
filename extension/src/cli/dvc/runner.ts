@@ -1,5 +1,4 @@
 import { EventEmitter, Event } from 'vscode'
-import { CliResult, CliStarted, ICli, typeCheckCommands } from '.'
 import {
   Args,
   Command,
@@ -7,14 +6,16 @@ import {
   ExperimentSubCommand
 } from './constants'
 import { getOptions } from './options'
-import { Config } from '../config'
-import { PseudoTerminal } from '../vscode/pseudoTerminal'
-import { createProcess, Process } from '../processExecution'
-import { StopWatch } from '../util/time'
-import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
-import { EventName } from '../telemetry/constants'
-import { Toast } from '../vscode/toast'
-import { Disposable } from '../class/dispose'
+import { CliResult, CliStarted, ICli, typeCheckCommands } from '..'
+import { getCommandString } from '../command'
+import { Config } from '../../config'
+import { PseudoTerminal } from '../../vscode/pseudoTerminal'
+import { createProcess, Process } from '../../processExecution'
+import { StopWatch } from '../../util/time'
+import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../../telemetry'
+import { EventName } from '../../telemetry/constants'
+import { Toast } from '../../vscode/toast'
+import { Disposable } from '../../class/dispose'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
@@ -23,7 +24,7 @@ export const autoRegisteredCommands = {
   IS_EXPERIMENT_RUNNING: 'isExperimentRunning'
 } as const
 
-export class CliRunner extends Disposable implements ICli {
+export class DvcRunner extends Disposable implements ICli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this
@@ -166,7 +167,8 @@ export class CliRunner extends Disposable implements ICli {
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const { command, ...options } = this.getOptions(cwd, args)
+    const options = this.getOptions(cwd, args)
+    const command = getCommandString(options)
     const stopWatch = new StopWatch()
     const process = this.dispose.track(createProcess(options))
     const baseEvent = { command, cwd, pid: process.pid }

@@ -1,12 +1,13 @@
 import { join } from 'path'
 import { collectChanges, collectColumns } from '.'
+import { timestampColumn } from '../constants'
 import { buildDepPath, buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
 import outputFixture from '../../../test/fixtures/expShow/output'
 import columnsFixture from '../../../test/fixtures/expShow/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
-import { ExperimentsOutput } from '../../../cli/reader'
+import { ExperimentsOutput } from '../../../cli/dvc/reader'
 
 describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {
@@ -67,7 +68,7 @@ describe('collectColumns', () => {
         baseline: {}
       }
     })
-    expect(columns).toStrictEqual([])
+    expect(columns).toStrictEqual([timestampColumn])
   })
 
   const exampleBigNumber = 3000000000
@@ -335,6 +336,7 @@ describe('collectColumns', () => {
     })
 
     expect(columns.map(({ path }) => path)).toStrictEqual([
+      timestampColumn.path,
       buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
       buildMetricOrParamPath(
         ColumnType.PARAMS,
@@ -419,6 +421,7 @@ describe('collectColumns', () => {
   it('should collect all params and metrics from the test fixture', () => {
     expect(collectColumns(outputFixture).map(({ path }) => path)).toStrictEqual(
       [
+        timestampColumn.path,
         buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
         buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'loss'),
         buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'accuracy'),

@@ -1,4 +1,4 @@
-import { BaseExperimentFields, ValueTree } from '../../cli/reader'
+import { BaseExperimentFields, ValueTree } from '../../cli/dvc/reader'
 import { FilteredCounts } from '../model/filterBy/collect'
 import { SortDefinition } from '../model/sortBy'
 
@@ -30,6 +30,7 @@ export interface Experiment extends BaseExperimentFields {
   selected?: boolean
   sha?: string
   starred?: boolean
+  Created?: string
 }
 
 export interface Row extends Experiment {
@@ -45,13 +46,14 @@ export interface ColumnAggregateData {
 export enum ColumnType {
   METRICS = 'metrics',
   PARAMS = 'params',
-  DEPS = 'deps'
+  DEPS = 'deps',
+  TIMESTAMP = 'timestamp'
 }
 
 export interface Column extends ColumnAggregateData {
   hasChildren: boolean
   label: string
-  parentPath: string
+  parentPath?: string
   path: string
   pathArray?: string[]
   type: ColumnType

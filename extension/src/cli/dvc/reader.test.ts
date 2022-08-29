@@ -1,23 +1,23 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { CliResult, CliStarted } from '.'
 import { UNEXPECTED_ERROR_CODE } from './constants'
-import { MaybeConsoleError } from './error'
-import { CliReader, ExperimentsOutput } from './reader'
-import { createProcess } from '../processExecution'
-import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
-import { getProcessEnv } from '../env'
-import expShowFixture from '../test/fixtures/expShow/output'
-import plotsDiffFixture from '../test/fixtures/plotsDiff/output/minimal'
-import { Config } from '../config'
+import { DvcReader, ExperimentsOutput } from './reader'
+import { CliResult, CliStarted } from '..'
+import { MaybeConsoleError } from '../error'
+import { createProcess } from '../../processExecution'
+import { getFailingMockedProcess, getMockedProcess } from '../../test/util/jest'
+import { getProcessEnv } from '../../env'
+import expShowFixture from '../../test/fixtures/expShow/output'
+import plotsDiffFixture from '../../test/fixtures/plotsDiff/output/minimal'
+import { Config } from '../../config'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('fs')
-jest.mock('../processExecution')
-jest.mock('../env')
-jest.mock('../common/logger')
+jest.mock('../../processExecution')
+jest.mock('../../env')
+jest.mock('../../common/logger')
 
 const mockedDisposable = jest.mocked(Disposable)
 
@@ -45,7 +45,7 @@ describe('CliReader', () => {
     }
   } as unknown as (() => void) & Disposer)
 
-  const cliReader = new CliReader(
+  const dvcReader = new DvcReader(
     {
       getCliPath: () => undefined,
       pythonBinPath: undefined
@@ -69,7 +69,7 @@ describe('CliReader', () => {
         getMockedProcess(JSON.stringify(expShowFixture))
       )
 
-      const cliOutput = await cliReader.expShow(cwd)
+      const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual(expShowFixture)
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'show', SHOW_JSON],
@@ -87,7 +87,7 @@ describe('CliReader', () => {
         throw error
       })
 
-      const cliOutput = await cliReader.expShow(cwd)
+      const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual({ workspace: { baseline: {} } })
     })
 
@@ -107,7 +107,7 @@ describe('CliReader', () => {
         getMockedProcess(JSON.stringify(mockOutput))
       )
 
-      const cliOutput = await cliReader.expShow(cwd)
+      const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual(mockOutput)
       expect(mockedCreateProcess).toBeCalledTimes(2)
     })
@@ -133,7 +133,7 @@ describe('CliReader', () => {
       mockedCreateProcess.mockReturnValueOnce(
         getMockedProcess(JSON.stringify(cliOutput))
       )
-      const statusOutput = await cliReader.diff(cwd)
+      const statusOutput = await dvcReader.diff(cwd)
 
       expect(statusOutput).toStrictEqual(cliOutput)
 
@@ -153,7 +153,7 @@ describe('CliReader', () => {
           throw new Error('I failed wit a lock error')
         })
         .mockReturnValueOnce(getMockedProcess(JSON.stringify(cliOutput)))
-      const statusOutput = await cliReader.diff(cwd)
+      const statusOutput = await dvcReader.diff(cwd)
 
       expect(statusOutput).toStrictEqual(cliOutput)
 
@@ -226,7 +226,7 @@ describe('CliReader', () => {
       mockedCreateProcess.mockReturnValueOnce(
         getMockedProcess(JSON.stringify(listOutput))
       )
-      const tracked = await cliReader.listDvcOnlyRecursive(cwd)
+      const tracked = await dvcReader.listDvcOnlyRecursive(cwd)
 
       expect(tracked).toStrictEqual(listOutput)
 
@@ -244,7 +244,7 @@ describe('CliReader', () => {
       const cwd = __dirname
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(''))
 
-      const plots = await cliReader.plotsDiff(cwd, 'HEAD')
+      const plots = await dvcReader.plotsDiff(cwd, 'HEAD')
       expect(plots).toStrictEqual({})
     })
 
@@ -255,7 +255,7 @@ describe('CliReader', () => {
         getMockedProcess(JSON.stringify(plotsDiffFixture))
       )
 
-      const plots = await cliReader.plotsDiff(cwd, 'HEAD')
+      const plots = await dvcReader.plotsDiff(cwd, 'HEAD')
       expect(plots).toStrictEqual(plotsDiffFixture)
       expect(mockedCreateProcess).toBeCalledWith({
         args: [
@@ -279,7 +279,7 @@ describe('CliReader', () => {
       const stdout = join('..', '..')
       const cwd = __dirname
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-      const relativeRoot = await cliReader.root(cwd)
+      const relativeRoot = await dvcReader.root(cwd)
       expect(relativeRoot).toStrictEqual(stdout)
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['root'],
@@ -297,7 +297,7 @@ describe('CliReader', () => {
         )
       )
 
-      const relativeRoot = await cliReader.root(cwd)
+      const relativeRoot = await dvcReader.root(cwd)
       expect(relativeRoot).toBeUndefined()
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['root'],
@@ -324,7 +324,7 @@ describe('CliReader', () => {
       mockedCreateProcess.mockReturnValueOnce(
         getMockedProcess(JSON.stringify(cliOutput))
       )
-      const diffOutput = await cliReader.status(cwd)
+      const diffOutput = await dvcReader.status(cwd)
 
       expect(diffOutput).toStrictEqual(cliOutput)
 
@@ -342,7 +342,7 @@ describe('CliReader', () => {
       const cwd = __dirname
       const stdout = '3.9.11'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-      const output = await cliReader.version(cwd)
+      const output = await dvcReader.version(cwd)
 
       expect(output).toStrictEqual(stdout)
       expect(mockedCreateProcess).toBeCalledWith({
@@ -359,7 +359,7 @@ describe('CliReader', () => {
         throw new Error('spawn dvc ENOENT retrying...')
       })
 
-      await expect(cliReader.version(cwd)).rejects.toBeTruthy()
+      await expect(dvcReader.version(cwd)).rejects.toBeTruthy()
     })
   })
 })

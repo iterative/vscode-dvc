@@ -50,5 +50,8 @@
       "cache": false
     }
   },
-  "globalDependencies": ["extension/src/test/fixtures/**"]
+  "globalDependencies": [
+    "extension/src/test/fixtures/**",
+    "extension/src/experiments/columns/constants.ts"
+  ]
 }
