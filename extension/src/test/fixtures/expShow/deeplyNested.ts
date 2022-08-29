@@ -1,4 +1,5 @@
 import { ExperimentsOutput } from '../../../cli/dvc/reader'
+import { timestampColumn } from '../../../experiments/columns/constants'
 import {
   Column,
   ColumnType,
@@ -72,6 +73,7 @@ export const deeplyNestedOutput: ExperimentsOutput = {
 }
 
 export const columns: Column[] = [
+  timestampColumn,
   {
     hasChildren: true,
     label: 'params.yaml',
@@ -218,7 +220,6 @@ export const rows = [
   {
     id: 'workspace',
     label: 'workspace',
-    timestamp: null,
     queued: false,
     running: false,
     executor: null,
@@ -248,7 +249,7 @@ export const rows = [
   {
     id: 'main',
     label: 'main',
-    timestamp: '2020-11-21T19:58:22',
+    Created: '2020-11-21T19:58:22',
     queued: false,
     running: false,
     executor: null,

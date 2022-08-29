@@ -143,7 +143,7 @@ export class WebviewMessages {
       ),
       filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
-      hasColumns: this.columns.hasColumns(),
+      hasColumns: this.columns.hasNonDefaultColumns(),
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()

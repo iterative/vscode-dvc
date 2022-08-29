@@ -44,7 +44,7 @@ const collectOrderedData = (
 ) => {
   const copy = [...orderedData]
   for (const node of copy) {
-    const { parentPath, path } = node
+    const { path, type, parentPath = type } = node
 
     if (parentPath !== previousGroup) {
       previousGroups.push(previousGroup)

@@ -54,7 +54,7 @@ const ExperimentHeader = () => (
 )
 
 const TimestampHeader = () => (
-  <div className={styles.timestampHeader}>Timestamp</div>
+  <div className={styles.timestampHeader}>Created</div>
 )
 
 const DateCellContents: React.FC<{ value: string }> = ({ value }) => {
@@ -67,8 +67,12 @@ const DateCellContents: React.FC<{ value: string }> = ({ value }) => {
   )
 }
 
-const getColumns = (columns: Column[]): TableColumn<Row>[] =>
-  [
+const getColumns = (columns: Column[]): TableColumn<Row>[] => {
+  const includeTimestamp = columns.some(
+    ({ type }) => type === ColumnType.TIMESTAMP
+  )
+
+  const builtColumns = [
     {
       Cell: ({
         row: {
@@ -92,8 +96,14 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] =>
       minWidth: 250,
       width: 250
     },
-    {
-      Cell: ({ value }: { value: string }) => {
+    ...buildDynamicColumns(columns, ColumnType.METRICS),
+    ...buildDynamicColumns(columns, ColumnType.PARAMS),
+    ...buildDynamicColumns(columns, ColumnType.DEPS)
+  ] as TableColumn<Row>[]
+
+  if (includeTimestamp) {
+    builtColumns.splice(1, 0, {
+      Cell: ({ value }) => {
         return (
           <div className={styles.timestampInnerCell}>
             {value && <DateCellContents value={value} />}
@@ -101,13 +111,16 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] =>
         )
       },
       Header: TimestampHeader,
-      accessor: 'timestamp',
+      accessor: 'Created',
+      group: ColumnType.TIMESTAMP,
+      id: 'Created',
+      name: 'Created',
       width: 100
-    },
-    ...buildDynamicColumns(columns, ColumnType.METRICS),
-    ...buildDynamicColumns(columns, ColumnType.PARAMS),
-    ...buildDynamicColumns(columns, ColumnType.DEPS)
-  ] as TableColumn<Row>[]
+    })
+  }
+
+  return builtColumns
+}
 
 const reportResizedColumn = (state: TableState<Row>) => {
   const id = state.columnResizing.isResizingColumn

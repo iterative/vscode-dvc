@@ -3969,10 +3969,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.21.tgz#864b987c0c68d07b4345845c3e63b75edd143644"
   integrity sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==
 
-"@types/node@16.11.49":
-  version "16.11.49"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.49.tgz#560b1ea774b61e19a89c3fc72d2dcaa3863f38b2"
-  integrity sha512-Abq9fBviLV93OiXMu+f6r0elxCzRwc0RC5f99cU892uBITL44pTvgvEqlRlPRi8EGcO1z7Cp8A4d0s/p3J/+Nw==
+"@types/node@16.11.52":
+  version "16.11.52"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.52.tgz#d797437435455f237800c171d05639f0335c37b9"
+  integrity sha512-GnstYouCa9kbYokBCWEVrszJ1P2rGAQpKrqACHKuixkaT8XGu8nsqHvEUIGqDs5vwtsJ7LrYqnPDKRD1V+M39A==
 
 "@types/node@^14.0.10 || ^16.0.0", "@types/node@^14.14.20 || ^16.0.0":
   version "16.11.39"
@@ -8576,10 +8576,10 @@ eslint-plugin-import@2.26.0:
     resolve "^1.22.0"
     tsconfig-paths "^3.14.1"
 
-eslint-plugin-jest@26.8.3:
-  version "26.8.3"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-26.8.3.tgz#f5d9bb162636491c8f6f0cd2743fe67c86569338"
-  integrity sha512-2roWu1MkEiihQ/qEszPPoaoqVI1x2D8Jtadk5AmoXTdEeNVPMu01Dtz7jIuTOAmdW3L+tSkPZOtEtQroYJDt0A==
+eslint-plugin-jest@26.8.7:
+  version "26.8.7"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-26.8.7.tgz#f38f067d0a69483d64578eb43508ca7b29c8a4b7"
+  integrity sha512-nJJVv3VY6ZZvJGDMC8h1jN/TIGT4We1JkNn1lvstPURicr/eZPVnlFULQ4W2qL9ByCuCr1hPmlBOc2aZ1ktw4Q==
   dependencies:
     "@typescript-eslint/utils" "^5.10.0"
 
@@ -8602,18 +8602,18 @@ eslint-plugin-jsx-a11y@6.6.1:
     minimatch "^3.1.2"
     semver "^6.3.0"
 
-eslint-plugin-n@15.2.4:
-  version "15.2.4"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-n/-/eslint-plugin-n-15.2.4.tgz#d62021a0821ae650701ed459756aaf478a9b6056"
-  integrity sha512-tjnVMv2fiXYMnuiIFI8QMtyUFI42SckEEWvi8h68SWGWshfqO6SSCASy24dGMGAiy7NUk6DZt90DM0iNUsmQ5w==
+eslint-plugin-n@15.2.5:
+  version "15.2.5"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-n/-/eslint-plugin-n-15.2.5.tgz#aa7ff8d45bb8bf2df8ea3b7d3774ae570cb794b8"
+  integrity sha512-8+BYsqiyZfpu6NXmdLOXVUfk8IocpCjpd8nMRRH0A9ulrcemhb2VI9RSJMEy5udx++A/YcVPD11zT8hpFq368g==
   dependencies:
     builtins "^5.0.1"
     eslint-plugin-es "^4.1.0"
     eslint-utils "^3.0.0"
     ignore "^5.1.1"
-    is-core-module "^2.9.0"
+    is-core-module "^2.10.0"
     minimatch "^3.1.2"
-    resolve "^1.10.1"
+    resolve "^1.22.1"
     semver "^7.3.7"
 
 eslint-plugin-node@11.1.0:
@@ -10952,6 +10952,13 @@ is-ci@^2.0.0:
   integrity sha512-YfJT7rkpQB0updsdHLGWrvhBJfcfzNNawYDNIyQXJz0IViGf75O8EBPKSdvw2rF+LGCsX4FZ8tcr3b19LcZq4w==
   dependencies:
     ci-info "^2.0.0"
+
+is-core-module@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.10.0.tgz#9012ede0a91c69587e647514e1d5277019e728ed"
+  integrity sha512-Erxj2n/LDAZ7H8WNJXd9tw38GYM3dv8rk8Zcs+jJuxYTW7sozH+SS8NtrSjVL1/vpLvWi1hxy96IzjJ3EHTJJg==
+  dependencies:
+    has "^1.0.3"
 
 is-core-module@^2.2.0, is-core-module@^2.8.1:
   version "2.8.1"
@@ -15414,7 +15421,7 @@ resolve@^1.1.10, resolve@^1.1.6, resolve@^1.10.0, resolve@^1.10.1, resolve@^1.14
     path-parse "^1.0.7"
     supports-preserve-symlinks-flag "^1.0.0"
 
-resolve@^1.22.0:
+resolve@^1.22.0, resolve@^1.22.1:
   version "1.22.1"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.1.tgz#27cb2ebb53f91abb49470a928bba7558066ac177"
   integrity sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==
@@ -15612,10 +15619,10 @@ sass-loader@13.0.2:
     klona "^2.0.4"
     neo-async "^2.6.2"
 
-sass@1.54.4:
-  version "1.54.4"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.54.4.tgz#803ff2fef5525f1dd01670c3915b4b68b6cba72d"
-  integrity sha512-3tmF16yvnBwtlPrNBHw/H907j8MlOX8aTBnlNX1yrKx24RKcJGPyLhFUwkoKBKesR3unP93/2z14Ll8NicwQUA==
+sass@1.54.5:
+  version "1.54.5"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.54.5.tgz#93708f5560784f6ff2eab8542ade021a4a947b3a"
+  integrity sha512-p7DTOzxkUPa/63FU0R3KApkRHwcVZYC0PLnLm5iyZACyp15qSi32x7zVUhRdABAATmkALqgGrjCJAcWvobmhHw==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
     immutable "^4.0.0"
@@ -18134,10 +18141,10 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
-vsce@2.10.0:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/vsce/-/vsce-2.10.0.tgz#19a9f070ec319e26d4f23567f32826f48fc694aa"
-  integrity sha512-b+wB3XMapEi368g64klSM6uylllZdNutseqbNY+tUoHYSy6g2NwnlWuAGKDQTYc0IqfDUjUFRQBpPgA89Q+Fyw==
+vsce@2.10.2:
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/vsce/-/vsce-2.10.2.tgz#9fb054c998aeec1d5eedd09ebcf651f92ede472d"
+  integrity sha512-DZdD3B7rfANNefBpyzE7g1IQkEWuJ/0KoCrimMreOYW6XKfoZSMouFNBh26Cpk9kNZsjZqxTc1/ckLouDZIw/Q==
   dependencies:
     azure-devops-node-api "^11.0.1"
     chalk "^2.4.2"

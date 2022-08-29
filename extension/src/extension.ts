@@ -122,7 +122,13 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.status = this.dispose.track(
-      new Status([this.dvcExecutor, this.dvcReader, this.dvcRunner])
+      new Status([
+        this.dvcExecutor,
+        this.dvcReader,
+        this.dvcRunner,
+        this.gitExecutor,
+        this.gitReader
+      ])
     )
 
     this.experiments = this.dispose.track(
