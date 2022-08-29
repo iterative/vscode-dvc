@@ -184,6 +184,17 @@ const createDataStatusAccumulator = (): DataStatusAccumulator => {
   return acc
 }
 
+const uncommitNotInCache = (
+  acc: DataStatusAccumulator,
+  absPath: string,
+  status: ExtendedStatus
+): ExtendedStatus => {
+  if (!acc.notInCache.has(absPath) || !status.startsWith('committed')) {
+    return status
+  }
+  return ('un' + status) as ExtendedStatus
+}
+
 const collectGroupWithMissingAncestors = (
   acc: DataStatusAccumulator,
   dvcRoot: string,
@@ -191,13 +202,17 @@ const collectGroupWithMissingAncestors = (
 ) => {
   const groupWithMissingAncestors = collectMissingAncestors(dataStatusMapping)
 
-  for (const [path, status] of Object.entries(groupWithMissingAncestors)) {
+  for (const [path, originalStatus] of Object.entries(
+    groupWithMissingAncestors
+  )) {
     const absPath = resolve(dvcRoot, path)
+    const status = uncommitNotInCache(acc, absPath, originalStatus)
+
     if (status !== DiscardedStatus.UNCHANGED) {
       acc[status].add(absPath)
     }
 
-    addToTracked(acc.trackedDecorations, absPath, status)
+    addToTracked(acc.trackedDecorations, absPath, originalStatus)
   }
 }
 
@@ -207,17 +222,17 @@ export const collectDataStatus = (
 ): DataStatusAccumulator => {
   const acc = createDataStatusAccumulator()
 
+  for (const { key, paths } of mapUngroupedStatuses(dataStatusOutput)) {
+    const dataStatusMapping = collectSingleStatus(acc, {}, dvcRoot, key, paths)
+    collectGroupWithMissingAncestors(acc, dvcRoot, dataStatusMapping)
+  }
+
   for (const groupedStatuses of mapGroupedStatuses(dataStatusOutput)) {
     const dataStatusMapping = collectMappingFromGroup(
       acc,
       dvcRoot,
       groupedStatuses
     )
-    collectGroupWithMissingAncestors(acc, dvcRoot, dataStatusMapping)
-  }
-
-  for (const { key, paths } of mapUngroupedStatuses(dataStatusOutput)) {
-    const dataStatusMapping = collectSingleStatus(acc, {}, dvcRoot, key, paths)
     collectGroupWithMissingAncestors(acc, dvcRoot, dataStatusMapping)
   }
 

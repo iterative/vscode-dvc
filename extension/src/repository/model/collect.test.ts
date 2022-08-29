@@ -211,6 +211,46 @@ describe('collectDataStatus', () => {
     expect(uncommittedAdded).toStrictEqual(addedAndDeleted)
     expect(uncommittedModified).toStrictEqual(modified)
   })
+
+  it('should move committed entries which are also not in cache to uncommitted', () => {
+    const rawDataDir = join('data', 'MNIST', 'raw')
+    const unknown = [
+      join(rawDataDir, 't10k-images-idx3-ubyte'),
+      join(rawDataDir, 't10k-labels-idx1-ubyte'),
+      join(rawDataDir, 'train-images-idx3-ubyte'),
+      join(rawDataDir, 't10k-images-idx3-ubyte.gz'),
+      join(rawDataDir, 'train-images-idx3-ubyte.gz'),
+      join(rawDataDir, 'train-labels-idx1-ubyte.gz'),
+      join(rawDataDir, 'train-labels-idx1-ubyte'),
+      join(rawDataDir, 't10k-labels-idx1-ubyte.gz')
+    ]
+
+    const dataStatusOutput = {
+      committed: {
+        modified: [rawDataDir + sep]
+      },
+      not_in_cache: [rawDataDir + sep],
+      uncommitted: {
+        unknown
+      }
+    }
+
+    const {
+      notInCache,
+      committedModified,
+      uncommittedModified,
+      uncommittedUnknown
+    } = collectDataStatus(dvcDemoPath, dataStatusOutput)
+
+    expect(committedModified).toStrictEqual(new Set())
+    expect(notInCache).toStrictEqual(makeAbsPathSet(dvcDemoPath, rawDataDir))
+    expect(uncommittedUnknown).toStrictEqual(
+      makeAbsPathSet(dvcDemoPath, ...unknown)
+    )
+    expect(uncommittedModified).toStrictEqual(
+      makeAbsPathSet(dvcDemoPath, rawDataDir)
+    )
+  })
 })
 
 const makeUri = (...paths: string[]): Uri =>
