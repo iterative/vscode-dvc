@@ -44,6 +44,7 @@ import { plotsReducers } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
+import { clearSelection, createWindowTextSelection } from '../../test/selection'
 
 jest.mock('../../shared/api')
 
@@ -336,6 +337,69 @@ describe('App', () => {
     expect(
       screen.queryByLabelText('Vega visualization')
     ).not.toBeInTheDocument()
+  })
+
+  it('should not toggle the checkpoint plots section when its header is clicked and its title is selected', async () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    const summaryElement = await screen.findByText('Trends')
+
+    createWindowTextSelection('Trends', 2)
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+
+    clearSelection()
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+  })
+
+  it('should not toggle the checkpoint plots section when its header is clicked and the content of its tooltip is selected', async () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    const summaryElement = await screen.findByText('Trends')
+    createWindowTextSelection(
+      // eslint-disable-next-line testing-library/no-node-access
+      SectionDescription['checkpoint-plots'].props.children,
+      2
+    )
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+
+    clearSelection()
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).toBeCalledWith({
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
   })
 
   it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {
