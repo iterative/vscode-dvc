@@ -10,6 +10,7 @@ import { sendMessage } from '../../../shared/vscode'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
+import { isSelecting } from '../../../util/strings'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -30,11 +31,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   const [isShown, setIsShown] = useState(true)
 
   const toggleIsShownState = () => {
-    const selection = window.getSelection()
-    if (
-      selection?.focusNode?.nodeValue === path &&
-      selection.anchorOffset !== selection.focusOffset
-    ) {
+    if (isSelecting([path])) {
       return
     }
     setIsShown(!isShown)

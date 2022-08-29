@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useEffect, useState } from 'react'
+import React, { MouseEvent, useEffect, useState } from 'react'
 import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
@@ -17,6 +17,7 @@ import {
   Info,
   Lines
 } from '../../shared/components/icons'
+import { isSelecting } from '../../util/strings'
 
 export interface CommonPlotsContainerProps {
   onResize: (size: PlotSize) => void
@@ -113,20 +114,22 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     </div>
   )
 
+  const toggleSection = (e: MouseEvent) => {
+    e.preventDefault()
+    if (!isSelecting([title, SectionDescription[sectionKey].props.children])) {
+      sendMessage({
+        payload: {
+          [sectionKey]: !sectionCollapsed
+        },
+        type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      })
+    }
+  }
+
   return (
     <div className={styles.plotsContainerWrapper} data-testid="plots-container">
       <details open={open} className={styles.plotsContainer}>
-        <summary
-          onClick={e => {
-            e.preventDefault()
-            sendMessage({
-              payload: {
-                [sectionKey]: !sectionCollapsed
-              },
-              type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
-            })
-          }}
-        >
+        <summary onClick={toggleSection}>
           <Icon
             icon={open ? ChevronDown : ChevronRight}
             data-testid="plots-container-details-chevron"
