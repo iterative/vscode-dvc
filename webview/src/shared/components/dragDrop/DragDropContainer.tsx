@@ -20,7 +20,9 @@ import { getStyleProperty } from '../../../util/styles'
 import { idToNode } from '../../../util/helpers'
 
 const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
-  if (direction === DragEnterDirection.RIGHT) {
+  if (
+    [DragEnterDirection.RIGHT, DragEnterDirection.BOTTOM].includes(direction)
+  ) {
     return isAfter ? 0 : 1
   }
 
