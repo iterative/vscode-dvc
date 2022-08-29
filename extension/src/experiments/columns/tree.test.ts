@@ -74,7 +74,9 @@ describe('ExperimentsColumnsTree', () => {
 
   const rootColumns = columnsFixture
     .filter(column =>
-      Object.values<string>(ColumnType).includes(column.parentPath)
+      Object.values<string>(ColumnType).includes(
+        column.parentPath || column.type
+      )
     )
     .map(column => ({
       ...column,

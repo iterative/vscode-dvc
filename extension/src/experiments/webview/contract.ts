@@ -53,7 +53,7 @@ export enum ColumnType {
 export interface Column extends ColumnAggregateData {
   hasChildren: boolean
   label: string
-  parentPath: string
+  parentPath?: string
   path: string
   pathArray?: string[]
   type: ColumnType
