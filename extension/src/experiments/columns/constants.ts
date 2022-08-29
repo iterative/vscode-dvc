@@ -2,7 +2,7 @@ import { ColumnType } from '../webview/contract'
 
 export const timestampColumn = {
   hasChildren: false,
-  label: 'Timestamp',
-  path: 'Timestamp',
+  label: 'Created',
+  path: 'Created',
   type: ColumnType.TIMESTAMP
 }

@@ -58,7 +58,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   const hasFilter = !!(column.id && filters.includes(column.id))
   const isSortable =
     !column.placeholderOf &&
-    !['id', 'timestamp'].includes(column.id) &&
+    !['id', 'Created'].includes(column.id) &&
     !column.columns
   const isTimestamp = column.group === ColumnType.TIMESTAMP
 
