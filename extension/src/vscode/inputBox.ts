@@ -6,3 +6,14 @@ export const getInput = (title: Title, value?: string) =>
     title,
     value
   })
+
+export const getValidInput = (
+  title: Title,
+  validateInput: (text?: string) => null | string,
+  value?: string
+) =>
+  window.showInputBox({
+    title,
+    validateInput,
+    value
+  })

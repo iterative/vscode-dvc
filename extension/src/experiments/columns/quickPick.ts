@@ -1,5 +1,4 @@
 import { ColumnLike } from './like'
-import { timestampColumn } from './constants'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickOptionsWithTitle,
@@ -15,13 +14,11 @@ export const pickFromColumnLikes = (
     return Toast.showError('There are no columns to select from.')
   }
   return quickPickValue<ColumnLike>(
-    columnLikes
-      .filter(columnLike => columnLike.path !== timestampColumn.path)
-      .map(columnLike => ({
-        description: columnLike.path,
-        label: columnLike.label,
-        value: columnLike
-      })),
+    columnLikes.map(columnLike => ({
+      description: columnLike.path,
+      label: columnLike.label,
+      value: columnLike
+    })),
     quickPickOptions
   )
 }

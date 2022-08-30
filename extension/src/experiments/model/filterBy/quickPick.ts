@@ -1,13 +1,15 @@
-import { FilterDefinition, getFilterId, Operator } from '.'
+import { FilterDefinition, getFilterId, isDateOperator, Operator } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
-import { getInput } from '../../../vscode/inputBox'
+import { getIsoDate, validateTextIsDate } from '../../../util/date'
+import { getInput, getValidInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
 import { ColumnLike } from '../../columns/like'
 import { pickFromColumnLikes } from '../../columns/quickPick'
+import { ColumnType } from '../../webview/contract'
 
-export const operators = [
+export const OPERATORS = [
   {
     description: 'Equal',
     label: '=',
@@ -67,11 +69,40 @@ export const operators = [
     label: Operator.NOT_CONTAINS,
     types: ['string'],
     value: Operator.NOT_CONTAINS
+  },
+  {
+    description: 'Before',
+    label: Operator.BEFORE_DAY,
+    types: [ColumnType.TIMESTAMP],
+    value: Operator.BEFORE_DAY
+  },
+  {
+    description: 'After',
+    label: Operator.AFTER_DAY,
+    types: [ColumnType.TIMESTAMP],
+    value: Operator.AFTER_DAY
+  },
+  {
+    description: 'On Day',
+    label: Operator.ON_DAY,
+    types: [ColumnType.TIMESTAMP],
+    value: Operator.ON_DAY
   }
 ]
 
+const getValue = (operator: Operator): Thenable<string | undefined> => {
+  if (isDateOperator(operator)) {
+    return getValidInput(
+      Title.ENTER_FILTER_VALUE,
+      validateTextIsDate,
+      getIsoDate()
+    )
+  }
+  return getInput(Title.ENTER_FILTER_VALUE)
+}
+
 const addFilterValue = async (path: string, operator: Operator) => {
-  const value = await getInput(Title.ENTER_FILTER_VALUE)
+  const value = await getValue(operator)
   if (!value) {
     return
   }
@@ -93,7 +124,7 @@ export const pickFilterToAdd = async (
     return
   }
 
-  const typedOperators = operators.filter(operator =>
+  const typedOperators = OPERATORS.filter(operator =>
     operator.types.some(type => picked.types?.includes(type))
   )
 
