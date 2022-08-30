@@ -1,9 +1,15 @@
 name: Publish Extension
 
-on: workflow_dispatch
+on:
+  pull_request:
+    types: [closed]
 
 jobs:
   deploy:
+    if: |
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'make release go now') && 
+      github.event.pull_request.title == 'Update version and CHANGELOG for release'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
