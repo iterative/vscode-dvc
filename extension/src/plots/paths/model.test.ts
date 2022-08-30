@@ -155,7 +155,11 @@ describe('PathsModel', () => {
       join('plots', 'loss.png')
     ])
 
-    const newOrder = ['plots/heatmap.png', 'plots/acc.png', 'plots/loss.png']
+    const newOrder = [
+      join('plots', 'heatmap.png'),
+      join('plots', 'acc.png'),
+      join('plots', 'loss.png')
+    ]
 
     model.setComparisonPathsOrder(newOrder)
 
