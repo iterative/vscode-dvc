@@ -71,16 +71,16 @@ export const OPERATORS = [
     value: Operator.NOT_CONTAINS
   },
   {
-    description: 'Before',
-    label: Operator.BEFORE_DAY,
+    description: 'After Date',
+    label: Operator.AFTER_DATE,
     types: [ColumnType.TIMESTAMP],
-    value: Operator.BEFORE_DAY
+    value: Operator.AFTER_DATE
   },
   {
-    description: 'After',
-    label: Operator.AFTER_DAY,
+    description: 'Before Date',
+    label: Operator.BEFORE_DATE,
     types: [ColumnType.TIMESTAMP],
-    value: Operator.AFTER_DAY
+    value: Operator.BEFORE_DATE
   },
   {
     description: 'On Day',

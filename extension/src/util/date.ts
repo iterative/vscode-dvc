@@ -5,29 +5,8 @@ export const validateTextIsDate = (text?: string): null | string =>
     ? null
     : 'please enter a valid date of the form yyyy-mm-dd'
 
-export const compareDates = (
-  operator: '<' | '>' | '==',
-  dateString: string | number | boolean,
-  otherDateString: string | number | boolean
-): boolean => {
-  if (typeof dateString !== 'string' || typeof otherDateString !== 'string') {
-    return false
-  }
-
+export const getMidnightOnDateEpoch = (dateString: string): number => {
   const date = new Date(dateString)
   date.setUTCHours(0, 0, 0, 0)
-  const otherDate = new Date(otherDateString)
-  otherDate.setUTCHours(0, 0, 0, 0)
-
-  switch (operator) {
-    case '<':
-      return date.getTime() < otherDate.getTime()
-    case '>':
-      return date.getTime() > otherDate.getTime()
-    case '==':
-      return date.getTime() === otherDate.getTime()
-
-    default:
-      return false
-  }
+  return date.getTime()
 }
