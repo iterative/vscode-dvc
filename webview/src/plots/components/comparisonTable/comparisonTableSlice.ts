@@ -30,6 +30,9 @@ export const comparisonTableSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<PlotsComparisonData>) => {
+      if (!action.payload) {
+        return comparisonTableInitialState
+      }
       return {
         ...state,
         ...action.payload,
