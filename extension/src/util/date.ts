@@ -7,6 +7,6 @@ export const validateTextIsDate = (text?: string): null | string =>
 
 export const getMidnightOnDateEpoch = (dateString: string): number => {
   const date = new Date(dateString)
-  date.setUTCHours(0, 0, 0, 0)
+  date.setHours(0, 0, 0, 0)
   return date.getTime()
 }

@@ -2,16 +2,19 @@ import { Operator } from '.'
 import { getMidnightOnDateEpoch } from '../../../util/date'
 
 export const compareDateStrings = (
+  baseDateString: string | number | boolean,
   operator: Operator.LESS_THAN | Operator.GREATER_THAN | Operator.EQUAL,
-  dateString: string | number | boolean,
-  otherDateString: string | number | boolean
+  comparisonDateString: string | number | boolean
 ): boolean => {
-  if (typeof dateString !== 'string' || typeof otherDateString !== 'string') {
+  if (
+    typeof baseDateString !== 'string' ||
+    typeof comparisonDateString !== 'string'
+  ) {
     return false
   }
 
-  const epoch = getMidnightOnDateEpoch(dateString)
-  const otherEpoch = getMidnightOnDateEpoch(otherDateString)
+  const epoch = getMidnightOnDateEpoch(baseDateString)
+  const otherEpoch = getMidnightOnDateEpoch(comparisonDateString)
 
   switch (operator) {
     case Operator.LESS_THAN:

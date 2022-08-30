@@ -84,18 +84,18 @@ const evaluate = <T extends string | number | boolean>(
 
     case Operator.AFTER_DATE:
       return compareDateStrings(
-        Operator.GREATER_THAN,
         valueToEvaluate,
+        Operator.GREATER_THAN,
         filterValue
       )
     case Operator.BEFORE_DATE:
       return compareDateStrings(
-        Operator.LESS_THAN,
         valueToEvaluate,
+        Operator.LESS_THAN,
         filterValue
       )
     case Operator.ON_DAY:
-      return compareDateStrings(Operator.EQUAL, valueToEvaluate, filterValue)
+      return compareDateStrings(valueToEvaluate, Operator.EQUAL, filterValue)
     default:
       throw new Error('filter operator not found')
   }
