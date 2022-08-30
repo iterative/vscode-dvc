@@ -76,6 +76,8 @@ export class WebviewMessages {
         return this.setSectionCollapsed(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
         return this.setComparisonOrder(message.payload)
+      case MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS:
+        return this.setComparisonRowsOrder(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
         return this.setTemplateOrder(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_METRICS:
@@ -124,6 +126,16 @@ export class WebviewMessages {
     this.sendComparisonPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
+      undefined,
+      undefined
+    )
+  }
+
+  private setComparisonRowsOrder(order: string[]) {
+    this.paths.setComparisonPathsOrder(order)
+    this.sendComparisonPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED,
       undefined,
       undefined
     )

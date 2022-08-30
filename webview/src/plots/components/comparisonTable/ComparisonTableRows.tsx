@@ -1,4 +1,5 @@
 import { ComparisonPlots } from 'dvc/src/plots/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { createRef, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { ComparisonTableColumn } from './ComparisonTableHead'
@@ -6,6 +7,7 @@ import { ComparisonTableRow } from './ComparisonTableRow'
 import { changeRowHeight, DEFAULT_ROW_HEIGHT } from './comparisonTableSlice'
 import { RowDropTarget } from './RowDropTarget'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
+import { sendMessage } from '../../../shared/vscode'
 
 interface ComparisonTableRowsProps {
   plots: ComparisonPlots
@@ -53,11 +55,19 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
     )
   })
 
+  const changeRowsOrder = (order: string[]) => {
+    setRowsOrder(order)
+    sendMessage({
+      payload: order,
+      type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS
+    })
+  }
+
   return (
     <DragDropContainer
       items={rows as JSX.Element[]}
       order={rowsOrder}
-      setOrder={setRowsOrder}
+      setOrder={changeRowsOrder}
       group="comparison-table"
       dropTarget={<RowDropTarget colSpan={columns.length} />}
       onLayoutChange={onLayoutChange}
