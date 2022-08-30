@@ -1,5 +1,5 @@
 import { Operator } from '.'
-import { getMidnightOnDateEpoch } from '../../../util/date'
+import { standardizeDate } from '../../../util/date'
 
 export const compareDateStrings = (
   baseDateString: string | number | boolean,
@@ -13,8 +13,8 @@ export const compareDateStrings = (
     return false
   }
 
-  const epoch = getMidnightOnDateEpoch(baseDateString)
-  const otherEpoch = getMidnightOnDateEpoch(comparisonDateString)
+  const epoch = standardizeDate(baseDateString)
+  const otherEpoch = standardizeDate(comparisonDateString)
 
   switch (operator) {
     case Operator.LESS_THAN:
