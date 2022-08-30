@@ -150,9 +150,9 @@ describe('PathsModel', () => {
     model.transformAndSet(plotsDiffFixture)
 
     expect(model.getComparisonPaths()).toStrictEqual([
-      'plots/acc.png',
-      'plots/heatmap.png',
-      'plots/loss.png'
+      join('plots', 'acc.png'),
+      join('plots', 'heatmap.png'),
+      join('plots', 'loss.png')
     ])
 
     const newOrder = ['plots/heatmap.png', 'plots/acc.png', 'plots/loss.png']
