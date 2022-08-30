@@ -291,7 +291,46 @@ describe('App', () => {
     expect(screen.getByText(expectedSectionName)).toBeInTheDocument()
   })
 
-  it('should remove checkpoint plots given a message showing checkpoint plots as null', () => {
+  it('should remove image plots given a message showing image plots as null', async () => {
+    const emptyStateText = 'No Images to Compare'
+
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture,
+      comparison: comparisonTableFixture
+    })
+
+    expect(screen.queryByText(emptyStateText)).not.toBeInTheDocument()
+
+    sendSetDataMessage({
+      comparison: null
+    })
+
+    const emptyState = await screen.findByText(emptyStateText)
+
+    expect(emptyState).toBeInTheDocument()
+  })
+
+  it('should remove checkpoint plots given a message showing checkpoint plots as null', async () => {
+    const emptyStateText = 'No Plots to Display'
+
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture,
+      comparison: comparisonTableFixture,
+      template: templatePlotsFixture
+    })
+
+    expect(screen.queryByText(emptyStateText)).not.toBeInTheDocument()
+
+    sendSetDataMessage({
+      checkpoint: null
+    })
+
+    const emptyState = await screen.findByText(emptyStateText)
+
+    expect(emptyState).toBeInTheDocument()
+  })
+
+  it('should remove all sections from the document if there is no data provided', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
