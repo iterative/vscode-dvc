@@ -334,6 +334,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .table.withExpColumnShadow {
     .tr:not(.rowSelected) > *:first-child {
+      border-right-width: 0;
+
       &:after {
         box-shadow: 3px 0px 3px $shadow;
       }
@@ -373,10 +375,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
     & > *:first-child {
       background-color: $header-bg-color;
-    }
-
-    &:not(.rowSelected) > *:first-child:after {
-      right: -1px;
     }
 
     &:last-child,
