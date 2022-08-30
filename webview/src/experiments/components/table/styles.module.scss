@@ -309,31 +309,37 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       }
     }
 
-    &:not(.rowSelected) {
-      & > *:first-child {
-        position: sticky;
-        left: 0;
-        z-index: 3;
+    > *:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 3;
 
-        &:after {
-          content: '';
-          height: 100%;
-          position: absolute;
-          top: 0;
-          width: 6px;
-          right: 0;
-          transition: box-shadow 0.25s;
-        }
+      &:after {
+        content: '';
+        height: 100%;
+        position: absolute;
+        top: 0;
+        width: 6px;
+        right: 0;
+        transition: box-shadow 0.25s;
       }
     }
 
     &.rowSelected {
       background-color: $row-bg-selected-color;
+
+      > *:first-child {
+        background-color: $row-bg-color;
+
+        &:before {
+          background-color: $row-bg-selected-color;
+        }
+      }
     }
   }
 
   .table.withExpColumnShadow {
-    .tr:not(.rowSelected) > *:first-child:after {
+    .tr > *:first-child:after {
       box-shadow: 3px 0px 3px $shadow;
     }
   }
@@ -369,7 +375,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       background-color: $header-bg-color;
     }
 
-    &:not(.rowSelected) > *:first-child:after {
+    & > *:first-child:after {
       right: -1px;
     }
 
