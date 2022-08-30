@@ -1,5 +1,5 @@
-export const MIN_CLI_VERSION = '2.21.0'
-export const LATEST_TESTED_CLI_VERSION = '2.21.1'
+export const MIN_CLI_VERSION = '2.23.0'
+export const LATEST_TESTED_CLI_VERSION = '2.23.0'
 export const MAX_CLI_VERSION = '3'
 
 export const UNEXPECTED_ERROR_CODE = 255
@@ -36,8 +36,7 @@ export enum Flag {
   SET_PARAM = '-S',
   SPLIT = '--split',
   UNCHANGED = '--unchanged',
-  VERSION = '--version',
-  WITH_DIRS = '--with-dirs'
+  VERSION = '--version'
 }
 
 export enum ExperimentSubCommand {
