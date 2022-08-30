@@ -76,6 +76,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   public setComparisonPathsOrder(order: string[]) {
     this.comparisonPathsOrder = order
+    this.persist(
+      PersistenceKey.PLOT_COMPARISON_PATHS_ORDER,
+      this.comparisonPathsOrder
+    )
   }
 
   public hasPaths() {
