@@ -82,6 +82,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
 }
 
+.moveToRight {
+  left: auto;
+  right: 0;
+}
+
 // Concrete selectors
 
 @keyframes spin {

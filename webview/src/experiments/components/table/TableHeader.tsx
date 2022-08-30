@@ -57,17 +57,14 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 
   const hasFilter = !!(column.id && filters.includes(column.id))
   const isSortable =
-    !column.placeholderOf &&
-    !['id', 'Created'].includes(column.id) &&
-    !column.columns
-  const isTimestamp = column.group === ColumnType.TIMESTAMP
+    !column.placeholderOf && column.id !== 'id' && !column.columns
 
   const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
 
   const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = [
       {
-        hidden: !isTimestamp && !!column.headers,
+        hidden: !!column.headers,
         id: 'hide-column',
         label: 'Hide Column',
         message: {
@@ -87,7 +84,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     ]
 
     return menuOptions
-  }, [column, isTimestamp])
+  }, [column])
 
   return (
     <TableHeaderCell
@@ -100,16 +97,14 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragEnter={onDragEnter}
       onDragStart={onDragStart}
       onDrop={onDrop}
-      menuDisabled={
-        !isSortable && !isTimestamp && column.group !== ColumnType.PARAMS
-      }
+      menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
       root={root}
       firstExpColumnCellId={firstExpColumnCellId}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
       menuContent={
         <div>
           <MessagesMenu options={contextMenuOptions} />
-          {!isTimestamp && (
+          {
             <>
               <VSCodeDivider />
               <MessagesMenu
@@ -150,7 +145,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 ]}
               />
             </>
-          )}
+          }
         </div>
       }
     />

@@ -1,6 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 import styles from './styles.module.scss'
 import { SortOrder } from './TableHeader'
@@ -89,9 +89,12 @@ export const TableHeaderCellContents: React.FC<{
   setMenuSuppressed,
   resizerHeight
 }) => {
+  const isTimestamp = column.group === ColumnType.TIMESTAMP
   return (
     <>
-      <div className={styles.iconMenu}>
+      <div
+        className={cx(styles.iconMenu, { [styles.moveToRight]: isTimestamp })}
+      >
         <IconMenu items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)} />
       </div>
       <ColumnDragHandle
