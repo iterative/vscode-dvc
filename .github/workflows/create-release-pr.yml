@@ -59,7 +59,8 @@ jobs:
 
             Please close and reopen this PR to run the required workflows (Required statuses must pass before merging).
 
-            **This needs to be approved and merged before we run the `publish` workflow.**
-          commit-message: 'update version and changelog for release'
+            **The `publish` workflow will run automatically when this PR is merged.**
+          commit-message: 'Update version and CHANGELOG for release'
           title: 'Update version and CHANGELOG for release'
           token: ${{ secrets.GITHUB_TOKEN }}
+          labels: make release go now

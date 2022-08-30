@@ -12,6 +12,7 @@ import {
   ExperimentsOutput
 } from '../../../cli/dvc/reader'
 import { standardizePath } from '../../../fileSystem/path'
+import { timestampColumn } from '../constants'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -37,6 +38,8 @@ const collectFromBranch = (
 
 export const collectColumns = (data: ExperimentsOutput): Column[] => {
   const acc: ColumnAccumulator = {}
+
+  acc.timestamp = timestampColumn
 
   const { workspace, ...rest } = data
   collectFromBranch(acc, workspace)

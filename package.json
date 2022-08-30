@@ -33,8 +33,8 @@
     "svgr": "yarn workspace dvc-vscode-webview svgr"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "5.33.1",
-    "@typescript-eslint/parser": "5.33.1",
+    "@typescript-eslint/eslint-plugin": "5.34.0",
+    "@typescript-eslint/parser": "5.34.0",
     "@vscode/codicons": "0.0.32",
     "eslint": "8.22.0",
     "eslint-config-prettier": "8.5.0",
@@ -43,9 +43,9 @@
     "eslint-plugin-check-file": "1.2.2",
     "eslint-plugin-etc": "2.0.2",
     "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-jest": "26.8.3",
+    "eslint-plugin-jest": "26.8.7",
     "eslint-plugin-jsx-a11y": "6.6.1",
-    "eslint-plugin-n": "15.2.4",
+    "eslint-plugin-n": "15.2.5",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-promise": "6.0.0",

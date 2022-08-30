@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.25] - 2022-08-30
+
+### 🚀 New Features and Enhancements
+
+- Rename "Timestamp" column label to "Created" [#2269](https://github.com/iterative/vscode-dvc/pull/2269) by [@julieg18](https://github.com/julieg18)
+- Review when plot sections should collapse [#2285](https://github.com/iterative/vscode-dvc/pull/2285) by [@sroy3](https://github.com/sroy3)
+- Improve table styles [#2289](https://github.com/iterative/vscode-dvc/pull/2289) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Show empty state when final comparison plot is de-selected [#2290](https://github.com/iterative/vscode-dvc/pull/2290) by [@mattseddon](https://github.com/mattseddon)
+- Make the first cells of selected rows sticky [#2294](https://github.com/iterative/vscode-dvc/pull/2294) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Make column `parentPath` optional [#2272](https://github.com/iterative/vscode-dvc/pull/2272) by [@julieg18](https://github.com/julieg18)
+- Remove leftover file for section renaming [#2284](https://github.com/iterative/vscode-dvc/pull/2284) by [@sroy3](https://github.com/sroy3)
+- Dispatch publish extension action on merge of update version and CHANGELOG for release PR [#2292](https://github.com/iterative/vscode-dvc/pull/2292) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.3.24] - 2022-08-26
+
+### 🚀 New Features and Enhancements
+
+- Make timestamp column hideable and draggable [#2239](https://github.com/iterative/vscode-dvc/pull/2239) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Split up `Cell.tsx` and `Row.tsx` files [#2264](https://github.com/iterative/vscode-dvc/pull/2264) by [@julieg18](https://github.com/julieg18)
+
 ## [0.3.23] - 2022-08-25
 
 ### 🚀 New Features and Enhancements

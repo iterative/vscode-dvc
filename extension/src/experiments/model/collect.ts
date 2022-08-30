@@ -125,11 +125,14 @@ const transformColumns = (
   experimentFields: ExperimentFields,
   branch?: Experiment
 ) => {
-  const { error, metrics, params, deps } = extractColumns(
+  const { error, metrics, params, deps, Created } = extractColumns(
     experimentFields,
     branch
   )
 
+  if (Created) {
+    experiment.Created = Created
+  }
   if (metrics) {
     experiment.metrics = metrics
   }

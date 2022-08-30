@@ -58,15 +58,16 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   const hasFilter = !!(column.id && filters.includes(column.id))
   const isSortable =
     !column.placeholderOf &&
-    !['id', 'timestamp'].includes(column.id) &&
+    !['id', 'Created'].includes(column.id) &&
     !column.columns
+  const isTimestamp = column.group === ColumnType.TIMESTAMP
 
   const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
 
   const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = [
       {
-        hidden: !!column.headers,
+        hidden: !isTimestamp && !!column.headers,
         id: 'hide-column',
         label: 'Hide Column',
         message: {
@@ -86,7 +87,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     ]
 
     return menuOptions
-  }, [column])
+  }, [column, isTimestamp])
 
   return (
     <TableHeaderCell
@@ -99,51 +100,57 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragEnter={onDragEnter}
       onDragStart={onDragStart}
       onDrop={onDrop}
-      menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
+      menuDisabled={
+        !isSortable && !isTimestamp && column.group !== ColumnType.PARAMS
+      }
       root={root}
       firstExpColumnCellId={firstExpColumnCellId}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
       menuContent={
         <div>
           <MessagesMenu options={contextMenuOptions} />
-          <VSCodeDivider />
-          <MessagesMenu
-            options={[
-              {
-                hidden: sortOrder === SortOrder.ASCENDING,
-                id: SortOrder.ASCENDING,
-                label: SortOrder.ASCENDING,
-                message: {
-                  payload: {
-                    descending: false,
-                    path: column.id
+          {!isTimestamp && (
+            <>
+              <VSCodeDivider />
+              <MessagesMenu
+                options={[
+                  {
+                    hidden: sortOrder === SortOrder.ASCENDING,
+                    id: SortOrder.ASCENDING,
+                    label: SortOrder.ASCENDING,
+                    message: {
+                      payload: {
+                        descending: false,
+                        path: column.id
+                      },
+                      type: MessageFromWebviewType.SORT_COLUMN
+                    }
                   },
-                  type: MessageFromWebviewType.SORT_COLUMN
-                }
-              },
-              {
-                hidden: sortOrder === SortOrder.DESCENDING,
-                id: SortOrder.DESCENDING,
-                label: SortOrder.DESCENDING,
-                message: {
-                  payload: {
-                    descending: true,
-                    path: column.id
+                  {
+                    hidden: sortOrder === SortOrder.DESCENDING,
+                    id: SortOrder.DESCENDING,
+                    label: SortOrder.DESCENDING,
+                    message: {
+                      payload: {
+                        descending: true,
+                        path: column.id
+                      },
+                      type: MessageFromWebviewType.SORT_COLUMN
+                    }
                   },
-                  type: MessageFromWebviewType.SORT_COLUMN
-                }
-              },
-              {
-                hidden: sortOrder === SortOrder.NONE,
-                id: SortOrder.NONE,
-                label: SortOrder.NONE,
-                message: {
-                  payload: column.id,
-                  type: MessageFromWebviewType.REMOVE_COLUMN_SORT
-                }
-              }
-            ]}
-          />
+                  {
+                    hidden: sortOrder === SortOrder.NONE,
+                    id: SortOrder.NONE,
+                    label: SortOrder.NONE,
+                    message: {
+                      payload: column.id,
+                      type: MessageFromWebviewType.REMOVE_COLUMN_SORT
+                    }
+                  }
+                ]}
+              />
+            </>
+          )}
         </div>
       }
     />

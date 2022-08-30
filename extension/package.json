@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.3.23",
+  "version": "0.3.25",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1621,7 +1621,7 @@
     "@types/lodash.omit": "4.5.7",
     "@types/mocha": "9.1.1",
     "@types/mock-require": "2.0.1",
-    "@types/node": "16.11.49",
+    "@types/node": "16.11.55",
     "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.8",
     "@types/uuid": "8.3.4",
@@ -1646,7 +1646,7 @@
     "sinon-chai": "3.7.0",
     "ts-jest": "28.0.8",
     "ts-loader": "9.3.1",
-    "vsce": "2.10.0",
+    "vsce": "2.10.2",
     "vscode-uri": "3.0.3",
     "wdio-vscode-service": "4.0.5",
     "webdriverio": "7.23.0",
