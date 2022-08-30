@@ -6,6 +6,7 @@ describe('splitExperimentsByFilters', () => {
   const paramsFile = 'params.yaml'
   const experiments = [
     {
+      Created: '2020-12-29T12:00:01',
       id: 1,
       params: {
         'params.yaml': {
@@ -17,6 +18,7 @@ describe('splitExperimentsByFilters', () => {
       }
     },
     {
+      Created: '2020-12-30T12:00:01',
       id: 2,
       params: {
         'params.yaml': {
@@ -28,6 +30,7 @@ describe('splitExperimentsByFilters', () => {
       }
     },
     {
+      Created: '2021-01-01T00:00:01',
       id: 3,
       params: {
         'params.yaml': {
@@ -259,5 +262,50 @@ describe('splitExperimentsByFilters', () => {
     )
     expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 3])
     expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([2])
+  })
+
+  it('should split the experiments using after Created date', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
+      [
+        {
+          operator: Operator.AFTER_DATE,
+          path: 'Created',
+          value: '2020-12-31T15:40:00'
+        }
+      ],
+      experiments
+    )
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 2])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([3])
+  })
+
+  it('should split the experiments using before Created date', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
+      [
+        {
+          operator: Operator.BEFORE_DATE,
+          path: 'Created',
+          value: '2020-12-31T15:40:00'
+        }
+      ],
+      experiments
+    )
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([1, 2])
+  })
+
+  it('should split the experiments using on Created date', () => {
+    const { filtered, unfiltered } = splitExperimentsByFilters(
+      [
+        {
+          operator: Operator.ON_DATE,
+          path: 'Created',
+          value: '2020-12-31T15:40:00'
+        }
+      ],
+      experiments
+    )
+    expect(filtered.map(experiment => experiment.id)).toStrictEqual([1, 2, 3])
+    expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([])
   })
 })

@@ -20,11 +20,11 @@ export enum Operator {
 
   BEFORE_DATE = '<d',
   AFTER_DATE = '>d',
-  ON_DAY = '=d'
+  ON_DATE = '=d'
 }
 
 export const isDateOperator = (operator: Operator): boolean =>
-  [Operator.AFTER_DATE, Operator.BEFORE_DATE, Operator.ON_DAY].includes(
+  [Operator.AFTER_DATE, Operator.BEFORE_DATE, Operator.ON_DATE].includes(
     operator
   )
 
@@ -94,7 +94,7 @@ const evaluate = <T extends string | number | boolean>(
         Operator.LESS_THAN,
         filterValue
       )
-    case Operator.ON_DAY:
+    case Operator.ON_DATE:
       return compareDateStrings(valueToEvaluate, Operator.EQUAL, filterValue)
     default:
       throw new Error('filter operator not found')

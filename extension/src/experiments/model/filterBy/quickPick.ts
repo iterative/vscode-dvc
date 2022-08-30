@@ -84,9 +84,9 @@ export const OPERATORS = [
   },
   {
     description: 'On Day',
-    label: Operator.ON_DAY,
+    label: Operator.ON_DATE,
     types: [ColumnType.TIMESTAMP],
-    value: Operator.ON_DAY
+    value: Operator.ON_DATE
   }
 ]
 
