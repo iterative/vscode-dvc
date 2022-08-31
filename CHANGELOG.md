@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.26] - 2022-08-31
+
+### 🚀 New Features and Enhancements
+
+- Comparison table rows drag and drop [#2271](https://github.com/iterative/vscode-dvc/pull/2271) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Only drag rows not single imagges [#2304](https://github.com/iterative/vscode-dvc/pull/2304) by [@sroy3](https://github.com/sroy3)
+
 ## [0.3.25] - 2022-08-30
 
 ### 🚀 New Features and Enhancements
