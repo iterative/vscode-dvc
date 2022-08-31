@@ -8,6 +8,7 @@ export enum PersistenceKey {
   METRICS_AND_PARAMS_STATUS = 'columnsStatus:',
   PLOT_PATH_STATUS = 'plotPathStatus:',
   PLOT_COMPARISON_ORDER = 'plotComparisonOrder:',
+  PLOT_COMPARISON_PATHS_ORDER = 'plotComparisonPathsOrder',
   PLOT_METRIC_ORDER = 'plotMetricOrder:',
   PLOT_SECTION_COLLAPSED = 'plotSectionCollapsed:',
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',

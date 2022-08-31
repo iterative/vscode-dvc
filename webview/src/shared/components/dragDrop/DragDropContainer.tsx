@@ -337,7 +337,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const wrappedItems = items.flatMap(draggable => {
-    const { id } = draggable.props
+    const id = draggable?.props?.id
     const item = id && buildItem(id, draggable)
 
     return id === draggedOverId && (hoveringSomething || !parentDraggedOver)

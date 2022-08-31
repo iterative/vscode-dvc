@@ -553,5 +553,22 @@ describe('ComparisonTable', () => {
 
       expect(dropTarget.id).toStrictEqual(`${firstRow.id}__drop`)
     })
+
+    it('should send a message with the changed rows order', () => {
+      renderTable()
+
+      const [, firstRow, secondRow] = screen.getAllByRole('rowgroup')
+
+      dragAndDrop(firstRow, secondRow, DragEnterDirection.BOTTOM)
+
+      const reorderedRows = screen.getAllByRole('rowgroup').slice(1)
+      const newOrder = reorderedRows.map(row => row.id)
+
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: newOrder,
+        type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS
+      })
+    })
   })
 })
