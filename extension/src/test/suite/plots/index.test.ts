@@ -436,6 +436,60 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a comparison rows reordered message from the webview', async () => {
+      const { plots, pathsModel, messageSpy } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockSetComparisonPathsOrder = spy(
+        pathsModel,
+        'setComparisonPathsOrder'
+      )
+      const mockComparisonPathsOrder = [
+        join('plots', 'acc.png'),
+        join('plots', 'heatmap.png'),
+        join('plots', 'loss.png')
+      ]
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        payload: mockComparisonPathsOrder,
+        type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS
+      })
+
+      expect(mockSetComparisonPathsOrder).to.be.calledOnce
+      expect(mockSetComparisonPathsOrder).to.be.calledWithExactly(
+        mockComparisonPathsOrder
+      )
+      expect(messageSpy).to.be.calledOnce
+      expect(
+        messageSpy,
+        "should update the webview's comparison revision state"
+      ).to.be.calledWithExactly({
+        comparison: {
+          ...comparisonPlotsFixture,
+          plots: reorderObjectList(
+            mockComparisonPathsOrder,
+            comparisonPlotsFixture.plots,
+            'path'
+          )
+        },
+        selectedRevisions: plotsRevisionsFixture
+      })
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a template plots reordered message from the webview', async () => {
       const { pathsModel, plots, messageSpy } = await buildPlots(
         disposable,

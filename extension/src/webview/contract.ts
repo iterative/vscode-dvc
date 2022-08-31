@@ -22,6 +22,7 @@ export enum MessageFromWebviewType {
   REMOVE_EXPERIMENT = 'remove-experiment',
   REORDER_COLUMNS = 'reorder-columns',
   REORDER_PLOTS_COMPARISON = 'reorder-plots-comparison',
+  REORDER_PLOTS_COMPARISON_ROWS = 'reorder-plots-comparison-rows',
   REORDER_PLOTS_METRICS = 'reorder-plots-metrics',
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
   REFRESH_REVISION = 'refresh-revision',
@@ -121,6 +122,10 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
+      payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS
       payload: string[]
     }
   | {
