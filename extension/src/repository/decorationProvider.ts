@@ -20,6 +20,19 @@ type DecorationStatus =
 
 export type DecorationState = Record<DecorationStatus, Set<string>>
 
+const decorationPriority: DecorationStatus[] = [
+  DecorationDataStatus.NOT_IN_CACHE,
+  DecorationDataStatus.UNCOMMITTED_ADDED,
+  DecorationDataStatus.UNCOMMITTED_DELETED,
+  DecorationDataStatus.UNCOMMITTED_MODIFIED,
+  DecorationDataStatus.UNCOMMITTED_RENAMED,
+  DecorationDataStatus.COMMITTED_ADDED,
+  DecorationDataStatus.COMMITTED_DELETED,
+  DecorationDataStatus.COMMITTED_MODIFIED,
+  DecorationDataStatus.COMMITTED_RENAMED,
+  DecorationDataStatus.TRACKED
+]
+
 export class DecorationProvider
   extends Disposable
   implements FileDecorationProvider
@@ -95,6 +108,7 @@ export class DecorationProvider
     committedModified: DecorationProvider.DecorationCommittedModified,
     committedRenamed: DecorationProvider.DecorationCommittedRenamed,
     notInCache: DecorationProvider.DecorationNotInCache,
+    tracked: DecorationProvider.DecorationTracked,
     uncommittedAdded: DecorationProvider.DecorationUncommittedAdded,
     uncommittedDeleted: DecorationProvider.DecorationUncommittedDeleted,
     uncommittedModified: DecorationProvider.DecorationUncommittedModified,
@@ -117,17 +131,14 @@ export class DecorationProvider
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
     const path = uri.fsPath
 
-    const decoration = Object.keys(this.decorationMapping).find(status => {
+    const decoration = decorationPriority.find(status => {
       if (this.state[status as DecorationStatus]?.has(path)) {
         return status
       }
-    }) as DecorationStatus
+    })
 
     if (decoration) {
       return this.decorationMapping[decoration]
-    }
-    if (this.state.tracked?.has(path)) {
-      return DecorationProvider.DecorationTracked
     }
   }
 

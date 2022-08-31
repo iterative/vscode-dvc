@@ -3,16 +3,16 @@ import { BaseDataStatus } from './constants'
 import { PathItem } from './model/collect'
 import { Disposable } from '../class/dispose'
 
-export type SCMState = {
-  committed: SourceControlResource[]
-  uncommitted: SourceControlResource[]
-  untracked: SourceControlResource[]
-  notInCache: SourceControlResource[]
-}
-
 export const SourceControlDataStatus = Object.assign({}, BaseDataStatus, {
   UNTRACKED: 'untracked'
 } as const)
+
+export type SCMState = {
+  committed: SourceControlResource[]
+  uncommitted: SourceControlResource[]
+  [SourceControlDataStatus.UNTRACKED]: SourceControlResource[]
+  [SourceControlDataStatus.NOT_IN_CACHE]: SourceControlResource[]
+}
 
 export type SourceControlStatus =
   typeof SourceControlDataStatus[keyof typeof SourceControlDataStatus]

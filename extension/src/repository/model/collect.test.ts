@@ -141,28 +141,64 @@ describe('collectDataStatus', () => {
     )
   })
 
-  it('should return only not in cache when provided with duplicate paths', () => {
+  it('should not deduplicate paths when they are shown as both not in cache and deleted', () => {
     const not_in_cache = ['model.pt', 'misclassified.jpg', 'predictions.json']
 
     const duplicates = {
-      committed: {
-        modified: ['model.pt', 'misclassified.jpg', 'predictions.json']
-      },
       not_in_cache,
       uncommitted: {
         deleted: not_in_cache
       }
     }
 
-    const { committedModified, notInCache, uncommittedDeleted, tracked } =
-      collectDataStatus(dvcDemoPath, duplicates)
+    const { notInCache, uncommittedDeleted, tracked } = collectDataStatus(
+      dvcDemoPath,
+      duplicates
+    )
 
     const absNotInCache = makeAbsPathSet(dvcDemoPath, ...not_in_cache)
 
-    expect(committedModified).toStrictEqual(emptySet)
-    expect(uncommittedDeleted).toStrictEqual(emptySet)
+    expect(uncommittedDeleted).toStrictEqual(absNotInCache)
     expect(notInCache).toStrictEqual(absNotInCache)
     expect(tracked).toStrictEqual(absNotInCache)
+  })
+
+  it('should not deduplicate paths when they are shown as both committed and uncommitted', () => {
+    const data = join('data', 'MNIST', 'raw')
+    const paths = [
+      join(data, 't10k-images-idx3-ubyte'),
+      join(data, 't10k-images-idx3-ubyte.gz'),
+      join(data, 't10k-labels-idx1-ubyte')
+    ]
+    const dataStatusOutput = {
+      committed: {
+        deleted: [
+          'data/MNIST/raw/t10k-images-idx3-ubyte',
+          'data/MNIST/raw/t10k-images-idx3-ubyte.gz',
+          'data/MNIST/raw/t10k-labels-idx1-ubyte'
+        ],
+        modified: [data + sep]
+      },
+      uncommitted: {
+        added: paths,
+        modified: [data + sep]
+      }
+    }
+
+    const modified = makeAbsPathSet(dvcDemoPath, data)
+    const addedAndDeleted = makeAbsPathSet(dvcDemoPath, ...paths)
+
+    const {
+      committedDeleted,
+      committedModified,
+      uncommittedAdded,
+      uncommittedModified
+    } = collectDataStatus(dvcDemoPath, dataStatusOutput)
+
+    expect(committedDeleted).toStrictEqual(addedAndDeleted)
+    expect(committedModified).toStrictEqual(modified)
+    expect(uncommittedAdded).toStrictEqual(addedAndDeleted)
+    expect(uncommittedModified).toStrictEqual(modified)
   })
 })
 

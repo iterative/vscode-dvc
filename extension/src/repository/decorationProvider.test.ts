@@ -2,6 +2,7 @@ import { join } from 'path'
 import { EventEmitter, Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { DecorationProvider, DecorationState } from './decorationProvider'
+import { standardizePath } from '../fileSystem/path'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -23,6 +24,19 @@ beforeEach(() => {
 })
 
 describe('DecorationProvider', () => {
+  const dvcRoot = __dirname
+  const model = standardizePath(join(dvcRoot, 'model.pt')) as string
+  const dataDir = standardizePath(join(dvcRoot, 'data')) as string
+  const features = standardizePath(join(dataDir, 'features')) as string
+  const logDir = standardizePath(join(dvcRoot, 'logs')) as string
+  const logAcc = standardizePath(join(logDir, 'acc.tsv')) as string
+  const logLoss = standardizePath(join(logDir, 'loss.tsv')) as string
+  const dataXml = standardizePath(join(dataDir, 'data.xml')) as string
+  const dataCsv = standardizePath(join(dataDir, 'data.csv')) as string
+  const prepared = standardizePath(join(dataDir, 'prepared')) as string
+
+  const emptySet = new Set<string>()
+
   it('should be able to setState with no existing state', () => {
     const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
 
@@ -68,17 +82,6 @@ describe('DecorationProvider', () => {
   })
 
   it('should combine the existing state with the new state before providing new decorations', () => {
-    const dvcRoot = __dirname
-    const model = join(dvcRoot, 'model.pt')
-    const dataDir = join(dvcRoot, 'data')
-    const features = join(dataDir, 'features')
-    const logDir = join(dvcRoot, 'logs')
-    const logAcc = join(logDir, 'acc.tsv')
-    const logLoss = join(logDir, 'loss.tsv')
-    const dataXml = join(dataDir, 'data.xml')
-    const dataCsv = join(dataDir, 'data.csv')
-    const prepared = join(dataDir, 'prepared')
-
     const committedAdded = new Set([dataCsv])
     const committedDeleted = new Set([model])
     const uncommittedModified = new Set([features])
@@ -94,7 +97,6 @@ describe('DecorationProvider', () => {
       model,
       prepared
     ])
-    const emptySet = new Set<string>()
 
     const initialState = {
       committedAdded,
@@ -159,5 +161,54 @@ describe('DecorationProvider', () => {
         logLoss
       ].map(path => Uri.file(path))
     )
+  })
+
+  it('should provide a single decoration which is based on a set priority', () => {
+    const logs = new Set([logDir, logAcc, logLoss])
+
+    const initialState = {
+      committedAdded: new Set([dataXml]),
+      committedDeleted: emptySet,
+      committedModified: new Set([dataDir]),
+      committedRenamed: emptySet,
+      notInCache: logs,
+      tracked: new Set([
+        model,
+        logDir,
+        logAcc,
+        logLoss,
+        dataDir,
+        dataXml,
+        dataCsv,
+        prepared
+      ]),
+      uncommittedAdded: new Set([dataCsv]),
+      uncommittedDeleted: logs,
+      uncommittedModified: new Set([dataDir]),
+      uncommittedRenamed: emptySet
+    }
+
+    const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
+    decorationProvider.setState(initialState)
+
+    const expectDecoration = (
+      path: string,
+      privateStaticDecoration: string
+    ) => {
+      const prioritizedDecoration = decorationProvider.provideFileDecoration(
+        Uri.file(path)
+      )
+
+      expect(prioritizedDecoration).toStrictEqual(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (DecorationProvider as any)[privateStaticDecoration]
+      )
+    }
+
+    expectDecoration(logDir, 'DecorationNotInCache')
+    expectDecoration(dataDir, 'DecorationUncommittedModified')
+    expectDecoration(dataCsv, 'DecorationUncommittedAdded')
+    expectDecoration(dataXml, 'DecorationCommittedAdded')
+    expectDecoration(prepared, 'DecorationTracked')
   })
 })
