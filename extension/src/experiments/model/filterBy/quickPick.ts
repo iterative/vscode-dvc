@@ -1,13 +1,15 @@
-import { FilterDefinition, getFilterId, Operator } from '.'
+import { FilterDefinition, getFilterId, isDateOperator, Operator } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
-import { getInput } from '../../../vscode/inputBox'
+import { getIsoDate, isFreeTextDate } from '../../../util/date'
+import { getInput, getValidInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
 import { ColumnLike } from '../../columns/like'
 import { pickFromColumnLikes } from '../../columns/quickPick'
+import { ColumnType } from '../../webview/contract'
 
-export const operators = [
+export const OPERATORS = [
   {
     description: 'Equal',
     label: '=',
@@ -67,11 +69,43 @@ export const operators = [
     label: Operator.NOT_CONTAINS,
     types: ['string'],
     value: Operator.NOT_CONTAINS
+  },
+  {
+    description: 'After Date',
+    label: Operator.AFTER_DATE,
+    types: [ColumnType.TIMESTAMP],
+    value: Operator.AFTER_DATE
+  },
+  {
+    description: 'Before Date',
+    label: Operator.BEFORE_DATE,
+    types: [ColumnType.TIMESTAMP],
+    value: Operator.BEFORE_DATE
+  },
+  {
+    description: 'On Day',
+    label: Operator.ON_DATE,
+    types: [ColumnType.TIMESTAMP],
+    value: Operator.ON_DATE
   }
 ]
 
+const getValue = (operator: Operator): Thenable<string | undefined> => {
+  if (isDateOperator(operator)) {
+    return getValidInput(
+      Title.ENTER_FILTER_VALUE,
+      (text?: string): null | string =>
+        isFreeTextDate(text)
+          ? null
+          : 'please enter a valid date of the form yyyy-mm-dd',
+      getIsoDate()
+    )
+  }
+  return getInput(Title.ENTER_FILTER_VALUE)
+}
+
 const addFilterValue = async (path: string, operator: Operator) => {
-  const value = await getInput(Title.ENTER_FILTER_VALUE)
+  const value = await getValue(operator)
   if (!value) {
     return
   }
@@ -93,7 +127,7 @@ export const pickFilterToAdd = async (
     return
   }
 
-  const typedOperators = operators.filter(operator =>
+  const typedOperators = OPERATORS.filter(operator =>
     operator.types.some(type => picked.types?.includes(type))
   )
 
