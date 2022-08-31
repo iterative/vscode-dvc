@@ -16,12 +16,11 @@ import {
   SCMState,
   SourceControlStatus
 } from '../sourceControlManagement'
-import { DataStatusOutput, DvcError } from '../../cli/dvc/reader'
+import { DataStatusOutput, DvcError, isDvcError } from '../../cli/dvc/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'
 import { isDirectory } from '../../fileSystem'
-import { isDvcError } from '../../cli/dvc/error'
 
 export class RepositoryModel extends Disposable {
   private readonly dvcRoot: string

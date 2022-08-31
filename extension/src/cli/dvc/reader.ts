@@ -1,7 +1,6 @@
 import { join } from 'path'
 import { DvcCli } from '.'
 import { Args, Command, ExperimentFlag, Flag, SubCommand } from './constants'
-import { isDvcError } from './error'
 import { typeCheckCommands } from '..'
 import { MaybeConsoleError } from '../error'
 import { Plot } from '../../plots/webview/contract'
@@ -93,6 +92,12 @@ export interface PlotsOutput {
 }
 
 export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
+
+export const isDvcError = <
+  T extends ExperimentsOutput | DataStatusOutput | PlotsOutput
+>(
+  dataOrError: T | DvcError
+): dataOrError is DvcError => !!(dataOrError as DvcError).error
 
 export const autoRegisteredCommands = {
   DATA_STATUS: 'dataStatus',
