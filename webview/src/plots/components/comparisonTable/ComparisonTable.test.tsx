@@ -476,4 +476,99 @@ describe('ComparisonTable', () => {
       jest.useRealTimers()
     })
   })
+
+  describe('Rows drag and drop', () => {
+    it('should move a row before the previous one when dropped from the top', () => {
+      renderTable()
+
+      const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
+
+      dragAndDrop(secondRow, firstRow, DragEnterDirection.TOP)
+
+      const [, newFirstRow, newSecondRow] = screen.getAllByRole('rowgroup')
+
+      expect(newFirstRow.id).toStrictEqual(secondRow.id)
+      expect(newSecondRow.id).toStrictEqual(firstRow.id)
+    })
+
+    it('should not move a row before the previous one when dropped from the bottom', () => {
+      renderTable()
+
+      const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
+
+      dragAndDrop(secondRow, firstRow, DragEnterDirection.BOTTOM)
+
+      const [, newFirstRow, newSecondRow] = screen.getAllByRole('rowgroup')
+
+      expect(newFirstRow.id).toStrictEqual(firstRow.id)
+      expect(newSecondRow.id).toStrictEqual(secondRow.id)
+    })
+
+    it('should move a row after the next one when dropped from the bottom', () => {
+      renderTable()
+
+      const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
+
+      dragAndDrop(firstRow, secondRow, DragEnterDirection.BOTTOM)
+
+      const [, newFirstRow, newSecondRow] = screen.getAllByRole('rowgroup')
+
+      expect(newFirstRow.id).toStrictEqual(secondRow.id)
+      expect(newSecondRow.id).toStrictEqual(firstRow.id)
+    })
+
+    it('should not move a row after the next one when dropped from the top', () => {
+      renderTable()
+
+      const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
+
+      dragAndDrop(firstRow, secondRow, DragEnterDirection.TOP)
+
+      const [, newFirstRow, newSecondRow] = screen.getAllByRole('rowgroup')
+
+      expect(newFirstRow.id).toStrictEqual(firstRow.id)
+      expect(newSecondRow.id).toStrictEqual(secondRow.id)
+    })
+
+    it('should show a drop target after a row when dragging from the bottom', () => {
+      renderTable()
+
+      const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
+
+      dragEnter(firstRow, secondRow.id, DragEnterDirection.BOTTOM)
+
+      const dropTarget = screen.getAllByRole('rowgroup')[2]
+
+      expect(dropTarget.id).toStrictEqual(`${secondRow.id}__drop`)
+    })
+
+    it('should show a drop target before a row when dragging from the top', () => {
+      renderTable()
+
+      const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
+
+      dragEnter(secondRow, firstRow.id, DragEnterDirection.TOP)
+
+      const [, dropTarget] = screen.getAllByRole('rowgroup')
+
+      expect(dropTarget.id).toStrictEqual(`${firstRow.id}__drop`)
+    })
+
+    it('should send a message with the changed rows order', () => {
+      renderTable()
+
+      const [, firstRow, secondRow] = screen.getAllByRole('rowgroup')
+
+      dragAndDrop(firstRow, secondRow, DragEnterDirection.BOTTOM)
+
+      const reorderedRows = screen.getAllByRole('rowgroup').slice(1)
+      const newOrder = reorderedRows.map(row => row.id)
+
+      expect(mockPostMessage).toBeCalledTimes(1)
+      expect(mockPostMessage).toBeCalledWith({
+        payload: newOrder,
+        type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS
+      })
+    })
+  })
 })
