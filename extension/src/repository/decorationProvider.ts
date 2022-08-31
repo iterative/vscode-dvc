@@ -7,67 +7,79 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
+import { BaseDataStatus } from './constants'
 import { Disposable } from '../class/dispose'
 import { flattenUnique } from '../util/array'
 
-export type DecorationState = Record<Status, Set<string>>
+export const DecorationDataStatus = Object.assign({}, BaseDataStatus, {
+  TRACKED: 'tracked'
+} as const)
 
-export interface DecorationModel {
-  getDecorationState: () => DecorationState
-}
+type DecorationStatus =
+  typeof DecorationDataStatus[keyof typeof DecorationDataStatus]
 
-enum Status {
-  ADDED = 'added',
-  DELETED = 'deleted',
-  GIT_MODIFIED = 'gitModified',
-  MODIFIED = 'modified',
-  NOT_IN_CACHE = 'notInCache',
-  RENAMED = 'renamed',
-  TRACKED = 'tracked'
-}
+export type DecorationState = Record<DecorationStatus, Set<string>>
 
 export class DecorationProvider
   extends Disposable
   implements FileDecorationProvider
 {
-  private static DecorationAdded: FileDecoration = {
+  private static DecorationCommittedAdded: FileDecoration = {
     badge: 'A',
     color: new ThemeColor('gitDecoration.addedResourceForeground'),
-    tooltip: 'DVC added'
+    tooltip: 'DVC Committed Added'
   }
 
-  private static DecorationDeleted: FileDecoration = {
+  private static DecorationCommittedDeleted: FileDecoration = {
     badge: 'D',
-    color: new ThemeColor('gitDecoration.deletedResourceForeground'),
-    tooltip: 'DVC deleted'
+    color: new ThemeColor('gitDecoration.stageDeletedResourceForeground'),
+    tooltip: 'DVC Committed Deleted'
   }
 
-  private static DecorationModified: FileDecoration = {
+  private static DecorationCommittedModified: FileDecoration = {
     badge: 'M',
-    color: new ThemeColor('gitDecoration.modifiedResourceForeground'),
-    tooltip: 'DVC modified'
+    color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
+    tooltip: 'DVC Committed Modified'
+  }
+
+  private static DecorationCommittedRenamed: FileDecoration = {
+    badge: 'R',
+    color: new ThemeColor('gitDecoration.renamedResourceForeground'),
+    tooltip: 'DVC Committed Renamed'
   }
 
   private static DecorationNotInCache: FileDecoration = {
     badge: 'NC',
     color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
-    tooltip: 'DVC not in cache'
+    tooltip: 'DVC Not In Cache'
   }
 
-  private static DecorationRenamed: FileDecoration = {
+  private static DecorationUncommittedAdded: FileDecoration = {
+    badge: 'A',
+    color: new ThemeColor('gitDecoration.untrackedResourceForeground'),
+    tooltip: 'DVC Uncommitted Added'
+  }
+
+  private static DecorationUncommittedDeleted: FileDecoration = {
+    badge: 'D',
+    color: new ThemeColor('gitDecoration.deletedResourceForeground'),
+    tooltip: 'DVC Uncommitted Deleted'
+  }
+
+  private static DecorationUncommittedModified: FileDecoration = {
+    badge: 'M',
+    color: new ThemeColor('gitDecoration.modifiedResourceForeground'),
+    tooltip: 'DVC Uncommitted Modified'
+  }
+
+  private static DecorationUncommittedRenamed: FileDecoration = {
     badge: 'R',
     color: new ThemeColor('gitDecoration.renamedResourceForeground'),
-    tooltip: 'DVC renamed'
-  }
-
-  private static DecorationGitModified: FileDecoration = {
-    badge: 'M',
-    color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
-    tooltip: 'DVC modified'
+    tooltip: 'DVC Uncommitted Renamed'
   }
 
   private static DecorationTracked: FileDecoration = {
-    tooltip: 'DVC tracked'
+    tooltip: 'DVC Tracked'
   }
 
   public readonly onDidChangeFileDecorations: Event<Uri[]>
@@ -75,15 +87,19 @@ export class DecorationProvider
 
   private state: DecorationState
 
-  private readonly decorationMapping: Partial<Record<Status, FileDecoration>> =
-    {
-      added: DecorationProvider.DecorationAdded,
-      deleted: DecorationProvider.DecorationDeleted,
-      gitModified: DecorationProvider.DecorationGitModified,
-      modified: DecorationProvider.DecorationModified,
-      notInCache: DecorationProvider.DecorationNotInCache,
-      renamed: DecorationProvider.DecorationRenamed
-    }
+  private readonly decorationMapping: Partial<
+    Record<DecorationStatus, FileDecoration>
+  > = {
+    committedAdded: DecorationProvider.DecorationCommittedAdded,
+    committedDeleted: DecorationProvider.DecorationCommittedDeleted,
+    committedModified: DecorationProvider.DecorationCommittedModified,
+    committedRenamed: DecorationProvider.DecorationCommittedRenamed,
+    notInCache: DecorationProvider.DecorationNotInCache,
+    uncommittedAdded: DecorationProvider.DecorationUncommittedAdded,
+    uncommittedDeleted: DecorationProvider.DecorationUncommittedDeleted,
+    uncommittedModified: DecorationProvider.DecorationUncommittedModified,
+    uncommittedRenamed: DecorationProvider.DecorationUncommittedRenamed
+  }
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
     super()
@@ -99,16 +115,18 @@ export class DecorationProvider
   }
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
+    const path = uri.fsPath
+
     const decoration = Object.keys(this.decorationMapping).find(status => {
-      if (this.state[status as Status]?.has(uri.fsPath)) {
+      if (this.state[status as DecorationStatus]?.has(path)) {
         return status
       }
-    }) as Status
+    }) as DecorationStatus
 
     if (decoration) {
       return this.decorationMapping[decoration]
     }
-    if (this.state.tracked?.has(uri.fsPath)) {
+    if (this.state.tracked?.has(path)) {
       return DecorationProvider.DecorationTracked
     }
   }

@@ -1,54 +1,24 @@
 import { join } from 'path'
 import { DvcCli } from '.'
-import {
-  Args,
-  Command,
-  ExperimentFlag,
-  Flag,
-  ListFlag,
-  SubCommand
-} from './constants'
+import { Args, Command, ExperimentFlag, Flag, SubCommand } from './constants'
 import { retry } from './retry'
 import { typeCheckCommands } from '..'
 import { trim, trimAndSplit } from '../../util/stdout'
 import { Plot } from '../../plots/webview/contract'
 
-export type PathOutput = { path: string }
-
-export type DiffOutput = {
-  added?: PathOutput[]
-  deleted?: PathOutput[]
-  modified?: PathOutput[]
-  renamed?: { path: { old: string; new: string } }[]
-  'not in cache'?: PathOutput[]
+type Changes = {
+  added?: string[]
+  deleted?: string[]
+  modified?: string[]
+  renamed?: { new: string; old: string }[]
 }
 
-export type ListOutput = {
-  isdir: boolean
-  isexec: boolean
-  isout: boolean
-  path: string
+export type DataStatusOutput = {
+  committed?: Changes
+  not_in_cache?: string[]
+  unchanged?: string[]
+  uncommitted?: Changes
 }
-
-export enum Status {
-  DELETED = 'deleted',
-  MODIFIED = 'modified',
-  NEW = 'new',
-  NOT_IN_CACHE = 'not in cache'
-}
-
-export enum ChangedType {
-  CHANGED_OUTS = 'changed outs',
-  CHANGED_DEPS = 'changed deps'
-}
-
-export type PathStatus = Record<string, Status>
-
-export type StageOrFileStatuses = Partial<Record<ChangedType, PathStatus>>
-
-export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
-
-export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 type SingleValue = string | number | boolean | null
 export type Value = SingleValue | SingleValue[]
@@ -120,11 +90,9 @@ export interface PlotsOutput {
 export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
 
 export const autoRegisteredCommands = {
-  DIFF: 'diff',
+  DATA_STATUS: 'dataStatus',
   EXP_SHOW: 'expShow',
-  LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
-  PLOTS_DIFF: 'plotsDiff',
-  STATUS: 'status'
+  PLOTS_DIFF: 'plotsDiff'
 } as const
 
 export class DvcReader extends DvcCli {
@@ -132,6 +100,18 @@ export class DvcReader extends DvcCli {
     autoRegisteredCommands,
     this
   )
+
+  public dataStatus(cwd: string, ...args: Args) {
+    return this.readProcessJson<DataStatusOutput>(
+      cwd,
+      Command.DATA,
+      SubCommand.STATUS,
+      Flag.WITH_DIRS,
+      Flag.GRANULAR,
+      Flag.UNCHANGED,
+      ...args
+    )
+  }
 
   public expShow(
     cwd: string,
@@ -144,21 +124,7 @@ export class DvcReader extends DvcCli {
       Command.EXPERIMENT,
       SubCommand.SHOW,
       ...flags,
-      Flag.SHOW_JSON
-    )
-  }
-
-  public diff(cwd: string): Promise<DiffOutput> {
-    return this.readProcessJson<DiffOutput>(cwd, Command.DIFF)
-  }
-
-  public listDvcOnlyRecursive(cwd: string): Promise<ListOutput[]> {
-    return this.readProcessJson<ListOutput[]>(
-      cwd,
-      Command.LIST,
-      ListFlag.LOCAL_REPO,
-      ListFlag.DVC_ONLY,
-      Flag.RECURSIVE
+      Flag.JSON
     )
   }
 
@@ -166,7 +132,7 @@ export class DvcReader extends DvcCli {
     return this.readProcessJson<PlotsOutput>(
       cwd,
       Command.PLOTS,
-      Command.DIFF,
+      SubCommand.DIFF,
       ...revisions,
       Flag.OUTPUT_PATH,
       TEMP_PLOTS_DIR,
@@ -178,10 +144,6 @@ export class DvcReader extends DvcCli {
     try {
       return await this.executeDvcProcess(cwd, Command.ROOT)
     } catch {}
-  }
-
-  public status(cwd: string): Promise<StatusOutput> {
-    return this.readProcessJson<StatusOutput>(cwd, Command.STATUS)
   }
 
   public version(cwd: string): Promise<string> {
@@ -212,7 +174,7 @@ export class DvcReader extends DvcCli {
       '{}',
       command,
       ...args,
-      Flag.SHOW_JSON
+      Flag.JSON
     )
   }
 }

@@ -8,34 +8,36 @@ export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',
   COMMIT = 'commit',
-  DIFF = 'diff',
+  DATA = 'data',
   EXPERIMENT = 'exp',
   INITIALIZE = 'init',
-  LIST = 'list',
   MOVE = 'move',
   PLOTS = 'plots',
   PULL = 'pull',
   PUSH = 'push',
   REMOVE = 'remove',
   ROOT = 'root',
-  STATUS = 'status',
   PARAMS = 'params',
   METRICS = 'metrics'
 }
 
 export enum SubCommand {
+  DIFF = 'diff',
+  STATUS = 'status',
   SHOW = 'show'
 }
 
 export enum Flag {
   FORCE = '-f',
+  GRANULAR = '--granular',
+  JSON = '--json',
   OUTPUT_PATH = '-o',
-  RECURSIVE = '-R',
-  SHOW_JSON = '--show-json',
   SUBDIRECTORY = '--subdir',
   SET_PARAM = '-S',
   SPLIT = '--split',
-  VERSION = '--version'
+  UNCHANGED = '--unchanged',
+  VERSION = '--version',
+  WITH_DIRS = '--with-dirs'
 }
 
 export enum ExperimentSubCommand {
@@ -61,13 +63,8 @@ export enum GcPreserveFlag {
   WORKSPACE = '--workspace'
 }
 
-export enum ListFlag {
-  LOCAL_REPO = '.',
-  DVC_ONLY = '--dvc-only'
-}
-
 type Target = string
 
-type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag
+type Flags = Flag | ExperimentFlag | GcPreserveFlag
 
 export type Args = (Command | Target | ExperimentSubCommand | Flags)[]

@@ -15,3 +15,6 @@ export const getParent = (pathArray: string[], idx: number) => {
   }
   return parent
 }
+
+export const removeTrailingSlash = (path: string): string =>
+  path.endsWith(sep) ? path.slice(0, -1) : path

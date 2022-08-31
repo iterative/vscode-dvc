@@ -18,6 +18,7 @@ import * as Workspace from '../../../fileSystem/workspace'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import {
   activeTextEditorChangedEvent,
+  buildDependencies,
   closeAllEditors,
   getActiveTextEditorFilename,
   stubPrivatePrototypeMethod
@@ -29,9 +30,7 @@ import {
 } from '../../../commands/external'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
-import { buildExperiments } from '../experiments/util'
 import { Repository } from '../../../repository'
-import expShowFixture from '../../fixtures/expShow/output'
 import { WorkspaceRepositories } from '../../../repository/workspace'
 import { TrackedExplorerTree } from '../../../fileSystem/tree'
 
@@ -284,57 +283,24 @@ suite('Tracked Explorer Tree Test Suite', () => {
     })
 
     it('should pull the correct target(s) when asked to dvc.pullTarget a non-tracked directory', async () => {
-      const { dvcReader, experiments, internalCommands, updatesPaused } =
-        buildExperiments(disposable)
+      const { dvcReader, gitReader, internalCommands, updatesPaused } =
+        buildDependencies(disposable)
 
-      await experiments.isReady()
-
-      stub(dvcReader, 'listDvcOnlyRecursive').resolves([
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'data/data.xml'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'data/features/test.pkl'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'data/features/train.pkl'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'data/prepared/test.tsv'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'data/prepared/train.tsv'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'evaluation/importance.png'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'model.pkl'
-        }
-      ])
-      stub(dvcReader, 'status').resolves({})
-      stub(dvcReader, 'diff').resolves({})
+      stub(dvcReader, 'dataStatus').resolves({
+        unchanged: [
+          join('data', 'data.xml'),
+          join('data', 'features'),
+          join('data', 'features', 'test.pkl'),
+          join('data', 'features', 'train.pkl'),
+          join('data', 'prepared'),
+          join('data', 'prepared', 'test.tsv'),
+          join('data', 'prepared', 'train.tsv'),
+          join('evaluation', 'importance.png'),
+          'model.pkl'
+        ]
+      })
+      stub(gitReader, 'listUntracked').resolves(new Set())
+      stub(gitReader, 'hasChanges').resolves(false)
 
       const repository = disposable.track(
         new Repository(
@@ -344,15 +310,6 @@ suite('Tracked Explorer Tree Test Suite', () => {
           new EventEmitter<void>()
         )
       )
-
-      const experimentDataUpdatedEvent = new Promise(resolve =>
-        disposable.track(
-          experiments.onDidChangeExperiments(() => resolve(undefined))
-        )
-      )
-
-      repository.setExperiments(experiments)
-      experiments.setState(expShowFixture)
 
       stub(WorkspaceRepositories.prototype, 'getRepository').returns(repository)
       stub(WorkspaceRepositories.prototype, 'isReady').resolves(undefined)
@@ -364,7 +321,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target pulled'
       )
 
-      await Promise.all([repository.isReady(), experimentDataUpdatedEvent])
+      await repository.isReady()
 
       await commands.executeCommand(
         RegisteredCliCommands.PULL_TARGET,

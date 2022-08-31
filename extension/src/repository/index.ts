@@ -1,11 +1,10 @@
 import { EventEmitter } from 'vscode'
-import { DecorationProvider } from './decorationProvider'
+import { DecorationProvider, DecorationState } from './decorationProvider'
 import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
-import { SourceControlManagement } from './sourceControlManagement'
+import { SourceControlManagement, SCMState } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
-import { Experiments } from '../experiments'
 
 export const RepositoryScale = {
   TRACKED: 'tracked'
@@ -36,10 +35,12 @@ export class Repository extends DeferredDisposable {
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
     this.sourceControlManagement = this.dispose.track(
-      new SourceControlManagement(
-        this.dvcRoot,
-        this.model.getSourceControlManagementState()
-      )
+      new SourceControlManagement(this.dvcRoot, {
+        committed: [],
+        notInCache: [],
+        uncommitted: [],
+        untracked: []
+      })
     )
 
     this.treeDataChanged = treeDataChanged
@@ -51,35 +52,23 @@ export class Repository extends DeferredDisposable {
     return this.model.getChildren(path)
   }
 
-  public update(path?: string) {
-    return this.data.managedUpdate(path)
+  public update() {
+    return this.data.managedUpdate()
   }
 
   public hasChanges(): boolean {
-    return this.model.hasChanges()
+    return this.model.getHasChanges()
   }
 
   public getScale() {
-    return { tracked: this.model.getDecorationState().tracked.size }
-  }
-
-  public setExperiments(experiments: Experiments) {
-    this.dispose.track(
-      experiments.onDidChangeExperiments(data => {
-        if (data) {
-          this.model.transformAndSetExperiments(data)
-          this.setState()
-        }
-      })
-    )
+    return { tracked: this.model.getScale() }
   }
 
   private async initialize() {
     this.dispose.track(
       this.data.onDidUpdate(data => {
-        this.model.setState(data)
-        this.setState()
-        this.treeDataChanged.fire()
+        const scmAndDecorationState = this.model.transformAndSet(data)
+        this.notifyChanged(scmAndDecorationState)
       })
     )
 
@@ -87,10 +76,15 @@ export class Repository extends DeferredDisposable {
     return this.deferred.resolve()
   }
 
-  private setState() {
-    this.sourceControlManagement.setState(
-      this.model.getSourceControlManagementState()
-    )
-    this.decorationProvider.setState(this.model.getDecorationState())
+  private notifyChanged({
+    decorationState,
+    sourceControlManagementState
+  }: {
+    decorationState: DecorationState
+    sourceControlManagementState: SCMState
+  }) {
+    this.treeDataChanged.fire()
+    this.sourceControlManagement.setState(sourceControlManagementState)
+    this.decorationProvider.setState(decorationState)
   }
 }
