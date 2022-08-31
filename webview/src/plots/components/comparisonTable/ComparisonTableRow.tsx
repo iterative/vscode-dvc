@@ -83,6 +83,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                   </div>
                 ) : (
                   <img
+                    draggable={false}
                     src={plot.url}
                     alt={`Plot of ${path} (${plot.revision})`}
                   />
