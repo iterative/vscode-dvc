@@ -45,7 +45,9 @@ describe('ComparisonTableRow', () => {
         })}
       >
         <table>
-          <ComparisonTableRow {...props} />
+          <tbody>
+            <ComparisonTableRow {...props} />
+          </tbody>
         </table>
       </Provider>
     )

@@ -55,6 +55,8 @@ export const EventName = Object.assign(
       'views.experimentsTable.columnSortAdded',
 
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
+    VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
+      'views.plots.comparisonRowsReordered',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
@@ -225,6 +227,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: { revisions: number }
   [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
+  [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: { section: Section; size: PlotSize }
   [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined

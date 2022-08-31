@@ -3,11 +3,11 @@ import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { ComparisonTableRow } from './ComparisonTableRow'
 import {
   ComparisonTableColumn,
   ComparisonTableHead
 } from './ComparisonTableHead'
+import { ComparisionTableRows } from './ComparisonTableRows'
 import plotsStyles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
@@ -53,7 +53,9 @@ export const ComparisonTable: React.FC = () => {
     [revisions, getPinnedColumnRevision]
   )
 
-  useEffect(() => setComparisonPlots(plots), [plots])
+  useEffect(() => {
+    setComparisonPlots(plots)
+  }, [plots])
 
   if (!plots || plots.length === 0) {
     return <EmptyState isFullScreen={false}>No Images to Compare</EmptyState>
@@ -92,18 +94,11 @@ export const ComparisonTable: React.FC = () => {
         setColumnsOrder={setColumnsOrder}
         setPinnedColumn={changePinnedColumn}
       />
-      {comparisonPlots.map(({ path, revisions: revs }) => (
-        <ComparisonTableRow
-          key={path}
-          path={path}
-          plots={columns.map(column => ({
-            ...revs[column.revision],
-            revision: column.revision
-          }))}
-          nbColumns={columns.length}
-          pinnedColumn={pinnedColumn.current}
-        />
-      ))}
+      <ComparisionTableRows
+        plots={comparisonPlots}
+        columns={columns}
+        pinnedColumn={pinnedColumn.current}
+      />
     </table>
   )
 }

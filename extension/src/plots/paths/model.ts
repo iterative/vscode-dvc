@@ -9,14 +9,20 @@ import {
 import { PlotsOutput } from '../../cli/dvc/reader'
 import { PathSelectionModel } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
+import { performSimpleOrderedUpdate } from '../../util/array'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private templateOrder: TemplateOrder
+  private comparisonPathsOrder: string[]
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState, PersistenceKey.PLOT_PATH_STATUS)
 
     this.templateOrder = this.revive(PersistenceKey.PLOT_TEMPLATE_ORDER, [])
+    this.comparisonPathsOrder = this.revive(
+      PersistenceKey.PLOT_COMPARISON_PATHS_ORDER,
+      []
+    )
   }
 
   public transformAndSet(data: PlotsOutput) {
@@ -62,7 +68,18 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public getComparisonPaths() {
-    return this.getPathsByType(PathType.COMPARISON)
+    return performSimpleOrderedUpdate(
+      this.comparisonPathsOrder,
+      this.getPathsByType(PathType.COMPARISON)
+    )
+  }
+
+  public setComparisonPathsOrder(order: string[]) {
+    this.comparisonPathsOrder = order
+    this.persist(
+      PersistenceKey.PLOT_COMPARISON_PATHS_ORDER,
+      this.comparisonPathsOrder
+    )
   }
 
   public hasPaths() {
