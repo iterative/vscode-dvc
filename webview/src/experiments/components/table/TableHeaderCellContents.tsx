@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
@@ -89,7 +89,13 @@ export const TableHeaderCellContents: React.FC<{
   setMenuSuppressed,
   resizerHeight
 }) => {
+  const [isResizing, setIsResizing] = useState(false)
   const isTimestamp = column.group === ColumnType.TIMESTAMP
+
+  useEffect(() => {
+    setIsResizing(column.isResizing)
+  }, [column.isResizing])
+
   return (
     <>
       <div
@@ -109,7 +115,7 @@ export const TableHeaderCellContents: React.FC<{
           {...column.getResizerProps()}
           onMouseEnter={() => setMenuSuppressed(true)}
           onMouseLeave={() => setMenuSuppressed(false)}
-          className={styles.columnResizer}
+          className={cx(styles.columnResizer, isResizing && styles.isResizing)}
           style={{ height: resizerHeight }}
         />
       )}
