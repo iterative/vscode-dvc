@@ -1,6 +1,7 @@
 import { relative } from 'path'
 import {
   Event,
+  ThemeColor,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -89,7 +90,15 @@ export class TrackedExplorerTree
     return []
   }
 
-  public getTreeItem({ isDirectory, resourceUri }: PathItem): TreeItem {
+  public getTreeItem({ isDirectory, resourceUri, error }: PathItem): TreeItem {
+    if (error) {
+      const treeItem = new TreeItem(error, TreeItemCollapsibleState.None)
+      treeItem.iconPath = new ThemeIcon(
+        'error',
+        new ThemeColor('errorForeground')
+      )
+      return treeItem
+    }
     const treeItem = new TreeItem(
       resourceUri,
       isDirectory

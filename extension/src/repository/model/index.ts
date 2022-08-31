@@ -4,6 +4,7 @@ import omit from 'lodash.omit'
 import {
   collectDataStatus,
   collectTree,
+  createDataStatusAccumulator,
   DataStatusAccumulator,
   PathItem
 } from './collect'
@@ -15,11 +16,12 @@ import {
   SCMState,
   SourceControlStatus
 } from '../sourceControlManagement'
-import { DataStatusOutput } from '../../cli/dvc/reader'
+import { DataStatusOutput, DvcError } from '../../cli/dvc/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'
 import { isDirectory } from '../../fileSystem'
+import { isDvcError } from '../../cli/dvc/error'
 
 export class RepositoryModel extends Disposable {
   private readonly dvcRoot: string
@@ -45,6 +47,10 @@ export class RepositoryModel extends Disposable {
   }
 
   public transformAndSet({ dataStatus, hasGitChanges, untracked }: Data) {
+    if (isDvcError(dataStatus)) {
+      return this.handleError(dataStatus)
+    }
+
     const data = this.collectDataStatus({
       ...dataStatus,
       untracked: [...untracked].map(path => relative(this.dvcRoot, path))
@@ -60,6 +66,31 @@ export class RepositoryModel extends Disposable {
 
   public getHasChanges(): boolean {
     return this.hasChanges
+  }
+
+  private handleError(dataStatus: DvcError) {
+    const data = createDataStatusAccumulator()
+    this.hasChanges = true
+    this.tracked = new Set()
+    this.tree = new Map([
+      [
+        this.dvcRoot,
+        [
+          {
+            dvcRoot: this.dvcRoot,
+            error: dataStatus.error.msg,
+            isDirectory: false,
+            isTracked: false,
+            resourceUri: Uri.file(this.dvcRoot)
+          }
+        ]
+      ]
+    ])
+
+    return {
+      scmDecorationState: this.getScmDecorationState(data),
+      sourceControlManagementState: this.getSourceControlManagementState(data)
+    }
   }
 
   private collectTree(tracked: Set<string>): void {

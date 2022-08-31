@@ -176,7 +176,7 @@ const collectMappingFromGroup = (
   return dataStatusMapping
 }
 
-const createDataStatusAccumulator = (): DataStatusAccumulator => {
+export const createDataStatusAccumulator = (): DataStatusAccumulator => {
   const acc = {} as DataStatusAccumulator
   for (const status of Object.values(AvailableDataStatus)) {
     acc[status] = new Set<string>()
@@ -240,6 +240,7 @@ export const collectDataStatus = (
 }
 
 export type PathItem = Resource & {
+  error?: string
   isDirectory: boolean
   isTracked: boolean
 }
