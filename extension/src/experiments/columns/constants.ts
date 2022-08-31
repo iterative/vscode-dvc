@@ -1,8 +1,11 @@
-import { ColumnType } from '../webview/contract'
+import { Column, ColumnType } from '../webview/contract'
 
-export const timestampColumn = {
+const type = ColumnType.TIMESTAMP
+
+export const timestampColumn: Column = {
   hasChildren: false,
   label: 'Created',
   path: 'Created',
-  type: ColumnType.TIMESTAMP
+  type,
+  types: [type]
 }
