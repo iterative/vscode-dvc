@@ -38,7 +38,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   }
 
   return (
-    <tbody>
+    <>
       <tr>
         <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
           <div className={styles.rowPath}>
@@ -83,6 +83,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                   </div>
                 ) : (
                   <img
+                    draggable={false}
                     src={plot.url}
                     alt={`Plot of ${path} (${plot.revision})`}
                   />
@@ -92,6 +93,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           )
         })}
       </tr>
-    </tbody>
+    </>
   )
 }

@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { VisualizationSpec } from 'react-vega'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
@@ -44,13 +44,14 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 }) => {
   const [order, setOrder] = useState<string[]>([])
   const [disabledDrag, setDisabledDrag] = useState('')
+  const nbVegaPanels = useRef(0)
 
   useEffect(() => {
     setOrder(entries.map(({ id }) => id))
   }, [entries])
 
-  useEffect(() => {
-    const panels = document.querySelectorAll('.vega-bindings')
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  const layoutEffect = () => {
     const addDisabled = (e: Event) => {
       setDisabledDrag(
         (e.currentTarget as HTMLFormElement).parentElement?.parentElement
@@ -66,13 +67,18 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       e.stopPropagation()
     }
 
-    for (const panel of Object.values(panels)) {
-      panel.removeEventListener('mouseenter', addDisabled)
-      panel.removeEventListener('mouseleave', removeDisabled)
-      panel.removeEventListener('click', disableClick)
-      panel.addEventListener('mouseenter', addDisabled)
-      panel.addEventListener('mouseleave', removeDisabled)
-      panel.addEventListener('click', disableClick)
+    const panels = document.querySelectorAll('.vega-bindings')
+    if (panels.length > nbVegaPanels.current) {
+      for (const panel of Object.values(panels)) {
+        panel.removeEventListener('mouseenter', addDisabled)
+        panel.removeEventListener('mouseleave', removeDisabled)
+        panel.removeEventListener('click', disableClick)
+        panel.addEventListener('mouseenter', addDisabled)
+        panel.addEventListener('mouseleave', removeDisabled)
+        panel.addEventListener('click', disableClick)
+      }
+
+      nbVegaPanels.current = panels.length
     }
 
     return () => {
@@ -82,7 +88,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         panel.removeEventListener('click', disableClick)
       }
     }
-  })
+  }
 
   const setEntriesOrder = (order: string[]) => {
     setOrder(order)
@@ -141,6 +147,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       }
       parentDraggedOver={parentDraggedOver}
       disabledDropIds={[disabledDrag]}
+      onLayoutChange={layoutEffect}
     />
   )
 }

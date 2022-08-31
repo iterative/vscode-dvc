@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { ColorScale } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { performSimpleOrderedUpdate } from 'dvc/src/util/array'
 import { CheckpointPlot } from './CheckpointPlot'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
@@ -10,7 +11,6 @@ import {
   DragDropContainer,
   WrapperProps
 } from '../../../shared/components/dragDrop/DragDropContainer'
-import { performSimpleOrderedUpdate } from '../../../util/objects'
 import { sendMessage } from '../../../shared/vscode'
 import { DropTarget } from '../DropTarget'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'

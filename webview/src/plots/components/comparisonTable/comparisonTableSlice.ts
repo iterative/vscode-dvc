@@ -10,12 +10,16 @@ import {
 export interface ComparisonTableState extends PlotsComparisonData {
   isCollapsed: boolean
   hasData: boolean
+  rowHeight: number
 }
+
+export const DEFAULT_ROW_HEIGHT = 200
 
 export const comparisonTableInitialState: ComparisonTableState = {
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.COMPARISON_TABLE],
   plots: [],
+  rowHeight: DEFAULT_ROW_HEIGHT,
   size: DEFAULT_SECTION_SIZES[Section.COMPARISON_TABLE]
 }
 
@@ -23,6 +27,9 @@ export const comparisonTableSlice = createSlice({
   initialState: comparisonTableInitialState,
   name: 'comparison',
   reducers: {
+    changeRowHeight: (state, action: PayloadAction<number>) => {
+      state.rowHeight = action.payload
+    },
     changeSize: (state, action: PayloadAction<PlotSize>) => {
       state.size = action.payload
     },
@@ -42,6 +49,7 @@ export const comparisonTableSlice = createSlice({
   }
 })
 
-export const { update, setCollapsed, changeSize } = comparisonTableSlice.actions
+export const { update, setCollapsed, changeSize, changeRowHeight } =
+  comparisonTableSlice.actions
 
 export default comparisonTableSlice.reducer
