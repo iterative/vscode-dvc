@@ -620,7 +620,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   touch-action: none;
   cursor: col-resize;
 
-  &:hover::after {
+  &::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -628,6 +628,12 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     width: 2px;
     height: 100%;
     background-color: $header-resizer-color;
+    display: none;
+  }
+
+  &:hover::after,
+  &.isResizing::after {
+    display: block;
   }
 }
 
@@ -809,4 +815,9 @@ $badge-size: 0.85rem;
 
 .noSelect {
   user-select: none;
+}
+
+.isColumnResizing {
+  @extend .noSelect;
+  cursor: col-resize;
 }

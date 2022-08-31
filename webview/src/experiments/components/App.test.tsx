@@ -1085,7 +1085,7 @@ describe('App', () => {
   it('should disable text selection while resizing', async () => {
     renderTable()
 
-    expect(document.body).not.toHaveClass(styles.noSelect)
+    expect(document.body).not.toHaveClass(styles.isColumnResizing)
 
     const [experimentColumnResizeHandle] = await screen.findAllByRole(
       'separator'
@@ -1093,10 +1093,10 @@ describe('App', () => {
 
     fireEvent.mouseDown(experimentColumnResizeHandle)
 
-    expect(document.body).toHaveClass(styles.noSelect)
+    expect(document.body).toHaveClass(styles.isColumnResizing)
 
     fireEvent.mouseUp(experimentColumnResizeHandle)
 
-    expect(document.body).not.toHaveClass(styles.noSelect)
+    expect(document.body).not.toHaveClass(styles.isColumnResizing)
   })
 })
