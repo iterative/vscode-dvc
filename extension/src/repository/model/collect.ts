@@ -240,7 +240,7 @@ export const collectDataStatus = (
 }
 
 export type PathItem = Resource & {
-  error?: string
+  error?: { uri: Uri; msg: string }
   isDirectory: boolean
   isTracked: boolean
 }

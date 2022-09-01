@@ -1,7 +1,6 @@
 import { relative } from 'path'
 import {
   Event,
-  ThemeColor,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -38,6 +37,7 @@ import { Title } from '../vscode/title'
 import { Disposable } from '../class/dispose'
 import { createTreeView } from '../vscode/tree'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
+import { getMarkdownString } from '../vscode/markdownString'
 
 export class TrackedExplorerTree
   extends Disposable
@@ -92,11 +92,13 @@ export class TrackedExplorerTree
 
   public getTreeItem({ isDirectory, resourceUri, error }: PathItem): TreeItem {
     if (error) {
-      const treeItem = new TreeItem(error, TreeItemCollapsibleState.None)
-      treeItem.iconPath = new ThemeIcon(
-        'error',
-        new ThemeColor('errorForeground')
-      )
+      const treeItem = new TreeItem(error.uri, TreeItemCollapsibleState.None)
+      treeItem.tooltip = getMarkdownString(`$(error) ${error.msg}`)
+      treeItem.iconPath = new ThemeIcon('blank')
+      treeItem.command = {
+        command: 'dvc.showOutput',
+        title: 'WAT'
+      }
       return treeItem
     }
     const treeItem = new TreeItem(

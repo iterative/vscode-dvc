@@ -14,7 +14,7 @@ const mockedDisposable = jest.mocked(Disposable)
 beforeEach(() => {
   jest.resetAllMocks()
 
-  mockedDisposable.fn.mockReturnValueOnce({
+  mockedDisposable.fn.mockReturnValue({
     track: function <T>(disposable: T): T {
       return disposable
     }
