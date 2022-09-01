@@ -96,8 +96,8 @@ export class TrackedExplorerTree
       treeItem.tooltip = getMarkdownString(`$(error) ${error.msg}`)
       treeItem.iconPath = new ThemeIcon('blank')
       treeItem.command = {
-        command: 'dvc.showOutput',
-        title: 'WAT'
+        command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
+        title: 'Show DVC Output'
       }
       return treeItem
     }
