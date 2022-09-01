@@ -103,12 +103,14 @@ describe('DecorationProvider', () => {
       committedDeleted,
       committedModified: emptySet,
       committedRenamed: emptySet,
+      committedUnknown: emptySet,
       notInCache: emptySet,
       tracked: emptySet,
       uncommittedAdded: emptySet,
       uncommittedDeleted: emptySet,
       uncommittedModified,
-      uncommittedRenamed: emptySet
+      uncommittedRenamed: emptySet,
+      uncommittedUnknown: emptySet
     }
 
     const updatedState = {
@@ -116,12 +118,14 @@ describe('DecorationProvider', () => {
       committedDeleted,
       committedModified: emptySet,
       committedRenamed: emptySet,
+      committedUnknown: emptySet,
       notInCache,
       tracked,
       uncommittedAdded: emptySet,
       uncommittedDeleted: emptySet,
       uncommittedModified: emptySet,
-      uncommittedRenamed: emptySet
+      uncommittedRenamed: emptySet,
+      uncommittedUnknown: emptySet
     }
 
     expect(initialState.committedAdded).toStrictEqual(
@@ -171,6 +175,7 @@ describe('DecorationProvider', () => {
       committedDeleted: emptySet,
       committedModified: new Set([dataDir]),
       committedRenamed: emptySet,
+      committedUnknown: emptySet,
       notInCache: logs,
       tracked: new Set([
         model,
@@ -185,7 +190,8 @@ describe('DecorationProvider', () => {
       uncommittedAdded: new Set([dataCsv]),
       uncommittedDeleted: logs,
       uncommittedModified: new Set([dataDir]),
-      uncommittedRenamed: emptySet
+      uncommittedRenamed: emptySet,
+      uncommittedUnknown: emptySet
     }
 
     const decorationProvider = new DecorationProvider(mockedDecorationsChanged)

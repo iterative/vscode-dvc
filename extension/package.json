@@ -901,7 +901,7 @@
         {
           "command": "dvc.checkoutTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && scmResourceState != notInCache && dvc.commands.available && !dvc.scm.command.running"
+          "when": "scmProvider == dvc && scmResourceGroup == uncommitted && scmResourceState != uncommittedUnknown && scmResourceState != notInCache && dvc.commands.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.commitTarget",

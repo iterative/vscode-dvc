@@ -78,12 +78,14 @@ suite('Repository Test Suite', () => {
         committedDeleted: emptySet,
         committedModified: emptySet,
         committedRenamed: emptySet,
+        committedUnknown: emptySet,
         notInCache: emptySet,
         tracked: modified,
         uncommittedAdded: emptySet,
         uncommittedDeleted: emptySet,
         uncommittedModified: modified,
-        uncommittedRenamed: emptySet
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
       })
 
       expect(setScmStateSpy.lastCall.firstArg).to.deep.equal({
@@ -234,12 +236,14 @@ suite('Repository Test Suite', () => {
         committedDeleted: emptySet,
         committedModified: emptySet,
         committedRenamed: emptySet,
+        committedUnknown: emptySet,
         notInCache: emptySet,
         tracked: emptySet,
         uncommittedAdded: emptySet,
         uncommittedDeleted: emptySet,
         uncommittedModified: emptySet,
-        uncommittedRenamed: emptySet
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
       })
 
       expect(setScmStateSpy.lastCall.firstArg).to.deep.equal({
@@ -262,12 +266,14 @@ suite('Repository Test Suite', () => {
         committedDeleted: emptySet,
         committedModified: emptySet,
         committedRenamed: emptySet,
+        committedUnknown: emptySet,
         notInCache,
         tracked,
         uncommittedAdded: emptySet,
         uncommittedDeleted,
         uncommittedModified,
-        uncommittedRenamed: emptySet
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
       })
       expect(setScmStateSpy.lastCall.firstArg).to.deep.equal({
         committed: [],

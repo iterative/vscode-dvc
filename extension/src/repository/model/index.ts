@@ -100,11 +100,13 @@ export class RepositoryModel extends Disposable {
     committedDeleted,
     committedModified,
     committedRenamed,
+    committedUnknown,
     notInCache,
     uncommittedAdded,
     uncommittedDeleted,
     uncommittedModified,
     uncommittedRenamed,
+    uncommittedUnknown,
     untracked
   }: SourceControlResourceGroupData): SCMState {
     return {
@@ -113,7 +115,8 @@ export class RepositoryModel extends Disposable {
           committedAdded,
           committedDeleted,
           committedModified,
-          committedRenamed
+          committedRenamed,
+          committedUnknown
         },
         notInCache
       ),
@@ -123,7 +126,8 @@ export class RepositoryModel extends Disposable {
           uncommittedAdded,
           uncommittedDeleted,
           uncommittedModified,
-          uncommittedRenamed
+          uncommittedRenamed,
+          uncommittedUnknown
         },
         notInCache
       ),

@@ -11,6 +11,7 @@ export type Changes = {
   deleted?: string[]
   modified?: string[]
   renamed?: { new: string; old: string }[]
+  unknown?: string[]
 }
 
 export type DataStatusOutput = {
