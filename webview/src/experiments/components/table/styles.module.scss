@@ -271,7 +271,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .tableContainer {
     overflow: auto;
     flex: 1;
-    background-color: $view-bg-color;
+    background-color: $experiments-view-bg-color;
   }
   .table {
     display: inline-block;
