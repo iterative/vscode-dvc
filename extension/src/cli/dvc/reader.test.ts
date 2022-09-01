@@ -138,14 +138,7 @@ describe('CliReader', () => {
       expect(statusOutput).toStrictEqual(cliOutput)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: [
-          'data',
-          'status',
-          '--with-dirs',
-          '--granular',
-          '--unchanged',
-          JSON_FLAG
-        ],
+        args: ['data', 'status', '--granular', '--unchanged', JSON_FLAG],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

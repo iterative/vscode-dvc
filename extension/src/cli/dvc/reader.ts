@@ -107,7 +107,6 @@ export class DvcReader extends DvcCli {
       cwd,
       Command.DATA,
       SubCommand.STATUS,
-      Flag.WITH_DIRS,
       Flag.GRANULAR,
       Flag.UNCHANGED,
       ...args
