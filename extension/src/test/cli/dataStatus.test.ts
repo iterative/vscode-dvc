@@ -30,6 +30,9 @@ suite('data status --granular --unchanged --show-json', () => {
         join('training_metrics', 'scalars', 'loss.tsv')
       ].sort()
 
+      // eslint-disable-next-line no-console
+      console.error(JSON.stringify(output))
+
       const collectedPaths = [
         ...(output.committed?.modified || []),
         ...(output.unchanged || [])
