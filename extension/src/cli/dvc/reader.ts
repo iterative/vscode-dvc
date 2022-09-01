@@ -1,10 +1,10 @@
 import { join } from 'path'
 import { DvcCli } from '.'
 import { Args, Command, ExperimentFlag, Flag, SubCommand } from './constants'
-import { retry } from './retry'
 import { typeCheckCommands } from '..'
 import { trim, trimAndSplit } from '../../util/stdout'
 import { Plot } from '../../plots/webview/contract'
+import { Logger } from '../../common/logger'
 
 export type Changes = {
   added?: string[]
@@ -156,11 +156,16 @@ export class DvcReader extends DvcCli {
     defaultValue: string,
     ...args: Args
   ): Promise<T> {
-    const output =
-      (await retry(
-        () => this.executeDvcProcess(cwd, ...args),
-        args.join(' ')
-      )) || defaultValue
+    let output
+    try {
+      output = await this.executeDvcProcess(cwd, ...args)
+    } catch (error: unknown) {
+      const errorMessage = (error as Error).message
+      Logger.error(`${args} failed with ${errorMessage} retrying...`)
+    }
+
+    output = output || defaultValue
+
     if (!formatter) {
       return output as unknown as T
     }
