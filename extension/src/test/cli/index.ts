@@ -19,7 +19,11 @@ async function main() {
       'ts',
       async () => {
         await mkdirp(TEMP_DIR)
-        await setupVenv(TEMP_DIR, ENV_DIR, 'dvc[s3]')
+        await setupVenv(
+          TEMP_DIR,
+          ENV_DIR,
+          'git+https://github.com/skshetry/dvc@fix-paths#egg=dvc[s3]'
+        )
       },
       () => {
         removeDir(TEMP_DIR)
