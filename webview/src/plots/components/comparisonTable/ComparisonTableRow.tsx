@@ -10,6 +10,7 @@ import { sendMessage } from '../../../shared/vscode'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
+import { isSelecting } from '../../../util/strings'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -30,18 +31,14 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   const [isShown, setIsShown] = useState(true)
 
   const toggleIsShownState = () => {
-    const selection = window.getSelection()
-    if (
-      selection?.focusNode?.nodeValue === path &&
-      selection.anchorOffset !== selection.focusOffset
-    ) {
+    if (isSelecting([path])) {
       return
     }
     setIsShown(!isShown)
   }
 
   return (
-    <tbody>
+    <>
       <tr>
         <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
           <div className={styles.rowPath}>
@@ -86,6 +83,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                   </div>
                 ) : (
                   <img
+                    draggable={false}
                     src={plot.url}
                     alt={`Plot of ${path} (${plot.revision})`}
                   />
@@ -95,6 +93,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           )
         })}
       </tr>
-    </tbody>
+    </>
   )
 }

@@ -1,13 +1,12 @@
-import { join, resolve, sep } from 'path'
+import { join } from 'path'
+import { Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { RepositoryModel } from '.'
-import {
-  ExperimentsOutput,
-  ListOutput,
-  StatusOutput
-} from '../../cli/dvc/reader'
 import { dvcDemoPath } from '../../test/util'
+import { SourceControlDataStatus } from '../sourceControlManagement'
+import { makeAbsPathSet } from '../../test/util/path'
 
+jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
 const mockedDisposable = jest.mocked(Disposable)
@@ -22,829 +21,214 @@ beforeEach(() => {
   } as unknown as (() => void) & Disposer)
 })
 
-describe('RepositoryState', () => {
+describe('RepositoryModel', () => {
   const emptySet = new Set()
 
-  describe('updateStatus', () => {
-    it('should correctly process the outputs of list, diff and status', () => {
-      const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
-      const logDir = 'logs'
-      const scalarDir = join(logDir, 'scalar')
-      const logAcc = join(scalarDir, 'acc.tsv')
-      const logLoss = join(scalarDir, 'loss.tsv')
-      const output = 'model.pt'
-      const predictions = 'predictions.json'
-      const rawDataDir = join('data', 'MNIST', 'raw')
-      const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
+  describe('transformAndSet', () => {
+    const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
+    const logDir = 'logs'
+    const scalarDir = join(logDir, 'scalar')
+    const logAcc = join(scalarDir, 'acc.tsv')
+    const logLoss = join(scalarDir, 'loss.tsv')
+    const output = 'model.pt'
+    const predictions = 'predictions.json'
+    const rawDataDir = join('data', 'MNIST', 'raw')
+    const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
+    const notInCacheDeleted = join(
+      'data',
+      'MNIST',
+      'raw',
+      'train-labels-idx9-ubyte'
+    )
 
-      const list = [
-        { path: deleted },
-        { path: renamed },
-        { path: logAcc },
-        { path: logLoss },
-        { path: output }
-      ] as ListOutput[]
-
-      const diff = {
-        added: [],
-        deleted: [{ path: deleted }],
-        modified: [
-          { path: rawDataDir + sep },
-          { path: logDir + sep },
-          { path: logAcc },
-          { path: logLoss },
-          { path: output },
-          { path: predictions }
-        ],
-        'not in cache': [],
-        renamed: [{ path: { new: renamed, old: 'does not matter' } }]
+    it('should correctly process the output of data status', () => {
+      const dataStatus = {
+        committed: {
+          deleted: [deleted],
+          modified: [output],
+          renamed: [{ new: renamed, old: 'does not matter' }]
+        },
+        not_in_cache: [],
+        unchanged: [predictions],
+        uncommitted: {
+          modified: [rawDataDir, logDir, scalarDir, logAcc, logLoss]
+        },
+        untracked: []
       }
 
-      const status = {
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-        ],
-        train: [
-          { 'changed deps': { 'data/MNIST': 'modified' } },
-          {
-            'changed outs': {
-              [logDir]: 'modified',
-              'predictions.json': 'modified'
-            }
-          },
-          'always changed'
-        ]
-      } as StatusOutput
-
       const model = new RepositoryModel(dvcDemoPath)
-      model.setState({
-        diffFromCache: status,
-        diffFromHead: diff,
-        hasGitChanges: true,
-        tracked: list,
-        untracked: new Set<string>()
+      const { decorationState, sourceControlManagementState } =
+        model.transformAndSet({
+          dataStatus,
+          hasGitChanges: true,
+          untracked: new Set()
+        })
+
+      expect(decorationState).toStrictEqual({
+        committedAdded: emptySet,
+        committedDeleted: makeAbsPathSet(dvcDemoPath, deleted),
+        committedModified: makeAbsPathSet(dvcDemoPath, output),
+        committedRenamed: makeAbsPathSet(dvcDemoPath, renamed),
+        committedUnknown: emptySet,
+        notInCache: emptySet,
+        tracked: makeAbsPathSet(
+          dvcDemoPath,
+          predictions,
+          deleted,
+          output,
+          renamed,
+          rawDataDir,
+          logDir,
+          scalarDir,
+          logAcc,
+          logLoss
+        ),
+        uncommittedAdded: emptySet,
+        uncommittedDeleted: emptySet,
+        uncommittedModified: makeAbsPathSet(
+          dvcDemoPath,
+          rawDataDir,
+          logDir,
+          scalarDir,
+          logAcc,
+          logLoss
+        ),
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
       })
 
-      expect(model.getDecorationState()).toStrictEqual({
-        added: emptySet,
-        deleted: new Set([join(dvcDemoPath, deleted)]),
-        gitModified: new Set([join(dvcDemoPath, output)]),
-        modified: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, logDir),
-          join(dvcDemoPath, scalarDir),
-          join(dvcDemoPath, logAcc),
-          join(dvcDemoPath, logLoss)
-        ]),
-        notInCache: emptySet,
-        renamed: new Set([join(dvcDemoPath, renamed)]),
-        tracked: new Set([
-          ...list.map(entry => join(dvcDemoPath, entry.path)),
-          join(dvcDemoPath, 'data'),
-          join(dvcDemoPath, 'data', 'MNIST'),
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, logDir),
-          join(dvcDemoPath, scalarDir)
-        ])
-      })
-
-      expect(model.getSourceControlManagementState()).toStrictEqual({
-        added: emptySet,
-        deleted: new Set([join(dvcDemoPath, deleted)]),
-        gitModified: new Set([join(dvcDemoPath, output)]),
-        hasRemote: new Set(list.map(entry => join(dvcDemoPath, entry.path))),
-        modified: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, logDir),
-          join(dvcDemoPath, scalarDir),
-          join(dvcDemoPath, logAcc),
-          join(dvcDemoPath, logLoss)
-        ]),
-        notInCache: emptySet,
-        renamed: new Set([join(dvcDemoPath, renamed)]),
-        untracked: emptySet
+      expect(sourceControlManagementState).toStrictEqual({
+        committed: [
+          {
+            contextValue: SourceControlDataStatus.COMMITTED_DELETED,
+            dvcRoot: dvcDemoPath,
+            isDirectory: false,
+            isTracked: true,
+            resourceUri: Uri.file(join(dvcDemoPath, deleted))
+          },
+          {
+            contextValue: SourceControlDataStatus.COMMITTED_MODIFIED,
+            dvcRoot: dvcDemoPath,
+            isDirectory: false,
+            isTracked: true,
+            resourceUri: Uri.file(join(dvcDemoPath, output))
+          },
+          {
+            contextValue: SourceControlDataStatus.COMMITTED_RENAMED,
+            dvcRoot: dvcDemoPath,
+            isDirectory: false,
+            isTracked: true,
+            resourceUri: Uri.file(join(dvcDemoPath, renamed))
+          }
+        ],
+        notInCache: [],
+        uncommitted: [rawDataDir, logDir, scalarDir, logAcc, logLoss].map(
+          path => ({
+            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
+            dvcRoot: dvcDemoPath,
+            isDirectory: [rawDataDir, logDir, scalarDir].includes(path),
+            isTracked: true,
+            resourceUri: Uri.file(join(dvcDemoPath, path))
+          })
+        ),
+        untracked: []
       })
     })
 
-    it('should handle an empty status output', () => {
+    it('should set the context value of resources that are both uncommitted and not in cache to notInCache', () => {
+      const notInCache = [
+        rawDataDir,
+        logDir,
+        scalarDir,
+        logAcc,
+        logLoss,
+        notInCacheDeleted
+      ]
+
+      const dataStatus = {
+        not_in_cache: notInCache,
+        uncommitted: {
+          deleted: notInCache
+        }
+      }
+
+      const model = new RepositoryModel(dvcDemoPath)
+      const { decorationState, sourceControlManagementState } =
+        model.transformAndSet({
+          dataStatus,
+          hasGitChanges: false,
+          untracked: new Set()
+        })
+
+      const absNotInCache = makeAbsPathSet(dvcDemoPath, ...notInCache)
+
+      expect(decorationState).toStrictEqual({
+        committedAdded: emptySet,
+        committedDeleted: emptySet,
+        committedModified: emptySet,
+        committedRenamed: emptySet,
+        committedUnknown: emptySet,
+        notInCache: absNotInCache,
+        tracked: absNotInCache,
+        uncommittedAdded: emptySet,
+        uncommittedDeleted: absNotInCache,
+        uncommittedModified: emptySet,
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
+      })
+
+      const notInCacheScm = notInCache.map(path => ({
+        contextValue: SourceControlDataStatus.NOT_IN_CACHE,
+        dvcRoot: dvcDemoPath,
+        isDirectory: [rawDataDir, logDir, scalarDir].includes(path),
+        isTracked: true,
+        resourceUri: Uri.file(join(dvcDemoPath, path))
+      }))
+
+      expect(sourceControlManagementState).toStrictEqual({
+        committed: [],
+        notInCache: notInCacheScm,
+        uncommitted: notInCacheScm,
+        untracked: []
+      })
+    })
+
+    it('should handle data status output which only has unchanged paths', () => {
       const rawDataDir = join('data', 'MNIST', 'raw')
       const data = join(rawDataDir, 'train-labels-idx2-ubyte')
 
-      const list = [{ path: data }] as ListOutput[]
-
-      const diff = {
-        modified: [{ path: rawDataDir }, { path: data }]
+      const dataStatus = {
+        unchanged: [rawDataDir, data]
       }
 
-      const status = {}
-
       const model = new RepositoryModel(dvcDemoPath)
-      model.setState({
-        diffFromCache: status,
-        diffFromHead: diff,
-        hasGitChanges: true,
-        tracked: list,
-        untracked: new Set<string>()
-      })
+      const { decorationState, sourceControlManagementState } =
+        model.transformAndSet({
+          dataStatus,
+          hasGitChanges: true,
+          untracked: new Set()
+        })
 
-      expect(model.getDecorationState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, data)
-        ]),
-        modified: emptySet,
+      expect(decorationState).toStrictEqual({
+        committedAdded: emptySet,
+        committedDeleted: emptySet,
+        committedModified: emptySet,
+        committedRenamed: emptySet,
+        committedUnknown: emptySet,
         notInCache: emptySet,
-        renamed: emptySet,
-        tracked: new Set([
-          join(dvcDemoPath, data),
-          join(dvcDemoPath, 'data'),
-          join(dvcDemoPath, 'data', 'MNIST'),
-          join(dvcDemoPath, rawDataDir)
-        ])
+        tracked: makeAbsPathSet(dvcDemoPath, rawDataDir, data),
+        uncommittedAdded: emptySet,
+        uncommittedDeleted: emptySet,
+        uncommittedModified: emptySet,
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
       })
 
-      expect(model.getSourceControlManagementState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: new Set([
-          join(dvcDemoPath, rawDataDir),
-          join(dvcDemoPath, data)
-        ]),
-        hasRemote: new Set([join(dvcDemoPath, data)]),
-        modified: emptySet,
-        notInCache: emptySet,
-        renamed: emptySet,
-        untracked: emptySet
-      })
-    })
-
-    it('should handle an empty diff output', () => {
-      const rawDataDir = join('data', 'MNIST', 'raw')
-      const data = join(rawDataDir, 'train-labels-idx3-ubyte')
-
-      const list = [{ path: data }] as ListOutput[]
-
-      const diff = {}
-
-      const status = {
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-        ]
-      } as StatusOutput
-
-      const model = new RepositoryModel(dvcDemoPath)
-      model.setState({
-        diffFromCache: status,
-        diffFromHead: diff,
-        hasGitChanges: true,
-        tracked: list,
-        untracked: new Set<string>()
-      })
-
-      expect(model.getDecorationState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: emptySet,
-        modified: new Set([join(dvcDemoPath, rawDataDir)]),
-        notInCache: emptySet,
-        renamed: emptySet,
-        tracked: new Set([
-          join(dvcDemoPath, 'data'),
-          join(dvcDemoPath, 'data', 'MNIST'),
-          join(dvcDemoPath, data),
-          join(dvcDemoPath, rawDataDir)
-        ])
-      })
-      expect(model.getSourceControlManagementState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: emptySet,
-        hasRemote: new Set([join(dvcDemoPath, data)]),
-        modified: new Set([join(dvcDemoPath, rawDataDir)]),
-        notInCache: emptySet,
-        renamed: emptySet,
-        untracked: emptySet
-      })
-    })
-
-    it('should filter the diff and status down to tracked paths', () => {
-      const diff = {
-        modified: [{ path: 'data/MNIST/raw' }]
-      }
-
-      const status = {
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-        ]
-      } as StatusOutput
-
-      const model = new RepositoryModel(dvcDemoPath)
-      model.setState({
-        diffFromCache: status,
-        diffFromHead: diff,
-        hasGitChanges: false,
-        untracked: new Set<string>()
-      })
-
-      expect(model.getDecorationState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: emptySet,
-        modified: emptySet,
-        notInCache: emptySet,
-        renamed: emptySet,
-        tracked: emptySet
-      })
-      expect(model.getSourceControlManagementState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: emptySet,
-        hasRemote: emptySet,
-        modified: emptySet,
-        notInCache: emptySet,
-        renamed: emptySet,
-        untracked: emptySet
-      })
-    })
-
-    it('should display a dataset as not in cache if some of the data is missing', () => {
-      const diff = {
-        added: [],
-        deleted: [],
-        modified: [
-          {
-            path: 'data/MNIST/raw/'
-          }
-        ],
-        'not in cache': [
-          {
-            path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
-          },
-          {
-            path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
-          },
-          {
-            path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
-          },
-          {
-            path: 'data/MNIST/raw/train-images-idx3-ubyte'
-          },
-          {
-            path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
-          },
-          {
-            path: 'data/MNIST/raw/train-labels-idx1-ubyte'
-          },
-          {
-            path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
-          }
-        ],
-        renamed: []
-      }
-
-      const status = {
-        'data/MNIST/raw.dvc': [
-          {
-            'changed outs': {
-              'data/MNIST/raw': 'not in cache'
-            }
-          }
-        ],
-        train: [
-          {
-            'changed deps': {
-              'data/MNIST': 'modified',
-              'train.py': 'modified'
-            }
-          },
-          {
-            'changed outs': {
-              logs: 'not in cache',
-              'model.pt': 'not in cache'
-            }
-          },
-          'always changed'
-        ]
-      } as StatusOutput
-
-      const list = [
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('logs', 'acc.tsv')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: false,
-          path: join('logs', 'loss.tsv')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('model.pt')
-        }
-      ]
-
-      const model = new RepositoryModel(dvcDemoPath)
-      model.setState({
-        diffFromCache: status,
-        diffFromHead: diff,
-        hasGitChanges: true,
-        tracked: list,
-        untracked: new Set<string>()
-      })
-      model.transformAndSetExperiments({
-        workspace: {
-          baseline: {
-            data: {
-              outs: { [join('data', 'MNIST', 'raw')]: { use_cache: true } }
-            }
-          }
-        }
-      } as ExperimentsOutput)
-
-      expect(model.getDecorationState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: emptySet,
-        modified: emptySet,
-        notInCache: new Set([
-          ...diff['not in cache'].map(({ path }) => resolve(dvcDemoPath, path)),
-          ...diff.modified.map(({ path }) => resolve(dvcDemoPath, path))
-        ]),
-        renamed: emptySet,
-        tracked: new Set([
-          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
-          resolve(dvcDemoPath, 'data'),
-          resolve(dvcDemoPath, 'data', 'MNIST'),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-          resolve(dvcDemoPath, 'logs')
-        ])
-      })
-
-      expect(model.getSourceControlManagementState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: emptySet,
-        hasRemote: new Set([
-          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw')
-        ]),
-        modified: emptySet,
-        notInCache: new Set([
-          ...diff['not in cache'].map(({ path }) => resolve(dvcDemoPath, path)),
-          ...diff.modified.map(({ path }) => resolve(dvcDemoPath, path))
-        ]),
-        renamed: emptySet,
-        untracked: emptySet
-      })
-    })
-
-    it('should display all tracked paths as not in cache when the project is first opened (before pull)', () => {
-      const diff = {
-        added: [],
-        deleted: [
-          {
-            path: join('data', 'MNIST', 'raw')
-          },
-          {
-            path: 'misclassified.jpg'
-          },
-          {
-            path: 'model.pt'
-          },
-          {
-            path: 'predictions.json'
-          },
-          {
-            path: 'training_metrics.json'
-          },
-          {
-            path: 'training_metrics/'
-          }
-        ],
-        modified: [],
-        'not in cache': [],
-        renamed: []
-      }
-
-      const status = {
-        [join('data', 'MNIST', 'raw.dvc')]: [
-          {
-            'changed outs': {
-              [join('data', 'MNIST', 'raw')]: 'not in cache'
-            }
-          }
-        ],
-        train: [
-          {
-            'changed deps': {
-              [join('data', 'MNIST')]: 'modified'
-            }
-          },
-          {
-            'changed outs': {
-              'misclassified.jpg': 'not in cache',
-              'model.pt': 'not in cache',
-              'predictions.json': 'not in cache',
-              training_metrics: 'not in cache',
-              'training_metrics.json': 'not in cache'
-            }
-          },
-          'always changed'
-        ]
-      } as StatusOutput
-
-      const list = [
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'misclassified.jpg'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'model.pt'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'predictions.json'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: 'training_metrics.json'
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('training_metrics', 'report.html')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('training_metrics', 'scalars', 'acc.tsv')
-        },
-        {
-          isdir: false,
-          isexec: false,
-          isout: true,
-          path: join('training_metrics', 'scalars', 'loss.tsv')
-        }
-      ]
-
-      const model = new RepositoryModel(dvcDemoPath)
-      model.setState({
-        diffFromCache: status,
-        diffFromHead: diff,
-        hasGitChanges: true,
-        tracked: list,
-        untracked: new Set<string>()
-      })
-      model.transformAndSetExperiments({
-        workspace: {
-          baseline: {
-            data: {
-              outs: { [join('data', 'MNIST', 'raw')]: { use_cache: true } }
-            }
-          }
-        }
-      } as ExperimentsOutput)
-
-      expect(model.getDecorationState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: emptySet,
-        modified: emptySet,
-        notInCache: new Set([
-          resolve(dvcDemoPath, 'misclassified.jpg'),
-          resolve(dvcDemoPath, 'model.pt'),
-          resolve(dvcDemoPath, 'predictions.json'),
-          resolve(dvcDemoPath, 'training_metrics'),
-          resolve(dvcDemoPath, 'training_metrics.json'),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-images-idx3-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-images-idx3-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-labels-idx1-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-labels-idx1-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-images-idx3-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-images-idx3-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-labels-idx1-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-labels-idx1-ubyte.gz'
-          ),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars'),
-          resolve(dvcDemoPath, 'training_metrics', 'report.html'),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'acc.tsv'),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv')
-        ]),
-        renamed: emptySet,
-        tracked: new Set([
-          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
-          resolve(dvcDemoPath, 'data'),
-          resolve(dvcDemoPath, 'data', 'MNIST'),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-          resolve(dvcDemoPath, 'training_metrics'),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars')
-        ])
-      })
-
-      expect(model.getSourceControlManagementState()).toStrictEqual({
-        added: emptySet,
-        deleted: emptySet,
-        gitModified: emptySet,
-        hasRemote: new Set([
-          resolve(dvcDemoPath, 'misclassified.jpg'),
-          resolve(dvcDemoPath, 'model.pt'),
-          resolve(dvcDemoPath, 'predictions.json'),
-          resolve(dvcDemoPath, 'training_metrics.json'),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-images-idx3-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-images-idx3-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-labels-idx1-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-labels-idx1-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-images-idx3-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-images-idx3-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-labels-idx1-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-labels-idx1-ubyte.gz'
-          ),
-          resolve(dvcDemoPath, 'training_metrics.json'),
-          resolve(dvcDemoPath, 'training_metrics', 'report.html'),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'acc.tsv'),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv')
-        ]),
-        modified: emptySet,
-        notInCache: new Set([
-          resolve(dvcDemoPath, 'misclassified.jpg'),
-          resolve(dvcDemoPath, 'model.pt'),
-          resolve(dvcDemoPath, 'predictions.json'),
-          resolve(dvcDemoPath, 'training_metrics'),
-          resolve(dvcDemoPath, 'training_metrics.json'),
-          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-images-idx3-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-images-idx3-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-labels-idx1-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            't10k-labels-idx1-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-images-idx3-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-images-idx3-ubyte.gz'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-labels-idx1-ubyte'
-          ),
-          resolve(
-            dvcDemoPath,
-            'data',
-            'MNIST',
-            'raw',
-            'train-labels-idx1-ubyte.gz'
-          ),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars'),
-          resolve(dvcDemoPath, 'training_metrics', 'report.html'),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'acc.tsv'),
-          resolve(dvcDemoPath, 'training_metrics', 'scalars', 'loss.tsv')
-        ]),
-        renamed: emptySet,
-        untracked: emptySet
+      expect(sourceControlManagementState).toStrictEqual({
+        committed: [],
+        notInCache: [],
+        uncommitted: [],
+        untracked: []
       })
     })
   })

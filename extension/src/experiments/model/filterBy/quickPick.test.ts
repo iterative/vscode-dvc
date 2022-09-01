@@ -1,5 +1,5 @@
 import { FilterDefinition, getFilterId, Operator } from '.'
-import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
+import { OPERATORS, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { appendColumnToPath, buildMetricOrParamPath } from '../../columns/paths'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
@@ -76,9 +76,15 @@ describe('pickFilterToAdd', () => {
     mockedQuickPickValue.mockResolvedValueOnce(mixedParam)
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
     await pickFilterToAdd(params)
-    expect(mockedQuickPickValue).toBeCalledWith(operators, {
-      title: Title.SELECT_OPERATOR
-    })
+    expect(mockedQuickPickValue).toBeCalledWith(
+      OPERATORS.filter(
+        ({ types }) =>
+          !(types.length === 1 && types[0] === ColumnType.TIMESTAMP)
+      ),
+      {
+        title: Title.SELECT_OPERATOR
+      }
+    )
   })
 
   it('should return early if no value is provided', async () => {
@@ -101,7 +107,7 @@ describe('pickFilterToAdd', () => {
       value: undefined
     })
     expect(mockedQuickPickValue).toBeCalledWith(
-      operators.filter(operator => operator.types.includes('boolean')),
+      OPERATORS.filter(operator => operator.types.includes('boolean')),
       {
         title: Title.SELECT_OPERATOR
       }
@@ -121,7 +127,7 @@ describe('pickFilterToAdd', () => {
       value: '5'
     })
     expect(mockedQuickPickValue).toBeCalledWith(
-      operators.filter(operator => operator.types.includes('number')),
+      OPERATORS.filter(operator => operator.types.includes('number')),
       {
         title: Title.SELECT_OPERATOR
       }

@@ -368,7 +368,7 @@ const data: Row[] = [
             selected: false,
             sha: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
             starred: false,
-            Timestamp: '2020-12-29T15:31:51'
+            Created: '2020-12-29T15:31:51'
           },
           {
             checkpoint_tip: '4fb124aebddb2adf1545030907687fa9a4c80e70',
@@ -461,10 +461,10 @@ const data: Row[] = [
             selected: false,
             sha: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
             starred: false,
-            Timestamp: '2020-12-29T15:31:44'
+            Created: '2020-12-29T15:31:44'
           }
         ],
-        Timestamp: '2020-12-29T15:31:52'
+        Created: '2020-12-29T15:31:52'
       },
       {
         checkpoint_parent: '217312476f8854dda1865450b737eb6bc7a3ba1b',
@@ -649,7 +649,7 @@ const data: Row[] = [
             selected: false,
             starred: false,
             sha: '217312476f8854dda1865450b737eb6bc7a3ba1b',
-            Timestamp: '2020-12-29T15:28:57'
+            Created: '2020-12-29T15:28:57'
           },
           {
             checkpoint_tip: '42b8736b08170529903cd203a1f40382a4b4a8cd',
@@ -742,10 +742,10 @@ const data: Row[] = [
             selected: false,
             sha: '9523bde67538cf31230efaff2dbc47d38a944ab5',
             starred: false,
-            Timestamp: '2020-12-29T15:28:50'
+            Created: '2020-12-29T15:28:50'
           }
         ],
-        Timestamp: '2020-12-29T15:28:59'
+        Created: '2020-12-29T15:28:59'
       },
       {
         checkpoint_parent: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
@@ -930,7 +930,7 @@ const data: Row[] = [
             selected: false,
             sha: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
             starred: false,
-            Timestamp: '2020-12-29T15:27:01'
+            Created: '2020-12-29T15:27:01'
           },
           {
             checkpoint_tip: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
@@ -1023,7 +1023,7 @@ const data: Row[] = [
             selected: false,
             sha: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
             starred: false,
-            Timestamp: '2020-12-29T15:26:55'
+            Created: '2020-12-29T15:26:55'
           },
           {
             checkpoint_parent: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
@@ -1116,7 +1116,7 @@ const data: Row[] = [
             selected: false,
             sha: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
             starred: false,
-            Timestamp: '2020-12-29T15:26:49'
+            Created: '2020-12-29T15:26:49'
           },
           {
             checkpoint_parent: '23250b33e3d6dd0e136262d1d26a2face031cb03',
@@ -1209,7 +1209,7 @@ const data: Row[] = [
             selected: false,
             sha: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
             starred: false,
-            Timestamp: '2020-12-29T15:26:43'
+            Created: '2020-12-29T15:26:43'
           },
           {
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
@@ -1302,10 +1302,10 @@ const data: Row[] = [
             selected: false,
             sha: '23250b33e3d6dd0e136262d1d26a2face031cb03',
             starred: false,
-            Timestamp: '2020-12-29T15:26:36'
+            Created: '2020-12-29T15:26:36'
           }
         ],
-        Timestamp: '2020-12-29T15:27:02'
+        Created: '2020-12-29T15:27:02'
       },
       {
         displayColor: colorsList[5],
@@ -1400,7 +1400,7 @@ const data: Row[] = [
         selected: true,
         sha: 'f0f918662b4f8c47819ca154a23029bf9b47d4f3',
         starred: false,
-        Timestamp: '2020-12-29T15:26:36'
+        Created: '2020-12-29T15:26:36'
       },
       {
         deps: {
@@ -1476,10 +1476,10 @@ const data: Row[] = [
         queued: true,
         sha: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
         starred: false,
-        Timestamp: '2020-12-29T15:25:27'
+        Created: '2020-12-29T15:25:27'
       }
     ],
-    Timestamp: '2020-11-21T19:58:22'
+    Created: '2020-11-21T19:58:22'
   }
 ]
 

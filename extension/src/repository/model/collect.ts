@@ -1,10 +1,243 @@
-import { dirname, join, relative, resolve } from 'path'
+import { join, relative, resolve } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
-import { ExperimentsOutput, PathOutput } from '../../cli/dvc/reader'
-import { isSameOrChild, relativeWithUri } from '../../fileSystem'
-import { getDirectChild, getPath, getPathArray } from '../../fileSystem/util'
+import { Changes, DataStatusOutput } from '../../cli/dvc/reader'
+import { DecorationDataStatus } from '../decorationProvider'
+import { relativeWithUri } from '../../fileSystem'
+import {
+  getDirectChild,
+  getPath,
+  getPathArray,
+  removeTrailingSlash
+} from '../../fileSystem/util'
+import { DiscardedStatus, UndecoratedDataStatus } from '../constants'
+
+const AvailableDataStatus = Object.assign(
+  {} as const,
+  DecorationDataStatus,
+  UndecoratedDataStatus
+)
+
+const ExtendedDataStatus = Object.assign(
+  {} as const,
+  AvailableDataStatus,
+  DiscardedStatus
+)
+
+export type ExtendedStatus =
+  typeof ExtendedDataStatus[keyof typeof ExtendedDataStatus]
+
+export type Status =
+  typeof AvailableDataStatus[keyof typeof AvailableDataStatus]
+
+type DataStatusMapping = { [path: string]: ExtendedStatus }
+
+export type DataStatusAccumulator = Record<Status, Set<string>>
+
+const getStatus = (
+  path: string,
+  original: DataStatusMapping,
+  withMissingAncestors: DataStatusMapping
+) => original[path] || withMissingAncestors[path]
+
+const addMissingWithAncestorStatus = (
+  withMissingAncestors: DataStatusMapping,
+  missingAncestors: Set<string>,
+  status: ExtendedStatus
+): void => {
+  for (const ancestor of missingAncestors) {
+    withMissingAncestors[ancestor] = status
+  }
+}
+
+const addMissingAncestors = (
+  pathArray: string[],
+  original: DataStatusMapping,
+  withMissingAncestors: DataStatusMapping
+): void => {
+  const missingAncestors = new Set<string>()
+
+  for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
+    const path = getPath(pathArray, reverseIdx)
+
+    const status = getStatus(path, original, withMissingAncestors)
+    if (status) {
+      addMissingWithAncestorStatus(
+        withMissingAncestors,
+        missingAncestors,
+        status
+      )
+      return
+    }
+
+    missingAncestors.add(path)
+  }
+}
+
+const collectMissingAncestors = (originalMapping: {
+  [path: string]: ExtendedStatus
+}): DataStatusMapping => {
+  const withMissingAncestors: DataStatusMapping = {}
+
+  for (const [path, status] of Object.entries(originalMapping)) {
+    withMissingAncestors[path] = status
+    const pathArray = getPathArray(path)
+    addMissingAncestors(
+      pathArray.slice(0, -1),
+      originalMapping,
+      withMissingAncestors
+    )
+  }
+
+  return withMissingAncestors
+}
+
+const addToTracked = (
+  tracked: Set<string>,
+  absPath: string,
+  status: ExtendedStatus
+) => {
+  if (status === ExtendedDataStatus.UNTRACKED) {
+    return
+  }
+
+  tracked.add(absPath)
+}
+
+const mapChangesToGroup = (
+  type: 'COMMITTED' | 'UNCOMMITTED',
+  changes: Changes | undefined
+): Partial<Record<ExtendedStatus, string[] | undefined>> => ({
+  [ExtendedDataStatus[`${type}_ADDED`]]: changes?.added,
+  [ExtendedDataStatus[`${type}_DELETED`]]: changes?.deleted,
+  [ExtendedDataStatus[`${type}_MODIFIED`]]: changes?.modified,
+  [ExtendedDataStatus[`${type}_RENAMED`]]: changes?.renamed?.map(
+    ({ new: path }) => path
+  ),
+  [ExtendedDataStatus[`${type}_UNKNOWN`]]: changes?.unknown
+})
+
+const mapGroupedStatuses = (
+  dataStatusOutput: DataStatusOutput
+): Partial<Record<ExtendedStatus, string[] | undefined>>[] => [
+  mapChangesToGroup('COMMITTED', dataStatusOutput.committed),
+  mapChangesToGroup('UNCOMMITTED', dataStatusOutput.uncommitted)
+]
+
+const mapUngroupedStatuses = (
+  dataStatusOutput: DataStatusOutput & { untracked?: string[] }
+): { key: ExtendedStatus; paths: string[] | undefined }[] => [
+  {
+    key: ExtendedDataStatus.NOT_IN_CACHE,
+    paths: dataStatusOutput.not_in_cache
+  },
+  {
+    key: ExtendedDataStatus.UNTRACKED,
+    paths: dataStatusOutput.untracked
+  },
+  {
+    key: ExtendedDataStatus.UNCHANGED,
+    paths: dataStatusOutput.unchanged
+  }
+]
+
+const collectSingleStatus = (
+  acc: { tracked: Set<string> },
+  dataStatusMapping: DataStatusMapping,
+  dvcRoot: string,
+  status: ExtendedStatus,
+  paths: string[] | undefined
+): DataStatusMapping => {
+  for (const path of paths || []) {
+    dataStatusMapping[removeTrailingSlash(path)] = status
+    addToTracked(acc.tracked, resolve(dvcRoot, path), status)
+  }
+  return dataStatusMapping
+}
+
+const collectMappingFromGroup = (
+  acc: { tracked: Set<string> },
+  dvcRoot: string,
+  dataStatus: Partial<Record<ExtendedStatus, string[] | undefined>>
+): DataStatusMapping => {
+  const dataStatusMapping: DataStatusMapping = {}
+
+  for (const [key, data] of Object.entries(dataStatus)) {
+    collectSingleStatus(
+      acc,
+      dataStatusMapping,
+      dvcRoot,
+      key as ExtendedStatus,
+      data
+    )
+  }
+
+  return dataStatusMapping
+}
+
+const createDataStatusAccumulator = (): DataStatusAccumulator => {
+  const acc = {} as DataStatusAccumulator
+  for (const status of Object.values(AvailableDataStatus)) {
+    acc[status] = new Set<string>()
+  }
+  return acc
+}
+
+const uncommitNotInCache = (
+  acc: DataStatusAccumulator,
+  absPath: string,
+  status: ExtendedStatus
+): ExtendedStatus => {
+  if (!status.startsWith('committed') || !acc.notInCache.has(absPath)) {
+    return status
+  }
+  return ('un' + status) as ExtendedStatus
+}
+
+const collectGroupWithMissingAncestors = (
+  acc: DataStatusAccumulator,
+  dvcRoot: string,
+  dataStatusMapping: DataStatusMapping
+) => {
+  const groupWithMissingAncestors = collectMissingAncestors(dataStatusMapping)
+
+  for (const [path, originalStatus] of Object.entries(
+    groupWithMissingAncestors
+  )) {
+    const absPath = resolve(dvcRoot, path)
+    const status = uncommitNotInCache(acc, absPath, originalStatus)
+
+    if (status !== DiscardedStatus.UNCHANGED) {
+      acc[status].add(absPath)
+    }
+
+    addToTracked(acc.trackedDecorations, absPath, originalStatus)
+  }
+}
+
+export const collectDataStatus = (
+  dvcRoot: string,
+  dataStatusOutput: DataStatusOutput & { untracked?: string[] }
+): DataStatusAccumulator => {
+  const acc = createDataStatusAccumulator()
+
+  for (const { key, paths } of mapUngroupedStatuses(dataStatusOutput)) {
+    const dataStatusMapping = collectSingleStatus(acc, {}, dvcRoot, key, paths)
+    collectGroupWithMissingAncestors(acc, dvcRoot, dataStatusMapping)
+  }
+
+  for (const groupedStatuses of mapGroupedStatuses(dataStatusOutput)) {
+    const dataStatusMapping = collectMappingFromGroup(
+      acc,
+      dvcRoot,
+      groupedStatuses
+    )
+    collectGroupWithMissingAncestors(acc, dvcRoot, dataStatusMapping)
+  }
+
+  return acc
+}
 
 export type PathItem = Resource & {
   isDirectory: boolean
@@ -34,12 +267,13 @@ const transformToAbsTree = (
 
 export const collectTree = (
   dvcRoot: string,
-  absLeafs: Set<string>,
-  trackedRelPaths = new Set<string>()
+  tracked: Set<string>
 ): Map<string, PathItem[]> => {
   const relTree = new Map<string, Set<string>>()
 
-  for (const absLeaf of absLeafs) {
+  const trackedRelPaths = new Set<string>()
+
+  for (const absLeaf of tracked) {
     const relPath = relative(dvcRoot, absLeaf)
     const relPathArray = getPathArray(relPath)
 
@@ -52,86 +286,6 @@ export const collectTree = (
   }
 
   return transformToAbsTree(dvcRoot, relTree, trackedRelPaths)
-}
-
-const collectMissingParents = (acc: string[], absPath: string) => {
-  if (acc.length === 0) {
-    return
-  }
-
-  const prevAbsPath = acc.slice(-1)[0]
-  if (!isSameOrChild(prevAbsPath, absPath)) {
-    return
-  }
-
-  let dir = dirname(absPath)
-  while (dir !== prevAbsPath) {
-    acc.push(dir)
-    dir = dirname(dir)
-  }
-}
-
-export const collectModifiedAgainstHead = (
-  dvcRoot: string,
-  modified: PathOutput[],
-  tracked: Set<string>
-): string[] => {
-  const acc: string[] = []
-
-  for (const { path } of modified) {
-    const absPath = resolve(dvcRoot, path)
-    if (!tracked.has(absPath)) {
-      continue
-    }
-
-    collectMissingParents(acc, absPath)
-    acc.push(absPath)
-  }
-
-  return acc
-}
-
-const collectAbsPath = (
-  acc: Set<string>,
-  absLeafs: Set<string>,
-  dvcRoot: string,
-  absPath: string
-) => {
-  const relPathArray = getPathArray(relative(dvcRoot, absPath))
-
-  for (let reverseIdx = relPathArray.length; reverseIdx > 0; reverseIdx--) {
-    const absPath = join(dvcRoot, getPath(relPathArray, reverseIdx))
-    if (acc.has(absPath) || absLeafs.has(absPath)) {
-      continue
-    }
-
-    acc.add(absPath)
-  }
-}
-
-export const collectTrackedNonLeafs = (
-  dvcRoot: string,
-  absLeafs = new Set<string>()
-): Set<string> => {
-  const acc = new Set<string>()
-
-  for (const absPath of absLeafs) {
-    collectAbsPath(acc, absLeafs, dvcRoot, absPath)
-  }
-
-  return acc
-}
-
-export const collectTrackedOuts = (data: ExperimentsOutput): Set<string> => {
-  const acc = new Set<string>()
-  for (const [relPath, { use_cache }] of Object.entries(
-    data.workspace.baseline.data?.outs || {}
-  )) {
-    if (use_cache) {
-      acc.add(relPath)
-    }
-  }
-  return acc
 }
 
 export const collectTrackedPaths = async (
@@ -250,34 +404,4 @@ export const collectSelected = (
     collectRootOrPathItem(acc, addedPaths, selectedPaths, pathItem)
   }
   return acc
-}
-
-const isUncollectedChild = (
-  deleted: Set<string>,
-  deletedPath: string,
-  trackedPath: string
-): boolean => {
-  return !deleted.has(trackedPath) && isSameOrChild(deletedPath, trackedPath)
-}
-
-const collectIfDeletedChild = (
-  deleted: Set<string>,
-  deletedPath: string,
-  trackedPath: string
-): void => {
-  if (isUncollectedChild(deleted, deletedPath, trackedPath)) {
-    deleted.add(trackedPath)
-  }
-}
-
-export const collectDeleted = (
-  deleted: Set<string>,
-  tracked: Set<string>
-): Set<string> => {
-  for (const trackedPath of tracked) {
-    for (const deletedPath of deleted) {
-      collectIfDeletedChild(deleted, deletedPath, trackedPath)
-    }
-  }
-  return deleted
 }

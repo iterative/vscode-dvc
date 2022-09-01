@@ -68,7 +68,7 @@ describe('Table', () => {
           {
             ...headerBasicProps,
             id: 'timestamp',
-            render: () => 'Timestamp'
+            render: () => 'Created'
           }
         ]
       }

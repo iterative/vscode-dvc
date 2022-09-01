@@ -480,16 +480,11 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.pull(
-        cwd,
-        relPath,
-        Flag.FORCE,
-        Flag.RECURSIVE
-      )
+      const output = await dvcExecutor.pull(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['pull', relPath, '-f', '-R'],
+        args: ['pull', relPath, '-f'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -538,11 +533,11 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.push(cwd, relPath, Flag.RECURSIVE)
+      const output = await dvcExecutor.push(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push', relPath, '-R'],
+        args: ['push', relPath],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

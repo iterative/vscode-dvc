@@ -54,7 +54,7 @@ const ExperimentHeader = () => (
 )
 
 const TimestampHeader = () => (
-  <div className={styles.timestampHeader}>Timestamp</div>
+  <div className={styles.timestampHeader}>Created</div>
 )
 
 const DateCellContents: React.FC<{ value: string }> = ({ value }) => {
@@ -111,10 +111,10 @@ const getColumns = (columns: Column[]): TableColumn<Row>[] => {
         )
       },
       Header: TimestampHeader,
-      accessor: 'Timestamp',
+      accessor: 'Created',
       group: ColumnType.TIMESTAMP,
-      id: 'Timestamp',
-      name: 'Timestamp',
+      id: 'Created',
+      name: 'Created',
       width: 100
     })
   }
@@ -175,11 +175,11 @@ export const ExperimentsTable: React.FC = () => {
     hooks => {
       hooks.stateReducers.push((state, action) => {
         if (action.type === 'columnStartResizing') {
-          document.body.classList.add(styles.noSelect)
+          document.body.classList.add(styles.isColumnResizing)
         }
         if (action.type === 'columnDoneResizing') {
           reportResizedColumn(state)
-          document.body.classList.remove(styles.noSelect)
+          document.body.classList.remove(styles.isColumnResizing)
         }
         return state
       })

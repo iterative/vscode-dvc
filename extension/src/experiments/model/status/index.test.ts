@@ -26,17 +26,17 @@ describe('canSelect', () => {
 describe('limitToMaxSelected', () => {
   const mockedExperiments = [
     { id: '1', label: 'A' },
-    { Timestamp: null, id: '2', label: 'B' },
-    { Timestamp: '2022-02-20T09:10:52', id: '3', label: 'C' },
-    { Timestamp: '2022-02-20T09:10:53', id: '4', label: 'D' },
-    { Timestamp: '2022-02-20T09:10:54', id: '5', label: 'E' },
-    { Timestamp: '2022-02-20T09:10:55', id: '6', label: 'F' },
-    { Timestamp: '2022-02-20T09:10:56', id: '7', label: 'G' },
-    { Timestamp: '2022-02-20T09:10:57', id: '8', label: 'H' },
-    { Timestamp: '2022-02-20T09:10:58', id: '9', label: 'I' }
+    { Created: null, id: '2', label: 'B' },
+    { Created: '2022-02-20T09:10:52', id: '3', label: 'C' },
+    { Created: '2022-02-20T09:10:53', id: '4', label: 'D' },
+    { Created: '2022-02-20T09:10:54', id: '5', label: 'E' },
+    { Created: '2022-02-20T09:10:55', id: '6', label: 'F' },
+    { Created: '2022-02-20T09:10:56', id: '7', label: 'G' },
+    { Created: '2022-02-20T09:10:57', id: '8', label: 'H' },
+    { Created: '2022-02-20T09:10:58', id: '9', label: 'I' }
   ] as Experiment[]
 
-  it('should return the first 7 selected by Timestamp', () => {
+  it('should return the first 7 selected by Created', () => {
     expect(
       limitToMaxSelected(mockedExperiments)
         .map(({ label }) => label)

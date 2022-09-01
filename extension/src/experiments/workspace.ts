@@ -10,7 +10,6 @@ import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { WorkspacePlots } from '../plots/workspace'
 import { Title } from '../vscode/title'
 import { setContextValue } from '../vscode/context'
-import { WorkspaceRepositories } from '../repository/workspace'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -58,7 +57,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public linkRepositories(workspace: WorkspacePlots | WorkspaceRepositories) {
+  public linkRepositories(workspace: WorkspacePlots) {
     for (const [dvcRoot, repository] of Object.entries(this.repositories)) {
       workspace.getRepository(dvcRoot).setExperiments(repository)
     }

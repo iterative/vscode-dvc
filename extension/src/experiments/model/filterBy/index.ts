@@ -1,4 +1,5 @@
 import get from 'lodash.get'
+import { compareDateStrings } from './date'
 import { Experiment } from '../../webview/contract'
 import { definedAndNonEmpty } from '../../../util/array'
 import { splitColumnPath } from '../../columns/paths'
@@ -15,8 +16,17 @@ export enum Operator {
   NOT_CONTAINS = '!∈',
 
   IS_TRUE = '⊤',
-  IS_FALSE = '⊥'
+  IS_FALSE = '⊥',
+
+  BEFORE_DATE = '<d',
+  AFTER_DATE = '>d',
+  ON_DATE = '=d'
 }
+
+export const isDateOperator = (operator: Operator): boolean =>
+  [Operator.AFTER_DATE, Operator.BEFORE_DATE, Operator.ON_DATE].includes(
+    operator
+  )
 
 export interface FilterDefinition {
   path: string
@@ -71,6 +81,21 @@ const evaluate = <T extends string | number | boolean>(
       return stringContains(valueToEvaluate, filterValue)
     case Operator.NOT_CONTAINS:
       return !stringContains(valueToEvaluate, filterValue)
+
+    case Operator.AFTER_DATE:
+      return compareDateStrings(
+        valueToEvaluate,
+        Operator.GREATER_THAN,
+        filterValue
+      )
+    case Operator.BEFORE_DATE:
+      return compareDateStrings(
+        valueToEvaluate,
+        Operator.LESS_THAN,
+        filterValue
+      )
+    case Operator.ON_DATE:
+      return compareDateStrings(valueToEvaluate, Operator.EQUAL, filterValue)
     default:
       throw new Error('filter operator not found')
   }

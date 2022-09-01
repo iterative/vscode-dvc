@@ -35,9 +35,9 @@ describe('getOptions', () => {
 
   it('should append -m dvc to the args and use the python as the executable if only an isolated python env is in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
-    const options = getOptions(pythonBinPath, '', cwd, Command.DIFF)
+    const options = getOptions(pythonBinPath, '', cwd, Command.PULL)
     expect(options).toStrictEqual({
-      args: ['-m', 'dvc', 'diff'],
+      args: ['-m', 'dvc', 'pull'],
       cwd,
       env: {
         DVCLIVE_OPEN: 'false',
@@ -51,9 +51,9 @@ describe('getOptions', () => {
   it('should append to the PATH but only use the path to the cli if both an isolated python env and path to dvc are in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
     const cliPath = join('custom', 'path', 'to', 'dvc')
-    const options = getOptions(pythonBinPath, cliPath, cwd, Command.DIFF)
+    const options = getOptions(pythonBinPath, cliPath, cwd, Command.PULL)
     expect(options).toStrictEqual({
-      args: ['diff'],
+      args: ['pull'],
       cwd,
       env: {
         DVCLIVE_OPEN: 'false',

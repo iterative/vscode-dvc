@@ -1,7 +1,257 @@
-import { join } from 'path'
+import { join, sep } from 'path'
 import { Uri } from 'vscode'
-import { collectSelected, collectTree } from './collect'
+import { collectSelected, collectDataStatus, collectTree } from './collect'
 import { dvcDemoPath } from '../../test/util'
+import { makeAbsPathSet } from '../../test/util/path'
+
+describe('collectDataStatus', () => {
+  const emptySet = new Set()
+
+  it('should transform the data status output into the correct shape', () => {
+    const unknown = ['X1', 'X2', 'X3']
+
+    const committedAdded = ['CA1', 'CA2', 'CA3']
+    const committedDeleted = ['CD-A', 'CD-B']
+    const committedModified = ['CM1', 'CM2', 'CM3']
+    const committedRenamed = ['CR1']
+    const committedUnknown = unknown
+
+    const uncommittedAdded = [join('some', 'nested', 'UA-XYZ')]
+    const uncommittedDeleted = ['UD-C', 'UD-D']
+    const uncommittedModified = ['UM']
+    const uncommittedRenamed = ['UR1']
+    const uncommittedUnknown = unknown
+
+    const unchanged = ['A', 'B', 'C', 'D', join('E', 'F', 'G'), 'H']
+    const untracked = [join('A1', 'B2', 'C3'), join('D4', 'E5', 'F6')]
+
+    const data = collectDataStatus(dvcDemoPath, {
+      committed: {
+        added: committedAdded,
+        deleted: committedDeleted,
+        modified: committedModified,
+        renamed: committedRenamed.map(path => ({
+          new: path,
+          old: join('dir', 'path')
+        })),
+        unknown: committedUnknown
+      },
+      unchanged,
+      uncommitted: {
+        added: uncommittedAdded,
+        deleted: uncommittedDeleted,
+        modified: uncommittedModified,
+        renamed: uncommittedRenamed.map(path => ({
+          new: path,
+          old: join('dir', 'path')
+        })),
+        unknown: uncommittedUnknown
+      },
+      untracked
+    })
+
+    expect(data).toStrictEqual({
+      committedAdded: makeAbsPathSet(dvcDemoPath, ...committedAdded),
+      committedDeleted: makeAbsPathSet(dvcDemoPath, ...committedDeleted),
+      committedModified: makeAbsPathSet(dvcDemoPath, ...committedModified),
+      committedRenamed: makeAbsPathSet(dvcDemoPath, ...committedRenamed),
+      committedUnknown: makeAbsPathSet(dvcDemoPath, ...unknown),
+      notInCache: emptySet,
+      tracked: makeAbsPathSet(
+        dvcDemoPath,
+        ...committedAdded,
+        ...committedDeleted,
+        ...committedModified,
+        ...committedRenamed,
+        ...uncommittedAdded,
+        ...uncommittedDeleted,
+        ...uncommittedModified,
+        ...uncommittedRenamed,
+        ...unchanged,
+        ...unknown
+      ),
+      trackedDecorations: makeAbsPathSet(
+        dvcDemoPath,
+        ...committedAdded,
+        ...committedDeleted,
+        ...committedModified,
+        ...committedRenamed,
+        ...committedUnknown,
+        ...uncommittedAdded,
+        ...uncommittedDeleted,
+        ...uncommittedModified,
+        ...uncommittedRenamed,
+        ...uncommittedUnknown,
+        ...unchanged
+      ),
+      uncommittedAdded: makeAbsPathSet(dvcDemoPath, ...uncommittedAdded),
+      uncommittedDeleted: makeAbsPathSet(dvcDemoPath, ...uncommittedDeleted),
+      uncommittedModified: makeAbsPathSet(dvcDemoPath, ...uncommittedModified),
+      uncommittedRenamed: makeAbsPathSet(dvcDemoPath, ...uncommittedRenamed),
+      uncommittedUnknown: makeAbsPathSet(dvcDemoPath, ...unknown),
+      untracked: makeAbsPathSet(dvcDemoPath, ...untracked)
+    })
+  })
+
+  it('should collect missing untracked parents', () => {
+    const untracked = [
+      'data' + sep,
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz')
+    ]
+
+    const {
+      untracked: untrackedWithMissingParents,
+      tracked,
+      trackedDecorations
+    } = collectDataStatus(dvcDemoPath, {
+      untracked
+    })
+    expect(untrackedWithMissingParents).toStrictEqual(
+      makeAbsPathSet(
+        dvcDemoPath,
+        ...untracked,
+        join('data', 'MNIST', 'raw'),
+        join('data', 'MNIST')
+      )
+    )
+    expect(tracked).toStrictEqual(emptySet)
+    expect(trackedDecorations).toStrictEqual(emptySet)
+  })
+
+  it('should collect missing tracked parents', () => {
+    const tracked = [
+      join('training_metrics', 'scalars', 'loss.tsv'),
+      'training_metrics' + sep,
+      join('training_metrics', 'scalars', 'acc.tsv'),
+      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
+      join('model.pt'),
+      join('data', 'MNIST', 'raw'),
+      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
+      'misclassified.jpg',
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      'predictions.json',
+      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
+      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz')
+    ]
+    const { trackedDecorations: trackedWithMissingParents } = collectDataStatus(
+      dvcDemoPath,
+      {
+        unchanged: tracked
+      }
+    )
+    expect(trackedWithMissingParents).toStrictEqual(
+      makeAbsPathSet(
+        dvcDemoPath,
+        ...tracked,
+        join('training_metrics', 'scalars')
+      )
+    )
+  })
+
+  it('should not deduplicate paths when they are shown as both not in cache and deleted', () => {
+    const not_in_cache = ['model.pt', 'misclassified.jpg', 'predictions.json']
+
+    const duplicates = {
+      not_in_cache,
+      uncommitted: {
+        deleted: not_in_cache
+      }
+    }
+
+    const { notInCache, uncommittedDeleted, tracked } = collectDataStatus(
+      dvcDemoPath,
+      duplicates
+    )
+
+    const absNotInCache = makeAbsPathSet(dvcDemoPath, ...not_in_cache)
+
+    expect(uncommittedDeleted).toStrictEqual(absNotInCache)
+    expect(notInCache).toStrictEqual(absNotInCache)
+    expect(tracked).toStrictEqual(absNotInCache)
+  })
+
+  it('should not deduplicate paths when they are shown as both committed and uncommitted', () => {
+    const data = join('data', 'MNIST', 'raw')
+    const paths = [
+      join(data, 't10k-images-idx3-ubyte'),
+      join(data, 't10k-images-idx3-ubyte.gz'),
+      join(data, 't10k-labels-idx1-ubyte')
+    ]
+    const dataStatusOutput = {
+      committed: {
+        deleted: [
+          'data/MNIST/raw/t10k-images-idx3-ubyte',
+          'data/MNIST/raw/t10k-images-idx3-ubyte.gz',
+          'data/MNIST/raw/t10k-labels-idx1-ubyte'
+        ],
+        modified: [data + sep]
+      },
+      uncommitted: {
+        added: paths,
+        modified: [data + sep]
+      }
+    }
+
+    const modified = makeAbsPathSet(dvcDemoPath, data)
+    const addedAndDeleted = makeAbsPathSet(dvcDemoPath, ...paths)
+
+    const {
+      committedDeleted,
+      committedModified,
+      uncommittedAdded,
+      uncommittedModified
+    } = collectDataStatus(dvcDemoPath, dataStatusOutput)
+
+    expect(committedDeleted).toStrictEqual(addedAndDeleted)
+    expect(committedModified).toStrictEqual(modified)
+    expect(uncommittedAdded).toStrictEqual(addedAndDeleted)
+    expect(uncommittedModified).toStrictEqual(modified)
+  })
+
+  it('should move committed entries which are also not in cache to uncommitted', () => {
+    const rawDataDir = join('data', 'MNIST', 'raw')
+    const unknown = [
+      join(rawDataDir, 't10k-images-idx3-ubyte'),
+      join(rawDataDir, 't10k-labels-idx1-ubyte'),
+      join(rawDataDir, 'train-images-idx3-ubyte'),
+      join(rawDataDir, 't10k-images-idx3-ubyte.gz'),
+      join(rawDataDir, 'train-images-idx3-ubyte.gz'),
+      join(rawDataDir, 'train-labels-idx1-ubyte.gz'),
+      join(rawDataDir, 'train-labels-idx1-ubyte'),
+      join(rawDataDir, 't10k-labels-idx1-ubyte.gz')
+    ]
+
+    const dataStatusOutput = {
+      committed: {
+        modified: [rawDataDir + sep]
+      },
+      not_in_cache: [rawDataDir + sep],
+      uncommitted: {
+        unknown
+      }
+    }
+
+    const {
+      notInCache,
+      committedModified,
+      uncommittedModified,
+      uncommittedUnknown
+    } = collectDataStatus(dvcDemoPath, dataStatusOutput)
+
+    expect(committedModified).toStrictEqual(new Set())
+    expect(notInCache).toStrictEqual(makeAbsPathSet(dvcDemoPath, rawDataDir))
+    expect(uncommittedUnknown).toStrictEqual(
+      makeAbsPathSet(dvcDemoPath, ...unknown)
+    )
+    expect(uncommittedModified).toStrictEqual(
+      makeAbsPathSet(dvcDemoPath, rawDataDir)
+    )
+  })
+})
 
 const makeUri = (...paths: string[]): Uri =>
   Uri.file(join(dvcDemoPath, ...paths))
@@ -19,16 +269,13 @@ describe('collectTree', () => {
       makeAbsPath('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
       makeAbsPath('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
       makeAbsPath('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+      makeAbsPath('data', 'MNIST', 'raw'),
       makeAbsPath('logs', 'acc.tsv'),
       makeAbsPath('logs', 'loss.tsv'),
       makeAbsPath('model.pt')
     ])
 
-    const treeData = collectTree(
-      dvcDemoPath,
-      paths,
-      new Set([join('data', 'MNIST', 'raw')])
-    )
+    const treeData = collectTree(dvcDemoPath, paths)
 
     expect(treeData).toStrictEqual(
       new Map([

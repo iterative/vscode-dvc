@@ -2,6 +2,7 @@ import { join } from 'path'
 import { EventEmitter, Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { DecorationProvider, DecorationState } from './decorationProvider'
+import { standardizePath } from '../fileSystem/path'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -23,6 +24,19 @@ beforeEach(() => {
 })
 
 describe('DecorationProvider', () => {
+  const dvcRoot = __dirname
+  const model = standardizePath(join(dvcRoot, 'model.pt')) as string
+  const dataDir = standardizePath(join(dvcRoot, 'data')) as string
+  const features = standardizePath(join(dataDir, 'features')) as string
+  const logDir = standardizePath(join(dvcRoot, 'logs')) as string
+  const logAcc = standardizePath(join(logDir, 'acc.tsv')) as string
+  const logLoss = standardizePath(join(logDir, 'loss.tsv')) as string
+  const dataXml = standardizePath(join(dataDir, 'data.xml')) as string
+  const dataCsv = standardizePath(join(dataDir, 'data.csv')) as string
+  const prepared = standardizePath(join(dataDir, 'prepared')) as string
+
+  const emptySet = new Set<string>()
+
   it('should be able to setState with no existing state', () => {
     const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
 
@@ -32,7 +46,7 @@ describe('DecorationProvider', () => {
     ]
 
     decorationProvider.setState({
-      added: new Set(addedPaths),
+      committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
     } as DecorationState)
     expect(mockedDecorationsChangedFire).toBeCalledWith(
@@ -51,14 +65,14 @@ describe('DecorationProvider', () => {
     const subsetOfAddedPaths = [join('some', 'path', 'to', 'decorate')]
 
     decorationProvider.setState({
-      added: new Set(addedPaths),
+      committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
     } as DecorationState)
 
     mockedDecorationsChangedFire.mockClear()
 
     decorationProvider.setState({
-      added: new Set(subsetOfAddedPaths),
+      committedAdded: new Set(subsetOfAddedPaths),
       tracked: new Set(subsetOfAddedPaths)
     } as DecorationState)
 
@@ -68,20 +82,9 @@ describe('DecorationProvider', () => {
   })
 
   it('should combine the existing state with the new state before providing new decorations', () => {
-    const dvcRoot = __dirname
-    const model = join(dvcRoot, 'model.pt')
-    const dataDir = join(dvcRoot, 'data')
-    const features = join(dataDir, 'features')
-    const logDir = join(dvcRoot, 'logs')
-    const logAcc = join(logDir, 'acc.tsv')
-    const logLoss = join(logDir, 'loss.tsv')
-    const dataXml = join(dataDir, 'data.xml')
-    const dataCsv = join(dataDir, 'data.csv')
-    const prepared = join(dataDir, 'prepared')
-
-    const added = new Set([dataCsv])
-    const deleted = new Set([model])
-    const modified = new Set([features])
+    const committedAdded = new Set([dataCsv])
+    const committedDeleted = new Set([model])
+    const uncommittedModified = new Set([features])
     const notInCache = new Set([dataXml, prepared])
     const tracked = new Set([
       dataDir,
@@ -94,34 +97,53 @@ describe('DecorationProvider', () => {
       model,
       prepared
     ])
-    const emptySet = new Set<string>()
 
     const initialState = {
-      added,
-      deleted,
-      gitModified: emptySet,
-      modified,
+      committedAdded,
+      committedDeleted,
+      committedModified: emptySet,
+      committedRenamed: emptySet,
+      committedUnknown: emptySet,
       notInCache: emptySet,
-      renamed: emptySet,
-      tracked: emptySet
+      tracked: emptySet,
+      uncommittedAdded: emptySet,
+      uncommittedDeleted: emptySet,
+      uncommittedModified,
+      uncommittedRenamed: emptySet,
+      uncommittedUnknown: emptySet
     }
 
     const updatedState = {
-      added,
-      deleted,
-      gitModified: emptySet,
-      modified: emptySet,
+      committedAdded,
+      committedDeleted,
+      committedModified: emptySet,
+      committedRenamed: emptySet,
+      committedUnknown: emptySet,
       notInCache,
-      renamed: emptySet,
-      tracked
+      tracked,
+      uncommittedAdded: emptySet,
+      uncommittedDeleted: emptySet,
+      uncommittedModified: emptySet,
+      uncommittedRenamed: emptySet,
+      uncommittedUnknown: emptySet
     }
 
-    expect(initialState.added).toStrictEqual(updatedState.added)
-    expect(initialState.deleted).toStrictEqual(updatedState.deleted)
-    expect(initialState.renamed).toStrictEqual(updatedState.renamed)
-    expect(initialState.gitModified).toStrictEqual(updatedState.gitModified)
+    expect(initialState.committedAdded).toStrictEqual(
+      updatedState.committedAdded
+    )
+    expect(initialState.committedDeleted).toStrictEqual(
+      updatedState.committedDeleted
+    )
+    expect(initialState.committedRenamed).toStrictEqual(
+      updatedState.committedRenamed
+    )
+    expect(initialState.committedModified).toStrictEqual(
+      updatedState.committedModified
+    )
 
-    expect(initialState.modified).not.toStrictEqual(updatedState.modified)
+    expect(initialState.uncommittedModified).not.toStrictEqual(
+      updatedState.uncommittedModified
+    )
     expect(initialState.notInCache).not.toStrictEqual(updatedState.notInCache)
     expect(initialState.tracked).not.toStrictEqual(updatedState.tracked)
 
@@ -133,9 +155,9 @@ describe('DecorationProvider', () => {
 
     expect(mockedDecorationsChangedFire).toBeCalledWith(
       [
-        ...added,
-        ...deleted,
-        ...modified,
+        ...committedAdded,
+        ...committedDeleted,
+        ...uncommittedModified,
         ...notInCache,
         dataDir,
         logAcc,
@@ -143,5 +165,56 @@ describe('DecorationProvider', () => {
         logLoss
       ].map(path => Uri.file(path))
     )
+  })
+
+  it('should provide a single decoration which is based on a set priority', () => {
+    const logs = new Set([logDir, logAcc, logLoss])
+
+    const initialState = {
+      committedAdded: new Set([dataXml]),
+      committedDeleted: emptySet,
+      committedModified: new Set([dataDir]),
+      committedRenamed: emptySet,
+      committedUnknown: emptySet,
+      notInCache: logs,
+      tracked: new Set([
+        model,
+        logDir,
+        logAcc,
+        logLoss,
+        dataDir,
+        dataXml,
+        dataCsv,
+        prepared
+      ]),
+      uncommittedAdded: new Set([dataCsv]),
+      uncommittedDeleted: logs,
+      uncommittedModified: new Set([dataDir]),
+      uncommittedRenamed: emptySet,
+      uncommittedUnknown: emptySet
+    }
+
+    const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
+    decorationProvider.setState(initialState)
+
+    const expectDecoration = (
+      path: string,
+      privateStaticDecoration: string
+    ) => {
+      const prioritizedDecoration = decorationProvider.provideFileDecoration(
+        Uri.file(path)
+      )
+
+      expect(prioritizedDecoration).toStrictEqual(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (DecorationProvider as any)[privateStaticDecoration]
+      )
+    }
+
+    expectDecoration(logDir, 'DecorationNotInCache')
+    expectDecoration(dataDir, 'DecorationUncommittedModified')
+    expectDecoration(dataCsv, 'DecorationUncommittedAdded')
+    expectDecoration(dataXml, 'DecorationCommittedAdded')
+    expectDecoration(prepared, 'DecorationTracked')
   })
 })

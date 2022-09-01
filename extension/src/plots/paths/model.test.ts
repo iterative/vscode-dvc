@@ -144,4 +144,25 @@ describe('PathsModel', () => {
 
     expect(model.getTemplateOrder()).toStrictEqual([originalSingleViewGroup])
   })
+
+  it('should retain the order of the comparison paths when changed', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    model.transformAndSet(plotsDiffFixture)
+
+    expect(model.getComparisonPaths()).toStrictEqual([
+      join('plots', 'acc.png'),
+      join('plots', 'heatmap.png'),
+      join('plots', 'loss.png')
+    ])
+
+    const newOrder = [
+      join('plots', 'heatmap.png'),
+      join('plots', 'acc.png'),
+      join('plots', 'loss.png')
+    ]
+
+    model.setComparisonPathsOrder(newOrder)
+
+    expect(model.getComparisonPaths()).toStrictEqual(newOrder)
+  })
 })

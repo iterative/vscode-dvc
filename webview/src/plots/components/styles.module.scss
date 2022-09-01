@@ -19,6 +19,11 @@ $gap: 20px;
     font-size: 1.25rem;
     display: flex;
     align-items: center;
+    width: max-content;
+
+    svg {
+      cursor: pointer;
+    }
   }
 }
 
@@ -303,6 +308,11 @@ $gap: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.rowDropTarget {
+  width: 100%;
+  padding: 20px;
 }
 
 .dropIcon {

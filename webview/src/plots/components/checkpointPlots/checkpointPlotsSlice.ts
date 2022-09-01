@@ -40,20 +40,20 @@ export const checkpointPlotsSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<CheckpointPlotsData>) => {
-      if (action.payload) {
-        const { plots, ...statePayload } = action.payload
-        const plotsIds = plots?.map(plot => plot.title) || []
-        const snapShots = addCheckpointPlotsWithSnapshots(plots)
-        removeCheckpointPlots(plotsIds)
-        return {
-          ...state,
-          ...statePayload,
-          hasData: !!action.payload,
-          plotsIds: plots?.map(plot => plot.title) || [],
-          plotsSnapshots: snapShots
-        }
+      if (!action.payload) {
+        return checkpointPlotsInitialState
       }
-      return checkpointPlotsInitialState
+      const { plots, ...statePayload } = action.payload
+      const plotsIds = plots?.map(plot => plot.title) || []
+      const snapShots = addCheckpointPlotsWithSnapshots(plots)
+      removeCheckpointPlots(plotsIds)
+      return {
+        ...state,
+        ...statePayload,
+        hasData: !!action.payload,
+        plotsIds: plots?.map(plot => plot.title) || [],
+        plotsSnapshots: snapShots
+      }
     }
   }
 })

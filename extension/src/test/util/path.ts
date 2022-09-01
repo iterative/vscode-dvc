@@ -2,3 +2,9 @@
 import path from 'path'
 const sep = path.sep || '/'
 export const join = (...segments: string[]) => segments.join(sep)
+
+export const makeAbsPathSet = (
+  dvcRoot: string,
+  ...relPaths: string[]
+): Set<string> =>
+  new Set(relPaths.map(relPath => path.resolve(dvcRoot, relPath)))
