@@ -31,6 +31,8 @@ export const getTelemetryReporter = (): TelemetryReporter => {
   return telemetryReporter
 }
 
+type EventName = keyof IEventNamePropertyMapping
+
 const convertProperty = (prop: object | string | number | boolean): string => {
   if (typeof prop === 'string') {
     return prop
@@ -58,15 +60,12 @@ const sanitizeProperty = (
   }
 }
 
-const sanitizeProperties = <
-  P extends IEventNamePropertyMapping,
-  E extends keyof P
->(
-  eventName: E,
-  data: P[E]
+const sanitizeProperties = (
+  eventName: EventName,
+  data: IEventNamePropertyMapping[EventName]
 ) => {
   const sanitizedProperties: Record<string, string> = {}
-  for (const [key, value] of Object.entries(data)) {
+  for (const [key, value] of Object.entries(data || {})) {
     if (value === undefined || value === null) {
       continue
     }
@@ -75,12 +74,9 @@ const sanitizeProperties = <
   return sanitizedProperties
 }
 
-export const sendTelemetryEvent = <
-  P extends IEventNamePropertyMapping,
-  E extends keyof P
->(
-  eventName: E,
-  properties: P[E],
+export const sendTelemetryEvent = (
+  eventName: EventName,
+  properties: IEventNamePropertyMapping[EventName],
   measurements: { [key: string]: number } | undefined
 ) => {
   if (isTestExecution() || isDebugSession()) {
@@ -97,31 +93,28 @@ export const sendTelemetryEvent = <
   )
 }
 
-export const sendErrorTelemetryEvent = <
-  P extends IEventNamePropertyMapping,
-  E extends keyof P
->(
-  eventName: E,
+export const sendErrorTelemetryEvent = (
+  eventName: EventName,
   e: Error,
   duration: number,
-  properties = {} as P[E]
+  properties = {} as IEventNamePropertyMapping[EventName]
 ) =>
   sendTelemetryEvent(
-    `errors.${String(eventName)}` as E,
-    { ...properties, error: e.message } as P[E],
+    `errors.${String(eventName)}` as EventName,
+    {
+      ...properties,
+      error: e.message
+    } as unknown as IEventNamePropertyMapping[EventName],
     {
       duration
     }
   )
 
-export const sendTelemetryEventAndThrow = <
-  P extends IEventNamePropertyMapping,
-  E extends keyof P
->(
-  eventName: E,
+export const sendTelemetryEventAndThrow = (
+  eventName: EventName,
   e: Error,
   duration: number,
-  properties = {} as P[E]
+  properties = {} as IEventNamePropertyMapping[EventName]
 ) => {
   sendErrorTelemetryEvent(eventName, e, duration, properties)
   throw e
