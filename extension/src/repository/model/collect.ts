@@ -3,7 +3,7 @@ import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 import { Changes, DataStatusOutput } from '../../cli/dvc/reader'
-import { DecorationDataStatus } from '../decorationProvider'
+import { DecorationDataStatus } from '../scmDecorationProvider'
 import { relativeWithUri } from '../../fileSystem'
 import {
   getDirectChild,

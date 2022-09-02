@@ -87,9 +87,9 @@ export const buildRepository = async (
     new Repository(dvcRoot, internalCommands, updatesPaused, treeDataChanged)
   )
 
-  const setDecorationStateSpy = spyOnPrivateMemberMethod(
+  const setScmDecorationStateSpy = spyOnPrivateMemberMethod(
     repository,
-    'decorationProvider',
+    'scmDecorationProvider',
     'setState'
   )
   const setScmStateSpy = spyOnPrivateMemberMethod(
@@ -101,7 +101,7 @@ export const buildRepository = async (
   await repository.isReady()
   return {
     repository,
-    setDecorationStateSpy,
+    setScmDecorationStateSpy,
     setScmStateSpy
   }
 }

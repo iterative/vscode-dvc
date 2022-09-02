@@ -53,7 +53,10 @@ suite('Repository Test Suite', () => {
 
       mockGetHasChanges.resolves(true)
 
-      const { setDecorationStateSpy, setScmStateSpy } = await buildRepository(
+      const {
+        setScmDecorationStateSpy: setDecorationStateSpy,
+        setScmStateSpy
+      } = await buildRepository(
         disposable,
         internalCommands,
         updatesPaused,
@@ -217,13 +220,16 @@ suite('Repository Test Suite', () => {
           ])
         )
 
-      const { repository, setDecorationStateSpy, setScmStateSpy } =
-        await buildRepository(
-          disposable,
-          internalCommands,
-          updatesPaused,
-          treeDataChanged
-        )
+      const {
+        repository,
+        setScmDecorationStateSpy: setDecorationStateSpy,
+        setScmStateSpy
+      } = await buildRepository(
+        disposable,
+        internalCommands,
+        updatesPaused,
+        treeDataChanged
+      )
 
       bypassProcessManagerDebounce(mockNow)
 

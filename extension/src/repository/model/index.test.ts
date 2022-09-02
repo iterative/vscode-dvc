@@ -57,14 +57,14 @@ describe('RepositoryModel', () => {
       }
 
       const model = new RepositoryModel(dvcDemoPath)
-      const { decorationState, sourceControlManagementState } =
+      const { scmDecorationState, sourceControlManagementState } =
         model.transformAndSet({
           dataStatus,
           hasGitChanges: true,
           untracked: new Set()
         })
 
-      expect(decorationState).toStrictEqual({
+      expect(scmDecorationState).toStrictEqual({
         committedAdded: emptySet,
         committedDeleted: makeAbsPathSet(dvcDemoPath, deleted),
         committedModified: makeAbsPathSet(dvcDemoPath, output),
@@ -153,7 +153,7 @@ describe('RepositoryModel', () => {
       }
 
       const model = new RepositoryModel(dvcDemoPath)
-      const { decorationState, sourceControlManagementState } =
+      const { scmDecorationState, sourceControlManagementState } =
         model.transformAndSet({
           dataStatus,
           hasGitChanges: false,
@@ -162,7 +162,7 @@ describe('RepositoryModel', () => {
 
       const absNotInCache = makeAbsPathSet(dvcDemoPath, ...notInCache)
 
-      expect(decorationState).toStrictEqual({
+      expect(scmDecorationState).toStrictEqual({
         committedAdded: emptySet,
         committedDeleted: emptySet,
         committedModified: emptySet,
@@ -202,14 +202,14 @@ describe('RepositoryModel', () => {
       }
 
       const model = new RepositoryModel(dvcDemoPath)
-      const { decorationState, sourceControlManagementState } =
+      const { scmDecorationState, sourceControlManagementState } =
         model.transformAndSet({
           dataStatus,
           hasGitChanges: true,
           untracked: new Set()
         })
 
-      expect(decorationState).toStrictEqual({
+      expect(scmDecorationState).toStrictEqual({
         committedAdded: emptySet,
         committedDeleted: emptySet,
         committedModified: emptySet,

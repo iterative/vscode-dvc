@@ -53,7 +53,7 @@ export class RepositoryModel extends Disposable {
     this.collectHasChanges(data, hasGitChanges)
 
     return {
-      decorationState: this.getDecorationState(data),
+      scmDecorationState: this.getScmDecorationState(data),
       sourceControlManagementState: this.getSourceControlManagementState(data)
     }
   }
@@ -88,7 +88,7 @@ export class RepositoryModel extends Disposable {
     )
   }
 
-  private getDecorationState(data: DataStatusAccumulator) {
+  private getScmDecorationState(data: DataStatusAccumulator) {
     return {
       ...omit(data, ...Object.values(UndecoratedDataStatus)),
       tracked: data.trackedDecorations
