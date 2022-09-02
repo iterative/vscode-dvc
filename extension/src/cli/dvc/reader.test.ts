@@ -82,13 +82,19 @@ describe('CliReader', () => {
     it('should return the default output if the cli returns any type of error', async () => {
       const cwd = __dirname
       const error = new Error('unexpected error - something something')
+      const unexpectedStderr = 'This is very unexpected'
       ;(error as MaybeConsoleError).exitCode = UNEXPECTED_ERROR_CODE
+      ;(error as MaybeConsoleError).stderr = unexpectedStderr
       mockedCreateProcess.mockImplementationOnce(() => {
         throw error
       })
 
       const cliOutput = await dvcReader.expShow(cwd)
-      expect(cliOutput).toStrictEqual({ workspace: { baseline: {} } })
+      expect(cliOutput).toStrictEqual({
+        workspace: {
+          baseline: { error: { msg: unexpectedStderr, type: 'Caught error' } }
+        }
+      })
     })
 
     it('should return the default output if the cli returns an empty object (no commits)', async () => {

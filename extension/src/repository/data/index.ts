@@ -13,10 +13,10 @@ import {
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
 import { DOT_GIT } from '../../cli/git/constants'
-import { DataStatusOutput } from '../../cli/dvc/reader'
+import { DataStatusOutput, DvcError } from '../../cli/dvc/reader'
 
 export type Data = {
-  dataStatus: DataStatusOutput
+  dataStatus: DataStatusOutput | DvcError
   hasGitChanges: boolean
   untracked: Set<string>
 }
@@ -83,7 +83,7 @@ export class RepositoryData extends DeferredDisposable {
 
   private async update() {
     const [dataStatus, hasGitChanges, untracked] = await Promise.all([
-      this.internalCommands.executeCommand<DataStatusOutput>(
+      this.internalCommands.executeCommand<DataStatusOutput | DvcError>(
         AvailableCommands.DATA_STATUS,
         this.dvcRoot
       ),

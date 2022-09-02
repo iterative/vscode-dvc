@@ -1,7 +1,10 @@
 import { join } from 'path'
 import { EventEmitter, Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { DecorationProvider, DecorationState } from './decorationProvider'
+import {
+  ScmDecorationProvider,
+  ScmDecorationState
+} from './scmDecorationProvider'
 import { standardizePath } from '../fileSystem/path'
 
 jest.mock('vscode')
@@ -38,24 +41,28 @@ describe('DecorationProvider', () => {
   const emptySet = new Set<string>()
 
   it('should be able to setState with no existing state', () => {
-    const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
+    const scmDecorationProvider = new ScmDecorationProvider(
+      mockedDecorationsChanged
+    )
 
     const addedPaths = [
       join('some', 'path', 'to', 'decorate'),
       join('some', 'other', 'path', 'to', 'decorate')
     ]
 
-    decorationProvider.setState({
+    scmDecorationProvider.setState({
       committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
-    } as DecorationState)
+    } as ScmDecorationState)
     expect(mockedDecorationsChangedFire).toBeCalledWith(
       addedPaths.map(path => Uri.file(path))
     )
   })
 
   it('should update the decorations for paths that no longer have a decoration', () => {
-    const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
+    const scmDecorationProvider = new ScmDecorationProvider(
+      mockedDecorationsChanged
+    )
 
     const addedPaths = [
       join('some', 'path', 'to', 'decorate'),
@@ -64,17 +71,17 @@ describe('DecorationProvider', () => {
 
     const subsetOfAddedPaths = [join('some', 'path', 'to', 'decorate')]
 
-    decorationProvider.setState({
+    scmDecorationProvider.setState({
       committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
-    } as DecorationState)
+    } as ScmDecorationState)
 
     mockedDecorationsChangedFire.mockClear()
 
-    decorationProvider.setState({
+    scmDecorationProvider.setState({
       committedAdded: new Set(subsetOfAddedPaths),
       tracked: new Set(subsetOfAddedPaths)
-    } as DecorationState)
+    } as ScmDecorationState)
 
     expect(mockedDecorationsChangedFire).toBeCalledWith(
       addedPaths.map(path => Uri.file(path))
@@ -147,11 +154,13 @@ describe('DecorationProvider', () => {
     expect(initialState.notInCache).not.toStrictEqual(updatedState.notInCache)
     expect(initialState.tracked).not.toStrictEqual(updatedState.tracked)
 
-    const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
-    decorationProvider.setState(initialState)
+    const scmDecorationProvider = new ScmDecorationProvider(
+      mockedDecorationsChanged
+    )
+    scmDecorationProvider.setState(initialState)
     mockedDecorationsChangedFire.mockClear()
 
-    decorationProvider.setState(updatedState)
+    scmDecorationProvider.setState(updatedState)
 
     expect(mockedDecorationsChangedFire).toBeCalledWith(
       [
@@ -194,20 +203,22 @@ describe('DecorationProvider', () => {
       uncommittedUnknown: emptySet
     }
 
-    const decorationProvider = new DecorationProvider(mockedDecorationsChanged)
-    decorationProvider.setState(initialState)
+    const scmDecorationProvider = new ScmDecorationProvider(
+      mockedDecorationsChanged
+    )
+    scmDecorationProvider.setState(initialState)
 
     const expectDecoration = (
       path: string,
       privateStaticDecoration: string
     ) => {
-      const prioritizedDecoration = decorationProvider.provideFileDecoration(
+      const prioritizedDecoration = scmDecorationProvider.provideFileDecoration(
         Uri.file(path)
       )
 
       expect(prioritizedDecoration).toStrictEqual(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (DecorationProvider as any)[privateStaticDecoration]
+        (ScmDecorationProvider as any)[privateStaticDecoration]
       )
     }
 
