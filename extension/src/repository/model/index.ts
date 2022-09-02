@@ -77,7 +77,7 @@ export class RepositoryModel extends Disposable {
     this.tree = createTreeFromError(this.dvcRoot, msg, label)
 
     return {
-      errors: new Set([label]),
+      errorDecorationState: new Set([label]),
       scmDecorationState: this.getScmDecorationState(emptyState),
       sourceControlManagementState:
         this.getSourceControlManagementState(emptyState)
