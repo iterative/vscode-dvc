@@ -243,7 +243,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       .bullet {
         &::after {
           content: '';
-          height: 105%;
+          height: calc(100% + 1px);
           top: -1px;
           right: calc(50% - 0.5px);
           position: absolute;
@@ -253,7 +253,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       }
       &:first-of-type {
         .bullet::after {
-          height: 52%;
+          height: calc(50% + 1px);
           top: 50%;
           clip-path: inset(0 0 0 0);
         }
