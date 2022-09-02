@@ -1,11 +1,11 @@
 import { join } from 'path'
+import isEmpty from 'lodash.isempty'
 import { DvcCli } from '.'
 import { Args, Command, ExperimentFlag, Flag, SubCommand } from './constants'
 import { typeCheckCommands } from '..'
 import { MaybeConsoleError } from '../error'
 import { Plot } from '../../plots/webview/contract'
 import { Logger } from '../../common/logger'
-import isEmpty from 'lodash.isempty'
 
 export type DvcError = { error: { type: string; msg: string } }
 
