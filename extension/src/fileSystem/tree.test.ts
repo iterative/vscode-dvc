@@ -1,5 +1,12 @@
 import { basename, join, resolve } from 'path'
-import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
+import {
+  commands,
+  EventEmitter,
+  MarkdownString,
+  TreeItem,
+  Uri,
+  window
+} from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { exists, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
@@ -10,6 +17,8 @@ import { OutputChannel } from '../vscode/outputChannel'
 import { WorkspaceRepositories } from '../repository/workspace'
 import { Repository } from '../repository'
 import { dvcDemoPath } from '../test/util'
+import { getDecoratableUri } from '../repository/errorDecorationProvider'
+import { getMarkdownString } from '../vscode/markdownString'
 
 const mockedTreeDataChanged = jest.mocked(new EventEmitter<void>())
 const mockedTreeDataChangedFire = jest.fn()
@@ -47,11 +56,14 @@ const mockedIsDirectory = jest.mocked(isDirectory)
 
 const mockedGetWorkspaceFolders = jest.mocked(getWorkspaceFolders)
 
+const mockedGetMarkdownString = jest.mocked(getMarkdownString)
+
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('.')
 jest.mock('../cli/dvc/reader')
 jest.mock('../vscode/workspaceFolders')
+jest.mock('../vscode/markdownString')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -360,6 +372,51 @@ describe('TrackedTreeView', () => {
           title: 'Open File'
         },
         contextValue: 'file'
+      })
+    })
+
+    it('should return the correct tree item for an error', () => {
+      let mockedItem = {}
+      const decoratableUri = getDecoratableUri(
+        'ERROR: unable to read: params.yaml, YAML file structure is corrupted: mapping values are not allowed in this context'
+      )
+      const msg = `ERROR: unable to read: 'params.yaml', YAML file structure is corrupted: mapping values are not allowed in this context
+      in "<unicode string>", line 3, column 9`
+      mockedGetMarkdownString.mockImplementationOnce(
+        str => str as unknown as MarkdownString
+      )
+      const placeholderUri = Uri.file(join(dvcDemoPath))
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+        expect(collapsibleState).toStrictEqual(0)
+        expect(uri).toStrictEqual(decoratableUri)
+        mockedItem = { collapsibleState, uri }
+        return mockedItem
+      })
+
+      const trackedTreeView = new TrackedExplorerTree(
+        mockedInternalCommands,
+        mockedRepositories
+      )
+
+      const treeItem = trackedTreeView.getTreeItem({
+        dvcRoot: dvcDemoPath,
+        error: {
+          msg,
+          uri: decoratableUri
+        },
+        isDirectory: false,
+        isTracked: false,
+        resourceUri: placeholderUri
+      })
+
+      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(treeItem).toStrictEqual({
+        ...mockedItem,
+        command: {
+          command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
+          title: 'Show DVC Output'
+        },
+        tooltip: `$(error) ${msg}`
       })
     })
   })

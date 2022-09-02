@@ -33,20 +33,20 @@ import {
   collectTrackedPaths,
   PathItem
 } from '../repository/model/collect'
+import { ErrorItem, pathItemHasError } from '../repository/model/error'
 import { Title } from '../vscode/title'
 import { Disposable } from '../class/dispose'
 import { createTreeView } from '../vscode/tree'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 import { getMarkdownString } from '../vscode/markdownString'
-import { ErrorItem, isErrorItem } from '../repository/model/error'
 
 export class TrackedExplorerTree
   extends Disposable
-  implements TreeDataProvider<PathItem | ErrorItem>
+  implements TreeDataProvider<PathItem>
 {
   public readonly onDidChangeTreeData: Event<void>
 
-  private readonly view: TreeView<string | PathItem | ErrorItem>
+  private readonly view: TreeView<string | PathItem>
   private readonly internalCommands: InternalCommands
   private readonly repositories: WorkspaceRepositories
 
@@ -69,11 +69,7 @@ export class TrackedExplorerTree
     this.onDidChangeTreeData = repositories.treeDataChanged.event
 
     this.view = this.dispose.track(
-      createTreeView<PathItem | ErrorItem>(
-        'dvc.views.trackedExplorerTree',
-        this,
-        true
-      )
+      createTreeView<PathItem>('dvc.views.trackedExplorerTree', this, true)
     )
   }
 
@@ -95,8 +91,8 @@ export class TrackedExplorerTree
     return []
   }
 
-  public getTreeItem(item: PathItem | ErrorItem): TreeItem {
-    if (isErrorItem(item)) {
+  public getTreeItem(item: PathItem): TreeItem {
+    if (pathItemHasError(item)) {
       return this.getErrorTreeItem(item)
     }
     const { resourceUri, isDirectory } = item
@@ -121,7 +117,7 @@ export class TrackedExplorerTree
     return treeItem
   }
 
-  private getErrorTreeItem({ msg, uri }: ErrorItem) {
+  private getErrorTreeItem({ error: { msg, uri } }: ErrorItem) {
     const treeItem = new TreeItem(uri, TreeItemCollapsibleState.None)
 
     treeItem.tooltip = getMarkdownString(`$(error) ${msg}`)
@@ -303,6 +299,6 @@ export class TrackedExplorerTree
   }
 
   private getSelectedPathItems() {
-    return [...this.view.selection] as PathItem[]
+    return [...this.view.selection]
   }
 }
