@@ -53,15 +53,13 @@ suite('Repository Test Suite', () => {
 
       mockGetHasChanges.resolves(true)
 
-      const {
-        setScmDecorationStateSpy: setDecorationStateSpy,
-        setScmStateSpy
-      } = await buildRepository(
-        disposable,
-        internalCommands,
-        updatesPaused,
-        treeDataChanged
-      )
+      const { setScmDecorationStateSpy, setScmStateSpy } =
+        await buildRepository(
+          disposable,
+          internalCommands,
+          updatesPaused,
+          treeDataChanged
+        )
 
       const modified = makeAbsPathSet(
         dvcDemoPath,
@@ -76,7 +74,7 @@ suite('Repository Test Suite', () => {
       expect(mockDataStatus).to.be.calledWith(dvcDemoPath)
       expect(mockGetAllUntracked).to.be.calledWith(dvcDemoPath)
 
-      expect(setDecorationStateSpy.lastCall.firstArg).to.deep.equal({
+      expect(setScmDecorationStateSpy.lastCall.firstArg).to.deep.equal({
         committedAdded: emptySet,
         committedDeleted: emptySet,
         committedModified: emptySet,
@@ -220,16 +218,13 @@ suite('Repository Test Suite', () => {
           ])
         )
 
-      const {
-        repository,
-        setScmDecorationStateSpy: setDecorationStateSpy,
-        setScmStateSpy
-      } = await buildRepository(
-        disposable,
-        internalCommands,
-        updatesPaused,
-        treeDataChanged
-      )
+      const { repository, setScmDecorationStateSpy, setScmStateSpy } =
+        await buildRepository(
+          disposable,
+          internalCommands,
+          updatesPaused,
+          treeDataChanged
+        )
 
       bypassProcessManagerDebounce(mockNow)
 
@@ -237,7 +232,7 @@ suite('Repository Test Suite', () => {
         disposable.track(onDidChangeTreeData(() => resolve(undefined)))
       )
 
-      expect(setDecorationStateSpy.lastCall.firstArg).to.deep.equal({
+      expect(setScmDecorationStateSpy.lastCall.firstArg).to.deep.equal({
         committedAdded: emptySet,
         committedDeleted: emptySet,
         committedModified: emptySet,
@@ -267,7 +262,7 @@ suite('Repository Test Suite', () => {
       expect(mockDataStatus).to.be.calledTwice
       expect(mockGetHasChanges).to.be.calledTwice
 
-      expect(setDecorationStateSpy.lastCall.firstArg).to.deep.equal({
+      expect(setScmDecorationStateSpy.lastCall.firstArg).to.deep.equal({
         committedAdded: emptySet,
         committedDeleted: emptySet,
         committedModified: emptySet,
