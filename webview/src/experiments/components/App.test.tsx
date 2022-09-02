@@ -348,13 +348,26 @@ describe('App', () => {
   })
 
   describe('Toggle experiment status', () => {
+    const getRowByLabel = (label: string) => {
+      const rows = screen.getAllByRole('row')
+
+      return rows.find(element => element.innerHTML.includes(label))
+    }
+
     it('should send a message to the extension to toggle an experiment when the row is clicked', () => {
       renderTable()
 
       const testClick = (label: string, id = label) => {
         mockPostMessage.mockReset()
 
-        fireEvent.click(screen.getByText(label))
+        const row = getRowByLabel(label)
+        if (row) {
+          const bulletToggleElement = within(row).getByLabelText(
+            'Toggle experiment for plots'
+          )
+
+          fireEvent.click(bulletToggleElement)
+        }
 
         expect(mockPostMessage).toBeCalledTimes(1)
         expect(mockPostMessage).toBeCalledWith({
@@ -375,23 +388,28 @@ describe('App', () => {
 
       mockPostMessage.mockClear()
 
-      const testRowLabel = screen.getByText('main')
+      const row = getRowByLabel('main')
 
-      testRowLabel.focus()
+      const bulletToggleElement = row
+        ? within(row).getByLabelText('Toggle experiment for plots')
+        : screen.getByRole('span')
 
-      fireEvent.keyDown(testRowLabel, {
+      bulletToggleElement.focus()
+
+      fireEvent.keyDown(bulletToggleElement, {
         bubbles: true,
         code: 'Enter',
         key: 'Enter',
         keyCode: 13
       })
+
       expect(mockPostMessage).toBeCalledWith({
         payload: 'main',
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
       mockPostMessage.mockClear()
 
-      fireEvent.keyDown(testRowLabel, {
+      fireEvent.keyDown(bulletToggleElement, {
         bubbles: true,
         charCode: 32,
         code: 'Space',
@@ -404,7 +422,7 @@ describe('App', () => {
       })
       mockPostMessage.mockClear()
 
-      fireEvent.keyDown(testRowLabel, {
+      fireEvent.keyDown(bulletToggleElement, {
         bubbles: true,
         code: 'keyA',
         key: 'a'

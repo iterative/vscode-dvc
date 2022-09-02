@@ -506,8 +506,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     .innerCell {
       justify-content: flex-start;
 
-      .bullet,
-      .cellContents {
+      .bullet {
         cursor: pointer;
       }
 

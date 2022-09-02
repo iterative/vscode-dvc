@@ -66,6 +66,7 @@ export const FirstCell: React.FC<
         <span
           className={styles.bullet}
           style={{ color: bulletColor }}
+          aria-label="Toggle experiment for plots"
           {...clickAndEnterProps(toggleExperiment)}
         >
           <IndicatorWithJustTheCounter
@@ -80,10 +81,7 @@ export const FirstCell: React.FC<
         </span>
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>
-            <div
-              className={cx(styles.cellContents, error && styles.error)}
-              {...clickAndEnterProps(toggleExperiment)}
-            >
+            <div className={cx(styles.cellContents, error && styles.error)}>
               {cell.render('Cell')}
             </div>
           </ErrorTooltip>
