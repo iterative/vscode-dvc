@@ -377,9 +377,9 @@ describe('TrackedTreeView', () => {
 
     it('should return the correct tree item for an error', () => {
       let mockedItem = {}
-      const decoratableUri = getDecoratableUri(
+      const label =
         'ERROR: unable to read: params.yaml, YAML file structure is corrupted: mapping values are not allowed in this context'
-      )
+
       const msg = `ERROR: unable to read: 'params.yaml', YAML file structure is corrupted: mapping values are not allowed in this context
       in "<unicode string>", line 3, column 9`
       mockedGetMarkdownString.mockImplementationOnce(
@@ -388,7 +388,7 @@ describe('TrackedTreeView', () => {
       const placeholderUri = Uri.file(join(dvcDemoPath))
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toStrictEqual(0)
-        expect(uri).toStrictEqual(decoratableUri)
+        expect(uri).toStrictEqual(getDecoratableUri(label))
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -401,8 +401,8 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         error: {
-          msg,
-          uri: decoratableUri
+          label,
+          msg
         },
         isDirectory: false,
         isTracked: false,

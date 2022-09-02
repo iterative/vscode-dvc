@@ -1,13 +1,12 @@
 import { Uri } from 'vscode'
 import { PathItem } from './collect'
-import { getDecoratableUri } from '../errorDecorationProvider'
 
-export type ErrorItem = { error: { uri: Uri; msg: string } }
+export type ErrorItem = { error: { label: string; msg: string } }
 
 export const pathItemHasError = <T extends PathItem>(
   maybeErrorItem: T
 ): maybeErrorItem is T & ErrorItem =>
-  !!(maybeErrorItem?.error?.uri && maybeErrorItem?.error?.msg)
+  !!(maybeErrorItem?.error?.label && maybeErrorItem?.error?.msg)
 
 export const getLabel = (msg: string): string =>
   msg.split('\n')[0].replace(/'|"/g, '')
@@ -24,8 +23,8 @@ export const createTreeFromError = (
         {
           dvcRoot,
           error: {
-            msg,
-            uri: getDecoratableUri(label)
+            label,
+            msg
           },
           isDirectory: false,
           isTracked: false,

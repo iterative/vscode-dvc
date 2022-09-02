@@ -242,7 +242,7 @@ export const collectDataStatus = (
 export type PathItem = Resource & {
   isDirectory: boolean
   isTracked: boolean
-  error?: { msg: string; uri: Uri }
+  error?: { label: string; msg: string }
 }
 
 const transformToAbsTree = (
