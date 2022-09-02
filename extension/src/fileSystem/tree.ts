@@ -38,14 +38,15 @@ import { Disposable } from '../class/dispose'
 import { createTreeView } from '../vscode/tree'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 import { getMarkdownString } from '../vscode/markdownString'
+import { ErrorItem, isErrorItem } from '../repository/model/error'
 
 export class TrackedExplorerTree
   extends Disposable
-  implements TreeDataProvider<PathItem>
+  implements TreeDataProvider<PathItem | ErrorItem>
 {
   public readonly onDidChangeTreeData: Event<void>
 
-  private readonly view: TreeView<string | PathItem>
+  private readonly view: TreeView<string | PathItem | ErrorItem>
   private readonly internalCommands: InternalCommands
   private readonly repositories: WorkspaceRepositories
 
@@ -68,7 +69,11 @@ export class TrackedExplorerTree
     this.onDidChangeTreeData = repositories.treeDataChanged.event
 
     this.view = this.dispose.track(
-      createTreeView<PathItem>('dvc.views.trackedExplorerTree', this, true)
+      createTreeView<PathItem | ErrorItem>(
+        'dvc.views.trackedExplorerTree',
+        this,
+        true
+      )
     )
   }
 
@@ -90,17 +95,12 @@ export class TrackedExplorerTree
     return []
   }
 
-  public getTreeItem({ isDirectory, resourceUri, error }: PathItem): TreeItem {
-    if (error) {
-      const treeItem = new TreeItem(error.uri, TreeItemCollapsibleState.None)
-      treeItem.tooltip = getMarkdownString(`$(error) ${error.msg}`)
-      treeItem.iconPath = new ThemeIcon('blank')
-      treeItem.command = {
-        command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
-        title: 'Show DVC Output'
-      }
-      return treeItem
+  public getTreeItem(item: PathItem | ErrorItem): TreeItem {
+    if (isErrorItem(item)) {
+      return this.getErrorTreeItem(item)
     }
+    const { resourceUri, isDirectory } = item
+
     const treeItem = new TreeItem(
       resourceUri,
       isDirectory
@@ -118,6 +118,20 @@ export class TrackedExplorerTree
       }
     }
 
+    return treeItem
+  }
+
+  private getErrorTreeItem({ msg, uri }: ErrorItem) {
+    const treeItem = new TreeItem(uri, TreeItemCollapsibleState.None)
+
+    treeItem.tooltip = getMarkdownString(`$(error) ${msg}`)
+
+    treeItem.iconPath = new ThemeIcon('blank')
+
+    treeItem.command = {
+      command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
+      title: 'Show DVC Output'
+    }
     return treeItem
   }
 
@@ -289,6 +303,6 @@ export class TrackedExplorerTree
   }
 
   private getSelectedPathItems() {
-    return [...this.view.selection]
+    return [...this.view.selection] as PathItem[]
   }
 }
