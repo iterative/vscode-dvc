@@ -41,7 +41,7 @@ describe('DecorationProvider', () => {
   const emptySet = new Set<string>()
 
   it('should be able to setState with no existing state', () => {
-    const scmDecorationProvider = new ScmDecorationProvider(
+    const decorationProvider = new ScmDecorationProvider(
       mockedDecorationsChanged
     )
 

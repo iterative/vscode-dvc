@@ -1,4 +1,5 @@
 import { EventEmitter } from 'vscode'
+import { ErrorDecorationProvider } from './errorDecorationProvider'
 import {
   ScmDecorationProvider,
   ScmDecorationState
@@ -18,6 +19,7 @@ export class Repository extends DeferredDisposable {
   private readonly treeDataChanged: EventEmitter<void>
 
   private readonly dvcRoot: string
+  private readonly errorDecorationProvider: ErrorDecorationProvider
   private readonly scmDecorationProvider: ScmDecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
   private readonly data: RepositoryData
@@ -36,6 +38,9 @@ export class Repository extends DeferredDisposable {
       new RepositoryData(dvcRoot, internalCommands, updatesPaused)
     )
 
+    this.errorDecorationProvider = this.dispose.track(
+      new ErrorDecorationProvider()
+    )
     this.scmDecorationProvider = this.dispose.track(new ScmDecorationProvider())
     this.sourceControlManagement = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, {
@@ -70,8 +75,8 @@ export class Repository extends DeferredDisposable {
   private async initialize() {
     this.dispose.track(
       this.data.onDidUpdate(data => {
-        const scmAndDecorationState = this.model.transformAndSet(data)
-        this.notifyChanged(scmAndDecorationState)
+        const state = this.model.transformAndSet(data)
+        this.notifyChanged(state)
       })
     )
 
@@ -81,13 +86,18 @@ export class Repository extends DeferredDisposable {
 
   private notifyChanged({
     scmDecorationState,
+    errors,
     sourceControlManagementState
   }: {
     scmDecorationState: ScmDecorationState
+    errors?: Set<string>
     sourceControlManagementState: SCMState
   }) {
     this.treeDataChanged.fire()
     this.sourceControlManagement.setState(sourceControlManagementState)
     this.scmDecorationProvider.setState(scmDecorationState)
+    if (errors) {
+      this.errorDecorationProvider.setState(errors)
+    }
   }
 }

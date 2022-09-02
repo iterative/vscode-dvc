@@ -8,7 +8,7 @@ import {
   DataStatusAccumulator,
   PathItem
 } from './collect'
-import { DecorationProvider, getDecoratableUri } from './decorationProvider'
+import { getDecoratableUri } from '../errorDecorationProvider'
 import { UndecoratedDataStatus } from '../constants'
 import {
   SourceControlDataStatus,
@@ -26,8 +26,6 @@ import { isDirectory } from '../../fileSystem'
 export class RepositoryModel extends Disposable {
   private readonly dvcRoot: string
 
-  private readonly decorationProvider: DecorationProvider
-
   private hasChanges = false
 
   private tracked = new Set<string>()
@@ -38,7 +36,6 @@ export class RepositoryModel extends Disposable {
     super()
 
     this.dvcRoot = dvcRoot
-    this.decorationProvider = this.dispose.track(new DecorationProvider())
   }
 
   public getScale() {
@@ -72,8 +69,9 @@ export class RepositoryModel extends Disposable {
   }
 
   private handleError(dataStatus: DvcError) {
-    const data = createDataStatusAccumulator()
+    const emptyState = createDataStatusAccumulator()
     this.hasChanges = true
+
     this.tracked = new Set()
     const label = dataStatus.error.msg.split('\n')[0].replace(/'|"/g, '')
     this.tree = new Map([
@@ -94,11 +92,11 @@ export class RepositoryModel extends Disposable {
       ]
     ])
 
-    this.decorationProvider.setState(new Set([label]))
-
     return {
-      scmDecorationState: this.getScmDecorationState(data),
-      sourceControlManagementState: this.getSourceControlManagementState(data)
+      errors: new Set([label]),
+      scmDecorationState: this.getScmDecorationState(emptyState),
+      sourceControlManagementState:
+        this.getSourceControlManagementState(emptyState)
     }
   }
 

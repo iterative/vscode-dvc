@@ -7,12 +7,12 @@ import {
   Uri,
   window
 } from 'vscode'
-import { Disposable } from '../../class/dispose'
+import { Disposable } from '../class/dispose'
 
 export const getDecoratableUri = (label: string): Uri =>
   Uri.from({ path: label, scheme: 'dvc.tracked' })
 
-export class DecorationProvider
+export class ErrorDecorationProvider
   extends Disposable
   implements FileDecorationProvider
 {
@@ -38,7 +38,7 @@ export class DecorationProvider
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
     if (this.errors.has(uri.fsPath)) {
-      return DecorationProvider.DecorationError
+      return ErrorDecorationProvider.DecorationError
     }
   }
 
@@ -48,7 +48,6 @@ export class DecorationProvider
     for (const label of errors) {
       urisToUpdate.push(getDecoratableUri(label))
     }
-
     this.errors = errors
     this.decorationsChanged.fire(urisToUpdate)
   }
