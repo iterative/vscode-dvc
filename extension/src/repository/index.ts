@@ -1,5 +1,9 @@
 import { EventEmitter } from 'vscode'
-import { DecorationProvider, DecorationState } from './decorationProvider'
+import { ErrorDecorationProvider } from './errorDecorationProvider'
+import {
+  ScmDecorationProvider,
+  ScmDecorationState
+} from './scmDecorationProvider'
 import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
 import { SourceControlManagement, SCMState } from './sourceControlManagement'
@@ -15,7 +19,8 @@ export class Repository extends DeferredDisposable {
   private readonly treeDataChanged: EventEmitter<void>
 
   private readonly dvcRoot: string
-  private readonly decorationProvider: DecorationProvider
+  private readonly errorDecorationProvider: ErrorDecorationProvider
+  private readonly scmDecorationProvider: ScmDecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
   private readonly data: RepositoryData
 
@@ -33,7 +38,10 @@ export class Repository extends DeferredDisposable {
       new RepositoryData(dvcRoot, internalCommands, updatesPaused)
     )
 
-    this.decorationProvider = this.dispose.track(new DecorationProvider())
+    this.errorDecorationProvider = this.dispose.track(
+      new ErrorDecorationProvider()
+    )
+    this.scmDecorationProvider = this.dispose.track(new ScmDecorationProvider())
     this.sourceControlManagement = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, {
         committed: [],
@@ -67,8 +75,8 @@ export class Repository extends DeferredDisposable {
   private async initialize() {
     this.dispose.track(
       this.data.onDidUpdate(data => {
-        const scmAndDecorationState = this.model.transformAndSet(data)
-        this.notifyChanged(scmAndDecorationState)
+        const state = this.model.transformAndSet(data)
+        this.notifyChanged(state)
       })
     )
 
@@ -77,14 +85,19 @@ export class Repository extends DeferredDisposable {
   }
 
   private notifyChanged({
-    decorationState,
+    errorDecorationState,
+    scmDecorationState,
     sourceControlManagementState
   }: {
-    decorationState: DecorationState
+    scmDecorationState: ScmDecorationState
+    errorDecorationState?: Set<string>
     sourceControlManagementState: SCMState
   }) {
     this.treeDataChanged.fire()
     this.sourceControlManagement.setState(sourceControlManagementState)
-    this.decorationProvider.setState(decorationState)
+    this.scmDecorationProvider.setState(scmDecorationState)
+    if (errorDecorationState) {
+      this.errorDecorationProvider.setState(errorDecorationState)
+    }
   }
 }

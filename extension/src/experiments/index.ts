@@ -19,7 +19,7 @@ import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
 import { Experiment, ColumnType, TableData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
-import { DecorationProvider } from './model/decorationProvider'
+import { ExperimentsDecorationProvider } from './decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
@@ -72,7 +72,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   private readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
   private readonly decorationProvider = this.dispose.track(
-    new DecorationProvider()
+    new ExperimentsDecorationProvider()
   )
 
   private readonly internalCommands: InternalCommands
