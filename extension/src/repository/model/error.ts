@@ -1,4 +1,3 @@
-import { Uri } from 'vscode'
 import { PathItem } from './collect'
 
 export type ErrorItem = { error: { label: string; msg: string } }
@@ -21,15 +20,11 @@ export const createTreeFromError = (
       dvcRoot,
       [
         {
-          dvcRoot,
           error: {
             label,
             msg
-          },
-          isDirectory: false,
-          isTracked: false,
-          resourceUri: Uri.file(dvcRoot)
-        }
+          }
+        } as PathItem
       ]
     ]
   ])

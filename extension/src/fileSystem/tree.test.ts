@@ -19,6 +19,7 @@ import { Repository } from '../repository'
 import { dvcDemoPath } from '../test/util'
 import { getDecoratableUri } from '../repository/errorDecorationProvider'
 import { getMarkdownString } from '../vscode/markdownString'
+import { PathItem } from '../repository/model/collect'
 
 const mockedTreeDataChanged = jest.mocked(new EventEmitter<void>())
 const mockedTreeDataChangedFire = jest.fn()
@@ -385,7 +386,6 @@ describe('TrackedTreeView', () => {
       mockedGetMarkdownString.mockImplementationOnce(
         str => str as unknown as MarkdownString
       )
-      const placeholderUri = Uri.file(join(dvcDemoPath))
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toStrictEqual(0)
         expect(uri).toStrictEqual(getDecoratableUri(label))
@@ -399,15 +399,11 @@ describe('TrackedTreeView', () => {
       )
 
       const treeItem = trackedTreeView.getTreeItem({
-        dvcRoot: dvcDemoPath,
         error: {
           label,
           msg
-        },
-        isDirectory: false,
-        isTracked: false,
-        resourceUri: placeholderUri
-      })
+        }
+      } as PathItem)
 
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toStrictEqual({

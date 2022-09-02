@@ -403,17 +403,10 @@ suite('Repository Test Suite', () => {
 
       expect(repository.getChildren(dvcDemoPath)).to.deep.equal([
         {
-          dvcRoot: dvcDemoPath,
           error: {
-            msg,
-            uri: Uri.from({
-              path: './dvc.yaml validation failed.',
-              scheme: 'dvc.tracked'
-            })
-          },
-          isDirectory: false,
-          isTracked: false,
-          resourceUri: Uri.file(dvcDemoPath)
+            label: './dvc.yaml validation failed.',
+            msg
+          }
         }
       ])
     })
