@@ -1060,13 +1060,14 @@ describe('App', () => {
 
     const topSection = screen.getByTestId(NewSectionBlock.TOP)
 
-    const dragOverEvent = createBubbledEvent('dragover', {
-      preventDefault: jest.fn()
+    act(() => {
+      const dragOverEvent = createBubbledEvent('dragover', {
+        preventDefault: jest.fn()
+      })
+
+      topSection.dispatchEvent(dragOverEvent)
+      expect(dragOverEvent.preventDefault).toHaveBeenCalled()
     })
-
-    topSection.dispatchEvent(dragOverEvent)
-
-    expect(dragOverEvent.preventDefault).toHaveBeenCalled()
   })
 
   it('should show a drop target before a plot on drag enter from the left', () => {
