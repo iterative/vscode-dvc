@@ -311,5 +311,111 @@ suite('Repository Test Suite', () => {
       })
       expect(repository.hasChanges()).to.be.true
     })
+
+    it('should handle an error being returned', async () => {
+      const {
+        internalCommands,
+        mockDataStatus,
+        mockGetAllUntracked,
+        mockGetHasChanges,
+        mockNow,
+        onDidChangeTreeData,
+        updatesPaused,
+        treeDataChanged
+      } = buildDependencies(disposable)
+
+      mockNow.resolves(FIRST_TRUTHY_TIME)
+
+      const emptySet = new Set<string>()
+
+      const label = './dvc.yaml validation failed.'
+      const msg = `'./dvc.yaml' validation failed.
+
+      expected bool, in stages -> train -> outs -> 0 -> model.pt -> checkpoint, line 
+      11, column 9
+        10 │   - model.pt:                                                            
+        11 │   │   checkpoint: true asdasd                                            
+        12 │   metrics:                                                               `
+
+      mockDataStatus
+        .onFirstCall()
+        .resolves({})
+        .onSecondCall()
+        .resolves({ error: { msg, type: 'Caught error' } })
+      mockGetHasChanges.resolves(false)
+      mockGetAllUntracked
+        .onFirstCall()
+        .resolves(emptySet)
+        .onSecondCall()
+        .resolves(emptySet)
+
+      const {
+        repository,
+        setErrorDecorationStateSpy,
+        setScmDecorationStateSpy,
+        setScmStateSpy
+      } = await buildRepository(
+        disposable,
+        internalCommands,
+        updatesPaused,
+        treeDataChanged
+      )
+
+      bypassProcessManagerDebounce(mockNow)
+
+      const dataUpdateEvent = new Promise(resolve =>
+        disposable.track(onDidChangeTreeData(() => resolve(undefined)))
+      )
+
+      await repository.update()
+      await dataUpdateEvent
+
+      expect(mockDataStatus).to.be.calledTwice
+      expect(mockGetHasChanges).to.be.calledTwice
+
+      expect(setErrorDecorationStateSpy.lastCall.firstArg).to.deep.equal(
+        new Set([label])
+      )
+
+      expect(setScmDecorationStateSpy.lastCall.firstArg).to.deep.equal({
+        committedAdded: emptySet,
+        committedDeleted: emptySet,
+        committedModified: emptySet,
+        committedRenamed: emptySet,
+        committedUnknown: emptySet,
+        notInCache: emptySet,
+        tracked: emptySet,
+        uncommittedAdded: emptySet,
+        uncommittedDeleted: emptySet,
+        uncommittedModified: emptySet,
+        uncommittedRenamed: emptySet,
+        uncommittedUnknown: emptySet
+      })
+
+      expect(setScmStateSpy.lastCall.firstArg).to.deep.equal({
+        committed: [],
+        notInCache: [],
+        uncommitted: [],
+        untracked: []
+      })
+
+      expect(repository.hasChanges()).to.be.true
+
+      expect(repository.getChildren(dvcDemoPath)).to.deep.equal([
+        {
+          dvcRoot: dvcDemoPath,
+          error: {
+            msg,
+            uri: Uri.from({
+              path: './dvc.yaml validation failed.',
+              scheme: 'dvc.tracked'
+            })
+          },
+          isDirectory: false,
+          isTracked: false,
+          resourceUri: Uri.file(dvcDemoPath)
+        }
+      ])
+    })
   })
 })

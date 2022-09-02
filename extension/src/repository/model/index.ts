@@ -8,7 +8,7 @@ import {
   DataStatusAccumulator,
   PathItem
 } from './collect'
-import { getDecoratableUri } from '../errorDecorationProvider'
+import { createTreeFromError, getLabel } from './error'
 import { UndecoratedDataStatus } from '../constants'
 import {
   SourceControlDataStatus,
@@ -68,29 +68,13 @@ export class RepositoryModel extends Disposable {
     return this.hasChanges
   }
 
-  private handleError(dataStatus: DvcError) {
+  private handleError({ error: { msg } }: DvcError) {
     const emptyState = createDataStatusAccumulator()
     this.hasChanges = true
 
     this.tracked = new Set()
-    const label = dataStatus.error.msg.split('\n')[0].replace(/'|"/g, '')
-    this.tree = new Map([
-      [
-        this.dvcRoot,
-        [
-          {
-            dvcRoot: this.dvcRoot,
-            error: {
-              msg: dataStatus.error.msg,
-              uri: getDecoratableUri(label)
-            },
-            isDirectory: false,
-            isTracked: false,
-            resourceUri: Uri.file(this.dvcRoot)
-          }
-        ]
-      ]
-    ])
+    const label = getLabel(msg)
+    this.tree = createTreeFromError(this.dvcRoot, msg, label)
 
     return {
       errors: new Set([label]),
