@@ -41,7 +41,7 @@ describe('DecorationProvider', () => {
   const emptySet = new Set<string>()
 
   it('should be able to setState with no existing state', () => {
-    const decorationProvider = new ScmDecorationProvider(
+    const scmDecorationProvider = new ScmDecorationProvider(
       mockedDecorationsChanged
     )
 
@@ -50,7 +50,7 @@ describe('DecorationProvider', () => {
       join('some', 'other', 'path', 'to', 'decorate')
     ]
 
-    decorationProvider.setState({
+    scmDecorationProvider.setState({
       committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
     } as ScmDecorationState)
@@ -60,7 +60,7 @@ describe('DecorationProvider', () => {
   })
 
   it('should update the decorations for paths that no longer have a decoration', () => {
-    const decorationProvider = new ScmDecorationProvider(
+    const scmDecorationProvider = new ScmDecorationProvider(
       mockedDecorationsChanged
     )
 
@@ -71,14 +71,14 @@ describe('DecorationProvider', () => {
 
     const subsetOfAddedPaths = [join('some', 'path', 'to', 'decorate')]
 
-    decorationProvider.setState({
+    scmDecorationProvider.setState({
       committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
     } as ScmDecorationState)
 
     mockedDecorationsChangedFire.mockClear()
 
-    decorationProvider.setState({
+    scmDecorationProvider.setState({
       committedAdded: new Set(subsetOfAddedPaths),
       tracked: new Set(subsetOfAddedPaths)
     } as ScmDecorationState)
@@ -154,13 +154,13 @@ describe('DecorationProvider', () => {
     expect(initialState.notInCache).not.toStrictEqual(updatedState.notInCache)
     expect(initialState.tracked).not.toStrictEqual(updatedState.tracked)
 
-    const decorationProvider = new ScmDecorationProvider(
+    const scmDecorationProvider = new ScmDecorationProvider(
       mockedDecorationsChanged
     )
-    decorationProvider.setState(initialState)
+    scmDecorationProvider.setState(initialState)
     mockedDecorationsChangedFire.mockClear()
 
-    decorationProvider.setState(updatedState)
+    scmDecorationProvider.setState(updatedState)
 
     expect(mockedDecorationsChangedFire).toBeCalledWith(
       [
@@ -203,16 +203,16 @@ describe('DecorationProvider', () => {
       uncommittedUnknown: emptySet
     }
 
-    const decorationProvider = new ScmDecorationProvider(
+    const scmDecorationProvider = new ScmDecorationProvider(
       mockedDecorationsChanged
     )
-    decorationProvider.setState(initialState)
+    scmDecorationProvider.setState(initialState)
 
     const expectDecoration = (
       path: string,
       privateStaticDecoration: string
     ) => {
-      const prioritizedDecoration = decorationProvider.provideFileDecoration(
+      const prioritizedDecoration = scmDecorationProvider.provideFileDecoration(
         Uri.file(path)
       )
 
