@@ -18,6 +18,7 @@ import { Any } from '../../../util/objects'
 import { PlotsState } from '../../../plots/store'
 import { getStyleProperty } from '../../../util/styles'
 import { idToNode } from '../../../util/helpers'
+import { useDeferedDragLeave } from '../../hooks/useDeferedDragLeave'
 
 const AFTER_DIRECTIONS = new Set([
   DragEnterDirection.RIGHT,
@@ -96,34 +97,35 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     : DragEnterDirection.LEFT
 
   const [draggedOverId, setDraggedOverId] = useState('')
-  const [hoveringSomething, setHoveringSomething] = useState(false)
-  const isHovering = useRef(false)
+  const {
+    hoveringSomething,
+    immediateDragLeave,
+    immediateDragEnter,
+    deferedDragLeave
+  } = useDeferedDragLeave()
   const [draggedId, setDraggedId] = useState('')
   const [direction, setDirection] = useState(defaultDragEnterDirection)
   const { draggedRef, draggedOverGroup } = useSelector(
     (state: PlotsState) => state.dragAndDrop
   )
   const draggedOverIdTimeout = useRef<number>(0)
-  const hoveringTimeout = useRef(0)
   const dispatch = useDispatch()
 
   const cleanup = useCallback(() => {
-    setHoveringSomething(false)
-    isHovering.current = false
+    immediateDragLeave()
     setDraggedOverId('')
     setDraggedId('')
     setDirection(defaultDragEnterDirection)
   }, [
-    setHoveringSomething,
     setDraggedOverId,
     setDirection,
-    defaultDragEnterDirection
+    defaultDragEnterDirection,
+    immediateDragLeave
   ])
 
   useEffect(() => {
     return () => {
       clearTimeout(draggedOverIdTimeout.current)
-      clearTimeout(hoveringTimeout.current)
     }
   }, [])
 
@@ -214,13 +216,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }
   }
 
-  const setIsHovering = () => {
-    setHoveringSomething(true)
-    isHovering.current = true
-  }
-
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    setIsHovering()
+    immediateDragEnter()
+
     if (isSameGroup(draggedRef?.group, group)) {
       const { id } = e.currentTarget
       if (
@@ -238,7 +236,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const handleDragOver = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
     if (draggedOverId && e.currentTarget.id.includes(draggedOverId)) {
-      setIsHovering()
+      immediateDragEnter()
     }
     if (isSameGroup(draggedRef?.group, group)) {
       const { id } = e.currentTarget
@@ -254,12 +252,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleDragLeave = () => {
-    isHovering.current = false
-    hoveringTimeout.current = window.setTimeout(() => {
-      if (!isHovering.current) {
-        setHoveringSomething(false)
-      }
-    }, 500)
+    deferedDragLeave()
   }
 
   const buildItem = (id: string, draggable: JSX.Element) => (
