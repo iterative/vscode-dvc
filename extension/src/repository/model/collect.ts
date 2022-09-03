@@ -3,7 +3,7 @@ import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
 import { Changes, DataStatusOutput } from '../../cli/dvc/reader'
-import { DecorationDataStatus } from '../decorationProvider'
+import { DecorationDataStatus } from '../scmDecorationProvider'
 import { relativeWithUri } from '../../fileSystem'
 import {
   getDirectChild,
@@ -176,7 +176,7 @@ const collectMappingFromGroup = (
   return dataStatusMapping
 }
 
-const createDataStatusAccumulator = (): DataStatusAccumulator => {
+export const createDataStatusAccumulator = (): DataStatusAccumulator => {
   const acc = {} as DataStatusAccumulator
   for (const status of Object.values(AvailableDataStatus)) {
     acc[status] = new Set<string>()
@@ -242,6 +242,7 @@ export const collectDataStatus = (
 export type PathItem = Resource & {
   isDirectory: boolean
   isTracked: boolean
+  error?: { label: string; msg: string }
 }
 
 const transformToAbsTree = (

@@ -33,10 +33,13 @@ import {
   collectTrackedPaths,
   PathItem
 } from '../repository/model/collect'
+import { ErrorItem, pathItemHasError } from '../repository/model/error'
 import { Title } from '../vscode/title'
 import { Disposable } from '../class/dispose'
 import { createTreeView } from '../vscode/tree'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
+import { getMarkdownString } from '../vscode/markdownString'
+import { getDecoratableUri } from '../repository/errorDecorationProvider'
 
 export class TrackedExplorerTree
   extends Disposable
@@ -89,7 +92,12 @@ export class TrackedExplorerTree
     return []
   }
 
-  public getTreeItem({ isDirectory, resourceUri }: PathItem): TreeItem {
+  public getTreeItem(item: PathItem): TreeItem {
+    if (pathItemHasError(item)) {
+      return this.getErrorTreeItem(item)
+    }
+    const { resourceUri, isDirectory } = item
+
     const treeItem = new TreeItem(
       resourceUri,
       isDirectory
@@ -107,6 +115,23 @@ export class TrackedExplorerTree
       }
     }
 
+    return treeItem
+  }
+
+  private getErrorTreeItem({ error: { msg, label } }: ErrorItem) {
+    const treeItem = new TreeItem(
+      getDecoratableUri(label),
+      TreeItemCollapsibleState.None
+    )
+
+    treeItem.tooltip = getMarkdownString(`$(error) ${msg}`)
+
+    treeItem.iconPath = new ThemeIcon('blank')
+
+    treeItem.command = {
+      command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
+      title: 'Show DVC Output'
+    }
     return treeItem
   }
 

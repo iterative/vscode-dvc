@@ -15,14 +15,14 @@ export const DecorationDataStatus = Object.assign({}, BaseDataStatus, {
   TRACKED: 'tracked'
 } as const)
 
-type DecorationStatus =
+type ScmDecorationStatus =
   typeof DecorationDataStatus[keyof typeof DecorationDataStatus]
 
-export type DecorationState = Record<DecorationStatus, Set<string>>
+export type ScmDecorationState = Record<ScmDecorationStatus, Set<string>>
 
 const IGNORED_DECORATION = 'gitDecoration.ignoredResourceForeground'
 
-const decorationPriority: DecorationStatus[] = [
+const decorationPriority: ScmDecorationStatus[] = [
   DecorationDataStatus.NOT_IN_CACHE,
   DecorationDataStatus.UNCOMMITTED_UNKNOWN,
   DecorationDataStatus.UNCOMMITTED_ADDED,
@@ -37,7 +37,7 @@ const decorationPriority: DecorationStatus[] = [
   DecorationDataStatus.TRACKED
 ]
 
-export class DecorationProvider
+export class ScmDecorationProvider
   extends Disposable
   implements FileDecorationProvider
 {
@@ -114,29 +114,29 @@ export class DecorationProvider
   public readonly onDidChangeFileDecorations: Event<Uri[]>
   private readonly decorationsChanged: EventEmitter<Uri[]>
 
-  private state: DecorationState
+  private state: ScmDecorationState
 
   private readonly decorationMapping: Partial<
-    Record<DecorationStatus, FileDecoration>
+    Record<ScmDecorationStatus, FileDecoration>
   > = {
-    committedAdded: DecorationProvider.DecorationCommittedAdded,
-    committedDeleted: DecorationProvider.DecorationCommittedDeleted,
-    committedModified: DecorationProvider.DecorationCommittedModified,
-    committedRenamed: DecorationProvider.DecorationCommittedRenamed,
-    committedUnknown: DecorationProvider.DecorationCommittedUnknown,
-    notInCache: DecorationProvider.DecorationNotInCache,
-    tracked: DecorationProvider.DecorationTracked,
-    uncommittedAdded: DecorationProvider.DecorationUncommittedAdded,
-    uncommittedDeleted: DecorationProvider.DecorationUncommittedDeleted,
-    uncommittedModified: DecorationProvider.DecorationUncommittedModified,
-    uncommittedRenamed: DecorationProvider.DecorationUncommittedRenamed,
-    uncommittedUnknown: DecorationProvider.DecorationUncommittedUnknown
+    committedAdded: ScmDecorationProvider.DecorationCommittedAdded,
+    committedDeleted: ScmDecorationProvider.DecorationCommittedDeleted,
+    committedModified: ScmDecorationProvider.DecorationCommittedModified,
+    committedRenamed: ScmDecorationProvider.DecorationCommittedRenamed,
+    committedUnknown: ScmDecorationProvider.DecorationCommittedUnknown,
+    notInCache: ScmDecorationProvider.DecorationNotInCache,
+    tracked: ScmDecorationProvider.DecorationTracked,
+    uncommittedAdded: ScmDecorationProvider.DecorationUncommittedAdded,
+    uncommittedDeleted: ScmDecorationProvider.DecorationUncommittedDeleted,
+    uncommittedModified: ScmDecorationProvider.DecorationUncommittedModified,
+    uncommittedRenamed: ScmDecorationProvider.DecorationUncommittedRenamed,
+    uncommittedUnknown: ScmDecorationProvider.DecorationUncommittedUnknown
   }
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
     super()
 
-    this.state = {} as DecorationState
+    this.state = {} as ScmDecorationState
 
     this.decorationsChanged = this.dispose.track(
       decorationsChanged || new EventEmitter()
@@ -150,7 +150,7 @@ export class DecorationProvider
     const path = uri.fsPath
 
     const decoration = decorationPriority.find(status => {
-      if (this.state[status as DecorationStatus]?.has(path)) {
+      if (this.state[status as ScmDecorationStatus]?.has(path)) {
         return status
       }
     })
@@ -160,13 +160,16 @@ export class DecorationProvider
     }
   }
 
-  public setState(state: DecorationState) {
+  public setState(state: ScmDecorationState) {
     const urisToUpdate = this.getUnion(this.state, state)
     this.state = state
     this.decorationsChanged.fire(urisToUpdate)
   }
 
-  private getUnion(existingState: DecorationState, newState: DecorationState) {
+  private getUnion(
+    existingState: ScmDecorationState,
+    newState: ScmDecorationState
+  ) {
     return flattenUnique([
       ...Object.values(existingState).map(status => [...(status || [])]),
       ...Object.values(newState).map(status => [...(status || [])])

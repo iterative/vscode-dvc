@@ -3,9 +3,11 @@ import isEmpty from 'lodash.isempty'
 import { DvcCli } from '.'
 import { Args, Command, ExperimentFlag, Flag, SubCommand } from './constants'
 import { typeCheckCommands } from '..'
-import { trim, trimAndSplit } from '../../util/stdout'
+import { MaybeConsoleError } from '../error'
 import { Plot } from '../../plots/webview/contract'
 import { Logger } from '../../common/logger'
+
+export type DvcError = { error: { type: string; msg: string } }
 
 export type Changes = {
   added?: string[]
@@ -91,6 +93,12 @@ export interface PlotsOutput {
 
 export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
 
+export const isDvcError = <
+  T extends ExperimentsOutput | DataStatusOutput | PlotsOutput
+>(
+  dataOrError: T | DvcError
+): dataOrError is DvcError => !!(dataOrError as DvcError).error
+
 export const autoRegisteredCommands = {
   DATA_STATUS: 'dataStatus',
   EXP_SHOW: 'expShow',
@@ -103,7 +111,10 @@ export class DvcReader extends DvcCli {
     this
   )
 
-  public dataStatus(cwd: string, ...args: Args) {
+  public dataStatus(
+    cwd: string,
+    ...args: Args
+  ): Promise<DataStatusOutput | DvcError> {
     return this.readProcessJson<DataStatusOutput>(
       cwd,
       Command.DATA,
@@ -120,20 +131,22 @@ export class DvcReader extends DvcCli {
   ): Promise<ExperimentsOutput> {
     const output = await this.readProcess<ExperimentsOutput>(
       cwd,
-      JSON.parse,
       JSON.stringify(defaultExperimentsOutput),
       Command.EXPERIMENT,
       SubCommand.SHOW,
       ...flags,
       Flag.JSON
     )
-    if (isEmpty(output)) {
-      return { workspace: { baseline: output as {} } }
+    if (isDvcError(output) || isEmpty(output)) {
+      return { workspace: { baseline: output as DvcError | {} } }
     }
     return output
   }
 
-  public plotsDiff(cwd: string, ...revisions: string[]): Promise<PlotsOutput> {
+  public plotsDiff(
+    cwd: string,
+    ...revisions: string[]
+  ): Promise<PlotsOutput | DvcError> {
     return this.readProcessJson<PlotsOutput>(
       cwd,
       Command.PLOTS,
@@ -155,36 +168,26 @@ export class DvcReader extends DvcCli {
     return this.executeDvcProcess(cwd, Flag.VERSION)
   }
 
-  private async readProcess<T = string>(
+  private readProcessJson<T extends DataStatusOutput | PlotsOutput>(
     cwd: string,
-    formatter: typeof trimAndSplit | typeof JSON.parse | typeof trim,
-    defaultValue: string,
+    command: Command,
     ...args: Args
-  ): Promise<T> {
-    let output
-    try {
-      output = await this.executeDvcProcess(cwd, ...args)
-    } catch (error: unknown) {
-      const errorMessage = (error as Error).message
-      Logger.error(`${args} failed with ${errorMessage} retrying...`)
-    }
-
-    output = output || defaultValue
-
-    if (!formatter) {
-      return output as unknown as T
-    }
-    return formatter(output) as unknown as T
+  ) {
+    return this.readProcess<T>(cwd, '{}', command, ...args, Flag.JSON)
   }
 
-  private readProcessJson<T>(cwd: string, command: Command, ...args: Args) {
-    return this.readProcess<T>(
-      cwd,
-      JSON.parse,
-      '{}',
-      command,
-      ...args,
-      Flag.JSON
-    )
+  private async readProcess<
+    T extends DataStatusOutput | ExperimentsOutput | PlotsOutput
+  >(cwd: string, defaultValue: string, ...args: Args): Promise<T | DvcError> {
+    try {
+      const output =
+        (await this.executeDvcProcess(cwd, ...args)) || defaultValue
+      return JSON.parse(output) as T
+    } catch (error: unknown) {
+      const msg =
+        (error as MaybeConsoleError).stderr || (error as Error).message
+      Logger.error(`${args} failed with ${msg} retrying...`)
+      return { error: { msg, type: 'Caught error' } }
+    }
   }
 }
