@@ -7,6 +7,7 @@ import { getIDWithoutIndex } from '../../../util/ids'
 import { PlotsState } from '../../store'
 import { Icon } from '../../../shared/components/Icon'
 import { GraphLine } from '../../../shared/components/icons'
+import { useDeferedDragLeave } from '../../../shared/hooks/useDeferedDragLeave'
 
 interface AddedSectionProps {
   id: string
@@ -26,29 +27,37 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   acceptedGroups
 }) => {
   const { draggedRef } = useSelector((state: PlotsState) => state.dragAndDrop)
+  const { immediateDragEnter, deferedDragLeave } = useDeferedDragLeave()
+
+  const isHovered = hoveredSection === id
+
   const handleDragLeave = () => {
-    setHoveredSection('')
+    deferedDragLeave(() => setHoveredSection(''))
   }
 
-  const handleDragEnter = (e: DragEvent<HTMLElement>) => {
+  const handleDragEnter = () => {
     const draggedGroup = getIDWithoutIndex(draggedRef?.group) || ''
     if (
       acceptedGroups.includes(draggedGroup) &&
       draggedGroup !== closestSection.group
     ) {
-      setHoveredSection(e.currentTarget.id)
+      setHoveredSection(id)
+      immediateDragEnter()
     }
   }
 
-  const isHovered = hoveredSection === id
+  const handleDragOver = (e: DragEvent<HTMLElement>) => {
+    e.preventDefault()
+    immediateDragEnter()
+  }
 
   return (
     <div
       id={id}
       data-testid={id}
       onDragEnter={handleDragEnter}
-      onDragExit={handleDragLeave}
-      onDragOver={(e: DragEvent<HTMLElement>) => e.preventDefault()}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
       onDrop={onDrop}
       draggable
       className={cx(

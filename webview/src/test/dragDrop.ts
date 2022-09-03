@@ -82,6 +82,19 @@ export const dragEnter = (
 
   jest.useRealTimers()
 }
+
+export const dragLeave = (draggedOver: HTMLElement) => {
+  jest.useFakeTimers()
+  act(() => {
+    draggedOver.dispatchEvent(createBubbledEvent('dragleave'))
+  })
+
+  act(() => {
+    jest.advanceTimersByTime(501)
+  })
+  jest.useRealTimers()
+}
+
 export const dragAndDrop = (
   startingNode: HTMLElement,
   endingNode: HTMLElement,
