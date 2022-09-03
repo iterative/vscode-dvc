@@ -243,8 +243,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       .bullet {
         &::after {
           content: '';
-          height: 100%;
-          top: 0;
+          height: calc(100% + 1px);
+          top: -1px;
           right: calc(50% - 0.5px);
           position: absolute;
           border-right: 1px dotted rgb(127, 127, 127);
@@ -253,7 +253,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       }
       &:first-of-type {
         .bullet::after {
-          height: 50%;
+          height: calc(50% + 1px);
           top: 50%;
           clip-path: inset(0 0 0 0);
         }
@@ -271,6 +271,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .tableContainer {
     overflow: auto;
     flex: 1;
+    background-color: $experiments-view-bg-color;
   }
   .table {
     display: inline-block;
@@ -293,6 +294,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .tr {
     position: relative;
+    background-color: $row-bg-color;
 
     &:hover:not(.rowSelected) {
       .td:not(.experimentCell),
@@ -300,17 +302,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         background-color: $row-hover-background-color;
       }
 
-      .td:hover {
-        border-right-color: $border-color;
+      .td:hover,
+      .td:hover + .td {
         border-left-color: $border-color;
-
-        &:first-child:before {
-          border-right-color: $border-color;
-        }
-
-        &:last-child {
-          border-right-color: transparent;
-        }
       }
     }
 
@@ -331,7 +325,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     &.rowSelected {
-      background-color: $row-bg-selected-color;
+      .td {
+        background-color: $row-bg-selected-color;
+      }
 
       > *:first-child {
         background-color: $row-bg-color;
@@ -343,18 +339,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
   }
 
-  .table.withExpColumnShadow {
-    .tr > *:first-child {
-      border-right-width: 0;
-
-      &:after {
-        box-shadow: 3px 0px 3px $shadow;
-      }
-
-      &:hover:before {
-        border-right-width: 0;
-      }
-    }
+  .table.withExpColumnShadow .tr > *:first-child:after {
+    box-shadow: 3px 0px 3px $shadow;
   }
 
   .bodyRow {
@@ -437,6 +423,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
     &.withShadow {
       box-shadow: 0 5px 8px -2px $shadow;
+
+      .tr {
+        border-bottom: none;
+      }
     }
 
     .td {
@@ -467,6 +457,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     white-space: nowrap;
     min-width: 0;
     position: relative;
+    background-color: $row-bg-color;
   }
   .th {
     height: auto;
@@ -498,10 +489,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     text-align: left;
     border-right: none;
     border-left: none;
-
-    &:before {
-      border-right: 1px solid transparent;
-    }
 
     .innerCell {
       justify-content: flex-start;
@@ -553,10 +540,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    border-right: 1px solid $header-border-color;
+    border-left: 1px solid $header-border-color;
 
-    &:last-child {
-      border-right: none;
+    &:first-child {
+      border-left: none;
     }
   }
 
