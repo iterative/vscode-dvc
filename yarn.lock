@@ -11995,7 +11995,7 @@ jest-util@^26.6.2:
     is-ci "^2.0.0"
     micromatch "^4.0.2"
 
-jest-util@^28.0.0, jest-util@^28.1.1:
+jest-util@^28.1.1:
   version "28.1.1"
   resolved "https://registry.yarnpkg.com/jest-util/-/jest-util-28.1.1.tgz#ff39e436a1aca397c0ab998db5a51ae2b7080d05"
   integrity sha512-FktOu7ca1DZSyhPAxgxB6hfh2+9zMoJ7aEQA759Z6p45NuO8mWcqujH+UdHlCm/V6JTWwDztM2ITCzU1ijJAfw==
@@ -12019,7 +12019,7 @@ jest-util@^28.1.3:
     graceful-fs "^4.2.9"
     picomatch "^2.2.3"
 
-jest-util@^29.0.1:
+jest-util@^29.0.0, jest-util@^29.0.1:
   version "29.0.1"
   resolved "https://registry.yarnpkg.com/jest-util/-/jest-util-29.0.1.tgz#f854a4a8877c7817316c4afbc2a851ceb2e71598"
   integrity sha512-GIWkgNfkeA9d84rORDHPGGTFBrRD13A38QVSKE0bVrGSnoR1KDn8Kqz+0yI5kezMgbT/7zrWaruWP1Kbghlb2A==
@@ -17198,14 +17198,14 @@ ts-dedent@^2.0.0, ts-dedent@^2.2.0:
   resolved "https://registry.yarnpkg.com/ts-dedent/-/ts-dedent-2.2.0.tgz#39e4bd297cd036292ae2394eb3412be63f563bb5"
   integrity sha512-q5W7tVM71e2xjHZTlgfTDoPF/SmqKG5hddq9SzR49CH2hayqRKJtQ4mtRlSxKaJlR/+9rEM+mnBHf7I2/BQcpQ==
 
-ts-jest@28.0.8:
-  version "28.0.8"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-28.0.8.tgz#cd204b8e7a2f78da32cf6c95c9a6165c5b99cc73"
-  integrity sha512-5FaG0lXmRPzApix8oFG8RKjAz4ehtm8yMKOTy5HX3fY6W8kmvOrmcY0hKDElW52FJov+clhUbrKAqofnj4mXTg==
+ts-jest@29.0.0-next.1:
+  version "29.0.0-next.1"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.0.0-next.1.tgz#bfd6c190f1eb30ce2e9408f6c3309784ccf96349"
+  integrity sha512-bVo2GDuJiV+cWEYB72tdz2Ips4JDKa04bcKikPULxxUHT4fsoY1zB2zvsrJym18qrFpXyVrIdgJFLfEx2YTkbg==
   dependencies:
     bs-logger "0.x"
     fast-json-stable-stringify "2.x"
-    jest-util "^28.0.0"
+    jest-util "^29.0.0"
     json5 "^2.2.1"
     lodash.memoize "4.x"
     make-error "1.x"
