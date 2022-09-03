@@ -7,12 +7,12 @@ import {
   Uri,
   window
 } from 'vscode'
-import { Disposable } from '../../class/dispose'
+import { Disposable } from '../class/dispose'
 
 export const getDecoratableUri = (label: string): Uri =>
-  Uri.from({ path: label, scheme: 'dvc.experiments' })
+  Uri.from({ path: label, scheme: 'dvc.tracked' })
 
-export class DecorationProvider
+export class ErrorDecorationProvider
   extends Disposable
   implements FileDecorationProvider
 {
@@ -20,16 +20,10 @@ export class DecorationProvider
     color: new ThemeColor('errorForeground')
   }
 
-  private static DecorationFiltered: FileDecoration = {
-    color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
-    tooltip: 'Filtered'
-  }
-
   public readonly onDidChangeFileDecorations: Event<Uri[]>
   private readonly decorationsChanged: EventEmitter<Uri[]>
 
   private errors = new Set<string>()
-  private filtered = new Set<string>()
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
     super()
@@ -44,25 +38,16 @@ export class DecorationProvider
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
     if (this.errors.has(uri.fsPath)) {
-      return DecorationProvider.DecorationError
-    }
-    if (this.filtered.has(uri.fsPath)) {
-      return DecorationProvider.DecorationFiltered
+      return ErrorDecorationProvider.DecorationError
     }
   }
 
-  public setState(
-    labels: string[],
-    filtered: Set<string>,
-    errors: Set<string>
-  ) {
+  public setState(errors: Set<string>) {
     const urisToUpdate: Uri[] = []
 
-    for (const label of labels) {
+    for (const label of errors) {
       urisToUpdate.push(getDecoratableUri(label))
     }
-
-    this.filtered = filtered
     this.errors = errors
     this.decorationsChanged.fire(urisToUpdate)
   }

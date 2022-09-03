@@ -4,9 +4,11 @@ import omit from 'lodash.omit'
 import {
   collectDataStatus,
   collectTree,
+  createDataStatusAccumulator,
   DataStatusAccumulator,
   PathItem
 } from './collect'
+import { createTreeFromError, getLabel } from './error'
 import { UndecoratedDataStatus } from '../constants'
 import {
   SourceControlDataStatus,
@@ -15,7 +17,7 @@ import {
   SCMState,
   SourceControlStatus
 } from '../sourceControlManagement'
-import { DataStatusOutput } from '../../cli/dvc/reader'
+import { DataStatusOutput, DvcError, isDvcError } from '../../cli/dvc/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'
@@ -45,6 +47,10 @@ export class RepositoryModel extends Disposable {
   }
 
   public transformAndSet({ dataStatus, hasGitChanges, untracked }: Data) {
+    if (isDvcError(dataStatus)) {
+      return this.handleError(dataStatus)
+    }
+
     const data = this.collectDataStatus({
       ...dataStatus,
       untracked: [...untracked].map(path => relative(this.dvcRoot, path))
@@ -53,13 +59,29 @@ export class RepositoryModel extends Disposable {
     this.collectHasChanges(data, hasGitChanges)
 
     return {
-      decorationState: this.getDecorationState(data),
+      scmDecorationState: this.getScmDecorationState(data),
       sourceControlManagementState: this.getSourceControlManagementState(data)
     }
   }
 
   public getHasChanges(): boolean {
     return this.hasChanges
+  }
+
+  private handleError({ error: { msg } }: DvcError) {
+    const emptyState = createDataStatusAccumulator()
+    this.hasChanges = true
+
+    this.tracked = new Set()
+    const label = getLabel(msg)
+    this.tree = createTreeFromError(this.dvcRoot, msg, label)
+
+    return {
+      errorDecorationState: new Set([label]),
+      scmDecorationState: this.getScmDecorationState(emptyState),
+      sourceControlManagementState:
+        this.getSourceControlManagementState(emptyState)
+    }
   }
 
   private collectTree(tracked: Set<string>): void {
@@ -88,7 +110,7 @@ export class RepositoryModel extends Disposable {
     )
   }
 
-  private getDecorationState(data: DataStatusAccumulator) {
+  private getScmDecorationState(data: DataStatusAccumulator) {
     return {
       ...omit(data, ...Object.values(UndecoratedDataStatus)),
       tracked: data.trackedDecorations

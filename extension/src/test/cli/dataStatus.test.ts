@@ -4,13 +4,16 @@ import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
+import { DataStatusOutput } from '../../cli/dvc/reader'
 
 suite('data status --granular --unchanged --show-json', () => {
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
 
-      const output = await dvcReader.dataStatus(dvcDemoPath)
+      const output = (await dvcReader.dataStatus(
+        dvcDemoPath
+      )) as DataStatusOutput
 
       const demoRepoTrackedData = [
         join('data', 'MNIST', 'raw') + sep,

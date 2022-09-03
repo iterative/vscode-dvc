@@ -10,7 +10,7 @@ import {
 } from 'vscode'
 import { ExperimentType } from '.'
 import { ExperimentsTree } from './tree'
-import { getDecoratableUri } from './decorationProvider'
+import { getDecoratableUri } from '../decorationProvider'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'

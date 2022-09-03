@@ -42,7 +42,12 @@ import { SectionDescription } from './PlotsContainer'
 import { CheckpointPlotsById, plotDataStore } from './plotDataStore'
 import { plotsReducers } from '../store'
 import { vsCodeApi } from '../../shared/api'
-import { createBubbledEvent, dragAndDrop, dragEnter } from '../../test/dragDrop'
+import {
+  createBubbledEvent,
+  dragAndDrop,
+  dragEnter,
+  dragLeave
+} from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 
@@ -1034,6 +1039,29 @@ describe('App', () => {
     expect(topDropIcon).toBeInTheDocument()
   })
 
+  it('should remove the drop zone when hovering out a new section', () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    const topSection = screen.getByTestId(NewSectionBlock.TOP)
+    const multiViewPlot = screen.getByTestId(
+      join('plot_other', 'multiview.tsv')
+    )
+
+    dragEnter(multiViewPlot, topSection.id, DragEnterDirection.LEFT)
+
+    let topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+    expect(topDropIcon).toBeInTheDocument()
+
+    dragLeave(topSection)
+
+    topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+    expect(topDropIcon).not.toBeInTheDocument()
+  })
+
   it('should not show a drop target when moving an element from a whole different section (comparison to template)', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
@@ -1060,13 +1088,14 @@ describe('App', () => {
 
     const topSection = screen.getByTestId(NewSectionBlock.TOP)
 
-    const dragOverEvent = createBubbledEvent('dragover', {
-      preventDefault: jest.fn()
+    act(() => {
+      const dragOverEvent = createBubbledEvent('dragover', {
+        preventDefault: jest.fn()
+      })
+
+      topSection.dispatchEvent(dragOverEvent)
+      expect(dragOverEvent.preventDefault).toHaveBeenCalled()
     })
-
-    topSection.dispatchEvent(dragOverEvent)
-
-    expect(dragOverEvent.preventDefault).toHaveBeenCalled()
   })
 
   it('should show a drop target before a plot on drag enter from the left', () => {
