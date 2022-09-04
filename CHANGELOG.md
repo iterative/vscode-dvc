@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### 🚀 New Features and Enhancements
 
+- Use new data status command [#2091](https://github.com/iterative/vscode-dvc/pull/2091) by [@mattseddon](https://github.com/mattseddon)
 - Give option to sort or filter by Created timestamp [#2293](https://github.com/iterative/vscode-dvc/pull/2293) by [@mattseddon](https://github.com/mattseddon)
 - Improve table column resizing styles [#2305](https://github.com/iterative/vscode-dvc/pull/2305) by [@julieg18](https://github.com/julieg18)
 - Refine data status consumption [#2151](https://github.com/iterative/vscode-dvc/pull/2151) by [@mattseddon](https://github.com/mattseddon)
