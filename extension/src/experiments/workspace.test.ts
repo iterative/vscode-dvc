@@ -81,9 +81,9 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getCwdThenReport(mockedCommandId)
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot)
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledWith(mockedDvcRoot)
     })
 
     it('should not call the function if a project is not picked', async () => {
@@ -91,8 +91,8 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getCwdThenReport(mockedCommandId)
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedExpFunc).not.toBeCalled()
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
     })
   })
 
@@ -102,10 +102,10 @@ describe('Experiments', () => {
 
       await workspaceExperiments.pauseUpdatesThenRun(mockedFunc)
 
-      expect(mockedUpdatesPaused.fire).toBeCalledTimes(2)
-      expect(mockedUpdatesPaused.fire).toBeCalledWith(true)
+      expect(mockedUpdatesPaused.fire).toHaveBeenCalledTimes(2)
+      expect(mockedUpdatesPaused.fire).toHaveBeenCalledWith(true)
       expect(mockedUpdatesPaused.fire).toHaveBeenLastCalledWith(false)
-      expect(mockedFunc).toBeCalledTimes(1)
+      expect(mockedFunc).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -119,10 +119,10 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedPickCurrentExperiment).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123')
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedPickCurrentExperiment).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledWith(mockedDvcRoot, 'exp-123')
     })
 
     it('should not call the function if a project is not picked', async () => {
@@ -130,8 +130,8 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedExpFunc).not.toBeCalled()
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
     })
   })
 
@@ -148,10 +148,10 @@ describe('Experiments', () => {
         mockedQuickPick
       )
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedQuickPick).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledWith(
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedQuickPick).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledWith(
         mockedDvcRoot,
         ...mockedPickedOptions
       )
@@ -166,9 +166,9 @@ describe('Experiments', () => {
         mockedQuickPick
       )
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedQuickPick).not.toBeCalled()
-      expect(mockedExpFunc).not.toBeCalled()
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedQuickPick).not.toHaveBeenCalled()
+      expect(mockedExpFunc).not.toHaveBeenCalled()
     })
 
     it('should not call the function if quick picks are not provided', async () => {
@@ -180,9 +180,9 @@ describe('Experiments', () => {
         mockedQuickPick
       )
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedQuickPick).toBeCalledTimes(1)
-      expect(mockedExpFunc).not.toBeCalled()
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedQuickPick).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
     })
   })
 
@@ -201,10 +201,14 @@ describe('Experiments', () => {
         'enter your password please' as Title
       )
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedPickCurrentExperiment).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123', 'abc123')
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedPickCurrentExperiment).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'exp-123',
+        'abc123'
+      )
     })
 
     it('should not call the function or ask for input if a project is not picked', async () => {
@@ -216,9 +220,9 @@ describe('Experiments', () => {
         'please name the branch' as Title
       )
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedGetInput).not.toBeCalled()
-      expect(mockedExpFunc).not.toBeCalled()
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedGetInput).not.toHaveBeenCalled()
+      expect(mockedExpFunc).not.toHaveBeenCalled()
     })
 
     it('should not call the function if user input is not provided', async () => {
@@ -235,9 +239,9 @@ describe('Experiments', () => {
         'please enter your bank account number and sort code' as Title
       )
 
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedGetInput).toBeCalledTimes(1)
-      expect(mockedExpFunc).not.toBeCalled()
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedGetInput).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
     })
   })
 })

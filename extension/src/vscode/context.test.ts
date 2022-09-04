@@ -16,6 +16,6 @@ describe('setContextValue', () => {
     const key = 'my important key'
     const value = 'value that if not set everything breaks'
     setContextValue(key, value)
-    expect(mockedExecuteCommand).toBeCalledWith('setContext', key, value)
+    expect(mockedExecuteCommand).toHaveBeenCalledWith('setContext', key, value)
   })
 })

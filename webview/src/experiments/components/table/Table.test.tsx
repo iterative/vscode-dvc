@@ -195,7 +195,7 @@ describe('Table', () => {
         renderExperimentsTable()
         await clickOnSortOption(SortOrder.ASCENDING)
 
-        expect(mockedPostMessage).toBeCalledWith({
+        expect(mockedPostMessage).toHaveBeenCalledWith({
           payload: {
             descending: false,
             path: mockColumnPath
@@ -220,7 +220,7 @@ describe('Table', () => {
 
         await clickOnSortOption(SortOrder.DESCENDING)
 
-        expect(mockedPostMessage).toBeCalledWith({
+        expect(mockedPostMessage).toHaveBeenCalledWith({
           payload: {
             descending: true,
             path: mockColumnPath
@@ -245,7 +245,7 @@ describe('Table', () => {
 
         await clickOnSortOption(SortOrder.NONE)
 
-        expect(mockedPostMessage).toBeCalledWith({
+        expect(mockedPostMessage).toHaveBeenCalledWith({
           payload: mockColumnPath,
           type: MessageFromWebviewType.REMOVE_COLUMN_SORT
         })
@@ -375,7 +375,7 @@ describe('Table', () => {
       })
       fireEvent.mouseUp(experimentColumnResizeHandle)
 
-      expect(mockedPostMessage).toBeCalledWith({
+      expect(mockedPostMessage).toHaveBeenCalledWith({
         payload: { id: 'id', width: 333 },
         type: MessageFromWebviewType.RESIZE_COLUMN
       })
@@ -389,7 +389,7 @@ describe('Table', () => {
 
       fireEvent.mouseUp(experimentColumnResizeHandle)
 
-      expect(mockedPostMessage).toBeCalledWith({
+      expect(mockedPostMessage).toHaveBeenCalledWith({
         payload: { id: 'id', width: 353 },
         type: MessageFromWebviewType.RESIZE_COLUMN
       })

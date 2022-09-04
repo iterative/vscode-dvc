@@ -52,10 +52,10 @@ describe('getTelemetryReporter', () => {
     telemetryReporter = getTelemetryReporter()
 
     expect(telemetryReporter).toBeDefined()
-    expect(mockedGetExtension).toBeCalledTimes(1)
-    expect(mockedGetExtension).toBeCalledWith('iterative.dvc')
-    expect(mockedTelemetryReporter).toBeCalledTimes(1)
-    expect(mockedTelemetryReporter).toBeCalledWith(
+    expect(mockedGetExtension).toHaveBeenCalledTimes(1)
+    expect(mockedGetExtension).toHaveBeenCalledWith('iterative.dvc')
+    expect(mockedTelemetryReporter).toHaveBeenCalledTimes(1)
+    expect(mockedTelemetryReporter).toHaveBeenCalledWith(
       EXTENSION_ID,
       mockedPackageJSON.version,
       APPLICATION_INSIGHTS_KEY,
@@ -67,8 +67,8 @@ describe('getTelemetryReporter', () => {
     const sameTelemetryReporter = getTelemetryReporter()
 
     expect(telemetryReporter).toStrictEqual(sameTelemetryReporter)
-    expect(mockedTelemetryReporter).not.toBeCalled()
-    expect(mockedGetExtension).not.toBeCalled()
+    expect(mockedTelemetryReporter).not.toHaveBeenCalled()
+    expect(mockedGetExtension).not.toHaveBeenCalled()
   })
 })
 
@@ -95,7 +95,7 @@ describe('sendTelemetryEvent', () => {
       mockedMeasurements
     )
 
-    expect(mockedSendTelemetryEvent).toBeCalledWith(
+    expect(mockedSendTelemetryEvent).toHaveBeenCalledWith(
       mockedEventName,
       {
         a: '1',

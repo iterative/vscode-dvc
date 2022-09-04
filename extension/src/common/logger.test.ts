@@ -6,7 +6,7 @@ describe('Logger', () => {
       const error = 'I wrong'
       const logSpy = jest.spyOn(console, 'error').mockReturnValueOnce(undefined)
       Logger.error(error)
-      expect(logSpy).toBeCalledWith(error)
+      expect(logSpy).toHaveBeenCalledWith(error)
     })
   })
 
@@ -15,7 +15,7 @@ describe('Logger', () => {
       const warn = 'I may be wrong'
       const logSpy = jest.spyOn(console, 'warn').mockReturnValueOnce(undefined)
       Logger.warn(warn)
-      expect(logSpy).toBeCalledWith(warn)
+      expect(logSpy).toHaveBeenCalledWith(warn)
     })
   })
 
@@ -24,7 +24,7 @@ describe('Logger', () => {
       const info = 'I am information'
       const logSpy = jest.spyOn(console, 'info').mockReturnValueOnce(undefined)
       Logger.info(info)
-      expect(logSpy).toBeCalledWith(info)
+      expect(logSpy).toHaveBeenCalledWith(info)
     })
   })
 
@@ -33,7 +33,7 @@ describe('Logger', () => {
       const log = 'I am probably something that helps you debug'
       const logSpy = jest.spyOn(console, 'log').mockReturnValueOnce(undefined)
       Logger.log(log)
-      expect(logSpy).toBeCalledWith(log)
+      expect(logSpy).toHaveBeenCalledWith(log)
     })
   })
 })

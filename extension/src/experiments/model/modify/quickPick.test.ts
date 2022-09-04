@@ -21,7 +21,7 @@ describe('pickAndModifyParams', () => {
     ])
 
     expect(paramsToQueue).toBeUndefined()
-    expect(mockedGetInput).not.toBeCalled()
+    expect(mockedGetInput).not.toHaveBeenCalled()
   })
 
   it('should return early if the user exits from the input box', async () => {
@@ -41,7 +41,7 @@ describe('pickAndModifyParams', () => {
     ])
 
     expect(paramsToQueue).toBeUndefined()
-    expect(mockedGetInput).toBeCalledTimes(2)
+    expect(mockedGetInput).toHaveBeenCalledTimes(2)
   })
 
   it('should convert any selected params into the required format', async () => {
@@ -64,8 +64,8 @@ describe('pickAndModifyParams', () => {
       ...initialUserResponse
     ])
 
-    expect(mockedGetInput).toBeCalledTimes(3)
-    expect(mockedGetInput).toBeCalledWith(
+    expect(mockedGetInput).toHaveBeenCalledTimes(3)
+    expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:code_names',
       '[0,1,2]'
     )
@@ -80,6 +80,6 @@ describe('pickAndModifyParams', () => {
       '-S',
       [unchanged.path, unchanged.value].join('=')
     ])
-    expect(mockedGetInput).toBeCalledTimes(3)
+    expect(mockedGetInput).toHaveBeenCalledTimes(3)
   })
 })

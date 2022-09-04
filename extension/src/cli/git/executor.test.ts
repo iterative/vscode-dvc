@@ -49,7 +49,7 @@ describe('GitExecutor', () => {
       )
 
       await gitExecutor.pushBranch(cwd, branchName)
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['push', '--set-upstream', 'origin', branchName],
         cwd,
         executable: 'git'
@@ -63,7 +63,7 @@ describe('GitExecutor', () => {
       )
 
       await gitExecutor.pushBranch(cwd)
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['push', '--set-upstream', 'origin', 'HEAD'],
         cwd,
         executable: 'git'
@@ -83,13 +83,13 @@ describe('GitExecutor', () => {
         )
 
       await gitExecutor.stageAndCommit(cwd, message)
-      expect(mockedCreateProcess).toBeCalledTimes(3)
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledTimes(3)
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['add', '.'],
         cwd,
         executable: 'git'
       })
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['commit', '-m', message],
         cwd,
         executable: 'git'

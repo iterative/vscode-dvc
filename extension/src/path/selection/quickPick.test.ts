@@ -22,16 +22,16 @@ describe('pickPaths', () => {
     mockedQuickPickManyValues.mockResolvedValueOnce([])
     await pickPaths('plots', undefined)
 
-    expect(mockedShowError).toBeCalledTimes(1)
-    expect(mockedQuickPickManyValues).not.toBeCalled()
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickManyValues).not.toHaveBeenCalled()
   })
 
   it('should not call quickPickManyValues if no plots paths are provided', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce([])
     await pickPaths('plots', [])
 
-    expect(mockedShowError).toBeCalledTimes(1)
-    expect(mockedQuickPickManyValues).not.toBeCalled()
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickManyValues).not.toHaveBeenCalled()
   })
 
   it('should call the quickPick with the correct items', async () => {
@@ -66,9 +66,9 @@ describe('pickPaths', () => {
 
     await pickPaths('plots', plotPaths)
 
-    expect(mockedShowError).not.toBeCalled()
-    expect(mockedQuickPickManyValues).toBeCalledTimes(1)
-    expect(mockedQuickPickManyValues).toBeCalledWith(
+    expect(mockedShowError).not.toHaveBeenCalled()
+    expect(mockedQuickPickManyValues).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
       [
         {
           label: join('logs', 'loss.tsv'),

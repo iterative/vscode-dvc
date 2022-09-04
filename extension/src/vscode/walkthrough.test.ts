@@ -27,20 +27,20 @@ beforeEach(() => {
 describe('showWalkthroughOnFirstUse', () => {
   it('should ask to show the walkthrough after a new install', async () => {
     await showWalkthroughOnFirstUse(true)
-    expect(mockedAskShowOrCloseOrNever).toBeCalledTimes(1)
+    expect(mockedAskShowOrCloseOrNever).toHaveBeenCalledTimes(1)
   })
 
   it('should not ask to show the walkthrough when the install is not new', async () => {
     await showWalkthroughOnFirstUse(false)
-    expect(mockedAskShowOrCloseOrNever).not.toBeCalled()
+    expect(mockedAskShowOrCloseOrNever).not.toHaveBeenCalled()
   })
 
   it('should not ask to show the walkthrough when the user has set a config option', async () => {
     mockedGetConfigValue.mockReturnValueOnce(true)
     await showWalkthroughOnFirstUse(true)
-    expect(mockedAskShowOrCloseOrNever).not.toBeCalled()
-    expect(mockedGetConfigValue).toBeCalledTimes(1)
-    expect(mockedGetConfigValue).toBeCalledWith(
+    expect(mockedAskShowOrCloseOrNever).not.toHaveBeenCalled()
+    expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedGetConfigValue).toHaveBeenCalledWith(
       ConfigKey.DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL
     )
   })
@@ -49,8 +49,8 @@ describe('showWalkthroughOnFirstUse', () => {
     mockedAskShowOrCloseOrNever.mockResolvedValueOnce(Response.NEVER)
     await showWalkthroughOnFirstUse(true)
 
-    expect(mockedSetConfigValue).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).toBeCalledWith(
+    expect(mockedSetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
       ConfigKey.DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL,
       true
     )
@@ -60,8 +60,8 @@ describe('showWalkthroughOnFirstUse', () => {
     mockedAskShowOrCloseOrNever.mockResolvedValueOnce(Response.SHOW)
     await showWalkthroughOnFirstUse(true)
 
-    expect(mockedSetConfigValue).not.toBeCalled()
-    expect(mockedExecuteCommand).toBeCalledWith(
+    expect(mockedSetConfigValue).not.toHaveBeenCalled()
+    expect(mockedExecuteCommand).toHaveBeenCalledWith(
       RegisteredCommands.EXTENSION_GET_STARTED
     )
   })
@@ -70,15 +70,15 @@ describe('showWalkthroughOnFirstUse', () => {
     mockedAskShowOrCloseOrNever.mockResolvedValueOnce(undefined)
     await showWalkthroughOnFirstUse(true)
 
-    expect(mockedSetConfigValue).not.toBeCalled()
-    expect(mockedExecuteCommand).not.toBeCalled()
+    expect(mockedSetConfigValue).not.toHaveBeenCalled()
+    expect(mockedExecuteCommand).not.toHaveBeenCalled()
   })
 
   it('should take no action if the user respond with close', async () => {
     mockedAskShowOrCloseOrNever.mockResolvedValueOnce(Response.CLOSE)
     await showWalkthroughOnFirstUse(true)
 
-    expect(mockedSetConfigValue).not.toBeCalled()
-    expect(mockedExecuteCommand).not.toBeCalled()
+    expect(mockedSetConfigValue).not.toHaveBeenCalled()
+    expect(mockedExecuteCommand).not.toHaveBeenCalled()
   })
 })

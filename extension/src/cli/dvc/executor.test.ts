@@ -80,7 +80,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.add(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['add', relPath],
         cwd,
         env: mockedEnv,
@@ -98,7 +98,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.checkout(fsPath)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['checkout'],
         cwd: fsPath,
         env: mockedEnv,
@@ -114,7 +114,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.checkout(fsPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['checkout', '-f'],
         cwd: fsPath,
         env: mockedEnv,
@@ -133,7 +133,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.checkout(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['checkout', relPath],
         cwd,
         env: mockedEnv,
@@ -152,7 +152,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.checkout(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['checkout', relPath, '-f'],
         cwd,
         env: mockedEnv,
@@ -170,7 +170,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.commit(cwd)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['commit'],
         cwd,
         env: mockedEnv,
@@ -186,7 +186,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.commit(cwd, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['commit', '-f'],
         cwd,
         env: mockedEnv,
@@ -208,7 +208,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.commit(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['commit', relPath],
         cwd,
         env: mockedEnv,
@@ -230,7 +230,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.commit(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['commit', relPath, '-f'],
         cwd,
         env: mockedEnv,
@@ -248,7 +248,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.experimentApply(cwd, 'exp-test')
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'apply', 'exp-test'],
         cwd,
         env: mockedEnv,
@@ -273,7 +273,7 @@ describe('CliExecutor', () => {
       )
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'branch', 'exp-0898f', 'some-branch'],
         cwd,
         env: mockedEnv,
@@ -298,7 +298,7 @@ describe('CliExecutor', () => {
       )
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'gc', '-f', '--workspace', '--queued'],
         cwd,
         env: mockedEnv,
@@ -316,7 +316,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.experimentRemove(cwd, 'exp-dfd12')
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'remove', 'exp-dfd12'],
         cwd,
         env: mockedEnv,
@@ -334,7 +334,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.experimentRemoveQueue(cwd)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'remove', '--queue'],
         cwd,
         env: mockedEnv,
@@ -352,7 +352,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.experimentRunQueue(cwd)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'run', '--queue'],
         cwd,
         env: mockedEnv,
@@ -387,7 +387,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.init(fsPath)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['init', '--subdir'],
         cwd: fsPath,
         env: mockedEnv,
@@ -411,7 +411,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.move(cwd, target, destination)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['move', target, destination],
         cwd,
         env: mockedEnv,
@@ -430,7 +430,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.pull(cwd)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['pull'],
         cwd,
         env: mockedEnv,
@@ -447,7 +447,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.pull(cwd, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['pull', '-f'],
         cwd,
         env: mockedEnv,
@@ -465,7 +465,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.pull(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['pull', relPath],
         cwd,
         env: mockedEnv,
@@ -483,7 +483,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.pull(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['pull', relPath, '-f'],
         cwd,
         env: mockedEnv,
@@ -502,7 +502,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.push(cwd)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['push'],
         cwd,
         env: mockedEnv,
@@ -518,7 +518,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.push(cwd, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['push', '-f'],
         cwd,
         env: mockedEnv,
@@ -536,7 +536,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.push(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['push', relPath],
         cwd,
         env: mockedEnv,
@@ -554,7 +554,7 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.push(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['push', relPath, '-f'],
         cwd,
         env: mockedEnv,
@@ -575,15 +575,15 @@ describe('CliExecutor', () => {
       const output = await dvcExecutor.remove(cwd, relPath)
       expect(output).toStrictEqual(stdout)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['remove', relPath],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
 
-      expect(mockedSetContextValue).toBeCalledTimes(2)
-      expect(mockedSetContextValue).toBeCalledWith(
+      expect(mockedSetContextValue).toHaveBeenCalledTimes(2)
+      expect(mockedSetContextValue).toHaveBeenCalledWith(
         'dvc.scm.command.running',
         true
       )

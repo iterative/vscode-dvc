@@ -258,7 +258,7 @@ describe('App', () => {
       mockPostMessage.mockClear()
 
       fireEvent.click(expandButton)
-      expect(mockPostMessage).not.toBeCalled()
+      expect(mockPostMessage).not.toHaveBeenCalled()
 
       fireEvent.keyDown(expandButton, {
         bubbles: true,
@@ -266,7 +266,7 @@ describe('App', () => {
         key: 'Enter',
         keyCode: 13
       })
-      expect(mockPostMessage).not.toBeCalled()
+      expect(mockPostMessage).not.toHaveBeenCalled()
     })
   })
 
@@ -356,8 +356,8 @@ describe('App', () => {
 
         fireEvent.click(screen.getByText(label))
 
-        expect(mockPostMessage).toBeCalledTimes(1)
-        expect(mockPostMessage).toBeCalledWith({
+        expect(mockPostMessage).toHaveBeenCalledTimes(1)
+        expect(mockPostMessage).toHaveBeenCalledWith({
           payload: id,
           type: MessageFromWebviewType.TOGGLE_EXPERIMENT
         })
@@ -385,7 +385,7 @@ describe('App', () => {
         key: 'Enter',
         keyCode: 13
       })
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: 'main',
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
@@ -398,7 +398,7 @@ describe('App', () => {
         key: ' ',
         keyCode: 32
       })
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: 'main',
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
@@ -409,7 +409,7 @@ describe('App', () => {
         code: 'keyA',
         key: 'a'
       })
-      expect(mockPostMessage).not.toBeCalled()
+      expect(mockPostMessage).not.toHaveBeenCalled()
     })
   })
 
@@ -823,7 +823,7 @@ describe('App', () => {
       const starIcon = within(workspaceRow).getByTestId('star-icon')
       fireEvent.click(starIcon)
 
-      expect(mockPostMessage).not.toBeCalled()
+      expect(mockPostMessage).not.toHaveBeenCalled()
     })
 
     it('should toggle the star status of an experiment by clicking the star icon', () => {
@@ -834,8 +834,8 @@ describe('App', () => {
       const starIcon = within(mainRow).getByTestId('star-icon')
       fireEvent.click(starIcon)
 
-      expect(mockPostMessage).toBeCalledTimes(1)
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: ['main'],
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
       })
@@ -853,8 +853,8 @@ describe('App', () => {
       const starOption = screen.getByText('Star')
       fireEvent.click(starOption)
 
-      expect(mockPostMessage).toBeCalledTimes(1)
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: ['main'],
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
       })
@@ -875,8 +875,8 @@ describe('App', () => {
       const starOption = screen.getByText('Star')
       fireEvent.click(starOption)
 
-      expect(mockPostMessage).toBeCalledTimes(1)
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: ['main', 'exp-e7a67'],
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
       })
@@ -1066,18 +1066,18 @@ describe('App', () => {
     renderTable()
     mockPostMessage.mockClear()
     fireEvent.click(screen.getByLabelText('sorts'))
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.FOCUS_SORTS_TREE
     })
     mockPostMessage.mockClear()
     fireEvent.click(screen.getByLabelText('filters'))
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.FOCUS_FILTERS_TREE
     })
 
     mockPostMessage.mockClear()
     fireEvent.click(screen.getByLabelText('selected for plots'))
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
     })
   })

@@ -21,9 +21,9 @@ describe('readOrCreateUserId', () => {
     mockedExists.mockReturnValueOnce(false).mockReturnValueOnce(false)
 
     readOrCreateUserId()
-    expect(mockedReadJson).not.toBeCalled()
-    expect(mockedWriteJson).toBeCalledTimes(2)
-    expect(mockedWriteJson).toBeCalledWith(
+    expect(mockedReadJson).not.toHaveBeenCalled()
+    expect(mockedWriteJson).toHaveBeenCalledTimes(2)
+    expect(mockedWriteJson).toHaveBeenCalledWith(
       expect.stringContaining(sep + 'telemetry'),
       expect.objectContaining({ user_id: expect.stringContaining('-') })
     )
@@ -34,12 +34,12 @@ describe('readOrCreateUserId', () => {
     mockedReadJson.mockReturnValueOnce(mockedConfig)
 
     readOrCreateUserId()
-    expect(mockedWriteJson).toBeCalledTimes(1)
-    expect(mockedWriteJson).toBeCalledWith(
+    expect(mockedWriteJson).toHaveBeenCalledTimes(1)
+    expect(mockedWriteJson).toHaveBeenCalledWith(
       expect.stringContaining(sep + 'telemetry'),
       mockedConfig
     )
-    expect(mockedWriteJson).not.toBeCalledWith(
+    expect(mockedWriteJson).not.toHaveBeenCalledWith(
       expect.stringContaining('dvc'),
       mockedConfig
     )
@@ -50,15 +50,15 @@ describe('readOrCreateUserId', () => {
     mockedReadJson.mockReturnValueOnce(mockedConfig)
 
     readOrCreateUserId()
-    expect(mockedReadJson).toBeCalledTimes(1)
-    expect(mockedWriteJson).toBeCalledTimes(1)
+    expect(mockedReadJson).toHaveBeenCalledTimes(1)
+    expect(mockedWriteJson).toHaveBeenCalledTimes(1)
 
-    expect(mockedWriteJson).not.toBeCalledWith(
+    expect(mockedWriteJson).not.toHaveBeenCalledWith(
       expect.stringContaining(sep + 'telemetry'),
       mockedConfig
     )
 
-    expect(mockedWriteJson).toBeCalledWith(
+    expect(mockedWriteJson).toHaveBeenCalledWith(
       expect.stringContaining('dvc'),
       expect.objectContaining({ user_id: expect.stringContaining('-') })
     )
@@ -71,10 +71,10 @@ describe('readOrCreateUserId', () => {
       .mockReturnValueOnce({ 'some-other-info': true, user_id: 'bogus-id' })
 
     readOrCreateUserId()
-    expect(mockedReadJson).toBeCalledTimes(2)
-    expect(mockedWriteJson).toBeCalledTimes(1)
+    expect(mockedReadJson).toHaveBeenCalledTimes(2)
+    expect(mockedWriteJson).toHaveBeenCalledTimes(1)
 
-    expect(mockedWriteJson).toBeCalledWith(
+    expect(mockedWriteJson).toHaveBeenCalledWith(
       expect.stringContaining(sep + 'telemetry'),
       {
         'do-not-track': true,
@@ -93,8 +93,8 @@ describe('getUserId', () => {
     const user_id = getUserId()
 
     expect(user_id).toStrictEqual(mockedUserId)
-    expect(mockedExists).toBeCalledTimes(2)
-    expect(mockedReadJson).toBeCalledTimes(1)
+    expect(mockedExists).toHaveBeenCalledTimes(2)
+    expect(mockedReadJson).toHaveBeenCalledTimes(1)
 
     mockedExists.mockClear()
     mockedReadJson.mockClear()
@@ -103,7 +103,7 @@ describe('getUserId', () => {
     getUserId()
     getUserId()
 
-    expect(mockedExists).not.toBeCalled()
-    expect(mockedReadJson).not.toBeCalled()
+    expect(mockedExists).not.toHaveBeenCalled()
+    expect(mockedReadJson).not.toHaveBeenCalled()
   })
 })

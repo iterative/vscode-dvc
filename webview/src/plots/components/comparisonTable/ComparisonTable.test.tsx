@@ -133,8 +133,8 @@ describe('ComparisonTable', () => {
     expect(originalFirstColumn).not.toStrictEqual(currentFirstColumn)
     expect(originalFirstColumn).toStrictEqual(movedFirstColumn)
 
-    expect(mockPostMessage).toBeCalledTimes(1)
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledTimes(1)
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: [
         thirdExperiment,
         ...revisions.filter(rev => rev !== thirdExperiment)
@@ -281,8 +281,8 @@ describe('ComparisonTable', () => {
 
     for (const button of refreshButtons) {
       fireEvent.click(button)
-      expect(mockPostMessage).toBeCalledTimes(1)
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: revisionWithNoData,
         type: MessageFromWebviewType.REFRESH_REVISION
       })
@@ -346,8 +346,8 @@ describe('ComparisonTable', () => {
       ]
 
       expect(headers).toStrictEqual(expectedNamedRevisions)
-      expect(mockPostMessage).toBeCalledTimes(1)
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: expectedRevisions,
         type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
       })
@@ -564,8 +564,8 @@ describe('ComparisonTable', () => {
       const reorderedRows = screen.getAllByRole('rowgroup').slice(1)
       const newOrder = reorderedRows.map(row => row.id)
 
-      expect(mockPostMessage).toBeCalledTimes(1)
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: newOrder,
         type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS
       })

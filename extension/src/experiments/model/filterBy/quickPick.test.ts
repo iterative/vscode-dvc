@@ -76,7 +76,7 @@ describe('pickFilterToAdd', () => {
     mockedQuickPickValue.mockResolvedValueOnce(mixedParam)
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
     await pickFilterToAdd(params)
-    expect(mockedQuickPickValue).toBeCalledWith(
+    expect(mockedQuickPickValue).toHaveBeenCalledWith(
       OPERATORS.filter(
         ({ types }) =>
           !(types.length === 1 && types[0] === ColumnType.TIMESTAMP)
@@ -106,13 +106,13 @@ describe('pickFilterToAdd', () => {
       path: boolParam.path,
       value: undefined
     })
-    expect(mockedQuickPickValue).toBeCalledWith(
+    expect(mockedQuickPickValue).toHaveBeenCalledWith(
       OPERATORS.filter(operator => operator.types.includes('boolean')),
       {
         title: Title.SELECT_OPERATOR
       }
     )
-    expect(mockedGetInput).not.toBeCalled()
+    expect(mockedGetInput).not.toHaveBeenCalled()
   })
 
   it('should return a filter definition if all of the steps are completed', async () => {
@@ -126,7 +126,7 @@ describe('pickFilterToAdd', () => {
       path: epochsParam.path,
       value: '5'
     })
-    expect(mockedQuickPickValue).toBeCalledWith(
+    expect(mockedQuickPickValue).toHaveBeenCalledWith(
       OPERATORS.filter(operator => operator.types.includes('number')),
       {
         title: Title.SELECT_OPERATOR

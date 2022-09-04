@@ -84,7 +84,7 @@ describe('TrackedTreeView', () => {
       )
       trackedTreeView.initialize([dvcDemoPath])
 
-      expect(mockedTreeDataChangedFire).toBeCalledTimes(1)
+      expect(mockedTreeDataChangedFire).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -115,8 +115,8 @@ describe('TrackedTreeView', () => {
           resourceUri: Uri.file(mockedOtherRoot)
         }
       ])
-      expect(mockedGetRepository).toBeCalledTimes(0)
-      expect(mockedGetChildren).toBeCalledTimes(0)
+      expect(mockedGetRepository).toHaveBeenCalledTimes(0)
+      expect(mockedGetChildren).toHaveBeenCalledTimes(0)
     })
 
     it('should return the single dvc root if it is nested', async () => {
@@ -185,9 +185,9 @@ describe('TrackedTreeView', () => {
       expect(
         rootElements.map(({ resourceUri }) => basename(resourceUri.fsPath))
       ).toStrictEqual(['data', 'logs', 'plots', 'model.pt'])
-      expect(mockedGetRepository).toBeCalledTimes(1)
-      expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
-      expect(mockedGetChildren).toBeCalledTimes(1)
+      expect(mockedGetRepository).toHaveBeenCalledTimes(1)
+      expect(mockedGetRepository).toHaveBeenCalledWith(dvcDemoPath)
+      expect(mockedGetChildren).toHaveBeenCalledTimes(1)
     })
 
     it('should get the children for the provided element', async () => {
@@ -222,9 +222,9 @@ describe('TrackedTreeView', () => {
 
       const rootElements = await trackedTreeView.getChildren()
 
-      expect(mockedGetRepository).toBeCalledTimes(1)
-      expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
-      expect(mockedGetChildren).toBeCalledWith(dvcDemoPath)
+      expect(mockedGetRepository).toHaveBeenCalledTimes(1)
+      expect(mockedGetRepository).toHaveBeenCalledWith(dvcDemoPath)
+      expect(mockedGetChildren).toHaveBeenCalledWith(dvcDemoPath)
       expect(rootElements).toStrictEqual(mockedRootItems)
 
       mockedGetRepository.mockClear()
@@ -247,9 +247,9 @@ describe('TrackedTreeView', () => {
         resourceUri: data
       })
 
-      expect(mockedGetRepository).toBeCalledTimes(1)
-      expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
-      expect(mockedGetChildren).toBeCalledWith(data.fsPath)
+      expect(mockedGetRepository).toHaveBeenCalledTimes(1)
+      expect(mockedGetRepository).toHaveBeenCalledWith(dvcDemoPath)
+      expect(mockedGetChildren).toHaveBeenCalledWith(data.fsPath)
       expect(child).toStrictEqual(mockedDirItems)
     })
   })
@@ -277,7 +277,7 @@ describe('TrackedTreeView', () => {
         resourceUri: Uri.file(join(dvcDemoPath, 'data'))
       })
 
-      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(mockedTreeItem).toHaveBeenCalledTimes(1)
       expect(treeItem).toStrictEqual({
         ...mockedItem,
         contextValue: 'virtual'
@@ -305,7 +305,7 @@ describe('TrackedTreeView', () => {
         resourceUri: log
       })
 
-      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(mockedTreeItem).toHaveBeenCalledTimes(1)
       expect(treeItem).toStrictEqual({
         ...mockedItem,
         contextValue: 'virtual'
@@ -334,7 +334,7 @@ describe('TrackedTreeView', () => {
         resourceUri: Uri.file(join(dvcDemoPath, 'data'))
       })
 
-      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(mockedTreeItem).toHaveBeenCalledTimes(1)
       expect(treeItem).toStrictEqual({
         ...mockedItem,
         contextValue: 'dirData'
@@ -364,7 +364,7 @@ describe('TrackedTreeView', () => {
         resourceUri: log
       })
 
-      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(mockedTreeItem).toHaveBeenCalledTimes(1)
       expect(treeItem).toStrictEqual({
         ...mockedItem,
         command: {
@@ -405,7 +405,7 @@ describe('TrackedTreeView', () => {
         }
       } as PathItem)
 
-      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(mockedTreeItem).toHaveBeenCalledTimes(1)
       expect(treeItem).toStrictEqual({
         ...mockedItem,
         command: {

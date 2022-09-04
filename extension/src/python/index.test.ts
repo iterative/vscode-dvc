@@ -25,20 +25,20 @@ describe('setupVenv', () => {
 
     await setupVenv(__dirname, envDir, 'dvc')
 
-    expect(createProcessSpy).toBeCalledTimes(3)
-    expect(createProcessSpy).toBeCalledWith({
+    expect(createProcessSpy).toHaveBeenCalledTimes(3)
+    expect(createProcessSpy).toHaveBeenCalledWith({
       args: ['-m', 'venv', envDir],
       cwd,
       executable: 'python3'
     })
 
-    expect(createProcessSpy).toBeCalledWith({
+    expect(createProcessSpy).toHaveBeenCalledWith({
       args: ['-m', 'pip', 'install', '--upgrade', 'pip', 'wheel'],
       cwd,
       executable: join(cwd, envDir, 'bin', 'python')
     })
 
-    expect(createProcessSpy).toBeCalledWith({
+    expect(createProcessSpy).toHaveBeenCalledWith({
       args: ['-m', 'pip', 'install', '--upgrade', 'dvc'],
       cwd,
       executable: join(cwd, envDir, 'bin', 'python')
@@ -54,20 +54,20 @@ describe('setupVenv', () => {
 
     await setupVenv(__dirname, envDir, '-r', 'requirements.txt')
 
-    expect(createProcessSpy).toBeCalledTimes(3)
-    expect(createProcessSpy).toBeCalledWith({
+    expect(createProcessSpy).toHaveBeenCalledTimes(3)
+    expect(createProcessSpy).toHaveBeenCalledWith({
       args: ['-m', 'venv', envDir],
       cwd,
       executable: 'python'
     })
 
-    expect(createProcessSpy).toBeCalledWith({
+    expect(createProcessSpy).toHaveBeenCalledWith({
       args: ['-m', 'pip', 'install', '--upgrade', 'pip', 'wheel'],
       cwd,
       executable: join(cwd, envDir, 'Scripts', 'python.exe')
     })
 
-    expect(createProcessSpy).toBeCalledWith({
+    expect(createProcessSpy).toHaveBeenCalledWith({
       args: ['-m', 'pip', 'install', '--upgrade', '-r', 'requirements.txt'],
       cwd,
       executable: join(cwd, envDir, 'Scripts', 'python.exe')

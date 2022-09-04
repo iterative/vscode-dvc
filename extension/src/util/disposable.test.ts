@@ -39,7 +39,7 @@ describe('reset', () => {
 
     reset(disposables, disposer)
 
-    expect(mockedDispose).toBeCalledTimes(3)
+    expect(mockedDispose).toHaveBeenCalledTimes(3)
   })
 
   it('should stop the disposer tracking the disposables', () => {
@@ -50,6 +50,6 @@ describe('reset', () => {
 
     reset(disposables, disposer)
 
-    expect(mockedUntrack).toBeCalledWith(disposable)
+    expect(mockedUntrack).toHaveBeenCalledWith(disposable)
   })
 })

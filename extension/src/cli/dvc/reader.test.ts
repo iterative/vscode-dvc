@@ -71,7 +71,7 @@ describe('CliReader', () => {
 
       const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual(expShowFixture)
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'show', JSON_FLAG],
         cwd,
         env: mockedEnv,
@@ -132,7 +132,7 @@ describe('CliReader', () => {
 
       expect(statusOutput).toStrictEqual(cliOutput)
 
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['data', 'status', '--granular', '--unchanged', JSON_FLAG],
         cwd,
         env: mockedEnv,
@@ -159,7 +159,7 @@ describe('CliReader', () => {
 
       const plots = await dvcReader.plotsDiff(cwd, 'HEAD')
       expect(plots).toStrictEqual(plotsDiffFixture)
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: [
           'plots',
           'diff',
@@ -183,7 +183,7 @@ describe('CliReader', () => {
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
       const relativeRoot = await dvcReader.root(cwd)
       expect(relativeRoot).toStrictEqual(stdout)
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['root'],
         cwd,
         env: mockedEnv,
@@ -201,7 +201,7 @@ describe('CliReader', () => {
 
       const relativeRoot = await dvcReader.root(cwd)
       expect(relativeRoot).toBeUndefined()
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['root'],
         cwd,
         env: mockedEnv,
@@ -218,7 +218,7 @@ describe('CliReader', () => {
       const output = await dvcReader.version(cwd)
 
       expect(output).toStrictEqual(stdout)
-      expect(mockedCreateProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['--version'],
         cwd,
         env: mockedEnv,
