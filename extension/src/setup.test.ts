@@ -90,8 +90,8 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).not.toBeCalled()
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigValue).not.toHaveBeenCalled()
   })
 
   it('should return without setting any options if the dialog is cancelled at the DVC in virtual environment step', async () => {
@@ -100,10 +100,13 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedQuickPickYesOrNo).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
+      'dvc.pythonPath',
+      undefined
+    )
   })
 
   it('should set the dvc path option to undefined if the CLI is installed in a virtual environment', async () => {
@@ -112,9 +115,9 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedQuickPickYesOrNo).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', undefined)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith('dvc.dvcPath', undefined)
   })
 
   it('should return without setting any options if the dialog is cancelled at the virtual environment without DVC step', async () => {
@@ -124,10 +127,13 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
-    expect(mockedSetConfigValue).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
+    expect(mockedSetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
+      'dvc.pythonPath',
+      undefined
+    )
   })
 
   it("should set the dvc path option to dvc if there is a virtual environment which doesn't include the CLI but it is available globally", async () => {
@@ -137,11 +143,14 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
-    expect(mockedSetConfigValue).toBeCalledTimes(2)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', 'dvc')
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
+    expect(mockedSetConfigValue).toHaveBeenCalledTimes(2)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
+      'dvc.pythonPath',
+      undefined
+    )
+    expect(mockedSetConfigValue).toHaveBeenCalledWith('dvc.dvcPath', 'dvc')
   })
 
   it("should set the dvc path option to the entered value if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
@@ -153,13 +162,19 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
-    expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
-    expect(mockedPickFile).not.toBeCalled()
-    expect(mockedSetConfigValue).toBeCalledTimes(2)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
+    expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
+    expect(mockedPickFile).not.toHaveBeenCalled()
+    expect(mockedSetConfigValue).toHaveBeenCalledTimes(2)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
+      'dvc.pythonPath',
+      undefined
+    )
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
+      'dvc.dvcPath',
+      mockedDvcPath
+    )
   })
 
   it("should set the dvc path option to the picked file's path if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
@@ -172,13 +187,19 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
-    expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
-    expect(mockedPickFile).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).toBeCalledTimes(2)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
+    expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
+    expect(mockedPickFile).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigValue).toHaveBeenCalledTimes(2)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
+      'dvc.pythonPath',
+      undefined
+    )
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
+      'dvc.dvcPath',
+      mockedDvcPath
+    )
   })
 
   it('should not set the python or dvc path options if the user cancels the dialog at the pick a python interpreter step', async () => {
@@ -187,10 +208,10 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedQuickPickYesOrNo).not.toBeCalled()
-    expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).not.toBeCalled()
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).not.toHaveBeenCalled()
+    expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigValue).not.toHaveBeenCalled()
   })
 
   it("should set the python and dvc path options to the picked file's path if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
@@ -206,16 +227,19 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
-    expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
-    expect(mockedQuickPickOneOrInput).toBeCalledTimes(2)
-    expect(mockedPickFile).toBeCalledTimes(2)
-    expect(mockedSetConfigValue).toBeCalledTimes(2)
-    expect(mockedSetConfigValue).toBeCalledWith(
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
+    expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(2)
+    expect(mockedPickFile).toHaveBeenCalledTimes(2)
+    expect(mockedSetConfigValue).toHaveBeenCalledTimes(2)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
       'dvc.pythonPath',
       mockedPythonPath
     )
-    expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
+    expect(mockedSetConfigValue).toHaveBeenCalledWith(
+      'dvc.dvcPath',
+      mockedDvcPath
+    )
   })
 })
 
@@ -235,8 +259,8 @@ describe('setup', () => {
 
     await setup(extension)
 
-    expect(mockedCanRunCli).not.toBeCalled()
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedCanRunCli).not.toHaveBeenCalled()
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should set the DVC roots even if the cli cannot be used', async () => {
@@ -245,7 +269,7 @@ describe('setup', () => {
 
     await setup(extension)
 
-    expect(mockedSetRoots).toBeCalledTimes(1)
+    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
   })
 
   it('should not alert the user if the workspace has no DVC project and the cli cannot be found', async () => {
@@ -254,13 +278,13 @@ describe('setup', () => {
     mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
 
     await setup(extension)
-    expect(mockedSetRoots).toBeCalledTimes(1)
-    expect(mockedGetConfigValue).not.toBeCalled()
-    expect(mockedWarnWithOptions).not.toBeCalled()
-    expect(mockedSetupWorkspace).not.toBeCalled()
-    expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedResetMembers).toBeCalledTimes(1)
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
+    expect(mockedGetConfigValue).not.toHaveBeenCalled()
+    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
+    expect(mockedSetupWorkspace).not.toHaveBeenCalled()
+    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should not alert the user if the workspace contains a DVC project, the cli cannot be found and the do not show option is set', async () => {
@@ -270,13 +294,13 @@ describe('setup', () => {
     mockedGetConfigValue.mockReturnValueOnce(true)
 
     await setup(extension)
-    expect(mockedSetRoots).toBeCalledTimes(1)
-    expect(mockedGetConfigValue).toBeCalledTimes(1)
-    expect(mockedWarnWithOptions).not.toBeCalled()
-    expect(mockedSetupWorkspace).not.toBeCalled()
-    expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedResetMembers).toBeCalledTimes(1)
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
+    expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
+    expect(mockedSetupWorkspace).not.toHaveBeenCalled()
+    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should alert the user if the workspace contains a DVC project and the cli cannot be found', async () => {
@@ -292,11 +316,11 @@ describe('setup', () => {
 
     await setup(extension)
     await flushPromises()
-    expect(mockedSetRoots).toBeCalledTimes(1)
-    expect(mockedGetConfigValue).toBeCalledTimes(1)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
-    expect(mockedResetMembers).toBeCalledTimes(1)
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
+    expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should try to setup the workspace if the workspace contains a DVC project, the cli cannot be found and the user selects setup the workspace', async () => {
@@ -312,14 +336,14 @@ describe('setup', () => {
 
     await setup(extension)
     await flushPromises()
-    expect(mockedSetRoots).toBeCalledTimes(1)
-    expect(mockedGetConfigValue).toBeCalledTimes(1)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
-    expect(mockedSetupWorkspace).toBeCalledTimes(1)
-    expect(mockedExecuteCommand).not.toBeCalled()
-    expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedResetMembers).toBeCalledTimes(1)
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
+    expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedSetupWorkspace).toHaveBeenCalledTimes(1)
+    expect(mockedExecuteCommand).not.toHaveBeenCalled()
+    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should try to select the python interpreter if the workspace contains a DVC project, the cli cannot be found and the user decides to select the python interpreter', async () => {
@@ -335,14 +359,14 @@ describe('setup', () => {
 
     await setup(extension)
     await flushPromises()
-    expect(mockedSetRoots).toBeCalledTimes(1)
-    expect(mockedGetConfigValue).toBeCalledTimes(1)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
-    expect(mockedSetupWorkspace).toBeCalledTimes(0)
-    expect(mockedExecuteCommand).toBeCalledTimes(1)
-    expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedResetMembers).toBeCalledTimes(1)
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
+    expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedSetupWorkspace).toHaveBeenCalledTimes(0)
+    expect(mockedExecuteCommand).toHaveBeenCalledTimes(1)
+    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should set a user config option if the workspace contains a DVC project, the cli cannot be found and the user selects never', async () => {
@@ -358,14 +382,14 @@ describe('setup', () => {
 
     await setup(extension)
     await flushPromises()
-    expect(mockedSetRoots).toBeCalledTimes(1)
-    expect(mockedGetConfigValue).toBeCalledTimes(1)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
-    expect(mockedSetupWorkspace).not.toBeCalled()
-    expect(mockedExecuteCommand).not.toBeCalled()
-    expect(mockedSetUserConfigValue).toBeCalledTimes(1)
-    expect(mockedResetMembers).toBeCalledTimes(1)
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
+    expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedSetupWorkspace).not.toHaveBeenCalled()
+    expect(mockedExecuteCommand).not.toHaveBeenCalled()
+    expect(mockedSetUserConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should not send telemetry or set the cli as unavailable or run initialization if roots have not been found but the cli can be run', async () => {
@@ -374,10 +398,10 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(true)
 
     await setup(extension)
-    expect(mockedSetRoots).toBeCalledTimes(1)
-    expect(mockedResetMembers).toBeCalledTimes(1)
-    expect(mockedSetAvailable).not.toBeCalled()
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedSetAvailable).not.toHaveBeenCalled()
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should run initialization if roots have been found and the cli can be run', async () => {
@@ -386,8 +410,8 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(true)
 
     await setup(extension)
-    expect(mockedResetMembers).not.toBeCalled()
-    expect(mockedInitialize).toBeCalledTimes(1)
+    expect(mockedResetMembers).not.toHaveBeenCalled()
+    expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
 
   it('should run reset if the cli cannot be run and there is a workspace folder open', async () => {
@@ -396,7 +420,7 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(false)
 
     await setup(extension)
-    expect(mockedResetMembers).toBeCalledTimes(1)
-    expect(mockedInitialize).not.toBeCalled()
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 })

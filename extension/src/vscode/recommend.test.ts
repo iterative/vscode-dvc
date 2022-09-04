@@ -24,8 +24,8 @@ describe('recommendRedHatExtension', () => {
     mockedShowInformationMessage.mockResolvedValueOnce(Response.NEVER)
     await recommendRedHatExtension()
 
-    expect(mockedSetUserConfigValue).toBeCalledTimes(1)
-    expect(mockedSetUserConfigValue).toBeCalledWith(
+    expect(mockedSetUserConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedSetUserConfigValue).toHaveBeenCalledWith(
       ConfigKey.DO_NOT_RECOMMEND_RED_HAT,
       true
     )
@@ -37,8 +37,8 @@ describe('recommendRedHatExtension', () => {
 
     await recommendRedHatExtension()
 
-    expect(mockedExecuteCommand).toBeCalledTimes(1)
-    expect(mockedExecuteCommand).toBeCalledWith(
+    expect(mockedExecuteCommand).toHaveBeenCalledTimes(1)
+    expect(mockedExecuteCommand).toHaveBeenCalledWith(
       'workbench.extensions.search',
       '@id:redhat.vscode-yaml'
     )
@@ -48,13 +48,13 @@ describe('recommendRedHatExtension', () => {
     mockedShowInformationMessage.mockResolvedValueOnce(Response.NO)
     await recommendRedHatExtension()
 
-    expect(mockedSetUserConfigValue).not.toBeCalled()
+    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
   })
 
   it('should not set any options if the user cancels the dialog', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(undefined)
     await recommendRedHatExtension()
 
-    expect(mockedSetUserConfigValue).not.toBeCalled()
+    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
   })
 })

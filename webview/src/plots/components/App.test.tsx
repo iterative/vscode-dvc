@@ -248,13 +248,13 @@ describe('App', () => {
 
     fireEvent.click(addPlotsButton)
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.SELECT_PLOTS
     })
     mockPostMessage.mockReset()
 
     fireEvent.click(addExperimentsButton)
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.SELECT_EXPERIMENTS
     })
   })
@@ -366,7 +366,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
@@ -407,7 +407,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
@@ -440,7 +440,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
@@ -503,7 +503,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: [
         'summary.json:accuracy',
         'summary.json:val_accuracy',
@@ -517,7 +517,7 @@ describe('App', () => {
       cancelable: true
     })
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: [
         'summary.json:accuracy',
         'summary.json:loss',
@@ -571,7 +571,7 @@ describe('App', () => {
     const largeButton = screen.getByText('Large')
     fireEvent.click(largeButton)
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -579,7 +579,7 @@ describe('App', () => {
     const smallButton = screen.getByText('Small')
     fireEvent.click(smallButton)
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.SMALL },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -597,7 +597,7 @@ describe('App', () => {
     const largeButton = screen.getByText('Large')
     fireEvent.click(largeButton)
 
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -608,7 +608,7 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture
     })
 
-    expect(mockPostMessage).not.toBeCalled()
+    expect(mockPostMessage).not.toHaveBeenCalled()
   })
 
   it('should display the checkpoint plots in the order stored', () => {
@@ -661,8 +661,8 @@ describe('App', () => {
       'summary.json:val_accuracy'
     ]
 
-    expect(mockPostMessage).toBeCalledTimes(1)
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledTimes(1)
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: expectedOrder,
       type: MessageFromWebviewType.REORDER_PLOTS_METRICS
     })
@@ -796,8 +796,8 @@ describe('App', () => {
       join('logs', 'loss.tsv'),
       join('other', 'multiview.tsv')
     ])
-    expect(mockPostMessage).toBeCalledTimes(1)
-    expect(mockPostMessage).toBeCalledWith({
+    expect(mockPostMessage).toHaveBeenCalledTimes(1)
+    expect(mockPostMessage).toHaveBeenCalledWith({
       payload: [
         {
           group: TemplatePlotGroup.SINGLE_VIEW,
@@ -1707,7 +1707,7 @@ describe('App', () => {
 
       fireEvent.click(mainClearButton)
 
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: 'main',
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
@@ -1737,7 +1737,7 @@ describe('App', () => {
 
       fireEvent.click(filterButton)
 
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SELECT_EXPERIMENTS
       })
     })
@@ -1757,7 +1757,7 @@ describe('App', () => {
       fireEvent.click(refreshAllButton)
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toBeCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledWith({
         payload: ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd'],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })

@@ -25,9 +25,9 @@ describe('askToDisableAutoApplyFilters', () => {
       Response.TURN_OFF
     )
     expect(response).toBeUndefined()
-    expect(mockedGetConfigValue).toBeCalledTimes(1)
-    expect(mockedSetUserConfigValue).not.toBeCalled()
-    expect(mockedWarnWithOptions).not.toBeCalled()
+    expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
+    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
+    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
   })
 
   it("should set the appropriate config option when the user response with Don't Show Again", async () => {
@@ -39,7 +39,7 @@ describe('askToDisableAutoApplyFilters', () => {
       Response.TURN_OFF
     )
     expect(response).toStrictEqual(Response.NEVER)
-    expect(mockedSetUserConfigValue).toBeCalledTimes(1)
+    expect(mockedSetUserConfigValue).toHaveBeenCalledTimes(1)
   })
 
   it('should return cancel when the user dismisses the toast', async () => {
@@ -51,6 +51,6 @@ describe('askToDisableAutoApplyFilters', () => {
       Response.TURN_OFF
     )
     expect(response).toStrictEqual(Response.CANCEL)
-    expect(mockedSetUserConfigValue).not.toBeCalled()
+    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
   })
 })

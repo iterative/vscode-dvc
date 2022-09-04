@@ -57,8 +57,8 @@ describe('getResourceCommand', () => {
     })
 
     expect(output).toStrictEqual(stdout)
-    expect(mockedFunc).toBeCalledWith(mockedDvcRoot, mockedRelPath)
-    expect(mockedFunc).toBeCalledTimes(1)
+    expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot, mockedRelPath)
+    expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
   it('should return a function that throws if the first function fails without a force prompt', async () => {

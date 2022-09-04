@@ -27,8 +27,10 @@ describe('deleteTarget', () => {
     const path = Uri.file(join('test', 'path'))
     const deleted = await deleteTarget(path)
 
-    expect(mockedWorkspaceEdit).toBeCalledTimes(1)
-    expect(mockedApplyEdit).toBeCalledWith({ deleteFile: mockedDeleteFile })
+    expect(mockedWorkspaceEdit).toHaveBeenCalledTimes(1)
+    expect(mockedApplyEdit).toHaveBeenCalledWith({
+      deleteFile: mockedDeleteFile
+    })
     expect(deleted).toBe(true)
   })
 })
@@ -47,12 +49,14 @@ describe('moveTargets', () => {
     const destination = Uri.file(join('other', 'folder'))
     const moved = await moveTargets([path], destination)
 
-    expect(mockedWorkspaceEdit).toBeCalledTimes(1)
-    expect(mockedRenameFile).toBeCalledWith(
+    expect(mockedWorkspaceEdit).toHaveBeenCalledTimes(1)
+    expect(mockedRenameFile).toHaveBeenCalledWith(
       path,
       Uri.joinPath(destination, filename)
     )
-    expect(mockedApplyEdit).toBeCalledWith({ renameFile: mockedRenameFile })
+    expect(mockedApplyEdit).toHaveBeenCalledWith({
+      renameFile: mockedRenameFile
+    })
     expect(moved).toBe(true)
   })
 })

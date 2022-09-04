@@ -39,14 +39,14 @@ describe('pickFromColumnLikes', () => {
       title: "can't pick from no columns" as Title
     })
     expect(picked).toBeUndefined()
-    expect(mockedShowError).toBeCalledTimes(1)
-    expect(mockedQuickPickValue).not.toBeCalled()
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickValue).not.toHaveBeenCalled()
   })
 
   it('should invoke a QuickPick with the correct options', async () => {
     const title = 'Test title' as Title
     await pickFromColumnLikes(exampleColumns, { title })
-    expect(mockedQuickPickValue).toBeCalledWith(
+    expect(mockedQuickPickValue).toHaveBeenCalledWith(
       [
         {
           description: epochsParamPath,

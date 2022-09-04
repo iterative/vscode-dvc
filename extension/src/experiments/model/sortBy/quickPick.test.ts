@@ -40,29 +40,29 @@ const exampleColumns = [epochsParam, paramsYamlParam]
 describe('pickSortToAdd', () => {
   it('should not invoke a quickPick if an empty array', async () => {
     const resolvedPromise = await pickSortToAdd([])
-    expect(mockedQuickPickValue).not.toBeCalled()
+    expect(mockedQuickPickValue).not.toHaveBeenCalled()
     expect(resolvedPromise).toBe(undefined)
   })
 
   it('should resolve with no value if canceled at param or metric select', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
     expect(await pickSortToAdd(exampleColumns)).toBe(undefined)
-    expect(mockedQuickPickValue).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
   })
 
   it('should resolve with no value if canceled at order select', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
     expect(await pickSortToAdd(exampleColumns)).toBe(undefined)
-    expect(mockedQuickPickValue).toBeCalledTimes(2)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(2)
   })
 
   it('should invoke a descending sort with the expected quickPick calls', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
     mockedQuickPickValue.mockResolvedValueOnce(false)
     const resolvedPromise = await pickSortToAdd(exampleColumns)
-    expect(mockedQuickPickValue).toBeCalledTimes(2)
-    expect(mockedQuickPickValue).toBeCalledWith(
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(2)
+    expect(mockedQuickPickValue).toHaveBeenCalledWith(
       [
         { label: 'Ascending', value: false },
         { label: 'Descending', value: true }
@@ -79,7 +79,7 @@ describe('pickSortToAdd', () => {
     mockedQuickPickValue.mockResolvedValueOnce(paramsYamlParam)
     mockedQuickPickValue.mockResolvedValueOnce(false)
     const resolvedPromise = await pickSortToAdd(exampleColumns)
-    expect(mockedQuickPickValue).toBeCalledTimes(2)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(2)
     expect(resolvedPromise).toStrictEqual({
       descending: false,
       path: paramsYamlPath

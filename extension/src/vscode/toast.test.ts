@@ -27,8 +27,12 @@ describe('Toast', () => {
 
       await Toast.errorWithOptions(message, option1, option2)
 
-      expect(mockedShowErrorMessage).toBeCalledTimes(1)
-      expect(mockedShowErrorMessage).toBeCalledWith(message, option1, option2)
+      expect(mockedShowErrorMessage).toHaveBeenCalledTimes(1)
+      expect(mockedShowErrorMessage).toHaveBeenCalledWith(
+        message,
+        option1,
+        option2
+      )
     })
   })
 
@@ -40,10 +44,13 @@ describe('Toast', () => {
 
       await Toast.showOutput(mockedExperimentApply(defaultPath, exampleExpName))
 
-      expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
+      expect(mockedExperimentApply).toHaveBeenCalledWith(
+        defaultPath,
+        exampleExpName
+      )
 
-      expect(mockedShowInformationMessage).toBeCalledTimes(1)
-      expect(mockedShowInformationMessage).toBeCalledWith(mockedStdOut)
+      expect(mockedShowInformationMessage).toHaveBeenCalledTimes(1)
+      expect(mockedShowInformationMessage).toHaveBeenCalledWith(mockedStdOut)
     })
 
     it('reports operation successful when no output is returned for the given command', async () => {
@@ -53,10 +60,13 @@ describe('Toast', () => {
 
       await Toast.showOutput(mockedExperimentApply(defaultPath, exampleExpName))
 
-      expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
+      expect(mockedExperimentApply).toHaveBeenCalledWith(
+        defaultPath,
+        exampleExpName
+      )
 
-      expect(mockedShowInformationMessage).toBeCalledTimes(1)
-      expect(mockedShowInformationMessage).toBeCalledWith(
+      expect(mockedShowInformationMessage).toHaveBeenCalledTimes(1)
+      expect(mockedShowInformationMessage).toHaveBeenCalledWith(
         'Operation successful.'
       )
     })

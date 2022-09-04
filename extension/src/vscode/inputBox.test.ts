@@ -15,7 +15,7 @@ describe('getInput', () => {
   it('should call window.showInputBox with the provided title', async () => {
     const aggressiveText = 'TELL ME WHAT YOU WANT' as Title
     await getInput(aggressiveText)
-    expect(mockedInputBox).toBeCalledTimes(1)
-    expect(mockedInputBox).toBeCalledWith({ title: aggressiveText })
+    expect(mockedInputBox).toHaveBeenCalledTimes(1)
+    expect(mockedInputBox).toHaveBeenCalledWith({ title: aggressiveText })
   })
 })

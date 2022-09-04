@@ -24,7 +24,7 @@ describe('warnOfConsequences', () => {
     const response = await warnOfConsequences('WHAT DO I DO?', ...options)
 
     expect(response).toStrictEqual(userSelection)
-    expect(mockedShowWarningMessage).toBeCalledTimes(1)
+    expect(mockedShowWarningMessage).toHaveBeenCalledTimes(1)
   })
 
   it('should return undefined if the modal is cancelled', async () => {
@@ -36,6 +36,6 @@ describe('warnOfConsequences', () => {
     const response = await warnOfConsequences('WHAT DO I DO?', ...options)
 
     expect(response).toStrictEqual(modalCancelled)
-    expect(mockedShowWarningMessage).toBeCalledTimes(1)
+    expect(mockedShowWarningMessage).toHaveBeenCalledTimes(1)
   })
 })

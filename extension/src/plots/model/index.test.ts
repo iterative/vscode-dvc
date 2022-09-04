@@ -115,7 +115,7 @@ describe('plotsModel', () => {
     const newOrder = ['71f31cf', 'e93c7e6', 'ffbe811', 'workspace', 'main']
     model.setComparisonOrder(newOrder)
 
-    expect(mementoUpdateSpy).toBeCalledTimes(1)
+    expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       PersistenceKey.PLOT_COMPARISON_ORDER + exampleDvcRoot,
       newOrder

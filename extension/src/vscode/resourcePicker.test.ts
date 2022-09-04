@@ -20,7 +20,7 @@ describe('pickFile', () => {
 
     await pickFile(mockedTitle)
 
-    expect(mockedShowOpenDialog).toBeCalledWith({
+    expect(mockedShowOpenDialog).toHaveBeenCalledWith({
       canSelectFolders: false,
       canSelectMany: false,
       title: mockedTitle
@@ -46,7 +46,7 @@ describe('pickResources', () => {
 
     await pickResources(mockedTitle)
 
-    expect(mockedShowOpenDialog).toBeCalledWith({
+    expect(mockedShowOpenDialog).toHaveBeenCalledWith({
       canSelectFiles: true,
       canSelectFolders: true,
       canSelectMany: true,

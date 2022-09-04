@@ -54,7 +54,7 @@ describe('DecorationProvider', () => {
       committedAdded: new Set(addedPaths),
       tracked: new Set(addedPaths)
     } as ScmDecorationState)
-    expect(mockedDecorationsChangedFire).toBeCalledWith(
+    expect(mockedDecorationsChangedFire).toHaveBeenCalledWith(
       addedPaths.map(path => Uri.file(path))
     )
   })
@@ -83,7 +83,7 @@ describe('DecorationProvider', () => {
       tracked: new Set(subsetOfAddedPaths)
     } as ScmDecorationState)
 
-    expect(mockedDecorationsChangedFire).toBeCalledWith(
+    expect(mockedDecorationsChangedFire).toHaveBeenCalledWith(
       addedPaths.map(path => Uri.file(path))
     )
   })
@@ -162,7 +162,7 @@ describe('DecorationProvider', () => {
 
     scmDecorationProvider.setState(updatedState)
 
-    expect(mockedDecorationsChangedFire).toBeCalledWith(
+    expect(mockedDecorationsChangedFire).toHaveBeenCalledWith(
       [
         ...committedAdded,
         ...committedDeleted,

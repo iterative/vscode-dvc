@@ -18,7 +18,7 @@ describe('pickExperiments', () => {
   it('should return early given no experiments', async () => {
     const undef = await pickExperiments([], false)
     expect(undef).toBeUndefined()
-    expect(mockedQuickPickLimitedValues).not.toBeCalled()
+    expect(mockedQuickPickLimitedValues).not.toHaveBeenCalled()
   })
 
   it('should return the selected experiment', async () => {
@@ -37,8 +37,8 @@ describe('pickExperiments', () => {
     const picked = await pickExperiments(mockedExperiments, false)
 
     expect(picked).toStrictEqual([selectedExperiment])
-    expect(mockedQuickPickLimitedValues).toBeCalledTimes(1)
-    expect(mockedQuickPickLimitedValues).toBeCalledWith(
+    expect(mockedQuickPickLimitedValues).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickLimitedValues).toHaveBeenCalledWith(
       [
         {
           description: '[exp-123]',
@@ -126,8 +126,8 @@ describe('pickExperiments', () => {
     })
 
     expect(picked).toStrictEqual([selectedExperiment, selectedCheckpoint])
-    expect(mockedQuickPickLimitedValues).toBeCalledTimes(1)
-    expect(mockedQuickPickLimitedValues).toBeCalledWith(
+    expect(mockedQuickPickLimitedValues).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickLimitedValues).toHaveBeenCalledWith(
       [
         getExpectedItem(mockedWorkspace),
         getExpectedItem(mockedBranch),

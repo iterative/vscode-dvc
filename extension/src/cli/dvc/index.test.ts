@@ -82,7 +82,7 @@ describe('executeDvcProcess', () => {
 
     await cli.executeDvcProcess(cwd, ...args)
 
-    expect(mockedCreateProcess).toBeCalledWith({
+    expect(mockedCreateProcess).toHaveBeenCalledWith({
       args,
       cwd,
       env: { ...processEnv, DVCLIVE_OPEN: 'false', DVC_NO_ANALYTICS: 'true' },
@@ -121,7 +121,7 @@ describe('executeDvcProcess', () => {
 
     await expect(cli.executeDvcProcess(cwd, ...args)).rejects.toThrow()
 
-    expect(mockedCreateProcess).toBeCalledWith({
+    expect(mockedCreateProcess).toHaveBeenCalledWith({
       args,
       cwd,
       env: {

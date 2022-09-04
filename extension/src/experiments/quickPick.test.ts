@@ -113,7 +113,7 @@ describe('pickExperiment', () => {
 describe('pickGarbageCollectionFlags', () => {
   it('should invoke a QuickPick with the correct options', async () => {
     await pickGarbageCollectionFlags()
-    expect(mockedQuickPickManyValues).toBeCalledWith(
+    expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
       [
         {
           detail: 'Preserve experiments derived from the current workspace',

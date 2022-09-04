@@ -55,7 +55,7 @@ describe('quickPickValue', () => {
       }
     ]
     const probablyC = await quickPickValue(items, { placeHolder, title })
-    expect(mockedShowQuickPick).toBeCalledWith(items, {
+    expect(mockedShowQuickPick).toHaveBeenCalledWith(items, {
       canPickMany: false,
       placeHolder,
       title
@@ -93,7 +93,7 @@ describe('quickPickManyValues', () => {
       }
     ]
     const result = await quickPickManyValues(items, { placeHolder, title })
-    expect(mockedShowQuickPick).toBeCalledWith(items, {
+    expect(mockedShowQuickPick).toHaveBeenCalledWith(items, {
       canPickMany: true,
       placeHolder,
       title
@@ -109,7 +109,7 @@ describe('quickPickOne', () => {
 
     const noResponse = await quickPickOne(['a', 'b', 'c'], placeHolder)
 
-    expect(mockedShowQuickPick).toBeCalledWith(['a', 'b', 'c'], {
+    expect(mockedShowQuickPick).toHaveBeenCalledWith(['a', 'b', 'c'], {
       canPickMany: false,
       placeHolder
     })
@@ -135,7 +135,7 @@ describe('quickPickYesOrNo', () => {
       title
     })
 
-    expect(mockedShowQuickPick).toBeCalledWith(
+    expect(mockedShowQuickPick).toHaveBeenCalledWith(
       [
         yesItem,
         { description: noDescription, label: Response.NO, value: false }

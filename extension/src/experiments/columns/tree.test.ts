@@ -426,7 +426,7 @@ describe('ExperimentsColumnsTree', () => {
 
       const treeItem = experimentsColumnsTree.getTreeItem(mockedDvcRoot)
 
-      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(mockedTreeItem).toHaveBeenCalledTimes(1)
       expect(treeItem).toStrictEqual({
         ...mockedItem
       })
@@ -459,7 +459,7 @@ describe('ExperimentsColumnsTree', () => {
 
     const treeItem = experimentsColumnsTree.getTreeItem(columnsItem)
 
-    expect(mockedTreeItem).toBeCalledTimes(1)
+    expect(mockedTreeItem).toHaveBeenCalledTimes(1)
     expect(treeItem).toStrictEqual({
       collapsibleState: 1,
       command: {
@@ -499,7 +499,7 @@ describe('ExperimentsColumnsTree', () => {
 
     const treeItem = experimentsColumnsTree.getTreeItem(columnsItem)
 
-    expect(mockedTreeItem).toBeCalledTimes(1)
+    expect(mockedTreeItem).toHaveBeenCalledTimes(1)
     expect(treeItem).toStrictEqual({
       collapsibleState: 0,
       command: {

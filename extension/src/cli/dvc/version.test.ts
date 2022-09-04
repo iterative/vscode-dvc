@@ -61,7 +61,7 @@ describe('isVersionCompatible', () => {
     const isCompatible = isVersionCompatible(MIN_CLI_VERSION)
 
     expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toBeCalled()
+    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
   })
 
   it('should be compatible and not send a toast for a version with the same minor and higher patch as the min compatible version', () => {
@@ -72,7 +72,7 @@ describe('isVersionCompatible', () => {
     )
 
     expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toBeCalled()
+    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
   })
 
   it('should be compatible and not send a toast for a version with the same minor and higher patch as the latest tested version', () => {
@@ -85,7 +85,7 @@ describe('isVersionCompatible', () => {
     )
 
     expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toBeCalled()
+    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
   })
 
   it('should be compatible and not send a toast for a major and minor version in between the min compatible and the latest tested', () => {
@@ -98,7 +98,7 @@ describe('isVersionCompatible', () => {
     )
 
     expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toBeCalled()
+    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
   })
 
   it('should be compatible and send a toast for a version with a minor higher as the latest tested minor and any patch', () => {
@@ -122,7 +122,7 @@ describe('isVersionCompatible', () => {
     )
     expect(isCompatible).toBe(true)
 
-    expect(mockedWarnWithOptions).toBeCalledTimes(3)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(3)
   })
 
   it('should not be compatible and send a toast message if the provided version is a patch version before the minimum expected version', () => {
@@ -133,7 +133,7 @@ describe('isVersionCompatible', () => {
     )
 
     expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
   })
 
   it('should not be compatible and send a toast message if the provided minor version is before the minimum expected version', () => {
@@ -144,7 +144,7 @@ describe('isVersionCompatible', () => {
     )
 
     expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
   })
 
   it('should not be compatible and send a toast message if the provided major version is before the minimum expected version', () => {
@@ -155,7 +155,7 @@ describe('isVersionCompatible', () => {
     )
 
     expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
   })
 
   it('should not be compatible and send a toast message if the provided major version is above the expected major version', () => {
@@ -164,7 +164,7 @@ describe('isVersionCompatible', () => {
     const isCompatible = isVersionCompatible('3.0.0')
 
     expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toBeCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
   })
 
   it('should not be compatible and send a toast message if the provided version is malformed', () => {
@@ -176,6 +176,6 @@ describe('isVersionCompatible', () => {
     isCompatible = isVersionCompatible('1,2,3')
     expect(isCompatible).toBe(false)
 
-    expect(mockedWarnWithOptions).toBeCalledTimes(2)
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(2)
   })
 })

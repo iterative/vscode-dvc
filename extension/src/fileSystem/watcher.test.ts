@@ -96,7 +96,7 @@ describe('createFileSystemWatcher', () => {
 
     createFileSystemWatcher(file, mockedListener)
 
-    expect(mockedCreateFileSystemWatcher).toBeCalledWith(file)
+    expect(mockedCreateFileSystemWatcher).toHaveBeenCalledWith(file)
   })
 
   it('should throw an error when given a directory path', () => {

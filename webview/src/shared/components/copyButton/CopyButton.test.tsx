@@ -43,7 +43,7 @@ describe('CopyButton', () => {
 
     await screen.findByTitle(successStateTitle)
 
-    expect(mockWriteText).toBeCalledWith(exampleCopyText)
+    expect(mockWriteText).toHaveBeenCalledWith(exampleCopyText)
     act(() => {
       jest.advanceTimersByTime(1000)
     })
@@ -62,7 +62,7 @@ describe('CopyButton', () => {
 
     await screen.findByTitle(failureStateTitle)
 
-    expect(mockWriteText).toBeCalledWith(exampleCopyText)
+    expect(mockWriteText).toHaveBeenCalledWith(exampleCopyText)
     act(() => {
       jest.advanceTimersByTime(1000)
     })
