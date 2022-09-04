@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2022-09-04
+
+### 🚀 New Features and Enhancements
+
+- Use new data status command [#2091](https://github.com/iterative/vscode-dvc/pull/2091) by [@mattseddon](https://github.com/mattseddon)
+- Give option to sort or filter by Created timestamp [#2293](https://github.com/iterative/vscode-dvc/pull/2293) by [@mattseddon](https://github.com/mattseddon)
+- Improve table column resizing styles [#2305](https://github.com/iterative/vscode-dvc/pull/2305) by [@julieg18](https://github.com/julieg18)
+- Refine data status consumption [#2151](https://github.com/iterative/vscode-dvc/pull/2151) by [@mattseddon](https://github.com/mattseddon)
+- Consume unknown from data status [#2267](https://github.com/iterative/vscode-dvc/pull/2267) by [@mattseddon](https://github.com/mattseddon)
+- Remove retries from reader (all commands now lockless) [#2300](https://github.com/iterative/vscode-dvc/pull/2300) by [@mattseddon](https://github.com/mattseddon)
+- Show data status errors in DVC Tracked tree [#2301](https://github.com/iterative/vscode-dvc/pull/2301) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Account for exp show returning an empty object [#2280](https://github.com/iterative/vscode-dvc/pull/2280) by [@mattseddon](https://github.com/mattseddon)
+- Fix drag leave of top and bottom sections [#2320](https://github.com/iterative/vscode-dvc/pull/2320) by [@sroy3](https://github.com/sroy3)
+- Fix bugs in table styles [#2316](https://github.com/iterative/vscode-dvc/pull/2316) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Bump min version of DVC to 2.21.0 (data status) [#2266](https://github.com/iterative/vscode-dvc/pull/2266) by [@mattseddon](https://github.com/mattseddon)
+- Bump min version of DVC to 2.23.0 (--with-dirs removed from data status) [#2299](https://github.com/iterative/vscode-dvc/pull/2299) by [@mattseddon](https://github.com/mattseddon)
+- Bump min version of DVC to 2.24.0 (patch windows paths in data status) [#2314](https://github.com/iterative/vscode-dvc/pull/2314) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.3.26] - 2022-08-31
 
 ### 🚀 New Features and Enhancements
