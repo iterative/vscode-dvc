@@ -13,28 +13,28 @@ import {
   WorkspaceEdit,
   workspace
 } from 'vscode'
-import { Disposable } from '../../../extension'
-import * as Workspace from '../../../fileSystem/workspace'
-import { DvcExecutor } from '../../../cli/dvc/executor'
+import { Disposable } from '../../../../extension'
+import * as Workspace from '../../../../fileSystem/workspace'
+import { DvcExecutor } from '../../../../cli/dvc/executor'
 import {
   activeTextEditorChangedEvent,
   buildDependencies,
   closeAllEditors,
   getActiveTextEditorFilename,
   stubPrivatePrototypeMethod
-} from '../util'
-import { dvcDemoPath } from '../../util'
+} from '../../util'
+import { dvcDemoPath } from '../../../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands
-} from '../../../commands/external'
-import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
-import { Title } from '../../../vscode/title'
-import { Repository } from '../../../repository'
-import { WorkspaceRepositories } from '../../../repository/workspace'
-import { TrackedExplorerTree } from '../../../fileSystem/tree'
+} from '../../../../commands/external'
+import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
+import { Title } from '../../../../vscode/title'
+import { Repository } from '../../../../repository'
+import { WorkspaceRepositories } from '../../../../repository/workspace'
+import { RepositoriesTree } from '../../../../repository/model/tree'
 
-suite('Tracked Explorer Tree Test Suite', () => {
+suite('Repositories Tree Test Suite', () => {
   const { join } = path
 
   const getPathItem = (relPath: string, isTracked = true) => ({
@@ -54,7 +54,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
     return closeAllEditors()
   })
 
-  describe('TrackedExplorerTree', () => {
+  describe('RepositoriesTree', () => {
     it('should appear in the UI', async () => {
       await expect(
         commands.executeCommand('dvc.views.trackedExplorerTree.focus')
@@ -314,7 +314,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       stub(WorkspaceRepositories.prototype, 'getRepository').returns(repository)
       stub(WorkspaceRepositories.prototype, 'isReady').resolves(undefined)
       stubPrivatePrototypeMethod(
-        TrackedExplorerTree,
+        RepositoriesTree,
         'getSelectedPathItems'
       ).returns([])
       const mockPull = stub(DvcExecutor.prototype, 'pull').resolves(
@@ -345,7 +345,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target pulled'
       )
       stubPrivatePrototypeMethod(
-        TrackedExplorerTree,
+        RepositoriesTree,
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
@@ -375,7 +375,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       ).resolves('Force' as unknown as MessageItem)
 
       stubPrivatePrototypeMethod(
-        TrackedExplorerTree,
+        RepositoriesTree,
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
@@ -399,7 +399,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       )
 
       stubPrivatePrototypeMethod(
-        TrackedExplorerTree,
+        RepositoriesTree,
         'getSelectedPathItems'
       ).returns([getPathItem(relPath)])
 
@@ -428,7 +428,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       ).resolves('Force' as unknown as MessageItem)
 
       stubPrivatePrototypeMethod(
-        TrackedExplorerTree,
+        RepositoriesTree,
         'getSelectedPathItems'
       ).returns([])
 
