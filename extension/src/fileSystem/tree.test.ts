@@ -17,7 +17,7 @@ import { OutputChannel } from '../vscode/outputChannel'
 import { WorkspaceRepositories } from '../repository/workspace'
 import { Repository } from '../repository'
 import { dvcDemoPath } from '../test/util'
-import { getDecoratableUri } from '../repository/errorDecorationProvider'
+import { getDecoratableUri, DecoratableTreeItemScheme } from '../tree'
 import { getMarkdownString } from '../vscode/markdownString'
 import { PathItem } from '../repository/model/collect'
 
@@ -388,7 +388,9 @@ describe('TrackedTreeView', () => {
       )
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toStrictEqual(0)
-        expect(uri).toStrictEqual(getDecoratableUri(label))
+        expect(uri).toStrictEqual(
+          getDecoratableUri(label, DecoratableTreeItemScheme.TRACKED)
+        )
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
