@@ -18347,10 +18347,10 @@ wdio-chromedriver-service@^7.3.2:
     split2 "^3.2.2"
     tcp-port-used "^1.0.1"
 
-wdio-vscode-service@4.0.5:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/wdio-vscode-service/-/wdio-vscode-service-4.0.5.tgz#75bb59e3fc5a1a532a941e59af725dd01d789360"
-  integrity sha512-KuK22fy0NC+ALmfY4eSvHFMovLrbeXhAbozkfe1QG2QfY2yUYA9bp66YefZtGaHwU7htRywOF0t3q7103U3iGQ==
+wdio-vscode-service@4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/wdio-vscode-service/-/wdio-vscode-service-4.0.6.tgz#3f8de9ba44de93d529cd5376fd01dd1cd4d7102a"
+  integrity sha512-eF8VcCLHk/nHGaPK1vPAcw2Dlrijg5kheGuY6m0458ElGMntmixJzxz1m0bMEXSk8NMNfpM4XWnh8chgF0lNnw==
   dependencies:
     "@fastify/cors" "^7.0.0"
     "@fastify/static" "^5.0.2"
@@ -18486,10 +18486,10 @@ webpack-dev-middleware@^5.3.1:
     range-parser "^1.2.1"
     schema-utils "^4.0.0"
 
-webpack-dev-server@4.10.0:
-  version "4.10.0"
-  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-4.10.0.tgz#de270d0009eba050546912be90116e7fd740a9ca"
-  integrity sha512-7dezwAs+k6yXVFZ+MaL8VnE+APobiO3zvpp3rBHe/HmWQ+avwh0Q3d0xxacOiBybZZ3syTZw9HXzpa3YNbAZDQ==
+webpack-dev-server@4.10.1:
+  version "4.10.1"
+  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-4.10.1.tgz#124ac9ac261e75303d74d95ab6712b4aec3e12ed"
+  integrity sha512-FIzMq3jbBarz3ld9l7rbM7m6Rj1lOsgq/DyLGMX/fPEB1UBUPtf5iL/4eNfhx8YYJTRlzfv107UfWSWcBK5Odw==
   dependencies:
     "@types/bonjour" "^3.5.9"
     "@types/connect-history-api-fallback" "^1.3.5"
