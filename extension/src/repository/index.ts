@@ -1,9 +1,9 @@
 import { EventEmitter } from 'vscode'
-import { DecorationProvider } from './model/decorationProvider'
+import { DecorationProvider as ErrorDecorationProvider } from './model/decorationProvider'
 import {
-  ScmDecorationProvider,
+  DecorationProvider as ScmDecorationProvider,
   ScmDecorationState
-} from './scmDecorationProvider'
+} from './sourceControlManagement/decorationProvider'
 import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
 import { SourceControlManagement, SCMState } from './sourceControlManagement'
@@ -19,7 +19,7 @@ export class Repository extends DeferredDisposable {
   private readonly treeDataChanged: EventEmitter<void>
 
   private readonly dvcRoot: string
-  private readonly errorDecorationProvider: DecorationProvider
+  private readonly errorDecorationProvider: ErrorDecorationProvider
   private readonly scmDecorationProvider: ScmDecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
   private readonly data: RepositoryData
@@ -38,7 +38,9 @@ export class Repository extends DeferredDisposable {
       new RepositoryData(dvcRoot, internalCommands, updatesPaused)
     )
 
-    this.errorDecorationProvider = this.dispose.track(new DecorationProvider())
+    this.errorDecorationProvider = this.dispose.track(
+      new ErrorDecorationProvider()
+    )
     this.scmDecorationProvider = this.dispose.track(new ScmDecorationProvider())
     this.sourceControlManagement = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, {
