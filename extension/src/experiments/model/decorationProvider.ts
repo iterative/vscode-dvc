@@ -1,5 +1,5 @@
 import { EventEmitter, FileDecoration, ThemeColor, Uri } from 'vscode'
-import { DecoratableLabelScheme, getDecoratableUri } from '../../tree'
+import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
 import { ErrorDecorationProvider } from '../../tree/errorDecorationProvider'
 
 export class DecorationProvider extends ErrorDecorationProvider {
@@ -12,7 +12,7 @@ export class DecorationProvider extends ErrorDecorationProvider {
   private filtered = new Set<string>()
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
-    super(DecoratableLabelScheme.EXPERIMENTS, decorationsChanged)
+    super(DecoratableTreeItemScheme.EXPERIMENTS, decorationsChanged)
   }
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
@@ -33,7 +33,7 @@ export class DecorationProvider extends ErrorDecorationProvider {
 
     for (const label of labels) {
       urisToUpdate.push(
-        getDecoratableUri(label, DecoratableLabelScheme.EXPERIMENTS)
+        getDecoratableUri(label, DecoratableTreeItemScheme.EXPERIMENTS)
       )
     }
 

@@ -9,7 +9,7 @@ import {
   Uri,
   window
 } from 'vscode'
-import { DecoratableLabelScheme } from '.'
+import { DecoratableTreeItemScheme } from '.'
 import { Disposable } from '../class/dispose'
 
 export abstract class ErrorDecorationProvider
@@ -21,11 +21,11 @@ export abstract class ErrorDecorationProvider
   }
 
   public readonly onDidChangeFileDecorations: Event<Uri[]>
-  protected readonly scheme: DecoratableLabelScheme
+  protected readonly scheme: DecoratableTreeItemScheme
   protected readonly decorationsChanged: EventEmitter<Uri[]>
 
   constructor(
-    scheme: DecoratableLabelScheme,
+    scheme: DecoratableTreeItemScheme,
     decorationsChanged?: EventEmitter<Uri[]>
   ) {
     super()

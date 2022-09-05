@@ -38,7 +38,7 @@ import { Title } from '../vscode/title'
 import { Disposable } from '../class/dispose'
 import {
   createTreeView,
-  DecoratableLabelScheme,
+  DecoratableTreeItemScheme,
   getDecoratableTreeItem,
   getErrorTooltip
 } from '../tree'
@@ -124,7 +124,7 @@ export class TrackedExplorerTree
   private getErrorTreeItem({ error: { msg, label } }: ErrorItem) {
     const treeItem = getDecoratableTreeItem(
       label,
-      DecoratableLabelScheme.TRACKED
+      DecoratableTreeItemScheme.TRACKED
     )
 
     treeItem.tooltip = getErrorTooltip(msg)

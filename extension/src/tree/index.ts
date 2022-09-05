@@ -9,19 +9,19 @@ import {
 } from 'vscode'
 import { getMarkdownString } from '../vscode/markdownString'
 
-export enum DecoratableLabelScheme {
+export enum DecoratableTreeItemScheme {
   TRACKED = 'dvc.tracked',
   EXPERIMENTS = 'dvc.experiments'
 }
 
 export const getDecoratableUri = (
   label: string,
-  scheme: DecoratableLabelScheme
+  scheme: DecoratableTreeItemScheme
 ): Uri => Uri.from({ path: label, scheme })
 
 export const getDecoratableTreeItem = (
   label: string,
-  scheme: DecoratableLabelScheme,
+  scheme: DecoratableTreeItemScheme,
   collapsibleState = TreeItemCollapsibleState.None
 ): TreeItem => {
   const decoratableUri = getDecoratableUri(label, scheme)

@@ -17,7 +17,7 @@ import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   createTreeView,
-  DecoratableLabelScheme,
+  DecoratableTreeItemScheme,
   getDecoratableTreeItem,
   getErrorTooltip,
   getRootItem
@@ -92,7 +92,7 @@ export class ExperimentsTree
     } = element
     const item = getDecoratableTreeItem(
       label,
-      DecoratableLabelScheme.EXPERIMENTS,
+      DecoratableTreeItemScheme.EXPERIMENTS,
       collapsibleState
     )
     if (iconPath) {

@@ -1,12 +1,12 @@
 import { EventEmitter, FileDecoration, Uri } from 'vscode'
-import { DecoratableLabelScheme, getDecoratableUri } from '../../tree'
+import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
 import { ErrorDecorationProvider } from '../../tree/errorDecorationProvider'
 
 export class DecorationProvider extends ErrorDecorationProvider {
   private errors = new Set<string>()
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {
-    super(DecoratableLabelScheme.TRACKED, decorationsChanged)
+    super(DecoratableTreeItemScheme.TRACKED, decorationsChanged)
   }
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
