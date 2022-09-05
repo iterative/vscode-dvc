@@ -3,17 +3,17 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
-import { Disposable } from '../../../extension'
-import { DvcExecutor } from '../../../cli/dvc/executor'
-import { closeAllEditors, stubPrivatePrototypeMethod } from '../util'
-import { dvcDemoPath } from '../../util'
+import { Disposable } from '../../../../extension'
+import { DvcExecutor } from '../../../../cli/dvc/executor'
+import { closeAllEditors, stubPrivatePrototypeMethod } from '../../util'
+import { dvcDemoPath } from '../../../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands
-} from '../../../commands/external'
-import { WorkspaceRepositories } from '../../../repository/workspace'
-import { Cli } from '../../../cli'
-import { GitCli } from '../../../cli/git'
+} from '../../../../commands/external'
+import { WorkspaceRepositories } from '../../../../repository/workspace'
+import { Cli } from '../../../../cli'
+import { GitCli } from '../../../../cli/git'
 
 suite('Source Control Management Test Suite', () => {
   const disposable = Disposable.fn()

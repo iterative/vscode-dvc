@@ -1,7 +1,7 @@
 import { scm, SourceControl, SourceControlResourceGroup, Uri } from 'vscode'
-import { BaseDataStatus } from './constants'
-import { PathItem } from './model/collect'
-import { Disposable } from '../class/dispose'
+import { BaseDataStatus } from '../constants'
+import { PathItem } from '../model/collect'
+import { Disposable } from '../../class/dispose'
 
 export const SourceControlDataStatus = Object.assign({}, BaseDataStatus, {
   UNTRACKED: 'untracked'
