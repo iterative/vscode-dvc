@@ -1,4 +1,11 @@
-const StyleUtils = require('./src/util/styles')
+jest.mock('./src/util/styles', () => {
+  const actualModule = jest.requireActual('./src/util/styles')
+  return {
+    __esModule: true,
+    ...actualModule,
+    getThemeValue: jest.fn().mockImplementation(() => '#ffffff')
+  }
+})
 
 // eslint-disable-next-line no-global-assign
 window = {
@@ -23,5 +30,3 @@ const intersectionObserverMock = jest.fn().mockImplementation(() => {
   }
 })
 global.IntersectionObserver = intersectionObserverMock
-
-StyleUtils.getThemeValue = jest.fn().mockImplementation(() => '#ffffff')

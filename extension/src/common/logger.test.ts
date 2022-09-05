@@ -1,5 +1,13 @@
 import { Logger } from './logger'
 
+jest.mock('console', () => {
+  const actualModule = jest.requireActual('console')
+  return {
+    __esModule: true,
+    ...actualModule
+  }
+})
+
 describe('Logger', () => {
   describe('error', () => {
     it('should be able to write an error to the console', () => {
