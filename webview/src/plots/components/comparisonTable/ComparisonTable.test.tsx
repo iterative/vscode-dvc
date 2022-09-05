@@ -27,10 +27,20 @@ import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { plotsReducers } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
 import { getThemeValue, hexToRGB, ThemeProperty } from '../../../util/styles'
+import * as EventCurrentTargetDistances from '../../../shared/components/dragDrop/currentTarget'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
 jest.mock('../../../shared/api')
+jest.mock('../../../shared/components/dragDrop/currentTarget', () => {
+  const actualModule = jest.requireActual(
+    '../../../shared/components/dragDrop/currentTarget'
+  )
+  return {
+    __esModule: true,
+    ...actualModule
+  }
+})
 
 const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
@@ -488,13 +498,17 @@ describe('ComparisonTable', () => {
       expect(newSecondRow.id).toStrictEqual(firstRow.id)
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('should not move a row before the previous one when dropped from the bottom', () => {
+    it('should not move a row before the previous one when dropped from the bottom', () => {
       renderTable()
 
       const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
 
-      dragAndDrop(secondRow, firstRow, DragEnterDirection.BOTTOM)
+      dragAndDrop(
+        secondRow,
+        firstRow,
+        DragEnterDirection.BOTTOM,
+        EventCurrentTargetDistances
+      )
 
       const [, newFirstRow, newSecondRow] = screen.getAllByRole('rowgroup')
 
@@ -502,13 +516,17 @@ describe('ComparisonTable', () => {
       expect(newSecondRow.id).toStrictEqual(secondRow.id)
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('should move a row after the next one when dropped from the bottom', () => {
+    it('should move a row after the next one when dropped from the bottom', () => {
       renderTable()
 
       const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
 
-      dragAndDrop(firstRow, secondRow, DragEnterDirection.BOTTOM)
+      dragAndDrop(
+        firstRow,
+        secondRow,
+        DragEnterDirection.BOTTOM,
+        EventCurrentTargetDistances
+      )
 
       const [, newFirstRow, newSecondRow] = screen.getAllByRole('rowgroup')
 
@@ -529,13 +547,17 @@ describe('ComparisonTable', () => {
       expect(newSecondRow.id).toStrictEqual(secondRow.id)
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('should show a drop target after a row when dragging from the bottom', () => {
+    it('should show a drop target after a row when dragging from the bottom', () => {
       renderTable()
 
       const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
 
-      dragEnter(firstRow, secondRow.id, DragEnterDirection.BOTTOM)
+      dragEnter(
+        firstRow,
+        secondRow.id,
+        DragEnterDirection.BOTTOM,
+        EventCurrentTargetDistances
+      )
 
       const dropTarget = screen.getAllByRole('rowgroup')[2]
 

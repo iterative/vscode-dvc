@@ -47,6 +47,17 @@ import {
 } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
+import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
+
+jest.mock('../../shared/components/dragDrop/currentTarget', () => {
+  const actualModule = jest.requireActual(
+    '../../shared/components/dragDrop/currentTarget'
+  )
+  return {
+    __esModule: true,
+    ...actualModule
+  }
+})
 
 jest.mock('../../shared/api')
 
@@ -1113,15 +1124,19 @@ describe('App', () => {
     ])
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('should show a drop target after a plot on drag enter from the right', () => {
+  it('should show a drop target after a plot on drag enter from the right', () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
     })
 
     const plots = screen.getAllByTestId(/^plot_/)
 
-    dragEnter(plots[0], plots[1].id, DragEnterDirection.RIGHT)
+    dragEnter(
+      plots[0],
+      plots[1].id,
+      DragEnterDirection.RIGHT,
+      EventCurrentTargetDistances
+    )
 
     const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
 

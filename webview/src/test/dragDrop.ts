@@ -1,22 +1,9 @@
 import { act } from 'react-dom/test-utils'
-import {
-  DragEnterDirection,
-  getEventCurrentTargetDistances
-} from '../shared/components/dragDrop/util'
+import { DragEnterDirection } from '../shared/components/dragDrop/util'
 import { idToNode } from '../util/helpers'
 
-jest.mock('../shared/components/dragDrop/util', () => {
-  const actualModule = jest.requireActual('../shared/components/dragDrop/util')
-  return {
-    __esModule: true,
-    ...actualModule,
-    getEventCurrentTargetDistances: jest.fn()
-  }
-})
-
-const mockGetEventCurrentTargetDistances = jest.mocked(
-  getEventCurrentTargetDistances
-)
+export type SpyableEventCurrentTargetDistances =
+  typeof import('../shared/components/dragDrop/currentTarget')
 
 const testStorage = new Map()
 
@@ -39,10 +26,22 @@ const getAxis = (direction: DragEnterDirection) =>
     ? 'clientX'
     : 'clientY'
 
+const mockSingleCallToGetter = (
+  spyableGetter: SpyableEventCurrentTargetDistances | undefined,
+  distances: { bottom: number; left: number; right: number; top: number }
+) => {
+  if (spyableGetter) {
+    jest
+      .spyOn(spyableGetter, 'getEventCurrentTargetDistances')
+      .mockImplementationOnce(() => distances)
+  }
+}
+
 export const dragEnter = (
   dragged: HTMLElement,
   draggedOverId: string,
-  direction: DragEnterDirection
+  direction: DragEnterDirection,
+  spyableGetter?: SpyableEventCurrentTargetDistances
 ) => {
   jest.useFakeTimers()
   act(() => {
@@ -67,12 +66,7 @@ export const dragEnter = (
       const top = 100
       const bottom = top + 100
 
-      mockGetEventCurrentTargetDistances.mockImplementationOnce(() => ({
-        bottom,
-        left,
-        right,
-        top
-      }))
+      mockSingleCallToGetter(spyableGetter, { bottom, left, right, top })
 
       const clientPositionAxis = getAxis(direction)
 
@@ -111,11 +105,12 @@ export const dragLeave = (draggedOver: HTMLElement) => {
 export const dragAndDrop = (
   startingNode: HTMLElement,
   endingNode: HTMLElement,
-  direction: DragEnterDirection = DragEnterDirection.LEFT
+  direction: DragEnterDirection = DragEnterDirection.LEFT,
+  spyableModule?: SpyableEventCurrentTargetDistances
 ) => {
   // When showing element on drag, the dragged over element is being recreated to be wrapped in another element, thus the endingNode does not exist as is in the document
   const endingNodeId = endingNode.id
-  dragEnter(startingNode, endingNodeId, direction)
+  dragEnter(startingNode, endingNodeId, direction, spyableModule)
 
   jest.useFakeTimers()
   act(() => {
