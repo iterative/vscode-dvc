@@ -8,43 +8,46 @@ import {
   TreeView,
   Uri
 } from 'vscode'
-import { exists, relativeWithUri } from '.'
-import { standardizePath } from './path'
-import { fireWatcher } from './watcher'
-import { deleteTarget, moveTargets } from './workspace'
-import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
+import { collectSelected, collectTrackedPaths, PathItem } from './collect'
+import { ErrorItem, pathItemHasError } from './error'
+import { Resource } from '../commands'
+import { WorkspaceRepositories } from '../workspace'
+import { exists, relativeWithUri } from '../../fileSystem'
+import { standardizePath } from '../../fileSystem/path'
+import { fireWatcher } from '../../fileSystem/watcher'
+import { deleteTarget, moveTargets } from '../../fileSystem/workspace'
+import {
+  definedAndNonEmpty,
+  sameContents,
+  uniqueValues
+} from '../../util/array'
 import {
   AvailableCommands,
   CommandId,
   InternalCommands
-} from '../commands/internal'
-import { tryThenMaybeForce } from '../cli/dvc/actions'
-import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
-import { sendViewOpenedTelemetryEvent } from '../telemetry'
-import { EventName } from '../telemetry/constants'
-import { getInput } from '../vscode/inputBox'
-import { pickResources } from '../vscode/resourcePicker'
-import { warnOfConsequences } from '../vscode/modal'
-import { Response } from '../vscode/response'
-import { Resource } from '../repository/commands'
-import { WorkspaceRepositories } from '../repository/workspace'
+} from '../../commands/internal'
+import { tryThenMaybeForce } from '../../cli/dvc/actions'
 import {
-  collectSelected,
-  collectTrackedPaths,
-  PathItem
-} from '../repository/model/collect'
-import { ErrorItem, pathItemHasError } from '../repository/model/error'
-import { Title } from '../vscode/title'
-import { Disposable } from '../class/dispose'
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
+import { sendViewOpenedTelemetryEvent } from '../../telemetry'
+import { EventName } from '../../telemetry/constants'
+import { getInput } from '../../vscode/inputBox'
+import { pickResources } from '../../vscode/resourcePicker'
+import { warnOfConsequences } from '../../vscode/modal'
+import { Response } from '../../vscode/response'
+import { Title } from '../../vscode/title'
+import { Disposable } from '../../class/dispose'
 import {
   createTreeView,
   DecoratableTreeItemScheme,
   getDecoratableTreeItem,
   getErrorTooltip
-} from '../tree'
-import { getWorkspaceFolders } from '../vscode/workspaceFolders'
+} from '../../tree'
+import { getWorkspaceFolders } from '../../vscode/workspaceFolders'
 
-export class TrackedExplorerTree
+export class RepositoriesTree
   extends Disposable
   implements TreeDataProvider<PathItem>
 {

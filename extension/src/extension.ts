@@ -10,7 +10,7 @@ import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { registerPlotsCommands } from './plots/commands/register'
 import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
-import { TrackedExplorerTree } from './fileSystem/tree'
+import { RepositoriesTree } from './repository/model/tree'
 import { IExtension } from './interfaces'
 import { registerRepositoryCommands } from './repository/commands/register'
 import { ResourceLocator } from './resourceLocator'
@@ -61,7 +61,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
-  private readonly trackedExplorerTree: TrackedExplorerTree
+  private readonly repositoriesTree: RepositoriesTree
   private readonly dvcExecutor: DvcExecutor
   private readonly dvcReader: DvcReader
   private readonly dvcRunner: DvcRunner
@@ -177,8 +177,8 @@ export class Extension extends Disposable implements IExtension {
       )
     )
 
-    this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(this.internalCommands, this.repositories)
+    this.repositoriesTree = this.dispose.track(
+      new RepositoriesTree(this.internalCommands, this.repositories)
     )
 
     setup(this)
@@ -355,7 +355,7 @@ export class Extension extends Disposable implements IExtension {
 
     await Promise.all([
       this.repositories.create(this.dvcRoots, this.updatesPaused),
-      this.trackedExplorerTree.initialize(this.dvcRoots),
+      this.repositoriesTree.initialize(this.dvcRoots),
       this.experiments.create(
         this.dvcRoots,
         this.updatesPaused,
@@ -379,7 +379,7 @@ export class Extension extends Disposable implements IExtension {
 
   public resetMembers() {
     this.repositories.reset()
-    this.trackedExplorerTree.initialize([])
+    this.repositoriesTree.initialize([])
     this.experiments.reset()
     this.plots.reset()
   }
