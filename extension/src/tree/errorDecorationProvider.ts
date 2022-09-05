@@ -1,8 +1,21 @@
-import { Event, EventEmitter, FileDecoration, ThemeColor, Uri } from 'vscode'
+import {
+  CancellationToken,
+  Event,
+  EventEmitter,
+  FileDecoration,
+  FileDecorationProvider,
+  ProviderResult,
+  ThemeColor,
+  Uri,
+  window
+} from 'vscode'
 import { DecoratableLabelScheme } from '.'
 import { Disposable } from '../class/dispose'
 
-export abstract class ErrorDecorationProvider extends Disposable {
+export abstract class ErrorDecorationProvider
+  extends Disposable
+  implements FileDecorationProvider
+{
   protected static DecorationError: FileDecoration = {
     color: new ThemeColor('errorForeground')
   }
@@ -23,7 +36,14 @@ export abstract class ErrorDecorationProvider extends Disposable {
       decorationsChanged || new EventEmitter()
     )
     this.onDidChangeFileDecorations = this.decorationsChanged.event
+
+    this.dispose.track(window.registerFileDecorationProvider(this))
   }
 
   abstract setState(...args: unknown[]): void
+
+  abstract provideFileDecoration(
+    uri: Uri,
+    token: CancellationToken
+  ): ProviderResult<FileDecoration>
 }
