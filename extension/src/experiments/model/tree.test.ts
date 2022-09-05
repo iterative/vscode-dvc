@@ -10,11 +10,11 @@ import {
 } from 'vscode'
 import { ExperimentType } from '.'
 import { ExperimentsTree } from './tree'
-import { getDecoratableUri } from '../decorationProvider'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { getMarkdownString } from '../../vscode/markdownString'
+import { DecoratableLabelScheme, getDecoratableUri } from '../../tree'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -392,7 +392,9 @@ describe('ExperimentsTree', () => {
         collapsibleState
       ) {
         expect(collapsibleState).toStrictEqual(0)
-        expect(resourceUri).toStrictEqual(getDecoratableUri('workspace'))
+        expect(resourceUri).toStrictEqual(
+          getDecoratableUri('workspace', DecoratableLabelScheme.EXPERIMENTS)
+        )
         mockedItem = { collapsibleState, resourceUri }
         return mockedItem
       })

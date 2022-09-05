@@ -36,10 +36,13 @@ import {
 import { ErrorItem, pathItemHasError } from '../repository/model/error'
 import { Title } from '../vscode/title'
 import { Disposable } from '../class/dispose'
-import { createTreeView } from '../vscode/tree'
+import {
+  createTreeView,
+  DecoratableLabelScheme,
+  getDecoratableTreeItem,
+  getErrorTooltip
+} from '../tree'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
-import { getMarkdownString } from '../vscode/markdownString'
-import { getDecoratableUri } from '../repository/errorDecorationProvider'
 
 export class TrackedExplorerTree
   extends Disposable
@@ -119,12 +122,12 @@ export class TrackedExplorerTree
   }
 
   private getErrorTreeItem({ error: { msg, label } }: ErrorItem) {
-    const treeItem = new TreeItem(
-      getDecoratableUri(label),
-      TreeItemCollapsibleState.None
+    const treeItem = getDecoratableTreeItem(
+      label,
+      DecoratableLabelScheme.TRACKED
     )
 
-    treeItem.tooltip = getMarkdownString(`$(error) ${msg}`)
+    treeItem.tooltip = getErrorTooltip(msg)
 
     treeItem.iconPath = new ThemeIcon('blank')
 

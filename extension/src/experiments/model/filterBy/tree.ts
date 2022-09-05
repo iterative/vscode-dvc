@@ -14,7 +14,7 @@ import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { definedAndNonEmpty, joinTruthyItems } from '../../../util/array'
-import { createTreeView, getRootItem } from '../../../vscode/tree'
+import { createTreeView, getRootItem } from '../../../tree'
 import { Disposable } from '../../../class/dispose'
 
 export type FilterItem = {

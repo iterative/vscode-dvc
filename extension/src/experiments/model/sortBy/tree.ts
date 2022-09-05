@@ -1,7 +1,7 @@
 import { Event, ThemeIcon, TreeDataProvider, TreeItem } from 'vscode'
 import { SortDefinition } from './'
 import { WorkspaceExperiments } from '../../workspace'
-import { createTreeView, getRootItem } from '../../../vscode/tree'
+import { createTreeView, getRootItem } from '../../../tree'
 import { RegisteredCommands } from '../../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'

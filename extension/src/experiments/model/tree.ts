@@ -11,12 +11,17 @@ import {
 import { ExperimentType } from '.'
 import { collectDeletable, ExperimentItem } from './collect'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
-import { getDecoratableUri } from '../decorationProvider'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty } from '../../util/array'
-import { createTreeView, getRootItem } from '../../vscode/tree'
+import {
+  createTreeView,
+  DecoratableLabelScheme,
+  getDecoratableTreeItem,
+  getErrorTooltip,
+  getRootItem
+} from '../../tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import {
   RegisteredCliCommands,
@@ -24,7 +29,6 @@ import {
 } from '../../commands/external'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
-import { getMarkdownString } from '../../vscode/markdownString'
 
 export class ExperimentsTree
   extends Disposable
@@ -86,7 +90,11 @@ export class ExperimentsTree
       type,
       tooltip
     } = element
-    const item = new TreeItem(getDecoratableUri(label), collapsibleState)
+    const item = getDecoratableTreeItem(
+      label,
+      DecoratableLabelScheme.EXPERIMENTS,
+      collapsibleState
+    )
     if (iconPath) {
       item.iconPath = iconPath
     }
@@ -302,6 +310,6 @@ export class ExperimentsTree
       return
     }
 
-    return getMarkdownString(`$(error) ${error}`)
+    return getErrorTooltip(error)
   }
 }
