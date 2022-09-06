@@ -2,6 +2,7 @@ import cx from 'classnames'
 import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useEffect, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
@@ -13,6 +14,7 @@ import { withScale } from '../../../util/styles'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
 import { ZoomablePlot } from '../ZoomablePlot'
+import { PlotsState } from '../../store'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
@@ -45,6 +47,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   const [order, setOrder] = useState<string[]>([])
   const [disabledDrag, setDisabledDrag] = useState('')
   const nbVegaPanels = useRef(0)
+  const size = useSelector((state: PlotsState) => state.template.size)
 
   useEffect(() => {
     setOrder(entries.map(({ id }) => id))
@@ -124,6 +127,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         <ZoomablePlot
           id={id}
           spec={{ ...content, ...autoSize } as VisualizationSpec}
+          size={size}
         />
       </div>
     )
