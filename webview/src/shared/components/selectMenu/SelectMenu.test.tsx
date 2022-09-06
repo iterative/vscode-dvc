@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import React from 'react'
 import { render, cleanup, screen } from '@testing-library/react'
 import { SelectMenu } from './SelectMenu'

@@ -3,7 +3,6 @@ import { Readable } from 'stream'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import execa from 'execa'
-import { Logger } from './common/logger'
 
 interface RunningProcess extends ChildProcess {
   all?: Readable
@@ -58,17 +57,4 @@ export const executeProcess = async (
 ): Promise<string> => {
   const { stdout } = await createProcess(options)
   return stdout
-}
-
-const sendOutput = (process: Process) =>
-  process.all?.on('data', chunk =>
-    Logger.log(chunk.toString().replace(/(\r?\n)/g, ''))
-  )
-
-export const createProcessWithOutput = (options: ProcessOptions) => {
-  const process = createProcess(options)
-
-  sendOutput(process)
-
-  return process
 }

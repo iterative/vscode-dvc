@@ -2,7 +2,21 @@ import { join } from 'path'
 import { getVenvBinPath } from './path'
 import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
-import { createProcessWithOutput } from '../processExecution'
+import { Logger } from '../common/logger'
+import { createProcess, Process, ProcessOptions } from '../processExecution'
+
+const sendOutput = (process: Process) =>
+  process.all?.on('data', chunk =>
+    Logger.log(chunk.toString().replace(/(\r?\n)/g, ''))
+  )
+
+export const createProcessWithOutput = (options: ProcessOptions) => {
+  const process = createProcess(options)
+
+  sendOutput(process)
+
+  return process
+}
 
 const installPackages = (cwd: string, pythonBin: string, ...args: string[]) => {
   return createProcessWithOutput({
