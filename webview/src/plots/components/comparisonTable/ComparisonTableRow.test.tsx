@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { configureStore } from '@reduxjs/toolkit'
 import { join } from 'dvc/src/test/util/path'
 import React from 'react'

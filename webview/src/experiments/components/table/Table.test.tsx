@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import '@testing-library/jest-dom/extend-expect'
 import { configureStore } from '@reduxjs/toolkit'
@@ -34,6 +31,14 @@ import { experimentsReducers } from '../../store'
 import { customQueries } from '../../../test/queries'
 
 jest.mock('../../../shared/api')
+jest.mock('../../hooks/useColumnOrder', () => {
+  const actualModule = jest.requireActual('../../hooks/useColumnOrder')
+  return {
+    __esModule: true,
+    ...actualModule
+  }
+})
+
 const { postMessage } = vsCodeApi
 const mockedPostMessage = jest.mocked(postMessage)
 

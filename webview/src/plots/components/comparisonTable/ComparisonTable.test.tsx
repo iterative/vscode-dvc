@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { configureStore } from '@reduxjs/toolkit'
 import '@testing-library/jest-dom/extend-expect'
 import {
@@ -30,10 +27,20 @@ import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { plotsReducers } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
 import { getThemeValue, hexToRGB, ThemeProperty } from '../../../util/styles'
+import * as EventCurrentTargetDistances from '../../../shared/components/dragDrop/currentTarget'
 
 const getHeaders = () => screen.getAllByRole('columnheader')
 
 jest.mock('../../../shared/api')
+jest.mock('../../../shared/components/dragDrop/currentTarget', () => {
+  const actualModule = jest.requireActual(
+    '../../../shared/components/dragDrop/currentTarget'
+  )
+  return {
+    __esModule: true,
+    ...actualModule
+  }
+})
 
 const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
@@ -496,7 +503,12 @@ describe('ComparisonTable', () => {
 
       const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
 
-      dragAndDrop(secondRow, firstRow, DragEnterDirection.BOTTOM)
+      dragAndDrop(
+        secondRow,
+        firstRow,
+        DragEnterDirection.BOTTOM,
+        EventCurrentTargetDistances
+      )
 
       const [, newFirstRow, newSecondRow] = screen.getAllByRole('rowgroup')
 
@@ -509,7 +521,12 @@ describe('ComparisonTable', () => {
 
       const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
 
-      dragAndDrop(firstRow, secondRow, DragEnterDirection.BOTTOM)
+      dragAndDrop(
+        firstRow,
+        secondRow,
+        DragEnterDirection.BOTTOM,
+        EventCurrentTargetDistances
+      )
 
       const [, newFirstRow, newSecondRow] = screen.getAllByRole('rowgroup')
 
@@ -535,7 +552,12 @@ describe('ComparisonTable', () => {
 
       const [, firstRow, secondRow] = screen.getAllByRole('rowgroup') // First rowgroup is the thead
 
-      dragEnter(firstRow, secondRow.id, DragEnterDirection.BOTTOM)
+      dragEnter(
+        firstRow,
+        secondRow.id,
+        DragEnterDirection.BOTTOM,
+        EventCurrentTargetDistances
+      )
 
       const dropTarget = screen.getAllByRole('rowgroup')[2]
 

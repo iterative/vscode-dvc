@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { join } from 'dvc/src/test/util/path'
 import { configureStore } from '@reduxjs/toolkit'
 import React, { ReactElement } from 'react'
@@ -50,6 +47,17 @@ import {
 } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
+import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
+
+jest.mock('../../shared/components/dragDrop/currentTarget', () => {
+  const actualModule = jest.requireActual(
+    '../../shared/components/dragDrop/currentTarget'
+  )
+  return {
+    __esModule: true,
+    ...actualModule
+  }
+})
 
 jest.mock('../../shared/api')
 
@@ -1129,7 +1137,13 @@ describe('App', () => {
     })
 
     const plots = screen.getAllByTestId(/^plot_/)
-    dragEnter(plots[0], plots[1].id, DragEnterDirection.RIGHT)
+
+    dragEnter(
+      plots[0],
+      plots[1].id,
+      DragEnterDirection.RIGHT,
+      EventCurrentTargetDistances
+    )
 
     const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
 

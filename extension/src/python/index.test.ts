@@ -1,15 +1,16 @@
 import { join } from 'path'
 import { setupVenv } from '.'
-import * as ProcessExecution from '../processExecution'
+import { Process, createProcess } from '../processExecution'
 import { getProcessPlatform } from '../env'
 
 jest.mock('../env')
+jest.mock('../processExecution')
 
 const mockedGetProcessPlatform = jest.mocked(getProcessPlatform)
-const createProcessSpy = jest.spyOn(ProcessExecution, 'createProcess')
+const mockedCreateProcess = jest.mocked(createProcess)
 const mockedProcess = {
   all: { on: jest.fn() }
-} as unknown as ProcessExecution.Process
+} as unknown as Process
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -17,7 +18,7 @@ beforeEach(() => {
 
 describe('setupVenv', () => {
   it('should create the correct python processes on sane operating systems', async () => {
-    createProcessSpy.mockResolvedValue(mockedProcess)
+    mockedCreateProcess.mockResolvedValue(mockedProcess)
     mockedGetProcessPlatform.mockReturnValue('freebsd')
 
     const envDir = '.env'
@@ -25,20 +26,20 @@ describe('setupVenv', () => {
 
     await setupVenv(__dirname, envDir, 'dvc')
 
-    expect(createProcessSpy).toHaveBeenCalledTimes(3)
-    expect(createProcessSpy).toHaveBeenCalledWith({
+    expect(mockedCreateProcess).toHaveBeenCalledTimes(3)
+    expect(mockedCreateProcess).toHaveBeenCalledWith({
       args: ['-m', 'venv', envDir],
       cwd,
       executable: 'python3'
     })
 
-    expect(createProcessSpy).toHaveBeenCalledWith({
+    expect(mockedCreateProcess).toHaveBeenCalledWith({
       args: ['-m', 'pip', 'install', '--upgrade', 'pip', 'wheel'],
       cwd,
       executable: join(cwd, envDir, 'bin', 'python')
     })
 
-    expect(createProcessSpy).toHaveBeenCalledWith({
+    expect(mockedCreateProcess).toHaveBeenCalledWith({
       args: ['-m', 'pip', 'install', '--upgrade', 'dvc'],
       cwd,
       executable: join(cwd, envDir, 'bin', 'python')
@@ -47,27 +48,27 @@ describe('setupVenv', () => {
 
   it('should create the correct python processes on windows', async () => {
     mockedGetProcessPlatform.mockReturnValue('win32')
-    createProcessSpy.mockResolvedValue(mockedProcess)
+    mockedCreateProcess.mockResolvedValue(mockedProcess)
 
     const envDir = '.env'
     const cwd = __dirname
 
     await setupVenv(__dirname, envDir, '-r', 'requirements.txt')
 
-    expect(createProcessSpy).toHaveBeenCalledTimes(3)
-    expect(createProcessSpy).toHaveBeenCalledWith({
+    expect(mockedCreateProcess).toHaveBeenCalledTimes(3)
+    expect(mockedCreateProcess).toHaveBeenCalledWith({
       args: ['-m', 'venv', envDir],
       cwd,
       executable: 'python'
     })
 
-    expect(createProcessSpy).toHaveBeenCalledWith({
+    expect(mockedCreateProcess).toHaveBeenCalledWith({
       args: ['-m', 'pip', 'install', '--upgrade', 'pip', 'wheel'],
       cwd,
       executable: join(cwd, envDir, 'Scripts', 'python.exe')
     })
 
-    expect(createProcessSpy).toHaveBeenCalledWith({
+    expect(mockedCreateProcess).toHaveBeenCalledWith({
       args: ['-m', 'pip', 'install', '--upgrade', '-r', 'requirements.txt'],
       cwd,
       executable: join(cwd, envDir, 'Scripts', 'python.exe')
