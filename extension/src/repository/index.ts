@@ -1,9 +1,9 @@
 import { EventEmitter } from 'vscode'
-import { ErrorDecorationProvider } from './errorDecorationProvider'
+import { DecorationProvider as ErrorDecorationProvider } from './model/decorationProvider'
 import {
-  ScmDecorationProvider,
+  DecorationProvider as ScmDecorationProvider,
   ScmDecorationState
-} from './scmDecorationProvider'
+} from './sourceControlManagement/decorationProvider'
 import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
 import { SourceControlManagement, SCMState } from './sourceControlManagement'

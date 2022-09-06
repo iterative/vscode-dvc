@@ -8,18 +8,18 @@ import {
   window
 } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { exists, isDirectory } from '.'
-import { TrackedExplorerTree } from './tree'
-import { getWorkspaceFolders } from '../vscode/workspaceFolders'
-import { InternalCommands } from '../commands/internal'
-import { RegisteredCommands } from '../commands/external'
-import { OutputChannel } from '../vscode/outputChannel'
-import { WorkspaceRepositories } from '../repository/workspace'
-import { Repository } from '../repository'
-import { dvcDemoPath } from '../test/util'
-import { getDecoratableUri } from '../repository/errorDecorationProvider'
-import { getMarkdownString } from '../vscode/markdownString'
-import { PathItem } from '../repository/model/collect'
+import { PathItem } from './collect'
+import { RepositoriesTree } from './tree'
+import { Repository } from '..'
+import { WorkspaceRepositories } from '../workspace'
+import { exists, isDirectory } from '../../fileSystem'
+import { getWorkspaceFolders } from '../../vscode/workspaceFolders'
+import { InternalCommands } from '../../commands/internal'
+import { RegisteredCommands } from '../../commands/external'
+import { OutputChannel } from '../../vscode/outputChannel'
+import { dvcDemoPath } from '../../test/util'
+import { getDecoratableUri, DecoratableTreeItemScheme } from '../../tree'
+import { getMarkdownString } from '../../vscode/markdownString'
 
 const mockedTreeDataChanged = jest.mocked(new EventEmitter<void>())
 const mockedTreeDataChangedFire = jest.fn()
@@ -61,10 +61,10 @@ const mockedGetMarkdownString = jest.mocked(getMarkdownString)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
-jest.mock('.')
-jest.mock('../cli/dvc/reader')
-jest.mock('../vscode/workspaceFolders')
-jest.mock('../vscode/markdownString')
+jest.mock('../../fileSystem')
+jest.mock('../../cli/dvc/reader')
+jest.mock('../../vscode/workspaceFolders')
+jest.mock('../../vscode/markdownString')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -75,10 +75,10 @@ beforeEach(() => {
   } as unknown as Repository)
 })
 
-describe('TrackedTreeView', () => {
+describe('RepositoriesTree', () => {
   describe('initialize', () => {
     it('should fire the event emitter to reset the data in the view', () => {
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -93,7 +93,7 @@ describe('TrackedTreeView', () => {
       const mockedOtherRoot = join('some', 'other', 'root')
       const mockedDvcRoots = [dvcDemoPath, mockedOtherRoot]
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -125,7 +125,7 @@ describe('TrackedTreeView', () => {
         resolve(dvcDemoPath, '..')
       ])
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -147,7 +147,7 @@ describe('TrackedTreeView', () => {
       const mockedDvcRoots = [dvcDemoPath]
       mockedGetWorkspaceFolders.mockReturnValueOnce(mockedDvcRoots)
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -194,7 +194,7 @@ describe('TrackedTreeView', () => {
       const data = Uri.file(join(dvcDemoPath, 'data'))
       mockedGetWorkspaceFolders.mockReturnValueOnce([dvcDemoPath])
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -264,7 +264,7 @@ describe('TrackedTreeView', () => {
       })
       mockedExists.mockReturnValueOnce(false)
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -292,7 +292,7 @@ describe('TrackedTreeView', () => {
         return mockedItem
       })
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -319,7 +319,7 @@ describe('TrackedTreeView', () => {
         return mockedItem
       })
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -351,7 +351,7 @@ describe('TrackedTreeView', () => {
         return mockedItem
       })
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )
@@ -388,12 +388,14 @@ describe('TrackedTreeView', () => {
       )
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toStrictEqual(0)
-        expect(uri).toStrictEqual(getDecoratableUri(label))
+        expect(uri).toStrictEqual(
+          getDecoratableUri(label, DecoratableTreeItemScheme.TRACKED)
+        )
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
 
-      const trackedTreeView = new TrackedExplorerTree(
+      const trackedTreeView = new RepositoriesTree(
         mockedInternalCommands,
         mockedRepositories
       )

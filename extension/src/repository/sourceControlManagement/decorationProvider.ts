@@ -7,9 +7,9 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
-import { BaseDataStatus } from './constants'
-import { Disposable } from '../class/dispose'
-import { flattenUnique } from '../util/array'
+import { BaseDataStatus } from '../constants'
+import { Disposable } from '../../class/dispose'
+import { flattenUnique } from '../../util/array'
 
 export const DecorationDataStatus = Object.assign({}, BaseDataStatus, {
   TRACKED: 'tracked'
@@ -37,7 +37,7 @@ const decorationPriority: ScmDecorationStatus[] = [
   DecorationDataStatus.TRACKED
 ]
 
-export class ScmDecorationProvider
+export class DecorationProvider
   extends Disposable
   implements FileDecorationProvider
 {
@@ -119,18 +119,18 @@ export class ScmDecorationProvider
   private readonly decorationMapping: Partial<
     Record<ScmDecorationStatus, FileDecoration>
   > = {
-    committedAdded: ScmDecorationProvider.DecorationCommittedAdded,
-    committedDeleted: ScmDecorationProvider.DecorationCommittedDeleted,
-    committedModified: ScmDecorationProvider.DecorationCommittedModified,
-    committedRenamed: ScmDecorationProvider.DecorationCommittedRenamed,
-    committedUnknown: ScmDecorationProvider.DecorationCommittedUnknown,
-    notInCache: ScmDecorationProvider.DecorationNotInCache,
-    tracked: ScmDecorationProvider.DecorationTracked,
-    uncommittedAdded: ScmDecorationProvider.DecorationUncommittedAdded,
-    uncommittedDeleted: ScmDecorationProvider.DecorationUncommittedDeleted,
-    uncommittedModified: ScmDecorationProvider.DecorationUncommittedModified,
-    uncommittedRenamed: ScmDecorationProvider.DecorationUncommittedRenamed,
-    uncommittedUnknown: ScmDecorationProvider.DecorationUncommittedUnknown
+    committedAdded: DecorationProvider.DecorationCommittedAdded,
+    committedDeleted: DecorationProvider.DecorationCommittedDeleted,
+    committedModified: DecorationProvider.DecorationCommittedModified,
+    committedRenamed: DecorationProvider.DecorationCommittedRenamed,
+    committedUnknown: DecorationProvider.DecorationCommittedUnknown,
+    notInCache: DecorationProvider.DecorationNotInCache,
+    tracked: DecorationProvider.DecorationTracked,
+    uncommittedAdded: DecorationProvider.DecorationUncommittedAdded,
+    uncommittedDeleted: DecorationProvider.DecorationUncommittedDeleted,
+    uncommittedModified: DecorationProvider.DecorationUncommittedModified,
+    uncommittedRenamed: DecorationProvider.DecorationUncommittedRenamed,
+    uncommittedUnknown: DecorationProvider.DecorationUncommittedUnknown
   }
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {

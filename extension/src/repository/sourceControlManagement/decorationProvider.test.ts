@@ -1,11 +1,8 @@
 import { join } from 'path'
 import { EventEmitter, Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import {
-  ScmDecorationProvider,
-  ScmDecorationState
-} from './scmDecorationProvider'
-import { standardizePath } from '../fileSystem/path'
+import { DecorationProvider, ScmDecorationState } from './decorationProvider'
+import { standardizePath } from '../../fileSystem/path'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -41,7 +38,7 @@ describe('DecorationProvider', () => {
   const emptySet = new Set<string>()
 
   it('should be able to setState with no existing state', () => {
-    const scmDecorationProvider = new ScmDecorationProvider(
+    const scmDecorationProvider = new DecorationProvider(
       mockedDecorationsChanged
     )
 
@@ -60,7 +57,7 @@ describe('DecorationProvider', () => {
   })
 
   it('should update the decorations for paths that no longer have a decoration', () => {
-    const scmDecorationProvider = new ScmDecorationProvider(
+    const scmDecorationProvider = new DecorationProvider(
       mockedDecorationsChanged
     )
 
@@ -154,7 +151,7 @@ describe('DecorationProvider', () => {
     expect(initialState.notInCache).not.toStrictEqual(updatedState.notInCache)
     expect(initialState.tracked).not.toStrictEqual(updatedState.tracked)
 
-    const scmDecorationProvider = new ScmDecorationProvider(
+    const scmDecorationProvider = new DecorationProvider(
       mockedDecorationsChanged
     )
     scmDecorationProvider.setState(initialState)
@@ -203,7 +200,7 @@ describe('DecorationProvider', () => {
       uncommittedUnknown: emptySet
     }
 
-    const scmDecorationProvider = new ScmDecorationProvider(
+    const scmDecorationProvider = new DecorationProvider(
       mockedDecorationsChanged
     )
     scmDecorationProvider.setState(initialState)
@@ -218,7 +215,7 @@ describe('DecorationProvider', () => {
 
       expect(prioritizedDecoration).toStrictEqual(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ScmDecorationProvider as any)[privateStaticDecoration]
+        (DecorationProvider as any)[privateStaticDecoration]
       )
     }
 
