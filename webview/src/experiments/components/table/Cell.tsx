@@ -43,7 +43,7 @@ export const FirstCell: React.FC<
 > = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
   const { row, isPlaceholder } = cell
   const {
-    original: { error, queued }
+    original: { error, queued, label, displayNameOrParent = '' }
   } = row
 
   const {
@@ -82,7 +82,10 @@ export const FirstCell: React.FC<
           <ErrorTooltip error={error}>
             <div
               className={cx(styles.cellContents, error && styles.error)}
-              {...clickAndEnterProps(toggleExperiment)}
+              {...clickAndEnterProps(toggleExperiment, [
+                label,
+                displayNameOrParent
+              ])}
             >
               {cell.render('Cell')}
             </div>
