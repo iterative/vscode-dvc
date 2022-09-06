@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import {
   cleanup,

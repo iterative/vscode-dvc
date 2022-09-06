@@ -17,8 +17,10 @@ module.exports = {
   moduleNameMapper: {
     '\\.(scss|css|less)$': 'identity-obj-proxy'
   },
-  preset: 'ts-jest',
   setupFiles: ['jest-canvas-mock', '<rootDir>/setup-tests.js'],
-  testEnvironment: 'node',
-  testTimeout: 20000
+  testEnvironment: 'jsdom',
+  testTimeout: 20000,
+  transform: {
+    '^.+\\.(t|j)sx?$': ['@swc/jest']
+  }
 }
