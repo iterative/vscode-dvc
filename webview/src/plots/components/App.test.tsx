@@ -172,6 +172,13 @@ describe('App', () => {
     await changeSize(size, sectionButtonPosition[section], wrapper)
   }
 
+  const waitForVega = async (plot: HTMLElement) => {
+    await waitFor(() =>
+      // eslint-disable-next-line testing-library/no-node-access
+      expect(plot.querySelectorAll('.marks')[0]).toBeInTheDocument()
+    )
+  }
+
   beforeAll(() => {
     Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
       configurable: true,
@@ -1814,13 +1821,6 @@ describe('App', () => {
       ]
     }
 
-    const waitForVega = async (smoothPlot: HTMLElement) => {
-      await waitFor(() =>
-        // eslint-disable-next-line testing-library/no-node-access
-        expect(smoothPlot.querySelectorAll('.marks')[0]).toBeInTheDocument()
-      )
-    }
-
     const getPanel = (smoothPlot: HTMLElement) =>
       // eslint-disable-next-line testing-library/no-node-access
       smoothPlot.querySelector('.vega-bindings')
@@ -1883,6 +1883,86 @@ describe('App', () => {
       clickEvent.stopPropagation = jest.fn()
       fireEvent(panel, clickEvent)
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('Title truncation', () => {
+    const longTitle =
+      'we-need-a-very-very-very-long-title-to-test-with-many-many-many-characters-at-least-seventy-characters'
+    const withLongTemplatePlotTitle = {
+      ...templatePlotsFixture,
+      plots: [
+        {
+          entries: [
+            ...templatePlotsFixture.plots[0].entries,
+            {
+              ...templatePlotsFixture.plots[0].entries[0],
+              content: {
+                ...templatePlotsFixture.plots[0].entries[0].content,
+                title: longTitle
+              },
+              id: longTitle
+            }
+          ],
+          group: TemplatePlotGroup.SINGLE_VIEW
+        } as TemplatePlotSection
+      ]
+    }
+    it('should truncate the title of the plot from the left to 70 characters for large plots', async () => {
+      await renderAppAndChangeSize(
+        {
+          template: withLongTemplatePlotTitle
+        },
+        'Large',
+        Section.TEMPLATE_PLOTS
+      )
+      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
+
+      await waitForVega(longTitlePlot)
+
+      const truncatedTitle =
+        '…le-to-test-with-many-many-many-characters-at-least-seventy-characters'
+
+      expect(
+        within(longTitlePlot).getByText(truncatedTitle)
+      ).toBeInTheDocument()
+    })
+
+    it('should truncate the title of the plot from the left to 50 characters for large plots', async () => {
+      await renderAppAndChangeSize(
+        {
+          template: withLongTemplatePlotTitle
+        },
+        'Regular',
+        Section.TEMPLATE_PLOTS
+      )
+      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
+
+      await waitForVega(longTitlePlot)
+      const truncatedTitle =
+        '…-many-many-characters-at-least-seventy-characters'
+
+      expect(
+        within(longTitlePlot).getByText(truncatedTitle)
+      ).toBeInTheDocument()
+    })
+
+    it('should truncate the title of the plot from the left to 30 characters for large plots', async () => {
+      await renderAppAndChangeSize(
+        {
+          template: withLongTemplatePlotTitle
+        },
+        'Small',
+        Section.TEMPLATE_PLOTS
+      )
+      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
+
+      await waitForVega(longTitlePlot)
+      const truncatedTitle = '…s-at-least-seventy-characters'
+
+      expect(
+        within(longTitlePlot).getByText(truncatedTitle)
+      ).toBeInTheDocument()
     })
   })
 })
