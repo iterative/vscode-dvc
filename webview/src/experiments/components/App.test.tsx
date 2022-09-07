@@ -44,6 +44,7 @@ import {
   selectedRows,
   setTableData
 } from '../../test/experimentsTable'
+import { clearSelection, createWindowTextSelection } from '../../test/selection'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -407,6 +408,48 @@ describe('App', () => {
         key: 'a'
       })
       expect(mockPostMessage).not.toHaveBeenCalled()
+    })
+    it('should not send a message if row label was selected', () => {
+      renderTable()
+      mockPostMessage.mockClear()
+
+      const testRowId = 'workspace'
+
+      createWindowTextSelection(testRowId, 5)
+      fireEvent.click(screen.getByText(testRowId))
+
+      expect(mockPostMessage).not.toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
+        payload: testRowId,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+
+      mockPostMessage.mockClear()
+
+      clearSelection()
+      fireEvent.click(screen.getByText(testRowId))
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: testRowId,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+    })
+    it('should send a message if some other label is selected', () => {
+      renderTable()
+      mockPostMessage.mockClear()
+
+      const selectedTestRowId = 'workspace'
+      const testRowId = 'main'
+
+      createWindowTextSelection(selectedTestRowId, 5)
+      fireEvent.click(screen.getByText(testRowId))
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: testRowId,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
     })
   })
 
