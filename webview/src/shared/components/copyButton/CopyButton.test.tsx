@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 /* eslint-disable sonarjs/no-identical-functions */
 import React from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
