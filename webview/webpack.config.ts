@@ -75,8 +75,7 @@ export default {
         test: /\.(jpe?g|png|gif|eot|woff|woff2|md)$/i
       },
       {
-        loader: 'ts-loader',
-        options: { transpileOnly: true },
+        loader: 'swc-loader',
         test: /\.tsx?$/
       }
     ]

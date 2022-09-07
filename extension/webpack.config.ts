@@ -44,10 +44,7 @@ export default {
         test: /\.ts$/,
         use: [
           {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true
-            }
+            loader: 'swc-loader'
           }
         ]
       }
