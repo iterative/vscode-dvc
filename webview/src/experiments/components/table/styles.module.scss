@@ -670,6 +670,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   text-overflow: ellipsis;
   direction: ltr;
   align-items: center;
+  cursor: text;
+
   > * {
     margin: 0 0.25em;
     overflow: hidden;
