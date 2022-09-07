@@ -6,5 +6,6 @@
     },
     "target": "es2015"
   },
-  "minify": true
+  "minify": true,
+  "sourceMaps": true
 }

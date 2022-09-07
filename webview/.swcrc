@@ -4,7 +4,8 @@
     "parser": {
       "syntax": "typescript"
     },
-    "target": "es2015"
+    "target": "es2016"
   },
-  "minify": true
+  "minify": true,
+  "sourceMaps": true
 }
