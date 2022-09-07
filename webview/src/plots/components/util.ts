@@ -1,4 +1,6 @@
 import { PlotSize } from 'dvc/src/plots/webview/contract'
+import { ExprRef, hasOwnProperty, SignalRef, Title, truncate, Text } from 'vega'
+import { TitleParams } from 'vega-lite/build/src/title'
 
 const MaxItemsBeforeVirtualization = {
   [PlotSize.LARGE]: 10,
@@ -44,3 +46,43 @@ export const getNbItemsPerRow = (size: PlotSize) => {
 
 export const shouldUseVirtualizedGrid = (nbItems: number, size: PlotSize) =>
   nbItems > MaxItemsBeforeVirtualization[size]
+
+const truncateTitlePart = (title: string, size: number) =>
+  truncate(title, size, 'left')
+
+const truncateTitleAsArrayOrString = (title: Text, size: number) => {
+  if (Array.isArray(title)) {
+    return title.map(line => truncateTitlePart(line, size))
+  }
+  return truncateTitlePart(title as unknown as string, size)
+}
+
+export const truncateTitle = (
+  title: Title | Text | TitleParams<ExprRef | SignalRef> | undefined,
+  size: number
+) => {
+  if (!title) {
+    return ''
+  }
+
+  if (typeof title === 'string') {
+    return truncateTitlePart(title, size)
+  }
+
+  if (Array.isArray(title)) {
+    return truncateTitleAsArrayOrString(title as Text, size)
+  }
+
+  const titleCopy = { ...title } as Title
+
+  if (hasOwnProperty(titleCopy, 'text')) {
+    const text = titleCopy.text as unknown as Text
+    titleCopy.text = truncateTitleAsArrayOrString(text, size)
+  }
+
+  if (hasOwnProperty(title, 'subtitle')) {
+    const subtitle = titleCopy.subtitle as unknown as Text
+    titleCopy.subtitle = truncateTitleAsArrayOrString(subtitle, size)
+  }
+  return titleCopy
+}
