@@ -1,7 +1,8 @@
 import cx from 'classnames'
 import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { useSelector } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
@@ -13,6 +14,7 @@ import { withScale } from '../../../util/styles'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
 import { ZoomablePlot } from '../ZoomablePlot'
+import { PlotsState } from '../../store'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
@@ -44,49 +46,47 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 }) => {
   const [order, setOrder] = useState<string[]>([])
   const [disabledDrag, setDisabledDrag] = useState('')
-  const nbVegaPanels = useRef(0)
+  const size = useSelector((state: PlotsState) => state.template.size)
+
+  const addDisabled = useCallback(
+    (e: Event) => {
+      setDisabledDrag(
+        (e.currentTarget as HTMLFormElement).parentElement?.parentElement
+          ?.parentElement?.id || ''
+      )
+    },
+    [setDisabledDrag]
+  )
+
+  const removeDisabled = useCallback(() => {
+    setDisabledDrag('')
+  }, [setDisabledDrag])
+
+  const disableClick = useCallback((e: Event) => {
+    e.stopPropagation()
+  }, [])
 
   useEffect(() => {
     setOrder(entries.map(({ id }) => id))
   }, [entries])
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  const layoutEffect = () => {
-    const addDisabled = (e: Event) => {
-      setDisabledDrag(
-        (e.currentTarget as HTMLFormElement).parentElement?.parentElement
-          ?.parentElement?.id || ''
-      )
-    }
-
-    const removeDisabled = () => {
-      setDisabledDrag('')
-    }
-
-    const disableClick = (e: Event) => {
-      e.stopPropagation()
-    }
-
+  useEffect(() => {
     const panels = document.querySelectorAll('.vega-bindings')
-    if (panels.length > nbVegaPanels.current) {
-      for (const panel of Object.values(panels)) {
-        panel.removeEventListener('mouseenter', addDisabled)
-        panel.removeEventListener('mouseleave', removeDisabled)
-        panel.removeEventListener('click', disableClick)
-        panel.addEventListener('mouseenter', addDisabled)
-        panel.addEventListener('mouseleave', removeDisabled)
-        panel.addEventListener('click', disableClick)
-      }
-
-      nbVegaPanels.current = panels.length
-    }
-
     return () => {
       for (const panel of Object.values(panels)) {
         panel.removeEventListener('mouseenter', addDisabled)
         panel.removeEventListener('mouseleave', removeDisabled)
         panel.removeEventListener('click', disableClick)
       }
+    }
+  }, [addDisabled, removeDisabled, disableClick])
+
+  const addEventsOnViewReady = () => {
+    const panels = document.querySelectorAll('.vega-bindings')
+    for (const panel of Object.values(panels)) {
+      panel.addEventListener('mouseenter', addDisabled)
+      panel.addEventListener('mouseleave', removeDisabled)
+      panel.addEventListener('click', disableClick)
     }
   }
 
@@ -124,6 +124,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         <ZoomablePlot
           id={id}
           spec={{ ...content, ...autoSize } as VisualizationSpec}
+          size={size}
+          onViewReady={addEventsOnViewReady}
         />
       </div>
     )
@@ -147,7 +149,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       }
       parentDraggedOver={parentDraggedOver}
       disabledDropIds={[disabledDrag]}
-      onLayoutChange={layoutEffect}
     />
   )
 }

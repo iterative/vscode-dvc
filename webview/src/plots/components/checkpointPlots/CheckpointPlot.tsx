@@ -20,6 +20,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
+  const size = useSelector((state: PlotsState) => state.checkpoint.size)
   const [plot, setPlot] = useState(plotDataStore.checkpoint[id])
   const spec = useMemo(() => (id && createSpec(id, colors)) || {}, [id, colors])
 
@@ -42,7 +43,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
       id={title}
       style={withScale(1)}
     >
-      <ZoomablePlot spec={spec} data={{ values }} id={key} />
+      <ZoomablePlot spec={spec} data={{ values }} id={key} size={size} />
     </div>
   )
 }
