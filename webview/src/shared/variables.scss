@@ -15,7 +15,7 @@ $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $row-bg-alt-color: var(--vscode-sideBar-background);
 $row-bg-selected-color: var(--vscode-list-activeSelectionBackground);
-$row-border-selected-color: var(--vscode-list-focusOutline);
+$row-border-selected-color: var(--vscode-focusBorder);
 $header-bg-color: $bg-color;
 $header-border-color: $border-color;
 $meta-cell-color: var(--vscode-descriptionForeground);
@@ -26,8 +26,14 @@ $row-hover-background-color: var(--vscode-list-hoverBackground);
 
 $accent-color: var(--button-primary-background);
 
-$indicator-badge-foreground: var(--vscode-activityBarBadge-foreground);
-$indicator-badge-background: var(--vscode-activityBarBadge-background);
+$indicator-badge-background: var(--vscode-badge-background);
+$indicator-badge-foreground: var(--vscode-badge-foreground);
+$indicator-badge-border: $row-bg-color;
+$indicator-selected-badge-border: $row-bg-selected-color;
+$indicator-selected-badge-background: $accent-color;
+$indicator-selected-badge-foreground: var(--button-primary-foreground);
+
+$star-switch-selection-fill-color: var(--vscode-list-focusHighlightForeground);
 
 $shadow: var(--vscode-widget-shadow);
 
