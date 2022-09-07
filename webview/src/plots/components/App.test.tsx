@@ -15,6 +15,7 @@ import {
   within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
+import { Text, Title } from 'vega'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
@@ -1889,7 +1890,7 @@ describe('App', () => {
   describe('Title truncation', () => {
     const longTitle =
       'we-need-a-very-very-very-long-title-to-test-with-many-many-many-characters-at-least-seventy-characters'
-    const withLongTemplatePlotTitle = {
+    const withLongTemplatePlotTitle = (title: Text | Title = longTitle) => ({
       ...templatePlotsFixture,
       plots: [
         {
@@ -1899,7 +1900,7 @@ describe('App', () => {
               ...templatePlotsFixture.plots[0].entries[0],
               content: {
                 ...templatePlotsFixture.plots[0].entries[0].content,
-                title: longTitle
+                title
               },
               id: longTitle
             }
@@ -1907,11 +1908,11 @@ describe('App', () => {
           group: TemplatePlotGroup.SINGLE_VIEW
         } as TemplatePlotSection
       ]
-    }
-    it('should truncate the title of the plot from the left to 70 characters for large plots', async () => {
+    })
+    it('should truncate the title of the plot from the left to 50 characters for large plots', async () => {
       await renderAppAndChangeSize(
         {
-          template: withLongTemplatePlotTitle
+          template: withLongTemplatePlotTitle()
         },
         'Large',
         Section.TEMPLATE_PLOTS
@@ -1921,17 +1922,17 @@ describe('App', () => {
       await waitForVega(longTitlePlot)
 
       const truncatedTitle =
-        '…le-to-test-with-many-many-many-characters-at-least-seventy-characters'
+        '…-many-many-characters-at-least-seventy-characters'
 
       expect(
         within(longTitlePlot).getByText(truncatedTitle)
       ).toBeInTheDocument()
     })
 
-    it('should truncate the title of the plot from the left to 50 characters for large plots', async () => {
+    it('should truncate the title of the plot from the left to 50 characters for regular plots', async () => {
       await renderAppAndChangeSize(
         {
-          template: withLongTemplatePlotTitle
+          template: withLongTemplatePlotTitle()
         },
         'Regular',
         Section.TEMPLATE_PLOTS
@@ -1950,7 +1951,7 @@ describe('App', () => {
     it('should truncate the title of the plot from the left to 30 characters for large plots', async () => {
       await renderAppAndChangeSize(
         {
-          template: withLongTemplatePlotTitle
+          template: withLongTemplatePlotTitle()
         },
         'Small',
         Section.TEMPLATE_PLOTS
@@ -1963,6 +1964,75 @@ describe('App', () => {
       expect(
         within(longTitlePlot).getByText(truncatedTitle)
       ).toBeInTheDocument()
+    })
+
+    it('should truncate the title and the subtitle', async () => {
+      await renderAppAndChangeSize(
+        {
+          template: withLongTemplatePlotTitle({
+            subtitle: 'abcdefghijklmnopqrstuvwyz1234567890',
+            text: 'abcdefghijklmnopqrstuvwyz1234567890'
+          })
+        },
+        'Small',
+        Section.TEMPLATE_PLOTS
+      )
+      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
+
+      await waitForVega(longTitlePlot)
+      const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
+
+      expect(
+        within(longTitlePlot).getAllByText(truncatedTitle).length
+      ).toStrictEqual(2)
+    })
+
+    it('should truncate every line of the title', async () => {
+      await renderAppAndChangeSize(
+        {
+          template: withLongTemplatePlotTitle([
+            'abcdefghijklmnopqrstuvwyz1234567890',
+            'abcdefghijklmnopqrstuvwyz1234567890'
+          ])
+        },
+        'Small',
+        Section.TEMPLATE_PLOTS
+      )
+      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
+
+      await waitForVega(longTitlePlot)
+      const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
+
+      expect(
+        within(longTitlePlot).getAllByText(truncatedTitle).length
+      ).toStrictEqual(2)
+    })
+
+    it('should truncate every line of the title and subtitle', async () => {
+      await renderAppAndChangeSize(
+        {
+          template: withLongTemplatePlotTitle({
+            subtitle: [
+              'abcdefghijklmnopqrstuvwyz1234567890',
+              'abcdefghijklmnopqrstuvwyz1234567890'
+            ],
+            text: [
+              'abcdefghijklmnopqrstuvwyz1234567890',
+              'abcdefghijklmnopqrstuvwyz1234567890'
+            ]
+          })
+        },
+        'Small',
+        Section.TEMPLATE_PLOTS
+      )
+      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
+
+      await waitForVega(longTitlePlot)
+      const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
+
+      expect(
+        within(longTitlePlot).getAllByText(truncatedTitle).length
+      ).toStrictEqual(4)
     })
   })
 })
