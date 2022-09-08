@@ -8,6 +8,7 @@ import {
   isSeq,
   Pair,
   Scalar,
+  YAMLMap,
   YAMLSeq
 } from 'yaml'
 import { IDvcTextDocument } from './IDvcTextDocument'
@@ -42,6 +43,10 @@ export class Cmd implements ICmd {
     this.cmd = cmd
   }
 
+  static create(cmd: Scalar | YAMLSeq | undefined) {
+    return cmd ? new Cmd(cmd) : undefined
+  }
+
   getReferencedFiles(): string[] {
     const paths: string[] = []
 
@@ -69,21 +74,22 @@ export class Stage implements IDvcYamlStage {
     this.name = pairNode.key as string
     const value = pairNode.value
 
-    if (isMap(value)) {
-      const cmdNode = value.getIn(['cmd'], true) as Scalar | YAMLSeq | undefined
-      if (cmdNode) {
-        this.cmd = new Cmd(cmdNode)
-      }
+    isMap(value) && this.buildModel(value)
+  }
 
-      const depsNode = value.getIn(['deps'], true) as YAMLSeq | undefined
+  buildModel(value: YAMLMap) {
+    const cmdNode = value.getIn(['cmd'], true) as Scalar | YAMLSeq | undefined
+    this.cmd = Cmd.create(cmdNode)
 
-      if (isSeq(depsNode)) {
-        this.deps = new Set<string>()
-        for (const item of depsNode.items) {
-          if (isScalar(item)) {
-            this.deps.add(item.value as string)
-          }
-        }
+    const depsNode = value.getIn(['deps'], true) as YAMLSeq | undefined
+    isSeq(depsNode) && this.buildDependencies(depsNode)
+  }
+
+  buildDependencies(depsNode: YAMLSeq) {
+    this.deps = new Set<string>()
+    for (const item of depsNode.items) {
+      if (isScalar(item)) {
+        this.deps.add(item.value as string)
       }
     }
   }
