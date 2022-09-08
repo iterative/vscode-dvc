@@ -29,12 +29,12 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     appendTo,
     isContextMenu = false,
     animation = false,
-    className = typeof content === 'string' ? styles.padded : undefined,
-    arrow = false
+    className = typeof content === 'string' ? styles.padded : undefined
   },
   ref
 ) => (
   <Tippy
+    arrow={false}
     animation={animation}
     appendTo={appendTo}
     content={
@@ -46,7 +46,6 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     }
     className={className}
     placement={placement}
-    arrow={arrow}
     delay={delay}
     disabled={disabled}
     popperOptions={popperOptions}
