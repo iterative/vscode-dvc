@@ -67,13 +67,7 @@ export class DvcTextDocument {
     return parseDocument(this.getText())
   }
 
-  getCompletions() {
-    if (!this.uri.endsWith('dvc.yaml')) {
-      return []
-    }
-
-    const completions: CompletionItem[] = []
-
+  getCompletionTemplates() {
     const completionTemplates: CompletionTemplate[] = [
       {
         body: {
@@ -99,7 +93,17 @@ export class DvcTextDocument {
       }
     }
 
-    for (const { label, body } of completionTemplates) {
+    return completionTemplates
+  }
+
+  getCompletions() {
+    if (!this.uri.endsWith('dvc.yaml')) {
+      return []
+    }
+
+    const completions: CompletionItem[] = []
+
+    for (const { label, body } of this.getCompletionTemplates()) {
       const completionDocument: Document = new Document(body)
       const newSource = completionDocument.toString()
       const item = CompletionItem.create(label)
