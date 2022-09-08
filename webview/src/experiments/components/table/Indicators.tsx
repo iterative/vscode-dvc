@@ -13,7 +13,6 @@ import {
 } from '../../../shared/components/icons'
 import { sendMessage } from '../../../shared/vscode'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
-import tooltipStyles from '../../../shared/components/tooltip/styles.module.scss'
 import { pluralize } from '../../../util/strings'
 import { ExperimentsState } from '../../store'
 
@@ -31,7 +30,6 @@ export const IndicatorTooltip: React.FC<IndicatorTooltipProps> = ({
       placement="bottom-start"
       disabled={!tooltipContent}
       content={tooltipContent}
-      className={tooltipStyles.padded}
       ref={wrapperRef}
     >
       {children}
