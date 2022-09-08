@@ -24,6 +24,47 @@ const TitleLimit = {
   [PlotSize.SMALL]: 30
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, sonarjs/cognitive-complexity
+const layersWithTruncatedTitles = (layer: any, size: number) => {
+  if (layer.length === 0) {
+    return layer
+  }
+
+  const layerEncoding = layer[0].encoding
+
+  return [
+    {
+      ...layer[0],
+      encoding: layerEncoding
+        ? {
+            ...layerEncoding,
+            x: layerEncoding.x
+              ? {
+                  ...layerEncoding.x,
+                  title: truncateTitle(layerEncoding.x.title, size)
+                }
+              : {},
+            y: layerEncoding.y
+              ? {
+                  ...layerEncoding.y,
+                  title: truncateTitle(layerEncoding.y.title, size * 0.75)
+                }
+              : {}
+          }
+        : {}
+    },
+    ...layer.slice(1)
+  ]
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const withOrWithoutlayer = (spec: any, size: number) =>
+  spec.layer
+    ? {
+        layer: layersWithTruncatedTitles(spec.layer, size)
+      }
+    : {}
+
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   spec,
   data,
@@ -44,6 +85,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     renderer: 'svg' as unknown as Renderers,
     spec: {
       ...spec,
+      ...withOrWithoutlayer(spec, TitleLimit[size]),
       title: truncateTitle(spec.title, TitleLimit[size])
     }
   } as VegaLiteProps
