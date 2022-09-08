@@ -648,6 +648,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .errorTooltip {
+  border: 1px solid $tooltip-border;
   white-space: pre-wrap;
   display: flex;
   gap: 4px;

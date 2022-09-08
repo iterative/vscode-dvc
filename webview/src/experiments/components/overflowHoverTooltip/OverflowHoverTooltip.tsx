@@ -1,5 +1,6 @@
 import { TippyProps } from '@tippyjs/react'
 import React, { useRef } from 'react'
+import styles from './styles.module.scss'
 import { useIsFullyContained } from './useIsFullyContained'
 import Tooltip, {
   HEADER_TOOLTIP_DELAY
@@ -12,7 +13,7 @@ export const OverflowHoverTooltip: React.FC<
   const isDisabled = useIsFullyContained(wrapperRef)
   return (
     <Tooltip
-      content={content}
+      content={<div className={styles.overflowTooltip}>{content}</div>}
       placement="bottom-start"
       disabled={isDisabled}
       delay={HEADER_TOOLTIP_DELAY}
