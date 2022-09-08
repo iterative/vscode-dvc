@@ -115,6 +115,39 @@ export class DvcTextDocument {
     return completions
   }
 
+  getTemplateExpressionSymbolsInsideScalar(
+    scalarValue: string,
+    nodeOffset: number
+  ) {
+    const templateSymbols: DocumentSymbol[] = []
+
+    const templates = scalarValue.matchAll(variableTemplates)
+    for (const template of templates) {
+      const expression = template[1]
+      const expressionOffset: number = nodeOffset + (template.index ?? 0) + 2 // To account for the '${'
+      const symbols = expression.matchAll(/[\dA-Za-z]+/g)
+      for (const templateSymbol of symbols) {
+        const symbolStart = (templateSymbol.index ?? 0) + expressionOffset
+        const symbolEnd = symbolStart + templateSymbol[0].length
+        const symbolRange = Range.create(
+          this.positionAt(symbolStart),
+          this.positionAt(symbolEnd)
+        )
+        templateSymbols.push(
+          DocumentSymbol.create(
+            templateSymbol[0],
+            undefined,
+            SymbolKind.Variable,
+            symbolRange,
+            symbolRange
+          )
+        )
+      }
+    }
+
+    return templateSymbols
+  }
+
   yamlScalarNodeToDocumentSymbols(
     node: Scalar,
     [nodeStart, valueEnd, nodeEnd]: [number, number, number]
@@ -128,32 +161,9 @@ export class DvcTextDocument {
         SymbolKind.String,
         Range.create(this.positionAt(nodeStart), this.positionAt(nodeEnd)),
         Range.create(this.positionAt(nodeStart), this.positionAt(valueEnd))
-      )
+      ),
+      ...this.getTemplateExpressionSymbolsInsideScalar(nodeValue, nodeStart)
     ]
-
-    const templates = nodeValue.matchAll(variableTemplates)
-    for (const template of templates) {
-      const expression = template[1]
-      const expressionOffset: number = nodeStart + (template.index ?? 0) + 2 // To account for the '${'
-      const symbols = expression.matchAll(/[\dA-Za-z]+/g)
-      for (const templateSymbol of symbols) {
-        const symbolStart = (templateSymbol.index ?? 0) + expressionOffset
-        const symbolEnd = symbolStart + templateSymbol[0].length
-        const symbolRange = Range.create(
-          this.positionAt(symbolStart),
-          this.positionAt(symbolEnd)
-        )
-        symbolsSoFar.push(
-          DocumentSymbol.create(
-            templateSymbol[0],
-            undefined,
-            SymbolKind.Variable,
-            symbolRange,
-            symbolRange
-          )
-        )
-      }
-    }
 
     return symbolsSoFar
   }
@@ -205,13 +215,23 @@ export class DvcTextDocument {
     return codeActions
   }
 
-  convertYamlRange(range: [number, number, number]) {
-    const symbolStart = range[0]
-    const symbolEnd = range[2]
-    return Range.create(
+  convertYamlRange(yamlRange: [number, number, number]) {
+    const symbolStart = yamlRange[0]
+    const valueEnd = yamlRange[1]
+    const symbolEnd = yamlRange[2]
+    const range = Range.create(
       this.positionAt(symbolStart),
       this.positionAt(symbolEnd)
     )
+    const selectionRange = Range.create(
+      this.positionAt(symbolStart),
+      this.positionAt(valueEnd)
+    )
+
+    return {
+      range,
+      selectionRange
+    }
   }
 
   yamlNodeToDocumentSymbols(
