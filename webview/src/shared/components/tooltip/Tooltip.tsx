@@ -8,7 +8,7 @@ export const CELL_TOOLTIP_DELAY = 1000
 
 const TooltipRenderFunction: React.ForwardRefRenderFunction<
   unknown,
-  TippyProps
+  TippyProps & { isContextMenu?: boolean }
 > = (
   {
     children,
@@ -27,19 +27,23 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     hideOnClick,
     onTrigger,
     appendTo,
-    animation = false,
-    className = typeof content === 'string' ? styles.padded : undefined,
-    arrow = false
+    isContextMenu = false,
+    animation = false
   },
   ref
 ) => (
   <Tippy
+    arrow={false}
     animation={animation}
     appendTo={appendTo}
-    content={content}
-    className={className}
+    content={
+      isContextMenu ? (
+        content
+      ) : (
+        <div className={styles.tooltipContent}>{content}</div>
+      )
+    }
     placement={placement}
-    arrow={arrow}
     delay={delay}
     disabled={disabled}
     popperOptions={popperOptions}
