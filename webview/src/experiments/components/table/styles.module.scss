@@ -648,11 +648,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .errorTooltip {
-  border: 1px solid $tooltip-border;
   white-space: pre-wrap;
   display: flex;
   gap: 4px;
-  font-size: 0.8125rem;
 
   svg {
     min-width: 16px;

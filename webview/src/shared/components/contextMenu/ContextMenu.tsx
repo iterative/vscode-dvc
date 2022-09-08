@@ -57,6 +57,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     delay={[100, 200]}
     placement={'bottom'}
     interactive
+    isContextMenu={true}
     onTrigger={positionContextMenuAndDisableEvents}
     content={content}
     onShow={onShow}
