@@ -9,6 +9,23 @@ import {
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { DvcTextDocument } from './DvcTextDocument'
 
+const documentSelector = [
+  {
+    language: 'yaml'
+  },
+  {
+    pattern: '**/*.{dvc,dvc.lock}'
+  },
+  {
+    language: 'json'
+  },
+  {
+    language: 'toml'
+  },
+  {
+    language: 'python'
+  }
+]
 export class DvcLanguageServer {
   private pythonFilePaths: string[] = []
   private documents?: TextDocuments<TextDocument>
@@ -57,24 +74,6 @@ export class DvcLanguageServer {
   }
 
   private onInitialize() {
-    const documentSelector = [
-      {
-        language: 'yaml'
-      },
-      {
-        pattern: '**/*.{dvc,dvc.lock}'
-      },
-      {
-        language: 'json'
-      },
-      {
-        language: 'toml'
-      },
-      {
-        language: 'python'
-      }
-    ]
-
     const serverCapabilities: ServerCapabilities = {
       codeActionProvider: true,
       completionProvider: {
