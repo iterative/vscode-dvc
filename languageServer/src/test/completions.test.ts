@@ -30,6 +30,11 @@ describe('textDocument/completions', () => {
         insertText: 'stages:\n  $1:\n    cmd: $2\n',
         insertTextFormat: 2,
         label: 'stages'
+      },
+      {
+        insertText: '$1:\n  cmd: $2\n',
+        insertTextFormat: 2,
+        label: 'Add stage'
       }
     ])
   })

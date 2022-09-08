@@ -22,8 +22,6 @@ import {
   Node,
   Document,
   Scalar,
-  isMap,
-  isSeq,
   Pair,
   isPair
 } from 'yaml'
@@ -78,25 +76,25 @@ export class DvcTextDocument {
 
     const completionTemplates: CompletionTemplate[] = [
       {
-        label: 'stages',
         body: {
           stages: { $1: { cmd: '$2' } }
-        }
+        },
+        label: 'stages'
       },
       {
-        label: 'Add stage',
         body: {
           $1: { cmd: '$2' }
-        }
+        },
+        label: 'Add stage'
       }
     ]
     if (this.pythonFilePaths) {
       for (const path of this.pythonFilePaths) {
         completionTemplates.push({
-          label: `cmd: ${path}`,
           body: {
             cmd: `python ${path} $1`
-          }
+          },
+          label: `cmd: ${path}`
         })
       }
     }
@@ -203,35 +201,22 @@ export class DvcTextDocument {
     return codeActions
   }
 
+  convertYamlRange(range: [number, number, number]) {
+    const symbolStart = range[0]
+    const symbolEnd = range[2]
+    return Range.create(
+      this.positionAt(symbolStart),
+      this.positionAt(symbolEnd)
+    )
+  }
+
   yamlNodeToDocumentSymbols(
     node: Node | Pair,
     range: [number, number, number]
   ): DocumentSymbol[] {
     if (isNode(node)) {
-      const symbolStart = range[0]
-      const symbolEnd = range[2]
-      const symbolRange = Range.create(
-        this.positionAt(symbolStart),
-        this.positionAt(symbolEnd)
-      )
-
       if (isScalar(node)) {
         return this.yamlScalarNodeToDocumentSymbols(node, range)
-      }
-
-      if (isMap(node) || isSeq(node)) {
-        return [
-          DocumentSymbol.create(
-            'collection',
-            node.toJSON(),
-            SymbolKind.Object,
-            symbolRange,
-            symbolRange,
-            node.items.flatMap(item =>
-              this.yamlNodeToDocumentSymbols(item as Node | Pair, range)
-            )
-          )
-        ]
       }
     } else if (isPair(node)) {
       return this.yamlNodeToDocumentSymbols(node.value as Node | Pair, range)
