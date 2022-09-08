@@ -15,42 +15,7 @@ export class DvcLanguageServer {
       TextDocument
     )
 
-    connection.onInitialize(() => {
-      const documentSelector = [
-        {
-          language: 'yaml'
-        },
-        {
-          pattern: '**/*.{dvc,dvc.lock}'
-        },
-        {
-          language: 'json'
-        },
-        {
-          language: 'toml'
-        },
-        {
-          language: 'python'
-        }
-      ]
-
-      const serverCapabilities: ServerCapabilities = {
-        codeActionProvider: true,
-        completionProvider: {
-          resolveProvider: false,
-          triggerCharacters: ['.', ':', '/', '-']
-        },
-        declarationProvider: {
-          documentSelector
-        },
-        definitionProvider: true
-      }
-
-      const result: InitializeResult = {
-        capabilities: serverCapabilities
-      }
-      return result
-    })
+    connection.onInitialize(() => this.onInitialize())
 
     connection.onDefinition(params => {
       const uri = params.textDocument.uri
@@ -92,5 +57,42 @@ export class DvcLanguageServer {
     documents.listen(connection)
 
     connection.listen()
+  }
+
+  private onInitialize() {
+    const documentSelector = [
+      {
+        language: 'yaml'
+      },
+      {
+        pattern: '**/*.{dvc,dvc.lock}'
+      },
+      {
+        language: 'json'
+      },
+      {
+        language: 'toml'
+      },
+      {
+        language: 'python'
+      }
+    ]
+
+    const serverCapabilities: ServerCapabilities = {
+      codeActionProvider: true,
+      completionProvider: {
+        resolveProvider: false,
+        triggerCharacters: ['.', ':', '/', '-']
+      },
+      declarationProvider: {
+        documentSelector
+      },
+      definitionProvider: true
+    }
+
+    const result: InitializeResult = {
+      capabilities: serverCapabilities
+    }
+    return result
   }
 }
