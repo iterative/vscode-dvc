@@ -1,9 +1,10 @@
-import { relative } from 'path'
-import { workspace } from 'vscode'
+import path, { relative } from 'path'
+import { Uri, workspace } from 'vscode'
 import {
   LanguageClient,
   LanguageClientOptions
 } from 'vscode-languageclient/node'
+import { readFileSync } from 'fs-extra'
 import { ServerModule } from './server-options'
 import { Disposable } from '../class/dispose'
 import { findFiles } from '../fileSystem/workspace'
@@ -57,6 +58,19 @@ export class DVCLanguageClient extends Disposable {
       this.client.sendRequest(
         'sendPythonFiles',
         files.map(file => relative(workspaceRoot, file))
+      )
+    })
+
+    findFiles('**/*.{yaml,toml,json}', '.??*').then(files => {
+      this.client.sendRequest(
+        'sendParamsFiles',
+        files.map(file => {
+          return {
+            languageId: path.extname(file),
+            text: readFileSync(file),
+            uri: Uri.file(file).toString()
+          }
+        })
       )
     })
 

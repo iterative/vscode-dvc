@@ -35,6 +35,16 @@ describe('textDocument/completions', () => {
         insertText: '$1:\n  cmd: $2\n',
         insertTextFormat: 2,
         label: 'Add stage'
+      },
+      {
+        insertText: 'params:\n  - $1\n',
+        insertTextFormat: 2,
+        label: 'Params'
+      },
+      {
+        insertText: '- dvc.yaml\n',
+        insertTextFormat: 2,
+        label: 'dvc.yaml'
       }
     ])
   })

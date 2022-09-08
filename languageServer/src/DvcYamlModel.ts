@@ -29,11 +29,14 @@ export interface IDvcYamlStage extends JsonSerializable {
   contains(offset: number): boolean
   dependsOnAll(items: string[]): boolean
   addDependencies(items: string[]): void
+  addParams(items: string[]): void
+  clone(): IDvcYamlStage
 }
 
 export interface IDvcYamlModel {
   getStageAt(position: Position): IDvcYamlStage | undefined
   toString(): string
+  clone(): IDvcYamlModel
 }
 
 export class Cmd implements ICmd {
@@ -69,12 +72,17 @@ export class Stage implements IDvcYamlStage {
   name: string
   cmd?: ICmd
   deps?: Set<string>
+  params?: Set<string>
 
   constructor(private pairNode: Pair, public parentDvcYaml: IDvcYamlModel) {
     this.name = pairNode.key as string
     const value = pairNode.value
 
     isMap(value) && this.buildModel(value)
+  }
+
+  clone(): IDvcYamlStage {
+    return new Stage(this.pairNode, this.parentDvcYaml)
   }
 
   buildModel(value: YAMLMap) {
@@ -124,6 +132,12 @@ export class Stage implements IDvcYamlStage {
     this.deps = new Set<string>([...current, ...items])
   }
 
+  addParams(items: string[]): void {
+    const current = this.params || new Set<string>()
+
+    this.params = new Set<string>([...current, ...items])
+  }
+
   dependsOnAll(): boolean {
     return true
   }
@@ -145,6 +159,10 @@ export class DvcYaml implements IDvcYamlModel {
   constructor(private document: IDvcTextDocument) {
     const yamlDoc = this.document.getYamlDocument()
     this.setStages(yamlDoc.get('stages', true))
+  }
+
+  clone(): IDvcYamlModel {
+    return new DvcYaml(this.document)
   }
 
   setStages(node: unknown) {

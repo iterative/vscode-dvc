@@ -4,7 +4,10 @@ import {
   ServerCapabilities,
   _Connection,
   TextDocumentPositionParams,
-  CodeActionParams
+  CodeActionParams,
+  TextDocumentItem,
+  InitializeParams,
+  WorkspaceFolder
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { DvcTextDocument } from './DvcTextDocument'
@@ -28,12 +31,14 @@ const documentSelector = [
 ]
 export class DvcLanguageServer {
   private pythonFilePaths: string[] = []
+  private paramFiles: Record<string, TextDocument> = {}
   private documents?: TextDocuments<TextDocument>
+  private workspaceFolders: WorkspaceFolder[] = []
 
   public listen(connection: _Connection) {
     this.documents = new TextDocuments(TextDocument)
 
-    connection.onInitialize(() => this.onInitialize())
+    connection.onInitialize(params => this.onInitialize(params))
 
     connection.onDefinition(params => {
       return (
@@ -53,6 +58,18 @@ export class DvcLanguageServer {
       this.pythonFilePaths = files
     })
 
+    connection.onRequest('sendParamsFiles', (files: TextDocumentItem[]) => {
+      const textDocs = files
+        .filter(({ uri }) => !uri.endsWith('dvc.yaml'))
+        .map(({ uri, languageId, text }) =>
+          TextDocument.create(uri, languageId, 0, text)
+        )
+
+      for (const doc of textDocs) {
+        this.paramFiles[doc.uri] = doc
+      }
+    })
+
     this.documents.listen(connection)
 
     connection.listen()
@@ -70,10 +87,27 @@ export class DvcLanguageServer {
     if (!doc) {
       return null
     }
-    return new DvcTextDocument(doc, this.documents, this.pythonFilePaths)
+
+    const openParamDocs = this.documents
+      ?.all()
+      .filter(({ languageId }) => ['yaml', 'json', 'toml'].includes(languageId))
+
+    for (const doc of openParamDocs) {
+      this.paramFiles[doc.uri] = doc
+    }
+
+    return new DvcTextDocument(
+      doc,
+      this.documents,
+      this.pythonFilePaths,
+      Object.values(this.paramFiles),
+      this.workspaceFolders
+    )
   }
 
-  private onInitialize() {
+  private onInitialize(params: InitializeParams) {
+    this.workspaceFolders = params.workspaceFolders ?? []
+
     const serverCapabilities: ServerCapabilities = {
       codeActionProvider: true,
       completionProvider: {

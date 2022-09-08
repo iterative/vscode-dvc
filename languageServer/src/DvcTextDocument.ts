@@ -1,3 +1,4 @@
+import { relative, parse } from 'path'
 import {
   CompletionItem,
   DocumentSymbol,
@@ -11,7 +12,8 @@ import {
   CodeAction,
   CodeActionKind,
   WorkspaceEdit,
-  TextEdit
+  TextEdit,
+  WorkspaceFolder
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
@@ -25,10 +27,14 @@ import {
   Pair,
   isPair
 } from 'yaml'
+import { URI } from 'vscode-uri'
 import { variableTemplates } from './regexes'
 import { DvcYaml } from './DvcYamlModel'
 
-type CompletionTemplateBody = string | { [key: string]: CompletionTemplateBody }
+type CompletionTemplateBody =
+  | string
+  | { [key: string]: CompletionTemplateBody }
+  | CompletionTemplateBody[]
 interface CompletionTemplate {
   label: string
   body: CompletionTemplateBody
@@ -38,17 +44,23 @@ export class DvcTextDocument {
 
   private textDocument: TextDocument
   private documents: TextDocuments<TextDocument>
-  private pythonFilePaths?: string[]
+  private pythonFilePaths: string[]
+  private paramFiles: TextDocument[]
+  private workspaceFolders: WorkspaceFolder[] = []
 
   constructor(
     textDocument: TextDocument,
     documents: TextDocuments<TextDocument>,
-    pythonFilePaths?: string[]
+    pythonFilePaths: string[],
+    paramFiles: TextDocument[],
+    workspaceFolders: WorkspaceFolder[]
   ) {
     this.textDocument = textDocument
     this.documents = documents
     this.uri = this.textDocument.uri
     this.pythonFilePaths = pythonFilePaths
+    this.paramFiles = paramFiles
+    this.workspaceFolders = workspaceFolders
   }
 
   offsetAt(position: Position) {
@@ -80,17 +92,33 @@ export class DvcTextDocument {
           $1: { cmd: '$2' }
         },
         label: 'Add stage'
+      },
+      {
+        body: {
+          params: ['$1']
+        },
+        label: 'Params'
       }
     ]
-    if (this.pythonFilePaths) {
-      for (const path of this.pythonFilePaths) {
-        completionTemplates.push({
-          body: {
-            cmd: `python ${path} $1`
-          },
-          label: `cmd: ${path}`
-        })
-      }
+    for (const path of this.pythonFilePaths) {
+      completionTemplates.push({
+        body: {
+          cmd: `python ${path} $1`
+        },
+        label: `cmd: ${path}`
+      })
+    }
+
+    const myPath = URI.parse(this.uri).fsPath
+    const myDir = parse(myPath).dir
+
+    for (const paramsDocument of this.paramFiles) {
+      const relativePath = relative(myDir, URI.parse(paramsDocument.uri).fsPath)
+
+      completionTemplates.push({
+        body: [relativePath],
+        label: relativePath
+      })
     }
 
     return completionTemplates
@@ -283,7 +311,13 @@ export class DvcTextDocument {
   }
 
   createFinder(txtDoc: TextDocument) {
-    return new DvcTextDocument(txtDoc, this.documents)
+    return new DvcTextDocument(
+      txtDoc,
+      this.documents,
+      this.pythonFilePaths,
+      this.paramFiles,
+      this.workspaceFolders
+    )
   }
 
   findLocationsFor(aSymbol: DocumentSymbol) {
