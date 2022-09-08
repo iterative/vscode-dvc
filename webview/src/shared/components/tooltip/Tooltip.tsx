@@ -28,8 +28,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onTrigger,
     appendTo,
     isContextMenu = false,
-    animation = false,
-    className = typeof content === 'string' ? styles.padded : undefined
+    animation = false
   },
   ref
 ) => (
@@ -44,7 +43,6 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
         <div className={styles.tooltipContent}>{content}</div>
       )
     }
-    className={className}
     placement={placement}
     delay={delay}
     disabled={disabled}

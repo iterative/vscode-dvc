@@ -4,11 +4,6 @@ $foreground: var(--vscode-quickInput-foreground);
 $background: var(--vscode-quickInput-background);
 $font: var(--vscode-font-family);
 
-:global(.tippy-box).padded {
-  & > :global(.tippy-content) {
-    padding: 2px 6px;
-  }
-}
 :global(.tippy-box) {
   filter: $vscode-drop-shadow;
   font-family: $font;
