@@ -719,7 +719,7 @@ describe('App', () => {
       ])
     })
 
-    it('should present the correct option for an experiment with checkpoints', () => {
+    it('should present the correct option for an experiment with checkpoints and close on esc', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('[exp-e7a67]')
@@ -739,6 +739,9 @@ describe('App', () => {
         'Star',
         'Remove'
       ])
+
+      fireEvent.keyDown(menuitems[0], { bubbles: true, key: 'Escape' })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
