@@ -879,4 +879,8 @@ $badge-size: 0.85rem;
 .isColumnResizing {
   @extend .noSelect;
   cursor: col-resize;
+
+  * {
+    cursor: col-resize;
+  }
 }
