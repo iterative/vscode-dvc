@@ -29,11 +29,13 @@ const positionContextMenuAndDisableEvents = (
   instance.reference.addEventListener('contextmenu', handleDefaultEvent)
 
   const hideOnClick = () => {
-    instance.hide()
+    !instance.state.isDestroyed && instance.hide()
   }
 
   instance.popper.removeEventListener('click', hideOnClick)
   instance.popper.addEventListener('click', hideOnClick)
+
+  window.addEventListener('click', hideOnClick, { once: true })
 }
 
 export interface ContextMenuProps {
@@ -58,6 +60,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     placement={'bottom'}
     interactive
     onTrigger={positionContextMenuAndDisableEvents}
+    onClickOutside={(instance: Instance) => instance.hide()}
+    hideOnClick={false}
     content={content}
     onShow={onShow}
     disabled={!content || disabled}
