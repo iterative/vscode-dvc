@@ -2,61 +2,58 @@ import {
   TextDocuments,
   InitializeResult,
   ServerCapabilities,
-  _Connection
+  _Connection,
+  TextDocumentPositionParams,
+  CodeActionParams
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { DvcTextDocument } from './DvcTextDocument'
 
 export class DvcLanguageServer {
   private pythonFilePaths: string[] = []
+  private documents?: TextDocuments<TextDocument>
 
   public listen(connection: _Connection) {
-    const documents: TextDocuments<TextDocument> = new TextDocuments(
-      TextDocument
-    )
+    this.documents = new TextDocuments(TextDocument)
 
     connection.onInitialize(() => this.onInitialize())
 
     connection.onDefinition(params => {
-      const uri = params.textDocument.uri
-      const doc = documents.get(uri)
-
-      if (!doc) {
-        return null
-      }
-      const dvcDoc = new DvcTextDocument(doc, documents)
-      return dvcDoc.getDefinitions(params.position)
+      return (
+        this.getDvcTextDocument(params)?.getDefinitions(params.position) ?? null
+      )
     })
 
     connection.onCompletion(params => {
-      const uri = params.textDocument.uri
-      const doc = documents.get(uri)
-
-      if (!doc) {
-        return null
-      }
-      const dvcDoc = new DvcTextDocument(doc, documents, this.pythonFilePaths)
-      return dvcDoc.getCompletions()
+      return this.getDvcTextDocument(params)?.getCompletions() ?? null
     })
 
     connection.onCodeAction(params => {
-      const uri = params.textDocument.uri
-      const doc = documents.get(uri)
-
-      if (!doc) {
-        return null
-      }
-      const dvcDoc = new DvcTextDocument(doc, documents, this.pythonFilePaths)
-      return dvcDoc.getCodeActions(params)
+      return this.getDvcTextDocument(params)?.getCodeActions(params) ?? null
     })
 
     connection.onRequest('sendPythonFiles', (files: string[]) => {
       this.pythonFilePaths = files
     })
 
-    documents.listen(connection)
+    this.documents.listen(connection)
 
     connection.listen()
+  }
+
+  private getDvcTextDocument(
+    params: TextDocumentPositionParams | CodeActionParams
+  ) {
+    if (!this.documents) {
+      return null
+    }
+    const uri = params.textDocument.uri
+    const doc = this.documents?.get(uri)
+
+    if (!doc) {
+      return null
+    }
+    return new DvcTextDocument(doc, this.documents, this.pythonFilePaths)
   }
 
   private onInitialize() {
