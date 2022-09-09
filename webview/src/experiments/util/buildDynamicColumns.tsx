@@ -97,7 +97,6 @@ const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
     <Tooltip
       content={<CellTooltip stringValue={stringValue} />}
       placement="bottom-end"
-      arrow={true}
       delay={[CELL_TOOLTIP_DELAY, 0]}
       interactive={true}
     >

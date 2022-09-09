@@ -651,7 +651,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   white-space: pre-wrap;
   display: flex;
   gap: 4px;
-  font-size: 0.8125rem;
 
   svg {
     min-width: 16px;
@@ -814,4 +813,8 @@ $badge-size: 0.85rem;
 .isColumnResizing {
   @extend .noSelect;
   cursor: col-resize;
+
+  * {
+    cursor: col-resize;
+  }
 }
