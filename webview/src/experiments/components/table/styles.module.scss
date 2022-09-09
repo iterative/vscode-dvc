@@ -205,6 +205,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   position: relative;
   border: none;
   background: none;
+  cursor: pointer;
 }
 
 .expandedRowArrow {
@@ -221,6 +222,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   bottom: 0;
 }
 
+.rowGroup:last-child > .tr:last-child {
+  border-color: $row-bg-color;
+
+  &.rowSelected {
+    border-color: $row-bg-selected-color;
+  }
+}
+
 .experiments {
   box-sizing: border-box;
   height: 100%;
@@ -228,6 +237,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   flex-flow: column nowrap;
 
   .experimentGroup {
+    &:last-child .tr:last-child {
+      border-color: $row-bg-color;
+
+      &.rowSelected {
+        border-color: $row-bg-selected-color;
+      }
+    }
+
     .nestedRow {
       .experimentCell {
         padding-left: $nested-row-padding;
@@ -296,10 +313,33 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     position: relative;
     background-color: $row-bg-color;
 
+    &:hover.rowSelected {
+      &:after {
+        box-shadow: inset 0 0 20px $shadow;
+        content: '';
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 4;
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .td:hover,
+      .td:hover + .td {
+        border-left-color: $row-border-selected-color;
+      }
+    }
+
     &:hover:not(.rowSelected) {
       .td:not(.experimentCell),
       .experimentCell:before {
         background-color: $row-hover-background-color;
+      }
+
+      .indicatorCount {
+        border-color: $row-hover-background-color;
       }
 
       .td:hover,
@@ -325,6 +365,8 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     }
 
     &.rowSelected {
+      border-color: $row-border-selected-color;
+
       .td {
         background-color: $row-bg-selected-color;
       }
@@ -335,6 +377,21 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         &:before {
           background-color: $row-bg-selected-color;
         }
+      }
+
+      .indicatorCount {
+        background-color: $indicator-selected-badge-background;
+        color: $indicator-selected-badge-foreground;
+        border: 1px solid $indicator-selected-badge-border;
+      }
+
+      .starSwitch:not([aria-checked='true']) svg {
+        fill: $star-switch-selection-fill-color;
+      }
+
+      .expandedRowArrow,
+      .contractedRowArrow {
+        border-color: $star-switch-selection-fill-color;
       }
     }
   }
@@ -505,6 +562,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         left: -$cell-padding;
         height: 100%;
 
+        &:first-child {
+          margin-right: 2px;
+        }
+
         .starSwitch {
           display: inline-flex;
           align-items: center;
@@ -651,7 +712,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   white-space: pre-wrap;
   display: flex;
   gap: 4px;
-  font-size: 0.8125rem;
 
   svg {
     min-width: 16px;
@@ -755,11 +815,12 @@ $badge-size: 0.85rem;
 
 .indicatorCount {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 3px;
+  right: -2px;
   font-weight: bold;
   background-color: $indicator-badge-background;
   color: $indicator-badge-foreground;
+  border: 1px solid $indicator-badge-border;
   border-radius: 100%;
   width: $badge-size;
   height: $badge-size;
@@ -767,6 +828,9 @@ $badge-size: 0.85rem;
   text-align: center;
   vertical-align: middle;
   font-size: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .cellTooltip {
@@ -795,7 +859,7 @@ $badge-size: 0.85rem;
     .indicatorCount {
       display: none;
       .experimentGroup & {
-        display: block;
+        display: flex;
         &[aria-label='0'] {
           display: none;
         }
@@ -814,4 +878,8 @@ $badge-size: 0.85rem;
 .isColumnResizing {
   @extend .noSelect;
   cursor: col-resize;
+
+  * {
+    cursor: col-resize;
+  }
 }

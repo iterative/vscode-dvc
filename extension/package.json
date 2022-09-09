@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.4.0",
+  "version": "0.4.1",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1629,10 +1629,10 @@
     "@types/uuid": "8.3.4",
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.1.5",
-    "@wdio/cli": "7.23.0",
-    "@wdio/local-runner": "7.23.0",
-    "@wdio/mocha-framework": "7.23.0",
-    "@wdio/spec-reporter": "7.23.0",
+    "@wdio/cli": "7.24.0",
+    "@wdio/local-runner": "7.24.0",
+    "@wdio/mocha-framework": "7.24.0",
+    "@wdio/spec-reporter": "7.24.0",
     "chai": "4.3.6",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
@@ -1650,7 +1650,7 @@
     "vsce": "2.11.0",
     "vscode-uri": "3.0.3",
     "wdio-vscode-service": "4.0.6",
-    "webdriverio": "7.23.0",
+    "webdriverio": "7.24.0",
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0"
   },
