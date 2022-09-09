@@ -671,6 +671,46 @@ describe('App', () => {
     })
   })
 
+  describe('Header Context Menu', () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+    })
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
+    it('should open on left click', () => {
+      renderTableWithoutRunningExperiments()
+
+      const paramsFileHeader = screen.getByText('params.yaml')
+      fireEvent.click(paramsFileHeader, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toStrictEqual([
+        'Open to the Side',
+        'Sort Ascending',
+        'Sort Descending'
+      ])
+    })
+
+    it('should open on right click and close on esc', () => {
+      renderTableWithoutRunningExperiments()
+
+      const paramsFileHeader = screen.getByText('params.yaml')
+      fireEvent.contextMenu(paramsFileHeader, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+
+      const menuitems = screen.getAllByRole('menuitem')
+      expect(menuitems).toHaveLength(3)
+
+      fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+  })
+
   describe('Row Context Menu', () => {
     beforeAll(() => {
       jest.useFakeTimers()
