@@ -205,7 +205,7 @@ export const ExperimentsTable: React.FC = () => {
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
 
-  const hasOnlyDefaultColumns = columns.length <= 2
+  const hasOnlyDefaultColumns = columns.length <= 1
   const hasOnlyWorkspace = data.length <= 1
   if (hasOnlyDefaultColumns || hasOnlyWorkspace) {
     return (
