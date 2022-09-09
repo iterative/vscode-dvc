@@ -9,7 +9,7 @@ import styles from './styles.module.scss'
 import { config } from './constants'
 import { truncateTitles } from './util'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
-import { Any, Obj } from '../../util/objects'
+import { Any } from '../../util/objects'
 
 interface ZoomablePlotProps {
   spec: VisualizationSpec
@@ -43,10 +43,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     data,
     'data-testid': `${id}-vega`,
     renderer: 'svg' as unknown as Renderers,
-    spec: {
-      ...spec,
-      ...(truncateTitles(spec as Any, TitleLimit[size]) as Obj)
-    }
+    spec: truncateTitles(spec as Any, TitleLimit[size]) as VisualizationSpec
   } as VegaLiteProps
   currentPlotProps.current = plotProps
 
