@@ -1318,6 +1318,41 @@ describe('App', () => {
     ).toBeInTheDocument()
   })
 
+  it('should dismiss a tooltip by pressing esc', () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture,
+      comparison: comparisonTableFixture,
+      template: complexTemplatePlotsFixture
+    })
+
+    const [templateInfo] = screen.getAllByTestId('info-tooltip-toggle')
+
+    const getSectionText = (sectionNode: ReactElement) =>
+      // eslint-disable-next-line testing-library/no-node-access
+      sectionNode.props.children || ''
+
+    fireEvent.mouseEnter(templateInfo, { bubbles: true })
+    expect(
+      screen.getByText(
+        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
+      )
+    ).toBeInTheDocument()
+
+    fireEvent.keyDown(templateInfo, { bubbles: true, key: 'Space' })
+    expect(
+      screen.getByText(
+        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
+      )
+    ).toBeInTheDocument()
+
+    fireEvent.keyDown(templateInfo, { bubbles: true, key: 'Escape' })
+    expect(
+      screen.queryByText(
+        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
+      )
+    ).not.toBeInTheDocument()
+  })
+
   describe('Virtualization', () => {
     const createCheckpointPlots = (nbOfPlots: number) => {
       const plots = []
