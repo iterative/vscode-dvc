@@ -744,6 +744,51 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
+    it('should be removed with a left click', () => {
+      renderTableWithoutRunningExperiments()
+
+      const row = getRow('4fb124a')
+      fireEvent.contextMenu(row, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+
+      fireEvent.click(window, { bubbles: true })
+      jest.advanceTimersByTime(100)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+
+    it('should be removed with a left click on a different row', () => {
+      renderTableWithoutRunningExperiments()
+
+      const row = getRow('4fb124a')
+      fireEvent.contextMenu(row, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+
+      const branch = getRow('main')
+      fireEvent.click(branch, { bubbles: true })
+      jest.advanceTimersByTime(100)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+
+    it('should be moved with a right click on the same row (not toggle)', () => {
+      renderTableWithoutRunningExperiments()
+
+      const row = getRow('4fb124a')
+      fireEvent.contextMenu(row, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+
+      fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
+        bubbles: true
+      })
+      jest.advanceTimersByTime(200)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+    })
+
     it('should present the Remove experiment option for the checkpoint tips', () => {
       renderTableWithoutRunningExperiments()
 
