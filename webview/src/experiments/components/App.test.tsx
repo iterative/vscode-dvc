@@ -136,6 +136,18 @@ describe('App', () => {
     expect(noColumnsState).toBeInTheDocument()
   })
 
+  it('should not show the no columns selected empty state when only the timestamp column is provided', () => {
+    renderTable({
+      ...tableDataFixture,
+      columns: tableDataFixture.columns.filter(
+        ({ label }) => label === 'Created'
+      )
+    })
+
+    const noColumnsState = screen.queryByText('No Columns Selected.')
+    expect(noColumnsState).not.toBeInTheDocument()
+  })
+
   it('should show the no experiments empty state when only the workspace is provided', () => {
     renderTableWithWorkspaceRowOnly()
 
