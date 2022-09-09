@@ -358,6 +358,14 @@ const collectDatapoints = (
   }
 }
 
+const fillRevisionField = (acc: RevisionData, label: string, rev: string) => {
+  acc[rev][label].forEach(element => {
+    if (element.rev === undefined) {
+      element.rev = rev
+    }
+  })
+}
+
 const collectPlotData = (
   acc: RevisionData,
   path: string,
@@ -372,6 +380,7 @@ const collectPlotData = (
     acc[label][path] = []
 
     collectDatapoints(acc, path, label, plot.datapoints?.[id])
+    fillRevisionField(acc, path, label)
   }
 }
 
@@ -491,6 +500,18 @@ const fillTemplate = (template: string, datapoints: unknown[]) =>
     template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
   ) as TopLevelSpec
 
+const isMultiSourcePlot = (
+  datapoints: Record<string, unknown>[],
+  revisionColors: ColorScale | undefined
+): boolean => {
+  const pts_revs = new Set(datapoints.flatMap(elem => elem.rev))
+  const color_revs = new Set(revisionColors?.domain)
+  return !(
+    pts_revs.size === color_revs.size &&
+    [...color_revs].every(elem => pts_revs.has(elem))
+  )
+}
+
 const collectTemplateGroup = (
   paths: string[],
   selectedRevisions: string[],
@@ -507,10 +528,11 @@ const collectTemplateGroup = (
         .flatMap(revision => revisionData?.[revision]?.[path])
         .filter(Boolean)
 
-      const content = extendVegaSpec(
-        fillTemplate(template, datapoints),
-        revisionColors
-      )
+      const filled = fillTemplate(template, datapoints)
+
+      const content = isMultiSourcePlot(datapoints, revisionColors)
+        ? filled
+        : extendVegaSpec(filled, revisionColors)
 
       acc.push({
         content,

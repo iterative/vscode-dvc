@@ -416,7 +416,7 @@ export class PlotsModel extends ModelWithPersistence {
       selectedRevisions,
       this.templates,
       this.revisionData,
-      undefined
+      this.getRevisionColors()
     )
   }
 }
