@@ -373,6 +373,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
           background-color: $row-bg-selected-color;
         }
       }
+
+      .expandedRowArrow,
+      .contractedRowArrow {
+        border-color: $row-action-selected-icon-color;
+      }
     }
   }
 
