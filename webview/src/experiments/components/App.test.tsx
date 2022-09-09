@@ -741,7 +741,7 @@ describe('App', () => {
       ])
     })
 
-    it('should remove a context menu with a left click', () => {
+    it('should be removed with a left click', () => {
       renderTableWithoutRunningExperiments()
 
       const row = getRow('4fb124a')
@@ -755,7 +755,7 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
-    it('should remove a context menu with a left click on a different row', () => {
+    it('should be removed with a left click on a different row', () => {
       renderTableWithoutRunningExperiments()
 
       const row = getRow('4fb124a')
@@ -770,7 +770,7 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
-    it('should move a context menu with a right click on the same row', () => {
+    it('should be moved with a right click on the same row (not toggle)', () => {
       renderTableWithoutRunningExperiments()
 
       const row = getRow('4fb124a')
