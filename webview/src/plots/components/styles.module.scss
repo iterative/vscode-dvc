@@ -347,9 +347,15 @@ $gap: 20px;
   width: 80vw;
   height: calc(80vh - 100px);
 
+  :global(.chart-wrapper) {
+    width: 100%;
+    height: 100%;
+  }
+
   svg {
     background-color: transparent !important;
-    max-width: 100%;
+    width: 100%;
+    height: 100%;
   }
 }
 
