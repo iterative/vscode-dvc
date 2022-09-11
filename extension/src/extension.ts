@@ -69,6 +69,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly gitExecutor: GitExecutor
   private readonly gitReader: GitReader
   private readonly status: Status
+  private readonly lspClient: DVCLanguageClient
   private cliAccessible = false
   private cliCompatible: boolean | undefined
 
@@ -92,6 +93,8 @@ export class Extension extends Disposable implements IExtension {
 
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
+
+    this.lspClient = this.dispose.track(new DVCLanguageClient())
 
     this.resourceLocator = this.dispose.track(
       new ResourceLocator(context.extensionUri)
@@ -443,22 +446,14 @@ export class Extension extends Disposable implements IExtension {
 }
 
 let extension: undefined | Extension
-let client: DVCLanguageClient
 
 export function activate(context: ExtensionContext): void {
   extension = new Extension(context)
-  client = new DVCLanguageClient()
-  context.subscriptions.push(extension, client)
+  context.subscriptions.push(extension)
 }
 
 export function deactivate(): void {
   if (extension) {
     extension.dispose()
   }
-  if (client) {
-    client.dispose()
-    client.stop()
-  }
 }
-
-export { Disposer, Disposable } from '@hediet/std/disposable'
