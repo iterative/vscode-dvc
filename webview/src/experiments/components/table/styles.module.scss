@@ -17,8 +17,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   left: 0;
   display: inline-block;
   position: absolute;
-  border: 2px solid $watermark-color;
-  opacity: 0.5;
+  border: 2px solid $row-action-icon-color;
   border-top: unset;
   border-left: unset;
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
@@ -338,10 +337,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         background-color: $row-hover-background-color;
       }
 
-      .indicatorCount {
-        border-color: $row-hover-background-color;
-      }
-
       .td:hover,
       .td:hover + .td {
         border-left-color: $border-color;
@@ -379,19 +374,9 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         }
       }
 
-      .indicatorCount {
-        background-color: $indicator-selected-badge-background;
-        color: $indicator-selected-badge-foreground;
-        border: 1px solid $indicator-selected-badge-border;
-      }
-
-      .starSwitch:not([aria-checked='true']) svg {
-        fill: $star-switch-selection-fill-color;
-      }
-
       .expandedRowArrow,
       .contractedRowArrow {
-        border-color: $star-switch-selection-fill-color;
+        border-color: $row-action-selected-icon-color;
       }
     }
   }
@@ -571,7 +556,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
           align-items: center;
           justify-content: center;
           width: 14px;
-          opacity: 0.4;
           cursor: pointer;
 
           &[aria-checked='true'] {
@@ -618,6 +602,14 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     &.leafHeader {
       border-bottom: none;
     }
+  }
+}
+
+.experimentCell .rowActions .starSwitch svg {
+  fill: $row-action-icon-color;
+
+  .rowSelected & {
+    fill: $row-action-selected-icon-color;
   }
 }
 
@@ -820,7 +812,6 @@ $badge-size: 0.85rem;
   font-weight: bold;
   background-color: $indicator-badge-background;
   color: $indicator-badge-foreground;
-  border: 1px solid $indicator-badge-border;
   border-radius: 100%;
   width: $badge-size;
   height: $badge-size;
@@ -828,9 +819,6 @@ $badge-size: 0.85rem;
   text-align: center;
   vertical-align: middle;
   font-size: 0.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .cellTooltip {
@@ -859,7 +847,7 @@ $badge-size: 0.85rem;
     .indicatorCount {
       display: none;
       .experimentGroup & {
-        display: flex;
+        display: block;
         &[aria-label='0'] {
           display: none;
         }
