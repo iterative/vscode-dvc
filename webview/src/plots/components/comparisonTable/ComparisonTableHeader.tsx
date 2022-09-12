@@ -34,7 +34,7 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
         className={styles.bullet}
         style={{ backgroundColor: displayColor }}
       />
-      {children}
+      <span className={styles.headerText}>{children}</span>
     </div>
   )
 }

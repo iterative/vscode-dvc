@@ -44,7 +44,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           <div className={styles.rowPath}>
             <button className={styles.rowToggler} onClick={toggleIsShownState}>
               <Icon icon={isShown ? ChevronDown : ChevronRight} />
-              {path}
+              <span className={styles.pathText}>{path}</span>
             </button>
             <CopyButton value={path} className={styles.copyButton} />
           </div>
