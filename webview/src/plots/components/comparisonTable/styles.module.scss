@@ -48,6 +48,13 @@ $gap: 4px;
   }
 }
 
+.headerText {
+  max-width: calc(100% - 20px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .bullet {
   display: block;
   width: $bullet-size;
@@ -95,6 +102,7 @@ $gap: 4px;
   text-align: left;
   display: flex;
   user-select: text;
+  width: 100%;
 
   svg {
     fill: $fg-color;
@@ -182,9 +190,17 @@ $gap: 4px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  width: 100%;
 
   &:hover .copyButton {
     display: inline;
     font-size: 0.8125rem;
   }
+}
+
+.pathText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  direction: rtl;
 }
