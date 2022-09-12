@@ -3,7 +3,7 @@ import {
   disposeTestConnections,
   setupTestConnections
 } from './utils/setup-test-connections'
-import { requestCompletions } from './utils/requestCompletionsv1'
+import { requestCompletions } from './utils/requestCompletions'
 
 describe('textDocument/completions', () => {
   beforeEach(() => {

@@ -6,7 +6,7 @@ import {
 } from 'vscode-languageserver/node'
 import { client } from './setup-test-connections'
 
-export const requestCompletions = async (textDocument: TextDocument) => {
+export const requestCompletions = (textDocument: TextDocument) => {
   const uri = textDocument.uri
 
   const params: CompletionParams = {
@@ -15,5 +15,5 @@ export const requestCompletions = async (textDocument: TextDocument) => {
       uri
     }
   }
-  return await client.sendRequest(CompletionRequest.type, params)
+  return client.sendRequest(CompletionRequest.type, params)
 }
