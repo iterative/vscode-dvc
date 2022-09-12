@@ -4,9 +4,5 @@ module.exports = {
   coverageReporters: ['json'],
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testPathIgnorePatterns: [
-    '<rootDir>/dist/',
-    '<rootDir>/.vscode-test',
-    '<rootDir>/.wdio-vscode-service'
-  ]
+  testPathIgnorePatterns: ['<rootDir>/dist/']
 }
