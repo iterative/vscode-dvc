@@ -3,7 +3,7 @@ import {
   disposeTestConnections,
   setupTestConnections
 } from './utils/setup-test-connections'
-import { params_dvc_yaml } from './fixtures/examples/valid'
+import { plots_dvc_yaml } from './fixtures/examples/valid'
 import { requestCodeActions } from './utils/requestCodeActions'
 
 describe('textDocument/codeAction', () => {
@@ -19,7 +19,7 @@ describe('textDocument/codeAction', () => {
     const [dvcYaml] = await openTheseFilesAndNotifyServer([
       {
         languageId: 'yaml',
-        mockContents: params_dvc_yaml,
+        mockContents: plots_dvc_yaml,
         mockPath: 'dvc.yaml'
       }
     ])

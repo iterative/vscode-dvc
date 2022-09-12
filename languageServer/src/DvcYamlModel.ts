@@ -27,7 +27,6 @@ export interface IDvcYamlStage extends JsonSerializable {
   deps?: Set<string>
   parentDvcYaml: IDvcYamlModel
   contains(offset: number): boolean
-  dependsOnAll(items: string[]): boolean
   addDependencies(items: string[]): void
 }
 
@@ -36,7 +35,7 @@ export interface IDvcYamlModel {
   toString(): string
 }
 
-export class Cmd implements ICmd {
+class Cmd implements ICmd {
   private cmd: Scalar | YAMLSeq
 
   constructor(cmd: Scalar | YAMLSeq) {
@@ -65,7 +64,7 @@ export class Cmd implements ICmd {
   }
 }
 
-export class Stage implements IDvcYamlStage {
+class Stage implements IDvcYamlStage {
   name: string
   cmd?: ICmd
   deps?: Set<string>
@@ -127,10 +126,6 @@ export class Stage implements IDvcYamlStage {
     const current = this.deps || new Set<string>()
 
     this.deps = new Set<string>([...current, ...items])
-  }
-
-  dependsOnAll(): boolean {
-    return true
   }
 
   contains(offset: number): boolean {
