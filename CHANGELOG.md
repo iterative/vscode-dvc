@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.2] - 2022-09-12
+
+### 🚀 New Features and Enhancements
+
+- Update row styles [#2351](https://github.com/iterative/vscode-dvc/pull/2351) by [@julieg18](https://github.com/julieg18)
+- Update table indicators and chevrons/stars styles [#2367](https://github.com/iterative/vscode-dvc/pull/2367) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Ensure welcome screen is not shown when only one column is provided [#2363](https://github.com/iterative/vscode-dvc/pull/2363) by [@mattseddon](https://github.com/mattseddon)
+- Fix zoomed in plot overflow [#2366](https://github.com/iterative/vscode-dvc/pull/2366) by [@sroy3](https://github.com/sroy3)
+- Truncate all long titles inside of plots [#2365](https://github.com/iterative/vscode-dvc/pull/2365) by [@sroy3](https://github.com/sroy3)
+
 ## [0.4.1] - 2022-09-09
 
 ### 🚀 New Features and Enhancements
