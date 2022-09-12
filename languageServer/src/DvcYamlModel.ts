@@ -11,7 +11,7 @@ import {
   YAMLMap,
   YAMLSeq
 } from 'yaml'
-import { IDvcTextDocument } from './IDvcTextDocument'
+import { ITextDocumentWrapper } from './ITextDocumentWrapper'
 
 export interface JsonSerializable {
   toJSON(): JsonValue
@@ -142,7 +142,7 @@ export class Stage implements IDvcYamlStage {
 export class DvcYaml implements IDvcYamlModel {
   private stages: IDvcYamlStage[] = []
 
-  constructor(private document: IDvcTextDocument) {
+  constructor(private document: ITextDocumentWrapper) {
     const yamlDoc = this.document.getYamlDocument()
     this.setStages(yamlDoc.get('stages', true))
   }
