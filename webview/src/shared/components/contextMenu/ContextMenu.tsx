@@ -67,6 +67,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     disabled={!content || disabled}
     appendTo={'parent'}
     followCursor={'initial'}
+    offset={[0, 0]}
   >
     {children}
   </Tooltip>
