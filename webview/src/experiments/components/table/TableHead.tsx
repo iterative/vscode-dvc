@@ -97,8 +97,6 @@ export const TableHead = ({
 
   const selectedForPlotsCount = getSelectedForPlotsCount(rows)
 
-  const firstExpColumnCellId = headerGroups[0].headers[0].id
-
   return (
     <div className={styles.thead} ref={wrapper}>
       <Indicators selectedForPlotsCount={selectedForPlotsCount} />
@@ -113,7 +111,6 @@ export const TableHead = ({
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
           root={root}
-          firstExpColumnCellId={firstExpColumnCellId}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />
       ))}
