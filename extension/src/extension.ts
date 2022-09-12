@@ -94,7 +94,8 @@ export class Extension extends Disposable implements IExtension {
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
 
-    this.lspClient = this.dispose.track(new DVCLanguageClient())
+    this.lspClient = new DVCLanguageClient()
+    this.dispose.track(this.lspClient.start())
 
     this.resourceLocator = this.dispose.track(
       new ResourceLocator(context.extensionUri)
@@ -457,3 +458,5 @@ export function deactivate(): void {
     extension.dispose()
   }
 }
+
+export { Disposer, Disposable } from '@hediet/std/disposable'
