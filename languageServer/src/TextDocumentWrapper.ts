@@ -33,7 +33,7 @@ interface CompletionTemplate {
   label: string
   body: CompletionTemplateBody
 }
-export class DvcTextDocument {
+export class TextDocumentWrapper {
   uri: string
 
   private textDocument: TextDocument
@@ -283,7 +283,7 @@ export class DvcTextDocument {
   }
 
   createFinder(txtDoc: TextDocument) {
-    return new DvcTextDocument(txtDoc, this.documents)
+    return new TextDocumentWrapper(txtDoc, this.documents)
   }
 
   findLocationsFor(aSymbol: DocumentSymbol) {
