@@ -4,7 +4,8 @@ import {
   ServerCapabilities,
   _Connection,
   TextDocumentPositionParams,
-  CodeActionParams
+  CodeActionParams,
+  DefinitionParams
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { TextDocumentWrapper } from './TextDocumentWrapper'
@@ -35,11 +36,7 @@ export class LanguageServer {
 
     connection.onInitialize(() => this.onInitialize())
 
-    connection.onDefinition(params => {
-      return (
-        this.getDvcTextDocument(params)?.getDefinitions(params.position) ?? null
-      )
-    })
+    connection.onDefinition(params => this.onDefinition(params))
 
     connection.onCompletion(params => {
       return this.getDvcTextDocument(params)?.getCompletions() ?? null
@@ -71,6 +68,12 @@ export class LanguageServer {
       return null
     }
     return new TextDocumentWrapper(doc, this.documents, this.pythonFilePaths)
+  }
+
+  private onDefinition(params: DefinitionParams) {
+    return (
+      this.getDvcTextDocument(params)?.getDefinitions(params.position) ?? null
+    )
   }
 
   private onInitialize() {
