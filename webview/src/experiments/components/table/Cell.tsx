@@ -65,7 +65,7 @@ export const FirstCell: React.FC<
         <RowExpansionButton row={row} />
         <CellHintTooltip
           tooltipContent={`${
-            bulletColor ? 'Remove from plots' : 'Add from plots'
+            bulletColor ? 'Remove from plots' : 'Add to plots'
           }`}
         >
           <span
