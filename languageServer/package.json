@@ -30,7 +30,7 @@
     "lint:tsc": "tsc --noEmit",
     "lint": "run-p 'lint:*'",
     "dev": "tsc -b --watch",
-    "test": "jest"
+    "test": "jest --collect-coverage"
   },
   "devDependencies": {}
 }
