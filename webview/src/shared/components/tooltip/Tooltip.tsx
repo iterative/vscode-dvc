@@ -7,6 +7,27 @@ import 'tippy.js/dist/tippy.css'
 export const HEADER_TOOLTIP_DELAY = 100
 export const CELL_TOOLTIP_DELAY = 1000
 
+const hideOnEsc = {
+  defaultValue: true,
+  fn({ hide }: { hide: () => void }) {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        hide()
+      }
+    }
+
+    return {
+      onHide() {
+        document.removeEventListener('keydown', onKeyDown)
+      },
+      onShow() {
+        document.addEventListener('keydown', onKeyDown)
+      }
+    }
+  },
+  name: 'hideOnEsc'
+}
+
 const TooltipRenderFunction: React.ForwardRefRenderFunction<
   unknown,
   TippyProps & { isContextMenu?: boolean }
@@ -61,7 +82,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onHide={onHide}
     ref={ref as Ref<Element>}
     followCursor={followCursorVal}
-    plugins={[followCursor]}
+    plugins={[hideOnEsc, followCursor]}
     offset={offset}
   >
     {children}

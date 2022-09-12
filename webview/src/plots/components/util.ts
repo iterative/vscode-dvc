@@ -1,6 +1,7 @@
 import { PlotSize } from 'dvc/src/plots/webview/contract'
 import { ExprRef, hasOwnProperty, SignalRef, Title, truncate, Text } from 'vega'
 import { TitleParams } from 'vega-lite/build/src/title'
+import { Any, Obj } from '../../util/objects'
 
 const MaxItemsBeforeVirtualization = {
   [PlotSize.LARGE]: 10,
@@ -85,4 +86,37 @@ export const truncateTitle = (
     titleCopy.subtitle = truncateTitleAsArrayOrString(subtitle, size)
   }
   return titleCopy
+}
+
+const isEndValue = (valueType: string) =>
+  ['string', 'number', 'boolean'].includes(valueType)
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const truncateTitles = (spec: Any, size: number, vertical?: boolean) => {
+  if (spec && typeof spec === 'object') {
+    const specCopy: Obj = {}
+
+    for (const [key, value] of Object.entries(spec)) {
+      const valueType = typeof value
+      if (key === 'y') {
+        vertical = true
+      }
+      if (key === 'title') {
+        specCopy[key] = truncateTitle(
+          value as unknown as Title,
+          size * (vertical ? 0.75 : 1)
+        )
+      } else if (isEndValue(valueType)) {
+        specCopy[key] = value
+      } else if (Array.isArray(value)) {
+        specCopy[key] = value.map(val =>
+          isEndValue(typeof val) ? val : truncateTitles(val, size, vertical)
+        )
+      } else if (typeof value === 'object') {
+        specCopy[key] = truncateTitles(value as Any, size, vertical)
+      }
+    }
+    return specCopy
+  }
+  return spec
 }

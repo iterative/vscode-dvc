@@ -41,9 +41,6 @@ export const ColumnDragHandle: React.FC<{
     <span
       data-testid="rendered-header"
       className={cx(styles.cellContents)}
-      onKeyDown={e => {
-        e.stopPropagation()
-      }}
       role={'columnheader'}
       tabIndex={0}
     >

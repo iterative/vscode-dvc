@@ -27,8 +27,14 @@ $row-hover-background-color: var(--vscode-list-hoverBackground);
 
 $accent-color: var(--button-primary-background);
 
-$indicator-badge-foreground: var(--vscode-activityBarBadge-foreground);
 $indicator-badge-background: var(--vscode-activityBarBadge-background);
+$indicator-badge-foreground: var(--vscode-activityBarBadge-foreground);
+
+$row-action-icon-color: var(--vscode-icon-foreground);
+$row-action-selected-icon-color: var(
+  --vscode-list-activeSelectionIconForeground,
+  var(--vscode-icon-foreground)
+);
 
 $shadow: var(--vscode-widget-shadow);
 
