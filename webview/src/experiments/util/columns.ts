@@ -114,3 +114,8 @@ export const leafColumnIds: (
 
   return [column.id]
 }
+
+export const EXPERIMENT_COLUMN_ID = 'id'
+
+export const isExperimentColumn = (id: string): boolean =>
+  id === EXPERIMENT_COLUMN_ID

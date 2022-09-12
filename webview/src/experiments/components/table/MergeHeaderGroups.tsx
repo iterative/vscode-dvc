@@ -13,7 +13,6 @@ export const MergedHeaderGroups: React.FC<{
   onDragUpdate: DragFunction
   onDragStart: DragFunction
   onDragEnd: DragFunction
-  firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({
@@ -24,7 +23,6 @@ export const MergedHeaderGroups: React.FC<{
   onDragEnd,
   onDragStart,
   root,
-  firstExpColumnCellId,
   setExpColumnNeedsShadow
 }) => {
   return (
@@ -35,7 +33,6 @@ export const MergedHeaderGroups: React.FC<{
     >
       {headerGroup.headers.map((column: HeaderGroup<Experiment>) => (
         <TableHeader
-          firstExpColumnCellId={firstExpColumnCellId}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           key={column.id}
           orderedColumns={orderedColumns}

@@ -586,6 +586,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   .placeholderHeaderCell {
     background-color: $header-bg-color;
     border-left: 1px solid $header-border-color;
+    padding: 0.31rem $cell-padding;
 
     &:first-child {
       border-left: none;
@@ -597,7 +598,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
     color: $header-fg-color;
     text-align: center;
     border-bottom: 1px solid $header-border-color;
-    padding: 0.31rem $cell-padding;
 
     &.leafHeader {
       border-bottom: none;
