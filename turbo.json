@@ -26,7 +26,9 @@
         "dvc#test-build",
         "dvc#test",
         "dvc-vscode-webview#build",
-        "dvc-vscode-webview#test"
+        "dvc-vscode-webview#test",
+        "dvc-vscode-lsp#build",
+        "dvc-vscode-lsp#test"
       ],
       "outputs": ["coverage/integration/**"]
     },
@@ -34,10 +36,18 @@
       "outputs": ["dist/**"]
     },
     "test-vscode": {
-      "dependsOn": ["dvc-vscode-webview#build", "dvc#test-build"]
+      "dependsOn": [
+        "dvc-vscode-webview#build",
+        "dvc-vscode-lsp#build",
+        "dvc#test-build"
+      ]
     },
     "test-e2e": {
-      "dependsOn": ["dvc-vscode-webview#build", "dvc#test-build"]
+      "dependsOn": [
+        "dvc-vscode-webview#build",
+        "dvc-vscode-lsp#build",
+        "dvc#test-build"
+      ]
     },
     "format": {
       "dependsOn": ["^format"],
