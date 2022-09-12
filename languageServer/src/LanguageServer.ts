@@ -26,7 +26,7 @@ const documentSelector = [
     language: 'python'
   }
 ]
-export class DvcLanguageServer {
+export class LanguageServer {
   private pythonFilePaths: string[] = []
   private documents?: TextDocuments<TextDocument>
 
