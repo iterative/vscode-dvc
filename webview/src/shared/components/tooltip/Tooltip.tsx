@@ -1,4 +1,5 @@
 import React, { forwardRef, Ref } from 'react'
+import { followCursor } from 'tippy.js'
 import Tippy, { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
 import 'tippy.js/dist/tippy.css'
@@ -28,7 +29,9 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onTrigger,
     appendTo,
     isContextMenu = false,
-    animation = false
+    animation = false,
+    followCursor: followCursorVal,
+    offset
   },
   ref
 ) => (
@@ -57,6 +60,9 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     onShow={onShow}
     onHide={onHide}
     ref={ref as Ref<Element>}
+    followCursor={followCursorVal}
+    plugins={[followCursor]}
+    offset={offset}
   >
     {children}
   </Tippy>

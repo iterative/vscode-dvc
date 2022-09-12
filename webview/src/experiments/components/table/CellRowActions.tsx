@@ -3,12 +3,9 @@ import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import { Indicator } from './Indicators'
 import styles from './styles.module.scss'
+import { CellHintTooltip } from './CellHintTooltip'
 import { clickAndEnterProps } from '../../../util/props'
 import { StarFull, StarEmpty } from '../../../shared/components/icons'
-import { pluralize } from '../../../util/strings'
-import Tooltip, {
-  CELL_TOOLTIP_DELAY
-} from '../../../shared/components/tooltip/Tooltip'
 
 export type CellRowActionsProps = {
   isRowSelected: boolean
@@ -26,7 +23,6 @@ export type CellRowActionsProps = {
 export type CellRowActionProps = {
   showSubRowStates: boolean
   subRowsAffected: number
-  actionAppliedLabel: string
   children: React.ReactElement
   hidden?: boolean
   testId?: string
@@ -36,7 +32,6 @@ export type CellRowActionProps = {
 export const CellRowAction: React.FC<CellRowActionProps> = ({
   showSubRowStates,
   subRowsAffected,
-  actionAppliedLabel,
   children,
   hidden,
   testId,
@@ -45,26 +40,16 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   const count = (showSubRowStates && subRowsAffected) || 0
 
   return (
-    <Tooltip
-      content={tooltipContent}
-      placement="bottom-end"
-      delay={[CELL_TOOLTIP_DELAY, 0]}
-    >
+    <CellHintTooltip tooltipContent={tooltipContent}>
       <div
         className={cx(styles.rowActions, hidden && styles.hidden)}
         data-testid={testId}
       >
-        <Indicator
-          count={count}
-          tooltipContent={
-            count &&
-            `${count} ${pluralize('sub-row', count)} ${actionAppliedLabel}.`
-          }
-        >
+        <Indicator tooltipContent="" count={count}>
           {children}
         </Indicator>
       </div>
-    </Tooltip>
+    </CellHintTooltip>
   )
 }
 
@@ -81,7 +66,6 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
       <CellRowAction
         showSubRowStates={showSubRowStates}
         subRowsAffected={selections}
-        actionAppliedLabel={'selected'}
         testId={'row-action-checkbox'}
         tooltipContent={isRowSelected ? 'Unselect' : 'Select'}
       >
@@ -93,7 +77,6 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
       <CellRowAction
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
-        actionAppliedLabel={'starred'}
         testId={'row-action-star'}
         tooltipContent={starred ? 'Remove Star' : 'Add Star'}
       >

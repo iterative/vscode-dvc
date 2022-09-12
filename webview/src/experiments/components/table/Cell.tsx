@@ -5,9 +5,9 @@ import { IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
+import { CellHintTooltip } from './CellHintTooltip'
 import { clickAndEnterProps } from '../../../util/props'
 import { Clock } from '../../../shared/components/icons'
-import { pluralize } from '../../../util/strings'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
@@ -63,21 +63,24 @@ export const FirstCell: React.FC<
       <div className={styles.innerCell}>
         <CellRowActions {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        <span
-          className={styles.bullet}
-          style={{ color: bulletColor }}
-          {...clickAndEnterProps(toggleExperiment)}
+        <CellHintTooltip
+          tooltipContent={`${
+            bulletColor ? 'Remove from plots' : 'Add from plots'
+          }`}
         >
-          <IndicatorWithJustTheCounter
-            aria-label={'Sub-rows selected for plots'}
-            count={plotSelections}
-            tooltipContent={`${plotSelections} ${pluralize(
-              'sub-row',
-              plotSelections
-            )} selected for plots.`}
-          />
-          {queued && <Clock />}
-        </span>
+          <span
+            className={styles.bullet}
+            style={{ color: bulletColor }}
+            {...clickAndEnterProps(toggleExperiment)}
+          >
+            <IndicatorWithJustTheCounter
+              aria-label={'Sub-rows selected for plots'}
+              count={plotSelections}
+              tooltipContent={''}
+            />
+            {queued && <Clock />}
+          </span>
+        </CellHintTooltip>
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>
             <div

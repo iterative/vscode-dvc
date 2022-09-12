@@ -54,7 +54,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   <Tooltip
     trigger={trigger}
     delay={[100, 200]}
-    placement={'bottom'}
+    placement={'bottom-start'}
     interactive
     isContextMenu={true}
     onTrigger={positionContextMenuAndDisableEvents}
@@ -62,6 +62,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     onShow={onShow}
     disabled={!content || disabled}
     appendTo={'parent'}
+    followCursor={'initial'}
   >
     {children}
   </Tooltip>
