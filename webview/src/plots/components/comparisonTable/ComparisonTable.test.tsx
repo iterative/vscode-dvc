@@ -45,7 +45,9 @@ jest.mock('../../../shared/components/dragDrop/currentTarget', () => {
 const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
 
-const getPin = (element: HTMLElement) => within(element).getByRole('button')
+const getPin = (element: HTMLElement) =>
+  // eslint-disable-next-line testing-library/no-node-access
+  within(element?.parentElement || element).getByRole('button')
 
 describe('ComparisonTable', () => {
   afterEach(() => {
