@@ -2,7 +2,9 @@ module.exports = {
   coverageDirectory: 'coverage/jest',
   coveragePathIgnorePatterns: ['<rootDir>/src/test/'],
   coverageReporters: ['json'],
-  preset: 'ts-jest',
   testEnvironment: 'node',
-  testPathIgnorePatterns: ['<rootDir>/dist/']
+  testPathIgnorePatterns: ['<rootDir>/dist/'],
+  transform: {
+    '^.+\\.(t|j)sx?$': ['@swc/jest']
+  }
 }
