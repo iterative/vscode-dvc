@@ -38,7 +38,7 @@ export class TextDocumentWrapper {
 
   private textDocument: TextDocument
   private documents: TextDocuments<TextDocument>
-  private pythonFilePaths?: string[]
+  private pythonFilePaths: string[] = []
 
   constructor(
     textDocument: TextDocument,
@@ -48,7 +48,7 @@ export class TextDocumentWrapper {
     this.textDocument = textDocument
     this.documents = documents
     this.uri = this.textDocument.uri
-    this.pythonFilePaths = pythonFilePaths
+    this.pythonFilePaths = pythonFilePaths ?? []
   }
 
   public offsetAt(position: Position) {
@@ -156,15 +156,13 @@ export class TextDocumentWrapper {
         label: 'Add stage'
       }
     ]
-    if (this.pythonFilePaths) {
-      for (const path of this.pythonFilePaths) {
-        completionTemplates.push({
-          body: {
-            cmd: `python ${path} $1`
-          },
-          label: `cmd: ${path}`
-        })
-      }
+    for (const path of this.pythonFilePaths) {
+      completionTemplates.push({
+        body: {
+          cmd: `python ${path} $1`
+        },
+        label: `cmd: ${path}`
+      })
     }
 
     return completionTemplates
