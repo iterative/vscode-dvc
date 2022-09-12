@@ -7,6 +7,7 @@ import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
+import { timestampColumn } from 'dvc/src/experiments/columns/constants'
 import {
   within,
   userEvent,
@@ -197,6 +198,11 @@ WithNoExperiments.args = {
 export const WithNoColumns = Template.bind({})
 WithNoColumns.args = {
   tableData: { ...tableData, columns: [] }
+}
+
+export const WithOnlyTimestamp = Template.bind({})
+WithOnlyTimestamp.args = {
+  tableData: { ...tableData, columns: [timestampColumn] }
 }
 
 export const WithNoSortsOrFilters = Template.bind({})
