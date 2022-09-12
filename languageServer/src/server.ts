@@ -1,7 +1,7 @@
 import { createConnection, ProposedFeatures } from 'vscode-languageserver/node'
-import { DvcLanguageServer } from './DvcLanguageServer'
+import { LanguageServer } from './LanguageServer'
 
-const dvcLanguageServer = new DvcLanguageServer()
+const dvcLanguageServer = new LanguageServer()
 
 const connection = createConnection(ProposedFeatures.all)
 

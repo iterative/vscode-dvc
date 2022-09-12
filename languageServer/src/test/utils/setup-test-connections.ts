@@ -1,6 +1,6 @@
 import { Duplex } from 'stream'
 import { Connection, createConnection } from 'vscode-languageserver/node'
-import { DvcLanguageServer } from '../../DvcLanguageServer'
+import { LanguageServer } from '../../LanguageServer'
 
 class TestStream extends Duplex {
   _write(chunk: string, _encoding: string, done: () => void) {
@@ -16,7 +16,7 @@ export let server: Connection
 export let client: Connection
 
 export const setupTestConnections = () => {
-  const dvcLanguageService = new DvcLanguageServer()
+  const dvcLanguageService = new LanguageServer()
   const up = new TestStream()
   const down = new TestStream()
 
