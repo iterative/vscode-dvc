@@ -67,35 +67,45 @@ const DateCellContents: React.FC<{ value: string }> = ({ value }) => {
   )
 }
 
+const getDefaultColumnWithIndicatorsPlaceHolder = () => {
+  const experimentColumn = {
+    Cell: ({
+      row: {
+        original: { label, displayNameOrParent }
+      }
+    }: Cell<Row>) => {
+      return (
+        <div className={styles.experimentCellContents}>
+          <span className={styles.experimentCellPrimaryName}>{label}</span>
+          {displayNameOrParent && (
+            <span className={styles.experimentCellSecondaryName}>
+              {displayNameOrParent}
+            </span>
+          )}
+        </div>
+      )
+    },
+    Header: ExperimentHeader,
+    accessor: 'id',
+    id: 'id',
+    minWidth: 250,
+    width: 250
+  }
+  return {
+    Header: '',
+    columns: [experimentColumn],
+    id: 'id_placeholder',
+    placeholderOf: experimentColumn
+  }
+}
+
 const getColumns = (columns: Column[]): TableColumn<Row>[] => {
   const includeTimestamp = columns.some(
     ({ type }) => type === ColumnType.TIMESTAMP
   )
 
   const builtColumns = [
-    {
-      Cell: ({
-        row: {
-          original: { label, displayNameOrParent }
-        }
-      }: Cell<Row>) => {
-        return (
-          <div className={styles.experimentCellContents}>
-            <span className={styles.experimentCellPrimaryName}>{label}</span>
-            {displayNameOrParent && (
-              <span className={styles.experimentCellSecondaryName}>
-                {displayNameOrParent}
-              </span>
-            )}
-          </div>
-        )
-      },
-      Header: ExperimentHeader,
-      accessor: 'id',
-      id: 'id',
-      minWidth: 250,
-      width: 250
-    },
+    getDefaultColumnWithIndicatorsPlaceHolder(),
     ...buildDynamicColumns(columns, ColumnType.METRICS),
     ...buildDynamicColumns(columns, ColumnType.PARAMS),
     ...buildDynamicColumns(columns, ColumnType.DEPS)
