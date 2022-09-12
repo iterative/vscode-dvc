@@ -126,7 +126,7 @@ export class TextDocumentWrapper {
   public getDefinitions(position: Position): Location[] {
     const theSymbol = this.symbolAt(position)
     if (theSymbol) {
-      const allDocs = this.getTextDocuments().all()
+      const allDocs = this.documents.all()
 
       const locationsAccumulator = []
 
@@ -273,10 +273,6 @@ export class TextDocumentWrapper {
 
   private symbolAt(position: Position): DocumentSymbol | undefined {
     return this.symbolScopeAt(position).pop()
-  }
-
-  private getTextDocuments() {
-    return this.documents
   }
 
   private createFinder(txtDoc: TextDocument) {
