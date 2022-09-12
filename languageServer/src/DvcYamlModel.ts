@@ -69,8 +69,13 @@ export class Stage implements IDvcYamlStage {
   name: string
   cmd?: ICmd
   deps?: Set<string>
+  parentDvcYaml: IDvcYamlModel
 
-  constructor(private pairNode: Pair, public parentDvcYaml: IDvcYamlModel) {
+  private pairNode: Pair
+
+  constructor(pairNode: Pair, parentDvcYaml: IDvcYamlModel) {
+    this.pairNode = pairNode
+    this.parentDvcYaml = parentDvcYaml
     this.name = pairNode.key as string
     const value = pairNode.value
 
@@ -141,8 +146,10 @@ export class Stage implements IDvcYamlStage {
 
 export class DvcYaml implements IDvcYamlModel {
   private stages: IDvcYamlStage[] = []
+  private document: ITextDocumentWrapper
 
-  constructor(private document: ITextDocumentWrapper) {
+  constructor(document: ITextDocumentWrapper) {
+    this.document = document
     const yamlDoc = this.document.getYamlDocument()
     this.setStages(yamlDoc.get('stages', true))
   }
