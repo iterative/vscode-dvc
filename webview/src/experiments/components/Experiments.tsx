@@ -23,6 +23,7 @@ import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWr
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
+import { EXPERIMENT_COLUMN_ID } from '../util/columns'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
@@ -86,8 +87,8 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
       )
     },
     Header: ExperimentHeader,
-    accessor: 'id',
-    id: 'id',
+    accessor: EXPERIMENT_COLUMN_ID,
+    id: EXPERIMENT_COLUMN_ID,
     minWidth: 250,
     width: 250
   }

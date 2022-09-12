@@ -10,7 +10,11 @@ import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
 import { SortOrder } from './TableHeader'
 import { TableHeaderCellContents } from './TableHeaderCellContents'
-import { countUpperLevels, isFirstLevelHeader } from '../../util/columns'
+import {
+  countUpperLevels,
+  isExperimentColumn,
+  isFirstLevelHeader
+} from '../../util/columns'
 import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
 import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
 
@@ -84,7 +88,6 @@ export const TableHeaderCell: React.FC<{
   onDragEnter: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
-  firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({
@@ -100,7 +103,6 @@ export const TableHeaderCell: React.FC<{
   onDragStart,
   onDrop,
   root,
-  firstExpColumnCellId,
   setExpColumnNeedsShadow
 }) => {
   const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
@@ -147,7 +149,7 @@ export const TableHeaderCell: React.FC<{
         role="columnheader"
         tabIndex={0}
       >
-        {firstExpColumnCellId === column.id ? (
+        {isExperimentColumn(column.id) ? (
           <WithExpColumnNeedsShadowUpdates
             setExpColumnNeedsShadow={setExpColumnNeedsShadow}
             root={root}
