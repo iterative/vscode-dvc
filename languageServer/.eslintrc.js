@@ -6,13 +6,7 @@ module.exports = {
   overrides: [
     ...config.overrides,
     {
-      files: ['src/test/**/*.test.ts'],
-      rules: {
-        // These aren't jest tests, but still use `expect`
-        // 'jest/no-standalone-expect': 'off',
-        // 'jest/valid-expect': 'off',
-        // 'no-unused-expressions': 'off'
-      }
+      files: ['src/test/**/*.test.ts']
     }
   ]
 }
