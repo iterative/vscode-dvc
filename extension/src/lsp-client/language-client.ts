@@ -2,9 +2,11 @@ import { relative } from 'path'
 import { workspace } from 'vscode'
 import {
   LanguageClient,
-  LanguageClientOptions
+  LanguageClientOptions,
+  ServerOptions,
+  TransportKind
 } from 'vscode-languageclient/node'
-import { ServerModule } from './server-options'
+import { serverModule } from 'dvc-vscode-lsp'
 import { Disposable } from '../class/dispose'
 import { findFiles } from '../fileSystem/workspace'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
@@ -41,7 +43,7 @@ export class DVCLanguageClient extends Disposable {
     this.client = new LanguageClient(
       'dvc-vscode-lsp',
       'DVC Language Server',
-      new ServerModule().options,
+      this.getServerOptions(),
       clientOptions
     )
 
@@ -65,5 +67,18 @@ export class DVCLanguageClient extends Disposable {
 
   stop() {
     this.client.stop()
+  }
+
+  private getServerOptions(): ServerOptions {
+    const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] }
+
+    return {
+      debug: {
+        module: serverModule,
+        options: debugOptions,
+        transport: TransportKind.ipc
+      },
+      run: { module: serverModule, transport: TransportKind.ipc }
+    }
   }
 }
