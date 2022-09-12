@@ -5,7 +5,8 @@ import {
   _Connection,
   TextDocumentPositionParams,
   CodeActionParams,
-  DefinitionParams
+  DefinitionParams,
+  CompletionParams
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { TextDocumentWrapper } from './TextDocumentWrapper'
@@ -37,14 +38,8 @@ export class LanguageServer {
     connection.onInitialize(() => this.onInitialize())
 
     connection.onDefinition(params => this.onDefinition(params))
-
-    connection.onCompletion(params => {
-      return this.getDvcTextDocument(params)?.getCompletions() ?? null
-    })
-
-    connection.onCodeAction(params => {
-      return this.getDvcTextDocument(params)?.getCodeActions(params) ?? null
-    })
+    connection.onCompletion(params => this.onCompletion(params))
+    connection.onCodeAction(params => this.onCodeAction(params))
 
     connection.onRequest('sendPythonFiles', (files: string[]) => {
       this.pythonFilePaths = files
@@ -68,6 +63,14 @@ export class LanguageServer {
       return null
     }
     return new TextDocumentWrapper(doc, this.documents, this.pythonFilePaths)
+  }
+
+  private onCodeAction(params: CodeActionParams) {
+    return this.getDvcTextDocument(params)?.getCodeActions(params) ?? null
+  }
+
+  private onCompletion(params: CompletionParams) {
+    return this.getDvcTextDocument(params)?.getCompletions() ?? null
   }
 
   private onDefinition(params: DefinitionParams) {
