@@ -7,7 +7,7 @@ import {
   CodeActionParams
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
-import { DvcTextDocument } from './DvcTextDocument'
+import { TextDocumentWrapper } from './TextDocumentWrapper'
 
 const documentSelector = [
   {
@@ -70,7 +70,7 @@ export class LanguageServer {
     if (!doc) {
       return null
     }
-    return new DvcTextDocument(doc, this.documents, this.pythonFilePaths)
+    return new TextDocumentWrapper(doc, this.documents, this.pythonFilePaths)
   }
 
   private onInitialize() {
