@@ -12,6 +12,7 @@ import {
   YAMLSeq
 } from 'yaml'
 import { ITextDocumentWrapper } from './ITextDocumentWrapper'
+import { filePaths } from './regexes'
 
 export interface JsonSerializable {
   toJSON(): JsonValue
@@ -51,7 +52,7 @@ class Cmd implements ICmd {
 
     if (isScalar(this.cmd)) {
       const value = this.cmd.value as string
-      const matches = value.matchAll(/[\d/A-Za-z]+\.[A-Za-z]+/g)
+      const matches = value.matchAll(filePaths)
       for (const match of matches) {
         paths.push(match[0])
       }
