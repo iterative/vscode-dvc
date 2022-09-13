@@ -25,7 +25,7 @@ import {
   Pair,
   isPair
 } from 'yaml'
-import { variableTemplates } from './regexes'
+import { alphadecimalWords, variableTemplates } from './regexes'
 import { DvcYaml } from './DvcYamlModel'
 
 type CompletionTemplateBody = string | { [key: string]: CompletionTemplateBody }
@@ -178,7 +178,7 @@ export class TextDocumentWrapper {
     for (const template of templates) {
       const expression = template[1]
       const expressionOffset: number = nodeOffset + (template.index ?? 0) + 2 // To account for the '${'
-      const symbols = expression.matchAll(/[\dA-Za-z]+/g)
+      const symbols = expression.matchAll(alphadecimalWords)
       for (const templateSymbol of symbols) {
         const symbolStart = (templateSymbol.index ?? 0) + expressionOffset
         const symbolEnd = symbolStart + templateSymbol[0].length
