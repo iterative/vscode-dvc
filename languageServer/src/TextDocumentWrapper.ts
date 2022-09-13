@@ -95,30 +95,23 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     const codeActions: CodeAction[] = []
 
     const model = new DvcYaml(this)
-    const stage = model.getStageAt(params.range.start)
-    if (stage?.cmd) {
-      const filesUsed = stage.cmd.getReferencedFiles()
-      const missingDeps = filesUsed.filter(path => !stage.deps?.has(path))
+    const yamlWithExtraDeps = model.getYamlWithMissingDeps(params.range)
+    if (yamlWithExtraDeps) {
+      const textEdits = this.calculateTextEdits(yamlWithExtraDeps)
 
-      if (missingDeps.length > 0) {
-        stage.addDependencies(missingDeps)
-        const yamlSource = stage.parentDvcYaml.toString()
-        const textEdits = this.calculateTextEdits(yamlSource)
-
-        const workspaceEdit: WorkspaceEdit = {
-          changes: {
-            [this.uri]: textEdits
-          }
+      const workspaceEdit: WorkspaceEdit = {
+        changes: {
+          [this.uri]: textEdits
         }
-
-        const codeAction = CodeAction.create(
-          'Add cmd files as dependencies',
-          workspaceEdit,
-          CodeActionKind.RefactorRewrite
-        )
-
-        codeActions.push(codeAction)
       }
+
+      const codeAction = CodeAction.create(
+        'Add cmd files as dependencies',
+        workspaceEdit,
+        CodeActionKind.RefactorRewrite
+      )
+
+      codeActions.push(codeAction)
     }
 
     return codeActions

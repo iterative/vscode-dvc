@@ -1,5 +1,5 @@
 import { inRange } from 'lodash'
-import { Position } from 'vscode-languageserver/node'
+import { Range } from 'vscode-languageserver/node'
 import {
   Document,
   isMap,
@@ -27,13 +27,12 @@ export interface IDvcYamlStage extends JsonSerializable {
   cmd?: ICmd
   deps?: Set<string>
   parentDvcYaml: IDvcYamlModel
-  contains(offset: number): boolean
+  presentIn(range: [number, number]): boolean
   addDependencies(items: string[]): void
 }
 
 export interface IDvcYamlModel {
-  getStageAt(position: Position): IDvcYamlStage | undefined
-  toString(): string
+  getYamlWithMissingDeps(range: Range): string | undefined
 }
 
 class Cmd implements ICmd {
@@ -67,9 +66,9 @@ class Cmd implements ICmd {
 
 class Stage implements IDvcYamlStage {
   name: string
+  parentDvcYaml: IDvcYamlModel
   cmd?: ICmd
   deps?: Set<string>
-  parentDvcYaml: IDvcYamlModel
 
   private pairNode: Pair
 
@@ -111,13 +110,14 @@ class Stage implements IDvcYamlStage {
     }
   }
 
-  public contains(offset: number): boolean {
+  public presentIn([start, end]: [number, number]): boolean {
     const valueNode = this.pairNode.value
 
     return !!(
       isNode(valueNode) &&
       valueNode.range &&
-      inRange(offset, valueNode.range[0], valueNode.range[2])
+      (inRange(start, valueNode.range[0], valueNode.range[1]) ||
+        inRange(end, valueNode.range[0], valueNode.range[1]))
     )
   }
 
@@ -149,12 +149,37 @@ export class DvcYaml implements IDvcYamlModel {
     this.setStages(yamlDoc.get('stages', true))
   }
 
-  public getStageAt(position: Position): IDvcYamlStage | undefined {
-    const offset = this.document.offsetAt(position)
-    return this.stages.find(stage => stage.contains(offset))
+  public getYamlWithMissingDeps({ start, end }: Range): string | undefined {
+    const yamlRange: [number, number] = [
+      this.document.offsetAt(start),
+      this.document.offsetAt(end)
+    ]
+
+    const stages = this.getStagesInside(yamlRange)
+
+    const originalSrc = this.toString()
+
+    for (const stage of stages) {
+      const cmdFileReferences = stage.cmd?.getReferencedFiles()
+      if (cmdFileReferences) {
+        stage.addDependencies(cmdFileReferences)
+      }
+    }
+
+    const newSrc = this.toString()
+
+    if (newSrc === originalSrc) {
+      return undefined
+    }
+
+    return newSrc
   }
 
-  public toString(): string {
+  private getStagesInside(range: [number, number]): IDvcYamlStage[] {
+    return this.stages.filter(stage => stage.presentIn(range))
+  }
+
+  private toString(): string {
     const stages: JsonValue = {}
 
     for (const stage of this.stages) {
