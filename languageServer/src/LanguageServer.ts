@@ -10,24 +10,7 @@ import {
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { TextDocumentWrapper } from './TextDocumentWrapper'
-
-const documentSelector = [
-  {
-    language: 'yaml'
-  },
-  {
-    pattern: '**/*.{dvc,dvc.lock}'
-  },
-  {
-    language: 'json'
-  },
-  {
-    language: 'toml'
-  },
-  {
-    language: 'python'
-  }
-]
+import { documentSelector } from './documentSelector'
 export class LanguageServer {
   private pythonFilePaths: string[] = []
   private documents?: TextDocuments<TextDocument>
