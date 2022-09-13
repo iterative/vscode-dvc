@@ -64,6 +64,7 @@ import { ExperimentFlag } from '../../../cli/dvc/constants'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
+import { WorkspacePlots } from '../../../plots/workspace'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -917,8 +918,76 @@ suite('Experiments Test Suite', () => {
         areExperimentsStarred(experimentsToToggle),
         'experiments have been starred'
       ).to.be.true
-    })
-  }).timeout(WEBVIEW_TEST_TIMEOUT)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to handle a message to select experiments for plotting', async () => {
+      const { experiments, experimentsModel } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentIds = [
+        'exp-e7a67',
+        'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
+        'test-branch'
+      ]
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+      mockMessageReceived.fire({
+        payload: mockExperimentIds,
+        type: MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS
+      })
+
+      await tableChangePromise
+
+      const selectExperimentIds = experimentsModel
+        .getSelectedRevisions()
+        .map(({ id }) => id)
+        .sort()
+      expect(selectExperimentIds).to.deep.equal(mockExperimentIds.sort())
+      expect(selectExperimentIds).to.deep.equal(mockExperimentIds)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to handle a message to compare experiments plots', async () => {
+      const { experiments, experimentsModel } = buildExperiments(disposable)
+      const mockShowPlots = stub(
+        WorkspacePlots.prototype,
+        'showWebview'
+      ).resolves(undefined)
+
+      await experiments.isReady()
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentIds = [
+        'exp-e7a67',
+        'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
+        'test-branch'
+      ]
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+      mockMessageReceived.fire({
+        payload: mockExperimentIds,
+        type: MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS
+      })
+
+      await tableChangePromise
+
+      const selectExperimentIds = experimentsModel
+        .getSelectedRevisions()
+        .map(({ id }) => id)
+        .sort()
+      expect(selectExperimentIds).to.deep.equal(mockExperimentIds.sort())
+      expect(mockShowPlots).to.be.calledOnce
+      expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+  })
 
   describe('Sorting', () => {
     it('should be able to sort', async () => {

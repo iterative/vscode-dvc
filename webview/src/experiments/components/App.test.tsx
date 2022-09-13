@@ -868,6 +868,22 @@ describe('App', () => {
       expect(itemLabels).toContain('Remove Selected Rows')
     })
 
+    it('should always present the Plots options if multiple rows are selected', () => {
+      renderTableWithoutRunningExperiments()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      jest.advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Plot and Show')
+      expect(itemLabels).toContain('Plot')
+    })
+
     it('should allow batch selection of rows by shift-clicking a range of them', () => {
       renderTableWithoutRunningExperiments()
 

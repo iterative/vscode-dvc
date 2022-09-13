@@ -27,8 +27,8 @@ export abstract class BaseWorkspaceWebviews<
     }
   }
 
-  public async showWebview() {
-    const dvcRoot = await this.getOnlyOrPickProject()
+  public async showWebview(overrideRoot?: string) {
+    const dvcRoot = overrideRoot || (await this.getOnlyOrPickProject())
     if (!dvcRoot) {
       return
     }
