@@ -364,6 +364,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
       .td {
         background-color: $row-bg-selected-color;
+        color: $row-fg-selected-color;
       }
 
       > *:first-child {
