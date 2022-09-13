@@ -69,7 +69,6 @@ export class Extension extends Disposable implements IExtension {
   private readonly gitExecutor: GitExecutor
   private readonly gitReader: GitReader
   private readonly status: Status
-  private readonly lspClient: LanguageClientWrapper
   private cliAccessible = false
   private cliCompatible: boolean | undefined
 
@@ -94,8 +93,7 @@ export class Extension extends Disposable implements IExtension {
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
 
-    this.lspClient = new LanguageClientWrapper()
-    this.dispose.track(this.lspClient.start())
+    this.dispose.track(new LanguageClientWrapper())
 
     this.resourceLocator = this.dispose.track(
       new ResourceLocator(context.extensionUri)
