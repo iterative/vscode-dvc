@@ -54,8 +54,12 @@ export const tableData: TableData = {
 }
 
 export const getHeaders = async () => {
-  const renderedHeaders = await screen.findAllByTestId('rendered-header')
-  return renderedHeaders.map(header => header.textContent)
+  const renderedHeadersAndPlaceholders = await screen.findAllByTestId(
+    'rendered-header'
+  )
+  return renderedHeadersAndPlaceholders
+    .map(header => header.textContent?.trim())
+    .filter(Boolean)
 }
 
 export const expectHeaders = async (expectedHeaderNames: string[]) => {

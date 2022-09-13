@@ -33,7 +33,6 @@ interface TableHeaderProps {
   onDragEnter: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
-  firstExpColumnCellId: string
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }
@@ -46,7 +45,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   onDragStart,
   onDrop,
   root,
-  firstExpColumnCellId,
   setExpColumnNeedsShadow
 }) => {
   const { filters, sorts } = useSelector(
@@ -99,7 +97,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDrop={onDrop}
       menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
       root={root}
-      firstExpColumnCellId={firstExpColumnCellId}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
       menuContent={
         <div>
