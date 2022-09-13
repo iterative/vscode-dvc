@@ -78,7 +78,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
         testId={'row-action-star'}
-        tooltipContent={starred ? 'Remove Star' : 'Add Star'}
+        tooltipContent={starred ? 'Star' : 'Unstar'}
       >
         <div
           className={styles.starSwitch}

@@ -63,11 +63,7 @@ export const FirstCell: React.FC<
       <div className={styles.innerCell}>
         <CellRowActions {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        <CellHintTooltip
-          tooltipContent={`${
-            bulletColor ? 'Remove from plots' : 'Add to plots'
-          }`}
-        >
+        <CellHintTooltip tooltipContent={bulletColor ? 'Unplot' : 'Plot'}>
           <span
             className={styles.bullet}
             style={{ color: bulletColor }}
