@@ -613,6 +613,10 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   }
 }
 
+.cellHintTooltip {
+  font-size: 0.65rem;
+}
+
 .webviewHeader {
   display: flex;
   justify-content: space-between;
