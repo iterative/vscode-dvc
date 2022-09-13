@@ -27,13 +27,14 @@ import {
 } from 'yaml'
 import { alphadecimalWords, variableTemplates } from './regexes'
 import { DvcYaml } from './DvcYamlModel'
+import { ITextDocumentWrapper } from './ITextDocumentWrapper'
 
 type CompletionTemplateBody = string | { [key: string]: CompletionTemplateBody }
 interface CompletionTemplate {
   label: string
   body: CompletionTemplateBody
 }
-export class TextDocumentWrapper {
+export class TextDocumentWrapper implements ITextDocumentWrapper {
   uri: string
 
   private textDocument: TextDocument
