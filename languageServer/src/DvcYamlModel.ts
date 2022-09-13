@@ -46,7 +46,7 @@ class Cmd implements ICmd {
     return cmd ? new Cmd(cmd) : undefined
   }
 
-  getReferencedFiles(): string[] {
+  public getReferencedFiles(): string[] {
     const paths: string[] = []
 
     if (isScalar(this.cmd)) {
@@ -59,7 +59,7 @@ class Cmd implements ICmd {
     return paths
   }
 
-  toJSON(): JsonValue {
+  public toJSON(): JsonValue {
     return this.cmd.toJSON()
   }
 }
@@ -81,24 +81,7 @@ class Stage implements IDvcYamlStage {
     isMap(value) && this.buildModel(value)
   }
 
-  buildModel(value: YAMLMap) {
-    const cmdNode = value.getIn(['cmd'], true) as Scalar | YAMLSeq | undefined
-    this.cmd = Cmd.create(cmdNode)
-
-    const depsNode = value.getIn(['deps'], true) as YAMLSeq | undefined
-    isSeq(depsNode) && this.buildDependencies(depsNode)
-  }
-
-  buildDependencies(depsNode: YAMLSeq) {
-    this.deps = new Set<string>()
-    for (const item of depsNode.items) {
-      if (isScalar(item)) {
-        this.deps.add(item.value as string)
-      }
-    }
-  }
-
-  toJSON(): JsonValue {
+  public toJSON(): JsonValue {
     let json: Record<string, JsonValue> = {}
     const nodeValue = this.pairNode.value
 
@@ -122,13 +105,13 @@ class Stage implements IDvcYamlStage {
     return json
   }
 
-  addDependencies(items: string[]): void {
+  public addDependencies(items: string[]): void {
     const current = this.deps || new Set<string>()
 
     this.deps = new Set<string>([...current, ...items])
   }
 
-  contains(offset: number): boolean {
+  public contains(offset: number): boolean {
     const valueNode = this.pairNode.value
 
     return !!(
@@ -136,6 +119,23 @@ class Stage implements IDvcYamlStage {
       valueNode.range &&
       inRange(offset, valueNode.range[0], valueNode.range[2])
     )
+  }
+
+  private buildModel(value: YAMLMap) {
+    const cmdNode = value.getIn(['cmd'], true) as Scalar | YAMLSeq | undefined
+    this.cmd = Cmd.create(cmdNode)
+
+    const depsNode = value.getIn(['deps'], true) as YAMLSeq | undefined
+    isSeq(depsNode) && this.buildDependencies(depsNode)
+  }
+
+  private buildDependencies(depsNode: YAMLSeq) {
+    this.deps = new Set<string>()
+    for (const item of depsNode.items) {
+      if (isScalar(item)) {
+        this.deps.add(item.value as string)
+      }
+    }
   }
 }
 
@@ -149,20 +149,12 @@ export class DvcYaml implements IDvcYamlModel {
     this.setStages(yamlDoc.get('stages', true))
   }
 
-  setStages(node: unknown) {
-    if (isMap(node)) {
-      for (const pair of node.items) {
-        this.stages.push(new Stage(pair, this))
-      }
-    }
-  }
-
-  getStageAt(position: Position): IDvcYamlStage | undefined {
+  public getStageAt(position: Position): IDvcYamlStage | undefined {
     const offset = this.document.offsetAt(position)
     return this.stages.find(stage => stage.contains(offset))
   }
 
-  toString(): string {
+  public toString(): string {
     const stages: JsonValue = {}
 
     for (const stage of this.stages) {
@@ -173,6 +165,14 @@ export class DvcYaml implements IDvcYamlModel {
     }
 
     return new Document(model).toString()
+  }
+
+  private setStages(node: unknown) {
+    if (isMap(node)) {
+      for (const pair of node.items) {
+        this.stages.push(new Stage(pair, this))
+      }
+    }
   }
 }
 

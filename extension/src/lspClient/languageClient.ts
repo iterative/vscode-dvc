@@ -40,15 +40,17 @@ export class LanguageClientWrapper extends Disposable {
       }
     }
 
-    this.client = new LanguageClient(
-      'dvc-vscode-lsp',
-      'DVC Language Server',
-      this.getServerOptions(),
-      clientOptions
+    this.client = this.dispose.track(
+      new LanguageClient(
+        'dvc-vscode-lsp',
+        'DVC Language Server',
+        this.getServerOptions(),
+        clientOptions
+      )
     )
 
     // Start the client. This will also launch the server
-    this.dispose.track(this.start())
+    this.start()
   }
 
   start() {
