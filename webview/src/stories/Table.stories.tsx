@@ -154,9 +154,12 @@ const contextMenuPlay = async ({
   canvasElement: HTMLElement
 }) => {
   const experiment = await within(canvasElement).findByText('[exp-e7a67]')
+  const clientRect = experiment.getBoundingClientRect()
   userEvent.click(experiment, {
     bubbles: true,
-    button: 2
+    button: 2,
+    clientX: clientRect.left,
+    clientY: clientRect.top
   })
 }
 
