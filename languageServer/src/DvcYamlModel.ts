@@ -104,9 +104,11 @@ class Stage implements IDvcYamlStage {
   }
 
   public addDependencies(items: string[]): void {
-    const current = this.deps || new Set<string>()
+    this.deps = this.deps || new Set<string>()
 
-    this.deps = new Set<string>([...current, ...items])
+    for (const item of items) {
+      this.deps.add(item)
+    }
   }
 
   public contains(offset: number): boolean {
