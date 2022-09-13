@@ -880,8 +880,8 @@ describe('App', () => {
       jest.advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toContain('Compare Plots')
-      expect(itemLabels).toContain('Select for Plots')
+      expect(itemLabels).toContain('Plot and Show')
+      expect(itemLabels).toContain('Plot')
     })
 
     it('should allow batch selection of rows by shift-clicking a range of them', () => {

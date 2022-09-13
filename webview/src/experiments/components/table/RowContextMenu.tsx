@@ -73,14 +73,14 @@ const getMultiSelectMenuOptions = (
     ),
     experimentMenuOption(
       selectedIds,
-      'Select for Plots',
+      'Plot',
       MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS,
       false,
       true
     ),
     experimentMenuOption(
       selectedIds,
-      'Compare Plots',
+      'Plot and Show',
       MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
       false,
       false
