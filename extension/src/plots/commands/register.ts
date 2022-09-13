@@ -8,7 +8,8 @@ export const registerPlotsCommands = (
 ) => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.PLOTS_SHOW,
-    ({ dvcRoot }: { dvcRoot?: string }) => plots.showWebview(dvcRoot)
+    (context: { dvcRoot?: string } | undefined) =>
+      plots.showWebview(context?.dvcRoot)
   )
 
   internalCommands.registerExternalCommand(
