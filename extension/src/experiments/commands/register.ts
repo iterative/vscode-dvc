@@ -295,7 +295,7 @@ const registerExperimentRunCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SHOW,
-    () => experiments.showWebview()
+    ({ dvcRoot }: { dvcRoot?: string }) => experiments.showWebview(dvcRoot)
   )
 }
 

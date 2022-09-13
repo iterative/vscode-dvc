@@ -7,7 +7,7 @@ import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu
 import { cond } from '../../../util/helpers'
 
 const experimentMenuOption = (
-  id: string | string[],
+  payload: string | string[],
   label: string,
   type: MessageFromWebviewType,
   hidden?: boolean,
@@ -19,7 +19,7 @@ const experimentMenuOption = (
     id: type,
     label,
     message: {
-      payload: id,
+      payload,
       type
     }
   } as MessagesMenuOptionProps
@@ -45,6 +45,8 @@ const getMultiSelectMenuOptions = (
     }) => starred
   )
 
+  const selectedIds = selectedRowsList.map(value => value.row.values.id)
+
   const removableRowIds = selectedRowsList
     .filter(value => value.row.depth === 1)
     .map(value => value.row.values.id)
@@ -68,6 +70,20 @@ const getMultiSelectMenuOptions = (
     toggleStarOption(
       starredExperiments.map(value => value.row.values.id),
       'Unstar'
+    ),
+    experimentMenuOption(
+      selectedIds,
+      'Select for Plots',
+      MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS,
+      false,
+      true
+    ),
+    experimentMenuOption(
+      selectedIds,
+      'Compare Plots',
+      MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
+      false,
+      false
     ),
     experimentMenuOption(
       removableRowIds,
