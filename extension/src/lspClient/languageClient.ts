@@ -6,7 +6,7 @@ import {
   ServerOptions,
   TransportKind
 } from 'vscode-languageclient/node'
-import { serverModule } from 'dvc-vscode-lsp'
+import { documentSelector, serverModule } from 'dvc-vscode-lsp'
 import { Disposable } from '../class/dispose'
 import { findFiles } from '../fileSystem/workspace'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
@@ -18,20 +18,7 @@ export class LanguageClientWrapper extends Disposable {
     super()
 
     const clientOptions: LanguageClientOptions = {
-      documentSelector: [
-        {
-          language: 'yaml'
-        },
-        {
-          language: 'python'
-        },
-        {
-          language: 'json'
-        },
-        {
-          language: 'toml'
-        }
-      ],
+      documentSelector,
 
       synchronize: {
         fileEvents: workspace.createFileSystemWatcher(

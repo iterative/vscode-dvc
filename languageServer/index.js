@@ -6,3 +6,7 @@
 const path = require('path')
 
 module.exports.serverModule = path.join(__dirname, 'dist', 'server.js')
+module.exports.documentSelector = path.join(
+  __dirname,
+  'dist/documentSelector.js'
+)
