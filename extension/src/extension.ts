@@ -51,7 +51,7 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
-import { DVCLanguageClient } from './lspClient/languageClient'
+import { LanguageClientWrapper } from './lspClient/languageClient'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -69,7 +69,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly gitExecutor: GitExecutor
   private readonly gitReader: GitReader
   private readonly status: Status
-  private readonly lspClient: DVCLanguageClient
+  private readonly lspClient: LanguageClientWrapper
   private cliAccessible = false
   private cliCompatible: boolean | undefined
 
@@ -94,7 +94,7 @@ export class Extension extends Disposable implements IExtension {
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
 
-    this.lspClient = new DVCLanguageClient()
+    this.lspClient = new LanguageClientWrapper()
     this.dispose.track(this.lspClient.start())
 
     this.resourceLocator = this.dispose.track(
