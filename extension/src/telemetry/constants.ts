@@ -51,6 +51,8 @@ export const EventName = Object.assign(
       'views.experimentsTable.columnResized',
     VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS:
       'views.experimentsTable.selectColumns',
+    VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS:
+      'views.experimentsTable.selectExperimentsForPlots',
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
 
@@ -217,6 +219,9 @@ export interface IEventNamePropertyMapping {
     path: string
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS]: {
+    experimentCount: number
+  }
   [EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE]: {
     path: string
   }
