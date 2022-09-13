@@ -93,10 +93,7 @@ class Stage implements IDvcYamlStage {
     }
 
     if (this.cmd) {
-      json = {
-        ...json,
-        cmd: this.cmd.toJSON()
-      }
+      json.cmd = this.cmd.toJSON()
     }
 
     if (this.deps) {
