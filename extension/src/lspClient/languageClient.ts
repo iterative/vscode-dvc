@@ -11,7 +11,7 @@ import { Disposable } from '../class/dispose'
 import { findFiles } from '../fileSystem/workspace'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
-export class DVCLanguageClient extends Disposable {
+export class LanguageClientWrapper extends Disposable {
   private client: LanguageClient
 
   constructor() {
