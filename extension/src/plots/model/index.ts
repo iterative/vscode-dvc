@@ -14,6 +14,7 @@ import {
   collectBranchRevisionDetails
 } from './collect'
 import {
+  CheckpointPlot,
   CheckpointPlotData,
   ComparisonPlots,
   Revision,
@@ -26,7 +27,7 @@ import {
 } from '../webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/dvc/reader'
 import { Experiments } from '../../experiments'
-import { getColorScale } from '../vega/util'
+import { getColorScale, truncateVerticalTitle } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
@@ -49,7 +50,7 @@ export class PlotsModel extends ModelWithPersistence {
   private revisionData: RevisionData = {}
   private templates: TemplateAccumulator = {}
 
-  private checkpointPlots?: CheckpointPlotData[]
+  private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
   private metricOrder: string[]
 
@@ -84,7 +85,7 @@ export class PlotsModel extends ModelWithPersistence {
     ])
 
     if (!this.selectedMetrics && checkpointPlots) {
-      this.selectedMetrics = checkpointPlots.map(({ title }) => title)
+      this.selectedMetrics = checkpointPlots.map(({ id }) => id)
     }
 
     this.checkpointPlots = checkpointPlots
@@ -358,21 +359,25 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   private getPlots(
-    checkpointPlots: CheckpointPlotData[],
+    checkpointPlots: CheckpointPlot[],
     selectedExperiments: string[]
   ) {
     return reorderObjectList<CheckpointPlotData>(
       this.metricOrder,
       checkpointPlots.map(plot => {
-        const { title, values } = plot
+        const { id, values } = plot
         return {
-          title,
+          id,
+          title: truncateVerticalTitle(
+            id,
+            this.getPlotSize(Section.CHECKPOINT_PLOTS)
+          ) as string,
           values: values.filter(value =>
             selectedExperiments.includes(value.group)
           )
         }
       }),
-      'title'
+      'id'
     )
   }
 
@@ -416,6 +421,7 @@ export class PlotsModel extends ModelWithPersistence {
       selectedRevisions,
       this.templates,
       this.revisionData,
+      this.getPlotSize(Section.TEMPLATE_PLOTS),
       this.getRevisionColors()
     )
   }

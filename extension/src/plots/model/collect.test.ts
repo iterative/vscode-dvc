@@ -31,7 +31,9 @@ const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
 describe('collectCheckpointPlotsData', () => {
   it('should return the expected data from the test fixture', () => {
     const data = collectCheckpointPlotsData(expShowFixture)
-    expect(data).toStrictEqual(checkpointPlotsFixture.plots)
+    expect(data).toStrictEqual(
+      checkpointPlotsFixture.plots.map(({ id, values }) => ({ id, values }))
+    )
   })
 
   it('should provide a continuous series for a modified experiment', () => {
@@ -133,12 +135,12 @@ describe('collectMetricOrder', () => {
 
     const metricOrder = collectMetricOrder(
       [
-        { title: 'metric:A', values: [] },
-        { title: 'metric:B', values: [] },
-        { title: 'metric:C', values: [] },
-        { title: 'metric:D', values: [] },
-        { title: 'metric:E', values: [] },
-        { title: 'metric:F', values: [] }
+        { id: 'metric:A', values: [] },
+        { id: 'metric:B', values: [] },
+        { id: 'metric:C', values: [] },
+        { id: 'metric:D', values: [] },
+        { id: 'metric:E', values: [] },
+        { id: 'metric:F', values: [] }
       ],
       expectedOrder,
       expectedOrder
@@ -158,12 +160,12 @@ describe('collectMetricOrder', () => {
 
     const metricOrder = collectMetricOrder(
       [
-        { title: 'metric:A', values: [] },
-        { title: 'metric:B', values: [] },
-        { title: 'metric:C', values: [] },
-        { title: 'metric:D', values: [] },
-        { title: 'metric:E', values: [] },
-        { title: 'metric:F', values: [] }
+        { id: 'metric:A', values: [] },
+        { id: 'metric:B', values: [] },
+        { id: 'metric:C', values: [] },
+        { id: 'metric:D', values: [] },
+        { id: 'metric:E', values: [] },
+        { id: 'metric:F', values: [] }
       ],
       existingOrder,
       existingOrder.filter(metric => !['metric:A', 'metric:B'].includes(metric))
@@ -181,12 +183,12 @@ describe('collectMetricOrder', () => {
   it('should add new metrics in the given order', () => {
     const metricOrder = collectMetricOrder(
       [
-        { title: 'metric:C', values: [] },
-        { title: 'metric:D', values: [] },
-        { title: 'metric:A', values: [] },
-        { title: 'metric:B', values: [] },
-        { title: 'metric:E', values: [] },
-        { title: 'metric:F', values: [] }
+        { id: 'metric:C', values: [] },
+        { id: 'metric:D', values: [] },
+        { id: 'metric:A', values: [] },
+        { id: 'metric:B', values: [] },
+        { id: 'metric:E', values: [] },
+        { id: 'metric:F', values: [] }
       ],
       ['metric:B', 'metric:A'],
       ['metric:B', 'metric:A']
@@ -204,12 +206,12 @@ describe('collectMetricOrder', () => {
   it('should give selected metrics precedence', () => {
     const metricOrder = collectMetricOrder(
       [
-        { title: 'metric:C', values: [] },
-        { title: 'metric:D', values: [] },
-        { title: 'metric:A', values: [] },
-        { title: 'metric:B', values: [] },
-        { title: 'metric:E', values: [] },
-        { title: 'metric:F', values: [] }
+        { id: 'metric:C', values: [] },
+        { id: 'metric:D', values: [] },
+        { id: 'metric:A', values: [] },
+        { id: 'metric:B', values: [] },
+        { id: 'metric:E', values: [] },
+        { id: 'metric:F', values: [] }
       ],
       ['metric:B', 'metric:A'],
       ['metric:B', 'metric:A', 'metric:F']
