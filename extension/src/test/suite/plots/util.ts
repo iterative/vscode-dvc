@@ -108,6 +108,7 @@ export const getExpectedCheckpointPlotsData = (
         range
       },
       plots: plots.map(plot => ({
+        id: plot.id,
         title: plot.title,
         values: plot.values.filter(values => domain.includes(values.group))
       })),
