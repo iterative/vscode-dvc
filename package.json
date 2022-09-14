@@ -33,8 +33,8 @@
     "svgr": "yarn workspace dvc-vscode-webview svgr"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "5.36.1",
-    "@typescript-eslint/parser": "5.36.1",
+    "@typescript-eslint/eslint-plugin": "5.36.2",
+    "@typescript-eslint/parser": "5.36.2",
     "@vscode/codicons": "0.0.32",
     "eslint": "8.23.0",
     "eslint-config-prettier": "8.5.0",
@@ -49,7 +49,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-promise": "6.0.1",
-    "eslint-plugin-react": "7.31.6",
+    "eslint-plugin-react": "7.31.7",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-sonarjs": "0.15.0",
     "eslint-plugin-sort-keys-fix": "1.1.2",
