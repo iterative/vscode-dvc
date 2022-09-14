@@ -1356,9 +1356,10 @@ describe('App', () => {
     const createCheckpointPlots = (nbOfPlots: number) => {
       const plots = []
       for (let i = 0; i < nbOfPlots; i++) {
+        const id = `plot-${i}`
         plots.push({
-          id: `${i}`,
-          title: `plot-${i}`,
+          id,
+          title: id,
           values: []
         })
       }

@@ -27,7 +27,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
       return {}
     }
     return createSpec(title, colors)
-  }, [plot, colors])
+  }, [plot?.title, colors])
 
   useEffect(() => {
     setPlot(plotDataStore.checkpoint[id])
@@ -37,17 +37,12 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
     return null
   }
 
-  const { title, values } = plot
+  const { values } = plot
 
   const key = `plot-${id}`
 
   return (
-    <div
-      className={styles.plot}
-      data-testid={key}
-      id={title}
-      style={withScale(1)}
-    >
+    <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot spec={spec} data={{ values }} id={key} />
     </div>
   )
