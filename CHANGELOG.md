@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.3] - 2022-09-13
+
+### 🚀 New Features and Enhancements
+
+- Move experiment table context menus to right-start [#2377](https://github.com/iterative/vscode-dvc/pull/2377) by [@mattseddon](https://github.com/mattseddon)
+- Update cell hint styles and context menu position [#2384](https://github.com/iterative/vscode-dvc/pull/2384) by [@julieg18](https://github.com/julieg18)
+- Add plotting actions to experiments table context menu [#2388](https://github.com/iterative/vscode-dvc/pull/2388) by [@mattseddon](https://github.com/mattseddon)
+- Update selected row foreground [#2391](https://github.com/iterative/vscode-dvc/pull/2391) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Ensure table indicators do not overlap with experiment column title [#2376](https://github.com/iterative/vscode-dvc/pull/2376) by [@mattseddon](https://github.com/mattseddon)
+- Fix overflowing comparison table texts [#2381](https://github.com/iterative/vscode-dvc/pull/2381) by [@sroy3](https://github.com/sroy3)
+
 ## [0.4.2] - 2022-09-12
 
 ### 🚀 New Features and Enhancements
