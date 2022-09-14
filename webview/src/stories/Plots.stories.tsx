@@ -36,6 +36,20 @@ const smallCheckpointPlotsFixture = {
   size: PlotSize.SMALL
 }
 
+const manyCheckpointPlots = (length: number, size = PlotSize.REGULAR) =>
+  Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
+    (plot, i) => {
+      const id = plot.id + i.toString()
+      return {
+        ...plot,
+        id,
+        title: truncateVerticalTitle(id, size) as string
+      }
+    }
+  )
+
+const manyCheckpointPlotsFixture = manyCheckpointPlots(15)
+
 const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
   children,
   data
@@ -185,24 +199,13 @@ AllSmall.args = {
 }
 AllSmall.parameters = chromaticParameters
 
-const manyCheckpointPlots = (length: number) =>
-  Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
-    (plot, i) => ({
-      ...plot,
-      id: plot.id + i.toString(),
-      title: plot.title + i.toString()
-    })
-  )
-
-const moreCheckpointPlots = manyCheckpointPlots(15)
-
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {
   data: {
     checkpoint: {
       ...checkpointPlotsFixture,
-      plots: moreCheckpointPlots,
-      selectedMetrics: moreCheckpointPlots.map(plot => plot.id)
+      plots: manyCheckpointPlotsFixture,
+      selectedMetrics: manyCheckpointPlotsFixture.map(plot => plot.id)
     },
     comparison: undefined,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
