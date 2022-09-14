@@ -76,7 +76,10 @@ export default {
       },
       {
         loader: 'ts-loader',
-        options: { transpileOnly: true },
+        options: {
+          configFile: 'tsconfig.webpack.json',
+          transpileOnly: true
+        },
         test: /\.tsx?$/
       }
     ]

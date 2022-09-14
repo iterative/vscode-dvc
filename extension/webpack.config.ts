@@ -40,16 +40,12 @@ export default {
   module: {
     rules: [
       {
-        exclude: /node_modules/,
-        test: /\.ts$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true
-            }
-          }
-        ]
+        loader: 'ts-loader',
+        options: {
+          configFile: 'tsconfig.webpack.json',
+          transpileOnly: true
+        },
+        test: /\.ts$/
       }
     ]
   },
