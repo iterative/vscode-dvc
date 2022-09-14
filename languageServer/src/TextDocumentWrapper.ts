@@ -3,7 +3,6 @@ import {
   DocumentSymbol,
   Position,
   SymbolKind,
-  TextDocuments,
   Range,
   Location,
   InsertTextFormat,
@@ -38,16 +37,10 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
   uri: string
 
   private textDocument: TextDocument
-  private documents: TextDocuments<TextDocument>
   private pythonFilePaths: string[] = []
 
-  constructor(
-    textDocument: TextDocument,
-    documents: TextDocuments<TextDocument>,
-    pythonFilePaths?: string[]
-  ) {
+  constructor(textDocument: TextDocument, pythonFilePaths?: string[]) {
     this.textDocument = textDocument
-    this.documents = documents
     this.uri = this.textDocument.uri
     this.pythonFilePaths = pythonFilePaths ?? []
   }
@@ -117,22 +110,21 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     return codeActions
   }
 
-  public getDefinitions(position: Position): Location[] {
-    const theSymbol = this.symbolAt(position)
-    if (theSymbol) {
-      const allDocs = this.documents.all()
+  public findLocationsFor(aSymbol: DocumentSymbol) {
+    const parts = aSymbol.name.split(/\s/g)
+    const txt = this.getText()
 
-      const locationsAccumulator = []
+    return parts
+      .map(str => txt.indexOf(str))
+      .filter(index => index > 0)
+      .map(index => this.positionAt(index))
+      .map(pos => this.symbolAt(pos)?.range)
+      .filter(Boolean)
+      .map(range => Location.create(this.uri, range as Range))
+  }
 
-      for (const txtDoc of allDocs) {
-        const finder = this.createFinder(txtDoc)
-        const locations = finder.findLocationsFor(theSymbol)
-        locationsAccumulator.push(...locations)
-      }
-
-      return locationsAccumulator ?? []
-    }
-    return []
+  public symbolAt(position: Position): DocumentSymbol | undefined {
+    return this.symbolScopeAt(position).pop()
   }
 
   private getCompletionTemplates() {
@@ -263,26 +255,5 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     )
 
     return [...symbolStack]
-  }
-
-  private symbolAt(position: Position): DocumentSymbol | undefined {
-    return this.symbolScopeAt(position).pop()
-  }
-
-  private createFinder(txtDoc: TextDocument) {
-    return new TextDocumentWrapper(txtDoc, this.documents)
-  }
-
-  private findLocationsFor(aSymbol: DocumentSymbol) {
-    const parts = aSymbol.name.split(/\s/g)
-    const txt = this.getText()
-
-    return parts
-      .map(str => txt.indexOf(str))
-      .filter(index => index > 0)
-      .map(index => this.positionAt(index))
-      .map(pos => this.symbolAt(pos)?.range)
-      .filter(Boolean)
-      .map(range => Location.create(this.uri, range as Range))
   }
 }

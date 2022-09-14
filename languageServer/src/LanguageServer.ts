@@ -13,7 +13,7 @@ import { TextDocumentWrapper } from './TextDocumentWrapper'
 import { documentSelector } from './documentSelector'
 export class LanguageServer {
   private pythonFilePaths: string[] = []
-  private documents?: TextDocuments<TextDocument>
+  private documents!: TextDocuments<TextDocument>
 
   public listen(connection: _Connection) {
     this.documents = new TextDocuments(TextDocument)
@@ -36,16 +36,17 @@ export class LanguageServer {
   private getDvcTextDocument(
     params: TextDocumentPositionParams | CodeActionParams
   ) {
-    if (!this.documents) {
-      return null
-    }
     const uri = params.textDocument.uri
-    const doc = this.documents?.get(uri)
+    const doc = this.documents.get(uri)
 
     if (!doc) {
       return null
     }
-    return new TextDocumentWrapper(doc, this.documents, this.pythonFilePaths)
+    return this.wrap(doc)
+  }
+
+  private wrap(doc: TextDocument) {
+    return new TextDocumentWrapper(doc, this.pythonFilePaths)
   }
 
   private onCodeAction(params: CodeActionParams) {
@@ -57,9 +58,23 @@ export class LanguageServer {
   }
 
   private onDefinition(params: DefinitionParams) {
-    return (
-      this.getDvcTextDocument(params)?.getDefinitions(params.position) ?? null
-    )
+    const document = this.getDvcTextDocument(params)
+    const symbolUnderCursor = document?.symbolAt(params.position)
+
+    if (symbolUnderCursor) {
+      const allDocs = this.documents.all()
+      const locationsAccumulator = []
+
+      for (const txtDoc of allDocs) {
+        const finder = this.wrap(txtDoc)
+        const locations = finder.findLocationsFor(symbolUnderCursor)
+        locationsAccumulator.push(...locations)
+      }
+
+      return locationsAccumulator ?? []
+    }
+
+    return null
   }
 
   private onInitialize() {
