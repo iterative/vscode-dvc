@@ -3,6 +3,8 @@ import cloneDeep from 'lodash.clonedeep'
 import merge from 'lodash.merge'
 import { VisualizationSpec } from 'react-vega'
 import { TopLevelSpec } from 'vega-lite'
+import { ExprRef, hasOwnProperty, SignalRef, Title, truncate, Text } from 'vega'
+import { TitleParams } from 'vega-lite/build/src/title'
 import {
   GenericHConcatSpec,
   GenericVConcatSpec,
@@ -17,7 +19,20 @@ import {
   RepeatMapping
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
-import { ColorScale, Revision } from '../webview/contract'
+import { ColorScale, PlotSize, Revision } from '../webview/contract'
+
+export type BaseType =
+  | string
+  | number
+  | boolean
+  | object
+  | Obj
+  | undefined
+  | null
+
+export type Any = BaseType | BaseType[]
+
+export type Obj = { [key: string]: Any }
 
 const COMMIT_FIELD = 'rev'
 
@@ -136,12 +151,101 @@ const mergeUpdate = (spec: TopLevelSpec, update: EncodingUpdate) => {
   return newSpec
 }
 
-export const extendVegaSpec = (spec: TopLevelSpec, colorScale?: ColorScale) => {
+const truncateTitlePart = (title: string, size: number) =>
+  truncate(title, size, 'left')
+
+const truncateTitleAsArrayOrString = (title: Text, size: number) => {
+  if (Array.isArray(title)) {
+    return title.map(line => truncateTitlePart(line, size))
+  }
+  return truncateTitlePart(title as unknown as string, size)
+}
+
+export const TitleLimit = {
+  [PlotSize.LARGE]: 50,
+  [PlotSize.REGULAR]: 50,
+  [PlotSize.SMALL]: 30
+}
+
+export const truncateTitle = (
+  title: Title | Text | TitleParams<ExprRef | SignalRef> | undefined,
+  size: number
+) => {
+  if (!title) {
+    return ''
+  }
+
+  if (typeof title === 'string') {
+    return truncateTitlePart(title, size)
+  }
+
+  if (Array.isArray(title)) {
+    return truncateTitleAsArrayOrString(title as Text, size)
+  }
+
+  const titleCopy = { ...title } as Title
+
+  if (hasOwnProperty(titleCopy, 'text')) {
+    const text = titleCopy.text as unknown as Text
+    titleCopy.text = truncateTitleAsArrayOrString(text, size)
+  }
+
+  if (hasOwnProperty(title, 'subtitle')) {
+    const subtitle = titleCopy.subtitle as unknown as Text
+    titleCopy.subtitle = truncateTitleAsArrayOrString(subtitle, size)
+  }
+  return titleCopy
+}
+
+const isEndValue = (valueType: string) =>
+  ['string', 'number', 'boolean'].includes(valueType)
+
+export const truncateTitles = (
+  spec: TopLevelSpec,
+  size: PlotSize,
+  vertical?: boolean
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  if (spec && typeof spec === 'object') {
+    const specCopy: Obj = {}
+
+    for (const [key, value] of Object.entries(spec)) {
+      const valueType = typeof value
+      if (key === 'y') {
+        vertical = true
+      }
+      if (key === 'title') {
+        specCopy[key] = truncateTitle(
+          value as unknown as Title,
+          TitleLimit[size] * (vertical ? 0.75 : 1)
+        )
+      } else if (isEndValue(valueType)) {
+        specCopy[key] = value
+      } else if (Array.isArray(value)) {
+        specCopy[key] = value.map(val =>
+          isEndValue(typeof val) ? val : truncateTitles(val, size, vertical)
+        )
+      } else if (typeof value === 'object') {
+        specCopy[key] = truncateTitles(value, size, vertical)
+      }
+    }
+    return specCopy
+  }
+  return spec
+}
+
+export const extendVegaSpec = (
+  spec: TopLevelSpec,
+  size: PlotSize,
+  colorScale?: ColorScale
+) => {
+  const updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec
+
   if (isMultiViewByCommitPlot(spec) || !colorScale) {
-    return spec
+    return updatedSpec
   }
 
   const update = getSpecEncodingUpdate(colorScale)
 
-  return mergeUpdate(spec, update)
+  return mergeUpdate(updatedSpec, update)
 }

@@ -11,7 +11,8 @@ import {
   Plot,
   TemplatePlotEntry,
   TemplatePlotSection,
-  PlotsType
+  PlotsType,
+  PlotSize
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -496,6 +497,7 @@ const collectTemplateGroup = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
+  size: PlotSize,
   revisionColors: ColorScale | undefined
 ): TemplatePlotEntry[] => {
   const acc: TemplatePlotEntry[] = []
@@ -509,6 +511,7 @@ const collectTemplateGroup = (
 
       const content = extendVegaSpec(
         fillTemplate(template, datapoints),
+        size,
         revisionColors
       )
 
@@ -529,6 +532,7 @@ export const collectSelectedTemplatePlots = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
+  size: PlotSize,
   revisionColors: ColorScale | undefined
 ): TemplatePlotSection[] | undefined => {
   const acc: TemplatePlotSection[] = []
@@ -539,6 +543,7 @@ export const collectSelectedTemplatePlots = (
       selectedRevisions,
       templates,
       revisionData,
+      size,
       revisionColors
     )
     if (!definedAndNonEmpty(entries)) {

@@ -26,7 +26,7 @@ import {
 } from '../webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/dvc/reader'
 import { Experiments } from '../../experiments'
-import { getColorScale } from '../vega/util'
+import { getColorScale, TitleLimit, truncateTitle } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
@@ -366,7 +366,10 @@ export class PlotsModel extends ModelWithPersistence {
       checkpointPlots.map(plot => {
         const { title, values } = plot
         return {
-          title,
+          title: truncateTitle(
+            title,
+            TitleLimit[this.getPlotSize(Section.CHECKPOINT_PLOTS)]
+          ) as string,
           values: values.filter(value =>
             selectedExperiments.includes(value.group)
           )
@@ -416,6 +419,7 @@ export class PlotsModel extends ModelWithPersistence {
       selectedRevisions,
       this.templates,
       this.revisionData,
+      this.getPlotSize(Section.TEMPLATE_PLOTS),
       this.getRevisionColors()
     )
   }
