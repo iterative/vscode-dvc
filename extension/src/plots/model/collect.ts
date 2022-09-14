@@ -11,7 +11,8 @@ import {
   Plot,
   TemplatePlotEntry,
   TemplatePlotSection,
-  PlotsType
+  PlotsType,
+  Datapoint
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -32,6 +33,8 @@ import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
 import { shortenForLabel } from '../../util/string'
+import { PassThrough } from 'stream'
+import data from '../../test/fixtures/expShow/output'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -309,7 +312,7 @@ export const collectMetricOrder = (
   return [...acc.newOrder, ...acc.uncollectedMetrics]
 }
 
-type RevisionPathData = { [path: string]: Record<string, unknown>[] }
+type RevisionPathData = { [path: string]: Datapoint[] }
 
 export type RevisionData = {
   [label: string]: RevisionPathData
@@ -347,14 +350,37 @@ const collectImageData = (
   acc[label][path] = plot
 }
 
+const isMultiSourcePlot = (datapoints: Datapoint[]): boolean => {
+  const filenames = new Set(
+    datapoints.flatMap(elem => elem.dvc_data_version_info.filename)
+  )
+  const fields = new Set(
+    datapoints.flatMap(elem => elem.dvc_data_version_info.field)
+  )
+
+  return !(filenames.size * fields.size == 1)
+}
+
 const collectDatapoints = (
   acc: RevisionData,
   path: string,
   rev: string,
-  values: Record<string, unknown>[] = []
+  values: Datapoint[] = []
 ) => {
+  const multiSource = isMultiSourcePlot(values)
+
   for (const value of values) {
-    ;(acc[rev][path] as unknown[]).push({ ...value })
+    value.dvc_data_version_info.revision = rev
+    ;(acc[rev][path] as Datapoint[]).push({
+      ...value,
+      rev: multiSource
+        ? new Array(
+            value.dvc_data_version_info.revision,
+            value.dvc_data_version_info.filename,
+            value.dvc_data_version_info.field
+          ).join('::')
+        : value.dvc_data_version_info.revision
+    })
   }
 }
 
@@ -366,7 +392,7 @@ const fillRevisionField = (acc: RevisionData, label: string, rev: string) => {
   })
 }
 
-const collectPlotData = (
+const collectAndUpdateVegaData = (
   acc: RevisionData,
   path: string,
   plot: TemplatePlot,
@@ -378,9 +404,7 @@ const collectPlotData = (
       acc[label] = {}
     }
     acc[label][path] = []
-
     collectDatapoints(acc, path, label, plot.datapoints?.[id])
-    fillRevisionField(acc, path, label)
   }
 }
 
@@ -401,7 +425,7 @@ const collectPathData = (
       continue
     }
 
-    collectPlotData(acc.revisionData, path, plot, cliIdToLabel)
+    collectAndUpdateVegaData(acc.revisionData, path, plot, cliIdToLabel)
   }
 }
 
@@ -500,18 +524,6 @@ const fillTemplate = (template: string, datapoints: unknown[]) =>
     template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
   ) as TopLevelSpec
 
-const isMultiSourcePlot = (
-  datapoints: Record<string, unknown>[],
-  revisionColors: ColorScale | undefined
-): boolean => {
-  const pts_revs = new Set(datapoints.flatMap(elem => elem.rev))
-  const color_revs = new Set(revisionColors?.domain)
-  return !(
-    pts_revs.size === color_revs.size &&
-    [...color_revs].every(elem => pts_revs.has(elem))
-  )
-}
-
 const collectTemplateGroup = (
   paths: string[],
   selectedRevisions: string[],
@@ -530,7 +542,7 @@ const collectTemplateGroup = (
 
       const filled = fillTemplate(template, datapoints)
 
-      const content = isMultiSourcePlot(datapoints, revisionColors)
+      const content = isMultiSourcePlot(datapoints)
         ? filled
         : extendVegaSpec(filled, revisionColors)
 

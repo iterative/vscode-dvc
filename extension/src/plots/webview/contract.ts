@@ -77,9 +77,20 @@ export enum PlotsType {
 export const isVegaPlot = (plot: Plot): plot is TemplatePlot =>
   plot.type === PlotsType.VEGA
 
+export type DatapointVersionInfo = {
+  revision: string
+  filename: string
+  field: string
+}
+
+export type Datapoint = {
+  dvc_data_version_info: DatapointVersionInfo
+  [key: string]: string | DatapointVersionInfo
+}
+
 export type TemplatePlot = {
   content: VisualizationSpec
-  datapoints?: { [revision: string]: Record<string, unknown>[] }
+  datapoints?: { [revision: string]: Datapoint[] }
   revisions?: string[]
   type: PlotsType
   multiView?: boolean
