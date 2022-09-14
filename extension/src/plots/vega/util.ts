@@ -161,13 +161,13 @@ const truncateTitleAsArrayOrString = (title: Text, size: number) => {
   return truncateTitlePart(title as unknown as string, size)
 }
 
-export const TitleLimit = {
+const TitleLimit = {
   [PlotSize.LARGE]: 50,
   [PlotSize.REGULAR]: 50,
   [PlotSize.SMALL]: 30
 }
 
-export const truncateTitle = (
+const truncateTitle = (
   title: Title | Text | TitleParams<ExprRef | SignalRef> | undefined,
   size: number
 ) => {
@@ -197,6 +197,9 @@ export const truncateTitle = (
   return titleCopy
 }
 
+export const truncateVerticalTitle = (title: Text | Title, size: PlotSize) =>
+  truncateTitle(title, TitleLimit[size] * 0.75)
+
 const isEndValue = (valueType: string) =>
   ['string', 'number', 'boolean'].includes(valueType)
 
@@ -215,10 +218,10 @@ export const truncateTitles = (
         vertical = true
       }
       if (key === 'title') {
-        specCopy[key] = truncateTitle(
-          value as unknown as Title,
-          TitleLimit[size] * (vertical ? 0.75 : 1)
-        )
+        const title = value as unknown as Title
+        specCopy[key] = vertical
+          ? truncateVerticalTitle(title, size)
+          : truncateTitle(title, TitleLimit[size])
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {

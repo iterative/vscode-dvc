@@ -4,7 +4,7 @@ import { TopLevelSpec } from 'vega-lite'
 import {
   ColorScale,
   CheckpointPlotValues,
-  CheckpointPlotData,
+  CheckpointPlot,
   isImagePlot,
   ImagePlot,
   TemplatePlot,
@@ -195,7 +195,7 @@ const collectFromExperimentsObject = (
 
 export const collectCheckpointPlotsData = (
   data: ExperimentsOutput
-): CheckpointPlotData[] | undefined => {
+): CheckpointPlot[] | undefined => {
   const acc = {
     iterations: {},
     plots: new Map<string, CheckpointPlotValues>()
@@ -215,10 +215,10 @@ export const collectCheckpointPlotsData = (
     return
   }
 
-  const plotsData: CheckpointPlotData[] = []
+  const plotsData: CheckpointPlot[] = []
 
   for (const [key, value] of acc.plots.entries()) {
-    plotsData.push({ title: decodeColumn(key), values: value })
+    plotsData.push({ id: decodeColumn(key), values: value })
   }
 
   return plotsData
@@ -286,7 +286,7 @@ const collectRemainingSelected = (acc: MetricOrderAccumulator) => {
 }
 
 export const collectMetricOrder = (
-  checkpointPlotData: CheckpointPlotData[] | undefined,
+  checkpointPlotData: CheckpointPlot[] | undefined,
   existingMetricOrder: string[],
   selectedMetrics: string[] = []
 ): string[] => {
@@ -297,7 +297,7 @@ export const collectMetricOrder = (
   const acc: MetricOrderAccumulator = {
     newOrder: [],
     remainingSelectedMetrics: [...selectedMetrics],
-    uncollectedMetrics: checkpointPlotData.map(({ title }) => title)
+    uncollectedMetrics: checkpointPlotData.map(({ id }) => id)
   }
 
   if (!definedAndNonEmpty(acc.remainingSelectedMetrics)) {

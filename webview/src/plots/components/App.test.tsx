@@ -1357,6 +1357,7 @@ describe('App', () => {
       const plots = []
       for (let i = 0; i < nbOfPlots; i++) {
         plots.push({
+          id: `${i}`,
           title: `plot-${i}`,
           values: []
         })
@@ -1364,7 +1365,7 @@ describe('App', () => {
       return {
         ...checkpointPlotsFixture,
         plots,
-        selectedMetrics: plots.map(plot => plot.title)
+        selectedMetrics: plots.map(plot => plot.id)
       }
     }
 

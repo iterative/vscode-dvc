@@ -21,7 +21,13 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
   const [plot, setPlot] = useState(plotDataStore.checkpoint[id])
-  const spec = useMemo(() => (id && createSpec(id, colors)) || {}, [id, colors])
+  const spec = useMemo(() => {
+    const title = plot?.title
+    if (!title) {
+      return {}
+    }
+    return createSpec(title, colors)
+  }, [plot, colors])
 
   useEffect(() => {
     setPlot(plotDataStore.checkpoint[id])
@@ -33,7 +39,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
 
   const { title, values } = plot
 
-  const key = `plot-${title}`
+  const key = `plot-${id}`
 
   return (
     <div

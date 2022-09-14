@@ -15,8 +15,8 @@ export const addCheckpointPlotsWithSnapshots = (
 ) => {
   const snapShots: { [key: string]: string } = {}
   for (const plot of plots || []) {
-    plotDataStore.checkpoint[plot.title] = plot
-    snapShots[plot.title] = JSON.stringify(plot)
+    plotDataStore.checkpoint[plot.id] = plot
+    snapShots[plot.id] = JSON.stringify(plot)
   }
   return snapShots
 }
