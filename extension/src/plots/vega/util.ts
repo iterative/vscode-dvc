@@ -151,20 +151,31 @@ const mergeUpdate = (spec: TopLevelSpec, update: EncodingUpdate) => {
   return newSpec
 }
 
-const truncateTitlePart = (title: string, size: number) =>
+const truncateTitleString = (title: string, size: number) =>
   truncate(title, size, 'left')
 
 const truncateTitleAsArrayOrString = (title: Text, size: number) => {
   if (Array.isArray(title)) {
-    return title.map(line => truncateTitlePart(line, size))
+    return title.map(line => truncateTitleString(line, size))
   }
-  return truncateTitlePart(title as unknown as string, size)
+  return truncateTitleString(title as unknown as string, size)
 }
 
 const TitleLimit = {
   [PlotSize.LARGE]: 50,
   [PlotSize.REGULAR]: 50,
   [PlotSize.SMALL]: 30
+}
+
+const truncateTitlePart = (
+  title: Title,
+  key: 'text' | 'subtitle',
+  size: number
+) => {
+  if (hasOwnProperty(title, key)) {
+    const text = title[key] as unknown as Text
+    title[key] = truncateTitleAsArrayOrString(text, size)
+  }
 }
 
 const truncateTitle = (
@@ -176,7 +187,7 @@ const truncateTitle = (
   }
 
   if (typeof title === 'string') {
-    return truncateTitlePart(title, size)
+    return truncateTitleString(title, size)
   }
 
   if (Array.isArray(title)) {
@@ -184,16 +195,8 @@ const truncateTitle = (
   }
 
   const titleCopy = { ...title } as Title
-
-  if (hasOwnProperty(titleCopy, 'text')) {
-    const text = titleCopy.text as unknown as Text
-    titleCopy.text = truncateTitleAsArrayOrString(text, size)
-  }
-
-  if (hasOwnProperty(title, 'subtitle')) {
-    const subtitle = titleCopy.subtitle as unknown as Text
-    titleCopy.subtitle = truncateTitleAsArrayOrString(subtitle, size)
-  }
+  truncateTitlePart(titleCopy, 'text', size)
+  truncateTitlePart(titleCopy, 'subtitle', size)
   return titleCopy
 }
 
