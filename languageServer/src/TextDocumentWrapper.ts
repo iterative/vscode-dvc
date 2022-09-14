@@ -114,13 +114,20 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     const parts = aSymbol.name.split(/\s/g)
     const txt = this.getText()
 
-    return parts
-      .map(str => txt.indexOf(str))
-      .filter(index => index > 0)
-      .map(index => this.positionAt(index))
-      .map(pos => this.symbolAt(pos)?.range)
-      .filter(Boolean)
-      .map(range => Location.create(this.uri, range as Range))
+    const acc: Location[] = []
+    for (const str of parts) {
+      const index = txt.indexOf(str)
+      if (index <= 0) {
+        continue
+      }
+      const pos = this.positionAt(index)
+      const range = this.symbolAt(pos)?.range
+      if (!range) {
+        continue
+      }
+      acc.push(Location.create(this.uri, range as Range))
+    }
+    return acc
   }
 
   public symbolAt(position: Position): DocumentSymbol | undefined {
