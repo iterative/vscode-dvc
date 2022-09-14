@@ -171,7 +171,8 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     for (const template of templates) {
       const expression = template[1]
       const expressionOffset: number = nodeOffset + (template.index ?? 0) + 2 // To account for the '${'
-      const symbols = expression.matchAll(alphadecimalWords)
+      const symbols = expression.matchAll(alphadecimalWords) // It works well for now. We can always add more sophistication when needed.
+
       for (const templateSymbol of symbols) {
         const symbolStart = (templateSymbol.index ?? 0) + expressionOffset
         const symbolEnd = symbolStart + templateSymbol[0].length
@@ -228,11 +229,11 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     node: Node | Pair,
     range: [number, number, number]
   ): DocumentSymbol[] {
-    if (isNode(node)) {
-      if (isScalar(node)) {
-        return this.yamlScalarNodeToDocumentSymbols(node, range)
-      }
-    } else if (isPair(node)) {
+    if (isScalar(node)) {
+      return this.yamlScalarNodeToDocumentSymbols(node, range)
+    }
+
+    if (isPair(node)) {
       return this.yamlNodeToDocumentSymbols(node.value as Node | Pair, range)
     }
 
@@ -244,10 +245,15 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
 
     const symbolsFound: Array<DocumentSymbol | null> = []
 
-    visit(this.getYamlDocument(), (_key, node) => {
-      if (isNode(node)) {
+    visit(this.getYamlDocument(), (_, node) => {
+      if (isNode(node) && node.range) {
         const range = node.range
-        if (!!range && cursorOffset >= range[0] && cursorOffset <= range[2]) {
+        const nodeStart = range[0]
+        const nodeEnd = range[2]
+        const isCursorInsideNode =
+          cursorOffset >= nodeStart && cursorOffset <= nodeEnd
+
+        if (isCursorInsideNode) {
           symbolsFound.push(...this.yamlNodeToDocumentSymbols(node, range))
         }
       }
