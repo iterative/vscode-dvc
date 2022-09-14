@@ -12,7 +12,6 @@ import {
   within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import { Text, Title } from 'vega'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
@@ -1357,15 +1356,17 @@ describe('App', () => {
     const createCheckpointPlots = (nbOfPlots: number) => {
       const plots = []
       for (let i = 0; i < nbOfPlots; i++) {
+        const id = `plot-${i}`
         plots.push({
-          title: `plot-${i}`,
+          id,
+          title: id,
           values: []
         })
       }
       return {
         ...checkpointPlotsFixture,
         plots,
-        selectedMetrics: plots.map(plot => plot.title)
+        selectedMetrics: plots.map(plot => plot.id)
       }
     }
 
@@ -1933,205 +1934,6 @@ describe('App', () => {
       clickEvent.stopPropagation = jest.fn()
       fireEvent(panel, clickEvent)
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe('Title truncation', () => {
-    const longTitle =
-      'we-need-a-very-very-very-long-title-to-test-with-many-many-many-characters-at-least-seventy-characters'
-    const longAxisTitleHorizontal = `${longTitle}-x`
-    const longAxisTitleVertical = `${longTitle}-y`
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const layers = (templatePlotsFixture.plots[0].entries[0].content as any)
-      .layer
-
-    const withLongTemplatePlotTitle = (title: Text | Title = longTitle) => ({
-      ...templatePlotsFixture,
-      plots: [
-        {
-          entries: [
-            ...templatePlotsFixture.plots[0].entries,
-            {
-              ...templatePlotsFixture.plots[0].entries[0],
-              content: {
-                ...templatePlotsFixture.plots[0].entries[0].content,
-                layer: [
-                  {
-                    ...layers[0],
-                    encoding: {
-                      ...layers[0].encoding,
-                      x: {
-                        ...layers[0].encoding.x,
-                        title: longAxisTitleHorizontal
-                      },
-                      y: {
-                        ...layers[0].encoding.y,
-                        title: longAxisTitleVertical
-                      }
-                    }
-                  },
-                  ...layers.slice(1)
-                ],
-                title
-              },
-              id: longTitle
-            }
-          ],
-          group: TemplatePlotGroup.SINGLE_VIEW
-        } as TemplatePlotSection
-      ]
-    })
-    it('should truncate all titles from the left to 50 characters for large plots', async () => {
-      await renderAppAndChangeSize(
-        {
-          template: withLongTemplatePlotTitle()
-        },
-        'Large',
-        Section.TEMPLATE_PLOTS
-      )
-
-      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
-
-      await waitForVega(longTitlePlot)
-
-      const truncatedTitle =
-        '…-many-many-characters-at-least-seventy-characters'
-      const truncatedHorizontalTitle =
-        '…any-many-characters-at-least-seventy-characters-x'
-      const truncatedVerticalTitle = '…racters-at-least-seventy-characters-y'
-
-      expect(
-        within(longTitlePlot).getByText(truncatedTitle)
-      ).toBeInTheDocument()
-      expect(
-        within(longTitlePlot).getByText(truncatedHorizontalTitle)
-      ).toBeInTheDocument()
-      expect(
-        within(longTitlePlot).getByText(truncatedVerticalTitle)
-      ).toBeInTheDocument()
-    })
-
-    it('should truncate all titles from the left to 50 characters for regular plots', async () => {
-      await renderAppAndChangeSize(
-        {
-          template: withLongTemplatePlotTitle()
-        },
-        'Regular',
-        Section.TEMPLATE_PLOTS
-      )
-      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
-
-      await waitForVega(longTitlePlot)
-      const truncatedTitle =
-        '…-many-many-characters-at-least-seventy-characters'
-      const truncatedHorizontalTitle =
-        '…any-many-characters-at-least-seventy-characters-x'
-      const truncatedVerticalTitle = '…racters-at-least-seventy-characters-y'
-
-      expect(
-        within(longTitlePlot).getByText(truncatedTitle)
-      ).toBeInTheDocument()
-      expect(
-        within(longTitlePlot).getByText(truncatedHorizontalTitle)
-      ).toBeInTheDocument()
-      expect(
-        within(longTitlePlot).getByText(truncatedVerticalTitle)
-      ).toBeInTheDocument()
-    })
-
-    it('should truncate all titles from the left to 30 characters for large plots', async () => {
-      await renderAppAndChangeSize(
-        {
-          template: withLongTemplatePlotTitle()
-        },
-        'Small',
-        Section.TEMPLATE_PLOTS
-      )
-      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
-
-      await waitForVega(longTitlePlot)
-      const truncatedTitle = '…s-at-least-seventy-characters'
-      const truncatedHorizontalTitle = '…at-least-seventy-characters-x'
-      const truncatedVerticalTitle = '…t-seventy-characters-y'
-
-      expect(
-        within(longTitlePlot).getByText(truncatedTitle)
-      ).toBeInTheDocument()
-      expect(
-        within(longTitlePlot).getByText(truncatedHorizontalTitle)
-      ).toBeInTheDocument()
-      expect(
-        within(longTitlePlot).getByText(truncatedVerticalTitle)
-      ).toBeInTheDocument()
-    })
-
-    it('should truncate the title and the subtitle', async () => {
-      await renderAppAndChangeSize(
-        {
-          template: withLongTemplatePlotTitle({
-            subtitle: 'abcdefghijklmnopqrstuvwyz1234567890',
-            text: 'abcdefghijklmnopqrstuvwyz1234567890'
-          })
-        },
-        'Small',
-        Section.TEMPLATE_PLOTS
-      )
-      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
-
-      await waitForVega(longTitlePlot)
-      const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
-
-      expect(
-        within(longTitlePlot).getAllByText(truncatedTitle).length
-      ).toStrictEqual(2)
-    })
-
-    it('should truncate every line of the title', async () => {
-      await renderAppAndChangeSize(
-        {
-          template: withLongTemplatePlotTitle([
-            'abcdefghijklmnopqrstuvwyz1234567890',
-            'abcdefghijklmnopqrstuvwyz1234567890'
-          ])
-        },
-        'Small',
-        Section.TEMPLATE_PLOTS
-      )
-      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
-
-      await waitForVega(longTitlePlot)
-      const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
-
-      expect(
-        within(longTitlePlot).getAllByText(truncatedTitle).length
-      ).toStrictEqual(2)
-    })
-
-    it('should truncate every line of the title and subtitle', async () => {
-      await renderAppAndChangeSize(
-        {
-          template: withLongTemplatePlotTitle({
-            subtitle: [
-              'abcdefghijklmnopqrstuvwyz1234567890',
-              'abcdefghijklmnopqrstuvwyz1234567890'
-            ],
-            text: [
-              'abcdefghijklmnopqrstuvwyz1234567890',
-              'abcdefghijklmnopqrstuvwyz1234567890'
-            ]
-          })
-        },
-        'Small',
-        Section.TEMPLATE_PLOTS
-      )
-      const longTitlePlot = screen.getByTestId(`plot_${longTitle}`)
-
-      await waitForVega(longTitlePlot)
-      const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
-
-      expect(
-        within(longTitlePlot).getAllByText(truncatedTitle).length
-      ).toStrictEqual(4)
     })
   })
 })

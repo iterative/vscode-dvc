@@ -3,33 +3,22 @@ import { useDispatch } from 'react-redux'
 import { PlainObject, VisualizationSpec } from 'react-vega'
 import { Renderers } from 'vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
-import { PlotSize } from 'dvc/src/plots/webview/contract'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { config } from './constants'
-import { truncateTitles } from './util'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
-import { Any } from '../../util/objects'
 
 interface ZoomablePlotProps {
   spec: VisualizationSpec
   data?: PlainObject
   id: string
-  size: PlotSize
   onViewReady?: () => void
-}
-
-const TitleLimit = {
-  [PlotSize.LARGE]: 50,
-  [PlotSize.REGULAR]: 50,
-  [PlotSize.SMALL]: 30
 }
 
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   spec,
   data,
   id,
-  size,
   onViewReady
 }) => {
   const dispatch = useDispatch()
@@ -43,7 +32,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     data,
     'data-testid': `${id}-vega`,
     renderer: 'svg' as unknown as Renderers,
-    spec: truncateTitles(spec as Any, TitleLimit[size]) as VisualizationSpec
+    spec
   } as VegaLiteProps
   currentPlotProps.current = plotProps
 

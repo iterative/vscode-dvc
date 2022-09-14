@@ -57,10 +57,12 @@ export type CheckpointPlotValues = {
 
 export type ColorScale = { domain: string[]; range: Color[] }
 
-export type CheckpointPlotData = {
-  title: string
+export type CheckpointPlot = {
+  id: string
   values: CheckpointPlotValues
 }
+
+export type CheckpointPlotData = CheckpointPlot & { title: string }
 
 export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
