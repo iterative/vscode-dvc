@@ -20,9 +20,14 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
-  const size = useSelector((state: PlotsState) => state.checkpoint.size)
   const [plot, setPlot] = useState(plotDataStore.checkpoint[id])
-  const spec = useMemo(() => (id && createSpec(id, colors)) || {}, [id, colors])
+  const spec = useMemo(() => {
+    const title = plot?.title
+    if (!title) {
+      return {}
+    }
+    return createSpec(title, colors)
+  }, [plot?.title, colors])
 
   useEffect(() => {
     setPlot(plotDataStore.checkpoint[id])
@@ -32,18 +37,13 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
     return null
   }
 
-  const { title, values } = plot
+  const { values } = plot
 
-  const key = `plot-${title}`
+  const key = `plot-${id}`
 
   return (
-    <div
-      className={styles.plot}
-      data-testid={key}
-      id={title}
-      style={withScale(1)}
-    >
-      <ZoomablePlot spec={spec} data={{ values }} id={key} size={size} />
+    <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
+      <ZoomablePlot spec={spec} data={{ values }} id={key} />
     </div>
   )
 }

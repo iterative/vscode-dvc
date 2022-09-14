@@ -1,3 +1,5 @@
+import { Text as VegaText, Title as VegaTitle } from 'vega'
+import { TopLevelSpec } from 'vega-lite'
 import {
   isMultiViewPlot,
   isMultiViewByCommitPlot,
@@ -11,6 +13,7 @@ import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
 import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
 import { copyOriginalColors } from '../../experiments/model/status/colors'
+import { PlotSize } from '../webview/contract'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {
@@ -75,7 +78,7 @@ describe('getColorScale', () => {
 
 describe('extendVegaSpec', () => {
   it('should not add encoding if no color scale is provided', () => {
-    const extendedSpec = extendVegaSpec(linearTemplate)
+    const extendedSpec = extendVegaSpec(linearTemplate, PlotSize.REGULAR)
     expect(extendedSpec.encoding).toBeUndefined()
   })
 
@@ -84,12 +87,180 @@ describe('extendVegaSpec', () => {
       domain: ['workspace', 'main'],
       range: copyOriginalColors().slice(0, 2)
     }
-    const extendedSpec = extendVegaSpec(linearTemplate, colorScale)
+    const extendedSpec = extendVegaSpec(
+      linearTemplate,
+      PlotSize.REGULAR,
+      colorScale
+    )
 
     expect(extendedSpec).not.toStrictEqual(defaultTemplate)
     expect(extendedSpec.encoding.color).toStrictEqual({
       legend: { disable: true },
       scale: colorScale
     })
+  })
+
+  const longTitle =
+    'we-need-a-very-very-very-long-title-to-test-with-many-many-many-characters-at-least-seventy-characters'
+  const longAxisTitleHorizontal = `${longTitle}-x`
+  const longAxisTitleVertical = `${longTitle}-y`
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const layers = (linearTemplate as any).layer
+
+  const withLongTemplatePlotTitle = (title: VegaText | VegaTitle = longTitle) =>
+    ({
+      ...linearTemplate,
+      layer: [
+        {
+          ...layers[0],
+          encoding: {
+            ...layers[0].encoding,
+            x: {
+              ...layers[0].encoding.x,
+              title: longAxisTitleHorizontal
+            },
+            y: {
+              ...layers[0].encoding.y,
+              title: longAxisTitleVertical
+            }
+          }
+        },
+        ...layers.slice(1)
+      ],
+      title
+    } as TopLevelSpec)
+
+  it('should truncate all titles from the left to 50 characters for large plots', () => {
+    const spec = withLongTemplatePlotTitle()
+    const updatedSpec = extendVegaSpec(spec, PlotSize.LARGE)
+
+    const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
+    const truncatedHorizontalTitle =
+      '…any-many-characters-at-least-seventy-characters-x'
+    const truncatedVerticalTitle = '…racters-at-least-seventy-characters-y'
+
+    const specString = JSON.stringify(spec)
+    expect(specString).not.toContain(truncatedTitle)
+    expect(specString).not.toContain(truncatedHorizontalTitle)
+    expect(specString).not.toContain(truncatedVerticalTitle)
+    expect(specString).toContain(longTitle)
+    expect(specString).toContain(longAxisTitleHorizontal)
+    expect(specString).toContain(longAxisTitleVertical)
+
+    const updatedSpecString = JSON.stringify(updatedSpec)
+    expect(updatedSpecString).toContain(truncatedTitle)
+    expect(updatedSpecString).toContain(truncatedHorizontalTitle)
+    expect(updatedSpecString).toContain(truncatedVerticalTitle)
+    expect(updatedSpecString).not.toContain(longTitle)
+    expect(updatedSpecString).not.toContain(longAxisTitleHorizontal)
+    expect(updatedSpecString).not.toContain(longAxisTitleVertical)
+  })
+
+  it('should truncate all titles from the left to 50 characters for regular plots', () => {
+    const spec = withLongTemplatePlotTitle()
+    const updatedSpec = extendVegaSpec(spec, PlotSize.REGULAR)
+
+    const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
+    const truncatedHorizontalTitle =
+      '…any-many-characters-at-least-seventy-characters-x'
+    const truncatedVerticalTitle = '…racters-at-least-seventy-characters-y'
+
+    const specString = JSON.stringify(spec)
+    expect(specString).not.toContain(truncatedTitle)
+    expect(specString).not.toContain(truncatedHorizontalTitle)
+    expect(specString).not.toContain(truncatedVerticalTitle)
+    expect(specString).toContain(longTitle)
+    expect(specString).toContain(longAxisTitleHorizontal)
+    expect(specString).toContain(longAxisTitleVertical)
+
+    const updatedSpecString = JSON.stringify(updatedSpec)
+    expect(updatedSpecString).toContain(truncatedTitle)
+    expect(updatedSpecString).toContain(truncatedHorizontalTitle)
+    expect(updatedSpecString).toContain(truncatedVerticalTitle)
+    expect(updatedSpecString).not.toContain(longTitle)
+    expect(updatedSpecString).not.toContain(longAxisTitleHorizontal)
+    expect(updatedSpecString).not.toContain(longAxisTitleVertical)
+  })
+
+  it('should truncate all titles from the left to 30 characters for small plots', () => {
+    const spec = withLongTemplatePlotTitle()
+    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL)
+
+    const truncatedTitle = '…s-at-least-seventy-characters'
+    const truncatedHorizontalTitle = '…at-least-seventy-characters-x'
+    const truncatedVerticalTitle = '…t-seventy-characters-y'
+
+    const specString = JSON.stringify(spec)
+    expect(specString).not.toContain(truncatedTitle)
+    expect(specString).not.toContain(truncatedHorizontalTitle)
+    expect(specString).not.toContain(truncatedVerticalTitle)
+    expect(specString).toContain(longTitle)
+    expect(specString).toContain(longAxisTitleHorizontal)
+    expect(specString).toContain(longAxisTitleVertical)
+
+    const updatedSpecString = JSON.stringify(updatedSpec)
+    expect(updatedSpecString).toContain(truncatedTitle)
+    expect(updatedSpecString).toContain(truncatedHorizontalTitle)
+    expect(updatedSpecString).toContain(truncatedVerticalTitle)
+    expect(updatedSpecString).not.toContain(longTitle)
+    expect(updatedSpecString).not.toContain(longAxisTitleHorizontal)
+    expect(updatedSpecString).not.toContain(longAxisTitleVertical)
+  })
+
+  it('should truncate the title and the subtitle', () => {
+    const repeatedTitle = 'abcdefghijklmnopqrstuvwyz1234567890'
+    const spec = withLongTemplatePlotTitle({
+      subtitle: repeatedTitle,
+      text: repeatedTitle
+    })
+
+    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL)
+
+    const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
+
+    const specString = JSON.stringify(spec)
+    expect(specString).toContain(repeatedTitle)
+    expect(specString).not.toContain(truncatedTitle)
+
+    const updatedSpecString = JSON.stringify(updatedSpec)
+    expect(updatedSpecString).not.toContain(repeatedTitle)
+    expect(updatedSpecString).toContain(truncatedTitle)
+  })
+
+  it('should truncate every line of the title', () => {
+    const repeatedTitle = 'abcdefghijklmnopqrstuvwyz1234567890'
+    const spec = withLongTemplatePlotTitle([repeatedTitle, repeatedTitle])
+
+    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL)
+
+    const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
+
+    const specString = JSON.stringify(spec)
+    expect(specString).toContain(repeatedTitle)
+    expect(specString).not.toContain(truncatedTitle)
+
+    const updatedSpecString = JSON.stringify(updatedSpec)
+    expect(updatedSpecString).not.toContain(repeatedTitle)
+    expect(updatedSpecString).toContain(truncatedTitle)
+  })
+
+  it('should truncate every line of the title and subtitle', () => {
+    const repeatedTitle = 'abcdefghijklmnopqrstuvwyz1234567890'
+    const spec = withLongTemplatePlotTitle({
+      subtitle: [repeatedTitle, repeatedTitle],
+      text: [repeatedTitle, repeatedTitle]
+    })
+
+    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL)
+
+    const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
+
+    const specString = JSON.stringify(spec)
+    expect(specString).toContain(repeatedTitle)
+    expect(specString).not.toContain(truncatedTitle)
+
+    const updatedSpecString = JSON.stringify(updatedSpec)
+    expect(updatedSpecString).not.toContain(repeatedTitle)
+    expect(updatedSpecString).toContain(truncatedTitle)
   })
 })

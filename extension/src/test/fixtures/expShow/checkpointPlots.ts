@@ -10,6 +10,7 @@ const data: CheckpointPlotsData = {
   },
   plots: [
     {
+      id: 'summary.json:loss',
       title: 'summary.json:loss',
       values: [
         { group: 'exp-83425', iteration: 1, y: 1.9896177053451538 },
@@ -27,6 +28,7 @@ const data: CheckpointPlotsData = {
       ]
     },
     {
+      id: 'summary.json:accuracy',
       title: 'summary.json:accuracy',
       values: [
         { group: 'exp-83425', iteration: 1, y: 0.40904998779296875 },
@@ -44,6 +46,7 @@ const data: CheckpointPlotsData = {
       ]
     },
     {
+      id: 'summary.json:val_loss',
       title: 'summary.json:val_loss',
       values: [
         { group: 'exp-83425', iteration: 1, y: 1.9391471147537231 },
@@ -61,6 +64,7 @@ const data: CheckpointPlotsData = {
       ]
     },
     {
+      id: 'summary.json:val_accuracy',
       title: 'summary.json:val_accuracy',
       values: [
         { group: 'exp-83425', iteration: 1, y: 0.49399998784065247 },
@@ -86,11 +90,5 @@ const data: CheckpointPlotsData = {
   ],
   size: PlotSize.REGULAR
 }
-
-export const manyCheckpointPlots = (length: number) =>
-  Array.from({ length }, () => data.plots[0]).map((plot, i) => ({
-    ...plot,
-    title: plot.title + i.toString()
-  }))
 
 export default data
