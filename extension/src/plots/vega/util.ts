@@ -21,19 +21,6 @@ import {
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import { ColorScale, PlotSize, Revision } from '../webview/contract'
 
-export type BaseType =
-  | string
-  | number
-  | boolean
-  | object
-  | Obj
-  | undefined
-  | null
-
-export type Any = BaseType | BaseType[]
-
-export type Obj = { [key: string]: Any }
-
 const COMMIT_FIELD = 'rev'
 
 const getFacetField = (
@@ -213,7 +200,7 @@ export const truncateTitles = (
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   if (spec && typeof spec === 'object') {
-    const specCopy: Obj = {}
+    const specCopy: Record<string, unknown> = {}
 
     for (const [key, value] of Object.entries(spec)) {
       const valueType = typeof value
