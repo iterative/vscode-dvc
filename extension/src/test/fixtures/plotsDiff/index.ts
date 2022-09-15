@@ -479,6 +479,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             }
           } as TopLevelSpec,
           PlotSize.REGULAR,
+          false,
           {
             domain: expectedRevisions,
             range: copyOriginalColors().slice(0, 5)

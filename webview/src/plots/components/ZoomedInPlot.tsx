@@ -28,7 +28,12 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
         {...merge(
           { ...cloneDeep(props) },
           {
-            spec: { encoding: { color: { legend: { disable: false } } } }
+            spec: {
+              encoding: {
+                color: { legend: { disable: false } },
+                strokeDash: { legend: { disable: false } }
+              }
+            }
           }
         )}
         config={{

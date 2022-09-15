@@ -11,7 +11,8 @@ import {
   ComparisonData,
   RevisionData,
   TemplateAccumulator,
-  collectBranchRevisionDetails
+  collectBranchRevisionDetails,
+  collectFlexiblePlots
 } from './collect'
 import {
   CheckpointPlot,
@@ -49,6 +50,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   private revisionData: RevisionData = {}
   private templates: TemplateAccumulator = {}
+  private flexiblePlots: Record<string, boolean> = {}
 
   private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
@@ -104,10 +106,12 @@ export class PlotsModel extends ModelWithPersistence {
       ...revs.map(rev => cliIdToLabel[rev])
     ])
 
-    const [{ comparisonData, revisionData }, templates] = await Promise.all([
-      collectData(data, cliIdToLabel),
-      collectTemplates(data)
-    ])
+    const [{ comparisonData, revisionData }, templates, flexiblePlots] =
+      await Promise.all([
+        collectData(data, cliIdToLabel),
+        collectTemplates(data),
+        collectFlexiblePlots(data)
+      ])
 
     const { overwriteComparisonData, overwriteRevisionData } =
       collectWorkspaceRaceConditionData(
@@ -127,6 +131,7 @@ export class PlotsModel extends ModelWithPersistence {
       ...overwriteRevisionData
     }
     this.templates = { ...this.templates, ...templates }
+    this.flexiblePlots = { ...this.flexiblePlots, ...flexiblePlots }
 
     this.setComparisonOrder()
 
@@ -421,6 +426,7 @@ export class PlotsModel extends ModelWithPersistence {
       selectedRevisions,
       this.templates,
       this.revisionData,
+      this.flexiblePlots,
       this.getPlotSize(Section.TEMPLATE_PLOTS),
       this.getRevisionColors()
     )

@@ -355,7 +355,20 @@ const collectDatapoints = (
   values: Record<string, unknown>[] = []
 ) => {
   for (const value of values) {
-    ;(acc[rev][path] as unknown[]).push({ ...value, rev })
+    const filename = (
+      value?.dvc_data_version_info as {
+        filename: string | undefined
+      }
+    )?.filename
+    const data: { rev: string; filename?: string } = {
+      ...value,
+      rev
+    }
+
+    if (filename) {
+      data.filename = filename
+    }
+    ;(acc[rev][path] as unknown[]).push(data)
   }
 }
 
@@ -408,6 +421,46 @@ export const collectData = (
 
   for (const [path, plots] of Object.entries(data)) {
     collectPathData(acc, path, plots, cliIdToLabel)
+  }
+
+  return acc
+}
+
+const collectFlexiblePlot = (
+  acc: Record<string, boolean>,
+  path: string,
+  plot: TemplatePlot
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  acc[path] = false
+  const files = new Set()
+  for (const value of Object.values(plot.datapoints || {}).flat()) {
+    const filename = (
+      value?.dvc_data_version_info as {
+        filename: string | undefined
+      }
+    )?.filename
+    if (filename) {
+      files.add(filename)
+    }
+    if (files.size > 1) {
+      acc[path] = true
+      return
+    }
+  }
+}
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const collectFlexiblePlots = (data: PlotsOutput) => {
+  const acc = {}
+  for (const [path, plots] of Object.entries(data)) {
+    for (const plot of plots) {
+      if (isImagePlot(plot)) {
+        continue
+      }
+
+      collectFlexiblePlot(acc, path, plot)
+    }
   }
 
   return acc
@@ -497,6 +550,7 @@ const collectTemplateGroup = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
+  flexiblePlots: Record<string, boolean>,
   size: PlotSize,
   revisionColors: ColorScale | undefined
 ): TemplatePlotEntry[] => {
@@ -509,9 +563,12 @@ const collectTemplateGroup = (
         .flatMap(revision => revisionData?.[revision]?.[path])
         .filter(Boolean)
 
+      const isFlexiblePlot = flexiblePlots[path]
+
       const content = extendVegaSpec(
         fillTemplate(template, datapoints),
         size,
+        isFlexiblePlot,
         revisionColors
       )
 
@@ -532,6 +589,7 @@ export const collectSelectedTemplatePlots = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
+  flexiblePlots: Record<string, boolean>,
   size: PlotSize,
   revisionColors: ColorScale | undefined
 ): TemplatePlotSection[] | undefined => {
@@ -543,6 +601,7 @@ export const collectSelectedTemplatePlots = (
       selectedRevisions,
       templates,
       revisionData,
+      flexiblePlots,
       size,
       revisionColors
     )

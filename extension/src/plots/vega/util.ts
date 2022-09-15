@@ -98,27 +98,43 @@ export const getColorScale = (
   return acc.domain.length > 0 ? acc : undefined
 }
 
-type EncodingUpdate = {
-  encoding: {
-    color: {
-      legend: {
-        disable: boolean
-      }
-      scale: ColorScale
+type Encoding = {
+  strokeDash?: {
+    field: string
+    legend: {
+      disable: boolean
     }
+  }
+  color: {
+    legend: {
+      disable: boolean
+    }
+    scale: ColorScale
   }
 }
 
+type EncodingUpdate = {
+  encoding: Encoding
+}
+
 export const getSpecEncodingUpdate = (
-  colorScale: ColorScale
-): EncodingUpdate => ({
-  encoding: {
+  colorScale: ColorScale,
+  hasMultipleFiles: boolean
+): EncodingUpdate => {
+  const encoding: Encoding = {
     color: {
       legend: { disable: true },
       scale: colorScale
     }
   }
-})
+  if (hasMultipleFiles) {
+    encoding.strokeDash = { field: 'filename', legend: { disable: true } }
+  }
+
+  return {
+    encoding
+  }
+}
 
 const mergeUpdate = (spec: TopLevelSpec, update: EncodingUpdate) => {
   let newSpec = cloneDeep(spec) as any
@@ -230,6 +246,7 @@ export const truncateTitles = (
 export const extendVegaSpec = (
   spec: TopLevelSpec,
   size: PlotSize,
+  isFlexiblePlot: boolean,
   colorScale?: ColorScale
 ) => {
   const updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec
@@ -238,7 +255,7 @@ export const extendVegaSpec = (
     return updatedSpec
   }
 
-  const update = getSpecEncodingUpdate(colorScale)
+  const update = getSpecEncodingUpdate(colorScale, isFlexiblePlot)
 
   return mergeUpdate(updatedSpec, update)
 }
