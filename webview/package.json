@@ -11,6 +11,7 @@
     "dev": "webpack watch --mode development",
     "build": "webpack --mode production",
     "test": "jest --collect-coverage",
+    "test-build": "webpack --mode development",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "chromatic": "npx chromatic --project-token fexq6zfy6",
