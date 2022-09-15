@@ -1,4 +1,3 @@
-import { relative } from 'path'
 import { workspace } from 'vscode'
 import {
   LanguageClient,
@@ -8,8 +7,6 @@ import {
 } from 'vscode-languageclient/node'
 import { documentSelector, serverModule } from 'dvc-vscode-lsp'
 import { Disposable } from '../class/dispose'
-import { findFiles } from '../fileSystem/workspace'
-import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 export class LanguageClientWrapper extends Disposable {
   private client: LanguageClient
@@ -42,14 +39,6 @@ export class LanguageClientWrapper extends Disposable {
 
   start() {
     this.client.start()
-    findFiles('**/*.py', '.??*').then(files => {
-      const [workspaceRoot] = getWorkspaceFolders()
-
-      this.client.sendRequest(
-        'sendPythonFiles',
-        files.map(file => relative(workspaceRoot, file))
-      )
-    })
 
     return this
   }
