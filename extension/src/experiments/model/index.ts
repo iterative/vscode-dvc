@@ -324,13 +324,15 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperimentsWithCheckpoints(): ExperimentWithCheckpoints[] {
-    return this.getExperiments().map(experiment => {
-      const checkpoints = this.getCheckpointsWithType(experiment.id)
-      if (!definedAndNonEmpty(checkpoints)) {
-        return experiment
-      }
-      return { ...experiment, checkpoints }
-    })
+    return this.getExperiments()
+      .filter(({ queued }) => !queued)
+      .map(experiment => {
+        const checkpoints = this.getCheckpointsWithType(experiment.id)
+        if (!definedAndNonEmpty(checkpoints)) {
+          return experiment
+        }
+        return { ...experiment, checkpoints }
+      })
   }
 
   public getExperimentParams(id: string) {

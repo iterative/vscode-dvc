@@ -44,6 +44,7 @@ import {
   QuickPickItemWithValue,
   QuickPickOptionsWithTitle
 } from '../../../../vscode/quickPick'
+import * as QuickPickWrapper from '../../../../vscode/quickPick'
 import { Response } from '../../../../vscode/response'
 import { DvcExecutor } from '../../../../cli/dvc/executor'
 import { Param } from '../../../../experiments/model/modify/collect'
@@ -63,6 +64,7 @@ suite('Experiments Tree Test Suite', () => {
     disposable.dispose()
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsTree', () => {
     const { colors } = checkpointPlotsFixture
     const { domain, range } = colors
@@ -148,6 +150,34 @@ suite('Experiments Tree Test Suite', () => {
         setSelectionModeSpy,
         'selecting any experiment disables auto-apply filters to experiments selection'
       ).to.be.calledOnceWith(false)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should not show queued experiments in the dvc.views.experimentsTree.selectExperiments quick pick', async () => {
+      await buildPlots(disposable)
+
+      const mockQuickPickLimitedValues = stub(
+        QuickPickWrapper,
+        'quickPickLimitedValues'
+      ).resolves(undefined)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SELECT)
+
+      const [availableItems] = mockQuickPickLimitedValues.lastCall.args
+
+      expect(availableItems.length).to.be.greaterThan(0)
+      const queued = []
+
+      for (const experimentOrSeparator of availableItems) {
+        if (
+          (experimentOrSeparator?.value as { type: ExperimentType })?.type ===
+          ExperimentType.QUEUED
+        ) {
+          queued.push(experimentOrSeparator)
+        }
+      }
+
+      expect(mockQuickPickLimitedValues).to.be.calledOnce
+      expect(queued).to.deep.equal([])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
