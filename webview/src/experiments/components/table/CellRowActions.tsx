@@ -45,9 +45,7 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
         className={cx(styles.rowActions, hidden && styles.hidden)}
         data-testid={testId}
       >
-        <Indicator tooltipContent="" count={count}>
-          {children}
-        </Indicator>
+        <Indicator count={count}>{children}</Indicator>
       </div>
     </CellHintTooltip>
   )
