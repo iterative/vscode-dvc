@@ -9,6 +9,7 @@ import {
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { TextDocumentWrapper } from './TextDocumentWrapper'
+
 export class LanguageServer {
   private documents!: TextDocuments<TextDocument>
 
