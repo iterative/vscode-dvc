@@ -6,7 +6,20 @@
 const path = require('path')
 
 module.exports.serverModule = path.join(__dirname, 'dist', 'server.js')
-module.exports.documentSelector = path.join(
-  __dirname,
-  'dist/documentSelector.js'
-)
+module.exports.documentSelector = [
+  {
+    language: 'yaml'
+  },
+  {
+    pattern: '**/*.{dvc,dvc.lock}'
+  },
+  {
+    language: 'json'
+  },
+  {
+    language: 'toml'
+  },
+  {
+    language: 'python'
+  }
+]

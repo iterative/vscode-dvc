@@ -9,7 +9,6 @@ import {
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { TextDocumentWrapper } from './TextDocumentWrapper'
-import { documentSelector } from './documentSelector'
 export class LanguageServer {
   private documents!: TextDocuments<TextDocument>
 
@@ -63,14 +62,6 @@ export class LanguageServer {
 
   private onInitialize() {
     const serverCapabilities: ServerCapabilities = {
-      codeActionProvider: true,
-      completionProvider: {
-        resolveProvider: false,
-        triggerCharacters: ['.', ':', '/', '-']
-      },
-      declarationProvider: {
-        documentSelector
-      },
       definitionProvider: true
     }
 
