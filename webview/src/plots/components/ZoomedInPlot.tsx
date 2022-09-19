@@ -31,6 +31,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
             spec: {
               encoding: {
                 color: { legend: { disable: false } },
+                shape: { legend: { disable: false } },
                 strokeDash: { legend: { disable: false } }
               }
             }

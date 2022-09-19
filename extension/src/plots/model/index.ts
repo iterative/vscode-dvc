@@ -12,7 +12,10 @@ import {
   RevisionData,
   TemplateAccumulator,
   collectBranchRevisionDetails,
-  collectFlexiblePlots
+  collectMultiSourceData,
+  collectMultiSourceKeys,
+  Shape,
+  StrokeDash
 } from './collect'
 import {
   CheckpointPlot,
@@ -50,7 +53,13 @@ export class PlotsModel extends ModelWithPersistence {
 
   private revisionData: RevisionData = {}
   private templates: TemplateAccumulator = {}
-  private flexiblePlots: Record<string, boolean> = {}
+  private multiSourceData: Record<
+    string,
+    { filename?: string; field?: string }[]
+  > = {}
+
+  private scales: Record<string, { strokeDash?: StrokeDash; shape?: Shape }> =
+    {}
 
   private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
@@ -106,11 +115,11 @@ export class PlotsModel extends ModelWithPersistence {
       ...revs.map(rev => cliIdToLabel[rev])
     ])
 
-    const [{ comparisonData, revisionData }, templates, flexiblePlots] =
+    const [{ comparisonData, revisionData }, templates, multiSourceData] =
       await Promise.all([
         collectData(data, cliIdToLabel),
         collectTemplates(data),
-        collectFlexiblePlots(data)
+        collectMultiSourceData(data, this.multiSourceData)
       ])
 
     const { overwriteComparisonData, overwriteRevisionData } =
@@ -131,7 +140,8 @@ export class PlotsModel extends ModelWithPersistence {
       ...overwriteRevisionData
     }
     this.templates = { ...this.templates, ...templates }
-    this.flexiblePlots = { ...this.flexiblePlots, ...flexiblePlots }
+    this.multiSourceData = multiSourceData
+    this.scales = collectMultiSourceKeys(this.multiSourceData)
 
     this.setComparisonOrder()
 
@@ -426,9 +436,15 @@ export class PlotsModel extends ModelWithPersistence {
       selectedRevisions,
       this.templates,
       this.revisionData,
-      this.flexiblePlots,
+      this.scales,
       this.getPlotSize(Section.TEMPLATE_PLOTS),
       this.getRevisionColors()
     )
   }
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  // private collectMultiSourceKeys() {
+  //   const acc: Record<string, Record<string, Set<string>>> = collectMultiSourceKeys(this.multiSourceValues)
+
+  // }
 }

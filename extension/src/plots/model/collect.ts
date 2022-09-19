@@ -1,5 +1,6 @@
 import cloneDeep from 'lodash.clonedeep'
 import omit from 'lodash.omit'
+import isEqual from 'lodash.isequal'
 import { TopLevelSpec } from 'vega-lite'
 import {
   ColorScale,
@@ -355,19 +356,14 @@ const collectDatapoints = (
   values: Record<string, unknown>[] = []
 ) => {
   for (const value of values) {
-    const filename = (
-      value?.dvc_data_version_info as {
-        filename: string | undefined
-      }
-    )?.filename
-    const data: { rev: string; filename?: string } = {
+    const dvc_data_version_info = (value?.dvc_data_version_info ||
+      {}) as Record<string, unknown>
+    const data: { rev: string } = {
       ...value,
+      ...dvc_data_version_info,
       rev
     }
 
-    if (filename) {
-      data.filename = filename
-    }
     ;(acc[rev][path] as unknown[]).push(data)
   }
 }
@@ -426,40 +422,210 @@ export const collectData = (
   return acc
 }
 
-const collectFlexiblePlot = (
-  acc: Record<string, boolean>,
+const collectMultiSource = (
+  acc: Record<string, Record<string, unknown>[]>,
   path: string,
   plot: TemplatePlot
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  acc[path] = false
-  const files = new Set()
   for (const value of Object.values(plot.datapoints || {}).flat()) {
-    const filename = (
-      value?.dvc_data_version_info as {
-        filename: string | undefined
-      }
-    )?.filename
-    if (filename) {
-      files.add(filename)
+    const dvc_data_version_info = {
+      // eslint-disable-next-line unicorn/no-useless-fallback-in-spread
+      ...(value?.dvc_data_version_info || {})
+    } as Record<string, unknown>
+
+    if (dvc_data_version_info.revision) {
+      delete dvc_data_version_info.revision
     }
-    if (files.size > 1) {
-      acc[path] = true
-      return
+
+    if (!acc[path]) {
+      acc[path] = []
+    }
+
+    if (!acc[path].some(obj => isEqual(obj, dvc_data_version_info))) {
+      acc[path].push(dvc_data_version_info)
     }
   }
 }
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-export const collectFlexiblePlots = (data: PlotsOutput) => {
-  const acc = {}
+export const collectMultiSourceData = (
+  data: PlotsOutput,
+  acc: Record<string, Record<string, unknown>[]>
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
   for (const [path, plots] of Object.entries(data)) {
     for (const plot of plots) {
       if (isImagePlot(plot)) {
         continue
       }
 
-      collectFlexiblePlot(acc, path, plot)
+      collectMultiSource(acc, path, plot)
+    }
+  }
+
+  return acc
+}
+
+const ShapeValues = ['square', 'circle', 'triangle'] as const
+const StrokeDashValues = [
+  [1, 0],
+  [8, 8],
+  [8, 4],
+  [4, 4],
+  [4, 2],
+  [2, 1],
+  [1, 1]
+] as const
+
+export type StrokeDashScale = {
+  domain: string[]
+  range: typeof StrokeDashValues[number][]
+}
+
+export type StrokeDash = { scale: StrokeDashScale } & { field: string }
+
+export type ShapeScale = {
+  domain: string[]
+  range: typeof ShapeValues[number][]
+}
+export type Shape = { scale: ShapeScale } & { field: string }
+
+export const collectMultiSourceKeys = (
+  data: Record<string, { filename?: string; field?: string }[]>
+): Record<
+  string,
+  {
+    strokeDash: StrokeDash
+    shape?: Shape
+  }
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+> => {
+  const acc: Record<
+    string,
+    {
+      strokeDash: StrokeDash
+      shape?: Shape
+    }
+  > = {}
+
+  for (const [path, values] of Object.entries(data)) {
+    if (values.length <= 1) {
+      continue
+    }
+
+    const valueAcc: { filename?: Set<string>; field?: Set<string> } = {}
+    for (const value of values) {
+      for (const [key, fun] of Object.entries(value)) {
+        if (key !== 'filename' && key !== 'field') {
+          continue
+        }
+
+        if (!valueAcc[key]) {
+          valueAcc[key] = new Set()
+        }
+
+        ;(valueAcc[key] as Set<string>).add(fun as string)
+      }
+    }
+
+    const same: string[] = []
+    const different: { field: string; variations: number }[] = []
+
+    for (const [field, variations] of Object.entries(valueAcc)) {
+      if (variations.size === 1) {
+        continue
+      }
+      if (variations.size === values.length) {
+        same.push(field)
+        continue
+      }
+      different.push({ field, variations: variations.size })
+    }
+
+    const expectedOrder: [string, string] = ['filename', 'field']
+
+    different.sort(
+      (
+        { field: aField, variations: aVariations },
+        { field: bField, variations: bVariations }
+      ) =>
+        aVariations === bVariations
+          ? expectedOrder.indexOf(aField) - expectedOrder.indexOf(bField)
+          : aVariations - bVariations
+    )
+
+    const strokeDashScale: StrokeDashScale = {
+      domain: [],
+      range: []
+    }
+    const shapeScale: ShapeScale = {
+      domain: [],
+      range: []
+    }
+
+    if (same.length > 0) {
+      let idx = 0
+      const field = new Set<string>()
+      for (const available of values) {
+        const domain: string[] = []
+
+        if (same.includes('filename') && available.filename) {
+          domain.push(available.filename)
+          field.add('filename')
+        }
+        if (same.includes('field') && available.field) {
+          domain.push(available.field)
+          field.add('field')
+        }
+        strokeDashScale.domain.push(domain.join('::'))
+        strokeDashScale.range.push(StrokeDashValues[idx])
+        strokeDashScale.domain.sort()
+        idx++
+      }
+
+      const [first] = field
+      const fieldDef = field.size === 2 ? 'data' : first
+      acc[path] = { strokeDash: { field: fieldDef, scale: strokeDashScale } }
+    }
+
+    if (different.length > 0 && strokeDashScale.domain.length === 0) {
+      const filenameOrField = different.shift()
+      let idx = 0
+      const field = new Set<string>()
+      if (filenameOrField?.field) {
+        for (const value of valueAcc[
+          filenameOrField.field as 'filename' | 'field'
+        ] || []) {
+          field.add(filenameOrField.field)
+          strokeDashScale.domain.push(value)
+          strokeDashScale.range.push(StrokeDashValues[idx])
+          strokeDashScale.domain.sort()
+          idx++
+        }
+        acc[path] = {
+          strokeDash: { field: [...field].join('::'), scale: strokeDashScale }
+        }
+      }
+    }
+    if (different.length > 0) {
+      const filenameOrField = different.shift()
+      let idx = 0
+      const shapeField = new Set<string>()
+      if (filenameOrField?.field) {
+        for (const value of valueAcc[
+          filenameOrField.field as 'filename' | 'field'
+        ] || []) {
+          shapeField.add(filenameOrField.field)
+          shapeScale.domain.push(value)
+          shapeScale.domain.sort()
+          shapeScale.range.push(ShapeValues[idx])
+          idx++
+        }
+        acc[path] = {
+          ...acc[path],
+          shape: { field: [...shapeField].join('::'), scale: shapeScale }
+        }
+      }
     }
   }
 
@@ -540,9 +706,27 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
   return acc
 }
 
-const fillTemplate = (template: string, datapoints: unknown[]) =>
+const fillTemplate = (
+  template: string,
+  datapoints: unknown[],
+  field?: string
+) =>
   JSON.parse(
-    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+    template.replace(
+      '"<DVC_METRIC_DATA>"',
+      JSON.stringify(
+        datapoints.map(data => {
+          if (field !== 'data') {
+            return data
+          }
+          const obj = data as Record<string, unknown>
+          return {
+            ...obj,
+            data: [obj.filename, obj.field].join('::')
+          }
+        })
+      )
+    )
   ) as TopLevelSpec
 
 const collectTemplateGroup = (
@@ -550,7 +734,13 @@ const collectTemplateGroup = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  flexiblePlots: Record<string, boolean>,
+  scales: Record<
+    string,
+    {
+      strokeDash?: StrokeDash
+      shape?: Shape
+    }
+  >,
   size: PlotSize,
   revisionColors: ColorScale | undefined
 ): TemplatePlotEntry[] => {
@@ -563,13 +753,15 @@ const collectTemplateGroup = (
         .flatMap(revision => revisionData?.[revision]?.[path])
         .filter(Boolean)
 
-      const isFlexiblePlot = flexiblePlots[path]
+      const scale = scales[path] || {}
 
       const content = extendVegaSpec(
-        fillTemplate(template, datapoints),
+        fillTemplate(template, datapoints, scale.strokeDash?.field),
         size,
-        isFlexiblePlot,
-        revisionColors
+        {
+          ...scale,
+          color: revisionColors
+        }
       )
 
       acc.push({
@@ -589,7 +781,13 @@ export const collectSelectedTemplatePlots = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  flexiblePlots: Record<string, boolean>,
+  scales: Record<
+    string,
+    {
+      strokeDash?: StrokeDash
+      shape?: Shape
+    }
+  >,
   size: PlotSize,
   revisionColors: ColorScale | undefined
 ): TemplatePlotSection[] | undefined => {
@@ -601,7 +799,7 @@ export const collectSelectedTemplatePlots = (
       selectedRevisions,
       templates,
       revisionData,
-      flexiblePlots,
+      scales,
       size,
       revisionColors
     )

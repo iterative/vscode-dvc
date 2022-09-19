@@ -78,7 +78,7 @@ describe('getColorScale', () => {
 
 describe('extendVegaSpec', () => {
   it('should not add encoding if no color scale is provided', () => {
-    const extendedSpec = extendVegaSpec(linearTemplate, PlotSize.REGULAR, false)
+    const extendedSpec = extendVegaSpec(linearTemplate, PlotSize.REGULAR)
     expect(extendedSpec.encoding).toBeUndefined()
   })
 
@@ -87,12 +87,9 @@ describe('extendVegaSpec', () => {
       domain: ['workspace', 'main'],
       range: copyOriginalColors().slice(0, 2)
     }
-    const extendedSpec = extendVegaSpec(
-      linearTemplate,
-      PlotSize.REGULAR,
-      false,
-      colorScale
-    )
+    const extendedSpec = extendVegaSpec(linearTemplate, PlotSize.REGULAR, {
+      color: colorScale
+    })
 
     expect(extendedSpec).not.toStrictEqual(defaultTemplate)
     expect(extendedSpec.encoding.color).toStrictEqual({
@@ -133,7 +130,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for large plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotSize.LARGE, false)
+    const updatedSpec = extendVegaSpec(spec, PlotSize.LARGE)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -159,7 +156,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for regular plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotSize.REGULAR, false)
+    const updatedSpec = extendVegaSpec(spec, PlotSize.REGULAR)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -185,7 +182,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 30 characters for small plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL, false)
+    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL)
 
     const truncatedTitle = '…s-at-least-seventy-characters'
     const truncatedHorizontalTitle = '…at-least-seventy-characters-x'
@@ -215,7 +212,7 @@ describe('extendVegaSpec', () => {
       text: repeatedTitle
     })
 
-    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL, false)
+    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -232,7 +229,7 @@ describe('extendVegaSpec', () => {
     const repeatedTitle = 'abcdefghijklmnopqrstuvwyz1234567890'
     const spec = withLongTemplatePlotTitle([repeatedTitle, repeatedTitle])
 
-    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL, false)
+    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -252,7 +249,7 @@ describe('extendVegaSpec', () => {
       text: [repeatedTitle, repeatedTitle]
     })
 
-    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL, false)
+    const updatedSpec = extendVegaSpec(spec, PlotSize.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 

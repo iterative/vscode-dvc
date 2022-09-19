@@ -20,6 +20,12 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import { ColorScale, PlotSize, Revision } from '../webview/contract'
+import {
+  Shape,
+  ShapeScale,
+  StrokeDash,
+  StrokeDashScale
+} from '../model/collect'
 
 const COMMIT_FIELD = 'rev'
 
@@ -104,8 +110,19 @@ type Encoding = {
     legend: {
       disable: boolean
     }
+    scale: StrokeDashScale
   }
-  color: {
+  shape?: {
+    field: string
+    legend: {
+      disable: boolean
+    }
+    scale: ShapeScale
+  }
+  detail?: {
+    field: string
+  }
+  color?: {
     legend: {
       disable: boolean
     }
@@ -117,18 +134,37 @@ type EncodingUpdate = {
   encoding: Encoding
 }
 
-export const getSpecEncodingUpdate = (
-  colorScale: ColorScale,
-  hasMultipleFiles: boolean
-): EncodingUpdate => {
-  const encoding: Encoding = {
-    color: {
+export const getSpecEncodingUpdate = ({
+  color,
+  shape,
+  strokeDash
+}: {
+  color?: ColorScale
+  shape?: Shape
+  strokeDash?: StrokeDash
+}): EncodingUpdate => {
+  const encoding: Encoding = {}
+  if (color) {
+    encoding.color = {
       legend: { disable: true },
-      scale: colorScale
+      scale: color
     }
   }
-  if (hasMultipleFiles) {
-    encoding.strokeDash = { field: 'filename', legend: { disable: true } }
+
+  if (strokeDash) {
+    encoding.strokeDash = {
+      field: strokeDash.field,
+      legend: { disable: true },
+      scale: strokeDash.scale
+    }
+  }
+  if (shape) {
+    encoding.shape = {
+      field: shape.field,
+      legend: { disable: true },
+      scale: shape.scale
+    }
+    encoding.detail = { field: shape.field }
   }
 
   return {
@@ -246,16 +282,19 @@ export const truncateTitles = (
 export const extendVegaSpec = (
   spec: TopLevelSpec,
   size: PlotSize,
-  isFlexiblePlot: boolean,
-  colorScale?: ColorScale
+  scale?: {
+    color?: ColorScale
+    strokeDash?: StrokeDash
+    shape?: Shape
+  }
 ) => {
   const updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec
 
-  if (isMultiViewByCommitPlot(spec) || !colorScale) {
+  if (isMultiViewByCommitPlot(spec) || !scale) {
     return updatedSpec
   }
 
-  const update = getSpecEncodingUpdate(colorScale, isFlexiblePlot)
+  const update = getSpecEncodingUpdate(scale)
 
   return mergeUpdate(updatedSpec, update)
 }
