@@ -33,16 +33,10 @@ describe('textDocument/definitions', () => {
     const response = await requestDefinitions(dvcYaml, 'auc')
 
     expect(response).toBeTruthy()
-    expect(response).toStrictEqual([
-      {
-        range: Range.create(Position.create(5, 8), Position.create(6, 0)),
-        uri: 'file:///dvc.yaml'
-      },
-      {
-        range: Range.create(Position.create(4, 0), Position.create(4, 3)),
-        uri: 'file:///params.yaml'
-      }
-    ])
+    expect(response).toStrictEqual({
+      range: Range.create(Position.create(4, 0), Position.create(4, 3)),
+      uri: 'file:///params.yaml'
+    })
   })
 
   it('should be able to read a complicated command from a stage', async () => {
@@ -56,11 +50,9 @@ describe('textDocument/definitions', () => {
     const response = await requestDefinitions(dvcYaml, '{item.os}')
 
     expect(response).toBeTruthy()
-    expect(response).toStrictEqual([
-      {
-        range: Range.create(Position.create(15, 8), Position.create(15, 10)),
-        uri: 'file:///dvc.yaml'
-      }
-    ])
+    expect(response).toStrictEqual({
+      range: Range.create(Position.create(15, 8), Position.create(15, 10)),
+      uri: 'file:///dvc.yaml'
+    })
   })
 })

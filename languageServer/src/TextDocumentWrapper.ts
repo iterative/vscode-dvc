@@ -109,11 +109,17 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
   ) {
     const nodeValue = `${node.value}`
 
+    let symbolKind: SymbolKind = SymbolKind.String
+
+    if (/\.[A-Za-z]+$/.test(nodeValue)) {
+      symbolKind = SymbolKind.File
+    }
+
     const symbolsSoFar: DocumentSymbol[] = [
       DocumentSymbol.create(
         nodeValue,
         undefined,
-        SymbolKind.String,
+        symbolKind,
         Range.create(this.positionAt(nodeStart), this.positionAt(nodeEnd)),
         Range.create(this.positionAt(nodeStart), this.positionAt(valueEnd))
       ),
