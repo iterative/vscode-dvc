@@ -1,6 +1,5 @@
 import cloneDeep from 'lodash.clonedeep'
 import omit from 'lodash.omit'
-import isEqual from 'lodash.isequal'
 import { TopLevelSpec } from 'vega-lite'
 import {
   ColorScale,
@@ -34,6 +33,8 @@ import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
 import { shortenForLabel } from '../../util/string'
+import { getDvcDataVersionInfo, joinFields } from '../multiSource/collect'
+import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -356,8 +357,7 @@ const collectDatapoints = (
   values: Record<string, unknown>[] = []
 ) => {
   for (const value of values) {
-    const dvc_data_version_info = (value?.dvc_data_version_info ||
-      {}) as Record<string, unknown>
+    const dvc_data_version_info = getDvcDataVersionInfo(value)
     const data: { rev: string } = {
       ...value,
       ...dvc_data_version_info,
@@ -417,343 +417,6 @@ export const collectData = (
 
   for (const [path, plots] of Object.entries(data)) {
     collectPathData(acc, path, plots, cliIdToLabel)
-  }
-
-  return acc
-}
-
-const getDvcDataVersionInfo = (
-  value: Record<string, unknown>
-): Record<string, unknown> => {
-  const dvcDataVersionInfo =
-    (value.dvc_data_version_info as Record<string, unknown>) || {}
-  if (dvcDataVersionInfo.revision) {
-    delete dvcDataVersionInfo.revision
-  }
-
-  return dvcDataVersionInfo
-}
-
-const collectPlotMultiSourceVariations = (
-  acc: Record<string, Record<string, unknown>[]>,
-  path: string,
-  plot: TemplatePlot
-) => {
-  if (!acc[path]) {
-    acc[path] = []
-  }
-
-  for (const value of Object.values(plot.datapoints || {}).flat()) {
-    const dvcDataVersionInfo = getDvcDataVersionInfo(value)
-
-    if (acc[path].some(obj => isEqual(obj, dvcDataVersionInfo))) {
-      continue
-    }
-    acc[path].push(dvcDataVersionInfo)
-  }
-}
-
-const collectPathMultiSourceVariations = (
-  acc: Record<string, Record<string, unknown>[]>,
-  path: string,
-  plots: Plot[]
-) => {
-  for (const plot of plots) {
-    if (isImagePlot(plot)) {
-      continue
-    }
-
-    collectPlotMultiSourceVariations(acc, path, plot)
-  }
-}
-
-export const collectMultiSourceVariations = (
-  data: PlotsOutput,
-  acc: Record<string, Record<string, unknown>[]>
-) => {
-  for (const [path, plots] of Object.entries(data)) {
-    collectPathMultiSourceVariations(acc, path, plots)
-  }
-
-  return acc
-}
-
-const ShapeValues = ['square', 'circle', 'triangle'] as const
-const StrokeDashValues = [
-  [1, 0],
-  [8, 8],
-  [8, 4],
-  [4, 4],
-  [4, 2],
-  [2, 1],
-  [1, 1]
-] as const
-
-export type StrokeDashScale = {
-  domain: string[]
-  range: typeof StrokeDashValues[number][]
-}
-
-export type StrokeDash = { scale: StrokeDashScale } & { field: string }
-
-export type ShapeScale = {
-  domain: string[]
-  range: typeof ShapeValues[number][]
-}
-export type Shape = { scale: ShapeScale } & { field: string }
-
-const initializeAcc = (
-  values: { filename?: Set<string>; field?: Set<string> },
-  key: 'filename' | 'field'
-) => {
-  if (!values[key]) {
-    values[key] = new Set<string>()
-  }
-}
-
-const collectMultiSourceValue = (
-  values: { filename?: Set<string>; field?: Set<string> },
-  variation: {
-    filename?: string | undefined
-    field?: string | undefined
-  }
-) => {
-  for (const [key, value] of Object.entries(variation)) {
-    if (key !== 'filename' && key !== 'field') {
-      continue
-    }
-    initializeAcc(values, key)
-    ;(values[key] as Set<string>).add(value)
-  }
-}
-
-const collectMultiSourceValues = (
-  variations: {
-    filename?: string | undefined
-    field?: string | undefined
-  }[]
-): { filename?: Set<string>; field?: Set<string> } => {
-  const values: { filename?: Set<string>; field?: Set<string> } = {}
-  for (const variation of variations) {
-    collectMultiSourceValue(values, variation)
-  }
-  return values
-}
-
-const sortDifferentVariations = (
-  differentVariations: { field: string; variations: number }[]
-): { field: string; variations: number }[] => {
-  const expectedOrder = ['filename', 'field']
-  differentVariations.sort(
-    (
-      { field: aField, variations: aVariations },
-      { field: bField, variations: bVariations }
-    ) =>
-      aVariations === bVariations
-        ? expectedOrder.indexOf(aField) - expectedOrder.indexOf(bField)
-        : aVariations - bVariations
-  )
-  return differentVariations
-}
-
-const groupVariations = (
-  variations: {
-    filename?: string | undefined
-    field?: string | undefined
-  }[],
-  values: {
-    filename?: Set<string>
-    field?: Set<string>
-  }
-): {
-  lessValuesThanVariations: { field: string; variations: number }[]
-  valuesMatchVariations: string[]
-} => {
-  const valuesMatchVariations: string[] = []
-  const lessValuesThanVariations: { field: string; variations: number }[] = []
-
-  for (const [field, valueSet] of Object.entries(values)) {
-    if (valueSet.size === 1) {
-      continue
-    }
-    if (valueSet.size === variations.length) {
-      valuesMatchVariations.push(field)
-      continue
-    }
-    lessValuesThanVariations.push({ field, variations: valueSet.size })
-  }
-
-  return {
-    lessValuesThanVariations: sortDifferentVariations(lessValuesThanVariations),
-    valuesMatchVariations: valuesMatchVariations.sort((a, b) =>
-      b.localeCompare(a)
-    )
-  }
-}
-
-const collectEqualVariation = (
-  scale: StrokeDashScale,
-  valuesMatchVariations: string[],
-  field: Set<string>,
-  idx: number,
-  variation: { filename?: string; field?: string }
-) => {
-  const domain: string[] = []
-
-  for (const key of valuesMatchVariations as (keyof typeof variation)[]) {
-    if (variation[key]) {
-      domain.push(variation[key] as string)
-      field.add(key)
-    }
-  }
-
-  scale.domain.push(domain.join('::'))
-  scale.range.push(StrokeDashValues[idx])
-  scale.domain.sort()
-  idx++
-}
-
-const combineFieldAndScale = <T extends StrokeDashScale | ShapeScale>(
-  field: Set<string>,
-  scale: T
-): { field: string; scale: T } => ({ field: [...field].join('::'), scale })
-
-const collectScaleFromVariations = (
-  acc: Record<
-    string,
-    {
-      strokeDash: StrokeDash
-      shape?: Shape
-    }
-  >,
-  path: string,
-  variations: {
-    filename?: string | undefined
-    field?: string | undefined
-  }[],
-  valuesMatchVariations: string[]
-): void => {
-  const scale: StrokeDashScale = {
-    domain: [],
-    range: []
-  }
-
-  let idx = 0
-  const field = new Set<string>()
-  for (const variation of variations) {
-    collectEqualVariation(scale, valuesMatchVariations, field, idx, variation)
-    idx++
-  }
-
-  acc[path] = {
-    strokeDash: combineFieldAndScale(field, scale)
-  }
-}
-
-const collectScaleFromValues = <
-  T extends typeof ShapeValues | typeof StrokeDashValues
->(
-  scaleRange: T,
-  values: {
-    filename?: Set<string>
-    field?: Set<string>
-  },
-  lessValuesThanVariations: { field: string; variations: number }[]
-): { field: Set<string>; scale: { range: T[number][]; domain: string[] } } => {
-  const scale: { range: T[number][]; domain: string[] } = {
-    domain: [],
-    range: []
-  }
-  const filenameOrField = lessValuesThanVariations.shift()
-  let idx = 0
-  const field = new Set<string>()
-  if (filenameOrField?.field) {
-    for (const value of values[filenameOrField.field as 'filename' | 'field'] ||
-      []) {
-      field.add(filenameOrField.field)
-      scale.domain.push(value)
-      scale.range.push(scaleRange[idx])
-      scale.domain.sort()
-      idx++
-    }
-  }
-  return { field, scale }
-}
-
-const collectMultiSourceScales = (
-  acc: Record<
-    string,
-    {
-      strokeDash: StrokeDash
-      shape?: Shape
-    }
-  >,
-  path: string,
-  variations: {
-    filename?: string | undefined
-    field?: string | undefined
-  }[]
-): void => {
-  const values = collectMultiSourceValues(variations)
-
-  const { valuesMatchVariations, lessValuesThanVariations } = groupVariations(
-    variations,
-    values
-  )
-
-  if (valuesMatchVariations.length > 0) {
-    collectScaleFromVariations(acc, path, variations, valuesMatchVariations)
-  }
-
-  if (lessValuesThanVariations.length > 0 && !acc[path]?.strokeDash) {
-    const { field, scale } = collectScaleFromValues(
-      StrokeDashValues,
-      values,
-      lessValuesThanVariations
-    )
-
-    acc[path] = {
-      strokeDash: combineFieldAndScale(field, scale)
-    }
-  }
-
-  if (lessValuesThanVariations.length > 0) {
-    const { field, scale } = collectScaleFromValues(
-      ShapeValues,
-      values,
-      lessValuesThanVariations
-    )
-
-    acc[path] = {
-      ...acc[path],
-      shape: combineFieldAndScale(field, scale)
-    }
-  }
-}
-
-export const collectMultiSourceData = (
-  data: Record<string, { filename?: string; field?: string }[]>
-): Record<
-  string,
-  {
-    strokeDash: StrokeDash
-    shape?: Shape
-  }
-> => {
-  const acc: Record<
-    string,
-    {
-      strokeDash: StrokeDash
-      shape?: Shape
-    }
-  > = {}
-
-  for (const [path, variations] of Object.entries(data)) {
-    if (variations.length <= 1) {
-      continue
-    }
-
-    collectMultiSourceScales(acc, path, variations)
   }
 
   return acc
@@ -853,7 +516,7 @@ const fillTemplate = (
           const obj = data as Record<string, unknown>
           return {
             ...obj,
-            [field]: mapping.map(field => obj[field]).join('::')
+            [field]: joinFields(mapping.map(field => obj[field] as string))
           }
         })
       )
@@ -869,8 +532,8 @@ const collectTemplateGroup = (
   scales: Record<
     string,
     {
-      strokeDash?: StrokeDash
-      shape?: Shape
+      strokeDash?: StrokeDashEncoding
+      shape?: ShapeEncoding
     }
   >,
   size: PlotSize,
@@ -916,8 +579,8 @@ export const collectSelectedTemplatePlots = (
   scales: Record<
     string,
     {
-      strokeDash?: StrokeDash
-      shape?: Shape
+      strokeDash?: StrokeDashEncoding
+      shape?: ShapeEncoding
     }
   >,
   size: PlotSize,

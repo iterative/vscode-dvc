@@ -20,12 +20,7 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import { ColorScale, PlotSize, Revision } from '../webview/contract'
-import {
-  Shape,
-  ShapeScale,
-  StrokeDash,
-  StrokeDashScale
-} from '../model/collect'
+import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
 const COMMIT_FIELD = 'rev'
 
@@ -105,19 +100,15 @@ export const getColorScale = (
 }
 
 type Encoding = {
-  strokeDash?: {
-    field: string
+  strokeDash?: StrokeDashEncoding & {
     legend: {
       disable: boolean
     }
-    scale: StrokeDashScale
   }
-  shape?: {
-    field: string
+  shape?: ShapeEncoding & {
     legend: {
       disable: boolean
     }
-    scale: ShapeScale
   }
   detail?: {
     field: string
@@ -140,8 +131,8 @@ export const getSpecEncodingUpdate = ({
   strokeDash
 }: {
   color?: ColorScale
-  shape?: Shape
-  strokeDash?: StrokeDash
+  shape?: ShapeEncoding
+  strokeDash?: StrokeDashEncoding
 }): EncodingUpdate => {
   const encoding: Encoding = {}
   if (color) {
@@ -284,8 +275,8 @@ export const extendVegaSpec = (
   size: PlotSize,
   scale?: {
     color?: ColorScale
-    strokeDash?: StrokeDash
-    shape?: Shape
+    strokeDash?: StrokeDashEncoding
+    shape?: ShapeEncoding
   }
 ) => {
   const updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec

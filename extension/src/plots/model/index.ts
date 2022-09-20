@@ -11,11 +11,7 @@ import {
   ComparisonData,
   RevisionData,
   TemplateAccumulator,
-  collectBranchRevisionDetails,
-  collectMultiSourceVariations,
-  collectMultiSourceData,
-  Shape,
-  StrokeDash
+  collectBranchRevisionDetails
 } from './collect'
 import {
   CheckpointPlot,
@@ -37,6 +33,11 @@ import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
+import {
+  collectMultiSourceData,
+  collectMultiSourceVariations
+} from '../multiSource/collect'
+import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -58,8 +59,10 @@ export class PlotsModel extends ModelWithPersistence {
     { filename?: string; field?: string }[]
   > = {}
 
-  private scales: Record<string, { strokeDash?: StrokeDash; shape?: Shape }> =
-    {}
+  private scales: Record<
+    string,
+    { strokeDash?: StrokeDashEncoding; shape?: ShapeEncoding }
+  > = {}
 
   private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
@@ -441,10 +444,4 @@ export class PlotsModel extends ModelWithPersistence {
       this.getRevisionColors()
     )
   }
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  // private collectMultiSourceData() {
-  //   const acc: Record<string, Record<string, Set<string>>> = collectMultiSourceData(this.multiSourceValues)
-
-  // }
 }
