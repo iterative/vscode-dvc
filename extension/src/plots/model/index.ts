@@ -12,8 +12,8 @@ import {
   RevisionData,
   TemplateAccumulator,
   collectBranchRevisionDetails,
+  collectMultiSourceVariations,
   collectMultiSourceData,
-  collectMultiSourceKeys,
   Shape,
   StrokeDash
 } from './collect'
@@ -119,7 +119,7 @@ export class PlotsModel extends ModelWithPersistence {
       await Promise.all([
         collectData(data, cliIdToLabel),
         collectTemplates(data),
-        collectMultiSourceData(data, this.multiSourceData)
+        collectMultiSourceVariations(data, this.multiSourceData)
       ])
 
     const { overwriteComparisonData, overwriteRevisionData } =
@@ -141,7 +141,7 @@ export class PlotsModel extends ModelWithPersistence {
     }
     this.templates = { ...this.templates, ...templates }
     this.multiSourceData = multiSourceData
-    this.scales = collectMultiSourceKeys(this.multiSourceData)
+    this.scales = collectMultiSourceData(this.multiSourceData)
 
     this.setComparisonOrder()
 
@@ -443,8 +443,8 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  // private collectMultiSourceKeys() {
-  //   const acc: Record<string, Record<string, Set<string>>> = collectMultiSourceKeys(this.multiSourceValues)
+  // private collectMultiSourceData() {
+  //   const acc: Record<string, Record<string, Set<string>>> = collectMultiSourceData(this.multiSourceValues)
 
   // }
 }

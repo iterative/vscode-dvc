@@ -10,7 +10,7 @@ import {
   collectMetricOrder,
   collectWorkspaceRunningCheckpoint,
   collectWorkspaceRaceConditionData,
-  collectMultiSourceKeys
+  collectMultiSourceData
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/output'
@@ -360,9 +360,9 @@ describe('collectWorkspaceRaceConditionData', () => {
   })
 })
 
-describe('collectMultiSourceKeys', () => {
+describe('collectMultiSourceData', () => {
   it('should return an empty object given no multi source data', () => {
-    const multiSourceKeys = collectMultiSourceKeys({
+    const multiSourceKeys = collectMultiSourceData({
       path: [{ field: 'x', filename: 'path' }]
     })
     expect(multiSourceKeys).toStrictEqual({})
@@ -370,7 +370,7 @@ describe('collectMultiSourceKeys', () => {
 
   it('should return an object containing a filename strokeDash given data with varying filenames', () => {
     const otherPath = join('other', 'path')
-    const multiSourceKeys = collectMultiSourceKeys({
+    const multiSourceKeys = collectMultiSourceData({
       combined: [
         { field: 'x', filename: 'path' },
         { field: 'x', filename: otherPath }
@@ -393,7 +393,7 @@ describe('collectMultiSourceKeys', () => {
   })
 
   it('should return an object containing a field strokeDash given data with varying fields', () => {
-    const multiSourceKeys = collectMultiSourceKeys({
+    const multiSourceKeys = collectMultiSourceData({
       path: [
         { field: 'x', filename: 'path' },
         { field: 'z', filename: 'path' }
@@ -417,7 +417,7 @@ describe('collectMultiSourceKeys', () => {
 
   it('should return an object containing a filename and field strokeDash given data with varying filename and fields', () => {
     const otherPath = join('other', 'path')
-    const multiSourceKeys = collectMultiSourceKeys({
+    const multiSourceKeys = collectMultiSourceData({
       combined: [
         { field: 'x', filename: 'path' },
         { field: 'z', filename: otherPath }
@@ -426,7 +426,7 @@ describe('collectMultiSourceKeys', () => {
     expect(multiSourceKeys).toStrictEqual({
       combined: {
         strokeDash: {
-          field: 'data',
+          field: 'filename::field',
           scale: {
             domain: [`${otherPath}::z`, 'path::x'],
             range: [
@@ -440,7 +440,7 @@ describe('collectMultiSourceKeys', () => {
   })
 
   it('should return an object containing a filename strokeDash and field shape given data with differently varying filename and field', () => {
-    const multiSourceKeys = collectMultiSourceKeys({
+    const multiSourceKeys = collectMultiSourceData({
       combined: [
         { field: 'x', filename: 'path' },
         { field: 'z', filename: 'path' },
@@ -468,7 +468,7 @@ describe('collectMultiSourceKeys', () => {
   })
 
   it('should return an object containing a filename strokeDash and field shape given data with varying filename and similar field', () => {
-    const multiSourceKeys = collectMultiSourceKeys({
+    const multiSourceKeys = collectMultiSourceData({
       combined: [
         { field: 'x', filename: join('first', 'path') },
         { field: 'z', filename: join('second', 'path') },
@@ -501,7 +501,7 @@ describe('collectMultiSourceKeys', () => {
   })
 
   it('should return an object containing a filename strokeDash and field shape given data with varying filename and similar field 2', () => {
-    const multiSourceKeys = collectMultiSourceKeys({
+    const multiSourceKeys = collectMultiSourceData({
       combined: [
         { field: 'x', filename: join('first', 'path') },
         { field: 'z', filename: join('second', 'path') },
@@ -511,7 +511,7 @@ describe('collectMultiSourceKeys', () => {
     expect(multiSourceKeys).toStrictEqual({
       combined: {
         strokeDash: {
-          field: 'data',
+          field: 'filename::field',
           scale: {
             domain: [
               `${join('first', 'path')}::x`,
