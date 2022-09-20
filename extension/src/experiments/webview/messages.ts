@@ -114,7 +114,7 @@ export class WebviewMessages {
         return this.focusSortsTree()
 
       case MessageFromWebviewType.OPEN_PLOTS_WEBVIEW:
-        return commands.executeCommand(RegisteredCommands.PLOTS_SHOW)
+        return this.showPlots()
 
       case MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH:
         return commands.executeCommand(
@@ -126,6 +126,15 @@ export class WebviewMessages {
           RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
+
+      case MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS:
+        return this.setSelectedExperiments(message.payload)
+
+      case MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS:
+        return Promise.all([
+          this.setSelectedExperiments(message.payload),
+          this.showPlots()
+        ])
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -253,5 +262,28 @@ export class WebviewMessages {
       { path },
       undefined
     )
+  }
+
+  private setSelectedExperiments(ids: string[]) {
+    const experiments = this.experiments
+      .getCombinedList()
+      .filter(({ id }) => ids.includes(id))
+
+    this.experiments.setSelectionMode(false)
+    this.experiments.setSelected(experiments)
+
+    this.notifyChanged()
+
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS,
+      { experimentCount: ids.length },
+      undefined
+    )
+  }
+
+  private showPlots() {
+    return commands.executeCommand(RegisteredCommands.PLOTS_SHOW, {
+      dvcRoot: this.dvcRoot
+    })
   }
 }

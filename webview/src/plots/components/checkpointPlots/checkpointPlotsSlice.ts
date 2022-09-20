@@ -44,14 +44,14 @@ export const checkpointPlotsSlice = createSlice({
         return checkpointPlotsInitialState
       }
       const { plots, ...statePayload } = action.payload
-      const plotsIds = plots?.map(plot => plot.title) || []
+      const plotsIds = plots?.map(plot => plot.id) || []
       const snapShots = addCheckpointPlotsWithSnapshots(plots)
       removeCheckpointPlots(plotsIds)
       return {
         ...state,
         ...statePayload,
         hasData: !!action.payload,
-        plotsIds: plots?.map(plot => plot.title) || [],
+        plotsIds: plots?.map(plot => plot.id) || [],
         plotsSnapshots: snapShots
       }
     }
