@@ -9,6 +9,7 @@ import {
   Uri
 } from 'vscode'
 import { ExperimentType } from '.'
+import { ExperimentAugmented } from './filterBy/collect'
 import { collectDeletable, ExperimentItem } from './collect'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { WorkspaceExperiments } from '../workspace'
@@ -29,6 +30,7 @@ import {
 } from '../../commands/external'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
+import { Experiment } from '../webview/contract'
 
 export class ExperimentsTree
   extends Disposable
@@ -120,6 +122,12 @@ export class ExperimentsTree
       return Promise.resolve(this.getExperiments(element))
     }
 
+    if (element.type === ExperimentType.BRANCH) {
+      return Promise.resolve(
+        this.getExperimentsByBranch(element.dvcRoot, element)
+      )
+    }
+
     const { dvcRoot, id } = element
     return Promise.resolve(this.getCheckpoints(dvcRoot, id))
   }
@@ -168,27 +176,43 @@ export class ExperimentsTree
     return []
   }
 
+  private formatExperiment(experiment: ExperimentAugmented, dvcRoot: string) {
+    return {
+      collapsibleState: experiment.hasChildren
+        ? this.getCollapsibleState(experiment.displayNameOrParent)
+        : TreeItemCollapsibleState.None,
+      command: {
+        arguments: [{ dvcRoot, id: experiment.id }],
+        command: RegisteredCommands.EXPERIMENT_TOGGLE,
+        title: 'toggle'
+      },
+      description: experiment.displayNameOrParent,
+      dvcRoot,
+      iconPath: this.getExperimentIcon(experiment),
+      id: experiment.id,
+      label: experiment.label,
+      tooltip: this.getTooltip(experiment.error),
+      type: experiment.type
+    }
+  }
+
   private getExperiments(dvcRoot: string): ExperimentItem[] {
     return this.experiments
       .getRepository(dvcRoot)
       .getExperiments()
-      .map(experiment => ({
-        collapsibleState: experiment.hasChildren
-          ? this.getCollapsibleState(experiment.displayNameOrParent)
-          : TreeItemCollapsibleState.None,
-        command: {
-          arguments: [{ dvcRoot, id: experiment.id }],
-          command: RegisteredCommands.EXPERIMENT_TOGGLE,
-          title: 'toggle'
-        },
-        description: experiment.displayNameOrParent,
-        dvcRoot,
-        iconPath: this.getExperimentIcon(experiment),
-        id: experiment.id,
-        label: experiment.label,
-        tooltip: this.getTooltip(experiment.error),
-        type: experiment.type
-      }))
+      .map(experiment => this.formatExperiment(experiment, dvcRoot))
+  }
+
+  private getExperimentsByBranch(
+    dvcRoot: string,
+    branch: Experiment
+  ): ExperimentItem[] {
+    return (
+      this.experiments
+        .getRepository(dvcRoot)
+        .getBranchExperiments(branch)
+        ?.map(experiment => this.formatExperiment(experiment, dvcRoot)) || []
+    )
   }
 
   private setExpanded(element: string | ExperimentItem, expanded: boolean) {

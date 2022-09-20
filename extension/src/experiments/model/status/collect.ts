@@ -31,14 +31,17 @@ const collectStatus = (
 const collectExistingStatuses = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
+  experimentsByBranch: Map<string, Experiment[]>,
   previousStatus: ColoredStatus
 ) => {
   const existingStatuses: ColoredStatus = {}
   for (const experiment of [
     ...experiments,
+    ...flattenMapValues(experimentsByBranch),
     ...flattenMapValues(checkpointsByTip)
   ]) {
     const { id } = experiment
+
     if (!hasKey(previousStatus, id)) {
       continue
     }
@@ -70,11 +73,16 @@ export const unassignColors = (
 export const collectColoredStatus = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
+  experimentsByBranch: Map<string, Experiment[]>,
   previousStatus: ColoredStatus,
   unassignedColors: Color[]
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
   const availableColors = unassignColors(
-    [...experiments, ...flattenMapValues(checkpointsByTip)],
+    [
+      ...experiments,
+      ...flattenMapValues(checkpointsByTip),
+      ...flattenMapValues(experimentsByBranch)
+    ],
     previousStatus,
     unassignedColors
   )
@@ -82,6 +90,7 @@ export const collectColoredStatus = (
   const coloredStatus = collectExistingStatuses(
     experiments,
     checkpointsByTip,
+    experimentsByBranch,
     previousStatus
   )
 
