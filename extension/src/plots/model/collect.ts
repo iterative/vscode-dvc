@@ -554,53 +554,59 @@ const groupVariations = (
     field?: Set<string>
   }
 ): {
-  differentVariations: { field: string; variations: number }[]
-  equalVariations: string[]
+  lessValuesThanVariations: { field: string; variations: number }[]
+  valuesMatchVariations: string[]
 } => {
-  const equalVariations: string[] = []
-  const differentVariations: { field: string; variations: number }[] = []
+  const valuesMatchVariations: string[] = []
+  const lessValuesThanVariations: { field: string; variations: number }[] = []
 
   for (const [field, valueSet] of Object.entries(values)) {
     if (valueSet.size === 1) {
       continue
     }
     if (valueSet.size === variations.length) {
-      equalVariations.push(field)
+      valuesMatchVariations.push(field)
       continue
     }
-    differentVariations.push({ field, variations: valueSet.size })
+    lessValuesThanVariations.push({ field, variations: valueSet.size })
   }
 
   return {
-    differentVariations: sortDifferentVariations(differentVariations),
-    equalVariations
+    lessValuesThanVariations: sortDifferentVariations(lessValuesThanVariations),
+    valuesMatchVariations: valuesMatchVariations.sort((a, b) =>
+      b.localeCompare(a)
+    )
   }
 }
 
 const collectEqualVariation = (
-  strokeDashScale: StrokeDashScale,
-  equalVariations: string[],
+  scale: StrokeDashScale,
+  valuesMatchVariations: string[],
   field: Set<string>,
   idx: number,
-  available: { filename?: string; field?: string }
+  variation: { filename?: string; field?: string }
 ) => {
   const domain: string[] = []
 
-  if (equalVariations.includes('filename') && available.filename) {
-    domain.push(available.filename)
-    field.add('filename')
+  for (const key of valuesMatchVariations as (keyof typeof variation)[]) {
+    if (variation[key]) {
+      domain.push(variation[key] as string)
+      field.add(key)
+    }
   }
-  if (equalVariations.includes('field') && available.field) {
-    domain.push(available.field)
-    field.add('field')
-  }
-  strokeDashScale.domain.push(domain.join('::'))
-  strokeDashScale.range.push(StrokeDashValues[idx])
-  strokeDashScale.domain.sort()
+
+  scale.domain.push(domain.join('::'))
+  scale.range.push(StrokeDashValues[idx])
+  scale.domain.sort()
   idx++
 }
 
-const collectEqualVariations = (
+const combineFieldAndScale = <T extends StrokeDashScale | ShapeScale>(
+  field: Set<string>,
+  scale: T
+): { field: string; scale: T } => ({ field: [...field].join('::'), scale })
+
+const collectScaleFromVariations = (
   acc: Record<
     string,
     {
@@ -613,48 +619,40 @@ const collectEqualVariations = (
     filename?: string | undefined
     field?: string | undefined
   }[],
-  equalVariations: string[]
+  valuesMatchVariations: string[]
 ): void => {
-  if (equalVariations.length <= 0) {
-    return
-  }
-
-  const strokeDashScale: StrokeDashScale = {
+  const scale: StrokeDashScale = {
     domain: [],
     range: []
   }
 
   let idx = 0
   const field = new Set<string>()
-  for (const available of variations) {
-    collectEqualVariation(
-      strokeDashScale,
-      equalVariations,
-      field,
-      idx,
-      available
-    )
+  for (const variation of variations) {
+    collectEqualVariation(scale, valuesMatchVariations, field, idx, variation)
     idx++
   }
 
   acc[path] = {
-    strokeDash: { field: [...field].join('::'), scale: strokeDashScale }
+    strokeDash: combineFieldAndScale(field, scale)
   }
 }
 
-const collectDifferentVariation = <
-  T extends typeof ShapeValues | typeof StrokeDashValues,
-  U extends { range: T[number][]; domain: string[] }
+const collectScaleFromValues = <
+  T extends typeof ShapeValues | typeof StrokeDashValues
 >(
-  scale: U,
   scaleRange: T,
-  differentVariations: { field: string; variations: number }[],
   values: {
     filename?: Set<string>
     field?: Set<string>
+  },
+  lessValuesThanVariations: { field: string; variations: number }[]
+): { field: Set<string>; scale: { range: T[number][]; domain: string[] } } => {
+  const scale: { range: T[number][]; domain: string[] } = {
+    domain: [],
+    range: []
   }
-): { field: Set<string>; scale: U } => {
-  const filenameOrField = differentVariations.shift()
+  const filenameOrField = lessValuesThanVariations.shift()
   let idx = 0
   const field = new Set<string>()
   if (filenameOrField?.field) {
@@ -662,18 +660,13 @@ const collectDifferentVariation = <
       []) {
       field.add(filenameOrField.field)
       scale.domain.push(value)
-      scale.range.push(scaleRange[idx] as typeof scale.range[number])
+      scale.range.push(scaleRange[idx])
       scale.domain.sort()
       idx++
     }
   }
   return { field, scale }
 }
-
-const combineFieldAndScale = <T extends StrokeDashScale | ShapeScale>(
-  field: Set<string>,
-  scale: T
-): { field: string; scale: T } => ({ field: [...field].join('::'), scale })
 
 const collectMultiSourceScales = (
   acc: Record<
@@ -687,31 +680,24 @@ const collectMultiSourceScales = (
   variations: {
     filename?: string | undefined
     field?: string | undefined
-  }[],
-  values: {
-    filename?: Set<string>
-    field?: Set<string>
-  },
-  equalVariations: string[],
-  differentVariations: { field: string; variations: number }[]
+  }[]
 ): void => {
-  const strokeDashScale: StrokeDashScale = {
-    domain: [],
-    range: []
-  }
-  const shapeScale: ShapeScale = {
-    domain: [],
-    range: []
+  const values = collectMultiSourceValues(variations)
+
+  const { valuesMatchVariations, lessValuesThanVariations } = groupVariations(
+    variations,
+    values
+  )
+
+  if (valuesMatchVariations.length > 0) {
+    collectScaleFromVariations(acc, path, variations, valuesMatchVariations)
   }
 
-  collectEqualVariations(acc, path, variations, equalVariations)
-
-  if (differentVariations.length > 0 && !acc[path]?.strokeDash) {
-    const { field, scale } = collectDifferentVariation(
-      strokeDashScale,
+  if (lessValuesThanVariations.length > 0 && !acc[path]?.strokeDash) {
+    const { field, scale } = collectScaleFromValues(
       StrokeDashValues,
-      differentVariations,
-      values
+      values,
+      lessValuesThanVariations
     )
 
     acc[path] = {
@@ -719,12 +705,11 @@ const collectMultiSourceScales = (
     }
   }
 
-  if (differentVariations.length > 0) {
-    const { field, scale } = collectDifferentVariation(
-      shapeScale,
+  if (lessValuesThanVariations.length > 0) {
+    const { field, scale } = collectScaleFromValues(
       ShapeValues,
-      differentVariations,
-      values
+      values,
+      lessValuesThanVariations
     )
 
     acc[path] = {
@@ -756,21 +741,7 @@ export const collectMultiSourceData = (
       continue
     }
 
-    const values = collectMultiSourceValues(variations)
-
-    const { equalVariations, differentVariations } = groupVariations(
-      variations,
-      values
-    )
-
-    collectMultiSourceScales(
-      acc,
-      path,
-      variations,
-      values,
-      equalVariations,
-      differentVariations
-    )
+    collectMultiSourceScales(acc, path, variations)
   }
 
   return acc
