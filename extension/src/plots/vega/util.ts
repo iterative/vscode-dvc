@@ -144,16 +144,14 @@ export const getSpecEncodingUpdate = ({
 
   if (strokeDash) {
     encoding.strokeDash = {
-      field: strokeDash.field,
-      legend: { disable: true },
-      scale: strokeDash.scale
+      ...strokeDash,
+      legend: { disable: true }
     }
   }
   if (shape) {
     encoding.shape = {
-      field: shape.field,
-      legend: { disable: true },
-      scale: shape.scale
+      ...shape,
+      legend: { disable: true }
     }
     encoding.detail = { field: shape.field }
   }
