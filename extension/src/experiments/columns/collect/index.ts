@@ -16,35 +16,40 @@ import { timestampColumn } from '../constants'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
-  experiment: ExperimentFieldsOrError
+  experiment: ExperimentFieldsOrError,
+  maxHeadLayers: number
 ) => {
   const { data } = experiment
   if (data) {
-    collectMetricsAndParams(acc, data)
-    collectDeps(acc, data)
+    collectMetricsAndParams(acc, data, maxHeadLayers)
+    collectDeps(acc, data, maxHeadLayers)
   }
 }
 
 const collectFromBranch = (
   acc: ColumnAccumulator,
-  branch: ExperimentsBranchOutput
+  branch: ExperimentsBranchOutput,
+  maxHeadLayers: number
 ) => {
   const { baseline, ...rest } = branch
-  collectFromExperiment(acc, baseline)
+  collectFromExperiment(acc, baseline, maxHeadLayers)
   for (const experiment of Object.values(rest)) {
-    collectFromExperiment(acc, experiment)
+    collectFromExperiment(acc, experiment, maxHeadLayers)
   }
 }
 
-export const collectColumns = (data: ExperimentsOutput): Column[] => {
+export const collectColumns = (
+  data: ExperimentsOutput,
+  columnsLayersMaxLength: number
+): Column[] => {
   const acc: ColumnAccumulator = {}
 
   acc.timestamp = timestampColumn
 
   const { workspace, ...rest } = data
-  collectFromBranch(acc, workspace)
+  collectFromBranch(acc, workspace, columnsLayersMaxLength)
   for (const branch of Object.values(rest)) {
-    collectFromBranch(acc, branch)
+    collectFromBranch(acc, branch, columnsLayersMaxLength)
   }
   return Object.values(acc)
 }

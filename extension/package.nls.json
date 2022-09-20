@@ -34,6 +34,7 @@
   "command.modifyExperimentParamsAndRun": "Modify Experiment Param(s) and Run",
   "command.modifyExperimentParamsAndResume": "Modify Experiment Param(s) and Resume",
   "command.modifyExperimentParamsResetAndRun": "Modify Experiment Param(s), Reset and Run",
+  "command.modifyExperimentHeadMaxLayers": "Modify Experiment Head Max Layers",
   "command.queueExperiment": "Queue Experiment",
   "command.removeExperiment": "Remove Experiment",
   "command.removeExperimentQueue": "Remove All Queued Experiments",

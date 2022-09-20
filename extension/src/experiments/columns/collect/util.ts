@@ -6,7 +6,7 @@ export type ColumnAccumulator = Record<string, Column>
 export const limitAncestorDepth = (
   ancestors: string[],
   sep: string,
-  limit = 5
+  limit: number
 ) => {
   const [path, ...rest] = ancestors
   /*

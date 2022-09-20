@@ -1,5 +1,6 @@
 import { Memento } from 'vscode'
 import { collectChanges, collectColumns, collectParamsFiles } from './collect'
+import { INITIAL_TABLE_HEAD_MAX_LAYERS } from './consts'
 import { Column, ColumnType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/dvc/reader'
 import { PersistenceKey } from '../../persistence/constants'
@@ -8,6 +9,7 @@ import { PathSelectionModel } from '../../path/selection/model'
 export class ColumnsModel extends PathSelectionModel<Column> {
   private columnOrderState: string[] = []
   private columnWidthsState: Record<string, number> = {}
+  private columnHeadLayersMaxLength = INITIAL_TABLE_HEAD_MAX_LAYERS
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
 
@@ -22,6 +24,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       {}
     )
+    this.columnHeadLayersMaxLength = this.revive(
+      PersistenceKey.EXPERIMENTS_HEAD_MAX_LAYERS,
+      INITIAL_TABLE_HEAD_MAX_LAYERS
+    )
   }
 
   public getColumnOrder(): string[] {
@@ -30,6 +36,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public getColumnWidths(): Record<string, number> {
     return this.columnWidthsState
+  }
+
+  public getHeadColumnsMaxLayers() {
+    return this.columnHeadLayersMaxLength
   }
 
   public getParamsFiles() {
@@ -63,6 +73,14 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     )
   }
 
+  public setColumnHeadLayersMax(max: number) {
+    this.columnHeadLayersMaxLength = max
+    this.persist(
+      PersistenceKey.EXPERIMENTS_HEAD_MAX_LAYERS,
+      this.columnHeadLayersMaxLength
+    )
+  }
+
   public filterChildren(path?: string) {
     return this.data.filter(element =>
       path
@@ -79,7 +97,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   private async transformAndSetColumns(data: ExperimentsOutput) {
     const [columns, paramsFiles] = await Promise.all([
-      collectColumns(data),
+      collectColumns(data, this.getHeadColumnsMaxLayers()),
       collectParamsFiles(this.dvcRoot, data)
     ])
 

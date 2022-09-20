@@ -12,7 +12,11 @@ import { ExperimentFields } from '../../../cli/dvc/reader'
 import { getPathArray } from '../../../fileSystem/util'
 import { shortenForLabel } from '../../../util/string'
 
-export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
+export const collectDeps = (
+  acc: ColumnAccumulator,
+  data: ExperimentFields,
+  maxHeaderLayers: number
+) => {
   const { deps } = data
   if (!deps) {
     return
@@ -21,7 +25,11 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
     const pathArray = getPathArray(file)
     const label = pathArray.pop() as string
 
-    const limitedDepthAncestors = limitAncestorDepth(pathArray, sep)
+    const limitedDepthAncestors = limitAncestorDepth(
+      pathArray,
+      sep,
+      maxHeaderLayers
+    )
     const path = buildDepPath(file)
 
     mergeAncestors(

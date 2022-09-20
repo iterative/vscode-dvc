@@ -267,6 +267,11 @@ const registerExperimentQuickPickCommands = (
     RegisteredCommands.EXPERIMENT_COLUMNS_SELECT,
     (dvcRoot?: string) => experiments.selectColumns(dvcRoot)
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_UPDATE_HEAD_MAX_LAYERS,
+    (dvcRoot?: string) => experiments.modifyExperimentHeadMaxLayers(dvcRoot)
+  )
 }
 
 const registerExperimentRunCommands = (

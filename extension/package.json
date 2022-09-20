@@ -251,6 +251,11 @@
         "icon": "$(cloud-upload)"
       },
       {
+        "title": "%command.modifyExperimentHeadMaxLayers%",
+        "command": "dvc.modifyExperimentHeadMaxLayers",
+        "category": "DVC"
+      },
+      {
         "title": "%command.modifyExperimentParamsAndQueue%",
         "command": "dvc.modifyExperimentParamsAndQueue",
         "category": "DVC",
@@ -682,6 +687,10 @@
         {
           "command": "dvc.pushTarget",
           "when": "false"
+        },
+        {
+          "command": "dvc.modifyExperimentHeadMaxLayers",
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.modifyExperimentParamsAndQueue",
