@@ -422,45 +422,57 @@ export const collectData = (
   return acc
 }
 
-const collectPathMultiSourceVariations = (
+const getDvcDataVersionInfo = (
+  value: Record<string, unknown>
+): Record<string, unknown> => {
+  const dvcDataVersionInfo =
+    (value.dvc_data_version_info as Record<string, unknown>) || {}
+  if (dvcDataVersionInfo.revision) {
+    delete dvcDataVersionInfo.revision
+  }
+
+  return dvcDataVersionInfo
+}
+
+const collectPlotMultiSourceVariations = (
   acc: Record<string, Record<string, unknown>[]>,
   path: string,
   plot: TemplatePlot
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
+  if (!acc[path]) {
+    acc[path] = []
+  }
+
   for (const value of Object.values(plot.datapoints || {}).flat()) {
-    const dvc_data_version_info = {
-      // eslint-disable-next-line unicorn/no-useless-fallback-in-spread
-      ...(value?.dvc_data_version_info || {})
-    } as Record<string, unknown>
+    const dvcDataVersionInfo = getDvcDataVersionInfo(value)
 
-    if (dvc_data_version_info.revision) {
-      delete dvc_data_version_info.revision
+    if (acc[path].some(obj => isEqual(obj, dvcDataVersionInfo))) {
+      continue
+    }
+    acc[path].push(dvcDataVersionInfo)
+  }
+}
+
+const collectPathMultiSourceVariations = (
+  acc: Record<string, Record<string, unknown>[]>,
+  path: string,
+  plots: Plot[]
+) => {
+  for (const plot of plots) {
+    if (isImagePlot(plot)) {
+      continue
     }
 
-    if (!acc[path]) {
-      acc[path] = []
-    }
-
-    if (!acc[path].some(obj => isEqual(obj, dvc_data_version_info))) {
-      acc[path].push(dvc_data_version_info)
-    }
+    collectPlotMultiSourceVariations(acc, path, plot)
   }
 }
 
 export const collectMultiSourceVariations = (
   data: PlotsOutput,
   acc: Record<string, Record<string, unknown>[]>
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   for (const [path, plots] of Object.entries(data)) {
-    for (const plot of plots) {
-      if (isImagePlot(plot)) {
-        continue
-      }
-
-      collectPathMultiSourceVariations(acc, path, plot)
-    }
+    collectPathMultiSourceVariations(acc, path, plots)
   }
 
   return acc
