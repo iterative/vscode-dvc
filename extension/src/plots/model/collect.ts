@@ -33,7 +33,12 @@ import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
 import { shortenForLabel } from '../../util/string'
-import { getDvcDataVersionInfo, joinFields } from '../multiSource/collect'
+import {
+  getDvcDataVersionInfo,
+  isConcatenatedField,
+  joinFields,
+  splitConcatenatedFields
+} from '../multiSource/collect'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
 type CheckpointPlotAccumulator = {
@@ -501,13 +506,13 @@ const fillTemplate = (
   datapoints: unknown[],
   field?: string
 ) => {
-  if (!field?.includes('::')) {
+  if (!field || !isConcatenatedField(field)) {
     return JSON.parse(
       template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
     ) as TopLevelSpec
   }
 
-  const mapping = field.split('::')
+  const fields = splitConcatenatedFields(field)
   return JSON.parse(
     template.replace(
       '"<DVC_METRIC_DATA>"',
@@ -516,7 +521,7 @@ const fillTemplate = (
           const obj = data as Record<string, unknown>
           return {
             ...obj,
-            [field]: joinFields(mapping.map(field => obj[field] as string))
+            [field]: joinFields(fields.map(field => obj[field] as string))
           }
         })
       )

@@ -1,4 +1,3 @@
-export const Shape = ['square', 'circle', 'triangle'] as const
 export const StrokeDash = [
   [1, 0],
   [8, 8],
@@ -8,16 +7,22 @@ export const StrokeDash = [
   [2, 1],
   [1, 1]
 ] as const
+export type StrokeDashValue = typeof StrokeDash[number]
 
-export type StrokeDashScale = {
+export const Shape = ['square', 'circle', 'triangle'] as const
+export type ShapeValue = typeof Shape[number]
+
+export type Scale<T extends StrokeDashValue | ShapeValue> = {
   domain: string[]
-  range: typeof StrokeDash[number][]
+  range: T[]
 }
 
-export type StrokeDashEncoding = { scale: StrokeDashScale } & { field: string }
+export type Encoding<T extends StrokeDashValue | ShapeValue> = {
+  scale: Scale<T>
+} & { field: string }
 
-export type ShapeScale = {
-  domain: string[]
-  range: typeof Shape[number][]
-}
-export type ShapeEncoding = { scale: ShapeScale } & { field: string }
+export type StrokeDashScale = Scale<StrokeDashValue>
+export type StrokeDashEncoding = Encoding<StrokeDashValue>
+
+export type ShapeScale = Scale<ShapeValue>
+export type ShapeEncoding = Encoding<ShapeValue>
