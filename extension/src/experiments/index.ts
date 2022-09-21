@@ -32,7 +32,6 @@ import { Title } from '../vscode/title'
 import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
-import { getInput } from '../vscode/inputBox'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -432,19 +431,6 @@ export class Experiments extends BaseRepository<TableData> {
       )
     )
     return this.notifyChanged()
-  }
-
-  public async modifyColumnHeadLayersMax() {
-    const max = await getInput(Title.SELEECT_MAX_HEAD_LAYERS)
-    const intMax = Number(max)
-    if (!intMax || intMax < 3) {
-      return
-    }
-    this.columns.setColumnHeadLayersMax(intMax)
-
-    await this.cliData.update()
-
-    return max
   }
 
   public hasRunningExperiment() {

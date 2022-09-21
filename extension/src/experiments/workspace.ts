@@ -171,14 +171,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return await repository.modifyExperimentParamsAndQueue(overrideId)
   }
 
-  public async modifyExperimentHeadMaxLayers(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).modifyColumnHeadLayersMax()
-  }
-
   public async getCwdThenRun(commandId: CommandId) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
