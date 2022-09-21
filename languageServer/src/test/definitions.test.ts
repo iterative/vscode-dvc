@@ -1,5 +1,9 @@
 import { Position, Range } from 'vscode-languageserver/node'
-import { foreach_dvc_yaml, params_dvc_yaml } from './fixtures/examples/valid'
+import {
+  foreach_dvc_yaml,
+  params_dvc_yaml,
+  vars_dvc_yaml
+} from './fixtures/examples/valid'
 import { params } from './fixtures/params'
 import { requestDefinitions } from './utils/requestDefinitions'
 import { openTheseFilesAndNotifyServer } from './utils/openTheseFilesAndNotifyServer'
@@ -67,6 +71,28 @@ describe('textDocument/definitions', () => {
     expect(response).toStrictEqual({
       range: Range.create(Position.create(15, 8), Position.create(15, 10)),
       uri: 'file:///dvc.yaml'
+    })
+  })
+
+  it('should provide a single location that points to the top of the file path symbol', async () => {
+    const [dvcYaml] = await openTheseFilesAndNotifyServer([
+      {
+        languageId: 'yaml',
+        mockContents: vars_dvc_yaml,
+        mockPath: 'dvc.yaml'
+      },
+      {
+        languageId: 'json',
+        mockContents: '',
+        mockPath: 'params.json'
+      }
+    ])
+    const response = await requestDefinitions(dvcYaml, 'params.json')
+
+    expect(response).toBeTruthy()
+    expect(response).toStrictEqual({
+      range: Range.create(Position.create(0, 0), Position.create(0, 0)),
+      uri: 'file:///params.json'
     })
   })
 })
