@@ -17,8 +17,7 @@ export enum Title {
   SELECT_PLOTS = 'Select Plots to Display',
   SELECT_SORT_DIRECTION = 'Select Sort Direction',
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',
-  SETUP_WORKSPACE = 'Setup the Workspace',
-  SELEECT_MAX_HEAD_LAYERS = 'Select max amount of layers in the table header (min is 3)'
+  SETUP_WORKSPACE = 'Setup the Workspace'
 }
 
 export const getEnterValueTitle = (path: string): Title =>
