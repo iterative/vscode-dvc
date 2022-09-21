@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.5] - 2022-09-21
+
+### 🔨 Maintenance
+
+- Bump min tested version of DVC to 2.26.2 [#2428](https://github.com/iterative/vscode-dvc/pull/2428) by [@mattseddon](https://github.com/mattseddon)
+- Bump min tested version of DVC to 2.27.2 [#2440](https://github.com/iterative/vscode-dvc/pull/2440) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.4.4] - 2022-09-18
 
 ### 🚀 New Features and Enhancements
