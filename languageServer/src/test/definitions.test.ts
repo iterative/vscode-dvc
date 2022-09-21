@@ -17,6 +17,20 @@ describe('textDocument/definitions', () => {
     disposeTestConnections()
   })
 
+  it('should not provide definitions for files other than dvc.yamls', async () => {
+    const [paramsYaml] = await openTheseFilesAndNotifyServer([
+      {
+        languageId: 'yaml',
+        mockContents: params,
+        mockPath: 'params.yaml'
+      }
+    ])
+
+    const response = await requestDefinitions(paramsYaml, 'auc')
+
+    expect(response).toBeNull()
+  })
+
   it('should be able to point out the symbol under the cursor when needed', async () => {
     const [dvcYaml] = await openTheseFilesAndNotifyServer([
       {
