@@ -1,5 +1,6 @@
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
+import { Context, getDvcRootFromContext } from '../../vscode/context'
 import { WorkspacePlots } from '../workspace'
 
 export const registerPlotsCommands = (
@@ -8,17 +9,16 @@ export const registerPlotsCommands = (
 ) => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.PLOTS_SHOW,
-    (context: { dvcRoot?: string } | undefined) =>
-      plots.showWebview(context?.dvcRoot)
+    (context: Context) => plots.showWebview(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.PLOTS_SELECT,
-    (dvcRoot?: string) => plots.selectPlots(dvcRoot)
+    (context: Context) => plots.selectPlots(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.PLOTS_REFRESH,
-    (dvcRoot?: string) => plots.refresh(dvcRoot)
+    (context: Context) => plots.refresh(getDvcRootFromContext(context))
   )
 }

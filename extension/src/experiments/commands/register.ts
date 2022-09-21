@@ -11,6 +11,7 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import { Title } from '../../vscode/title'
+import { Context, getDvcRootFromContext } from '../../vscode/context'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -230,12 +231,13 @@ const registerExperimentQuickPickCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTER_ADD,
-    (dvcRoot?: string) => experiments.addFilter(dvcRoot)
+    (context: Context) => experiments.addFilter(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
-    (dvcRoot?: string) => experiments.addStarredFilter(dvcRoot)
+    (context: Context) =>
+      experiments.addStarredFilter(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
@@ -245,12 +247,13 @@ const registerExperimentQuickPickCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SORT_ADD,
-    (dvcRoot?: string) => experiments.addSort(dvcRoot)
+    (context: Context) => experiments.addSort(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SORT_ADD_STARRED,
-    (dvcRoot?: string) => experiments.addStarredSort(dvcRoot)
+    (context: Context) =>
+      experiments.addStarredSort(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
@@ -260,12 +263,14 @@ const registerExperimentQuickPickCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SELECT,
-    (dvcRoot?: string) => experiments.selectExperiments(dvcRoot)
+    (context: Context) =>
+      experiments.selectExperiments(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_COLUMNS_SELECT,
-    (dvcRoot?: string) => experiments.selectColumns(dvcRoot)
+    (context: Context) =>
+      experiments.selectColumns(getDvcRootFromContext(context))
   )
 }
 
@@ -295,8 +300,8 @@ const registerExperimentRunCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SHOW,
-    (context: { dvcRoot?: string } | undefined) =>
-      experiments.showWebview(context?.dvcRoot)
+    (context: Context) =>
+      experiments.showWebview(getDvcRootFromContext(context))
   )
 }
 
@@ -312,12 +317,14 @@ export const registerExperimentCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS,
-    (dvcRoot?: string) => experiments.autoApplyFilters(true, dvcRoot)
+    (context: Context) =>
+      experiments.autoApplyFilters(true, getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS,
-    (dvcRoot?: string) => experiments.autoApplyFilters(false, dvcRoot)
+    (context: Context) =>
+      experiments.autoApplyFilters(false, getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
