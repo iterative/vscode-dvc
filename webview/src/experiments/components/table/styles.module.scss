@@ -227,13 +227,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   &.rowSelected {
     border-color: $row-bg-selected-color;
   }
-}
-
-.experiments {
-  box-sizing: border-box;
-  height: 100%;
-  display: flex;
-  flex-flow: column nowrap;
 
   .experimentGroup {
     &:last-child .tr:last-child {
@@ -243,7 +236,16 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         border-color: $row-bg-selected-color;
       }
     }
+  }
+}
 
+.experiments {
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+
+  .experimentGroup {
     .nestedRow {
       .experimentCell {
         padding-left: $nested-row-padding;
