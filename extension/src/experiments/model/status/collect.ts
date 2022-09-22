@@ -25,6 +25,7 @@ const collectStatus = (
   if (!id || queued || hasKey(acc, id)) {
     return
   }
+
   acc[id] = getStatus(acc, unassignColors)
 }
 
@@ -77,11 +78,12 @@ export const collectColoredStatus = (
   previousStatus: ColoredStatus,
   unassignedColors: Color[]
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
+  const flattenExperimentsByBranch = flattenMapValues(experimentsByBranch)
   const availableColors = unassignColors(
     [
       ...experiments,
-      ...flattenMapValues(checkpointsByTip),
-      ...flattenMapValues(experimentsByBranch)
+      ...flattenExperimentsByBranch,
+      ...flattenMapValues(checkpointsByTip)
     ],
     previousStatus,
     unassignedColors
@@ -94,7 +96,7 @@ export const collectColoredStatus = (
     previousStatus
   )
 
-  for (const experiment of experiments) {
+  for (const experiment of [...experiments, ...flattenExperimentsByBranch]) {
     collectStatus(coloredStatus, experiment, availableColors)
 
     for (const checkpoint of checkpointsByTip.get(experiment.id) || []) {

@@ -364,7 +364,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getBranchExperiments(branch: Experiment) {
-    return this.experiments.getExperimentsByBranch(branch)
+    return this.experiments.getExperimentsByBranchForTree(branch)
   }
 
   public sendInitialWebviewData() {

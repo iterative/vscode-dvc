@@ -211,7 +211,9 @@ export class ExperimentsTree
       this.experiments
         .getRepository(dvcRoot)
         .getBranchExperiments(branch)
-        ?.map(experiment => this.formatExperiment(experiment, dvcRoot)) || []
+        ?.map(experiment =>
+          this.formatExperiment(experiment as ExperimentAugmented, dvcRoot)
+        ) || []
     )
   }
 
