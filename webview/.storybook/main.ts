@@ -30,7 +30,8 @@ export default {
   webpackFinal: (config: webpack.Configuration) => {
     return {
       ...config,
-      module: webpackConfig.module
+      module: webpackConfig.module,
+      mode: 'development'
     }
   }
 }

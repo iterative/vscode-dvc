@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.5] - 2022-09-21
+
+### 🔨 Maintenance
+
+- Bump min tested version of DVC to 2.26.2 [#2428](https://github.com/iterative/vscode-dvc/pull/2428) by [@mattseddon](https://github.com/mattseddon)
+- Bump min tested version of DVC to 2.27.2 [#2440](https://github.com/iterative/vscode-dvc/pull/2440) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.4.4] - 2022-09-18
+
+### 🚀 New Features and Enhancements
+
+- Remove extra background color from the table view [#2425](https://github.com/iterative/vscode-dvc/pull/2425) by [@shcheklein](https://github.com/shcheklein)
+
+### 🐛 Bug Fixes
+
+- Update table hints [#2413](https://github.com/iterative/vscode-dvc/pull/2413) by [@julieg18](https://github.com/julieg18)
+- Exclude queued experiments from select experiments for plots quick pick [#2410](https://github.com/iterative/vscode-dvc/pull/2410) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Move vega title truncation into the extension [#2396](https://github.com/iterative/vscode-dvc/pull/2396) by [@mattseddon](https://github.com/mattseddon)
+- Use webpack's development mode to build webview for testing [#2404](https://github.com/iterative/vscode-dvc/pull/2404) by [@mattseddon](https://github.com/mattseddon)
+- Remove unused SVGs [#2409](https://github.com/iterative/vscode-dvc/pull/2409) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.4.3] - 2022-09-13
 
 ### 🚀 New Features and Enhancements

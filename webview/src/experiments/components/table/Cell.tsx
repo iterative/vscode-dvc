@@ -72,7 +72,6 @@ export const FirstCell: React.FC<
             <IndicatorWithJustTheCounter
               aria-label={'Sub-rows selected for plots'}
               count={plotSelections}
-              tooltipContent={''}
             />
             {queued && <Clock />}
           </span>

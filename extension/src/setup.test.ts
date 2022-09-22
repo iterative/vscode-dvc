@@ -80,8 +80,10 @@ const mockedSetUserConfigValue = jest.mocked(setUserConfigValue)
 beforeEach(() => {
   jest.resetAllMocks()
   mockedExtensions.all = [
-    { id: 'ms-python.python' } as Extension<{ id: string }>
-  ]
+    { id: 'ms-python.python' }
+  ] as unknown as readonly Extension<unknown>[] & {
+    [x: number]: Extension<unknown>
+  } & { [x: number]: jest.MockedObjectDeep<Extension<unknown>> }
 })
 
 describe('setupWorkspace', () => {

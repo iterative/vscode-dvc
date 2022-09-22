@@ -1,10 +1,10 @@
-import React, { MouseEventHandler, ReactNode } from 'react'
+import React, { MouseEventHandler, ReactElement, ReactNode } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
-import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
+import { CellHintTooltip } from './CellHintTooltip'
 import { Icon } from '../../../shared/components/Icon'
 import {
   Filter,
@@ -12,30 +12,8 @@ import {
   SortPrecedence
 } from '../../../shared/components/icons'
 import { sendMessage } from '../../../shared/vscode'
-import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { pluralize } from '../../../util/strings'
 import { ExperimentsState } from '../../store'
-
-export type IndicatorTooltipProps = Pick<TippyProps, 'children'> & {
-  tooltipContent: ReactNode
-}
-
-export const IndicatorTooltip: React.FC<IndicatorTooltipProps> = ({
-  children,
-  tooltipContent
-}) => {
-  const wrapperRef = React.useRef<HTMLDivElement>(null)
-  return (
-    <Tooltip
-      placement="bottom-start"
-      disabled={!tooltipContent}
-      content={tooltipContent}
-      ref={wrapperRef}
-    >
-      {children}
-    </Tooltip>
-  )
-}
 
 export type CounterBadgeProps = {
   count?: number
@@ -59,12 +37,13 @@ export const Indicator = ({
   'aria-label': ariaLabel,
   tooltipContent,
   onClick
-}: IndicatorTooltipProps &
-  CounterBadgeProps & {
-    'aria-label'?: string
-    onClick?: MouseEventHandler
-  }) => (
-  <IndicatorTooltip tooltipContent={tooltipContent}>
+}: CounterBadgeProps & {
+  'aria-label'?: string
+  onClick?: MouseEventHandler
+  tooltipContent?: ReactNode
+  children: ReactElement
+}) => {
+  const content = (
     <button
       className={cx(styles.indicatorIcon, count && styles.indicatorWithCount)}
       aria-label={ariaLabel}
@@ -73,23 +52,39 @@ export const Indicator = ({
       {children}
       <CounterBadge count={count} />
     </button>
-  </IndicatorTooltip>
-)
+  )
+
+  return tooltipContent ? (
+    <CellHintTooltip tooltipContent={tooltipContent} delay={[0, 0]}>
+      {content}
+    </CellHintTooltip>
+  ) : (
+    content
+  )
+}
 
 export const IndicatorWithJustTheCounter = ({
   count,
   'aria-label': ariaLabel,
   tooltipContent
-}: CounterBadgeProps &
-  IndicatorTooltipProps & {
-    'aria-label'?: string
-  }) => (
-  <IndicatorTooltip tooltipContent={tooltipContent}>
+}: CounterBadgeProps & {
+  'aria-label'?: string
+  tooltipContent?: ReactNode
+}) => {
+  const children = (
     <span aria-label={ariaLabel}>
       <CounterBadge count={count} />
     </span>
-  </IndicatorTooltip>
-)
+  )
+
+  return tooltipContent ? (
+    <CellHintTooltip tooltipContent={tooltipContent}>
+      {children}
+    </CellHintTooltip>
+  ) : (
+    children
+  )
+}
 
 const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })

@@ -25,9 +25,24 @@
       "group": "build"
     },
     {
+      "type": "npm",
+      "label": "npm: dev - languageServer",
+      "script": "dev",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never"
+      },
+      "path": "languageServer/",
+      "group": "build"
+    },
+    {
       "label": "npm: dev - all",
       "isBackground": true,
-      "dependsOn": ["npm: dev - extension", "npm: dev - webview"],
+      "dependsOn": [
+        "npm: dev - extension",
+        "npm: dev - webview",
+        "npm: dev - languageServer"
+      ],
       "group": {
         "kind": "build",
         "isDefault": true

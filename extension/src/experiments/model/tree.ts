@@ -320,7 +320,11 @@ export class ExperimentsTree
       )
     )
 
-    return `${selected} of ${total} (max ${MAX_SELECTED_EXPERIMENTS})`
+    return (
+      `${selected} of ${total} (max ${MAX_SELECTED_EXPERIMENTS}` +
+      (dvcRoots.length > 1 ? ' per project' : '') +
+      ')'
+    )
   }
 
   private isRoot(element: string | ExperimentItem): element is string {
