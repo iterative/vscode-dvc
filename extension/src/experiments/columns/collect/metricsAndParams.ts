@@ -21,13 +21,11 @@ const collectMetricOrParam = (
   type: ColumnType,
   pathArray: string[],
   label: string,
-  value: Value,
-  maxHeadLayers: number
+  value: Value
 ) => {
   const limitedDepthAncestors = limitAncestorDepth(
     pathArray,
-    METRIC_PARAM_SEPARATOR,
-    maxHeadLayers
+    METRIC_PARAM_SEPARATOR
   )
   const path = buildMetricOrParamPath(type, ...limitedDepthAncestors, label)
   mergeAncestors(
@@ -55,14 +53,13 @@ const walkValueTree = (
   acc: ColumnAccumulator,
   type: ColumnType,
   tree: ValueTree,
-  ancestors: string[] = [],
-  maxHeadLayers: number
+  ancestors: string[] = []
 ) => {
   for (const [label, value] of Object.entries(tree)) {
     if (notLeaf(value)) {
-      walkValueTree(acc, type, value, [...ancestors, label], maxHeadLayers)
+      walkValueTree(acc, type, value, [...ancestors, label])
     } else {
-      collectMetricOrParam(acc, type, ancestors, label, value, maxHeadLayers)
+      collectMetricOrParam(acc, type, ancestors, label, value)
     }
   }
 }
@@ -70,28 +67,26 @@ const walkValueTree = (
 export const walkValueFileRoot = (
   acc: ColumnAccumulator,
   type: ColumnType,
-  root: ValueTreeRoot,
-  maxHeaderLayers: number
+  root: ValueTreeRoot
 ) => {
   for (const [file, value] of Object.entries(root)) {
     const { data } = value
     if (data) {
-      walkValueTree(acc, type, data, [file], maxHeaderLayers)
+      walkValueTree(acc, type, data, [file])
     }
   }
 }
 
 export const collectMetricsAndParams = (
   acc: ColumnAccumulator,
-  data: ExperimentFields,
-  maxHeadLayers: number
+  data: ExperimentFields
 ) => {
   const { metrics, params } = data
   if (metrics) {
-    walkValueFileRoot(acc, ColumnType.METRICS, metrics, maxHeadLayers)
+    walkValueFileRoot(acc, ColumnType.METRICS, metrics)
   }
   if (params) {
-    walkValueFileRoot(acc, ColumnType.PARAMS, params, maxHeadLayers)
+    walkValueFileRoot(acc, ColumnType.PARAMS, params)
   }
 }
 

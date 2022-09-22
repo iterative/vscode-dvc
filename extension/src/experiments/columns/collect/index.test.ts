@@ -8,38 +8,36 @@ import columnsFixture from '../../../test/fixtures/expShow/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
 import { ExperimentsOutput } from '../../../cli/dvc/reader'
-import { INITIAL_TABLE_HEAD_MAX_LAYERS } from '../consts'
+
+jest.mock('../../../vscode/config')
 
 describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {
-    const columns = collectColumns(outputFixture, INITIAL_TABLE_HEAD_MAX_LAYERS)
+    const columns = collectColumns(outputFixture)
     expect(columns).toStrictEqual(columnsFixture)
   })
 
   it('should output both params and metrics when both are present', () => {
-    const columns = collectColumns(
-      {
-        workspace: {
-          baseline: {
-            data: {
-              metrics: {
-                1: {
-                  data: { 2: 3 }
-                }
-              },
-              params: {
-                a: {
-                  data: {
-                    b: 'c'
-                  }
+    const columns = collectColumns({
+      workspace: {
+        baseline: {
+          data: {
+            metrics: {
+              1: {
+                data: { 2: 3 }
+              }
+            },
+            params: {
+              a: {
+                data: {
+                  b: 'c'
                 }
               }
             }
           }
         }
-      },
-      INITIAL_TABLE_HEAD_MAX_LAYERS
-    )
+      }
+    })
     const params = columns.find(column => column.type === ColumnType.PARAMS)
     const metrics = columns.find(column => column.type === ColumnType.METRICS)
     expect(params).toBeDefined()
@@ -47,22 +45,19 @@ describe('collectColumns', () => {
   })
 
   it('should omit params when none exist in the source data', () => {
-    const columns = collectColumns(
-      {
-        workspace: {
-          baseline: {
-            data: {
-              metrics: {
-                1: {
-                  data: { 2: 3 }
-                }
+    const columns = collectColumns({
+      workspace: {
+        baseline: {
+          data: {
+            metrics: {
+              1: {
+                data: { 2: 3 }
               }
             }
           }
         }
-      },
-      INITIAL_TABLE_HEAD_MAX_LAYERS
-    )
+      }
+    })
     const params = columns.find(column => column.type === ColumnType.PARAMS)
     const metrics = columns.find(column => column.type === ColumnType.METRICS)
     expect(params).toBeUndefined()
@@ -70,65 +65,59 @@ describe('collectColumns', () => {
   })
 
   it('should return an empty array if no params and metrics are provided', () => {
-    const columns = collectColumns(
-      {
-        workspace: {
-          baseline: {}
-        }
-      },
-      INITIAL_TABLE_HEAD_MAX_LAYERS
-    )
+    const columns = collectColumns({
+      workspace: {
+        baseline: {}
+      }
+    })
     expect(columns).toStrictEqual([timestampColumn])
   })
 
   const exampleBigNumber = 3000000000
-  const columns = collectColumns(
-    {
-      branchA: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedParam: 'string' }
-              }
-            }
-          }
-        },
-        otherExp: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedParam: true }
-              }
+  const columns = collectColumns({
+    branchA: {
+      baseline: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: { mixedParam: 'string' }
             }
           }
         }
       },
-      branchB: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedParam: null }
-              }
-            }
-          }
-        }
-      },
-      workspace: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedParam: exampleBigNumber }
-              }
+      otherExp: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: { mixedParam: true }
             }
           }
         }
       }
     },
-    INITIAL_TABLE_HEAD_MAX_LAYERS
-  )
+    branchB: {
+      baseline: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: { mixedParam: null }
+            }
+          }
+        }
+      }
+    },
+    workspace: {
+      baseline: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: { mixedParam: exampleBigNumber }
+            }
+          }
+        }
+      }
+    }
+  })
 
   const exampleMixedParam = columns.find(
     column =>
@@ -155,52 +144,49 @@ describe('collectColumns', () => {
   })
 
   it('should find a different minNumber and maxNumber on a mixed param', () => {
-    const columns = collectColumns(
-      {
-        branch1: {
-          baseline: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: { mixedNumber: null }
-                }
-              }
-            }
-          },
-          exp1: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: { mixedNumber: 0 }
-                }
-              }
-            }
-          },
-          exp2: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: { mixedNumber: -1 }
-                }
-              }
-            }
-          },
-          exp3: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: { mixedNumber: 1 }
-                }
+    const columns = collectColumns({
+      branch1: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: null }
               }
             }
           }
         },
-        workspace: {
-          baseline: {}
+        exp1: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: 0 }
+              }
+            }
+          }
+        },
+        exp2: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: -1 }
+              }
+            }
+          }
+        },
+        exp3: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: 1 }
+              }
+            }
+          }
         }
       },
-      INITIAL_TABLE_HEAD_MAX_LAYERS
-    )
+      workspace: {
+        baseline: {}
+      }
+    })
     const mixedParam = columns.find(
       column =>
         column.path ===
@@ -211,43 +197,40 @@ describe('collectColumns', () => {
     expect(mixedParam.maxNumber).toStrictEqual(1)
   })
 
-  const numericColumns = collectColumns(
-    {
-      branch1: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { withNumbers: -1, withoutNumbers: 'a' }
-              }
-            }
-          }
-        },
-        exp1: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { withNumbers: 2, withoutNumbers: 'b' }
-              }
-            }
-          }
-        },
-        exp2: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { withNumbers: 'c', withoutNumbers: 'b' }
-              }
+  const numericColumns = collectColumns({
+    branch1: {
+      baseline: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: { withNumbers: -1, withoutNumbers: 'a' }
             }
           }
         }
       },
-      workspace: {
-        baseline: {}
+      exp1: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: { withNumbers: 2, withoutNumbers: 'b' }
+            }
+          }
+        }
+      },
+      exp2: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: { withNumbers: 'c', withoutNumbers: 'b' }
+            }
+          }
+        }
       }
     },
-    INITIAL_TABLE_HEAD_MAX_LAYERS
-  )
+    workspace: {
+      baseline: {}
+    }
+  })
   const param = numericColumns.filter(
     column => column.type === ColumnType.PARAMS
   ) as Column[]
@@ -274,53 +257,50 @@ describe('collectColumns', () => {
   })
 
   it('should aggregate multiple different field names', () => {
-    const columns = collectColumns(
-      {
-        branchA: {
-          baseline: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: { two: 2 }
-                }
-              }
-            }
-          },
-          otherExp: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: { three: 3 }
-                }
+    const columns = collectColumns({
+      branchA: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: { two: 2 }
               }
             }
           }
         },
-        branchB: {
-          baseline: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: { four: 4 }
-                }
-              }
-            }
-          }
-        },
-        workspace: {
-          baseline: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: { one: 1 }
-                }
+        otherExp: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: { three: 3 }
               }
             }
           }
         }
       },
-      INITIAL_TABLE_HEAD_MAX_LAYERS
-    )
+      branchB: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: { four: 4 }
+              }
+            }
+          }
+        }
+      },
+      workspace: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: { one: 1 }
+              }
+            }
+          }
+        }
+      }
+    })
 
     const params = columns.filter(
       column =>
@@ -337,18 +317,16 @@ describe('collectColumns', () => {
   })
 
   it('should create concatenated columns for nesting deeper than 5', () => {
-    const columns = collectColumns(
-      {
-        workspace: {
-          baseline: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: {
-                    one: {
-                      two: {
-                        three: { four: { five: { six: { seven: 'Lucky!' } } } }
-                      }
+    const columns = collectColumns({
+      workspace: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: {
+                  one: {
+                    two: {
+                      three: { four: { five: { six: { seven: 'Lucky!' } } } }
                     }
                   }
                 }
@@ -356,9 +334,8 @@ describe('collectColumns', () => {
             }
           }
         }
-      },
-      INITIAL_TABLE_HEAD_MAX_LAYERS
-    )
+      }
+    })
 
     expect(columns.map(({ path }) => path)).toStrictEqual([
       timestampColumn.path,
@@ -393,26 +370,23 @@ describe('collectColumns', () => {
   })
 
   it('should not report types for params and metrics without primitives or children for params and metrics without objects', () => {
-    const columns = collectColumns(
-      {
-        workspace: {
-          baseline: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: {
-                    onlyHasChild: {
-                      onlyHasPrimitive: 1
-                    }
+    const columns = collectColumns({
+      workspace: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: {
+                  onlyHasChild: {
+                    onlyHasPrimitive: 1
                   }
                 }
               }
             }
           }
         }
-      },
-      INITIAL_TABLE_HEAD_MAX_LAYERS
-    )
+      }
+    })
 
     const objectParam = columns.find(
       column =>
@@ -447,58 +421,67 @@ describe('collectColumns', () => {
   })
 
   it('should collect all params and metrics from the test fixture', () => {
-    expect(
-      collectColumns(outputFixture, INITIAL_TABLE_HEAD_MAX_LAYERS).map(
-        ({ path }) => path
-      )
-    ).toStrictEqual([
-      timestampColumn.path,
-      buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
-      buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'loss'),
-      buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'accuracy'),
-      buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'val_loss'),
-      buildMetricOrParamPath(
-        ColumnType.METRICS,
-        'summary.json',
-        'val_accuracy'
-      ),
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'code_names'),
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'learning_rate'),
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'dvc_logs_dir'),
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'log_file'),
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'dropout'),
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'process'),
-      buildMetricOrParamPath(
-        ColumnType.PARAMS,
-        'params.yaml',
-        'process',
-        'threshold'
-      ),
-      buildMetricOrParamPath(
-        ColumnType.PARAMS,
-        'params.yaml',
-        'process',
-        'test_arg'
-      ),
-      buildMetricOrParamPath(ColumnType.PARAMS, join('nested', 'params.yaml')),
-      buildMetricOrParamPath(
-        ColumnType.PARAMS,
-        join('nested', 'params.yaml'),
-        'test'
-      ),
-      buildDepPath('data'),
-      buildDepPath('data', 'data.xml'),
-      buildDepPath('src'),
-      buildDepPath('src', 'prepare.py'),
-      buildDepPath('data', 'prepared'),
-      buildDepPath('src', 'featurization.py'),
-      buildDepPath('data', 'features'),
-      buildDepPath('src', 'train.py'),
-      buildDepPath('model.pkl'),
-      buildDepPath('src', 'evaluate.py')
-    ])
+    expect(collectColumns(outputFixture).map(({ path }) => path)).toStrictEqual(
+      [
+        timestampColumn.path,
+        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
+        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'loss'),
+        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'accuracy'),
+        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'val_loss'),
+        buildMetricOrParamPath(
+          ColumnType.METRICS,
+          'summary.json',
+          'val_accuracy'
+        ),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'code_names'),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          'params.yaml',
+          'learning_rate'
+        ),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          'params.yaml',
+          'dvc_logs_dir'
+        ),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'log_file'),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'dropout'),
+        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'process'),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          'params.yaml',
+          'process',
+          'threshold'
+        ),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          'params.yaml',
+          'process',
+          'test_arg'
+        ),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          join('nested', 'params.yaml')
+        ),
+        buildMetricOrParamPath(
+          ColumnType.PARAMS,
+          join('nested', 'params.yaml'),
+          'test'
+        ),
+        buildDepPath('data'),
+        buildDepPath('data', 'data.xml'),
+        buildDepPath('src'),
+        buildDepPath('src', 'prepare.py'),
+        buildDepPath('data', 'prepared'),
+        buildDepPath('src', 'featurization.py'),
+        buildDepPath('data', 'features'),
+        buildDepPath('src', 'train.py'),
+        buildDepPath('model.pkl'),
+        buildDepPath('src', 'evaluate.py')
+      ]
+    )
   })
 
   it('should mark new dep files as changes', () => {

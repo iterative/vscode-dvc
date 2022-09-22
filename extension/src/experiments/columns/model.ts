@@ -1,16 +1,13 @@
 import { Memento } from 'vscode'
 import { collectChanges, collectColumns, collectParamsFiles } from './collect'
-import { INITIAL_TABLE_HEAD_MAX_LAYERS } from './consts'
 import { Column, ColumnType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/dvc/reader'
 import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel } from '../../path/selection/model'
-import { ConfigKey, getConfigValue } from '../../vscode/config'
 
 export class ColumnsModel extends PathSelectionModel<Column> {
   private columnOrderState: string[] = []
   private columnWidthsState: Record<string, number> = {}
-  private columnHeadLayersMaxLength = INITIAL_TABLE_HEAD_MAX_LAYERS
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
 
@@ -25,9 +22,6 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       {}
     )
-    this.columnHeadLayersMaxLength =
-      getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS) ||
-      INITIAL_TABLE_HEAD_MAX_LAYERS
   }
 
   public getColumnOrder(): string[] {
@@ -85,7 +79,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   private async transformAndSetColumns(data: ExperimentsOutput) {
     const [columns, paramsFiles] = await Promise.all([
-      collectColumns(data, this.columnHeadLayersMaxLength),
+      collectColumns(data),
       collectParamsFiles(this.dvcRoot, data)
     ])
 
