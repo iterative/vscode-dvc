@@ -33,6 +33,7 @@ export default {
   devtool: 'source-map',
   entry: r('./src/extension'),
   externals: {
+    'dvc-vscode-lsp': 'dvc-vscode-lsp',
     'dvc-vscode-webview': 'dvc-vscode-webview',
     fsevents: "require('fsevents')",
     vscode: 'commonjs vscode'
@@ -65,6 +66,7 @@ export default {
   plugins: [
     new CleanWebpackPlugin(),
     includeDependency(r('../webview/')),
+    includeDependency(r('../languageServer/')),
     includeFiles(),
     new ForkTsCheckerWebpackPlugin()
   ],
