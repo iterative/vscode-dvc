@@ -16,6 +16,8 @@ import {
   columns as dataTypesColumns
 } from '../../test/fixtures/expShow/dataTypes'
 
+jest.mock('../../vscode/config')
+
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
 

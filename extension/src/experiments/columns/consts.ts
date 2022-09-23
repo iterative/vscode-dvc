@@ -1,0 +1,1 @@
+export const INITIAL_TABLE_HEAD_MAX_LAYERS = 5
