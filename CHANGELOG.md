@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.6] - 2022-09-23
+
+### 🚀 New Features and Enhancements
+
+- Language Server with Definitions Only [#2408](https://github.com/iterative/vscode-dvc/pull/2408) by [@wolmir](https://github.com/wolmir)
+- Multiple commits in the experiments table [#2392](https://github.com/iterative/vscode-dvc/pull/2392) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Update `view/title` commands to account for VS Code change [#2439](https://github.com/iterative/vscode-dvc/pull/2439) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.4.5] - 2022-09-21
 
 ### 🔨 Maintenance

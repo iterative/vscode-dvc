@@ -1474,6 +1474,7 @@ const data: Row[] = [
           }
         },
         queued: true,
+        selected: false,
         sha: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
         starred: false,
         Created: '2020-12-29T15:25:27'

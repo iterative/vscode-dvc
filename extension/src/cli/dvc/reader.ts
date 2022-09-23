@@ -92,6 +92,7 @@ export interface PlotsOutput {
 }
 
 export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
+export const NUM_OF_COMMITS_TO_SHOW = '3'
 
 export const isDvcError = <
   T extends ExperimentsOutput | DataStatusOutput | PlotsOutput
@@ -135,6 +136,8 @@ export class DvcReader extends DvcCli {
       Command.EXPERIMENT,
       SubCommand.SHOW,
       ...flags,
+      Flag.NUM_COMMIT,
+      NUM_OF_COMMITS_TO_SHOW,
       Flag.JSON
     )
     if (isDvcError(output) || isEmpty(output)) {
