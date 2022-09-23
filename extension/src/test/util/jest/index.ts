@@ -36,12 +36,14 @@ export const buildMockedExperiments = () => {
   const mockedGetFilter = jest.fn()
   const mockedGetSorts = jest.fn()
   const mockedGetSelectedRevisions = jest.fn()
+  const mockedGetBranchExperiments = jest.fn()
   const mockedExperiments = {
     columnsChanged: mockedColumnsChanged,
     experimentsChanged: mockedExperimentsChanged,
     getDvcRoots: mockedGetDvcRoots,
     getRepository: () =>
       ({
+        getBranchExperiments: mockedGetBranchExperiments,
         getCheckpoints: mockedGetCheckpoints,
         getChildColumns: mockedGetChildColumns,
         getExperiments: mockedGetExperiments,
@@ -57,6 +59,7 @@ export const buildMockedExperiments = () => {
     mockedColumnsChanged,
     mockedExperiments,
     mockedExperimentsChanged,
+    mockedGetBranchExperiments,
     mockedGetCheckpoints,
     mockedGetChildColumns,
     mockedGetDvcRoots,
