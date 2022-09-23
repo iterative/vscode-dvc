@@ -79,7 +79,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('getExperiments', () => {
-    it('should return all existing experiments, the workspace and branch (HEAD revision)', async () => {
+    it('should return the workspace and branch (HEAD revision)', async () => {
       const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
@@ -88,13 +88,7 @@ suite('Experiments Test Suite', () => {
 
       expect(runs.map(experiment => experiment.label)).to.deep.equal([
         'workspace',
-        'main',
-        '4fb124a',
-        '42b8736',
-        '1ba7bcd',
-        '489fd8b',
-        'f0f9186',
-        '90aea7f'
+        'main'
       ])
     })
   })
@@ -729,7 +723,7 @@ suite('Experiments Test Suite', () => {
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
 
       const isExperimentSelected = (expId: string): boolean =>
-        !!experimentsModel.getExperiments().find(({ id }) => id === expId)
+        !!experimentsModel.getAllExperiments().find(({ id }) => id === expId)
           ?.selected
 
       expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
@@ -893,7 +887,7 @@ suite('Experiments Test Suite', () => {
       const areExperimentsStarred = (expIds: string[]): boolean =>
         expIds
           .map(expId =>
-            experimentsModel.getExperiments().find(({ id }) => id === expId)
+            experimentsModel.getAllExperiments().find(({ id }) => id === expId)
           )
           .every(exp => exp?.starred)
 

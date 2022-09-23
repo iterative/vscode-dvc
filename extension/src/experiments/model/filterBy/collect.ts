@@ -8,6 +8,11 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { Experiment } from '../../webview/contract'
 
 export type ExperimentWithType = Experiment & { type: ExperimentType }
+export type ExperimentAugmented = ExperimentWithType & {
+  hasChildren: boolean
+  selected?: boolean
+  starred: boolean
+}
 export type FilteredCounts = {
   checkpoints?: number
   experiments: number

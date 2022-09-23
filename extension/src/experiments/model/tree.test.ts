@@ -33,6 +33,7 @@ const {
   mockedExperiments,
   mockedGetDvcRoots,
   mockedGetExperiments,
+  mockedGetBranchExperiments,
   mockedGetCheckpoints
 } = buildMockedExperiments()
 
@@ -331,6 +332,61 @@ describe('ExperimentsTree', () => {
           label: 'bbbbbbb',
           tooltip: undefined,
           type: ExperimentType.CHECKPOINT
+        }
+      ])
+    })
+
+    it('should return the branch experiments when the element is a branch', async () => {
+      const experimentsTree = new ExperimentsTree(
+        mockedExperiments,
+        mockedResourceLocator
+      )
+      const getMockedUri = (name: string, color: string) =>
+        Uri.file(join('path', 'to', 'resources', `${name}-${color}.svg`))
+      const dvcRoot = '/dvc-root'
+      const branch = {
+        collapsibleState: 0,
+        description: 'f81f1b5',
+        dvcRoot,
+        hasChildren: true,
+        iconPath: getMockedUri('circle-filled', '#b180d7'),
+        id: 'f81f1b5',
+        label: 'f81f1b5',
+        queued: false,
+        tooltip: undefined,
+        type: ExperimentType.BRANCH
+      }
+
+      const experimentsByBranch = [
+        {
+          displayColor: undefined,
+          hasChildren: false,
+          id: 'exp-abcdef',
+          label: 'e350702',
+          running: false,
+          selected: false,
+          type: ExperimentType.EXPERIMENT
+        }
+      ]
+      mockedGetBranchExperiments.mockReturnValueOnce(experimentsByBranch)
+
+      const children = await experimentsTree.getChildren(branch)
+
+      expect(children).toStrictEqual([
+        {
+          collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot, id: 'exp-abcdef' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: undefined,
+          dvcRoot,
+          iconPath: expect.anything(),
+          id: 'exp-abcdef',
+          label: 'e350702',
+          tooltip: undefined,
+          type: ExperimentType.EXPERIMENT
         }
       ])
     })
