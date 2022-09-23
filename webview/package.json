@@ -40,13 +40,13 @@
     "vega-lite": "^5.2.0"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "6.5.11",
-    "@storybook/addon-interactions": "6.5.11",
-    "@storybook/addons": "6.5.11",
-    "@storybook/builder-webpack5": "6.5.11",
-    "@storybook/manager-webpack5": "6.5.11",
+    "@storybook/addon-essentials": "6.5.12",
+    "@storybook/addon-interactions": "6.5.12",
+    "@storybook/addons": "6.5.12",
+    "@storybook/builder-webpack5": "6.5.12",
+    "@storybook/manager-webpack5": "6.5.12",
     "@storybook/preset-scss": "1.0.3",
-    "@storybook/react": "6.5.11",
+    "@storybook/react": "6.5.12",
     "@storybook/testing-library": "0.0.13",
     "@svgr/cli": "6.3.1",
     "@swc/core": "1.3.1",
@@ -56,8 +56,8 @@
     "@types/classnames": "2.3.1",
     "@types/jest": "29.0.3",
     "@types/jsdom": "20.0.0",
-    "@types/node": "16.11.58",
-    "@types/react": "18.0.19",
+    "@types/node": "16.11.59",
+    "@types/react": "18.0.20",
     "@types/react-dom": "18.0.6",
     "@types/react-measure": "2.0.8",
     "@types/react-table": "7.7.12",
@@ -83,7 +83,7 @@
     "ts-loader": "9.3.1",
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0",
-    "webpack-dev-server": "4.11.0"
+    "webpack-dev-server": "4.11.1"
   },
   "svgr": {
     "typescript": true,

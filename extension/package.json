@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.4.4",
+  "version": "0.4.5",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1055,44 +1055,14 @@
           "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/ && !dvc.scm.command.running"
         },
         {
-          "command": "dvc.addExperimentsTableSort",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
-        },
-        {
-          "command": "dvc.addStarredExperimentsTableSort",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
-        },
-        {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "group": "inline",
           "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem != dvcRoot"
         },
         {
-          "command": "dvc.views.experimentsSortByTree.removeAllSorts",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
-        },
-        {
-          "command": "dvc.addExperimentsTableFilter",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
-        },
-        {
-          "command": "dvc.addStarredExperimentsTableFilter",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
-        },
-        {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem != dvcRoot"
-        },
-        {
-          "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experiments.applyExperiment",
@@ -1138,31 +1108,6 @@
           "command": "dvc.views.experiments.queueExperiment",
           "group": "2_modify@3",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.experiment.running"
-        },
-        {
-          "command": "dvc.views.experimentsTree.selectExperiments",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == dvcRoot"
-        },
-        {
-          "command": "dvc.views.experimentsTree.autoApplyFilters",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && !dvc.experiments.filter.selected && viewItem == dvcRoot"
-        },
-        {
-          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && dvc.experiments.filter.selected && viewItem == dvcRoot"
-        },
-        {
-          "command": "dvc.views.plotsPathsTree.selectPlots",
-          "group": "inline",
-          "when": "view == dvc.views.plotsPathsTree && dvc.commands.available && viewItem == dvcRoot"
-        },
-        {
-          "command": "dvc.views.plotsPathsTree.refreshPlots",
-          "group": "inline",
-          "when": "view == dvc.views.plotsPathsTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -1190,11 +1135,6 @@
           "command": "dvc.views.experimentsColumnsTree.selectColumns",
           "when": "view == dvc.views.experimentsColumnsTree",
           "group": "navigation@2"
-        },
-        {
-          "command": "dvc.views.experimentsColumnsTree.selectColumns",
-          "group": "inline",
-          "when": "view == dvc.views.experimentsColumnsTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.runExperiment",
@@ -1604,7 +1544,8 @@
     "lodash.merge": "4.6.2",
     "lodash.omit": "4.5.0",
     "tree-kill": "1.2.2",
-    "uuid": "9.0.0"
+    "uuid": "9.0.0",
+    "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
     "@swc/core": "1.3.1",
@@ -1623,7 +1564,7 @@
     "@types/lodash.omit": "4.5.7",
     "@types/mocha": "9.1.1",
     "@types/mock-require": "2.0.1",
-    "@types/node": "16.11.58",
+    "@types/node": "16.11.59",
     "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.8",
     "@types/uuid": "8.3.4",
@@ -1648,7 +1589,7 @@
     "sinon-chai": "3.7.0",
     "ts-loader": "9.3.1",
     "vsce": "2.11.0",
-    "vscode-uri": "3.0.3",
+    "vscode-uri": "3.0.4",
     "wdio-vscode-service": "4.0.7",
     "webdriverio": "7.24.0",
     "webpack": "5.74.0",

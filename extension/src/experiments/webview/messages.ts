@@ -282,8 +282,6 @@ export class WebviewMessages {
   }
 
   private showPlots() {
-    return commands.executeCommand(RegisteredCommands.PLOTS_SHOW, {
-      dvcRoot: this.dvcRoot
-    })
+    return commands.executeCommand(RegisteredCommands.PLOTS_SHOW, this.dvcRoot)
   }
 }
