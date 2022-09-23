@@ -534,15 +534,15 @@ const collectTemplateGroup = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  scales: Record<
+  size: PlotSize,
+  revisionColors: ColorScale | undefined,
+  multiSourceEncoding: Record<
     string,
     {
       strokeDash?: StrokeDashEncoding
       shape?: ShapeEncoding
     }
-  >,
-  size: PlotSize,
-  revisionColors: ColorScale | undefined
+  >
 ): TemplatePlotEntry[] => {
   const acc: TemplatePlotEntry[] = []
   for (const path of paths) {
@@ -553,13 +553,17 @@ const collectTemplateGroup = (
         .flatMap(revision => revisionData?.[revision]?.[path])
         .filter(Boolean)
 
-      const scale = scales[path] || {}
+      const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
 
       const content = extendVegaSpec(
-        fillTemplate(template, datapoints, scale.strokeDash?.field),
+        fillTemplate(
+          template,
+          datapoints,
+          multiSourceEncodingUpdate.strokeDash?.field
+        ),
         size,
         {
-          ...scale,
+          ...multiSourceEncodingUpdate,
           color: revisionColors
         }
       )
@@ -581,15 +585,15 @@ export const collectSelectedTemplatePlots = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  scales: Record<
+  size: PlotSize,
+  revisionColors: ColorScale | undefined,
+  multiSourceEncoding: Record<
     string,
     {
       strokeDash?: StrokeDashEncoding
       shape?: ShapeEncoding
     }
-  >,
-  size: PlotSize,
-  revisionColors: ColorScale | undefined
+  >
 ): TemplatePlotSection[] | undefined => {
   const acc: TemplatePlotSection[] = []
   for (const templateGroup of order) {
@@ -599,9 +603,9 @@ export const collectSelectedTemplatePlots = (
       selectedRevisions,
       templates,
       revisionData,
-      scales,
       size,
-      revisionColors
+      revisionColors,
+      multiSourceEncoding
     )
     if (!definedAndNonEmpty(entries)) {
       continue

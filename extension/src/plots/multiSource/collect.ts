@@ -21,7 +21,9 @@ type Variation = {
 }
 type Variations = Variation[]
 
-type MultiSourceEncoding = Record<
+export type MultiSourceVariations = Record<string, Variations>
+
+export type MultiSourceEncoding = Record<
   string,
   {
     strokeDash: StrokeDashEncoding
@@ -188,7 +190,7 @@ const collectVariation = (
   scale.domain.sort()
 }
 
-const combineFieldAndScale = <T extends StrokeDashValue | ShapeValue>(
+const getEncoding = <T extends StrokeDashValue | ShapeValue>(
   field: Set<string>,
   scale: { domain: string[]; range: T[] }
 ): { field: string; scale: { domain: string[]; range: T[] } } => ({
@@ -196,7 +198,7 @@ const combineFieldAndScale = <T extends StrokeDashValue | ShapeValue>(
   scale
 })
 
-const collectScaleFromVariations = (
+const collectGroupedStrokeDashEncoding = (
   acc: MultiSourceEncoding,
   path: string,
   variations: Variations,
@@ -215,11 +217,11 @@ const collectScaleFromVariations = (
   }
 
   acc[path] = {
-    strokeDash: combineFieldAndScale(field, scale)
+    strokeDash: getEncoding(field, scale)
   }
 }
 
-const collectScaleFromValues = <T extends typeof Shape | typeof StrokeDash>(
+const collectEncodingFromValues = <T extends typeof Shape | typeof StrokeDash>(
   scaleRange: T,
   values: Values,
   lessValuesThanVariations: { field: string; variations: number }[]
@@ -241,10 +243,37 @@ const collectScaleFromValues = <T extends typeof Shape | typeof StrokeDash>(
       idx++
     }
   }
-  return combineFieldAndScale(field, scale)
+  return getEncoding(field, scale)
 }
 
-const collectMultiSourceScales = (
+const collectSingleStrokeDashEncoding = (
+  acc: MultiSourceEncoding,
+  path: string,
+  values: Values,
+  lessValuesThanVariations: { field: string; variations: number }[]
+): void => {
+  acc[path] = {
+    strokeDash: collectEncodingFromValues(
+      StrokeDash,
+      values,
+      lessValuesThanVariations
+    )
+  }
+}
+
+const collectSingleShapeEncoding = (
+  acc: MultiSourceEncoding,
+  path: string,
+  values: Values,
+  lessValuesThanVariations: { field: string; variations: number }[]
+): void => {
+  acc[path] = {
+    ...acc[path],
+    shape: collectEncodingFromValues(Shape, values, lessValuesThanVariations)
+  }
+}
+
+const collectMultiSourceData = (
   acc: MultiSourceEncoding,
   path: string,
   variations: Variations
@@ -261,29 +290,20 @@ const collectMultiSourceScales = (
       ...valuesMatchVariations,
       ...lessValuesThanVariations.map(({ field }) => field)
     ]
-    collectScaleFromVariations(acc, path, variations, keysToCombined)
+    collectGroupedStrokeDashEncoding(acc, path, variations, keysToCombined)
     return
   }
 
   if (lessValuesThanVariations.length > 0 && !acc[path]?.strokeDash) {
-    acc[path] = {
-      strokeDash: collectScaleFromValues(
-        StrokeDash,
-        values,
-        lessValuesThanVariations
-      )
-    }
+    collectSingleStrokeDashEncoding(acc, path, values, lessValuesThanVariations)
   }
 
   if (lessValuesThanVariations.length > 0) {
-    acc[path] = {
-      ...acc[path],
-      shape: collectScaleFromValues(Shape, values, lessValuesThanVariations)
-    }
+    collectSingleShapeEncoding(acc, path, values, lessValuesThanVariations)
   }
 }
 
-export const collectMultiSourceData = (
+export const collectMultiSourceEncoding = (
   data: Record<string, { filename?: string; field?: string }[]>
 ): MultiSourceEncoding => {
   const acc: MultiSourceEncoding = {}
@@ -293,7 +313,7 @@ export const collectMultiSourceData = (
       continue
     }
 
-    collectMultiSourceScales(acc, path, variations)
+    collectMultiSourceData(acc, path, variations)
   }
 
   return acc

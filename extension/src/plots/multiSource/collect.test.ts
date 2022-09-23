@@ -1,23 +1,23 @@
 import { join } from 'path'
-import { collectMultiSourceData } from './collect'
+import { collectMultiSourceEncoding } from './collect'
 
-describe('collectMultiSourceData', () => {
+describe('collectMultiSourceEncoding', () => {
   it('should return an empty object given no multi source data', () => {
-    const multiSourceKeys = collectMultiSourceData({
+    const multiSourceEncoding = collectMultiSourceEncoding({
       path: [{ field: 'x', filename: 'path' }]
     })
-    expect(multiSourceKeys).toStrictEqual({})
+    expect(multiSourceEncoding).toStrictEqual({})
   })
 
   it('should return an object containing a filename strokeDash given data with varying filenames', () => {
     const otherPath = join('other', 'path')
-    const multiSourceKeys = collectMultiSourceData({
+    const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
         { field: 'x', filename: 'path' },
         { field: 'x', filename: otherPath }
       ]
     })
-    expect(multiSourceKeys).toStrictEqual({
+    expect(multiSourceEncoding).toStrictEqual({
       combined: {
         strokeDash: {
           field: 'filename',
@@ -34,13 +34,13 @@ describe('collectMultiSourceData', () => {
   })
 
   it('should return an object containing a field strokeDash given data with varying fields', () => {
-    const multiSourceKeys = collectMultiSourceData({
+    const multiSourceEncoding = collectMultiSourceEncoding({
       path: [
         { field: 'x', filename: 'path' },
         { field: 'z', filename: 'path' }
       ]
     })
-    expect(multiSourceKeys).toStrictEqual({
+    expect(multiSourceEncoding).toStrictEqual({
       path: {
         strokeDash: {
           field: 'field',
@@ -58,13 +58,13 @@ describe('collectMultiSourceData', () => {
 
   it('should return an object containing a filename::field strokeDash given data with varying filename and fields', () => {
     const otherPath = join('other', 'path')
-    const multiSourceKeys = collectMultiSourceData({
+    const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
         { field: 'x', filename: 'path' },
         { field: 'z', filename: otherPath }
       ]
     })
-    expect(multiSourceKeys).toStrictEqual({
+    expect(multiSourceEncoding).toStrictEqual({
       combined: {
         strokeDash: {
           field: 'filename::field',
@@ -81,14 +81,14 @@ describe('collectMultiSourceData', () => {
   })
 
   it('should return an object containing a filename::field strokeDash given data with varying filename and similar field', () => {
-    const multiSourceKeys = collectMultiSourceData({
+    const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
         { field: 'x', filename: join('first', 'path') },
         { field: 'z', filename: join('second', 'path') },
         { field: 'z', filename: join('third', 'path') }
       ]
     })
-    expect(multiSourceKeys).toStrictEqual({
+    expect(multiSourceEncoding).toStrictEqual({
       combined: {
         strokeDash: {
           field: 'filename::field',
@@ -110,14 +110,14 @@ describe('collectMultiSourceData', () => {
   })
 
   it('should return an object containing a filename::field strokeDash given data with different filename and field for each variation', () => {
-    const multiSourceKeys = collectMultiSourceData({
+    const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
         { field: 'x', filename: join('first', 'path') },
         { field: 'z', filename: join('second', 'path') },
         { field: 'q', filename: join('third', 'path') }
       ]
     })
-    expect(multiSourceKeys).toStrictEqual({
+    expect(multiSourceEncoding).toStrictEqual({
       combined: {
         strokeDash: {
           field: 'filename::field',
@@ -139,14 +139,14 @@ describe('collectMultiSourceData', () => {
   })
 
   it('should return an object containing a filename strokeDash and field shape given data with differently varying filename and field', () => {
-    const multiSourceKeys = collectMultiSourceData({
+    const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
         { field: 'x', filename: 'path' },
         { field: 'z', filename: 'path' },
         { field: 'z', filename: join('other', 'path') }
       ]
     })
-    expect(multiSourceKeys).toStrictEqual({
+    expect(multiSourceEncoding).toStrictEqual({
       combined: {
         shape: {
           field: 'field',

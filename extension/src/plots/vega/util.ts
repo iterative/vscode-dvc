@@ -99,7 +99,7 @@ export const getColorScale = (
   return acc.domain.length > 0 ? acc : undefined
 }
 
-type Encoding = {
+export type Encoding = {
   strokeDash?: StrokeDashEncoding & {
     legend: {
       disable: boolean
@@ -287,3 +287,13 @@ export const extendVegaSpec = (
 
   return mergeUpdate(updatedSpec, update)
 }
+
+export const reverseOfLegendSuppressionUpdate = () => ({
+  spec: {
+    encoding: {
+      color: { legend: { disable: false } },
+      shape: { legend: { disable: false } },
+      strokeDash: { legend: { disable: false } }
+    }
+  }
+})

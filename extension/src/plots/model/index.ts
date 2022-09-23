@@ -34,10 +34,11 @@ import { TemplateOrder } from '../paths/collect'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
 import {
-  collectMultiSourceData,
-  collectMultiSourceVariations
+  collectMultiSourceEncoding,
+  collectMultiSourceVariations,
+  MultiSourceEncoding,
+  MultiSourceVariations
 } from '../multiSource/collect'
-import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -54,15 +55,8 @@ export class PlotsModel extends ModelWithPersistence {
 
   private revisionData: RevisionData = {}
   private templates: TemplateAccumulator = {}
-  private multiSourceData: Record<
-    string,
-    { filename?: string; field?: string }[]
-  > = {}
-
-  private scales: Record<
-    string,
-    { strokeDash?: StrokeDashEncoding; shape?: ShapeEncoding }
-  > = {}
+  private multiSourceVariations: MultiSourceVariations = {}
+  private multiSourceEncoding: MultiSourceEncoding = {}
 
   private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
@@ -118,11 +112,11 @@ export class PlotsModel extends ModelWithPersistence {
       ...revs.map(rev => cliIdToLabel[rev])
     ])
 
-    const [{ comparisonData, revisionData }, templates, multiSourceData] =
+    const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
       await Promise.all([
         collectData(data, cliIdToLabel),
         collectTemplates(data),
-        collectMultiSourceVariations(data, this.multiSourceData)
+        collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
 
     const { overwriteComparisonData, overwriteRevisionData } =
@@ -143,8 +137,10 @@ export class PlotsModel extends ModelWithPersistence {
       ...overwriteRevisionData
     }
     this.templates = { ...this.templates, ...templates }
-    this.multiSourceData = multiSourceData
-    this.scales = collectMultiSourceData(this.multiSourceData)
+    this.multiSourceVariations = multiSourceVariations
+    this.multiSourceEncoding = collectMultiSourceEncoding(
+      this.multiSourceVariations
+    )
 
     this.setComparisonOrder()
 
@@ -439,9 +435,9 @@ export class PlotsModel extends ModelWithPersistence {
       selectedRevisions,
       this.templates,
       this.revisionData,
-      this.scales,
       this.getPlotSize(Section.TEMPLATE_PLOTS),
-      this.getRevisionColors()
+      this.getRevisionColors(),
+      this.multiSourceEncoding
     )
   }
 }
