@@ -221,11 +221,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   bottom: 0;
 }
 
-.rowGroup:last-child > .tr:last-child {
-  border-color: $row-bg-color;
+.rowGroup:last-child {
+  & > .tr:last-child {
+    border-color: $row-bg-color;
 
-  &.rowSelected {
-    border-color: $row-bg-selected-color;
+    &.rowSelected {
+      border-color: $row-bg-selected-color;
+    }
   }
 
   .experimentGroup {
