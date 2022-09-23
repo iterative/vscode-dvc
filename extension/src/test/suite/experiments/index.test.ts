@@ -79,7 +79,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('getExperiments', () => {
-    it('should return all existing experiments, the workspace and branch (HEAD revision)', async () => {
+    it('should return the workspace and branch (HEAD revision)', async () => {
       const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
@@ -88,13 +88,7 @@ suite('Experiments Test Suite', () => {
 
       expect(runs.map(experiment => experiment.label)).to.deep.equal([
         'workspace',
-        'main',
-        '4fb124a',
-        '42b8736',
-        '1ba7bcd',
-        '489fd8b',
-        'f0f9186',
-        '90aea7f'
+        'main'
       ])
     })
   })
