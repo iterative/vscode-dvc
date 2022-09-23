@@ -44,17 +44,6 @@ export abstract class PathSelectionModel<
       .map(element => ({ ...element, selected: !!this.status[element.path] }))
   }
 
-  public getChildren(path: string | undefined) {
-    return this.filterChildren(path).map(element => {
-      return {
-        ...element,
-        descendantStatuses: this.getTerminalNodeStatuses(element.path),
-        label: element.label,
-        status: this.status[element.path]
-      }
-    })
-  }
-
   public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
     this.status[path] = status
@@ -153,5 +142,7 @@ export abstract class PathSelectionModel<
     return this.persist(this.statusKey, this.status)
   }
 
-  abstract filterChildren(path?: string): T[]
+  abstract getChildren(
+    ...args: unknown[]
+  ): (T & { descendantStatuses: Status[]; label: string; status: Status })[]
 }

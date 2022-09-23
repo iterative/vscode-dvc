@@ -4,6 +4,8 @@ import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
 import { createTypedAccumulator } from '../../util/object'
+import { StrokeDashValue } from '../multiSource/constants'
+import { MultiSourceEncoding } from '../multiSource/collect'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -262,4 +264,37 @@ export const collectScale = (paths: PlotPath[] = []) => {
     addToScale(acc, type)
   }
   return acc
+}
+
+export type EncodingElement = {
+  type: string
+  value: StrokeDashValue
+  label: string
+}
+
+export const isEncodingElement = (
+  element: unknown
+): element is EncodingElement => !!(element as EncodingElement)?.value
+
+export const collectElementsFromEncoding = (
+  path: string,
+  multiSourceEncoding: MultiSourceEncoding
+): EncodingElement[] => {
+  const encoding = multiSourceEncoding[path]
+  const { strokeDash } = encoding
+  const elements: {
+    type: string
+    value: StrokeDashValue
+    label: string
+  }[] = []
+  const { domain, range } = strokeDash.scale
+  for (const [i, element] of domain.entries()) {
+    const child = {
+      label: element,
+      type: 'strokeDash',
+      value: range[i]
+    }
+    elements.push(child)
+  }
+  return elements
 }
