@@ -10,6 +10,7 @@ import { collectExperiments, collectMutableRevisions } from './collect'
 import {
   collectFiltered,
   collectFilteredCounts,
+  ExperimentAugmented,
   ExperimentWithType
 } from './filterBy/collect'
 import { collectColoredStatus, collectSelected } from './status/collect'
@@ -228,7 +229,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getMutableRevisions(hasCheckpoints: boolean) {
-    return collectMutableRevisions(this.getExperiments(), hasCheckpoints)
+    return collectMutableRevisions(this.getAllExperiments(), hasCheckpoints)
   }
 
   public getSelectedRevisions() {
@@ -264,7 +265,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getUnfilteredExperiments(filters = this.getFilters()) {
     const unfilteredExperiments = this.getSubRows(
-      this.getExperiments(),
+      this.getAllExperiments(),
       filters
     )
 
@@ -285,11 +286,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public getExperiments(): (ExperimentWithType & {
-    hasChildren: boolean
-    selected?: boolean
-    starred: boolean
-  })[] {
+  public getExperiments(): ExperimentAugmented[] {
     return [
       {
         ...this.addDetails(this.workspace),
@@ -299,20 +296,15 @@ export class ExperimentsModel extends ModelWithPersistence {
       ...this.branches.map(branch => {
         return {
           ...this.addDetails(branch),
-          hasChildren: false,
+          hasChildren: !!this.experimentsByBranch.get(branch.label),
           type: ExperimentType.BRANCH
         }
-      }),
-      ...this.getFlattenedExperiments().map(experiment => ({
-        ...experiment,
-        hasChildren: definedAndNonEmpty(
-          this.checkpointsByTip.get(experiment.id)
-        ),
-        type: experiment.queued
-          ? ExperimentType.QUEUED
-          : ExperimentType.EXPERIMENT
-      }))
+      })
     ]
+  }
+
+  public getAllExperiments() {
+    return [...this.getExperiments(), ...this.getFlattenedExperiments()]
   }
 
   public getErrors() {
@@ -325,7 +317,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getExperimentsWithCheckpoints(): ExperimentWithCheckpoints[] {
     const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = []
-    for (const experiment of this.getExperiments()) {
+    for (const experiment of this.getAllExperiments()) {
       const { id, queued } = experiment
       if (queued) {
         continue
@@ -342,7 +334,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperimentParams(id: string) {
-    const params = this.getExperiments().find(
+    const params = this.getAllExperiments().find(
       experiment => experiment.id === id
     )?.params
 
@@ -414,6 +406,16 @@ export class ExperimentsModel extends ModelWithPersistence {
       ...this.getFlattenedExperiments(),
       ...this.getFlattenedCheckpoints()
     ]
+  }
+
+  public getExperimentsByBranchForTree(branch: Experiment) {
+    return this.getExperimentsByBranch(branch)?.map(experiment => ({
+      ...experiment,
+      hasChildren: definedAndNonEmpty(this.checkpointsByTip.get(experiment.id)),
+      type: experiment.queued
+        ? ExperimentType.QUEUED
+        : ExperimentType.EXPERIMENT
+    }))
   }
 
   private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
@@ -514,6 +516,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     const { coloredStatus, availableColors } = collectColoredStatus(
       this.getExperiments(),
       this.checkpointsByTip,
+      this.experimentsByBranch,
       this.coloredStatus,
       this.availableColors
     )
@@ -571,6 +574,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     if (!hasKey(this.coloredStatus, id)) {
       return {
         ...experiment,
+        selected: false,
         starred
       }
     }

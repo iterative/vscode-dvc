@@ -13,16 +13,21 @@ describe('collectColoredStatus', () => {
     return mockExperiments
   }
 
-  it('should set new experiments to selected if there are less than 7', () => {
-    const experiments = buildMockExperiments(4)
-    const colors = copyOriginalColors()
-
-    const { availableColors, coloredStatus } = collectColoredStatus(
+  const collectedColoredStatus = (experiments: Experiment[]) =>
+    collectColoredStatus(
       experiments,
+      new Map(),
       new Map(),
       {},
       copyOriginalColors()
     )
+
+  it('should set new experiments to selected if there are less than 7', () => {
+    const experiments = buildMockExperiments(4)
+    const colors = copyOriginalColors()
+
+    const { availableColors, coloredStatus } =
+      collectedColoredStatus(experiments)
 
     expect(availableColors).toStrictEqual(colors.slice(4))
     expect(coloredStatus).toStrictEqual({
@@ -40,12 +45,8 @@ describe('collectColoredStatus', () => {
     ] as Experiment[]
     const colors = copyOriginalColors()
 
-    const { availableColors, coloredStatus } = collectColoredStatus(
-      experiments,
-      new Map(),
-      {},
-      copyOriginalColors()
-    )
+    const { availableColors, coloredStatus } =
+      collectedColoredStatus(experiments)
 
     expect(availableColors).toStrictEqual(colors.slice(1))
     expect(coloredStatus).toStrictEqual({
@@ -57,12 +58,8 @@ describe('collectColoredStatus', () => {
     const experiments = buildMockExperiments(8)
     const colors = copyOriginalColors()
 
-    const { availableColors, coloredStatus } = collectColoredStatus(
-      experiments,
-      new Map(),
-      {},
-      copyOriginalColors()
-    )
+    const { availableColors, coloredStatus } =
+      collectedColoredStatus(experiments)
 
     expect(availableColors).toStrictEqual([])
     expect(coloredStatus).toStrictEqual({
@@ -83,6 +80,7 @@ describe('collectColoredStatus', () => {
 
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
+      new Map(),
       new Map(),
       {
         exp2: 0,
@@ -106,6 +104,7 @@ describe('collectColoredStatus', () => {
 
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
+      new Map(),
       new Map(),
       {
         exp1: 0,
@@ -138,6 +137,7 @@ describe('collectColoredStatus', () => {
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
       new Map(),
+      new Map(),
       { exp9: colors[0] },
       copyOriginalColors().slice(1)
     )
@@ -162,6 +162,7 @@ describe('collectColoredStatus', () => {
 
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
+      new Map(),
       new Map(),
       {
         exp4: colors[0],
@@ -198,6 +199,7 @@ describe('collectColoredStatus', () => {
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
       checkpointsByTip,
+      new Map(),
       {},
       copyOriginalColors()
     )
@@ -231,6 +233,7 @@ describe('collectColoredStatus', () => {
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
       checkpointsByTip,
+      new Map(),
       {
         checkC1: colors[1],
         checkD2: colors[2],
