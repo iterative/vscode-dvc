@@ -9,7 +9,13 @@ export const StrokeDash = [
 ] as const
 export type StrokeDashValue = typeof StrokeDash[number]
 
-export const Shape = ['square', 'circle', 'triangle'] as const
+export const Shape = [
+  'square',
+  'circle',
+  'triangle',
+  'diamond',
+  'cross'
+] as const
 export type ShapeValue = typeof Shape[number]
 
 export type Scale<T extends StrokeDashValue | ShapeValue> = {
