@@ -36,9 +36,9 @@ import { shortenForLabel } from '../../util/string'
 import {
   getDvcDataVersionInfo,
   isConcatenatedField,
-  joinFields,
+  mergeFields,
   MultiSourceEncoding,
-  splitConcatenatedFields
+  unmergeConcatenatedFields
 } from '../multiSource/collect'
 
 type CheckpointPlotAccumulator = {
@@ -512,7 +512,7 @@ const fillTemplate = (
     ) as TopLevelSpec
   }
 
-  const fields = splitConcatenatedFields(field)
+  const fields = unmergeConcatenatedFields(field)
   return JSON.parse(
     template.replace(
       '"<DVC_METRIC_DATA>"',
@@ -521,7 +521,7 @@ const fillTemplate = (
           const obj = data as Record<string, unknown>
           return {
             ...obj,
-            [field]: joinFields(fields.map(field => obj[field] as string))
+            [field]: mergeFields(fields.map(field => obj[field] as string))
           }
         })
       )

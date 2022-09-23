@@ -31,13 +31,13 @@ export type MultiSourceEncoding = Record<
   }
 >
 
-export const joinFields = (fields: string[]): string =>
+export const mergeFields = (fields: string[]): string =>
   fields.join(FIELD_SEPARATOR)
 
 export const isConcatenatedField = (field: string): boolean =>
   !!field.includes(FIELD_SEPARATOR)
 
-export const splitConcatenatedFields = (field: string): string[] =>
+export const unmergeConcatenatedFields = (field: string): string[] =>
   field.split(FIELD_SEPARATOR)
 
 export const getDvcDataVersionInfo = (
@@ -185,7 +185,7 @@ const collectVariation = (
     }
   }
 
-  scale.domain.push(joinFields(domain))
+  scale.domain.push(mergeFields(domain))
   scale.range.push(StrokeDash[idx])
   scale.domain.sort()
 }
@@ -194,11 +194,11 @@ const getEncoding = <T extends StrokeDashValue | ShapeValue>(
   field: Set<string>,
   scale: { domain: string[]; range: T[] }
 ): { field: string; scale: { domain: string[]; range: T[] } } => ({
-  field: joinFields([...field]),
+  field: mergeFields([...field]),
   scale
 })
 
-const collectGroupedStrokeDashEncoding = (
+const collectMergedStrokeDashEncoding = (
   acc: MultiSourceEncoding,
   path: string,
   variations: Variations,
@@ -246,7 +246,7 @@ const collectEncodingFromValues = <T extends typeof Shape | typeof StrokeDash>(
   return getEncoding(field, scale)
 }
 
-const collectSingleStrokeDashEncoding = (
+const collectUnmergedStrokeDashEncoding = (
   acc: MultiSourceEncoding,
   path: string,
   values: Values,
@@ -261,7 +261,7 @@ const collectSingleStrokeDashEncoding = (
   }
 }
 
-const collectSingleShapeEncoding = (
+const collectUnmergedShapeEncoding = (
   acc: MultiSourceEncoding,
   path: string,
   values: Values,
@@ -273,7 +273,7 @@ const collectSingleShapeEncoding = (
   }
 }
 
-const collectMultiSourceData = (
+const collectPathMultiSourceEncoding = (
   acc: MultiSourceEncoding,
   path: string,
   variations: Variations
@@ -290,16 +290,21 @@ const collectMultiSourceData = (
       ...valuesMatchVariations,
       ...lessValuesThanVariations.map(({ field }) => field)
     ]
-    collectGroupedStrokeDashEncoding(acc, path, variations, keysToCombined)
+    collectMergedStrokeDashEncoding(acc, path, variations, keysToCombined)
     return
   }
 
   if (lessValuesThanVariations.length > 0 && !acc[path]?.strokeDash) {
-    collectSingleStrokeDashEncoding(acc, path, values, lessValuesThanVariations)
+    collectUnmergedStrokeDashEncoding(
+      acc,
+      path,
+      values,
+      lessValuesThanVariations
+    )
   }
 
   if (lessValuesThanVariations.length > 0) {
-    collectSingleShapeEncoding(acc, path, values, lessValuesThanVariations)
+    collectUnmergedShapeEncoding(acc, path, values, lessValuesThanVariations)
   }
 }
 
@@ -313,7 +318,7 @@ export const collectMultiSourceEncoding = (
       continue
     }
 
-    collectMultiSourceData(acc, path, variations)
+    collectPathMultiSourceEncoding(acc, path, variations)
   }
 
   return acc
