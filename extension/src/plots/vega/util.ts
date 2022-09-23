@@ -271,7 +271,7 @@ export const truncateTitles = (
 export const extendVegaSpec = (
   spec: TopLevelSpec,
   size: PlotSize,
-  scale?: {
+  encoding?: {
     color?: ColorScale
     strokeDash?: StrokeDashEncoding
     shape?: ShapeEncoding
@@ -279,11 +279,11 @@ export const extendVegaSpec = (
 ) => {
   const updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec
 
-  if (isMultiViewByCommitPlot(spec) || !scale) {
+  if (isMultiViewByCommitPlot(spec) || !encoding) {
     return updatedSpec
   }
 
-  const update = getSpecEncodingUpdate(scale)
+  const update = getSpecEncodingUpdate(encoding)
 
   return mergeUpdate(updatedSpec, update)
 }
