@@ -37,9 +37,9 @@ import {
   getDvcDataVersionInfo,
   isConcatenatedField,
   joinFields,
+  MultiSourceEncoding,
   splitConcatenatedFields
 } from '../multiSource/collect'
-import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -536,13 +536,7 @@ const collectTemplateGroup = (
   revisionData: RevisionData,
   size: PlotSize,
   revisionColors: ColorScale | undefined,
-  multiSourceEncoding: Record<
-    string,
-    {
-      strokeDash?: StrokeDashEncoding
-      shape?: ShapeEncoding
-    }
-  >
+  multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotEntry[] => {
   const acc: TemplatePlotEntry[] = []
   for (const path of paths) {
@@ -587,13 +581,7 @@ export const collectSelectedTemplatePlots = (
   revisionData: RevisionData,
   size: PlotSize,
   revisionColors: ColorScale | undefined,
-  multiSourceEncoding: Record<
-    string,
-    {
-      strokeDash?: StrokeDashEncoding
-      shape?: ShapeEncoding
-    }
-  >
+  multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotSection[] | undefined => {
   const acc: TemplatePlotSection[] = []
   for (const templateGroup of order) {
