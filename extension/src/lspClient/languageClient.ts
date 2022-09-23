@@ -42,7 +42,7 @@ export class LanguageClientWrapper extends Disposable {
   async start() {
     await this.client.start()
 
-    const files = await findFiles('**/*.{yaml,json}', '.??*')
+    const files = await findFiles('**/*.{yaml,json,py,toml}', '.??*')
 
     const textDocuments = files.map(filePath => {
       const uri = Uri.file(filePath).toString()
