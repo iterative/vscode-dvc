@@ -2,7 +2,7 @@ import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { isSameOrChild, loadYaml, PartialDvcYaml } from '..'
 import { findFiles } from '../workspace'
-import { createFileSystemWatcher } from '../watcher'
+import { createFileSystemWatcher, getRelativePattern } from '../watcher'
 import { DeferredDisposable } from '../../class/deferred'
 
 export class FileSystemData extends DeferredDisposable {
@@ -40,15 +40,18 @@ export class FileSystemData extends DeferredDisposable {
 
   private watchDvcYaml() {
     this.dispose.track(
-      createFileSystemWatcher(join(this.dvcRoot, '**', 'dvc.yaml'), path => {
-        if (!path) {
-          return
+      createFileSystemWatcher(
+        getRelativePattern(this.dvcRoot, join('**', 'dvc.yaml')),
+        path => {
+          if (!path) {
+            return
+          }
+          const yaml = loadYaml<PartialDvcYaml>(path)
+          if (yaml) {
+            this.updated.fire({ path, yaml })
+          }
         }
-        const yaml = loadYaml<PartialDvcYaml>(path)
-        if (yaml) {
-          this.updated.fire({ path, yaml })
-        }
-      })
+      )
     )
   }
 }
