@@ -2,14 +2,14 @@ import { join } from 'path'
 import { collectMultiSourceEncoding } from './collect'
 
 describe('collectMultiSourceEncoding', () => {
-  it('should return an empty object given no multi source data', () => {
+  it('should return an empty object given a single variation collected from the datapoints', () => {
     const multiSourceEncoding = collectMultiSourceEncoding({
       path: [{ field: 'x', filename: 'path' }]
     })
     expect(multiSourceEncoding).toStrictEqual({})
   })
 
-  it('should return an object containing a filename strokeDash given data with varying filenames', () => {
+  it('should return an object containing a filename strokeDash given variations with differing filenames', () => {
     const otherPath = join('other', 'path')
     const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
@@ -33,7 +33,7 @@ describe('collectMultiSourceEncoding', () => {
     })
   })
 
-  it('should return an object containing a field strokeDash given data with varying fields', () => {
+  it('should return an object containing a field strokeDash given variations with differing fields', () => {
     const multiSourceEncoding = collectMultiSourceEncoding({
       path: [
         { field: 'x', filename: 'path' },
@@ -56,7 +56,7 @@ describe('collectMultiSourceEncoding', () => {
     })
   })
 
-  it('should return an object containing a filename::field strokeDash given data with varying filename and fields', () => {
+  it('should return an object containing a merged filename::field strokeDash given variations with differing filename and fields', () => {
     const otherPath = join('other', 'path')
     const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
@@ -80,7 +80,7 @@ describe('collectMultiSourceEncoding', () => {
     })
   })
 
-  it('should return an object containing a filename::field strokeDash given data with varying filename and similar field', () => {
+  it('should return an object containing a merged filename::field strokeDash given variations with differing filename and similar field', () => {
     const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
         { field: 'x', filename: join('first', 'path') },
@@ -109,7 +109,7 @@ describe('collectMultiSourceEncoding', () => {
     })
   })
 
-  it('should return an object containing a filename::field strokeDash given data with different filename and field for each variation', () => {
+  it('should return an object containing a merged filename::field strokeDash given variations with differing filename and field for each variation', () => {
     const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
         { field: 'x', filename: join('first', 'path') },
@@ -138,7 +138,7 @@ describe('collectMultiSourceEncoding', () => {
     })
   })
 
-  it('should return an object containing a filename strokeDash and field shape given data with differently varying filename and field', () => {
+  it('should return an object containing a filename strokeDash and field shape given variations with unmergable combinations of filename and field', () => {
     const multiSourceEncoding = collectMultiSourceEncoding({
       combined: [
         { field: 'x', filename: 'path' },
