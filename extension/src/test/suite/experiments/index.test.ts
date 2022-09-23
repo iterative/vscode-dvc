@@ -729,7 +729,7 @@ suite('Experiments Test Suite', () => {
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
 
       const isExperimentSelected = (expId: string): boolean =>
-        !!experimentsModel.getExperiments().find(({ id }) => id === expId)
+        !!experimentsModel.getAllExperiments().find(({ id }) => id === expId)
           ?.selected
 
       expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
@@ -893,7 +893,7 @@ suite('Experiments Test Suite', () => {
       const areExperimentsStarred = (expIds: string[]): boolean =>
         expIds
           .map(expId =>
-            experimentsModel.getExperiments().find(({ id }) => id === expId)
+            experimentsModel.getAllExperiments().find(({ id }) => id === expId)
           )
           .every(exp => exp?.starred)
 
