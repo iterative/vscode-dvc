@@ -303,7 +303,7 @@ export class Extension extends Disposable implements IExtension {
     const stopWatch = new StopWatch()
     try {
       const previousCliPath = this.config.getCliPath()
-      const previousPythonPath = this.config.pythonBinPath
+      const previousPythonPath = this.config.getPythonBinPath()
 
       const completed = await setupWorkspace()
       sendTelemetryEvent(
@@ -316,7 +316,7 @@ export class Extension extends Disposable implements IExtension {
 
       const executionDetailsUnchanged =
         this.config.getCliPath() === previousPythonPath &&
-        this.config.pythonBinPath === previousCliPath
+        this.config.getPythonBinPath() === previousCliPath
 
       if (completed && !this.cliAccessible && executionDetailsUnchanged) {
         this.workspaceChanged.fire()
@@ -428,7 +428,7 @@ export class Extension extends Disposable implements IExtension {
       dvcRootCount: this.dvcRoots.length,
       msPythonInstalled: isPythonExtensionInstalled(),
       msPythonUsed: this.config.isPythonExtensionUsed(),
-      pythonPathUsed: !!this.config.pythonBinPath,
+      pythonPathUsed: !!this.config.getPythonBinPath(),
       workspaceFolderCount: getWorkspaceFolderCount()
     }
   }

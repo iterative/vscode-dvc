@@ -11,7 +11,7 @@ import { getOnDidChangeExtensions } from './vscode/extensions'
 export class Config extends DeferredDisposable {
   public readonly onDidChangeExecutionDetails: Event<void>
 
-  public pythonBinPath: string | undefined
+  private pythonBinPath: string | undefined
 
   private dvcPath = this.getCliPath()
 
@@ -39,16 +39,20 @@ export class Config extends DeferredDisposable {
     return getConfigValue(ConfigKey.DVC_PATH)
   }
 
+  public getPythonBinPath() {
+    return this.pythonBinPath
+  }
+
   public isPythonExtensionUsed() {
     return !getConfigValue(ConfigKey.PYTHON_PATH) && !!this.pythonBinPath
   }
 
-  private async getPythonBinPath() {
+  private async getConfigOrExtensionPythonBinPath() {
     return getConfigValue(ConfigKey.PYTHON_PATH) || (await getPythonBinPath())
   }
 
   private async setPythonBinPath() {
-    this.pythonBinPath = await this.getPythonBinPath()
+    this.pythonBinPath = await this.getConfigOrExtensionPythonBinPath()
     return this.deferred.resolve()
   }
 
@@ -89,7 +93,7 @@ export class Config extends DeferredDisposable {
 
   private async setPythonAndNotifyIfChanged() {
     const oldPath = this.pythonBinPath
-    this.pythonBinPath = await this.getPythonBinPath()
+    this.pythonBinPath = await this.getConfigOrExtensionPythonBinPath()
     this.notifyIfChanged(oldPath, this.pythonBinPath)
   }
 
