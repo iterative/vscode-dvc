@@ -1,6 +1,6 @@
 import { Uri } from 'vscode'
 import { Disposable } from './class/dispose'
-import { StrokeDashValue } from './plots/multiSource/constants'
+import { ShapeValue, StrokeDashValue } from './plots/multiSource/constants'
 
 export type Resource = { dark: Uri; light: Uri }
 
@@ -54,6 +54,10 @@ export class ResourceLocator extends Disposable {
       'plots',
       `stroke-dash-${strokeDash.join('-')}.svg`
     )
+  }
+
+  public getPlotsShapeResource(shape: ShapeValue): Uri {
+    return Uri.joinPath(this.extensionUri, 'resources', 'plots', `${shape}.svg`)
   }
 
   private getResourceLocations(...path: string[]): { dark: Uri; light: Uri } {

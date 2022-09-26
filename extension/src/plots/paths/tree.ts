@@ -1,5 +1,5 @@
 import { TreeItemCollapsibleState } from 'vscode'
-import { isEncodingElement } from './collect'
+import { EncodingType, isEncodingElement } from './collect'
 import {
   BasePathSelectionTree,
   PathSelectionItem
@@ -38,12 +38,15 @@ export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
       .getChildPaths(path)
       .map(element => {
         if (isEncodingElement(element)) {
-          const { label, value } = element
+          const { label, type, value } = element
           return {
             collapsibleState: TreeItemCollapsibleState.None,
             description: undefined,
             dvcRoot,
-            iconPath: this.resourceLocator.getPlotsStrokeDashResource(value),
+            iconPath:
+              type === EncodingType.STROKE_DASH
+                ? this.resourceLocator.getPlotsStrokeDashResource(value)
+                : this.resourceLocator.getPlotsShapeResource(value),
             label,
             path: label
           }
