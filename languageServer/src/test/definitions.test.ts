@@ -11,6 +11,7 @@ import {
   disposeTestConnections,
   setupTestConnections
 } from './utils/setup-test-connections'
+import { sendTheseFilesToServer } from './utils/sendTheseFilesToServer'
 
 describe('textDocument/definitions', () => {
   beforeEach(() => {
@@ -75,7 +76,7 @@ describe('textDocument/definitions', () => {
   })
 
   it('should provide a single location that points to the top of the file path symbol', async () => {
-    const [dvcYaml] = await openTheseFilesAndNotifyServer([
+    const [dvcYaml] = await sendTheseFilesToServer([
       {
         languageId: 'yaml',
         mockContents: vars_dvc_yaml,
