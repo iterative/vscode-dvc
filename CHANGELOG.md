@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.8] - 2022-09-26
+
+### 🚀 New Features and Enhancements
+
+- Send initial YAML and JSON files right after language client starts (2/3) [#2445](https://github.com/iterative/vscode-dvc/pull/2445) by [@wolmir](https://github.com/wolmir)
+
+### 🐛 Bug Fixes
+
+- Add webpack to languageServer [#2469](https://github.com/iterative/vscode-dvc/pull/2469) by [@wolmir](https://github.com/wolmir)
+- Check for global install of CLI after python install not found [#2462](https://github.com/iterative/vscode-dvc/pull/2462) by [@mattseddon](https://github.com/mattseddon)
+- Account for exp show returning extra data in CLI output tests [#2463](https://github.com/iterative/vscode-dvc/pull/2463) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove coverage for prettier [#2470](https://github.com/iterative/vscode-dvc/pull/2470) by [@sroy3](https://github.com/sroy3)
+
 ## [0.4.7] - 2022-09-25
 
 ### 🚀 New Features and Enhancements
