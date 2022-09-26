@@ -209,17 +209,36 @@ const warnUserCLIInaccessible = async (
   }
 }
 
-const extensionCanRunCli = async (
-  extension: IExtension,
-  cwd: string
-): Promise<boolean> => {
+const extensionCanRunPythonCli = async (extension: IExtension, cwd: string) => {
+  let canRunCli = false
+  if (await extension.isDvcPythonModule()) {
+    try {
+      canRunCli = await extension.canRunCli(cwd)
+    } catch {}
+  }
+  return canRunCli
+}
+
+const extensionCanRunGlobalCli = async (extension: IExtension, cwd: string) => {
   let canRunCli = false
   try {
-    canRunCli = await extension.canRunCli(cwd)
+    canRunCli = await extension.canRunCli(cwd, true)
   } catch {
     if (extension.hasRoots()) {
       warnUserCLIInaccessible(extension)
     }
+  }
+  return canRunCli
+}
+
+const extensionCanRunCli = async (
+  extension: IExtension,
+  cwd: string
+): Promise<boolean> => {
+  let canRunCli = await extensionCanRunPythonCli(extension, cwd)
+
+  if (!canRunCli) {
+    canRunCli = await extensionCanRunGlobalCli(extension, cwd)
   }
   return canRunCli
 }

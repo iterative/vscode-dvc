@@ -2,6 +2,7 @@ import { join } from 'path'
 import isEmpty from 'lodash.isempty'
 import { DvcCli } from '.'
 import { Args, Command, ExperimentFlag, Flag, SubCommand } from './constants'
+import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 import { MaybeConsoleError } from '../error'
 import { Plot } from '../../plots/webview/contract'
@@ -167,8 +168,15 @@ export class DvcReader extends DvcCli {
     } catch {}
   }
 
-  public version(cwd: string): Promise<string> {
-    return this.executeDvcProcess(cwd, Flag.VERSION)
+  public version(cwd: string, isCliGlobal?: true): Promise<string> {
+    const options = getOptions(
+      isCliGlobal ? undefined : this.config.getPythonBinPath(),
+      this.config.getCliPath(),
+      cwd,
+      Flag.VERSION
+    )
+
+    return this.executeProcess(options)
   }
 
   private readProcessJson<T extends DataStatusOutput | PlotsOutput>(

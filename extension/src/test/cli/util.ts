@@ -9,7 +9,7 @@ import { dvcDemoPath } from '../util'
 
 const config = {
   getCliPath: () => '',
-  pythonBinPath: getVenvBinPath(TEMP_DIR, ENV_DIR, 'python')
+  getPythonBinPath: () => getVenvBinPath(TEMP_DIR, ENV_DIR, 'python')
 } as Config
 
 export const dvcReader = new DvcReader(config)
