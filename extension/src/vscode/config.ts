@@ -10,8 +10,11 @@ export enum ConfigKey {
   PYTHON_PATH = 'dvc.pythonPath'
 }
 
-export const getConfigValue = <T = string>(key: ConfigKey): T =>
-  workspace.getConfiguration().get(key, '') as unknown as T
+export const getConfigValue = <T = string, D = string>(
+  key: ConfigKey,
+  defaultValue?: D | T
+): T =>
+  workspace.getConfiguration().get(key, defaultValue ?? '') as unknown as T
 
 export const setConfigValue = (key: ConfigKey, value: unknown) =>
   workspace.getConfiguration().update(key, value)

@@ -16,8 +16,9 @@ export const limitAncestorDepth = (
     concatenated layer itself counts as one; because of this, we must subtract 3
     from what we want the final layer count to be.
   */
-  const collectedLimit =
-    Number(getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS)) || limit
+  const collectedLimit = Number(
+    getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS, limit)
+  )
   const convertedLimit = (collectedLimit >= 3 ? collectedLimit : 3) - 3
   if (rest.length <= convertedLimit) {
     return ancestors

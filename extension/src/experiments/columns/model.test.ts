@@ -22,6 +22,7 @@ import { getConfigValue } from '../../vscode/config'
 jest.mock('../../vscode/config')
 
 const mockedGetConfigValue = jest.mocked(getConfigValue)
+mockedGetConfigValue.mockImplementation(() => 5)
 
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
