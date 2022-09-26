@@ -211,7 +211,7 @@ const warnUserCLIInaccessible = async (
 
 const extensionCanRunPythonCli = async (extension: IExtension, cwd: string) => {
   let canRunCli = false
-  if (await extension.isPythonExtensionUsed()) {
+  if (await extension.isDvcPythonModule()) {
     try {
       canRunCli = await extension.canRunCli(cwd)
     } catch {}

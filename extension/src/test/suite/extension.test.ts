@@ -455,7 +455,7 @@ suite('Extension Test Suite', () => {
       stub(DvcReader.prototype, 'plotsDiff').resolves({})
       stub(GitReader.prototype, 'hasChanges').resolves(false)
       stub(GitReader.prototype, 'listUntracked').resolves(new Set())
-      stub(Config.prototype, 'isPythonExtensionUsed').resolves(true)
+      stub(Config.prototype, 'getPythonBinPath').resolves(join('python'))
 
       const mockVersion = stub(DvcReader.prototype, 'version')
         .onFirstCall()

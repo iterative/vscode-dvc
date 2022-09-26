@@ -1,7 +1,7 @@
 export interface IExtension {
   canRunCli: (cwd: string, isCliGlobal?: true) => Promise<boolean>
   hasRoots: () => boolean
-  isPythonExtensionUsed: () => Promise<boolean>
+  isDvcPythonModule: () => Promise<boolean>
 
   setupWorkspace: () => void
 

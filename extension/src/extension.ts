@@ -329,9 +329,9 @@ export class Extension extends Disposable implements IExtension {
     }
   }
 
-  public async isPythonExtensionUsed() {
+  public async isDvcPythonModule() {
     await this.config.isReady()
-    return this.config.isPythonExtensionUsed()
+    return !!this.config.getPythonBinPath()
   }
 
   public async canRunCli(cwd: string, tryGlobalCli?: true) {
