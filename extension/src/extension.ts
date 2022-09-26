@@ -51,7 +51,6 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
-import { LanguageClientWrapper } from './lspClient/languageClient'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -92,8 +91,6 @@ export class Extension extends Disposable implements IExtension {
 
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
-
-    this.dispose.track(new LanguageClientWrapper())
 
     this.resourceLocator = this.dispose.track(
       new ResourceLocator(context.extensionUri)

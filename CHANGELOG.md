@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.7] - 2022-09-25
+
+### 🚀 New Features and Enhancements
+
+- Add config for updating max amount of table head layers [#2436](https://github.com/iterative/vscode-dvc/pull/2436) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Turn off language server until it is fixed [#2460](https://github.com/iterative/vscode-dvc/pull/2460) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Move remaining data update watchers to RelativePatterns [#2451](https://github.com/iterative/vscode-dvc/pull/2451) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.4.6] - 2022-09-23
 
 ### 🚀 New Features and Enhancements
