@@ -1,11 +1,14 @@
 import { Column, ColumnType } from '../../webview/contract'
 import { Value } from '../../../cli/dvc/reader'
 import { ConfigKey, getConfigValue } from '../../../vscode/config'
-import { INITIAL_TABLE_HEAD_MAX_LAYERS } from '../consts'
 
 export type ColumnAccumulator = Record<string, Column>
 
-export const limitAncestorDepth = (ancestors: string[], sep: string) => {
+export const limitAncestorDepth = (
+  ancestors: string[],
+  sep: string,
+  limit = 5
+) => {
   const [path, ...rest] = ancestors
   /*
     The depth is only limited for the middle of the path array.
@@ -14,9 +17,7 @@ export const limitAncestorDepth = (ancestors: string[], sep: string) => {
     from what we want the final layer count to be.
   */
   const collectedLimit =
-    Number(getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS)) ||
-    INITIAL_TABLE_HEAD_MAX_LAYERS
-
+    Number(getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS)) || limit
   const convertedLimit = (collectedLimit >= 3 ? collectedLimit : 3) - 3
   if (rest.length <= convertedLimit) {
     return ancestors

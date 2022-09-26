@@ -9,14 +9,19 @@ import outputFixture from '../../test/fixtures/expShow/output'
 import columnsFixture from '../../test/fixtures/expShow/columns'
 import {
   deeplyNestedOutput,
-  columns as deeplyNestedColumns
+  columns as deeplyNestedColumns,
+  columnsWithDepthOf10 as deeplyNestedColumnsWithDepthOf10,
+  columnsWithDepthOf3 as deeplyNestedColumnsWithDepthOf3
 } from '../../test/fixtures/expShow/deeplyNested'
 import {
   dataTypesOutput,
   columns as dataTypesColumns
 } from '../../test/fixtures/expShow/dataTypes'
+import { getConfigValue } from '../../vscode/config'
 
 jest.mock('../../vscode/config')
+
+const mockedGetConfigValue = jest.mocked(getConfigValue)
 
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
@@ -24,13 +29,39 @@ describe('ColumnsModel', () => {
   it('should return the expected columns when given the default output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
     await model.transformAndSet(outputFixture)
+    expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(columnsFixture)
   })
 
   it('should return the expected columns when given the deeply nested output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
     await model.transformAndSet(deeplyNestedOutput)
+    expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
+  })
+
+  it('should return the expected columns when the max depth config is set to 10', async () => {
+    mockedGetConfigValue.mockImplementation(() => 10)
+    const model = new ColumnsModel('', buildMockMemento())
+    await model.transformAndSet(deeplyNestedOutput)
+    expect(mockedGetConfigValue).toHaveBeenCalled()
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf10)
+  })
+
+  it('should return the expected columns when the max depth config is set to 3', async () => {
+    mockedGetConfigValue.mockImplementation(() => 3)
+    const model = new ColumnsModel('', buildMockMemento())
+    await model.transformAndSet(deeplyNestedOutput)
+    expect(mockedGetConfigValue).toHaveBeenCalled()
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf3)
+  })
+
+  it('should return the expected columns when the max depth config is set to -1', async () => {
+    mockedGetConfigValue.mockImplementation(() => -1)
+    const model = new ColumnsModel('', buildMockMemento())
+    await model.transformAndSet(deeplyNestedOutput)
+    expect(mockedGetConfigValue).toHaveBeenCalled()
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf3)
   })
 
   it('should return the expected columns when given the data types output fixture', async () => {
