@@ -48,7 +48,7 @@ describe('CliReader', () => {
   const dvcReader = new DvcReader(
     {
       getCliPath: () => undefined,
-      pythonBinPath: undefined
+      getPythonBinPath: () => undefined
     } as unknown as Config,
     {
       processCompleted: {

@@ -46,7 +46,7 @@ describe('CliExecutor', () => {
   const dvcExecutor = new DvcExecutor(
     {
       getCliPath: () => undefined,
-      pythonBinPath: undefined
+      getPythonBinPath: () => undefined
     } as unknown as Config,
     {
       processCompleted: {

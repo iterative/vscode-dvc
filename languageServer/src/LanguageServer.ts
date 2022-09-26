@@ -10,17 +10,19 @@ import {
   Location,
   Position,
   Range,
-  DocumentSymbol
+  DocumentSymbol,
+  TextDocumentItem
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { URI } from 'vscode-uri'
 import { TextDocumentWrapper } from './TextDocumentWrapper'
 
 export class LanguageServer {
-  private documents!: TextDocuments<TextDocument>
+  private documentsKnownToEditor!: TextDocuments<TextDocument>
+  private documentsFromDvcClient: TextDocumentWrapper[] = []
 
   public listen(connection: _Connection) {
-    this.documents = new TextDocuments(TextDocument)
+    this.documentsKnownToEditor = new TextDocuments(TextDocument)
 
     connection.onInitialize(() => this.onInitialize())
 
@@ -32,20 +34,59 @@ export class LanguageServer {
       return this.onDefinition(params)
     })
 
-    this.documents.listen(connection)
+    connection.onRequest(
+      'initialTextDocuments',
+      (params: { textDocuments: TextDocumentItem[] }) => {
+        this.documentsFromDvcClient = params.textDocuments.map(
+          ({ uri, languageId, version, text: content }) => {
+            const textDocument = TextDocument.create(
+              uri,
+              languageId,
+              version,
+              content
+            )
+
+            return this.wrap(textDocument)
+          }
+        )
+      }
+    )
+
+    this.documentsKnownToEditor.listen(connection)
 
     connection.listen()
+  }
+
+  private getAllDocuments() {
+    const openDocuments = this.documentsKnownToEditor.all()
+    const acc: TextDocumentWrapper[] = openDocuments.map(doc => this.wrap(doc))
+
+    for (const textDocument of this.documentsFromDvcClient) {
+      const userAlreadyOpenedIt = this.documentsKnownToEditor.get(
+        textDocument.uri
+      )
+
+      if (!userAlreadyOpenedIt) {
+        acc.push(textDocument)
+      }
+    }
+
+    return acc
   }
 
   private getDvcTextDocument(
     params: TextDocumentPositionParams | CodeActionParams
   ) {
     const uri = params.textDocument.uri
-    const doc = this.documents.get(uri)
+    const doc = this.documentsKnownToEditor.get(uri)
 
     if (!doc) {
-      return null
+      const alternative = this.documentsFromDvcClient.find(
+        txtDoc => txtDoc.uri === uri
+      )
+      return alternative ?? null
     }
+
     return this.wrap(doc)
   }
 
@@ -55,7 +96,7 @@ export class LanguageServer {
 
   private getFilePathLocations(
     symbolUnderCursor: DocumentSymbol,
-    allDocs: TextDocument[]
+    allDocs: TextDocumentWrapper[]
   ) {
     if (symbolUnderCursor.kind !== SymbolKind.File) {
       return []
@@ -79,13 +120,12 @@ export class LanguageServer {
 
   private getLocationsFromOtherDocuments(
     symbolUnderCursor: DocumentSymbol,
-    allDocs: TextDocument[]
+    allDocs: TextDocumentWrapper[]
   ) {
     const locationsAccumulator = []
 
     for (const txtDoc of allDocs) {
-      const finder = this.wrap(txtDoc)
-      const locations = finder.findLocationsFor(symbolUnderCursor)
+      const locations = txtDoc.findLocationsFor(symbolUnderCursor)
       locationsAccumulator.push(...locations)
     }
 
@@ -97,7 +137,7 @@ export class LanguageServer {
     const symbolUnderCursor = document?.symbolAt(params.position)
 
     if (document && symbolUnderCursor) {
-      const allDocs = this.documents.all()
+      const allDocs = this.getAllDocuments()
       const locationsAccumulator = []
 
       const fileLocations = this.getFilePathLocations(
