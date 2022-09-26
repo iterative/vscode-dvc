@@ -66,7 +66,7 @@ describe('executeDvcProcess', () => {
     const cli = new DvcCli(
       {
         getCliPath: () => undefined,
-        pythonBinPath: undefined
+        getPythonBinPath: () => undefined
       } as unknown as Config,
       {
         processCompleted: {
@@ -105,7 +105,7 @@ describe('executeDvcProcess', () => {
     const cli = new DvcCli(
       {
         getCliPath: () => '/some/path/to/dvc',
-        pythonBinPath
+        getPythonBinPath: () => pythonBinPath
       } as unknown as Config,
       {
         processCompleted: {

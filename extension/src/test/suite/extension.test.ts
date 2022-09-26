@@ -32,6 +32,7 @@ import { MIN_CLI_VERSION } from '../../cli/dvc/constants'
 import * as WorkspaceFolders from '../../vscode/workspaceFolders'
 import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
+import { Config } from '../../config'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -454,6 +455,7 @@ suite('Extension Test Suite', () => {
       stub(DvcReader.prototype, 'plotsDiff').resolves({})
       stub(GitReader.prototype, 'hasChanges').resolves(false)
       stub(GitReader.prototype, 'listUntracked').resolves(new Set())
+      stub(Config.prototype, 'getPythonBinPath').resolves(join('python'))
 
       const mockVersion = stub(DvcReader.prototype, 'version')
         .onFirstCall()
@@ -468,7 +470,8 @@ suite('Extension Test Suite', () => {
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
 
-      expect(mockVersion).to.be.calledOnce
+      expect(mockVersion).to.be.calledTwice
+      mockVersion.resetHistory()
       expect(
         executeCommandSpy,
         'should set dvc.cli.incompatible to true if the version is incompatible'
@@ -480,6 +483,7 @@ suite('Extension Test Suite', () => {
       )
 
       expect(mockVersion).to.be.calledTwice
+      mockVersion.resetHistory()
       expect(
         executeCommandSpy,
         'should set dvc.cli.incompatible to false if the version is compatible'
@@ -494,7 +498,7 @@ suite('Extension Test Suite', () => {
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
 
-      expect(mockVersion).to.be.calledThrice
+      expect(mockVersion).to.be.calledTwice
       expect(
         executeCommandSpy,
         'should unset dvc.cli.incompatible if the CLI throws an error'

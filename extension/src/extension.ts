@@ -51,6 +51,7 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
+import { LanguageClientWrapper } from './lspClient/languageClient'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -91,6 +92,8 @@ export class Extension extends Disposable implements IExtension {
 
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
+
+    this.dispose.track(new LanguageClientWrapper())
 
     this.resourceLocator = this.dispose.track(
       new ResourceLocator(context.extensionUri)
@@ -300,7 +303,7 @@ export class Extension extends Disposable implements IExtension {
     const stopWatch = new StopWatch()
     try {
       const previousCliPath = this.config.getCliPath()
-      const previousPythonPath = this.config.pythonBinPath
+      const previousPythonPath = this.config.getPythonBinPath()
 
       const completed = await setupWorkspace()
       sendTelemetryEvent(
@@ -313,7 +316,7 @@ export class Extension extends Disposable implements IExtension {
 
       const executionDetailsUnchanged =
         this.config.getCliPath() === previousPythonPath &&
-        this.config.pythonBinPath === previousCliPath
+        this.config.getPythonBinPath() === previousCliPath
 
       if (completed && !this.cliAccessible && executionDetailsUnchanged) {
         this.workspaceChanged.fire()
@@ -329,11 +332,19 @@ export class Extension extends Disposable implements IExtension {
     }
   }
 
-  public async canRunCli(cwd: string) {
+  public async isDvcPythonModule() {
+    await this.config.isReady()
+    return !!this.config.getPythonBinPath()
+  }
+
+  public async canRunCli(cwd: string, tryGlobalCli?: true) {
     await this.config.isReady()
     setContextValue('dvc.cli.incompatible', undefined)
-    const version = await this.dvcReader.version(cwd)
+    const version = await this.dvcReader.version(cwd, tryGlobalCli)
     const compatible = isVersionCompatible(version)
+    if (compatible && tryGlobalCli) {
+      this.config.unsetPythonBinPath()
+    }
     this.cliCompatible = compatible
     setContextValue('dvc.cli.incompatible', !compatible)
     return this.setAvailable(compatible)
@@ -425,7 +436,7 @@ export class Extension extends Disposable implements IExtension {
       dvcRootCount: this.dvcRoots.length,
       msPythonInstalled: isPythonExtensionInstalled(),
       msPythonUsed: this.config.isPythonExtensionUsed(),
-      pythonPathUsed: !!this.config.pythonBinPath,
+      pythonPathUsed: !!this.config.getPythonBinPath(),
       workspaceFolderCount: getWorkspaceFolderCount()
     }
   }
