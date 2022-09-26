@@ -103,11 +103,14 @@ export type Encoding = {
   strokeDash?: StrokeDashEncoding & {
     legend: {
       disable: boolean
+      symbolFillColor: string
+      symbolStrokeColor: string
     }
   }
   shape?: ShapeEncoding & {
     legend: {
       disable: boolean
+      symbolFillColor: string
     }
   }
   detail?: {
@@ -145,13 +148,21 @@ export const getSpecEncodingUpdate = ({
   if (strokeDash) {
     encoding.strokeDash = {
       ...strokeDash,
-      legend: { disable: true }
+      legend: {
+        disable: true,
+        symbolFillColor: 'transparent',
+        symbolStrokeColor: 'grey'
+      }
     }
   }
+
   if (shape) {
     encoding.shape = {
       ...shape,
-      legend: { disable: true }
+      legend: {
+        disable: true,
+        symbolFillColor: 'grey'
+      }
     }
     encoding.detail = shape
   }
@@ -299,15 +310,7 @@ export const reverseOfLegendSuppressionUpdate = () => ({
       },
       strokeDash: {
         legend: {
-          disable: false,
-          encode: {
-            symbols: {
-              update: {
-                fill: { value: 'transparent' },
-                stroke: { value: 'grey' }
-              }
-            }
-          }
+          disable: false
         }
       }
     }
