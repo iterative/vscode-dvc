@@ -1,5 +1,5 @@
 export interface IExtension {
-  canRunCli: (cwd: string) => Promise<boolean>
+  canRunCli: (cwd: string, isCliGlobal?: true) => Promise<boolean>
   hasRoots: () => boolean
 
   setupWorkspace: () => void

@@ -43,6 +43,10 @@ export class Config extends DeferredDisposable {
     return this.pythonBinPath
   }
 
+  public unsetPythonBinPath() {
+    this.pythonBinPath = undefined
+  }
+
   public isPythonExtensionUsed() {
     return !getConfigValue(ConfigKey.PYTHON_PATH) && !!this.pythonBinPath
   }

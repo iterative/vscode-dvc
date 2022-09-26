@@ -292,7 +292,9 @@ describe('setup', () => {
   it('should not alert the user if the workspace contains a DVC project, the cli cannot be found and the do not show option is set', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedCanRunCli
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
     mockedGetConfigValue.mockReturnValueOnce(true)
 
     await setup(extension)
@@ -308,7 +310,9 @@ describe('setup', () => {
   it('should alert the user if the workspace contains a DVC project and the cli cannot be found', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedCanRunCli
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -328,7 +332,9 @@ describe('setup', () => {
   it('should try to setup the workspace if the workspace contains a DVC project, the cli cannot be found and the user selects setup the workspace', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedCanRunCli
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
     mockedWarnWithOptions.mockResolvedValueOnce(Response.SETUP_WORKSPACE)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -351,7 +357,9 @@ describe('setup', () => {
   it('should try to select the python interpreter if the workspace contains a DVC project, the cli cannot be found and the user decides to select the python interpreter', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedCanRunCli
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
     mockedWarnWithOptions.mockResolvedValueOnce(Response.SELECT_INTERPRETER)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -374,7 +382,9 @@ describe('setup', () => {
   it('should set a user config option if the workspace contains a DVC project, the cli cannot be found and the user selects never', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedCanRunCli
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
+      .mockRejectedValueOnce(new Error('command not found: dvc'))
     mockedWarnWithOptions.mockResolvedValueOnce(Response.NEVER)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)

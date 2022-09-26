@@ -332,11 +332,14 @@ export class Extension extends Disposable implements IExtension {
     }
   }
 
-  public async canRunCli(cwd: string) {
+  public async canRunCli(cwd: string, tryGlobalCli?: true) {
     await this.config.isReady()
     setContextValue('dvc.cli.incompatible', undefined)
-    const version = await this.dvcReader.version(cwd)
+    const version = await this.dvcReader.version(cwd, tryGlobalCli)
     const compatible = isVersionCompatible(version)
+    if (compatible && tryGlobalCli) {
+      this.config.unsetPythonBinPath()
+    }
     this.cliCompatible = compatible
     setContextValue('dvc.cli.incompatible', !compatible)
     return this.setAvailable(compatible)

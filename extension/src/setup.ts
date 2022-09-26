@@ -209,6 +209,18 @@ const warnUserCLIInaccessible = async (
   }
 }
 
+const extensionCanRunGlobalCli = async (extension: IExtension, cwd: string) => {
+  let canRunCli = false
+  try {
+    canRunCli = await extension.canRunCli(cwd, true)
+  } catch {
+    if (extension.hasRoots()) {
+      warnUserCLIInaccessible(extension)
+    }
+  }
+  return canRunCli
+}
+
 const extensionCanRunCli = async (
   extension: IExtension,
   cwd: string
@@ -216,10 +228,9 @@ const extensionCanRunCli = async (
   let canRunCli = false
   try {
     canRunCli = await extension.canRunCli(cwd)
-  } catch {
-    if (extension.hasRoots()) {
-      warnUserCLIInaccessible(extension)
-    }
+  } catch {}
+  if (!canRunCli) {
+    canRunCli = await extensionCanRunGlobalCli(extension, cwd)
   }
   return canRunCli
 }

@@ -168,12 +168,13 @@ export class DvcReader extends DvcCli {
     } catch {}
   }
 
-  public version(
-    cwd: string,
-    pythonBinPath = this.config.getPythonBinPath(),
-    cliPath = this.config.getCliPath()
-  ): Promise<string> {
-    const options = getOptions(pythonBinPath, cliPath, cwd, Flag.VERSION)
+  public version(cwd: string, isCliGlobal?: true): Promise<string> {
+    const options = getOptions(
+      isCliGlobal ? undefined : this.config.getPythonBinPath(),
+      this.config.getCliPath(),
+      cwd,
+      Flag.VERSION
+    )
 
     return this.executeProcess(options)
   }

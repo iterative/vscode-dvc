@@ -468,7 +468,8 @@ suite('Extension Test Suite', () => {
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
 
-      expect(mockVersion).to.be.calledOnce
+      expect(mockVersion).to.be.calledTwice
+      mockVersion.resetHistory()
       expect(
         executeCommandSpy,
         'should set dvc.cli.incompatible to true if the version is incompatible'
@@ -480,6 +481,7 @@ suite('Extension Test Suite', () => {
       )
 
       expect(mockVersion).to.be.calledTwice
+      mockVersion.resetHistory()
       expect(
         executeCommandSpy,
         'should set dvc.cli.incompatible to false if the version is compatible'
@@ -494,7 +496,7 @@ suite('Extension Test Suite', () => {
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
 
-      expect(mockVersion).to.be.calledThrice
+      expect(mockVersion).to.be.calledTwice
       expect(
         executeCommandSpy,
         'should unset dvc.cli.incompatible if the CLI throws an error'
