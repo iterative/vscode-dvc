@@ -153,7 +153,7 @@ export const getSpecEncodingUpdate = ({
       ...shape,
       legend: { disable: true }
     }
-    encoding.detail = { field: shape.field }
+    encoding.detail = shape
   }
 
   return {
@@ -292,8 +292,24 @@ export const reverseOfLegendSuppressionUpdate = () => ({
   spec: {
     encoding: {
       color: { legend: { disable: false } },
-      shape: { legend: { disable: false } },
-      strokeDash: { legend: { disable: false } }
+      shape: {
+        legend: {
+          disable: false
+        }
+      },
+      strokeDash: {
+        legend: {
+          disable: false,
+          encode: {
+            symbols: {
+              update: {
+                fill: { value: 'transparent' },
+                stroke: { value: 'grey' }
+              }
+            }
+          }
+        }
+      }
     }
   }
 })
