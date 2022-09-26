@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { stub, restore } from 'sinon'
 import { expect } from 'chai'
+import { RelativePattern, Uri } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { FileSystemData } from '../../../../fileSystem/data'
 import { dvcDemoPath } from '../../../util'
@@ -46,8 +47,8 @@ suite('File System Data Test Suite', () => {
       const data = disposable.track(new FileSystemData(dvcDemoPath))
 
       expect(mockCreateFileSystemWatcher).to.be.calledOnce
-      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.equal(
-        join(dvcDemoPath, '**', 'dvc.yaml')
+      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
+        new RelativePattern(Uri.file(dvcDemoPath), join('**', 'dvc.yaml'))
       )
 
       await data.isReady()

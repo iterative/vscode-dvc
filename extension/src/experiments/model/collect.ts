@@ -282,8 +282,14 @@ const collectFromBranchesObject = (
   for (const [sha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
   )) {
-    const name = baseline.data?.name || sha
-    const branch = transformExperimentData(name, baseline, name, sha)
+    let name = baseline.data?.name
+    let label = name
+
+    if (!name) {
+      name = sha
+      label = shortenForLabel(name)
+    }
+    const branch = transformExperimentData(name, baseline, label, sha)
 
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject, sha, branch)

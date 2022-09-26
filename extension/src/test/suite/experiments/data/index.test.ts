@@ -1,6 +1,6 @@
 import { join, resolve, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { EventEmitter, FileSystemWatcher } from 'vscode'
+import { EventEmitter, FileSystemWatcher, RelativePattern, Uri } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { Disposable } from '../../../../extension'
@@ -63,11 +63,13 @@ suite('Experiments Data Test Suite', () => {
       expect(mockExperimentShow).to.be.calledOnce
       expect(mockCreateFileSystemWatcher).to.be.calledOnce
 
-      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.equal(
-        join(
-          dvcDemoPath,
-          '**',
-          `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
+      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
+        new RelativePattern(
+          Uri.file(dvcDemoPath),
+          join(
+            '**',
+            `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
+          )
         )
       )
     })
@@ -135,18 +137,22 @@ suite('Experiments Data Test Suite', () => {
 
       expect(mockCreateFileSystemWatcher).to.be.calledTwice
       expect(mockDispose).to.be.calledOnce
-      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.equal(
-        join(
-          dvcDemoPath,
-          '**',
-          `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
+      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
+        new RelativePattern(
+          Uri.file(dvcDemoPath),
+          join(
+            '**',
+            `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
+          )
         )
       )
-      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.equal(
-        join(
-          dvcDemoPath,
-          '**',
-          `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
+      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.deep.equal(
+        new RelativePattern(
+          Uri.file(dvcDemoPath),
+          join(
+            '**',
+            `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
+          )
         )
       )
     })

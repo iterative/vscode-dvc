@@ -145,7 +145,7 @@ describe('ExperimentsModel', () => {
       }
     })
 
-    const experiments = model.getExperiments()
+    const experiments = model.getAllExperiments()
 
     const changed: string[] = []
     for (const { deps, sha } of experiments) {

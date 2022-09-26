@@ -9,6 +9,8 @@ import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceCha
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
 import { ExperimentsOutput } from '../../../cli/dvc/reader'
 
+jest.mock('../../../vscode/config')
+
 describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {
     const columns = collectColumns(outputFixture)

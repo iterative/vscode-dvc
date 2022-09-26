@@ -28,9 +28,11 @@ export enum SubCommand {
 }
 
 export enum Flag {
+  ALL_COMMITS = '-A',
   FORCE = '-f',
   GRANULAR = '--granular',
   JSON = '--json',
+  NUM_COMMIT = '-n',
   OUTPUT_PATH = '-o',
   SUBDIRECTORY = '--subdir',
   SET_PARAM = '-S',

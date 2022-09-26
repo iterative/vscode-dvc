@@ -1,4 +1,10 @@
-import { Event, EventEmitter, Memento } from 'vscode'
+import {
+  ConfigurationChangeEvent,
+  Event,
+  EventEmitter,
+  Memento,
+  workspace
+} from 'vscode'
 import omit from 'lodash.omit'
 import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
@@ -32,6 +38,7 @@ import { Title } from '../vscode/title'
 import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
+import { ConfigKey } from '../vscode/config'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -119,6 +126,14 @@ export class Experiments extends BaseRepository<TableData> {
         this.checkpoints.transformAndSet(data)
         if (hadCheckpoints !== this.hasCheckpoints()) {
           this.checkpointsChanged.fire()
+        }
+      })
+    )
+
+    this.dispose.track(
+      workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
+        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS)) {
+          this.cliData.update()
         }
       })
     )
@@ -361,6 +376,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getCheckpoints(id: string) {
     return this.experiments.getCheckpointsWithType(id)
+  }
+
+  public getBranchExperiments(branch: Experiment) {
+    return this.experiments.getExperimentsByBranchForTree(branch)
   }
 
   public sendInitialWebviewData() {

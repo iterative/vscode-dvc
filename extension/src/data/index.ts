@@ -1,7 +1,10 @@
 import { join } from 'path'
 import { EventEmitter, Event } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { createFileSystemWatcher } from '../fileSystem/watcher'
+import {
+  createFileSystemWatcher,
+  getRelativePattern
+} from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutput } from '../cli/dvc/reader'
@@ -94,7 +97,7 @@ export abstract class BaseData<
 
     return this.dispose.track(
       createFileSystemWatcher(
-        join(this.dvcRoot, '**', `{${files.join(',')}}`),
+        getRelativePattern(this.dvcRoot, join('**', `{${files.join(',')}}`)),
         path => {
           if (!path) {
             return
