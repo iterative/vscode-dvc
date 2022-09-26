@@ -329,6 +329,11 @@ export class Extension extends Disposable implements IExtension {
     }
   }
 
+  public async isPythonExtensionUsed() {
+    await this.config.isReady()
+    return this.config.isPythonExtensionUsed()
+  }
+
   public async canRunCli(cwd: string, tryGlobalCli?: true) {
     await this.config.isReady()
     setContextValue('dvc.cli.incompatible', undefined)

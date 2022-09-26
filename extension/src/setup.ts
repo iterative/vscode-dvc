@@ -209,6 +209,16 @@ const warnUserCLIInaccessible = async (
   }
 }
 
+const extensionCanRunPythonCli = async (extension: IExtension, cwd: string) => {
+  let canRunCli = false
+  if (await extension.isPythonExtensionUsed()) {
+    try {
+      canRunCli = await extension.canRunCli(cwd)
+    } catch {}
+  }
+  return canRunCli
+}
+
 const extensionCanRunGlobalCli = async (extension: IExtension, cwd: string) => {
   let canRunCli = false
   try {
@@ -225,10 +235,8 @@ const extensionCanRunCli = async (
   extension: IExtension,
   cwd: string
 ): Promise<boolean> => {
-  let canRunCli = false
-  try {
-    canRunCli = await extension.canRunCli(cwd)
-  } catch {}
+  let canRunCli = await extensionCanRunPythonCli(extension, cwd)
+
   if (!canRunCli) {
     canRunCli = await extensionCanRunGlobalCli(extension, cwd)
   }
