@@ -20,6 +20,7 @@ import { TextDocumentWrapper } from './TextDocumentWrapper'
 export class LanguageServer {
   private documentsKnownToEditor!: TextDocuments<TextDocument>
   private documentsFromDvcClient: TextDocumentWrapper[] = []
+  private documentsCache: Record<string, TextDocumentWrapper> = {}
 
   public listen(connection: _Connection) {
     this.documentsKnownToEditor = new TextDocuments(TextDocument)
@@ -91,7 +92,11 @@ export class LanguageServer {
   }
 
   private wrap(doc: TextDocument) {
-    return new TextDocumentWrapper(doc)
+    if (!this.documentsCache[doc.uri]) {
+      this.documentsCache[doc.uri] = new TextDocumentWrapper(doc)
+    }
+
+    return this.documentsCache[doc.uri]
   }
 
   private getFilePathLocations(

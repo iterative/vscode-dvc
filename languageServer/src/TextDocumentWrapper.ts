@@ -14,7 +14,8 @@ import {
   Node,
   Scalar,
   Pair,
-  isPair
+  isPair,
+  Document
 } from 'yaml'
 import { alphadecimalWords, variableTemplates } from './regexes'
 import { ITextDocumentWrapper } from './ITextDocumentWrapper'
@@ -23,10 +24,14 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
   uri: string
 
   private textDocument: TextDocument
+  private yamlDocument: Document
+  private lastParsedVersion!: number
 
   constructor(textDocument: TextDocument) {
     this.textDocument = textDocument
     this.uri = this.textDocument.uri
+    this.lastParsedVersion = this.textDocument.version
+    this.yamlDocument = parseDocument(this.textDocument.getText())
   }
 
   public offsetAt(position: Position) {
@@ -42,7 +47,11 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
   }
 
   public getYamlDocument() {
-    return parseDocument(this.getText())
+    if (this.lastParsedVersion !== this.textDocument.version) {
+      this.yamlDocument = parseDocument(this.getText())
+    }
+
+    return this.yamlDocument
   }
 
   public findLocationsFor(aSymbol: DocumentSymbol) {
