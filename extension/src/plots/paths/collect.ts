@@ -4,7 +4,12 @@ import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
 import { createTypedAccumulator } from '../../util/object'
-import { ShapeValue, StrokeDashValue } from '../multiSource/constants'
+import {
+  ShapeScale,
+  ShapeValue,
+  StrokeDashScale,
+  StrokeDashValue
+} from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
 
 export enum PathType {
@@ -287,6 +292,22 @@ export const isEncodingElement = (
   element: unknown
 ): element is EncodingElement => !!(element as EncodingElement)?.value
 
+const collectElements = (
+  acc: EncodingElement[],
+  scale: StrokeDashScale | ShapeScale,
+  type: EncodingType
+): void => {
+  const { domain, range } = scale
+  for (const [i, element] of domain.entries()) {
+    const child = {
+      label: element,
+      type,
+      value: range[i]
+    }
+    acc.push(child as EncodingElement)
+  }
+}
+
 export const collectEncodingElements = (
   path: string,
   multiSourceEncoding: MultiSourceEncoding
@@ -298,30 +319,14 @@ export const collectEncodingElements = (
   }
 
   const { strokeDash } = encoding
-  const elements: EncodingElement[] = []
-  const { domain, range } = strokeDash.scale
-  for (const [i, element] of domain.entries()) {
-    const child = {
-      label: element,
-      type: EncodingType.STROKE_DASH as EncodingType.STROKE_DASH,
-      value: range[i]
-    }
-    elements.push(child)
-  }
+  const acc: EncodingElement[] = []
+  collectElements(acc, strokeDash.scale, EncodingType.STROKE_DASH)
 
   const { shape } = encoding
 
   if (shape) {
-    const { domain, range } = shape.scale
-    for (const [i, element] of domain.entries()) {
-      const child = {
-        label: element,
-        type: EncodingType.SHAPE as EncodingType.SHAPE,
-        value: range[i]
-      }
-      elements.push(child)
-    }
+    collectElements(acc, shape.scale, EncodingType.SHAPE)
   }
 
-  return elements
+  return acc
 }
