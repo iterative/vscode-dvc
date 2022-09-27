@@ -287,11 +287,16 @@ export const isEncodingElement = (
   element: unknown
 ): element is EncodingElement => !!(element as EncodingElement)?.value
 
-export const collectElementsFromEncoding = (
+export const collectEncodingElements = (
   path: string,
   multiSourceEncoding: MultiSourceEncoding
 ): EncodingElement[] => {
   const encoding = multiSourceEncoding[path]
+
+  if (!encoding) {
+    return []
+  }
+
   const { strokeDash } = encoding
   const elements: EncodingElement[] = []
   const { domain, range } = strokeDash.scale

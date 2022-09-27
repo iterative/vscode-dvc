@@ -4,7 +4,7 @@ import { PlotsData as TPlotsData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { PlotsData } from './data'
 import { PlotsModel } from './model'
-import { collectElementsFromEncoding, collectScale } from './paths/collect'
+import { collectEncodingElements, collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -131,7 +131,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     const multiSourceEncoding = this.plots?.getMultiSourceData() || {}
 
     if (path && multiSourceEncoding[path]) {
-      return collectElementsFromEncoding(path, multiSourceEncoding)
+      return collectEncodingElements(path, multiSourceEncoding)
     }
 
     return this.paths?.getChildren(path, multiSourceEncoding) || []

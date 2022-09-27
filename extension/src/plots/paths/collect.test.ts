@@ -1,8 +1,14 @@
 import { join } from 'path'
 import { VisualizationSpec } from 'react-vega'
-import { collectPaths, collectTemplateOrder } from './collect'
+import {
+  collectEncodingElements,
+  collectPaths,
+  collectTemplateOrder,
+  EncodingType
+} from './collect'
 import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
+import { Shape, StrokeDash } from '../multiSource/constants'
 
 describe('collectPath', () => {
   it('should return the expected data from the test fixture', () => {
@@ -377,6 +383,58 @@ describe('collectTemplateOrder', () => {
 
     expect(plotSections).toStrictEqual([
       { group: TemplatePlotGroup.MULTI_VIEW, paths: multiViewOrder }
+    ])
+  })
+})
+
+describe('collectEncodingElements', () => {
+  it('should return an empty array if there is no multi source encoding for a path', () => {
+    const elements = collectEncodingElements(__filename, {})
+    expect(elements).toStrictEqual([])
+  })
+
+  it('should collect encoding elements from multi source encoding', () => {
+    const elements = collectEncodingElements(__filename, {
+      [__filename]: {
+        shape: {
+          field: 'filename',
+          scale: { domain: ['X', 'Y'], range: [Shape[0], Shape[1]] }
+        },
+        strokeDash: {
+          field: 'field',
+          scale: {
+            domain: ['A', 'B', 'C'],
+            range: [StrokeDash[0], StrokeDash[1], StrokeDash[2]]
+          }
+        }
+      }
+    })
+    expect(elements).toStrictEqual([
+      {
+        label: 'A',
+        type: EncodingType.STROKE_DASH,
+        value: StrokeDash[0]
+      },
+      {
+        label: 'B',
+        type: EncodingType.STROKE_DASH,
+        value: StrokeDash[1]
+      },
+      {
+        label: 'C',
+        type: EncodingType.STROKE_DASH,
+        value: StrokeDash[2]
+      },
+      {
+        label: 'X',
+        type: EncodingType.SHAPE,
+        value: Shape[0]
+      },
+      {
+        label: 'Y',
+        type: EncodingType.SHAPE,
+        value: Shape[1]
+      }
     ])
   })
 })
