@@ -38,10 +38,16 @@ const collectMetricOrParam = (
 
   mergeValueColumn(
     acc,
-    buildMetricOrParamPath(type, ...limitedDepthAncestors, label),
+    buildMetricOrParamPath(
+      type,
+      ...(limitedDepthAncestors || pathArray),
+      label
+    ),
     buildMetricOrParamPath(type, ...limitedDepthAncestors),
     [type, ...pathArray, label],
-    label,
+    limitedDepthAncestors.length === 0
+      ? buildMetricOrParamPath(type, ...pathArray, label).slice(type.length + 1)
+      : label,
     value
   )
 }

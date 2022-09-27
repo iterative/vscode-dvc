@@ -10,15 +10,24 @@ export const limitAncestorDepth = (
   limit = 5
 ) => {
   const [path, ...rest] = ancestors
-  /*
-    The depth is only limited for the middle of the path array.
+  const collectedLimit = Number(
+    getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS, limit)
+  )
+
+  switch (collectedLimit) {
+    case 0:
+      return ancestors
+    case 1:
+      return []
+    case 2:
+      return [ancestors.join(sep)]
+  }
+
+  /* The depth is only limited for the middle of the path array.
     The first and final layer are excluded, and the
     concatenated layer itself counts as one; because of this, we must subtract 3
     from what we want the final layer count to be.
   */
-  const collectedLimit = Number(
-    getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS, limit)
-  )
   const convertedLimit = (collectedLimit >= 3 ? collectedLimit : 3) - 3
   if (rest.length <= convertedLimit) {
     return ancestors

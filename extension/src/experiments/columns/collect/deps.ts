@@ -37,7 +37,7 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
       path,
       buildDepPath(...limitedDepthAncestors),
       [ColumnType.DEPS, file],
-      label,
+      limitedDepthAncestors.length === 0 ? file : label,
       shortenForLabel(hash)
     )
   }
