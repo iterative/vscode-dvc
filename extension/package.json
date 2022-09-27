@@ -1593,7 +1593,7 @@
     "shx": "0.3.4",
     "sinon": "14.0.0",
     "sinon-chai": "3.7.0",
-    "ts-loader": "9.3.1",
+    "ts-loader": "9.4.0",
     "vsce": "2.11.0",
     "vscode-uri": "3.0.6",
     "wdio-vscode-service": "4.0.7",
