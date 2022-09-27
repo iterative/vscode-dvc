@@ -109,6 +109,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     (state: PlotsState) => state.dragAndDrop
   )
   const draggedOverIdTimeout = useRef<number>(0)
+  const pickedUp = useRef<boolean>(false)
   const dispatch = useDispatch()
 
   const cleanup = useCallback(() => {
@@ -116,22 +117,32 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     setDraggedOverId('')
     setDraggedId('')
     setDirection(defaultDragEnterDirection)
+    pickedUp.current = false
+    dispatch(changeRef(undefined))
   }, [
     setDraggedOverId,
     setDirection,
     defaultDragEnterDirection,
-    immediateDragLeave
+    immediateDragLeave,
+    dispatch
   ])
 
   useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!e.buttons && pickedUp.current) {
+        cleanup()
+      }
+    }
+    document.addEventListener('mousemove', onMove)
     return () => {
       clearTimeout(draggedOverIdTimeout.current)
+      document.removeEventListener('mousemove', onMove)
     }
-  }, [])
+  }, [cleanup])
 
   useEffect(() => {
     cleanup()
-  }, [order, cleanup])
+  }, [cleanup])
 
   useLayoutEffect(() => {
     onLayoutChange?.()
@@ -142,6 +153,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   }
 
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
+    pickedUp.current = true
     const { id } = e.currentTarget
     const idx = order.indexOf(id)
     let toIdx = shouldShowOnDrag ? idx : idx + 1
@@ -189,6 +201,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     dispatch(changeRef(undefined))
 
     onDrop?.(oldDraggedId, draggedRef?.group || '', group, droppedIndex)
+    cleanup()
   }
 
   const handleOnDrop = (e: DragEvent<HTMLElement>) => {
@@ -201,7 +214,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }, 0)
     const dragged = draggedRef.itemId
     if (dragged === draggedOverId) {
-      dispatch(changeRef(undefined))
+      cleanup()
       return
     }
     const isNew = !order.includes(dragged)
@@ -246,11 +259,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     }
   }
 
-  const handleDragEnd = () => {
-    dispatch(changeRef(undefined))
-    cleanup()
-  }
-
   const handleDragLeave = () => {
     deferedDragLeave()
   }
@@ -262,7 +270,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       ref={(draggable as any).ref}
       {...draggable.props}
       onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      onDragEnd={cleanup}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDrop={handleOnDrop}
