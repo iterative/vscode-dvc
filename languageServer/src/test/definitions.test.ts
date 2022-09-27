@@ -1,9 +1,5 @@
 import { Position, Range } from 'vscode-languageserver/node'
-import {
-  foreach_dvc_yaml,
-  params_dvc_yaml,
-  vars_dvc_yaml
-} from './fixtures/examples/valid'
+import { foreach_dvc_yaml, params_dvc_yaml } from './fixtures/examples/valid'
 import { params } from './fixtures/params'
 import { requestDefinitions } from './utils/requestDefinitions'
 import { openTheseFilesAndNotifyServer } from './utils/openTheseFilesAndNotifyServer'
@@ -11,7 +7,6 @@ import {
   disposeTestConnections,
   setupTestConnections
 } from './utils/setup-test-connections'
-import { sendTheseFilesToServer } from './utils/sendTheseFilesToServer'
 
 describe('textDocument/definitions', () => {
   beforeEach(() => {
@@ -53,7 +48,7 @@ describe('textDocument/definitions', () => {
 
     expect(response).toBeTruthy()
     expect(response).toStrictEqual({
-      range: Range.create(Position.create(4, 0), Position.create(4, 3)),
+      range: Range.create(Position.create(3, 5), Position.create(4, 0)),
       uri: 'file:///params.yaml'
     })
   })
@@ -72,28 +67,6 @@ describe('textDocument/definitions', () => {
     expect(response).toStrictEqual({
       range: Range.create(Position.create(15, 8), Position.create(15, 10)),
       uri: 'file:///dvc.yaml'
-    })
-  })
-
-  it('should provide a single location that points to the top of the file path symbol', async () => {
-    const [dvcYaml] = await sendTheseFilesToServer([
-      {
-        languageId: 'yaml',
-        mockContents: vars_dvc_yaml,
-        mockPath: 'dvc.yaml'
-      },
-      {
-        languageId: 'json',
-        mockContents: '',
-        mockPath: 'params.json'
-      }
-    ])
-    const response = await requestDefinitions(dvcYaml, 'params.json')
-
-    expect(response).toBeTruthy()
-    expect(response).toStrictEqual({
-      range: Range.create(Position.create(0, 0), Position.create(0, 0)),
-      uri: 'file:///params.json'
     })
   })
 })
