@@ -29,7 +29,7 @@ suite('Config Test Suite', () => {
 
       const config = disposable.track(new Config(extensionsChanged.event))
       expect(mockGetExtensionAPI).to.be.calledTwice
-      expect(config.pythonBinPath).to.be.undefined
+      expect(config.getPythonBinPath()).to.be.undefined
 
       const pythonBinPath = join('some', 'magic', 'python', 'path')
 
@@ -45,7 +45,7 @@ suite('Config Test Suite', () => {
       extensionsChanged.fire()
 
       await executionDetailsUpdated
-      expect(config.pythonBinPath).to.equal(pythonBinPath)
+      expect(config.getPythonBinPath()).to.equal(pythonBinPath)
     })
   })
 })

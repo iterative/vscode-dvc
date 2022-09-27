@@ -196,7 +196,7 @@ export class DvcRunner extends Disposable implements ICli {
 
   private getOptions(cwd: string, args: Args) {
     return getOptions(
-      this.config.pythonBinPath,
+      this.config.getPythonBinPath(),
       this.getOverrideOrCliPath(),
       cwd,
       ...args

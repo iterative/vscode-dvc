@@ -8,8 +8,12 @@ import columnsFixture from '../../../test/fixtures/expShow/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
 import { ExperimentsOutput } from '../../../cli/dvc/reader'
+import { getConfigValue } from '../../../vscode/config'
 
 jest.mock('../../../vscode/config')
+
+const mockedGetConfigValue = jest.mocked(getConfigValue)
+mockedGetConfigValue.mockImplementation(() => 5)
 
 describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {

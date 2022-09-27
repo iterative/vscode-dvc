@@ -23,7 +23,7 @@ export class DvcCli extends Cli {
 
   public executeDvcProcess(cwd: string, ...args: Args): Promise<string> {
     const options = getOptions(
-      this.config.pythonBinPath,
+      this.config.getPythonBinPath(),
       this.config.getCliPath(),
       cwd,
       ...args

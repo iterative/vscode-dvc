@@ -24,7 +24,8 @@ suite('DVC Runner Test Suite', () => {
 
   describe('DvcRunner', () => {
     it('should only be able to run a single command at a time', async () => {
-      const dvcRunner = disposable.track(new DvcRunner({} as Config, 'sleep'))
+      const mockConfig = { getPythonBinPath: () => undefined } as Config
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig, 'sleep'))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
@@ -36,7 +37,8 @@ suite('DVC Runner Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to stop a started command', async () => {
-      const dvcRunner = disposable.track(new DvcRunner({} as Config, 'sleep'))
+      const mockConfig = { getPythonBinPath: () => undefined } as Config
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig, 'sleep'))
       const cwd = __dirname
 
       const onDidCompleteProcess = (): Promise<void> =>
@@ -107,8 +109,9 @@ suite('DVC Runner Test Suite', () => {
 
       const cwd = __dirname
 
+      const mockConfig = { getPythonBinPath: () => undefined } as Config
       const dvcRunner = disposable.track(
-        new DvcRunner({} as Config, 'echo', {
+        new DvcRunner(mockConfig, 'echo', {
           processCompleted,
           processOutput,
           processStarted
@@ -126,7 +129,8 @@ suite('DVC Runner Test Suite', () => {
     it('should send an error event if the command fails with an exit code and stderr', async () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendErrorTelemetryEvent')
 
-      const dvcRunner = disposable.track(new DvcRunner({} as Config, 'sleep'))
+      const mockConfig = { getPythonBinPath: () => undefined } as Config
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig, 'sleep'))
 
       const cwd = __dirname
 
