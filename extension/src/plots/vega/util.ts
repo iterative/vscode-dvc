@@ -268,6 +268,11 @@ export const truncateTitles = (
     const specCopy: Record<string, unknown> = {}
 
     for (const [key, value] of Object.entries(spec)) {
+      if (['data', 'color', 'strokeDash', 'shape', 'detail'].includes(key)) {
+        specCopy[key] = value
+        continue
+      }
+
       const valueType = typeof value
       if (key === 'y') {
         vertical = true
