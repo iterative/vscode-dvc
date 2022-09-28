@@ -282,17 +282,14 @@ describe('reverseOfLegendSuppressionUpdate', () => {
       shape: {
         field: 'shape-field',
         legend: {
-          disable: true,
-          symbolFillColor: 'blue'
+          disable: true
         },
         scale: { domain: [], range: [] }
       },
       strokeDash: {
         field: 'strokeDash-field',
         legend: {
-          disable: true,
-          symbolFillColor: 'blue',
-          symbolStrokeColor: 'red'
+          disable: true
         },
         scale: { domain: [], range: [] }
       }

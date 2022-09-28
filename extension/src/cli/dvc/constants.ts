@@ -1,4 +1,4 @@
-export const MIN_CLI_VERSION = '2.24.0'
+export const MIN_CLI_VERSION = '2.0.0'
 export const LATEST_TESTED_CLI_VERSION = '2.27.2'
 export const MAX_CLI_VERSION = '3'
 
