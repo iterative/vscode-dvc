@@ -3,6 +3,7 @@ import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
+import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 
@@ -25,12 +26,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   return (
     <div className={styles.zoomedInPlot} data-testid="zoomed-in-plot">
       <VegaLite
-        {...merge(
-          { ...cloneDeep(props) },
-          {
-            spec: { encoding: { color: { legend: { disable: false } } } }
-          }
-        )}
+        {...merge({ ...cloneDeep(props) }, reverseOfLegendSuppressionUpdate())}
         config={{
           ...(props.config as Config),
           background: getThemeValue(ThemeProperty.MENU_BACKGROUND)

@@ -63,7 +63,22 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     )
   }
 
-  public filterChildren(path?: string) {
+  public getChildren(path: string | undefined) {
+    return this.filterChildren(path).map(element => {
+      return {
+        ...element,
+        descendantStatuses: this.getTerminalNodeStatuses(element.path),
+        label: element.label,
+        status: this.status[element.path]
+      }
+    })
+  }
+
+  public hasNonDefaultColumns() {
+    return this.data.length > 1
+  }
+
+  private filterChildren(path?: string) {
     return this.data.filter(element =>
       path
         ? element.parentPath === path
@@ -71,10 +86,6 @@ export class ColumnsModel extends PathSelectionModel<Column> {
             element.parentPath || element.type
           )
     )
-  }
-
-  public hasNonDefaultColumns() {
-    return this.data.length > 1
   }
 
   private async transformAndSetColumns(data: ExperimentsOutput) {

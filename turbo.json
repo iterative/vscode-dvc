@@ -48,6 +48,7 @@
   },
   "globalDependencies": [
     "extension/src/test/fixtures/**",
-    "extension/src/experiments/columns/constants.ts"
+    "extension/src/experiments/columns/constants.ts",
+    "extension/src/plots/vega/util"
   ]
 }
