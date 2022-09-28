@@ -17,6 +17,9 @@ suite('DVC Extension For Visual Studio Code', () => {
   before('should finish loading the extension', async function () {
     this.timeout(240000)
     await waitForViewContainerToLoad()
+    const workbench = await browser.getWorkbench()
+    await workbench.executeCommand('DVC: Garbage Collect Experiments')
+    await browser.keys('Enter')
     return dismissAllNotifications()
   })
 
