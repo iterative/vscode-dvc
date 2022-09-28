@@ -306,6 +306,10 @@ export class PlotsModel extends ModelWithPersistence {
     return this.sectionCollapsed
   }
 
+  public getMultiSourceData() {
+    return this.multiSourceEncoding
+  }
+
   private removeStaleData() {
     return Promise.all([
       this.removeStaleBranches(),

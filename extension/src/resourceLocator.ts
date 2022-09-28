@@ -1,12 +1,14 @@
 import { Uri } from 'vscode'
 import { Disposable } from './class/dispose'
+import { ShapeValue, StrokeDashValue } from './plots/multiSource/constants'
 
 export type Resource = { dark: Uri; light: Uri }
 
 export enum IconName {
   CIRCLE_FILLED = 'circle-filled',
   CIRCLE_OUTLINE = 'circle-outline',
-  LOADING_SPIN = 'loading-spin'
+  LOADING_SPIN = 'loading-spin',
+  STROKE_DASH = 'stroke-dash'
 }
 
 export class ResourceLocator extends Disposable {
@@ -43,6 +45,19 @@ export class ResourceLocator extends Disposable {
       'experiments',
       `${name}-${color}.svg`
     )
+  }
+
+  public getPlotsStrokeDashResource(strokeDash: StrokeDashValue): Uri {
+    return Uri.joinPath(
+      this.extensionUri,
+      'resources',
+      'plots',
+      `stroke-dash-${strokeDash.join('-')}.svg`
+    )
+  }
+
+  public getPlotsShapeResource(shape: ShapeValue): Uri {
+    return Uri.joinPath(this.extensionUri, 'resources', 'plots', `${shape}.svg`)
   }
 
   private getResourceLocations(...path: string[]): { dark: Uri; light: Uri } {
