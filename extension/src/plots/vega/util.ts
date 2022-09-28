@@ -20,6 +20,7 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import { ColorScale, PlotSize, Revision } from '../webview/contract'
+import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
 const COMMIT_FIELD = 'rev'
 
@@ -98,27 +99,67 @@ export const getColorScale = (
   return acc.domain.length > 0 ? acc : undefined
 }
 
-type EncodingUpdate = {
-  encoding: {
-    color: {
-      legend: {
-        disable: boolean
-      }
-      scale: ColorScale
+export type Encoding = {
+  strokeDash?: StrokeDashEncoding & {
+    legend: {
+      disable: boolean
     }
+  }
+  shape?: ShapeEncoding & {
+    legend: {
+      disable: boolean
+    }
+  }
+  detail?: {
+    field: string
+  }
+  color?: {
+    legend: {
+      disable: boolean
+    }
+    scale: ColorScale
   }
 }
 
-export const getSpecEncodingUpdate = (
-  colorScale: ColorScale
-): EncodingUpdate => ({
-  encoding: {
-    color: {
+type EncodingUpdate = {
+  encoding: Encoding
+}
+
+export const getSpecEncodingUpdate = ({
+  color,
+  shape,
+  strokeDash
+}: {
+  color?: ColorScale
+  shape?: ShapeEncoding
+  strokeDash?: StrokeDashEncoding
+}): EncodingUpdate => {
+  const encoding: Encoding = {}
+  if (color) {
+    encoding.color = {
       legend: { disable: true },
-      scale: colorScale
+      scale: color
     }
   }
-})
+
+  if (strokeDash) {
+    encoding.strokeDash = {
+      ...strokeDash,
+      legend: { disable: true }
+    }
+  }
+  if (shape) {
+    encoding.shape = {
+      ...shape,
+      legend: { disable: true }
+    }
+    encoding.detail = { field: shape.field }
+  }
+
+  return {
+    encoding
+  }
+}
 
 const mergeUpdate = (spec: TopLevelSpec, update: EncodingUpdate) => {
   let newSpec = cloneDeep(spec) as any
@@ -230,15 +271,29 @@ export const truncateTitles = (
 export const extendVegaSpec = (
   spec: TopLevelSpec,
   size: PlotSize,
-  colorScale?: ColorScale
+  encoding?: {
+    color?: ColorScale
+    strokeDash?: StrokeDashEncoding
+    shape?: ShapeEncoding
+  }
 ) => {
   const updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec
 
-  if (isMultiViewByCommitPlot(spec) || !colorScale) {
+  if (isMultiViewByCommitPlot(spec) || !encoding) {
     return updatedSpec
   }
 
-  const update = getSpecEncodingUpdate(colorScale)
+  const update = getSpecEncodingUpdate(encoding)
 
   return mergeUpdate(updatedSpec, update)
 }
+
+export const reverseOfLegendSuppressionUpdate = () => ({
+  spec: {
+    encoding: {
+      color: { legend: { disable: false } },
+      shape: { legend: { disable: false } },
+      strokeDash: { legend: { disable: false } }
+    }
+  }
+})

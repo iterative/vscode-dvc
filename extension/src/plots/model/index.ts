@@ -33,6 +33,12 @@ import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
+import {
+  collectMultiSourceEncoding,
+  collectMultiSourceVariations,
+  MultiSourceEncoding,
+  MultiSourceVariations
+} from '../multiSource/collect'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -49,6 +55,8 @@ export class PlotsModel extends ModelWithPersistence {
 
   private revisionData: RevisionData = {}
   private templates: TemplateAccumulator = {}
+  private multiSourceVariations: MultiSourceVariations = {}
+  private multiSourceEncoding: MultiSourceEncoding = {}
 
   private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
@@ -104,10 +112,12 @@ export class PlotsModel extends ModelWithPersistence {
       ...revs.map(rev => cliIdToLabel[rev])
     ])
 
-    const [{ comparisonData, revisionData }, templates] = await Promise.all([
-      collectData(data, cliIdToLabel),
-      collectTemplates(data)
-    ])
+    const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
+      await Promise.all([
+        collectData(data, cliIdToLabel),
+        collectTemplates(data),
+        collectMultiSourceVariations(data, this.multiSourceVariations)
+      ])
 
     const { overwriteComparisonData, overwriteRevisionData } =
       collectWorkspaceRaceConditionData(
@@ -127,6 +137,10 @@ export class PlotsModel extends ModelWithPersistence {
       ...overwriteRevisionData
     }
     this.templates = { ...this.templates, ...templates }
+    this.multiSourceVariations = multiSourceVariations
+    this.multiSourceEncoding = collectMultiSourceEncoding(
+      this.multiSourceVariations
+    )
 
     this.setComparisonOrder()
 
@@ -422,7 +436,8 @@ export class PlotsModel extends ModelWithPersistence {
       this.templates,
       this.revisionData,
       this.getPlotSize(Section.TEMPLATE_PLOTS),
-      this.getRevisionColors()
+      this.getRevisionColors(),
+      this.multiSourceEncoding
     )
   }
 }
