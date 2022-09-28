@@ -40,7 +40,10 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   return (
     <>
       <tr>
-        <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
+        <td
+          className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
+          colSpan={pinnedColumn ? 1 : nbColumns}
+        >
           <div className={styles.rowPath}>
             <button className={styles.rowToggler} onClick={toggleIsShownState}>
               <Icon icon={isShown ? ChevronDown : ChevronRight} />
@@ -49,7 +52,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             <CopyButton value={path} className={styles.copyButton} />
           </div>
         </td>
-        {nbColumns > 1 && <td colSpan={nbColumns - 1}></td>}
+        {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
       </tr>
       <tr>
         {plots.map((plot: ComparisonPlot) => {
