@@ -1,6 +1,7 @@
 import { Column, ColumnType } from '../../webview/contract'
 import { Value } from '../../../cli/dvc/reader'
 import { ConfigKey, getConfigValue } from '../../../vscode/config'
+import { buildMetricOrParamPath } from '../paths'
 
 export type ColumnAccumulator = Record<string, Column>
 
@@ -20,7 +21,11 @@ export const limitAncestorDepth = (
     case 1:
       return []
     case 2:
-      return [ancestors.join(sep)]
+      return [
+        buildMetricOrParamPath(ColumnType.PARAMS, ...ancestors).slice(
+          ColumnType.PARAMS.length + 1
+        )
+      ]
   }
 
   /* The depth is only limited for the middle of the path array.
@@ -28,7 +33,7 @@ export const limitAncestorDepth = (
     concatenated layer itself counts as one; because of this, we must subtract 3
     from what we want the final layer count to be.
   */
-  const convertedLimit = (collectedLimit >= 3 ? collectedLimit : 3) - 3
+  const convertedLimit = (collectedLimit >= 3 ? collectedLimit : 5) - 3
   if (rest.length <= convertedLimit) {
     return ancestors
   }
