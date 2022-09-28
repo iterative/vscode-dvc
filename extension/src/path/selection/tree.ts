@@ -23,7 +23,7 @@ export type PathSelectionItem = {
   collapsibleState: TreeItemCollapsibleState
   label: string
   path: string
-  iconPath: Resource
+  iconPath: Resource | Uri
 }
 
 export abstract class BasePathSelectionTree<
@@ -35,8 +35,7 @@ export abstract class BasePathSelectionTree<
   public readonly onDidChangeTreeData: Event<PathSelectionItem | void>
 
   protected readonly workspace: T
-
-  private readonly resourceLocator: ResourceLocator
+  protected readonly resourceLocator: ResourceLocator
 
   private readonly view: TreeView<string | PathSelectionItem>
 
@@ -127,6 +126,33 @@ export abstract class BasePathSelectionTree<
     }${separator}${statuses.length}`
   }
 
+  protected transformElement(element: {
+    dvcRoot: string
+    descendantStatuses: Status[]
+    hasChildren: boolean
+    path: string
+    status: Status
+    label: string
+  }) {
+    const { dvcRoot, descendantStatuses, hasChildren, path, status, label } =
+      element
+
+    const description = this.getDescription(descendantStatuses, '/')
+    const iconPath = this.getIconPath(status)
+    const collapsibleState = hasChildren
+      ? TreeItemCollapsibleState.Collapsed
+      : TreeItemCollapsibleState.None
+
+    return {
+      collapsibleState,
+      description,
+      dvcRoot,
+      iconPath,
+      label,
+      path
+    } as PathSelectionItem
+  }
+
   private updateDescriptionOnChange() {
     this.dispose.track(
       this.onDidChangeTreeData(() => {
@@ -165,40 +191,16 @@ export abstract class BasePathSelectionTree<
     }
 
     if (this.isRoot(element)) {
-      return this.transformRepositoryChildren(element, undefined)
+      return this.getRepositoryChildren(element, undefined)
     }
 
     const { dvcRoot, path } = element
 
-    return this.transformRepositoryChildren(dvcRoot, path)
+    return this.getRepositoryChildren(dvcRoot, path)
   }
 
   private isRoot(element: string | PathSelectionItem): element is string {
     return typeof element === 'string'
-  }
-
-  private transformRepositoryChildren(
-    dvcRoot: string,
-    path: string | undefined
-  ) {
-    return this.getRepositoryChildren(dvcRoot, path).map(element => {
-      const { descendantStatuses, hasChildren, path, status, label } = element
-
-      const description = this.getDescription(descendantStatuses, '/')
-      const iconPath = this.getIconPath(status)
-      const collapsibleState = hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
-
-      return {
-        collapsibleState,
-        description,
-        dvcRoot,
-        iconPath,
-        label,
-        path
-      } as PathSelectionItem
-    })
   }
 
   abstract getRepositoryStatuses(dvcRoot: string): Status[]
@@ -206,11 +208,5 @@ export abstract class BasePathSelectionTree<
   abstract getRepositoryChildren(
     dvcRoot: string,
     path: string | undefined
-  ): {
-    descendantStatuses: Status[]
-    hasChildren: boolean
-    label: string
-    path: string
-    status: Status
-  }[]
+  ): PathSelectionItem[]
 }

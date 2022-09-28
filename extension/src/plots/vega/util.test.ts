@@ -1,10 +1,13 @@
 import { Text as VegaText, Title as VegaTitle } from 'vega'
 import { TopLevelSpec } from 'vega-lite'
+import merge from 'lodash.merge'
 import {
   isMultiViewPlot,
   isMultiViewByCommitPlot,
   extendVegaSpec,
-  getColorScale
+  getColorScale,
+  Encoding,
+  reverseOfLegendSuppressionUpdate
 } from './util'
 import confusionTemplate from '../../test/fixtures/plotsDiff/templates/confusion'
 import confusionNormalizedTemplate from '../../test/fixtures/plotsDiff/templates/confusionNormalized'
@@ -87,11 +90,9 @@ describe('extendVegaSpec', () => {
       domain: ['workspace', 'main'],
       range: copyOriginalColors().slice(0, 2)
     }
-    const extendedSpec = extendVegaSpec(
-      linearTemplate,
-      PlotSize.REGULAR,
-      colorScale
-    )
+    const extendedSpec = extendVegaSpec(linearTemplate, PlotSize.REGULAR, {
+      color: colorScale
+    })
 
     expect(extendedSpec).not.toStrictEqual(defaultTemplate)
     expect(extendedSpec.encoding.color).toStrictEqual({
@@ -262,5 +263,49 @@ describe('extendVegaSpec', () => {
     const updatedSpecString = JSON.stringify(updatedSpec)
     expect(updatedSpecString).not.toContain(repeatedTitle)
     expect(updatedSpecString).toContain(truncatedTitle)
+  })
+})
+
+describe('reverseOfLegendSuppressionUpdate', () => {
+  it('should reverse the legend suppression applied by extendVegaSpec', () => {
+    type NonOptionalEncoding = { [P in keyof Encoding]-?: Encoding[P] }
+    const update: NonOptionalEncoding = {
+      color: {
+        legend: {
+          disable: true
+        },
+        scale: { domain: [], range: [] }
+      },
+      detail: {
+        field: 'shape-field'
+      },
+      shape: {
+        field: 'shape-field',
+        legend: {
+          disable: true,
+          symbolFillColor: 'blue'
+        },
+        scale: { domain: [], range: [] }
+      },
+      strokeDash: {
+        field: 'strokeDash-field',
+        legend: {
+          disable: true,
+          symbolFillColor: 'blue',
+          symbolStrokeColor: 'red'
+        },
+        scale: { domain: [], range: [] }
+      }
+    }
+
+    expect(JSON.stringify(update)).toContain('"legend":{"disable":true}')
+
+    const reverse = reverseOfLegendSuppressionUpdate()
+
+    const result = JSON.stringify(
+      merge({ spec: { encoding: update } }, reverse)
+    )
+    expect(result).not.toContain('"legend":{"disable":true}')
+    expect(result).toContain('"legend":{"disable":false}')
   })
 })

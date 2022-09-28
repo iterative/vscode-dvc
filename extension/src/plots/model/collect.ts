@@ -33,6 +33,13 @@ import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
 import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
 import { shortenForLabel } from '../../util/string'
+import {
+  getDvcDataVersionInfo,
+  isConcatenatedField,
+  mergeFields,
+  MultiSourceEncoding,
+  unmergeConcatenatedFields
+} from '../multiSource/collect'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -355,7 +362,14 @@ const collectDatapoints = (
   values: Record<string, unknown>[] = []
 ) => {
   for (const value of values) {
-    ;(acc[rev][path] as unknown[]).push({ ...value, rev })
+    const dvc_data_version_info = getDvcDataVersionInfo(value)
+    const data: { rev: string } = {
+      ...value,
+      ...dvc_data_version_info,
+      rev
+    }
+
+    ;(acc[rev][path] as unknown[]).push(data)
   }
 }
 
@@ -487,10 +501,33 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
   return acc
 }
 
-const fillTemplate = (template: string, datapoints: unknown[]) =>
-  JSON.parse(
-    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+const fillTemplate = (
+  template: string,
+  datapoints: unknown[],
+  field?: string
+) => {
+  if (!field || !isConcatenatedField(field)) {
+    return JSON.parse(
+      template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+    ) as TopLevelSpec
+  }
+
+  const fields = unmergeConcatenatedFields(field)
+  return JSON.parse(
+    template.replace(
+      '"<DVC_METRIC_DATA>"',
+      JSON.stringify(
+        datapoints.map(data => {
+          const obj = data as Record<string, unknown>
+          return {
+            ...obj,
+            [field]: mergeFields(fields.map(field => obj[field] as string))
+          }
+        })
+      )
+    )
   ) as TopLevelSpec
+}
 
 const collectTemplateGroup = (
   paths: string[],
@@ -498,7 +535,8 @@ const collectTemplateGroup = (
   templates: TemplateAccumulator,
   revisionData: RevisionData,
   size: PlotSize,
-  revisionColors: ColorScale | undefined
+  revisionColors: ColorScale | undefined,
+  multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotEntry[] => {
   const acc: TemplatePlotEntry[] = []
   for (const path of paths) {
@@ -509,10 +547,19 @@ const collectTemplateGroup = (
         .flatMap(revision => revisionData?.[revision]?.[path])
         .filter(Boolean)
 
+      const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
+
       const content = extendVegaSpec(
-        fillTemplate(template, datapoints),
+        fillTemplate(
+          template,
+          datapoints,
+          multiSourceEncodingUpdate.strokeDash?.field
+        ),
         size,
-        revisionColors
+        {
+          ...multiSourceEncodingUpdate,
+          color: revisionColors
+        }
       )
 
       acc.push({
@@ -533,7 +580,8 @@ export const collectSelectedTemplatePlots = (
   templates: TemplateAccumulator,
   revisionData: RevisionData,
   size: PlotSize,
-  revisionColors: ColorScale | undefined
+  revisionColors: ColorScale | undefined,
+  multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotSection[] | undefined => {
   const acc: TemplatePlotSection[] = []
   for (const templateGroup of order) {
@@ -544,7 +592,8 @@ export const collectSelectedTemplatePlots = (
       templates,
       revisionData,
       size,
-      revisionColors
+      revisionColors,
+      multiSourceEncoding
     )
     if (!definedAndNonEmpty(entries)) {
       continue

@@ -10,6 +10,7 @@ import { PlotsOutput } from '../../cli/dvc/reader'
 import { PathSelectionModel } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { performSimpleOrderedUpdate } from '../../util/array'
+import { MultiSourceEncoding } from '../multiSource/collect'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private templateOrder: TemplateOrder
@@ -50,12 +51,23 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     this.persist(PersistenceKey.PLOT_TEMPLATE_ORDER, this.templateOrder)
   }
 
-  public filterChildren(path: string | undefined): PlotPath[] {
-    return this.data.filter(element => {
-      if (!path) {
-        return !element.parentPath
+  public getChildren(
+    path: string | undefined,
+    multiSourceEncoding: MultiSourceEncoding = {}
+  ) {
+    return this.filterChildren(path).map(element => {
+      const hasChildren =
+        element.hasChildren === false
+          ? !!multiSourceEncoding[element.path]
+          : element.hasChildren
+
+      return {
+        ...element,
+        descendantStatuses: this.getTerminalNodeStatuses(element.path),
+        hasChildren,
+        label: element.label,
+        status: this.status[element.path]
       }
-      return element.parentPath === path
     })
   }
 
@@ -94,5 +106,14 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.data
       .filter(plotPath => filter(type, plotPath))
       .map(({ path }) => path)
+  }
+
+  private filterChildren(path: string | undefined): PlotPath[] {
+    return this.data.filter(element => {
+      if (!path) {
+        return !element.parentPath
+      }
+      return element.parentPath === path
+    })
   }
 }
