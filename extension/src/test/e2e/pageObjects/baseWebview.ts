@@ -23,7 +23,7 @@ export class BaseWebview extends BasePage<
     await this.outerFrame$.waitForDisplayed()
 
     await browser.switchToFrame(webviewContainer)
-    await this.innerFrame$.waitForDisplayed()
+    await this.innerFrame$.waitForDisplayed({ timeout: 20000 })
     const webviewInner = await browser.findElement(
       'css selector',
       this.locators.innerFrame
