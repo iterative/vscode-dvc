@@ -1,6 +1,7 @@
 import { Text as VegaText, Title as VegaTitle } from 'vega'
 import { TopLevelSpec } from 'vega-lite'
 import merge from 'lodash.merge'
+import cloneDeep from 'lodash.clonedeep'
 import {
   isMultiViewPlot,
   isMultiViewByCommitPlot,
@@ -15,6 +16,7 @@ import defaultTemplate from '../../test/fixtures/plotsDiff/templates/default'
 import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
 import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
+import multiSourceTemplate from '../../test/fixtures/plotsDiff/templates/multiSource'
 import { copyOriginalColors } from '../../experiments/model/status/colors'
 import { PlotSize } from '../webview/contract'
 
@@ -264,6 +266,25 @@ describe('extendVegaSpec', () => {
     expect(updatedSpecString).not.toContain(repeatedTitle)
     expect(updatedSpecString).toContain(truncatedTitle)
   })
+
+  it('should update the multi-source template to remove erroneous shape encoding from the vertical line displayed on hover', () => {
+    const updatedSpec = extendVegaSpec(multiSourceTemplate, PlotSize.LARGE, {
+      color: { domain: [], range: [] },
+      shape: {
+        field: 'field',
+        scale: { domain: [], range: [] }
+      }
+    })
+
+    expect(updatedSpec.encoding).not.toBeUndefined()
+    expect(updatedSpec.layer[1].layer[0].encoding.shape).toBeNull()
+
+    const updatedSpecCopy = cloneDeep(updatedSpec)
+    delete updatedSpecCopy.layer[1].layer[0].encoding.shape
+    delete updatedSpecCopy.encoding
+
+    expect(updatedSpecCopy).toStrictEqual(multiSourceTemplate)
+  })
 })
 
 describe('reverseOfLegendSuppressionUpdate', () => {
@@ -282,17 +303,14 @@ describe('reverseOfLegendSuppressionUpdate', () => {
       shape: {
         field: 'shape-field',
         legend: {
-          disable: true,
-          symbolFillColor: 'blue'
+          disable: true
         },
         scale: { domain: [], range: [] }
       },
       strokeDash: {
         field: 'strokeDash-field',
         legend: {
-          disable: true,
-          symbolFillColor: 'blue',
-          symbolStrokeColor: 'red'
+          disable: true
         },
         scale: { domain: [], range: [] }
       }
