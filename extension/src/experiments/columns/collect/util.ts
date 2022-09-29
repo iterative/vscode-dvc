@@ -16,8 +16,6 @@ export const limitAncestorDepth = (
   )
 
   switch (collectedLimit) {
-    case 0:
-      return ancestors
     case 1:
       return []
     case 2:
@@ -26,20 +24,22 @@ export const limitAncestorDepth = (
           ColumnType.PARAMS.length + 1
         )
       ]
+    default: {
+      /* 
+      The depth is only limited for the middle of the path array.
+      The first and final layer are excluded, and the
+      concatenated layer itself counts as one; because of this, we must subtract 3
+      from what we want the final layer count to be.
+      */
+      const convertedLimit = collectedLimit - 3
+      if (collectedLimit <= 0 || rest.length <= convertedLimit) {
+        return ancestors
+      }
+      const cutoff = rest.length - convertedLimit
+      const concatenatedPath = rest.slice(0, cutoff).join(sep)
+      return [path, concatenatedPath, ...rest.slice(cutoff)]
+    }
   }
-
-  /* The depth is only limited for the middle of the path array.
-    The first and final layer are excluded, and the
-    concatenated layer itself counts as one; because of this, we must subtract 3
-    from what we want the final layer count to be.
-  */
-  const convertedLimit = (collectedLimit >= 3 ? collectedLimit : 5) - 3
-  if (rest.length <= convertedLimit) {
-    return ancestors
-  }
-  const cutoff = rest.length - convertedLimit
-  const concatenatedPath = rest.slice(0, cutoff).join(sep)
-  return [path, concatenatedPath, ...rest.slice(cutoff)]
 }
 
 const mergeParentColumnByPath = (

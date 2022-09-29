@@ -92,7 +92,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel('', buildMockMemento())
     await model.transformAndSet(deeplyNestedOutput)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf10)
   })
 
   it('should return the expected columns when given the data types output fixture', async () => {
