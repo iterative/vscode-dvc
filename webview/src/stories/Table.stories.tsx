@@ -18,13 +18,13 @@ import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
-import { CELL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 import {
   setExperimentsAsSelected,
   setExperimentsAsStarred
 } from '../test/tableDataFixture'
 import { experimentsReducers } from '../experiments/store'
 import { TableDataState } from '../experiments/components/table/tableDataSlice'
+import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 
 const tableData: TableDataState = {
   changes: workspaceChangesFixture,
@@ -182,7 +182,7 @@ WithAllDataTypes.play = async ({ canvasElement }) => {
   userEvent.hover(falseCell, { bubbles: true })
 }
 WithAllDataTypes.parameters = {
-  chromatic: { delay: CELL_TOOLTIP_DELAY }
+  chromatic: { delay: NORMAL_TOOLTIP_DELAY[0] }
 }
 
 export const WithDeeplyNestedHeaders = Template.bind({})

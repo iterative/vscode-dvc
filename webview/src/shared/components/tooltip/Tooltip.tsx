@@ -5,7 +5,7 @@ import styles from './styles.module.scss'
 import 'tippy.js/dist/tippy.css'
 
 export const HEADER_TOOLTIP_DELAY = 100
-export const CELL_TOOLTIP_DELAY = 1000
+export const NORMAL_TOOLTIP_DELAY = [1000, 0] as [number, number]
 
 const hideOnEsc = {
   defaultValue: true,

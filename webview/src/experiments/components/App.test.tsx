@@ -21,7 +21,7 @@ import {
   tableData as sortingTableDataFixture
 } from '../../test/sort'
 import {
-  CELL_TOOLTIP_DELAY,
+  NORMAL_TOOLTIP_DELAY,
   HEADER_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
 import { getRow } from '../../test/queries'
@@ -610,7 +610,7 @@ describe('App', () => {
       const testParamCell = screen.getByText(testParamStringValue)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY - 1)
+      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0] - 1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       jest.advanceTimersByTime(1)
@@ -621,7 +621,7 @@ describe('App', () => {
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
@@ -631,14 +631,14 @@ describe('App', () => {
       const testParamCell = screen.getByText(testParamStringValue)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
       fireEvent.mouseEnter(tooltip, { bubbles: true })
 
-      jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       expect(tooltip).toBeInTheDocument()
     })
 
@@ -652,13 +652,13 @@ describe('App', () => {
 
         fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
-        jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+        jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
         const tooltip = screen.queryByRole('tooltip')
         expect(tooltip).toHaveTextContent(expectedTooltipResult)
 
         fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
-        jest.advanceTimersByTime(CELL_TOOLTIP_DELAY)
+        jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
         expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
       }
 
