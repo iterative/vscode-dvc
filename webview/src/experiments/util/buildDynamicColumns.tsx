@@ -16,7 +16,7 @@ import {
 import { Value } from 'dvc/src/cli/dvc/reader'
 import { formatFloat } from './numberFormatting'
 import Tooltip, {
-  CELL_TOOLTIP_DELAY
+  NORMAL_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
 import styles from '../components/table/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
@@ -97,7 +97,7 @@ const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
     <Tooltip
       content={<CellTooltip stringValue={stringValue} />}
       placement="bottom-end"
-      delay={[CELL_TOOLTIP_DELAY, 0]}
+      delay={NORMAL_TOOLTIP_DELAY}
       interactive={true}
     >
       <div className={styles.innerCell}>

@@ -11,6 +11,9 @@ import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 import { isSelecting } from '../../../util/strings'
+import Tooltip, {
+  NORMAL_TOOLTIP_DELAY
+} from '../../../shared/components/tooltip/Tooltip'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -40,16 +43,25 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   return (
     <>
       <tr>
-        <td className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}>
+        <td
+          className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
+          colSpan={pinnedColumn ? 1 : nbColumns}
+        >
           <div className={styles.rowPath}>
             <button className={styles.rowToggler} onClick={toggleIsShownState}>
               <Icon icon={isShown ? ChevronDown : ChevronRight} />
-              <span className={styles.pathText}>{path}</span>
+              <Tooltip
+                content={path}
+                placement="bottom-start"
+                delay={NORMAL_TOOLTIP_DELAY}
+              >
+                <span className={styles.pathText}>{path}</span>
+              </Tooltip>
             </button>
             <CopyButton value={path} className={styles.copyButton} />
           </div>
         </td>
-        {nbColumns > 1 && <td colSpan={nbColumns - 1}></td>}
+        {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
       </tr>
       <tr>
         {plots.map((plot: ComparisonPlot) => {

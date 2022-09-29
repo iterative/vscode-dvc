@@ -102,7 +102,7 @@ $gap: 4px;
   text-align: left;
   display: flex;
   user-select: text;
-  width: calc(100% - 20px);
+  max-width: calc(100% - 20px);
 
   svg {
     fill: $fg-color;
