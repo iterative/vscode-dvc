@@ -24,6 +24,7 @@ import {
 } from '../test/tableDataFixture'
 import { experimentsReducers } from '../experiments/store'
 import { TableDataState } from '../experiments/components/table/tableDataSlice'
+import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 
 const tableData: TableDataState = {
   changes: workspaceChangesFixture,
@@ -181,7 +182,7 @@ WithAllDataTypes.play = async ({ canvasElement }) => {
   userEvent.hover(falseCell, { bubbles: true })
 }
 WithAllDataTypes.parameters = {
-  chromatic: { delay: 1000 }
+  chromatic: { delay: NORMAL_TOOLTIP_DELAY[0] }
 }
 
 export const WithDeeplyNestedHeaders = Template.bind({})
