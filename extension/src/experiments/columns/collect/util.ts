@@ -1,15 +1,36 @@
 import { Column, ColumnType } from '../../webview/contract'
 import { Value } from '../../../cli/dvc/reader'
 import { ConfigKey, getConfigValue } from '../../../vscode/config'
-import { buildMetricOrParamPath } from '../paths'
 
 export type ColumnAccumulator = Record<string, Column>
+
+export const joinPathArray = (
+  pathSegments: string[],
+  sep: string,
+  fileSep: string
+) => {
+  const [fileSegment, ...rest] = pathSegments
+  if (!fileSegment) {
+    return ''
+  }
+
+  if (rest.length === 0) {
+    return fileSegment
+  }
+
+  return fileSegment + fileSep + rest.join(sep)
+}
 
 export const limitAncestorDepth = (
   ancestors: string[],
   sep: string,
+  fileSep: string,
+  label: string,
   limit = 5
-) => {
+): {
+  limitedDepthAncestors: string[]
+  limitedDepthLabel: string
+} => {
   const [path, ...rest] = ancestors
   const collectedLimit = Number(
     getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS, limit)
@@ -17,13 +38,15 @@ export const limitAncestorDepth = (
 
   switch (collectedLimit) {
     case 1:
-      return []
+      return {
+        limitedDepthAncestors: [],
+        limitedDepthLabel: joinPathArray([...ancestors, label], sep, fileSep)
+      }
     case 2:
-      return [
-        buildMetricOrParamPath(ColumnType.PARAMS, ...ancestors).slice(
-          ColumnType.PARAMS.length + 1
-        )
-      ]
+      return {
+        limitedDepthAncestors: [joinPathArray(ancestors, sep, fileSep)],
+        limitedDepthLabel: label
+      }
     default: {
       /* 
       The depth is only limited for the middle of the path array.
@@ -33,11 +56,14 @@ export const limitAncestorDepth = (
       */
       const convertedLimit = collectedLimit - 3
       if (collectedLimit <= 0 || rest.length <= convertedLimit) {
-        return ancestors
+        return { limitedDepthAncestors: ancestors, limitedDepthLabel: label }
       }
       const cutoff = rest.length - convertedLimit
       const concatenatedPath = rest.slice(0, cutoff).join(sep)
-      return [path, concatenatedPath, ...rest.slice(cutoff)]
+      return {
+        limitedDepthAncestors: [path, concatenatedPath, ...rest.slice(cutoff)],
+        limitedDepthLabel: label
+      }
     }
   }
 }

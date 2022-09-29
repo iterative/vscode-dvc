@@ -14,7 +14,11 @@ import {
   ValueTreeOrError,
   ValueTreeRoot
 } from '../../../cli/dvc/reader'
-import { buildMetricOrParamPath, METRIC_PARAM_SEPARATOR } from '../paths'
+import {
+  buildMetricOrParamPath,
+  FILE_SEPARATOR,
+  METRIC_PARAM_SEPARATOR
+} from '../paths'
 
 const collectMetricOrParam = (
   acc: ColumnAccumulator,
@@ -23,9 +27,11 @@ const collectMetricOrParam = (
   label: string,
   value: Value
 ) => {
-  const limitedDepthAncestors = limitAncestorDepth(
+  const { limitedDepthAncestors, limitedDepthLabel } = limitAncestorDepth(
     pathArray,
-    METRIC_PARAM_SEPARATOR
+    METRIC_PARAM_SEPARATOR,
+    FILE_SEPARATOR,
+    label
   )
   const path = buildMetricOrParamPath(type, ...limitedDepthAncestors, label)
   mergeAncestors(
@@ -45,9 +51,7 @@ const collectMetricOrParam = (
     ),
     buildMetricOrParamPath(type, ...limitedDepthAncestors),
     [type, ...pathArray, label],
-    limitedDepthAncestors.length === 0
-      ? buildMetricOrParamPath(type, ...pathArray, label).slice(type.length + 1)
-      : label,
+    limitedDepthLabel,
     value
   )
 }
