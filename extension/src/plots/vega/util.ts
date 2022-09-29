@@ -19,6 +19,7 @@ import {
   RepeatMapping
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
+import isEqual from 'lodash.isequal'
 import { ColorScale, PlotSize, Revision } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
@@ -99,44 +100,61 @@ export const getColorScale = (
   return acc.domain.length > 0 ? acc : undefined
 }
 
+type LegendDisabled = {
+  legend: {
+    disable: boolean
+  }
+}
+
 export type Encoding = {
-  strokeDash?: StrokeDashEncoding & {
-    legend: {
-      disable: boolean
-      symbolFillColor: string
-      symbolStrokeColor: string
-    }
-  }
-  shape?: ShapeEncoding & {
-    legend: {
-      disable: boolean
-      symbolFillColor: string
-    }
-  }
-  detail?: {
-    field: string
-  }
-  color?: {
-    legend: {
-      disable: boolean
-    }
-    scale: ColorScale
-  }
+  strokeDash?: StrokeDashEncoding & LegendDisabled
+  shape?: ShapeEncoding & LegendDisabled
+  detail?: { field: string }
+  color?: { scale: ColorScale } & LegendDisabled
+}
+
+type ShapePatchUpdate = {
+  layer?: { layer: [{ encoding: Record<string, unknown> }] }[]
 }
 
 type EncodingUpdate = {
   encoding: Encoding
+} & ShapePatchUpdate
+
+const specHasVerticalLineOnHover = (
+  spec: any
+): spec is { layer: { layer: [{ encoding: Record<string, unknown> }] }[] } =>
+  spec.layer?.[1]?.layer?.[0]?.encoding?.x &&
+  isEqual(spec.layer[1].layer[0].mark, {
+    color: 'gray',
+    type: 'rule'
+  })
+
+const patchShapeEncoding = (spec: TopLevelSpec, encoding: Encoding) => {
+  const update: EncodingUpdate = {
+    encoding
+  }
+
+  if (encoding.shape && specHasVerticalLineOnHover(spec)) {
+    update.layer = spec.layer
+    update.layer[1].layer[0].encoding.shape = null
+  }
+
+  return update
 }
 
-export const getSpecEncodingUpdate = ({
-  color,
-  shape,
-  strokeDash
-}: {
-  color?: ColorScale
-  shape?: ShapeEncoding
-  strokeDash?: StrokeDashEncoding
-}): EncodingUpdate => {
+const getSpecEncodingUpdate = (
+  spec: TopLevelSpec,
+  {
+    color,
+    shape,
+    strokeDash
+  }: {
+    color?: ColorScale
+    shape?: ShapeEncoding
+    strokeDash?: StrokeDashEncoding
+  }
+): EncodingUpdate => {
   const encoding: Encoding = {}
   if (color) {
     encoding.color = {
@@ -149,9 +167,7 @@ export const getSpecEncodingUpdate = ({
     encoding.strokeDash = {
       ...strokeDash,
       legend: {
-        disable: true,
-        symbolFillColor: 'transparent',
-        symbolStrokeColor: 'grey'
+        disable: true
       }
     }
   }
@@ -160,16 +176,13 @@ export const getSpecEncodingUpdate = ({
     encoding.shape = {
       ...shape,
       legend: {
-        disable: true,
-        symbolFillColor: 'grey'
+        disable: true
       }
     }
-    encoding.detail = shape
+    encoding.detail = { field: shape.field }
   }
 
-  return {
-    encoding
-  }
+  return patchShapeEncoding(spec, encoding)
 }
 
 const mergeUpdate = (spec: TopLevelSpec, update: EncodingUpdate) => {
@@ -255,6 +268,11 @@ export const truncateTitles = (
     const specCopy: Record<string, unknown> = {}
 
     for (const [key, value] of Object.entries(spec)) {
+      if (['data', 'color', 'strokeDash', 'shape', 'detail'].includes(key)) {
+        specCopy[key] = value
+        continue
+      }
+
       const valueType = typeof value
       if (key === 'y') {
         vertical = true
@@ -294,7 +312,7 @@ export const extendVegaSpec = (
     return updatedSpec
   }
 
-  const update = getSpecEncodingUpdate(encoding)
+  const update = getSpecEncodingUpdate(updatedSpec, encoding)
 
   return mergeUpdate(updatedSpec, update)
 }
@@ -302,15 +320,22 @@ export const extendVegaSpec = (
 export const reverseOfLegendSuppressionUpdate = () => ({
   spec: {
     encoding: {
-      color: { legend: { disable: false } },
-      shape: {
+      color: {
         legend: {
           disable: false
         }
       },
+      shape: {
+        legend: {
+          disable: false,
+          symbolFillColor: 'grey'
+        }
+      },
       strokeDash: {
         legend: {
-          disable: false
+          disable: false,
+          symbolFillColor: 'transparent',
+          symbolStrokeColor: 'grey'
         }
       }
     }
