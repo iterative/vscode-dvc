@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.9] - 2022-09-29
+
+### 🚀 New Features and Enhancements
+
+- Render flexible plots [#2403](https://github.com/iterative/vscode-dvc/pull/2403) by [@mattseddon](https://github.com/mattseddon)
+- Add flexible plots legends to plots tree [#2452](https://github.com/iterative/vscode-dvc/pull/2452) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Cleanup after drag and drop [#2481](https://github.com/iterative/vscode-dvc/pull/2481) by [@sroy3](https://github.com/sroy3)
+- Fix comparison table row copy button [#2489](https://github.com/iterative/vscode-dvc/pull/2489) by [@sroy3](https://github.com/sroy3)
+- Remove erroneous shape from vertical on hover line when shape dimension is added [#2486](https://github.com/iterative/vscode-dvc/pull/2486) by [@mattseddon](https://github.com/mattseddon)
+- Add tooltip to comparison table row path [#2490](https://github.com/iterative/vscode-dvc/pull/2490) by [@sroy3](https://github.com/sroy3)
+- Make the comparison table row path take available space [#2491](https://github.com/iterative/vscode-dvc/pull/2491) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Do not walk unnecessary keys in truncate titles [#2487](https://github.com/iterative/vscode-dvc/pull/2487) by [@mattseddon](https://github.com/mattseddon)
+- Bump min tested version of DVC to 2.28.0 [#2488](https://github.com/iterative/vscode-dvc/pull/2488) by [@mattseddon](https://github.com/mattseddon)
+- Stabilize e2e tests [#2493](https://github.com/iterative/vscode-dvc/pull/2493) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.4.8] - 2022-09-26
 
 ### 🚀 New Features and Enhancements
