@@ -18,7 +18,6 @@ import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
-import { CELL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 import {
   setExperimentsAsSelected,
   setExperimentsAsStarred
@@ -182,7 +181,7 @@ WithAllDataTypes.play = async ({ canvasElement }) => {
   userEvent.hover(falseCell, { bubbles: true })
 }
 WithAllDataTypes.parameters = {
-  chromatic: { delay: CELL_TOOLTIP_DELAY }
+  chromatic: { delay: 1000 }
 }
 
 export const WithDeeplyNestedHeaders = Template.bind({})

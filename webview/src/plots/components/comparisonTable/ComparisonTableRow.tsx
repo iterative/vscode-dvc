@@ -11,7 +11,9 @@ import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 import { isSelecting } from '../../../util/strings'
-import Tooltip from '../../../shared/components/tooltip/Tooltip'
+import Tooltip, {
+  NORMAL_TOOLTIP_DELAY
+} from '../../../shared/components/tooltip/Tooltip'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -51,7 +53,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
               <Tooltip
                 content={path}
                 placement="bottom-start"
-                delay={[1000, 0]}
+                delay={NORMAL_TOOLTIP_DELAY}
               >
                 <span className={styles.pathText}>{path}</span>
               </Tooltip>

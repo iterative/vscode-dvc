@@ -2,7 +2,7 @@ import React, { ReactNode, ReactElement } from 'react'
 import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
 import Tooltip, {
-  CELL_TOOLTIP_DELAY
+  NORMAL_TOOLTIP_DELAY
 } from '../../../shared/components/tooltip/Tooltip'
 
 export type CellHintTooltipProps = {
@@ -13,7 +13,7 @@ export type CellHintTooltipProps = {
 export const CellHintTooltip: React.FC<CellHintTooltipProps & TippyProps> = ({
   tooltipContent,
   children,
-  delay = [CELL_TOOLTIP_DELAY, 0]
+  delay = NORMAL_TOOLTIP_DELAY
 }) => {
   return (
     <Tooltip
