@@ -404,6 +404,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
     .headerCellWrapper {
       @extend %truncateLeftParent;
+      direction: rtl;
       opacity: 0.6;
     }
     .cellContents {
