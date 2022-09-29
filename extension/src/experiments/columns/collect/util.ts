@@ -4,21 +4,22 @@ import { ConfigKey, getConfigValue } from '../../../vscode/config'
 
 export type ColumnAccumulator = Record<string, Column>
 
-export const joinPathArray = (
+const joinPathArray = (
   pathSegments: string[],
   sep: string,
   fileSep: string
-) => {
+): string[] => {
   const [fileSegment, ...rest] = pathSegments
+
   if (!fileSegment) {
-    return ''
+    return []
   }
 
   if (rest.length === 0) {
-    return fileSegment
+    return [fileSegment]
   }
 
-  return fileSegment + fileSep + rest.join(sep)
+  return [fileSegment + fileSep + rest.join(sep)]
 }
 
 export const limitAncestorDepth = (
@@ -40,11 +41,11 @@ export const limitAncestorDepth = (
     case 1:
       return {
         limitedDepthAncestors: [],
-        limitedDepthLabel: joinPathArray([...ancestors, label], sep, fileSep)
+        limitedDepthLabel: joinPathArray([...ancestors, label], sep, fileSep)[0]
       }
     case 2:
       return {
-        limitedDepthAncestors: [joinPathArray(ancestors, sep, fileSep)],
+        limitedDepthAncestors: joinPathArray(ancestors, sep, fileSep),
         limitedDepthLabel: label
       }
     default: {
