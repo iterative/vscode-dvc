@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.10] - 2022-09-29
+
+### 🐛 Bug Fixes
+
+- Turn off language server again [#2505](https://github.com/iterative/vscode-dvc/pull/2505) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use a variable for tooltip delays [#2500](https://github.com/iterative/vscode-dvc/pull/2500) by [@sroy3](https://github.com/sroy3)
+
 ## [0.4.9] - 2022-09-29
 
 ### 🚀 New Features and Enhancements
