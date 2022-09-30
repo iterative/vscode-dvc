@@ -7,7 +7,7 @@ const ENCODED_METRIC_PARAM_SEPARATOR = '%2E'
 const ENCODE_METRIC_PARAM_REGEX = /\./g
 const DECODE_METRIC_PARAM_REGEX = /%2E/g
 
-const FILE_SEPARATOR = ':'
+export const FILE_SEPARATOR = ':'
 const FILE_SPLIT_REGEX = new RegExp(
   `([^${FILE_SEPARATOR}]*)(?:${FILE_SEPARATOR}([^${FILE_SEPARATOR}]*))?(?:${FILE_SEPARATOR}(.*))?`
 )

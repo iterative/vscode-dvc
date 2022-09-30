@@ -4,28 +4,69 @@ import { ConfigKey, getConfigValue } from '../../../vscode/config'
 
 export type ColumnAccumulator = Record<string, Column>
 
+const joinPathArray = (
+  pathSegments: string[],
+  sep: string,
+  fileSep: string
+): string[] => {
+  const [fileSegment, ...rest] = pathSegments
+
+  if (!fileSegment) {
+    return []
+  }
+
+  if (rest.length === 0) {
+    return [fileSegment]
+  }
+
+  return [fileSegment + fileSep + rest.join(sep)]
+}
+
 export const limitAncestorDepth = (
   ancestors: string[],
   sep: string,
+  fileSep: string,
+  label: string,
   limit = 5
-) => {
+): {
+  limitedDepthAncestors: string[]
+  limitedDepthLabel: string
+} => {
   const [path, ...rest] = ancestors
-  /*
-    The depth is only limited for the middle of the path array.
-    The first and final layer are excluded, and the
-    concatenated layer itself counts as one; because of this, we must subtract 3
-    from what we want the final layer count to be.
-  */
   const collectedLimit = Number(
     getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS, limit)
   )
-  const convertedLimit = (collectedLimit >= 3 ? collectedLimit : 3) - 3
-  if (rest.length <= convertedLimit) {
-    return ancestors
+
+  switch (collectedLimit) {
+    case 1:
+      return {
+        limitedDepthAncestors: [],
+        limitedDepthLabel: joinPathArray([...ancestors, label], sep, fileSep)[0]
+      }
+    case 2:
+      return {
+        limitedDepthAncestors: joinPathArray(ancestors, sep, fileSep),
+        limitedDepthLabel: label
+      }
+    default: {
+      /* 
+      The depth is only limited for the middle of the path array.
+      The first and final layer are excluded, and the
+      concatenated layer itself counts as one; because of this, we must subtract 3
+      from what we want the final layer count to be.
+      */
+      const convertedLimit = collectedLimit - 3
+      if (collectedLimit <= 0 || rest.length <= convertedLimit) {
+        return { limitedDepthAncestors: ancestors, limitedDepthLabel: label }
+      }
+      const cutoff = rest.length - convertedLimit
+      const concatenatedPath = rest.slice(0, cutoff).join(sep)
+      return {
+        limitedDepthAncestors: [path, concatenatedPath, ...rest.slice(cutoff)],
+        limitedDepthLabel: label
+      }
+    }
   }
-  const cutoff = rest.length - convertedLimit
-  const concatenatedPath = rest.slice(0, cutoff).join(sep)
-  return [path, concatenatedPath, ...rest.slice(cutoff)]
 }
 
 const mergeParentColumnByPath = (
