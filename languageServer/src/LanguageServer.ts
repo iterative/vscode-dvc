@@ -10,8 +10,7 @@ import {
   Location,
   Position,
   Range,
-  DocumentSymbol,
-  TextDocumentItem
+  DocumentSymbol
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { URI } from 'vscode-uri'
@@ -19,7 +18,6 @@ import { TextDocumentWrapper } from './TextDocumentWrapper'
 
 export class LanguageServer {
   private documentsKnownToEditor!: TextDocuments<TextDocument>
-  private documentsFromDvcClient: TextDocumentWrapper[] = []
 
   public listen(connection: _Connection) {
     this.documentsKnownToEditor = new TextDocuments(TextDocument)
@@ -34,24 +32,6 @@ export class LanguageServer {
       return this.onDefinition(params)
     })
 
-    connection.onRequest(
-      'initialTextDocuments',
-      (params: { textDocuments: TextDocumentItem[] }) => {
-        this.documentsFromDvcClient = params.textDocuments.map(
-          ({ uri, languageId, version, text: content }) => {
-            const textDocument = TextDocument.create(
-              uri,
-              languageId,
-              version,
-              content
-            )
-
-            return this.wrap(textDocument)
-          }
-        )
-      }
-    )
-
     this.documentsKnownToEditor.listen(connection)
 
     connection.listen()
@@ -60,16 +40,6 @@ export class LanguageServer {
   private getAllDocuments() {
     const openDocuments = this.documentsKnownToEditor.all()
     const acc: TextDocumentWrapper[] = openDocuments.map(doc => this.wrap(doc))
-
-    for (const textDocument of this.documentsFromDvcClient) {
-      const userAlreadyOpenedIt = this.documentsKnownToEditor.get(
-        textDocument.uri
-      )
-
-      if (!userAlreadyOpenedIt) {
-        acc.push(textDocument)
-      }
-    }
 
     return acc
   }
@@ -81,10 +51,7 @@ export class LanguageServer {
     const doc = this.documentsKnownToEditor.get(uri)
 
     if (!doc) {
-      const alternative = this.documentsFromDvcClient.find(
-        txtDoc => txtDoc.uri === uri
-      )
-      return alternative ?? null
+      return null
     }
 
     return this.wrap(doc)

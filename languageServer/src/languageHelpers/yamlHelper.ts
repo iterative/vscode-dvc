@@ -85,11 +85,7 @@ export class YamlHelper extends BaseLanguageHelper<Document> {
   ) {
     const nodeValue = `${node.value}`
 
-    let symbolKind: SymbolKind = SymbolKind.String
-
-    if (/\.[A-Za-z]+$/.test(nodeValue)) {
-      symbolKind = SymbolKind.File
-    }
+    const symbolKind: SymbolKind = SymbolKind.String
 
     const children: DocumentSymbol[] = []
 
@@ -107,6 +103,9 @@ export class YamlHelper extends BaseLanguageHelper<Document> {
       children.push(...propertyPathSymbols)
     }
 
+    const filePathSymbols = this.extractFilePathSymbols(nodeValue, nodeStart)
+    children.push(...filePathSymbols)
+
     const symbolsSoFar: DocumentSymbol[] = [
       DocumentSymbol.create(
         nodeValue,
@@ -119,6 +118,36 @@ export class YamlHelper extends BaseLanguageHelper<Document> {
     ]
 
     return symbolsSoFar
+  }
+
+  private extractFilePathSymbols(text: string, startIndex: number) {
+    const symbols: DocumentSymbol[] = []
+    const patternMatches = text.matchAll(RegExes.filePaths)
+
+    for (const match of patternMatches) {
+      const matchIndex = match.index ?? 0
+
+      symbols.push(this.getFilePathSymbol(match[0], startIndex + matchIndex))
+    }
+
+    return symbols
+  }
+
+  private getFilePathSymbol(path: string, startIndex: number) {
+    const pathStringLength = path.length
+    const endIndex = startIndex + pathStringLength
+    const symbolStart = this.positionAt(startIndex)
+    const symbolEnd = this.positionAt(endIndex)
+    const symbolRange = Range.create(symbolStart, symbolEnd)
+    const symbolSelectionRange = symbolRange
+
+    return DocumentSymbol.create(
+      path,
+      path,
+      SymbolKind.File,
+      symbolRange,
+      symbolSelectionRange
+    )
   }
 
   private extractPropertyPathSymbolsFrom(text: string, startIndex: number) {

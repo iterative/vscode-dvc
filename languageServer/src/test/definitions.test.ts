@@ -1,5 +1,10 @@
 import { Position, Range } from 'vscode-languageserver/node'
-import { foreach_dvc_yaml, params_dvc_yaml } from './fixtures/examples/valid'
+import { TextDocument } from 'vscode-languageserver-textdocument'
+import {
+  file_path_dvc_yaml,
+  foreach_dvc_yaml,
+  params_dvc_yaml
+} from './fixtures/examples/valid'
 import { params } from './fixtures/params'
 import { requestDefinitions } from './utils/requestDefinitions'
 import { openTheseFilesAndNotifyServer } from './utils/openTheseFilesAndNotifyServer'
@@ -27,6 +32,19 @@ describe('textDocument/definitions', () => {
     ])
 
     const response = await requestDefinitions(paramsYaml, 'auc')
+
+    expect(response).toBeNull()
+  })
+
+  it('should not provide definitions for files that were not synchronized', async () => {
+    const fakeDocument = TextDocument.create(
+      'fakeUri://fakeson/dvc.yaml',
+      'yaml',
+      0,
+      'mock content'
+    )
+
+    const response = await requestDefinitions(fakeDocument, 'mock')
 
     expect(response).toBeNull()
   })
@@ -68,5 +86,23 @@ describe('textDocument/definitions', () => {
       range: Range.create(Position.create(15, 8), Position.create(15, 10)),
       uri: 'file:///dvc.yaml'
     })
+  })
+
+  it('should return the file location if the symbol is a file path', async () => {
+    const [dvcYaml] = await openTheseFilesAndNotifyServer([
+      {
+        languageId: 'yaml',
+        mockContents: file_path_dvc_yaml,
+        mockPath: 'dvc.yaml'
+      },
+      {
+        languageId: 'json',
+        mockContents: '',
+        mockPath: 'params.json'
+      }
+    ])
+    const response = await requestDefinitions(dvcYaml, 'params.json')
+
+    expect(response).toBeTruthy()
   })
 })

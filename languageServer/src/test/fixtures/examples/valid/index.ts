@@ -58,6 +58,7 @@ stages:
           persist: false
 
 `
+
 export const minimal_dvc_yaml = `
 stages:
   stage1:
@@ -68,6 +69,20 @@ stages:
       - echo world
 
 `
+
+export const file_path_dvc_yaml = `
+stages:
+  stage1:
+    cmd: echo foo
+    params:
+      - params.json
+  stage2:
+    cmd:
+      - echo hello
+      - echo world
+
+`
+
 export const outs_dvc_yaml = `
 stages:
   copy_multiple:
