@@ -77,6 +77,7 @@ stages:
     params:
       - params.json
       - moreParams/otherParams.json
+      - data/blankFile
   stage2:
     cmd:
       - echo hello

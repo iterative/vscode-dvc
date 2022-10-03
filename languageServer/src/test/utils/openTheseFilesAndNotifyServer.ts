@@ -13,7 +13,7 @@ export const openTheseFilesAndNotifyServer = async (
     const textDocument = TextDocument.create(uri, languageId, 1, mockContents)
     await client.sendNotification(DidOpenTextDocumentNotification.type, {
       textDocument: {
-        languageId: 'yaml',
+        languageId,
         text: textDocument.getText(),
         uri: textDocument.uri,
         version: textDocument.version

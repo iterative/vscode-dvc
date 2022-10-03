@@ -104,12 +104,16 @@ describe('textDocument/definitions', () => {
         languageId: 'json',
         mockContents: '',
         mockPath: 'moreParams/otherParams.json'
+      },
+      {
+        languageId: 'blankLang',
+        mockContents: '',
+        mockPath: 'data/blankFile'
       }
     ])
 
     let response = await requestDefinitions(dvcYaml, 'params.json')
 
-    expect(response).toBeTruthy()
     expect(response).toStrictEqual({
       range: Range.create(Position.create(0, 0), Position.create(0, 0)),
       uri: 'file:///params.json'
@@ -117,7 +121,6 @@ describe('textDocument/definitions', () => {
 
     response = await requestDefinitions(dvcYaml, 'otherParams.json')
 
-    expect(response).toBeTruthy()
     expect(response).toStrictEqual({
       range: Range.create(Position.create(0, 0), Position.create(0, 0)),
       uri: 'file:///moreParams/otherParams.json'
