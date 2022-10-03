@@ -104,5 +104,9 @@ describe('textDocument/definitions', () => {
     const response = await requestDefinitions(dvcYaml, 'params.json')
 
     expect(response).toBeTruthy()
+    expect(response).toStrictEqual({
+      range: Range.create(Position.create(0, 0), Position.create(0, 0)),
+      uri: 'file:///params.json'
+    })
   })
 })
