@@ -76,6 +76,7 @@ stages:
     cmd: echo foo
     params:
       - params.json
+      - moreParams/otherParams.json
   stage2:
     cmd:
       - echo hello
