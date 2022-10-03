@@ -136,6 +136,9 @@ export class WebviewMessages {
           this.showPlots()
         ])
 
+      case MessageFromWebviewType.UPDATE_HEADER_DEPTH_SETTINGS:
+        return commands.executeCommand('workbench.action.openWorkspaceSettings')
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }

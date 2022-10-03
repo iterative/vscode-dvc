@@ -44,7 +44,8 @@ export enum MessageFromWebviewType {
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
-  MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run'
+  MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
+  UPDATE_HEADER_DEPTH_SETTINGS = 'update-header-depth-settings'
 }
 
 export type ColumnResizePayload = {
@@ -171,6 +172,7 @@ export type MessageFromWebview =
       type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
       payload: string
     }
+  | { type: MessageFromWebviewType.UPDATE_HEADER_DEPTH_SETTINGS }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA
