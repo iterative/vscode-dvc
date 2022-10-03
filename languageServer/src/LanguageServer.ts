@@ -61,15 +61,30 @@ export class LanguageServer {
     return new TextDocumentWrapper(doc)
   }
 
+  private isPossibleFilePath(symbol: DocumentSymbol) {
+    const isFile = symbol.kind === SymbolKind.File
+    const isProperty = symbol.kind === SymbolKind.Property
+
+    return isFile || (symbol.detail && isProperty)
+  }
+
+  private getFilePathFromSymbol(symbol: DocumentSymbol) {
+    if (symbol.kind === SymbolKind.File) {
+      return symbol.name
+    }
+
+    return symbol.detail ?? ''
+  }
+
   private getFilePathLocations(
     symbolUnderCursor: DocumentSymbol,
     allDocs: TextDocumentWrapper[]
   ) {
-    if (symbolUnderCursor.kind !== SymbolKind.File) {
+    if (!this.isPossibleFilePath(symbolUnderCursor)) {
       return []
     }
 
-    const filePath = symbolUnderCursor.name
+    const filePath = this.getFilePathFromSymbol(symbolUnderCursor)
 
     const matchingFiles = allDocs.filter(doc =>
       URI.file(doc.uri).fsPath.endsWith(filePath)
