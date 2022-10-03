@@ -82,6 +82,8 @@
   "config.doNotShowWalkthroughAfterInstall.title": "Do not show the Get Started page.",
   "config.doNotShowUnableToFilter.description": "Do not warn before disabling auto-apply filters when these would result in too many experiments being selected.",
   "config.doNotShowUnableToFilter.title": "Do not warn before disabling auto-apply filters to experiment selection.",
+  "config.disableLanguageServer.description": "Disable the language server for dvc.yaml files.",
+  "config.disableLanguageServer.title": "Disable language server",
   "config.dvcPath.description": "Path or shell command to the DVC binary. Required unless Microsoft's Python extension is installed and the `dvc` package found in its environment.",
   "config.dvcPath.title": "DVC Path (or shell command)",
   "config.expTableHeadMaxLayers.title": "Maximum depth of Experiment table head rows",

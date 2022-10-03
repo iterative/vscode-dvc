@@ -548,6 +548,12 @@
           "type": "boolean",
           "default": null
         },
+        "dvc.disableLanguageServer": {
+          "title": "%config.disableLanguageServer.title%",
+          "description": "%config.disableLanguageServer.description%",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",
