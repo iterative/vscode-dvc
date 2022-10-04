@@ -132,7 +132,7 @@ describe('textDocument/definitions', () => {
       }
     ]
 
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 100; i++) {
       multipleDocuments.push({
         languageId: 'yaml',
         mockContents: file_path_dvc_yaml,
@@ -156,7 +156,7 @@ describe('textDocument/definitions', () => {
       }
     ]
 
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       multipleDocuments.push(
         {
           languageId: 'yaml',
@@ -187,7 +187,7 @@ describe('textDocument/definitions', () => {
       }
     ]
 
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       const [dvcYaml] = await openTheseFilesAndNotifyServer(multipleDocuments)
 
       const response = await requestDefinitions(dvcYaml, 'params.json')
