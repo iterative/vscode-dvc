@@ -1,99 +1,28 @@
-import { join } from 'path'
 import isEmpty from 'lodash.isempty'
 import { DvcCli } from '.'
-import { Args, Command, ExperimentFlag, Flag, SubCommand } from './constants'
+import {
+  Args,
+  Command,
+  ExperimentFlag,
+  Flag,
+  NUM_OF_COMMITS_TO_SHOW,
+  SubCommand,
+  TEMP_PLOTS_DIR
+} from './constants'
+import {
+  DataStatusOutput,
+  DvcError,
+  ExperimentsOutput,
+  PlotsOutput
+} from './contract'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 import { MaybeConsoleError } from '../error'
-import { Plot } from '../../plots/webview/contract'
 import { Logger } from '../../common/logger'
-
-export type DvcError = { error: { type: string; msg: string } }
-
-export type Changes = {
-  added?: string[]
-  deleted?: string[]
-  modified?: string[]
-  renamed?: { new: string; old: string }[]
-  unknown?: string[]
-}
-
-export type DataStatusOutput = {
-  committed?: Changes
-  not_in_cache?: string[]
-  unchanged?: string[]
-  uncommitted?: Changes
-}
-
-type SingleValue = string | number | boolean | null
-export type Value = SingleValue | SingleValue[]
-
-export interface ValueTreeOrError {
-  data?: ValueTree
-  error?: { type: string; msg: string }
-}
-
-type RelPathObject<T> = {
-  [relPath: string]: T
-}
-
-export type ValueTreeRoot = RelPathObject<ValueTreeOrError>
-
-export interface ValueTreeNode {
-  [key: string]: Value | ValueTree
-}
-
-export type ValueTree = ValueTreeRoot | ValueTreeNode
-
-export interface BaseExperimentFields {
-  name?: string
-  timestamp?: string | null
-  queued?: boolean
-  running?: boolean
-  executor?: string | null
-  checkpoint_tip?: string
-  checkpoint_parent?: string
-}
-
-type Dep = { hash: null | string; size: null | number; nfiles: null | number }
-type Out = Dep & { use_cache: boolean; is_data_source: boolean }
-
-export type Deps = RelPathObject<Dep>
-
-export interface ExperimentFields extends BaseExperimentFields {
-  params?: ValueTreeRoot
-  metrics?: ValueTreeRoot
-  deps?: Deps
-  outs?: RelPathObject<Out>
-}
-
-export interface ExperimentFieldsOrError {
-  data?: ExperimentFields
-  error?: { type: string; msg: string }
-}
-
-export interface ExperimentsBranchOutput {
-  [sha: string]: ExperimentFieldsOrError
-  baseline: ExperimentFieldsOrError
-}
-
-export interface ExperimentsOutput {
-  [name: string]: ExperimentsBranchOutput
-  workspace: {
-    baseline: ExperimentFieldsOrError
-  }
-}
 
 const defaultExperimentsOutput: ExperimentsOutput = {
   workspace: { baseline: {} }
 }
-
-export interface PlotsOutput {
-  [path: string]: Plot[]
-}
-
-export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
-export const NUM_OF_COMMITS_TO_SHOW = '3'
 
 export const isDvcError = <
   T extends ExperimentsOutput | DataStatusOutput | PlotsOutput
