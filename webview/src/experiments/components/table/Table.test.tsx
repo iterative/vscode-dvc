@@ -258,6 +258,23 @@ describe('Table', () => {
     })
   })
 
+  describe('Head Depth', () => {
+    it('should be updated by the user in the header context menu', async () => {
+      renderExperimentsTable()
+      const column = await screen.findByText('C')
+      fireEvent.contextMenu(column, {
+        bubbles: true
+      })
+
+      const sortOption = await screen.findByText('Set Max Header Depth')
+      fireEvent.click(sortOption)
+
+      expect(mockedPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
+      })
+    })
+  })
+
   describe('Changes', () => {
     it('should not have the workspaceWithChanges class on a row if there are no workspace changes', async () => {
       renderTable()
