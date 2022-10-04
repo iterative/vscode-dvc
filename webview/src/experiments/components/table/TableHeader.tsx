@@ -81,7 +81,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       },
       {
         id: 'update-header-depth',
-        label: 'Update Header Depth',
+        label: 'Set Max Header Depth',
         message: {
           type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
         }
