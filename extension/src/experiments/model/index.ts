@@ -29,7 +29,7 @@ import {
   reorderListSubset,
   reorderObjectList
 } from '../../util/array'
-import { ExperimentsOutput } from '../../cli/dvc/reader'
+import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { setContextValue } from '../../vscode/context'
 import { hasKey } from '../../util/object'
 import { flattenMapValues } from '../../util/map'

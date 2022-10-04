@@ -4,7 +4,7 @@ import { getInput } from '../../../vscode/inputBox'
 import { Flag } from '../../../cli/dvc/constants'
 import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
-import { Value } from '../../../cli/dvc/reader'
+import { Value } from '../../../cli/dvc/contract'
 
 const standardizeValue = (value: Value): string =>
   typeof value === 'object' ? JSON.stringify(value) : `${value}`

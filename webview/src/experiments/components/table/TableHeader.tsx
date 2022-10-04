@@ -78,6 +78,13 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           payload: column.id,
           type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
         }
+      },
+      {
+        id: 'update-header-depth',
+        label: 'Set Max Header Depth',
+        message: {
+          type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
+        }
       }
     ]
 

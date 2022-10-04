@@ -1,4 +1,4 @@
-import { BaseExperimentFields, ValueTree } from '../../cli/dvc/reader'
+import { BaseExperimentFields, ValueTree } from '../../cli/dvc/contract'
 import { FilteredCounts } from '../model/filterBy/collect'
 import { SortDefinition } from '../model/sortBy'
 

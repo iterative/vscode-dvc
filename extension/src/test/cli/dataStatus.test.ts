@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
-import { DataStatusOutput } from '../../cli/dvc/reader'
+import { DataStatusOutput } from '../../cli/dvc/contract'
 
 suite('data status --granular --unchanged --show-json', () => {
   describe('Demo Repository', () => {

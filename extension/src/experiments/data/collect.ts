@@ -1,4 +1,4 @@
-import { ExperimentsOutput } from '../../cli/dvc/reader'
+import { ExperimentsOutput } from '../../cli/dvc/contract'
 
 export const collectFiles = (
   data: ExperimentsOutput,

@@ -21,7 +21,7 @@ import {
   PlotsOutput,
   Value,
   ValueTree
-} from '../../cli/dvc/reader'
+} from '../../cli/dvc/contract'
 import { extractColumns } from '../../experiments/columns/extract'
 import {
   decodeColumn,

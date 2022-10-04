@@ -13,7 +13,7 @@ import {
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
 import { DOT_GIT } from '../../cli/git/constants'
-import { DataStatusOutput, DvcError } from '../../cli/dvc/reader'
+import { DataStatusOutput, DvcError } from '../../cli/dvc/contract'
 
 export type Data = {
   dataStatus: DataStatusOutput | DvcError

@@ -13,7 +13,7 @@ import * as Time from '../../../util/time'
 import * as Watcher from '../../../fileSystem/watcher'
 import { Repository } from '../../../repository'
 import { InternalCommands } from '../../../commands/internal'
-import { DataStatusOutput } from '../../../cli/dvc/reader'
+import { DataStatusOutput } from '../../../cli/dvc/contract'
 
 export const buildDependencies = (disposer: Disposer) => {
   const { dvcReader, gitReader, internalCommands } =
