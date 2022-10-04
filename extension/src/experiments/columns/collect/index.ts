@@ -10,7 +10,7 @@ import {
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
   ExperimentsOutput
-} from '../../../cli/dvc/reader'
+} from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
 

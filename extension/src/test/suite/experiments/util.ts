@@ -12,7 +12,7 @@ import {
   buildMockData,
   mockDisposable
 } from '../util'
-import { ExperimentsOutput } from '../../../cli/dvc/reader'
+import { ExperimentsOutput } from '../../../cli/dvc/contract'
 import { ExperimentsData } from '../../../experiments/data'
 import { CheckpointsModel } from '../../../experiments/checkpoints/model'
 import { FileSystemData } from '../../../fileSystem/data'

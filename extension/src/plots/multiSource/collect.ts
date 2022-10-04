@@ -9,7 +9,7 @@ import {
   ShapeValue
 } from './constants'
 import { isImagePlot, Plot, TemplatePlot } from '../webview/contract'
-import { PlotsOutput } from '../../cli/dvc/reader'
+import { PlotsOutput } from '../../cli/dvc/contract'
 
 const FIELD_SEPARATOR = '::'
 

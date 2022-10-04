@@ -7,7 +7,7 @@ import {
 } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, PlotsOutput } from '../cli/dvc/reader'
+import { ExperimentsOutput, PlotsOutput } from '../cli/dvc/contract'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 
