@@ -57,7 +57,8 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   ) {
     return this.filterChildren(path).map(element => {
       const hasChildren =
-        element.hasChildren === false
+        element.hasChildren === false &&
+        !element.type?.has(PathType.TEMPLATE_MULTI)
           ? !!multiSourceEncoding[element.path]
           : element.hasChildren
 
