@@ -177,4 +177,22 @@ describe('textDocument/definitions', () => {
 
     expect(response).toBeTruthy()
   })
+
+  it('should send responses for a big number of requests to the same file', async () => {
+    const multipleDocuments = [
+      {
+        languageId: 'yaml',
+        mockContents: file_path_dvc_yaml,
+        mockPath: 'dvc.yaml'
+      }
+    ]
+
+    for (let i = 0; i < 1000; i++) {
+      const [dvcYaml] = await openTheseFilesAndNotifyServer(multipleDocuments)
+
+      const response = await requestDefinitions(dvcYaml, 'params.json')
+
+      expect(response).toBeTruthy()
+    }
+  })
 })
