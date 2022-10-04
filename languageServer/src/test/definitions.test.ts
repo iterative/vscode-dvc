@@ -122,4 +122,28 @@ describe('textDocument/definitions', () => {
       uri: 'file:///moreParams/otherParams.json'
     })
   })
+
+  it('should send responses for a big number of files', async () => {
+    const multipleDocuments = [
+      {
+        languageId: 'yaml',
+        mockContents: file_path_dvc_yaml,
+        mockPath: 'dvc.yaml'
+      }
+    ]
+
+    for (let i = 0; i < 10000; i++) {
+      multipleDocuments.push({
+        languageId: 'yaml',
+        mockContents: file_path_dvc_yaml,
+        mockPath: 'dvc.yaml'
+      })
+    }
+
+    const [dvcYaml] = await openTheseFilesAndNotifyServer(multipleDocuments)
+
+    const response = await requestDefinitions(dvcYaml, 'params.json')
+
+    expect(response).toBeTruthy()
+  })
 })
