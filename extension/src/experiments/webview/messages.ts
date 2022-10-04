@@ -18,6 +18,9 @@ import { splitColumnPath } from '../columns/paths'
 import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
 import { CheckpointsModel } from '../checkpoints/model'
+import { getValidInput } from '../../vscode/inputBox'
+import { Title } from '../../vscode/title'
+import { ConfigKey, setConfigValue } from '../../vscode/config'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -136,8 +139,9 @@ export class WebviewMessages {
           this.showPlots()
         ])
 
-      case MessageFromWebviewType.UPDATE_HEADER_DEPTH_SETTINGS:
-        return commands.executeCommand('workbench.action.openWorkspaceSettings')
+      case MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH: {
+        return this.setMaxTableHeadLayers()
+      }
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -160,6 +164,16 @@ export class WebviewMessages {
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
+  }
+
+  private async setMaxTableHeadLayers() {
+    const newValue = await getValidInput(
+      Title.SET_EXPERIMENTS_HEADER_DEPTH,
+      val => {
+        return Number.isNaN(Number(val)) ? 'Input needs to be a number' : ''
+      }
+    )
+    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS, Number(newValue))
   }
 
   private setColumnOrder(order: string[]) {

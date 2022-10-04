@@ -7,8 +7,7 @@
 .item {
   display: flex;
   cursor: pointer;
-  min-height: 24px;
-  white-space: normal;
+  height: 24px;
   padding: 2px 6px;
   &:hover {
     background-color: $hover-background-color;

@@ -80,10 +80,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         }
       },
       {
-        id: 'update-header-depth-settings',
-        label: 'Update Header Depth In Settings',
+        id: 'update-header-depth',
+        label: 'Update Header Depth',
         message: {
-          type: MessageFromWebviewType.UPDATE_HEADER_DEPTH_SETTINGS
+          type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
         }
       }
     ]
