@@ -26,7 +26,7 @@ stages:
       md5: 0aa0e279e904572c28c1203ebfa41b29
       size: 310000
     - path: training_metrics
-      md5: 5abc8d18d6b57bd513acf95e55e2755a.dir
+      md5: 2786b882ea7a85e5c19014c3a5eb5167.dir
       size: 947
       nfiles: 2
     - path: training_metrics.json
