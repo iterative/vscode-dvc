@@ -1,5 +1,5 @@
 import { join } from '../../util/path'
-import { ExperimentsOutput } from '../../../cli/dvc/reader'
+import { ExperimentsOutput } from '../../../cli/dvc/contract'
 
 export const errorShas = [
   '489fd8bdaa709f7330aac342e051a9431c625481',

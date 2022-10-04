@@ -11,7 +11,7 @@ import {
   getRelativePattern
 } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExperimentsOutput } from '../../cli/dvc/reader'
+import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { ExperimentFlag } from '../../cli/dvc/constants'
 import { DOT_GIT, DOT_GIT_HEAD, HEADS_GIT_REFS } from '../../cli/git/constants'

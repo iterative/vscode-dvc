@@ -2,7 +2,7 @@ import { join, relative, resolve } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
-import { Changes, DataStatusOutput } from '../../cli/dvc/reader'
+import { Changes, DataStatusOutput } from '../../cli/dvc/contract'
 import { DecorationDataStatus } from '../sourceControlManagement/decorationProvider'
 import { relativeWithUri } from '../../fileSystem'
 import {

@@ -1,5 +1,5 @@
 import { Column, ColumnType } from '../../webview/contract'
-import { Value } from '../../../cli/dvc/reader'
+import { Value } from '../../../cli/dvc/contract'
 import { ConfigKey, getConfigValue } from '../../../vscode/config'
 
 export type ColumnAccumulator = Record<string, Column>
