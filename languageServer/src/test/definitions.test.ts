@@ -1,3 +1,4 @@
+import path from 'path'
 import { Position, Range } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
@@ -103,12 +104,7 @@ describe('textDocument/definitions', () => {
       {
         languageId: 'json',
         mockContents: '',
-        mockPath: 'moreParams/otherParams.json'
-      },
-      {
-        languageId: 'blankLang',
-        mockContents: '',
-        mockPath: 'data/blankFile'
+        mockPath: path.join('moreParams', 'otherParams.json')
       }
     ])
 
