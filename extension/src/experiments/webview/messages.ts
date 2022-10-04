@@ -140,7 +140,7 @@ export class WebviewMessages {
         ])
 
       case MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH: {
-        return this.setMaxTableHeadLayers()
+        return this.setMaxTableHeadDepth()
       }
 
       default:
@@ -166,14 +166,14 @@ export class WebviewMessages {
     }
   }
 
-  private async setMaxTableHeadLayers() {
+  private async setMaxTableHeadDepth() {
     const newValue = await getValidInput(
       Title.SET_EXPERIMENTS_HEADER_DEPTH,
       val => {
         return Number.isNaN(Number(val)) ? 'Input needs to be a number' : ''
       }
     )
-    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS, Number(newValue))
+    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH, Number(newValue))
   }
 
   private setColumnOrder(order: string[]) {
