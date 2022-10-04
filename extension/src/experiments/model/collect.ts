@@ -13,7 +13,8 @@ import {
   ExperimentFieldsOrError,
   ExperimentFields,
   ExperimentsBranchOutput,
-  ExperimentsOutput
+  ExperimentsOutput,
+  ExperimentStatus
 } from '../../cli/dvc/contract'
 import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
@@ -228,7 +229,7 @@ const collectHasRunningExperiment = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
 ) => {
-  if (experiment.running) {
+  if (experiment.status === ExperimentStatus.RUNNING) {
     acc.hasRunning = true
   }
 }
@@ -327,19 +328,20 @@ const getDefaultMutableRevision = (hasCheckpoints: boolean): string[] => {
 
 const noWorkspaceVsSelectedRaceCondition = (
   hasCheckpoints: boolean,
-  running: boolean | undefined,
+  status: ExperimentStatus | undefined,
   selected: boolean | undefined
-): boolean => !!(hasCheckpoints && running && !selected)
+): boolean =>
+  !!(hasCheckpoints && status === ExperimentStatus.RUNNING && !selected)
 
 const collectMutableRevision = (
   acc: string[],
-  { label, running, selected }: Experiment,
+  { label, status, selected }: Experiment,
   hasCheckpoints: boolean
 ) => {
-  if (noWorkspaceVsSelectedRaceCondition(hasCheckpoints, running, selected)) {
+  if (noWorkspaceVsSelectedRaceCondition(hasCheckpoints, status, selected)) {
     acc.push('workspace')
   }
-  if (running && !hasCheckpoints) {
+  if (status === ExperimentStatus.RUNNING && !hasCheckpoints) {
     acc.push(label)
   }
 }

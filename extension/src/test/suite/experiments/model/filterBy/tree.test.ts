@@ -38,6 +38,7 @@ import {
   FilterItem
 } from '../../../../../experiments/model/filterBy/tree'
 import { starredFilter } from '../../../../../experiments/model/filterBy/constants'
+import { ExperimentStatus } from '../../../../../cli/dvc/contract'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -95,7 +96,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
               )
             })
             .map(experiment =>
-              experiment.queued || experiment.error
+              experiment.status === ExperimentStatus.QUEUED || experiment.error
                 ? experiment
                 : {
                     ...experiment,

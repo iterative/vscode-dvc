@@ -35,6 +35,7 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
+import { ExperimentStatus } from '../../../cli/dvc/contract'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -97,17 +98,14 @@ suite('Plots Test Suite', () => {
           '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
             checkpoint: {
               data: {
-                checkpoint_tip: 'experiment',
-                queued: false,
-                running: false
+                checkpoint_tip: 'experiment'
               }
             },
             experiment: {
               data: {
                 checkpoint_tip: 'experiment',
                 name: 'exp-e1new',
-                queued: false,
-                running: true
+                status: ExperimentStatus.RUNNING
               }
             }
           }

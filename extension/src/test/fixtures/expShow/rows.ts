@@ -2,6 +2,7 @@ import { join } from '../../util/path'
 import { Row } from '../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { shortenForLabel } from '../../../util/string'
+import { ExperimentStatus } from '../../../cli/dvc/contract'
 
 const valueWithNoChanges = (str: string) => ({
   value: shortenForLabel(str),
@@ -92,8 +93,7 @@ const data: Row[] = [
         test: true
       }
     },
-    queued: false,
-    running: true,
+    status: ExperimentStatus.RUNNING,
     selected: true,
     starred: false
   },
@@ -179,8 +179,7 @@ const data: Row[] = [
         test: true
       }
     },
-    queued: false,
-    running: false,
+    status: ExperimentStatus.SUCCESS,
     selected: true,
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     starred: false,
@@ -271,8 +270,7 @@ const data: Row[] = [
             test: true
           }
         },
-        queued: false,
-        running: true,
+        status: ExperimentStatus.RUNNING,
         selected: true,
         sha: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         starred: false,
@@ -363,8 +361,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             sha: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
             starred: false,
@@ -456,8 +453,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             sha: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
             starred: false,
@@ -552,8 +548,7 @@ const data: Row[] = [
             test: true
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         selected: true,
         sha: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         starred: false,
@@ -644,8 +639,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             starred: false,
             sha: '217312476f8854dda1865450b737eb6bc7a3ba1b',
@@ -737,8 +731,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             sha: '9523bde67538cf31230efaff2dbc47d38a944ab5',
             starred: false,
@@ -833,8 +826,7 @@ const data: Row[] = [
             test: true
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         selected: true,
         sha: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         starred: false,
@@ -925,8 +917,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             sha: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
             starred: false,
@@ -1018,8 +1009,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             sha: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
             starred: false,
@@ -1111,8 +1101,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             sha: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
             starred: false,
@@ -1204,8 +1193,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             sha: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
             starred: false,
@@ -1297,8 +1285,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.RUNNING,
             selected: false,
             sha: '23250b33e3d6dd0e136262d1d26a2face031cb03',
             starred: false,
@@ -1395,14 +1382,14 @@ const data: Row[] = [
             test: true
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         selected: true,
         sha: 'f0f918662b4f8c47819ca154a23029bf9b47d4f3',
         starred: false,
         Created: '2020-12-29T15:26:36'
       },
       {
+        displayColor: undefined,
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -1473,8 +1460,8 @@ const data: Row[] = [
             test: true
           }
         },
-        queued: true,
         selected: false,
+        status: ExperimentStatus.QUEUED,
         sha: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
         starred: false,
         Created: '2020-12-29T15:25:27'

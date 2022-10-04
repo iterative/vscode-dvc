@@ -4,6 +4,7 @@ import { hasKey } from '../../../util/object'
 import { Experiment } from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'
 import { flattenMapValues } from '../../../util/map'
+import { ExperimentStatus } from '../../../cli/dvc/contract'
 
 const getStatus = (
   acc: ColoredStatus,
@@ -21,8 +22,8 @@ const collectStatus = (
   experiment: Experiment,
   unassignColors?: Color[]
 ) => {
-  const { id, queued } = experiment
-  if (!id || queued || hasKey(acc, id)) {
+  const { id, status } = experiment
+  if (!id || status === ExperimentStatus.QUEUED || hasKey(acc, id)) {
     return
   }
 

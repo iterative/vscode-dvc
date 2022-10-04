@@ -1,7 +1,10 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  ExperimentStatus
+} from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { RowProp } from './interfaces'
 import styles from './styles.module.scss'
@@ -14,11 +17,11 @@ import { HandlerFunc } from '../../../util/props'
 import { cond } from '../../../util/helpers'
 import { ExperimentsState } from '../../store'
 
-const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
-  if (running) {
+const getExperimentTypeClass = ({ status, selected }: Experiment) => {
+  if (status === ExperimentStatus.RUNNING) {
     return styles.runningExperiment
   }
-  if (queued) {
+  if (status === ExperimentStatus.QUEUED) {
     return styles.queuedExperiment
   }
   if (selected === false) {

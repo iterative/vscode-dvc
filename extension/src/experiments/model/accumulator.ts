@@ -1,4 +1,4 @@
-import { Experiment } from '../webview/contract'
+import { Experiment, ExperimentStatus } from '../webview/contract'
 
 export class ExperimentsAccumulator {
   public workspace = {} as Experiment
@@ -11,6 +11,6 @@ export class ExperimentsAccumulator {
     if (workspace) {
       this.workspace = workspace
     }
-    this.hasRunning = !!workspace?.running
+    this.hasRunning = !!(workspace?.status === ExperimentStatus.RUNNING)
   }
 }

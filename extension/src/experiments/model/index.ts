@@ -29,9 +29,8 @@ import {
   reorderListSubset,
   reorderObjectList
 } from '../../util/array'
-import { ExperimentsOutput } from '../../cli/dvc/contract'
+import { ExperimentsOutput, ExperimentStatus } from '../../cli/dvc/contract'
 import { setContextValue } from '../../vscode/context'
-import { hasKey } from '../../util/object'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -130,7 +129,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public toggleStatus(id: string) {
     if (
       this.getFlattenedExperiments().find(({ id: queuedId }) => queuedId === id)
-        ?.queued
+        ?.status === ExperimentStatus.QUEUED
     ) {
       return
     }
@@ -318,8 +317,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getExperimentsWithCheckpoints(): ExperimentWithCheckpoints[] {
     const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = []
     for (const experiment of this.getAllExperiments()) {
-      const { id, queued } = experiment
-      if (queued) {
+      const { id, status } = experiment
+      if (status === ExperimentStatus.QUEUED) {
         continue
       }
 
@@ -412,9 +411,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsByBranch(branch)?.map(experiment => ({
       ...experiment,
       hasChildren: definedAndNonEmpty(this.checkpointsByTip.get(experiment.id)),
-      type: experiment.queued
-        ? ExperimentType.QUEUED
-        : ExperimentType.EXPERIMENT
+      type:
+        experiment.status === ExperimentStatus.QUEUED
+          ? ExperimentType.QUEUED
+          : ExperimentType.EXPERIMENT
     }))
   }
 
@@ -494,11 +494,11 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   private splitExperimentsByQueued(getQueued = false) {
-    return this.getFlattenedExperiments().filter(({ queued }) => {
+    return this.getFlattenedExperiments().filter(({ status }) => {
       if (getQueued) {
-        return queued
+        return status === ExperimentStatus.QUEUED
       }
-      return !queued
+      return status !== ExperimentStatus.QUEUED
     })
   }
 
@@ -569,23 +569,11 @@ export class ExperimentsModel extends ModelWithPersistence {
   private addDetails(experiment: Experiment) {
     const { id } = experiment
 
-    const starred = !!this.isStarred(id)
-
-    if (!hasKey(this.coloredStatus, id)) {
-      return {
-        ...experiment,
-        selected: false,
-        starred
-      }
-    }
-
-    const selected = this.isSelected(id)
-
     return {
       ...experiment,
       displayColor: this.getDisplayColor(id),
-      selected,
-      starred
+      selected: this.isSelected(id),
+      starred: !!this.isStarred(id)
     }
   }
 

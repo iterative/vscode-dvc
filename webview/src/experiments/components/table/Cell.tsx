@@ -1,5 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
+import { ExperimentStatus } from 'dvc/src/experiments/webview/contract'
 import { ErrorTooltip } from './Errors'
 import { IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
@@ -43,7 +44,7 @@ export const FirstCell: React.FC<
 > = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
   const { row, isPlaceholder } = cell
   const {
-    original: { error, queued, label, displayNameOrParent = '' }
+    original: { error, status, label, displayNameOrParent = '' }
   } = row
 
   const {
@@ -73,7 +74,7 @@ export const FirstCell: React.FC<
               aria-label={'Sub-rows selected for plots'}
               count={plotSelections}
             />
-            {queued && <Clock />}
+            {status === ExperimentStatus.QUEUED && <Clock />}
           </span>
         </CellHintTooltip>
         {isPlaceholder ? null : (

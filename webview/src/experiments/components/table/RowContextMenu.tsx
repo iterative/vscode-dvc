@@ -1,5 +1,6 @@
 import React from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { ExperimentStatus } from 'dvc/src/experiments/webview/contract'
 import { RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
@@ -144,10 +145,11 @@ const getSingleSelectMenuOptions = (
   projectHasCheckpoints: boolean,
   hasRunningExperiment: boolean,
   depth: number,
-  queued?: boolean,
+  status?: ExperimentStatus,
   starred?: boolean
 ) => {
-  const isNotExperimentOrCheckpoint = queued || isWorkspace || depth <= 0
+  const isNotExperimentOrCheckpoint =
+    status === ExperimentStatus.QUEUED || isWorkspace || depth <= 0
 
   const withId = (
     label: string,
@@ -213,7 +215,7 @@ const getContextMenuOptions = (
   hasRunningExperiment: boolean,
   depth: number,
   selectedRows: Record<string, RowProp | undefined>,
-  queued?: boolean,
+  status?: ExperimentStatus,
   starred?: boolean
 ) => {
   const isFromSelection = !!selectedRows[id]
@@ -231,7 +233,7 @@ const getContextMenuOptions = (
         projectHasCheckpoints,
         hasRunningExperiment,
         depth,
-        queued,
+        status,
         starred
       )
   )
@@ -241,7 +243,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   hasRunningExperiment = false,
   projectHasCheckpoints = false,
   row: {
-    original: { queued, starred },
+    original: { status, starred },
     depth,
     values: { id }
   }
@@ -259,11 +261,11 @@ export const RowContextMenu: React.FC<RowProp> = ({
       hasRunningExperiment,
       depth,
       selectedRows,
-      queued,
+      status,
       starred
     )
   }, [
-    queued,
+    status,
     starred,
     isWorkspace,
     depth,

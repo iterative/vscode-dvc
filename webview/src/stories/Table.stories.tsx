@@ -8,6 +8,7 @@ import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChan
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
 import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
+import { ExperimentStatus } from 'dvc/src/experiments/webview/contract'
 import {
   within,
   userEvent,
@@ -46,7 +47,9 @@ const tableData: TableDataState = {
       starred: experiment.starred || experiment.label === '42b8736',
       subRows: experiment.subRows?.map(checkpoint => ({
         ...checkpoint,
-        running: checkpoint.running || checkpoint.label === '23250b3',
+        running:
+          checkpoint.status === ExperimentStatus.RUNNING ||
+          checkpoint.label === '23250b3',
         starred: checkpoint.starred || checkpoint.label === '22e40e1'
       }))
     }))
@@ -62,13 +65,16 @@ const noRunningExperiments = {
   hasRunningExperiment: false,
   rows: rowsFixture.map(row => ({
     ...row,
-    running: false,
+    status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      running: false,
+      status:
+        experiment.status === ExperimentStatus.RUNNING
+          ? ExperimentStatus.SUCCESS
+          : experiment.status,
       subRows: experiment.subRows?.map(checkpoint => ({
         ...checkpoint,
-        running: false
+        status: ExperimentStatus.SUCCESS
       }))
     }))
   }))
@@ -79,10 +85,13 @@ const noRunningExperimentsNoCheckpoints = {
   hasCheckpoints: false,
   rows: rowsFixture.map(row => ({
     ...row,
-    running: false,
+    status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      running: false,
+      status:
+        experiment.status === ExperimentStatus.RUNNING
+          ? ExperimentStatus.SUCCESS
+          : experiment.status,
       subRows: []
     }))
   }))
