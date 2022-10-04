@@ -152,7 +152,7 @@ export class YamlHelper extends BaseLanguageHelper<Document> {
 
   private extractPropertyPathSymbolsFrom(text: string, startIndex: number) {
     const symbols: DocumentSymbol[] = []
-    const pathLikeSegments = text.matchAll(RegExes.propertyPathLike)
+    const pathLikeSegments = RegExes.propertyPathLike(text)
 
     for (const path of pathLikeSegments) {
       const matchIndex = path.index ?? 0
