@@ -87,7 +87,7 @@ export class LanguageServer {
     const filePath = this.getFilePathFromSymbol(symbolUnderCursor)
 
     const matchingFiles = allDocs.filter(doc =>
-      URI.file(doc.uri).fsPath.endsWith(filePath)
+      URI.file(doc.uri).path.endsWith(filePath)
     )
 
     return matchingFiles.map(doc => {
