@@ -506,16 +506,38 @@ const fillTemplate = (
   datapoints: unknown[],
   field?: string
 ) => {
-  if (!field || !isConcatenatedField(field)) {
+  const isMultiView = isMultiViewPlot(JSON.parse(template))
+  const anchor = '"<DVC_METRIC_DATA>"'
+
+  if (!field || (!isMultiView && !isConcatenatedField(field))) {
     return JSON.parse(
-      template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+      template.replace(anchor, JSON.stringify(datapoints))
     ) as TopLevelSpec
   }
 
   const fields = unmergeConcatenatedFields(field)
+
+  if (isMultiView) {
+    fields.unshift('rev')
+    return JSON.parse(
+      template.replace(
+        anchor,
+        JSON.stringify(
+          datapoints.map(data => {
+            const obj = data as Record<string, unknown>
+            return {
+              ...obj,
+              rev: mergeFields(fields.map(field => obj[field] as string))
+            }
+          })
+        )
+      )
+    ) as TopLevelSpec
+  }
+
   return JSON.parse(
     template.replace(
-      '"<DVC_METRIC_DATA>"',
+      anchor,
       JSON.stringify(
         datapoints.map(data => {
           const obj = data as Record<string, unknown>
