@@ -6,7 +6,7 @@ import {
   foreach_dvc_yaml,
   params_dvc_yaml
 } from './fixtures/examples/valid'
-import { params } from './fixtures/params'
+import { params, paramsJson } from './fixtures/params'
 import { requestDefinitions } from './utils/requestDefinitions'
 import { openTheseFilesAndNotifyServer } from './utils/openTheseFilesAndNotifyServer'
 import {
@@ -123,7 +123,7 @@ describe('textDocument/definitions', () => {
     })
   })
 
-  it('should send responses for a big number of files', async () => {
+  it('should send responses for a big number of the same file', async () => {
     const multipleDocuments = [
       {
         languageId: 'yaml',
@@ -138,6 +138,37 @@ describe('textDocument/definitions', () => {
         mockContents: file_path_dvc_yaml,
         mockPath: 'dvc.yaml'
       })
+    }
+
+    const [dvcYaml] = await openTheseFilesAndNotifyServer(multipleDocuments)
+
+    const response = await requestDefinitions(dvcYaml, 'params.json')
+
+    expect(response).toBeTruthy()
+  })
+
+  it('should send responses for a big number of different files', async () => {
+    const multipleDocuments = [
+      {
+        languageId: 'yaml',
+        mockContents: file_path_dvc_yaml,
+        mockPath: 'dvc.yaml'
+      }
+    ]
+
+    for (let i = 0; i < 1000; i++) {
+      multipleDocuments.push(
+        {
+          languageId: 'yaml',
+          mockContents: file_path_dvc_yaml.repeat(i),
+          mockPath: 'dvc.yaml'
+        },
+        {
+          languageId: 'json',
+          mockContents: paramsJson.repeat(i),
+          mockPath: 'params.json'
+        }
+      )
     }
 
     const [dvcYaml] = await openTheseFilesAndNotifyServer(multipleDocuments)
