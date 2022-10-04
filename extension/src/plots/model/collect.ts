@@ -501,53 +501,48 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
   return acc
 }
 
-const fillTemplate = (
-  template: string,
+const updateDatapoints = (
   datapoints: unknown[],
-  field?: string
-) => {
-  const isMultiView = isMultiViewPlot(JSON.parse(template))
-  const anchor = '"<DVC_METRIC_DATA>"'
+  key: string,
+  fields: string[]
+): unknown[] =>
+  datapoints.map(data => {
+    const obj = data as Record<string, unknown>
+    return {
+      ...obj,
+      [key]: mergeFields(fields.map(field => obj[field] as string))
+    }
+  })
 
+const getDatapoints = (
+  datapoints: unknown[],
+  field: string | undefined,
+  isMultiView: boolean
+) => {
   if (!field || (!isMultiView && !isConcatenatedField(field))) {
-    return JSON.parse(
-      template.replace(anchor, JSON.stringify(datapoints))
-    ) as TopLevelSpec
+    return datapoints
   }
 
   const fields = unmergeConcatenatedFields(field)
 
   if (isMultiView) {
     fields.unshift('rev')
-    return JSON.parse(
-      template.replace(
-        anchor,
-        JSON.stringify(
-          datapoints.map(data => {
-            const obj = data as Record<string, unknown>
-            return {
-              ...obj,
-              rev: mergeFields(fields.map(field => obj[field] as string))
-            }
-          })
-        )
-      )
-    ) as TopLevelSpec
+    return updateDatapoints(datapoints, 'rev', fields)
   }
 
+  return updateDatapoints(datapoints, field, fields)
+}
+
+const fillTemplate = (
+  template: string,
+  datapoints: unknown[],
+  field?: string
+): TopLevelSpec => {
+  const isMultiView = isMultiViewPlot(JSON.parse(template))
+  const updatedDatapoints = getDatapoints(datapoints, field, isMultiView)
+
   return JSON.parse(
-    template.replace(
-      anchor,
-      JSON.stringify(
-        datapoints.map(data => {
-          const obj = data as Record<string, unknown>
-          return {
-            ...obj,
-            [field]: mergeFields(fields.map(field => obj[field] as string))
-          }
-        })
-      )
-    )
+    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(updatedDatapoints))
   ) as TopLevelSpec
 }
 
