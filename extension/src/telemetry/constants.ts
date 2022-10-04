@@ -28,6 +28,8 @@ export const EventName = Object.assign(
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
+    SET_EXPERIMENTS_HEADER_DEPTH: 'extension.updateHeaderDepth',
+
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
       'views.experimentsTable.columnsReordered',
@@ -194,6 +196,8 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined
   [EventName.EXTENSION_SHOW_OUTPUT]: undefined
+
+  [EventName.SET_EXPERIMENTS_HEADER_DEPTH]: undefined
 
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount
