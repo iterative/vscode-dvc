@@ -433,6 +433,7 @@ describe('ComparisonTable', () => {
 
       const [headerWrapper] = getHeaders()
 
+      // eslint-disable-next-line testing-library/no-node-access
       expect(headerWrapper.childElementCount).toBe(2)
       expect(headerWrapper.contains(endingNode)).toBe(true)
     })
