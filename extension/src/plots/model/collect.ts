@@ -521,32 +521,17 @@ const updateDatapoints = (
     )
     .filter(Boolean)
 
-const transformMultiSourceMultiViewRevisionData = (
-  path: string,
+const updateRevisions = (
   selectedRevisions: string[],
-  revisionData: RevisionData,
-  fields: string[],
   domain: string[]
-) => {
-  fields.unshift('rev')
-
+): string[] => {
   const revisions: string[] = []
   for (const revision of selectedRevisions) {
     for (const entry of domain) {
-      revisions.push([revision, entry].join('::'))
+      revisions.push(mergeFields([revision, entry]))
     }
   }
-
-  return {
-    datapoints: updateDatapoints(
-      path,
-      revisionData,
-      selectedRevisions,
-      'rev',
-      fields
-    ),
-    revisions
-  }
+  return revisions
 }
 
 const transformRevisionData = (
@@ -557,7 +542,12 @@ const transformRevisionData = (
   multiSourceEncodingUpdate: { strokeDash: StrokeDashEncoding }
 ): { revisions: string[]; datapoints: unknown[] } => {
   const field = multiSourceEncodingUpdate.strokeDash?.field
-  if (!field || (!isMultiView && !isConcatenatedField(field))) {
+  const isMultiSource = !!field
+
+  const transformNeeded =
+    isMultiSource && (isMultiView || isConcatenatedField(field))
+
+  if (!transformNeeded) {
     return {
       datapoints: selectedRevisions
         .flatMap(revision => revisionData?.[revision]?.[path])
@@ -567,15 +557,21 @@ const transformRevisionData = (
   }
 
   const fields = unmergeConcatenatedFields(field)
-
   if (isMultiView) {
-    return transformMultiSourceMultiViewRevisionData(
-      path,
-      selectedRevisions,
-      revisionData,
-      fields,
-      multiSourceEncodingUpdate.strokeDash.scale.domain
-    )
+    fields.unshift('rev')
+    return {
+      datapoints: updateDatapoints(
+        path,
+        revisionData,
+        selectedRevisions,
+        'rev',
+        fields
+      ),
+      revisions: updateRevisions(
+        selectedRevisions,
+        multiSourceEncodingUpdate.strokeDash.scale.domain
+      )
+    }
   }
 
   return {
