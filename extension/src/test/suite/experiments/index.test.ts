@@ -878,6 +878,29 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should be able to handle a message to update the table depth', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+
+      const webview = await experiments.showWebview()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const executeCommandStub = stub(commands, 'executeCommand')
+
+      const messageReceived = new Promise(resolve =>
+        disposable.track(mockMessageReceived.event(() => resolve(undefined)))
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
+      })
+
+      expect(executeCommandStub).to.be.calledWith(
+        'dvc.extension.updateHeaderDepth'
+      )
+
+      await messageReceived
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it("should be able to handle a message to toggle an experiment's star status", async () => {
       const { experiments, experimentsModel } =
         setupExperimentsAndMockCommands()
