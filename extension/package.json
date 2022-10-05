@@ -1568,7 +1568,7 @@
     "@types/lodash.isequal": "4.5.6",
     "@types/lodash.merge": "4.6.7",
     "@types/lodash.omit": "4.5.7",
-    "@types/mocha": "9.1.1",
+    "@types/mocha": "10.0.0",
     "@types/mock-require": "2.0.1",
     "@types/node": "16.11.62",
     "@types/react-vega": "7.0.0",
