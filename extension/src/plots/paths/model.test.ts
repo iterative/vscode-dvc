@@ -165,4 +165,96 @@ describe('PathsModel', () => {
 
     expect(model.getComparisonPaths()).toStrictEqual(newOrder)
   })
+
+  it('should return the expected children from the test fixture', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    model.transformAndSet(plotsDiffFixture)
+
+    const rootChildren = model.getChildren(undefined, {
+      'predictions.json': {
+        strokeDash: { field: '', scale: { domain: [], range: [] } }
+      }
+    })
+    expect(rootChildren).toStrictEqual([
+      {
+        descendantStatuses: [2, 2, 2],
+        hasChildren: true,
+        label: 'plots',
+        parentPath: undefined,
+        path: 'plots',
+        status: 2
+      },
+      {
+        descendantStatuses: [2, 2],
+        hasChildren: true,
+        label: 'logs',
+        parentPath: undefined,
+        path: 'logs',
+        status: 2
+      },
+      {
+        descendantStatuses: [],
+        hasChildren: false,
+        label: 'predictions.json',
+        parentPath: undefined,
+        path: 'predictions.json',
+        status: 2,
+        type: new Set([PathType.TEMPLATE_MULTI])
+      }
+    ])
+
+    const directoryChildren = model.getChildren('logs')
+    expect(directoryChildren).toStrictEqual([
+      {
+        descendantStatuses: [],
+        hasChildren: false,
+        label: 'loss.tsv',
+        parentPath: 'logs',
+        path: logsLoss,
+        status: 2,
+        type: new Set([PathType.TEMPLATE_SINGLE])
+      },
+      {
+        descendantStatuses: [],
+        hasChildren: false,
+        label: 'acc.tsv',
+        parentPath: 'logs',
+        path: logsAcc,
+        status: 2,
+        type: new Set([PathType.TEMPLATE_SINGLE])
+      }
+    ])
+
+    const plotsWithEncoding = model.getChildren('logs', {
+      [logsAcc]: {
+        strokeDash: { field: '', scale: { domain: [], range: [] } }
+      },
+      [logsLoss]: {
+        strokeDash: { field: '', scale: { domain: [], range: [] } }
+      }
+    })
+    expect(plotsWithEncoding).toStrictEqual([
+      {
+        descendantStatuses: [],
+        hasChildren: true,
+        label: 'loss.tsv',
+        parentPath: 'logs',
+        path: logsLoss,
+        status: 2,
+        type: new Set([PathType.TEMPLATE_SINGLE])
+      },
+      {
+        descendantStatuses: [],
+        hasChildren: true,
+        label: 'acc.tsv',
+        parentPath: 'logs',
+        path: logsAcc,
+        status: 2,
+        type: new Set([PathType.TEMPLATE_SINGLE])
+      }
+    ])
+
+    const noChildren = model.getChildren(logsLoss)
+    expect(noChildren).toStrictEqual([])
+  })
 })

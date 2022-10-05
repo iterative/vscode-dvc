@@ -448,6 +448,10 @@ export const getOutput = (
 
 export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
 
+export const getMultiSourceOutput = (): PlotsOutput => ({
+  ...require('./multiSource').default
+})
+
 const expectedRevisions = ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd']
 
 const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
