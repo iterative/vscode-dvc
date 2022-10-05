@@ -810,14 +810,14 @@ suite('Plots Test Suite', () => {
       expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
 
       const expectedRevisions = [
-        `HEAD::${join('evaluation', 'test', 'plots', 'confusion_matrix.json')}`,
+        `main::${join('evaluation', 'test', 'plots', 'confusion_matrix.json')}`,
         `workspace::${join(
           'evaluation',
           'test',
           'plots',
           'confusion_matrix.json'
         )}`,
-        `HEAD::${join(
+        `main::${join(
           'evaluation',
           'train',
           'plots',
