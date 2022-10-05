@@ -10,6 +10,7 @@ import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/noErrors'
 import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
+import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
 import plotsRevisionsFixture from '../../fixtures/plotsDiff/revisions'
@@ -27,7 +28,8 @@ import {
   PlotSize,
   PlotsType,
   Section,
-  TemplatePlotGroup
+  TemplatePlotGroup,
+  TemplatePlotsData
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -35,6 +37,7 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
+import { SelectedExperimentWithColor } from '../../../experiments/model'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -756,6 +759,88 @@ suite('Plots Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should send the correct data to the webview for flexible plots', async () => {
+      const { plots, messageSpy, mockPlotsDiff, experiments } =
+        await buildPlots(disposable, multiSourcePlotsDiffFixture)
+
+      stub(experiments, 'getSelectedRevisions').returns([
+        { label: 'workspace' },
+        { label: 'main' }
+      ] as SelectedExperimentWithColor[])
+
+      const webview = await plots.showWebview()
+      await webview.isReady()
+
+      expect(mockPlotsDiff).to.be.called
+
+      const { template: templateData } = getFirstArgOfLastCall(messageSpy)
+
+      const [singleViewSection, multiViewSection] = (
+        templateData as TemplatePlotsData
+      ).plots
+
+      expect(
+        singleViewSection.entries.map(({ id }: { id: string }) => id)
+      ).to.deep.equal(['dvc.yaml::ROC', 'dvc.yaml::Precision-Recall'])
+
+      const [roc] = singleViewSection.entries
+      const rocDatapoints =
+        (
+          roc.content.data as {
+            values: { rev: string; filename: string | undefined }[]
+          }
+        )?.values || []
+      expect(rocDatapoints.length).to.be.greaterThan(0)
+      for (const entry of rocDatapoints) {
+        expect(entry.rev).not.to.contain('::')
+        expect(entry.filename).not.to.be.undefined
+      }
+
+      expect(
+        multiViewSection.entries.map(({ id }: { id: string }) => id)
+      ).to.deep.equal(['dvc.yaml::Confusion-Matrix'])
+
+      const expectedRevisions = [
+        `main::${join('evaluation', 'test', 'plots', 'confusion_matrix.json')}`,
+        `workspace::${join(
+          'evaluation',
+          'test',
+          'plots',
+          'confusion_matrix.json'
+        )}`,
+        `main::${join(
+          'evaluation',
+          'train',
+          'plots',
+          'confusion_matrix.json'
+        )}`,
+        `workspace::${join(
+          'evaluation',
+          'train',
+          'plots',
+          'confusion_matrix.json'
+        )}`
+      ].sort()
+
+      const [confusionMatrix] = multiViewSection.entries
+
+      const confusionMatrixDatapoints =
+        (
+          confusionMatrix.content.data as {
+            values: { rev: string }[]
+          }
+        )?.values || []
+
+      expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
+
+      expect(confusionMatrix.revisions?.length).to.equal(4)
+      expect(confusionMatrix.revisions?.sort()).to.deep.equal(expectedRevisions)
+
+      for (const entry of confusionMatrixDatapoints) {
+        expect(expectedRevisions).to.include(entry.rev)
+      }
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a toggle experiment message from the webview', async () => {
