@@ -1,7 +1,7 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
-import { PlotsOutput } from '../../../cli/dvc/reader'
+import { PlotsOutput } from '../../../cli/dvc/contract'
 import {
   ComparisonPlots,
   ComparisonRevisionData,

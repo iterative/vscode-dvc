@@ -1,5 +1,5 @@
 import { isImagePlot, Plot, TemplatePlotGroup } from '../webview/contract'
-import { PlotsOutput } from '../../cli/dvc/reader'
+import { PlotsOutput } from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'

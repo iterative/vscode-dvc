@@ -13,7 +13,7 @@ import {
   ValueTreeNode,
   ValueTreeOrError,
   ValueTreeRoot
-} from '../../../cli/dvc/reader'
+} from '../../../cli/dvc/contract'
 import {
   buildMetricOrParamPath,
   FILE_SEPARATOR,

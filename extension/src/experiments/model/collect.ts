@@ -14,7 +14,7 @@ import {
   ExperimentFields,
   ExperimentsBranchOutput,
   ExperimentsOutput
-} from '../../cli/dvc/reader'
+} from '../../cli/dvc/contract'
 import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
 import { RegisteredCommands } from '../../commands/external'

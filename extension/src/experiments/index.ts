@@ -29,7 +29,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput } from '../cli/dvc/reader'
+import { ExperimentsOutput } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { FileSystemData } from '../fileSystem/data'
@@ -132,7 +132,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
-        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_LAYERS)) {
+        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)) {
           this.cliData.update()
         }
       })
