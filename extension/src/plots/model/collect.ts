@@ -40,6 +40,7 @@ import {
   MultiSourceEncoding,
   unmergeConcatenatedFields
 } from '../multiSource/collect'
+import { StrokeDashEncoding } from '../multiSource/constants'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -502,49 +503,99 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
 }
 
 const updateDatapoints = (
-  datapoints: unknown[],
+  path: string,
+  revisionData: RevisionData,
+  selectedRevisions: string[],
   key: string,
   fields: string[]
 ): unknown[] =>
-  datapoints.map(data => {
-    const obj = data as Record<string, unknown>
-    return {
-      ...obj,
-      [key]: mergeFields(fields.map(field => obj[field] as string))
-    }
-  })
+  selectedRevisions
+    .flatMap(revision =>
+      revisionData?.[revision]?.[path].map(data => {
+        const obj = data as Record<string, unknown>
+        return {
+          ...obj,
+          [key]: mergeFields(fields.map(field => obj[field] as string))
+        }
+      })
+    )
+    .filter(Boolean)
 
-const stringifyDatapoints = (
-  datapoints: unknown[],
-  field: string | undefined,
-  isMultiView: boolean
-): string => {
+const transformMultiSourceMultiViewRevisionData = (
+  path: string,
+  selectedRevisions: string[],
+  revisionData: RevisionData,
+  fields: string[],
+  domain: string[]
+) => {
+  fields.unshift('rev')
+
+  const revisions: string[] = []
+  for (const revision of selectedRevisions) {
+    for (const entry of domain) {
+      revisions.push([revision, entry].join('::'))
+    }
+  }
+
+  return {
+    datapoints: updateDatapoints(
+      path,
+      revisionData,
+      selectedRevisions,
+      'rev',
+      fields
+    ),
+    revisions
+  }
+}
+
+const transformRevisionData = (
+  path: string,
+  selectedRevisions: string[],
+  revisionData: RevisionData,
+  isMultiView: boolean,
+  multiSourceEncodingUpdate: { strokeDash: StrokeDashEncoding }
+): { revisions: string[]; datapoints: unknown[] } => {
+  const field = multiSourceEncodingUpdate.strokeDash?.field
   if (!field || (!isMultiView && !isConcatenatedField(field))) {
-    return JSON.stringify(datapoints)
+    return {
+      datapoints: selectedRevisions
+        .flatMap(revision => revisionData?.[revision]?.[path])
+        .filter(Boolean),
+      revisions: selectedRevisions
+    }
   }
 
   const fields = unmergeConcatenatedFields(field)
 
   if (isMultiView) {
-    fields.unshift('rev')
-    return JSON.stringify(updateDatapoints(datapoints, 'rev', fields))
+    return transformMultiSourceMultiViewRevisionData(
+      path,
+      selectedRevisions,
+      revisionData,
+      fields,
+      multiSourceEncodingUpdate.strokeDash.scale.domain
+    )
   }
 
-  return JSON.stringify(updateDatapoints(datapoints, field, fields))
+  return {
+    datapoints: updateDatapoints(
+      path,
+      revisionData,
+      selectedRevisions,
+      field,
+      fields
+    ),
+    revisions: selectedRevisions
+  }
 }
 
 const fillTemplate = (
   template: string,
-  datapoints: unknown[],
-  field?: string
+  datapoints: unknown[]
 ): TopLevelSpec => {
-  const isMultiView = isMultiViewPlot(JSON.parse(template))
-
   return JSON.parse(
-    template.replace(
-      '"<DVC_METRIC_DATA>"',
-      stringifyDatapoints(datapoints, field, isMultiView)
-    )
+    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
   ) as TopLevelSpec
 }
 
@@ -562,30 +613,26 @@ const collectTemplateGroup = (
     const template = templates[path]
 
     if (template) {
-      const datapoints = selectedRevisions
-        .flatMap(revision => revisionData?.[revision]?.[path])
-        .filter(Boolean)
-
+      const isMultiView = isMultiViewPlot(JSON.parse(template))
       const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
-
-      const content = extendVegaSpec(
-        fillTemplate(
-          template,
-          datapoints,
-          multiSourceEncodingUpdate.strokeDash?.field
-        ),
-        size,
-        {
-          ...multiSourceEncodingUpdate,
-          color: revisionColors
-        }
+      const { datapoints, revisions } = transformRevisionData(
+        path,
+        selectedRevisions,
+        revisionData,
+        isMultiView,
+        multiSourceEncodingUpdate
       )
+
+      const content = extendVegaSpec(fillTemplate(template, datapoints), size, {
+        ...multiSourceEncodingUpdate,
+        color: revisionColors
+      })
 
       acc.push({
         content,
         id: path,
         multiView: isMultiViewPlot(content),
-        revisions: selectedRevisions,
+        revisions,
         type: PlotsType.VEGA
       })
     }
