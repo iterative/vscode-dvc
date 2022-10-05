@@ -55,21 +55,13 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     path: string | undefined,
     multiSourceEncoding: MultiSourceEncoding = {}
   ) {
-    return this.filterChildren(path).map(element => {
-      const hasChildren =
-        element.hasChildren === false &&
-        !element.type?.has(PathType.TEMPLATE_MULTI)
-          ? !!multiSourceEncoding[element.path]
-          : element.hasChildren
-
-      return {
-        ...element,
-        descendantStatuses: this.getTerminalNodeStatuses(element.path),
-        hasChildren,
-        label: element.label,
-        status: this.status[element.path]
-      }
-    })
+    return this.filterChildren(path).map(element => ({
+      ...element,
+      descendantStatuses: this.getTerminalNodeStatuses(element.path),
+      hasChildren: this.getHasChildren(element, multiSourceEncoding),
+      label: element.label,
+      status: this.status[element.path]
+    }))
   }
 
   public getTemplateOrder(): TemplateOrder {
@@ -116,5 +108,21 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       }
       return element.parentPath === path
     })
+  }
+
+  private getHasChildren(
+    element: PlotPath,
+    multiSourceEncoding: MultiSourceEncoding
+  ) {
+    const hasEncodingChildren =
+      !element.hasChildren &&
+      !element.type?.has(PathType.TEMPLATE_MULTI) &&
+      !!multiSourceEncoding[element.path]
+
+    if (hasEncodingChildren) {
+      return true
+    }
+
+    return element.hasChildren
   }
 }
