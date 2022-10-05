@@ -501,30 +501,49 @@ export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
   return acc
 }
 
+const updateDatapoints = (
+  datapoints: unknown[],
+  key: string,
+  fields: string[]
+): unknown[] =>
+  datapoints.map(data => {
+    const obj = data as Record<string, unknown>
+    return {
+      ...obj,
+      [key]: mergeFields(fields.map(field => obj[field] as string))
+    }
+  })
+
+const stringifyDatapoints = (
+  datapoints: unknown[],
+  field: string | undefined,
+  isMultiView: boolean
+): string => {
+  if (!field || (!isMultiView && !isConcatenatedField(field))) {
+    return JSON.stringify(datapoints)
+  }
+
+  const fields = unmergeConcatenatedFields(field)
+
+  if (isMultiView) {
+    fields.unshift('rev')
+    return JSON.stringify(updateDatapoints(datapoints, 'rev', fields))
+  }
+
+  return JSON.stringify(updateDatapoints(datapoints, field, fields))
+}
+
 const fillTemplate = (
   template: string,
   datapoints: unknown[],
   field?: string
-) => {
-  if (!field || !isConcatenatedField(field)) {
-    return JSON.parse(
-      template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
-    ) as TopLevelSpec
-  }
+): TopLevelSpec => {
+  const isMultiView = isMultiViewPlot(JSON.parse(template))
 
-  const fields = unmergeConcatenatedFields(field)
   return JSON.parse(
     template.replace(
       '"<DVC_METRIC_DATA>"',
-      JSON.stringify(
-        datapoints.map(data => {
-          const obj = data as Record<string, unknown>
-          return {
-            ...obj,
-            [field]: mergeFields(fields.map(field => obj[field] as string))
-          }
-        })
-      )
+      stringifyDatapoints(datapoints, field, isMultiView)
     )
   ) as TopLevelSpec
 }
