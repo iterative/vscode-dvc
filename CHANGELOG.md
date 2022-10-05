@@ -11,14 +11,12 @@ All notable changes to this project will be documented in this file.
 
 ### 🐛 Bug Fixes
 
-- Turn off language server again [#2505](https://github.com/iterative/vscode-dvc/pull/2505) by [@mattseddon](https://github.com/mattseddon)
 - Fix comparison table row path chevron being cut [#2533](https://github.com/iterative/vscode-dvc/pull/2533) by [@sroy3](https://github.com/sroy3)
 - Render flexible confusion matrices as expected [#2523](https://github.com/iterative/vscode-dvc/pull/2523) by [@mattseddon](https://github.com/mattseddon)
 - Fix size of flexible confusion matrix [#2531](https://github.com/iterative/vscode-dvc/pull/2531) by [@mattseddon](https://github.com/mattseddon)
 
 ### 🔨 Maintenance
 
-- Use a variable for tooltip delays [#2500](https://github.com/iterative/vscode-dvc/pull/2500) by [@sroy3](https://github.com/sroy3)
 - Move types from reader into new contract file [#2520](https://github.com/iterative/vscode-dvc/pull/2520) by [@mattseddon](https://github.com/mattseddon)
 - Switch e2e tests back to insiders build [#2526](https://github.com/iterative/vscode-dvc/pull/2526) by [@mattseddon](https://github.com/mattseddon)
 
