@@ -514,23 +514,23 @@ const updateDatapoints = (
     }
   })
 
-const getDatapoints = (
+const stringifyDatapoints = (
   datapoints: unknown[],
   field: string | undefined,
   isMultiView: boolean
-) => {
+): string => {
   if (!field || (!isMultiView && !isConcatenatedField(field))) {
-    return datapoints
+    return JSON.stringify(datapoints)
   }
 
   const fields = unmergeConcatenatedFields(field)
 
   if (isMultiView) {
     fields.unshift('rev')
-    return updateDatapoints(datapoints, 'rev', fields)
+    return JSON.stringify(updateDatapoints(datapoints, 'rev', fields))
   }
 
-  return updateDatapoints(datapoints, field, fields)
+  return JSON.stringify(updateDatapoints(datapoints, field, fields))
 }
 
 const fillTemplate = (
@@ -539,10 +539,12 @@ const fillTemplate = (
   field?: string
 ): TopLevelSpec => {
   const isMultiView = isMultiViewPlot(JSON.parse(template))
-  const updatedDatapoints = getDatapoints(datapoints, field, isMultiView)
 
   return JSON.parse(
-    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(updatedDatapoints))
+    template.replace(
+      '"<DVC_METRIC_DATA>"',
+      stringifyDatapoints(datapoints, field, isMultiView)
+    )
   ) as TopLevelSpec
 }
 
