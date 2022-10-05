@@ -210,7 +210,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         label: 'loss.tsv',
         parentPath: 'logs',
-        path: join('logs', 'loss.tsv'),
+        path: logsLoss,
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -219,17 +219,17 @@ describe('PathsModel', () => {
         hasChildren: false,
         label: 'acc.tsv',
         parentPath: 'logs',
-        path: 'logs/acc.tsv',
+        path: logsAcc,
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }
     ])
 
     const plotsWithEncoding = model.getChildren('logs', {
-      [join('logs', 'loss.tsv')]: {
+      [logsAcc]: {
         strokeDash: { field: '', scale: { domain: [], range: [] } }
       },
-      [join('logs', 'acc.tsv')]: {
+      [logsLoss]: {
         strokeDash: { field: '', scale: { domain: [], range: [] } }
       }
     })
@@ -239,7 +239,7 @@ describe('PathsModel', () => {
         hasChildren: true,
         label: 'loss.tsv',
         parentPath: 'logs',
-        path: join('logs', 'loss.tsv'),
+        path: logsLoss,
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -248,13 +248,13 @@ describe('PathsModel', () => {
         hasChildren: true,
         label: 'acc.tsv',
         parentPath: 'logs',
-        path: join('logs', 'acc.tsv'),
+        path: logsAcc,
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }
     ])
 
-    const noChildren = model.getChildren(join('logs', 'loss.tsv'))
+    const noChildren = model.getChildren(logsLoss)
     expect(noChildren).toStrictEqual([])
   })
 })
