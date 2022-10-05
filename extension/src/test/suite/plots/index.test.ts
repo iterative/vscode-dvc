@@ -37,6 +37,7 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
+import { SelectedExperimentWithColor } from '../../../experiments/model'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -761,10 +762,13 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should send the correct data to the webview for flexible plots', async () => {
-      const { plots, messageSpy, mockPlotsDiff } = await buildPlots(
-        disposable,
-        multiSourcePlotsDiffFixture
-      )
+      const { plots, messageSpy, mockPlotsDiff, experiments } =
+        await buildPlots(disposable, multiSourcePlotsDiffFixture)
+
+      stub(experiments, 'getSelectedRevisions').returns([
+        { label: 'workspace' },
+        { label: 'main' }
+      ] as SelectedExperimentWithColor[])
 
       const webview = await plots.showWebview()
       await webview.isReady()
@@ -798,17 +802,6 @@ suite('Plots Test Suite', () => {
         multiViewSection.entries.map(({ id }: { id: string }) => id)
       ).to.deep.equal(['dvc.yaml::Confusion-Matrix'])
 
-      const [confusionMatrix] = multiViewSection.entries
-
-      const confusionMatrixDatapoints =
-        (
-          confusionMatrix.content.data as {
-            values: { rev: string }[]
-          }
-        )?.values || []
-
-      expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
-
       const expectedRevisions = [
         `main::${join('evaluation', 'test', 'plots', 'confusion_matrix.json')}`,
         `workspace::${join(
@@ -829,7 +822,21 @@ suite('Plots Test Suite', () => {
           'plots',
           'confusion_matrix.json'
         )}`
-      ]
+      ].sort()
+
+      const [confusionMatrix] = multiViewSection.entries
+
+      const confusionMatrixDatapoints =
+        (
+          confusionMatrix.content.data as {
+            values: { rev: string }[]
+          }
+        )?.values || []
+
+      expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
+
+      expect(confusionMatrix.revisions?.length).to.equal(4)
+      expect(confusionMatrix.revisions?.sort()).to.deep.equal(expectedRevisions)
 
       for (const entry of confusionMatrixDatapoints) {
         expect(expectedRevisions).to.include(entry.rev)
