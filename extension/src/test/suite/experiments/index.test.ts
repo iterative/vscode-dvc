@@ -882,21 +882,18 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const webview = await experiments.showWebview()
+      const mockShowInputBox = stub(window, 'showInputBox')
+      mockShowInputBox.onFirstCall().resolves('0')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const executeCommandStub = stub(commands, 'executeCommand')
-
       const messageReceived = new Promise(resolve =>
         disposable.track(mockMessageReceived.event(() => resolve(undefined)))
       )
-
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
       })
 
-      expect(executeCommandStub).to.be.calledWith(
-        'dvc.extension.updateHeaderDepth'
-      )
+      expect(mockShowInputBox).to.be.calledOnce
 
       await messageReceived
     }).timeout(WEBVIEW_TEST_TIMEOUT)
