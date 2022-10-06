@@ -148,6 +148,11 @@ const transformColumns = (
   }
 }
 
+const mergeErrors = (
+  experimentFieldsOrError: ExperimentFieldsOrError
+): string | undefined =>
+  experimentFieldsOrError.error?.msg || experimentFieldsOrError.data?.error?.msg
+
 const transformExperimentData = (
   id: string,
   experimentFieldsOrError: ExperimentFieldsOrError,
@@ -159,7 +164,7 @@ const transformExperimentData = (
 ): Experiment => {
   const data = experimentFieldsOrError.data || {}
 
-  const error = experimentFieldsOrError.error
+  const error = mergeErrors(experimentFieldsOrError)
 
   const experiment = {
     id,
@@ -180,7 +185,7 @@ const transformExperimentData = (
   }
 
   if (error) {
-    experiment.error = error.msg
+    experiment.error = error
   }
 
   transformColumns(experiment, data, branch)

@@ -1743,6 +1743,77 @@ const data: ExperimentsOutput = {
         status: ExperimentStatus.QUEUED,
         timestamp: '2020-12-29T15:25:27'
       }
+    },
+    '55d492c9c633912685351b32df91bfe1f9ecefb9': {
+      data: {
+        deps: {
+          [join('data', 'data.xml')]: {
+            hash: '22a1a2931c8370d3aeedd7183606fd7f',
+            size: 14445097,
+            nfiles: null
+          },
+          [join('src', 'prepare.py')]: {
+            hash: 'f09ea0c15980b43010257ccb9f0055e2',
+            size: 1576,
+            nfiles: null
+          },
+          [join('data', 'prepared')]: {
+            hash: '153aad06d376b6595932470e459ef42a.dir',
+            size: 8437363,
+            nfiles: 2
+          },
+          [join('src', 'featurization.py')]: {
+            hash: 'e0265fc22f056a4b86d85c3056bc2894',
+            size: 2490,
+            nfiles: null
+          },
+          [join('data', 'features')]: {
+            hash: 'f35d4cc2c552ac959ae602162b8543f3.dir',
+            size: 2232588,
+            nfiles: 2
+          },
+          [join('src', 'train.py')]: {
+            hash: 'c3961d777cfbd7727f9fde4851896006',
+            size: 967,
+            nfiles: null
+          },
+          'model.pkl': {
+            hash: '46865edbf3d62fc5c039dd9d2b0567a4',
+            size: 1763725,
+            nfiles: null
+          },
+          [join('src', 'evaluate.py')]: {
+            hash: '44e714021a65edf881b1716e791d7f59',
+            size: 2346,
+            nfiles: null
+          }
+        },
+        error: {
+          msg: 'Experiment run failed.',
+          type: 'Queue failure'
+        },
+        outs: {},
+        params: {
+          'params.yaml': {
+            data: {
+              code_names: [0, 2],
+              epochs: 5,
+              learning_rate: 2.1e-7,
+              dvc_logs_dir: 'dvc_logs',
+              log_file: 'logs.csv',
+              dropout: 0.125,
+              process: { threshold: 0.85 }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
+          }
+        },
+        status: ExperimentStatus.FAILED,
+        timestamp: '2020-12-29T15:25:27'
+      }
     }
   }
 }
