@@ -38,7 +38,7 @@ import { sum } from '../../util/math'
 
 export type StarredExperiments = Record<string, boolean | undefined>
 
-type SelectedExperimentWithColor = Experiment & {
+export type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
   selected: true
 }
