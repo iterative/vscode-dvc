@@ -3,7 +3,8 @@ import { ExperimentsOutput, ExperimentStatus } from '../../../cli/dvc/contract'
 
 export const errorShas = [
   '489fd8bdaa709f7330aac342e051a9431c625481',
-  'f0f918662b4f8c47819ca154a23029bf9b47d4f3'
+  'f0f918662b4f8c47819ca154a23029bf9b47d4f3',
+  '55d492c9c633912685351b32df91bfe1f9ecefb9'
 ]
 
 const data: ExperimentsOutput = {
