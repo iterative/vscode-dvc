@@ -1,7 +1,7 @@
 import { join } from 'path'
 
 export const MIN_CLI_VERSION = '2.24.0'
-export const LATEST_TESTED_CLI_VERSION = '2.28.0'
+export const LATEST_TESTED_CLI_VERSION = '2.29.0'
 export const MAX_CLI_VERSION = '3'
 
 export const UNEXPECTED_ERROR_CODE = 255
