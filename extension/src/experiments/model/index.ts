@@ -29,7 +29,7 @@ import {
   reorderListSubset,
   reorderObjectList
 } from '../../util/array'
-import { ExperimentsOutput, ExperimentStatus } from '../../cli/dvc/contract'
+import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { setContextValue } from '../../vscode/context'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
@@ -500,7 +500,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       if (getQueued) {
         return isQueued(status)
       }
-      return status !== ExperimentStatus.QUEUED
+      return !isQueued(status)
     })
   }
 
