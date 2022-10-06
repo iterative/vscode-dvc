@@ -23,7 +23,7 @@ import {
   UNSELECTED
 } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
-import { Experiment, Row } from '../webview/contract'
+import { Experiment, isQueued, Row } from '../webview/contract'
 import {
   definedAndNonEmpty,
   reorderListSubset,
@@ -128,8 +128,11 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public toggleStatus(id: string) {
     if (
-      this.getFlattenedExperiments().find(({ id: queuedId }) => queuedId === id)
-        ?.status === ExperimentStatus.QUEUED
+      isQueued(
+        this.getFlattenedExperiments().find(
+          ({ id: queuedId }) => queuedId === id
+        )?.status
+      )
     ) {
       return
     }
@@ -318,7 +321,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = []
     for (const experiment of this.getAllExperiments()) {
       const { id, status } = experiment
-      if (status === ExperimentStatus.QUEUED) {
+      if (isQueued(status)) {
         continue
       }
 
@@ -411,10 +414,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsByBranch(branch)?.map(experiment => ({
       ...experiment,
       hasChildren: definedAndNonEmpty(this.checkpointsByTip.get(experiment.id)),
-      type:
-        experiment.status === ExperimentStatus.QUEUED
-          ? ExperimentType.QUEUED
-          : ExperimentType.EXPERIMENT
+      type: isQueued(experiment.status)
+        ? ExperimentType.QUEUED
+        : ExperimentType.EXPERIMENT
     }))
   }
 
@@ -496,7 +498,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private splitExperimentsByQueued(getQueued = false) {
     return this.getFlattenedExperiments().filter(({ status }) => {
       if (getQueued) {
-        return status === ExperimentStatus.QUEUED
+        return isQueued(status)
       }
       return status !== ExperimentStatus.QUEUED
     })

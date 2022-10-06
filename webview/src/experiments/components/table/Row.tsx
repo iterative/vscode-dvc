@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
   Experiment,
-  ExperimentStatus
+  isQueued,
+  isRunning
 } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { RowProp } from './interfaces'
@@ -18,10 +19,10 @@ import { cond } from '../../../util/helpers'
 import { ExperimentsState } from '../../store'
 
 const getExperimentTypeClass = ({ status, selected }: Experiment) => {
-  if (status === ExperimentStatus.RUNNING) {
+  if (isRunning(status)) {
     return styles.runningExperiment
   }
-  if (status === ExperimentStatus.QUEUED) {
+  if (isQueued(status)) {
     return styles.queuedExperiment
   }
   if (selected === false) {

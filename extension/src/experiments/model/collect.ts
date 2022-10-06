@@ -8,7 +8,7 @@ import omit from 'lodash.omit'
 import { ExperimentType } from '.'
 import { ExperimentsAccumulator } from './accumulator'
 import { extractColumns } from '../columns/extract'
-import { Experiment, ColumnType } from '../webview/contract'
+import { Experiment, ColumnType, isRunning } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
@@ -229,7 +229,7 @@ const collectHasRunningExperiment = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
 ) => {
-  if (experiment.status === ExperimentStatus.RUNNING) {
+  if (isRunning(experiment.status)) {
     acc.hasRunning = true
   }
 }
@@ -330,8 +330,7 @@ const noWorkspaceVsSelectedRaceCondition = (
   hasCheckpoints: boolean,
   status: ExperimentStatus | undefined,
   selected: boolean | undefined
-): boolean =>
-  !!(hasCheckpoints && status === ExperimentStatus.RUNNING && !selected)
+): boolean => !!(hasCheckpoints && isRunning(status) && !selected)
 
 const collectMutableRevision = (
   acc: string[],
@@ -341,7 +340,7 @@ const collectMutableRevision = (
   if (noWorkspaceVsSelectedRaceCondition(hasCheckpoints, status, selected)) {
     acc.push('workspace')
   }
-  if (status === ExperimentStatus.RUNNING && !hasCheckpoints) {
+  if (isRunning(status) && !hasCheckpoints) {
     acc.push(label)
   }
 }

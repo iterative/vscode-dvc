@@ -1,6 +1,5 @@
 import { Color } from './colors'
-import { Experiment } from '../../webview/contract'
-import { ExperimentStatus } from '../../../cli/dvc/contract'
+import { Experiment, isRunning } from '../../webview/contract'
 
 export const MAX_SELECTED_EXPERIMENTS = 7
 
@@ -29,6 +28,6 @@ export const limitToMaxSelected = (experiments: Experiment[]) =>
       if (a.status === b.status) {
         return compareTimestamps(a, b)
       }
-      return a.status === ExperimentStatus.RUNNING ? -1 : 1
+      return isRunning(a.status) ? -1 : 1
     })
     .slice(0, MAX_SELECTED_EXPERIMENTS)

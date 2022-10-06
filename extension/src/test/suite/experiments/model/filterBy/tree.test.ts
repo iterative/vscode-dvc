@@ -24,6 +24,7 @@ import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
 import {
   ColumnType,
   Experiment,
+  isQueued,
   TableData
 } from '../../../../../experiments/webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
@@ -38,7 +39,6 @@ import {
   FilterItem
 } from '../../../../../experiments/model/filterBy/tree'
 import { starredFilter } from '../../../../../experiments/model/filterBy/constants'
-import { ExperimentStatus } from '../../../../../cli/dvc/contract'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -96,7 +96,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
               )
             })
             .map(experiment =>
-              experiment.status === ExperimentStatus.QUEUED || experiment.error
+              isQueued(experiment.status) || experiment.error
                 ? experiment
                 : {
                     ...experiment,

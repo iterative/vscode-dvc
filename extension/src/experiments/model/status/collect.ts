@@ -1,10 +1,9 @@
 import { canSelect, ColoredStatus, UNSELECTED } from '.'
 import { Color, copyOriginalColors } from './colors'
 import { hasKey } from '../../../util/object'
-import { Experiment } from '../../webview/contract'
+import { Experiment, isQueued } from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'
 import { flattenMapValues } from '../../../util/map'
-import { ExperimentStatus } from '../../../cli/dvc/contract'
 
 const getStatus = (
   acc: ColoredStatus,
@@ -23,7 +22,7 @@ const collectStatus = (
   unassignColors?: Color[]
 ) => {
   const { id, status } = experiment
-  if (!id || status === ExperimentStatus.QUEUED || hasKey(acc, id)) {
+  if (!id || isQueued(status) || hasKey(acc, id)) {
     return
   }
 

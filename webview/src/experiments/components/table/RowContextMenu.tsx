@@ -1,6 +1,9 @@
 import React from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { ExperimentStatus } from 'dvc/src/experiments/webview/contract'
+import {
+  ExperimentStatus,
+  isQueued
+} from 'dvc/src/experiments/webview/contract'
 import { RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
@@ -149,7 +152,7 @@ const getSingleSelectMenuOptions = (
   starred?: boolean
 ) => {
   const isNotExperimentOrCheckpoint =
-    status === ExperimentStatus.QUEUED || isWorkspace || depth <= 0
+    isQueued(status) || isWorkspace || depth <= 0
 
   const withId = (
     label: string,
