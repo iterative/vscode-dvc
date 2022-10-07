@@ -880,22 +880,20 @@ suite('Experiments Test Suite', () => {
 
     it('should be able to handle a message to update the table depth', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
+      const inputEvent = getInputBoxEvent('0')
 
       const webview = await experiments.showWebview()
-      const mockShowInputBox = stub(window, 'showInputBox')
-      mockShowInputBox.onFirstCall().resolves('0')
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const messageReceived = new Promise(resolve =>
-        disposable.track(mockMessageReceived.event(() => resolve(undefined)))
-      )
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
       })
 
-      expect(mockShowInputBox).to.be.calledOnce
+      await inputEvent
 
-      await messageReceived
+      expect(
+        await workspace.getConfiguration().get('dvc.expTableHeadMaxLayers')
+      ).to.equal(0)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's star status", async () => {
