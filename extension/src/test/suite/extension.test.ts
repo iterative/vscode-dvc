@@ -446,7 +446,7 @@ suite('Extension Test Suite', () => {
       expect(mockSetup).to.have.been.calledOnce
     })
 
-    it('should set the dvc.cli.incompatible context value', async () => {
+    it.only('should set the dvc.cli.incompatible context value', async () => {
       stub(DvcReader.prototype, 'expShow').resolves({
         workspace: { baseline: {} }
       })
@@ -470,8 +470,7 @@ suite('Extension Test Suite', () => {
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
 
-      expect(mockVersion).to.be.calledTwice
-      mockVersion.resetHistory()
+      expect(mockVersion).to.be.calledOnce
       expect(
         executeCommandSpy,
         'should set dvc.cli.incompatible to true if the version is incompatible'
@@ -483,7 +482,6 @@ suite('Extension Test Suite', () => {
       )
 
       expect(mockVersion).to.be.calledTwice
-      mockVersion.resetHistory()
       expect(
         executeCommandSpy,
         'should set dvc.cli.incompatible to false if the version is compatible'
@@ -498,7 +496,6 @@ suite('Extension Test Suite', () => {
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
 
-      expect(mockVersion).to.be.calledTwice
       expect(
         executeCommandSpy,
         'should unset dvc.cli.incompatible if the CLI throws an error'

@@ -20,6 +20,14 @@ import {
   isPythonExtensionInstalled,
   selectPythonInterpreter
 } from './extensions/python'
+import {
+  CliCompatible,
+  cliIsCompatible,
+  EXPECTED_VERSION_TEXT,
+  getTextAndSend,
+  isVersionCompatible,
+  warnAheadOfLatestTested
+} from './cli/dvc/version'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -184,6 +192,31 @@ const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
     : [Response.SETUP_WORKSPACE, Response.NEVER]
 }
 
+const warnUserCLIInaccessibleAnywhere = async (
+  extension: IExtension,
+  globalDvcVersion: string | undefined
+): Promise<void> => {
+  if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
+    return
+  }
+
+  const response = await Toast.warnWithOptions(
+    `The extension is unable to access an appropriate version of the CLI. No version was located using the Python extension. ${
+      globalDvcVersion || 'No version'
+    } was located globally. ${EXPECTED_VERSION_TEXT}`,
+    ...getToastOptions(true)
+  )
+
+  switch (response) {
+    case Response.SELECT_INTERPRETER:
+      return selectPythonInterpreter()
+    case Response.SETUP_WORKSPACE:
+      return extension.setupWorkspace()
+    case Response.NEVER:
+      return setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
+  }
+}
+
 const warnUserCLIInaccessible = async (
   extension: IExtension
 ): Promise<void> => {
@@ -209,38 +242,79 @@ const warnUserCLIInaccessible = async (
   }
 }
 
-const extensionCanRunPythonCli = async (extension: IExtension, cwd: string) => {
-  let canRunCli = false
-  if (await extension.isDvcPythonModule()) {
-    try {
-      canRunCli = await extension.canRunCli(cwd)
-    } catch {}
+const warnUser = (
+  extension: IExtension,
+  cliCompatible: CliCompatible,
+  version: string | undefined
+) => {
+  if (!extension.hasRoots()) {
+    return
   }
-  return canRunCli
-}
-
-const extensionCanRunGlobalCli = async (extension: IExtension, cwd: string) => {
-  let canRunCli = false
-  try {
-    canRunCli = await extension.canRunCli(cwd, true)
-  } catch {
-    if (extension.hasRoots()) {
-      warnUserCLIInaccessible(extension)
-    }
+  switch (cliCompatible) {
+    case CliCompatible.NO_BEHIND_MIN_VERSION:
+      return getTextAndSend(version as string, 'CLI')
+    case CliCompatible.NO_CANNOT_VERIFY:
+      Toast.warnWithOptions(
+        'The extension cannot initialize as we were unable to verify the DVC CLI version.'
+      )
+      return
+    case CliCompatible.NO_MAJOR_VERSION_AHEAD:
+      return getTextAndSend(version as string, 'extension')
+    case CliCompatible.NO_NOT_FOUND:
+      return warnUserCLIInaccessible(extension)
+    case CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED:
+      return warnAheadOfLatestTested()
   }
-  return canRunCli
 }
 
 const extensionCanRunCli = async (
   extension: IExtension,
   cwd: string
-): Promise<boolean> => {
-  let canRunCli = await extensionCanRunPythonCli(extension, cwd)
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+): Promise<{ isAvailable: boolean; isCompatible: boolean | undefined }> => {
+  if (await extension.isDvcPythonModule()) {
+    const pythonVersion = await extension.getCliVersion(cwd)
+    const pythonDvcCompatible = isVersionCompatible(pythonVersion)
 
-  if (!canRunCli) {
-    canRunCli = await extensionCanRunGlobalCli(extension, cwd)
+    if (pythonDvcCompatible !== CliCompatible.NO_NOT_FOUND && pythonVersion) {
+      warnUser(extension, pythonDvcCompatible, pythonVersion)
+      const isCompatible = cliIsCompatible(pythonDvcCompatible)
+      return { isAvailable: !!isCompatible, isCompatible }
+    }
+
+    const globalVersion = await extension.getCliVersion(cwd, true)
+
+    const globalDvcCompatible = isVersionCompatible(globalVersion)
+    const globalIsCompatible = cliIsCompatible(globalDvcCompatible)
+    const globalIsAvailable = !!globalIsCompatible
+
+    if (extension.hasRoots()) {
+      if (!globalIsCompatible) {
+        warnUserCLIInaccessibleAnywhere(extension, globalVersion)
+      }
+      if (
+        globalDvcCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
+      ) {
+        warnAheadOfLatestTested()
+      }
+    }
+
+    if (globalIsCompatible) {
+      extension.unsetPythonBinPath()
+    }
+
+    return { isAvailable: globalIsAvailable, isCompatible: globalIsCompatible }
   }
-  return canRunCli
+
+  const version = await extension.getCliVersion(cwd)
+
+  const cliCompatible = isVersionCompatible(version)
+  const isCompatible = cliIsCompatible(cliCompatible)
+  const isAvailable = !!isCompatible
+
+  warnUser(extension, cliCompatible, version)
+
+  return { isAvailable, isCompatible }
 }
 
 export const setup = async (extension: IExtension) => {
@@ -251,15 +325,18 @@ export const setup = async (extension: IExtension) => {
 
   extension.setRoots()
 
-  const isCliAvailable = await extensionCanRunCli(extension, cwd)
+  const { isAvailable, isCompatible } = await extensionCanRunCli(extension, cwd)
 
-  if (extension.hasRoots() && isCliAvailable) {
+  extension.setCliCompatible(isCompatible)
+
+  if (extension.hasRoots() && isAvailable) {
+    extension.setAvailable(isAvailable)
     return extension.initialize()
   }
 
   extension.resetMembers()
 
-  if (!isCliAvailable) {
+  if (!isAvailable) {
     extension.setAvailable(false)
   }
 }

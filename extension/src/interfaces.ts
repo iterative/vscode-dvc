@@ -1,5 +1,8 @@
 export interface IExtension {
-  canRunCli: (cwd: string, isCliGlobal?: true) => Promise<boolean>
+  getCliVersion: (
+    cwd: string,
+    isCliGlobal?: true
+  ) => Promise<string | undefined>
   hasRoots: () => boolean
   isDvcPythonModule: () => Promise<boolean>
 
@@ -7,6 +10,9 @@ export interface IExtension {
 
   initialize: () => Promise<void[]>
   resetMembers: () => void
+
   setAvailable: (available: boolean) => void
+  setCliCompatible: (compatible: boolean | undefined) => void
   setRoots: () => Promise<void>
+  unsetPythonBinPath: () => void
 }

@@ -18,6 +18,7 @@ import { Toast } from './vscode/toast'
 import { Response } from './vscode/response'
 import { VscodePython } from './extensions/python'
 import { executeProcess } from './processExecution'
+import { MIN_CLI_VERSION } from './cli/dvc/constants'
 
 jest.mock('vscode')
 jest.mock('./vscode/config')
@@ -54,16 +55,18 @@ const mockedVscodePython = {
   activate: () => Promise.resolve(mockedVscodePythonAPI)
 }
 
-const mockedCanRunCli = jest.fn()
-const mockedHasRoots = jest.fn()
-const mockedGetFirstWorkspaceFolder = jest.mocked(getFirstWorkspaceFolder)
 const mockedCwd = __dirname
+const mockedGetCliVersion = jest.fn()
+const mockedGetFirstWorkspaceFolder = jest.mocked(getFirstWorkspaceFolder)
+const mockedHasRoots = jest.fn()
 const mockedInitialize = jest.fn()
 const mockedIsDvcPythonModule = jest.fn()
 const mockedResetMembers = jest.fn()
 const mockedSetAvailable = jest.fn()
+const mockedSetCliCompatible = jest.fn()
 const mockedSetRoots = jest.fn()
 const mockedSetupWorkspace = jest.fn()
+const mockedUnsetPythonBinPath = jest.fn()
 
 const mockedQuickPickYesOrNo = jest.mocked(quickPickYesOrNo)
 const mockedQuickPickValue = jest.mocked(quickPickValue)
@@ -248,14 +251,16 @@ describe('setupWorkspace', () => {
 
 describe('setup', () => {
   const extension = {
-    canRunCli: mockedCanRunCli,
+    getCliVersion: mockedGetCliVersion,
     hasRoots: mockedHasRoots,
     initialize: mockedInitialize,
     isDvcPythonModule: mockedIsDvcPythonModule,
     resetMembers: mockedResetMembers,
     setAvailable: mockedSetAvailable,
+    setCliCompatible: mockedSetCliCompatible,
     setRoots: mockedSetRoots,
-    setupWorkspace: mockedSetupWorkspace
+    setupWorkspace: mockedSetupWorkspace,
+    unsetPythonBinPath: mockedUnsetPythonBinPath
   }
 
   it('should do nothing if there is no workspace folder', async () => {
@@ -263,14 +268,14 @@ describe('setup', () => {
 
     await setup(extension)
 
-    expect(mockedCanRunCli).not.toHaveBeenCalled()
+    expect(mockedGetCliVersion).not.toHaveBeenCalled()
     expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should set the DVC roots even if the cli cannot be used', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedIsDvcPythonModule.mockResolvedValueOnce(false)
-    mockedCanRunCli.mockResolvedValueOnce(false)
+    mockedGetCliVersion.mockResolvedValueOnce(false)
 
     await setup(extension)
 
@@ -281,7 +286,7 @@ describe('setup', () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(false)
     mockedIsDvcPythonModule.mockResolvedValueOnce(false)
-    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
     await setup(extension)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
@@ -297,9 +302,9 @@ describe('setup', () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedIsDvcPythonModule.mockResolvedValueOnce(true)
-    mockedCanRunCli
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedGetCliVersion
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
     mockedGetConfigValue.mockReturnValueOnce(true)
 
     await setup(extension)
@@ -316,9 +321,9 @@ describe('setup', () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedIsDvcPythonModule.mockResolvedValueOnce(true)
-    mockedCanRunCli
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedGetCliVersion
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
     mockedWarnWithOptions.mockResolvedValueOnce(undefined)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -339,9 +344,9 @@ describe('setup', () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedIsDvcPythonModule.mockResolvedValueOnce(true)
-    mockedCanRunCli
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedGetCliVersion
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
     mockedWarnWithOptions.mockResolvedValueOnce(Response.SETUP_WORKSPACE)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -365,7 +370,7 @@ describe('setup', () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedIsDvcPythonModule.mockResolvedValueOnce(false)
-    mockedCanRunCli.mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedGetCliVersion.mockResolvedValueOnce(undefined)
     mockedWarnWithOptions.mockResolvedValueOnce(Response.SELECT_INTERPRETER)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -388,10 +393,8 @@ describe('setup', () => {
   it('should set a user config option if the workspace contains a DVC project, the cli cannot be found and the user selects never', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(true)
-    mockedCanRunCli
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
+    mockedIsDvcPythonModule.mockResolvedValueOnce(false)
+    mockedGetCliVersion.mockResolvedValueOnce(undefined)
     mockedWarnWithOptions.mockResolvedValueOnce(Response.NEVER)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -405,7 +408,7 @@ describe('setup', () => {
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedSetupWorkspace).not.toHaveBeenCalled()
-    expect(mockedExecuteCommand).not.toHaveBeenCalled()
+    expect(mockedExecuteCommand).toHaveBeenCalledTimes(0)
     expect(mockedSetUserConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
@@ -413,9 +416,9 @@ describe('setup', () => {
 
   it('should not send telemetry or set the cli as unavailable or run initialization if roots have not been found but the cli can be run', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(false)
+    mockedHasRoots.mockReturnValueOnce(false).mockReturnValueOnce(false)
     mockedIsDvcPythonModule.mockResolvedValueOnce(false)
-    mockedCanRunCli.mockResolvedValueOnce(true)
+    mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
     await setup(extension)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
@@ -426,9 +429,9 @@ describe('setup', () => {
 
   it('should run initialization if roots have been found and the cli can be run', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedHasRoots.mockReturnValueOnce(true).mockReturnValueOnce(true)
     mockedIsDvcPythonModule.mockResolvedValueOnce(true)
-    mockedCanRunCli.mockResolvedValueOnce(true)
+    mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
     await setup(extension)
     expect(mockedResetMembers).not.toHaveBeenCalled()
@@ -437,14 +440,14 @@ describe('setup', () => {
 
   it('should call the cli to see if it is available from path if it fails on the first call', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedHasRoots.mockReturnValueOnce(true).mockReturnValueOnce(true)
     mockedIsDvcPythonModule.mockResolvedValueOnce(true)
-    mockedCanRunCli
-      .mockRejectedValueOnce(new Error('command not found: dvc'))
-      .mockResolvedValueOnce(true)
+    mockedGetCliVersion
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(MIN_CLI_VERSION)
 
     await setup(extension)
-    expect(mockedCanRunCli).toHaveBeenCalledTimes(2)
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
     expect(mockedResetMembers).not.toHaveBeenCalled()
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
@@ -453,17 +456,17 @@ describe('setup', () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedIsDvcPythonModule.mockResolvedValueOnce(false)
-    mockedCanRunCli.mockResolvedValueOnce(false)
+    mockedGetCliVersion.mockResolvedValueOnce(false)
 
     await setup(extension)
-    expect(mockedCanRunCli).toHaveBeenCalledTimes(1)
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
   })
 
   it('should run reset if the cli cannot be run and there is a workspace folder open', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedIsDvcPythonModule.mockResolvedValueOnce(true)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedCanRunCli.mockResolvedValueOnce(false)
+    mockedGetCliVersion.mockResolvedValueOnce(false)
 
     await setup(extension)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)

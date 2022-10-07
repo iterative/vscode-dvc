@@ -4,7 +4,6 @@ import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
 import { Config } from './config'
 import { Context } from './context'
-import { isVersionCompatible } from './cli/dvc/version'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
@@ -334,17 +333,15 @@ export class Extension extends Disposable implements IExtension {
     return !!this.config.getPythonBinPath()
   }
 
-  public async canRunCli(cwd: string, tryGlobalCli?: true) {
+  public async getCliVersion(cwd: string, tryGlobalCli?: true) {
     await this.config.isReady()
-    setContextValue('dvc.cli.incompatible', undefined)
-    const version = await this.dvcReader.version(cwd, tryGlobalCli)
-    const compatible = isVersionCompatible(version)
-    if (compatible && tryGlobalCli) {
-      this.config.unsetPythonBinPath()
-    }
-    this.cliCompatible = compatible
-    setContextValue('dvc.cli.incompatible', !compatible)
-    return this.setAvailable(compatible)
+    try {
+      return await this.dvcReader.version(cwd, tryGlobalCli)
+    } catch {}
+  }
+
+  public unsetPythonBinPath() {
+    this.config.unsetPythonBinPath()
   }
 
   public async setRoots() {
@@ -390,6 +387,12 @@ export class Extension extends Disposable implements IExtension {
     this.repositoriesTree.initialize([])
     this.experiments.reset()
     this.plots.reset()
+  }
+
+  public setCliCompatible(compatible: boolean | undefined) {
+    this.cliCompatible = compatible
+    const incompatible = compatible === undefined ? undefined : !compatible
+    setContextValue('dvc.cli.incompatible', incompatible)
   }
 
   public setAvailable(available: boolean) {
