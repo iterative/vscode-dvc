@@ -174,6 +174,11 @@ export class WebviewMessages {
       },
       { prompt: 'Use 0 for infinite height.' }
     )
+
+    if (!newValue) {
+      return
+    }
+
     setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH, Number(newValue))
     sendTelemetryEvent(
       EventName.SET_EXPERIMENTS_HEADER_DEPTH,
