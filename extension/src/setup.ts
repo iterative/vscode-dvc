@@ -267,54 +267,101 @@ const warnUser = (
   }
 }
 
+const getVersionDetails = async (
+  extension: IExtension,
+  cwd: string,
+  tryGlobalCli?: true
+): Promise<{
+  cliCompatible: CliCompatible
+  isAvailable: boolean
+  isCompatible: boolean | undefined
+  version: string | undefined
+}> => {
+  const version = await extension.getCliVersion(cwd, tryGlobalCli)
+  const cliCompatible = isVersionCompatible(version)
+  const isCompatible = cliIsCompatible(cliCompatible)
+  return { cliCompatible, isAvailable: !!isCompatible, isCompatible, version }
+}
+
+const processVersionDetails = (
+  extension: IExtension,
+  cliCompatible: CliCompatible,
+  version: string | undefined,
+  isAvailable: boolean,
+  isCompatible: boolean | undefined
+): { isAvailable: boolean; isCompatible: boolean | undefined } => {
+  warnUser(extension, cliCompatible, version)
+  return {
+    isAvailable,
+    isCompatible
+  }
+}
+
+const tryGlobalFallbackVersion = async (
+  extension: IExtension,
+  cwd: string
+): Promise<{ isAvailable: boolean; isCompatible: boolean | undefined }> => {
+  const { cliCompatible, isAvailable, isCompatible, version } =
+    await getVersionDetails(extension, cwd, true)
+
+  if (extension.hasRoots() && !isCompatible) {
+    warnUserCLIInaccessibleAnywhere(extension, version)
+  }
+  if (
+    extension.hasRoots() &&
+    cliCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
+  ) {
+    warnAheadOfLatestTested()
+  }
+
+  if (isCompatible) {
+    extension.unsetPythonBinPath()
+  }
+
+  return { isAvailable, isCompatible }
+}
+
+const extensionCanAutoRunCli = async (
+  extension: IExtension,
+  cwd: string
+): Promise<{ isAvailable: boolean; isCompatible: boolean | undefined }> => {
+  const {
+    cliCompatible: pythonCliCompatible,
+    isAvailable: pythonVersionIsAvailable,
+    isCompatible: pythonVersionIsCompatible,
+    version: pythonVersion
+  } = await getVersionDetails(extension, cwd)
+
+  if (pythonCliCompatible === CliCompatible.NO_NOT_FOUND) {
+    return tryGlobalFallbackVersion(extension, cwd)
+  }
+  return processVersionDetails(
+    extension,
+    pythonCliCompatible,
+    pythonVersion,
+    pythonVersionIsAvailable,
+    pythonVersionIsCompatible
+  )
+}
+
 const extensionCanRunCli = async (
   extension: IExtension,
   cwd: string
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<{ isAvailable: boolean; isCompatible: boolean | undefined }> => {
-  if (await extension.isDvcPythonModule()) {
-    const pythonVersion = await extension.getCliVersion(cwd)
-    const pythonDvcCompatible = isVersionCompatible(pythonVersion)
-
-    if (pythonDvcCompatible !== CliCompatible.NO_NOT_FOUND && pythonVersion) {
-      warnUser(extension, pythonDvcCompatible, pythonVersion)
-      const isCompatible = cliIsCompatible(pythonDvcCompatible)
-      return { isAvailable: !!isCompatible, isCompatible }
-    }
-
-    const globalVersion = await extension.getCliVersion(cwd, true)
-
-    const globalDvcCompatible = isVersionCompatible(globalVersion)
-    const globalIsCompatible = cliIsCompatible(globalDvcCompatible)
-    const globalIsAvailable = !!globalIsCompatible
-
-    if (extension.hasRoots()) {
-      if (!globalIsCompatible) {
-        warnUserCLIInaccessibleAnywhere(extension, globalVersion)
-      }
-      if (
-        globalDvcCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-      ) {
-        warnAheadOfLatestTested()
-      }
-    }
-
-    if (globalIsCompatible) {
-      extension.unsetPythonBinPath()
-    }
-
-    return { isAvailable: globalIsAvailable, isCompatible: globalIsCompatible }
+  if (await extension.isPythonExtensionUsed()) {
+    return extensionCanAutoRunCli(extension, cwd)
   }
 
-  const version = await extension.getCliVersion(cwd)
+  const { cliCompatible, isAvailable, isCompatible, version } =
+    await getVersionDetails(extension, cwd)
 
-  const cliCompatible = isVersionCompatible(version)
-  const isCompatible = cliIsCompatible(cliCompatible)
-  const isAvailable = !!isCompatible
-
-  warnUser(extension, cliCompatible, version)
-
-  return { isAvailable, isCompatible }
+  return processVersionDetails(
+    extension,
+    cliCompatible,
+    version,
+    isAvailable,
+    isCompatible
+  )
 }
 
 export const setup = async (extension: IExtension) => {

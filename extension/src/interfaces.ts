@@ -4,7 +4,7 @@ export interface IExtension {
     isCliGlobal?: true
   ) => Promise<string | undefined>
   hasRoots: () => boolean
-  isDvcPythonModule: () => Promise<boolean>
+  isPythonExtensionUsed: () => Promise<boolean>
 
   setupWorkspace: () => void
 

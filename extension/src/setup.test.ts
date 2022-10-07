@@ -60,7 +60,7 @@ const mockedGetCliVersion = jest.fn()
 const mockedGetFirstWorkspaceFolder = jest.mocked(getFirstWorkspaceFolder)
 const mockedHasRoots = jest.fn()
 const mockedInitialize = jest.fn()
-const mockedIsDvcPythonModule = jest.fn()
+const mockedIsPythonExtensionUsed = jest.fn()
 const mockedResetMembers = jest.fn()
 const mockedSetAvailable = jest.fn()
 const mockedSetCliCompatible = jest.fn()
@@ -254,7 +254,7 @@ describe('setup', () => {
     getCliVersion: mockedGetCliVersion,
     hasRoots: mockedHasRoots,
     initialize: mockedInitialize,
-    isDvcPythonModule: mockedIsDvcPythonModule,
+    isPythonExtensionUsed: mockedIsPythonExtensionUsed,
     resetMembers: mockedResetMembers,
     setAvailable: mockedSetAvailable,
     setCliCompatible: mockedSetCliCompatible,
@@ -274,7 +274,7 @@ describe('setup', () => {
 
   it('should set the DVC roots even if the cli cannot be used', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(false)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
     await setup(extension)
@@ -285,7 +285,7 @@ describe('setup', () => {
   it('should not alert the user if the workspace has no DVC project and the cli cannot be found', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(false)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(false)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
     await setup(extension)
@@ -301,7 +301,7 @@ describe('setup', () => {
   it('should not alert the user if the workspace contains a DVC project, the cli cannot be found and the do not show option is set', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
@@ -320,7 +320,7 @@ describe('setup', () => {
   it('should alert the user if the workspace contains a DVC project and the cli cannot be found', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
@@ -343,7 +343,7 @@ describe('setup', () => {
   it('should try to setup the workspace if the workspace contains a DVC project, the cli cannot be found and the user selects setup the workspace', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
@@ -369,7 +369,7 @@ describe('setup', () => {
   it('should try to select the python interpreter if the workspace contains a DVC project, the cli cannot be found and the user decides to select the python interpreter', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(false)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
     mockedWarnWithOptions.mockResolvedValueOnce(Response.SELECT_INTERPRETER)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
@@ -393,7 +393,7 @@ describe('setup', () => {
   it('should set a user config option if the workspace contains a DVC project, the cli cannot be found and the user selects never', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(false)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
     mockedWarnWithOptions.mockResolvedValueOnce(Response.NEVER)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
@@ -417,7 +417,7 @@ describe('setup', () => {
   it('should not send telemetry or set the cli as unavailable or run initialization if roots have not been found but the cli can be run', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(false).mockReturnValueOnce(false)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(false)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
     await setup(extension)
@@ -430,7 +430,7 @@ describe('setup', () => {
   it('should run initialization if roots have been found and the cli can be run', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true).mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
     await setup(extension)
@@ -438,10 +438,13 @@ describe('setup', () => {
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
 
-  it('should call the cli to see if it is available from path if it fails on the first call', async () => {
+  it('should call the cli to see if it is available from path if the Python extension is being used and the first call fails', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true).mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(true)
+    mockedHasRoots
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(MIN_CLI_VERSION)
@@ -455,7 +458,7 @@ describe('setup', () => {
   it('should only call the cli once if the python extension is not used', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(false)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
     await setup(extension)
@@ -464,7 +467,7 @@ describe('setup', () => {
 
   it('should run reset if the cli cannot be run and there is a workspace folder open', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedIsDvcPythonModule.mockResolvedValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 

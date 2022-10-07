@@ -446,7 +446,7 @@ suite('Extension Test Suite', () => {
       expect(mockSetup).to.have.been.calledOnce
     })
 
-    it.only('should set the dvc.cli.incompatible context value', async () => {
+    it('should set the dvc.cli.incompatible context value', async () => {
       stub(DvcReader.prototype, 'expShow').resolves({
         workspace: { baseline: {} }
       })
