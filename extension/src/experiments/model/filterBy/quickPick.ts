@@ -98,7 +98,7 @@ const getValue = (operator: Operator): Thenable<string | undefined> => {
         isFreeTextDate(text)
           ? null
           : 'please enter a valid date of the form yyyy-mm-dd',
-      getIsoDate()
+      { value: getIsoDate() }
     )
   }
   return getInput(Title.ENTER_FILTER_VALUE)

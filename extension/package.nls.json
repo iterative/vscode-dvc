@@ -84,8 +84,8 @@
   "config.doNotShowUnableToFilter.title": "Do not warn before disabling auto-apply filters to experiment selection.",
   "config.dvcPath.description": "Path or shell command to the DVC binary. Required unless Microsoft's Python extension is installed and the `dvc` package found in its environment.",
   "config.dvcPath.title": "DVC Path (or shell command)",
-  "config.expTableHeadMaxLayers.title": "Maximum depth of Experiment table head rows",
-  "config.expTableHeadMaxLayers.description": "Use 0 for infinite depth.",
+  "config.expTableHeadMaxLayers.title": "Maximum height of Experiment table head rows",
+  "config.expTableHeadMaxLayers.description": "Use 0 for infinite height.",
   "config.pythonPath.description": "Path to the desired Python interpreter to use with DVC. Required when using a virtual environment. Overrides any other extension's settings for this extension's purposes.",
   "config.pythonPath.title": "Python Interpreter"
 }

@@ -18,7 +18,7 @@ export enum Title {
   SELECT_SORT_DIRECTION = 'Select Sort Direction',
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',
   SETUP_WORKSPACE = 'Setup the Workspace',
-  SET_EXPERIMENTS_HEADER_DEPTH = 'Set Maximum Experiment Table Header Depth'
+  SET_EXPERIMENTS_HEADER_DEPTH = 'Set Maximum Experiment Table Header Height'
 }
 
 export const getEnterValueTitle = (path: string): Title =>

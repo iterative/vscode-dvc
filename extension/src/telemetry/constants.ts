@@ -28,7 +28,7 @@ export const EventName = Object.assign(
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
-    SET_EXPERIMENTS_HEADER_DEPTH: 'extension.updateHeaderDepth',
+    SET_EXPERIMENTS_HEADER_DEPTH: 'extension.updateHeaderHeight',
 
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:

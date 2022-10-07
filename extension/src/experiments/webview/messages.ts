@@ -171,9 +171,15 @@ export class WebviewMessages {
       Title.SET_EXPERIMENTS_HEADER_DEPTH,
       val => {
         return Number.isNaN(Number(val)) ? 'Input needs to be a number' : ''
-      }
+      },
+      { prompt: 'Use 0 for infinite height.' }
     )
     setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH, Number(newValue))
+    sendTelemetryEvent(
+      EventName.SET_EXPERIMENTS_HEADER_DEPTH,
+      undefined,
+      undefined
+    )
   }
 
   private setColumnOrder(order: string[]) {
