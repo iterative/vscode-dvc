@@ -14,7 +14,7 @@ export enum CliCompatible {
   YES = 'yes'
 }
 
-export const cliIsCompatible = (
+export const isCliCompatible = (
   cliCompatible: CliCompatible
 ): boolean | undefined => {
   if (cliCompatible === CliCompatible.NO_NOT_FOUND) {
@@ -59,11 +59,25 @@ export const warnAheadOfLatestTested = (): void => {
 		Please upgrade to the most recent version of the extension and reload this window.`)
 }
 
+const cliIsCompatible = (
+  currentMajor: number,
+  currentMinor: number
+): CliCompatible => {
+  const { major: latestTestedMajor, minor: latestTestedMinor } = extractSemver(
+    LATEST_TESTED_CLI_VERSION
+  ) as ParsedSemver
+
+  if (currentMajor === latestTestedMajor && currentMinor > latestTestedMinor) {
+    return CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
+  }
+
+  return CliCompatible.YES
+}
+
 const checkCLIVersion = (currentSemVer: {
   major: number
   minor: number
   patch: number
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 }): CliCompatible => {
   const {
     major: currentMajor,
@@ -89,15 +103,7 @@ const checkCLIVersion = (currentSemVer: {
     return CliCompatible.NO_BEHIND_MIN_VERSION
   }
 
-  const { major: latestTestedMajor, minor: latestTestedMinor } = extractSemver(
-    LATEST_TESTED_CLI_VERSION
-  ) as ParsedSemver
-
-  if (currentMajor === latestTestedMajor && currentMinor > latestTestedMinor) {
-    return CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-  }
-
-  return CliCompatible.YES
+  return cliIsCompatible(currentMajor, currentMinor)
 }
 
 export const isVersionCompatible = (
@@ -111,9 +117,6 @@ export const isVersionCompatible = (
 
   if (
     !currentSemVer ||
-    typeof currentSemVer.major !== 'number' ||
-    typeof currentSemVer.minor !== 'number' ||
-    typeof currentSemVer.patch !== 'number' ||
     Number.isNaN(currentSemVer.major) ||
     Number.isNaN(currentSemVer.minor) ||
     Number.isNaN(currentSemVer.patch)

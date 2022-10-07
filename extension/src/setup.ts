@@ -22,7 +22,7 @@ import {
 } from './extensions/python'
 import {
   CliCompatible,
-  cliIsCompatible,
+  isCliCompatible,
   EXPECTED_VERSION_TEXT,
   getTextAndSend,
   isVersionCompatible,
@@ -192,40 +192,14 @@ const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
     : [Response.SETUP_WORKSPACE, Response.NEVER]
 }
 
-const warnUserCLIInaccessibleAnywhere = async (
-  extension: IExtension,
-  globalDvcVersion: string | undefined
-): Promise<void> => {
-  if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
-    return
-  }
-
-  const response = await Toast.warnWithOptions(
-    `The extension is unable to access an appropriate version of the CLI. No version was located using the Python extension. ${
-      globalDvcVersion || 'No version'
-    } was located globally. ${EXPECTED_VERSION_TEXT}`,
-    ...getToastOptions(true)
-  )
-
-  switch (response) {
-    case Response.SELECT_INTERPRETER:
-      return selectPythonInterpreter()
-    case Response.SETUP_WORKSPACE:
-      return extension.setupWorkspace()
-    case Response.NEVER:
-      return setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
-  }
-}
-
 const warnUserCLIInaccessible = async (
-  extension: IExtension
+  extension: IExtension,
+  isMsPythonInstalled: boolean,
+  warningText: string
 ): Promise<void> => {
   if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
     return
   }
-
-  const isMsPythonInstalled = isPythonExtensionInstalled()
-  const warningText = await getToastText(isMsPythonInstalled)
 
   const response = await Toast.warnWithOptions(
     warningText,
@@ -242,7 +216,20 @@ const warnUserCLIInaccessible = async (
   }
 }
 
-const warnUser = (
+const warnUserCLIInaccessibleAnywhere = (
+  extension: IExtension,
+  globalDvcVersion: string | undefined
+): Promise<void> => {
+  return warnUserCLIInaccessible(
+    extension,
+    isPythonExtensionInstalled(),
+    `The extension is unable to access an appropriate version of the CLI. No version was located using the Python extension. ${
+      globalDvcVersion || 'No version'
+    } was located globally. ${EXPECTED_VERSION_TEXT}`
+  )
+}
+
+const warnUser = async (
   extension: IExtension,
   cliCompatible: CliCompatible,
   version: string | undefined
@@ -260,8 +247,14 @@ const warnUser = (
       return
     case CliCompatible.NO_MAJOR_VERSION_AHEAD:
       return getTextAndSend(version as string, 'extension')
-    case CliCompatible.NO_NOT_FOUND:
-      return warnUserCLIInaccessible(extension)
+    case CliCompatible.NO_NOT_FOUND: {
+      const isMsPythonInstalled = isPythonExtensionInstalled()
+      return warnUserCLIInaccessible(
+        extension,
+        isPythonExtensionInstalled(),
+        await getToastText(isMsPythonInstalled)
+      )
+    }
     case CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED:
       return warnAheadOfLatestTested()
   }
@@ -279,7 +272,7 @@ const getVersionDetails = async (
 }> => {
   const version = await extension.getCliVersion(cwd, tryGlobalCli)
   const cliCompatible = isVersionCompatible(version)
-  const isCompatible = cliIsCompatible(cliCompatible)
+  const isCompatible = isCliCompatible(cliCompatible)
   return { cliCompatible, isAvailable: !!isCompatible, isCompatible, version }
 }
 
