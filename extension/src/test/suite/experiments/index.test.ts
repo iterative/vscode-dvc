@@ -32,6 +32,7 @@ import {
   buildInternalCommands,
   buildMockData,
   closeAllEditors,
+  configurationChangeEvent,
   experimentsUpdatedEvent,
   extensionUri,
   getInputBoxEvent,
@@ -882,6 +883,10 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
       const inputEvent = getInputBoxEvent('0')
       const tableMaxDepthOption = 'dvc.expTableHeadMaxLayers'
+      const tableMaxDepthChanged = configurationChangeEvent(
+        tableMaxDepthOption,
+        disposable
+      )
 
       const webview = await experiments.showWebview()
 
@@ -892,6 +897,7 @@ suite('Experiments Test Suite', () => {
 
       await inputEvent
       await mockMessageReceived
+      await tableMaxDepthChanged
 
       expect(
         await workspace.getConfiguration().get(tableMaxDepthOption)
