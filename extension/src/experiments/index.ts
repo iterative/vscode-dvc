@@ -366,6 +366,11 @@ export class Experiments extends BaseRepository<TableData> {
     return pickAndModifyParams(params)
   }
 
+  public setSelected(experiments: Experiment[]) {
+    this.experiments.setSelected(experiments)
+    this.notifyChanged()
+  }
+
   public getExperiments() {
     if (!this.columns.hasNonDefaultColumns()) {
       return []

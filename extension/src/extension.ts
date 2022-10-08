@@ -1,4 +1,11 @@
-import { commands, env, Event, EventEmitter, ExtensionContext } from 'vscode'
+import {
+  commands,
+  env,
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  ViewColumn
+} from 'vscode'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
@@ -37,7 +44,7 @@ import {
 } from './telemetry'
 import { EventName } from './telemetry/constants'
 import { RegisteredCliCommands, RegisteredCommands } from './commands/external'
-import { StopWatch } from './util/time'
+import { delay, StopWatch } from './util/time'
 import {
   registerWalkthroughCommands,
   showWalkthroughOnFirstUse
@@ -51,6 +58,7 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
+import { Toast } from './vscode/toast'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -250,6 +258,55 @@ export class Extension extends Disposable implements IExtension {
             stopWatch.getElapsedTime()
           )
         }
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand(RegisteredCommands.DO_WALKTHROUGH, () => {
+        Toast.showProgress('Running Walkthrough', async progress => {
+          progress.report({ increment: 0 })
+          const [dvcRoot] = this.dvcRoots
+
+          const experiments = this.experiments.getRepository(dvcRoot)
+          const plots = this.plots.getRepository(dvcRoot)
+
+          await Toast.runCommandAndIncrementProgress(
+            async () => {
+              await experiments.showWebview()
+              await plots.showWebview(ViewColumn.Beside)
+              await commands.executeCommand('workbench.action.terminal.focus')
+              await commands.executeCommand(
+                'workbench.action.terminal.toggleTerminal'
+              )
+              await commands.executeCommand('dvc.views.experimentsTree.focus')
+              return 'DVC views opened'
+            },
+            progress,
+            5
+          )
+
+          await Toast.runCommandAndIncrementProgress(
+            async () => {
+              await delay(5000)
+              experiments.setSelected([])
+              return 'all experiments un-plotted'
+            },
+            progress,
+            25
+          )
+
+          await Toast.runCommandAndIncrementProgress(
+            async () => {
+              await delay(10000)
+              experiments.setSelected(experiments.getExperiments().slice(0, 7))
+              return 'all experiments plotted'
+            },
+            progress,
+            25
+          )
+
+          return Toast.delayProgressClosing()
+        })
       })
     )
 

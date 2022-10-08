@@ -89,6 +89,12 @@
     ],
     "commands": [
       {
+        "title": "Do Plots Walkthrough",
+        "command": "dvc.plotsWalkthrough",
+        "category": "DVC",
+        "icon": "$()"
+      },
+      {
         "title": "%command.addExperimentsTableFilter%",
         "command": "dvc.addExperimentsTableFilter",
         "category": "DVC",

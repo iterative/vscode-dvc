@@ -47,6 +47,7 @@ export enum RegisteredCliCommands {
 }
 
 export enum RegisteredCommands {
+  DO_WALKTHROUGH = 'dvc.plotsWalkthrough',
   EXPERIMENT_AUTO_APPLY_FILTERS = 'dvc.views.experimentsTree.autoApplyFilters',
   EXPERIMENT_COLUMNS_SELECT = 'dvc.views.experimentsColumnsTree.selectColumns',
   EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS = 'dvc.views.experimentsTree.disableAutoApplyFilters',

@@ -103,6 +103,8 @@ type WebviewFocusChangedProperties = {
 }
 
 export interface IEventNamePropertyMapping {
+  [EventName.DO_WALKTHROUGH]: undefined
+
   [EventName.EXTENSION_EXECUTION_DETAILS_CHANGED]: ExtensionProperties
   [EventName.EXTENSION_LOAD]: ExtensionProperties
 
