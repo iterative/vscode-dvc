@@ -881,6 +881,7 @@ suite('Experiments Test Suite', () => {
     it('should be able to handle a message to update the table depth', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
       const inputEvent = getInputBoxEvent('0')
+      const tableMaxDepthOption = 'dvc.expTableHeadMaxLayers'
 
       const webview = await experiments.showWebview()
 
@@ -890,9 +891,10 @@ suite('Experiments Test Suite', () => {
       })
 
       await inputEvent
+      await mockMessageReceived
 
       expect(
-        await workspace.getConfiguration().get('dvc.expTableHeadMaxLayers')
+        await workspace.getConfiguration().get(tableMaxDepthOption)
       ).to.equal(0)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
