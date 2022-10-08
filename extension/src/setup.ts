@@ -25,7 +25,8 @@ import {
   isCliCompatible,
   warnVersionIncompatible,
   isVersionCompatible,
-  warnAheadOfLatestTested
+  warnAheadOfLatestTested,
+  warnUnableToVerifyVersion
 } from './cli/dvc/version'
 
 const setConfigPath = async (
@@ -209,9 +210,9 @@ const warnUserCLIInaccessibleAnywhere = async (
   return warnUserCLIInaccessible(
     extension,
     true,
-    `The extension is unable to access an appropriate version of the CLI. No version was located using the interpreter provided by the Python extension. ${
-      globalDvcVersion || 'No version'
-    } was located globally. For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${binPath}.`
+    `The extension is unable to access an appropriate version of the CLI. The CLI was not located using the interpreter provided by the Python extension. ${
+      globalDvcVersion ? globalDvcVersion + ' is' : 'The CLI is also not'
+    } installed globally. For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${binPath}.`
   )
 }
 
@@ -227,9 +228,7 @@ const warnUser = (
     case CliCompatible.NO_BEHIND_MIN_VERSION:
       return warnVersionIncompatible(version as string, 'CLI')
     case CliCompatible.NO_CANNOT_VERIFY:
-      Toast.warnWithOptions(
-        'The extension cannot initialize as we were unable to verify the DVC CLI version.'
-      )
+      warnUnableToVerifyVersion()
       return
     case CliCompatible.NO_MAJOR_VERSION_AHEAD:
       return warnVersionIncompatible(version as string, 'extension')
@@ -279,8 +278,8 @@ const tryGlobalFallbackVersion = async (
   extension: IExtension,
   cwd: string
 ): Promise<{ isAvailable: boolean; isCompatible: boolean | undefined }> => {
-  const { cliCompatible, isAvailable, isCompatible, version } =
-    await getVersionDetails(extension, cwd, true)
+  const tryGlobal = await getVersionDetails(extension, cwd, true)
+  const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
   if (extension.hasRoots() && !isCompatible) {
     warnUserCLIInaccessibleAnywhere(extension, version)

@@ -37,21 +37,24 @@ export const extractSemver = (stdout: string): ParsedSemver | undefined => {
   return { major: Number(major), minor: Number(minor), patch: Number(patch) }
 }
 
+export const warnUnableToVerifyVersion = () =>
+  Toast.warnWithOptions(
+    'The extension cannot initialize as we were unable to verify the DVC CLI version.'
+  )
+
 export const warnVersionIncompatible = (
   version: string,
   update: 'CLI' | 'extension'
 ): void => {
   Toast.warnWithOptions(
-    `The extension cannot initialize because you are using version ${version} of the DVC CLI. 
-		The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. 
-		Please upgrade to the most recent version of the ${update} and reload this window.`
+    `The extension cannot initialize because you are using version ${version} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the ${update} and reload this window.`
   )
 }
 
 export const warnAheadOfLatestTested = (): void => {
-  Toast.warnWithOptions(`The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). 
-		This could lead to unexpected behaviour. 
-		Please upgrade to the most recent version of the extension and reload this window.`)
+  Toast.warnWithOptions(
+    `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
+  )
 }
 
 const cliIsCompatible = (

@@ -18,7 +18,12 @@ import { Toast } from './vscode/toast'
 import { Response } from './vscode/response'
 import { VscodePython } from './extensions/python'
 import { executeProcess } from './processExecution'
-import { MIN_CLI_VERSION } from './cli/dvc/constants'
+import {
+  LATEST_TESTED_CLI_VERSION,
+  MAX_CLI_VERSION,
+  MIN_CLI_VERSION
+} from './cli/dvc/constants'
+import { extractSemver, ParsedSemver } from './cli/dvc/version'
 
 jest.mock('vscode')
 jest.mock('./vscode/config')
@@ -476,7 +481,96 @@ describe('setup', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension is unable to access an appropriate version of the CLI. No version was located using the interpreter provided by the Python extension. ${belowMinVersion} was located globally. For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
+      `The extension is unable to access an appropriate version of the CLI. The CLI was not located using the interpreter provided by the Python extension. ${belowMinVersion} is installed globally. For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
+      Response.SETUP_WORKSPACE,
+      Response.SELECT_INTERPRETER,
+      Response.NEVER
+    )
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
+  })
+
+  it('should send a specific message and initialize if the Python extension is being used, the CLI is not available in the virtual environment and the global CLI is a minor version ahead of the expected version', async () => {
+    const { major, minor, patch } = extractSemver(
+      LATEST_TESTED_CLI_VERSION
+    ) as ParsedSemver
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
+    mockedGetCliVersion
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce([major, minor + 1, patch].join('.'))
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
+      `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
+    )
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
+    expect(mockedResetMembers).not.toHaveBeenCalled()
+    expect(mockedInitialize).toHaveBeenCalledTimes(1)
+  })
+
+  it('should send a specific message to the user if the Python extension is not being used and the CLI is not available', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedExtensions.all = []
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
+    mockedGetCliVersion.mockResolvedValueOnce(undefined)
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
+      'An error was thrown when trying to access the CLI.',
+      Response.SETUP_WORKSPACE,
+      Response.NEVER
+    )
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
+  })
+
+  it('should send a specific message to the user if the located CLI is a major version ahead', async () => {
+    const majorVersion = '16.0.0'
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
+    mockedGetCliVersion.mockResolvedValueOnce(majorVersion)
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
+      `The extension cannot initialize because you are using version ${majorVersion} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the extension and reload this window.`
+    )
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
+  })
+
+  it('should send a specific message to the user if the Python extension is being used, the CLI is not available in the virtual environment and no cli is found globally', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
+    mockedExecuteProcess.mockImplementation(({ executable }) =>
+      Promise.resolve(executable)
+    )
+    mockedGetExtension.mockReturnValue(mockedVscodePython)
+    mockedGetCliVersion
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
+      `The extension is unable to access an appropriate version of the CLI. The CLI was not located using the interpreter provided by the Python extension. The CLI is also not installed globally. For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
       Response.SETUP_WORKSPACE,
       Response.SELECT_INTERPRETER,
       Response.NEVER
