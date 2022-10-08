@@ -244,16 +244,21 @@ const warnUser = (
   }
 }
 
+type CanRunCli = {
+  isAvailable: boolean
+  isCompatible: boolean | undefined
+}
+
 const getVersionDetails = async (
   extension: IExtension,
   cwd: string,
   tryGlobalCli?: true
-): Promise<{
-  cliCompatible: CliCompatible
-  isAvailable: boolean
-  isCompatible: boolean | undefined
-  version: string | undefined
-}> => {
+): Promise<
+  CanRunCli & {
+    cliCompatible: CliCompatible
+    version: string | undefined
+  }
+> => {
   const version = await extension.getCliVersion(cwd, tryGlobalCli)
   const cliCompatible = isVersionCompatible(version)
   const isCompatible = isCliCompatible(cliCompatible)
@@ -266,7 +271,7 @@ const processVersionDetails = (
   version: string | undefined,
   isAvailable: boolean,
   isCompatible: boolean | undefined
-): { isAvailable: boolean; isCompatible: boolean | undefined } => {
+): CanRunCli => {
   warnUser(extension, cliCompatible, version)
   return {
     isAvailable,
@@ -277,7 +282,7 @@ const processVersionDetails = (
 const tryGlobalFallbackVersion = async (
   extension: IExtension,
   cwd: string
-): Promise<{ isAvailable: boolean; isCompatible: boolean | undefined }> => {
+): Promise<CanRunCli> => {
   const tryGlobal = await getVersionDetails(extension, cwd, true)
   const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
@@ -301,7 +306,7 @@ const tryGlobalFallbackVersion = async (
 const extensionCanAutoRunCli = async (
   extension: IExtension,
   cwd: string
-): Promise<{ isAvailable: boolean; isCompatible: boolean | undefined }> => {
+): Promise<CanRunCli> => {
   const {
     cliCompatible: pythonCliCompatible,
     isAvailable: pythonVersionIsAvailable,
@@ -324,7 +329,7 @@ const extensionCanAutoRunCli = async (
 const extensionCanRunCli = async (
   extension: IExtension,
   cwd: string
-): Promise<{ isAvailable: boolean; isCompatible: boolean | undefined }> => {
+): Promise<CanRunCli> => {
   if (await extension.isPythonExtensionUsed()) {
     return extensionCanAutoRunCli(extension, cwd)
   }
