@@ -37,20 +37,15 @@ export const extractSemver = (stdout: string): ParsedSemver | undefined => {
   return { major: Number(major), minor: Number(minor), patch: Number(patch) }
 }
 
-export const EXPECTED_VERSION_TEXT = `The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}.`
-
-const getWarningText = (
-  currentVersion: string,
-  update: 'CLI' | 'extension'
-): string => `The extension cannot initialize because you are using version ${currentVersion} of the DVC CLI.
-${EXPECTED_VERSION_TEXT} Please upgrade to the most recent version of the ${update} and reload this window.`
-
-export const getTextAndSend = (
+export const warnVersionIncompatible = (
   version: string,
   update: 'CLI' | 'extension'
 ): void => {
-  const text = getWarningText(version, update)
-  Toast.warnWithOptions(text)
+  Toast.warnWithOptions(
+    `The extension cannot initialize because you are using version ${version} of the DVC CLI. 
+		The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. 
+		Please upgrade to the most recent version of the ${update} and reload this window.`
+  )
 }
 
 export const warnAheadOfLatestTested = (): void => {

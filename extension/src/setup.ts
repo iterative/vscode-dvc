@@ -23,8 +23,7 @@ import {
 import {
   CliCompatible,
   isCliCompatible,
-  EXPECTED_VERSION_TEXT,
-  getTextAndSend,
+  warnVersionIncompatible,
   isVersionCompatible,
   warnAheadOfLatestTested
 } from './cli/dvc/version'
@@ -171,21 +170,6 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
-const getToastText = async (
-  isPythonExtensionInstalled: boolean
-): Promise<string> => {
-  const text = 'An error was thrown when trying to access the CLI.'
-  if (!isPythonExtensionInstalled) {
-    return text
-  }
-  const binPath = await getPythonBinPath()
-
-  return (
-    text +
-    ` For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${binPath}. `
-  )
-}
-
 const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
   return isPythonExtensionInstalled
     ? [Response.SETUP_WORKSPACE, Response.SELECT_INTERPRETER, Response.NEVER]
@@ -216,45 +200,46 @@ const warnUserCLIInaccessible = async (
   }
 }
 
-const warnUserCLIInaccessibleAnywhere = (
+const warnUserCLIInaccessibleAnywhere = async (
   extension: IExtension,
   globalDvcVersion: string | undefined
 ): Promise<void> => {
+  const binPath = await getPythonBinPath()
+
   return warnUserCLIInaccessible(
     extension,
-    isPythonExtensionInstalled(),
-    `The extension is unable to access an appropriate version of the CLI. No version was located using the Python extension. ${
+    true,
+    `The extension is unable to access an appropriate version of the CLI. No version was located using the interpreter provided by the Python extension. ${
       globalDvcVersion || 'No version'
-    } was located globally. ${EXPECTED_VERSION_TEXT}`
+    } was located globally. For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${binPath}.`
   )
 }
 
-const warnUser = async (
+const warnUser = (
   extension: IExtension,
   cliCompatible: CliCompatible,
   version: string | undefined
-) => {
+): void => {
   if (!extension.hasRoots()) {
     return
   }
   switch (cliCompatible) {
     case CliCompatible.NO_BEHIND_MIN_VERSION:
-      return getTextAndSend(version as string, 'CLI')
+      return warnVersionIncompatible(version as string, 'CLI')
     case CliCompatible.NO_CANNOT_VERIFY:
       Toast.warnWithOptions(
         'The extension cannot initialize as we were unable to verify the DVC CLI version.'
       )
       return
     case CliCompatible.NO_MAJOR_VERSION_AHEAD:
-      return getTextAndSend(version as string, 'extension')
-    case CliCompatible.NO_NOT_FOUND: {
-      const isMsPythonInstalled = isPythonExtensionInstalled()
-      return warnUserCLIInaccessible(
+      return warnVersionIncompatible(version as string, 'extension')
+    case CliCompatible.NO_NOT_FOUND:
+      warnUserCLIInaccessible(
         extension,
         isPythonExtensionInstalled(),
-        await getToastText(isMsPythonInstalled)
+        'An error was thrown when trying to access the CLI.'
       )
-    }
+      return
     case CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED:
       return warnAheadOfLatestTested()
   }

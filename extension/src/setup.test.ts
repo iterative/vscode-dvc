@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { resolve } from 'path'
 import { extensions, Extension, commands } from 'vscode'
 import { setup, setupWorkspace } from './setup'
 import { flushPromises } from './test/util/jest'
@@ -40,9 +40,10 @@ mockedExtensions.getExtension = mockedGetExtension
 
 const mockedReady = jest.fn()
 
+const mockedPythonPath = 'python'
 const mockedSettings = {
   getExecutionDetails: () => ({
-    execCommand: [join('some', 'bin', 'path')]
+    execCommand: [mockedPythonPath]
   })
 }
 
@@ -453,6 +454,36 @@ describe('setup', () => {
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
     expect(mockedResetMembers).not.toHaveBeenCalled()
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
+  })
+
+  it('should send a specific message to the user if the Python extension is being used, the CLI is not available in the virtual environment and the global CLI is not compatible', async () => {
+    const belowMinVersion = '2.0.0'
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
+    mockedExecuteProcess.mockImplementation(({ executable }) =>
+      Promise.resolve(executable)
+    )
+    mockedGetExtension.mockReturnValue(mockedVscodePython)
+    mockedGetCliVersion
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(belowMinVersion)
+
+    await setup(extension)
+    await flushPromises()
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
+      `The extension is unable to access an appropriate version of the CLI. No version was located using the interpreter provided by the Python extension. ${belowMinVersion} was located globally. For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
+      Response.SETUP_WORKSPACE,
+      Response.SELECT_INTERPRETER,
+      Response.NEVER
+    )
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
   it('should only call the cli once if the python extension is not used', async () => {
