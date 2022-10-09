@@ -414,7 +414,7 @@ describe('setup', () => {
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedSetupWorkspace).not.toHaveBeenCalled()
-    expect(mockedExecuteCommand).toHaveBeenCalledTimes(0)
+    expect(mockedExecuteCommand).not.toHaveBeenCalled()
     expect(mockedSetUserConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
@@ -537,17 +537,19 @@ describe('setup', () => {
   })
 
   it('should send a specific message to the user if the located CLI is a major version ahead', async () => {
-    const majorVersion = '16.0.0'
+    const MajorAhead = MIN_CLI_VERSION.split('.')
+      .map(num => Number(num) + 100)
+      .join('.')
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
-    mockedGetCliVersion.mockResolvedValueOnce(majorVersion)
+    mockedGetCliVersion.mockResolvedValueOnce(MajorAhead)
 
     await setup(extension)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension cannot initialize because you are using version ${majorVersion} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the extension and reload this window.`
+      `The extension cannot initialize because you are using version ${MajorAhead} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the extension and reload this window.`
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
