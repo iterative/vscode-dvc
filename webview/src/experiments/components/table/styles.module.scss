@@ -545,6 +545,13 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         cursor: pointer;
       }
 
+      .plotEye {
+        color: $fg-color;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
       .rowActions {
         display: inline-flex;
         align-items: center;

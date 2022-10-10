@@ -7,7 +7,7 @@ import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
 import { CellHintTooltip } from './CellHintTooltip'
 import { clickAndEnterProps } from '../../../util/props'
-import { Clock } from '../../../shared/components/icons'
+import { Clock, Eye, EyeClosed } from '../../../shared/components/icons'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
@@ -33,6 +33,26 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
   ) : (
     <span className={styles.rowArrowContainer} />
   )
+
+const PlotIndicator: React.FC<{
+  bulletColor?: string
+  plotSelections: number
+  queued?: boolean
+  toggleExperiment: () => void
+}> = ({ bulletColor, plotSelections, queued, toggleExperiment }) => (
+  <CellHintTooltip tooltipContent={bulletColor ? 'Unplot' : 'Plot'}>
+    <div className={styles.plotEye} {...clickAndEnterProps(toggleExperiment)}>
+      {!queued && bulletColor ? <Eye /> : <EyeClosed />}
+      <span className={styles.bullet} style={{ color: bulletColor }}>
+        <IndicatorWithJustTheCounter
+          aria-label={'Sub-rows selected for plots'}
+          count={plotSelections}
+        />
+        {queued && <Clock />}
+      </span>
+    </div>
+  </CellHintTooltip>
+)
 
 export const FirstCell: React.FC<
   CellProp &
@@ -63,19 +83,12 @@ export const FirstCell: React.FC<
       <div className={styles.innerCell}>
         <CellRowActions {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        <CellHintTooltip tooltipContent={bulletColor ? 'Unplot' : 'Plot'}>
-          <span
-            className={styles.bullet}
-            style={{ color: bulletColor }}
-            {...clickAndEnterProps(toggleExperiment)}
-          >
-            <IndicatorWithJustTheCounter
-              aria-label={'Sub-rows selected for plots'}
-              count={plotSelections}
-            />
-            {queued && <Clock />}
-          </span>
-        </CellHintTooltip>
+        <PlotIndicator
+          bulletColor={bulletColor}
+          plotSelections={plotSelections}
+          queued={queued}
+          toggleExperiment={toggleExperiment}
+        />
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>
             <div
