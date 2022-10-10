@@ -32,6 +32,7 @@ import {
   buildInternalCommands,
   buildMockData,
   closeAllEditors,
+  configurationChangeEvent,
   experimentsUpdatedEvent,
   extensionUri,
   getInputBoxEvent,
@@ -876,6 +877,31 @@ suite('Experiments Test Suite', () => {
         undefined,
         undefined
       )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to handle a message to update the table depth', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const inputEvent = getInputBoxEvent('0')
+      const tableMaxDepthOption = 'dvc.expTableHeadMaxLayers'
+      const tableMaxDepthChanged = configurationChangeEvent(
+        tableMaxDepthOption,
+        disposable
+      )
+
+      const webview = await experiments.showWebview()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
+      })
+
+      await inputEvent
+      await mockMessageReceived
+      await tableMaxDepthChanged
+
+      expect(
+        await workspace.getConfiguration().get(tableMaxDepthOption)
+      ).to.equal(0)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's star status", async () => {
