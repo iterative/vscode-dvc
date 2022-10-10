@@ -3,7 +3,6 @@ import {
   LATEST_TESTED_CLI_VERSION,
   MIN_CLI_VERSION
 } from './constants'
-import { Toast } from '../../vscode/toast'
 
 export enum CliCompatible {
   NO_BEHIND_MIN_VERSION = 'no-behind-min-version',
@@ -14,18 +13,6 @@ export enum CliCompatible {
   YES = 'yes'
 }
 
-export const isCliCompatible = (
-  cliCompatible: CliCompatible
-): boolean | undefined => {
-  if (cliCompatible === CliCompatible.NO_NOT_FOUND) {
-    return
-  }
-
-  return [
-    CliCompatible.YES,
-    CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-  ].includes(cliCompatible)
-}
 export type ParsedSemver = { major: number; minor: number; patch: number }
 
 export const extractSemver = (stdout: string): ParsedSemver | undefined => {
@@ -35,26 +22,6 @@ export const extractSemver = (stdout: string): ParsedSemver | undefined => {
   }
   const [major, minor, patch] = semver[0].split('.')
   return { major: Number(major), minor: Number(minor), patch: Number(patch) }
-}
-
-export const warnUnableToVerifyVersion = () =>
-  Toast.warnWithOptions(
-    'The extension cannot initialize as we were unable to verify the DVC CLI version.'
-  )
-
-export const warnVersionIncompatible = (
-  version: string,
-  update: 'CLI' | 'extension'
-): void => {
-  Toast.warnWithOptions(
-    `The extension cannot initialize because you are using version ${version} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the ${update} and reload this window.`
-  )
-}
-
-export const warnAheadOfLatestTested = (): void => {
-  Toast.warnWithOptions(
-    `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
-  )
 }
 
 const cliIsCompatible = (
