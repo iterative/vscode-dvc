@@ -487,6 +487,11 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       }
     }
 
+    svg {
+      position: relative;
+      top: -6px;
+    }
+
     .innerCell,
     .timestampInnerCell {
       height: 100%;
@@ -547,6 +552,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       }
 
       .plotEye {
+        visibility: visible;
         color: $fg-color;
         display: inline-flex;
         align-items: center;
