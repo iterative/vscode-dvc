@@ -66,23 +66,18 @@ export const Indicator = ({
 export const IndicatorWithJustTheCounter = ({
   count,
   'aria-label': ariaLabel,
-  tooltipContent
+  children
 }: CounterBadgeProps & {
   'aria-label'?: string
-  tooltipContent?: ReactNode
+  children: React.ReactElement
 }) => {
-  const children = (
-    <span aria-label={ariaLabel}>
-      <CounterBadge count={count} />
-    </span>
-  )
-
-  return tooltipContent ? (
-    <CellHintTooltip tooltipContent={tooltipContent}>
+  return (
+    <div aria-label={ariaLabel} className={styles.indicatorWithOnlyCount}>
       {children}
-    </CellHintTooltip>
-  ) : (
-    children
+      <div className={styles.badge}>
+        <CounterBadge count={count} />
+      </div>
+    </div>
   )
 }
 

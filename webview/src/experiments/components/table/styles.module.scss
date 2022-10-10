@@ -550,6 +550,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
         display: inline-flex;
         align-items: center;
         cursor: pointer;
+        text-align: center;
       }
 
       .rowActions {
@@ -835,6 +836,18 @@ $badge-size: 0.85rem;
   text-align: center;
   vertical-align: middle;
   font-size: 0.5rem;
+}
+
+.indicatorWithOnlyCount {
+  display: inline-block;
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+
+  .badge {
+    position: relative;
+    top: -4px;
+  }
 }
 
 .cellTooltip {

@@ -42,14 +42,12 @@ const PlotIndicator: React.FC<{
 }> = ({ bulletColor, plotSelections, queued, toggleExperiment }) => (
   <CellHintTooltip tooltipContent={bulletColor ? 'Unplot' : 'Plot'}>
     <div className={styles.plotEye} {...clickAndEnterProps(toggleExperiment)}>
-      {!queued && bulletColor ? <Eye /> : <EyeClosed />}
       <span className={styles.bullet} style={{ color: bulletColor }}>
-        <IndicatorWithJustTheCounter
-          aria-label={'Sub-rows selected for plots'}
-          count={plotSelections}
-        />
         {queued && <Clock />}
       </span>
+      <IndicatorWithJustTheCounter count={plotSelections}>
+        {!queued && bulletColor ? <Eye /> : <EyeClosed />}
+      </IndicatorWithJustTheCounter>
     </div>
   </CellHintTooltip>
 )
