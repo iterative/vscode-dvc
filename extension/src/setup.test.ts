@@ -481,7 +481,7 @@ describe('setup', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension is unable to access an appropriate version of the CLI. The CLI was not located using the interpreter provided by the Python extension. ${belowMinVersion} is installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
+      `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${belowMinVersion} is installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
       Response.SETUP_WORKSPACE,
       Response.SELECT_INTERPRETER,
       Response.NEVER
@@ -572,7 +572,7 @@ describe('setup', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension is unable to access an appropriate version of the CLI. The CLI was not located using the interpreter provided by the Python extension. The CLI is also not installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
+      `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. The CLI is also not installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
       Response.SETUP_WORKSPACE,
       Response.SELECT_INTERPRETER,
       Response.NEVER

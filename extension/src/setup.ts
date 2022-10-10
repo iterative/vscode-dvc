@@ -210,7 +210,7 @@ const warnUserCLIInaccessibleAnywhere = async (
   return warnUserCLIInaccessible(
     extension,
     true,
-    `The extension is unable to access an appropriate version of the CLI. The CLI was not located using the interpreter provided by the Python extension. ${
+    `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${
       globalDvcVersion ? globalDvcVersion + ' is' : 'The CLI is also not'
     } installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${binPath}.`
   )
