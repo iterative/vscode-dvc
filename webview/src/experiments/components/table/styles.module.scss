@@ -200,6 +200,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   height: 32px;
   padding: 0;
   flex: 0 0 20px;
+  left: -8px;
   display: inline-block;
   position: relative;
   border: none;
@@ -217,7 +218,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 .contractedRowArrow {
   @extend %expandableRowArrow;
   transform: rotate(-45deg);
-  right: 4px;
+  right: 5px;
   bottom: 0;
 }
 
