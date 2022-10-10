@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.13] - 2022-10-10
+
+### 🐛 Bug Fixes
+
+- Fix UX of extension using fallback global CLI when Python extension is active [#2544](https://github.com/iterative/vscode-dvc/pull/2544) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add test for setting table header depth [#2525](https://github.com/iterative/vscode-dvc/pull/2525) by [@julieg18](https://github.com/julieg18)
+- Consolidate version checking into CLI discovery file [#2552](https://github.com/iterative/vscode-dvc/pull/2552) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.4.12] - 2022-10-06
 
 ### 🔨 Maintenance
