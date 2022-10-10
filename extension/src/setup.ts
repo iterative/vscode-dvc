@@ -20,6 +20,14 @@ import {
   isPythonExtensionInstalled,
   selectPythonInterpreter
 } from './extensions/python'
+import {
+  CliCompatible,
+  isCliCompatible,
+  warnVersionIncompatible,
+  isVersionCompatible,
+  warnAheadOfLatestTested,
+  warnUnableToVerifyVersion
+} from './cli/dvc/version'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -163,21 +171,6 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
-const getToastText = async (
-  isPythonExtensionInstalled: boolean
-): Promise<string> => {
-  const text = 'An error was thrown when trying to access the CLI.'
-  if (!isPythonExtensionInstalled) {
-    return text
-  }
-  const binPath = await getPythonBinPath()
-
-  return (
-    text +
-    ` For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${binPath}. `
-  )
-}
-
 const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
   return isPythonExtensionInstalled
     ? [Response.SETUP_WORKSPACE, Response.SELECT_INTERPRETER, Response.NEVER]
@@ -185,14 +178,13 @@ const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
 }
 
 const warnUserCLIInaccessible = async (
-  extension: IExtension
+  extension: IExtension,
+  isMsPythonInstalled: boolean,
+  warningText: string
 ): Promise<void> => {
   if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
     return
   }
-
-  const isMsPythonInstalled = isPythonExtensionInstalled()
-  const warningText = await getToastText(isMsPythonInstalled)
 
   const response = await Toast.warnWithOptions(
     warningText,
@@ -209,38 +201,149 @@ const warnUserCLIInaccessible = async (
   }
 }
 
-const extensionCanRunPythonCli = async (extension: IExtension, cwd: string) => {
-  let canRunCli = false
-  if (await extension.isDvcPythonModule()) {
-    try {
-      canRunCli = await extension.canRunCli(cwd)
-    } catch {}
-  }
-  return canRunCli
+const warnUserCLIInaccessibleAnywhere = async (
+  extension: IExtension,
+  globalDvcVersion: string | undefined
+): Promise<void> => {
+  const binPath = await getPythonBinPath()
+
+  return warnUserCLIInaccessible(
+    extension,
+    true,
+    `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${
+      globalDvcVersion ? globalDvcVersion + ' is' : 'The CLI is also not'
+    } installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${binPath}.`
+  )
 }
 
-const extensionCanRunGlobalCli = async (extension: IExtension, cwd: string) => {
-  let canRunCli = false
-  try {
-    canRunCli = await extension.canRunCli(cwd, true)
-  } catch {
-    if (extension.hasRoots()) {
-      warnUserCLIInaccessible(extension)
-    }
+const warnUser = (
+  extension: IExtension,
+  cliCompatible: CliCompatible,
+  version: string | undefined
+): void => {
+  if (!extension.hasRoots()) {
+    return
   }
-  return canRunCli
+  switch (cliCompatible) {
+    case CliCompatible.NO_BEHIND_MIN_VERSION:
+      return warnVersionIncompatible(version as string, 'CLI')
+    case CliCompatible.NO_CANNOT_VERIFY:
+      warnUnableToVerifyVersion()
+      return
+    case CliCompatible.NO_MAJOR_VERSION_AHEAD:
+      return warnVersionIncompatible(version as string, 'extension')
+    case CliCompatible.NO_NOT_FOUND:
+      warnUserCLIInaccessible(
+        extension,
+        isPythonExtensionInstalled(),
+        'An error was thrown when trying to access the CLI.'
+      )
+      return
+    case CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED:
+      return warnAheadOfLatestTested()
+  }
+}
+
+type CanRunCli = {
+  isAvailable: boolean
+  isCompatible: boolean | undefined
+}
+
+const getVersionDetails = async (
+  extension: IExtension,
+  cwd: string,
+  tryGlobalCli?: true
+): Promise<
+  CanRunCli & {
+    cliCompatible: CliCompatible
+    version: string | undefined
+  }
+> => {
+  const version = await extension.getCliVersion(cwd, tryGlobalCli)
+  const cliCompatible = isVersionCompatible(version)
+  const isCompatible = isCliCompatible(cliCompatible)
+  return { cliCompatible, isAvailable: !!isCompatible, isCompatible, version }
+}
+
+const processVersionDetails = (
+  extension: IExtension,
+  cliCompatible: CliCompatible,
+  version: string | undefined,
+  isAvailable: boolean,
+  isCompatible: boolean | undefined
+): CanRunCli => {
+  warnUser(extension, cliCompatible, version)
+  return {
+    isAvailable,
+    isCompatible
+  }
+}
+
+const tryGlobalFallbackVersion = async (
+  extension: IExtension,
+  cwd: string
+): Promise<CanRunCli> => {
+  const tryGlobal = await getVersionDetails(extension, cwd, true)
+  const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
+
+  if (extension.hasRoots() && !isCompatible) {
+    warnUserCLIInaccessibleAnywhere(extension, version)
+  }
+  if (
+    extension.hasRoots() &&
+    cliCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
+  ) {
+    warnAheadOfLatestTested()
+  }
+
+  if (isCompatible) {
+    extension.unsetPythonBinPath()
+  }
+
+  return { isAvailable, isCompatible }
+}
+
+const extensionCanAutoRunCli = async (
+  extension: IExtension,
+  cwd: string
+): Promise<CanRunCli> => {
+  const {
+    cliCompatible: pythonCliCompatible,
+    isAvailable: pythonVersionIsAvailable,
+    isCompatible: pythonVersionIsCompatible,
+    version: pythonVersion
+  } = await getVersionDetails(extension, cwd)
+
+  if (pythonCliCompatible === CliCompatible.NO_NOT_FOUND) {
+    return tryGlobalFallbackVersion(extension, cwd)
+  }
+  return processVersionDetails(
+    extension,
+    pythonCliCompatible,
+    pythonVersion,
+    pythonVersionIsAvailable,
+    pythonVersionIsCompatible
+  )
 }
 
 const extensionCanRunCli = async (
   extension: IExtension,
   cwd: string
-): Promise<boolean> => {
-  let canRunCli = await extensionCanRunPythonCli(extension, cwd)
-
-  if (!canRunCli) {
-    canRunCli = await extensionCanRunGlobalCli(extension, cwd)
+): Promise<CanRunCli> => {
+  if (await extension.isPythonExtensionUsed()) {
+    return extensionCanAutoRunCli(extension, cwd)
   }
-  return canRunCli
+
+  const { cliCompatible, isAvailable, isCompatible, version } =
+    await getVersionDetails(extension, cwd)
+
+  return processVersionDetails(
+    extension,
+    cliCompatible,
+    version,
+    isAvailable,
+    isCompatible
+  )
 }
 
 export const setup = async (extension: IExtension) => {
@@ -251,15 +354,18 @@ export const setup = async (extension: IExtension) => {
 
   extension.setRoots()
 
-  const isCliAvailable = await extensionCanRunCli(extension, cwd)
+  const { isAvailable, isCompatible } = await extensionCanRunCli(extension, cwd)
 
-  if (extension.hasRoots() && isCliAvailable) {
+  extension.setCliCompatible(isCompatible)
+
+  if (extension.hasRoots() && isAvailable) {
+    extension.setAvailable(isAvailable)
     return extension.initialize()
   }
 
   extension.resetMembers()
 
-  if (!isCliAvailable) {
+  if (!isAvailable) {
     extension.setAvailable(false)
   }
 }
