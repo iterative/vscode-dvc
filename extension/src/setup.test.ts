@@ -592,6 +592,18 @@ describe('setup', () => {
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
   })
 
+  it('should not attempt to find the cli globally if the python extension is used and the found version is behind', async () => {
+    const [major] = MIN_CLI_VERSION.split('.')
+    const behind = [major, 0, 0].join('.')
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
+    mockedGetCliVersion.mockResolvedValueOnce(behind)
+
+    await setup(extension)
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+  })
+
   it('should run reset if the cli cannot be run and there is a workspace folder open', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
