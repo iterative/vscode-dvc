@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.4.11",
+  "version": "0.4.12",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1570,7 +1570,7 @@
     "@types/lodash.omit": "4.5.7",
     "@types/mocha": "10.0.0",
     "@types/mock-require": "2.0.1",
-    "@types/node": "16.11.62",
+    "@types/node": "16.11.63",
     "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.8",
     "@types/uuid": "8.3.4",
