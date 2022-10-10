@@ -1,11 +1,17 @@
 import React from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
-import { Indicator } from './Indicators'
+import { Indicator, IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
 import { clickAndEnterProps } from '../../../util/props'
-import { StarFull, StarEmpty } from '../../../shared/components/icons'
+import {
+  Clock,
+  Eye,
+  EyeClosed,
+  StarFull,
+  StarEmpty
+} from '../../../shared/components/icons'
 
 export type CellRowActionsProps = {
   isRowSelected: boolean
@@ -18,6 +24,9 @@ export type CellRowActionsProps = {
   }
   toggleRowSelection: () => void
   toggleStarred: () => void
+  bulletColor?: string
+  toggleExperiment: () => void
+  queued?: boolean
 }
 
 export type CellRowActionProps = {
@@ -27,6 +36,7 @@ export type CellRowActionProps = {
   hidden?: boolean
   testId?: string
   tooltipContent: string
+  queued?: boolean
 }
 
 export const CellRowAction: React.FC<CellRowActionProps> = ({
@@ -51,11 +61,35 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   )
 }
 
+const PlotIndicator: React.FC<{
+  bulletColor?: string
+  plotSelections: number
+  queued?: boolean
+  toggleExperiment: () => void
+}> = ({ bulletColor, plotSelections, queued, toggleExperiment }) => (
+  <CellHintTooltip tooltipContent={bulletColor ? 'Unplot' : 'Plot'}>
+    <div
+      className={cx(styles.rowActions, styles.plotEye)}
+      {...clickAndEnterProps(toggleExperiment)}
+    >
+      <IndicatorWithJustTheCounter count={plotSelections}>
+        {!queued && bulletColor ? <Eye /> : <EyeClosed />}
+      </IndicatorWithJustTheCounter>
+      <span className={styles.bullet} style={{ color: bulletColor }}>
+        {queued && <Clock />}
+      </span>
+    </div>
+  </CellHintTooltip>
+)
+
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
+  bulletColor,
+  queued,
+  toggleExperiment,
   isRowSelected,
   showSubRowStates,
   starred,
-  subRowStates: { selections, stars },
+  subRowStates: { selections, stars, plotSelections },
   toggleRowSelection,
   toggleStarred
 }) => {
@@ -90,6 +124,12 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           {!starred && <StarEmpty />}
         </div>
       </CellRowAction>
+      <PlotIndicator
+        bulletColor={bulletColor}
+        plotSelections={plotSelections}
+        queued={queued}
+        toggleExperiment={toggleExperiment}
+      />
     </>
   )
 }

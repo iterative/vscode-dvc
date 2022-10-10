@@ -1,13 +1,10 @@
 import React from 'react'
 import cx from 'classnames'
 import { ErrorTooltip } from './Errors'
-import { IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
-import { CellHintTooltip } from './CellHintTooltip'
 import { clickAndEnterProps } from '../../../util/props'
-import { Clock, Eye, EyeClosed } from '../../../shared/components/icons'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
@@ -34,39 +31,14 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
     <span className={styles.rowArrowContainer} />
   )
 
-const PlotIndicator: React.FC<{
-  bulletColor?: string
-  plotSelections: number
-  queued?: boolean
-  toggleExperiment: () => void
-}> = ({ bulletColor, plotSelections, queued, toggleExperiment }) => (
-  <CellHintTooltip tooltipContent={bulletColor ? 'Unplot' : 'Plot'}>
-    <div className={styles.plotEye} {...clickAndEnterProps(toggleExperiment)}>
-      <span className={styles.bullet} style={{ color: bulletColor }}>
-        {queued && <Clock />}
-      </span>
-      <IndicatorWithJustTheCounter count={plotSelections}>
-        {!queued && bulletColor ? <Eye /> : <EyeClosed />}
-      </IndicatorWithJustTheCounter>
-    </div>
-  </CellHintTooltip>
-)
-
-export const FirstCell: React.FC<
-  CellProp &
-    CellRowActionsProps & {
-      bulletColor?: string
-      toggleExperiment: () => void
-    }
-> = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
+export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
+  cell,
+  ...rowActionsProps
+}) => {
   const { row, isPlaceholder } = cell
   const {
-    original: { error, queued, label, displayNameOrParent = '' }
+    original: { error, label, queued, displayNameOrParent = '' }
   } = row
-
-  const {
-    subRowStates: { plotSelections }
-  } = rowActionsProps
 
   return (
     <div
@@ -79,19 +51,13 @@ export const FirstCell: React.FC<
       })}
     >
       <div className={styles.innerCell}>
-        <CellRowActions {...rowActionsProps} />
+        <CellRowActions queued={queued} {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        <PlotIndicator
-          bulletColor={bulletColor}
-          plotSelections={plotSelections}
-          queued={queued}
-          toggleExperiment={toggleExperiment}
-        />
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>
             <div
               className={cx(styles.cellContents, error && styles.error)}
-              {...clickAndEnterProps(toggleExperiment, [
+              {...clickAndEnterProps(rowActionsProps.toggleExperiment, [
                 label,
                 displayNameOrParent
               ])}
