@@ -10,10 +10,11 @@ export const getInput = (title: Title, value?: string) =>
 export const getValidInput = (
   title: Title,
   validateInput: (text?: string) => null | string,
-  value?: string
+  options?: { prompt?: string; value?: string }
 ) =>
   window.showInputBox({
+    prompt: options?.prompt,
     title,
     validateInput,
-    value
+    value: options?.value
   })

@@ -268,11 +268,11 @@ describe('Table', () => {
         bubbles: true
       })
 
-      const sortOption = await screen.findByText('Set Max Header Depth')
+      const sortOption = await screen.findByText('Set Max Header Height')
       fireEvent.click(sortOption)
 
       expect(mockedPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
+        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT
       })
     })
   })

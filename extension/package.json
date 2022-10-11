@@ -554,9 +554,9 @@
           "type": "string",
           "default": null
         },
-        "dvc.expTableHeadMaxLayers": {
-          "title": "%config.expTableHeadMaxLayers.title%",
-          "description": "%config.expTableHeadMaxLayers.description%",
+        "dvc.experimentsTableHeadMaxHeight": {
+          "title": "%config.experimentsTableHeadMaxHeight.title%",
+          "description": "%config.experimentsTableHeadMaxHeight.description%",
           "type": "number",
           "default": 5
         },
