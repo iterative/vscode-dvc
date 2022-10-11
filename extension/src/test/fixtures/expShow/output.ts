@@ -1,5 +1,5 @@
 import { join } from '../../util/path'
-import { ExperimentsOutput } from '../../../cli/dvc/contract'
+import { ExperimentsOutput, ExperimentStatus } from '../../../cli/dvc/contract'
 
 export const errorShas = [
   '489fd8bdaa709f7330aac342e051a9431c625481',
@@ -111,8 +111,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: true,
+        status: ExperimentStatus.RUNNING,
         timestamp: null
       }
     }
@@ -222,8 +221,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-11-21T19:58:22'
       }
     },
@@ -333,8 +331,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: true,
+        status: ExperimentStatus.RUNNING,
         timestamp: '2020-12-29T15:31:52'
       }
     },
@@ -443,8 +440,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:31:51'
       }
     },
@@ -553,8 +549,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:31:44'
       }
     },
@@ -664,8 +659,7 @@ const data: ExperimentsOutput = {
             is_data_source: true
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:28:59'
       }
     },
@@ -774,8 +768,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:28:57'
       }
     },
@@ -884,8 +877,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:28:50'
       }
     },
@@ -995,8 +987,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:27:02'
       }
     },
@@ -1105,8 +1096,7 @@ const data: ExperimentsOutput = {
             is_data_source: true
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:27:01'
       }
     },
@@ -1215,8 +1205,7 @@ const data: ExperimentsOutput = {
             is_data_source: true
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:26:55'
       }
     },
@@ -1325,8 +1314,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:26:49'
       }
     },
@@ -1435,8 +1423,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:26:43'
       }
     },
@@ -1545,8 +1532,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.RUNNING,
         timestamp: '2020-12-29T15:26:36'
       }
     },
@@ -1658,8 +1644,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:26:36'
       }
     },
@@ -1755,7 +1740,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        queued: true,
+        status: ExperimentStatus.QUEUED,
         timestamp: '2020-12-29T15:25:27'
       }
     }

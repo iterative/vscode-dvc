@@ -23,7 +23,7 @@ import { ColumnsModel } from './columns/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { askToDisableAutoApplyFilters } from './toast'
-import { Experiment, ColumnType, TableData } from './webview/contract'
+import { Experiment, ColumnType, TableData, isQueued } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
@@ -333,7 +333,7 @@ export class Experiments extends BaseRepository<TableData> {
     if (useFilters) {
       const filteredExperiments = this.experiments
         .getUnfilteredExperiments()
-        .filter(exp => !exp.queued)
+        .filter(exp => !isQueued(exp.status))
       if (tooManySelected(filteredExperiments)) {
         await this.warnAndDoNotAutoApply(filteredExperiments)
       } else {

@@ -12,7 +12,6 @@ describe('sortExperiments', () => {
     checkpoint_tip: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
     id: testId,
     label: testLabel,
-    queued: false,
     timestamp: testTimestamp
   }
   const testPathArray: [ColumnType, string, string] = [

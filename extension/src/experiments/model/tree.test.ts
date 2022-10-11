@@ -15,6 +15,7 @@ import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
+import { ExperimentStatus } from '../webview/contract'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -141,8 +142,8 @@ describe('ExperimentsTree', () => {
           hasChildren: false,
           id: 'exp-67899',
           label: 'f0778b3',
-          running: true,
           selected: true,
+          status: ExperimentStatus.RUNNING,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -150,7 +151,6 @@ describe('ExperimentsTree', () => {
           hasChildren: false,
           id: 'exp-abcdef',
           label: 'e350702',
-          running: false,
           selected: false,
           type: ExperimentType.EXPERIMENT
         },
@@ -161,7 +161,6 @@ describe('ExperimentsTree', () => {
           hasChildren: false,
           id: '139eabc',
           label: '139eabc',
-          running: false,
           selected: false,
           type: ExperimentType.EXPERIMENT
         },
@@ -169,7 +168,7 @@ describe('ExperimentsTree', () => {
           hasChildren: false,
           id: 'f81f1b5',
           label: 'f81f1b5',
-          queued: true,
+          status: ExperimentStatus.QUEUED,
           type: ExperimentType.QUEUED
         }
       ]
@@ -352,7 +351,6 @@ describe('ExperimentsTree', () => {
         iconPath: getMockedUri('circle-filled', '#b180d7'),
         id: 'f81f1b5',
         label: 'f81f1b5',
-        queued: false,
         tooltip: undefined,
         type: ExperimentType.BRANCH
       }
@@ -363,7 +361,6 @@ describe('ExperimentsTree', () => {
           hasChildren: false,
           id: 'exp-abcdef',
           label: 'e350702',
-          running: false,
           selected: false,
           type: ExperimentType.EXPERIMENT
         }

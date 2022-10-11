@@ -19,6 +19,7 @@ import {
   dataTypesOutput,
   rows as dataTypesRows
 } from '../../test/fixtures/expShow/dataTypes'
+import { ExperimentStatus } from '../../cli/dvc/contract'
 
 jest.mock('vscode')
 
@@ -96,8 +97,7 @@ describe('ExperimentsModel', () => {
           data: {
             executor: null,
             params: { 'params.yaml': { data: { epochs: 100 } } },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             timestamp: null
           }
         }
@@ -109,8 +109,7 @@ describe('ExperimentsModel', () => {
             executor: null,
             name: 'main',
             params: { 'params.yaml': { data: { epochs: 100 } } },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             timestamp: '2022-08-10T19:40:14'
           }
         },
@@ -126,8 +125,7 @@ describe('ExperimentsModel', () => {
             },
             executor: null,
             name: 'exp-750e4',
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             timestamp: '2022-08-11T23:04:39'
           }
         },
@@ -137,8 +135,7 @@ describe('ExperimentsModel', () => {
             executor: null,
             name: 'exp-d6ddc',
             params: { 'params.yaml': { data: { epochs: 100 } } },
-            queued: false,
-            running: false,
+            status: ExperimentStatus.SUCCESS,
             timestamp: '2022-08-11T22:55:46'
           }
         }

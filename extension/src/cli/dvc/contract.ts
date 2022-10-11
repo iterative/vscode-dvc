@@ -37,11 +37,17 @@ export interface ValueTreeNode {
 
 export type ValueTree = ValueTreeRoot | ValueTreeNode
 
+export enum ExperimentStatus {
+  FAILED = 'Failed',
+  QUEUED = 'Queued',
+  RUNNING = 'Running',
+  SUCCESS = 'Success'
+}
+
 export interface BaseExperimentFields {
   name?: string
   timestamp?: string | null
-  queued?: boolean
-  running?: boolean
+  status?: ExperimentStatus
   executor?: string | null
   checkpoint_tip?: string
   checkpoint_parent?: string
