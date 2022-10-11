@@ -1,4 +1,4 @@
-import { ExperimentsOutput } from '../../../cli/dvc/contract'
+import { ExperimentsOutput, ExperimentStatus } from '../../../cli/dvc/contract'
 
 const data: ExperimentsOutput = {
   workspace: {
@@ -53,8 +53,7 @@ const data: ExperimentsOutput = {
             is_data_source: false
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {}
       }
@@ -66,8 +65,7 @@ const data: ExperimentsOutput = {
         timestamp: '2022-08-13T09:13:15',
         deps: {},
         outs: {},
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {},
         name: 'main'

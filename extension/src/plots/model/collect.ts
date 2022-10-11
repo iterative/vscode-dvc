@@ -18,6 +18,7 @@ import {
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
   ExperimentsOutput,
+  ExperimentStatus,
   PlotsOutput,
   Value,
   ValueTree
@@ -81,8 +82,7 @@ type MetricsAndDetailsOrUndefined =
       checkpoint_parent: string | undefined
       checkpoint_tip: string | undefined
       metrics: MetricOrParamColumns | undefined
-      queued: boolean | undefined
-      running: boolean | undefined
+      status: ExperimentStatus | undefined
     }
   | undefined
 
@@ -94,19 +94,17 @@ const transformExperimentData = (
     return
   }
 
-  const { checkpoint_tip, checkpoint_parent, queued, running } =
-    experimentFields
+  const { checkpoint_tip, checkpoint_parent, status } = experimentFields
   const { metrics } = extractColumns(experimentFields)
 
-  return { checkpoint_parent, checkpoint_tip, metrics, queued, running }
+  return { checkpoint_parent, checkpoint_tip, metrics, status }
 }
 
 type ValidData = {
   checkpoint_parent: string
   checkpoint_tip: string
   metrics: MetricOrParamColumns
-  queued: boolean | undefined
-  running: boolean | undefined
+  status: ExperimentStatus
 }
 
 const isValid = (data: MetricsAndDetailsOrUndefined): data is ValidData =>

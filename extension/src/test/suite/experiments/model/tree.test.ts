@@ -368,27 +368,27 @@ suite('Experiments Tree Test Suite', () => {
         },
         {
           displayColor: colors[1],
+          group: '[exp-83425]',
+          id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
+          revision: '23250b3'
+        },
+        {
+          displayColor: colors[4],
           group: '[exp-e7a67]',
           id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
           revision: 'd1343a8'
         },
         {
-          displayColor: colors[4],
+          displayColor: colors[5],
           group: '[exp-e7a67]',
           id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
           revision: '1ee5f2e'
         },
         {
-          displayColor: colors[5],
+          displayColor: colors[6],
           group: '[test-branch]',
           id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
           revision: '2173124'
-        },
-        {
-          displayColor: colors[6],
-          group: '[test-branch]',
-          id: '9523bde67538cf31230efaff2dbc47d38a944ab5',
-          revision: '9523bde'
         }
       ])
       expect(
@@ -398,7 +398,7 @@ suite('Experiments Tree Test Suite', () => {
         dvcDemoPath,
         '1ee5f2e',
         '2173124',
-        '9523bde',
+        '23250b3',
         'd1343a8'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)

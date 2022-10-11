@@ -24,6 +24,7 @@ import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
 import {
   ColumnType,
   Experiment,
+  isQueued,
   TableData
 } from '../../../../../experiments/webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
@@ -95,7 +96,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
               )
             })
             .map(experiment =>
-              experiment.queued || experiment.error
+              isQueued(experiment.status) || experiment.error
                 ? experiment
                 : {
                     ...experiment,
@@ -478,7 +479,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: columnsFixture,
-        filteredCounts: { checkpoints: 9, experiments: 5 },
+        filteredCounts: { checkpoints: 9, experiments: 6 },
         filters: ['starred'],
         hasCheckpoints: true,
         hasColumns: true,
