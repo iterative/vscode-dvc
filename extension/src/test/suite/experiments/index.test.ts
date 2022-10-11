@@ -65,6 +65,7 @@ import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
+import { PlotSizeNumber } from '../../../plots/webview/contract'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -250,7 +251,7 @@ suite('Experiments Test Suite', () => {
       ).returns(undefined)
 
       const mockColumnId = 'params:params.yaml:lr'
-      const mockWidth = 400
+      const mockWidth = PlotSizeNumber.REGULAR
 
       mockMessageReceived.fire({
         payload: { id: mockColumnId, width: mockWidth },
