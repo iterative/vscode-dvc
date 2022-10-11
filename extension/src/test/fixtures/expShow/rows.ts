@@ -1465,6 +1465,56 @@ const data: Row[] = [
         sha: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
         starred: false,
         Created: '2020-12-29T15:25:27'
+      },
+      {
+        displayColor: undefined,
+        deps: {
+          [join('data', 'data.xml')]: valueWithNoChanges(
+            '22a1a2931c8370d3aeedd7183606fd7f'
+          ),
+          [join('data', 'features')]: valueWithNoChanges(
+            'f35d4cc2c552ac959ae602162b8543f3.dir'
+          ),
+          [join('data', 'prepared')]: valueWithNoChanges(
+            '153aad06d376b6595932470e459ef42a.dir'
+          ),
+          'model.pkl': valueWithNoChanges('46865edbf3d62fc5c039dd9d2b0567a4'),
+          [join('src', 'evaluate.py')]: valueWithNoChanges(
+            '44e714021a65edf881b1716e791d7f59'
+          ),
+          [join('src', 'featurization.py')]: valueWithNoChanges(
+            'e0265fc22f056a4b86d85c3056bc2894'
+          ),
+          [join('src', 'prepare.py')]: valueWithNoChanges(
+            'f09ea0c15980b43010257ccb9f0055e2'
+          ),
+          [join('src', 'train.py')]: valueWithNoChanges(
+            'c3961d777cfbd7727f9fde4851896006'
+          )
+        },
+        error: 'Experiment run failed.',
+        id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
+        label: '55d492c',
+        outs: {},
+        params: {
+          'params.yaml': {
+            code_names: [0, 2],
+            epochs: 5,
+            learning_rate: 2.1e-7,
+            dvc_logs_dir: 'dvc_logs',
+            log_file: 'logs.csv',
+            dropout: 0.125,
+            process: { threshold: 0.85 }
+          },
+          [join('nested', 'params.yaml')]: {
+            test: true
+          }
+        },
+        selected: false,
+        status: ExperimentStatus.FAILED,
+        sha: '55d492c9c633912685351b32df91bfe1f9ecefb9',
+        starred: false,
+        Created: '2020-12-29T15:25:27'
       }
     ],
     Created: '2020-11-21T19:58:22'
