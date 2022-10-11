@@ -83,7 +83,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         id: 'update-header-depth',
         label: 'Set Max Header Height',
         message: {
-          type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
+          type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT
         }
       }
     ]

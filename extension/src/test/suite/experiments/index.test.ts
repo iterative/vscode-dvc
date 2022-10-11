@@ -882,7 +882,7 @@ suite('Experiments Test Suite', () => {
     it('should be able to handle a message to update the table depth', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
       const inputEvent = getInputBoxEvent('0')
-      const tableMaxDepthOption = 'dvc.expTableHeadMaxLayers'
+      const tableMaxDepthOption = 'dvc.experimentsTableHeadMaxHeight'
       const tableMaxDepthChanged = configurationChangeEvent(
         tableMaxDepthOption,
         disposable
@@ -890,9 +890,10 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       mockMessageReceived.fire({
-        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
+        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT
       })
 
       await inputEvent
@@ -902,6 +903,15 @@ suite('Experiments Test Suite', () => {
       expect(
         await workspace.getConfiguration().get(tableMaxDepthOption)
       ).to.equal(0)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(
+        mockSendTelemetryEvent,
+        'should send a telemetry call that tells you the max height has been updated'
+      ).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT,
+        undefined,
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's star status", async () => {
