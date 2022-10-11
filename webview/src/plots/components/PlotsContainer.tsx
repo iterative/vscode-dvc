@@ -156,7 +156,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
               })}
               style={
                 {
-                  '--size': size.toString() + 'px'
+                  '--size': `${size}px`
                 } as DetailedHTMLProps<
                   HTMLAttributes<HTMLDivElement>,
                   HTMLDivElement

@@ -204,6 +204,7 @@ $gap: 20px;
   width: calc(var(--size) * var(--scale));
   position: relative;
   padding: 0 20px;
+  padding-right: $gap;
 }
 
 .dropSectionWrapper {

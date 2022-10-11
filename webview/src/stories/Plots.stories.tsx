@@ -118,7 +118,7 @@ WithTemplateOnly.args = {
   data: {
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: templatePlotsFixture
+    template: { ...templatePlotsFixture, size: PlotSizeNumber.REGULAR }
   }
 }
 

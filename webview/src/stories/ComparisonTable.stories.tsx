@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { configureStore } from '@reduxjs/toolkit'
 import { userEvent, within } from '@storybook/testing-library'
-import React from 'react'
+import React, { DetailedHTMLProps, HTMLAttributes } from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import {
@@ -49,7 +49,16 @@ const Template: Story = ({ plots, revisions }) => {
         selectedRevisions={revisions}
       >
         <WebviewWrapper>
-          <ComparisonTable />
+          <div
+            style={
+              { '--size': `${PlotSizeNumber.REGULAR}px` } as DetailedHTMLProps<
+                HTMLAttributes<HTMLDivElement>,
+                HTMLDivElement
+              >
+            }
+          >
+            <ComparisonTable />
+          </div>
         </WebviewWrapper>
       </MockedState>
     </Provider>
