@@ -172,6 +172,7 @@ $gap: 20px;
   aspect-ratio: calc(0.8 * var(--scale) + 0.2);
   grid-column: span var(--scale);
   width: calc(var(--size) * var(--scale));
+  max-width: max-content;
 }
 
 .comparisonTable {
