@@ -8,7 +8,7 @@ import {
   ComparisonRevisionData,
   Revision,
   PlotsComparisonData,
-  PlotSize
+  PlotSizeNumber
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
@@ -44,7 +44,7 @@ const Template: Story = ({ plots, revisions }) => {
       <MockedState
         data={{
           plots,
-          size: PlotSize.REGULAR
+          size: PlotSizeNumber.REGULAR
         }}
         selectedRevisions={revisions}
       >

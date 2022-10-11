@@ -2,7 +2,7 @@ import { ViewColumn } from 'vscode'
 import { WorkspaceScale } from './collect'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { SortDefinition } from '../experiments/model/sortBy'
-import { PlotSize, Section, SectionCollapsed } from '../plots/webview/contract'
+import { Section, SectionCollapsed } from '../plots/webview/contract'
 
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
 export const EXTENSION_ID = 'iterative.dvc'
@@ -233,7 +233,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined
-  [EventName.VIEWS_PLOTS_SECTION_RESIZED]: { section: Section; size: PlotSize }
+  [EventName.VIEWS_PLOTS_SECTION_RESIZED]: { section: Section; size: number }
   [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined

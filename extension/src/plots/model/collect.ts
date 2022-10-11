@@ -11,8 +11,7 @@ import {
   Plot,
   TemplatePlotEntry,
   TemplatePlotSection,
-  PlotsType,
-  PlotSize
+  PlotsType
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -534,7 +533,7 @@ const collectTemplateGroup = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  size: PlotSize,
+  size: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotEntry[] => {
@@ -579,7 +578,7 @@ export const collectSelectedTemplatePlots = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  size: PlotSize,
+  size: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotSection[] | undefined => {

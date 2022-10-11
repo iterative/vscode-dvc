@@ -1,46 +1,34 @@
-import { PlotSize } from 'dvc/src/plots/webview/contract'
-
-const MaxItemsBeforeVirtualization = {
-  [PlotSize.LARGE]: 10,
-  [PlotSize.REGULAR]: 15,
-  [PlotSize.SMALL]: 20
-}
-
-const maxPlotSize = {
-  [PlotSize.LARGE]: 1000,
-  [PlotSize.REGULAR]: 800,
-  [PlotSize.SMALL]: 500
-}
+import { PlotSizeNumber } from 'dvc/src/plots/webview/contract'
 
 export const DEFAULT_NB_ITEMS_PER_ROW = 4
 
-const w1600NbItemsPerRow = {
-  [PlotSize.LARGE]: 3,
-  [PlotSize.REGULAR]: 4,
-  [PlotSize.SMALL]: 6
-}
-const w800NbItemsPerRow = {
-  [PlotSize.LARGE]: 2,
-  [PlotSize.REGULAR]: 3,
-  [PlotSize.SMALL]: 4
-}
-
-export const getNbItemsPerRow = (size: PlotSize) => {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const getNbItemsPerRow = (size: number) => {
   const { innerWidth } = window
   if (innerWidth >= 2000) {
-    return Math.floor(innerWidth / maxPlotSize[size])
+    const maxPlotSize = size === PlotSizeNumber.SMALL ? size * 1.666 : size * 2
+    return Math.floor(innerWidth / maxPlotSize)
   }
 
   if (innerWidth >= 1600) {
-    return w1600NbItemsPerRow[size]
+    return Math.floor(1999 / size)
   }
 
   if (innerWidth >= 800) {
-    return w800NbItemsPerRow[size]
+    return Math.round(1599 / size) - 1
   }
 
-  return size === PlotSize.SMALL && innerWidth >= 600 ? 2 : 1
+  return size === PlotSizeNumber.SMALL && innerWidth >= 600 ? 2 : 1
 }
 
-export const shouldUseVirtualizedGrid = (nbItems: number, size: PlotSize) =>
-  nbItems > MaxItemsBeforeVirtualization[size]
+const MaxItemsBeforeVirtualization = {
+  [PlotSizeNumber.LARGE]: 10,
+  [PlotSizeNumber.REGULAR]: 15,
+  [PlotSizeNumber.SMALL]: 20
+}
+
+export const shouldUseVirtualizedGrid = (nbItems: number, size: number) =>
+  nbItems >
+  MaxItemsBeforeVirtualization[
+    size as keyof typeof MaxItemsBeforeVirtualization
+  ]

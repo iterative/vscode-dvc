@@ -2,7 +2,6 @@ import { SortDefinition } from '../experiments/model/sortBy'
 import { TableData } from '../experiments/webview/contract'
 import {
   PlotsData,
-  PlotSize,
   Section,
   SectionCollapsed,
   TemplatePlotGroup
@@ -51,7 +50,7 @@ export type ColumnResizePayload = {
   id: string
   width: number
 }
-export type PlotsResizedPayload = { section: Section; size: PlotSize }
+export type PlotsResizedPayload = { section: Section; size: number }
 export type PlotSectionRenamedPayload = {
   section: Section
   name: string

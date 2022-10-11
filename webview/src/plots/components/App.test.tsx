@@ -21,7 +21,7 @@ import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtuali
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotSize,
+  PlotSizeNumber,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
@@ -563,15 +563,21 @@ describe('App', () => {
 
     fireEvent.click(smallButton)
     let wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('smallPlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.SMALL}`)
+    ).toBe(true)
 
     fireEvent.click(regularButton)
     wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('regularPlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.REGULAR}`)
+    ).toBe(true)
 
     fireEvent.click(largeButton)
     wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('largePlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.LARGE}`)
+    ).toBe(true)
   })
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
@@ -587,7 +593,10 @@ describe('App', () => {
     fireEvent.click(largeButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.LARGE
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
@@ -595,7 +604,10 @@ describe('App', () => {
     fireEvent.click(smallButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.SMALL },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.SMALL
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
   })
@@ -613,7 +625,10 @@ describe('App', () => {
     fireEvent.click(largeButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.LARGE
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
