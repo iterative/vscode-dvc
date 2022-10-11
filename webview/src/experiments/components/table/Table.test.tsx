@@ -9,7 +9,11 @@ import {
   screen
 } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  ExperimentStatus,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
@@ -53,8 +57,7 @@ describe('Table', () => {
     row: {
       id: 'workspace',
       original: {
-        queued: false,
-        running: false
+        status: ExperimentStatus.SUCCESS
       }
     }
   }
@@ -102,8 +105,7 @@ describe('Table', () => {
         id: 'workspace',
         label: 'workspace',
         original: {
-          queued: false,
-          running: false
+          status: ExperimentStatus.SUCCESS
         },
         values: {
           id: 'workspace'
@@ -254,6 +256,23 @@ describe('Table', () => {
           payload: mockColumnPath,
           type: MessageFromWebviewType.REMOVE_COLUMN_SORT
         })
+      })
+    })
+  })
+
+  describe('Head Depth', () => {
+    it('should be updated by the user in the header context menu', async () => {
+      renderExperimentsTable()
+      const column = await screen.findByText('C')
+      fireEvent.contextMenu(column, {
+        bubbles: true
+      })
+
+      const sortOption = await screen.findByText('Set Max Header Depth')
+      fireEvent.click(sortOption)
+
+      expect(mockedPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
       })
     })
   })

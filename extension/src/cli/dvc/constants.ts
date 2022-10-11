@@ -1,8 +1,13 @@
-export const MIN_CLI_VERSION = '2.24.0'
-export const LATEST_TESTED_CLI_VERSION = '2.28.0'
+import { join } from 'path'
+
+export const MIN_CLI_VERSION = '2.30.0'
+export const LATEST_TESTED_CLI_VERSION = '2.30.0'
 export const MAX_CLI_VERSION = '3'
 
 export const UNEXPECTED_ERROR_CODE = 255
+
+export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
+export const NUM_OF_COMMITS_TO_SHOW = '3'
 
 export enum Command {
   ADD = 'add',

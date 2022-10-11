@@ -1,4 +1,4 @@
-import { ExperimentsOutput } from '../../../cli/dvc/reader'
+import { ExperimentsOutput, ExperimentStatus } from '../../../cli/dvc/contract'
 import { timestampColumn } from '../../../experiments/columns/constants'
 import {
   Column,
@@ -26,8 +26,7 @@ export const dataTypesOutput: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null
       }
     }
@@ -36,8 +35,7 @@ export const dataTypesOutput: ExperimentsOutput = {
     baseline: {
       data: {
         timestamp: '2020-11-21T19:58:22',
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         name: 'main'
       }
@@ -159,8 +157,7 @@ export const rows: Row[] = [
         zero: 0
       }
     },
-    queued: false,
-    running: false,
+    status: ExperimentStatus.SUCCESS,
     selected: true,
     starred: false
   },
@@ -170,8 +167,7 @@ export const rows: Row[] = [
     id: 'main',
     label: 'main',
     name: 'main',
-    queued: false,
-    running: false,
+    status: ExperimentStatus.SUCCESS,
     selected: true,
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     starred: false,

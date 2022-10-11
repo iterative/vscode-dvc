@@ -4,22 +4,12 @@ import {
   quickPickValue,
   quickPickYesOrNo
 } from './vscode/quickPick'
-import {
-  ConfigKey,
-  getConfigValue,
-  setConfigValue,
-  setUserConfigValue
-} from './vscode/config'
+import { ConfigKey, setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
-import { Response } from './vscode/response'
 import { getSelectTitle, Title } from './vscode/title'
-import { Toast } from './vscode/toast'
-import {
-  getPythonBinPath,
-  isPythonExtensionInstalled,
-  selectPythonInterpreter
-} from './extensions/python'
+import { isPythonExtensionInstalled } from './extensions/python'
+import { extensionCanRunCli } from './cli/dvc/discovery'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -163,86 +153,6 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
-const getToastText = async (
-  isPythonExtensionInstalled: boolean
-): Promise<string> => {
-  const text = 'An error was thrown when trying to access the CLI.'
-  if (!isPythonExtensionInstalled) {
-    return text
-  }
-  const binPath = await getPythonBinPath()
-
-  return (
-    text +
-    ` For auto Python environment activation ensure the correct interpreter is set. Active Python interpreter: ${binPath}. `
-  )
-}
-
-const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
-  return isPythonExtensionInstalled
-    ? [Response.SETUP_WORKSPACE, Response.SELECT_INTERPRETER, Response.NEVER]
-    : [Response.SETUP_WORKSPACE, Response.NEVER]
-}
-
-const warnUserCLIInaccessible = async (
-  extension: IExtension
-): Promise<void> => {
-  if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
-    return
-  }
-
-  const isMsPythonInstalled = isPythonExtensionInstalled()
-  const warningText = await getToastText(isMsPythonInstalled)
-
-  const response = await Toast.warnWithOptions(
-    warningText,
-    ...getToastOptions(isMsPythonInstalled)
-  )
-
-  switch (response) {
-    case Response.SELECT_INTERPRETER:
-      return selectPythonInterpreter()
-    case Response.SETUP_WORKSPACE:
-      return extension.setupWorkspace()
-    case Response.NEVER:
-      return setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
-  }
-}
-
-const extensionCanRunPythonCli = async (extension: IExtension, cwd: string) => {
-  let canRunCli = false
-  if (await extension.isDvcPythonModule()) {
-    try {
-      canRunCli = await extension.canRunCli(cwd)
-    } catch {}
-  }
-  return canRunCli
-}
-
-const extensionCanRunGlobalCli = async (extension: IExtension, cwd: string) => {
-  let canRunCli = false
-  try {
-    canRunCli = await extension.canRunCli(cwd, true)
-  } catch {
-    if (extension.hasRoots()) {
-      warnUserCLIInaccessible(extension)
-    }
-  }
-  return canRunCli
-}
-
-const extensionCanRunCli = async (
-  extension: IExtension,
-  cwd: string
-): Promise<boolean> => {
-  let canRunCli = await extensionCanRunPythonCli(extension, cwd)
-
-  if (!canRunCli) {
-    canRunCli = await extensionCanRunGlobalCli(extension, cwd)
-  }
-  return canRunCli
-}
-
 export const setup = async (extension: IExtension) => {
   const cwd = getFirstWorkspaceFolder()
   if (!cwd) {
@@ -251,15 +161,18 @@ export const setup = async (extension: IExtension) => {
 
   extension.setRoots()
 
-  const isCliAvailable = await extensionCanRunCli(extension, cwd)
+  const { isAvailable, isCompatible } = await extensionCanRunCli(extension, cwd)
 
-  if (extension.hasRoots() && isCliAvailable) {
+  extension.setCliCompatible(isCompatible)
+
+  if (extension.hasRoots() && isAvailable) {
+    extension.setAvailable(isAvailable)
     return extension.initialize()
   }
 
   extension.resetMembers()
 
-  if (!isCliAvailable) {
+  if (!isAvailable) {
     extension.setAvailable(false)
   }
 }

@@ -1,4 +1,4 @@
-import { ExperimentsOutput } from '../../../cli/dvc/reader'
+import { ExperimentsOutput, ExperimentStatus } from '../../../cli/dvc/contract'
 import { timestampColumn } from '../../../experiments/columns/constants'
 import {
   Column,
@@ -32,8 +32,7 @@ export const deeplyNestedOutput: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null
       }
     }
@@ -63,8 +62,7 @@ export const deeplyNestedOutput: ExperimentsOutput = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         name: 'main'
       }
@@ -655,8 +653,6 @@ export const rows = [
   {
     id: 'workspace',
     label: 'workspace',
-    queued: false,
-    running: false,
     executor: null,
     params: {
       'params.yaml': {
@@ -679,14 +675,14 @@ export const rows = [
     },
     displayColor: '#945dd6',
     selected: true,
+    status: ExperimentStatus.SUCCESS,
     starred: false
   },
   {
     id: 'main',
     label: 'main',
     Created: '2020-11-21T19:58:22',
-    queued: false,
-    running: false,
+    status: ExperimentStatus.SUCCESS,
     executor: null,
     name: 'main',
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',

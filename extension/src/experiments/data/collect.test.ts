@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { collectFiles } from './collect'
-import { ExperimentsOutput } from '../../cli/dvc/reader'
+import { ExperimentsOutput, ExperimentStatus } from '../../cli/dvc/contract'
 import expShowFixture from '../../test/fixtures/expShow/output'
 
 describe('collectFiles', () => {
@@ -100,8 +100,7 @@ describe('collectFiles', () => {
                 }
               }
             },
-            queued: false,
-            running: true,
+            status: ExperimentStatus.RUNNING,
             timestamp: null
           }
         }

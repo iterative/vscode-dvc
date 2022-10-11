@@ -1,6 +1,10 @@
-import { isVersionCompatible, extractSemver, ParsedSemver } from './version'
+import {
+  isVersionCompatible,
+  extractSemver,
+  ParsedSemver,
+  CliCompatible
+} from './version'
 import { MIN_CLI_VERSION, LATEST_TESTED_CLI_VERSION } from './constants'
-import { Toast } from '../../vscode/toast'
 
 jest.mock('./constants', () => ({
   ...jest.requireActual('./constants'),
@@ -8,11 +12,6 @@ jest.mock('./constants', () => ({
   MIN_CLI_VERSION: '2.9.4'
 }))
 jest.mock('../../vscode/config')
-jest.mock('../../vscode/toast')
-
-const mockedToast = jest.mocked(Toast)
-const mockedWarnWithOptions = jest.fn()
-mockedToast.warnWithOptions = mockedWarnWithOptions
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -57,39 +56,31 @@ describe('isVersionCompatible', () => {
     patch: latestTestedPatch
   } = extractSemver(LATEST_TESTED_CLI_VERSION) as ParsedSemver
 
-  it('should be compatible and not send a toast message if the provided version matches the min version', () => {
+  it('should be compatible if the provided version matches the min version', () => {
     const isCompatible = isVersionCompatible(MIN_CLI_VERSION)
 
-    expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
+    expect(isCompatible).toStrictEqual(CliCompatible.YES)
   })
 
-  it('should be compatible and not send a toast for a version with the same minor and higher patch as the min compatible version', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
-
+  it('should be compatible for a version with the same minor and higher patch as the min compatible version', () => {
     const isCompatible = isVersionCompatible(
       [minMajor, minMinor, minPatch + 10000].join('.')
     )
 
-    expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
+    expect(isCompatible).toStrictEqual(CliCompatible.YES)
   })
 
-  it('should be compatible and not send a toast for a version with the same minor and higher patch as the latest tested version', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
-
+  it('should be compatible for a version with the same minor and higher patch as the latest tested version', () => {
     const isCompatible = isVersionCompatible(
       [latestTestedMajor, latestTestedMinor, latestTestedPatch + 10000].join(
         '.'
       )
     )
 
-    expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
+    expect(isCompatible).toStrictEqual(CliCompatible.YES)
   })
 
-  it('should be compatible and not send a toast for a major and minor version in between the min compatible and the latest tested', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+  it('should be compatible for a major and minor version in between the min compatible and the latest tested', () => {
     expect(minMinor + 1).toBeLessThan(latestTestedMinor)
     expect(minMajor).toStrictEqual(latestTestedMajor)
 
@@ -97,85 +88,82 @@ describe('isVersionCompatible', () => {
       [minMajor, minMinor + 1, 0].join('.')
     )
 
-    expect(isCompatible).toBe(true)
-    expect(mockedWarnWithOptions).not.toHaveBeenCalled()
+    expect(isCompatible).toStrictEqual(CliCompatible.YES)
   })
 
-  it('should be compatible and send a toast for a version with a minor higher as the latest tested minor and any patch', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
+  it('should return not found if the version provided is undefined', () => {
+    const isCompatible = isVersionCompatible(undefined)
+
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_NOT_FOUND)
+  })
+
+  it('should return minor version ahead of tested for a version with a minor higher as the latest tested minor and any patch', () => {
     expect(0).toBeLessThan(latestTestedPatch)
 
     let isCompatible = isVersionCompatible(
       [latestTestedMajor, latestTestedMinor + 1, 0].join('.')
     )
-    expect(isCompatible).toBe(true)
+
+    expect(isCompatible).toStrictEqual(
+      CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
+    )
 
     isCompatible = isVersionCompatible(
       [latestTestedMajor, latestTestedMinor + 1, latestTestedPatch + 1000].join(
         '.'
       )
     )
-    expect(isCompatible).toBe(true)
+
+    expect(isCompatible).toStrictEqual(
+      CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
+    )
 
     isCompatible = isVersionCompatible(
       [latestTestedMajor, latestTestedMinor + 1, latestTestedPatch].join('.')
     )
-    expect(isCompatible).toBe(true)
 
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(3)
+    expect(isCompatible).toStrictEqual(
+      CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
+    )
   })
 
-  it('should not be compatible and send a toast message if the provided version is a patch version before the minimum expected version', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
-
+  it('should return behind min version if the provided version is a patch version before the minimum expected version', () => {
     const isCompatible = isVersionCompatible(
       [minMajor, minMinor, minPatch - 1].join('.')
     )
 
-    expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_BEHIND_MIN_VERSION)
   })
 
-  it('should not be compatible and send a toast message if the provided minor version is before the minimum expected version', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
-
+  it('should return behind min version if the provided minor version is before the minimum expected version', () => {
     const isCompatible = isVersionCompatible(
       [minMajor, minMinor - 1, minPatch + 100].join('.')
     )
 
-    expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_BEHIND_MIN_VERSION)
   })
 
-  it('should not be compatible and send a toast message if the provided major version is before the minimum expected version', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
-
+  it('should return behind min version if the provided major version is before the minimum expected version', () => {
     const isCompatible = isVersionCompatible(
       [minMajor - 1, minMinor + 1000, minPatch + 100].join('.')
     )
 
-    expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_BEHIND_MIN_VERSION)
   })
 
-  it('should not be compatible and send a toast message if the provided major version is above the expected major version', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
-
+  it('should return major ahead if the provided major version is above the expected major version', () => {
     const isCompatible = isVersionCompatible('3.0.0')
 
-    expect(isCompatible).toBe(false)
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_MAJOR_VERSION_AHEAD)
   })
 
-  it('should not be compatible and send a toast message if the provided version is malformed', () => {
-    mockedWarnWithOptions.mockResolvedValueOnce(undefined)
-
+  it('should return cannot verify if the provided version is malformed', () => {
     let isCompatible = isVersionCompatible('not a valid version')
-    expect(isCompatible).toBe(false)
+
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_CANNOT_VERIFY)
 
     isCompatible = isVersionCompatible('1,2,3')
-    expect(isCompatible).toBe(false)
 
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(2)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_CANNOT_VERIFY)
   })
 })

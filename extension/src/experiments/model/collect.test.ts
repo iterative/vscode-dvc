@@ -1,6 +1,7 @@
 import { collectExperiments, collectMutableRevisions } from './collect'
 import { Experiment } from '../webview/contract'
 import modifiedFixture from '../../test/fixtures/expShow/modified'
+import { ExperimentStatus } from '../../cli/dvc/contract'
 
 describe('collectExperiments', () => {
   it('should return an empty array if no branches are present', () => {
@@ -132,16 +133,16 @@ describe('collectExperiments', () => {
 
 describe('collectMutableRevisions', () => {
   const baseExperiments = [
-    { label: 'branch-A', running: false, selected: false },
-    { label: 'workspace', running: false, selected: false }
+    { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
+    { label: 'workspace', selected: false, status: ExperimentStatus.FAILED }
   ] as Experiment[]
 
   it('should not return the workspace when there is a selected running checkpoint experiment (race condition)', () => {
     const experiments = [
       {
         label: 'exp-123',
-        running: true,
-        selected: true
+        selected: true,
+        status: ExperimentStatus.RUNNING
       },
       ...baseExperiments
     ] as Experiment[]
@@ -154,8 +155,8 @@ describe('collectMutableRevisions', () => {
     const experiments = [
       {
         label: 'exp-123',
-        running: true,
-        selected: false
+        selected: false,
+        status: ExperimentStatus.RUNNING
       },
       ...baseExperiments
     ] as Experiment[]
@@ -166,8 +167,8 @@ describe('collectMutableRevisions', () => {
 
   it('should return the workspace when there are no checkpoints', () => {
     const experiments = [
-      { label: 'branch-A', running: false, selected: false },
-      { label: 'workspace', running: false, selected: false }
+      { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
+      { label: 'workspace', selected: false, status: ExperimentStatus.SUCCESS }
     ] as Experiment[]
 
     const mutableRevisions = collectMutableRevisions(experiments, false)
@@ -176,10 +177,10 @@ describe('collectMutableRevisions', () => {
 
   it('should return all running experiments when there are checkpoints', () => {
     const experiments = [
-      { label: 'branch-A', running: false, selected: false },
-      { label: 'workspace', running: false, selected: false },
-      { label: 'running-1', running: true, selected: false },
-      { label: 'running-2', running: true, selected: true }
+      { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
+      { label: 'workspace', selected: false, status: ExperimentStatus.SUCCESS },
+      { label: 'running-1', selected: false, status: ExperimentStatus.RUNNING },
+      { label: 'running-2', selected: true, status: ExperimentStatus.RUNNING }
     ] as Experiment[]
 
     const mutableRevisions = collectMutableRevisions(experiments, false)

@@ -1,5 +1,5 @@
 import { EventEmitter } from 'vscode'
-import { PlotsOutput } from '../../cli/dvc/reader'
+import { PlotsOutput } from '../../cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
 import {

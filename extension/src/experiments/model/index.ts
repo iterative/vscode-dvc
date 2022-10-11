@@ -23,15 +23,14 @@ import {
   UNSELECTED
 } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
-import { Experiment, Row } from '../webview/contract'
+import { Experiment, isQueued, Row } from '../webview/contract'
 import {
   definedAndNonEmpty,
   reorderListSubset,
   reorderObjectList
 } from '../../util/array'
-import { ExperimentsOutput } from '../../cli/dvc/reader'
+import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { setContextValue } from '../../vscode/context'
-import { hasKey } from '../../util/object'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -39,7 +38,7 @@ import { sum } from '../../util/math'
 
 export type StarredExperiments = Record<string, boolean | undefined>
 
-type SelectedExperimentWithColor = Experiment & {
+export type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
   selected: true
 }
@@ -129,8 +128,11 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public toggleStatus(id: string) {
     if (
-      this.getFlattenedExperiments().find(({ id: queuedId }) => queuedId === id)
-        ?.queued
+      isQueued(
+        this.getFlattenedExperiments().find(
+          ({ id: queuedId }) => queuedId === id
+        )?.status
+      )
     ) {
       return
     }
@@ -318,8 +320,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getExperimentsWithCheckpoints(): ExperimentWithCheckpoints[] {
     const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = []
     for (const experiment of this.getAllExperiments()) {
-      const { id, queued } = experiment
-      if (queued) {
+      const { id, status } = experiment
+      if (isQueued(status)) {
         continue
       }
 
@@ -412,7 +414,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsByBranch(branch)?.map(experiment => ({
       ...experiment,
       hasChildren: definedAndNonEmpty(this.checkpointsByTip.get(experiment.id)),
-      type: experiment.queued
+      type: isQueued(experiment.status)
         ? ExperimentType.QUEUED
         : ExperimentType.EXPERIMENT
     }))
@@ -494,11 +496,11 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   private splitExperimentsByQueued(getQueued = false) {
-    return this.getFlattenedExperiments().filter(({ queued }) => {
+    return this.getFlattenedExperiments().filter(({ status }) => {
       if (getQueued) {
-        return queued
+        return isQueued(status)
       }
-      return !queued
+      return !isQueued(status)
     })
   }
 
@@ -569,23 +571,11 @@ export class ExperimentsModel extends ModelWithPersistence {
   private addDetails(experiment: Experiment) {
     const { id } = experiment
 
-    const starred = !!this.isStarred(id)
-
-    if (!hasKey(this.coloredStatus, id)) {
-      return {
-        ...experiment,
-        selected: false,
-        starred
-      }
-    }
-
-    const selected = this.isSelected(id)
-
     return {
       ...experiment,
       displayColor: this.getDisplayColor(id),
-      selected,
-      starred
+      selected: this.isSelected(id),
+      starred: !!this.isStarred(id)
     }
   }
 

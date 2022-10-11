@@ -702,6 +702,7 @@ describe('App', () => {
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
         'Open to the Side',
+        'Set Max Header Depth',
         'Sort Ascending',
         'Sort Descending'
       ])
@@ -716,7 +717,7 @@ describe('App', () => {
       jest.advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(3)
+      expect(menuitems).toHaveLength(4)
 
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)

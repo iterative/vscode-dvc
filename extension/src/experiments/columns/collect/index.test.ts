@@ -7,7 +7,7 @@ import outputFixture from '../../../test/fixtures/expShow/output'
 import columnsFixture from '../../../test/fixtures/expShow/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
-import { ExperimentsOutput } from '../../../cli/dvc/reader'
+import { ExperimentsOutput } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
 
 jest.mock('../../../vscode/config')

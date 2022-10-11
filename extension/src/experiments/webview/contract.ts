@@ -1,6 +1,12 @@
-import { BaseExperimentFields, ValueTree } from '../../cli/dvc/reader'
+import {
+  BaseExperimentFields,
+  ExperimentStatus,
+  ValueTree
+} from '../../cli/dvc/contract'
 import { FilteredCounts } from '../model/filterBy/collect'
 import { SortDefinition } from '../model/sortBy'
+
+export { ExperimentStatus } from '../../cli/dvc/contract'
 
 export interface MetricOrParamColumns {
   [filename: string]: ValueTree
@@ -32,6 +38,12 @@ export interface Experiment extends BaseExperimentFields {
   starred?: boolean
   Created?: string
 }
+
+export const isRunning = (status: ExperimentStatus | undefined): boolean =>
+  status === ExperimentStatus.RUNNING
+
+export const isQueued = (status: ExperimentStatus | undefined): boolean =>
+  status === ExperimentStatus.QUEUED
 
 export interface Row extends Experiment {
   subRows?: Row[]

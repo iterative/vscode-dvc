@@ -1,7 +1,7 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
-import { PlotsOutput } from '../../../cli/dvc/reader'
+import { PlotsOutput } from '../../../cli/dvc/contract'
 import {
   ComparisonPlots,
   ComparisonRevisionData,
@@ -447,6 +447,10 @@ export const getOutput = (
 })
 
 export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
+
+export const getMultiSourceOutput = (): PlotsOutput => ({
+  ...require('./multiSource').default
+})
 
 const expectedRevisions = ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd']
 
