@@ -479,7 +479,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columnOrder: [],
         columnWidths: {},
         columns: columnsFixture,
-        filteredCounts: { checkpoints: 9, experiments: 5 },
+        filteredCounts: { checkpoints: 9, experiments: 6 },
         filters: ['starred'],
         hasCheckpoints: true,
         hasColumns: true,
