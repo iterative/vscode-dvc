@@ -1,4 +1,4 @@
-# Command Palette
+# Available Commands
 
 This extension makes extensive use of the
 [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
