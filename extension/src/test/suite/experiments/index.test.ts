@@ -895,9 +895,8 @@ suite('Experiments Test Suite', () => {
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT
       })
-      // comment
+
       await inputEvent
-      await mockMessageReceived
       await tableMaxDepthChanged
 
       expect(
