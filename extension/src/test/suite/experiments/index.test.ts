@@ -32,6 +32,7 @@ import {
   buildInternalCommands,
   buildMockData,
   closeAllEditors,
+  configurationChangeEvent,
   experimentsUpdatedEvent,
   extensionUri,
   getInputBoxEvent,
@@ -878,6 +879,41 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should be able to handle a message to update the table depth', async () => {
+      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const inputEvent = getInputBoxEvent('0')
+      const tableMaxDepthOption = 'dvc.experimentsTableHeadMaxHeight'
+      const tableMaxDepthChanged = configurationChangeEvent(
+        tableMaxDepthOption,
+        disposable
+      )
+
+      const webview = await experiments.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT
+      })
+
+      await inputEvent
+      await mockMessageReceived
+      await tableMaxDepthChanged
+
+      expect(
+        await workspace.getConfiguration().get(tableMaxDepthOption)
+      ).to.equal(0)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(
+        mockSendTelemetryEvent,
+        'should send a telemetry call that tells you the max height has been updated'
+      ).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it("should be able to handle a message to toggle an experiment's star status", async () => {
       const { experiments, experimentsModel } =
         setupExperimentsAndMockCommands()
@@ -1260,6 +1296,7 @@ suite('Experiments Test Suite', () => {
         '22e40e1fa3c916ac567f69b85969e3066a91dda4': 0,
         '23250b33e3d6dd0e136262d1d26a2face031cb03': 0,
         '489fd8bdaa709f7330aac342e051a9431c625481': colors[5],
+        '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
         '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15': 0,
         '9523bde67538cf31230efaff2dbc47d38a944ab5': 0,
         c658f8b14ac819ac2a5ea0449da6c15dbe8eb880: 0,
@@ -1359,6 +1396,7 @@ suite('Experiments Test Suite', () => {
         '22e40e1fa3c916ac567f69b85969e3066a91dda4': 0,
         '23250b33e3d6dd0e136262d1d26a2face031cb03': 0,
         '489fd8bdaa709f7330aac342e051a9431c625481': colors[5],
+        '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
         '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15': 0,
         '9523bde67538cf31230efaff2dbc47d38a944ab5': 0,
         c658f8b14ac819ac2a5ea0449da6c15dbe8eb880: 0,
@@ -1380,6 +1418,7 @@ suite('Experiments Test Suite', () => {
         'experimentsSortBy:test': sortDefinitions,
         'experimentsStatus:test': {
           '489fd8bdaa709f7330aac342e051a9431c625481': 0,
+          '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
           'exp-83425': colors[0],
           'exp-e7a67': 0,
           'exp-f13bca': 0,

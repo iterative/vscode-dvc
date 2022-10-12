@@ -30,7 +30,7 @@ import {
 } from '../../commands/external'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
-import { Experiment } from '../webview/contract'
+import { Experiment, ExperimentStatus, isRunning } from '../webview/contract'
 
 export class ExperimentsTree
   extends Disposable
@@ -236,17 +236,17 @@ export class ExperimentsTree
 
   private getExperimentIcon({
     displayColor,
-    running,
+    status,
     type,
     selected
   }: {
     displayColor?: string
     label: string
-    running?: boolean
+    status?: ExperimentStatus
     type?: ExperimentType
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
-    if (running) {
+    if (isRunning(status)) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
     if (type === ExperimentType.QUEUED) {

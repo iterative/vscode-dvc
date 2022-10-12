@@ -37,7 +37,7 @@ export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
 }) => {
   const { row, isPlaceholder } = cell
   const {
-    original: { error, label, queued, displayNameOrParent = '' }
+    original: { error, status, label, displayNameOrParent = '' }
   } = row
   const { toggleExperiment } = rowActionsProps
 
@@ -52,7 +52,7 @@ export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
       })}
     >
       <div className={styles.innerCell}>
-        <CellRowActions queued={queued} {...rowActionsProps} />
+        <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>

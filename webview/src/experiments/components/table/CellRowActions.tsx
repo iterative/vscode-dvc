@@ -1,6 +1,10 @@
 import React from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import {
+  ExperimentStatus,
+  isQueued
+} from 'dvc/src/experiments/webview/contract'
 import { Indicator } from './Indicators'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
@@ -20,7 +24,7 @@ export type CellRowActionsProps = {
   toggleStarred: () => void
   bulletColor?: string
   toggleExperiment: () => void
-  queued?: boolean
+  status?: ExperimentStatus
 }
 
 export type CellRowActionProps = {
@@ -60,7 +64,7 @@ const getTooltipContent = (determiner: boolean, text: string): string =>
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   bulletColor,
-  queued,
+  status,
   toggleExperiment,
   isRowSelected,
   showSubRowStates,
@@ -99,7 +103,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           {starred ? <StarFull /> : <StarEmpty />}
         </div>
       </CellRowAction>
-      {queued ? (
+      {isQueued(status) ? (
         <div className={styles.rowActions}>
           <span className={styles.queued}>
             <Clock />

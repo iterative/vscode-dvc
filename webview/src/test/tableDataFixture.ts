@@ -1,5 +1,9 @@
 import { copyOriginalColors } from 'dvc/src/experiments/model/status/colors'
-import { Row, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  ExperimentStatus,
+  Row,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 
 const matchAndTransform = (
   rows: Row[],
@@ -41,12 +45,16 @@ export const transformRows = (
   } as TableData
 }
 
-export const setRowPropertyAsTrue =
-  (prop: keyof Row) => (fixture: TableData, labelOrIds: string[]) => {
-    return transformRows(fixture, labelOrIds, row => ({ ...row, [prop]: true }))
+const setRowProperty =
+  (prop: keyof Row, value: unknown) =>
+  (fixture: TableData, labelOrIds: string[]) => {
+    return transformRows(fixture, labelOrIds, row => ({
+      ...row,
+      [prop]: value
+    }))
   }
 
-export const setExperimentsAsStarred = setRowPropertyAsTrue('starred')
+export const setExperimentsAsStarred = setRowProperty('starred', true)
 
 export const setExperimentsAsSelected = (
   fixture: TableData,
@@ -66,4 +74,7 @@ export const setExperimentsAsSelected = (
     selected: true
   }))
 }
-export const setExperimentsAsRunning = setRowPropertyAsTrue('running')
+export const setExperimentsAsRunning = setRowProperty(
+  'status',
+  ExperimentStatus.RUNNING
+)

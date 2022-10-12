@@ -1,6 +1,8 @@
 import { Plot } from '../../plots/webview/contract'
 
-export type DvcError = { error: { type: string; msg: string } }
+type ErrorContents = { type: string; msg: string }
+
+export type DvcError = { error: ErrorContents }
 
 export type Changes = {
   added?: string[]
@@ -22,7 +24,7 @@ export type Value = SingleValue | SingleValue[]
 
 export interface ValueTreeOrError {
   data?: ValueTree
-  error?: { type: string; msg: string }
+  error?: ErrorContents
 }
 
 type RelPathObject<T> = {
@@ -37,11 +39,17 @@ export interface ValueTreeNode {
 
 export type ValueTree = ValueTreeRoot | ValueTreeNode
 
+export enum ExperimentStatus {
+  FAILED = 'Failed',
+  QUEUED = 'Queued',
+  RUNNING = 'Running',
+  SUCCESS = 'Success'
+}
+
 export interface BaseExperimentFields {
   name?: string
   timestamp?: string | null
-  queued?: boolean
-  running?: boolean
+  status?: ExperimentStatus
   executor?: string | null
   checkpoint_tip?: string
   checkpoint_parent?: string
@@ -57,11 +65,12 @@ export interface ExperimentFields extends BaseExperimentFields {
   metrics?: ValueTreeRoot
   deps?: Deps
   outs?: RelPathObject<Out>
+  error?: ErrorContents
 }
 
 export interface ExperimentFieldsOrError {
   data?: ExperimentFields
-  error?: { type: string; msg: string }
+  error?: ErrorContents
 }
 
 export interface ExperimentsBranchOutput {
