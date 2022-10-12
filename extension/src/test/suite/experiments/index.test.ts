@@ -897,7 +897,6 @@ suite('Experiments Test Suite', () => {
       })
 
       await inputEvent
-      await mockMessageReceived
       await tableMaxDepthChanged
 
       expect(
