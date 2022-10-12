@@ -1496,7 +1496,7 @@
           },
           {
             "id": "dvc.moreResources",
-            "title": "More Resources",
+            "title": "Helpful Resources",
             "description": "Learn more about this extension and DVC, and find other relevant materials.\n[DVC Docs](https://dvc.org/doc)",
             "media": {
               "markdown": "resources/walkthrough/more-resources.md"
