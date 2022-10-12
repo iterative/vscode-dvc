@@ -95,19 +95,26 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 }
 
 .bullet {
+  visibility: visible;
+  background: $checkbox-background;
+  border-radius: 999px;
+  border: calc(var(--border-width) * 1px) solid $checkbox-border;
+  box-sizing: border-box;
+  cursor: pointer;
+  height: calc(var(--design-unit) * 4px);
+  outline: none;
+  width: calc(var(--design-unit) * 4px);
   color: $fg-color;
-  display: inline-block;
-  width: 24px;
-  flex: 0 0 24px;
-  text-align: center;
+
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+
+  display: flex;
   position: relative;
-  .queuedExperiment & svg {
-    height: 12px;
-  }
 
   &::before {
     display: inline-block;
-    margin: 0 5px;
     position: relative;
     content: '';
     border-radius: 99px;
@@ -129,70 +136,39 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       width: 4px;
       height: 4px;
       vertical-align: middle;
-      border: 1px solid currentColor;
-      background-color: $bg-color;
-    }
-
-    .unselectedExperiment:not(.rowSelected):hover & {
-      background-image: linear-gradient(
-          $row-hover-background-color,
-          $row-hover-background-color
-        ),
-        linear-gradient($bg-color, $bg-color);
+      border: 1px solid $fg-color;
+      background-color: $checkbox-background;
     }
 
     .workspaceWithChanges.unselectedExperiment & {
       border: 1px solid $changed-color;
     }
 
-    .rowSelected.unselectedExperiment & {
-      background-image: linear-gradient(
-          $row-bg-selected-color,
-          $row-bg-selected-color
-        ),
-        linear-gradient($bg-color, $bg-color);
-    }
-
-    .queuedExperiment & {
-      display: none;
-    }
     .runningExperiment & {
       width: 4px;
       height: 4px;
       vertical-align: middle;
-      border: 1.5px solid $row-bg-color;
+      border: 1.5px solid $checkbox-border;
       border-radius: 100%;
       border-right: 1.5px solid currentColor;
       border-top: 1.5px solid currentColor;
       animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
-      background-color: $bg-color;
-    }
-
-    .runningExperiment:not(.rowSelected):hover & {
-      background-image: linear-gradient(
-          $row-hover-background-color,
-          $row-hover-background-color
-        ),
-        linear-gradient($bg-color, $bg-color);
-      border-left-color: $row-hover-background-color;
-      border-bottom-color: $row-hover-background-color;
+      background-color: $checkbox-background;
     }
 
     .workspaceWithChanges.runningExperiment & {
       border-right-color: $changed-color;
       border-top-color: $changed-color;
     }
-
-    .rowSelected.runningExperiment & {
-      background-image: linear-gradient(
-          $row-bg-selected-color,
-          $row-bg-selected-color
-        ),
-        linear-gradient($bg-color, $bg-color);
-      border-left-color: $row-bg-selected-color;
-      border-bottom-color: $row-bg-selected-color;
-    }
   }
+}
+
+.queued {
+  display: flex;
+  height: 16px;
+  left: 2px;
+  position: relative;
+  width: 16px;
 }
 
 .rowArrowContainer {
@@ -200,7 +176,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
   height: 32px;
   padding: 0;
   flex: 0 0 20px;
-  left: -8px;
   display: inline-block;
   position: relative;
   border: none;
@@ -218,7 +193,7 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 .contractedRowArrow {
   @extend %expandableRowArrow;
   transform: rotate(-45deg);
-  right: 5px;
+  right: 4px;
   bottom: 0;
 }
 
@@ -257,31 +232,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
           .rowActions {
             left: calc(($cell-padding + $nested-row-padding) * -1);
           }
-        }
-      }
-    }
-    &.expandedGroup .nestedRow {
-      .bullet {
-        &::after {
-          content: '';
-          height: calc(100% + 1px);
-          top: -1px;
-          right: calc(50% - 0.5px);
-          position: absolute;
-          border-right: 1px dotted rgb(127, 127, 127);
-          clip-path: inset(0.05rem 0 0 0);
-        }
-      }
-      &:first-of-type {
-        .bullet::after {
-          height: calc(50% + 1px);
-          top: 50%;
-          clip-path: inset(0 0 0 0);
-        }
-      }
-      &:last-of-type {
-        .bullet::after {
-          height: 50%;
         }
       }
     }
@@ -487,11 +437,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       }
     }
 
-    svg {
-      position: relative;
-      top: -6px;
-    }
-
     .innerCell,
     .timestampInnerCell {
       height: 100%;
@@ -549,15 +494,6 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
       .bullet,
       .cellContents {
         cursor: pointer;
-      }
-
-      .plotEye {
-        visibility: visible;
-        color: $fg-color;
-        display: inline-flex;
-        align-items: center;
-        cursor: pointer;
-        text-align: center;
       }
 
       .rowActions {
@@ -843,18 +779,6 @@ $badge-size: 0.85rem;
   text-align: center;
   vertical-align: middle;
   font-size: 0.5rem;
-}
-
-.indicatorWithOnlyCount {
-  display: inline-block;
-  position: relative;
-  width: 1.5rem;
-  height: 1.5rem;
-
-  .badge {
-    position: relative;
-    top: -4px;
-  }
 }
 
 .cellTooltip {

@@ -63,24 +63,6 @@ export const Indicator = ({
   )
 }
 
-export const IndicatorWithJustTheCounter = ({
-  count,
-  'aria-label': ariaLabel,
-  children
-}: CounterBadgeProps & {
-  'aria-label'?: string
-  children: React.ReactElement
-}) => {
-  return (
-    <div aria-label={ariaLabel} className={styles.indicatorWithOnlyCount}>
-      {children}
-      <div className={styles.badge}>
-        <CounterBadge count={count} />
-      </div>
-    </div>
-  )
-}
-
 const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
 const focusSortsTree = () =>
