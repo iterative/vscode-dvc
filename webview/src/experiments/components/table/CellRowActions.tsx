@@ -110,11 +110,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           showSubRowStates={showSubRowStates}
           subRowsAffected={plotSelections}
           testId={'row-action-plot'}
-          tooltipContent={
-            bulletColor
-              ? 'Click to Unplot\nTo open the plots view click the plot icon in the top left corner\nor use "DVC: Show Plots" from the command palette.'
-              : 'Click to Plot\nTo open the plots view click the plot icon in the top left corner\nor use "DVC: Show Plots" from the command palette.'
-          }
+          tooltipContent={getTooltipContent(!!bulletColor, 'Plot')}
         >
           <span
             className={styles.bullet}
