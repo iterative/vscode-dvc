@@ -12,19 +12,19 @@ import { clickAndEnterProps } from '../../../util/props'
 import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 
 export type CellRowActionsProps = {
+  bulletColor?: string
   isRowSelected: boolean
   showSubRowStates: boolean
   starred?: boolean
+  status?: ExperimentStatus
   subRowStates: {
     selections: number
     stars: number
     plotSelections: number
   }
+  toggleExperiment: () => void
   toggleRowSelection: () => void
   toggleStarred: () => void
-  bulletColor?: string
-  toggleExperiment: () => void
-  status?: ExperimentStatus
 }
 
 export type CellRowActionProps = {
