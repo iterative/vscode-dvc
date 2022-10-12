@@ -112,8 +112,8 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           testId={'row-action-plot'}
           tooltipContent={
             bulletColor
-              ? 'Click to Plot\nUse "DVC: Show Plots" to open the plots view.'
-              : 'Click to Unplot\nUse "DVC: Show Plots" to open the plots view.'
+              ? 'Click to Unplot\nUse "DVC: Show Plots" to open the plots view.'
+              : 'Click to Plot\nUse "DVC: Show Plots" to open the plots view.'
           }
         >
           <span
