@@ -39,6 +39,7 @@ export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
   const {
     original: { error, label, queued, displayNameOrParent = '' }
   } = row
+  const { toggleExperiment } = rowActionsProps
 
   return (
     <div
@@ -57,7 +58,7 @@ export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
           <ErrorTooltip error={error}>
             <div
               className={cx(styles.cellContents, error && styles.error)}
-              {...clickAndEnterProps(rowActionsProps.toggleExperiment, [
+              {...clickAndEnterProps(toggleExperiment, [
                 label,
                 displayNameOrParent
               ])}
