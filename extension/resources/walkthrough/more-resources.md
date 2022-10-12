@@ -1,4 +1,4 @@
-# More Resources
+# Helpful Resources
 
 - Get started with a [hands-on tour] of DVC's major features. Refer to the the
   [User Guide] for deeper knowledge on the approach and mechanics of DVC.
