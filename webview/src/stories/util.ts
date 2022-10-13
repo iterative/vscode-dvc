@@ -40,6 +40,14 @@ export const viewports = {
       width: '2560px'
     },
     type: 'desktop'
+  },
+  test: {
+    name: 'Test',
+    styles: {
+      height: '1440px',
+      width: '936px'
+    },
+    type: 'desktop'
   }
 }
 
