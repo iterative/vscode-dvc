@@ -897,13 +897,12 @@ suite('Experiments Test Suite', () => {
       })
 
       await inputEvent
-      await mockMessageReceived
       await tableMaxDepthChanged
 
       expect(
         await workspace.getConfiguration().get(tableMaxDepthOption)
       ).to.equal(0)
-      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.called
       expect(
         mockSendTelemetryEvent,
         'should send a telemetry call that tells you the max height has been updated'
