@@ -139,7 +139,7 @@ export class WebviewMessages {
           this.showPlots()
         ])
 
-      case MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH: {
+      case MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT: {
         return this.setMaxTableHeadDepth()
       }
 
@@ -168,12 +168,23 @@ export class WebviewMessages {
 
   private async setMaxTableHeadDepth() {
     const newValue = await getValidInput(
-      Title.SET_EXPERIMENTS_HEADER_DEPTH,
+      Title.SET_EXPERIMENTS_HEADER_HEIGHT,
       val => {
         return Number.isNaN(Number(val)) ? 'Input needs to be a number' : ''
-      }
+      },
+      { prompt: 'Use 0 for infinite height.' }
     )
+
+    if (!newValue) {
+      return
+    }
+
     setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH, Number(newValue))
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT,
+      undefined,
+      undefined
+    )
   }
 
   private setColumnOrder(order: string[]) {

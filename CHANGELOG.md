@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 2022-10-12
+
+### 🐛 Bug Fixes
+
+- Account for dvc yaml potentially not having a train stage [#2571](https://github.com/iterative/vscode-dvc/pull/2571) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.0] - 2022-10-11
+
+### 🚀 New Features and Enhancements
+
+- Display failed experiments [#2535](https://github.com/iterative/vscode-dvc/pull/2535) by [@mattseddon](https://github.com/mattseddon)
+- Improve max table depth feature [#2538](https://github.com/iterative/vscode-dvc/pull/2538) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Bump min DVC version to 2.30.0 (Use status from exp show) [#2521](https://github.com/iterative/vscode-dvc/pull/2521) by [@mattseddon](https://github.com/mattseddon)
+- Remove stale developer roadmap from README [#2561](https://github.com/iterative/vscode-dvc/pull/2561) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.4.13] - 2022-10-10
 
 ### 🐛 Bug Fixes

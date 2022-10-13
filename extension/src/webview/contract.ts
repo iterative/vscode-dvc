@@ -44,7 +44,7 @@ export enum MessageFromWebviewType {
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
-  SET_EXPERIMENTS_HEADER_DEPTH = 'update-experiments-header-depth'
+  SET_EXPERIMENTS_HEADER_HEIGHT = 'update-experiments-header-height'
 }
 
 export type ColumnResizePayload = {
@@ -171,7 +171,7 @@ export type MessageFromWebview =
       type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
       payload: string
     }
-  | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH }
+  | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

@@ -702,7 +702,7 @@ describe('App', () => {
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
         'Open to the Side',
-        'Set Max Header Depth',
+        'Set Max Header Height',
         'Sort Ascending',
         'Sort Descending'
       ])

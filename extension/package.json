@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.4.13",
+  "version": "0.5.1",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -554,9 +554,9 @@
           "type": "string",
           "default": null
         },
-        "dvc.expTableHeadMaxLayers": {
-          "title": "%config.expTableHeadMaxLayers.title%",
-          "description": "%config.expTableHeadMaxLayers.description%",
+        "dvc.experimentsTableHeadMaxHeight": {
+          "title": "%config.experimentsTableHeadMaxHeight.title%",
+          "description": "%config.experimentsTableHeadMaxHeight.description%",
           "type": "number",
           "default": 5
         },
