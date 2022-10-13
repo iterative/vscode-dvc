@@ -67,9 +67,15 @@ export const isSameOrChild = (root: string, path: string) => {
   return !rel.startsWith('..')
 }
 
+export type Out =
+  | string
+  | Record<string, { checkpoint?: boolean; cache?: boolean }>
+
 export type PartialDvcYaml = {
   stages: {
-    train: { outs: (string | Record<string, { checkpoint?: boolean }>)[] }
+    [stage: string]: {
+      outs?: Out[]
+    }
   }
 }
 

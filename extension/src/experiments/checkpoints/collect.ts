@@ -1,13 +1,22 @@
-import { PartialDvcYaml } from '../../fileSystem'
+import { Out, PartialDvcYaml } from '../../fileSystem'
 
-export const collectHasCheckpoints = (yaml: PartialDvcYaml): boolean => {
-  return !!yaml.stages.train.outs.some(out => {
+const stageHasCheckpoints = (outs: Out[] = []): boolean => {
+  for (const out of outs) {
     if (typeof out === 'string') {
-      return false
+      continue
     }
-
     if (Object.values(out).some(file => file?.checkpoint)) {
       return true
     }
-  })
+  }
+  return false
+}
+
+export const collectHasCheckpoints = (yaml: PartialDvcYaml): boolean => {
+  for (const stage of Object.values(yaml?.stages || {})) {
+    if (stageHasCheckpoints(stage?.outs)) {
+      return true
+    }
+  }
+  return false
 }
