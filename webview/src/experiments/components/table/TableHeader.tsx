@@ -108,7 +108,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       menuContent={
         <div>
           <MessagesMenu options={contextMenuOptions} />
-          {
+          {isSortable && (
             <>
               <VSCodeDivider />
               <MessagesMenu
@@ -149,7 +149,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 ]}
               />
             </>
-          }
+          )}
         </div>
       }
     />
