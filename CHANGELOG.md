@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 2022-10-12
+
+### 🐛 Bug Fixes
+
+- Account for dvc yaml potentially not having a train stage [#2571](https://github.com/iterative/vscode-dvc/pull/2571) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.0] - 2022-10-11
 
 ### 🚀 New Features and Enhancements
