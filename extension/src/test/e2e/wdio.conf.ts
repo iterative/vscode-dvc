@@ -7,7 +7,7 @@ import { Logger } from '../../common/logger'
 const screenshotDir = join(__dirname, 'screenshots')
 const logsDir = join(__dirname, 'logs')
 const extensionPath = resolve(__dirname, '..', '..', '..')
-const dvcDemoPath = resolve(extensionPath, '..', 'demo')
+const dvcDemoPath = resolve(extensionPath, '..', 'vscode-dvc-demo')
 
 export const config: Options.Testrunner = {
   after: async function () {

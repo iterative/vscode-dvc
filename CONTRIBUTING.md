@@ -58,17 +58,17 @@ First, ensure that [Visual Studio Code](https://code.visualstudio.com) and
 
 ## The demo project
 
-The [demo project](demo) is provided as a lightweight, convenient testbed to try
-your changes to this extension.
+The [demo project](vscode-dvc-demo) is provided as a lightweight, convenient
+testbed to try your changes to this extension.
 
 > **Note**: It is not an exhaustive showcase of DVC's features. Testers are
 > encouraged to try other DVC repositories -- especially real-world cases!
 
 - Run `yarn setup:venv` from the _Terminal_ in the root of this repo to set up a
-  Python virtual environment for the demo project (in `demo/.env`).
+  Python virtual environment for the demo project (in `vscode-dvc-demo/.env`).
 
-- Open the `./demo` project in a VS Code window, for example in the _Extension
-  Development Host_ (see previous section).
+- Open the `./vscode-dvc-demo` project in a VS Code window, for example in the
+  _Extension Development Host_ (see previous section).
 
 - Pull the project data using this extension (either from the **DVC Tracked**
   panel in the _File Explorer_ or the **DVC panel** in _Source Control_) or by

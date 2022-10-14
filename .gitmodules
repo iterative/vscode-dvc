@@ -1,0 +1,3 @@
+[submodule "vscode-dvc-demo"]
+	path = vscode-dvc-demo
+	url = https://github.com/iterative/vscode-dvc-demo

@@ -1,4 +1,4 @@
-import { join, resolve, sep } from 'path'
+import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, FileSystemWatcher, RelativePattern, Uri } from 'vscode'
 import { expect } from 'chai'
@@ -159,7 +159,7 @@ suite('Experiments Data Test Suite', () => {
 
     it('should watch the .git directory for updates', async () => {
       const mockNow = getMockNow()
-      const gitRoot = resolve(dvcDemoPath, '..')
+      const gitRoot = dvcDemoPath
 
       const mockExecuteCommand = (command: CommandId) => {
         if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {

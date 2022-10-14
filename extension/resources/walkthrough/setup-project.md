@@ -5,7 +5,7 @@
 
 💡 Check out the
 [DVC Get Started](https://github.com/iterative/example-get-started) or
-[Extension Demo](https://github.com/iterative/vscode-dvc/tree/main/demo)
+[Extension Demo](https://github.com/iterative/vscode-dvc/tree/main/vscode-dvc-demo)
 projects to quickly try the extension.
 
 To quickly setup a new DVC project run

@@ -9,6 +9,6 @@ const importModuleAfterMockingVsCode = () => {
 
 const setupVenv = importModuleAfterMockingVsCode()
 
-const cwd = resolve(__dirname, '..', 'demo')
+const cwd = resolve(__dirname, '..', 'vscode-dvc-demo')
 
 setupVenv(cwd, '.env', '-r', join('.', 'requirements.txt'))

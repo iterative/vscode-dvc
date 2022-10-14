@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { Memento, Uri } from 'vscode'
 
-const dvcRoot = resolve(__dirname, '..', '..', '..', '..', 'demo')
+const dvcRoot = resolve(__dirname, '..', '..', '..', '..', 'vscode-dvc-demo')
 export const dvcDemoPath = Uri.file(dvcRoot).fsPath
 export const basePlotsUrl = Uri.file(
   resolve(__dirname, '..', 'fixtures', 'plotsDiff', 'staticImages')
