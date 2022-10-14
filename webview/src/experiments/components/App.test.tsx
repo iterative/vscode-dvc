@@ -756,7 +756,7 @@ describe('App', () => {
       jest.advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(2)
+      expect(menuitems).toHaveLength(3)
 
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)

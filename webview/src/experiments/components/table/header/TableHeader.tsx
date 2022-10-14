@@ -27,7 +27,7 @@ const possibleOrders = {
 } as const
 
 interface TableHeaderProps {
-  column: HeaderGroup<Experiment>
+  column: HeaderGroup<Experiment> & { originalId?: string }
   columns: HeaderGroup<Experiment>[]
   orderedColumns: Column[]
   onDragEnter: DragFunction
@@ -97,11 +97,11 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = [
       {
-        hidden: !!column.headers,
+        hidden: column.id === 'id' || column.group === 'timestamp',
         id: 'hide-column',
         label: 'Hide Column',
         message: {
-          payload: column.id,
+          payload: column.originalId || column.id,
           type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
         }
       },
@@ -126,6 +126,11 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     return menuOptions
   }, [column])
 
+  const visibleOptions: number = React.useMemo(
+    () => contextMenuOptions.filter(option => !option.hidden).length,
+    [contextMenuOptions]
+  )
+
   return (
     <TableHeaderCell
       column={column}
@@ -138,7 +143,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragEnd={onDragEnd}
       onDragStart={onDragStart}
       onDrop={onDrop}
-      menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
+      menuDisabled={!isSortable && visibleOptions === 0}
       root={root}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
       menuContent={
