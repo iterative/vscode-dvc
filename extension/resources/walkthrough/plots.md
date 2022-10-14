@@ -30,14 +30,16 @@ with open("plots.json", "w") as fd:
 ```
 
 ```python
-from matplotlib import pyplot as plt fig, axes = plt.subplots(dpi=100)
----
+from matplotlib import pyplot as plt
+fig, axes = plt.subplots(dpi=100)
+...
 fig.savefig("importance.png")
 ```
 
 ```python
-from dvclive import Live live = Live("evaluation") live.log_plot("roc", labels,
-predictions)
+from dvclive import Live
+live = Live("evaluation")
+live.log_plot("roc", labels, predictions)
 ```
 
 [dvc plots]: https://dvc.org/doc/start/experiments/visualization
