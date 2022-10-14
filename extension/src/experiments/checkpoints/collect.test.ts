@@ -51,6 +51,34 @@ describe('collectHasCheckpoints', () => {
     expect(hasCheckpoints).toBe(false)
   })
 
+  it('should not fail if a train stage is not provided', () => {
+    const hasCheckpoints = collectHasCheckpoints({
+      stages: {
+        extract: {
+          cmd: 'tar -xzf data/images.tar.gz --directory data',
+          deps: ['data/images.tar.gz'],
+          outs: [{ 'data/images/': { cache: false } }]
+        }
+      }
+    } as PartialDvcYaml)
+
+    expect(hasCheckpoints).toBe(false)
+  })
+
+  it('should return true if any stage has checkpoints', () => {
+    const hasCheckpoints = collectHasCheckpoints({
+      stages: {
+        extract: {
+          cmd: 'tar -xzf data/images.tar.gz --directory data',
+          deps: ['data/images.tar.gz'],
+          outs: [{ 'data/images/': { cache: false, checkpoint: true } }]
+        }
+      }
+    } as PartialDvcYaml)
+
+    expect(hasCheckpoints).toBe(true)
+  })
+
   it('should correctly classify a more complex dvc.yaml without checkpoint', () => {
     const hasCheckpoints = collectHasCheckpoints({
       stages: {
