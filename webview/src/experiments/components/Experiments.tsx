@@ -89,8 +89,8 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
     Header: ExperimentHeader,
     accessor: EXPERIMENT_COLUMN_ID,
     id: EXPERIMENT_COLUMN_ID,
-    minWidth: 250,
-    width: 250
+    minWidth: 215,
+    width: 215
   }
   return {
     Header: '',

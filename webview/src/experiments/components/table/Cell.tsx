@@ -44,11 +44,7 @@ export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
   return (
     <div
       {...cell.getCellProps({
-        className: cx(
-          styles.td,
-          styles.experimentCell,
-          isPlaceholder && styles.groupPlaceholder
-        )
+        className: cx(styles.td, styles.experimentCell)
       })}
     >
       <div className={styles.innerCell}>
@@ -57,7 +53,10 @@ export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>
             <div
-              className={cx(styles.cellContents, error && styles.error)}
+              className={cx(
+                styles.experimentCellContentsContainer,
+                error && styles.error
+              )}
               {...clickAndEnterProps(toggleExperiment, [
                 label,
                 displayNameOrParent
@@ -85,8 +84,7 @@ export const CellWrapper: React.FC<
       {...cell.getCellProps({
         className: cx(styles.td, {
           [styles.workspaceChange]: changes?.includes(cell.column.id),
-          [styles.depChange]: cellHasChanges(cell.value),
-          [styles.groupPlaceholder]: cell.isPlaceholder
+          [styles.depChange]: cellHasChanges(cell.value)
         })
       })}
       data-testid={cellId}
