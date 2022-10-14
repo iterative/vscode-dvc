@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { MouseEventHandler } from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import {
@@ -35,6 +35,7 @@ export type CellRowActionProps = {
   testId?: string
   tooltipContent: string
   queued?: boolean
+  onClick?: MouseEventHandler
 }
 
 export const CellRowAction: React.FC<CellRowActionProps> = ({
@@ -43,7 +44,8 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   children,
   hidden,
   testId,
-  tooltipContent
+  tooltipContent,
+  onClick
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
@@ -53,7 +55,9 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
         className={cx(styles.rowActions, hidden && styles.hidden)}
         data-testid={testId}
       >
-        <Indicator count={count}>{children}</Indicator>
+        <Indicator onClick={onClick} count={count}>
+          {children}
+        </Indicator>
       </div>
     </CellHintTooltip>
   )
@@ -115,12 +119,9 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           subRowsAffected={plotSelections}
           testId={'row-action-plot'}
           tooltipContent={getTooltipContent(!!bulletColor, 'Plot')}
+          onClick={toggleExperiment}
         >
-          <button
-            className={styles.bullet}
-            style={{ color: bulletColor }}
-            {...clickAndEnterProps(toggleExperiment)}
-          />
+          <span className={styles.bullet} style={{ color: bulletColor }} />
         </CellRowAction>
       )}
     </>

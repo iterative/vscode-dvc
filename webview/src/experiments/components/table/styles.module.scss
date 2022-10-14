@@ -100,7 +100,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   align-items: center;
   background: $checkbox-background;
   border-radius: $bullet-size;
-  border: none;
+  border: calc(var(--border-width) * 1px) solid $checkbox-border;
   color: $fg-color;
   cursor: pointer;
   display: flex;
