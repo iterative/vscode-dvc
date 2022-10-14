@@ -20,7 +20,7 @@ menu.
 CSV, or TSV files; or save your own plot images (`.png`, etc.). If you're using
 Python, the [DVCLive] helper library can save plots data for you!
 
-```yaml
+```python
 points = metrics.precision_recall_curve(labels, predictions)
 with open("plots.json", "w") as fd:
      json.dump({"prc": [
@@ -29,27 +29,16 @@ with open("plots.json", "w") as fd:
      ]})
 ```
 
-```yaml
+```python
 from matplotlib import pyplot as plt fig, axes = plt.subplots(dpi=100)
 ---
 fig.savefig("importance.png")
 ```
 
-```yaml
+```python
 from dvclive import Live live = Live("evaluation") live.log_plot("roc", labels,
 predictions)
 ```
-
-<!-- The image will needs to be deleted
-<p align="center">
-  <img src="images/plots-dump-with-open-file.png"
-       alt="Code to Dump a JSON Plot File" />
-  <img src="images/plots-dump-image.png"
-       alt="Code to Dump an Image Plot File" />
-  <img src="images/plots-dump-with-dvclive.png"
-       alt="Code to Dump a JSON Plot File with DVCLive" />
-</p>
--->
 
 [dvc plots]: https://dvc.org/doc/start/experiments/visualization
 [dvclive]: https://dvc.org/doc/dvclive
