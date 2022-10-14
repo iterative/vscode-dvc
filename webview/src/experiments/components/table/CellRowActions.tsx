@@ -116,7 +116,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           testId={'row-action-plot'}
           tooltipContent={getTooltipContent(!!bulletColor, 'Plot')}
         >
-          <span
+          <button
             className={styles.bullet}
             style={{ color: bulletColor }}
             {...clickAndEnterProps(toggleExperiment)}

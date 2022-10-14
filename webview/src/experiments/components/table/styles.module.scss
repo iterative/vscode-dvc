@@ -8,6 +8,7 @@ $row-border: 1px solid $border-color;
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
 $workspace-row-edge-margin: $edge-padding - $cell-padding;
+$bullet-size: calc(var(--design-unit) * 4px);
 
 // Extendable Silent Rules
 %expandableRowArrow {
@@ -96,22 +97,19 @@ $workspace-row-edge-margin: $edge-padding - $cell-padding;
 
 .bullet {
   visibility: visible;
-  background: $checkbox-background;
-  border-radius: 999px;
-  border: calc(var(--border-width) * 1px) solid $checkbox-border;
-  box-sizing: border-box;
-  cursor: pointer;
-  height: calc(var(--design-unit) * 4px);
-  outline: none;
-  width: calc(var(--design-unit) * 4px);
-  color: $fg-color;
-
   align-items: center;
-  justify-content: center;
-  align-self: center;
-
+  background: $checkbox-background;
+  border-radius: $bullet-size;
+  border: none;
+  color: $fg-color;
+  cursor: pointer;
   display: flex;
+  height: $bullet-size;
+  justify-content: center;
+  outline: none;
+  padding: 0;
   position: relative;
+  width: $bullet-size;
 
   &::before {
     display: inline-block;
