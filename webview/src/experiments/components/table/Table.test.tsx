@@ -438,6 +438,7 @@ describe('Table', () => {
       )
 
       headers = await getHeaders()
+      console.log('2', Object.assign({}, headers))
 
       expect(headers.indexOf('loss')).toBeGreaterThan(
         headers.indexOf('threshold')
