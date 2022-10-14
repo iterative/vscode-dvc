@@ -1,17 +1,9 @@
 # Plots Dashboard
 
-Select (click the circle beside the experiment name) up to 7 experiments in the
-table view to visualize in the [**Plots Dashboard**](command:dvc.showPlots).
-
-<p align="center">
-  <img src="images/plots-click-the-circle-beside-experiment-name.png"
-       alt="Select for Plots" />
-</p>
-
-Use
+Select one or more experiments to visualize in the
+[**Plots Dashboard**](command:dvc.showPlots). Use
 [`DVC: Show Plots`](command:workbench.action.quickOpen?%22>DVC:%20Show%20Plots%22)
-from the command palette to open it or open it using the table's row context
-menu.
+from the command palette to open it.
 
 [`dvc plots show`]: https://dvc.org/doc/command-reference/plots/show
 [`dvc plots diff`]: https://dvc.org/doc/command-reference/plots/diff
