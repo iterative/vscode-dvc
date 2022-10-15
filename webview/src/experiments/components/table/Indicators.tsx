@@ -63,29 +63,6 @@ export const Indicator = ({
   )
 }
 
-export const IndicatorWithJustTheCounter = ({
-  count,
-  'aria-label': ariaLabel,
-  tooltipContent
-}: CounterBadgeProps & {
-  'aria-label'?: string
-  tooltipContent?: ReactNode
-}) => {
-  const children = (
-    <span aria-label={ariaLabel}>
-      <CounterBadge count={count} />
-    </span>
-  )
-
-  return tooltipContent ? (
-    <CellHintTooltip tooltipContent={tooltipContent}>
-      {children}
-    </CellHintTooltip>
-  ) : (
-    children
-  )
-}
-
 const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
 const focusSortsTree = () =>

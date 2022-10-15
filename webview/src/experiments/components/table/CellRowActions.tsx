@@ -1,21 +1,28 @@
-import React from 'react'
+import React, { MouseEventHandler } from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import {
+  ExperimentStatus,
+  isQueued
+} from 'dvc/src/experiments/webview/contract'
 import { Indicator } from './Indicators'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
 import { clickAndEnterProps } from '../../../util/props'
-import { StarFull, StarEmpty } from '../../../shared/components/icons'
+import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 
 export type CellRowActionsProps = {
+  bulletColor?: string
   isRowSelected: boolean
   showSubRowStates: boolean
   starred?: boolean
+  status?: ExperimentStatus
   subRowStates: {
     selections: number
     stars: number
     plotSelections: number
   }
+  toggleExperiment: () => void
   toggleRowSelection: () => void
   toggleStarred: () => void
 }
@@ -27,6 +34,8 @@ export type CellRowActionProps = {
   hidden?: boolean
   testId?: string
   tooltipContent: string
+  queued?: boolean
+  onClick?: MouseEventHandler
 }
 
 export const CellRowAction: React.FC<CellRowActionProps> = ({
@@ -35,7 +44,8 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   children,
   hidden,
   testId,
-  tooltipContent
+  tooltipContent,
+  onClick
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
@@ -45,17 +55,25 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
         className={cx(styles.rowActions, hidden && styles.hidden)}
         data-testid={testId}
       >
-        <Indicator count={count}>{children}</Indicator>
+        <Indicator onClick={onClick} count={count}>
+          {children}
+        </Indicator>
       </div>
     </CellHintTooltip>
   )
 }
 
+const getTooltipContent = (determiner: boolean, text: string): string =>
+  determiner ? `Un${text.toLowerCase()}` : text
+
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
+  bulletColor,
+  status,
+  toggleExperiment,
   isRowSelected,
   showSubRowStates,
   starred,
-  subRowStates: { selections, stars },
+  subRowStates: { selections, stars, plotSelections },
   toggleRowSelection,
   toggleStarred
 }) => {
@@ -65,7 +83,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         showSubRowStates={showSubRowStates}
         subRowsAffected={selections}
         testId={'row-action-checkbox'}
-        tooltipContent={isRowSelected ? 'Unselect' : 'Select'}
+        tooltipContent={getTooltipContent(isRowSelected, 'Select')}
       >
         <VSCodeCheckbox
           {...clickAndEnterProps(toggleRowSelection)}
@@ -76,7 +94,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
         testId={'row-action-star'}
-        tooltipContent={starred ? 'Star' : 'Unstar'}
+        tooltipContent={getTooltipContent(!!starred, 'Star')}
       >
         <div
           className={styles.starSwitch}
@@ -86,10 +104,26 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           {...clickAndEnterProps(toggleStarred)}
           data-testid="star-icon"
         >
-          {starred && <StarFull />}
-          {!starred && <StarEmpty />}
+          {starred ? <StarFull /> : <StarEmpty />}
         </div>
       </CellRowAction>
+      {isQueued(status) ? (
+        <div className={styles.rowActions}>
+          <span className={styles.queued}>
+            <Clock />
+          </span>
+        </div>
+      ) : (
+        <CellRowAction
+          showSubRowStates={showSubRowStates}
+          subRowsAffected={plotSelections}
+          testId={'row-action-plot'}
+          tooltipContent={getTooltipContent(!!bulletColor, 'Plot')}
+          onClick={toggleExperiment}
+        >
+          <span className={styles.bullet} style={{ color: bulletColor }} />
+        </CellRowAction>
+      )}
     </>
   )
 }
