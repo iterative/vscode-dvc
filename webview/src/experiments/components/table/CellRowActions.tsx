@@ -63,8 +63,14 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   )
 }
 
-const getTooltipContent = (determiner: boolean, text: string): string =>
-  determiner ? `Un${text.toLowerCase()}` : text
+const getTooltipContent = (
+  determiner: boolean,
+  action: string,
+  helperText?: string
+): string =>
+  'Click to ' +
+  (determiner ? `un${action}` : action) +
+  (helperText ? `\n${helperText}` : '')
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   bulletColor,
@@ -83,7 +89,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         showSubRowStates={showSubRowStates}
         subRowsAffected={selections}
         testId={'row-action-checkbox'}
-        tooltipContent={getTooltipContent(isRowSelected, 'Select')}
+        tooltipContent={getTooltipContent(isRowSelected, 'select the row')}
       >
         <VSCodeCheckbox
           {...clickAndEnterProps(toggleRowSelection)}
@@ -94,7 +100,11 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
         testId={'row-action-star'}
-        tooltipContent={getTooltipContent(!!starred, 'Star')}
+        tooltipContent={getTooltipContent(
+          !!starred,
+          'star',
+          'To filter by stars click the star icon above the filters tree\nor use "DVC: Filter Experiments Table to Starred" from the command palette.'
+        )}
       >
         <div
           className={styles.starSwitch}
@@ -118,7 +128,11 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           showSubRowStates={showSubRowStates}
           subRowsAffected={plotSelections}
           testId={'row-action-plot'}
-          tooltipContent={getTooltipContent(!!bulletColor, 'Plot')}
+          tooltipContent={getTooltipContent(
+            !!bulletColor,
+            'plot',
+            'To open the plots view click the plot icon in the top left corner\nor use "DVC: Show Plots" from the command palette.'
+          )}
           onClick={toggleExperiment}
         >
           <span className={styles.bullet} style={{ color: bulletColor }} />
