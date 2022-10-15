@@ -402,7 +402,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
       .experimentHeader {
         @extend %headerCellPadding;
         padding-left: $cell-padding;
-        text-align: right;
+        text-align: left;
         direction: ltr;
         overflow-x: hidden;
         text-overflow: ellipsis;
@@ -674,18 +674,17 @@ $bullet-size: calc(var(--design-unit) * 4px);
 .experimentCellContentsContainer {
   @extend .cellContents;
   display: flex;
-  width: 100%;
-  justify-content: flex-end;
-  text-align: right;
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .experimentCellContents {
+  @extend .cellContents;
   display: flex;
   flex-flow: row wrap;
   line-height: normal;
   direction: ltr;
-  width: 100%;
-  justify-content: flex-end;
+  align-items: center;
   cursor: text;
 
   > * {
@@ -695,12 +694,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
-.experimentCellPrimaryName {
-  width: 100%;
-}
-
 .experimentCellSecondaryName {
-  width: 100%;
   color: $meta-cell-color;
   font-size: 0.8em;
 }
