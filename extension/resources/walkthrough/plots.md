@@ -76,7 +76,7 @@ rendered side by side for the selected experiments.
 
 <p align="center">
   <img src="images/plots-view-icon.png"
-       alt="Plots Biew Icon" />
+       alt="Plots View Icon" />
 </p>
 
 Automatically generated and updated **Trends** that show scalar [metrics] value
