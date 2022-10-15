@@ -77,7 +77,7 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
     }: Cell<Row>) => {
       return (
         <div className={styles.experimentCellContents}>
-          <span className={styles.experimentCellPrimaryName}>{label}</span>
+          <span>{label}</span>
           {displayNameOrParent && (
             <span className={styles.experimentCellSecondaryName}>
               {displayNameOrParent}
