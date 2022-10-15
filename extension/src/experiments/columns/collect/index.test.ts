@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join } from 'path'
 import { collectChanges, collectColumns } from '.'
 import { timestampColumn } from '../constants'
@@ -487,15 +488,6 @@ describe('collectColumns', () => {
       ]
     )
   })
-
-  it('should mark new dep files as changes', () => {
-    const changes = collectChanges(uncommittedDepsFixture)
-    expect(changes).toStrictEqual(
-      Object.keys(uncommittedDepsFixture.workspace.baseline.data?.deps || {})
-        .map(dep => `deps:${dep}`)
-        .sort()
-    )
-  })
 })
 
 describe('collectChanges', () => {
@@ -516,6 +508,15 @@ describe('collectChanges', () => {
     }
   }
 
+  it('should mark new dep files as changes', () => {
+    const changes = collectChanges(uncommittedDepsFixture)
+    expect(changes).toStrictEqual(
+      Object.keys(uncommittedDepsFixture.workspace.baseline.data?.deps || {})
+        .map(dep => `deps:${dep}`)
+        .sort()
+    )
+  })
+
   it('should return the expected data from the output fixture', () => {
     const changes = collectChanges(outputFixture)
     expect(changes).toStrictEqual(workspaceChangesFixture)
@@ -532,12 +533,12 @@ describe('collectChanges', () => {
 
   it('should collect the changes between the current commit and the workspace', () => {
     const data: ExperimentsOutput = {
+      workspace: mockedExperimentData,
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: {
         baseline: {
           data: {}
         }
-      },
-      workspace: mockedExperimentData
+      }
     }
 
     expect(collectChanges(data)).toStrictEqual([
@@ -548,6 +549,35 @@ describe('collectChanges', () => {
       'params:params.yaml:seed',
       'params:params.yaml:weight_decay'
     ])
+  })
+
+  it('should not fail when the workspace does not have metrics but a previous commit does', () => {
+    const data: ExperimentsOutput = {
+      workspace: {
+        baseline: {
+          data: {
+            params: mockedExperimentData.baseline.data.params
+          }
+        }
+      },
+      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedExperimentData
+    }
+
+    expect(collectChanges(data)).toStrictEqual([])
+  })
+
+  it('should not fail when there is no commit data', () => {
+    const data: ExperimentsOutput = {
+      workspace: {
+        baseline: {
+          data: {
+            params: mockedExperimentData.baseline.data.params
+          }
+        }
+      }
+    }
+
+    expect(collectChanges(data)).toStrictEqual([])
   })
 
   it('should collect the changes between the current commit and the workspace when the values are nested', () => {
