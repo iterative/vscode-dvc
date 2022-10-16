@@ -7,9 +7,9 @@ import React, { useEffect } from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
-import styles from './styles.module.scss'
 import { SortOrder } from './TableHeader'
 import { TableHeaderCellContents } from './TableHeaderCellContents'
+import styles from '../styles.module.scss'
 import {
   countUpperLevels,
   isExperimentColumn,
