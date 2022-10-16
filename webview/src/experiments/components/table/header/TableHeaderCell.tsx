@@ -14,9 +14,9 @@ import {
   countUpperLevels,
   isExperimentColumn,
   isFirstLevelHeader
-} from '../../util/columns'
-import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
-import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
+} from '../../../util/columns'
+import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
+import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 
 const calcResizerHeight = (
   isPlaceholder: boolean,

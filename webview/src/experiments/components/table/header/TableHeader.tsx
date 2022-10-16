@@ -9,10 +9,10 @@ import { HeaderGroup } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import { TableHeaderCell } from './TableHeaderCell'
-import { ExperimentsState } from '../../store'
-import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
-import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
-import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
+import { ExperimentsState } from '../../../store'
+import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
+import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
+import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 
 export enum SortOrder {
   ASCENDING = 'Sort Ascending',
