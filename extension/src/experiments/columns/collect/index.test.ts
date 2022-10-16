@@ -8,7 +8,7 @@ import outputFixture from '../../../test/fixtures/expShow/output'
 import columnsFixture from '../../../test/fixtures/expShow/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
-import { ExperimentsOutput } from '../../../cli/dvc/contract'
+import { ExperimentsOutput, ExperimentStatus } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
 
 jest.mock('../../../vscode/config')
@@ -563,6 +563,69 @@ describe('collectChanges', () => {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedExperimentData
     }
 
+    expect(collectChanges(data)).toStrictEqual([])
+  })
+
+  it('should compare against the most recent commit', () => {
+    const matchingParams = {
+      'params.yaml': {
+        data: {
+          lr: 0.1
+        }
+      }
+    }
+    const differingParams = {
+      'params.yaml': {
+        data: {
+          lr: 10000000
+        }
+      }
+    }
+
+    const data = {
+      workspace: {
+        baseline: {
+          data: {
+            timestamp: null,
+            params: matchingParams,
+            status: ExperimentStatus.SUCCESS,
+            executor: null
+          }
+        }
+      },
+      '31c419826c6961bc0ec1d3900ac18bf904dcf82e': {
+        baseline: {
+          data: {
+            timestamp: '2022-10-17T07:30:53',
+            params: matchingParams,
+            status: ExperimentStatus.SUCCESS,
+            executor: null,
+            name: 'main'
+          }
+        }
+      },
+      '1987d9de990090d73cf2afd73e6889d182585bf3': {
+        baseline: {
+          data: {
+            timestamp: '2022-10-17T07:25:23',
+            params: differingParams,
+            status: ExperimentStatus.SUCCESS,
+            executor: null,
+            name: 'main'
+          }
+        }
+      },
+      '3d7fcb87062d136a2025f8c302312abe9593edf8': {
+        baseline: {
+          data: {
+            timestamp: '2022-10-17T07:20:12',
+            params: differingParams,
+            status: ExperimentStatus.SUCCESS,
+            executor: null
+          }
+        }
+      }
+    }
     expect(collectChanges(data)).toStrictEqual([])
   })
 
