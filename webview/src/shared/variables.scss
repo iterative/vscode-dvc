@@ -36,6 +36,9 @@ $row-action-selected-icon-color: var(
   var(--vscode-icon-foreground)
 );
 
+$row-action-star: var(--vscode-descriptionForeground);
+$row-action-star-checked: var(--vscode-editorLightBulb-foreground);
+
 $shadow: var(--vscode-widget-shadow);
 
 $plot-block-bg-color: var(--vscode-dropdown-background);
