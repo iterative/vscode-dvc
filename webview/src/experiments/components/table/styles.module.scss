@@ -101,7 +101,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   background: $checkbox-background;
   border-radius: $bullet-size;
   border: calc(var(--border-width) * 1px) solid $checkbox-border;
-  color: $fg-color;
+  color: $row-action-icon-color;
   cursor: pointer;
   display: flex;
   height: $bullet-size;
@@ -134,7 +134,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
       width: 4px;
       height: 4px;
       vertical-align: middle;
-      border: 1px solid $fg-color;
+      border: 1px solid $row-action-icon-color;
       background-color: $checkbox-background;
     }
 
@@ -162,6 +162,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
 }
 
 .queued {
+  color: $row-action-icon-color;
   display: flex;
   height: 16px;
   left: 2px;
