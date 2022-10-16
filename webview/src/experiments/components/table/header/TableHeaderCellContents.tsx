@@ -7,9 +7,9 @@ import { SortOrder } from './TableHeader'
 import {
   Draggable,
   DragFunction
-} from '../../../shared/components/dragDrop/Draggable'
-import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
-import { DownArrow, Lines, UpArrow } from '../../../shared/components/icons'
+} from '../../../../shared/components/dragDrop/Draggable'
+import { IconMenu } from '../../../../shared/components/iconMenu/IconMenu'
+import { DownArrow, Lines, UpArrow } from '../../../../shared/components/icons'
 
 const getIconMenuItems = (
   sortEnabled: boolean,

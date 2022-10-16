@@ -5,15 +5,14 @@ import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
-import { Indicators } from './Indicators'
-import { setDropTarget } from './headerDropTargetSlice'
-import { useColumnOrder } from '../../hooks/useColumnOrder'
-import { ExperimentsState } from '../../store'
-import { sendMessage } from '../../../shared/vscode'
-import { leafColumnIds, reorderColumnIds } from '../../util/columns'
-import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
-import { getSelectedForPlotsCount } from '../../util/rows'
-
+import { setDropTarget } from '../headerDropTargetSlice'
+import { Indicators } from '../Indicators'
+import { useColumnOrder } from '../../../hooks/useColumnOrder'
+import { ExperimentsState } from '../../../store'
+import { sendMessage } from '../../../../shared/vscode'
+import { leafColumnIds, reorderColumnIds } from '../../../util/columns'
+import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
+import { getSelectedForPlotsCount } from '../../../util/rows'
 interface TableHeadProps {
   instance: TableInstance<Experiment>
   root: HTMLElement | null
