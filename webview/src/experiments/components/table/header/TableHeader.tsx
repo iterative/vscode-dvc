@@ -37,6 +37,39 @@ interface TableHeaderProps {
   root: HTMLElement | null
 }
 
+export const sortOption = (
+  label: SortOrder,
+  currentSort: SortOrder,
+  columnId: string
+) => {
+  const sortOrder = currentSort
+  const hidden = sortOrder === label
+  const descending = label === SortOrder.DESCENDING
+  const path = columnId
+  const removeSortMessage = {
+    payload: columnId,
+    type: MessageFromWebviewType.REMOVE_COLUMN_SORT
+  }
+  const payload = {
+    descending,
+    path
+  }
+  const message =
+    label === SortOrder.NONE
+      ? removeSortMessage
+      : {
+          payload,
+          type: MessageFromWebviewType.SORT_COLUMN
+        }
+
+  return {
+    hidden,
+    id: label,
+    label,
+    message
+  } as MessagesMenuOptionProps
+}
+
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
@@ -113,39 +146,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               <VSCodeDivider />
               <MessagesMenu
                 options={[
-                  {
-                    hidden: sortOrder === SortOrder.ASCENDING,
-                    id: SortOrder.ASCENDING,
-                    label: SortOrder.ASCENDING,
-                    message: {
-                      payload: {
-                        descending: false,
-                        path: column.id
-                      },
-                      type: MessageFromWebviewType.SORT_COLUMN
-                    }
-                  },
-                  {
-                    hidden: sortOrder === SortOrder.DESCENDING,
-                    id: SortOrder.DESCENDING,
-                    label: SortOrder.DESCENDING,
-                    message: {
-                      payload: {
-                        descending: true,
-                        path: column.id
-                      },
-                      type: MessageFromWebviewType.SORT_COLUMN
-                    }
-                  },
-                  {
-                    hidden: sortOrder === SortOrder.NONE,
-                    id: SortOrder.NONE,
-                    label: SortOrder.NONE,
-                    message: {
-                      payload: column.id,
-                      type: MessageFromWebviewType.REMOVE_COLUMN_SORT
-                    }
-                  }
+                  sortOption(SortOrder.ASCENDING, sortOrder, column.id),
+                  sortOption(SortOrder.DESCENDING, sortOrder, column.id),
+                  sortOption(SortOrder.NONE, sortOrder, column.id)
                 ]}
               />
             </>
