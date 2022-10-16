@@ -17,6 +17,16 @@
   }
 }
 
+.disabledItem {
+  @extend .item;
+  cursor: default;
+  color: $disabled-color;
+  opacity: $disabled-opacity;
+  &:hover {
+    background-color: transparent;
+  }
+}
+
 .itemLabel {
   width: 165px;
   overflow: hidden;
