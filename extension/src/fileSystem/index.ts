@@ -10,6 +10,7 @@ import {
 } from 'fs-extra'
 import { load } from 'js-yaml'
 import { Uri } from 'vscode'
+import { standardizePath } from './path'
 import { definedAndNonEmpty } from '../util/array'
 import { Logger } from '../common/logger'
 
@@ -36,7 +37,7 @@ export const findDvcSubRootPaths = async (
 
   return children
     .filter(child => isDirectory(join(cwd, child, '.dvc')))
-    .map(child => join(cwd, child))
+    .map(child => standardizePath(join(cwd, child)) as string)
 }
 
 export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
@@ -57,7 +58,7 @@ export const findAbsoluteDvcRootPath = async (
     return []
   }
 
-  const absoluteRoot = resolve(cwd, relativePath)
+  const absoluteRoot = standardizePath(resolve(cwd, relativePath)) as string
 
   return [absoluteRoot]
 }
@@ -67,9 +68,15 @@ export const isSameOrChild = (root: string, path: string) => {
   return !rel.startsWith('..')
 }
 
+export type Out =
+  | string
+  | Record<string, { checkpoint?: boolean; cache?: boolean }>
+
 export type PartialDvcYaml = {
   stages: {
-    train: { outs: (string | Record<string, { checkpoint?: boolean }>)[] }
+    [stage: string]: {
+      outs?: Out[]
+    }
   }
 }
 

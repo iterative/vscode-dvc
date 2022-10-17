@@ -681,6 +681,52 @@ describe('App', () => {
         expectedTooltipResult: '[true, false, string, 2]'
       })
     })
+
+    it('should show the expected tooltip for the plot experiment row action', () => {
+      const clickableText = 'Open the plots view'
+
+      renderTable(testData)
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      const radioButton = within(getRow('workspace')).getByTestId(
+        'row-action-plot'
+      )
+      fireEvent.mouseEnter(radioButton)
+
+      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      const tooltip = screen.queryByRole('tooltip')
+
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent(`Click to plot${clickableText}`)
+      const clickableContent = screen.getByText(clickableText)
+      fireEvent.click(clickableContent)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+      })
+    })
+
+    it('should show the expected tooltip for the star experiment row action', () => {
+      const clickableText = 'Filter experiments by starred'
+
+      renderTable(testData)
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      const radioButton = within(getRow('main')).getByTestId('row-action-star')
+      fireEvent.mouseEnter(radioButton)
+
+      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      const tooltip = screen.queryByRole('tooltip')
+
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent(`Click to star${clickableText}`)
+      const clickableContent = screen.getByText('Filter experiments by starred')
+      fireEvent.click(clickableContent)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
+      })
+    })
   })
 
   describe('Header Context Menu', () => {
@@ -702,9 +748,7 @@ describe('App', () => {
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
         'Open to the Side',
-        'Set Max Header Height',
-        'Sort Ascending',
-        'Sort Descending'
+        'Set Max Header Height'
       ])
     })
 
@@ -717,7 +761,7 @@ describe('App', () => {
       jest.advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(4)
+      expect(menuitems).toHaveLength(2)
 
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)

@@ -1,17 +1,16 @@
 import React, { MouseEventHandler, ReactElement, ReactNode } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
+import { focusFiltersTree, focusSortsTree, openPlotsWebview } from './messages'
 import { Icon } from '../../../shared/components/Icon'
 import {
   Filter,
   GraphScatter,
   SortPrecedence
 } from '../../../shared/components/icons'
-import { sendMessage } from '../../../shared/vscode'
 import { pluralize } from '../../../util/strings'
 import { ExperimentsState } from '../../store'
 
@@ -62,36 +61,6 @@ export const Indicator = ({
     content
   )
 }
-
-export const IndicatorWithJustTheCounter = ({
-  count,
-  'aria-label': ariaLabel,
-  tooltipContent
-}: CounterBadgeProps & {
-  'aria-label'?: string
-  tooltipContent?: ReactNode
-}) => {
-  const children = (
-    <span aria-label={ariaLabel}>
-      <CounterBadge count={count} />
-    </span>
-  )
-
-  return tooltipContent ? (
-    <CellHintTooltip tooltipContent={tooltipContent}>
-      {children}
-    </CellHintTooltip>
-  ) : (
-    children
-  )
-}
-
-const focusFiltersTree = () =>
-  sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
-const focusSortsTree = () =>
-  sendMessage({ type: MessageFromWebviewType.FOCUS_SORTS_TREE })
-const openPlotsWebview = () =>
-  sendMessage({ type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW })
 
 const formatCountMessage = (
   item: string,
