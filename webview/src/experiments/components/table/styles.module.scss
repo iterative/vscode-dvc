@@ -505,18 +505,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
           margin-right: 2px;
         }
 
-        .starSwitch {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 14px;
-          cursor: pointer;
-
-          &[aria-checked='true'] {
-            opacity: 1;
-          }
-        }
-
         .indicatorIcon {
           display: inline-flex;
           align-items: center;
@@ -559,15 +547,27 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
-.experimentCell .rowActions .starSwitch svg {
-  fill: $icon-color;
+.starSwitch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  cursor: pointer;
 
-  .rowSelected & {
-    fill: $selected-icon-color;
+  svg {
+    fill: $icon-color;
+
+    .rowSelected & {
+      fill: $selected-icon-color;
+    }
+  }
+
+  &[aria-checked='true'] svg {
+    fill: $row-action-star-checked;
   }
 }
 
-.cellHintTooltip {
+.starSwitch .cellHintTooltip {
   font-size: 0.65rem;
 }
 
@@ -763,9 +763,6 @@ $badge-size: 0.85rem;
   height: 1.5rem;
   cursor: pointer;
   svg {
-    fill: $watermark-color;
-  }
-  &.indicatorWithCount svg {
     fill: $icon-color;
   }
 }
