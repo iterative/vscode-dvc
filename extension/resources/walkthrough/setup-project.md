@@ -26,7 +26,7 @@ train:
     - models/predict.h5
   metrics:
     - metrics.json:
-        cashe: false
+        cache: false
 ```
 
 💡 Names, values in this file are project dependent and can be customized.
