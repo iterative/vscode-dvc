@@ -30,8 +30,8 @@ $accent-color: var(--button-primary-background);
 $indicator-badge-background: var(--vscode-activityBarBadge-background);
 $indicator-badge-foreground: var(--vscode-activityBarBadge-foreground);
 
-$row-action-icon-color: var(--vscode-icon-foreground);
-$row-action-selected-icon-color: var(
+$icon-color: var(--vscode-icon-foreground);
+$selected-icon-color: var(
   --vscode-list-activeSelectionIconForeground,
   var(--vscode-icon-foreground)
 );

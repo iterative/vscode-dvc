@@ -18,7 +18,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   left: 0;
   display: inline-block;
   position: absolute;
-  border: 2px solid $row-action-icon-color;
+  border: 2px solid $icon-color;
   border-top: unset;
   border-left: unset;
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
@@ -101,7 +101,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   background: $checkbox-background;
   border-radius: $bullet-size;
   border: calc(var(--border-width) * 1px) solid $checkbox-border;
-  color: $row-action-icon-color;
+  color: $icon-color;
   cursor: pointer;
   display: flex;
   height: $bullet-size;
@@ -134,7 +134,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
       width: 4px;
       height: 4px;
       vertical-align: middle;
-      border: 1px solid $row-action-icon-color;
+      border: 1px solid $icon-color;
       background-color: $checkbox-background;
     }
 
@@ -162,7 +162,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
 }
 
 .queued {
-  color: $row-action-icon-color;
+  color: $icon-color;
   display: flex;
   height: 16px;
   left: 2px;
@@ -331,7 +331,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
       .expandedRowArrow,
       .contractedRowArrow {
-        border-color: $row-action-selected-icon-color;
+        border-color: $selected-icon-color;
       }
     }
   }
@@ -560,10 +560,10 @@ $bullet-size: calc(var(--design-unit) * 4px);
 }
 
 .experimentCell .rowActions .starSwitch svg {
-  fill: $row-action-icon-color;
+  fill: $icon-color;
 
   .rowSelected & {
-    fill: $row-action-selected-icon-color;
+    fill: $selected-icon-color;
   }
 }
 
@@ -766,7 +766,7 @@ $badge-size: 0.85rem;
     fill: $watermark-color;
   }
   &.indicatorWithCount svg {
-    fill: $fg-color;
+    fill: $icon-color;
   }
 }
 
