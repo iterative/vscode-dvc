@@ -97,7 +97,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
     const menuOptions: MessagesMenuOptionProps[] = [
       {
-        hidden: column.id === 'id' || column.group === 'timestamp',
+        hidden: column.id === 'id',
         id: 'hide-column',
         label: 'Hide Column',
         message: {
