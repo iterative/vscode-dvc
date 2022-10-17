@@ -839,8 +839,8 @@ $badge-size: 0.85rem;
 
 .buttonAsLink {
   @extend a;
-  background: none !important;
+  background: none;
   border: none;
-  padding: 0 !important;
+  padding: 0;
   font-size: 0.65rem;
 }
