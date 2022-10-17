@@ -74,6 +74,26 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
 const getTooltipContent = (determiner: boolean, action: string): string =>
   'Click to ' + (determiner ? `un${action}` : action)
 
+type ClickableTooltipContentProps = {
+  clickableText: string
+  helperText: string
+  onClick: MouseEventHandler
+}
+
+const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
+  clickableText,
+  helperText,
+  onClick
+}) => (
+  <span>
+    {helperText}
+    <br />
+    <button className={styles.buttonAsLink} onClick={onClick}>
+      {clickableText}
+    </button>
+  </span>
+)
+
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   bulletColor,
   isWorkspace,
@@ -104,20 +124,15 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         subRowsAffected={stars}
         testId={'row-action-star'}
         tooltipContent={
-          <span>
-            {getTooltipContent(!!starred, 'star')}
-            <br />
-            <button
-              className={styles.buttonAsLink}
-              onClick={() =>
-                sendMessage({
-                  type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
-                })
-              }
-            >
-              Filter experiments by starred
-            </button>
-          </span>
+          <ClickableTooltipContent
+            clickableText={'Filter experiments by starred'}
+            onClick={() =>
+              sendMessage({
+                type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
+              })
+            }
+            helperText={getTooltipContent(!!starred, 'star')}
+          />
         }
       >
         <div
@@ -144,20 +159,15 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           testId={'row-action-plot'}
           tooltipOffset={isWorkspace ? [0, -16] : undefined}
           tooltipContent={
-            <span>
-              {getTooltipContent(!!bulletColor, 'plot')}
-              <br />
-              <button
-                className={styles.buttonAsLink}
-                onClick={() =>
-                  sendMessage({
-                    type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
-                  })
-                }
-              >
-                Open the plots view
-              </button>
-            </span>
+            <ClickableTooltipContent
+              clickableText={'Open the plots view'}
+              helperText={getTooltipContent(!!bulletColor, 'plot')}
+              onClick={() =>
+                sendMessage({
+                  type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+                })
+              }
+            />
           }
           onClick={toggleExperiment}
         >
