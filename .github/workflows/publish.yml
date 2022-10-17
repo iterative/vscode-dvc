@@ -32,6 +32,11 @@ jobs:
       - run: yarn run install-frozen-lockfile
       - run: yarn build
 
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./extension/dvc.vsix
+
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
