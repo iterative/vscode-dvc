@@ -7,20 +7,22 @@ import Tooltip, {
 
 export type CellHintTooltipProps = {
   tooltipContent: ReactNode
+  tooltipOffset?: [number, number]
   children: ReactElement
 }
 
 export const CellHintTooltip: React.FC<CellHintTooltipProps & TippyProps> = ({
   tooltipContent,
   children,
-  delay = NORMAL_TOOLTIP_DELAY
+  delay = NORMAL_TOOLTIP_DELAY,
+  tooltipOffset = [0, -2]
 }) => {
   return (
     <Tooltip
       content={<span className={styles.cellHintTooltip}>{tooltipContent}</span>}
       appendTo={document.body}
       placement="bottom-start"
-      offset={[0, -2]}
+      offset={tooltipOffset}
       delay={delay}
       interactive={true}
     >

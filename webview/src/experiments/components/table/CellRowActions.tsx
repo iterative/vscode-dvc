@@ -14,6 +14,7 @@ import { clickAndEnterProps } from '../../../util/props'
 import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 
 export type CellRowActionsProps = {
+  isWorkspace: boolean
   bulletColor?: string
   isRowSelected: boolean
   showSubRowStates: boolean
@@ -30,6 +31,7 @@ export type CellRowActionsProps = {
 }
 
 export type CellRowActionProps = {
+  tooltipOffset?: [number, number]
   showSubRowStates: boolean
   subRowsAffected: number
   children: React.ReactElement
@@ -47,12 +49,16 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   hidden,
   testId,
   tooltipContent,
+  tooltipOffset,
   onClick
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
   return (
-    <CellHintTooltip tooltipContent={tooltipContent}>
+    <CellHintTooltip
+      tooltipContent={tooltipContent}
+      tooltipOffset={tooltipOffset}
+    >
       <div
         className={cx(styles.rowActions, hidden && styles.hidden)}
         data-testid={testId}
@@ -70,6 +76,7 @@ const getTooltipContent = (determiner: boolean, action: string): string =>
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   bulletColor,
+  isWorkspace,
   status,
   toggleExperiment,
   isRowSelected,
@@ -135,6 +142,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           showSubRowStates={showSubRowStates}
           subRowsAffected={plotSelections}
           testId={'row-action-plot'}
+          tooltipOffset={isWorkspace ? [0, -16] : undefined}
           tooltipContent={
             <span>
               {getTooltipContent(!!bulletColor, 'plot')}
