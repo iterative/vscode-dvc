@@ -167,6 +167,7 @@ export const RowContent: React.FC<
           bulletColor={displayColor}
           starred={starred}
           isRowSelected={isRowSelected}
+          isWorkspace={isWorkspace}
           showSubRowStates={!isExpanded && depth > 0}
           subRowStates={subRowStates}
           toggleExperiment={toggleExperiment}
