@@ -109,7 +109,7 @@ export class WebviewMessages {
           { dvcRoot: this.dvcRoot, ids: [message.payload].flat() }
         )
 
-      case MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER: // needs analytics event
+      case MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER:
         return commands.executeCommand(
           RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
           this.dvcRoot
