@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.3] - 2022-10-17
+
+### 🚀 New Features and Enhancements
+
+- Add actions to experiment cell hint tooltips [#2606](https://github.com/iterative/vscode-dvc/pull/2606) by [@mattseddon](https://github.com/mattseddon)
+- Update experiment table icons to use --vscode-descriptionForeground and use --vscode-editorLightBulb-foreground for selected stars [#2604](https://github.com/iterative/vscode-dvc/pull/2604) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix experiment table changes collection bug [#2598](https://github.com/iterative/vscode-dvc/pull/2598) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use stable version of VS Code for e2e tests (again) [#2611](https://github.com/iterative/vscode-dvc/pull/2611) by [@mattseddon](https://github.com/mattseddon)
+- Standardize dvc root paths as they come into the system [#2597](https://github.com/iterative/vscode-dvc/pull/2597) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.2] - 2022-10-16
 
 ### 🚀 New Features and Enhancements
