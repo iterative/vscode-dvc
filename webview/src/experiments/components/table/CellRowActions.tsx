@@ -1,6 +1,7 @@
 import React, { MouseEventHandler } from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
   isQueued
@@ -8,6 +9,7 @@ import {
 import { Indicator } from './Indicators'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
+import { sendMessage } from '../../../shared/vscode'
 import { clickAndEnterProps } from '../../../util/props'
 import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 
@@ -33,7 +35,7 @@ export type CellRowActionProps = {
   children: React.ReactElement
   hidden?: boolean
   testId?: string
-  tooltipContent: string
+  tooltipContent: string | React.ReactElement
   queued?: boolean
   onClick?: MouseEventHandler
 }
@@ -63,14 +65,8 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   )
 }
 
-const getTooltipContent = (
-  determiner: boolean,
-  action: string,
-  helperText?: string
-): string =>
-  'Click to ' +
-  (determiner ? `un${action}` : action) +
-  (helperText ? `\n${helperText}` : '')
+const getTooltipContent = (determiner: boolean, action: string): string =>
+  'Click to ' + (determiner ? `un${action}` : action)
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   bulletColor,
@@ -100,11 +96,22 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
         testId={'row-action-star'}
-        tooltipContent={getTooltipContent(
-          !!starred,
-          'star',
-          'To filter by stars click the star icon above the filters tree\nor use "DVC: Filter Experiments Table to Starred" from the command palette.'
-        )}
+        tooltipContent={
+          <span>
+            {getTooltipContent(!!starred, 'star')}
+            <br />
+            <button
+              className={styles.buttonAsLink}
+              onClick={() =>
+                sendMessage({
+                  type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
+                })
+              }
+            >
+              Filter experiments by starred
+            </button>
+          </span>
+        }
       >
         <div
           className={styles.starSwitch}
@@ -128,11 +135,22 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           showSubRowStates={showSubRowStates}
           subRowsAffected={plotSelections}
           testId={'row-action-plot'}
-          tooltipContent={getTooltipContent(
-            !!bulletColor,
-            'plot',
-            'To open the plots view click the plot icon in the top left corner\nor use "DVC: Show Plots" from the command palette.'
-          )}
+          tooltipContent={
+            <span>
+              {getTooltipContent(!!bulletColor, 'plot')}
+              <br />
+              <button
+                className={styles.buttonAsLink}
+                onClick={() =>
+                  sendMessage({
+                    type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+                  })
+                }
+              >
+                Open the plots view
+              </button>
+            </span>
+          }
           onClick={toggleExperiment}
         >
           <span className={styles.bullet} style={{ color: bulletColor }} />
