@@ -13,6 +13,7 @@ export type WebviewData = TableData | PlotsData
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   APPLY_EXPERIMENT_TO_WORKSPACE = 'apply-experiment-to-workspace',
+  ADD_STARRED_EXPERIMENT_FILTER = 'add-starred-experiment-filter',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
@@ -45,7 +46,7 @@ export enum MessageFromWebviewType {
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
-  SET_EXPERIMENTS_HEADER_DEPTH = 'update-experiments-header-depth'
+  SET_EXPERIMENTS_HEADER_HEIGHT = 'update-experiments-header-height'
 }
 
 export type ColumnResizePayload = {
@@ -90,6 +91,9 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
       payload: string
+    }
+  | {
+      type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
     }
   | {
       type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
@@ -172,7 +176,7 @@ export type MessageFromWebview =
       type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
       payload: string
     }
-  | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH }
+  | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

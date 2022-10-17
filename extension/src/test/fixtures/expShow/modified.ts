@@ -1,3 +1,5 @@
+import { ExperimentStatus } from '../../../cli/dvc/contract'
+
 const data = {
   workspace: {
     baseline: {
@@ -12,8 +14,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -40,8 +41,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -62,8 +62,7 @@ const data = {
         params: {
           'params.yaml': { data: { seed: 473987, lr: 0.001, weight_decay: 0 } }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -81,8 +80,7 @@ const data = {
         params: {
           'params.yaml': { data: { seed: 473987, lr: 0.001, weight_decay: 0 } }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -99,8 +97,7 @@ const data = {
         params: {
           'params.yaml': { data: { seed: 473987, lr: 0.001, weight_decay: 0 } }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -117,8 +114,7 @@ const data = {
         params: {
           'params.yaml': { data: { seed: 473987, lr: 0.001, weight_decay: 0 } }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -141,8 +137,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -170,8 +165,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -198,8 +192,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -226,8 +219,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -254,8 +246,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -282,8 +273,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -310,8 +300,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -338,8 +327,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -366,8 +354,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -395,8 +382,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -423,8 +409,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -451,8 +436,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -479,8 +463,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -507,8 +490,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -535,8 +517,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -564,8 +545,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -592,8 +572,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -620,8 +599,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -648,8 +626,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -676,8 +653,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -704,8 +680,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -732,8 +707,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -760,8 +734,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -788,8 +761,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -816,8 +788,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -844,8 +815,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -872,8 +842,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -900,8 +869,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -928,8 +896,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -956,8 +923,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -984,8 +950,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1012,8 +977,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1040,8 +1004,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1068,8 +1031,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1096,8 +1058,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1124,8 +1085,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1152,8 +1112,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1180,8 +1139,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1208,8 +1166,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1236,8 +1193,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1264,8 +1220,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1292,8 +1247,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1320,8 +1274,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1348,8 +1301,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1377,8 +1329,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1405,8 +1356,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1433,8 +1383,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1461,8 +1410,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1489,8 +1437,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1517,8 +1464,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1545,8 +1491,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1573,8 +1518,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1601,8 +1545,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1629,8 +1572,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1657,8 +1599,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1685,8 +1626,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1713,8 +1653,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1741,8 +1680,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1769,8 +1707,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1797,8 +1734,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1825,8 +1761,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1853,8 +1788,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1881,8 +1815,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1909,8 +1842,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1937,8 +1869,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1965,8 +1896,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -1993,8 +1923,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2021,8 +1950,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2049,8 +1977,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2077,8 +2004,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2105,8 +2031,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2133,8 +2058,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2161,8 +2085,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2189,8 +2112,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2217,8 +2139,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2245,8 +2166,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2273,8 +2193,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2301,8 +2220,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2329,8 +2247,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2357,8 +2274,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2385,8 +2301,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2413,8 +2328,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2441,8 +2355,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {
@@ -2469,8 +2382,7 @@ const data = {
             }
           }
         },
-        queued: false,
-        running: false,
+        status: ExperimentStatus.SUCCESS,
         executor: null,
         metrics: {
           'logs.json': {

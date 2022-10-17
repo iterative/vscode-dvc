@@ -1,13 +1,10 @@
 import React from 'react'
 import cx from 'classnames'
 import { ErrorTooltip } from './Errors'
-import { IndicatorWithJustTheCounter } from './Indicators'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
-import { CellHintTooltip } from './CellHintTooltip'
 import { clickAndEnterProps } from '../../../util/props'
-import { Clock } from '../../../shared/components/icons'
 import { cellHasChanges } from '../../util/buildDynamicColumns'
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
@@ -34,52 +31,32 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
     <span className={styles.rowArrowContainer} />
   )
 
-export const FirstCell: React.FC<
-  CellProp &
-    CellRowActionsProps & {
-      bulletColor?: string
-      toggleExperiment: () => void
-    }
-> = ({ cell, bulletColor, toggleExperiment, ...rowActionsProps }) => {
+export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
+  cell,
+  ...rowActionsProps
+}) => {
   const { row, isPlaceholder } = cell
   const {
-    original: { error, queued, label, displayNameOrParent = '' }
+    original: { error, status, label, displayNameOrParent = '' }
   } = row
-
-  const {
-    subRowStates: { plotSelections }
-  } = rowActionsProps
+  const { toggleExperiment } = rowActionsProps
 
   return (
     <div
       {...cell.getCellProps({
-        className: cx(
-          styles.td,
-          styles.experimentCell,
-          isPlaceholder && styles.groupPlaceholder
-        )
+        className: cx(styles.td, styles.experimentCell)
       })}
     >
       <div className={styles.innerCell}>
-        <CellRowActions {...rowActionsProps} />
+        <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        <CellHintTooltip tooltipContent={bulletColor ? 'Unplot' : 'Plot'}>
-          <span
-            className={styles.bullet}
-            style={{ color: bulletColor }}
-            {...clickAndEnterProps(toggleExperiment)}
-          >
-            <IndicatorWithJustTheCounter
-              aria-label={'Sub-rows selected for plots'}
-              count={plotSelections}
-            />
-            {queued && <Clock />}
-          </span>
-        </CellHintTooltip>
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>
             <div
-              className={cx(styles.cellContents, error && styles.error)}
+              className={cx(
+                styles.experimentCellContentsContainer,
+                error && styles.error
+              )}
               {...clickAndEnterProps(toggleExperiment, [
                 label,
                 displayNameOrParent
@@ -107,8 +84,7 @@ export const CellWrapper: React.FC<
       {...cell.getCellProps({
         className: cx(styles.td, {
           [styles.workspaceChange]: changes?.includes(cell.column.id),
-          [styles.depChange]: cellHasChanges(cell.value),
-          [styles.groupPlaceholder]: cell.isPlaceholder
+          [styles.depChange]: cellHasChanges(cell.value)
         })
       })}
       data-testid={cellId}

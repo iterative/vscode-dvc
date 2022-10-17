@@ -501,6 +501,14 @@ suite('Workspace Experiments Test Suite', () => {
             description: '[exp-f13bca]',
             label: 'f0f9186',
             value: { id: 'exp-f13bca', name: 'exp-f13bca' }
+          },
+          {
+            description: undefined,
+            label: '55d492c',
+            value: {
+              id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
+              name: '55d492c'
+            }
           }
         ],
         {

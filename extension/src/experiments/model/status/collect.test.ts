@@ -1,6 +1,7 @@
 import { collectColoredStatus } from './collect'
 import { copyOriginalColors } from './colors'
 import { Experiment } from '../../webview/contract'
+import { ExperimentStatus } from '../../../cli/dvc/contract'
 
 describe('collectColoredStatus', () => {
   const buildMockExperiments = (n: number, prefix = 'exp') => {
@@ -41,7 +42,7 @@ describe('collectColoredStatus', () => {
   it('should not push queued experiments into the returned object', () => {
     const experiments = [
       { id: 'exp1' },
-      { id: 'exp2', queued: true }
+      { id: 'exp2', status: ExperimentStatus.QUEUED }
     ] as Experiment[]
     const colors = copyOriginalColors()
 

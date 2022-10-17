@@ -28,8 +28,6 @@ export const EventName = Object.assign(
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
-    SET_EXPERIMENTS_HEADER_DEPTH: 'extension.updateHeaderDepth',
-
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
       'views.experimentsTable.columnsReordered',
@@ -55,6 +53,8 @@ export const EventName = Object.assign(
       'views.experimentsTable.selectColumns',
     VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS:
       'views.experimentsTable.selectExperimentsForPlots',
+    VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT:
+      'views.experimentsTable.updateHeaderMaxHeight',
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
 
@@ -197,8 +197,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined
   [EventName.EXTENSION_SHOW_OUTPUT]: undefined
 
-  [EventName.SET_EXPERIMENTS_HEADER_DEPTH]: undefined
-
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED]: DvcRootCount
@@ -213,6 +211,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN]: {
     width: number
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN]: SortDefinition
   [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT]: {
     path: string

@@ -8,12 +8,13 @@ import omit from 'lodash.omit'
 import { ExperimentType } from '.'
 import { ExperimentsAccumulator } from './accumulator'
 import { extractColumns } from '../columns/extract'
-import { Experiment, ColumnType } from '../webview/contract'
+import { Experiment, ColumnType, isRunning } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
   ExperimentsBranchOutput,
-  ExperimentsOutput
+  ExperimentsOutput,
+  ExperimentStatus
 } from '../../cli/dvc/contract'
 import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
@@ -147,6 +148,11 @@ const transformColumns = (
   }
 }
 
+const mergeErrors = (
+  experimentFieldsOrError: ExperimentFieldsOrError
+): string | undefined =>
+  experimentFieldsOrError.error?.msg || experimentFieldsOrError.data?.error?.msg
+
 const transformExperimentData = (
   id: string,
   experimentFieldsOrError: ExperimentFieldsOrError,
@@ -158,7 +164,7 @@ const transformExperimentData = (
 ): Experiment => {
   const data = experimentFieldsOrError.data || {}
 
-  const error = experimentFieldsOrError.error
+  const error = mergeErrors(experimentFieldsOrError)
 
   const experiment = {
     id,
@@ -179,7 +185,7 @@ const transformExperimentData = (
   }
 
   if (error) {
-    experiment.error = error.msg
+    experiment.error = error
   }
 
   transformColumns(experiment, data, branch)
@@ -228,7 +234,7 @@ const collectHasRunningExperiment = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
 ) => {
-  if (experiment.running) {
+  if (isRunning(experiment.status)) {
     acc.hasRunning = true
   }
 }
@@ -327,19 +333,19 @@ const getDefaultMutableRevision = (hasCheckpoints: boolean): string[] => {
 
 const noWorkspaceVsSelectedRaceCondition = (
   hasCheckpoints: boolean,
-  running: boolean | undefined,
+  status: ExperimentStatus | undefined,
   selected: boolean | undefined
-): boolean => !!(hasCheckpoints && running && !selected)
+): boolean => !!(hasCheckpoints && isRunning(status) && !selected)
 
 const collectMutableRevision = (
   acc: string[],
-  { label, running, selected }: Experiment,
+  { label, status, selected }: Experiment,
   hasCheckpoints: boolean
 ) => {
-  if (noWorkspaceVsSelectedRaceCondition(hasCheckpoints, running, selected)) {
+  if (noWorkspaceVsSelectedRaceCondition(hasCheckpoints, status, selected)) {
     acc.push('workspace')
   }
-  if (running && !hasCheckpoints) {
+  if (isRunning(status) && !hasCheckpoints) {
     acc.push(label)
   }
 }

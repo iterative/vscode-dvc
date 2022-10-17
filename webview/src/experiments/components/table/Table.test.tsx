@@ -9,7 +9,11 @@ import {
   screen
 } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  ExperimentStatus,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
@@ -53,8 +57,7 @@ describe('Table', () => {
     row: {
       id: 'workspace',
       original: {
-        queued: false,
-        running: false
+        status: ExperimentStatus.SUCCESS
       }
     }
   }
@@ -102,8 +105,7 @@ describe('Table', () => {
         id: 'workspace',
         label: 'workspace',
         original: {
-          queued: false,
-          running: false
+          status: ExperimentStatus.SUCCESS
         },
         values: {
           id: 'workspace'
@@ -266,11 +268,11 @@ describe('Table', () => {
         bubbles: true
       })
 
-      const sortOption = await screen.findByText('Set Max Header Depth')
+      const sortOption = await screen.findByText('Set Max Header Height')
       fireEvent.click(sortOption)
 
       expect(mockedPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_DEPTH
+        type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT
       })
     })
   })
