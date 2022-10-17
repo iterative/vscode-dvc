@@ -1,15 +1,14 @@
 import React, { MouseEventHandler } from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
   isQueued
 } from 'dvc/src/experiments/webview/contract'
 import { Indicator } from './Indicators'
+import { addStarredFilter, openPlotsWebview } from './messages'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
-import { sendMessage } from '../../../shared/vscode'
 import { clickAndEnterProps } from '../../../util/props'
 import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 
@@ -126,11 +125,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         tooltipContent={
           <ClickableTooltipContent
             clickableText={'Filter experiments by starred'}
-            onClick={() =>
-              sendMessage({
-                type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
-              })
-            }
+            onClick={addStarredFilter}
             helperText={getTooltipContent(!!starred, 'star')}
           />
         }
@@ -162,11 +157,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
             <ClickableTooltipContent
               clickableText={'Open the plots view'}
               helperText={getTooltipContent(!!bulletColor, 'plot')}
-              onClick={() =>
-                sendMessage({
-                  type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
-                })
-              }
+              onClick={openPlotsWebview}
             />
           }
           onClick={toggleExperiment}
