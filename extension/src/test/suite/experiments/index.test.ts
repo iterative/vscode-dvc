@@ -66,6 +66,7 @@ import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
+import { RegisteredCommands } from '../../../commands/external'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -948,6 +949,32 @@ suite('Experiments Test Suite', () => {
         'experiments have been starred'
       ).to.be.true
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it.only(
+      'should be able to handle a message to filter to starred experiments',
+      async () => {
+        const { experiments } = setupExperimentsAndMockCommands()
+
+        const mockExecuteCommand = stub(commands, 'executeCommand')
+
+        const webview = await experiments.showWebview()
+        const mockMessageReceived = getMessageReceivedEmitter(webview)
+        const messageReceived = new Promise(resolve =>
+          disposable.track(mockMessageReceived.event(() => resolve(undefined)))
+        )
+
+        mockMessageReceived.fire({
+          type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
+        })
+
+        await messageReceived
+
+        expect(mockExecuteCommand).to.be.calledWithExactly(
+          RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
+          dvcDemoPath
+        )
+      }
+    ).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select experiments for plotting', async () => {
       const { experiments, experimentsModel } = buildExperiments(disposable)
