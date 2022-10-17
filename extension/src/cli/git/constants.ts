@@ -1,11 +1,41 @@
 import { join } from 'path'
+import fs from 'fs'
 
-export const DOT_GIT = '.git'
-export const DOT_GIT_HEAD = join(DOT_GIT, 'HEAD')
-export const DOT_GIT_INDEX = join(DOT_GIT, 'index')
-export const GIT_REFS = join(DOT_GIT, 'refs')
-export const GIT_LOGS_REFS = join(DOT_GIT, 'logs', 'refs')
-export const HEADS_GIT_REFS = join(GIT_REFS, 'heads')
+export enum gitPath {
+  DOT_GIT = '.git',
+  DOT_GIT_HEAD = 'HEAD',
+  DOT_GIT_INDEX = 'index',
+  GIT_REFS = 'refs',
+  GIT_LOGS_REFS = 'logs/ref',
+  HEADS_GIT_REFS = 'heads'
+}
+
+const getGitDirPath = (gitRoot: string) => {
+  const dotGitPath = join(gitRoot, gitPath.DOT_GIT)
+
+  if (fs.lstatSync(dotGitPath).isFile()) {
+    const dotGitAsFileContent = fs.readFileSync(dotGitPath, 'utf8')
+    const gitDirPrefix = 'gitdir: '
+    const gitDirLine = dotGitAsFileContent
+      .split(/\r?\n/)
+      .find(line => line.indexOf(gitDirPrefix) === 0)
+    return join(gitRoot, ...(gitDirLine?.slice(8).split('/') || []))
+  }
+  return dotGitPath
+}
+
+const gitRootGitDir: { [key: string]: string } = {}
+
+export const getGitPath = (gitRoot: string, path: gitPath | string) => {
+  const gitDir = gitRootGitDir[gitRoot] || getGitDirPath(gitRoot)
+  gitRootGitDir[gitRoot] = gitDir
+
+  if (path === gitPath.DOT_GIT) {
+    return gitDir
+  }
+
+  return join(gitDir, ...path.split('/'))
+}
 
 export enum Command {
   ADD = 'add',

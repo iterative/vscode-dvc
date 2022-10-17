@@ -25,7 +25,7 @@ import {
 import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
 import { ExperimentFlag } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
-import { DOT_GIT_HEAD } from '../../../../cli/git/constants'
+import { getGitPath, gitPath } from '../../../../cli/git/constants'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -186,7 +186,7 @@ suite('Experiments Data Test Suite', () => {
         data.onDidUpdate(() => resolve(undefined))
       )
 
-      await Watcher.fireWatcher(join(gitRoot, DOT_GIT_HEAD))
+      await Watcher.fireWatcher(getGitPath(gitRoot, gitPath.DOT_GIT_HEAD))
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called

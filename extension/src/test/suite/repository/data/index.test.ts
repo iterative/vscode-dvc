@@ -1,4 +1,3 @@
-import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
@@ -13,7 +12,7 @@ import {
   CommandId,
   InternalCommands
 } from '../../../../commands/internal'
-import { DOT_GIT_HEAD } from '../../../../cli/git/constants'
+import { getGitPath, gitPath } from '../../../../cli/git/constants'
 
 suite('Repository Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -42,7 +41,7 @@ suite('Repository Data Test Suite', () => {
     })
 
     it('should watch the .git index and HEAD for updates', async () => {
-      const gitRoot = resolve(dvcDemoPath, '..')
+      const gitRoot = dvcDemoPath
 
       const mockExecuteCommand = (command: CommandId) => {
         if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
@@ -67,7 +66,7 @@ suite('Repository Data Test Suite', () => {
         data.onDidUpdate(() => resolve(undefined))
       )
 
-      await fireWatcher(join(gitRoot, DOT_GIT_HEAD))
+      await fireWatcher(getGitPath(gitRoot, gitPath.DOT_GIT_HEAD))
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called

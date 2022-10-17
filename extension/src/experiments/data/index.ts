@@ -14,7 +14,7 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { ExperimentFlag } from '../../cli/dvc/constants'
-import { DOT_GIT, DOT_GIT_HEAD, HEADS_GIT_REFS } from '../../cli/git/constants'
+import { getGitPath, gitPath } from '../../cli/git/constants'
 
 export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
 
@@ -80,16 +80,18 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       AvailableCommands.GIT_GET_REPOSITORY_ROOT,
       this.dvcRoot
     )
+
+    const dotGitPath = getGitPath(gitRoot, gitPath.DOT_GIT_HEAD)
     const watchedRelPaths = [
-      DOT_GIT_HEAD,
-      EXPERIMENTS_GIT_REFS,
-      EXPERIMENTS_GIT_LOGS_REFS,
-      HEADS_GIT_REFS
+      dotGitPath,
+      getGitPath(gitRoot, EXPERIMENTS_GIT_REFS),
+      getGitPath(gitRoot, EXPERIMENTS_GIT_LOGS_REFS),
+      getGitPath(gitRoot, gitPath.HEADS_GIT_REFS)
     ]
 
     this.dispose.track(
       createFileSystemWatcher(
-        getRelativePattern(join(gitRoot, DOT_GIT), '**'),
+        getRelativePattern(dotGitPath, '**'),
         (path: string) => {
           if (path.includes(EXPERIMENTS_GIT_REFS_EXEC)) {
             return
