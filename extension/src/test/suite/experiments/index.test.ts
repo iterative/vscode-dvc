@@ -67,6 +67,7 @@ import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { RegisteredCommands } from '../../../commands/external'
+import { ConfigKey } from '../../../vscode/config'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -172,6 +173,12 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('handleMessageFromWebview', () => {
+    after(() => {
+      workspace
+        .getConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)
+        .update('', undefined, false)
+    })
+
     const setupExperimentsAndMockCommands = () => {
       const {
         columnsModel,
@@ -883,9 +890,8 @@ suite('Experiments Test Suite', () => {
     it('should be able to handle a message to update the table depth', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
       const inputEvent = getInputBoxEvent('0')
-      const tableMaxDepthOption = 'dvc.experimentsTableHeadMaxHeight'
       const tableMaxDepthChanged = configurationChangeEvent(
-        tableMaxDepthOption,
+        ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH,
         disposable
       )
 
@@ -901,7 +907,7 @@ suite('Experiments Test Suite', () => {
       await tableMaxDepthChanged
 
       expect(
-        await workspace.getConfiguration().get(tableMaxDepthOption)
+        workspace.getConfiguration().get(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)
       ).to.equal(0)
       expect(mockSendTelemetryEvent).to.be.called
       expect(
