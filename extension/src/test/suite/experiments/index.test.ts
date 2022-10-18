@@ -173,7 +173,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('handleMessageFromWebview', () => {
-    after(() => {
+    afterEach(() => {
       workspace
         .getConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)
         .update('', undefined, false)
