@@ -41,7 +41,6 @@ export const TableHead = ({
   )
   const dispatch = useDispatch()
   const orderedColumns = useColumnOrder(columns, columnOrder)
-  const draggingIds = useRef<string[]>()
 
   const allHeaders: HeaderGroup<Experiment>[] = []
   for (const headerGroup of headerGroups) {
@@ -49,6 +48,7 @@ export const TableHead = ({
   }
 
   const fullColumnOrder = useRef<string[]>()
+  const draggingIds = useRef<string[]>()
   const wrapper = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
