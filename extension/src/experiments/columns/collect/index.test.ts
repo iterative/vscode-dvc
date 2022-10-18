@@ -693,6 +693,32 @@ describe('collectChanges', () => {
     ).toStrictEqual(['params:params.yaml:a.b'])
   })
 
+  it('should handle when a parameter has a null value', () => {
+    const nullParam = {
+      param_tuning: {
+        logistic_regression: null
+      }
+    }
+
+    expect(
+      collectChanges({
+        workspace: updateParams(nullParam),
+        '9c6ba26745d2fbc286a13b99011d5126b5a245dc': updateParams(nullParam)
+      })
+    ).toStrictEqual([])
+
+    expect(
+      collectChanges({
+        workspace: updateParams(nullParam),
+        '9c6ba26745d2fbc286a13b99011d5126b5a245dc': updateParams({
+          param_tuning: {
+            logistic_regression: 1
+          }
+        })
+      })
+    ).toStrictEqual(['params:params.yaml:param_tuning.logistic_regression'])
+  })
+
   it('should compare against the most recent commit', () => {
     const matchingParams = {
       lr: 0.1
