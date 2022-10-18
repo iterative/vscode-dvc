@@ -461,6 +461,22 @@ $bullet-size: calc(var(--design-unit) * 4px);
   .th {
     height: auto;
     background-color: $header-bg-color;
+
+    .dropTarget {
+      position: absolute;
+      right: -3px;
+      bottom: 0;
+      width: 3px;
+      z-index: -1;
+      height: var(--table-head-height);
+      background-color: $header-resizer-color;
+      z-index: 1;
+      display: none;
+
+      &.active {
+        display: block;
+      }
+    }
   }
   .td {
     height: auto;
