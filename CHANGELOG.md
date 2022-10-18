@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.4] - 2022-10-18
+
+### 🐛 Bug Fixes
+
+- Account for null being an object in workspace change data collection [#2617](https://github.com/iterative/vscode-dvc/pull/2617) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.3] - 2022-10-17
 
 ### 🚀 New Features and Enhancements
