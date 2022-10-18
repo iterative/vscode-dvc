@@ -19,6 +19,7 @@ import {
   ExperimentsBranchOutput,
   ExperimentsOutput,
   ExperimentStatus,
+  isValueTree,
   PlotsOutput,
   Value,
   ValueTree
@@ -58,8 +59,8 @@ const collectFromMetricsFile = (
 ) => {
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
-  if (typeof value === 'object') {
-    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
+  if (isValueTree(value)) {
+    for (const [childKey, childValue] of Object.entries(value)) {
       collectFromMetricsFile(
         acc,
         name,

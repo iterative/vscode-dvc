@@ -427,7 +427,7 @@ describe('Table', () => {
       let headers = await getHeaders()
 
       expect(headers.indexOf('threshold')).toBeGreaterThan(
-        headers.indexOf('loss')
+        headers.indexOf('accuracy')
       )
       expect(headers.indexOf('test')).toBeGreaterThan(
         headers.indexOf('accuracy')
@@ -441,12 +441,13 @@ describe('Table', () => {
 
       headers = await getHeaders()
 
-      expect(headers.indexOf('loss')).toBeGreaterThan(
+      expect(headers.indexOf('accuracy')).toBeGreaterThan(
         headers.indexOf('threshold')
       )
 
+      const [, startingNode] = screen.getAllByText('summary.json')
       dragAndDrop(
-        screen.getByText('summary.json'),
+        startingNode,
         getDraggableHeaderFromText('test'),
         DragEnterDirection.AUTO
       )

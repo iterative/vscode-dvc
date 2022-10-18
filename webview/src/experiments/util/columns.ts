@@ -96,10 +96,11 @@ export const reorderColumnIds = (
       ...columnIds.slice(displacedIndex + displaced.length)
     ]
   }
+
   return [
     ...columnIds.slice(0, displacedIndex),
-    ...displacer,
     ...displaced,
+    ...displacer,
     ...columnIds.slice(displacedIndex + displaced.length, displacerIndex),
     ...columnIds.slice(displacerIndex + displacer.length)
   ]

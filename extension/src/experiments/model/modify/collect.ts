@@ -1,4 +1,4 @@
-import { Value, ValueTree } from '../../../cli/dvc/contract'
+import { isValueTree, Value, ValueTree } from '../../../cli/dvc/contract'
 import { appendColumnToPath } from '../../columns/paths'
 import { MetricOrParamColumns } from '../../webview/contract'
 
@@ -15,8 +15,8 @@ const collectFromParamsFile = (
 ) => {
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
-  if (!Array.isArray(value) && typeof value === 'object') {
-    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
+  if (isValueTree(value)) {
+    for (const [childKey, childValue] of Object.entries(value)) {
       collectFromParamsFile(acc, childKey, childValue, pathArray)
     }
     return
