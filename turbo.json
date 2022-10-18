@@ -3,6 +3,7 @@
   "baseBranch": "origin/main",
   "pipeline": {
     "build": {
+      "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
     "dvc#build": {
@@ -13,16 +14,20 @@
       "dependsOn": ["dvc#build"]
     },
     "build-storybook": {
+      "dependsOn": ["^build-storybook"],
       "outputs": ["storybook-static/**"]
     },
     "test": {
+      "dependsOn": ["^test"],
       "outputs": ["coverage/jest/**"]
     },
     "cover-vscode-run": {
       "dependsOn": ["test", "test-build"],
+      "inputs": ["coverage/jest/**", "dist/**"],
       "outputs": ["coverage/integration/**"]
     },
     "test-build": {
+      "dependsOn": ["^test-build"],
       "outputs": ["dist/**"]
     },
     "test-vscode": {
@@ -32,6 +37,7 @@
       "dependsOn": ["test-build"]
     },
     "format": {
+      "dependsOn": ["^format"],
       "outputs": []
     },
     "lint": {
