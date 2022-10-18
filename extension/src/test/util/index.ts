@@ -2,18 +2,8 @@ import { resolve } from 'path'
 import { Memento, Uri, workspace, WorkspaceFolder } from 'vscode'
 
 const dvcRoot = resolve(__dirname, '..', '..', '..', '..', 'vscode-dvc-demo')
-const dvcDemoGitRoot = resolve(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  '..',
-  '.git',
-  'modules',
-  'vscode-dvc-demo'
-)
+
 export const dvcDemoPath = Uri.file(dvcRoot).fsPath
-export const dvcDemoGitPath = Uri.file(dvcDemoGitRoot).fsPath
 export const basePlotsUrl = Uri.file(
   resolve(__dirname, '..', 'fixtures', 'plotsDiff', 'staticImages')
 ).fsPath

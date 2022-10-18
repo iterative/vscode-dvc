@@ -10,6 +10,7 @@ export enum gitPath {
   HEADS_GIT_REFS = 'heads'
 }
 
+// .git inside a submodule is a file with the following content: `gitdir: ../.git/modules/vscode-dvc-demo`
 const getGitDirPath = (gitRoot: string) => {
   const dotGitPath = join(gitRoot, gitPath.DOT_GIT)
 
