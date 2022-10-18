@@ -39,6 +39,11 @@ export interface ValueTreeNode {
 
 export type ValueTree = ValueTreeRoot | ValueTreeNode
 
+export const isValueTree = (
+  value: Value | ValueTree
+): value is NonNullable<ValueTree> =>
+  !!(value && !Array.isArray(value) && typeof value === 'object')
+
 export enum ExperimentStatus {
   FAILED = 'Failed',
   QUEUED = 'Queued',
