@@ -7,7 +7,7 @@
   "prettier.configPath": ".prettierrc.json",
   "editor.tabSize": 2,
   "typescript.updateImportsOnFileMove.enabled": "prompt",
-  "npm.exclude": ["**/{vscode-dvc-demo,.wdio*}/**"],
+  "npm.exclude": ["**/{demo,.wdio*}/**"],
   "cSpell.words": [
     "appdirs",
     "camelcase",

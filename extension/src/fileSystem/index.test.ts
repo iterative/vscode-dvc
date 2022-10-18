@@ -34,7 +34,7 @@ describe('findDvcRootPaths', () => {
 
     remove(mockDvcRoot)
 
-    expect([...dvcRoots]).toStrictEqual([mockDvcRoot, dvcDemoPath])
+    expect([...dvcRoots]).toStrictEqual([dvcDemoPath, mockDvcRoot])
   })
 })
 

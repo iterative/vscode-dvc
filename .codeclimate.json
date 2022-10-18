@@ -5,7 +5,7 @@
     "**/*.test.*",
     "**/constants.ts",
     "**/contract.ts",
-    "vscode-dvc-demo/**",
+    "demo/**",
     "extension/src/test/**",
     "languageServer/src/test/**",
     "webview/src/react-table-config.d.ts",
