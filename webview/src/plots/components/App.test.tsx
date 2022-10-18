@@ -1,6 +1,6 @@
 import { join } from 'dvc/src/test/util/path'
 import { configureStore } from '@reduxjs/toolkit'
-import React, { ReactElement } from 'react'
+import React from 'react'
 import { Provider } from 'react-redux'
 import {
   cleanup,
@@ -1291,30 +1291,14 @@ describe('App', () => {
     const [templateInfo, comparisonInfo, checkpointInfo] =
       screen.getAllByTestId('info-tooltip-toggle')
 
-    const getSectionText = (sectionNode: ReactElement) =>
-      // eslint-disable-next-line testing-library/no-node-access
-      sectionNode.props.children || ''
-
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.mouseEnter(comparisonInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.COMPARISON_TABLE])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-comparison-plots')).toBeInTheDocument()
 
     fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.CHECKPOINT_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-checkpoint-plots')).toBeInTheDocument()
   })
 
   it('should dismiss a tooltip by pressing esc', () => {
@@ -1326,29 +1310,15 @@ describe('App', () => {
 
     const [templateInfo] = screen.getAllByTestId('info-tooltip-toggle')
 
-    const getSectionText = (sectionNode: ReactElement) =>
-      // eslint-disable-next-line testing-library/no-node-access
-      sectionNode.props.children || ''
-
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.keyDown(templateInfo, { bubbles: true, key: 'Space' })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.keyDown(templateInfo, { bubbles: true, key: 'Escape' })
     expect(
-      screen.queryByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
+      screen.queryByTestId('tooltip-template-plots')
     ).not.toBeInTheDocument()
   })
 
