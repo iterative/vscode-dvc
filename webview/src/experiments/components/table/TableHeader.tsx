@@ -31,6 +31,7 @@ interface TableHeaderProps {
   columns: HeaderGroup<Experiment>[]
   orderedColumns: Column[]
   onDragEnter: DragFunction
+  onDragEnd: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
@@ -42,6 +43,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   columns,
   orderedColumns,
   onDragEnter,
+  onDragEnd,
   onDragStart,
   onDrop,
   root,
@@ -100,6 +102,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       sortEnabled={isSortable}
       hasFilter={hasFilter}
       onDragEnter={onDragEnter}
+      onDragEnd={onDragEnd}
       onDragStart={onDragStart}
       onDrop={onDrop}
       menuDisabled={!isSortable && column.group !== ColumnType.PARAMS}
