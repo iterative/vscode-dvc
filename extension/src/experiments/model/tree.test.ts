@@ -73,7 +73,7 @@ describe('ExperimentsTree', () => {
         mockedExperiments,
         mockedResourceLocator
       )
-      mockedGetDvcRoots.mockReturnValueOnce(['demo', 'second/repo'])
+      mockedGetDvcRoots.mockReturnValueOnce(['vsocde-dvc-demo', 'second/repo'])
       mockedGetExperiments.mockReturnValueOnce([])
       mockedGetExperiments.mockReturnValueOnce([])
 
@@ -87,7 +87,7 @@ describe('ExperimentsTree', () => {
         mockedExperiments,
         mockedResourceLocator
       )
-      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
+      mockedGetDvcRoots.mockReturnValueOnce(['vsocde-dvc-demo'])
       mockedGetExperiments.mockReturnValueOnce([])
 
       const rootElements = await experimentsTree.getChildren()
@@ -96,7 +96,7 @@ describe('ExperimentsTree', () => {
     })
 
     it('should return an array of root elements when at least one experiment exists in one of the repositories', async () => {
-      const dvcRoots = ['demo', 'and/mock', 'other/repo']
+      const dvcRoots = ['vsocde-dvc-demo', 'and/mock', 'other/repo']
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
         mockedResourceLocator
@@ -402,13 +402,13 @@ describe('ExperimentsTree', () => {
         mockedExperiments,
         mockedResourceLocator
       )
-      mockedGetDvcRoots.mockReturnValueOnce(['demo', 'other'])
+      mockedGetDvcRoots.mockReturnValueOnce(['vsocde-dvc-demo', 'other'])
       mockedGetExperiments.mockReturnValueOnce([])
       mockedGetExperiments.mockReturnValueOnce([])
 
       await experimentsTree.getChildren()
 
-      const treeItem = experimentsTree.getTreeItem('demo')
+      const treeItem = experimentsTree.getTreeItem('vsocde-dvc-demo')
       expect(treeItem).toStrictEqual({ ...mockedItem })
     })
 
@@ -428,7 +428,7 @@ describe('ExperimentsTree', () => {
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
         description: undefined,
-        dvcRoot: 'demo',
+        dvcRoot: 'vsocde-dvc-demo',
         iconPath: mockedClockResource,
         id: 'f0778b3',
         label: 'f0778b3',
@@ -463,7 +463,7 @@ describe('ExperimentsTree', () => {
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
         description: undefined,
-        dvcRoot: 'demo',
+        dvcRoot: 'vsocde-dvc-demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'workspace',
         label: 'workspace',
@@ -496,7 +496,7 @@ describe('ExperimentsTree', () => {
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 1,
         description: undefined,
-        dvcRoot: 'demo',
+        dvcRoot: 'vsocde-dvc-demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'f0778b3',
         label: 'f0778b3',
@@ -529,7 +529,7 @@ describe('ExperimentsTree', () => {
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
         description: undefined,
-        dvcRoot: 'demo',
+        dvcRoot: 'vsocde-dvc-demo',
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0778b3',
         label: 'f0778b3',
@@ -556,12 +556,12 @@ describe('ExperimentsTree', () => {
         mockedExperiments,
         mockedResourceLocator
       )
-      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
+      mockedGetDvcRoots.mockReturnValueOnce(['vsocde-dvc-demo'])
 
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 1,
         description: undefined,
-        dvcRoot: 'demo',
+        dvcRoot: 'vsocde-dvc-demo',
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0998a3',
         label: 'f0998a3',

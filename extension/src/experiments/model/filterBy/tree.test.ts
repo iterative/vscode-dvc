@@ -59,7 +59,7 @@ describe('ExperimentsFilterByTree', () => {
       mockedExperiments,
       mockedInternalCommands
     )
-    mockedGetDvcRoots.mockReturnValueOnce(['demo'])
+    mockedGetDvcRoots.mockReturnValueOnce(['vsocde-dvc-demo'])
     mockedGetFilters.mockReturnValueOnce([])
     const rootElements = await experimentsFilterByTree.getChildren()
     expect(rootElements).toStrictEqual([])
@@ -77,7 +77,7 @@ describe('ExperimentsFilterByTree', () => {
         value: '90000'
       }
     ]
-    const dvcRoots = ['demo']
+    const dvcRoots = ['vsocde-dvc-demo']
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
     mockedGetFilters.mockReturnValueOnce(mockedFilters)
     mockedGetFilters.mockReturnValueOnce(mockedFilters)
@@ -86,7 +86,7 @@ describe('ExperimentsFilterByTree', () => {
     expect(filters).toStrictEqual([
       {
         description: '== 90000',
-        dvcRoot: 'demo',
+        dvcRoot: 'vsocde-dvc-demo',
         id: buildMetricOrParamPath(
           ColumnType.PARAMS,
           'params.yaml',
@@ -102,7 +102,7 @@ describe('ExperimentsFilterByTree', () => {
       mockedExperiments,
       mockedInternalCommands
     )
-    const dvcRoots = ['demo', 'other']
+    const dvcRoots = ['vsocde-dvc-demo', 'other']
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
     mockedGetFilters.mockReturnValueOnce([
       {
@@ -134,7 +134,7 @@ describe('ExperimentsFilterByTree', () => {
       mockedExperiments,
       mockedInternalCommands
     )
-    const dvcRoots = ['demo', 'and', 'another']
+    const dvcRoots = ['vsocde-dvc-demo', 'and', 'another']
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
     mockedGetFilters.mockReturnValueOnce(mockedFilters)
     mockedGetFilters.mockReturnValueOnce([])
@@ -142,12 +142,12 @@ describe('ExperimentsFilterByTree', () => {
     await experimentsFilterByTree.getChildren()
 
     mockedGetFilters.mockReturnValueOnce(mockedFilters)
-    const filters = await experimentsFilterByTree.getChildren('demo')
+    const filters = await experimentsFilterByTree.getChildren('vsocde-dvc-demo')
 
     expect(filters).toStrictEqual([
       {
         description: '== 90000',
-        dvcRoot: 'demo',
+        dvcRoot: 'vsocde-dvc-demo',
         id: buildMetricOrParamPath(
           ColumnType.PARAMS,
           'params.yml',
@@ -157,7 +157,7 @@ describe('ExperimentsFilterByTree', () => {
       },
       {
         description: '< 1',
-        dvcRoot: 'demo',
+        dvcRoot: 'vsocde-dvc-demo',
         id: buildMetricOrParamPath(ColumnType.METRICS, 'logs.json', 'metric<1'),
         label: buildMetricOrParamPath(ColumnType.METRICS, 'logs.json', 'metric')
       }

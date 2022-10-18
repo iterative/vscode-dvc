@@ -58,7 +58,7 @@ beforeEach(() => {
 })
 
 describe('ExperimentsSortByTree', () => {
-  const dvcRoot = 'demo'
+  const dvcRoot = 'vsocde-dvc-demo'
   const examplePath = buildMetricOrParamPath(ColumnType.PARAMS, 'test')
   const exampleSortDefinition: SortDefinition = {
     descending: true,
@@ -113,8 +113,8 @@ describe('ExperimentsSortByTree', () => {
         mockedInternalCommands
       )
       expect(await experimentsSortByTree.getChildren(undefined)).toStrictEqual([
-        dvcRoot,
-        'demo2'
+        'demo2',
+        dvcRoot
       ])
     })
 

@@ -12,7 +12,7 @@ async function main() {
 
     const vscodeExecutablePath = await downloadAndUnzipVSCode('insiders')
 
-    const workspacePath = resolve(__dirname, '../../../demo')
+    const workspacePath = resolve(__dirname, '../../../vsocde-dvc-demo')
 
     await runTests({
       extensionDevelopmentPath,
