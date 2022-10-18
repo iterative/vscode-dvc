@@ -22,7 +22,14 @@
       "outputs": ["coverage/jest/**"]
     },
     "cover-vscode-run": {
-      "dependsOn": ["test", "test-build"],
+      "dependsOn": [
+        "dvc-vscode-lsp#test-build",
+        "dvc-vscode-lsp#test",
+        "dvc-vscode-webview#test-build",
+        "dvc-vscode-webview#test",
+        "dvc#test-build",
+        "dvc#test"
+      ],
       "inputs": ["coverage/jest/**", "dist/**"],
       "outputs": ["coverage/integration/**"]
     },
