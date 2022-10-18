@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.4] - 2022-10-18
+
+### 🐛 Bug Fixes
+
+- Account for null being an object in workspace change data collection [#2617](https://github.com/iterative/vscode-dvc/pull/2617) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.3] - 2022-10-17
+
+### 🚀 New Features and Enhancements
+
+- Add actions to experiment cell hint tooltips [#2606](https://github.com/iterative/vscode-dvc/pull/2606) by [@mattseddon](https://github.com/mattseddon)
+- Update experiment table icons to use --vscode-descriptionForeground and use --vscode-editorLightBulb-foreground for selected stars [#2604](https://github.com/iterative/vscode-dvc/pull/2604) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix experiment table changes collection bug [#2598](https://github.com/iterative/vscode-dvc/pull/2598) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use stable version of VS Code for e2e tests (again) [#2611](https://github.com/iterative/vscode-dvc/pull/2611) by [@mattseddon](https://github.com/mattseddon)
+- Standardize dvc root paths as they come into the system [#2597](https://github.com/iterative/vscode-dvc/pull/2597) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.2] - 2022-10-16
+
+### 🚀 New Features and Enhancements
+
+- Use error foreground for status bar item color if CLI unavailable [#2587](https://github.com/iterative/vscode-dvc/pull/2587) by [@mattseddon](https://github.com/mattseddon)
+- Change experiments table circle to radio button [#2553](https://github.com/iterative/vscode-dvc/pull/2553) by [@mattseddon](https://github.com/mattseddon)
+- Add hints into experiment table row action tooltips [#2567](https://github.com/iterative/vscode-dvc/pull/2567) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Revert moving experiment names to right in table's experiment column (maintain heirarchy) [#2594](https://github.com/iterative/vscode-dvc/pull/2594) by [@mattseddon](https://github.com/mattseddon)
+- Follow directions in the VS Code API docs for relative paths [#2590](https://github.com/iterative/vscode-dvc/pull/2590) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix failing CI vscode test [#2580](https://github.com/iterative/vscode-dvc/pull/2580) by [@julieg18](https://github.com/julieg18)
+- Update CODEOWNERS [#2595](https://github.com/iterative/vscode-dvc/pull/2595) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.1] - 2022-10-12
 
 ### 🐛 Bug Fixes

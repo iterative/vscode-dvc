@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { Memento, Uri } from 'vscode'
+import { Memento, Uri, workspace, WorkspaceFolder } from 'vscode'
 
 const dvcRoot = resolve(__dirname, '..', '..', '..', '..', 'vscode-dvc-demo')
 const dvcDemoGitRoot = resolve(
@@ -17,6 +17,9 @@ export const dvcDemoGitPath = Uri.file(dvcDemoGitRoot).fsPath
 export const basePlotsUrl = Uri.file(
   resolve(__dirname, '..', 'fixtures', 'plotsDiff', 'staticImages')
 ).fsPath
+
+export const getTestWorkspaceFolder = (): WorkspaceFolder =>
+  (workspace.workspaceFolders as WorkspaceFolder[])[0]
 
 export const buildMockMemento = (
   values: Record<string, unknown> = {}

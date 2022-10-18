@@ -1,4 +1,5 @@
 import get from 'lodash.get'
+import isEqual from 'lodash.isequal'
 import {
   ColumnAccumulator,
   limitAncestorDepth,
@@ -109,7 +110,7 @@ const collectChange = (
   commitData: ExperimentFields,
   ancestors: string[] = []
 ) => {
-  if (typeof value === 'object') {
+  if (value && !Array.isArray(value) && typeof value === 'object') {
     for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
       collectChange(changes, type, file, childKey, childValue, commitData, [
         ...ancestors,
@@ -119,7 +120,9 @@ const collectChange = (
     return
   }
 
-  if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
+  if (
+    !isEqual(get(commitData?.[type], [file, 'data', ...ancestors, key]), value)
+  ) {
     changes.push(buildMetricOrParamPath(type, file, ...ancestors, key))
   }
 }

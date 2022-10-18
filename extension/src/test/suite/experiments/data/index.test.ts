@@ -1,6 +1,6 @@
 import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { EventEmitter, FileSystemWatcher, RelativePattern, Uri } from 'vscode'
+import { EventEmitter, FileSystemWatcher, RelativePattern } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { Disposable } from '../../../../extension'
@@ -11,7 +11,7 @@ import {
   getMockNow,
   stubPrivateMemberMethod
 } from '../../util'
-import { dvcDemoPath } from '../../../util'
+import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
 import {
   ExperimentsData,
   QUEUED_EXPERIMENT_PATH
@@ -65,7 +65,7 @@ suite('Experiments Data Test Suite', () => {
 
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
         new RelativePattern(
-          Uri.file(dvcDemoPath),
+          getTestWorkspaceFolder(),
           join(
             '**',
             `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
@@ -139,7 +139,7 @@ suite('Experiments Data Test Suite', () => {
       expect(mockDispose).to.be.calledOnce
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
         new RelativePattern(
-          Uri.file(dvcDemoPath),
+          getTestWorkspaceFolder(),
           join(
             '**',
             `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
@@ -148,7 +148,7 @@ suite('Experiments Data Test Suite', () => {
       )
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.deep.equal(
         new RelativePattern(
-          Uri.file(dvcDemoPath),
+          getTestWorkspaceFolder(),
           join(
             '**',
             `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
