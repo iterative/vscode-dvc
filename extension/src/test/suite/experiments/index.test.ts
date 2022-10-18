@@ -1,5 +1,5 @@
 import { join, resolve } from 'path'
-import { afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore, SinonStub } from 'sinon'
 import {
@@ -173,7 +173,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('handleMessageFromWebview', () => {
-    afterEach(() => {
+    after(() => {
       workspace
         .getConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)
         .update('', undefined, false)
