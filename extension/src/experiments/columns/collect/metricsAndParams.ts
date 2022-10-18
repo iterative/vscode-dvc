@@ -110,7 +110,7 @@ const collectChange = (
   commitData: ExperimentFields,
   ancestors: string[] = []
 ) => {
-  if (!Array.isArray(value) && typeof value === 'object') {
+  if (value && !Array.isArray(value) && typeof value === 'object') {
     for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
       collectChange(changes, type, file, childKey, childValue, commitData, [
         ...ancestors,
