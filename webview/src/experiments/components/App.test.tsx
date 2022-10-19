@@ -750,7 +750,12 @@ describe('App', () => {
       jest.advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toStrictEqual(['Modify and Run', 'Modify and Queue'])
+      expect(itemLabels).toStrictEqual([
+        'Modify and Run',
+        'Modify and Queue',
+        'Plot',
+        'Unplot'
+      ])
     })
 
     it('should present the correct options for the main row with checkpoints', () => {
@@ -766,7 +771,9 @@ describe('App', () => {
         'Modify, Reset and Run',
         'Modify and Resume',
         'Modify and Queue',
-        'Star'
+        'Star',
+        'Plot',
+        'Unplot'
       ])
     })
 
@@ -788,6 +795,8 @@ describe('App', () => {
         'Modify and Resume',
         'Modify and Queue',
         'Star',
+        'Plot',
+        'Unplot',
         'Remove'
       ])
 
@@ -802,7 +811,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       jest.advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(11)
 
       fireEvent.click(window, { bubbles: true })
       jest.advanceTimersByTime(100)
@@ -816,7 +825,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       jest.advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(11)
 
       const branch = getRow('main')
       fireEvent.click(branch, { bubbles: true })
@@ -831,13 +840,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       jest.advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(11)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       jest.advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(11)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
@@ -879,7 +888,6 @@ describe('App', () => {
       jest.advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toContain('Plot and Show')
       expect(itemLabels).toContain('Plot')
     })
 
