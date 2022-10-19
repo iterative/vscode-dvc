@@ -14,6 +14,8 @@ interface VirtualizedGridProps {
   nbItemsPerRow: number
 }
 
+export const OVERSCAN_ROW_COUNT = 15
+
 export const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
   items,
   nbItemsPerRow = DEFAULT_NB_ITEMS_PER_ROW
@@ -59,7 +61,7 @@ export const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
             columnCount={nbItemsPerRow}
             columnWidth={cache.current.columnWidth}
             cellRenderer={cellRenderer}
-            overscanRowCount={15}
+            overscanRowCount={OVERSCAN_ROW_COUNT}
           />
         )}
       </AutoSizer>
