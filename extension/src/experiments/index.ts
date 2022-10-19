@@ -190,6 +190,16 @@ export class Experiments extends BaseRepository<TableData> {
     return status
   }
 
+  public unselectExperiments(ids: string[]) {
+    for (const id of ids) {
+      const selected = this.experiments.isSelected(id)
+      if (selected) {
+        this.experiments.toggleStatus(id)
+      }
+    }
+    return this.notifyChanged()
+  }
+
   public getSorts() {
     return this.experiments.getSorts()
   }

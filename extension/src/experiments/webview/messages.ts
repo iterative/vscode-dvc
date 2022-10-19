@@ -67,6 +67,14 @@ export class WebviewMessages {
           dvcRoot: this.dvcRoot,
           id: message.payload
         })
+      case MessageFromWebviewType.UNSELECT_EXPERIMENTS:
+        return commands.executeCommand(
+          RegisteredCommands.EXPERIMENTS_UNSELECT,
+          {
+            dvcRoot: this.dvcRoot,
+            ids: [message.payload].flat()
+          }
+        )
       case MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR:
         return this.setExperimentStars(message.payload)
       case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:

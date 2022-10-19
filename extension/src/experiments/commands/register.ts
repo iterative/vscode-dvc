@@ -332,4 +332,10 @@ export const registerExperimentCommands = (
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENTS_UNSELECT,
+    ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) =>
+      experiments.getRepository(dvcRoot).unselectExperiments(ids)
+  )
 }

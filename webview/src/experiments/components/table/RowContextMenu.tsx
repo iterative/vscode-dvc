@@ -49,6 +49,14 @@ const getMultiSelectMenuOptions = (
     }) => starred
   )
 
+  const plottedExeperiments = selectedRowsList.filter(
+    ({
+      row: {
+        original: { selected }
+      }
+    }) => selected
+  )
+
   const selectedIds = selectedRowsList.map(value => value.row.values.id)
 
   const removableRowIds = selectedRowsList
@@ -78,15 +86,15 @@ const getMultiSelectMenuOptions = (
     experimentMenuOption(
       selectedIds,
       'Plot',
-      MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS,
+      MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
       false,
-      true
+      false
     ),
     experimentMenuOption(
       selectedIds,
-      'Plot and Show',
-      MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
-      false,
+      'Unplot',
+      MessageFromWebviewType.UNSELECT_EXPERIMENTS,
+      plottedExeperiments.length === 0,
       false
     ),
     experimentMenuOption(
@@ -154,6 +162,8 @@ const getSingleSelectMenuOptions = (
   const isNotExperimentOrCheckpoint =
     isQueued(status) || isWorkspace || depth <= 0
 
+  status = isNotExperimentOrCheckpoint ? undefined : status
+
   const withId = (
     label: string,
     type: MessageFromWebviewType,
@@ -201,6 +211,20 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       isWorkspace,
       !hasRunningExperiment
+    ),
+    experimentMenuOption(
+      [id],
+      'Plot',
+      MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
+      false,
+      false
+    ),
+    experimentMenuOption(
+      [id],
+      'Unplot',
+      MessageFromWebviewType.UNSELECT_EXPERIMENTS,
+      false,
+      false
     ),
     withId(
       'Remove',

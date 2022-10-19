@@ -146,6 +146,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_VIEW_SHARE_AS_BRANCH]: undefined
   [EventName.EXPERIMENT_VIEW_SHARE_AS_COMMIT]: undefined
   [EventName.EXPERIMENT_TOGGLE]: undefined
+  [EventName.EXPERIMENTS_UNSELECT]: undefined
 
   [EventName.EXPERIMENT_VIEW_QUEUE]: undefined
   [EventName.EXPERIMENT_VIEW_RESUME]: undefined

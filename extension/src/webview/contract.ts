@@ -31,6 +31,7 @@ export enum MessageFromWebviewType {
   RESIZE_PLOTS = 'resize-plots',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
+  UNSELECT_EXPERIMENTS = 'unselect-experiments',
   TOGGLE_EXPERIMENT_STAR = 'toggle-experiment-star',
   HIDE_EXPERIMENTS_TABLE_COLUMN = 'hide-experiments-table-column',
   SELECT_EXPERIMENTS = 'select-experiments',
@@ -74,6 +75,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       payload: string
+    }
+  | {
+      type: MessageFromWebviewType.UNSELECT_EXPERIMENTS
+      payload: string[]
     }
   | {
       type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
