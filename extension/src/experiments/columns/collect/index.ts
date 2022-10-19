@@ -77,6 +77,6 @@ export const collectParamsFiles = (
 ): Set<string> => {
   const files = Object.keys(data.workspace.baseline.data?.params || {})
     .filter(Boolean)
-    .map(file => standardizePath(join(dvcRoot, file))) as string[]
+    .map(file => standardizePath(join(dvcRoot, file)))
   return new Set(files)
 }

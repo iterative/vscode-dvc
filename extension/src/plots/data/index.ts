@@ -73,11 +73,9 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
   }
 
   private getArgs(revs: string[]) {
-    if (
-      this.model &&
-      (sameContents(revs, ['workspace']) || sameContents(revs, []))
-    ) {
-      return this.model.getDefaultRevs()
+    const cliWillThrowError = sameContents(revs, ['workspace'])
+    if (this.model && cliWillThrowError) {
+      return []
     }
 
     return revs

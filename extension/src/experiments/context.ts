@@ -1,7 +1,7 @@
 import { Event, EventEmitter, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { setContextValue } from '../vscode/context'
-import { standardizePath } from '../fileSystem/path'
+import { standardizePossiblePath } from '../fileSystem/path'
 
 const setContextOnDidChangeParamsFiles = (
   setActiveEditorContext: (paramsFileActive: boolean) => void,
@@ -9,7 +9,9 @@ const setContextOnDidChangeParamsFiles = (
   getParamsFiles: () => Set<string>
 ): Disposable =>
   onDidChangeColumns(() => {
-    const path = standardizePath(window.activeTextEditor?.document.fileName)
+    const path = standardizePossiblePath(
+      window.activeTextEditor?.document.fileName
+    )
     if (!path) {
       return
     }
@@ -26,7 +28,7 @@ const setContextOnDidChangeActiveEditor = (
   getParamsFiles: () => Set<string>
 ): Disposable =>
   window.onDidChangeActiveTextEditor(event => {
-    const path = standardizePath(event?.document.fileName)
+    const path = standardizePossiblePath(event?.document.fileName)
     if (!path) {
       setActiveEditorContext(false)
       return

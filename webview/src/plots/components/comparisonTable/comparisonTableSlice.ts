@@ -3,7 +3,6 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
   PlotsComparisonData,
-  PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
 
@@ -30,7 +29,7 @@ export const comparisonTableSlice = createSlice({
     changeRowHeight: (state, action: PayloadAction<number>) => {
       state.rowHeight = action.payload
     },
-    changeSize: (state, action: PayloadAction<PlotSize>) => {
+    changeSize: (state, action: PayloadAction<number>) => {
       state.size = action.payload
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {

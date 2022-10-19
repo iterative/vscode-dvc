@@ -1411,7 +1411,7 @@
             },
             "completionEvents": [
               "onLink:https://github.com/iterative/example-get-started",
-              "onLink:https://github.com/iterative/vscode-dvc/tree/main/demo",
+              "onLink:https://github.com/iterative/vscode-dvc-demo",
               "onLink:https://dvc.org/doc/dvclive"
             ]
           },

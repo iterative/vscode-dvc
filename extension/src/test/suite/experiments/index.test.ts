@@ -66,6 +66,7 @@ import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
+import { PlotSizeNumber } from '../../../plots/webview/contract'
 import { RegisteredCommands } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
 
@@ -173,11 +174,11 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('handleMessageFromWebview', () => {
-    after(() => {
+    after(() =>
       workspace
-        .getConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)
-        .update('', undefined, false)
-    })
+        .getConfiguration()
+        .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
+    )
 
     const setupExperimentsAndMockCommands = () => {
       const {
@@ -259,7 +260,7 @@ suite('Experiments Test Suite', () => {
       ).returns(undefined)
 
       const mockColumnId = 'params:params.yaml:lr'
-      const mockWidth = 400
+      const mockWidth = PlotSizeNumber.REGULAR
 
       mockMessageReceived.fire({
         payload: { id: mockColumnId, width: mockWidth },
@@ -891,7 +892,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
       const inputEvent = getInputBoxEvent('0')
       const tableMaxDepthChanged = configurationChangeEvent(
-        ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH,
+        ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT,
         disposable
       )
 
@@ -907,7 +908,7 @@ suite('Experiments Test Suite', () => {
       await tableMaxDepthChanged
 
       expect(
-        workspace.getConfiguration().get(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)
+        workspace.getConfiguration().get(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)
       ).to.equal(0)
       expect(mockSendTelemetryEvent).to.be.called
       expect(

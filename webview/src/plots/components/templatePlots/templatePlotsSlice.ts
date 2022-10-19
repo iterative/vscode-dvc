@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
-  PlotSize,
   Section,
   TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
@@ -25,7 +24,7 @@ export const templatePlotsSlice = createSlice({
   initialState: templatePlotsInitialState,
   name: 'template',
   reducers: {
-    changeSize: (state, action: PayloadAction<PlotSize>) => {
+    changeSize: (state, action: PayloadAction<number>) => {
       state.size = action.payload
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
