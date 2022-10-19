@@ -4,6 +4,7 @@ import { GitExecutor } from './executor'
 import { createProcess } from '../../processExecution'
 import { CliResult, CliStarted } from '..'
 import { getMockedProcess } from '../../test/util/jest'
+import { standardizePath } from '../../fileSystem/path'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -38,9 +39,10 @@ describe('GitExecutor', () => {
     } as unknown as EventEmitter<CliStarted>
   })
 
+  const cwd = standardizePath(__dirname)
+
   describe('pushBranch', () => {
     it('should call createProcess with the correct parameters to push a branch', async () => {
-      const cwd = __dirname
       const branchName = 'my-branch'
       mockedCreateProcess.mockReturnValueOnce(
         getMockedProcess(
@@ -57,7 +59,6 @@ describe('GitExecutor', () => {
     })
 
     it('should call createProcess with the correct parameters to push the current branch', async () => {
-      const cwd = __dirname
       mockedCreateProcess.mockReturnValueOnce(
         getMockedProcess('Everything up-to-date')
       )
@@ -73,7 +74,6 @@ describe('GitExecutor', () => {
 
   describe('stageAndCommit', () => {
     it('should call createProcess with the correct parameters to stage all files and then commit', async () => {
-      const cwd = __dirname
       const message = 'best experiment'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(cwd))
       mockedCreateProcess

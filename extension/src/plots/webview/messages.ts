@@ -3,7 +3,6 @@ import {
   ComparisonPlot,
   ComparisonRevisionData,
   PlotsData as TPlotsData,
-  PlotSize,
   Section,
   SectionCollapsed
 } from './contract'
@@ -102,7 +101,7 @@ export class WebviewMessages {
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
   }
 
-  private setPlotSize(section: Section, size: PlotSize) {
+  private setPlotSize(section: Section, size: number) {
     this.plots.setPlotSize(section, size)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,

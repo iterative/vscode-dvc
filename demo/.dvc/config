@@ -1,4 +1,0 @@
-[core]
-    remote = storage
-['remote "storage"']
-    url = https://remote.dvc.org/mnist-vscode

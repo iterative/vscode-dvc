@@ -9,10 +9,10 @@ import { HeaderGroup } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import { TableHeaderCell } from './TableHeaderCell'
-import { ExperimentsState } from '../../store'
-import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
-import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
-import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
+import { ExperimentsState } from '../../../store'
+import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
+import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
+import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 
 export enum SortOrder {
   ASCENDING = 'Sort Ascending',
@@ -36,6 +36,39 @@ interface TableHeaderProps {
   onDrop: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
+}
+
+export const sortOption = (
+  label: SortOrder,
+  currentSort: SortOrder,
+  columnId: string
+) => {
+  const sortOrder = currentSort
+  const hidden = sortOrder === label
+  const descending = label === SortOrder.DESCENDING
+  const path = columnId
+  const removeSortMessage = {
+    payload: columnId,
+    type: MessageFromWebviewType.REMOVE_COLUMN_SORT
+  }
+  const payload = {
+    descending,
+    path
+  }
+  const message =
+    label === SortOrder.NONE
+      ? removeSortMessage
+      : {
+          payload,
+          type: MessageFromWebviewType.SORT_COLUMN
+        }
+
+  return {
+    hidden,
+    id: label,
+    label,
+    message
+  } as MessagesMenuOptionProps
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
@@ -116,39 +149,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
               <VSCodeDivider />
               <MessagesMenu
                 options={[
-                  {
-                    hidden: sortOrder === SortOrder.ASCENDING,
-                    id: SortOrder.ASCENDING,
-                    label: SortOrder.ASCENDING,
-                    message: {
-                      payload: {
-                        descending: false,
-                        path: column.id
-                      },
-                      type: MessageFromWebviewType.SORT_COLUMN
-                    }
-                  },
-                  {
-                    hidden: sortOrder === SortOrder.DESCENDING,
-                    id: SortOrder.DESCENDING,
-                    label: SortOrder.DESCENDING,
-                    message: {
-                      payload: {
-                        descending: true,
-                        path: column.id
-                      },
-                      type: MessageFromWebviewType.SORT_COLUMN
-                    }
-                  },
-                  {
-                    hidden: sortOrder === SortOrder.NONE,
-                    id: SortOrder.NONE,
-                    label: SortOrder.NONE,
-                    message: {
-                      payload: column.id,
-                      type: MessageFromWebviewType.REMOVE_COLUMN_SORT
-                    }
-                  }
+                  sortOption(SortOrder.ASCENDING, sortOrder, column.id),
+                  sortOption(SortOrder.DESCENDING, sortOrder, column.id),
+                  sortOption(SortOrder.NONE, sortOrder, column.id)
                 ]}
               />
             </>

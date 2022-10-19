@@ -20,7 +20,7 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import isEqual from 'lodash.isequal'
-import { ColorScale, PlotSize, Revision } from '../webview/contract'
+import { ColorScale, PlotSizeNumber, Revision } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 
 const COMMIT_FIELD = 'rev'
@@ -214,9 +214,9 @@ const truncateTitleAsArrayOrString = (title: Text, size: number) => {
 }
 
 const TitleLimit = {
-  [PlotSize.LARGE]: 50,
-  [PlotSize.REGULAR]: 50,
-  [PlotSize.SMALL]: 30
+  [PlotSizeNumber.LARGE]: 50,
+  [PlotSizeNumber.REGULAR]: 50,
+  [PlotSizeNumber.SMALL]: 30
 }
 
 const truncateTitlePart = (
@@ -252,15 +252,15 @@ const truncateTitle = (
   return titleCopy
 }
 
-export const truncateVerticalTitle = (title: Text | Title, size: PlotSize) =>
-  truncateTitle(title, TitleLimit[size] * 0.75)
+export const truncateVerticalTitle = (title: Text | Title, size: number) =>
+  truncateTitle(title, TitleLimit[size as keyof typeof TitleLimit] * 0.75)
 
 const isEndValue = (valueType: string) =>
   ['string', 'number', 'boolean'].includes(valueType)
 
 export const truncateTitles = (
   spec: TopLevelSpec,
-  size: PlotSize,
+  size: number,
   vertical?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
@@ -281,7 +281,7 @@ export const truncateTitles = (
         const title = value as unknown as Title
         specCopy[key] = vertical
           ? truncateVerticalTitle(title, size)
-          : truncateTitle(title, TitleLimit[size])
+          : truncateTitle(title, TitleLimit[size as keyof typeof TitleLimit])
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {
@@ -299,7 +299,7 @@ export const truncateTitles = (
 
 export const extendVegaSpec = (
   spec: TopLevelSpec,
-  size: PlotSize,
+  size: number,
   encoding?: {
     color?: ColorScale
     strokeDash?: StrokeDashEncoding

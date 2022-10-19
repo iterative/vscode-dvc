@@ -1,7 +1,0 @@
-/.vscode/settings.json
-.env
-/model.pt
-/training_metrics
-/misclassified.jpg
-/predictions.json
-

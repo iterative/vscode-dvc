@@ -25,15 +25,15 @@ beforeEach(() => {
 
 describe('DecorationProvider', () => {
   const dvcRoot = __dirname
-  const model = standardizePath(join(dvcRoot, 'model.pt')) as string
-  const dataDir = standardizePath(join(dvcRoot, 'data')) as string
-  const features = standardizePath(join(dataDir, 'features')) as string
-  const logDir = standardizePath(join(dvcRoot, 'logs')) as string
-  const logAcc = standardizePath(join(logDir, 'acc.tsv')) as string
-  const logLoss = standardizePath(join(logDir, 'loss.tsv')) as string
-  const dataXml = standardizePath(join(dataDir, 'data.xml')) as string
-  const dataCsv = standardizePath(join(dataDir, 'data.csv')) as string
-  const prepared = standardizePath(join(dataDir, 'prepared')) as string
+  const model = standardizePath(join(dvcRoot, 'model.pt'))
+  const dataDir = standardizePath(join(dvcRoot, 'data'))
+  const features = standardizePath(join(dataDir, 'features'))
+  const logDir = standardizePath(join(dvcRoot, 'logs'))
+  const logAcc = standardizePath(join(logDir, 'acc.tsv'))
+  const logLoss = standardizePath(join(logDir, 'loss.tsv'))
+  const dataXml = standardizePath(join(dataDir, 'data.xml'))
+  const dataCsv = standardizePath(join(dataDir, 'data.csv'))
+  const prepared = standardizePath(join(dataDir, 'prepared'))
 
   const emptySet = new Set<string>()
 
