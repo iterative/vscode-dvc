@@ -34,7 +34,7 @@ export const limitAncestorDepth = (
 } => {
   const [path, ...rest] = ancestors
   const collectedLimit = Number(
-    getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH, limit)
+    getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, limit)
   )
 
   switch (collectedLimit) {

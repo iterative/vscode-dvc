@@ -15,3 +15,7 @@ export type Obj = { [key: string]: Any }
 
 export const keepReferenceIfEqual = (old: BaseType, recent: BaseType) =>
   isEqual(old, recent) ? old : recent
+
+export interface EventTargetWithNodeName extends EventTarget {
+  nodeName: string
+}

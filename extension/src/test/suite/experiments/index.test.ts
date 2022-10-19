@@ -173,11 +173,11 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('handleMessageFromWebview', () => {
-    after(() => {
+    after(() =>
       workspace
-        .getConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)
-        .update('', undefined, false)
-    })
+        .getConfiguration()
+        .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
+    )
 
     const setupExperimentsAndMockCommands = () => {
       const {
@@ -891,7 +891,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
       const inputEvent = getInputBoxEvent('0')
       const tableMaxDepthChanged = configurationChangeEvent(
-        ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH,
+        ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT,
         disposable
       )
 
@@ -907,7 +907,7 @@ suite('Experiments Test Suite', () => {
       await tableMaxDepthChanged
 
       expect(
-        workspace.getConfiguration().get(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)
+        workspace.getConfiguration().get(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)
       ).to.equal(0)
       expect(mockSendTelemetryEvent).to.be.called
       expect(
