@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react'
+import React from 'react'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
@@ -21,9 +21,6 @@ const WorkspaceRowGroupWrapper: React.FC<
 
   return (
     <div
-      style={
-        { '--table-head-height': `${tableHeaderHeight}px` } as CSSProperties
-      }
       ref={ref}
       {...instance.getTableBodyProps({
         className: cx(

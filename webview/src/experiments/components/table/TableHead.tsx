@@ -1,17 +1,19 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React, { DragEvent, useRef, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { Indicators } from './Indicators'
+import { setDropTarget } from './headerDropTargetSlice'
 import { useColumnOrder } from '../../hooks/useColumnOrder'
 import { ExperimentsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
 import { leafColumnIds, reorderColumnIds } from '../../util/columns'
 import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
 import { getSelectedForPlotsCount } from '../../util/rows'
+
 interface TableHeadProps {
   instance: TableInstance<Experiment>
   root: HTMLElement | null
@@ -34,7 +36,12 @@ export const TableHead = ({
   const columns = useSelector(
     (state: ExperimentsState) => state.tableData.columns
   )
+  const headerDropTargetId = useSelector(
+    (state: ExperimentsState) => state.headerDropTarget
+  )
+  const dispatch = useDispatch()
   const orderedColumns = useColumnOrder(columns, columnOrder)
+
   const allHeaders: HeaderGroup<Experiment>[] = []
   for (const headerGroup of headerGroups) {
     allHeaders.push(...headerGroup.headers)
@@ -73,26 +80,33 @@ export const TableHead = ({
   }
 
   const onDragUpdate = (e: DragEvent<HTMLElement>) => {
-    const displacer = draggingIds.current
-    displacer &&
-      findDisplacedHeader(e.currentTarget.id, displacedHeader => {
-        const displaced = leafColumnIds(displacedHeader)
-        if (!displaced.some(id => displacer.includes(id))) {
-          fullColumnOrder.current &&
-            setColumnOrder(
-              reorderColumnIds(fullColumnOrder.current, displacer, displaced)
-            )
-        }
-      })
+    findDisplacedHeader(e.currentTarget.id, displacedHeader => {
+      const displaced = leafColumnIds(displacedHeader)
+      dispatch(setDropTarget(displaced[displaced.length - 1]))
+    })
   }
 
   const onDragEnd = () => {
-    draggingIds.current = undefined
     fullColumnOrder.current = undefined
-    sendMessage({
-      payload: columnOrder,
-      type: MessageFromWebviewType.REORDER_COLUMNS
-    })
+    draggingIds.current = undefined
+    dispatch(setDropTarget(''))
+  }
+
+  const onDrop = () => {
+    const fullOrder = fullColumnOrder.current
+    const displacer = draggingIds.current
+    let newOrder: string[] = []
+
+    if (fullOrder && displacer) {
+      newOrder = reorderColumnIds(fullOrder, displacer, [headerDropTargetId])
+
+      setColumnOrder(newOrder)
+      sendMessage({
+        payload: newOrder,
+        type: MessageFromWebviewType.REORDER_COLUMNS
+      })
+      onDragEnd()
+    }
   }
 
   const selectedForPlotsCount = getSelectedForPlotsCount(rows)
@@ -110,6 +124,7 @@ export const TableHead = ({
           onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
           onDragEnd={onDragEnd}
+          onDrop={onDrop}
           root={root}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />

@@ -34,7 +34,8 @@ export const ColumnDragHandle: React.FC<{
   onDragEnter: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
-}> = ({ disabled, column, onDragEnter, onDragStart, onDrop }) => {
+  onDragEnd: DragFunction
+}> = ({ disabled, column, onDragEnter, onDragStart, onDragEnd, onDrop }) => {
   const DropTarget = <span>{column?.name}</span>
 
   return (
@@ -51,6 +52,7 @@ export const ColumnDragHandle: React.FC<{
         dropTarget={DropTarget}
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
         onDrop={onDrop}
       >
         <span>{column?.render('Header')}</span>
@@ -67,6 +69,7 @@ export const TableHeaderCellContents: React.FC<{
   isDraggable: boolean
   menuSuppressed: boolean
   onDragEnter: DragFunction
+  onDragEnd: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
   canResize: boolean
@@ -80,6 +83,7 @@ export const TableHeaderCellContents: React.FC<{
   isDraggable,
   menuSuppressed,
   onDragEnter,
+  onDragEnd,
   onDragStart,
   onDrop,
   canResize,
@@ -106,6 +110,7 @@ export const TableHeaderCellContents: React.FC<{
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
         onDrop={onDrop}
+        onDragEnd={onDragEnd}
       />
       {canResize && (
         <div

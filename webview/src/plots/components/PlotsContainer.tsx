@@ -35,17 +35,40 @@ export interface PlotsContainerProps extends CommonPlotsContainerProps {
 export const SectionDescription = {
   // "Trends"
   [Section.CHECKPOINT_PLOTS]: (
-    <span>Real-time plots based on metrics from the Experiments Table</span>
+    <span data-testid="tooltip-checkpoint-plots">
+      Automatically generated and updated linear plots that show metric value
+      per epoch if{' '}
+      <a href="https://dvc.org/doc/user-guide/experiment-management/checkpoints">
+        checkpoints
+      </a>{' '}
+      are enabled.
+    </span>
   ),
   // "Images"
   [Section.COMPARISON_TABLE]: (
-    <span>Displays image plots side by side across experiments.</span>
+    <span data-testid="tooltip-comparison-plots">
+      Images (e.g. any <code>.jpg</code>, <code>.svg</code>, or
+      <code>.png</code> file) rendered side by side across experiments. They
+      should be registered as{' '}
+      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots">
+        plots
+      </a>
+      .
+    </span>
   ),
   // "Data Series"
   [Section.TEMPLATE_PLOTS]: (
-    <span>
-      Plots of JSON, YAML, CSV, or TSV files, visualized using `dvc plots`
-      templates
+    <span data-testid="tooltip-template-plots">
+      Any <code>JSON</code>, <code>YAML</code>, <code>CSV</code>, or{' '}
+      <code>TSV</code> file(s) with data points, visualized using{' '}
+      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots#plot-templates-data-series-only">
+        plot templates
+      </a>
+      . Either predefenined (e.g. confusion matrix, linear) or{' '}
+      <a href="https://dvc.org/doc/command-reference/plots/templates#custom-templates">
+        custom Vega-lite templates
+      </a>
+      .
     </span>
   )
 }
