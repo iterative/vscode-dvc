@@ -21,9 +21,9 @@ import {
   ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
-  PlotSize,
   Section,
-  SectionCollapsed
+  SectionCollapsed,
+  PlotSizeNumber
 } from '../webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
@@ -43,7 +43,7 @@ import {
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
-  private plotSizes: Record<Section, PlotSize>
+  private plotSizes: Record<Section, number>
   private sectionCollapsed: SectionCollapsed
   private branchRevisions: Record<string, string> = {}
   private workspaceRunningCheckpoint: string | undefined
@@ -281,13 +281,13 @@ export class PlotsModel extends ModelWithPersistence {
     this.persist(PersistenceKey.PLOT_METRIC_ORDER, this.metricOrder)
   }
 
-  public setPlotSize(section: Section, size: PlotSize) {
+  public setPlotSize(section: Section, size: number) {
     this.plotSizes[section] = size
     this.persist(PersistenceKey.PLOT_SIZES, this.plotSizes)
   }
 
   public getPlotSize(section: Section) {
-    return this.plotSizes[section]
+    return this.plotSizes[section] || PlotSizeNumber.REGULAR
   }
 
   public setSectionCollapsed(newState: Partial<SectionCollapsed>) {

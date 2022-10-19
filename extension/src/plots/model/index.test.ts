@@ -2,7 +2,7 @@ import { PlotsModel } from '.'
 import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
-  PlotSize,
+  PlotSizeNumber,
   Section
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
@@ -64,25 +64,28 @@ describe('plotsModel', () => {
 
   it('should change the plotSize when calling setPlotSize', () => {
     expect(model.getPlotSize(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      PlotSize.REGULAR
+      PlotSizeNumber.REGULAR
     )
 
-    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotSize.LARGE)
+    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotSizeNumber.LARGE)
 
     expect(model.getPlotSize(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      PlotSize.LARGE
+      PlotSizeNumber.LARGE
     )
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotSize.SMALL)
+    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotSizeNumber.REGULAR)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       PersistenceKey.PLOT_SIZES + exampleDvcRoot,
-      { ...DEFAULT_SECTION_SIZES, [Section.CHECKPOINT_PLOTS]: PlotSize.SMALL }
+      {
+        ...DEFAULT_SECTION_SIZES,
+        [Section.CHECKPOINT_PLOTS]: PlotSizeNumber.REGULAR
+      }
     )
   })
 

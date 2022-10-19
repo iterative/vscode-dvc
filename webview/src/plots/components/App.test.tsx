@@ -21,7 +21,7 @@ import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtuali
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotSize,
+  PlotSizeNumber,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
@@ -48,6 +48,7 @@ import {
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
+import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
@@ -589,15 +590,21 @@ describe('App', () => {
 
     fireEvent.click(smallButton)
     let wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('smallPlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.SMALL}`)
+    ).toBe(true)
 
     fireEvent.click(regularButton)
     wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('regularPlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.REGULAR}`)
+    ).toBe(true)
 
     fireEvent.click(largeButton)
     wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('largePlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.LARGE}`)
+    ).toBe(true)
   })
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
@@ -613,7 +620,10 @@ describe('App', () => {
     fireEvent.click(largeButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.LARGE
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
@@ -621,7 +631,10 @@ describe('App', () => {
     fireEvent.click(smallButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.SMALL },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.SMALL
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
   })
@@ -639,7 +652,10 @@ describe('App', () => {
     fireEvent.click(largeButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.LARGE
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
@@ -1457,7 +1473,7 @@ describe('App', () => {
           )
         })
 
-        it('should render one large plot per row per 1000px of screen when the screen is larger than 2000px', () => {
+        it('should render the plots correctly when the screen is larger than 2000px', () => {
           resizeScreen(3000)
 
           let plots = screen.getAllByTestId(/^plot-/)
@@ -1473,7 +1489,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render three large plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
           resizeScreen(1849)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1482,16 +1498,16 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render two large plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
           resizeScreen(936)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[24].id).toBe(checkpoint.plots[24].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[14].id).toBe(checkpoint.plots[14].title)
+          expect(plots.length).toBe(1 + OVERSCAN_ROW_COUNT) // Only the first and the next lines defined by the overscan row count will be rendered
         })
 
-        it('should render one large plot per row when the screen is smaller than 800px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px', () => {
           resizeScreen(563)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1553,7 +1569,7 @@ describe('App', () => {
           )
         })
 
-        it('should render one regular plot per row per 800px of screen when the screen is larger than 2000px', () => {
+        it('should render the plots correctly when the screen is larger than 2000px', () => {
           resizeScreen(3200)
 
           let plots = screen.getAllByTestId(/^plot-/)
@@ -1569,7 +1585,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render four regular plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
           resizeScreen(1889)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1578,7 +1594,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render three regular plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
           resizeScreen(938)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1587,7 +1603,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render one regular plot per row when the screen is smaller than 800px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px', () => {
           resizeScreen(562)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1649,7 +1665,7 @@ describe('App', () => {
           )
         })
 
-        it('should render one small plot per row per 500px of screen when the screen is larger than 2000px', () => {
+        it('should render the plots correctly when the screen is larger than 2000px', () => {
           resizeScreen(3004)
 
           let plots = screen.getAllByTestId(/^plot-/)
@@ -1665,7 +1681,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render six small plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
           resizeScreen(1839)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1674,7 +1690,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render four small plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
           resizeScreen(956)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1683,7 +1699,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render one small plot per row when the screen is smaller than 800px but larger than 600px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px but larger than 600px', () => {
           resizeScreen(663)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1692,7 +1708,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render two small plot per row when the screen is smaller than 600px', () => {
+        it('should render the plots correctly when the screen is smaller than 600px', () => {
           resizeScreen(569)
 
           const plots = screen.getAllByTestId(/^plot-/)
