@@ -223,10 +223,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getBranchRevisions() {
-    return this.branches.map(({ id, sha }) => ({
-      id,
-      sha
-    }))
+    return this.branches.map(({ id, sha }) => ({ id, sha }))
   }
 
   public getRevisions() {
