@@ -10,7 +10,7 @@ import { GitReader } from '../../../cli/git/reader'
 import { standardizePath } from '../../../fileSystem/path'
 import { EXPERIMENTS_GIT_REFS } from '../../../experiments/data/constants'
 
-suite('File System Watcher Test Suite', () => {
+suite('File System Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
