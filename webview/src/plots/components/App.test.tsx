@@ -428,6 +428,32 @@ describe('App', () => {
     })
   })
 
+  it('should not toggle the checkpoint plots section if a link is clicked', () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    const checkpointsTooltipToggle = screen.getAllByTestId(
+      'info-tooltip-toggle'
+    )[2]
+    fireEvent.mouseEnter(checkpointsTooltipToggle, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const tooltip = screen.getByTestId('tooltip-checkpoint-plots')
+    const tooltipLink = within(tooltip).getByRole('link')
+    fireEvent.click(tooltipLink, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+  })
+
   it('should not toggle the checkpoint plots section when its header is clicked and the content of its tooltip is selected', async () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
