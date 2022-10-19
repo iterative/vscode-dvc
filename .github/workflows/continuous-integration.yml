@@ -43,6 +43,8 @@ jobs:
 
       - run: yarn run install-frozen-lockfile
 
+      - run: xvfb-run -a yarn test:vscode
+
       - run: yarn run lint
 
       - run: yarn cover:prep
