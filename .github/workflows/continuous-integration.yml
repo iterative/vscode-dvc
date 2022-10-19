@@ -51,7 +51,7 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
-          coverageCommand: xvfb-run -a yarn run cover
+          coverageCommand: xvfb-run -a yarn test:vscode
           coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
 
       - run: yarn build-storybook
