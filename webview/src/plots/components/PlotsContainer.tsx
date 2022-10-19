@@ -18,6 +18,7 @@ import {
   Lines
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
+import { EventTargetWithNodeName } from '../../util/objects'
 
 export interface CommonPlotsContainerProps {
   onResize: (size: PlotSize) => void
@@ -139,7 +140,10 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
-    if (!isSelecting([title, SectionDescription[sectionKey].props.children])) {
+    if (
+      !isSelecting([title, SectionDescription[sectionKey].props.children]) &&
+      !['A', 'BUTTON'].includes((e.target as EventTargetWithNodeName).nodeName)
+    ) {
       sendMessage({
         payload: {
           [sectionKey]: !sectionCollapsed

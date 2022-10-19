@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
-import styles from './styles.module.scss'
 import { SortOrder } from './TableHeader'
+import styles from '../styles.module.scss'
 import {
   Draggable,
   DragFunction
-} from '../../../shared/components/dragDrop/Draggable'
-import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
-import { DownArrow, Lines, UpArrow } from '../../../shared/components/icons'
+} from '../../../../shared/components/dragDrop/Draggable'
+import { IconMenu } from '../../../../shared/components/iconMenu/IconMenu'
+import { DownArrow, Lines, UpArrow } from '../../../../shared/components/icons'
 
 const getIconMenuItems = (
   sortEnabled: boolean,
