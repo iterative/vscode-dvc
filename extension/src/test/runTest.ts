@@ -10,7 +10,7 @@ async function main() {
 
     const extensionTestsPath = resolve(__dirname, './suite/index')
 
-    const vscodeExecutablePath = await downloadAndUnzipVSCode('stable')
+    const vscodeExecutablePath = await downloadAndUnzipVSCode('insiders')
 
     const workspacePath = resolve(__dirname, '../../../demo')
 
