@@ -24,7 +24,6 @@
     "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
     "lint:build": "yarn webpack --mode development",
-    "lint": "run-p 'lint:*'",
     "dev": "webpack watch --mode development",
     "test": "jest --collect-coverage"
   },

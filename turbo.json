@@ -25,10 +25,6 @@
       "dependsOn": ["test", "lint:build"],
       "outputs": ["coverage/integration/**"]
     },
-    "lint:build": {
-      "dependsOn": ["^lint:build"],
-      "outputs": ["dist/**"]
-    },
     "test-vscode": {
       "dependsOn": ["lint:build"]
     },
@@ -39,7 +35,20 @@
       "dependsOn": ["^format"],
       "outputs": []
     },
+    "lint:build": {
+      "dependsOn": ["^lint:build"],
+      "outputs": ["dist/**"]
+    },
+    "lint:eslint": {
+      "dependsOn": ["^lint:eslint"],
+      "outputs": []
+    },
+    "lint:prettier": {
+      "dependsOn": ["^lint:prettier"],
+      "outputs": []
+    },
     "lint": {
+      "dependsOn": ["lint:prettier", "lint:eslint", "lint:build"],
       "outputs": []
     },
     "dev": {
