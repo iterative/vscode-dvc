@@ -82,7 +82,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       this.dvcRoot
     )
 
-    const dotGitPath = getGitPath(gitRoot, gitPath.DOT_GIT_HEAD)
+    const dotGitPath = getGitPath(gitRoot, gitPath.DOT_GIT)
     const watchedRelPaths = [
       gitPath.DOT_GIT_HEAD,
       EXPERIMENTS_GIT_REFS,
