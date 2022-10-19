@@ -77,7 +77,7 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
       this.model &&
       (sameContents(revs, ['workspace']) || sameContents(revs, []))
     ) {
-      return this.model.getDefaultRevs()
+      return []
     }
 
     return revs
