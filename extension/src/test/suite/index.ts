@@ -16,7 +16,6 @@ function setupNyc() {
     hookRequire: true,
     hookRunInContext: true,
     hookRunInThisContext: true,
-
     instrument: true,
     reporter: ['text', 'html'],
     sourceMap: true,

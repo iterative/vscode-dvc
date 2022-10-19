@@ -25,10 +25,10 @@ const tsc = execa('tsc', ['-p', '.'], {
 pipe(tsc)
 tsc.then(() => {
   const tests = execa('node', [join(cwd, 'dist', 'test', 'runTest.js')], {
-    cwd,
-    stdio: 'ignore'
+    cwd
   })
 
+  pipe(tests)
   tests
     .then(() => {})
     .catch(() => {

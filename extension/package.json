@@ -42,7 +42,8 @@
     "node": ">=16.13.0"
   },
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "workspaceContains:**/*dvc*"
   ],
   "main": "./dist/extension.js",
   "capabilities": {
