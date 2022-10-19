@@ -186,7 +186,7 @@ export class WebviewMessages {
       return
     }
 
-    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH, Number(newValue))
+    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, Number(newValue))
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT,
       undefined,
