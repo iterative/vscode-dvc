@@ -737,19 +737,14 @@ describe('App', () => {
       jest.useRealTimers()
     })
 
-    it('should open on left click', () => {
+    it('should not open on left click', () => {
       renderTableWithoutRunningExperiments()
 
       const paramsFileHeader = screen.getByText('params.yaml')
       fireEvent.click(paramsFileHeader, { bubbles: true })
 
       jest.advanceTimersByTime(100)
-      const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toStrictEqual([
-        'Open to the Side',
-        'Set Max Header Height'
-      ])
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
     it('should open on right click and close on esc', () => {
