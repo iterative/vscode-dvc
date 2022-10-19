@@ -45,13 +45,12 @@ jobs:
 
       - run: yarn run lint
 
-      - run: yarn test:jest
-
-      - name: Test VS Code
-        uses: GabrielBB/xvfb-action@v1
+      - uses: paambaati/codeclimate-action@v3.1.0
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
-          run: yarn test:vscode
-          options: '-screen 0 1600x1200x24'
+          coverageCommand: xvfb-run -a yarn run cover
+          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
 
       - run: yarn build-storybook
 
