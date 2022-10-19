@@ -4,7 +4,7 @@ Select (click the circle beside the experiment name) up to 7 experiments in the
 table view to visualize in the [**Plots Dashboard**](command:dvc.showPlots).
 
 <p align="center">
-  <img src="images/plots-click-the-circle-beside-experiment-name.png"
+  <img src="images/click-the-circle-beside-experiment-name.png"
        alt="Select for Plots" />
 </p>
 
