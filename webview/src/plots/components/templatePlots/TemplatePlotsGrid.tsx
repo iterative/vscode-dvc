@@ -106,9 +106,11 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     [styles.multiViewPlot]: multiView
   })
 
-  const items = reorderedItems.map((plot: TemplatePlotEntry) => {
+  const items = reorderedItems.map((plot: TemplatePlotEntry, i) => {
     const { id, content, multiView, revisions } = plot
     const nbRevisions = (multiView && revisions?.length) || 1
+    const isLastOfRow = nbItemsPerRow / (i + 1) === 1
+    const isLastRow = i + 1 >= reorderedItems.length - nbItemsPerRow
 
     return (
       <div
@@ -122,6 +124,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           id={id}
           spec={{ ...content, ...autoSize } as VisualizationSpec}
           onViewReady={addEventsOnViewReady}
+          showVerticalResizer={!isLastOfRow}
+          showHorizontalResizer={!isLastRow}
         />
       </div>
     )

@@ -211,6 +211,43 @@ $gap: 20px;
   }
 }
 
+.plotHorizontalResizer,
+.plotVerticalResizer {
+  background-color: $accent-color;
+  opacity: 0.5;
+  position: absolute;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.plotHorizontalResizer {
+  height: 1px;
+  width: calc(100% + $gap);
+  bottom: -10px;
+  left: 0;
+  cursor: row-resize;
+
+  &:hover {
+    width: 10000px;
+    left: -5000px;
+  }
+}
+
+.plotVerticalResizer {
+  width: 1px;
+  height: calc(100% + $gap);
+  right: -10px;
+  top: 0;
+  cursor: col-resize;
+
+  &:hover {
+    height: 10000px;
+    top: -5000px;
+  }
+}
+
 .plot img,
 .plot svg {
   max-width: 100%;

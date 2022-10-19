@@ -13,13 +13,17 @@ interface ZoomablePlotProps {
   data?: PlainObject
   id: string
   onViewReady?: () => void
+  showVerticalResizer?: boolean
+  showHorizontalResizer?: boolean
 }
 
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   spec,
   data,
   id,
-  onViewReady
+  onViewReady,
+  showVerticalResizer,
+  showHorizontalResizer
 }) => {
   const dispatch = useDispatch()
   const previousSpecsAndData = useRef(JSON.stringify({ data, spec }))
@@ -52,6 +56,12 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       <GripIcon className={styles.plotGripIcon} />
       {currentPlotProps.current && (
         <VegaLite {...plotProps} onNewView={onViewReady} />
+      )}
+      {showVerticalResizer && (
+        <div className={styles.plotVerticalResizer}></div>
+      )}
+      {showHorizontalResizer && (
+        <div className={styles.plotHorizontalResizer}></div>
       )}
     </button>
   )

@@ -11,11 +11,15 @@ import { PlotsState } from '../../store'
 interface CheckpointPlotProps {
   id: string
   colors: ColorScale
+  isLastOfRow?: boolean
+  isLastRow?: boolean
 }
 
 export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   id,
-  colors
+  colors,
+  isLastOfRow,
+  isLastRow
 }) => {
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
@@ -43,7 +47,13 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
 
   return (
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
-      <ZoomablePlot spec={spec} data={{ values }} id={key} />
+      <ZoomablePlot
+        spec={spec}
+        data={{ values }}
+        id={key}
+        showVerticalResizer={!isLastOfRow}
+        showHorizontalResizer={!isLastRow}
+      />
     </div>
   )
 }
