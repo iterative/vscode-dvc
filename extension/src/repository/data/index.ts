@@ -11,8 +11,9 @@ import {
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
-import { getGitPath, gitPath } from '../../cli/git/constants'
+import { gitPath } from '../../cli/git/constants'
 import { DataStatusOutput, DvcError } from '../../cli/dvc/contract'
+import { getGitPath } from '../../fileSystem'
 
 export type Data = {
   dataStatus: DataStatusOutput | DvcError

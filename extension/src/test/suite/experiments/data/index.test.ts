@@ -25,7 +25,8 @@ import {
 import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
 import { ExperimentFlag } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
-import { getGitPath, gitPath } from '../../../../cli/git/constants'
+import { gitPath } from '../../../../cli/git/constants'
+import { getGitPath } from '../../../../fileSystem'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()

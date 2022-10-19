@@ -12,7 +12,8 @@ import {
   CommandId,
   InternalCommands
 } from '../../../../commands/internal'
-import { getGitPath, gitPath } from '../../../../cli/git/constants'
+import { gitPath } from '../../../../cli/git/constants'
+import { getGitPath } from '../../../../fileSystem'
 
 suite('Repository Data Test Suite', () => {
   const disposable = Disposable.fn()

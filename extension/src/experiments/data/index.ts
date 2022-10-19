@@ -14,7 +14,8 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { ExperimentFlag } from '../../cli/dvc/constants'
-import { getGitPath, gitPath } from '../../cli/git/constants'
+import { gitPath } from '../../cli/git/constants'
+import { getGitPath } from '../../fileSystem'
 
 export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
 
@@ -83,10 +84,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     const dotGitPath = getGitPath(gitRoot, gitPath.DOT_GIT_HEAD)
     const watchedRelPaths = [
-      dotGitPath,
-      getGitPath(gitRoot, EXPERIMENTS_GIT_REFS),
-      getGitPath(gitRoot, EXPERIMENTS_GIT_LOGS_REFS),
-      getGitPath(gitRoot, gitPath.HEADS_GIT_REFS)
+      gitPath.DOT_GIT_HEAD,
+      EXPERIMENTS_GIT_REFS,
+      EXPERIMENTS_GIT_LOGS_REFS,
+      gitPath.HEADS_GIT_REFS
     ]
 
     this.dispose.track(
