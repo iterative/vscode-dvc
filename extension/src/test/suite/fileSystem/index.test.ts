@@ -27,7 +27,7 @@ suite('File System Test Suite', () => {
       const root = await reader.getGitRepositoryRoot(__dirname)
       const submoduleDotGit = standardizePath(
         resolve(root, gitPath.DOT_GIT, 'modules', 'demo')
-      ) as string
+      )
 
       const dotGitPath = getGitPath(dvcDemoPath, gitPath.DOT_GIT)
       expect(dotGitPath).to.equal(submoduleDotGit)
@@ -39,9 +39,7 @@ suite('File System Test Suite', () => {
     it('should get the expected paths for this project', async () => {
       const reader = disposable.track(new GitReader())
       const root = await reader.getGitRepositoryRoot(__dirname)
-      const rootDotGit = standardizePath(
-        resolve(root, gitPath.DOT_GIT)
-      ) as string
+      const rootDotGit = standardizePath(resolve(root, gitPath.DOT_GIT))
 
       const dotGitPath = getGitPath(root, gitPath.DOT_GIT)
       expect(dotGitPath).to.equal(rootDotGit)
