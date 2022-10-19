@@ -46,7 +46,7 @@ suite('File System Watcher Test Suite', () => {
       const dotGitPath = getGitPath(root, gitPath.DOT_GIT)
       expect(dotGitPath).to.equal(rootDotGit)
 
-      const expRefPaths = getGitPath(rootDotGit, EXPERIMENTS_GIT_REFS)
+      const expRefPaths = getGitPath(root, EXPERIMENTS_GIT_REFS)
       expect(expRefPaths).to.equal(join(rootDotGit, EXPERIMENTS_GIT_REFS))
     })
   })
