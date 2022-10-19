@@ -38,7 +38,7 @@ export const findDvcSubRootPaths = async (
 
   return children
     .filter(child => isDirectory(join(cwd, child, '.dvc')))
-    .map(child => standardizePath(join(cwd, child)) as string)
+    .map(child => standardizePath(join(cwd, child)))
 }
 
 export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
@@ -59,7 +59,7 @@ export const findAbsoluteDvcRootPath = async (
     return []
   }
 
-  const absoluteRoot = standardizePath(resolve(cwd, relativePath)) as string
+  const absoluteRoot = standardizePath(resolve(cwd, relativePath))
 
   return [absoluteRoot]
 }

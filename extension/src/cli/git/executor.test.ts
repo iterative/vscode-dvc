@@ -39,7 +39,7 @@ describe('GitExecutor', () => {
     } as unknown as EventEmitter<CliStarted>
   })
 
-  const cwd = standardizePath(__dirname) as string
+  const cwd = standardizePath(__dirname)
 
   describe('pushBranch', () => {
     it('should call createProcess with the correct parameters to push a branch', async () => {
