@@ -1,6 +1,6 @@
 import { join } from 'dvc/src/test/util/path'
 import { configureStore } from '@reduxjs/toolkit'
-import React, { ReactElement } from 'react'
+import React from 'react'
 import { Provider } from 'react-redux'
 import {
   cleanup,
@@ -424,6 +424,32 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+  })
+
+  it('should not toggle the checkpoint plots section if a link is clicked', () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    const checkpointsTooltipToggle = screen.getAllByTestId(
+      'info-tooltip-toggle'
+    )[2]
+    fireEvent.mouseEnter(checkpointsTooltipToggle, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const tooltip = screen.getByTestId('tooltip-checkpoint-plots')
+    const tooltipLink = within(tooltip).getByRole('link')
+    fireEvent.click(tooltipLink, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
@@ -1307,30 +1333,14 @@ describe('App', () => {
     const [templateInfo, comparisonInfo, checkpointInfo] =
       screen.getAllByTestId('info-tooltip-toggle')
 
-    const getSectionText = (sectionNode: ReactElement) =>
-      // eslint-disable-next-line testing-library/no-node-access
-      sectionNode.props.children || ''
-
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.mouseEnter(comparisonInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.COMPARISON_TABLE])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-comparison-plots')).toBeInTheDocument()
 
     fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.CHECKPOINT_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-checkpoint-plots')).toBeInTheDocument()
   })
 
   it('should dismiss a tooltip by pressing esc', () => {
@@ -1342,29 +1352,15 @@ describe('App', () => {
 
     const [templateInfo] = screen.getAllByTestId('info-tooltip-toggle')
 
-    const getSectionText = (sectionNode: ReactElement) =>
-      // eslint-disable-next-line testing-library/no-node-access
-      sectionNode.props.children || ''
-
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.keyDown(templateInfo, { bubbles: true, key: 'Space' })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.keyDown(templateInfo, { bubbles: true, key: 'Escape' })
     expect(
-      screen.queryByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
+      screen.queryByTestId('tooltip-template-plots')
     ).not.toBeInTheDocument()
   })
 

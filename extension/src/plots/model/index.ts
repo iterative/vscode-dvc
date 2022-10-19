@@ -216,10 +216,6 @@ export class PlotsModel extends ModelWithPersistence {
     )
   }
 
-  public getDefaultRevs() {
-    return ['workspace', ...Object.values(this.branchRevisions)]
-  }
-
   public getTemplatePlots(order: TemplateOrder | undefined) {
     if (!definedAndNonEmpty(order)) {
       return

@@ -132,7 +132,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
-        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)) {
+        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
           this.cliData.update()
         }
       })

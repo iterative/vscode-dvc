@@ -22,8 +22,7 @@ suite('Plots Data Test Suite', () => {
   const buildPlotsData = (
     experimentIsRunning: boolean,
     missingRevisions: string[] = [],
-    mutableRevisions: string[] = [],
-    defaultRevs: string[] = []
+    mutableRevisions: string[] = []
   ) => {
     const { internalCommands, updatesPaused, mockPlotsDiff, dvcRunner } =
       buildDependencies(disposable)
@@ -36,10 +35,8 @@ suite('Plots Data Test Suite', () => {
 
     const mockGetMissingRevisions = stub().returns(missingRevisions)
     const mockGetMutableRevisions = stub().returns(mutableRevisions)
-    const mockGetDefaultRevs = stub().returns(defaultRevs)
 
     const mockPlotsModel = {
-      getDefaultRevs: mockGetDefaultRevs,
       getMissingRevisions: mockGetMissingRevisions,
       getMutableRevisions: mockGetMutableRevisions
     } as unknown as PlotsModel
@@ -62,38 +59,20 @@ suite('Plots Data Test Suite', () => {
     })
 
     it('should call plots diff when there are no revisions to fetch and no experiment is running (workspace updates)', async () => {
-      const defaultRevisions = ['workspace', '4d78b9e']
-      const { data, mockPlotsDiff } = buildPlotsData(
-        false,
-        [],
-        [],
-        defaultRevisions
-      )
+      const { data, mockPlotsDiff } = buildPlotsData(false, [], [])
 
       await data.update()
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        ...defaultRevisions
-      )
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath)
     })
 
     it('should call plots diff when an experiment is running in the workspace (live updates)', async () => {
-      const defaultRevisions = ['workspace', '4d78b9e']
-      const { data, mockPlotsDiff } = buildPlotsData(
-        true,
-        [],
-        ['workspace'],
-        defaultRevisions
-      )
+      const { data, mockPlotsDiff } = buildPlotsData(true, [], ['workspace'])
 
       await data.update()
 
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        ...defaultRevisions
-      )
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath)
     })
 
     it('should call plots diff when an experiment is running in a temporary directory (live updates)', async () => {

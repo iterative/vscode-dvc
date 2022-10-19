@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
-import styles from './styles.module.scss'
 import { SortOrder } from './TableHeader'
+import styles from '../styles.module.scss'
 import {
   Draggable,
   DragFunction
-} from '../../../shared/components/dragDrop/Draggable'
-import { IconMenu } from '../../../shared/components/iconMenu/IconMenu'
-import { DownArrow, Lines, UpArrow } from '../../../shared/components/icons'
+} from '../../../../shared/components/dragDrop/Draggable'
+import { IconMenu } from '../../../../shared/components/iconMenu/IconMenu'
+import { DownArrow, Lines, UpArrow } from '../../../../shared/components/icons'
 
 const getIconMenuItems = (
   sortEnabled: boolean,
@@ -34,7 +34,8 @@ export const ColumnDragHandle: React.FC<{
   onDragEnter: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
-}> = ({ disabled, column, onDragEnter, onDragStart, onDrop }) => {
+  onDragEnd: DragFunction
+}> = ({ disabled, column, onDragEnter, onDragStart, onDragEnd, onDrop }) => {
   const DropTarget = <span>{column?.name}</span>
 
   return (
@@ -51,6 +52,7 @@ export const ColumnDragHandle: React.FC<{
         dropTarget={DropTarget}
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
         onDrop={onDrop}
       >
         <span>{column?.render('Header')}</span>
@@ -67,6 +69,7 @@ export const TableHeaderCellContents: React.FC<{
   isDraggable: boolean
   menuSuppressed: boolean
   onDragEnter: DragFunction
+  onDragEnd: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
   canResize: boolean
@@ -80,6 +83,7 @@ export const TableHeaderCellContents: React.FC<{
   isDraggable,
   menuSuppressed,
   onDragEnter,
+  onDragEnd,
   onDragStart,
   onDrop,
   canResize,
@@ -106,6 +110,7 @@ export const TableHeaderCellContents: React.FC<{
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
         onDrop={onDrop}
+        onDragEnd={onDragEnd}
       />
       {canResize && (
         <div

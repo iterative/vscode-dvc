@@ -4,19 +4,21 @@ import {
   ColumnType
 } from 'dvc/src/experiments/webview/contract'
 import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
-import styles from './styles.module.scss'
 import { SortOrder } from './TableHeader'
 import { TableHeaderCellContents } from './TableHeaderCellContents'
+import styles from '../styles.module.scss'
 import {
   countUpperLevels,
   isExperimentColumn,
   isFirstLevelHeader
-} from '../../util/columns'
-import { ContextMenu } from '../../../shared/components/contextMenu/ContextMenu'
-import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
+} from '../../../util/columns'
+import { ExperimentsState } from '../../../store'
+import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
+import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 
 const calcResizerHeight = (
   isPlaceholder: boolean,
@@ -86,6 +88,7 @@ export const TableHeaderCell: React.FC<{
   menuDisabled?: boolean
   menuContent?: React.ReactNode
   onDragEnter: DragFunction
+  onDragEnd: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
@@ -100,15 +103,20 @@ export const TableHeaderCell: React.FC<{
   menuContent,
   menuDisabled,
   onDragEnter,
+  onDragEnd,
   onDragStart,
   onDrop,
   root,
   setExpColumnNeedsShadow
 }) => {
   const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
+  const headerDropTargetId = useSelector(
+    (state: ExperimentsState) => state.headerDropTarget
+  )
   const isDraggable = !column.placeholderOf && column.id !== 'id'
 
   const isPlaceholder = !!column.placeholderOf
+
   const canResize = column.canResize && !isPlaceholder
   const resizerHeight = calcResizerHeight(
     isPlaceholder,
@@ -127,6 +135,7 @@ export const TableHeaderCell: React.FC<{
       menuSuppressed={menuSuppressed}
       onDragEnter={onDragEnter}
       onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
       onDrop={onDrop}
       canResize={canResize}
       setMenuSuppressed={setMenuSuppressed}
@@ -138,7 +147,7 @@ export const TableHeaderCell: React.FC<{
     <ContextMenu
       content={menuContent}
       disabled={menuDisabled || menuSuppressed}
-      trigger={'contextmenu click'}
+      trigger={'contextmenu'}
     >
       <div
         {...column.getHeaderProps(
@@ -159,6 +168,12 @@ export const TableHeaderCell: React.FC<{
         ) : (
           cellContents
         )}
+        <div
+          className={cx(
+            styles.dropTarget,
+            headerDropTargetId === column.id && styles.active
+          )}
+        />
       </div>
     </ContextMenu>
   )

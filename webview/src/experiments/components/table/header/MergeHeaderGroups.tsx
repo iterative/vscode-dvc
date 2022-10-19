@@ -3,8 +3,8 @@ import cx from 'classnames'
 import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
 import { TableHeader } from './TableHeader'
-import styles from './styles.module.scss'
-import { DragFunction } from '../../../shared/components/dragDrop/Draggable'
+import styles from '../styles.module.scss'
+import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 
 export const MergedHeaderGroups: React.FC<{
   headerGroup: HeaderGroup<Experiment>
@@ -13,6 +13,7 @@ export const MergedHeaderGroups: React.FC<{
   onDragUpdate: DragFunction
   onDragStart: DragFunction
   onDragEnd: DragFunction
+  onDrop: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({
@@ -22,6 +23,7 @@ export const MergedHeaderGroups: React.FC<{
   onDragUpdate,
   onDragEnd,
   onDragStart,
+  onDrop,
   root,
   setExpColumnNeedsShadow
 }) => {
@@ -40,7 +42,8 @@ export const MergedHeaderGroups: React.FC<{
           columns={columns}
           onDragEnter={onDragUpdate}
           onDragStart={onDragStart}
-          onDrop={onDragEnd}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
           root={root}
         />
       ))}
