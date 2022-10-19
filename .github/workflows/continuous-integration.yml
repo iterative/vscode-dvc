@@ -45,6 +45,8 @@ jobs:
 
       - run: yarn run lint
 
+      - run: yarn cover:prep
+
       - uses: paambaati/codeclimate-action@v3.1.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
