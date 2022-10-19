@@ -43,17 +43,21 @@ jobs:
 
       - run: yarn run install-frozen-lockfile
 
-      - run: xvfb-run -a yarn test:vscode
-
       - run: yarn run lint
 
       - run: yarn cover:prep
+
+      - name: Int cover
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: xvfb-run -a yarn turbo run cover-vscode-run
+          options: '-screen 0 1600x1200x24'
 
       - uses: paambaati/codeclimate-action@v3.1.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
-          coverageCommand: xvfb-run -a yarn cover
+          coverageCommand: yarn cover
           coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
 
       - run: yarn build-storybook
