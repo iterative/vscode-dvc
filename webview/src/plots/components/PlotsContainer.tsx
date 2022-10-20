@@ -138,7 +138,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const isTooltip = (el: Element) => {
     let currentNode = el
-    while (currentNode.nodeName !== 'SUMMARY') {
+    while (!['SUMMARY', 'BODY'].includes(currentNode.nodeName)) {
       if (
         !!currentNode.className.toLocaleLowerCase &&
         currentNode.className.toLocaleLowerCase().includes('tooltip')
