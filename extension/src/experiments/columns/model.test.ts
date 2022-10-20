@@ -17,6 +17,8 @@ import deeplyNestedColumnsFixture from '../../test/fixtures/expShow/deeplyNested
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import dataTypesColumnsFixture from '../../test/fixtures/expShow/dataTypes/columns'
 import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output'
+import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
+import survivalColumnsFixture from '../../test/fixtures/expShow/survival/columns'
 import { getConfigValue } from '../../vscode/config'
 
 jest.mock('../../vscode/config')
@@ -36,6 +38,12 @@ describe('ColumnsModel', () => {
     await model.transformAndSet(outputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(columnsFixture)
+  })
+
+  it('should return the expected columns when given the survival output fixture', async () => {
+    const model = new ColumnsModel('', buildMockMemento())
+    await model.transformAndSet(survivalOutputFixture)
+    expect(model.getSelected()).toStrictEqual(survivalColumnsFixture)
   })
 
   it('should return the expected columns when given the deeply nested output fixture', async () => {
