@@ -20,12 +20,10 @@
   },
   "scripts": {
     "build": "yarn webpack --mode production",
-    "test-build": "yarn webpack --mode development",
     "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
-    "lint:compile": "webpack --mode development",
-    "lint": "run-p 'lint:*'",
+    "lint:build": "yarn webpack --mode development",
     "dev": "webpack watch --mode development",
     "test": "jest --collect-coverage"
   },
