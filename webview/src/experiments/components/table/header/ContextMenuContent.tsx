@@ -118,7 +118,7 @@ export const getMenuOptions = (
 
   const menuEnabled = isSortable || visibleOptions > 0
 
-  return { isSortable, menuEnabled, menuOptions, sortOptions }
+  return { isSortable, menuEnabled, menuOptions, sortOptions, sortOrder }
 }
 
 export const ContextMenuContent: React.FC<HeaderMenuProps> = ({ column }) => {

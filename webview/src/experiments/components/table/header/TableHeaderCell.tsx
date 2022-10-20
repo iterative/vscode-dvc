@@ -82,12 +82,6 @@ const WithExpColumnNeedsShadowUpdates: React.FC<{
   return <div ref={ref}>{children}</div>
 }
 
-const possibleOrders = {
-  false: SortOrder.ASCENDING,
-  true: SortOrder.DESCENDING,
-  undefined: SortOrder.NONE
-} as const
-
 export const TableHeaderCell: React.FC<{
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
@@ -117,11 +111,7 @@ export const TableHeaderCell: React.FC<{
   )
   const { sorts } = useSelector((state: ExperimentsState) => state.tableData)
 
-  const baseColumn = column.placeholderOf || column
-  const sort = sorts.find(sort => sort.path === baseColumn.id)
-  const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
-
-  const { menuEnabled, isSortable } = React.useMemo(() => {
+  const { menuEnabled, isSortable, sortOrder } = React.useMemo(() => {
     return getMenuOptions(column, sorts)
   }, [column, sorts])
 
