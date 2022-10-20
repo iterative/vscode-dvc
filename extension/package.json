@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.5.4",
+  "version": "0.5.5",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1524,12 +1524,10 @@
     "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
-    "lint:tsc": "tsc --noEmit",
-    "lint": "run-p 'lint:*'",
+    "lint:build": "tsc -p .",
     "dev": "shx rm -rf dist && tsc -watch -p ./",
     "build": "yarn webpack --mode production",
     "package": "node ./scripts/ensureYarnLock.js && yarn run vsce package --yarn -o ./dvc.vsix",
-    "test-build": "tsc -p .",
     "test-vscode": "node ./dist/test/runTest.js",
     "test-e2e": "wdio run ./src/test/e2e/wdio.conf.ts",
     "test": "jest --collect-coverage",

@@ -22,24 +22,33 @@
       "outputs": ["coverage/jest/**"]
     },
     "cover-vscode-run": {
-      "dependsOn": ["test", "test-build"],
+      "dependsOn": ["test", "lint:build"],
       "outputs": ["coverage/integration/**"]
     },
-    "test-build": {
-      "dependsOn": ["^test-build"],
-      "outputs": ["dist/**"]
-    },
     "test-vscode": {
-      "dependsOn": ["test-build"]
+      "dependsOn": ["lint:build"]
     },
     "test-e2e": {
-      "dependsOn": ["test-build"]
+      "dependsOn": ["lint:build"]
     },
     "format": {
       "dependsOn": ["^format"],
       "outputs": []
     },
+    "lint:build": {
+      "dependsOn": ["^lint:build"],
+      "outputs": ["dist/**"]
+    },
+    "lint:eslint": {
+      "dependsOn": ["^lint:eslint"],
+      "outputs": []
+    },
+    "lint:prettier": {
+      "dependsOn": ["^lint:prettier"],
+      "outputs": []
+    },
     "lint": {
+      "dependsOn": ["lint:prettier", "lint:eslint", "lint:build"],
       "outputs": []
     },
     "dev": {

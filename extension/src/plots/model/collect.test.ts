@@ -12,9 +12,9 @@ import {
   collectWorkspaceRaceConditionData
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import expShowFixture from '../../test/fixtures/expShow/output'
-import modifiedFixture from '../../test/fixtures/expShow/modified'
-import checkpointPlotsFixture from '../../test/fixtures/expShow/checkpointPlots'
+import expShowFixture from '../../test/fixtures/expShow/base/output'
+import modifiedFixture from '../../test/fixtures/expShow/modified/output'
+import checkpointPlotsFixture from '../../test/fixtures/expShow/base/checkpointPlots'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
 import {
   definedAndNonEmpty,

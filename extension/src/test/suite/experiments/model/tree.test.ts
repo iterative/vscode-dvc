@@ -27,9 +27,9 @@ import {
   RegisteredCommands
 } from '../../../../commands/external'
 import { buildPlots, getExpectedCheckpointPlotsData } from '../../plots/util'
-import checkpointPlotsFixture from '../../../fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture from '../../../fixtures/expShow/base/checkpointPlots'
 import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
-import expShowFixture from '../../../fixtures/expShow/output'
+import expShowFixture from '../../../fixtures/expShow/base/output'
 import { Operator } from '../../../../experiments/model/filterBy'
 import { buildMetricOrParamPath } from '../../../../experiments/columns/paths'
 import { ExperimentsTree } from '../../../../experiments/model/tree'

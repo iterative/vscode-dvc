@@ -1,4 +1,4 @@
-import { ExperimentStatus } from '../../../cli/dvc/contract'
+import { ExperimentStatus } from '../../../../cli/dvc/contract'
 
 const data = {
   workspace: {
