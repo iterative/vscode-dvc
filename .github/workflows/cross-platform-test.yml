@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
+  pull_request_target:
 
 concurrency:
   group: cross-platform-${{ github.head_ref }}
@@ -32,6 +32,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
