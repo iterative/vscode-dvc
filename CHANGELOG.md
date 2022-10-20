@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.5] - 2022-10-20
+
+### 🚀 New Features and Enhancements
+
+- Update table drag and drop implementation  [#2566](https://github.com/iterative/vscode-dvc/pull/2566) by [@julieg18](https://github.com/julieg18)
+- Plots improve section tooltips copy and style [#2622](https://github.com/iterative/vscode-dvc/pull/2622) by [@shcheklein](https://github.com/shcheklein)
+
+### 🐛 Bug Fixes
+
+- Do not toggle plot section when clicking a link [#2632](https://github.com/iterative/vscode-dvc/pull/2632) by [@sroy3](https://github.com/sroy3)
+- Only patch workspace only calls to plots diff [#2629](https://github.com/iterative/vscode-dvc/pull/2629) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add util for identifying ValueTree type [#2619](https://github.com/iterative/vscode-dvc/pull/2619) by [@mattseddon](https://github.com/mattseddon)
+- Switch CI test coverage to use stable build [#2623](https://github.com/iterative/vscode-dvc/pull/2623) by [@mattseddon](https://github.com/mattseddon)
+- Upload vsix as part of publish action [#2615](https://github.com/iterative/vscode-dvc/pull/2615) by [@mattseddon](https://github.com/mattseddon)
+- Improve max table depth test [#2621](https://github.com/iterative/vscode-dvc/pull/2621) by [@julieg18](https://github.com/julieg18)
+- Add webpack dummy build as a lint step [#2626](https://github.com/iterative/vscode-dvc/pull/2626) by [@wolmir](https://github.com/wolmir)
+- Fix integration test suite after hook [#2628](https://github.com/iterative/vscode-dvc/pull/2628) by [@mattseddon](https://github.com/mattseddon)
+- Make the plot sizes use numbers underneath [#2563](https://github.com/iterative/vscode-dvc/pull/2563) by [@sroy3](https://github.com/sroy3)
+- Demo project as a submodule [#2624](https://github.com/iterative/vscode-dvc/pull/2624) by [@sroy3](https://github.com/sroy3)
+- Split standardize path into two functions [#2627](https://github.com/iterative/vscode-dvc/pull/2627) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.4] - 2022-10-18
 
 ### 🐛 Bug Fixes
