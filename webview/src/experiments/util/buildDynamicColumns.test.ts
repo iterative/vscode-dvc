@@ -2,8 +2,8 @@
 import { join } from 'dvc/src/test/util/path'
 import { ColumnGroup } from 'react-table'
 import { Experiment, ColumnType } from 'dvc/src/experiments/webview/contract'
-import { columns as deeplyNestedColumnsFixture } from 'dvc/src/test/fixtures/expShow/deeplyNested'
-import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
+import deeplyNestedColumnsFixture from 'dvc/src/test/fixtures/expShow/deeplyNested/columns'
+import columnsFixture from 'dvc/src/test/fixtures/expShow/base/columns'
 import {
   buildMetricOrParamPath,
   buildDepPath

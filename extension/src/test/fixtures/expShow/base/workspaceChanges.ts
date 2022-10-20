@@ -1,4 +1,4 @@
-import { buildDepPath } from '../../../experiments/columns/paths'
+import { buildDepPath } from '../../../../experiments/columns/paths'
 
 const data = [
   buildDepPath('src', 'prepare.py'),

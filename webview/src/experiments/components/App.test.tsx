@@ -7,11 +7,11 @@ import {
   within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
+import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Column, ColumnType, Row } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
-import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
+import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
@@ -662,7 +662,7 @@ describe('App', () => {
         expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
       }
 
-      renderTable(dataTypesTableData)
+      renderTable(dataTypesTableFixture)
 
       expectTooltipValue({
         cellLabel: '1.9293',

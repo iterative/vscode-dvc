@@ -4,10 +4,10 @@ import { collectChanges, collectColumns } from '.'
 import { timestampColumn } from '../constants'
 import { buildDepPath, buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
-import outputFixture from '../../../test/fixtures/expShow/output'
-import columnsFixture from '../../../test/fixtures/expShow/columns'
-import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
-import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
+import outputFixture from '../../../test/fixtures/expShow/base/output'
+import columnsFixture from '../../../test/fixtures/expShow/base/columns'
+import workspaceChangesFixture from '../../../test/fixtures/expShow/base/workspaceChanges'
+import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps/output'
 import {
   ExperimentsOutput,
   ExperimentStatus,

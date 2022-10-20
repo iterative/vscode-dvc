@@ -17,7 +17,7 @@ import {
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
-import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
+import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { SortOrder } from './header/TableHeader'
 import { Table } from './Table'
 import styles from './styles.module.scss'
