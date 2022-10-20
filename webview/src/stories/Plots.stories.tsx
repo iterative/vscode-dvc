@@ -11,7 +11,7 @@ import {
   PlotSizeNumber
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'

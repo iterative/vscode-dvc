@@ -4,9 +4,9 @@ import { stub, spy, restore } from 'sinon'
 import { window, commands, MessageItem, EventEmitter, TreeView } from 'vscode'
 import { addFilterViaQuickInput, mockQuickInputFilter } from './util'
 import { Disposable } from '../../../../../extension'
-import columnsFixture from '../../../../fixtures/expShow/columns'
-import rowsFixture from '../../../../fixtures/expShow/rows'
-import workspaceChangesFixture from '../../../../fixtures/expShow/workspaceChanges'
+import columnsFixture from '../../../../fixtures/expShow/base/columns'
+import rowsFixture from '../../../../fixtures/expShow/base/rows'
+import workspaceChangesFixture from '../../../../fixtures/expShow/base/workspaceChanges'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   getFilterId,

@@ -9,7 +9,7 @@ import {
   splitColumnPath
 } from './paths'
 import { timestampColumn } from './constants'
-import columnsFixture from '../../test/fixtures/expShow/columns'
+import columnsFixture from '../../test/fixtures/expShow/base/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
