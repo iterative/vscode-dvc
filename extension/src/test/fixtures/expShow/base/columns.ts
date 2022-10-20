@@ -1,10 +1,10 @@
-import { join } from '../../util/path'
-import { Column, ColumnType } from '../../../experiments/webview/contract'
+import { join } from '../../../util/path'
+import { Column, ColumnType } from '../../../../experiments/webview/contract'
 import {
   buildDepPath,
   buildMetricOrParamPath
-} from '../../../experiments/columns/paths'
-import { timestampColumn } from '../../../experiments/columns/constants'
+} from '../../../../experiments/columns/paths'
+import { timestampColumn } from '../../../../experiments/columns/constants'
 
 const nestedParamsFile = join('nested', 'params.yaml')
 

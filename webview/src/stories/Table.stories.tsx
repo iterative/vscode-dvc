@@ -2,11 +2,11 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { Meta, Story } from '@storybook/react/types-6-0'
-import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
-import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
-import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
-import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested'
-import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
+import rowsFixture from 'dvc/src/test/fixtures/expShow/base/rows'
+import columnsFixture from 'dvc/src/test/fixtures/expShow/base/columns'
+import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/base/workspaceChanges'
+import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
+import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
 import {
   ExperimentStatus,
@@ -184,7 +184,9 @@ WithContextMenuNoCheckpoints.args = {
 WithContextMenuNoCheckpoints.play = contextMenuPlay
 
 export const WithAllDataTypes = Template.bind({})
-WithAllDataTypes.args = { tableData: { ...dataTypesTableData, hasData: true } }
+WithAllDataTypes.args = {
+  tableData: { ...dataTypesTableFixture, hasData: true }
+}
 WithAllDataTypes.play = async ({ canvasElement }) => {
   const falseCell = await within(canvasElement).findByText('false')
   userEvent.hover(falseCell, { bubbles: true })

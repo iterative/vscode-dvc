@@ -4,7 +4,7 @@ import { EventEmitter, FileSystemWatcher, RelativePattern } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { Disposable } from '../../../../extension'
-import expShowFixture from '../../../fixtures/expShow/output'
+import expShowFixture from '../../../fixtures/expShow/base/output'
 import {
   bypassProcessManagerDebounce,
   getFirstArgOfCall,

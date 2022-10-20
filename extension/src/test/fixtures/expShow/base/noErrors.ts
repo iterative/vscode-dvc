@@ -1,7 +1,7 @@
 import {
   ExperimentFieldsOrError,
   ExperimentsOutput
-} from '../../../cli/dvc/contract'
+} from '../../../../cli/dvc/contract'
 import expShowFixture, { errorShas } from './output'
 
 const excludeErrors = (): ExperimentsOutput => {

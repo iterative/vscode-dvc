@@ -1,8 +1,8 @@
-import { copyOriginalColors } from '../../../experiments/model/status/colors'
+import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import {
   CheckpointPlotsData,
   PlotSizeNumber
-} from '../../../plots/webview/contract'
+} from '../../../../plots/webview/contract'
 
 const colors = copyOriginalColors()
 
