@@ -8,8 +8,12 @@ import { useSelector } from 'react-redux'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
-import { SortOrder } from './TableHeader'
 import { TableHeaderCellContents } from './TableHeaderCellContents'
+import {
+  ContextMenuContent,
+  getMenuOptions,
+  SortOrder
+} from './ContextMenuContent'
 import styles from '../styles.module.scss'
 import {
   countUpperLevels,
@@ -78,15 +82,17 @@ const WithExpColumnNeedsShadowUpdates: React.FC<{
   return <div ref={ref}>{children}</div>
 }
 
+const possibleOrders = {
+  false: SortOrder.ASCENDING,
+  true: SortOrder.DESCENDING,
+  undefined: SortOrder.NONE
+} as const
+
 export const TableHeaderCell: React.FC<{
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   hasFilter: boolean
   orderedColumns: Column[]
-  sortOrder: SortOrder
-  sortEnabled: boolean
-  menuDisabled?: boolean
-  menuContent?: React.ReactNode
   onDragEnter: DragFunction
   onDragEnd: DragFunction
   onDragStart: DragFunction
@@ -98,10 +104,6 @@ export const TableHeaderCell: React.FC<{
   columns,
   orderedColumns,
   hasFilter,
-  sortOrder,
-  sortEnabled,
-  menuContent,
-  menuDisabled,
   onDragEnter,
   onDragEnd,
   onDragStart,
@@ -113,8 +115,17 @@ export const TableHeaderCell: React.FC<{
   const headerDropTargetId = useSelector(
     (state: ExperimentsState) => state.headerDropTarget
   )
-  const isDraggable = !column.placeholderOf && column.id !== 'id'
+  const { sorts } = useSelector((state: ExperimentsState) => state.tableData)
 
+  const baseColumn = column.placeholderOf || column
+  const sort = sorts.find(sort => sort.path === baseColumn.id)
+  const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
+
+  const { menuEnabled, isSortable } = React.useMemo(() => {
+    return getMenuOptions(column, sorts)
+  }, [column, sorts])
+
+  const isDraggable = !column.placeholderOf && column.id !== 'id'
   const isPlaceholder = !!column.placeholderOf
 
   const canResize = column.canResize && !isPlaceholder
@@ -129,7 +140,7 @@ export const TableHeaderCell: React.FC<{
     <TableHeaderCellContents
       column={column}
       sortOrder={sortOrder}
-      sortEnabled={sortEnabled}
+      sortEnabled={isSortable}
       hasFilter={hasFilter}
       isDraggable={isDraggable}
       menuSuppressed={menuSuppressed}
@@ -143,15 +154,17 @@ export const TableHeaderCell: React.FC<{
     />
   )
 
+  const menuContent = <ContextMenuContent column={column} />
+
   return (
     <ContextMenu
       content={menuContent}
-      disabled={menuDisabled || menuSuppressed}
+      disabled={!menuEnabled || menuSuppressed}
       trigger={'contextmenu'}
     >
       <div
         {...column.getHeaderProps(
-          getHeaderPropsArgs(column, sortEnabled, sortOrder)
+          getHeaderPropsArgs(column, isSortable, sortOrder)
         )}
         data-testid={`header-${column.id}`}
         key={column.id}
