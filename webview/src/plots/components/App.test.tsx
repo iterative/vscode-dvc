@@ -1,6 +1,6 @@
 import { join } from 'dvc/src/test/util/path'
 import { configureStore } from '@reduxjs/toolkit'
-import React, { ReactElement } from 'react'
+import React from 'react'
 import { Provider } from 'react-redux'
 import {
   cleanup,
@@ -13,7 +13,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
@@ -21,7 +21,7 @@ import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtuali
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotSize,
+  PlotSizeNumber,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
@@ -48,6 +48,7 @@ import {
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
+import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
@@ -428,6 +429,32 @@ describe('App', () => {
     })
   })
 
+  it('should not toggle the checkpoint plots section if a link is clicked', () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    const checkpointsTooltipToggle = screen.getAllByTestId(
+      'info-tooltip-toggle'
+    )[2]
+    fireEvent.mouseEnter(checkpointsTooltipToggle, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    const tooltip = screen.getByTestId('tooltip-checkpoint-plots')
+    const tooltipLink = within(tooltip).getByRole('link')
+    fireEvent.click(tooltipLink, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+  })
+
   it('should not toggle the checkpoint plots section when its header is clicked and the content of its tooltip is selected', async () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
@@ -563,15 +590,21 @@ describe('App', () => {
 
     fireEvent.click(smallButton)
     let wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('smallPlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.SMALL}`)
+    ).toBe(true)
 
     fireEvent.click(regularButton)
     wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('regularPlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.REGULAR}`)
+    ).toBe(true)
 
     fireEvent.click(largeButton)
     wrapper = await getWrapper()
-    expect(wrapper).toHaveClass('largePlots')
+    expect(
+      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.LARGE}`)
+    ).toBe(true)
   })
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
@@ -587,7 +620,10 @@ describe('App', () => {
     fireEvent.click(largeButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.LARGE
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
@@ -595,7 +631,10 @@ describe('App', () => {
     fireEvent.click(smallButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.SMALL },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.SMALL
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
   })
@@ -613,7 +652,10 @@ describe('App', () => {
     fireEvent.click(largeButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { section: Section.CHECKPOINT_PLOTS, size: PlotSize.LARGE },
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.LARGE
+      },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
@@ -1291,30 +1333,14 @@ describe('App', () => {
     const [templateInfo, comparisonInfo, checkpointInfo] =
       screen.getAllByTestId('info-tooltip-toggle')
 
-    const getSectionText = (sectionNode: ReactElement) =>
-      // eslint-disable-next-line testing-library/no-node-access
-      sectionNode.props.children || ''
-
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.mouseEnter(comparisonInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.COMPARISON_TABLE])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-comparison-plots')).toBeInTheDocument()
 
     fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.CHECKPOINT_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-checkpoint-plots')).toBeInTheDocument()
   })
 
   it('should dismiss a tooltip by pressing esc', () => {
@@ -1326,29 +1352,15 @@ describe('App', () => {
 
     const [templateInfo] = screen.getAllByTestId('info-tooltip-toggle')
 
-    const getSectionText = (sectionNode: ReactElement) =>
-      // eslint-disable-next-line testing-library/no-node-access
-      sectionNode.props.children || ''
-
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.keyDown(templateInfo, { bubbles: true, key: 'Space' })
-    expect(
-      screen.getByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
 
     fireEvent.keyDown(templateInfo, { bubbles: true, key: 'Escape' })
     expect(
-      screen.queryByText(
-        getSectionText(SectionDescription[Section.TEMPLATE_PLOTS])
-      )
+      screen.queryByTestId('tooltip-template-plots')
     ).not.toBeInTheDocument()
   })
 
@@ -1461,7 +1473,7 @@ describe('App', () => {
           )
         })
 
-        it('should render one large plot per row per 1000px of screen when the screen is larger than 2000px', () => {
+        it('should render the plots correctly when the screen is larger than 2000px', () => {
           resizeScreen(3000)
 
           let plots = screen.getAllByTestId(/^plot-/)
@@ -1477,7 +1489,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render three large plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
           resizeScreen(1849)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1486,16 +1498,16 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render two large plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
           resizeScreen(936)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[24].id).toBe(checkpoint.plots[24].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[14].id).toBe(checkpoint.plots[14].title)
+          expect(plots.length).toBe(1 + OVERSCAN_ROW_COUNT) // Only the first and the next lines defined by the overscan row count will be rendered
         })
 
-        it('should render one large plot per row when the screen is smaller than 800px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px', () => {
           resizeScreen(563)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1557,7 +1569,7 @@ describe('App', () => {
           )
         })
 
-        it('should render one regular plot per row per 800px of screen when the screen is larger than 2000px', () => {
+        it('should render the plots correctly when the screen is larger than 2000px', () => {
           resizeScreen(3200)
 
           let plots = screen.getAllByTestId(/^plot-/)
@@ -1573,7 +1585,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render four regular plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
           resizeScreen(1889)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1582,7 +1594,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render three regular plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
           resizeScreen(938)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1591,7 +1603,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render one regular plot per row when the screen is smaller than 800px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px', () => {
           resizeScreen(562)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1653,7 +1665,7 @@ describe('App', () => {
           )
         })
 
-        it('should render one small plot per row per 500px of screen when the screen is larger than 2000px', () => {
+        it('should render the plots correctly when the screen is larger than 2000px', () => {
           resizeScreen(3004)
 
           let plots = screen.getAllByTestId(/^plot-/)
@@ -1669,7 +1681,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render six small plot per row when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
           resizeScreen(1839)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1678,7 +1690,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render four small plot per row when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
           resizeScreen(956)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1687,7 +1699,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render one small plot per row when the screen is smaller than 800px but larger than 600px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px but larger than 600px', () => {
           resizeScreen(663)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -1696,7 +1708,7 @@ describe('App', () => {
           expect(plots.length).toBe(checkpoint.plots.length)
         })
 
-        it('should render two small plot per row when the screen is smaller than 600px', () => {
+        it('should render the plots correctly when the screen is smaller than 600px', () => {
           resizeScreen(569)
 
           const plots = screen.getAllByTestId(/^plot-/)

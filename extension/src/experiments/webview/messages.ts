@@ -116,6 +116,13 @@ export class WebviewMessages {
           RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
           { dvcRoot: this.dvcRoot, ids: [message.payload].flat() }
         )
+
+      case MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER:
+        return commands.executeCommand(
+          RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
+          this.dvcRoot
+        )
+
       case MessageFromWebviewType.SELECT_COLUMNS:
         return this.setColumnsStatus()
 
@@ -187,7 +194,7 @@ export class WebviewMessages {
       return
     }
 
-    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH, Number(newValue))
+    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, Number(newValue))
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT,
       undefined,

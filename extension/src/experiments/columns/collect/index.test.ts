@@ -1,13 +1,18 @@
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join } from 'path'
 import { collectChanges, collectColumns } from '.'
 import { timestampColumn } from '../constants'
 import { buildDepPath, buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
-import outputFixture from '../../../test/fixtures/expShow/output'
-import columnsFixture from '../../../test/fixtures/expShow/columns'
-import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
-import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
-import { ExperimentsOutput } from '../../../cli/dvc/contract'
+import outputFixture from '../../../test/fixtures/expShow/base/output'
+import columnsFixture from '../../../test/fixtures/expShow/base/columns'
+import workspaceChangesFixture from '../../../test/fixtures/expShow/base/workspaceChanges'
+import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps/output'
+import {
+  ExperimentsOutput,
+  ExperimentStatus,
+  ValueTree
+} from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
 
 jest.mock('../../../vscode/config')
@@ -487,15 +492,6 @@ describe('collectColumns', () => {
       ]
     )
   })
-
-  it('should mark new dep files as changes', () => {
-    const changes = collectChanges(uncommittedDepsFixture)
-    expect(changes).toStrictEqual(
-      Object.keys(uncommittedDepsFixture.workspace.baseline.data?.deps || {})
-        .map(dep => `deps:${dep}`)
-        .sort()
-    )
-  })
 })
 
 describe('collectChanges', () => {
@@ -516,6 +512,15 @@ describe('collectChanges', () => {
     }
   }
 
+  it('should mark new dep files as changes', () => {
+    const changes = collectChanges(uncommittedDepsFixture)
+    expect(changes).toStrictEqual(
+      Object.keys(uncommittedDepsFixture.workspace.baseline.data?.deps || {})
+        .map(dep => `deps:${dep}`)
+        .sort()
+    )
+  })
+
   it('should return the expected data from the output fixture', () => {
     const changes = collectChanges(outputFixture)
     expect(changes).toStrictEqual(workspaceChangesFixture)
@@ -532,12 +537,12 @@ describe('collectChanges', () => {
 
   it('should collect the changes between the current commit and the workspace', () => {
     const data: ExperimentsOutput = {
+      workspace: mockedExperimentData,
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: {
         baseline: {
           data: {}
         }
-      },
-      workspace: mockedExperimentData
+      }
     }
 
     expect(collectChanges(data)).toStrictEqual([
@@ -548,6 +553,201 @@ describe('collectChanges', () => {
       'params:params.yaml:seed',
       'params:params.yaml:weight_decay'
     ])
+  })
+
+  it('should not fail when the workspace does not have metrics but a previous commit does', () => {
+    const data: ExperimentsOutput = {
+      workspace: {
+        baseline: {
+          data: {
+            params: mockedExperimentData.baseline.data.params
+          }
+        }
+      },
+      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedExperimentData
+    }
+
+    expect(collectChanges(data)).toStrictEqual([])
+  })
+
+  const updateParams = (data: ValueTree) => ({
+    baseline: {
+      data: {
+        timestamp: null,
+        params: {
+          'params.yaml': {
+            data
+          }
+        },
+        status: ExperimentStatus.SUCCESS,
+        executor: null
+      }
+    }
+  })
+
+  it('should work for objects', () => {
+    expect(
+      collectChanges({
+        workspace: updateParams({
+          a: { b: 1, d: { e: 100 } }
+        }),
+        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
+          a: { b: 'c', d: { e: 'f' } }
+        })
+      })
+    ).toStrictEqual(['params:params.yaml:a.b', 'params:params.yaml:a.d.e'])
+
+    expect(
+      collectChanges({
+        workspace: updateParams({
+          a: { b: 'c', d: { e: 'f' } }
+        }),
+        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
+          a: { b: 'c', d: { e: 'f' } }
+        })
+      })
+    ).toStrictEqual([])
+  })
+
+  it('should work for arrays', () => {
+    expect(
+      collectChanges({
+        workspace: updateParams({
+          a: [1, 1]
+        }),
+        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
+          a: [1, 0]
+        })
+      })
+    ).toStrictEqual(['params:params.yaml:a'])
+
+    expect(
+      collectChanges({
+        workspace: updateParams({
+          a: [1, 0]
+        }),
+        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
+          a: [1, 0]
+        })
+      })
+    ).toStrictEqual([])
+  })
+
+  it('should work for nested arrays', () => {
+    expect(
+      collectChanges({
+        workspace: updateParams({
+          a: { b: [1, 1] }
+        }),
+        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
+          a: { b: [1, 0] }
+        })
+      })
+    ).toStrictEqual(['params:params.yaml:a.b'])
+
+    expect(
+      collectChanges({
+        workspace: updateParams({
+          a: { b: [1, 0] }
+        }),
+        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
+          a: { b: [1, 0] }
+        })
+      })
+    ).toStrictEqual([])
+  })
+
+  it('should work for missing nested arrays', () => {
+    expect(
+      collectChanges({
+        workspace: {
+          baseline: {
+            data: {
+              timestamp: null,
+              status: ExperimentStatus.SUCCESS,
+              executor: null
+            }
+          }
+        },
+        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
+          a: { b: [1, 0] }
+        })
+      })
+    ).toStrictEqual([])
+
+    expect(
+      collectChanges({
+        workspace: updateParams({
+          a: { b: [1, 0] }
+        }),
+        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': {
+          baseline: {
+            data: {
+              timestamp: null,
+              status: ExperimentStatus.SUCCESS,
+              executor: null
+            }
+          }
+        }
+      })
+    ).toStrictEqual(['params:params.yaml:a.b'])
+  })
+
+  it('should handle when a parameter has a null value', () => {
+    const nullParam = {
+      param_tuning: {
+        logistic_regression: null
+      }
+    }
+
+    expect(
+      collectChanges({
+        workspace: updateParams(nullParam),
+        '9c6ba26745d2fbc286a13b99011d5126b5a245dc': updateParams(nullParam)
+      })
+    ).toStrictEqual([])
+
+    expect(
+      collectChanges({
+        workspace: updateParams(nullParam),
+        '9c6ba26745d2fbc286a13b99011d5126b5a245dc': updateParams({
+          param_tuning: {
+            logistic_regression: 1
+          }
+        })
+      })
+    ).toStrictEqual(['params:params.yaml:param_tuning.logistic_regression'])
+  })
+
+  it('should compare against the most recent commit', () => {
+    const matchingParams = {
+      lr: 0.1
+    }
+    const differingParams = {
+      lr: 10000000
+    }
+
+    const data = {
+      workspace: updateParams(matchingParams),
+      '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams(matchingParams),
+      '1987d9de990090d73cf2afd73e6889d182585bf3': updateParams(differingParams),
+      '3d7fcb87062d136a2025f8c302312abe9593edf8': updateParams(differingParams)
+    }
+    expect(collectChanges(data)).toStrictEqual([])
+  })
+
+  it('should not fail when there is no commit data', () => {
+    const data: ExperimentsOutput = {
+      workspace: {
+        baseline: {
+          data: {
+            params: mockedExperimentData.baseline.data.params
+          }
+        }
+      }
+    }
+
+    expect(collectChanges(data)).toStrictEqual([])
   })
 
   it('should collect the changes between the current commit and the workspace when the values are nested', () => {

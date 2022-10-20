@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import styles from './styles.module.scss'
-import { TableHead } from './TableHead'
+import { TableHead } from './header/TableHead'
 import { InstanceProp, RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { TableBody } from './TableBody'
@@ -61,7 +61,10 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
   )
 
   return (
-    <div className={styles.tableContainer}>
+    <div
+      className={styles.tableContainer}
+      style={{ '--table-head-height': `${tableHeadHeight}px` } as CSSProperties}
+    >
       <div
         {...getTableProps({
           className: cx(

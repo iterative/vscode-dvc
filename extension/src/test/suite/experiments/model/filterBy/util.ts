@@ -1,6 +1,6 @@
 import { stub } from 'sinon'
 import { commands, QuickPickItem, window } from 'vscode'
-import columnsFixture from '../../../../fixtures/expShow/columns'
+import columnsFixture from '../../../../fixtures/expShow/base/columns'
 import { FilterDefinition } from '../../../../../experiments/model/filterBy'
 import { experimentsUpdatedEvent } from '../../../util'
 import { Experiments } from '../../../../../experiments'

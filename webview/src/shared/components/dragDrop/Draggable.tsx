@@ -15,6 +15,7 @@ export interface DraggableProps {
   onDrop: DragFunction
   onDragStart: DragFunction
   onDragEnter: DragFunction
+  onDragEnd: DragFunction
 }
 
 export const Draggable: React.FC<DraggableProps> = ({
@@ -25,7 +26,8 @@ export const Draggable: React.FC<DraggableProps> = ({
   dropTarget,
   onDrop,
   onDragEnter,
-  onDragStart
+  onDragStart,
+  onDragEnd
 }) => {
   const groupState = useSelector(
     (state: ExperimentsState) => state.dragAndDrop.groups[group] || {}
@@ -56,7 +58,7 @@ export const Draggable: React.FC<DraggableProps> = ({
   }
 
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    if (!disabled && draggedId) {
+    if (draggedId) {
       const { id } = e.currentTarget
 
       if (id !== draggedId && id !== draggedOverId) {
@@ -70,7 +72,7 @@ export const Draggable: React.FC<DraggableProps> = ({
     e.preventDefault()
   }
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (e: DragEvent<HTMLElement>) => {
     dispatch(
       setGroup({
         group: {
@@ -81,12 +83,14 @@ export const Draggable: React.FC<DraggableProps> = ({
         id: group
       })
     )
+    onDragEnd(e)
   }
 
   if (dropTarget && id === draggedOverId) {
     return (
       <DropTarget
         onDragOver={handleDragOver}
+        onDragEnd={onDragEnd}
         onDrop={onDrop}
         id={id}
         key="drop-target"

@@ -6,12 +6,14 @@ import {
   isQueued
 } from 'dvc/src/experiments/webview/contract'
 import { Indicator } from './Indicators'
+import { addStarredFilter, openPlotsWebview } from './messages'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
 import { clickAndEnterProps } from '../../../util/props'
 import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 
 export type CellRowActionsProps = {
+  isWorkspace: boolean
   bulletColor?: string
   isRowSelected: boolean
   showSubRowStates: boolean
@@ -28,12 +30,13 @@ export type CellRowActionsProps = {
 }
 
 export type CellRowActionProps = {
+  tooltipOffset?: [number, number]
   showSubRowStates: boolean
   subRowsAffected: number
   children: React.ReactElement
   hidden?: boolean
   testId?: string
-  tooltipContent: string
+  tooltipContent: string | React.ReactElement
   queued?: boolean
   onClick?: MouseEventHandler
 }
@@ -45,12 +48,16 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   hidden,
   testId,
   tooltipContent,
+  tooltipOffset,
   onClick
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
   return (
-    <CellHintTooltip tooltipContent={tooltipContent}>
+    <CellHintTooltip
+      tooltipContent={tooltipContent}
+      tooltipOffset={tooltipOffset}
+    >
       <div
         className={cx(styles.rowActions, hidden && styles.hidden)}
         data-testid={testId}
@@ -63,17 +70,32 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   )
 }
 
-const getTooltipContent = (
-  determiner: boolean,
-  action: string,
-  helperText?: string
-): string =>
-  'Click to ' +
-  (determiner ? `un${action}` : action) +
-  (helperText ? `\n${helperText}` : '')
+const getTooltipContent = (determiner: boolean, action: string): string =>
+  'Click to ' + (determiner ? `un${action}` : action)
+
+type ClickableTooltipContentProps = {
+  clickableText: string
+  helperText: string
+  onClick: MouseEventHandler
+}
+
+const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
+  clickableText,
+  helperText,
+  onClick
+}) => (
+  <span>
+    {helperText}
+    <br />
+    <button className={styles.buttonAsLink} onClick={onClick}>
+      {clickableText}
+    </button>
+  </span>
+)
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   bulletColor,
+  isWorkspace,
   status,
   toggleExperiment,
   isRowSelected,
@@ -100,11 +122,13 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
         testId={'row-action-star'}
-        tooltipContent={getTooltipContent(
-          !!starred,
-          'star',
-          'To filter by stars click the star icon above the filters tree\nor use "DVC: Filter Experiments Table to Starred" from the command palette.'
-        )}
+        tooltipContent={
+          <ClickableTooltipContent
+            clickableText={'Filter experiments by starred'}
+            onClick={addStarredFilter}
+            helperText={getTooltipContent(!!starred, 'star')}
+          />
+        }
       >
         <div
           className={styles.starSwitch}
@@ -128,11 +152,14 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           showSubRowStates={showSubRowStates}
           subRowsAffected={plotSelections}
           testId={'row-action-plot'}
-          tooltipContent={getTooltipContent(
-            !!bulletColor,
-            'plot',
-            'To open the plots view click the plot icon in the top left corner\nor use "DVC: Show Plots" from the command palette.'
-          )}
+          tooltipOffset={isWorkspace ? [0, -16] : undefined}
+          tooltipContent={
+            <ClickableTooltipContent
+              clickableText={'Open the plots view'}
+              helperText={getTooltipContent(!!bulletColor, 'plot')}
+              onClick={openPlotsWebview}
+            />
+          }
           onClick={toggleExperiment}
         >
           <span className={styles.bullet} style={{ color: bulletColor }} />

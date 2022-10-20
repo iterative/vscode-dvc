@@ -4,21 +4,20 @@ import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
 import { copyOriginalColors } from './status/colors'
 import { Operator } from './filterBy'
-import outputFixture from '../../test/fixtures/expShow/output'
-import rowsFixture from '../../test/fixtures/expShow/rows'
-import {
-  deeplyNestedOutput,
-  rows as deeplyNestedRows
-} from '../../test/fixtures/expShow/deeplyNested'
-import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps'
+import outputFixture from '../../test/fixtures/expShow/base/output'
+import rowsFixture from '../../test/fixtures/expShow/base/rows'
+import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
+import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
+import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
 import { buildMockMemento } from '../../test/util'
 import { buildMetricOrParamPath } from '../columns/paths'
 import { Experiment, ColumnType } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
-import {
-  dataTypesOutput,
-  rows as dataTypesRows
-} from '../../test/fixtures/expShow/dataTypes'
+import dataTypesRowsFixture from '../../test/fixtures/expShow/dataTypes/rows'
+import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output'
+import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
+import survivalRowsFixture from '../../test/fixtures/expShow/survival/rows'
+
 import { ExperimentStatus } from '../../cli/dvc/contract'
 
 jest.mock('vscode')
@@ -76,6 +75,13 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
+  })
+
+  it('should return the expected rows when given the survival fixture', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(survivalOutputFixture)
+
+    expect(model.getRowData()).toStrictEqual(survivalRowsFixture)
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -166,14 +172,14 @@ describe('ExperimentsModel', () => {
 
   it('should return the expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(deeplyNestedOutput)
-    expect(model.getRowData()).toStrictEqual(deeplyNestedRows)
+    model.transformAndSet(deeplyNestedOutputFixture)
+    expect(model.getRowData()).toStrictEqual(deeplyNestedRowsFixture)
   })
 
   it('should return the expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(dataTypesOutput)
-    expect(model.getRowData()).toStrictEqual(dataTypesRows)
+    model.transformAndSet(dataTypesOutputFixture)
+    expect(model.getRowData()).toStrictEqual(dataTypesRowsFixture)
   })
 
   it('should continue to apply filters to new data if selection mode is set to use filters', () => {

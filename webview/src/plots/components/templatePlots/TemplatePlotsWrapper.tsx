@@ -1,4 +1,4 @@
-import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
+import { Section } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { TemplatePlots } from './TemplatePlots'
@@ -12,7 +12,7 @@ export const TemplatePlotsWrapper: React.FC = () => {
     (state: PlotsState) => state.template
   )
 
-  const handleResize = (size: PlotSize) => {
+  const handleResize = (size: number) => {
     dispatch(changeSize(size))
   }
 

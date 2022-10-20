@@ -1,8 +1,7 @@
-import { PlotSize } from 'dvc/src/plots/webview/contract'
 import { useCallback, useEffect, useState } from 'react'
 import { DEFAULT_NB_ITEMS_PER_ROW, getNbItemsPerRow } from '../components/util'
 
-export const useNbItemsPerRow = (size: PlotSize) => {
+export const useNbItemsPerRow = (size: number) => {
   const [nbItemsPerRow, setNbItemsPerRow] = useState(DEFAULT_NB_ITEMS_PER_ROW)
 
   const changeNbItemsPerRow = useCallback(

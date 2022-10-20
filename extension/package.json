@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.5.1",
+  "version": "0.5.5",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1412,7 +1412,7 @@
             },
             "completionEvents": [
               "onLink:https://github.com/iterative/example-get-started",
-              "onLink:https://github.com/iterative/vscode-dvc/tree/main/demo",
+              "onLink:https://github.com/iterative/vscode-dvc-demo",
               "onLink:https://dvc.org/doc/dvclive"
             ]
           },
@@ -1524,12 +1524,10 @@
     "format": "prettier --write '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:prettier": "prettier -c '**/*.{js,json,jsx,md,scss,ts,tsx,yaml,yml}'",
     "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
-    "lint:tsc": "tsc --noEmit",
-    "lint": "run-p 'lint:*'",
+    "lint:build": "tsc -p .",
     "dev": "shx rm -rf dist && tsc -watch -p ./",
     "build": "yarn webpack --mode production",
     "package": "node ./scripts/ensureYarnLock.js && yarn run vsce package --yarn -o ./dvc.vsix",
-    "test-build": "tsc -p .",
     "test-vscode": "node ./dist/test/runTest.js",
     "test-e2e": "wdio run ./src/test/e2e/wdio.conf.ts",
     "test": "jest --collect-coverage",
@@ -1554,7 +1552,7 @@
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
-    "@swc/core": "1.3.6",
+    "@swc/core": "1.3.7",
     "@swc/jest": "0.2.23",
     "@types/chai": "4.3.3",
     "@types/chai-as-promised": "7.1.5",
@@ -1570,7 +1568,7 @@
     "@types/lodash.omit": "4.5.7",
     "@types/mocha": "10.0.0",
     "@types/mock-require": "2.0.1",
-    "@types/node": "16.11.64",
+    "@types/node": "16.11.65",
     "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.8",
     "@types/uuid": "8.3.4",

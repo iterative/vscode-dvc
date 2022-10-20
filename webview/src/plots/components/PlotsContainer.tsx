@@ -1,6 +1,12 @@
 import cx from 'classnames'
-import React, { MouseEvent, useEffect, useState } from 'react'
-import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
+import React, {
+  MouseEvent,
+  useEffect,
+  useState,
+  DetailedHTMLProps,
+  HTMLAttributes
+} from 'react'
+import { Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import { SizePicker } from './SizePicker'
@@ -18,16 +24,17 @@ import {
   Lines
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
+import { EventTargetWithNodeName } from '../../util/objects'
 
 export interface CommonPlotsContainerProps {
-  onResize: (size: PlotSize) => void
+  onResize: (size: number) => void
 }
 
 export interface PlotsContainerProps extends CommonPlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: Section
   title: string
-  currentSize: PlotSize
+  currentSize: number
   menu?: PlotsPickerProps
   children: React.ReactNode
 }
@@ -35,17 +42,40 @@ export interface PlotsContainerProps extends CommonPlotsContainerProps {
 export const SectionDescription = {
   // "Trends"
   [Section.CHECKPOINT_PLOTS]: (
-    <span>Real-time plots based on metrics from the Experiments Table</span>
+    <span data-testid="tooltip-checkpoint-plots">
+      Automatically generated and updated linear plots that show metric value
+      per epoch if{' '}
+      <a href="https://dvc.org/doc/user-guide/experiment-management/checkpoints">
+        checkpoints
+      </a>{' '}
+      are enabled.
+    </span>
   ),
   // "Images"
   [Section.COMPARISON_TABLE]: (
-    <span>Displays image plots side by side across experiments.</span>
+    <span data-testid="tooltip-comparison-plots">
+      Images (e.g. any <code>.jpg</code>, <code>.svg</code>, or
+      <code>.png</code> file) rendered side by side across experiments. They
+      should be registered as{' '}
+      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots">
+        plots
+      </a>
+      .
+    </span>
   ),
   // "Data Series"
   [Section.TEMPLATE_PLOTS]: (
-    <span>
-      Plots of JSON, YAML, CSV, or TSV files, visualized using `dvc plots`
-      templates
+    <span data-testid="tooltip-template-plots">
+      Any <code>JSON</code>, <code>YAML</code>, <code>CSV</code>, or{' '}
+      <code>TSV</code> file(s) with data points, visualized using{' '}
+      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots#plot-templates-data-series-only">
+        plot templates
+      </a>
+      . Either predefenined (e.g. confusion matrix, linear) or{' '}
+      <a href="https://dvc.org/doc/command-reference/plots/templates#custom-templates">
+        custom Vega-lite templates
+      </a>
+      .
     </span>
   )
 }
@@ -63,7 +93,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   currentSize,
   menu
 }) => {
-  const [size, setSize] = useState<PlotSize>(currentSize)
+  const [size, setSize] = useState<number>(currentSize || 400)
 
   const open = !sectionCollapsed
 
@@ -71,14 +101,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     window.dispatchEvent(new Event('resize'))
   }, [size])
 
-  const sizeClass = cx({
-    [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
-    [styles.smallPlots]: size === PlotSize.SMALL,
-    [styles.regularPlots]: size === PlotSize.REGULAR,
-    [styles.largePlots]: size === PlotSize.LARGE
-  })
-
-  const changeSize = (newSize: PlotSize) => {
+  const changeSize = (newSize: number) => {
     if (size === newSize) {
       return
     }
@@ -116,7 +139,10 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
-    if (!isSelecting([title, SectionDescription[sectionKey].props.children])) {
+    if (
+      !isSelecting([title, SectionDescription[sectionKey].props.children]) &&
+      !['A', 'BUTTON'].includes((e.target as EventTargetWithNodeName).nodeName)
+    ) {
       sendMessage({
         payload: {
           [sectionKey]: !sectionCollapsed
@@ -150,7 +176,21 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         </summary>
         <div>
           {open && (
-            <div className={sizeClass} data-testid="plots-wrapper">
+            <div
+              className={cx({
+                [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
+                [styles.smallPlots]: size < 300
+              })}
+              style={
+                {
+                  '--size': `${size}px`
+                } as DetailedHTMLProps<
+                  HTMLAttributes<HTMLDivElement>,
+                  HTMLDivElement
+                >
+              }
+              data-testid="plots-wrapper"
+            >
               {children}
             </div>
           )}

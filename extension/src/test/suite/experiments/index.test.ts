@@ -1,5 +1,5 @@
 import { join, resolve } from 'path'
-import { afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore, SinonStub } from 'sinon'
 import {
@@ -13,10 +13,10 @@ import {
 } from 'vscode'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
-import expShowFixture from '../../fixtures/expShow/output'
-import rowsFixture from '../../fixtures/expShow/rows'
-import columnsFixture from '../../fixtures/expShow/columns'
-import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
+import expShowFixture from '../../fixtures/expShow/base/output'
+import rowsFixture from '../../fixtures/expShow/base/rows'
+import columnsFixture from '../../fixtures/expShow/base/columns'
+import workspaceChangesFixture from '../../fixtures/expShow/base/workspaceChanges'
 import { Experiments } from '../../../experiments'
 import { ResourceLocator } from '../../../resourceLocator'
 import {
@@ -66,6 +66,9 @@ import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
+import { PlotSizeNumber } from '../../../plots/webview/contract'
+import { RegisteredCommands } from '../../../commands/external'
+import { ConfigKey } from '../../../vscode/config'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -171,6 +174,12 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('handleMessageFromWebview', () => {
+    after(() =>
+      workspace
+        .getConfiguration()
+        .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
+    )
+
     const setupExperimentsAndMockCommands = () => {
       const {
         columnsModel,
@@ -251,7 +260,7 @@ suite('Experiments Test Suite', () => {
       ).returns(undefined)
 
       const mockColumnId = 'params:params.yaml:lr'
-      const mockWidth = 400
+      const mockWidth = PlotSizeNumber.REGULAR
 
       mockMessageReceived.fire({
         payload: { id: mockColumnId, width: mockWidth },
@@ -882,9 +891,8 @@ suite('Experiments Test Suite', () => {
     it('should be able to handle a message to update the table depth', async () => {
       const { experiments } = buildExperiments(disposable, expShowFixture)
       const inputEvent = getInputBoxEvent('0')
-      const tableMaxDepthOption = 'dvc.experimentsTableHeadMaxHeight'
       const tableMaxDepthChanged = configurationChangeEvent(
-        tableMaxDepthOption,
+        ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT,
         disposable
       )
 
@@ -900,7 +908,7 @@ suite('Experiments Test Suite', () => {
       await tableMaxDepthChanged
 
       expect(
-        await workspace.getConfiguration().get(tableMaxDepthOption)
+        workspace.getConfiguration().get(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)
       ).to.equal(0)
       expect(mockSendTelemetryEvent).to.be.called
       expect(
@@ -947,6 +955,29 @@ suite('Experiments Test Suite', () => {
         areExperimentsStarred(experimentsToToggle),
         'experiments have been starred'
       ).to.be.true
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to handle a message to filter to starred experiments', async () => {
+      const { experiments } = setupExperimentsAndMockCommands()
+
+      const mockExecuteCommand = stub(commands, 'executeCommand')
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const messageReceived = new Promise(resolve =>
+        disposable.track(mockMessageReceived.event(() => resolve(undefined)))
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
+      })
+
+      await messageReceived
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
+        dvcDemoPath
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select experiments for plotting', async () => {
