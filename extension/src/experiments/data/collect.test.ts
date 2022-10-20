@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { collectFiles } from './collect'
 import { ExperimentsOutput, ExperimentStatus } from '../../cli/dvc/contract'
-import expShowFixture from '../../test/fixtures/expShow/output'
+import expShowFixture from '../../test/fixtures/expShow/base/output'
 
 describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {

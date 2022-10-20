@@ -1,8 +1,8 @@
-import { join } from '../../util/path'
-import { Row } from '../../../experiments/webview/contract'
-import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { shortenForLabel } from '../../../util/string'
-import { ExperimentStatus } from '../../../cli/dvc/contract'
+import { join } from '../../../util/path'
+import { Row } from '../../../../experiments/webview/contract'
+import { copyOriginalColors } from '../../../../experiments/model/status/colors'
+import { shortenForLabel } from '../../../../util/string'
+import { ExperimentStatus } from '../../../../cli/dvc/contract'
 
 const valueWithNoChanges = (str: string) => ({
   value: shortenForLabel(str),
