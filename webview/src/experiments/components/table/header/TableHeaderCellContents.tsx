@@ -102,7 +102,13 @@ export const TableHeaderCellContents: React.FC<{
       <div
         className={cx(styles.iconMenu, { [styles.moveToRight]: isTimestamp })}
       >
-        <IconMenu items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)} />
+        <IconMenu
+          items={getIconMenuItems(
+            sortEnabled && !column.placeholderOf,
+            sortOrder,
+            hasFilter
+          )}
+        />
       </div>
       <ColumnDragHandle
         column={column}

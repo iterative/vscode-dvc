@@ -64,18 +64,34 @@ export interface HeaderMenuDescription {
   menuEnabled: boolean
 }
 
-export const getMenuOptions = (
+export const getSortOptions = (
   column: HeaderGroup<Experiment> & { originalId?: string },
   sorts: SortDefinition[]
 ) => {
+  const isNotExperiments = column.id !== 'id'
   const isSortable =
-    !column.placeholderOf && column.id !== 'id' && !column.columns
+    isNotExperiments && (!column.columns || column.columns?.length === 1)
 
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
 
   const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
 
+  const sortOptions = isSortable
+    ? [
+        sortOption(SortOrder.ASCENDING, sortOrder, column.id),
+        sortOption(SortOrder.DESCENDING, sortOrder, column.id),
+        sortOption(SortOrder.NONE, sortOrder, column.id)
+      ]
+    : []
+
+  return { isSortable, sortOptions, sortOrder }
+}
+
+export const getMenuOptions = (
+  column: HeaderGroup<Experiment> & { originalId?: string },
+  sorts: SortDefinition[]
+) => {
   const menuOptions: MessagesMenuOptionProps[] = [
     {
       hidden: column.id === 'id',
@@ -104,13 +120,7 @@ export const getMenuOptions = (
     }
   ]
 
-  const sortOptions = isSortable
-    ? [
-        sortOption(SortOrder.ASCENDING, sortOrder, column.id),
-        sortOption(SortOrder.DESCENDING, sortOrder, column.id),
-        sortOption(SortOrder.NONE, sortOrder, column.id)
-      ]
-    : []
+  const { isSortable, sortOptions, sortOrder } = getSortOptions(column, sorts)
 
   const visibleOptions: number = menuOptions.filter(
     option => !option.hidden
