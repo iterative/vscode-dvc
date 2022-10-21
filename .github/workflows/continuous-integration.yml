@@ -24,6 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - name: Dump GitHub context
+        id: github_context_step
+        run: echo '${{ toJSON(github) }}'
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -60,6 +64,9 @@ jobs:
       - uses: paambaati/codeclimate-action@v3.2.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+          GITHUB_EVENT_NAME:
+            ${{ github.event_name == 'pull_request_target' && 'pull_request' ||
+            github.event_name }}
         with:
           coverageCommand: xvfb-run -a yarn run cover
           coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
