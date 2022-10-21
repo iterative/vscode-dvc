@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.6] - 2022-10-21
+
+### 🐛 Bug Fixes
+
+- Do not toggle plot section on tooltip click [#2642](https://github.com/iterative/vscode-dvc/pull/2642) by [@sroy3](https://github.com/sroy3)
+- Update packages to fix d3-color vulnerability [#2650](https://github.com/iterative/vscode-dvc/pull/2650) by [@sroy3](https://github.com/sroy3)
+- Update packages to fix minimatch vulnerability [#2651](https://github.com/iterative/vscode-dvc/pull/2651) by [@sroy3](https://github.com/sroy3)
+- Update packages to fix terser vulnerability [#2652](https://github.com/iterative/vscode-dvc/pull/2652) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Do not run build twice in CI [#2634](https://github.com/iterative/vscode-dvc/pull/2634) by [@mattseddon](https://github.com/mattseddon)
+- Add revisions to scheduled plots diff demo repo test (required for submodule to behave like a git repo) [#2639](https://github.com/iterative/vscode-dvc/pull/2639) by [@mattseddon](https://github.com/mattseddon)
+- Rearrange exp show fixtures [#2635](https://github.com/iterative/vscode-dvc/pull/2635) by [@mattseddon](https://github.com/mattseddon)
+- Add survival exp show test fixture [#2638](https://github.com/iterative/vscode-dvc/pull/2638) by [@mattseddon](https://github.com/mattseddon)
+- Remove undici yarn resolution [#2654](https://github.com/iterative/vscode-dvc/pull/2654) by [@sroy3](https://github.com/sroy3)
+
 ## [0.5.5] - 2022-10-20
 
 ### 🚀 New Features and Enhancements
