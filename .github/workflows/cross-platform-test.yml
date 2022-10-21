@@ -1,8 +1,5 @@
 name: Cross-Platform Test
 on:
-  push:
-    branches:
-      - main
   pull_request_target:
 
 concurrency:
@@ -41,16 +38,15 @@ jobs:
           cache: yarn
 
       - name: Turbo cache
-        if: ${{ github.ref_name != 'main' }}
         id: turbo-cache
         uses: actions/cache@v3
         with:
           path: node_modules/.cache/turbo
           key:
-            turbo-${{ runner.os }}-${{ github.job }}-${{ github.ref_name }}-${{
-            github.sha }}
+            turbo-${{ runner.os }}-${{ github.job }}-${{ github.head_ref }}-${{
+            github.event.pull_request.head.sha }}
           restore-keys: |
-            turbo-${{ runner.os }}-${{ github.job }}-${{ github.ref_name }}-
+            turbo-${{ runner.os }}-${{ github.job }}-${{ github.head_ref }}-
 
       - run: yarn install
 
