@@ -72,6 +72,7 @@
     "undici": "5.8.2",
     "trim": "1.0.1",
     "trim-newlines": "3.0.1",
-    "@types/react": "18.0.21"
+    "@types/react": "18.0.21",
+    "**/recursive-readdir/minimatch": "3.0.5"
   }
 }
