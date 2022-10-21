@@ -15,6 +15,9 @@ import { Experiment, ColumnType } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import dataTypesRowsFixture from '../../test/fixtures/expShow/dataTypes/rows'
 import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output'
+import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
+import survivalRowsFixture from '../../test/fixtures/expShow/survival/rows'
+
 import { ExperimentStatus } from '../../cli/dvc/contract'
 
 jest.mock('vscode')
@@ -72,6 +75,13 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
+  })
+
+  it('should return the expected rows when given the survival fixture', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(survivalOutputFixture)
+
+    expect(model.getRowData()).toStrictEqual(survivalRowsFixture)
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity

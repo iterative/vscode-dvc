@@ -7,6 +7,7 @@ import columnsFixture from 'dvc/src/test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/base/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
+import survivalTableData from 'dvc/src/test/fixtures/expShow/survival/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
 import {
   ExperimentStatus,
@@ -125,6 +126,11 @@ const Template: Story<{ tableData: TableDataState }> = ({ tableData }) => {
 }
 
 export const WithData = Template.bind({})
+
+export const WithSurvivalData = Template.bind({})
+WithSurvivalData.args = {
+  tableData: { ...survivalTableData, hasData: true }
+}
 
 export const WithMiddleStates = Template.bind({})
 const tableDataWithSomeSelectedExperiments = setExperimentsAsSelected(
