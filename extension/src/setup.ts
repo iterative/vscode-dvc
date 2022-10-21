@@ -164,9 +164,9 @@ export const setup = async (extension: IExtension) => {
   const { isAvailable, isCompatible } = await extensionCanRunCli(extension, cwd)
 
   extension.setCliCompatible(isCompatible)
+  extension.setAvailable(isAvailable)
 
   if (extension.hasRoots() && isAvailable) {
-    extension.setAvailable(isAvailable)
     return extension.initialize()
   }
 
