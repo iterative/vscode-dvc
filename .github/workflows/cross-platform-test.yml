@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo ✓
+      - run: echo "some more garbage you won't see"
 
   suite:
     needs: authorize
