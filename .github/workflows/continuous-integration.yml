@@ -5,6 +5,17 @@ on:
       - main
   pull_request_target:
 
+env:
+  SHA:
+    ${{ github.event_name == 'pull_request_target' &&
+    github.event.pull_request.head.sha || github.sha }}
+  REF:
+    ${{ github.event_name == 'pull_request_target' &&
+    github.event.pull_request.head.ref || github.ref }}
+  REF_NAME:
+    ${{ github.event_name == 'pull_request_target' && github.head_ref ||
+    github.ref_name }}
+
 concurrency:
   group: continuous-integration-${{ github.head_ref }}
   cancel-in-progress: true
@@ -15,6 +26,7 @@ jobs:
       ${{ (github.event_name == 'pull_request_target' &&
       github.event.pull_request.head.repo.full_name != github.repository) &&
       'external' || 'internal' }}
+
     runs-on: ubuntu-latest
     steps:
       - run: echo ✓
@@ -24,10 +36,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Dump GitHub context
-        id: github_context_step
-        run: echo '${{ toJSON(github) }}'
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -48,14 +56,14 @@ jobs:
           cache: 'yarn'
 
       - name: Turbo cache
-        if: ${{ github.ref_name != 'main' }}
+        if: ${{ env.REF_NAME != 'main' }}
         id: turbo-cache
         uses: actions/cache@v3
         with:
           path: node_modules/.cache/turbo
-          key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
+          key: turbo-${{ github.job }}-${{ env.REF_NAME }}-${{ github.sha }}
           restore-keys: |
-            turbo-${{ github.job }}-${{ github.ref_name }}-
+            turbo-${{ github.job }}-${{ env.REF_NAME }}-
 
       - run: yarn run install-frozen-lockfile
 
@@ -64,9 +72,8 @@ jobs:
       - uses: paambaati/codeclimate-action@v3.2.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-          GITHUB_EVENT_NAME:
-            ${{ github.event_name == 'pull_request_target' && 'pull_request' ||
-            github.event_name }}
+          GITHUB_SHA: ${{ env.SHA }}
+          GITHUB_REF: ${{ env.REF }}
         with:
           coverageCommand: xvfb-run -a yarn run cover
           coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
