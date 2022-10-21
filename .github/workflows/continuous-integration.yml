@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo ✓
+      - run: echo "some garbage you won't see"
 
   build:
     needs: authorize
