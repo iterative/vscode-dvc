@@ -61,7 +61,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules/.cache/turbo
-          key: turbo-${{ github.job }}-${{ env.REF_NAME }}-${{ github.sha }}
+          key: turbo-${{ github.job }}-${{ env.REF_NAME }}-${{ env.SHA }}
           restore-keys: |
             turbo-${{ github.job }}-${{ env.REF_NAME }}-
 
