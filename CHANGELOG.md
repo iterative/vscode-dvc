@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.7] - 2022-10-22
+
+### 🐛 Bug Fixes
+
+- Set CLI as available for project initialization purposes [#2661](https://github.com/iterative/vscode-dvc/pull/2661) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.6] - 2022-10-21
 
 ### 🐛 Bug Fixes
