@@ -787,6 +787,27 @@ describe('App', () => {
         fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
       }
     })
+
+    it('should have the same options in the empty placeholders of the Experiment column', () => {
+      renderTableWithPlaceholder()
+      const header = screen.getByTestId('header-id')
+      const placeholders = screen.getAllByTestId(/header-id.+placeholder/)
+      const entireColumn = [header, ...placeholders]
+
+      expect(entireColumn).toHaveLength(5)
+
+      for (const segment of entireColumn) {
+        fireEvent.contextMenu(segment, { bubbles: true })
+        jest.advanceTimersByTime(100)
+        const menuitems = screen
+          .getAllByRole('menuitem')
+          .map(item => item.textContent)
+
+        expect(menuitems).toStrictEqual(['Set Max Header Height'])
+
+        fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
+      }
+    })
   })
 
   describe('Row Context Menu', () => {

@@ -21,6 +21,10 @@ const possibleOrders = {
   undefined: SortOrder.NONE
 } as const
 
+const isFromExperimentColumn = (column: HeaderGroup<Experiment>) => {
+  return column.id === 'id' || column.id.startsWith('id_placeholder')
+}
+
 export const sortOption = (
   label: SortOrder,
   currentSort: SortOrder,
@@ -68,7 +72,7 @@ export const getSortOptions = (
   column: HeaderGroup<Experiment> & { originalId?: string },
   sorts: SortDefinition[]
 ) => {
-  const isNotExperiments = column.id !== 'id'
+  const isNotExperiments = !isFromExperimentColumn(column)
   const isSortable =
     isNotExperiments && (!column.columns || column.columns?.length === 1)
 
@@ -94,7 +98,7 @@ export const getMenuOptions = (
 ) => {
   const menuOptions: MessagesMenuOptionProps[] = [
     {
-      hidden: column.id === 'id',
+      hidden: isFromExperimentColumn(column),
       id: 'hide-column',
       label: 'Hide Column',
       message: {
