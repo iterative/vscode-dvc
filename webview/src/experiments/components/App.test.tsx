@@ -761,6 +761,32 @@ describe('App', () => {
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
+
+    it('should have the same options in the empty placeholders', () => {
+      renderTableWithPlaceholder()
+      const header = screen.getByTestId('header-Created')
+      const placeholders = screen.getAllByTestId(/header-Created.+placeholder/)
+      const entireColumn = [header, ...placeholders]
+
+      expect(entireColumn).toHaveLength(5)
+
+      for (const segment of entireColumn) {
+        fireEvent.contextMenu(segment, { bubbles: true })
+        jest.advanceTimersByTime(100)
+        const menuitems = screen
+          .getAllByRole('menuitem')
+          .map(item => item.textContent)
+
+        expect(menuitems).toStrictEqual([
+          'Hide Column',
+          'Set Max Header Height',
+          'Sort Ascending',
+          'Sort Descending'
+        ])
+
+        fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
+      }
+    })
   })
 
   describe('Row Context Menu', () => {
