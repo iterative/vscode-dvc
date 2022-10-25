@@ -1,8 +1,11 @@
 import cx from 'classnames'
-import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
+import { Section, TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
+import { changeDisabledDragIds, changeSize } from './templatePlotsSlice'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
   DragDropContainer,
@@ -13,6 +16,8 @@ import { withScale } from '../../../util/styles'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
 import { ZoomablePlot } from '../ZoomablePlot'
+import { PlotsState } from '../../store'
+import { sendMessage } from '../../../shared/vscode'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
@@ -42,22 +47,28 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   nbItemsPerRow,
   parentDraggedOver
 }) => {
+  const dispatch = useDispatch()
   const [order, setOrder] = useState<string[]>([])
-  const [disabledDrag, setDisabledDrag] = useState('')
+  const maxSize = useSelector((state: PlotsState) => state.webview.maxPlotSize)
+
+  const disabledDragPlotIds = useSelector(
+    (state: PlotsState) => state.template.disabledDragPlotIds
+  )
+  const currentSize = useSelector((state: PlotsState) => state.template.size)
+  const lockedinSize = useRef(currentSize)
 
   const addDisabled = useCallback(
     (e: Event) => {
-      setDisabledDrag(
-        (e.currentTarget as HTMLFormElement).parentElement?.parentElement
-          ?.parentElement?.id || ''
-      )
+      const disabledId = (e.currentTarget as HTMLFormElement).parentElement
+        ?.parentElement?.parentElement?.id
+      dispatch(changeDisabledDragIds(disabledId ? [disabledId] : []))
     },
-    [setDisabledDrag]
+    [dispatch]
   )
 
   const removeDisabled = useCallback(() => {
-    setDisabledDrag('')
-  }, [setDisabledDrag])
+    dispatch(changeDisabledDragIds([]))
+  }, [dispatch])
 
   const disableClick = useCallback((e: Event) => {
     e.stopPropagation()
@@ -106,11 +117,29 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     [styles.multiViewPlot]: multiView
   })
 
-  const items = reorderedItems.map((plot: TemplatePlotEntry, i) => {
+  const resizePlots = useCallback(
+    (diff: number) => {
+      const newSize = Math.abs(Math.min(lockedinSize.current + diff, maxSize))
+
+      dispatch(changeSize(newSize))
+      sendMessage({
+        payload: { section: Section.TEMPLATE_PLOTS, size: newSize },
+        type: MessageFromWebviewType.RESIZE_PLOTS
+      })
+    },
+    [dispatch, maxSize]
+  )
+
+  const items = reorderedItems.map((plot: TemplatePlotEntry) => {
     const { id, content, multiView, revisions } = plot
     const nbRevisions = (multiView && revisions?.length) || 1
-    const isLastOfRow = nbItemsPerRow / (i + 1) === 1
-    const isLastRow = i + 1 >= reorderedItems.length - nbItemsPerRow
+
+    const toggleDrag = (enabled: boolean) => {
+      dispatch(changeDisabledDragIds(enabled ? [] : [id]))
+      if (enabled) {
+        lockedinSize.current = currentSize
+      }
+    }
 
     return (
       <div
@@ -124,8 +153,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           id={id}
           spec={{ ...content, ...autoSize } as VisualizationSpec}
           onViewReady={addEventsOnViewReady}
-          showVerticalResizer={!isLastOfRow}
-          showHorizontalResizer={!isLastRow}
+          toggleDrag={toggleDrag}
+          onResize={resizePlots}
         />
       </div>
     )
@@ -148,7 +177,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           : undefined
       }
       parentDraggedOver={parentDraggedOver}
-      disabledDropIds={[disabledDrag]}
+      disabledDropIds={disabledDragPlotIds}
     />
   )
 }

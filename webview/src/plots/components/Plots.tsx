@@ -6,7 +6,7 @@ import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
-import { setZoomedInPlot } from './webviewSlice'
+import { setMaxPlotSize, setZoomedInPlot } from './webviewSlice'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -52,8 +52,12 @@ const PlotsContent = () => {
     )
   }
 
+  const setContainerMaxSize = (node: HTMLDivElement) => {
+    node && dispatch(setMaxPlotSize(node.getBoundingClientRect().width - 40))
+  }
+
   return (
-    <>
+    <div ref={setContainerMaxSize}>
       <Ribbon />
       <TemplatePlotsWrapper />
       <ComparisonTableWrapper />
@@ -68,7 +72,7 @@ const PlotsContent = () => {
           <ZoomedInPlot props={zoomedInPlot.plot} />
         </Modal>
       )}
-    </>
+    </div>
   )
 }
 

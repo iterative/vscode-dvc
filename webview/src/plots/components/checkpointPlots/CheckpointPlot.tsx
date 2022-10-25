@@ -1,7 +1,8 @@
 import { ColorScale } from 'dvc/src/plots/webview/contract'
 import React, { useMemo, useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { createSpec } from './util'
+import { changeDisabledDragIds, changeSize } from './checkpointPlotsSlice'
 import { ZoomablePlot } from '../ZoomablePlot'
 import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
@@ -11,20 +12,18 @@ import { PlotsState } from '../../store'
 interface CheckpointPlotProps {
   id: string
   colors: ColorScale
-  isLastOfRow?: boolean
-  isLastRow?: boolean
 }
 
 export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   id,
-  colors,
-  isLastOfRow,
-  isLastRow
+  colors
 }) => {
+  const dispatch = useDispatch()
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
   const [plot, setPlot] = useState(plotDataStore.checkpoint[id])
+  const currentSize = useSelector((state: PlotsState) => state.checkpoint.size)
   const spec = useMemo(() => {
     const title = plot?.title
     if (!title) {
@@ -45,14 +44,22 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
 
   const key = `plot-${id}`
 
+  const toggleDrag = (enabled: boolean) => {
+    dispatch(changeDisabledDragIds(enabled ? [] : [id]))
+  }
+
+  const resizePlots = (diff: number) => {
+    dispatch(changeSize(currentSize + diff))
+  }
+
   return (
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot
         spec={spec}
         data={{ values }}
         id={key}
-        showVerticalResizer={!isLastOfRow}
-        showHorizontalResizer={!isLastRow}
+        toggleDrag={toggleDrag}
+        onResize={resizePlots}
       />
     </div>
   )

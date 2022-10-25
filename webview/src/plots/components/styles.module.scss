@@ -42,6 +42,8 @@ $gap: 20px;
 
 .plotsWrapper {
   width: 100%;
+  overflow-y: hidden;
+  overflow-x: visible;
 }
 
 :global(.vega-bindings):not(:empty) {
@@ -86,24 +88,29 @@ $gap: 20px;
 .multiViewPlotsGrid {
   width: 100%;
   height: max-content;
+  overflow-y: hidden;
+  overflow-x: visible;
 
   + .singleViewPlotsGrid,
   + .multiViewPlotsGrid {
     margin-top: $gap;
   }
 }
+.plotsGridWrapper {
+  width: 100%;
+}
 
 :global(.ReactVirtualized__Grid__innerScrollContainer),
 .noBigGrid {
   width: calc(100% - $gap * 2) !important;
-  max-width: none !important;
+  max-width: 100%;
   max-height: none !important;
   height: auto !important;
   margin-left: $gap;
   display: grid;
   gap: $gap;
   grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fill, minmax(var(--size), 1fr));
+  grid-template-columns: repeat(auto-fill, var(--size));
 
   + .singleViewPlotsGrid,
   + .multiViewPlotsGrid {
@@ -160,19 +167,24 @@ $gap: 20px;
 
 .plotHorizontalResizer,
 .plotVerticalResizer {
-  background-color: $fg-color;
   opacity: 0.5;
   position: absolute;
 
   &:hover {
     opacity: 1;
   }
+
+  &::after {
+    content: '';
+    background-color: $fg-color;
+    position: absolute;
+  }
 }
 
 .plotHorizontalResizer {
-  height: 1px;
-  width: calc(100% + $gap);
-  bottom: -10px;
+  height: 3px;
+  width: 100%;
+  bottom: -11px;
   left: 0;
   cursor: row-resize;
 
@@ -180,11 +192,18 @@ $gap: 20px;
     width: 10000px;
     left: -5000px;
   }
+
+  &::after {
+    width: 100%;
+    height: 1px;
+    left: 0;
+    top: 1px;
+  }
 }
 
 .plotVerticalResizer {
-  width: 1px;
-  height: calc(100% + $gap);
+  width: 3px;
+  height: 100%;
   right: -10px;
   top: 0;
   cursor: col-resize;
@@ -192,6 +211,13 @@ $gap: 20px;
   &:hover {
     height: 10000px;
     top: -5000px;
+  }
+
+  &::after {
+    width: 1px;
+    height: 100%;
+    top: 0;
+    right: 1px;
   }
 }
 
