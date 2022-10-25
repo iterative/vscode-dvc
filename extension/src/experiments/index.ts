@@ -305,7 +305,11 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 
-    const selected = await pickExperiments(experiments, this.hasCheckpoints())
+    const selected = await pickExperiments(
+      experiments,
+      this.hasCheckpoints(),
+      this.columns.getFirstThreeColumnOrder()
+    )
     if (!selected) {
       return
     }

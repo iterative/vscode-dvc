@@ -1,5 +1,6 @@
 import { QuickPickItemKind } from 'vscode'
 import omit from 'lodash.omit'
+import get from 'lodash.get'
 import { ExperimentWithCheckpoints } from '.'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { definedAndNonEmpty } from '../../util/array'
@@ -10,6 +11,8 @@ import {
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
+import { splitColumnPath } from '../columns/paths'
+import { formatDate } from '../../util/date'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -22,7 +25,23 @@ const getSeparator = (experiment: Experiment) => ({
   value: undefined
 })
 
-const getItem = (experiment: Experiment) => ({
+const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
+  detail: firstThreeColumnOrder
+    .map(name => {
+      const splitUpName = splitColumnPath(name)
+      const collectedVal = get(experiment, splitUpName)
+      if (!collectedVal) {
+        return null
+      }
+      const value =
+        name === 'Created'
+          ? formatDate(collectedVal)
+          : collectedVal?.value || collectedVal
+
+      return `${splitUpName[splitUpName.length - 1]}:${value}`
+    })
+    .filter(Boolean)
+    .join(' '),
   label: experiment.label,
   value: omit(experiment, 'checkpoints')
 })
@@ -30,9 +49,10 @@ const getItem = (experiment: Experiment) => ({
 const collectItem = (
   acc: QuickPickItemAccumulator,
   experiment: Experiment,
+  firstThreeColumnOrder: string[],
   transformer = getItem
 ) => {
-  const item = transformer(experiment)
+  const item = transformer(experiment, firstThreeColumnOrder)
   acc.items.push(item)
   if (experiment.selected) {
     acc.selectedItems.push(item)
@@ -42,43 +62,55 @@ const collectItem = (
 
 const collectFromExperiment = (
   acc: QuickPickItemAccumulator,
-  experiment: ExperimentWithCheckpoints
+  experiment: ExperimentWithCheckpoints,
+  firstThreeColumnOrder: string[]
 ): void => {
   if (experiment.checkpoints) {
     acc.items.push(getSeparator(experiment))
   }
 
-  collectItem(acc, experiment)
+  collectItem(acc, experiment, firstThreeColumnOrder)
 
   for (const checkpoint of experiment.checkpoints || []) {
-    collectItem(acc, checkpoint)
+    collectItem(acc, checkpoint, firstThreeColumnOrder)
   }
 }
 
-const collectCheckpointItems = (experiments: ExperimentWithCheckpoints[]) => {
+const collectCheckpointItems = (
+  experiments: ExperimentWithCheckpoints[],
+  firstThreeColumnOrder: string[]
+) => {
   const acc: QuickPickItemAccumulator = {
     items: [],
     selectedItems: []
   }
 
   for (const experiment of experiments) {
-    collectFromExperiment(acc, experiment)
+    collectFromExperiment(acc, experiment, firstThreeColumnOrder)
   }
 
   return acc
 }
 
-const collectExperimentOnlyItems = (experiments: Experiment[]) => {
+const collectExperimentOnlyItems = (
+  experiments: Experiment[],
+  firstThreeColumnOrder: string[]
+) => {
   const acc: QuickPickItemAccumulator = {
     items: [],
     selectedItems: []
   }
 
   for (const experiment of experiments) {
-    collectItem(acc, experiment, (experiment: Experiment) => ({
-      ...getItem(experiment),
-      description: experiment.displayNameOrParent
-    }))
+    collectItem(
+      acc,
+      experiment,
+      firstThreeColumnOrder,
+      (experiment: Experiment) => ({
+        ...getItem(experiment, firstThreeColumnOrder),
+        description: experiment.displayNameOrParent
+      })
+    )
   }
 
   return acc
@@ -86,23 +118,29 @@ const collectExperimentOnlyItems = (experiments: Experiment[]) => {
 
 const collectItems = (
   experiments: ExperimentWithCheckpoints[],
-  hasCheckpoints: boolean
+  hasCheckpoints: boolean,
+  firstThreeColumnOrder: string[]
 ): QuickPickItemAccumulator => {
   if (hasCheckpoints) {
-    return collectCheckpointItems(experiments)
+    return collectCheckpointItems(experiments, firstThreeColumnOrder)
   }
-  return collectExperimentOnlyItems(experiments)
+  return collectExperimentOnlyItems(experiments, firstThreeColumnOrder)
 }
 
 export const pickExperiments = (
   experiments: ExperimentWithCheckpoints[],
-  hasCheckpoints: boolean
+  hasCheckpoints: boolean,
+  firstThreeColumnOrder: string[]
 ): Promise<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {
     return Toast.showError('There are no experiments to select.')
   }
 
-  const { items, selectedItems } = collectItems(experiments, hasCheckpoints)
+  const { items, selectedItems } = collectItems(
+    experiments,
+    hasCheckpoints,
+    firstThreeColumnOrder
+  )
 
   return quickPickLimitedValues<Experiment | undefined>(
     items,

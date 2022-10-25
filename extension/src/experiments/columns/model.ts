@@ -28,6 +28,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return this.columnOrderState
   }
 
+  public getFirstThreeColumnOrder(): string[] {
+    return this.columnOrderState.slice(1, 4)
+  }
+
   public getColumnWidths(): Record<string, number> {
     return this.columnWidthsState
   }
