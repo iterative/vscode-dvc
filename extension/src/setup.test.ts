@@ -429,7 +429,7 @@ describe('setup', () => {
     await setup(extension)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
-    expect(mockedSetAvailable).not.toHaveBeenCalled()
+    expect(mockedSetAvailable).not.toHaveBeenCalledWith(false)
     expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
