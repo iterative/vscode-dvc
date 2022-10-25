@@ -15,7 +15,12 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
-      const output = await dvcReader.plotsDiff(dvcDemoPath)
+      const revisionsRequiredForSubmodule = ['workspace', 'HEAD']
+
+      const output = await dvcReader.plotsDiff(
+        dvcDemoPath,
+        ...revisionsRequiredForSubmodule
+      )
 
       expect(output, 'should be an object').to.be.an('object')
 

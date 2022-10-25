@@ -5,20 +5,20 @@ import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { ColumnType } from '../webview/contract'
-import outputFixture from '../../test/fixtures/expShow/output'
-import columnsFixture from '../../test/fixtures/expShow/columns'
+import outputFixture from '../../test/fixtures/expShow/base/output'
+import columnsFixture from '../../test/fixtures/expShow/base/columns'
 import {
-  deeplyNestedOutput,
-  columns as deeplyNestedColumns,
-  columnsWithDepthOf10 as deeplyNestedColumnsWithDepthOf10,
-  columnsWithDepthOf3 as deeplyNestedColumnsWithDepthOf3,
-  columnsWithDepthOf2 as deeplyNestedColumnsWithDepthOf2,
-  columnsWithDepthOf1 as deeplyNestedColumnsWithDepthOf1
-} from '../../test/fixtures/expShow/deeplyNested'
-import {
-  dataTypesOutput,
-  columns as dataTypesColumns
-} from '../../test/fixtures/expShow/dataTypes'
+  deeplyNestedColumnsWithHeightOf10,
+  deeplyNestedColumnsWithHeightOf3,
+  deeplyNestedColumnsWithHeightOf2,
+  deeplyNestedColumnsWithHeightOf1
+} from '../../test/fixtures/expShow/deeplyNested/maxHeight'
+import deeplyNestedColumnsFixture from '../../test/fixtures/expShow/deeplyNested/columns'
+import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
+import dataTypesColumnsFixture from '../../test/fixtures/expShow/dataTypes/columns'
+import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output'
+import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
+import survivalColumnsFixture from '../../test/fixtures/expShow/survival/columns'
 import { getConfigValue } from '../../vscode/config'
 
 jest.mock('../../vscode/config')
@@ -40,65 +40,71 @@ describe('ColumnsModel', () => {
     expect(model.getSelected()).toStrictEqual(columnsFixture)
   })
 
+  it('should return the expected columns when given the survival output fixture', async () => {
+    const model = new ColumnsModel('', buildMockMemento())
+    await model.transformAndSet(survivalOutputFixture)
+    expect(model.getSelected()).toStrictEqual(survivalColumnsFixture)
+  })
+
   it('should return the expected columns when given the deeply nested output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsFixture)
   })
 
   it('should return the expected columns when the max depth config is set to 10', async () => {
     mockedGetConfigValue.mockReturnValue(10)
     const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf10)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
 
   it('should return the expected columns when the max depth config is set to 3', async () => {
     mockedGetConfigValue.mockReturnValue(3)
     const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf3)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf3)
   })
 
   it('should return the expected columns when the max depth config is set to 2', async () => {
     mockedGetConfigValue.mockReturnValue(2)
     const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf2)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf2)
   })
 
   it('should return the expected columns when the max depth config is set to 1', async () => {
     mockedGetConfigValue.mockReturnValue(1)
     const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf1)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf1)
   })
 
   it('should return the expected columns when the max depth config is set to 0', async () => {
     mockedGetConfigValue.mockReturnValue(0)
     const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf10)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
 
   it('should return the expected columns when the max depth config is set to -1', async () => {
     mockedGetConfigValue.mockReturnValue(-1)
     const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf10)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
 
   it('should return the expected columns when given the data types output fixture', async () => {
     const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(dataTypesOutput)
-    expect(model.getSelected()).toStrictEqual(dataTypesColumns)
+    await model.transformAndSet(dataTypesOutputFixture)
+    expect(model.getSelected()).toStrictEqual(dataTypesColumnsFixture)
   })
 
   describe('persistence', () => {

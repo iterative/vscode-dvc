@@ -7,11 +7,11 @@ import {
   within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
+import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Column, ColumnType, Row } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
-import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
+import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
@@ -662,7 +662,7 @@ describe('App', () => {
         expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
       }
 
-      renderTable(dataTypesTableData)
+      renderTable(dataTypesTableFixture)
 
       expectTooltipValue({
         cellLabel: '1.9293',
@@ -737,19 +737,14 @@ describe('App', () => {
       jest.useRealTimers()
     })
 
-    it('should open on left click', () => {
+    it('should not open on left click', () => {
       renderTableWithoutRunningExperiments()
 
       const paramsFileHeader = screen.getByText('params.yaml')
       fireEvent.click(paramsFileHeader, { bubbles: true })
 
       jest.advanceTimersByTime(100)
-      const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toStrictEqual([
-        'Open to the Side',
-        'Set Max Header Height'
-      ])
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
     it('should open on right click and close on esc', () => {

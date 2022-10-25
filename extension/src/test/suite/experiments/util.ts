@@ -4,7 +4,7 @@ import omit from 'lodash.omit'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
-import expShowFixture from '../../fixtures/expShow/output'
+import expShowFixture from '../../fixtures/expShow/base/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,

@@ -50,7 +50,7 @@ templates], which may be predefined (e.g. confusion matrix, linear) or custom
 ([Vega-lite] files)
 
 [plot templates]:
-  https://dvc.org/doc/command-reference/plots#plot-templates-data-series-only
+  https://dvc.org/doc/user-guide/experiment-management/visualizing-plots#plot-templates-data-series-only
 [vega-lite]: https://vega.github.io/vega-lite/
 
 <p align="center">
@@ -73,8 +73,8 @@ rendered side by side for the selected experiments.
        alt="Experiments View" width="49%" />
 </p>
 
-Real-time **Trends** based on scalar [metrics] from the **Experiments Table**
-are available when you use [checkpoints].
+Automatically generated and updated **Trends** that show scalar [metrics] value
+per epoch if [checkpoints] are enabled.
 
 [metrics]: https://dvc.org/doc/command-reference/metrics
 [checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints

@@ -1,14 +1,11 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
-export const PlotSize = {
-  LARGE: 'LARGE',
-  REGULAR: 'REGULAR',
-  SMALL: 'SMALL'
+export const PlotSizeNumber = {
+  LARGE: 500,
+  REGULAR: 400,
+  SMALL: 300
 }
-
-type PlotSizeKeys = keyof typeof PlotSize
-export type PlotSize = typeof PlotSize[PlotSizeKeys]
 
 export enum Section {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
@@ -17,9 +14,9 @@ export enum Section {
 }
 
 export const DEFAULT_SECTION_SIZES = {
-  [Section.CHECKPOINT_PLOTS]: PlotSize.REGULAR,
-  [Section.TEMPLATE_PLOTS]: PlotSize.REGULAR,
-  [Section.COMPARISON_TABLE]: PlotSize.REGULAR
+  [Section.CHECKPOINT_PLOTS]: PlotSizeNumber.REGULAR,
+  [Section.TEMPLATE_PLOTS]: PlotSizeNumber.REGULAR,
+  [Section.COMPARISON_TABLE]: PlotSizeNumber.REGULAR
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
@@ -46,7 +43,7 @@ export type Revision = {
 
 export interface PlotsComparisonData {
   plots: ComparisonPlots
-  size: PlotSize
+  size: number
 }
 
 export type CheckpointPlotValues = {
@@ -67,7 +64,7 @@ export type CheckpointPlotData = CheckpointPlot & { title: string }
 export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
   colors: ColorScale
-  size: PlotSize
+  size: number
   selectedMetrics?: string[]
 }
 
@@ -115,7 +112,7 @@ export type TemplatePlotSection = {
 
 export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
-  size: PlotSize
+  size: number
 }
 
 export type ComparisonPlot = {

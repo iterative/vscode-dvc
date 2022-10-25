@@ -11,14 +11,14 @@ import {
   Plot,
   TemplatePlotEntry,
   TemplatePlotSection,
-  PlotsType,
-  PlotSize
+  PlotsType
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
   ExperimentsOutput,
   ExperimentStatus,
+  isValueTree,
   PlotsOutput,
   Value,
   ValueTree
@@ -58,8 +58,8 @@ const collectFromMetricsFile = (
 ) => {
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
-  if (typeof value === 'object') {
-    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
+  if (isValueTree(value)) {
+    for (const [childKey, childValue] of Object.entries(value)) {
       collectFromMetricsFile(
         acc,
         name,
@@ -598,7 +598,7 @@ const collectTemplateGroup = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  size: PlotSize,
+  size: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotEntry[] => {
@@ -639,7 +639,7 @@ export const collectSelectedTemplatePlots = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  size: PlotSize,
+  size: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotSection[] | undefined => {

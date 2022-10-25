@@ -1,4 +1,4 @@
-import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
+import { Section } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ComparisonTable } from './ComparisonTable'
@@ -11,7 +11,7 @@ export const ComparisonTableWrapper: React.FC = () => {
   const { size, isCollapsed } = useSelector(
     (state: PlotsState) => state.comparison
   )
-  const handleResize = (size: PlotSize) => {
+  const handleResize = (size: number) => {
     dispatch(changeSize(size))
   }
 

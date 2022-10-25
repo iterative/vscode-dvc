@@ -8,7 +8,7 @@ import { MaybeConsoleError } from '../error'
 import { createProcess } from '../../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../../test/util/jest'
 import { getProcessEnv } from '../../env'
-import expShowFixture from '../../test/fixtures/expShow/output'
+import expShowFixture from '../../test/fixtures/expShow/base/output'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output/minimal'
 import { Config } from '../../config'
 

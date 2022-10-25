@@ -132,7 +132,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
-        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)) {
+        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
           this.cliData.update()
         }
       })
@@ -305,7 +305,11 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 
-    const selected = await pickExperiments(experiments, this.hasCheckpoints())
+    const selected = await pickExperiments(
+      experiments,
+      this.hasCheckpoints(),
+      this.columns.getFirstThreeColumnOrder()
+    )
     if (!selected) {
       return
     }

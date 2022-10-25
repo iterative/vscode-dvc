@@ -4,10 +4,10 @@ import { collectChanges, collectColumns } from '.'
 import { timestampColumn } from '../constants'
 import { buildDepPath, buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
-import outputFixture from '../../../test/fixtures/expShow/output'
-import columnsFixture from '../../../test/fixtures/expShow/columns'
-import workspaceChangesFixture from '../../../test/fixtures/expShow/workspaceChanges'
-import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps'
+import outputFixture from '../../../test/fixtures/expShow/base/output'
+import columnsFixture from '../../../test/fixtures/expShow/base/columns'
+import workspaceChangesFixture from '../../../test/fixtures/expShow/base/workspaceChanges'
+import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps/output'
 import {
   ExperimentsOutput,
   ExperimentStatus,
@@ -691,6 +691,32 @@ describe('collectChanges', () => {
         }
       })
     ).toStrictEqual(['params:params.yaml:a.b'])
+  })
+
+  it('should handle when a parameter has a null value', () => {
+    const nullParam = {
+      param_tuning: {
+        logistic_regression: null
+      }
+    }
+
+    expect(
+      collectChanges({
+        workspace: updateParams(nullParam),
+        '9c6ba26745d2fbc286a13b99011d5126b5a245dc': updateParams(nullParam)
+      })
+    ).toStrictEqual([])
+
+    expect(
+      collectChanges({
+        workspace: updateParams(nullParam),
+        '9c6ba26745d2fbc286a13b99011d5126b5a245dc': updateParams({
+          param_tuning: {
+            logistic_regression: 1
+          }
+        })
+      })
+    ).toStrictEqual(['params:params.yaml:param_tuning.logistic_regression'])
   })
 
   it('should compare against the most recent commit', () => {

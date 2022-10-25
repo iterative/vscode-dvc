@@ -1,4 +1,4 @@
-import { PlotSize, Section } from 'dvc/src/plots/webview/contract'
+import { Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -29,7 +29,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
     })
   }
 
-  const handleResize = (size: PlotSize) => {
+  const handleResize = (size: number) => {
     dispatch(changeSize(size))
   }
 
