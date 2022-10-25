@@ -2,9 +2,10 @@ import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
 export const PlotSizeNumber = {
-  LARGE: 500,
-  REGULAR: 400,
-  SMALL: 300
+  LARGE: 1,
+  MEDIUM: 3,
+  REGULAR: 2,
+  SMALL: 4
 }
 
 export enum Section {

@@ -287,7 +287,18 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getPlotSize(section: Section) {
-    return this.plotSizes[section] || PlotSizeNumber.REGULAR
+    if (
+      this.plotSizes[section] &&
+      [
+        PlotSizeNumber.LARGE,
+        PlotSizeNumber.REGULAR,
+        PlotSizeNumber.MEDIUM,
+        PlotSizeNumber.SMALL
+      ].includes(this.plotSizes[section])
+    ) {
+      return this.plotSizes[section]
+    }
+    return PlotSizeNumber.REGULAR
   }
 
   public setSectionCollapsed(newState: Partial<SectionCollapsed>) {

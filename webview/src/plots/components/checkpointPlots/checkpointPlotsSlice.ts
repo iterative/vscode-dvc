@@ -15,10 +15,12 @@ export interface CheckpointPlotsState
   hasData: boolean
   plotsIds: string[]
   plotsSnapshots: { [key: string]: string }
+  disabledDragPlotIds: string[]
 }
 
 export const checkpointPlotsInitialState: CheckpointPlotsState = {
   colors: { domain: [], range: [] },
+  disabledDragPlotIds: [],
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
   plotsIds: [],
@@ -31,10 +33,12 @@ export const checkpointPlotsSlice = createSlice({
   initialState: checkpointPlotsInitialState,
   name: 'checkpoint',
   reducers: {
+    changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
+      state.disabledDragPlotIds = action.payload
+    },
     changeSize: (state, action: PayloadAction<number>) => {
       state.size = action.payload
     },
-
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
     },
@@ -57,6 +61,7 @@ export const checkpointPlotsSlice = createSlice({
   }
 })
 
-export const { update, setCollapsed, changeSize } = checkpointPlotsSlice.actions
+export const { update, setCollapsed, changeSize, changeDisabledDragIds } =
+  checkpointPlotsSlice.actions
 
 export default checkpointPlotsSlice.reducer

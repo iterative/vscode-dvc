@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, createRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { AddPlots, Welcome } from './GetStarted'
 import { ZoomedInPlot } from './ZoomedInPlot'
@@ -6,7 +6,7 @@ import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
-import { setZoomedInPlot } from './webviewSlice'
+import { setMaxPlotSize, setZoomedInPlot } from './webviewSlice'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -32,6 +32,21 @@ const PlotsContent = () => {
   const hasTemplateData = useSelector(
     (state: PlotsState) => state.template.hasData
   )
+  const wrapperRef = createRef<HTMLDivElement>()
+
+  useEffect(() => {
+    const onResize = () => {
+      wrapperRef.current &&
+        dispatch(
+          setMaxPlotSize(wrapperRef.current.getBoundingClientRect().width - 100)
+        )
+    }
+    window.addEventListener('resize', onResize)
+
+    return () => {
+      window.removeEventListener('resize', onResize)
+    }
+  }, [dispatch, wrapperRef])
 
   if (!hasData) {
     return <EmptyState>Loading Plots...</EmptyState>
@@ -53,7 +68,7 @@ const PlotsContent = () => {
   }
 
   return (
-    <>
+    <div ref={wrapperRef}>
       <Ribbon />
       <TemplatePlotsWrapper />
       <ComparisonTableWrapper />
@@ -68,7 +83,7 @@ const PlotsContent = () => {
           <ZoomedInPlot props={zoomedInPlot.plot} />
         </Modal>
       )}
-    </>
+    </div>
   )
 }
 

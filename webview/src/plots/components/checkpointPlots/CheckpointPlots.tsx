@@ -29,7 +29,9 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   colors
 }) => {
   const [order, setOrder] = useState(plotsIds)
-  const { size, hasData } = useSelector((state: PlotsState) => state.checkpoint)
+  const { size, hasData, disabledDragPlotIds } = useSelector(
+    (state: PlotsState) => state.checkpoint
+  )
   const [onSection, setOnSection] = useState(false)
   const nbItemsPerRow = useNbItemsPerRow(size)
   const draggedRef = useSelector(
@@ -54,12 +56,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
 
   const items = order.map((plot, i) => (
     <div key={plot} id={plot}>
-      <CheckpointPlot
-        id={plot}
-        colors={colors}
-        isLastOfRow={nbItemsPerRow / (i + 1) === 1 || i === order.length - 1}
-        isLastRow={i + 1 >= order.length - nbItemsPerRow}
-      />
+      <CheckpointPlot id={plot} colors={colors} index={i} />
     </div>
   ))
 
@@ -89,7 +86,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       <DragDropContainer
         order={order}
         setOrder={setMetricOrder}
-        disabledDropIds={[]}
+        disabledDropIds={disabledDragPlotIds}
         items={items as JSX.Element[]}
         group="live-plots"
         dropTarget={<DropTarget />}

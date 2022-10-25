@@ -6,6 +6,7 @@ export const useThemeVariables = () => {
 
   const createCSSVariables = useCallback(() => {
     const ColorsWithOpacity = {
+      accent: getThemeValue(ThemeProperty.ACCENT_COLOR),
       'editor-background': getThemeValue(ThemeProperty.BACKGROUND_COLOR),
       'editor-foreground': getThemeValue(ThemeProperty.FOREGROUND_COLOR)
     }

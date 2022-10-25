@@ -42,6 +42,8 @@ $gap: 20px;
 
 .plotsWrapper {
   width: 100%;
+  overflow-y: hidden;
+  overflow-x: visible;
 }
 
 :global(.vega-bindings):not(:empty) {
@@ -86,24 +88,29 @@ $gap: 20px;
 .multiViewPlotsGrid {
   width: 100%;
   height: max-content;
+  overflow-y: hidden;
+  overflow-x: visible;
 
   + .singleViewPlotsGrid,
   + .multiViewPlotsGrid {
     margin-top: $gap;
   }
 }
+.plotsGridWrapper {
+  width: 100%;
+}
 
 :global(.ReactVirtualized__Grid__innerScrollContainer),
 .noBigGrid {
   width: calc(100% - $gap * 2) !important;
-  max-width: none !important;
+  max-width: 100%;
   max-height: none !important;
   height: auto !important;
   margin-left: $gap;
   display: grid;
   gap: $gap;
   grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fill, minmax(var(--size), 1fr));
+  grid-template-columns: repeat(var(--nbPerRow), 1fr);
 
   + .singleViewPlotsGrid,
   + .multiViewPlotsGrid {
@@ -160,38 +167,64 @@ $gap: 20px;
 
 .plotHorizontalResizer,
 .plotVerticalResizer {
-  background-color: $fg-color;
-  opacity: 0.5;
   position: absolute;
+  border: none;
+  background: none;
 
-  &:hover {
-    opacity: 1;
+  &::after {
+    content: '';
+    background-color: $fg-color;
+    position: absolute;
   }
 }
 
-.plotHorizontalResizer {
-  height: 1px;
-  width: calc(100% + $gap);
-  bottom: -10px;
-  left: 0;
-  cursor: row-resize;
+$resizer-border: 2px dashed $accent-color;
+.resizerLocked {
+  position: absolute;
+  background-color: $accent-color-transparent;
+  border: $resizer-border;
+  border-right: none;
 
-  &:hover {
-    width: 10000px;
-    left: -5000px;
+  .plotExpanding & {
+    border-right: $resizer-border;
+    border-left: none;
+  }
+}
+
+.plotExpanding {
+  &::after {
+    content: '';
+    background-color: $accent-color-transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: $resizer-border;
+    border-right: none;
+    box-sizing: border-box;
   }
 }
 
 .plotVerticalResizer {
-  width: 1px;
-  height: calc(100% + $gap);
-  right: -10px;
+  width: 3px;
+  height: 100%;
+  right: 0;
   top: 0;
   cursor: col-resize;
 
-  &:hover {
-    height: 10000px;
-    top: -5000px;
+  &::after {
+    width: 1px;
+    height: 50%;
+    top: 25%;
+    right: 1px;
+  }
+
+  .resizerLocked {
+    width: 3px;
+    height: 100%;
+    top: 0;
+    right: 1px;
   }
 }
 
@@ -205,13 +238,13 @@ $gap: 20px;
 .plot.multiViewPlot {
   aspect-ratio: calc(0.8 * var(--scale) + 0.2);
   grid-column: span var(--scale);
-  width: calc(var(--size) * var(--scale));
+  width: calc(300px * var(--scale));
   max-width: max-content;
 }
 
 .comparisonTable {
   table-layout: fixed;
-  width: calc(var(--size) * var(--scale));
+  width: calc(400px * var(--scale));
   position: relative;
   padding: 0 20px;
   padding-right: $gap;
