@@ -54,7 +54,7 @@
     "@types/classnames": "2.3.1",
     "@types/jest": "29.2.0",
     "@types/jsdom": "20.0.0",
-    "@types/node": "18.11.0",
+    "@types/node": "18.11.2",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
     "@types/react-measure": "2.0.8",
