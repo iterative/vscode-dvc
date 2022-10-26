@@ -1592,7 +1592,7 @@
     "sinon": "14.0.1",
     "sinon-chai": "3.7.0",
     "ts-loader": "9.4.1",
-    "vsce": "2.11.0",
+    "vsce": "2.12.0",
     "vscode-uri": "3.0.6",
     "wdio-vscode-service": "4.1.0",
     "webdriverio": "7.25.2",
