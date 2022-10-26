@@ -110,7 +110,7 @@ $gap: 20px;
   display: grid;
   gap: $gap;
   grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fill, var(--size));
+  grid-template-columns: repeat(auto-fill, minmax(var(--size), 1fr));
 
   + .singleViewPlotsGrid,
   + .multiViewPlotsGrid {
