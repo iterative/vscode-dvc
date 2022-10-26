@@ -390,7 +390,7 @@ describe('ColumnsModel', () => {
       expectStatus(children, Status.SELECTED)
     })
 
-    it('should unselect the toggled children of an unselected column', async () => {
+    it('should unselect the children of an indeterminate column when it is unselected', async () => {
       const mockMemento = buildMockMemento({
         [PersistenceKey.METRICS_AND_PARAMS_STATUS + exampleDvcRoot]: {}
       })
@@ -400,7 +400,7 @@ describe('ColumnsModel', () => {
 
       const parentPath = 'metrics:summary.json'
       model.toggleStatus('metrics:summary.json:val_loss')
-      model.toggleStatus(parentPath)
+      model.unselect(parentPath)
 
       const children = model.getChildren(parentPath)
       expectStatus(children, Status.UNSELECTED)
