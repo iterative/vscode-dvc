@@ -353,7 +353,7 @@ suite('Experiments Test Suite', () => {
     it('should be able to handle a message to hide a table column', async () => {
       const { experiments, columnsModel } = buildExperiments(disposable)
 
-      const mockToggleStatus = stub(columnsModel, 'toggleStatus')
+      const mockUnselect = stub(columnsModel, 'unselect')
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -364,8 +364,8 @@ suite('Experiments Test Suite', () => {
         type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
       })
 
-      expect(mockToggleStatus).to.be.calledOnce
-      expect(mockToggleStatus).to.be.calledWithExactly(mockColumnId)
+      expect(mockUnselect).to.be.calledOnce
+      expect(mockUnselect).to.be.calledWithExactly(mockColumnId)
 
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
