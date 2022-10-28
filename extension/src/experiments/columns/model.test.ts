@@ -194,6 +194,40 @@ describe('ColumnsModel', () => {
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
+    it('should return the first three columns from the persisted state', () => {
+      const persistedState = [
+        { path: 'A', width: 0 },
+        { path: 'B', width: 0 },
+        { path: 'C', width: 0 },
+        { path: 'D', width: 0 },
+        { path: 'E', width: 0 },
+        { path: 'F', width: 0 }
+      ]
+
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        buildMockMemento({
+          [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
+            persistedState
+        })
+      )
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual(
+        persistedState.slice(1, 4)
+      )
+    })
+
+    it('should return first three columns collected from data if state is empty', async () => {
+      const model = new ColumnsModel(exampleDvcRoot, buildMockMemento())
+      await model.transformAndSet(outputFixture)
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+        'Created',
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy'
+      ])
+    })
+
     it('should re-order the columns if a new columnOrder is set', () => {
       const model = new ColumnsModel(
         exampleDvcRoot,
