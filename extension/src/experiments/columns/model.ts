@@ -29,7 +29,9 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   }
 
   public getFirstThreeColumnOrder(): string[] {
-    return this.columnOrderState.slice(1, 4)
+    return this.columnOrderState.length === 0
+      ? this.getFirstThreeColumnOrderFromData()
+      : this.columnOrderState.slice(1, 4)
   }
 
   public getColumnWidths(): Record<string, number> {
@@ -80,6 +82,13 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public hasNonDefaultColumns() {
     return this.data.length > 1
+  }
+
+  private getFirstThreeColumnOrderFromData(): string[] {
+    return this.data
+      .filter(({ hasChildren }) => !hasChildren)
+      .slice(0, 3)
+      .map(({ path }) => path)
   }
 
   private filterChildren(path?: string) {
