@@ -14,6 +14,7 @@ export enum Command {
   CLEAN = 'clean',
   COMMIT = 'commit',
   DIFF = 'diff',
+  INITIALIZE = 'init',
   LS_FILES = 'ls-files',
   PUSH = 'push',
   RESET = 'reset',
