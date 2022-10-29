@@ -17,6 +17,12 @@ export class GitExecutor extends GitCli {
     this
   )
 
+  public init(cwd: string) {
+    const options = getOptions(cwd, Command.INITIALIZE)
+
+    return this.executeProcess(options)
+  }
+
   public pushBranch(cwd: string, branchName?: string) {
     const args: Args = [Command.PUSH, Flag.SET_UPSTREAM, DEFAULT_REMOTE]
 
