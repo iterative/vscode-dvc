@@ -1,6 +1,5 @@
 import { describe, it, suite } from 'mocha'
 import isEmpty from 'lodash.isempty'
-import omit from 'lodash.omit'
 import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
@@ -77,50 +76,13 @@ suite('exp show --show-json', () => {
   })
 
   describe('Empty Repository', () => {
-    it('should return the expected output', async () => {
+    it('should return the default output', async () => {
       await initializeEmptyRepo()
       const output = await dvcReader.expShow(TEMP_DIR)
 
-      expect(
-        Object.keys(output),
-        'should have at least two entries'
-      ).to.have.lengthOf.greaterThanOrEqual(2)
-
-      const { workspace } = output
-
-      expect(workspace, 'should have a workspace key').not.to.be.undefined
-
-      const data = workspace.baseline.data
-
-      expect(
-        data,
-        'should have data inside of the workspace baseline'
-      ).to.be.an('object')
-
-      expect(data?.timestamp, 'should have a timestamp').to.be.a('null')
-
-      expect(data?.deps, 'should have deps inside of the workspace').to.be.an(
-        'object'
-      )
-
-      expect(data?.outs, 'should have outs inside of the workspace').to.be.an(
-        'object'
-      )
-
-      expect(
-        data?.metrics,
-        'should have metrics inside of the workspace'
-      ).to.be.an('object')
-
-      expect(
-        data?.params,
-        'should not have params inside of the workspace'
-      ).to.be.a('undefined')
-
-      for (const obj of Object.values(omit(output, 'workspace'))) {
-        expect(obj, 'should have a child object').to.be.an('object')
-        expect(obj.baseline, 'should have a baseline entry').to.be.an('object')
-      }
+      expect(output).to.deep.equal({
+        workspace: { baseline: {} }
+      })
     })
   })
 })
