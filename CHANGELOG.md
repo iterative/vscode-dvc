@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.8] - 2022-10-31
+
+### 🚀 New Features and Enhancements
+
+- Add experiment details when selecting exps for plots [#2670](https://github.com/iterative/vscode-dvc/pull/2670) by [@julieg18](https://github.com/julieg18)
+- Changing images with code to code snippets [#2588](https://github.com/iterative/vscode-dvc/pull/2588) by [@maxagin](https://github.com/maxagin)
+
+### 🐛 Bug Fixes
+
+- Fix missing exp selection quick pick details on inital extension render [#2694](https://github.com/iterative/vscode-dvc/pull/2694) by [@julieg18](https://github.com/julieg18)
+- Fix scheduled CLI output test by moving TEMP_DIR outside of Git repository [#2697](https://github.com/iterative/vscode-dvc/pull/2697) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- bump latest DVC tested version to 2.31.0 [#2677](https://github.com/iterative/vscode-dvc/pull/2677) by [@shcheklein](https://github.com/shcheklein)
+
 ## [0.5.7] - 2022-10-22
 
 ### 🐛 Bug Fixes
