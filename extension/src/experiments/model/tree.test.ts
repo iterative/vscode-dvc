@@ -35,14 +35,14 @@ const {
   mockedGetDvcRoots,
   mockedGetExperiments,
   mockedGetBranchExperiments,
-  mockedGetCheckpoints
+  mockedGetCheckpoints,
+  mockedGetFirstThreeColumnOrder
 } = buildMockedExperiments()
 
 const mockedClockResource = {
   dark: Uri.file(join('some', 'light', 'clock')),
   light: Uri.file(join('some', 'dark', 'clock'))
 }
-
 const mockedGetExperimentsResource = jest.fn()
 const mockedResourceLocator = {
   clock: mockedClockResource,
@@ -181,6 +181,7 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren()
 
@@ -289,6 +290,7 @@ describe('ExperimentsTree', () => {
         }
       ]
       mockedGetCheckpoints.mockReturnValueOnce(checkpoints)
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren({
         collapsibleState: 1,
@@ -366,6 +368,7 @@ describe('ExperimentsTree', () => {
         }
       ]
       mockedGetBranchExperiments.mockReturnValueOnce(experimentsByBranch)
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren(branch)
 
@@ -383,6 +386,131 @@ describe('ExperimentsTree', () => {
           id: 'exp-abcdef',
           label: 'e350702',
           tooltip: undefined,
+          type: ExperimentType.EXPERIMENT
+        }
+      ])
+    })
+    it('should return experiments with markdown table tooltips', async () => {
+      mockedGetMarkdownString.mockImplementation(
+        str => str as unknown as MarkdownString
+      )
+
+      const experiments = [
+        {
+          Created: '2022-08-19T08:17:22',
+          deps: {
+            'data/data.xml': { changes: false, value: '22a1a29' }
+          },
+          displayColor: undefined,
+          hasChildren: true,
+          id: 'exp-123',
+          label: 'a123',
+          params: {
+            'params.yaml': {
+              featurize: { max_features: 200 }
+            }
+          },
+          selected: false,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          Created: '2022-09-15T06:58:29',
+          deps: {
+            'data/data.xml': { changes: false, value: '22a1a29' }
+          },
+          displayColor: undefined,
+          hasChildren: false,
+          id: 'exp-456',
+          label: 'b456',
+          params: {
+            'params.yaml': {
+              featurize: { max_features: 210 }
+            }
+          },
+          selected: true,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          Created: '2022-07-03T05:10:10',
+          deps: {
+            'data/data.xml': { changes: false, value: '22a1a29' }
+          },
+          displayColor: undefined,
+          hasChildren: false,
+          id: 'exp-789',
+          label: 'c789',
+          params: {
+            'params.yaml': {
+              featurize: { max_features: 190 }
+            }
+          },
+          selected: false,
+          type: ExperimentType.EXPERIMENT
+        }
+      ]
+      const experimentsTree = new ExperimentsTree(
+        mockedExperiments,
+        mockedResourceLocator
+      )
+      mockedGetExperiments
+        .mockReturnValueOnce(experiments)
+        .mockReturnValueOnce(experiments)
+      mockedGetDvcRoots.mockReturnValueOnce(['repo'])
+      mockedGetFirstThreeColumnOrder.mockReturnValue([
+        'Created',
+        'params:params.yaml:featurize.max_features',
+        'deps:data/data.xml'
+      ])
+
+      const children = await experimentsTree.getChildren()
+
+      expect(children).toStrictEqual([
+        {
+          collapsibleState: 1,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'exp-123' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: undefined,
+          dvcRoot: 'repo',
+          iconPath: expect.anything(),
+          id: 'exp-123',
+          label: 'a123',
+          tooltip:
+            '|First Three Columns||\n|:--|--|\n| Created | Aug 19, 2022 |\n| params.yaml:featurize.max_features | 200 |\n| data/data.xml | 22a1a29 |\n',
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'exp-456' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: undefined,
+          dvcRoot: 'repo',
+          iconPath: expect.anything(),
+          id: 'exp-456',
+          label: 'b456',
+          tooltip:
+            '|First Three Columns||\n|:--|--|\n| Created | Sep 15, 2022 |\n| params.yaml:featurize.max_features | 210 |\n| data/data.xml | 22a1a29 |\n',
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'exp-789' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: undefined,
+          dvcRoot: 'repo',
+          iconPath: expect.anything(),
+          id: 'exp-789',
+          label: 'c789',
+          tooltip:
+            '|First Three Columns||\n|:--|--|\n| Created | Jul 3, 2022 |\n| params.yaml:featurize.max_features | 190 |\n| data/data.xml | 22a1a29 |\n',
           type: ExperimentType.EXPERIMENT
         }
       ])
