@@ -92,17 +92,27 @@ export const getSortOptions = (
   return { isSortable, sortOptions, sortOrder }
 }
 
+export type HeaderGroupWithOptionalOriginalId = HeaderGroup<Experiment> & {
+  originalId?: string
+}
+
 export const getMenuOptions = (
-  column: HeaderGroup<Experiment> & { originalId?: string },
+  column: HeaderGroupWithOptionalOriginalId,
   sorts: SortDefinition[]
 ) => {
+  let leafColumn: HeaderGroupWithOptionalOriginalId = column
+
+  while (leafColumn?.placeholderOf) {
+    leafColumn = leafColumn.placeholderOf as HeaderGroupWithOptionalOriginalId
+  }
+
   const menuOptions: MessagesMenuOptionProps[] = [
     {
       hidden: isFromExperimentColumn(column),
       id: 'hide-column',
       label: 'Hide Column',
       message: {
-        payload: column.originalId || column.id,
+        payload: leafColumn.originalId || leafColumn.id,
         type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
       }
     },
@@ -111,7 +121,7 @@ export const getMenuOptions = (
       id: 'open-to-the-side',
       label: 'Open to the Side',
       message: {
-        payload: column.id,
+        payload: leafColumn.id,
         type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
       }
     },

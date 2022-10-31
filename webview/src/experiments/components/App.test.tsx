@@ -808,6 +808,30 @@ describe('App', () => {
         fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
       }
     })
+
+    describe('Hiding a column from its empty placeholder', () => {
+      it('should send the column id and not the placeholder id as the message payload', () => {
+        renderTableWithPlaceholder()
+        const placeholders = screen.getAllByTestId(
+          /header-Created.+placeholder/
+        )
+        const placeholder = placeholders[0]
+        fireEvent.contextMenu(placeholder, { bubbles: true })
+        jest.advanceTimersByTime(100)
+
+        const hideOption = screen.getByText('Hide Column')
+
+        mockPostMessage.mockClear()
+
+        fireEvent.click(hideOption)
+
+        expect(mockPostMessage).toHaveBeenCalledTimes(1)
+        expect(mockPostMessage).toHaveBeenCalledWith({
+          payload: 'Created',
+          type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+        })
+      })
+    })
   })
 
   describe('Row Context Menu', () => {
