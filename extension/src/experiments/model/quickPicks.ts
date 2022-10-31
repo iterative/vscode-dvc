@@ -13,6 +13,7 @@ import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
 import { splitColumnPath } from '../columns/paths'
 import { formatDate } from '../../util/date'
+import { truncateFromLeft } from '../../util/string'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -38,10 +39,13 @@ const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
           ? formatDate(collectedVal)
           : collectedVal?.value || collectedVal
 
-      return `${splitUpName[splitUpName.length - 1]}:${value}`
+      return `${truncateFromLeft(
+        splitUpName[splitUpName.length - 1],
+        15
+      )}:${value}`
     })
     .filter(Boolean)
-    .join(' '),
+    .join(', '),
   label: experiment.label,
   value: omit(experiment, 'checkpoints')
 })

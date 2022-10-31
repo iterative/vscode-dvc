@@ -135,19 +135,19 @@ describe('pickExperiments', () => {
       [
         {
           description: '[exp-123]',
-          detail: 'Created:Aug 19, 2022 split:0.1 data/data.xml:22a1a29',
+          detail: 'Created:Aug 19, 2022, split:0.1, data/data.xml:22a1a29',
           label: '123fsf4',
           value: mockedExperiments[0]
         },
         {
           description: '[exp-456]',
-          detail: 'Created:Aug 19, 2022 split:0.2 data/data.xml:22a1a29',
+          detail: 'Created:Aug 19, 2022, split:0.2, data/data.xml:22a1a29',
           label: '456fsf4',
           value: mockedExperiments[1]
         },
         {
           description: '[exp-789]',
-          detail: 'Created:Sep 15, 2022 split:0.3 data/data.xml:22a1a29',
+          detail: 'Created:Sep 15, 2022, split:0.3, data/data.xml:22a1a29',
           label: '789fsf4',
           value: mockedExperiments[2]
         }
