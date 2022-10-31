@@ -6,6 +6,7 @@ import { Config } from '../../config'
 import { exists } from '../../fileSystem'
 import { getVenvBinPath } from '../../python/path'
 import { dvcDemoPath } from '../util'
+import { GitExecutor } from '../../cli/git/executor'
 
 const config = {
   getCliPath: () => '',
@@ -14,6 +15,7 @@ const config = {
 
 export const dvcReader = new DvcReader(config)
 export const dvcExecutor = new DvcExecutor(config)
+const gitExecutor = new GitExecutor()
 
 let demoInitialized: Promise<string>
 export const initializeDemoRepo = (): Promise<string> => {
@@ -23,10 +25,12 @@ export const initializeDemoRepo = (): Promise<string> => {
   return demoInitialized
 }
 
-export const initializeEmptyRepo = (): Promise<string> => {
+export const initializeEmptyRepo = async (): Promise<string> => {
   if (exists(join(TEMP_DIR, '.dvc'))) {
-    return Promise.resolve('')
+    return ''
   }
+
+  await gitExecutor.init(TEMP_DIR)
 
   return dvcExecutor.init(TEMP_DIR)
 }

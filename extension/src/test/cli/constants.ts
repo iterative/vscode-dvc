@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { resolve } from 'path'
 
 export const ENV_DIR = '.env'
-export const TEMP_DIR = join(__dirname, 'temp')
+export const TEMP_DIR = resolve(__dirname, '..', '..', '..', '..', '..', 'temp')
