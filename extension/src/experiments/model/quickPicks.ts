@@ -11,6 +11,7 @@ import {
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
+import { truncate, truncateFromLeft } from '../../util/string'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -27,10 +28,17 @@ const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
   detail: firstThreeColumnOrder
     .map(path => {
       const { splitUpPath, value } = getDataFromColumnPath(experiment, path)
-      return value ? `${splitUpPath[splitUpPath.length - 1]}:${value}` : ''
+      const truncatedKey = truncateFromLeft(
+        splitUpPath[splitUpPath.length - 1],
+        15
+      )
+      const truncatedVal =
+        typeof value === 'number' ? truncate(String(value), 7) : value
+
+      return value ? `${truncatedKey}:${truncatedVal}` : ''
     })
     .filter(Boolean)
-    .join(' '),
+    .join(', '),
   label: experiment.label,
   value: omit(experiment, 'checkpoints')
 })
