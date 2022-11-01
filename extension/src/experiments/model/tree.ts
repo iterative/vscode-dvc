@@ -355,7 +355,7 @@ export class ExperimentsTree
           : ''
       })
       .join('')
-    return getMarkdownString(`|First Three Columns||\n|:--|--|\n${data}`)
+    return getMarkdownString(`|||\n|:--|--|\n${data}`)
   }
 
   private getTooltip(

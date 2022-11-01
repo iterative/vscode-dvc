@@ -478,7 +478,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-123',
           label: 'a123',
           tooltip:
-            '|First Three Columns||\n|:--|--|\n| Created | Aug 19, 2022 |\n| params.yaml:featurize.max_features | 200 |\n| data/data.xml | 22a1a29 |\n',
+            '|||\n|:--|--|\n| Created | Aug 19, 2022 |\n| params.yaml:featurize.max_features | 200 |\n| data/data.xml | 22a1a29 |\n',
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -494,7 +494,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-456',
           label: 'b456',
           tooltip:
-            '|First Three Columns||\n|:--|--|\n| Created | Sep 15, 2022 |\n| params.yaml:featurize.max_features | 210 |\n| data/data.xml | 22a1a29 |\n',
+            '|||\n|:--|--|\n| Created | Sep 15, 2022 |\n| params.yaml:featurize.max_features | 210 |\n| data/data.xml | 22a1a29 |\n',
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -510,7 +510,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-789',
           label: 'c789',
           tooltip:
-            '|First Three Columns||\n|:--|--|\n| Created | Jul 3, 2022 |\n| params.yaml:featurize.max_features | 190 |\n| data/data.xml | 22a1a29 |\n',
+            '|||\n|:--|--|\n| Created | Jul 3, 2022 |\n| params.yaml:featurize.max_features | 190 |\n| data/data.xml | 22a1a29 |\n',
           type: ExperimentType.EXPERIMENT
         }
       ])
