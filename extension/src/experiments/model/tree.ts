@@ -33,6 +33,7 @@ import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
 import { Experiment, ExperimentStatus, isRunning } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
+import { truncate, truncateFromLeft } from '../../util/string'
 
 export class ExperimentsTree
   extends Disposable
@@ -350,9 +351,13 @@ export class ExperimentsTree
       .map(path => {
         const { value, splitUpPath } = getDataFromColumnPath(experiment, path)
         const [type] = splitUpPath
-        return value
-          ? `| ${path.slice(type.length + 1) || path} | ${value} |\n`
-          : ''
+        const truncatedKey = truncateFromLeft(
+          path.slice(type.length + 1) || path,
+          30
+        )
+        const truncatedVal =
+          typeof value === 'number' ? truncate(String(value), 7) : value
+        return value ? `| ${truncatedKey} | ${truncatedVal} |\n` : ''
       })
       .join('')
     return getMarkdownString(`|||\n|:--|--|\n${data}`)
