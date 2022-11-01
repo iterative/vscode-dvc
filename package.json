@@ -35,8 +35,8 @@
     "svgr": "yarn workspace dvc-vscode-webview svgr"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "5.40.1",
-    "@typescript-eslint/parser": "5.40.1",
+    "@typescript-eslint/eslint-plugin": "5.41.0",
+    "@typescript-eslint/parser": "5.41.0",
     "@vscode/codicons": "0.0.32",
     "eslint": "8.26.0",
     "eslint-config-prettier": "8.5.0",
@@ -71,7 +71,7 @@
   "resolutions": {
     "trim": "1.0.1",
     "trim-newlines": "3.0.1",
-    "@types/react": "18.0.21",
+    "@types/react": "18.0.22",
     "terser": "5.15.1",
     "**/recursive-readdir/minimatch": "5.1.0",
     "vega-functions": "5.13.0",
