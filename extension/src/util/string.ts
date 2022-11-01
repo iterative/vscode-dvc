@@ -5,3 +5,7 @@ export const shortenForLabel = <T extends string | null>(
 export const truncateFromLeft = (str: string, length: number): string => {
   return str.length > length ? '...' + str.slice(str.length - length) : str
 }
+
+export const truncate = (str: string, length: number): string => {
+  return str.length > length ? str.slice(0, length - 1) + '...' : str
+}

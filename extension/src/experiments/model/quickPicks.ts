@@ -13,7 +13,7 @@ import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
 import { splitColumnPath } from '../columns/paths'
 import { formatDate } from '../../util/date'
-import { truncateFromLeft } from '../../util/string'
+import { truncate, truncateFromLeft } from '../../util/string'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -39,10 +39,14 @@ const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
           ? formatDate(collectedVal)
           : collectedVal?.value || collectedVal
 
-      return `${truncateFromLeft(
+      const truncatedKey = truncateFromLeft(
         splitUpName[splitUpName.length - 1],
         15
-      )}:${value}`
+      )
+      const truncatedVal =
+        typeof value === 'number' ? truncate(String(value), 7) : value
+
+      return `${truncatedKey}:${truncatedVal}`
     })
     .filter(Boolean)
     .join(', '),
