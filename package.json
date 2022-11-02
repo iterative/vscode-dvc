@@ -71,7 +71,7 @@
   "resolutions": {
     "trim": "1.0.1",
     "trim-newlines": "3.0.1",
-    "@types/react": "18.0.22",
+    "@types/react": "18.0.23",
     "terser": "5.15.1",
     "**/recursive-readdir/minimatch": "5.1.0",
     "vega-functions": "5.13.0",
