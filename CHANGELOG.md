@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.9] - 2022-11-02
+
+### 🚀 New Features and Enhancements
+
+- Improve exp selection quick pick details [#2711](https://github.com/iterative/vscode-dvc/pull/2711) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fixes infinite loop in plots when workspace only is selected [#2715](https://github.com/iterative/vscode-dvc/pull/2715) by [@shcheklein](https://github.com/shcheklein)
+
 ## [0.5.8] - 2022-10-31
 
 ### 🚀 New Features and Enhancements
