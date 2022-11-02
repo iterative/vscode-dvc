@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.10] - 2022-11-02
+
+### 🚀 New Features and Enhancements
+
+- Add tooltips to experiments tree [#2706](https://github.com/iterative/vscode-dvc/pull/2706) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project to be on latest commit [#2720](https://github.com/iterative/vscode-dvc/pull/2720) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.9] - 2022-11-02
 
 ### 🚀 New Features and Enhancements
