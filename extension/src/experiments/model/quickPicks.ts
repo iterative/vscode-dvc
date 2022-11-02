@@ -1,8 +1,8 @@
 import { QuickPickItemKind } from 'vscode'
 import omit from 'lodash.omit'
-import get from 'lodash.get'
 import { ExperimentWithCheckpoints } from '.'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
+import { getDataFromColumnPath } from './util'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickItemWithValue,
@@ -11,8 +11,6 @@ import {
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
-import { splitColumnPath } from '../columns/paths'
-import { formatDate } from '../../util/date'
 import { truncate, truncateFromLeft } from '../../util/string'
 
 type QuickPickItemAccumulator = {
@@ -28,25 +26,16 @@ const getSeparator = (experiment: Experiment) => ({
 
 const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
   detail: firstThreeColumnOrder
-    .map(name => {
-      const splitUpName = splitColumnPath(name)
-      const collectedVal = get(experiment, splitUpName)
-      if (!collectedVal) {
-        return null
-      }
-      const value =
-        name === 'Created'
-          ? formatDate(collectedVal)
-          : collectedVal?.value || collectedVal
-
+    .map(path => {
+      const { splitUpPath, value } = getDataFromColumnPath(experiment, path)
       const truncatedKey = truncateFromLeft(
-        splitUpName[splitUpName.length - 1],
+        splitUpPath[splitUpPath.length - 1],
         15
       )
       const truncatedVal =
         typeof value === 'number' ? truncate(String(value), 7) : value
 
-      return `${truncatedKey}:${truncatedVal}`
+      return value ? `${truncatedKey}:${truncatedVal}` : ''
     })
     .filter(Boolean)
     .join(', '),

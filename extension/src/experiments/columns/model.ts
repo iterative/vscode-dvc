@@ -1,4 +1,4 @@
-import { Memento } from 'vscode'
+import { EventEmitter, Memento } from 'vscode'
 import { collectChanges, collectColumns, collectParamsFiles } from './collect'
 import { Column, ColumnType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
@@ -6,12 +6,17 @@ import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel } from '../../path/selection/model'
 
 export class ColumnsModel extends PathSelectionModel<Column> {
+  private columnsOrderChanged: EventEmitter<void>
   private columnOrderState: string[] = []
   private columnWidthsState: Record<string, number> = {}
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
 
-  constructor(dvcRoot: string, workspaceState: Memento) {
+  constructor(
+    dvcRoot: string,
+    workspaceState: Memento,
+    columnsOrderChanged: EventEmitter<void>
+  ) {
     super(dvcRoot, workspaceState, PersistenceKey.METRICS_AND_PARAMS_STATUS)
 
     this.columnOrderState = this.revive(
@@ -22,6 +27,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       {}
     )
+    this.columnsOrderChanged = columnsOrderChanged
   }
 
   public getColumnOrder(): string[] {
@@ -59,6 +65,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,
       this.getColumnOrder()
     )
+    this.columnsOrderChanged.fire()
   }
 
   public setColumnWidth(id: string, width: number) {
