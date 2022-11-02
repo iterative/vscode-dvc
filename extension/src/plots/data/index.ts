@@ -57,7 +57,7 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
 
     this.compareFiles(files)
 
-    return this.notifyChanged({ data, revs: args })
+    return this.notifyChanged({ data, revs })
   }
 
   public managedUpdate() {
