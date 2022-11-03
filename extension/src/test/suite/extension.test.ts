@@ -15,7 +15,7 @@ import { WEBVIEW_TEST_TIMEOUT } from './timeouts'
 import { Disposable } from '../../extension'
 import * as Python from '../../extensions/python'
 import { DvcReader } from '../../cli/dvc/reader'
-import expShowFixture from '../fixtures/expShow/output'
+import expShowFixture from '../fixtures/expShow/base/output'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
 import {

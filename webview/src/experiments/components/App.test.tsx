@@ -7,11 +7,11 @@ import {
   within
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
+import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Column, ColumnType, Row } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
-import { dataTypesTableData } from 'dvc/src/test/fixtures/expShow/dataTypes'
+import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
@@ -662,7 +662,7 @@ describe('App', () => {
         expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
       }
 
-      renderTable(dataTypesTableData)
+      renderTable(dataTypesTableFixture)
 
       expectTooltipValue({
         cellLabel: '1.9293',
@@ -681,6 +681,52 @@ describe('App', () => {
         expectedTooltipResult: '[true, false, string, 2]'
       })
     })
+
+    it('should show the expected tooltip for the plot experiment row action', () => {
+      const clickableText = 'Open the plots view'
+
+      renderTable(testData)
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      const radioButton = within(getRow('workspace')).getByTestId(
+        'row-action-plot'
+      )
+      fireEvent.mouseEnter(radioButton)
+
+      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      const tooltip = screen.queryByRole('tooltip')
+
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent(`Click to plot${clickableText}`)
+      const clickableContent = screen.getByText(clickableText)
+      fireEvent.click(clickableContent)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+      })
+    })
+
+    it('should show the expected tooltip for the star experiment row action', () => {
+      const clickableText = 'Filter experiments by starred'
+
+      renderTable(testData)
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      const radioButton = within(getRow('main')).getByTestId('row-action-star')
+      fireEvent.mouseEnter(radioButton)
+
+      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      const tooltip = screen.queryByRole('tooltip')
+
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent(`Click to star${clickableText}`)
+      const clickableContent = screen.getByText('Filter experiments by starred')
+      fireEvent.click(clickableContent)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
+      })
+    })
   })
 
   describe('Header Context Menu', () => {
@@ -691,19 +737,14 @@ describe('App', () => {
       jest.useRealTimers()
     })
 
-    it('should open on left click', () => {
+    it('should not open on left click', () => {
       renderTableWithoutRunningExperiments()
 
       const paramsFileHeader = screen.getByText('params.yaml')
       fireEvent.click(paramsFileHeader, { bubbles: true })
 
       jest.advanceTimersByTime(100)
-      const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toStrictEqual([
-        'Open to the Side',
-        'Set Max Header Height'
-      ])
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
     it('should open on right click and close on esc', () => {

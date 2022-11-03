@@ -6,12 +6,12 @@ import { userEvent, within } from '@storybook/testing-library'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
-  PlotSize,
   TemplatePlotGroup,
-  TemplatePlotSection
+  TemplatePlotSection,
+  PlotSizeNumber
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
@@ -31,12 +31,12 @@ const smallCheckpointPlotsFixture = {
   ...checkpointPlotsFixture,
   plots: checkpointPlotsFixture.plots.map(plot => ({
     ...plot,
-    title: truncateVerticalTitle(plot.title, PlotSize.SMALL) as string
+    title: truncateVerticalTitle(plot.title, PlotSizeNumber.SMALL) as string
   })),
-  size: PlotSize.SMALL
+  size: PlotSizeNumber.SMALL
 }
 
-const manyCheckpointPlots = (length: number, size = PlotSize.REGULAR) =>
+const manyCheckpointPlots = (length: number, size = PlotSizeNumber.REGULAR) =>
   Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
     (plot, i) => {
       const id = plot.id + i.toString()
@@ -118,7 +118,7 @@ WithTemplateOnly.args = {
   data: {
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: templatePlotsFixture
+    template: { ...templatePlotsFixture, size: PlotSizeNumber.REGULAR }
   }
 }
 
@@ -178,11 +178,11 @@ WithoutData.args = {
 export const AllLarge = Template.bind({})
 AllLarge.args = {
   data: {
-    checkpoint: { ...checkpointPlotsFixture, size: PlotSize.LARGE },
-    comparison: { ...comparisonPlotsFixture, size: PlotSize.LARGE },
+    checkpoint: { ...checkpointPlotsFixture, size: PlotSizeNumber.LARGE },
+    comparison: { ...comparisonPlotsFixture, size: PlotSizeNumber.LARGE },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: { ...templatePlotsFixture, size: PlotSize.LARGE }
+    template: { ...templatePlotsFixture, size: PlotSizeNumber.LARGE }
   }
 }
 AllLarge.parameters = chromaticParameters
@@ -191,10 +191,10 @@ export const AllSmall = Template.bind({})
 AllSmall.args = {
   data: {
     checkpoint: smallCheckpointPlotsFixture,
-    comparison: { ...comparisonPlotsFixture, size: PlotSize.SMALL },
+    comparison: { ...comparisonPlotsFixture, size: PlotSizeNumber.SMALL },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: { ...templatePlotsFixture, size: PlotSize.SMALL }
+    template: { ...templatePlotsFixture, size: PlotSizeNumber.SMALL }
   }
 }
 AllSmall.parameters = chromaticParameters

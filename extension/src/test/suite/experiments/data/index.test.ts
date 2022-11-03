@@ -1,17 +1,17 @@
-import { join, resolve, sep } from 'path'
+import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { EventEmitter, FileSystemWatcher, RelativePattern, Uri } from 'vscode'
+import { EventEmitter, FileSystemWatcher, RelativePattern } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { Disposable } from '../../../../extension'
-import expShowFixture from '../../../fixtures/expShow/output'
+import expShowFixture from '../../../fixtures/expShow/base/output'
 import {
   bypassProcessManagerDebounce,
   getFirstArgOfCall,
   getMockNow,
   stubPrivateMemberMethod
 } from '../../util'
-import { dvcDemoPath } from '../../../util'
+import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
 import {
   ExperimentsData,
   QUEUED_EXPERIMENT_PATH
@@ -25,7 +25,8 @@ import {
 import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
 import { ExperimentFlag } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
-import { DOT_GIT_HEAD } from '../../../../cli/git/constants'
+import { gitPath } from '../../../../cli/git/constants'
+import { getGitPath } from '../../../../fileSystem'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -65,7 +66,7 @@ suite('Experiments Data Test Suite', () => {
 
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
         new RelativePattern(
-          Uri.file(dvcDemoPath),
+          getTestWorkspaceFolder(),
           join(
             '**',
             `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
@@ -139,7 +140,7 @@ suite('Experiments Data Test Suite', () => {
       expect(mockDispose).to.be.calledOnce
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
         new RelativePattern(
-          Uri.file(dvcDemoPath),
+          getTestWorkspaceFolder(),
           join(
             '**',
             `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
@@ -148,7 +149,7 @@ suite('Experiments Data Test Suite', () => {
       )
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.deep.equal(
         new RelativePattern(
-          Uri.file(dvcDemoPath),
+          getTestWorkspaceFolder(),
           join(
             '**',
             `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
@@ -159,7 +160,7 @@ suite('Experiments Data Test Suite', () => {
 
     it('should watch the .git directory for updates', async () => {
       const mockNow = getMockNow()
-      const gitRoot = resolve(dvcDemoPath, '..')
+      const gitRoot = dvcDemoPath
 
       const mockExecuteCommand = (command: CommandId) => {
         if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
@@ -186,7 +187,7 @@ suite('Experiments Data Test Suite', () => {
         data.onDidUpdate(() => resolve(undefined))
       )
 
-      await Watcher.fireWatcher(join(gitRoot, DOT_GIT_HEAD))
+      await Watcher.fireWatcher(getGitPath(gitRoot, gitPath.DOT_GIT_HEAD))
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called

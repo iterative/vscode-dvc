@@ -77,7 +77,7 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
     }: Cell<Row>) => {
       return (
         <div className={styles.experimentCellContents}>
-          <span className={styles.experimentCellPrimaryName}>{label}</span>
+          <span>{label}</span>
           {displayNameOrParent && (
             <span className={styles.experimentCellSecondaryName}>
               {displayNameOrParent}
@@ -89,8 +89,8 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
     Header: ExperimentHeader,
     accessor: EXPERIMENT_COLUMN_ID,
     id: EXPERIMENT_COLUMN_ID,
-    minWidth: 250,
-    width: 250
+    minWidth: 215,
+    width: 215
   }
   return {
     Header: '',

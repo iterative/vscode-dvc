@@ -1,6 +1,6 @@
 import { collectExperiments, collectMutableRevisions } from './collect'
 import { Experiment } from '../webview/contract'
-import modifiedFixture from '../../test/fixtures/expShow/modified'
+import modifiedFixture from '../../test/fixtures/expShow/modified/output'
 import { ExperimentStatus } from '../../cli/dvc/contract'
 
 describe('collectExperiments', () => {

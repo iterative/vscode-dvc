@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { collectFlatExperimentParams } from './collect'
-import rowsFixture from '../../../test/fixtures/expShow/rows'
+import rowsFixture from '../../../test/fixtures/expShow/base/rows'
 import { appendColumnToPath } from '../../columns/paths'
 
 describe('collectFlatExperimentParams', () => {

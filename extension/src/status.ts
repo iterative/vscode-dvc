@@ -1,4 +1,4 @@
-import { StatusBarItem, window } from 'vscode'
+import { StatusBarItem, ThemeColor, window } from 'vscode'
 import { Disposable } from './class/dispose'
 import { ICli } from './cli'
 import { RegisteredCommands } from './commands/external'
@@ -51,6 +51,8 @@ export class Status extends Disposable {
 
   private setState = (isWorking: boolean) => {
     this.statusBarItem.text = this.getText(isWorking)
+    this.statusBarItem.color = this.getColor()
+
     this.statusBarItem.command = this.getCommand()
   }
 
@@ -64,6 +66,13 @@ export class Status extends Disposable {
     if (!this.workers) {
       this.setState(false)
     }
+  }
+
+  private getColor() {
+    if (this.available) {
+      return
+    }
+    return new ThemeColor('errorForeground')
   }
 
   private getCommand() {

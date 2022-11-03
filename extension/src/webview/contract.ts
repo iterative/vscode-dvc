@@ -2,7 +2,6 @@ import { SortDefinition } from '../experiments/model/sortBy'
 import { TableData } from '../experiments/webview/contract'
 import {
   PlotsData,
-  PlotSize,
   Section,
   SectionCollapsed,
   TemplatePlotGroup
@@ -13,6 +12,7 @@ export type WebviewData = TableData | PlotsData
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
   APPLY_EXPERIMENT_TO_WORKSPACE = 'apply-experiment-to-workspace',
+  ADD_STARRED_EXPERIMENT_FILTER = 'add-starred-experiment-filter',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
@@ -52,7 +52,7 @@ export type ColumnResizePayload = {
   id: string
   width: number
 }
-export type PlotsResizedPayload = { section: Section; size: PlotSize }
+export type PlotsResizedPayload = { section: Section; size: number }
 export type PlotSectionRenamedPayload = {
   section: Section
   name: string
@@ -90,6 +90,9 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
       payload: string
+    }
+  | {
+      type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
     }
   | {
       type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
