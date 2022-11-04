@@ -1568,7 +1568,7 @@
     "@types/lodash.omit": "4.5.7",
     "@types/mocha": "10.0.0",
     "@types/mock-require": "2.0.1",
-    "@types/node": "18.11.3",
+    "@types/node": "18.11.7",
     "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.8",
     "@types/uuid": "8.3.4",
