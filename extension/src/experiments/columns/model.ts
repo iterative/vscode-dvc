@@ -105,22 +105,27 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     )
   }
 
-  private getColumnsFromType(type: string): string[] {
-    const childrenColumns: string[] = []
-    const findChildrenColumns = (parent: string, columns: Column[]) => {
-      const filteredColumns = columns.filter(
-        ({ parentPath }) => parentPath === parent
-      )
-      for (const column of filteredColumns) {
-        if (column.hasChildren) {
-          findChildrenColumns(column.path, columns)
-        } else {
-          childrenColumns.push(column.path)
-        }
+  private findChildrenColumns(
+    parent: string,
+    columns: Column[],
+    childrenColumns: string[]
+  ) {
+    const filteredColumns = columns.filter(
+      ({ parentPath }) => parentPath === parent
+    )
+    for (const column of filteredColumns) {
+      if (column.hasChildren) {
+        this.findChildrenColumns(column.path, columns, childrenColumns)
+      } else {
+        childrenColumns.push(column.path)
       }
     }
+  }
+
+  private getColumnsFromType(type: string): string[] {
+    const childrenColumns: string[] = []
     const dataWithType = this.data.filter(({ path }) => path.startsWith(type))
-    findChildrenColumns(type, dataWithType)
+    this.findChildrenColumns(type, dataWithType, childrenColumns)
     return childrenColumns
   }
 
