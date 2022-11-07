@@ -242,7 +242,7 @@ describe('ColumnsModel', () => {
       )
       await model.transformAndSet(outputFixture)
 
-      expect(model.getColumnOrder()).toStrictEqual([
+      expect(model.getColumnOrder().slice(0, 14)).toStrictEqual([
         'id',
         'Created',
         'metrics:summary.json:loss',
@@ -256,16 +256,7 @@ describe('ColumnsModel', () => {
         'params:params.yaml:log_file',
         'params:params.yaml:dropout',
         'params:params.yaml:process.threshold',
-        'params:params.yaml:process.test_arg',
-        'params:nested/params.yaml:test',
-        'deps:data/data.xml',
-        'deps:data/prepared',
-        'deps:data/features',
-        'deps:src/prepare.py',
-        'deps:src/featurization.py',
-        'deps:src/train.py',
-        'deps:src/evaluate.py',
-        'deps:model.pkl'
+        'params:params.yaml:process.test_arg'
       ])
     })
 
