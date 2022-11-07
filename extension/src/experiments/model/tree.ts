@@ -357,7 +357,7 @@ export class ExperimentsTree
         )
         const truncatedVal =
           typeof value === 'number' ? truncate(String(value), 7) : value
-        return value ? `| ${truncatedKey} | ${truncatedVal} |\n` : ''
+        return value !== null ? `| ${truncatedKey} | ${truncatedVal} |\n` : ''
       })
       .join('')
     return getMarkdownString(`|||\n|:--|--|\n${data}`)

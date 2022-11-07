@@ -35,7 +35,7 @@ const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
       const truncatedVal =
         typeof value === 'number' ? truncate(String(value), 7) : value
 
-      return value ? `${truncatedKey}:${truncatedVal}` : ''
+      return value !== null ? `${truncatedKey}:${truncatedVal}` : ''
     })
     .filter(Boolean)
     .join(', '),

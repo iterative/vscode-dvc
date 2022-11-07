@@ -13,8 +13,9 @@ export const getDataFromColumnPath = (
     columnPath === 'Created' && collectedVal
       ? formatDate(collectedVal)
       : collectedVal?.value || collectedVal
+
   return {
     splitUpPath,
-    value: value || null
+    value: value === 0 || value ? value : null
   }
 }
