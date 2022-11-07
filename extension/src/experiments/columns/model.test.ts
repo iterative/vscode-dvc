@@ -234,32 +234,6 @@ describe('ColumnsModel', () => {
   })
 
   describe('columns order', () => {
-    it('should set a new column order collected from data if state is empty', async () => {
-      const model = new ColumnsModel(
-        exampleDvcRoot,
-        buildMockMemento(),
-        mockedColumnsOrderOrStatusChanged
-      )
-      await model.transformAndSet(outputFixture)
-
-      expect(model.getColumnOrder().slice(0, 14)).toStrictEqual([
-        'id',
-        'Created',
-        'metrics:summary.json:loss',
-        'metrics:summary.json:accuracy',
-        'metrics:summary.json:val_loss',
-        'metrics:summary.json:val_accuracy',
-        'params:params.yaml:code_names',
-        'params:params.yaml:epochs',
-        'params:params.yaml:learning_rate',
-        'params:params.yaml:dvc_logs_dir',
-        'params:params.yaml:log_file',
-        'params:params.yaml:dropout',
-        'params:params.yaml:process.threshold',
-        'params:params.yaml:process.test_arg'
-      ])
-    })
-
     it('should return the columns order from the persisted state', () => {
       const persistedState = [
         { path: 'A', width: 0 },
@@ -277,7 +251,7 @@ describe('ColumnsModel', () => {
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
-    it('should return the first three none hidden columns', async () => {
+    it('should return the first three none hidden columns from the persisted state', async () => {
       const persistedState = [
         'id',
         'Created',
@@ -307,6 +281,29 @@ describe('ColumnsModel', () => {
       expect(model.getFirstThreeColumnOrder()).toStrictEqual(
         persistedState.slice(2, 5)
       )
+    })
+
+    it('should return the first three none hidden columns collected from data if state is empty', async () => {
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        buildMockMemento(),
+        mockedColumnsOrderOrStatusChanged
+      )
+      await model.transformAndSet(outputFixture)
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+        'Created',
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy'
+      ])
+
+      model.toggleStatus('Created')
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy',
+        'metrics:summary.json:val_loss'
+      ])
     })
 
     it('should re-order the columns if a new columnOrder is set', () => {

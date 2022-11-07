@@ -39,7 +39,12 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   }
 
   public getFirstThreeColumnOrder(): string[] {
-    return this.columnOrderState
+    const columnOrder =
+      this.columnOrderState.length === 0
+        ? this.getColumnOrderFromData()
+        : this.columnOrderState
+
+    return columnOrder
       .filter(path => this.status[path] && this.status[path] === 2)
       .slice(0, 3)
   }
@@ -149,9 +154,6 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
     this.data = columns
 
-    if (this.columnOrderState.length === 0) {
-      this.setColumnOrder(this.getColumnOrderFromData())
-    }
     this.paramsFiles = paramsFiles
   }
 
