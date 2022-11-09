@@ -11,7 +11,7 @@ import {
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
-import { truncate, truncateFromLeft } from '../../util/string'
+import { truncateFromLeft } from '../../util/string'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -32,10 +32,8 @@ const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
         splitUpPath[splitUpPath.length - 1],
         15
       )
-      const truncatedVal =
-        typeof value === 'number' ? truncate(String(value), 7) : value
 
-      return value !== null ? `${truncatedKey}:${truncatedVal}` : ''
+      return value !== null ? `${truncatedKey}:${value}` : ''
     })
     .filter(Boolean)
     .join(', '),
