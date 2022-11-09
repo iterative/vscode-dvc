@@ -83,7 +83,7 @@ describe('pickExperiments', () => {
       label: '123fsf4',
       params: {
         'params.yaml': {
-          prepare: { split: 0.1 }
+          prepare: { split: 0 }
         }
       },
       selected: false
@@ -135,7 +135,7 @@ describe('pickExperiments', () => {
       [
         {
           description: '[exp-123]',
-          detail: 'Created:Aug 19, 2022, split:0.1, data/data.xml:22a1a29',
+          detail: 'Created:Aug 19, 2022, split:0, data/data.xml:22a1a29',
           label: '123fsf4',
           value: mockedExperiments[0]
         },
