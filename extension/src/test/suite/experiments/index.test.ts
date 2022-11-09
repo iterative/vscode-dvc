@@ -1344,7 +1344,7 @@ suite('Experiments Test Suite', () => {
 
       expect(
         mockMemento.get('columnsColumnOrder:test'),
-        'the columns order is add to Momento'
+        'the columns order is added to memento'
       ).to.deep.equal(columnsOrderFixture)
 
       const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
