@@ -13,7 +13,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/checkpointPlots'
+import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
@@ -429,7 +429,7 @@ describe('App', () => {
     })
   })
 
-  it('should not toggle the checkpoint plots section if a link is clicked', () => {
+  it('should not toggle the checkpoint plots section if the tooltip is clicked', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
@@ -445,6 +445,16 @@ describe('App', () => {
     const tooltip = screen.getByTestId('tooltip-checkpoint-plots')
     const tooltipLink = within(tooltip).getByRole('link')
     fireEvent.click(tooltipLink, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
+      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+
+    fireEvent.click(checkpointsTooltipToggle, {
       bubbles: true,
       cancelable: true
     })

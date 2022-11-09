@@ -320,6 +320,7 @@ $resizer-border: 2px dashed $accent-color;
 .infoTooltipToggle {
   display: flex;
   align-items: center;
+  cursor: initial;
 }
 
 .infoIcon {

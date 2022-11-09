@@ -1,4 +1,4 @@
-import { Memento } from 'vscode'
+import { EventEmitter, Memento } from 'vscode'
 import { collectChanges, collectColumns, collectParamsFiles } from './collect'
 import { Column, ColumnType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
@@ -6,12 +6,17 @@ import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel } from '../../path/selection/model'
 
 export class ColumnsModel extends PathSelectionModel<Column> {
+  private columnsOrderChanged: EventEmitter<void>
   private columnOrderState: string[] = []
   private columnWidthsState: Record<string, number> = {}
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
 
-  constructor(dvcRoot: string, workspaceState: Memento) {
+  constructor(
+    dvcRoot: string,
+    workspaceState: Memento,
+    columnsOrderChanged: EventEmitter<void>
+  ) {
     super(dvcRoot, workspaceState, PersistenceKey.METRICS_AND_PARAMS_STATUS)
 
     this.columnOrderState = this.revive(
@@ -22,10 +27,17 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       {}
     )
+    this.columnsOrderChanged = columnsOrderChanged
   }
 
   public getColumnOrder(): string[] {
     return this.columnOrderState
+  }
+
+  public getFirstThreeColumnOrder(): string[] {
+    return this.columnOrderState.length === 0
+      ? this.getFirstThreeColumnOrderFromData()
+      : this.columnOrderState.slice(1, 4)
   }
 
   public getColumnWidths(): Record<string, number> {
@@ -53,6 +65,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,
       this.getColumnOrder()
     )
+    this.columnsOrderChanged.fire()
   }
 
   public setColumnWidth(id: string, width: number) {
@@ -76,6 +89,13 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public hasNonDefaultColumns() {
     return this.data.length > 1
+  }
+
+  private getFirstThreeColumnOrderFromData(): string[] {
+    return this.data
+      .filter(({ hasChildren }) => !hasChildren)
+      .slice(0, 3)
+      .map(({ path }) => path)
   }
 
   private filterChildren(path?: string) {

@@ -16,7 +16,7 @@ beforeEach(() => {
 
 describe('pickExperiments', () => {
   it('should return early given no experiments', async () => {
-    const undef = await pickExperiments([], false)
+    const undef = await pickExperiments([], false, [])
     expect(undef).toBeUndefined()
     expect(mockedQuickPickLimitedValues).not.toHaveBeenCalled()
   })
@@ -34,7 +34,7 @@ describe('pickExperiments', () => {
     ] as Experiment[]
 
     mockedQuickPickLimitedValues.mockResolvedValueOnce([selectedExperiment])
-    const picked = await pickExperiments(mockedExperiments, false)
+    const picked = await pickExperiments(mockedExperiments, false, [])
 
     expect(picked).toStrictEqual([selectedExperiment])
     expect(mockedQuickPickLimitedValues).toHaveBeenCalledTimes(1)
@@ -42,16 +42,19 @@ describe('pickExperiments', () => {
       [
         {
           description: '[exp-123]',
+          detail: '',
           label: '73de3fe',
           value: mockedExperiments[0]
         },
         {
           description: '[exp-456]',
+          detail: '',
           label: '0be657c',
           value: mockedExperiments[1]
         },
         {
           description: '[exp-789]',
+          detail: '',
           label: '7c366f6',
           value: mockedExperiments[2]
         }
@@ -59,10 +62,97 @@ describe('pickExperiments', () => {
       [
         {
           description: '[exp-456]',
+          detail: '',
           label: '0be657c',
           value: mockedExperiments[1]
         }
       ],
+      MAX_SELECTED_EXPERIMENTS,
+      Title.SELECT_EXPERIMENTS
+    )
+  })
+
+  it('should fill the quick pick item details with column values', async () => {
+    const selectedExperiment = {
+      Created: '2022-08-19T08:17:22',
+      deps: {
+        'data/data.xml': { changes: false, value: '22a1a29' }
+      },
+      displayNameOrParent: '[exp-123]',
+      id: 'exp-123',
+      label: '123fsf4',
+      params: {
+        'params.yaml': {
+          prepare: { split: 0.1 }
+        }
+      },
+      selected: false
+    } as Experiment
+    const mockedExperiments = [
+      selectedExperiment,
+      {
+        Created: '2022-08-19T08:17:22',
+        deps: {
+          'data/data.xml': { changes: false, value: '22a1a29' }
+        },
+        displayNameOrParent: '[exp-456]',
+        id: 'exp-456',
+        label: '456fsf4',
+        params: {
+          'params.yaml': {
+            prepare: { split: 0.2 }
+          }
+        },
+        selected: false
+      },
+      {
+        Created: '2022-09-15T06:58:29',
+        deps: {
+          'data/data.xml': { changes: false, value: '22a1a29' }
+        },
+        displayNameOrParent: '[exp-789]',
+        id: 'exp-789',
+        label: '789fsf4',
+        params: {
+          'params.yaml': {
+            prepare: { split: 0.3 }
+          }
+        },
+        selected: false
+      }
+    ] as Experiment[]
+
+    mockedQuickPickLimitedValues.mockResolvedValueOnce([selectedExperiment])
+    const picked = await pickExperiments(mockedExperiments, false, [
+      'Created',
+      'params:params.yaml:prepare.split',
+      'deps:data/data.xml'
+    ])
+
+    expect(picked).toStrictEqual([selectedExperiment])
+    expect(mockedQuickPickLimitedValues).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickLimitedValues).toHaveBeenCalledWith(
+      [
+        {
+          description: '[exp-123]',
+          detail: 'Created:Aug 19, 2022, split:0.1, data/data.xml:22a1a29',
+          label: '123fsf4',
+          value: mockedExperiments[0]
+        },
+        {
+          description: '[exp-456]',
+          detail: 'Created:Aug 19, 2022, split:0.2, data/data.xml:22a1a29',
+          label: '456fsf4',
+          value: mockedExperiments[1]
+        },
+        {
+          description: '[exp-789]',
+          detail: 'Created:Sep 15, 2022, split:0.3, data/data.xml:22a1a29',
+          label: '789fsf4',
+          value: mockedExperiments[2]
+        }
+      ],
+      [],
       MAX_SELECTED_EXPERIMENTS,
       Title.SELECT_EXPERIMENTS
     )
@@ -115,12 +205,14 @@ describe('pickExperiments', () => {
           checkpoints: [mockedExp2Checkpoint1, mockedExp2Checkpoint2]
         }
       ] as ExperimentWithCheckpoints[],
-      true
+      true,
+      []
     )
 
     const getExpectedItem = <T extends { label: string }>(
       item: T
-    ): { label: string; value: T } => ({
+    ): { label: string; value: T; detail: string } => ({
+      detail: '',
       label: item.label,
       value: item
     })

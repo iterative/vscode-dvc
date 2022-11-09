@@ -1,8 +1,8 @@
-import { TableData } from '../../../experiments/webview/contract'
+import { TableData } from '../../../../experiments/webview/contract'
 import rowsFixture from './rows'
 import columnsFixture from './columns'
 
-const tableDataFixture: TableData = {
+const data: TableData = {
   filteredCounts: { experiments: 0, checkpoints: 0 },
   rows: rowsFixture,
   columns: columnsFixture,
@@ -16,4 +16,4 @@ const tableDataFixture: TableData = {
   columnWidths: {}
 }
 
-export default tableDataFixture
+export default data
