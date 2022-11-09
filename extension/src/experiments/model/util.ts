@@ -6,23 +6,21 @@ import { Experiment } from '../webview/contract'
 
 type Value = undefined | null | [] | string | number
 
-const getValueType = (value: Value) => {
+const getValueType = (value: Value): string => {
+  let type: string = typeof value
   if (Number.isNaN(value)) {
-    return 'NaN'
+    type = 'NaN'
+  } else if (typeof value === 'string' && Date.parse(value)) {
+    type = 'date'
+  } else if (Array.isArray(value)) {
+    type = 'array'
+  } else if (value === '') {
+    type = 'empty'
   }
-  if (typeof value === 'string' && Date.parse(value)) {
-    return 'date'
-  }
-  if (Array.isArray(value)) {
-    return 'array'
-  }
-  if (value === '') {
-    return 'empty'
-  }
-  return typeof value
+  return type
 }
 
-const getStringifiedValue = (value: Value) => {
+const getStringifiedValue = (value: Value): string => {
   const type = getValueType(value)
   switch (type) {
     case 'date':
