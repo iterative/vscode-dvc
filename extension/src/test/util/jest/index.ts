@@ -27,7 +27,7 @@ export const buildMockedEventEmitter = <T = void>() => {
 
 export const buildMockedExperiments = () => {
   const mockedColumnsChanged = buildMockedEventEmitter()
-  const mockedColumnsOrderChanged = buildMockedEventEmitter()
+  const mockedColumnsOrderOrStatusChanged = buildMockedEventEmitter()
   const mockedExperimentsChanged = buildMockedEventEmitter()
   const mockedGetChildColumns = jest.fn()
   const mockedGetDvcRoots = jest.fn()
@@ -60,7 +60,7 @@ export const buildMockedExperiments = () => {
 
   return {
     mockedColumnsChanged,
-    mockedColumnsOrderChanged,
+    mockedColumnsOrderOrStatusChanged,
     mockedExperiments,
     mockedExperimentsChanged,
     mockedGetBranchExperiments,
