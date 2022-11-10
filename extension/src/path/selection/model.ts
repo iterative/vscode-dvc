@@ -1,4 +1,4 @@
-import { Memento } from 'vscode'
+import { EventEmitter, Memento } from 'vscode'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
 import { Column } from '../../experiments/webview/contract'
@@ -17,17 +17,22 @@ export abstract class PathSelectionModel<
 
   protected data: T[] = []
 
+  protected statusChanged?: EventEmitter<void>
   private readonly statusKey: PersistenceKey
 
   constructor(
     dvcRoot: string,
     workspaceState: Memento,
-    statusKey: PersistenceKey
+    statusKey: PersistenceKey,
+    statusChanged?: EventEmitter<void>
   ) {
     super(dvcRoot, workspaceState)
 
     this.statusKey = statusKey
     this.status = workspaceState.get(this.statusKey + dvcRoot, {})
+    if (statusChanged) {
+      this.statusChanged = statusChanged
+    }
   }
 
   public getSelected() {
@@ -50,6 +55,7 @@ export abstract class PathSelectionModel<
     this.setAreChildrenSelected(path, status)
     this.setAreParentsSelected(path)
     this.persistStatus()
+    this.statusChanged?.fire()
 
     return this.status[path]
   }
