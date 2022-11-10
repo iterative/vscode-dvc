@@ -23,7 +23,7 @@ export const dataColumnOrder: string[] = [
   'params:params.yaml:dropout',
   'params:params.yaml:process.threshold',
   'params:params.yaml:process.test_arg',
-  'params:nested/params.yaml:test',
+  join('params:nested', 'params.yaml:test'),
   join('deps:data', 'data.xml'),
   join('deps:data', 'prepared'),
   join('deps:data', 'features'),
