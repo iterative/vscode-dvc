@@ -22,7 +22,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   public readonly onDidChangeExperiments = this.experimentsChanged.event
 
   public readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
-  public readonly columnsOrderChanged = this.dispose.track(
+  public readonly columnsOrderOrStatusChanged = this.dispose.track(
     new EventEmitter<void>()
   )
 
@@ -314,7 +314,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     experiments.dispose.track(
-      experiments.onDidChangeColumnOrder(() => {
+      experiments.onDidChangeColumnOrderOrStatus(() => {
         this.experimentsChanged.fire()
       })
     )

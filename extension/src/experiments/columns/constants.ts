@@ -9,3 +9,5 @@ export const timestampColumn: Column = {
   type,
   types: [type]
 }
+
+export const EXPERIMENT_COLUMN_ID = 'id'
