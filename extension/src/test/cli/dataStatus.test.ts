@@ -28,9 +28,9 @@ suite('data status --granular --unchanged --show-json', () => {
         'misclassified.jpg',
         'model.pt',
         'predictions.json',
-        'training_metrics' + sep,
-        join('training_metrics', 'scalars', 'acc.tsv'),
-        join('training_metrics', 'scalars', 'loss.tsv')
+        join('training', 'plots') + sep,
+        join('training', 'plots', 'metrics', 'acc.tsv'),
+        join('training', 'plots', 'metrics', 'loss.tsv')
       ].sort()
 
       const collectedPaths = [
