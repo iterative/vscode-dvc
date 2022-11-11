@@ -33,6 +33,48 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 
   const hasFilter = !!(column.id && filters.includes(column.id))
 
+  const isSortable =
+    !column.placeholderOf && column.id !== 'id' && !column.columns
+
+  const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
+
+  const contextMenuOptions: MessagesMenuOptionProps[] = React.useMemo(() => {
+    const menuOptions: MessagesMenuOptionProps[] = [
+      {
+        hidden: column.id === 'id',
+        id: 'hide-column',
+        label: 'Hide Column',
+        message: {
+          payload: column.originalId || column.id,
+          type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+        }
+      },
+      {
+        hidden: column.group !== ColumnType.PARAMS,
+        id: 'open-to-the-side',
+        label: 'Open to the Side',
+        message: {
+          payload: column.id,
+          type: MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE
+        }
+      },
+      {
+        id: 'update-header-depth',
+        label: 'Set Max Header Height',
+        message: {
+          type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT
+        }
+      }
+    ]
+
+    return menuOptions
+  }, [column])
+
+  const visibleOptions: number = React.useMemo(
+    () => contextMenuOptions.filter(option => !option.hidden).length,
+    [contextMenuOptions]
+  )
+
   return (
     <TableHeaderCell
       column={column}
@@ -43,6 +85,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragEnd={onDragEnd}
       onDragStart={onDragStart}
       onDrop={onDrop}
+      menuDisabled={!isSortable && visibleOptions === 0}
       root={root}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
     />
