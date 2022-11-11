@@ -19,6 +19,7 @@ import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 import { MaybeConsoleError } from '../error'
 import { Logger } from '../../common/logger'
+import { parseNonStandardJson } from '../../util/json'
 
 const defaultExperimentsOutput: ExperimentsOutput = {
   workspace: { baseline: {} }
@@ -122,7 +123,7 @@ export class DvcReader extends DvcCli {
     try {
       const output =
         (await this.executeDvcProcess(cwd, ...args)) || defaultValue
-      return JSON.parse(output) as T
+      return parseNonStandardJson(output) as T
     } catch (error: unknown) {
       const msg =
         (error as MaybeConsoleError).stderr || (error as Error).message

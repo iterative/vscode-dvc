@@ -54,7 +54,7 @@ export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
   public readonly onDidChangeColumns: Event<void>
-  public readonly onDidChangeColumnOrder: Event<void>
+  public readonly onDidChangeColumnOrderOrStatus: Event<void>
   public readonly onDidChangeCheckpoints: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
@@ -79,7 +79,7 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
-  private readonly columnsOrderChanged = this.dispose.track(
+  private readonly columnsOrderOrStatusChanged = this.dispose.track(
     new EventEmitter<void>()
   )
 
@@ -106,7 +106,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.onDidChangeIsParamsFileFocused = this.paramsFileFocused.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeColumns = this.columnsChanged.event
-    this.onDidChangeColumnOrder = this.columnsOrderChanged.event
+    this.onDidChangeColumnOrderOrStatus = this.columnsOrderOrStatusChanged.event
     this.onDidChangeCheckpoints = this.checkpointsChanged.event
 
     this.experiments = this.dispose.track(
@@ -114,7 +114,11 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.columns = this.dispose.track(
-      new ColumnsModel(dvcRoot, workspaceState, this.columnsOrderChanged)
+      new ColumnsModel(
+        dvcRoot,
+        workspaceState,
+        this.columnsOrderOrStatusChanged
+      )
     )
 
     this.checkpoints = this.dispose.track(new CheckpointsModel())

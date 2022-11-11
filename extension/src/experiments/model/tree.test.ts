@@ -16,6 +16,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
 import { ExperimentStatus } from '../webview/contract'
+import { formatDate } from '../../util/date'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -407,7 +408,9 @@ describe('ExperimentsTree', () => {
           label: 'a123',
           params: {
             'params.yaml': {
-              featurize: { max_features: 200 }
+              featurize: {
+                random_value: undefined
+              }
             }
           },
           selected: false,
@@ -424,7 +427,9 @@ describe('ExperimentsTree', () => {
           label: 'b456',
           params: {
             'params.yaml': {
-              featurize: { max_features: 210 }
+              featurize: {
+                random_value: ['rbf', 'linear']
+              }
             }
           },
           selected: true,
@@ -441,7 +446,9 @@ describe('ExperimentsTree', () => {
           label: 'c789',
           params: {
             'params.yaml': {
-              featurize: { max_features: 190 }
+              featurize: {
+                random_value: false
+              }
             }
           },
           selected: false,
@@ -458,8 +465,8 @@ describe('ExperimentsTree', () => {
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
       mockedGetFirstThreeColumnOrder.mockReturnValue([
         'Created',
-        'params:params.yaml:featurize.max_features',
-        'deps:data/data.xml'
+        'deps:data/data.xml',
+        'params:params.yaml:featurize.random_value'
       ])
 
       const children = await experimentsTree.getChildren()
@@ -477,8 +484,9 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-123',
           label: 'a123',
-          tooltip:
-            '|||\n|:--|--|\n| Created | Aug 19, 2022 |\n| ...ms.yaml:featurize.max_features | 200 |\n| data/data.xml | 22a1a29 |\n',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[0].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | undefined |\n`,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -493,8 +501,9 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-456',
           label: 'b456',
-          tooltip:
-            '|||\n|:--|--|\n| Created | Sep 15, 2022 |\n| ...ms.yaml:featurize.max_features | 210 |\n| data/data.xml | 22a1a29 |\n',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[1].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | [rbf,linear] |\n`,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -509,8 +518,9 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-789',
           label: 'c789',
-          tooltip:
-            '|||\n|:--|--|\n| Created | Jul 3, 2022 |\n| ...ms.yaml:featurize.max_features | 190 |\n| data/data.xml | 22a1a29 |\n',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[2].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | false |\n`,
           type: ExperimentType.EXPERIMENT
         }
       ])

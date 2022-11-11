@@ -15,7 +15,9 @@ import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
 import rowsFixture from '../../fixtures/expShow/base/rows'
-import columnsFixture from '../../fixtures/expShow/base/columns'
+import columnsFixture, {
+  dataColumnOrder as columnsOrderFixture
+} from '../../fixtures/expShow/base/columns'
 import workspaceChangesFixture from '../../fixtures/expShow/base/workspaceChanges'
 import { Experiments } from '../../../experiments'
 import { ResourceLocator } from '../../../resourceLocator'
@@ -127,7 +129,7 @@ suite('Experiments Test Suite', () => {
 
       const expectedTableData: TableData = {
         changes: workspaceChangesFixture,
-        columnOrder: [],
+        columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
         filteredCounts: { checkpoints: 0, experiments: 0 },
@@ -807,7 +809,7 @@ suite('Experiments Test Suite', () => {
 
       const allColumnsUnselected: TableData = {
         changes: workspaceChangesFixture,
-        columnOrder: [],
+        columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: [],
         filteredCounts: { checkpoints: 0, experiments: 0 },
@@ -1314,8 +1316,8 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal([])
       expect(
         mockMemento.keys(),
-        'Memento starts with the status key'
-      ).to.deep.equal(['experimentsStatus:test'])
+        'Memento starts with the status keys'
+      ).to.deep.equal(['experimentsStatus:test', 'columnsColumnOrder:test'])
 
       expect(
         mockMemento.get('experimentsStatus:test'),
@@ -1339,6 +1341,11 @@ suite('Experiments Test Suite', () => {
         'test-branch': colors[3],
         workspace: colors[0]
       })
+
+      expect(
+        mockMemento.get('columnsColumnOrder:test'),
+        'the columns order is added to memento'
+      ).to.deep.equal(columnsOrderFixture)
 
       const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
 
