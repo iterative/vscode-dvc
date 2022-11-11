@@ -38,6 +38,7 @@ import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
 import { CheckpointPlotsById, plotDataStore } from './plotDataStore'
+import { setMaxPlotSize } from './webviewSlice'
 import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -51,7 +52,6 @@ import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
 import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { pickAndMove } from '../../test/mouseEventsWithCoordinates'
-import { setMaxPlotSize } from './webviewSlice'
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
@@ -169,6 +169,8 @@ describe('App', () => {
         ...withSize
       } as TemplatePlotsData
     }
+
+    // eslint-disable-next-line testing-library/render-result-naming-convention
     const store = renderAppWithOptionalData(plotsData)
     await screen.findAllByTestId('plots-wrapper')
 
@@ -575,6 +577,7 @@ describe('App', () => {
   })
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
+    // eslint-disable-next-line testing-library/render-result-naming-convention
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
