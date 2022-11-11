@@ -42,8 +42,6 @@ $gap: 20px;
 
 .plotsWrapper {
   width: 100%;
-  overflow-y: hidden;
-  overflow-x: visible;
 }
 
 :global(.vega-bindings):not(:empty) {
@@ -88,22 +86,17 @@ $gap: 20px;
 .multiViewPlotsGrid {
   width: 100%;
   height: max-content;
-  overflow-y: hidden;
-  overflow-x: visible;
 
   + .singleViewPlotsGrid,
   + .multiViewPlotsGrid {
     margin-top: $gap;
   }
 }
-.plotsGridWrapper {
-  width: 100%;
-}
 
 :global(.ReactVirtualized__Grid__innerScrollContainer),
 .noBigGrid {
   width: calc(100% - $gap * 2) !important;
-  max-width: 100%;
+  max-width: none !important;
   max-height: none !important;
   height: auto !important;
   margin-left: $gap;

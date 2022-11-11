@@ -19,6 +19,7 @@ import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webvi
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
+  CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSizeNumber,
@@ -37,7 +38,7 @@ import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
 import { CheckpointPlotsById, plotDataStore } from './plotDataStore'
-import { plotsReducers } from '../store'
+import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
   createBubbledEvent,
@@ -49,6 +50,8 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
 import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
+import { pickAndMove } from '../../test/mouseEventsWithCoordinates'
+import { setMaxPlotSize } from './webviewSlice'
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
@@ -113,6 +116,8 @@ describe('App', () => {
       </Provider>
     )
     data && sendSetDataMessage(data)
+
+    return store
   }
 
   const templatePlot = templatePlotsFixture.plots[0].entries[0]
@@ -140,45 +145,34 @@ describe('App', () => {
       ]
     ).getAllByTestId('icon-menu-item')[position]
 
-  const getCheckpointSizePickerButton = () => getCheckpointMenuItem(1)
-
-  const changeSize = async (
-    size: string,
-    buttonPosition: number,
-    wrapper: HTMLElement
-  ) => {
-    const sizePickerButton =
-      within(wrapper).getAllByTestId('icon-menu-item')[buttonPosition]
-    fireEvent.mouseEnter(sizePickerButton)
-    fireEvent.click(sizePickerButton)
-
-    const sizeButton = await within(wrapper).findByText(size)
-
-    fireEvent.click(sizeButton)
-    await screen.findAllByTestId('plots-wrapper')
-    fireEvent.click(sizePickerButton)
-    await screen.findAllByTestId('plots-wrapper')
-  }
-
   const renderAppAndChangeSize = async (
     data: PlotsData,
-    size: string,
+    size: number,
     section: Section
   ) => {
-    renderAppWithOptionalData({
+    const withSize = {
+      size
+    }
+    const plotsData = {
       ...data,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-    })
-
-    const sectionButtonPosition = {
-      [Section.CHECKPOINT_PLOTS]: 1,
-      [Section.TEMPLATE_PLOTS]: 0,
-      [Section.COMPARISON_TABLE]: 0
     }
-    const wrappers = await screen.findAllByTestId('plots-container')
-    const wrapper = wrappers[sectionPosition[section]]
+    if (section === Section.CHECKPOINT_PLOTS) {
+      plotsData.checkpoint = {
+        ...data?.checkpoint,
+        ...withSize
+      } as CheckpointPlotsData
+    }
+    if (section === Section.TEMPLATE_PLOTS) {
+      plotsData.template = {
+        ...data?.template,
+        ...withSize
+      } as TemplatePlotsData
+    }
+    const store = renderAppWithOptionalData(plotsData)
+    await screen.findAllByTestId('plots-wrapper')
 
-    await changeSize(size, sectionButtonPosition[section], wrapper)
+    return store
   }
 
   const waitForVega = async (plot: HTMLElement) => {
@@ -580,55 +574,20 @@ describe('App', () => {
     })
   })
 
-  it('should change the size of the plots according to the size picker', async () => {
-    renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-    const position = sectionPosition[Section.CHECKPOINT_PLOTS]
-    const getWrapper = async () => {
-      const wrappers = await screen.findAllByTestId('plots-wrapper')
-      return wrappers[position]
-    }
-
-    const sizePickerButton = getCheckpointSizePickerButton()
-    fireEvent.mouseEnter(sizePickerButton)
-    fireEvent.click(sizePickerButton)
-
-    const smallButton = screen.getByText('Small')
-    const regularButton = screen.getByText('Regular')
-    const largeButton = screen.getByText('Large')
-
-    fireEvent.click(smallButton)
-    let wrapper = await getWrapper()
-    expect(
-      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.SMALL}`)
-    ).toBe(true)
-
-    fireEvent.click(regularButton)
-    wrapper = await getWrapper()
-    expect(
-      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.REGULAR}`)
-    ).toBe(true)
-
-    fireEvent.click(largeButton)
-    wrapper = await getWrapper()
-    expect(
-      JSON.stringify(wrapper.style).includes(`${PlotSizeNumber.LARGE}`)
-    ).toBe(true)
-  })
-
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
-    renderAppWithOptionalData({
+    const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
 
-    const sizeButton = getCheckpointSizePickerButton()
-    fireEvent.mouseEnter(sizeButton)
-    fireEvent.click(sizeButton)
+    const setWrapperSize = () =>
+      act(() => {
+        store.dispatch(setMaxPlotSize(1000))
+      })
 
-    const largeButton = screen.getByText('Large')
-    fireEvent.click(largeButton)
+    const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
 
+    setWrapperSize()
+    pickAndMove(plotResizer, 10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
         section: Section.CHECKPOINT_PLOTS,
@@ -637,9 +596,30 @@ describe('App', () => {
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
-    const smallButton = screen.getByText('Small')
-    fireEvent.click(smallButton)
+    setWrapperSize()
+    pickAndMove(plotResizer, -10)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.REGULAR
+      },
+      type: MessageFromWebviewType.RESIZE_PLOTS
+    })
 
+    setWrapperSize()
+
+    pickAndMove(plotResizer, -10)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.MEDIUM
+      },
+      type: MessageFromWebviewType.RESIZE_PLOTS
+    })
+
+    setWrapperSize()
+    pickAndMove(plotResizer, -10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
         section: Section.CHECKPOINT_PLOTS,
@@ -647,35 +627,6 @@ describe('App', () => {
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
-  })
-
-  it('should not send a message to the extension with the selected size when the size has not changed', () => {
-    renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    const sizeButton = getCheckpointSizePickerButton()
-    fireEvent.mouseEnter(sizeButton)
-    fireEvent.click(sizeButton)
-
-    const largeButton = screen.getByText('Large')
-    fireEvent.click(largeButton)
-
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.LARGE
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-
-    mockPostMessage.mockClear()
-
-    sendSetDataMessage({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    expect(mockPostMessage).not.toHaveBeenCalled()
   })
 
   it('should display the checkpoint plots in the order stored', () => {
@@ -1392,7 +1343,10 @@ describe('App', () => {
       }
     }
 
-    const resizeScreen = (width: number) => {
+    const resizeScreen = (width: number, store: typeof plotsStore) => {
+      act(() => {
+        store.dispatch(setMaxPlotSize(width))
+      })
       act(() => {
         global.innerWidth = width
         global.dispatchEvent(new Event('resize'))
@@ -1403,7 +1357,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(11) },
-          'Large',
+          PlotSizeNumber.LARGE,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1421,7 +1375,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(10) },
-          'Large',
+          PlotSizeNumber.LARGE,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1439,7 +1393,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(11) },
-          'Large',
+          PlotSizeNumber.LARGE,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1457,7 +1411,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(10) },
-          'Large',
+          PlotSizeNumber.LARGE,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1474,42 +1428,43 @@ describe('App', () => {
 
       describe('Sizing', () => {
         const checkpoint = createCheckpointPlots(25)
+        let store: typeof plotsStore
 
         beforeEach(async () => {
-          await renderAppAndChangeSize(
+          store = await renderAppAndChangeSize(
             { checkpoint },
-            'Large',
+            PlotSizeNumber.LARGE,
             Section.CHECKPOINT_PLOTS
           )
         })
 
         it('should render the plots correctly when the screen is larger than 2000px', () => {
-          resizeScreen(3000)
+          resizeScreen(3000, store)
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[24].id).toBe(checkpoint.plots[24].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[4].id).toBe(checkpoint.plots[4].title)
+          expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
 
-          resizeScreen(5453)
+          resizeScreen(5453, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[20].id).toBe(checkpoint.plots[20].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
         })
 
         it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
-          resizeScreen(1849)
+          resizeScreen(1849, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[24].id).toBe(checkpoint.plots[24].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[12].id).toBe(checkpoint.plots[12].title)
+          expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
         })
 
         it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
-          resizeScreen(936)
+          resizeScreen(936, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1518,7 +1473,7 @@ describe('App', () => {
         })
 
         it('should render the plots correctly when the screen is smaller than 800px', () => {
-          resizeScreen(563)
+          resizeScreen(563, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1531,7 +1486,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(16) },
-          'Regular',
+          PlotSizeNumber.REGULAR,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1541,7 +1496,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
-          'Regular',
+          PlotSizeNumber.REGULAR,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1551,7 +1506,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(16) },
-          'Regular',
+          PlotSizeNumber.REGULAR,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1561,7 +1516,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are fifteen or fewer regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
-          'Regular',
+          PlotSizeNumber.REGULAR,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1570,24 +1525,25 @@ describe('App', () => {
 
       describe('Sizing', () => {
         const checkpoint = createCheckpointPlots(25)
+        let store: typeof plotsStore
 
         beforeEach(async () => {
-          await renderAppAndChangeSize(
+          store = await renderAppAndChangeSize(
             { checkpoint },
-            'Regular',
+            PlotSizeNumber.REGULAR,
             Section.CHECKPOINT_PLOTS
           )
         })
 
         it('should render the plots correctly when the screen is larger than 2000px', () => {
-          resizeScreen(3200)
+          resizeScreen(3200, store)
 
           let plots = screen.getAllByTestId(/^plot-/)
 
           expect(plots[20].id).toBe(checkpoint.plots[20].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
-          resizeScreen(6453)
+          resizeScreen(6453, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
@@ -1596,7 +1552,7 @@ describe('App', () => {
         })
 
         it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
-          resizeScreen(1889)
+          resizeScreen(1889, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1605,7 +1561,7 @@ describe('App', () => {
         })
 
         it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
-          resizeScreen(938)
+          resizeScreen(938, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1614,7 +1570,7 @@ describe('App', () => {
         })
 
         it('should render the plots correctly when the screen is smaller than 800px', () => {
-          resizeScreen(562)
+          resizeScreen(562, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1627,7 +1583,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(21) },
-          'Small',
+          PlotSizeNumber.SMALL,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1637,7 +1593,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(20) },
-          'Small',
+          PlotSizeNumber.SMALL,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1647,7 +1603,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
-          'Small',
+          PlotSizeNumber.SMALL,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1657,7 +1613,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
-          'Small',
+          PlotSizeNumber.SMALL,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1666,24 +1622,25 @@ describe('App', () => {
 
       describe('Sizing', () => {
         const checkpoint = createCheckpointPlots(25)
+        let store: typeof plotsStore
 
         beforeEach(async () => {
-          await renderAppAndChangeSize(
+          store = await renderAppAndChangeSize(
             { checkpoint },
-            'Small',
+            PlotSizeNumber.SMALL,
             Section.CHECKPOINT_PLOTS
           )
         })
 
         it('should render the plots correctly when the screen is larger than 2000px', () => {
-          resizeScreen(3004)
+          resizeScreen(3004, store)
 
           let plots = screen.getAllByTestId(/^plot-/)
 
           expect(plots[7].id).toBe(checkpoint.plots[7].title)
           expect(plots.length).toBe(checkpoint.plots.length)
 
-          resizeScreen(5473)
+          resizeScreen(5473, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
@@ -1692,7 +1649,7 @@ describe('App', () => {
         })
 
         it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
-          resizeScreen(1839)
+          resizeScreen(1839, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1701,7 +1658,7 @@ describe('App', () => {
         })
 
         it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
-          resizeScreen(956)
+          resizeScreen(956, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1710,7 +1667,7 @@ describe('App', () => {
         })
 
         it('should render the plots correctly when the screen is smaller than 800px but larger than 600px', () => {
-          resizeScreen(663)
+          resizeScreen(663, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1719,7 +1676,7 @@ describe('App', () => {
         })
 
         it('should render the plots correctly when the screen is smaller than 600px', () => {
-          resizeScreen(569)
+          resizeScreen(569, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
 
@@ -1899,11 +1856,7 @@ describe('App', () => {
       smoothPlot.querySelector('.vega-bindings')
 
     it('should disable a template plot from drag and drop when hovering a vega panel', async () => {
-      await renderAppAndChangeSize(
-        { template: withVegaPanels },
-        'Small',
-        Section.TEMPLATE_PLOTS
-      )
+      renderAppWithOptionalData({ template: withVegaPanels })
 
       const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
 
@@ -1920,11 +1873,7 @@ describe('App', () => {
     })
 
     it('should re-enable a template plot for drag and drop when the mouse leaves a vega panel', async () => {
-      await renderAppAndChangeSize(
-        { template: withVegaPanels },
-        'Small',
-        Section.TEMPLATE_PLOTS
-      )
+      renderAppWithOptionalData({ template: withVegaPanels })
 
       const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
 
@@ -1939,11 +1888,7 @@ describe('App', () => {
     })
 
     it('should disable zooming the template plot when clicking inside the vega panel', async () => {
-      await renderAppAndChangeSize(
-        { template: withVegaPanels },
-        'Small',
-        Section.TEMPLATE_PLOTS
-      )
+      renderAppWithOptionalData({ template: withVegaPanels })
 
       const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
 

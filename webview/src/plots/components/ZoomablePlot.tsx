@@ -83,7 +83,6 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     },
     onResize
   }
-
   return (
     <button
       className={cx(styles.zoomablePlot, {

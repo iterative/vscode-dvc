@@ -161,27 +161,25 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             </div>
           </Tooltip>
         </summary>
-        <div>
-          {open && (
-            <div
-              className={cx({
-                [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
-                [styles.smallPlots]: currentSize === 4
-              })}
-              style={
-                {
-                  '--nbPerRow': currentSize
-                } as DetailedHTMLProps<
-                  HTMLAttributes<HTMLDivElement>,
-                  HTMLDivElement
-                >
-              }
-              data-testid="plots-wrapper"
-            >
-              {children}
-            </div>
-          )}
-        </div>
+        {open && (
+          <div
+            className={cx({
+              [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
+              [styles.smallPlots]: currentSize === 4
+            })}
+            style={
+              {
+                '--nbPerRow': currentSize
+              } as DetailedHTMLProps<
+                HTMLAttributes<HTMLDivElement>,
+                HTMLDivElement
+              >
+            }
+            data-testid="plots-wrapper"
+          >
+            {children}
+          </div>
+        )}
       </details>
       <div className={styles.iconMenu}>
         <IconMenu items={menuItems} />

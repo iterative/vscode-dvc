@@ -49,7 +49,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     }
     const handleMouseMove = (e: MouseEvent) => {
       if (isResizing) {
-        const newDiffX = e.pageX - startingPageX.current
+        const newDiffX = e.clientX - startingPageX.current
         const positionX = newDiffX + sizeFactor
         const currentSnapPoint = getCurrentSnapPoint()
         const isShrinking = newDiffX < 0
@@ -99,7 +99,7 @@ export const Resizer: React.FC<ResizerProps> = ({
   }, [onResize, onRelease, isResizing, setIsExpanding])
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    startingPageX.current = e.pageX
+    startingPageX.current = e.clientX
     setIsResizing(true)
     onGrab()
   }
@@ -109,10 +109,14 @@ export const Resizer: React.FC<ResizerProps> = ({
     : {}
 
   return (
-    <button className={className} onMouseDown={handleMouseDown}>
+    <div
+      className={className}
+      onMouseDown={handleMouseDown}
+      data-testid="vertical-plot-resizer"
+    >
       {isResizing && (
         <div className={styles.resizerLocked} style={lockedStyle} />
       )}
-    </button>
+    </div>
   )
 }
