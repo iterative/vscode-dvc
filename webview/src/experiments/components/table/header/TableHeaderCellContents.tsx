@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
-import { SortOrder } from './TableHeader'
+import { SortOrder } from './ContextMenuContent'
 import styles from '../styles.module.scss'
 import {
   Draggable,
@@ -102,7 +102,13 @@ export const TableHeaderCellContents: React.FC<{
       <div
         className={cx(styles.iconMenu, { [styles.moveToRight]: isTimestamp })}
       >
-        <IconMenu items={getIconMenuItems(sortEnabled, sortOrder, hasFilter)} />
+        <IconMenu
+          items={getIconMenuItems(
+            sortEnabled && !column.placeholderOf,
+            sortOrder,
+            hasFilter
+          )}
+        />
       </div>
       <ColumnDragHandle
         column={column}

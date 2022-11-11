@@ -276,7 +276,7 @@ export class WebviewMessages {
   }
 
   private hideTableColumn(path: string) {
-    this.columns.toggleStatus(path)
+    this.columns.unselect(path)
 
     this.notifyChanged()
 

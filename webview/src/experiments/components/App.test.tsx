@@ -761,6 +761,77 @@ describe('App', () => {
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
+
+    it('should have the same options in the empty placeholders', () => {
+      renderTableWithPlaceholder()
+      const header = screen.getByTestId('header-Created')
+      const placeholders = screen.getAllByTestId(/header-Created.+placeholder/)
+      const entireColumn = [header, ...placeholders]
+
+      expect(entireColumn).toHaveLength(5)
+
+      for (const segment of entireColumn) {
+        fireEvent.contextMenu(segment, { bubbles: true })
+        jest.advanceTimersByTime(100)
+        const menuitems = screen
+          .getAllByRole('menuitem')
+          .map(item => item.textContent)
+
+        expect(menuitems).toStrictEqual([
+          'Hide Column',
+          'Set Max Header Height',
+          'Sort Ascending',
+          'Sort Descending'
+        ])
+
+        fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
+      }
+    })
+
+    it('should have the same options in the empty placeholders of the Experiment column', () => {
+      renderTableWithPlaceholder()
+      const header = screen.getByTestId('header-id')
+      const placeholders = screen.getAllByTestId(/header-id.+placeholder/)
+      const entireColumn = [header, ...placeholders]
+
+      expect(entireColumn).toHaveLength(5)
+
+      for (const segment of entireColumn) {
+        fireEvent.contextMenu(segment, { bubbles: true })
+        jest.advanceTimersByTime(100)
+        const menuitems = screen
+          .getAllByRole('menuitem')
+          .map(item => item.textContent)
+
+        expect(menuitems).toStrictEqual(['Set Max Header Height'])
+
+        fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
+      }
+    })
+
+    describe('Hiding a column from its empty placeholder', () => {
+      it('should send the column id and not the placeholder id as the message payload', () => {
+        renderTableWithPlaceholder()
+        const placeholders = screen.getAllByTestId(
+          /header-Created.+placeholder/
+        )
+        const placeholder = placeholders[0]
+        fireEvent.contextMenu(placeholder, { bubbles: true })
+        jest.advanceTimersByTime(100)
+
+        const hideOption = screen.getByText('Hide Column')
+
+        mockPostMessage.mockClear()
+
+        fireEvent.click(hideOption)
+
+        expect(mockPostMessage).toHaveBeenCalledTimes(1)
+        expect(mockPostMessage).toHaveBeenCalledWith({
+          payload: 'Created',
+          type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+        })
+      })
+    })
   })
 
   describe('Row Context Menu', () => {
