@@ -130,10 +130,10 @@ suite('DVC Extension For Visual Studio Code', () => {
     it('should show the expected changes after running an experiment', async () => {
       const expectedScmItemLabels = [
         'demo DVC',
-        'training_metrics',
-        'scalars, training_metrics',
-        `acc.tsv, ${join('training_metrics', 'scalars')}`,
-        `loss.tsv, ${join('training_metrics', 'scalars')}`
+        'plots, training',
+        `metrics, ${join('training', 'plots')}`,
+        `acc.tsv, ${join('training', 'plots', 'metrics')}`,
+        `loss.tsv, ${join('training', 'plots', 'metrics')}`
       ]
       const expectedScmSet = new Set(expectedScmItemLabels)
       let dvcTreeItemLabels: string[] = []
