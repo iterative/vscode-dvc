@@ -83,9 +83,9 @@ export const getSortOptions = (
 
   const sortOptions = isSortable
     ? [
-        sortOption(SortOrder.ASCENDING, sortOrder, column.id),
-        sortOption(SortOrder.DESCENDING, sortOrder, column.id),
-        sortOption(SortOrder.NONE, sortOrder, column.id)
+        sortOption(SortOrder.ASCENDING, sortOrder, baseColumn.id),
+        sortOption(SortOrder.DESCENDING, sortOrder, baseColumn.id),
+        sortOption(SortOrder.NONE, sortOrder, baseColumn.id)
       ]
     : []
 
