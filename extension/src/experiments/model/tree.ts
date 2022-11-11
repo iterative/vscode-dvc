@@ -358,7 +358,8 @@ export class ExperimentsTree
         return value !== null ? `| ${truncatedKey} | ${value} |\n` : ''
       })
       .join('')
-    return getMarkdownString(`|||\n|:--|--|\n${data}`)
+
+    return data === '' ? undefined : getMarkdownString(`|||\n|:--|--|\n${data}`)
   }
 
   private getTooltip(

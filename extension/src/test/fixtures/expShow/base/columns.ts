@@ -1,4 +1,4 @@
-import { join } from '../../../util/path'
+import { join } from 'path'
 import { Column, ColumnType } from '../../../../experiments/webview/contract'
 import {
   buildDepPath,
@@ -7,6 +7,32 @@ import {
 import { timestampColumn } from '../../../../experiments/columns/constants'
 
 const nestedParamsFile = join('nested', 'params.yaml')
+
+export const dataColumnOrder: string[] = [
+  'id',
+  'Created',
+  'metrics:summary.json:loss',
+  'metrics:summary.json:accuracy',
+  'metrics:summary.json:val_loss',
+  'metrics:summary.json:val_accuracy',
+  'params:params.yaml:code_names',
+  'params:params.yaml:epochs',
+  'params:params.yaml:learning_rate',
+  'params:params.yaml:dvc_logs_dir',
+  'params:params.yaml:log_file',
+  'params:params.yaml:dropout',
+  'params:params.yaml:process.threshold',
+  'params:params.yaml:process.test_arg',
+  join('params:nested', 'params.yaml:test'),
+  join('deps:data', 'data.xml'),
+  join('deps:data', 'prepared'),
+  join('deps:data', 'features'),
+  join('deps:src', 'prepare.py'),
+  join('deps:src', 'featurization.py'),
+  join('deps:src', 'train.py'),
+  join('deps:src', 'evaluate.py'),
+  'deps:model.pkl'
+]
 
 const data: Column[] = [
   timestampColumn,

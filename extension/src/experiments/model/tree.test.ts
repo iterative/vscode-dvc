@@ -16,6 +16,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
 import { ExperimentStatus } from '../webview/contract'
+import { formatDate } from '../../util/date'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -483,8 +484,9 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-123',
           label: 'a123',
-          tooltip:
-            '|||\n|:--|--|\n| Created | Aug 19, 2022 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | undefined |\n',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[0].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | undefined |\n`,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -499,8 +501,9 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-456',
           label: 'b456',
-          tooltip:
-            '|||\n|:--|--|\n| Created | Sep 15, 2022 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | [rbf,linear] |\n',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[1].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | [rbf,linear] |\n`,
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -515,8 +518,9 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-789',
           label: 'c789',
-          tooltip:
-            '|||\n|:--|--|\n| Created | Jul 3, 2022 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | false |\n',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[2].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | false |\n`,
           type: ExperimentType.EXPERIMENT
         }
       ])

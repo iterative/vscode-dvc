@@ -5,6 +5,7 @@ import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { quickPickLimitedValues } from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
+import { formatDate } from '../../util/date'
 
 jest.mock('../../vscode/quickPick')
 
@@ -135,19 +136,25 @@ describe('pickExperiments', () => {
       [
         {
           description: '[exp-123]',
-          detail: 'Created:Aug 19, 2022, split:0, data/data.xml:22a1a29',
+          detail: `Created:${formatDate(
+            mockedExperiments[0].Created as string
+          )}, split:0, data/data.xml:22a1a29`,
           label: '123fsf4',
           value: mockedExperiments[0]
         },
         {
           description: '[exp-456]',
-          detail: 'Created:Aug 19, 2022, split:0.2, data/data.xml:22a1a29',
+          detail: `Created:${formatDate(
+            mockedExperiments[1].Created as string
+          )}, split:0.2, data/data.xml:22a1a29`,
           label: '456fsf4',
           value: mockedExperiments[1]
         },
         {
           description: '[exp-789]',
-          detail: 'Created:Sep 15, 2022, split:0.3, data/data.xml:22a1a29',
+          detail: `Created:${formatDate(
+            mockedExperiments[2].Created as string
+          )}, split:0.3, data/data.xml:22a1a29`,
           label: '789fsf4',
           value: mockedExperiments[2]
         }
