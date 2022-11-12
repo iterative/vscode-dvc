@@ -112,6 +112,7 @@ export interface IEventNamePropertyMapping {
     wasStopped?: boolean
   }
 
+  [EventName.EXPERIMENT_AND_PLOTS_SHOW]: undefined
   [EventName.EXPERIMENT_APPLY]: undefined
   [EventName.EXPERIMENT_AUTO_APPLY_FILTERS]: undefined
   [EventName.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS]: undefined

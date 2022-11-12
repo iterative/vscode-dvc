@@ -1,4 +1,4 @@
-import { Event, EventEmitter, WebviewPanel, Uri } from 'vscode'
+import { Event, EventEmitter, WebviewPanel, Uri, ViewColumn } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import {
@@ -103,8 +103,8 @@ export class BaseWebview<T extends WebviewData> {
     })
   }
 
-  public reveal() {
-    this.webviewPanel.reveal()
+  public reveal(viewColumn?: ViewColumn) {
+    this.webviewPanel.reveal(viewColumn)
     return this
   }
 
