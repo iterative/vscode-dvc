@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
@@ -35,6 +35,7 @@ const getExperimentTypeClass = ({ status, selected }: Experiment) => {
 const getRowClassNames = (
   original: Experiment,
   flatIndex: number,
+  isRowFocused: boolean,
   isRowSelected: boolean,
   isWorkspace: boolean,
   className?: string,
@@ -53,7 +54,8 @@ const getRowClassNames = (
     isWorkspace ? styles.workspaceRow : styles.normalRow,
     styles.row,
     isRowSelected && styles.rowSelected,
-    isWorkspace && changes?.length && styles.workspaceWithChanges
+    isWorkspace && changes?.length && styles.workspaceWithChanges,
+    isRowFocused && styles.rowFocused
   )
 }
 
@@ -135,9 +137,17 @@ export const RowContent: React.FC<
     }
   }, [subRows, selectedRows])
 
+  const [menuActive, setMenuActive] = useState<boolean>(false)
+
   return (
     <ContextMenu
       disabled={contextMenuDisabled}
+      onShow={() => {
+        setMenuActive(true)
+      }}
+      onHide={() => {
+        setMenuActive(false)
+      }}
       content={
         <RowContextMenu
           row={row}
@@ -151,6 +161,7 @@ export const RowContent: React.FC<
           className: getRowClassNames(
             original,
             flatIndex,
+            menuActive,
             isRowSelected,
             isWorkspace,
             className,

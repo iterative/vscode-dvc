@@ -286,7 +286,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
       }
     }
 
-    &:hover:not(.rowSelected) {
+    &:hover:not(.rowSelected),
+    &.rowFocused:not(.rowSelected) {
       .td:not(.experimentCell),
       .experimentCell:before {
         background-color: $row-hover-background-color;
