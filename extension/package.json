@@ -1386,16 +1386,16 @@
         "contents": "No Experiments to Display."
       },
       {
+        "view": "dvc.views.plotsPathsTree",
+        "contents": "No Plots to Display."
+      },
+      {
         "view": "dvc.views.experimentsSortByTree",
         "contents": "No Sorts Applied. [Add Sort](command:dvc.addExperimentsTableSort)\n"
       },
       {
         "view": "dvc.views.experimentsFilterByTree",
         "contents": "No Filters Applied. [Add Filter](command:dvc.addExperimentsTableFilter)\n"
-      },
-      {
-        "view": "dvc.views.plotsPathsTree",
-        "contents": "No Plots to Display."
       },
       {
         "view": "dvc.views.support",
