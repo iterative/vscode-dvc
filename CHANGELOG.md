@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.11] - 2022-11-10
+
+### 🚀 New Features and Enhancements
+
+- Update the DVC: Get Started / Plots Dashboard [#2573](https://github.com/iterative/vscode-dvc/pull/2573) by [@maxagin](https://github.com/maxagin)
+
+### 🐛 Bug Fixes
+
+- Fix exp tree tooltips and quick pick selection ignoring columns with falsy values [#2745](https://github.com/iterative/vscode-dvc/pull/2745) by [@julieg18](https://github.com/julieg18)
+- Check hidden status when getting first three exp table column order [#2738](https://github.com/iterative/vscode-dvc/pull/2738) by [@julieg18](https://github.com/julieg18)
+- Use JSON5 library to parse non-standard JSON [#2750](https://github.com/iterative/vscode-dvc/pull/2750) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix unit tests for non en-US timezones [#2748](https://github.com/iterative/vscode-dvc/pull/2748) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.10] - 2022-11-02
 
 ### 🚀 New Features and Enhancements
