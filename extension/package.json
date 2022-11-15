@@ -392,8 +392,8 @@
         "icon": "$(graph-scatter)"
       },
       {
-        "title": "%command.showExperimentsAndPlots%",
-        "command": "dvc.showExperimentsAndPlots",
+        "title": "%command.showPlotsAndExperiments%",
+        "command": "dvc.showPlotsAndExperiments",
         "category": "DVC"
       },
       {
@@ -787,7 +787,7 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.showExperimentsAndPlots",
+          "command": "dvc.showPlotsAndExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1350,7 +1350,7 @@
     "viewsWelcome": [
       {
         "view": "dvc.views.webviews",
-        "contents": "[Open experiments](command:dvc.showExperiments)\n[Open plots](command:dvc.showPlots)\n[Open both views](command:dvc.showExperimentsAndPlots)",
+        "contents": "[Open experiments](command:dvc.showExperiments)\n[Open plots](command:dvc.showPlots)\n[Open both views](command:dvc.showPlotsAndExperiments)",
         "when": "dvc.commands.available && dvc.project.available"
       },
       {
