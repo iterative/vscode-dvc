@@ -1571,7 +1571,7 @@
     "@types/mock-require": "2.0.1",
     "@types/node": "18.11.3",
     "@types/react-vega": "7.0.0",
-    "@types/sinon-chai": "3.2.8",
+    "@types/sinon-chai": "3.2.9",
     "@types/uuid": "8.3.4",
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.2.0",
