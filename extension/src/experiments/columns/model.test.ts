@@ -42,13 +42,13 @@ beforeEach(() => {
 
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
-  const mockedColumnsOrderChanged = buildMockedEventEmitter<void>()
+  const mockedColumnsOrderOrStatusChanged = buildMockedEventEmitter<void>()
 
   it('should return the expected columns when given the default output fixture', async () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(outputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
@@ -59,7 +59,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(survivalOutputFixture)
     expect(model.getSelected()).toStrictEqual(survivalColumnsFixture)
@@ -69,7 +69,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
@@ -81,7 +81,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
@@ -93,7 +93,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
@@ -105,7 +105,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
@@ -117,7 +117,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
@@ -129,7 +129,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
@@ -141,7 +141,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
@@ -152,7 +152,7 @@ describe('ColumnsModel', () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
-      mockedColumnsOrderChanged
+      mockedColumnsOrderOrStatusChanged
     )
     await model.transformAndSet(dataTypesOutputFixture)
     expect(model.getSelected()).toStrictEqual(dataTypesColumnsFixture)
@@ -183,7 +183,7 @@ describe('ColumnsModel', () => {
       const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento(),
-        mockedColumnsOrderChanged
+        mockedColumnsOrderOrStatusChanged
       )
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
@@ -217,7 +217,7 @@ describe('ColumnsModel', () => {
             [testParamPath]: Status.UNSELECTED
           }
         }),
-        mockedColumnsOrderChanged
+        mockedColumnsOrderOrStatusChanged
       )
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
@@ -246,19 +246,20 @@ describe('ColumnsModel', () => {
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
         }),
-        mockedColumnsOrderChanged
+        mockedColumnsOrderOrStatusChanged
       )
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
-    it('should return the first three columns from the persisted state', () => {
+    it('should return the first three none hidden columns from the persisted state', async () => {
       const persistedState = [
-        { path: 'A', width: 0 },
-        { path: 'B', width: 0 },
-        { path: 'C', width: 0 },
-        { path: 'D', width: 0 },
-        { path: 'E', width: 0 },
-        { path: 'F', width: 0 }
+        'id',
+        'Created',
+        'params:params.yaml:dvc_logs_dir',
+        'params:params.yaml:process.threshold',
+        'params:params.yaml:process.test_arg',
+        'deps:src/prepare.py',
+        'deps:src/featurization.py'
       ]
 
       const model = new ColumnsModel(
@@ -267,19 +268,26 @@ describe('ColumnsModel', () => {
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
         }),
-        mockedColumnsOrderChanged
+        mockedColumnsOrderOrStatusChanged
       )
+      await model.transformAndSet(outputFixture)
 
       expect(model.getFirstThreeColumnOrder()).toStrictEqual(
         persistedState.slice(1, 4)
       )
+
+      model.toggleStatus('Created')
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual(
+        persistedState.slice(2, 5)
+      )
     })
 
-    it('should return first three columns collected from data if state is empty', async () => {
+    it('should return the first three none hidden columns collected from data if state is empty', async () => {
       const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento(),
-        mockedColumnsOrderChanged
+        mockedColumnsOrderOrStatusChanged
       )
       await model.transformAndSet(outputFixture)
 
@@ -287,6 +295,14 @@ describe('ColumnsModel', () => {
         'Created',
         'metrics:summary.json:loss',
         'metrics:summary.json:accuracy'
+      ])
+
+      model.toggleStatus('Created')
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy',
+        'metrics:summary.json:val_loss'
       ])
     })
 
@@ -300,7 +316,7 @@ describe('ColumnsModel', () => {
             { path: 'C', width: 0 }
           ]
         }),
-        mockedColumnsOrderChanged
+        mockedColumnsOrderOrStatusChanged
       )
       const newState = ['C', 'B', 'A']
       model.setColumnOrder(newState)
@@ -321,7 +337,7 @@ describe('ColumnsModel', () => {
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
         }),
-        mockedColumnsOrderChanged
+        mockedColumnsOrderOrStatusChanged
       )
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
@@ -338,7 +354,7 @@ describe('ColumnsModel', () => {
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
         }),
-        mockedColumnsOrderChanged
+        mockedColumnsOrderOrStatusChanged
       )
       const changedColumnId = 'C'
       const expectedWidth = 77

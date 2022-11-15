@@ -33,7 +33,7 @@ import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
 import { Experiment, ExperimentStatus, isRunning } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
-import { truncate, truncateFromLeft } from '../../util/string'
+import { truncateFromLeft } from '../../util/string'
 
 export class ExperimentsTree
   extends Disposable
@@ -355,12 +355,11 @@ export class ExperimentsTree
           path.slice(type.length + 1) || path,
           30
         )
-        const truncatedVal =
-          typeof value === 'number' ? truncate(String(value), 7) : value
-        return value ? `| ${truncatedKey} | ${truncatedVal} |\n` : ''
+        return value !== null ? `| ${truncatedKey} | ${value} |\n` : ''
       })
       .join('')
-    return getMarkdownString(`|||\n|:--|--|\n${data}`)
+
+    return data === '' ? undefined : getMarkdownString(`|||\n|:--|--|\n${data}`)
   }
 
   private getTooltip(
