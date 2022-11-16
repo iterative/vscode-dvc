@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.12] - 2022-11-16
+
+### 🚀 New Features and Enhancements
+
+- Highlight row when context menu is active [#2763](https://github.com/iterative/vscode-dvc/pull/2763) by [@shcheklein](https://github.com/shcheklein)
+- Make plots ribbon sticky on scroll [#2759](https://github.com/iterative/vscode-dvc/pull/2759) by [@shcheklein](https://github.com/shcheklein)
+- Add "views" section to sidebar [#2760](https://github.com/iterative/vscode-dvc/pull/2760) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update scheduled CLI test to match expected demo project output [#2753](https://github.com/iterative/vscode-dvc/pull/2753) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.11] - 2022-11-10
 
 ### 🚀 New Features and Enhancements
