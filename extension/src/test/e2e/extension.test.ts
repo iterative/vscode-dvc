@@ -158,8 +158,8 @@ suite('DVC Extension For Visual Studio Code', () => {
           return expectedScmItemLabels.length === dvcTreeItemLabels.length
         },
         {
-          interval: 5000,
-          timeout: 60000
+          interval: 10000,
+          timeout: 120000
         }
       )
 
