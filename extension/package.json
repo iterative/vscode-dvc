@@ -1616,7 +1616,7 @@
     "vscode-uri": "3.0.6",
     "wdio-vscode-service": "4.1.0",
     "webdriverio": "7.25.4",
-    "webpack": "5.74.0",
+    "webpack": "5.75.0",
     "webpack-cli": "4.10.0"
   },
   "peerDependencies": {
