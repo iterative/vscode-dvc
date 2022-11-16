@@ -65,7 +65,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       const focused = onDidChangeIsWebviewFocused(experiments)
 
-      await workspaceExperiments.showWebview()
+      await workspaceExperiments.showWebview('')
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
@@ -73,7 +73,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       mockQuickPickOne.resetHistory()
 
-      const focusedExperiments = await workspaceExperiments.showWebview()
+      const focusedExperiments = await workspaceExperiments.showWebview('')
 
       expect(focusedExperiments).to.equal(experiments)
       expect(mockQuickPickOne).to.be.calledOnce
@@ -87,7 +87,7 @@ suite('Workspace Experiments Test Suite', () => {
       const { workspaceExperiments } = buildSingleRepoExperiments(disposable)
       await workspaceExperiments.isReady()
 
-      await workspaceExperiments.showWebview()
+      await workspaceExperiments.showWebview('')
 
       expect(mockQuickPickOne).to.not.be.called
     })
@@ -104,7 +104,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       const focusedWebview = onDidChangeIsWebviewFocused(experiments)
 
-      await workspaceExperiments.showWebview()
+      await workspaceExperiments.showWebview('')
 
       expect(await focusedWebview).to.equal(dvcDemoPath)
 

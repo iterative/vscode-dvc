@@ -392,6 +392,11 @@
         "icon": "$(graph-scatter)"
       },
       {
+        "title": "%command.showPlotsAndExperiments%",
+        "command": "dvc.showPlotsAndExperiments",
+        "category": "DVC"
+      },
+      {
         "title": "%command.stopRunningExperiment%",
         "command": "dvc.stopRunningExperiment",
         "category": "DVC",
@@ -779,6 +784,10 @@
         },
         {
           "command": "dvc.showPlots",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.showPlotsAndExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1298,6 +1307,11 @@
       ],
       "dvc-views": [
         {
+          "id": "dvc.views.webviews",
+          "name": "Views",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
@@ -1313,6 +1327,11 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "id": "dvc.views.plotsPathsTree",
+          "name": "Plots",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "id": "dvc.views.experimentsSortByTree",
           "name": "Sort By",
           "when": "dvc.commands.available && dvc.project.available"
@@ -1323,17 +1342,17 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "id": "dvc.views.plotsPathsTree",
-          "name": "Plots",
-          "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
           "id": "dvc.views.support",
           "name": "Support"
         }
       ]
     },
     "viewsWelcome": [
+      {
+        "view": "dvc.views.webviews",
+        "contents": "[Open experiments](command:dvc.showExperiments)\n[Open plots](command:dvc.showPlots)\n[Open both views](command:dvc.showPlotsAndExperiments)",
+        "when": "dvc.commands.available && dvc.project.available"
+      },
       {
         "view": "dvc.views.welcome",
         "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\n",
@@ -1367,16 +1386,16 @@
         "contents": "No Experiments to Display."
       },
       {
+        "view": "dvc.views.plotsPathsTree",
+        "contents": "No Plots to Display."
+      },
+      {
         "view": "dvc.views.experimentsSortByTree",
-        "contents": "No Sorts Applied. \n[$(add) Add Sort](command:dvc.addExperimentsTableSort)\n"
+        "contents": "No Sorts Applied. [Add Sort](command:dvc.addExperimentsTableSort)\n"
       },
       {
         "view": "dvc.views.experimentsFilterByTree",
-        "contents": "No Filters Applied. \n[$(add) Add Filter](command:dvc.addExperimentsTableFilter)\n"
-      },
-      {
-        "view": "dvc.views.plotsPathsTree",
-        "contents": "No Plots to Display."
+        "contents": "No Filters Applied. [Add Filter](command:dvc.addExperimentsTableFilter)\n"
       },
       {
         "view": "dvc.views.support",

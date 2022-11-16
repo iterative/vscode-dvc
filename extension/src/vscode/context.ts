@@ -5,7 +5,7 @@ export const setContextValue = (key: string, value: unknown) =>
 
 export type Context = string | Record<string, unknown> | undefined
 
-export const getDvcRootFromContext = (context: Context): string | undefined => {
+export const getDvcRootFromContext = (context: Context): string => {
   const isDvcRoot = typeof context === 'string'
-  return isDvcRoot ? context : undefined
+  return isDvcRoot ? context : ''
 }
