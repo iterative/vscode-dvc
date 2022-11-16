@@ -131,6 +131,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       const expectedScmItemLabels = [
         'demo DVC',
         'plots, training',
+        `images, ${join('training', 'plots')}`,
         `metrics, ${join('training', 'plots')}`,
         `acc.tsv, ${join('training', 'plots', 'metrics')}`,
         `loss.tsv, ${join('training', 'plots', 'metrics')}`
@@ -158,8 +159,8 @@ suite('DVC Extension For Visual Studio Code', () => {
           return expectedScmItemLabels.length === dvcTreeItemLabels.length
         },
         {
-          interval: 10000,
-          timeout: 120000
+          interval: 5000,
+          timeout: 60000
         }
       )
 
