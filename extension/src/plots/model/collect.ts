@@ -508,15 +508,16 @@ const updateDatapoints = (
   fields: string[]
 ): unknown[] =>
   selectedRevisions
-    .flatMap(revision =>
-      revisionData?.[revision]?.[path].map(data => {
+    .flatMap(revision => {
+      const datapoints = revisionData?.[revision]?.[path] || []
+      datapoints.map(data => {
         const obj = data as Record<string, unknown>
         return {
           ...obj,
           [key]: mergeFields(fields.map(field => obj[field] as string))
         }
       })
-    )
+    })
     .filter(Boolean)
 
 const updateRevisions = (
