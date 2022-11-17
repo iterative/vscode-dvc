@@ -71,7 +71,7 @@
   "resolutions": {
     "@types/react": "18.0.25",
     "**/recursive-readdir/minimatch": "5.1.0",
-    "loader-utils": "2.0.2",
+    "loader-utils": "2.0.4",
     "terser": "5.15.1",
     "trim-newlines": "3.0.1",
     "trim": "1.0.1",
