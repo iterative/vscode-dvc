@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.13] - 2022-11-17
+
+### 🐛 Bug Fixes
+
+- Fix map on undefined is path doesn't exist in rev [#2785](https://github.com/iterative/vscode-dvc/pull/2785) by [@shcheklein](https://github.com/shcheklein)
+
 ## [0.5.12] - 2022-11-16
 
 ### 🚀 New Features and Enhancements
