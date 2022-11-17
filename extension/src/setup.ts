@@ -159,7 +159,7 @@ export const setup = async (extension: IExtension) => {
     return
   }
 
-  extension.setRoots()
+  await extension.setRoots()
 
   const { isAvailable, isCompatible } = await extensionCanRunCli(extension, cwd)
 
