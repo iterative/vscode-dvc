@@ -510,7 +510,7 @@ const updateDatapoints = (
   selectedRevisions
     .flatMap(revision => {
       const datapoints = revisionData?.[revision]?.[path] || []
-      datapoints.map(data => {
+      return datapoints.map(data => {
         const obj = data as Record<string, unknown>
         return {
           ...obj,
