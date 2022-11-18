@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.15] - 2022-11-18
+
+### 🐛 Bug Fixes
+
+- Check availability and compatibility on DVC projects in multi root workspaces [#2795](https://github.com/iterative/vscode-dvc/pull/2795) by [@sroy3](https://github.com/sroy3)
+
 ## [0.5.14] - 2022-11-18
 
 ### 🐛 Bug Fixes
