@@ -379,6 +379,10 @@ export class Extension extends Disposable implements IExtension {
     return this.setProjectAvailability()
   }
 
+  public getRoots() {
+    return this.dvcRoots
+  }
+
   public async initialize() {
     this.resetMembers()
 

@@ -161,7 +161,13 @@ export const setup = async (extension: IExtension) => {
 
   await extension.setRoots()
 
-  const { isAvailable, isCompatible } = await extensionCanRunCli(extension, cwd)
+  const roots = extension.getRoots()
+  const dvcRootOrFirstFolder = roots.length > 0 ? roots[0] : cwd
+
+  const { isAvailable, isCompatible } = await extensionCanRunCli(
+    extension,
+    dvcRootOrFirstFolder
+  )
 
   extension.setCliCompatible(isCompatible)
   extension.setAvailable(isAvailable)
