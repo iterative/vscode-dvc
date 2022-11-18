@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.14] - 2022-11-18
+
+### 🐛 Bug Fixes
+
+- Load projects inside multi-root workspaces [#2791](https://github.com/iterative/vscode-dvc/pull/2791) by [@sroy3](https://github.com/sroy3)
+
 ## [0.5.13] - 2022-11-17
 
 ### 🐛 Bug Fixes
