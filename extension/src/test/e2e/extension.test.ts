@@ -8,6 +8,7 @@ import {
   findScmTreeItems,
   getDVCActivityBarIcon,
   getLabel,
+  runModifiedExperiment,
   waitForDvcToFinish,
   waitForViewContainerToLoad
 } from './util'
@@ -74,12 +75,11 @@ suite('DVC Extension For Visual Studio Code', () => {
         },
         { interval: 5000, timeout: 30000 }
       )
+
       await webview.unfocus()
-
-      const workbench = await browser.getWorkbench()
-      await workbench.executeCommand('DVC: Reset and Run Experiment')
-
+      await runModifiedExperiment()
       await webview.focus()
+
       await browser.waitUntil(
         async () => {
           await webview.expandAllRows()
@@ -98,6 +98,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       expect(finalRows.length).toStrictEqual(initialRows + epochs)
       await webview.unfocus()
       await waitForDvcToFinish()
+      const workbench = await browser.getWorkbench()
       await workbench.executeCommand('Terminal: Kill All Terminals')
     }).timeout(180000)
   })
@@ -118,7 +119,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       await webview.focus()
 
       await browser.waitUntil(async () => {
-        return (await webview.vegaVisualization$$.length) === 6
+        return (await webview.vegaVisualization$$.length) === 5
       })
 
       const plots = await webview.vegaVisualization$$
@@ -138,10 +139,15 @@ suite('DVC Extension For Visual Studio Code', () => {
     it('should show the expected changes after running an experiment', async () => {
       const expectedScmItemLabels = [
         'demo DVC',
+        'model.pt',
         'plots, training',
+        `images, ${join('training', 'plots')}`,
         `metrics, ${join('training', 'plots')}`,
+        `sklearn, ${join('training', 'plots')}`,
+        `misclassified.jpg, ${join('training', 'plots', 'images')}`,
         `acc.tsv, ${join('training', 'plots', 'metrics')}`,
-        `loss.tsv, ${join('training', 'plots', 'metrics')}`
+        `loss.tsv, ${join('training', 'plots', 'metrics')}`,
+        `confusion_matrix.json, ${join('training', 'plots', 'sklearn')}`
       ]
       const expectedScmSet = new Set(expectedScmItemLabels)
       let dvcTreeItemLabels: string[] = []
