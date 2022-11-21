@@ -118,7 +118,10 @@ const getCheckpointTipId = (
   if (!checkpointTip) {
     return
   }
-  return experimentsObject[checkpointTip]?.data?.name
+
+  const tip = experimentsObject[checkpointTip]?.data
+
+  return tip?.name || checkpointTip
 }
 
 const transformColumns = (
