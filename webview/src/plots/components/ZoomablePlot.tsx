@@ -18,6 +18,7 @@ interface ZoomablePlotProps {
   toggleDrag: (enabled: boolean) => void
   onResize: (diff: number) => void
   snapPoints: number[]
+  currentSnapPoint: number
   size: number
   index: number
 }
@@ -30,6 +31,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   toggleDrag,
   onResize,
   snapPoints,
+  currentSnapPoint,
   size,
   index
 }) => {
@@ -98,7 +100,8 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         className={styles.plotVerticalResizer}
         {...commonResizerProps}
         snapPoints={snapPoints}
-        sizeBetweenResizers={size}
+        currentSnapPoint={currentSnapPoint}
+        sizeBetweenResizers={size} // 20 is the $gap set in styles.module.scss
         index={index}
         setIsExpanding={setIsExpanding}
       />

@@ -141,6 +141,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           toggleDrag={toggleDrag}
           onResize={handleResize}
           snapPoints={snapPoints}
+          currentSnapPoint={currentSize}
           size={snapPoints[currentSize - 1]}
           index={i}
         />

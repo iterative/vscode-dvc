@@ -1,4 +1,4 @@
-import React, { useEffect, createRef } from 'react'
+import React, { createRef, useLayoutEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { AddPlots, Welcome } from './GetStarted'
 import { ZoomedInPlot } from './ZoomedInPlot'
@@ -34,7 +34,7 @@ const PlotsContent = () => {
   )
   const wrapperRef = createRef<HTMLDivElement>()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const onResize = () => {
       wrapperRef.current &&
         dispatch(

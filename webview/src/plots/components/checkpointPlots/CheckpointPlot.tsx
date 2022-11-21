@@ -64,6 +64,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
         toggleDrag={toggleDrag}
         onResize={handleResize}
         snapPoints={snapPoints}
+        currentSnapPoint={currentSize}
         size={snapPoints[currentSize - 1]}
         index={index}
       />

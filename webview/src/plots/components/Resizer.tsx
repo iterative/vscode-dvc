@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from './styles.module.scss'
 
 interface ResizerProps {
@@ -10,6 +10,7 @@ interface ResizerProps {
   sizeBetweenResizers: number
   index: number
   setIsExpanding: (isExpanding: boolean) => void
+  currentSnapPoint: number
 }
 
 export const Resizer: React.FC<ResizerProps> = ({
@@ -20,41 +21,32 @@ export const Resizer: React.FC<ResizerProps> = ({
   snapPoints,
   sizeBetweenResizers, // Plot + gap
   index,
-  setIsExpanding
+  setIsExpanding,
+  currentSnapPoint
 }) => {
   const startingPageX = useRef(0)
   const [lockedX, setLockedX] = useState<number | undefined>(undefined)
   const [isResizing, setIsResizing] = useState(false)
-
-  const getCurrentSnapPoint = useCallback(() => {
-    for (const snapPoint of snapPoints) {
-      if (
-        snapPoint <= sizeBetweenResizers + 20 &&
-        snapPoint >= sizeBetweenResizers - 20
-      ) {
-        return snapPoints.indexOf(snapPoint)
-      }
-    }
-    return snapPoints.length - 1
-  }, [snapPoints, sizeBetweenResizers])
-  const lockedSnapPoint = useRef(getCurrentSnapPoint())
+  const lockedSnapPoint = useRef(currentSnapPoint)
   const sizeFactor = sizeBetweenResizers * (index + 1)
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   useEffect(() => {
     const setSnapPoint = (snapPoint: number, isShrinking?: boolean) => {
-      setLockedX(snapPoint - sizeFactor)
+      setLockedX(
+        snapPoint - sizeFactor + 10 * currentSnapPoint * (isShrinking ? -1 : 1)
+      )
       setIsExpanding(!isShrinking)
       lockedSnapPoint.current = snapPoints.indexOf(snapPoint) + 1
     }
     const handleMouseMove = (e: MouseEvent) => {
-      if (isResizing) {
-        const newDiffX = e.clientX - startingPageX.current
+      const newDiffX = e.clientX - startingPageX.current
+
+      if (isResizing && newDiffX !== 0) {
         const positionX = newDiffX + sizeFactor
-        const currentSnapPoint = getCurrentSnapPoint()
         const isShrinking = newDiffX < 0
         if (isShrinking) {
-          for (let i = currentSnapPoint + 1; i < snapPoints.length; i++) {
+          for (let i = currentSnapPoint; i < snapPoints.length; i++) {
             const snapPoint = snapPoints[i]
             if (Math.abs(positionX) >= snapPoint) {
               setSnapPoint(snapPoint, true)
@@ -78,7 +70,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
     }
-  }, [getCurrentSnapPoint, isResizing, sizeFactor, snapPoints, setIsExpanding])
+  }, [currentSnapPoint, isResizing, sizeFactor, snapPoints, setIsExpanding])
 
   useEffect(() => {
     const handleMouseUp = () => {
