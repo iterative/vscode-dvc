@@ -74,11 +74,9 @@ templates], which may be predefined (e.g. confusion matrix, linear) or custom
 **Images** (e.g. `.jpg` or `.svg` files) can be visualized as well. They will be
 rendered side by side for the selected experiments.
 
-<p float="left">
-  <img src="images/plots-plots-view-icon.png"
-       alt="Plots View" width="49%" />
-  <img src="images/plots-experiments-view-icon.png"
-       alt="Experiments View" width="49%" />
+<p align="center">
+  <img src="images/plots-view-icon.png"
+       alt="Plots View Icon" />
 </p>
 
 Automatically generated and updated **Trends** that show scalar [metrics] value
