@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import {
+  act,
   fireEvent,
   render,
   within,
@@ -104,3 +105,8 @@ export const expandRow = (label: string) => {
 
 export const selectedRows = () =>
   screen.queryAllByRole('row', { selected: true })
+
+export const advanceTimersByTime = (ms: number) =>
+  act(() => {
+    jest.advanceTimersByTime(ms)
+  })
