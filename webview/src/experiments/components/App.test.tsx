@@ -1,5 +1,6 @@
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import {
+  act,
   cleanup,
   createEvent,
   fireEvent,
@@ -29,6 +30,7 @@ import { dragAndDrop } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { setExperimentsAsStarred } from '../../test/tableDataFixture'
 import {
+  advanceTimersByTime,
   clickRowCheckbox,
   contractRow,
   expandRow,
@@ -573,19 +575,19 @@ describe('App', () => {
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY - 1)
+      advanceTimersByTime(HEADER_TOOLTIP_DELAY - 1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      jest.advanceTimersByTime(1)
+      advanceTimersByTime(1)
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
       expect(screen.getByRole('tooltip')).toHaveTextContent(testParamName)
 
       fireEvent.mouseLeave(testParamHeader, { bubbles: true })
 
-      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY - 1)
+      advanceTimersByTime(HEADER_TOOLTIP_DELAY - 1)
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
 
-      jest.advanceTimersByTime(1)
+      advanceTimersByTime(1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
@@ -599,7 +601,7 @@ describe('App', () => {
       const testParamHeader = screen.getByText(testParamName)
 
       fireEvent.mouseEnter(testParamHeader, { bubbles: true })
-      jest.advanceTimersByTime(HEADER_TOOLTIP_DELAY)
+      advanceTimersByTime(HEADER_TOOLTIP_DELAY)
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
@@ -610,10 +612,10 @@ describe('App', () => {
       const testParamCell = screen.getByText(testParamStringValue)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0] - 1)
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0] - 1)
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      jest.advanceTimersByTime(1)
+      advanceTimersByTime(1)
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
 
@@ -621,7 +623,7 @@ describe('App', () => {
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
 
@@ -631,14 +633,14 @@ describe('App', () => {
       const testParamCell = screen.getByText(testParamStringValue)
       fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
-      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
 
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
       fireEvent.mouseEnter(tooltip, { bubbles: true })
 
-      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       expect(tooltip).toBeInTheDocument()
     })
 
@@ -652,13 +654,13 @@ describe('App', () => {
 
         fireEvent.mouseEnter(testParamCell, { bubbles: true })
 
-        jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+        advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
         const tooltip = screen.queryByRole('tooltip')
         expect(tooltip).toHaveTextContent(expectedTooltipResult)
 
         fireEvent.mouseLeave(testParamCell, { bubbles: true })
 
-        jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+        advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
         expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
       }
 
@@ -694,7 +696,7 @@ describe('App', () => {
       )
       fireEvent.mouseEnter(radioButton)
 
-      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       const tooltip = screen.queryByRole('tooltip')
 
       expect(tooltip).toBeInTheDocument()
@@ -716,7 +718,7 @@ describe('App', () => {
       const radioButton = within(getRow('main')).getByTestId('row-action-star')
       fireEvent.mouseEnter(radioButton)
 
-      jest.advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       const tooltip = screen.queryByRole('tooltip')
 
       expect(tooltip).toBeInTheDocument()
@@ -743,7 +745,9 @@ describe('App', () => {
       const paramsFileHeader = screen.getByText('params.yaml')
       fireEvent.click(paramsFileHeader, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      act(() => {
+        advanceTimersByTime(100)
+      })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
@@ -753,7 +757,7 @@ describe('App', () => {
       const paramsFileHeader = screen.getByText('params.yaml')
       fireEvent.contextMenu(paramsFileHeader, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
       expect(menuitems).toHaveLength(2)
@@ -777,7 +781,7 @@ describe('App', () => {
       const target = screen.getByTestId('workspace-row')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const menu = screen.getByTestId('messages-menu')
       expect(menu).toBeDefined()
     })
@@ -788,7 +792,7 @@ describe('App', () => {
       const target = screen.getByTestId('workspace-row')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual(['Modify and Run', 'Modify and Queue'])
@@ -800,7 +804,7 @@ describe('App', () => {
       const target = screen.getByText('main')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
@@ -817,7 +821,7 @@ describe('App', () => {
       const target = screen.getByText('[exp-e7a67]')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
@@ -842,11 +846,11 @@ describe('App', () => {
       const row = getRow('4fb124a')
       fireEvent.contextMenu(row, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       expect(screen.getAllByRole('menuitem')).toHaveLength(9)
 
       fireEvent.click(window, { bubbles: true })
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
@@ -856,12 +860,12 @@ describe('App', () => {
       const row = getRow('4fb124a')
       fireEvent.contextMenu(row, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       expect(screen.getAllByRole('menuitem')).toHaveLength(9)
 
       const branch = getRow('main')
       fireEvent.click(branch, { bubbles: true })
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
@@ -871,13 +875,13 @@ describe('App', () => {
       const row = getRow('4fb124a')
       fireEvent.contextMenu(row, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
-      jest.advanceTimersByTime(200)
+      advanceTimersByTime(200)
       expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
     })
 
@@ -887,7 +891,7 @@ describe('App', () => {
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove')
@@ -902,7 +906,7 @@ describe('App', () => {
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected Rows')
@@ -917,7 +921,7 @@ describe('App', () => {
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Plot and Show')
@@ -935,7 +939,7 @@ describe('App', () => {
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Star')
@@ -958,12 +962,12 @@ describe('App', () => {
 
       contractRow('42b8736')
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       clickRowCheckbox('4fb124a')
       clickRowCheckbox('22e40e1', true)
       expandRow('42b8736')
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       expect(getRow('42b8736')).toHaveAttribute('aria-selected', 'true')
       expect(getRow('2173124')).not.toHaveAttribute('aria-selected', 'true')
       expect(getRow('9523bde')).not.toHaveAttribute('aria-selected', 'true')
@@ -980,11 +984,11 @@ describe('App', () => {
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       const clearOption = screen.getByText('Clear row selection')
       fireEvent.click(clearOption)
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       expect(selectedRows().length).toBe(0)
     })
 
@@ -998,7 +1002,7 @@ describe('App', () => {
 
       fireEvent.keyUp(getRow('42b8736'), { bubbles: true, key: 'Escape' })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
       expect(selectedRows().length).toBe(0)
     })
   })
@@ -1044,7 +1048,7 @@ describe('App', () => {
       const mainRow = getRow('main')
       fireEvent.contextMenu(mainRow, { bubbles: true })
 
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
 
       const starOption = screen.getByText('Star')
       fireEvent.click(starOption)
@@ -1066,7 +1070,7 @@ describe('App', () => {
       clickRowCheckbox('4fb124a')
 
       fireEvent.contextMenu(mainRow, { bubbles: true })
-      jest.advanceTimersByTime(100)
+      advanceTimersByTime(100)
 
       const starOption = screen.getByText('Star')
       fireEvent.click(starOption)
