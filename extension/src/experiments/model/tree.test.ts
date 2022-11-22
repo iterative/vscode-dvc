@@ -486,7 +486,7 @@ describe('ExperimentsTree', () => {
           label: 'a123',
           tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
             experiments[0].Created
-          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | undefined |\n`,
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | - |\n`,
           type: ExperimentType.EXPERIMENT
         },
         {
