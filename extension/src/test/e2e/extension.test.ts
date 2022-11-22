@@ -118,9 +118,12 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       await webview.focus()
 
-      await browser.waitUntil(async () => {
-        return (await webview.vegaVisualization$$.length) === 10
-      })
+      await browser.waitUntil(
+        async () => {
+          return (await webview.vegaVisualization$$.length) === 12
+        },
+        { timeout: 30000 }
+      )
 
       const plots = await webview.vegaVisualization$$
 
@@ -131,7 +134,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       }
 
       await webview.unfocus()
-    })
+    }).timeout(60000)
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
