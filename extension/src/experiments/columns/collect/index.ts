@@ -7,6 +7,7 @@ import {
 } from './metricsAndParams'
 import { Column } from '../../webview/contract'
 import {
+  ExperimentFields,
   ExperimentFieldsOrError,
   ExperimentsBranchOutput,
   ExperimentsOutput
@@ -49,22 +50,16 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
   return Object.values(acc)
 }
 
-const getData = (value: { baseline: ExperimentFieldsOrError }) =>
-  value.baseline.data || {}
+const getData = (value?: {
+  baseline?: ExperimentFieldsOrError
+}): ExperimentFields | undefined => value?.baseline?.data
 
 export const collectChanges = (data: ExperimentsOutput): string[] => {
   const changes: string[] = []
 
-  let workspace
-  let currentCommit
-
-  for (const [key, value] of Object.entries(data)) {
-    if (key === 'workspace') {
-      workspace = getData(value)
-      continue
-    }
-    currentCommit = getData(value)
-  }
+  const [workspaceData, currentCommitData] = Object.values(data)
+  const workspace = getData(workspaceData)
+  const currentCommit = getData(currentCommitData)
 
   if (!(workspace && currentCommit)) {
     return changes
@@ -82,6 +77,6 @@ export const collectParamsFiles = (
 ): Set<string> => {
   const files = Object.keys(data.workspace.baseline.data?.params || {})
     .filter(Boolean)
-    .map(file => standardizePath(join(dvcRoot, file))) as string[]
+    .map(file => standardizePath(join(dvcRoot, file)))
   return new Set(files)
 }

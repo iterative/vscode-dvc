@@ -12,6 +12,7 @@ import { ExperimentType } from '.'
 import { ExperimentAugmented } from './filterBy/collect'
 import { collectDeletable, ExperimentItem } from './collect'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
+import { getDataFromColumnPath } from './util'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -31,6 +32,8 @@ import {
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
 import { Experiment, ExperimentStatus, isRunning } from '../webview/contract'
+import { getMarkdownString } from '../../vscode/markdownString'
+import { truncateFromLeft } from '../../util/string'
 
 export class ExperimentsTree
   extends Disposable
@@ -191,7 +194,11 @@ export class ExperimentsTree
       iconPath: this.getExperimentIcon(experiment),
       id: experiment.id,
       label: experiment.label,
-      tooltip: this.getTooltip(experiment.error),
+      tooltip: this.getTooltip(
+        experiment.error,
+        experiment,
+        this.experiments.getRepository(dvcRoot).getFirstThreeColumnOrder()
+      ),
       type: experiment.type
     }
   }
@@ -276,7 +283,11 @@ export class ExperimentsTree
       ),
       id: checkpoint.id,
       label: checkpoint.label,
-      tooltip: this.getTooltip(checkpoint.error),
+      tooltip: this.getTooltip(
+        checkpoint.error,
+        checkpoint,
+        this.experiments.getRepository(dvcRoot).getFirstThreeColumnOrder()
+      ),
       type: checkpoint.type
     }))
   }
@@ -335,9 +346,33 @@ export class ExperimentsTree
     return [...this.view.selection]
   }
 
-  private getTooltip(error: string | undefined) {
+  private getTooltipTable(experiment: Experiment, firstThreeColumns: string[]) {
+    const data = firstThreeColumns
+      .map(path => {
+        const { value, splitUpPath } = getDataFromColumnPath(experiment, path)
+        const [type] = splitUpPath
+        const truncatedKey = truncateFromLeft(
+          path.slice(type.length + 1) || path,
+          30
+        )
+        return value !== null ? `| ${truncatedKey} | ${value} |\n` : ''
+      })
+      .join('')
+
+    return data === '' ? undefined : getMarkdownString(`|||\n|:--|--|\n${data}`)
+  }
+
+  private getTooltip(
+    error: string | undefined,
+    experiment: Experiment,
+    firstThreeColumns: string[]
+  ) {
     if (!error) {
-      return
+      if (firstThreeColumns.length === 0) {
+        return
+      }
+
+      return this.getTooltipTable(experiment, firstThreeColumns)
     }
 
     return getErrorTooltip(error)

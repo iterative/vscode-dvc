@@ -1,4 +1,11 @@
-import { commands, env, Event, EventEmitter, ExtensionContext } from 'vscode'
+import {
+  commands,
+  env,
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  ViewColumn
+} from 'vscode'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
@@ -22,7 +29,11 @@ import { ExperimentsColumnsTree } from './experiments/columns/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
-import { setContextValue } from './vscode/context'
+import {
+  Context as VsCodeContext,
+  getDvcRootFromContext,
+  setContextValue
+} from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import {
   getFirstWorkspaceFolder,
@@ -227,6 +238,19 @@ export class Extension extends Disposable implements IExtension {
 
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots, this.internalCommands)
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.PLOTS_AND_EXPERIMENT_SHOW,
+      async (context: VsCodeContext) => {
+        await this.experiments.showWebview(
+          getDvcRootFromContext(context),
+          ViewColumn.Active
+        )
+        await this.plots.showWebview(
+          getDvcRootFromContext(context),
+          ViewColumn.Beside
+        )
+      }
+    )
 
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
@@ -353,6 +377,10 @@ export class Extension extends Disposable implements IExtension {
     this.dvcRoots = nestedRoots.flat().sort()
 
     return this.setProjectAvailability()
+  }
+
+  public getRoots() {
+    return this.dvcRoots
   }
 
   public async initialize() {

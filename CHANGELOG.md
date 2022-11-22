@@ -2,6 +2,176 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.16] - 2022-11-22
+
+### 🚀 New Features and Enhancements
+
+- Update walkthrough images [#2802](https://github.com/iterative/vscode-dvc/pull/2802) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Patch experiment with checkpoints not having a name [#2805](https://github.com/iterative/vscode-dvc/pull/2805) by [@mattseddon](https://github.com/mattseddon)
+- Stabilize plot paths [#2811](https://github.com/iterative/vscode-dvc/pull/2811) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix webview test warnings [#2806](https://github.com/iterative/vscode-dvc/pull/2806) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.15] - 2022-11-18
+
+### 🐛 Bug Fixes
+
+- Check availability and compatibility on DVC projects in multi root workspaces [#2795](https://github.com/iterative/vscode-dvc/pull/2795) by [@sroy3](https://github.com/sroy3)
+
+## [0.5.14] - 2022-11-18
+
+### 🐛 Bug Fixes
+
+- Load projects inside multi-root workspaces [#2791](https://github.com/iterative/vscode-dvc/pull/2791) by [@sroy3](https://github.com/sroy3)
+
+## [0.5.13] - 2022-11-17
+
+### 🐛 Bug Fixes
+
+- Fix map on undefined is path doesn't exist in rev [#2785](https://github.com/iterative/vscode-dvc/pull/2785) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Add resolution for loader-utils [#2783](https://github.com/iterative/vscode-dvc/pull/2783) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.12] - 2022-11-16
+
+### 🚀 New Features and Enhancements
+
+- Highlight row when context menu is active [#2763](https://github.com/iterative/vscode-dvc/pull/2763) by [@shcheklein](https://github.com/shcheklein)
+- Make plots ribbon sticky on scroll [#2759](https://github.com/iterative/vscode-dvc/pull/2759) by [@shcheklein](https://github.com/shcheklein)
+- Add "views" section to sidebar [#2760](https://github.com/iterative/vscode-dvc/pull/2760) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update scheduled CLI test to match expected demo project output [#2753](https://github.com/iterative/vscode-dvc/pull/2753) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.11] - 2022-11-10
+
+### 🚀 New Features and Enhancements
+
+- Update the DVC: Get Started / Plots Dashboard [#2573](https://github.com/iterative/vscode-dvc/pull/2573) by [@maxagin](https://github.com/maxagin)
+
+### 🐛 Bug Fixes
+
+- Fix exp tree tooltips and quick pick selection ignoring columns with falsy values [#2745](https://github.com/iterative/vscode-dvc/pull/2745) by [@julieg18](https://github.com/julieg18)
+- Check hidden status when getting first three exp table column order [#2738](https://github.com/iterative/vscode-dvc/pull/2738) by [@julieg18](https://github.com/julieg18)
+- Use JSON5 library to parse non-standard JSON [#2750](https://github.com/iterative/vscode-dvc/pull/2750) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix unit tests for non en-US timezones [#2748](https://github.com/iterative/vscode-dvc/pull/2748) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.10] - 2022-11-02
+
+### 🚀 New Features and Enhancements
+
+- Add tooltips to experiments tree [#2706](https://github.com/iterative/vscode-dvc/pull/2706) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project to be on latest commit [#2720](https://github.com/iterative/vscode-dvc/pull/2720) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.9] - 2022-11-02
+
+### 🚀 New Features and Enhancements
+
+- Improve exp selection quick pick details [#2711](https://github.com/iterative/vscode-dvc/pull/2711) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fixes infinite loop in plots when workspace only is selected [#2715](https://github.com/iterative/vscode-dvc/pull/2715) by [@shcheklein](https://github.com/shcheklein)
+
+## [0.5.8] - 2022-10-31
+
+### 🚀 New Features and Enhancements
+
+- Add experiment details when selecting exps for plots [#2670](https://github.com/iterative/vscode-dvc/pull/2670) by [@julieg18](https://github.com/julieg18)
+- Changing images with code to code snippets [#2588](https://github.com/iterative/vscode-dvc/pull/2588) by [@maxagin](https://github.com/maxagin)
+
+### 🐛 Bug Fixes
+
+- Fix missing exp selection quick pick details on inital extension render [#2694](https://github.com/iterative/vscode-dvc/pull/2694) by [@julieg18](https://github.com/julieg18)
+- Fix scheduled CLI output test by moving TEMP_DIR outside of Git repository [#2697](https://github.com/iterative/vscode-dvc/pull/2697) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- bump latest DVC tested version to 2.31.0 [#2677](https://github.com/iterative/vscode-dvc/pull/2677) by [@shcheklein](https://github.com/shcheklein)
+
+## [0.5.7] - 2022-10-22
+
+### 🐛 Bug Fixes
+
+- Set CLI as available for project initialization purposes [#2661](https://github.com/iterative/vscode-dvc/pull/2661) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.6] - 2022-10-21
+
+### 🐛 Bug Fixes
+
+- Do not toggle plot section on tooltip click [#2642](https://github.com/iterative/vscode-dvc/pull/2642) by [@sroy3](https://github.com/sroy3)
+- Update packages to fix d3-color vulnerability [#2650](https://github.com/iterative/vscode-dvc/pull/2650) by [@sroy3](https://github.com/sroy3)
+- Update packages to fix minimatch vulnerability [#2651](https://github.com/iterative/vscode-dvc/pull/2651) by [@sroy3](https://github.com/sroy3)
+- Update packages to fix terser vulnerability [#2652](https://github.com/iterative/vscode-dvc/pull/2652) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Do not run build twice in CI [#2634](https://github.com/iterative/vscode-dvc/pull/2634) by [@mattseddon](https://github.com/mattseddon)
+- Add revisions to scheduled plots diff demo repo test (required for submodule to behave like a git repo) [#2639](https://github.com/iterative/vscode-dvc/pull/2639) by [@mattseddon](https://github.com/mattseddon)
+- Rearrange exp show fixtures [#2635](https://github.com/iterative/vscode-dvc/pull/2635) by [@mattseddon](https://github.com/mattseddon)
+- Add survival exp show test fixture [#2638](https://github.com/iterative/vscode-dvc/pull/2638) by [@mattseddon](https://github.com/mattseddon)
+- Remove undici yarn resolution [#2654](https://github.com/iterative/vscode-dvc/pull/2654) by [@sroy3](https://github.com/sroy3)
+
+## [0.5.5] - 2022-10-20
+
+### 🚀 New Features and Enhancements
+
+- Update table drag and drop implementation  [#2566](https://github.com/iterative/vscode-dvc/pull/2566) by [@julieg18](https://github.com/julieg18)
+- Plots improve section tooltips copy and style [#2622](https://github.com/iterative/vscode-dvc/pull/2622) by [@shcheklein](https://github.com/shcheklein)
+
+### 🐛 Bug Fixes
+
+- Do not toggle plot section when clicking a link [#2632](https://github.com/iterative/vscode-dvc/pull/2632) by [@sroy3](https://github.com/sroy3)
+- Only patch workspace only calls to plots diff [#2629](https://github.com/iterative/vscode-dvc/pull/2629) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add util for identifying ValueTree type [#2619](https://github.com/iterative/vscode-dvc/pull/2619) by [@mattseddon](https://github.com/mattseddon)
+- Switch CI test coverage to use stable build [#2623](https://github.com/iterative/vscode-dvc/pull/2623) by [@mattseddon](https://github.com/mattseddon)
+- Upload vsix as part of publish action [#2615](https://github.com/iterative/vscode-dvc/pull/2615) by [@mattseddon](https://github.com/mattseddon)
+- Improve max table depth test [#2621](https://github.com/iterative/vscode-dvc/pull/2621) by [@julieg18](https://github.com/julieg18)
+- Add webpack dummy build as a lint step [#2626](https://github.com/iterative/vscode-dvc/pull/2626) by [@wolmir](https://github.com/wolmir)
+- Fix integration test suite after hook [#2628](https://github.com/iterative/vscode-dvc/pull/2628) by [@mattseddon](https://github.com/mattseddon)
+- Make the plot sizes use numbers underneath [#2563](https://github.com/iterative/vscode-dvc/pull/2563) by [@sroy3](https://github.com/sroy3)
+- Demo project as a submodule [#2624](https://github.com/iterative/vscode-dvc/pull/2624) by [@sroy3](https://github.com/sroy3)
+- Split standardize path into two functions [#2627](https://github.com/iterative/vscode-dvc/pull/2627) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.4] - 2022-10-18
+
+### 🐛 Bug Fixes
+
+- Account for null being an object in workspace change data collection [#2617](https://github.com/iterative/vscode-dvc/pull/2617) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.3] - 2022-10-17
+
+### 🚀 New Features and Enhancements
+
+- Add actions to experiment cell hint tooltips [#2606](https://github.com/iterative/vscode-dvc/pull/2606) by [@mattseddon](https://github.com/mattseddon)
+- Update experiment table icons to use --vscode-descriptionForeground and use --vscode-editorLightBulb-foreground for selected stars [#2604](https://github.com/iterative/vscode-dvc/pull/2604) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix experiment table changes collection bug [#2598](https://github.com/iterative/vscode-dvc/pull/2598) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use stable version of VS Code for e2e tests (again) [#2611](https://github.com/iterative/vscode-dvc/pull/2611) by [@mattseddon](https://github.com/mattseddon)
+- Standardize dvc root paths as they come into the system [#2597](https://github.com/iterative/vscode-dvc/pull/2597) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.2] - 2022-10-16
 
 ### 🚀 New Features and Enhancements

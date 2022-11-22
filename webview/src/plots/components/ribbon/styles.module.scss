@@ -73,12 +73,22 @@
 
 .list {
   display: flex;
+  position: sticky;
   align-items: center;
   gap: 6px;
   border-bottom: 1px solid $border-color;
   padding: 10px 15px;
   margin: 0;
   flex-wrap: wrap;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+  background-color: $bg-color;
+  transition: box-shadow 0.25s;
+
+  &.withShadow {
+    box-shadow: 0 5px 8px -2px $shadow;
+  }
 }
 
 .buttonWrapper {

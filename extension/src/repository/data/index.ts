@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ProcessManager } from '../../processManager'
@@ -12,8 +11,9 @@ import {
   EXPERIMENTS_GIT_REFS
 } from '../../experiments/data/constants'
 import { DeferredDisposable } from '../../class/deferred'
-import { DOT_GIT } from '../../cli/git/constants'
+import { gitPath } from '../../cli/git/constants'
 import { DataStatusOutput, DvcError } from '../../cli/dvc/contract'
+import { getGitPath } from '../../fileSystem'
 
 export type Data = {
   dataStatus: DataStatusOutput | DvcError
@@ -128,7 +128,10 @@ export class RepositoryData extends DeferredDisposable {
 
     this.dispose.track(
       createFileSystemWatcher(
-        getRelativePattern(join(gitRoot, DOT_GIT), '{HEAD,index}'),
+        getRelativePattern(
+          getGitPath(gitRoot, gitPath.DOT_GIT),
+          '{HEAD,index}'
+        ),
         (path: string) => {
           if (!path) {
             return

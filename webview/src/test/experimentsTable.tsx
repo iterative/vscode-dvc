@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import {
+  act,
   fireEvent,
   render,
   within,
@@ -8,8 +9,8 @@ import {
 } from '@testing-library/react'
 import React from 'react'
 import { Provider } from 'react-redux'
-import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested'
-import tableDataFixture from 'dvc/src/test/fixtures/expShow/tableData'
+import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
+import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { tableData as sortingTableDataFixture } from './sort'
 import { customQueries, getRow } from './queries'
@@ -104,3 +105,8 @@ export const expandRow = (label: string) => {
 
 export const selectedRows = () =>
   screen.queryAllByRole('row', { selected: true })
+
+export const advanceTimersByTime = (ms: number) =>
+  act(() => {
+    jest.advanceTimersByTime(ms)
+  })

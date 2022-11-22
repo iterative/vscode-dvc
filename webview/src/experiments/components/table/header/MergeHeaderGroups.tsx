@@ -13,6 +13,7 @@ export const MergedHeaderGroups: React.FC<{
   onDragUpdate: DragFunction
   onDragStart: DragFunction
   onDragEnd: DragFunction
+  onDrop: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({
@@ -22,6 +23,7 @@ export const MergedHeaderGroups: React.FC<{
   onDragUpdate,
   onDragEnd,
   onDragStart,
+  onDrop,
   root,
   setExpColumnNeedsShadow
 }) => {
@@ -40,7 +42,8 @@ export const MergedHeaderGroups: React.FC<{
           columns={columns}
           onDragEnter={onDragUpdate}
           onDragStart={onDragStart}
-          onDrop={onDragEnd}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
           root={root}
         />
       ))}

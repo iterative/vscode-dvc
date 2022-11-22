@@ -10,8 +10,10 @@ import {
 } from 'fs-extra'
 import { load } from 'js-yaml'
 import { Uri } from 'vscode'
+import { standardizePath } from './path'
 import { definedAndNonEmpty } from '../util/array'
 import { Logger } from '../common/logger'
+import { gitPath } from '../cli/git/constants'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -36,7 +38,7 @@ export const findDvcSubRootPaths = async (
 
   return children
     .filter(child => isDirectory(join(cwd, child, '.dvc')))
-    .map(child => join(cwd, child))
+    .map(child => standardizePath(join(cwd, child)))
 }
 
 export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
@@ -57,9 +59,38 @@ export const findAbsoluteDvcRootPath = async (
     return []
   }
 
-  const absoluteRoot = resolve(cwd, relativePath)
+  const absoluteRoot = standardizePath(resolve(cwd, relativePath))
 
   return [absoluteRoot]
+}
+
+// .git inside a submodule is a file with the following content: `gitdir: ../.git/modules/demo`
+const findDotGitDir = (gitRoot: string) => {
+  const dotGitPath = join(gitRoot, gitPath.DOT_GIT)
+
+  const isSubmodule = lstatSync(dotGitPath).isFile()
+  if (isSubmodule) {
+    const dotGitAsFileContent = readFileSync(dotGitPath, 'utf8')
+    const gitDirPrefix = 'gitdir: '
+    const gitDirLine = dotGitAsFileContent
+      .split(/\r?\n/)
+      .find(line => line.indexOf(gitDirPrefix) === 0)
+    return resolve(gitRoot, ...(gitDirLine?.slice(8).split('/') || []))
+  }
+  return dotGitPath
+}
+
+const gitRootGitDir: { [key: string]: string } = {}
+
+export const getGitPath = (gitRoot: string, path: string) => {
+  const gitDir = gitRootGitDir[gitRoot] || findDotGitDir(gitRoot)
+  gitRootGitDir[gitRoot] = gitDir
+
+  if (path === gitPath.DOT_GIT) {
+    return gitDir
+  }
+
+  return join(gitDir, path)
 }
 
 export const isSameOrChild = (root: string, path: string) => {

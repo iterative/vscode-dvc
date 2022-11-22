@@ -1,3 +1,4 @@
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import { ColumnsModel } from './model'
 import { appendColumnToPath, buildMetricOrParamPath } from './paths'
 import { timestampColumn } from './constants'
@@ -5,100 +6,156 @@ import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { ColumnType } from '../webview/contract'
-import outputFixture from '../../test/fixtures/expShow/output'
-import columnsFixture from '../../test/fixtures/expShow/columns'
+import outputFixture from '../../test/fixtures/expShow/base/output'
+import columnsFixture from '../../test/fixtures/expShow/base/columns'
 import {
-  deeplyNestedOutput,
-  columns as deeplyNestedColumns,
-  columnsWithDepthOf10 as deeplyNestedColumnsWithDepthOf10,
-  columnsWithDepthOf3 as deeplyNestedColumnsWithDepthOf3,
-  columnsWithDepthOf2 as deeplyNestedColumnsWithDepthOf2,
-  columnsWithDepthOf1 as deeplyNestedColumnsWithDepthOf1
-} from '../../test/fixtures/expShow/deeplyNested'
-import {
-  dataTypesOutput,
-  columns as dataTypesColumns
-} from '../../test/fixtures/expShow/dataTypes'
+  deeplyNestedColumnsWithHeightOf10,
+  deeplyNestedColumnsWithHeightOf3,
+  deeplyNestedColumnsWithHeightOf2,
+  deeplyNestedColumnsWithHeightOf1
+} from '../../test/fixtures/expShow/deeplyNested/maxHeight'
+import deeplyNestedColumnsFixture from '../../test/fixtures/expShow/deeplyNested/columns'
+import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
+import dataTypesColumnsFixture from '../../test/fixtures/expShow/dataTypes/columns'
+import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output'
+import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
+import survivalColumnsFixture from '../../test/fixtures/expShow/survival/columns'
 import { getConfigValue } from '../../vscode/config'
+import { buildMockedEventEmitter } from '../../test/util/jest'
 
 jest.mock('../../vscode/config')
+jest.mock('@hediet/std/disposable')
 
 const mockedGetConfigValue = jest.mocked(getConfigValue)
+const mockedDisposable = jest.mocked(Disposable)
 
 beforeEach(() => {
   jest.resetAllMocks()
   mockedGetConfigValue.mockReturnValue(5)
+
+  mockedDisposable.fn.mockReturnValue({
+    track: function <T>(disposable: T): T {
+      return disposable
+    }
+  } as unknown as (() => void) & Disposer)
 })
 
 describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
+  const mockedColumnsOrderOrStatusChanged = buildMockedEventEmitter<void>()
 
   it('should return the expected columns when given the default output fixture', async () => {
-    const model = new ColumnsModel('', buildMockMemento())
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
     await model.transformAndSet(outputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(columnsFixture)
   })
 
+  it('should return the expected columns when given the survival output fixture', async () => {
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(survivalOutputFixture)
+    expect(model.getSelected()).toStrictEqual(survivalColumnsFixture)
+  })
+
   it('should return the expected columns when given the deeply nested output fixture', async () => {
-    const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumns)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsFixture)
   })
 
   it('should return the expected columns when the max depth config is set to 10', async () => {
     mockedGetConfigValue.mockReturnValue(10)
-    const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf10)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
 
   it('should return the expected columns when the max depth config is set to 3', async () => {
     mockedGetConfigValue.mockReturnValue(3)
-    const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf3)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf3)
   })
 
   it('should return the expected columns when the max depth config is set to 2', async () => {
     mockedGetConfigValue.mockReturnValue(2)
-    const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf2)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf2)
   })
 
   it('should return the expected columns when the max depth config is set to 1', async () => {
     mockedGetConfigValue.mockReturnValue(1)
-    const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf1)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf1)
   })
 
   it('should return the expected columns when the max depth config is set to 0', async () => {
     mockedGetConfigValue.mockReturnValue(0)
-    const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf10)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
 
   it('should return the expected columns when the max depth config is set to -1', async () => {
     mockedGetConfigValue.mockReturnValue(-1)
-    const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(deeplyNestedOutput)
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
-    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithDepthOf10)
+    expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
 
   it('should return the expected columns when given the data types output fixture', async () => {
-    const model = new ColumnsModel('', buildMockMemento())
-    await model.transformAndSet(dataTypesOutput)
-    expect(model.getSelected()).toStrictEqual(dataTypesColumns)
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet(dataTypesOutputFixture)
+    expect(model.getSelected()).toStrictEqual(dataTypesColumnsFixture)
   })
 
   describe('persistence', () => {
@@ -123,7 +180,11 @@ describe('ColumnsModel', () => {
       }
     }
     it('Shows all items when given no persisted status', async () => {
-      const model = new ColumnsModel(exampleDvcRoot, buildMockMemento())
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        buildMockMemento(),
+        mockedColumnsOrderOrStatusChanged
+      )
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
         timestampColumn,
@@ -155,7 +216,8 @@ describe('ColumnsModel', () => {
             [paramsDotYamlPath]: Status.INDETERMINATE,
             [testParamPath]: Status.UNSELECTED
           }
-        })
+        }),
+        mockedColumnsOrderOrStatusChanged
       )
       await model.transformAndSet(exampleData)
       expect(model.getSelected()).toStrictEqual([
@@ -183,9 +245,65 @@ describe('ColumnsModel', () => {
         buildMockMemento({
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
-        })
+        }),
+        mockedColumnsOrderOrStatusChanged
       )
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
+    })
+
+    it('should return the first three none hidden columns from the persisted state', async () => {
+      const persistedState = [
+        'id',
+        'Created',
+        'params:params.yaml:dvc_logs_dir',
+        'params:params.yaml:process.threshold',
+        'params:params.yaml:process.test_arg',
+        'deps:src/prepare.py',
+        'deps:src/featurization.py'
+      ]
+
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        buildMockMemento({
+          [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
+            persistedState
+        }),
+        mockedColumnsOrderOrStatusChanged
+      )
+      await model.transformAndSet(outputFixture)
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual(
+        persistedState.slice(1, 4)
+      )
+
+      model.toggleStatus('Created')
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual(
+        persistedState.slice(2, 5)
+      )
+    })
+
+    it('should return the first three none hidden columns collected from data if state is empty', async () => {
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        buildMockMemento(),
+        mockedColumnsOrderOrStatusChanged
+      )
+      await model.transformAndSet(outputFixture)
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+        'Created',
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy'
+      ])
+
+      model.toggleStatus('Created')
+
+      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy',
+        'metrics:summary.json:val_loss'
+      ])
     })
 
     it('should re-order the columns if a new columnOrder is set', () => {
@@ -197,7 +315,8 @@ describe('ColumnsModel', () => {
             { path: 'B', width: 0 },
             { path: 'C', width: 0 }
           ]
-        })
+        }),
+        mockedColumnsOrderOrStatusChanged
       )
       const newState = ['C', 'B', 'A']
       model.setColumnOrder(newState)
@@ -217,7 +336,8 @@ describe('ColumnsModel', () => {
         buildMockMemento({
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
-        })
+        }),
+        mockedColumnsOrderOrStatusChanged
       )
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
@@ -233,7 +353,8 @@ describe('ColumnsModel', () => {
         buildMockMemento({
           [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
             persistedState
-        })
+        }),
+        mockedColumnsOrderOrStatusChanged
       )
       const changedColumnId = 'C'
       const expectedWidth = 77

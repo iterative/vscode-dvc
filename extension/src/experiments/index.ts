@@ -54,6 +54,7 @@ export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
   public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
   public readonly onDidChangeColumns: Event<void>
+  public readonly onDidChangeColumnOrderOrStatus: Event<void>
   public readonly onDidChangeCheckpoints: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
@@ -78,6 +79,10 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly columnsChanged = this.dispose.track(new EventEmitter<void>())
+  private readonly columnsOrderOrStatusChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
   private readonly decorationProvider = this.dispose.track(
     new DecorationProvider()
   )
@@ -101,13 +106,20 @@ export class Experiments extends BaseRepository<TableData> {
     this.onDidChangeIsParamsFileFocused = this.paramsFileFocused.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeColumns = this.columnsChanged.event
+    this.onDidChangeColumnOrderOrStatus = this.columnsOrderOrStatusChanged.event
     this.onDidChangeCheckpoints = this.checkpointsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
     )
 
-    this.columns = this.dispose.track(new ColumnsModel(dvcRoot, workspaceState))
+    this.columns = this.dispose.track(
+      new ColumnsModel(
+        dvcRoot,
+        workspaceState,
+        this.columnsOrderOrStatusChanged
+      )
+    )
 
     this.checkpoints = this.dispose.track(new CheckpointsModel())
 
@@ -132,7 +144,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
-        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_DEPTH)) {
+        if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
           this.cliData.update()
         }
       })
@@ -305,7 +317,11 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 
-    const selected = await pickExperiments(experiments, this.hasCheckpoints())
+    const selected = await pickExperiments(
+      experiments,
+      this.hasCheckpoints(),
+      this.columns.getFirstThreeColumnOrder()
+    )
     if (!selected) {
       return
     }
@@ -454,6 +470,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public hasRunningExperiment() {
     return this.experiments.hasRunningExperiment()
+  }
+
+  public getFirstThreeColumnOrder() {
+    return this.columns.getFirstThreeColumnOrder()
   }
 
   private setupInitialData() {

@@ -4,9 +4,11 @@ import { stub, spy, restore } from 'sinon'
 import { window, commands, MessageItem, EventEmitter, TreeView } from 'vscode'
 import { addFilterViaQuickInput, mockQuickInputFilter } from './util'
 import { Disposable } from '../../../../../extension'
-import columnsFixture from '../../../../fixtures/expShow/columns'
-import rowsFixture from '../../../../fixtures/expShow/rows'
-import workspaceChangesFixture from '../../../../fixtures/expShow/workspaceChanges'
+import columnsFixture, {
+  dataColumnOrder as columnsOrderFixture
+} from '../../../../fixtures/expShow/base/columns'
+import rowsFixture from '../../../../fixtures/expShow/base/rows'
+import workspaceChangesFixture from '../../../../fixtures/expShow/base/workspaceChanges'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   getFilterId,
@@ -115,7 +117,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const filteredTableData: TableData = {
         changes: workspaceChangesFixture,
-        columnOrder: [],
+        columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
         filteredCounts: { checkpoints: 4, experiments: 1 },
@@ -146,7 +148,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const unfilteredTableData: TableData = {
         changes: workspaceChangesFixture,
-        columnOrder: [],
+        columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
         filteredCounts: { checkpoints: 0, experiments: 0 },
@@ -476,7 +478,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const filteredTableData: TableData = {
         changes: workspaceChangesFixture,
-        columnOrder: [],
+        columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
         filteredCounts: { checkpoints: 9, experiments: 6 },

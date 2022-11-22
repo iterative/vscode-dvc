@@ -1,6 +1,6 @@
 import { collectExperiments, collectMutableRevisions } from './collect'
 import { Experiment } from '../webview/contract'
-import modifiedFixture from '../../test/fixtures/expShow/modified'
+import modifiedFixture from '../../test/fixtures/expShow/modified/output'
 import { ExperimentStatus } from '../../cli/dvc/contract'
 
 describe('collectExperiments', () => {
@@ -128,6 +128,38 @@ describe('collectExperiments', () => {
       })
       expect(continuationCheckpoints).toHaveLength(0)
     }
+  })
+
+  it('should handle a checkpoint tip not having a name', () => {
+    const checkpointTipWithoutAName = '3fceabdcef3c7b97c7779f8ae0c69a5542eefaf5'
+
+    const repoWithNestedCheckpoints = {
+      branchA: {
+        baseline: { data: {} },
+        [checkpointTipWithoutAName]: {
+          data: { checkpoint_tip: checkpointTipWithoutAName }
+        },
+        tip1cp1: {
+          data: { checkpoint_tip: checkpointTipWithoutAName }
+        },
+        tip1cp2: {
+          data: { checkpoint_tip: checkpointTipWithoutAName }
+        },
+        tip1cp3: {
+          data: { checkpoint_tip: checkpointTipWithoutAName }
+        }
+      },
+      workspace: { baseline: {} }
+    }
+    const acc = collectExperiments(repoWithNestedCheckpoints)
+
+    const { experimentsByBranch, checkpointsByTip } = acc
+    const [experiment] = experimentsByBranch.get('branchA') || []
+
+    expect(experiment.id).toStrictEqual(checkpointTipWithoutAName)
+    expect(
+      checkpointsByTip.get(checkpointTipWithoutAName)?.length
+    ).toStrictEqual(3)
   })
 })
 

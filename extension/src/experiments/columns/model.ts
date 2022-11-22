@@ -1,5 +1,6 @@
-import { Memento } from 'vscode'
+import { EventEmitter, Memento } from 'vscode'
 import { collectChanges, collectColumns, collectParamsFiles } from './collect'
+import { EXPERIMENT_COLUMN_ID, timestampColumn } from './constants'
 import { Column, ColumnType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
@@ -11,8 +12,17 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
 
-  constructor(dvcRoot: string, workspaceState: Memento) {
-    super(dvcRoot, workspaceState, PersistenceKey.METRICS_AND_PARAMS_STATUS)
+  constructor(
+    dvcRoot: string,
+    workspaceState: Memento,
+    columnsOrderOrStatusChanged: EventEmitter<void>
+  ) {
+    super(
+      dvcRoot,
+      workspaceState,
+      PersistenceKey.METRICS_AND_PARAMS_STATUS,
+      columnsOrderOrStatusChanged
+    )
 
     this.columnOrderState = this.revive(
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,
@@ -26,6 +36,12 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public getColumnOrder(): string[] {
     return this.columnOrderState
+  }
+
+  public getFirstThreeColumnOrder(): string[] {
+    return this.columnOrderState
+      .filter(path => this.status[path] && this.status[path] === 2)
+      .slice(0, 3)
   }
 
   public getColumnWidths(): Record<string, number> {
@@ -53,6 +69,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER,
       this.getColumnOrder()
     )
+    this.statusChanged?.fire()
   }
 
   public setColumnWidth(id: string, width: number) {
@@ -88,6 +105,40 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     )
   }
 
+  private findChildrenColumns(
+    parent: string,
+    columns: Column[],
+    childrenColumns: string[]
+  ) {
+    const filteredColumns = columns.filter(
+      ({ parentPath }) => parentPath === parent
+    )
+    for (const column of filteredColumns) {
+      if (column.hasChildren) {
+        this.findChildrenColumns(column.path, columns, childrenColumns)
+      } else {
+        childrenColumns.push(column.path)
+      }
+    }
+  }
+
+  private getColumnsFromType(type: string): string[] {
+    const childrenColumns: string[] = []
+    const dataWithType = this.data.filter(({ path }) => path.startsWith(type))
+    this.findChildrenColumns(type, dataWithType, childrenColumns)
+    return childrenColumns
+  }
+
+  private getColumnOrderFromData() {
+    return [
+      EXPERIMENT_COLUMN_ID,
+      timestampColumn.path,
+      ...this.getColumnsFromType(ColumnType.METRICS),
+      ...this.getColumnsFromType(ColumnType.PARAMS),
+      ...this.getColumnsFromType(ColumnType.DEPS)
+    ]
+  }
+
   private async transformAndSetColumns(data: ExperimentsOutput) {
     const [columns, paramsFiles] = await Promise.all([
       collectColumns(data),
@@ -97,6 +148,11 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     this.setNewStatuses(columns)
 
     this.data = columns
+
+    if (this.columnOrderState.length === 0) {
+      this.setColumnOrder(this.getColumnOrderFromData())
+    }
+
     this.paramsFiles = paramsFiles
   }
 

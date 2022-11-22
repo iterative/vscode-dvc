@@ -7,8 +7,8 @@ import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
-import expShowFixtureWithoutErrors from '../../fixtures/expShow/noErrors'
-import checkpointPlotsFixture from '../../fixtures/expShow/checkpointPlots'
+import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
+import checkpointPlotsFixture from '../../fixtures/expShow/base/checkpointPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
@@ -25,7 +25,7 @@ import { basePlotsUrl, dvcDemoPath } from '../../util'
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
-  PlotSize,
+  PlotSizeNumber,
   PlotsType,
   Section,
   TemplatePlotGroup,
@@ -328,21 +328,24 @@ suite('Plots Test Suite', () => {
       const mockSetPlotSize = stub(plotsModel, 'setPlotSize').returns(undefined)
 
       mockMessageReceived.fire({
-        payload: { section: Section.TEMPLATE_PLOTS, size: PlotSize.SMALL },
+        payload: {
+          section: Section.TEMPLATE_PLOTS,
+          size: PlotSizeNumber.SMALL
+        },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
 
       expect(mockSetPlotSize).to.be.calledOnce
       expect(mockSetPlotSize).to.be.calledWithExactly(
         Section.TEMPLATE_PLOTS,
-        PlotSize.SMALL
+        PlotSizeNumber.SMALL
       )
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
           section: Section.TEMPLATE_PLOTS,
-          size: PlotSize.SMALL
+          size: PlotSizeNumber.SMALL
         },
         undefined
       )

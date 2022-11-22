@@ -16,6 +16,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
 import { ExperimentStatus } from '../webview/contract'
+import { formatDate } from '../../util/date'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -35,14 +36,14 @@ const {
   mockedGetDvcRoots,
   mockedGetExperiments,
   mockedGetBranchExperiments,
-  mockedGetCheckpoints
+  mockedGetCheckpoints,
+  mockedGetFirstThreeColumnOrder
 } = buildMockedExperiments()
 
 const mockedClockResource = {
   dark: Uri.file(join('some', 'light', 'clock')),
   light: Uri.file(join('some', 'dark', 'clock'))
 }
-
 const mockedGetExperimentsResource = jest.fn()
 const mockedResourceLocator = {
   clock: mockedClockResource,
@@ -181,6 +182,7 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren()
 
@@ -289,6 +291,7 @@ describe('ExperimentsTree', () => {
         }
       ]
       mockedGetCheckpoints.mockReturnValueOnce(checkpoints)
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren({
         collapsibleState: 1,
@@ -366,6 +369,7 @@ describe('ExperimentsTree', () => {
         }
       ]
       mockedGetBranchExperiments.mockReturnValueOnce(experimentsByBranch)
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren(branch)
 
@@ -383,6 +387,140 @@ describe('ExperimentsTree', () => {
           id: 'exp-abcdef',
           label: 'e350702',
           tooltip: undefined,
+          type: ExperimentType.EXPERIMENT
+        }
+      ])
+    })
+    it('should return experiments with markdown table tooltips', async () => {
+      mockedGetMarkdownString.mockImplementation(
+        str => str as unknown as MarkdownString
+      )
+
+      const experiments = [
+        {
+          Created: '2022-08-19T08:17:22',
+          deps: {
+            'data/data.xml': { changes: false, value: '22a1a29' }
+          },
+          displayColor: undefined,
+          hasChildren: true,
+          id: 'exp-123',
+          label: 'a123',
+          params: {
+            'params.yaml': {
+              featurize: {
+                random_value: undefined
+              }
+            }
+          },
+          selected: false,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          Created: '2022-09-15T06:58:29',
+          deps: {
+            'data/data.xml': { changes: false, value: '22a1a29' }
+          },
+          displayColor: undefined,
+          hasChildren: false,
+          id: 'exp-456',
+          label: 'b456',
+          params: {
+            'params.yaml': {
+              featurize: {
+                random_value: ['rbf', 'linear']
+              }
+            }
+          },
+          selected: true,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          Created: '2022-07-03T05:10:10',
+          deps: {
+            'data/data.xml': { changes: false, value: '22a1a29' }
+          },
+          displayColor: undefined,
+          hasChildren: false,
+          id: 'exp-789',
+          label: 'c789',
+          params: {
+            'params.yaml': {
+              featurize: {
+                random_value: false
+              }
+            }
+          },
+          selected: false,
+          type: ExperimentType.EXPERIMENT
+        }
+      ]
+      const experimentsTree = new ExperimentsTree(
+        mockedExperiments,
+        mockedResourceLocator
+      )
+      mockedGetExperiments
+        .mockReturnValueOnce(experiments)
+        .mockReturnValueOnce(experiments)
+      mockedGetDvcRoots.mockReturnValueOnce(['repo'])
+      mockedGetFirstThreeColumnOrder.mockReturnValue([
+        'Created',
+        'deps:data/data.xml',
+        'params:params.yaml:featurize.random_value'
+      ])
+
+      const children = await experimentsTree.getChildren()
+
+      expect(children).toStrictEqual([
+        {
+          collapsibleState: 1,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'exp-123' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: undefined,
+          dvcRoot: 'repo',
+          iconPath: expect.anything(),
+          id: 'exp-123',
+          label: 'a123',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[0].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | undefined |\n`,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'exp-456' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: undefined,
+          dvcRoot: 'repo',
+          iconPath: expect.anything(),
+          id: 'exp-456',
+          label: 'b456',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[1].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | [rbf,linear] |\n`,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'exp-789' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          description: undefined,
+          dvcRoot: 'repo',
+          iconPath: expect.anything(),
+          id: 'exp-789',
+          label: 'c789',
+          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
+            experiments[2].Created
+          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | false |\n`,
           type: ExperimentType.EXPERIMENT
         }
       ])

@@ -27,6 +27,7 @@ export const buildMockedEventEmitter = <T = void>() => {
 
 export const buildMockedExperiments = () => {
   const mockedColumnsChanged = buildMockedEventEmitter()
+  const mockedColumnsOrderOrStatusChanged = buildMockedEventEmitter()
   const mockedExperimentsChanged = buildMockedEventEmitter()
   const mockedGetChildColumns = jest.fn()
   const mockedGetDvcRoots = jest.fn()
@@ -37,6 +38,7 @@ export const buildMockedExperiments = () => {
   const mockedGetSorts = jest.fn()
   const mockedGetSelectedRevisions = jest.fn()
   const mockedGetBranchExperiments = jest.fn()
+  const mockedGetFirstThreeColumnOrder = jest.fn()
   const mockedExperiments = {
     columnsChanged: mockedColumnsChanged,
     experimentsChanged: mockedExperimentsChanged,
@@ -49,6 +51,7 @@ export const buildMockedExperiments = () => {
         getExperiments: mockedGetExperiments,
         getFilter: mockedGetFilter,
         getFilters: mockedGetFilters,
+        getFirstThreeColumnOrder: mockedGetFirstThreeColumnOrder,
         getSelectedRevisions: mockedGetSelectedRevisions,
         getSorts: mockedGetSorts
       } as unknown as Experiments),
@@ -57,6 +60,7 @@ export const buildMockedExperiments = () => {
 
   return {
     mockedColumnsChanged,
+    mockedColumnsOrderOrStatusChanged,
     mockedExperiments,
     mockedExperimentsChanged,
     mockedGetBranchExperiments,
@@ -66,6 +70,7 @@ export const buildMockedExperiments = () => {
     mockedGetExperiments,
     mockedGetFilter,
     mockedGetFilters,
+    mockedGetFirstThreeColumnOrder,
     mockedGetSelectedRevisions,
     mockedGetSorts
   }

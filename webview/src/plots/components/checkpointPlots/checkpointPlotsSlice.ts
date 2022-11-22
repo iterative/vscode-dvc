@@ -3,7 +3,6 @@ import {
   CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
-  PlotSize,
   Section
 } from 'dvc/src/plots/webview/contract'
 import {
@@ -32,7 +31,7 @@ export const checkpointPlotsSlice = createSlice({
   initialState: checkpointPlotsInitialState,
   name: 'checkpoint',
   reducers: {
-    changeSize: (state, action: PayloadAction<PlotSize>) => {
+    changeSize: (state, action: PayloadAction<number>) => {
       state.size = action.payload
     },
 

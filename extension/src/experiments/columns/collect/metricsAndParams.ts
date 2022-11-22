@@ -1,4 +1,5 @@
 import get from 'lodash.get'
+import isEqual from 'lodash.isequal'
 import {
   ColumnAccumulator,
   limitAncestorDepth,
@@ -8,9 +9,9 @@ import {
 import { ColumnType } from '../../webview/contract'
 import {
   ExperimentFields,
+  isValueTree,
   Value,
   ValueTree,
-  ValueTreeNode,
   ValueTreeOrError,
   ValueTreeRoot
 } from '../../../cli/dvc/contract'
@@ -56,9 +57,6 @@ const collectMetricOrParam = (
   )
 }
 
-const notLeaf = (value: ValueTreeNode): boolean =>
-  value && !Array.isArray(value) && typeof value === 'object'
-
 const walkValueTree = (
   acc: ColumnAccumulator,
   type: ColumnType,
@@ -66,7 +64,7 @@ const walkValueTree = (
   ancestors: string[] = []
 ) => {
   for (const [label, value] of Object.entries(tree)) {
-    if (notLeaf(value)) {
+    if (isValueTree(value)) {
       walkValueTree(acc, type, value, [...ancestors, label])
     } else {
       collectMetricOrParam(acc, type, ancestors, label, value)
@@ -109,8 +107,8 @@ const collectChange = (
   commitData: ExperimentFields,
   ancestors: string[] = []
 ) => {
-  if (typeof value === 'object') {
-    for (const [childKey, childValue] of Object.entries(value as ValueTree)) {
+  if (isValueTree(value)) {
+    for (const [childKey, childValue] of Object.entries(value)) {
       collectChange(changes, type, file, childKey, childValue, commitData, [
         ...ancestors,
         key
@@ -119,7 +117,9 @@ const collectChange = (
     return
   }
 
-  if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
+  if (
+    !isEqual(get(commitData?.[type], [file, 'data', ...ancestors, key]), value)
+  ) {
     changes.push(buildMetricOrParamPath(type, file, ...ancestors, key))
   }
 }
