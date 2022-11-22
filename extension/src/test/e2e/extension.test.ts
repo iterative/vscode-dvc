@@ -2,11 +2,13 @@ import { join } from 'path'
 import { suite, before, describe, it } from 'mocha'
 import {
   closeAllEditors,
+  deleteAllExistingExperiments,
   dismissAllNotifications,
   findDecorationTooltip,
   findScmTreeItems,
   getDVCActivityBarIcon,
   getLabel,
+  runModifiedExperiment,
   waitForDvcToFinish,
   waitForViewContainerToLoad
 } from './util'
@@ -17,9 +19,7 @@ suite('DVC Extension For Visual Studio Code', () => {
   before('should finish loading the extension', async function () {
     this.timeout(240000)
     await waitForViewContainerToLoad()
-    const workbench = await browser.getWorkbench()
-    await workbench.executeCommand('DVC: Garbage Collect Experiments')
-    await browser.keys('Enter')
+    await deleteAllExistingExperiments()
     return dismissAllNotifications()
   })
 
@@ -60,23 +60,31 @@ suite('DVC Extension For Visual Studio Code', () => {
     })
 
     it('should update with a new row for each checkpoint when an experiment is running', async () => {
-      const workbench = await browser.getWorkbench()
       const epochs = 15
-      await workbench.executeCommand('DVC: Reset and Run Experiment')
+      const headerRows = 3
+      const workspaceRow = 1
+      const commitRows = 3
+      const initialRows = headerRows + workspaceRow + commitRows
 
       await webview.focus()
+      await browser.waitUntil(
+        async () => {
+          await webview.expandAllRows()
+          const currentRows = await webview.row$$
+          return currentRows.length === initialRows
+        },
+        { interval: 5000, timeout: 30000 }
+      )
 
-      await browser.waitUntil(() => webview.expandAllRows())
-
-      const initialRows = await webview.row$$
-
-      expect(initialRows.length).toBeGreaterThanOrEqual(4)
+      await webview.unfocus()
+      await runModifiedExperiment()
+      await webview.focus()
 
       await browser.waitUntil(
         async () => {
           await webview.expandAllRows()
           const currentRows = await webview.row$$
-          return currentRows.length >= initialRows.length + epochs
+          return currentRows.length >= initialRows + epochs
         },
         { interval: 5000, timeout: 180000 }
       )
@@ -87,9 +95,10 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       const finalRows = await webview.row$$
 
-      expect(finalRows.length).toStrictEqual(initialRows.length + epochs)
+      expect(finalRows.length).toStrictEqual(initialRows + epochs)
       await webview.unfocus()
       await waitForDvcToFinish()
+      const workbench = await browser.getWorkbench()
       await workbench.executeCommand('Terminal: Kill All Terminals')
     }).timeout(180000)
   })
@@ -109,9 +118,12 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       await webview.focus()
 
-      await browser.waitUntil(async () => {
-        return (await webview.vegaVisualization$$.length) === 6
-      })
+      await browser.waitUntil(
+        async () => {
+          return (await webview.vegaVisualization$$.length) === 12
+        },
+        { timeout: 30000 }
+      )
 
       const plots = await webview.vegaVisualization$$
 
@@ -122,7 +134,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       }
 
       await webview.unfocus()
-    })
+    }).timeout(60000)
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -130,10 +142,20 @@ suite('DVC Extension For Visual Studio Code', () => {
     it('should show the expected changes after running an experiment', async () => {
       const expectedScmItemLabels = [
         'demo DVC',
+        'hist.csv',
+        'model.pt',
         'plots, training',
+        `images, ${join('training', 'plots')}`,
         `metrics, ${join('training', 'plots')}`,
-        `acc.tsv, ${join('training', 'plots', 'metrics')}`,
-        `loss.tsv, ${join('training', 'plots', 'metrics')}`
+        `sklearn, ${join('training', 'plots')}`,
+        `test, ${join('training', 'plots', 'metrics')}`,
+        `train, ${join('training', 'plots', 'metrics')}`,
+        `misclassified.jpg, ${join('training', 'plots', 'images')}`,
+        `acc.tsv, ${join('training', 'plots', 'metrics', 'test')}`,
+        `loss.tsv, ${join('training', 'plots', 'metrics', 'test')}`,
+        `acc.tsv, ${join('training', 'plots', 'metrics', 'train')}`,
+        `loss.tsv, ${join('training', 'plots', 'metrics', 'train')}`,
+        `confusion_matrix.json, ${join('training', 'plots', 'sklearn')}`
       ]
       const expectedScmSet = new Set(expectedScmItemLabels)
       let dvcTreeItemLabels: string[] = []
