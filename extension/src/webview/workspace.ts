@@ -1,4 +1,4 @@
-import { Memento } from 'vscode'
+import { Memento, ViewColumn } from 'vscode'
 import { BaseRepository } from './repository'
 import { WebviewData } from './contract'
 import { InternalCommands } from '../commands/internal'
@@ -27,14 +27,14 @@ export abstract class BaseWorkspaceWebviews<
     }
   }
 
-  public async showWebview(overrideRoot?: string) {
+  public async showWebview(overrideRoot: string, viewColumn?: ViewColumn) {
     const dvcRoot = overrideRoot || (await this.getOnlyOrPickProject())
     if (!dvcRoot) {
       return
     }
 
     const repository = this.getRepository(dvcRoot)
-    await repository.showWebview()
+    await repository.showWebview(viewColumn)
     return repository
   }
 

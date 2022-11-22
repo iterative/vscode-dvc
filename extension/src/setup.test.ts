@@ -65,6 +65,7 @@ const mockedCwd = __dirname
 const mockedGetCliVersion = jest.fn()
 const mockedGetFirstWorkspaceFolder = jest.mocked(getFirstWorkspaceFolder)
 const mockedHasRoots = jest.fn()
+const mockedGetRoots = jest.mocked(() => [])
 const mockedInitialize = jest.fn()
 const mockedIsPythonExtensionUsed = jest.fn()
 const mockedResetMembers = jest.fn()
@@ -258,6 +259,7 @@ describe('setupWorkspace', () => {
 describe('setup', () => {
   const extension = {
     getCliVersion: mockedGetCliVersion,
+    getRoots: mockedGetRoots,
     hasRoots: mockedHasRoots,
     initialize: mockedInitialize,
     isPythonExtensionUsed: mockedIsPythonExtensionUsed,

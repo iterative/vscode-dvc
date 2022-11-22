@@ -1,7 +1,9 @@
+import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { performOrderedUpdate, reorderObjectList } from 'dvc/src/util/array'
+import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
 import { sendMessage } from '../../../shared/vscode'
@@ -12,6 +14,12 @@ import { Lines, Refresh } from '../../../shared/components/icons'
 const MAX_NB_EXP = 7
 
 export const Ribbon: React.FC = () => {
+  const [ref, needsShadow] = useInView({
+    root: document.querySelector('#webview-wrapper'),
+    rootMargin: '-5px',
+    threshold: 0.95
+  })
+
   const revisions = useSelector(
     (state: PlotsState) => state.webview.selectedRevisions
   )
@@ -42,7 +50,11 @@ export const Ribbon: React.FC = () => {
   }
 
   return (
-    <ul className={styles.list} data-testid="ribbon">
+    <ul
+      ref={ref}
+      data-testid="ribbon"
+      className={cx(styles.list, needsShadow && styles.withShadow)}
+    >
       <li className={styles.buttonWrapper}>
         <IconButton
           onClick={selectRevisions}

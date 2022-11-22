@@ -3,6 +3,7 @@ export interface IExtension {
     cwd: string,
     isCliGlobal?: true
   ) => Promise<string | undefined>
+  getRoots: () => string[]
   hasRoots: () => boolean
   isPythonExtensionUsed: () => Promise<boolean>
 

@@ -14,6 +14,7 @@ export const WebviewWrapper = ({
 
   return (
     <div
+      id="webview-wrapper"
       className={cx(styles.webviewWrapper, className)}
       style={themeVariables}
       onContextMenu={e => {

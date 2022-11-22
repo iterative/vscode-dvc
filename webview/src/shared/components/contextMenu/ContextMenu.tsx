@@ -43,6 +43,7 @@ export interface ContextMenuProps {
   content?: React.ReactNode
   disabled?: boolean
   onShow?: () => void
+  onHide?: () => void
   trigger?: string
 }
 
@@ -51,6 +52,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   content,
   disabled,
   onShow,
+  onHide,
   trigger = 'contextmenu'
 }) => (
   <Tooltip
@@ -64,6 +66,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     hideOnClick={false}
     content={content}
     onShow={onShow}
+    onHide={onHide}
     disabled={!content || disabled}
     appendTo={'parent'}
     followCursor={'initial'}

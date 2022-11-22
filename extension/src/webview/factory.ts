@@ -24,14 +24,15 @@ const create = (
 export const createWebview = async (
   viewKey: ViewKey,
   dvcRoot: string,
-  iconPath: Resource
+  iconPath: Resource,
+  viewColumn?: ViewColumn
 ) => {
   const { title, distPath } = WebviewDetails[viewKey]
 
   const webviewPanel = window.createWebviewPanel(
     viewKey,
     title,
-    ViewColumn.Active,
+    viewColumn || ViewColumn.Active,
     {
       enableScripts: true,
       localResourceRoots: [Uri.file(distPath), ...getWorkspaceRootUris()],

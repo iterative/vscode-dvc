@@ -1,4 +1,4 @@
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, ViewColumn } from 'vscode'
 import { BaseWebview } from '.'
 import { ViewKey } from './constants'
 import { MessageFromWebview, WebviewData } from './contract'
@@ -38,15 +38,16 @@ export abstract class BaseRepository<
     this.onDidReceivedWebviewMessage = this.receivedWebviewMessage.event
   }
 
-  public async showWebview() {
+  public async showWebview(viewColumn?: ViewColumn) {
     if (this.webview) {
-      return this.webview.reveal()
+      return this.webview.reveal(viewColumn)
     }
 
     const webview = await createWebview(
       this.viewKey,
       this.dvcRoot,
-      this.webviewIcon
+      this.webviewIcon,
+      viewColumn
     )
 
     this.setWebview(webview)

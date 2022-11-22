@@ -2,6 +2,55 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.16] - 2022-11-22
+
+### 🚀 New Features and Enhancements
+
+- Update walkthrough images [#2802](https://github.com/iterative/vscode-dvc/pull/2802) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Patch experiment with checkpoints not having a name [#2805](https://github.com/iterative/vscode-dvc/pull/2805) by [@mattseddon](https://github.com/mattseddon)
+- Stabilize plot paths [#2811](https://github.com/iterative/vscode-dvc/pull/2811) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix webview test warnings [#2806](https://github.com/iterative/vscode-dvc/pull/2806) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.15] - 2022-11-18
+
+### 🐛 Bug Fixes
+
+- Check availability and compatibility on DVC projects in multi root workspaces [#2795](https://github.com/iterative/vscode-dvc/pull/2795) by [@sroy3](https://github.com/sroy3)
+
+## [0.5.14] - 2022-11-18
+
+### 🐛 Bug Fixes
+
+- Load projects inside multi-root workspaces [#2791](https://github.com/iterative/vscode-dvc/pull/2791) by [@sroy3](https://github.com/sroy3)
+
+## [0.5.13] - 2022-11-17
+
+### 🐛 Bug Fixes
+
+- Fix map on undefined is path doesn't exist in rev [#2785](https://github.com/iterative/vscode-dvc/pull/2785) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Add resolution for loader-utils [#2783](https://github.com/iterative/vscode-dvc/pull/2783) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.12] - 2022-11-16
+
+### 🚀 New Features and Enhancements
+
+- Highlight row when context menu is active [#2763](https://github.com/iterative/vscode-dvc/pull/2763) by [@shcheklein](https://github.com/shcheklein)
+- Make plots ribbon sticky on scroll [#2759](https://github.com/iterative/vscode-dvc/pull/2759) by [@shcheklein](https://github.com/shcheklein)
+- Add "views" section to sidebar [#2760](https://github.com/iterative/vscode-dvc/pull/2760) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update scheduled CLI test to match expected demo project output [#2753](https://github.com/iterative/vscode-dvc/pull/2753) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.11] - 2022-11-10
 
 ### 🚀 New Features and Enhancements
