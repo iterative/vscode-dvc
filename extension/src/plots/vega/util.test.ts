@@ -139,7 +139,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for large plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, 500)
+    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.LARGE)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -191,7 +191,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 30 characters for small plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, 300)
+    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.SMALL)
 
     const truncatedTitle = '…s-at-least-seventy-characters'
     const truncatedHorizontalTitle = '…at-least-seventy-characters-x'
@@ -221,7 +221,7 @@ describe('extendVegaSpec', () => {
       text: repeatedTitle
     })
 
-    const updatedSpec = extendVegaSpec(spec, 300)
+    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -238,7 +238,7 @@ describe('extendVegaSpec', () => {
     const repeatedTitle = 'abcdefghijklmnopqrstuvwyz1234567890'
     const spec = withLongTemplatePlotTitle([repeatedTitle, repeatedTitle])
 
-    const updatedSpec = extendVegaSpec(spec, 300)
+    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -258,7 +258,7 @@ describe('extendVegaSpec', () => {
       text: [repeatedTitle, repeatedTitle]
     })
 
-    const updatedSpec = extendVegaSpec(spec, 300)
+    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -272,13 +272,17 @@ describe('extendVegaSpec', () => {
   })
 
   it('should update the multi-source template to remove erroneous shape encoding from the vertical line displayed on hover', () => {
-    const updatedSpec = extendVegaSpec(multiSourceTemplate, 500, {
-      color: { domain: [], range: [] },
-      shape: {
-        field: 'field',
-        scale: { domain: [], range: [] }
+    const updatedSpec = extendVegaSpec(
+      multiSourceTemplate,
+      PlotSizeNumber.LARGE,
+      {
+        color: { domain: [], range: [] },
+        shape: {
+          field: 'field',
+          scale: { domain: [], range: [] }
+        }
       }
-    })
+    )
 
     expect(updatedSpec.encoding).not.toBeUndefined()
     expect(updatedSpec.layer[1].layer[0].encoding.shape).toBeNull()
