@@ -594,6 +594,44 @@ const fillTemplate = (
   ) as TopLevelSpec
 }
 
+const collectTemplatePlot = (
+  acc: TemplatePlotEntry[],
+  selectedRevisions: string[],
+  path: string,
+  template: string,
+  revisionData: RevisionData,
+  size: number,
+  revisionColors: ColorScale | undefined,
+  multiSourceEncoding: MultiSourceEncoding
+) => {
+  const isMultiView = isMultiViewPlot(JSON.parse(template))
+  const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
+  const { datapoints, revisions } = transformRevisionData(
+    path,
+    selectedRevisions,
+    revisionData,
+    isMultiView,
+    multiSourceEncodingUpdate
+  )
+
+  if (datapoints.length === 0) {
+    return
+  }
+
+  const content = extendVegaSpec(fillTemplate(template, datapoints), size, {
+    ...multiSourceEncodingUpdate,
+    color: revisionColors
+  })
+
+  acc.push({
+    content,
+    id: path,
+    multiView: isMultiViewPlot(content),
+    revisions,
+    type: PlotsType.VEGA
+  })
+}
+
 const collectTemplateGroup = (
   paths: string[],
   selectedRevisions: string[],
@@ -607,30 +645,20 @@ const collectTemplateGroup = (
   for (const path of paths) {
     const template = templates[path]
 
-    if (template) {
-      const isMultiView = isMultiViewPlot(JSON.parse(template))
-      const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
-      const { datapoints, revisions } = transformRevisionData(
-        path,
-        selectedRevisions,
-        revisionData,
-        isMultiView,
-        multiSourceEncodingUpdate
-      )
-
-      const content = extendVegaSpec(fillTemplate(template, datapoints), size, {
-        ...multiSourceEncodingUpdate,
-        color: revisionColors
-      })
-
-      acc.push({
-        content,
-        id: path,
-        multiView: isMultiViewPlot(content),
-        revisions,
-        type: PlotsType.VEGA
-      })
+    if (!template) {
+      continue
     }
+
+    collectTemplatePlot(
+      acc,
+      selectedRevisions,
+      path,
+      template,
+      revisionData,
+      size,
+      revisionColors,
+      multiSourceEncoding
+    )
   }
   return acc
 }
