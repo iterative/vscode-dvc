@@ -33,7 +33,11 @@ import { dragAndDrop } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { experimentsReducers } from '../../store'
 import { customQueries } from '../../../test/queries'
-import { renderTableWithPlaceholder } from '../../../test/experimentsTable'
+import {
+  advanceTimersByTime,
+  renderTableWithoutRunningExperiments,
+  renderTableWithPlaceholder
+} from '../../../test/experimentsTable'
 
 jest.mock('../../../shared/api')
 jest.mock('../../hooks/useColumnOrder', () => {
@@ -43,7 +47,6 @@ jest.mock('../../hooks/useColumnOrder', () => {
     ...actualModule
   }
 })
-
 const { postMessage } = vsCodeApi
 const mockedPostMessage = jest.mocked(postMessage)
 
@@ -172,6 +175,39 @@ describe('Table', () => {
 
   afterEach(() => {
     cleanup()
+  })
+
+  describe('Header Context Menu', () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+    })
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
+    it('should not open on left click', () => {
+      renderTableWithoutRunningExperiments()
+
+      const paramsFileHeader = screen.getByText('params.yaml')
+      fireEvent.click(paramsFileHeader, { bubbles: true })
+
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+
+    it('should open on right click and close on esc', () => {
+      renderTableWithoutRunningExperiments()
+
+      const paramsFileHeader = screen.getByText('params.yaml')
+      fireEvent.contextMenu(paramsFileHeader, { bubbles: true })
+
+      advanceTimersByTime(100)
+
+      const menuitems = screen.getAllByRole('menuitem')
+      expect(menuitems).toHaveLength(2)
+
+      fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
   })
 
   describe('Sorting Classes', () => {
