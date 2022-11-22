@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.16] - 2022-11-22
+
+### 🚀 New Features and Enhancements
+
+- Update walkthrough images [#2802](https://github.com/iterative/vscode-dvc/pull/2802) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Patch experiment with checkpoints not having a name [#2805](https://github.com/iterative/vscode-dvc/pull/2805) by [@mattseddon](https://github.com/mattseddon)
+- Stabilize plot paths [#2811](https://github.com/iterative/vscode-dvc/pull/2811) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix webview test warnings [#2806](https://github.com/iterative/vscode-dvc/pull/2806) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.15] - 2022-11-18
 
 ### 🐛 Bug Fixes
