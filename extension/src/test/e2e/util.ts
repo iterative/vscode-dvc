@@ -4,6 +4,7 @@ import {
   ElementArray
 } from 'webdriverio'
 import { ViewControl } from 'wdio-vscode-service'
+import { delay } from '../../util/time'
 
 const findProgressBars = (): ChainablePromiseArray<ElementArray> =>
   $$('.monaco-progress-container')
@@ -104,6 +105,42 @@ export const waitForViewContainerToLoad = async (): Promise<void> => {
     },
     { timeout: 180000 }
   )
+}
+
+export const deleteAllExistingExperiments = async () => {
+  const workbench = await browser.getWorkbench()
+
+  const deleteNonWorkspaceExperiments = await workbench.executeCommand(
+    'DVC: Garbage Collect Experiments'
+  )
+  browser.waitUntil(() => deleteNonWorkspaceExperiments.elem.isDisplayed())
+  await browser.keys('Enter')
+
+  const deleteAllNonTagExperiments = await workbench.executeCommand(
+    'DVC: Garbage Collect Experiments'
+  )
+
+  browser.waitUntil(() => deleteAllNonTagExperiments.elem.isDisplayed())
+
+  const tagOption = 'tags'
+  await browser.keys([...tagOption, 'ArrowDown', 'Space', 'ArrowUp'])
+  for (let i = 0; i < tagOption.length; i++) {
+    await browser.keys('Backspace')
+  }
+  await browser.keys(['w', 'o', 'ArrowDown', 'Space'])
+  return browser.keys('Enter')
+}
+
+export const runModifiedExperiment = async () => {
+  const workbench = await browser.getWorkbench()
+  const options = await workbench.executeCommand(
+    'DVC: Modify Experiment Param(s), Reset and Run'
+  )
+  await browser.waitUntil(() => options.elem.isDisplayed())
+  await browser.keys('Enter')
+  await delay(500)
+  await browser.keys(['ArrowDown', 'Space', 'Enter'])
+  await browser.keys([...'0.005', 'Enter'])
 }
 
 export const closeAllEditors = async (): Promise<void> => {
