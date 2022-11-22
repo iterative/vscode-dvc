@@ -61,7 +61,7 @@ suite('DVC Extension For Visual Studio Code', () => {
 
     it('should update with a new row for each checkpoint when an experiment is running', async () => {
       const epochs = 15
-      const headerRows = 2
+      const headerRows = 3
       const workspaceRow = 1
       const commitRows = 3
       const initialRows = headerRows + workspaceRow + commitRows
@@ -119,7 +119,7 @@ suite('DVC Extension For Visual Studio Code', () => {
       await webview.focus()
 
       await browser.waitUntil(async () => {
-        return (await webview.vegaVisualization$$.length) === 5
+        return (await webview.vegaVisualization$$.length) === 10
       })
 
       const plots = await webview.vegaVisualization$$
@@ -139,14 +139,19 @@ suite('DVC Extension For Visual Studio Code', () => {
     it('should show the expected changes after running an experiment', async () => {
       const expectedScmItemLabels = [
         'demo DVC',
+        'hist.csv',
         'model.pt',
         'plots, training',
         `images, ${join('training', 'plots')}`,
         `metrics, ${join('training', 'plots')}`,
         `sklearn, ${join('training', 'plots')}`,
+        `test, ${join('training', 'plots', 'metrics')}`,
+        `train, ${join('training', 'plots', 'metrics')}`,
         `misclassified.jpg, ${join('training', 'plots', 'images')}`,
-        `acc.tsv, ${join('training', 'plots', 'metrics')}`,
-        `loss.tsv, ${join('training', 'plots', 'metrics')}`,
+        `acc.tsv, ${join('training', 'plots', 'metrics', 'test')}`,
+        `loss.tsv, ${join('training', 'plots', 'metrics', 'test')}`,
+        `acc.tsv, ${join('training', 'plots', 'metrics', 'train')}`,
+        `loss.tsv, ${join('training', 'plots', 'metrics', 'train')}`,
         `confusion_matrix.json, ${join('training', 'plots', 'sklearn')}`
       ]
       const expectedScmSet = new Set(expectedScmItemLabels)
