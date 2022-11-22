@@ -26,6 +26,22 @@ export type PlotPath = {
   hasChildren: boolean
 }
 
+type PathAccumulator = {
+  plotPaths: PlotPath[]
+  included: Set<string>
+}
+
+const createPathAccumulator = (existingPaths: PlotPath[]): PathAccumulator => {
+  const acc: PathAccumulator = { included: new Set<string>(), plotPaths: [] }
+
+  for (const existing of existingPaths) {
+    acc.included.add(existing.path)
+    acc.plotPaths.push(existing)
+  }
+
+  return acc
+}
+
 const collectType = (plots: Plot[]) => {
   const type = new Set<PathType>()
 
@@ -60,11 +76,6 @@ const getType = (
   return collectType(plots)
 }
 
-type PathAccumulator = {
-  plotPaths: PlotPath[]
-  included: Set<string>
-}
-
 const collectPath = (
   acc: PathAccumulator,
   data: PlotsOutput,
@@ -95,8 +106,11 @@ const collectPath = (
   acc.included.add(path)
 }
 
-export const collectPaths = (data: PlotsOutput): PlotPath[] => {
-  const acc: PathAccumulator = { included: new Set<string>(), plotPaths: [] }
+export const collectPaths = (
+  existingPaths: PlotPath[],
+  data: PlotsOutput
+): PlotPath[] => {
+  const acc = createPathAccumulator(existingPaths)
 
   const paths = Object.keys(data)
 
