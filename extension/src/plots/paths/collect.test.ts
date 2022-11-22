@@ -1,10 +1,12 @@
 import { join } from 'path'
 import { VisualizationSpec } from 'react-vega'
+import isEqual from 'lodash.isequal'
 import {
   collectEncodingElements,
   collectPaths,
   collectTemplateOrder,
-  EncodingType
+  EncodingType,
+  PathType
 } from './collect'
 import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
@@ -12,7 +14,7 @@ import { Shape, StrokeDash } from '../multiSource/constants'
 
 describe('collectPath', () => {
   it('should return the expected data from the test fixture', () => {
-    expect(collectPaths(plotsDiffFixture)).toStrictEqual([
+    expect(collectPaths([], plotsDiffFixture)).toStrictEqual([
       {
         hasChildren: false,
         label: 'acc.png',
@@ -65,6 +67,21 @@ describe('collectPath', () => {
     ])
   })
 
+  it('should not drop already collected paths', () => {
+    const mockPath = 'completely:madeup:path'
+    const mockPlotPath = {
+      hasChildren: false,
+      label: mockPath,
+      parentPath: undefined,
+      path: mockPath,
+      type: new Set([PathType.TEMPLATE_SINGLE])
+    }
+
+    const paths = collectPaths([mockPlotPath], plotsDiffFixture)
+
+    expect(paths.some(plotPath => isEqual(plotPath, mockPlotPath))).toBeTruthy()
+  })
+
   it('should handle more complex paths', () => {
     const mockPlotsDiff = {
       [join('logs', 'scalars', 'acc.tsv')]: [
@@ -99,7 +116,7 @@ describe('collectPath', () => {
       ]
     }
 
-    expect(collectPaths(mockPlotsDiff)).toStrictEqual([
+    expect(collectPaths([], mockPlotsDiff)).toStrictEqual([
       {
         hasChildren: false,
         label: 'acc.tsv',
