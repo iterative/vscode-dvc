@@ -96,16 +96,20 @@ export type HeaderGroupWithOptionalOriginalId = HeaderGroup<Experiment> & {
   originalId?: string
 }
 
-export const getMenuOptions = (
-  column: HeaderGroupWithOptionalOriginalId,
-  sorts: SortDefinition[]
-) => {
+const getColumnLeaf = (column: HeaderGroupWithOptionalOriginalId) => {
   let leafColumn: HeaderGroupWithOptionalOriginalId = column
 
   while (leafColumn?.placeholderOf) {
     leafColumn = leafColumn.placeholderOf as HeaderGroupWithOptionalOriginalId
   }
+  return leafColumn
+}
 
+export const getMenuOptions = (
+  column: HeaderGroupWithOptionalOriginalId,
+  sorts: SortDefinition[]
+) => {
+  const leafColumn = getColumnLeaf(column)
   const menuOptions: MessagesMenuOptionProps[] = [
     {
       hidden: isFromExperimentColumn(column),
@@ -135,11 +139,7 @@ export const getMenuOptions = (
   ]
 
   const { isSortable, sortOptions, sortOrder } = getSortOptions(column, sorts)
-
-  const visibleOptions: number = menuOptions.filter(
-    option => !option.hidden
-  ).length
-
+  const visibleOptions = menuOptions.filter(option => !option.hidden).length
   const menuEnabled = isSortable || visibleOptions > 0
 
   return { isSortable, menuEnabled, menuOptions, sortOptions, sortOrder }
