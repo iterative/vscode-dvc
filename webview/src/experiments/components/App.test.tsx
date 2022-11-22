@@ -67,54 +67,6 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  describe('Sorting Classes', () => {
-    it('should apply the sortingHeaderCellAsc class to only a top level placeholder', () => {
-      renderTableWithPlaceholder()
-
-      const topPlaceholder = screen.getByTestId(
-        'header-params:params.yaml:outlier_previous_placeholder_18'
-      )
-      const midPlaceholder = screen.getByTestId(
-        'header-params:params.yaml:outlier_previous_placeholder_12'
-      )
-      const headerCell = screen.getByTestId('header-params:params.yaml:outlier')
-
-      expect(
-        topPlaceholder.classList.contains(styles.sortingHeaderCellAsc)
-      ).toBeTruthy()
-      expect(
-        midPlaceholder.classList.contains(styles.sortingHeaderCellAsc)
-      ).toBeFalsy()
-      expect(
-        headerCell.classList.contains(styles.sortingHeaderCellAsc)
-      ).toBeFalsy()
-    })
-
-    it('should apply the sortingHeaderCellAsc class to a header cell with no placeholders', () => {
-      renderTableWithPlaceholder()
-
-      const headerCell = screen.getByTestId(
-        'header-params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.nested6'
-      )
-
-      expect(
-        headerCell.classList.contains(styles.sortingHeaderCellAsc)
-      ).toBeTruthy()
-    })
-
-    it('should apply the sortingHeaderCellDesc class to a header cell of a column sorted descending', () => {
-      renderTableWithPlaceholder()
-
-      const headerCell = screen.getByTestId(
-        'header-params:params.yaml:nested1.doubled'
-      )
-
-      expect(
-        headerCell.classList.contains(styles.sortingHeaderCellDesc)
-      ).toBeTruthy()
-    })
-  })
-
   it('should send a message to the extension on the first render', () => {
     renderTable(undefined, true)
     expect(mockPostMessage).toHaveBeenCalledWith({
