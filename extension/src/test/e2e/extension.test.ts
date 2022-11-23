@@ -112,7 +112,8 @@ suite('DVC Extension For Visual Studio Code', () => {
 
     it('should load the plots webview with non-empty plots', async () => {
       const workbench = await browser.getWorkbench()
-      await workbench.executeCommand('DVC: Show Plots')
+      await workbench.openCommandPrompt()
+      await browser.keys([...'DVC: Show Plots', 'ArrowDown', 'Enter'])
 
       await waitForDvcToFinish()
 

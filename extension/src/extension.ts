@@ -239,7 +239,7 @@ export class Extension extends Disposable implements IExtension {
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots, this.internalCommands)
     this.internalCommands.registerExternalCommand(
-      RegisteredCommands.PLOTS_AND_EXPERIMENT_SHOW,
+      RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       async (context: VsCodeContext) => {
         await this.experiments.showWebview(
           getDvcRootFromContext(context),
