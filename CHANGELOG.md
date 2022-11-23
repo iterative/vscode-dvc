@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.17] - 2022-11-23
+
+### 🚀 New Features and Enhancements
+
+- Match the way that undefined/numeric experiment column values are shown in the table in tooltips and quick picks [#2813](https://github.com/iterative/vscode-dvc/pull/2813) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project to be on latest commit [#2799](https://github.com/iterative/vscode-dvc/pull/2799) by [@mattseddon](https://github.com/mattseddon)
+- Fix scheduled CLI output test by updating expected demo project output [#2818](https://github.com/iterative/vscode-dvc/pull/2818) by [@mattseddon](https://github.com/mattseddon)
+- Match open webviews welcome view button titles with command palette actions [#2820](https://github.com/iterative/vscode-dvc/pull/2820) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.16] - 2022-11-22
 
 ### 🚀 New Features and Enhancements
