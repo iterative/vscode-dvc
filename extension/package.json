@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.5.16",
+  "version": "0.5.17",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -392,8 +392,8 @@
         "icon": "$(graph-scatter)"
       },
       {
-        "title": "%command.showPlotsAndExperiments%",
-        "command": "dvc.showPlotsAndExperiments",
+        "title": "%command.showExperimentsAndPlots%",
+        "command": "dvc.showExperimentsAndPlots",
         "category": "DVC"
       },
       {
@@ -787,7 +787,7 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.showPlotsAndExperiments",
+          "command": "dvc.showExperimentsAndPlots",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1350,7 +1350,7 @@
     "viewsWelcome": [
       {
         "view": "dvc.views.webviews",
-        "contents": "[Open experiments](command:dvc.showExperiments)\n[Open plots](command:dvc.showPlots)\n[Open both views](command:dvc.showPlotsAndExperiments)",
+        "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)",
         "when": "dvc.commands.available && dvc.project.available"
       },
       {
@@ -1572,7 +1572,7 @@
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
-    "@swc/core": "1.3.17",
+    "@swc/core": "1.3.18",
     "@swc/jest": "0.2.23",
     "@types/chai": "4.3.4",
     "@types/chai-as-promised": "7.1.5",

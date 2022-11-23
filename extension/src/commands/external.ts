@@ -71,7 +71,7 @@ export enum RegisteredCommands {
   PLOTS_SELECT = 'dvc.views.plotsPathsTree.selectPlots',
   PLOTS_REFRESH = 'dvc.views.plotsPathsTree.refreshPlots',
 
-  PLOTS_AND_EXPERIMENT_SHOW = 'dvc.showPlotsAndExperiments',
+  EXPERIMENT_AND_PLOTS_SHOW = 'dvc.showExperimentsAndPlots',
 
   EXTENSION_CHECK_CLI_COMPATIBLE = 'dvc.checkCLICompatible',
   EXTENSION_GET_STARTED = 'dvc.getStarted',
