@@ -364,4 +364,74 @@ describe('ColumnsModel', () => {
       expect(model.getColumnWidths()[changedColumnId]).toBe(expectedWidth)
     })
   })
+
+  describe('columns selection', () => {
+    const expectStatus = (
+      columns: Array<{ status: Status }>,
+      expectedStatus: Status
+    ) => {
+      for (const { status } of columns) {
+        expect(status).toStrictEqual(expectedStatus)
+      }
+    }
+
+    it('should unselect the children of a unselected column', async () => {
+      const mockMemento = buildMockMemento({
+        [PersistenceKey.METRICS_AND_PARAMS_STATUS + exampleDvcRoot]: {}
+      })
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        mockMemento,
+        mockedColumnsOrderOrStatusChanged
+      )
+      await model.transformAndSet(outputFixture)
+      expect(model.getSelected()).toStrictEqual(columnsFixture)
+
+      const parentPath = 'params:params.yaml:process'
+      model.toggleStatus(parentPath)
+      const children = model.getChildren(parentPath)
+      expectStatus(children, Status.UNSELECTED)
+    })
+
+    it('should select the children of a selected column', async () => {
+      const parentPath = 'params:params.yaml:process'
+      const mockMemento = buildMockMemento({
+        [PersistenceKey.METRICS_AND_PARAMS_STATUS + exampleDvcRoot]: {
+          [parentPath]: Status.UNSELECTED
+        }
+      })
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        mockMemento,
+        mockedColumnsOrderOrStatusChanged
+      )
+      await model.transformAndSet(outputFixture)
+      expect(model.getSelected()).not.toStrictEqual(columnsFixture)
+
+      model.toggleStatus(parentPath)
+
+      const children = model.getChildren(parentPath)
+      expectStatus(children, Status.SELECTED)
+    })
+
+    it('should unselect the children of an indeterminate column when it is unselected', async () => {
+      const mockMemento = buildMockMemento({
+        [PersistenceKey.METRICS_AND_PARAMS_STATUS + exampleDvcRoot]: {}
+      })
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        mockMemento,
+        mockedColumnsOrderOrStatusChanged
+      )
+      await model.transformAndSet(outputFixture)
+      expect(model.getSelected()).toStrictEqual(columnsFixture)
+
+      const parentPath = 'metrics:summary.json'
+      model.toggleStatus('metrics:summary.json:val_loss')
+      model.unselect(parentPath)
+
+      const children = model.getChildren(parentPath)
+      expectStatus(children, Status.UNSELECTED)
+    })
+  })
 })

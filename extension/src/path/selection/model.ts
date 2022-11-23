@@ -51,13 +51,11 @@ export abstract class PathSelectionModel<
 
   public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
-    this.status[path] = status
-    this.setAreChildrenSelected(path, status)
-    this.setAreParentsSelected(path)
-    this.persistStatus()
-    this.statusChanged?.fire()
+    return this.setStatus(path, status)
+  }
 
-    return this.status[path]
+  public unselect(path: string) {
+    return this.setStatus(path, Status.UNSELECTED)
   }
 
   public getTerminalNodeStatuses(parentPath?: string): Status[] {
@@ -88,6 +86,16 @@ export abstract class PathSelectionModel<
         this.status[path] = Status.SELECTED
       }
     }
+  }
+
+  private setStatus(path: string, status: Status) {
+    this.status[path] = status
+    this.setAreChildrenSelected(path, status)
+    this.setAreParentsSelected(path)
+    this.persistStatus()
+    this.statusChanged?.fire()
+
+    return this.status[path]
   }
 
   private setAreChildrenSelected(path: string, status: Status) {
