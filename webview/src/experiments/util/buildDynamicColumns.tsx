@@ -40,7 +40,7 @@ const CellContents: React.FC<{ displayValue: string }> = ({ displayValue }) => (
 
 const UndefinedCell: React.FC = () => (
   <div className={styles.innerCell}>
-    <CellContents displayValue={'...'} />
+    <CellContents displayValue={'-'} />
   </div>
 )
 
