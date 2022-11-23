@@ -13,13 +13,11 @@ import { useResize } from '../../hooks/useResize'
 interface CheckpointPlotProps {
   id: string
   colors: ColorScale
-  index: number
 }
 
 export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   id,
-  colors,
-  index
+  colors
 }) => {
   const dispatch = useDispatch()
   const plotSnapshot = useSelector(
@@ -66,7 +64,6 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
         snapPoints={snapPoints}
         currentSnapPoint={currentSize}
         size={snapPoints[currentSize - 1]}
-        index={index}
       />
     </div>
   )

@@ -53,9 +53,9 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
   }
 
-  const items = order.map((plot, i) => (
+  const items = order.map(plot => (
     <div key={plot} id={plot}>
-      <CheckpointPlot id={plot} colors={colors} index={i} />
+      <CheckpointPlot id={plot} colors={colors} />
     </div>
   ))
 

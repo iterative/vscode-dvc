@@ -8,7 +8,6 @@ interface ResizerProps {
   onResize: (diff: number) => void
   snapPoints: number[]
   sizeBetweenResizers: number
-  index: number
   setIsExpanding: (isExpanding: boolean) => void
   currentSnapPoint: number
 }
@@ -20,7 +19,6 @@ export const Resizer: React.FC<ResizerProps> = ({
   onResize,
   snapPoints,
   sizeBetweenResizers, // Plot + gap
-  index,
   setIsExpanding,
   currentSnapPoint
 }) => {
@@ -28,13 +26,14 @@ export const Resizer: React.FC<ResizerProps> = ({
   const [lockedX, setLockedX] = useState<number | undefined>(undefined)
   const [isResizing, setIsResizing] = useState(false)
   const lockedSnapPoint = useRef(currentSnapPoint)
-  const sizeFactor = sizeBetweenResizers * (index + 1)
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   useEffect(() => {
     const setSnapPoint = (snapPoint: number, isShrinking?: boolean) => {
       setLockedX(
-        snapPoint - sizeFactor + 10 * currentSnapPoint * (isShrinking ? -1 : 1)
+        snapPoint -
+          sizeBetweenResizers +
+          20 * currentSnapPoint * (isShrinking ? -1 : 1)
       )
       setIsExpanding(!isShrinking)
       lockedSnapPoint.current = snapPoints.indexOf(snapPoint) + 1
@@ -43,7 +42,7 @@ export const Resizer: React.FC<ResizerProps> = ({
       const newDiffX = e.clientX - startingPageX.current
 
       if (isResizing && newDiffX !== 0) {
-        const positionX = newDiffX + sizeFactor
+        const positionX = newDiffX + sizeBetweenResizers
         const isShrinking = newDiffX < 0
         if (isShrinking) {
           for (let i = currentSnapPoint; i < snapPoints.length; i++) {
@@ -70,7 +69,13 @@ export const Resizer: React.FC<ResizerProps> = ({
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
     }
-  }, [currentSnapPoint, isResizing, sizeFactor, snapPoints, setIsExpanding])
+  }, [
+    currentSnapPoint,
+    isResizing,
+    snapPoints,
+    setIsExpanding,
+    sizeBetweenResizers
+  ])
 
   useEffect(() => {
     const handleMouseUp = () => {
@@ -97,7 +102,10 @@ export const Resizer: React.FC<ResizerProps> = ({
   }
 
   const lockedStyle = lockedX
-    ? { right: Math.min(-lockedX, 0), width: Math.abs(lockedX) }
+    ? {
+        right: Math.min(-lockedX, 0),
+        width: Math.abs(lockedX)
+      }
     : {}
 
   return (

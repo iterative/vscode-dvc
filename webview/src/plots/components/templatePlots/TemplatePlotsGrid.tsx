@@ -118,7 +118,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     [styles.multiViewPlot]: multiView
   })
 
-  const items = reorderedItems.map((plot: TemplatePlotEntry, i) => {
+  const items = reorderedItems.map((plot: TemplatePlotEntry) => {
     const { id, content, multiView, revisions } = plot
     const nbRevisions = (multiView && revisions?.length) || 1
 
@@ -143,7 +143,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           snapPoints={snapPoints}
           currentSnapPoint={currentSize}
           size={snapPoints[currentSize - 1]}
-          index={i}
         />
       </div>
     )

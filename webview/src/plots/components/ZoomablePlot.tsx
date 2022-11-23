@@ -20,7 +20,6 @@ interface ZoomablePlotProps {
   snapPoints: number[]
   currentSnapPoint: number
   size: number
-  index: number
 }
 
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
@@ -32,8 +31,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onResize,
   snapPoints,
   currentSnapPoint,
-  size,
-  index
+  size
 }) => {
   const dispatch = useDispatch()
   const previousSpecsAndData = useRef(JSON.stringify({ data, spec }))
@@ -102,7 +100,6 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         snapPoints={snapPoints}
         currentSnapPoint={currentSnapPoint}
         sizeBetweenResizers={size} // 20 is the $gap set in styles.module.scss
-        index={index}
         setIsExpanding={setIsExpanding}
       />
     </button>
