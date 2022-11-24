@@ -101,7 +101,7 @@ describe('pickExperiments', () => {
         label: '456fsf4',
         params: {
           'params.yaml': {
-            prepare: { split: 0.2 }
+            prepare: { split: 2200043556 }
           }
         },
         selected: false
@@ -116,7 +116,7 @@ describe('pickExperiments', () => {
         label: '789fsf4',
         params: {
           'params.yaml': {
-            prepare: { split: 0.3 }
+            prepare: { split: 0.000311111 }
           }
         },
         selected: false
@@ -146,7 +146,7 @@ describe('pickExperiments', () => {
           description: '[exp-456]',
           detail: `Created:${formatDate(
             mockedExperiments[1].Created as string
-          )}, split:0.2, data/data.xml:22a1a29`,
+          )}, split:2.2000e+9, data/data.xml:22a1a29`,
           label: '456fsf4',
           value: mockedExperiments[1]
         },
@@ -154,7 +154,7 @@ describe('pickExperiments', () => {
           description: '[exp-789]',
           detail: `Created:${formatDate(
             mockedExperiments[2].Created as string
-          )}, split:0.3, data/data.xml:22a1a29`,
+          )}, split:0.00031111, data/data.xml:22a1a29`,
           label: '789fsf4',
           value: mockedExperiments[2]
         }

@@ -26,8 +26,8 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
 
       expect(
         Object.keys(output),
-        'should have four plot paths'
-      ).to.have.lengthOf(4)
+        'should have six plot paths'
+      ).to.have.lengthOf(6)
 
       // each set of plots under a path
       for (const plots of Object.values(output)) {
