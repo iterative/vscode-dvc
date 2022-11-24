@@ -1,10 +1,19 @@
 {
-  "ignoreDeps": ["dvc", "execa", "@types/vscode"],
+  "ignoreDeps": ["execa", "@types/vscode"],
   "extends": ["config:base"],
   "packageRules": [
     {
+      "description": "Automatically merge non-major updates",
+      "automerge": true,
+      "automergeType": "branch",
+      "excludePackageNames": ["vsce"],
+      "matchDatasources": ["npm"],
+      "matchUpdateTypes": ["minor", "patch", "digest", "pin"]
+    },
+    {
       "internalChecksFilter": "strict",
-      "matchDatasources": ["npm", "pypi"],
+      "matchDatasources": ["npm"],
+      "prConcurrentLimit": 1,
       "stabilityDays": 7
     }
   ]
