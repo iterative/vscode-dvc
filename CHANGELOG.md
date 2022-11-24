@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.18] - 2022-11-24
+
+### 🚀 New Features and Enhancements
+
+- Resizing plots horizontally [#2747](https://github.com/iterative/vscode-dvc/pull/2747) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.34.3) [#2819](https://github.com/iterative/vscode-dvc/pull/2819) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.35.1) [#2824](https://github.com/iterative/vscode-dvc/pull/2824) by [@mattseddon](https://github.com/mattseddon)
+- Add resolution for fastify [#2823](https://github.com/iterative/vscode-dvc/pull/2823) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.17] - 2022-11-23
 
 ### 🚀 New Features and Enhancements
