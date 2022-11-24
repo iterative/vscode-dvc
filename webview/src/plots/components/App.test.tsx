@@ -120,6 +120,11 @@ describe('App', () => {
     return store
   }
 
+  const setWrapperSize = (store: typeof plotsStore) =>
+    act(() => {
+      store.dispatch(setMaxPlotSize(1000))
+    })
+
   const templatePlot = templatePlotsFixture.plots[0].entries[0]
   const complexTemplatePlotsFixture = {
     ...templatePlotsFixture,
@@ -170,7 +175,6 @@ describe('App', () => {
       } as TemplatePlotsData
     }
 
-    // eslint-disable-next-line testing-library/render-result-naming-convention
     const store = renderAppWithOptionalData(plotsData)
     await screen.findAllByTestId('plots-wrapper')
 
@@ -577,19 +581,13 @@ describe('App', () => {
   })
 
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
-    // eslint-disable-next-line testing-library/render-result-naming-convention
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
 
-    const setWrapperSize = () =>
-      act(() => {
-        store.dispatch(setMaxPlotSize(1000))
-      })
-
     const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
 
-    setWrapperSize()
+    setWrapperSize(store)
     pickAndMove(plotResizer, 10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
@@ -599,7 +597,7 @@ describe('App', () => {
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
-    setWrapperSize()
+    setWrapperSize(store)
     pickAndMove(plotResizer, -10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
@@ -609,24 +607,42 @@ describe('App', () => {
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
 
-    setWrapperSize()
+    setWrapperSize(store)
 
     pickAndMove(plotResizer, -10)
 
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.MEDIUM
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-
-    setWrapperSize()
-    pickAndMove(plotResizer, -10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
         section: Section.CHECKPOINT_PLOTS,
         size: PlotSizeNumber.SMALL
+      },
+      type: MessageFromWebviewType.RESIZE_PLOTS
+    })
+
+    setWrapperSize(store)
+    pickAndMove(plotResizer, -10)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.SMALLER
+      },
+      type: MessageFromWebviewType.RESIZE_PLOTS
+    })
+  })
+
+  it('should not send a message to the extension with the selected size when changing the size of plots and pressing escape', () => {
+    const store = renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
+
+    setWrapperSize(store)
+    pickAndMove(plotResizer, 10, 0, true)
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
+      payload: {
+        section: Section.CHECKPOINT_PLOTS,
+        size: PlotSizeNumber.LARGE
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -1582,11 +1598,11 @@ describe('App', () => {
       })
     })
 
-    describe('Small plots', () => {
+    describe('Smaller plots', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(21) },
-          PlotSizeNumber.SMALL,
+          PlotSizeNumber.SMALLER,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1596,7 +1612,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(20) },
-          PlotSizeNumber.SMALL,
+          PlotSizeNumber.SMALLER,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1606,7 +1622,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
-          PlotSizeNumber.SMALL,
+          PlotSizeNumber.SMALLER,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1616,7 +1632,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
-          PlotSizeNumber.SMALL,
+          PlotSizeNumber.SMALLER,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1630,7 +1646,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            PlotSizeNumber.SMALL,
+            PlotSizeNumber.SMALLER,
             Section.CHECKPOINT_PLOTS
           )
         })

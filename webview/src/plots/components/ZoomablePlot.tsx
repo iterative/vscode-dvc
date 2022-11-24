@@ -94,14 +94,16 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       {currentPlotProps.current && (
         <VegaLite {...plotProps} onNewView={onViewReady} />
       )}
-      <Resizer
-        className={styles.plotVerticalResizer}
-        {...commonResizerProps}
-        snapPoints={snapPoints}
-        currentSnapPoint={currentSnapPoint}
-        sizeBetweenResizers={size} // 20 is the $gap set in styles.module.scss
-        setIsExpanding={setIsExpanding}
-      />
+      {snapPoints.length > 0 && (
+        <Resizer
+          className={styles.plotVerticalResizer}
+          {...commonResizerProps}
+          snapPoints={snapPoints}
+          currentSnapPoint={currentSnapPoint}
+          sizeBetweenResizers={size} // 20 is the $gap set in styles.module.scss
+          setIsExpanding={setIsExpanding}
+        />
+      )}
     </button>
   )
 }

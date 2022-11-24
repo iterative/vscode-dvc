@@ -292,8 +292,8 @@ export class PlotsModel extends ModelWithPersistence {
       [
         PlotSizeNumber.LARGE,
         PlotSizeNumber.REGULAR,
-        PlotSizeNumber.MEDIUM,
-        PlotSizeNumber.SMALL
+        PlotSizeNumber.SMALL,
+        PlotSizeNumber.SMALLER
       ].includes(this.plotSizes[section])
     ) {
       return this.plotSizes[section]

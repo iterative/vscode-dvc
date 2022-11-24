@@ -140,7 +140,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           onViewReady={addEventsOnViewReady}
           toggleDrag={toggleDrag}
           onResize={handleResize}
-          snapPoints={snapPoints}
+          snapPoints={multiView ? [] : snapPoints}
           currentSnapPoint={currentSize}
           size={snapPoints[currentSize - 1]}
         />

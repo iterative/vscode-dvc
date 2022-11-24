@@ -3,7 +3,8 @@ import { act, fireEvent } from '@testing-library/react'
 export const pickAndMove = (
   node: HTMLElement,
   xDifference = 0,
-  yDifference = 0
+  yDifference = 0,
+  cancel?: boolean
 ) => {
   const startingPositionX = xDifference >= 0 ? 0 : -xDifference
   const startingPositionY = yDifference >= 0 ? 0 : -yDifference
@@ -14,6 +15,9 @@ export const pickAndMove = (
       clientY: startingPositionY
     })
   })
+  if (cancel) {
+    fireEvent.keyDown(node, { key: 'Escape' })
+  }
   act(() => {
     fireEvent.mouseMove(node, {
       clientX: xDifference,

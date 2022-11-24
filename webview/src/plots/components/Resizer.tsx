@@ -78,6 +78,22 @@ export const Resizer: React.FC<ResizerProps> = ({
   ])
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsResizing(false)
+        setLockedX(undefined)
+        setIsExpanding(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [setIsResizing, setLockedX, setIsExpanding])
+
+  useEffect(() => {
     const handleMouseUp = () => {
       if (isResizing) {
         setIsExpanding(false)

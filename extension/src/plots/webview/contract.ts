@@ -3,9 +3,9 @@ import { Color } from '../../experiments/model/status/colors'
 
 export const PlotSizeNumber = {
   LARGE: 1,
-  MEDIUM: 3,
   REGULAR: 2,
-  SMALL: 4
+  SMALL: 3,
+  SMALLER: 4
 }
 
 export enum Section {

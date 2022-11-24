@@ -181,9 +181,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           </div>
         )}
       </details>
-      <div className={styles.iconMenu}>
-        <IconMenu items={menuItems} />
-      </div>
+      {menuItems.length > 0 && (
+        <div className={styles.iconMenu}>
+          <IconMenu items={menuItems} />
+        </div>
+      )}
     </div>
   )
 }

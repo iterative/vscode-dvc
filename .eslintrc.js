@@ -28,7 +28,8 @@ module.exports = {
         '@typescript-eslint/no-unsafe-return': 'off',
         'no-undef': 'off',
         'sonarjs/no-duplicate-string': 'off',
-        'testing-library/no-render-in-setup': 'off'
+        'testing-library/no-render-in-setup': 'off',
+        'testing-library/render-result-naming-convention': 'off'
       }
     },
     {
