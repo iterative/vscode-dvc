@@ -121,7 +121,7 @@ suite('DVC Extension For Visual Studio Code', () => {
 
       await browser.waitUntil(
         async () => {
-          return (await webview.vegaVisualization$$.length) === 12
+          return (await webview.vegaVisualization$$.length) === 10
         },
         { timeout: 30000 }
       )
