@@ -15,7 +15,6 @@ import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
-import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 import { PlotsState } from '../../store'
 import { plotDataStore } from '../plotDataStore'
 import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
@@ -40,7 +39,7 @@ export const TemplatePlots: React.FC = () => {
   )
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
-  const nbItemsPerRow = useNbItemsPerRow(size)
+  const nbItemsPerRow = size
   const shouldSendMessage = useRef(true)
   const dispatch = useDispatch()
 
@@ -157,7 +156,7 @@ export const TemplatePlots: React.FC = () => {
   }
 
   return (
-    <div>
+    <>
       <AddedSection
         {...newDropSection}
         id={NewSectionBlock.TOP}
@@ -242,6 +241,6 @@ export const TemplatePlots: React.FC = () => {
         id={NewSectionBlock.BOTTOM}
         closestSection={lastSection}
       />
-    </div>
+    </>
   )
 }

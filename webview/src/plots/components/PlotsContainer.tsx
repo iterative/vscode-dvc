@@ -2,14 +2,12 @@ import cx from 'classnames'
 import React, {
   MouseEvent,
   useEffect,
-  useState,
   DetailedHTMLProps,
   HTMLAttributes
 } from 'react'
 import { Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
-import { SizePicker } from './SizePicker'
 import styles from './styles.module.scss'
 import { Icon } from '../../shared/components/Icon'
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
@@ -19,7 +17,6 @@ import Tooltip from '../../shared/components/tooltip/Tooltip'
 import {
   ChevronDown,
   ChevronRight,
-  Dots,
   Info,
   Lines
 } from '../../shared/components/icons'
@@ -88,38 +85,16 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionKey,
   title,
   children,
-  onResize,
   currentSize,
   menu
 }) => {
-  const [size, setSize] = useState<number>(currentSize || 400)
-
   const open = !sectionCollapsed
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
-  }, [size])
+  }, [currentSize])
 
-  const changeSize = (newSize: number) => {
-    if (size === newSize) {
-      return
-    }
-    sendMessage({
-      payload: { section: sectionKey, size: newSize },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-    onResize(newSize)
-    setSize(newSize)
-  }
-  const menuItems: IconMenuItemProps[] = [
-    {
-      icon: Dots,
-      onClickNode: (
-        <SizePicker currentSize={size} setSelectedSize={changeSize} />
-      ),
-      tooltip: 'Resize'
-    }
-  ]
+  const menuItems: IconMenuItemProps[] = []
 
   if (menu) {
     menuItems.unshift({
@@ -186,31 +161,31 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             </div>
           </Tooltip>
         </summary>
-        <div>
-          {open && (
-            <div
-              className={cx({
-                [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
-                [styles.smallPlots]: size < 300
-              })}
-              style={
-                {
-                  '--size': `${size}px`
-                } as DetailedHTMLProps<
-                  HTMLAttributes<HTMLDivElement>,
-                  HTMLDivElement
-                >
-              }
-              data-testid="plots-wrapper"
-            >
-              {children}
-            </div>
-          )}
-        </div>
+        {open && (
+          <div
+            className={cx({
+              [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
+              [styles.smallPlots]: currentSize === 4
+            })}
+            style={
+              {
+                '--nbPerRow': currentSize
+              } as DetailedHTMLProps<
+                HTMLAttributes<HTMLDivElement>,
+                HTMLDivElement
+              >
+            }
+            data-testid="plots-wrapper"
+          >
+            {children}
+          </div>
+        )}
       </details>
-      <div className={styles.iconMenu}>
-        <IconMenu items={menuItems} />
-      </div>
+      {menuItems.length > 0 && (
+        <div className={styles.iconMenu}>
+          <IconMenu items={menuItems} />
+        </div>
+      )}
     </div>
   )
 }

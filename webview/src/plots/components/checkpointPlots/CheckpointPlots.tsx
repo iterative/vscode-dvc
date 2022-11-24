@@ -15,7 +15,6 @@ import { sendMessage } from '../../../shared/vscode'
 import { DropTarget } from '../DropTarget'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { shouldUseVirtualizedGrid } from '../util'
-import { useNbItemsPerRow } from '../../hooks/useNbItemsPerRow'
 import { PlotsState } from '../../store'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 
@@ -29,9 +28,11 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   colors
 }) => {
   const [order, setOrder] = useState(plotsIds)
-  const { size, hasData } = useSelector((state: PlotsState) => state.checkpoint)
+  const { size, hasData, disabledDragPlotIds } = useSelector(
+    (state: PlotsState) => state.checkpoint
+  )
   const [onSection, setOnSection] = useState(false)
-  const nbItemsPerRow = useNbItemsPerRow(size)
+  const nbItemsPerRow = size
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
   )
@@ -84,7 +85,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       <DragDropContainer
         order={order}
         setOrder={setMetricOrder}
-        disabledDropIds={[]}
+        disabledDropIds={disabledDragPlotIds}
         items={items as JSX.Element[]}
         group="live-plots"
         dropTarget={<DropTarget />}

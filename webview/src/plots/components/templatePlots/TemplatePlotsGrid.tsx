@@ -1,8 +1,10 @@
 import cx from 'classnames'
-import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
+import { Section, TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useEffect, useState, useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
+import { changeDisabledDragIds, changeSize } from './templatePlotsSlice'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
   DragDropContainer,
@@ -13,6 +15,8 @@ import { withScale } from '../../../util/styles'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
 import { ZoomablePlot } from '../ZoomablePlot'
+import { PlotsState } from '../../store'
+import { useResize } from '../../hooks/useResize'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
@@ -42,22 +46,30 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   nbItemsPerRow,
   parentDraggedOver
 }) => {
+  const dispatch = useDispatch()
   const [order, setOrder] = useState<string[]>([])
-  const [disabledDrag, setDisabledDrag] = useState('')
+
+  const disabledDragPlotIds = useSelector(
+    (state: PlotsState) => state.template.disabledDragPlotIds
+  )
+  const currentSize = useSelector((state: PlotsState) => state.template.size)
+  const { onResize: handleResize, snapPoints } = useResize(
+    Section.TEMPLATE_PLOTS,
+    changeSize
+  )
 
   const addDisabled = useCallback(
     (e: Event) => {
-      setDisabledDrag(
-        (e.currentTarget as HTMLFormElement).parentElement?.parentElement
-          ?.parentElement?.id || ''
-      )
+      const disabledId = (e.currentTarget as HTMLFormElement).parentElement
+        ?.parentElement?.parentElement?.id
+      dispatch(changeDisabledDragIds(disabledId ? [disabledId] : []))
     },
-    [setDisabledDrag]
+    [dispatch]
   )
 
   const removeDisabled = useCallback(() => {
-    setDisabledDrag('')
-  }, [setDisabledDrag])
+    dispatch(changeDisabledDragIds([]))
+  }, [dispatch])
 
   const disableClick = useCallback((e: Event) => {
     e.stopPropagation()
@@ -110,6 +122,10 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     const { id, content, multiView, revisions } = plot
     const nbRevisions = (multiView && revisions?.length) || 1
 
+    const toggleDrag = (enabled: boolean) => {
+      dispatch(changeDisabledDragIds(enabled ? [] : [id]))
+    }
+
     return (
       <div
         key={id}
@@ -122,6 +138,11 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           id={id}
           spec={{ ...content, ...autoSize } as VisualizationSpec}
           onViewReady={addEventsOnViewReady}
+          toggleDrag={toggleDrag}
+          onResize={handleResize}
+          snapPoints={multiView ? [] : snapPoints}
+          currentSnapPoint={currentSize}
+          size={snapPoints[currentSize - 1]}
         />
       </div>
     )
@@ -144,7 +165,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           : undefined
       }
       parentDraggedOver={parentDraggedOver}
-      disabledDropIds={[disabledDrag]}
+      disabledDropIds={disabledDragPlotIds}
     />
   )
 }
