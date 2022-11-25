@@ -294,7 +294,9 @@ suite('Experiments Tree Test Suite', () => {
         await buildPlots(disposable, plotsDiffFixture)
 
       await plots.showWebview()
-      const initiallySelectedRevisions = plotsModel.getSelectedRevisionDetails()
+      const initiallySelectedRevisions = plotsModel.getSelectedRevisionDetails(
+        experiments.getSelectedRevisions()
+      )
 
       const setSelectionModeSpy = spy(
         ExperimentsModel.prototype,
@@ -345,7 +347,9 @@ suite('Experiments Tree Test Suite', () => {
         'auto-apply filters to experiment selection is not enabled when the user selects to use the most recent'
       ).to.be.false
       expect(
-        plotsModel.getSelectedRevisionDetails(),
+        plotsModel.getSelectedRevisionDetails(
+          experiments.getSelectedRevisions()
+        ),
         'all running and the most recent experiments are now selected'
       ).to.deep.equal([
         {

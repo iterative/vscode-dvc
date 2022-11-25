@@ -6,6 +6,7 @@ import { PlotsData } from '../../../../plots/data'
 import { PlotsModel } from '../../../../plots/model'
 import { dvcDemoPath } from '../../../util'
 import { buildDependencies } from '../../util'
+import { Experiments } from '../../../../experiments'
 
 suite('Plots Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -31,17 +32,25 @@ suite('Plots Data Test Suite', () => {
 
     const mockGetMissingRevisions = stub().returns(missingRevisions)
     const mockGetMutableRevisions = stub().returns(mutableRevisions)
+    const mockGetSelectedRevisions = stub().returns(
+      missingRevisions.map(rev => ({ label: rev }))
+    )
 
     const mockPlotsModel = {
-      getMissingRevisions: mockGetMissingRevisions,
-      getMutableRevisions: mockGetMutableRevisions
+      getMissingRevisions: mockGetMissingRevisions
     } as unknown as PlotsModel
+
+    const mockExperiments = {
+      getMutableRevisions: mockGetMutableRevisions,
+      getSelectedRevisions: mockGetSelectedRevisions
+    } as unknown as Experiments
 
     const data = disposable.track(
       new PlotsData(
         dvcDemoPath,
         internalCommands,
         mockPlotsModel,
+        mockExperiments,
         updatesPaused
       )
     )

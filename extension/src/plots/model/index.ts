@@ -26,7 +26,6 @@ import {
   PlotSizeNumber
 } from '../webview/contract'
 import { ExperimentsOutput, PlotsOutput } from '../../cli/dvc/contract'
-import { Experiments } from '../../experiments'
 import { getColorScale, truncateVerticalTitle } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
@@ -42,8 +41,6 @@ import {
 import { SelectedExperimentWithColor } from '../../experiments/model'
 
 export class PlotsModel extends ModelWithPersistence {
-  private readonly experiments: Experiments
-
   private plotSizes: Record<Section, number>
   private sectionCollapsed: SectionCollapsed
   private branchRevisions: Record<string, string> = {}
@@ -63,13 +60,8 @@ export class PlotsModel extends ModelWithPersistence {
   private selectedMetrics?: string[]
   private metricOrder: string[]
 
-  constructor(
-    dvcRoot: string,
-    experiments: Experiments,
-    workspaceState: Memento
-  ) {
+  constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState)
-    this.experiments = experiments
 
     this.plotSizes = this.revive(
       PersistenceKey.PLOT_SIZES,
@@ -87,10 +79,18 @@ export class PlotsModel extends ModelWithPersistence {
     this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
   }
 
-  public async transformAndSetExperiments(data: ExperimentsOutput) {
+  public async transformAndSetExperiments(
+    data: ExperimentsOutput,
+    branchRevisions: {
+      id: string
+      sha: string | undefined
+    }[],
+    revisions: string[],
+    hasCheckpoints = false
+  ) {
     const [checkpointPlots, workspaceRunningCheckpoint] = await Promise.all([
       collectCheckpointPlotsData(data),
-      collectWorkspaceRunningCheckpoint(data, this.experiments.hasCheckpoints())
+      collectWorkspaceRunningCheckpoint(data, hasCheckpoints)
     ])
 
     if (!this.selectedMetrics && checkpointPlots) {
@@ -102,19 +102,23 @@ export class PlotsModel extends ModelWithPersistence {
 
     this.setMetricOrder()
 
-    return this.removeStaleData()
+    return this.removeStaleData(branchRevisions, revisions)
   }
 
-  public async transformAndSetPlots(data: PlotsOutput, revs: string[]) {
+  public async transformAndSetPlots(
+    data: PlotsOutput,
+    newRevs: string[],
+    selectedRevs: SelectedExperimentWithColor[]
+  ) {
     if (data.error) {
       return
     }
 
-    const cliIdToLabel = this.getCLIIdToLabel()
+    const cliIdToLabel = this.getCLIIdToLabel(selectedRevs)
 
     this.fetchedRevs = new Set([
       ...this.fetchedRevs,
-      ...revs.map(rev => cliIdToLabel[rev])
+      ...newRevs.map(rev => cliIdToLabel[rev])
     ])
 
     const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
@@ -147,31 +151,34 @@ export class PlotsModel extends ModelWithPersistence {
       this.multiSourceVariations
     )
 
-    this.setComparisonOrder()
+    this.setComparisonOrder(selectedRevs)
 
     this.deferred.resolve()
   }
 
-  public getCheckpointPlots(overrideRevs?: SelectedExperimentWithColor[]) {
+  public getCheckpointPlots(
+    selectedExperiments: SelectedExperimentWithColor[]
+  ) {
     if (!this.checkpointPlots) {
       return
     }
 
     const colors = getColorScale(
-      (overrideRevs || this.experiments.getSelectedExperiments()).map(
-        ({ displayColor, id: revision }) => ({ displayColor, revision })
-      )
+      selectedExperiments.map(({ displayColor, id: revision }) => ({
+        displayColor,
+        revision
+      }))
     )
 
     if (!colors) {
       return
     }
 
-    const { domain: selectedExperiments } = colors
+    const { domain } = colors
 
     return {
       colors,
-      plots: this.getPlots(this.checkpointPlots, selectedExperiments),
+      plots: this.getPlots(this.checkpointPlots, domain),
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize(Section.CHECKPOINT_PLOTS)
     }
@@ -181,72 +188,60 @@ export class PlotsModel extends ModelWithPersistence {
     this.deleteRevisionData(id)
   }
 
-  public getUnfetchedRevisions(overrideRevs?: SelectedExperimentWithColor[]) {
-    return this.getSelectedRevisions(overrideRevs).filter(
-      revision => !this.fetchedRevs.has(revision)
-    )
-  }
-
-  public getMissingRevisions(overrideRevs?: SelectedExperimentWithColor[]) {
+  public getMissingRevisions(selectedRevs: SelectedExperimentWithColor[]) {
     const cachedRevisions = new Set([
       ...Object.keys(this.comparisonData),
       ...Object.keys(this.revisionData)
     ])
 
-    return this.getSelectedRevisions(overrideRevs)
+    return this.getSelectedRevisions(selectedRevs)
       .filter(label => !cachedRevisions.has(label))
       .map(label => this.getCLIId(label))
   }
 
-  public getMutableRevisions() {
-    return this.experiments.getMutableRevisions()
+  public getRevisionColors(selectedRevs: SelectedExperimentWithColor[]) {
+    return getColorScale(this.getSelectedRevisionDetails(selectedRevs))
   }
 
-  public getRevisionColors() {
-    return getColorScale(this.getSelectedRevisionDetails())
-  }
-
-  public getSelectedRevisionDetails() {
+  public getSelectedRevisionDetails(
+    selectedRevs: SelectedExperimentWithColor[]
+  ) {
     return reorderObjectList<Revision>(
       this.comparisonOrder,
-      this.experiments
-        .getSelectedRevisions()
-        .map(({ label, displayColor, logicalGroupName, id }) => ({
-          displayColor,
-          group: logicalGroupName,
-          id,
-          revision: label
-        })),
+      selectedRevs.map(({ label, displayColor, logicalGroupName, id }) => ({
+        displayColor,
+        group: logicalGroupName,
+        id,
+        revision: label
+      })),
       'revision'
     )
   }
 
   public getTemplatePlots(
     order: TemplateOrder | undefined,
-    overrideRevs?: SelectedExperimentWithColor[]
+    selectedRevs: SelectedExperimentWithColor[]
   ) {
     if (!definedAndNonEmpty(order)) {
       return
     }
 
-    const selectedRevisions = this.getSelectedRevisions(overrideRevs)
-
-    if (!definedAndNonEmpty(selectedRevisions)) {
+    if (!definedAndNonEmpty(selectedRevs)) {
       return
     }
 
-    return this.getSelectedTemplatePlots(order, selectedRevisions)
+    return this.getSelectedTemplatePlots(order, selectedRevs)
   }
 
   public getComparisonPlots(
     paths: string[] | undefined,
-    overrideRevs?: SelectedExperimentWithColor[]
+    selectedRevs: SelectedExperimentWithColor[]
   ) {
     if (!paths) {
       return
     }
 
-    const selectedRevisions = this.getSelectedRevisions(overrideRevs)
+    const selectedRevisions = this.getSelectedRevisions(selectedRevs)
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
     }
@@ -254,8 +249,11 @@ export class PlotsModel extends ModelWithPersistence {
     return this.getSelectedComparisonPlots(paths, selectedRevisions)
   }
 
-  public setComparisonOrder(revisions: string[] = this.comparisonOrder) {
-    const currentRevisions = this.getSelectedRevisions()
+  public setComparisonOrder(
+    selectedRevs: SelectedExperimentWithColor[],
+    revisions: string[] = this.comparisonOrder
+  ) {
+    const currentRevisions = this.getSelectedRevisions(selectedRevs)
 
     this.comparisonOrder = revisions.filter(revision =>
       currentRevisions.includes(revision)
@@ -328,22 +326,24 @@ export class PlotsModel extends ModelWithPersistence {
     return this.multiSourceEncoding
   }
 
-  public getSelectedRevisions(overrideRevs?: SelectedExperimentWithColor[]) {
-    return (overrideRevs || this.experiments.getSelectedRevisions()).map(
-      ({ label }) => label
-    )
+  public getSelectedRevisions(selectedRevs: SelectedExperimentWithColor[]) {
+    return selectedRevs.map(({ label }) => label)
   }
 
-  private removeStaleData() {
+  private removeStaleData(
+    branchRevisions: {
+      id: string
+      sha: string | undefined
+    }[],
+    revisions: string[]
+  ) {
     return Promise.all([
-      this.removeStaleBranches(),
-      this.removeStaleRevisions()
+      this.removeStaleBranches(branchRevisions),
+      this.removeStaleRevisions(revisions)
     ])
   }
 
-  private removeStaleRevisions() {
-    const revisions = this.experiments.getRevisions()
-
+  private removeStaleRevisions(revisions: string[]) {
     this.comparisonData = removeMissingKeysFromObject(
       revisions,
       this.comparisonData
@@ -361,10 +361,13 @@ export class PlotsModel extends ModelWithPersistence {
     }
   }
 
-  private removeStaleBranches() {
-    const currentBranchRevisions = collectBranchRevisionDetails(
-      this.experiments.getBranchRevisions()
-    )
+  private removeStaleBranches(
+    branchRevisions: {
+      id: string
+      sha: string | undefined
+    }[]
+  ) {
+    const currentBranchRevisions = collectBranchRevisionDetails(branchRevisions)
     for (const id of Object.keys(this.branchRevisions)) {
       if (this.branchRevisions[id] !== currentBranchRevisions[id]) {
         this.deleteRevisionData(id)
@@ -382,10 +385,10 @@ export class PlotsModel extends ModelWithPersistence {
     this.fetchedRevs.delete(id)
   }
 
-  private getCLIIdToLabel() {
+  private getCLIIdToLabel(selectedRevs: SelectedExperimentWithColor[]) {
     const mapping: { [shortSha: string]: string } = {}
 
-    for (const rev of this.getSelectedRevisions()) {
+    for (const rev of this.getSelectedRevisions(selectedRevs)) {
       mapping[this.getCLIId(rev)] = rev
     }
 
@@ -452,15 +455,15 @@ export class PlotsModel extends ModelWithPersistence {
 
   private getSelectedTemplatePlots(
     order: TemplateOrder,
-    selectedRevisions: string[]
+    selectedRevs: SelectedExperimentWithColor[]
   ) {
     return collectSelectedTemplatePlots(
       order,
-      selectedRevisions,
+      this.getSelectedRevisions(selectedRevs),
       this.templates,
       this.revisionData,
       this.getPlotSize(Section.TEMPLATE_PLOTS),
-      this.getRevisionColors(),
+      this.getRevisionColors(selectedRevs),
       this.multiSourceEncoding
     )
   }

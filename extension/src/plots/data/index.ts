@@ -2,6 +2,7 @@ import { EventEmitter } from 'vscode'
 import { PlotsOutput } from '../../cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
+import { Experiments } from '../../experiments'
 import {
   definedAndNonEmpty,
   flattenUnique,
@@ -10,12 +11,14 @@ import {
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
-  private readonly model: PlotsModel
+  private plots: PlotsModel
+  private experiments: Experiments
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    model: PlotsModel,
+    plots: PlotsModel,
+    experiments: Experiments,
     updatesPaused: EventEmitter<boolean>
   ) {
     super(
@@ -30,13 +33,15 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
       ],
       ['dvc.yaml', 'dvc.lock']
     )
-    this.model = model
+
+    this.plots = plots
+    this.experiments = experiments
   }
 
   public async update(): Promise<void> {
     const revs = flattenUnique([
-      this.model.getMissingRevisions(),
-      this.model.getMutableRevisions()
+      this.plots.getMissingRevisions(this.experiments.getSelectedRevisions()),
+      this.experiments.getMutableRevisions()
     ])
 
     if (
@@ -72,7 +77,7 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
 
   private getArgs(revs: string[]) {
     const cliWillThrowError = sameContents(revs, ['workspace'])
-    if (this.model && cliWillThrowError) {
+    if (this.plots && cliWillThrowError) {
       return []
     }
 

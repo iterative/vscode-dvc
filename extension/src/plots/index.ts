@@ -52,7 +52,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.internalCommands = internalCommands
 
     this.plots = this.dispose.track(
-      new PlotsModel(this.dvcRoot, experiments, workspaceState)
+      new PlotsModel(this.dvcRoot, workspaceState)
     )
     this.paths = this.dispose.track(
       new PathsModel(this.dvcRoot, workspaceState)
@@ -65,7 +65,13 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.data = this.dispose.track(
-      new PlotsData(dvcRoot, internalCommands, this.plots, updatesPaused)
+      new PlotsData(
+        dvcRoot,
+        internalCommands,
+        this.plots,
+        this.experiments,
+        updatesPaused
+      )
     )
 
     this.onDidUpdateData()
@@ -108,7 +114,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     Toast.infoWithOptions(
       'Attempting to refresh plots for selected experiments.'
     )
-    for (const { revision } of this.plots.getSelectedRevisionDetails()) {
+    for (const { revision } of this.plots.getSelectedRevisionDetails(
+      this.experiments.getSelectedRevisions()
+    )) {
       this.plots.setupManualRefresh(revision)
     }
     this.data.managedUpdate()
@@ -137,6 +145,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.fetchMissingAndSendPlots()
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   private async fetchMissingAndSendPlots(
     overrideRevs?: SelectedExperimentWithColor[]
   ) {
@@ -155,7 +164,11 @@ export class Plots extends BaseRepository<TPlotsData> {
       )
 
       await Promise.all([
-        this.plots.transformAndSetPlots(data, missingRevs),
+        this.plots.transformAndSetPlots(
+          data,
+          missingRevs,
+          this.experiments.getSelectedRevisions()
+        ),
         this.paths.transformAndSet(data)
       ])
     }
@@ -205,10 +218,15 @@ export class Plots extends BaseRepository<TPlotsData> {
       experiments.onDidChangeExperiments(async data => {
         const selectedRevs = experiments.getSelectedRevisions()
         if (data) {
-          await this.plots.transformAndSetExperiments(data)
+          await this.plots.transformAndSetExperiments(
+            data,
+            experiments.getBranchRevisions(),
+            experiments.getRevisions(),
+            experiments.hasCheckpoints()
+          )
         }
 
-        this.plots.setComparisonOrder()
+        this.plots.setComparisonOrder(selectedRevs)
 
         this.fetchMissingAndSendPlots(selectedRevs)
       })
@@ -216,7 +234,12 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private async initializeData(data: ExperimentsOutput) {
-    await this.plots.transformAndSetExperiments(data)
+    await this.plots.transformAndSetExperiments(
+      data,
+      this.experiments.getBranchRevisions(),
+      this.experiments.getRevisions(),
+      this.experiments.hasCheckpoints()
+    )
     this.data.managedUpdate()
     await Promise.all([
       this.data.isReady(),
@@ -230,7 +253,11 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       this.data.onDidUpdate(async ({ data, revs }) => {
         await Promise.all([
-          this.plots.transformAndSetPlots(data, revs),
+          this.plots.transformAndSetPlots(
+            data,
+            revs,
+            this.experiments.getSelectedRevisions()
+          ),
           this.paths.transformAndSet(data)
         ])
         this.notifyChanged()

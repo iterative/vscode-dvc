@@ -58,7 +58,7 @@ export class WebviewMessages {
       hasPlots: !!this.paths?.hasPaths(),
       hasSelectedPlots: definedAndNonEmpty(this.paths.getSelected()),
       sectionCollapsed: this.plots.getSectionCollapsed(),
-      selectedRevisions: this.plots.getSelectedRevisionDetails(),
+      selectedRevisions: this.plots.getSelectedRevisionDetails(selectedRevs),
       template: this.getTemplatePlots(selectedRevs)
     })
   }
@@ -72,11 +72,20 @@ export class WebviewMessages {
       case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
         return this.setSectionCollapsed(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
-        return this.setComparisonOrder(message.payload)
+        return this.setComparisonOrder(
+          this.experiments.getSelectedRevisions(),
+          message.payload
+        )
       case MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS:
-        return this.setComparisonRowsOrder(message.payload)
+        return this.setComparisonRowsOrder(
+          this.experiments.getSelectedRevisions(),
+          message.payload
+        )
       case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
-        return this.setTemplateOrder(message.payload)
+        return this.setTemplateOrder(
+          this.experiments.getSelectedRevisions(),
+          message.payload
+        )
       case MessageFromWebviewType.REORDER_PLOTS_METRICS:
         return this.setMetricOrder(message.payload)
       case MessageFromWebviewType.SELECT_PLOTS:
@@ -96,7 +105,9 @@ export class WebviewMessages {
 
   private sendCheckpointPlotsMessage() {
     this.getWebview()?.show({
-      checkpoint: this.getCheckpointPlots()
+      checkpoint: this.getCheckpointPlots(
+        this.experiments.getSelectedExperiments()
+      )
     })
   }
 
@@ -124,9 +135,12 @@ export class WebviewMessages {
     )
   }
 
-  private setComparisonOrder(order: string[]) {
-    this.plots.setComparisonOrder(order)
-    this.sendComparisonPlots()
+  private setComparisonOrder(
+    selectedRevs: SelectedExperimentWithColor[],
+    order: string[]
+  ) {
+    this.plots.setComparisonOrder(selectedRevs, order)
+    this.sendComparisonPlots(selectedRevs)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_REVISIONS_REORDERED,
       undefined,
@@ -134,9 +148,12 @@ export class WebviewMessages {
     )
   }
 
-  private setComparisonRowsOrder(order: string[]) {
+  private setComparisonRowsOrder(
+    selectedRevs: SelectedExperimentWithColor[],
+    order: string[]
+  ) {
     this.paths.setComparisonPathsOrder(order)
-    this.sendComparisonPlots()
+    this.sendComparisonPlots(selectedRevs)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED,
       undefined,
@@ -144,9 +161,12 @@ export class WebviewMessages {
     )
   }
 
-  private setTemplateOrder(order: PlotsTemplatesReordered) {
+  private setTemplateOrder(
+    selectedRevs: SelectedExperimentWithColor[],
+    order: PlotsTemplatesReordered
+  ) {
     this.paths.setTemplateOrder(order)
-    this.sendTemplatePlots()
+    this.sendTemplatePlots(selectedRevs)
     sendTelemetryEvent(
       EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
       undefined,
@@ -221,22 +241,22 @@ export class WebviewMessages {
     })
   }
 
-  private sendComparisonPlots() {
+  private sendComparisonPlots(selectedRevs: SelectedExperimentWithColor[]) {
     this.getWebview()?.show({
-      comparison: this.getComparisonPlots(),
-      selectedRevisions: this.plots?.getSelectedRevisionDetails()
+      comparison: this.getComparisonPlots(selectedRevs),
+      selectedRevisions: this.plots?.getSelectedRevisionDetails(selectedRevs)
     })
   }
 
-  private sendTemplatePlots() {
+  private sendTemplatePlots(selectedRevs: SelectedExperimentWithColor[]) {
     this.getWebview()?.show({
-      template: this.getTemplatePlots()
+      template: this.getTemplatePlots(selectedRevs)
     })
   }
 
-  private getTemplatePlots(overrideRevs?: SelectedExperimentWithColor[]) {
+  private getTemplatePlots(selectedRevs: SelectedExperimentWithColor[]) {
     const paths = this.paths?.getTemplateOrder()
-    const plots = this.plots?.getTemplatePlots(paths, overrideRevs)
+    const plots = this.plots?.getTemplatePlots(paths, selectedRevs)
 
     if (!this.plots || !plots || isEmpty(plots)) {
       return null
@@ -248,9 +268,9 @@ export class WebviewMessages {
     }
   }
 
-  private getComparisonPlots(overrideRevs?: SelectedExperimentWithColor[]) {
+  private getComparisonPlots(selectedRevs: SelectedExperimentWithColor[]) {
     const paths = this.paths.getComparisonPaths()
-    const comparison = this.plots.getComparisonPlots(paths, overrideRevs)
+    const comparison = this.plots.getComparisonPlots(paths, selectedRevs)
     if (!this.plots || !comparison || isEmpty(comparison)) {
       return null
     }
@@ -288,7 +308,9 @@ export class WebviewMessages {
     }
   }
 
-  private getCheckpointPlots(overrideRevs?: SelectedExperimentWithColor[]) {
-    return this.plots?.getCheckpointPlots(overrideRevs) || null
+  private getCheckpointPlots(
+    selectedExperiments: SelectedExperimentWithColor[]
+  ) {
+    return this.plots?.getCheckpointPlots(selectedExperiments) || null
   }
 }

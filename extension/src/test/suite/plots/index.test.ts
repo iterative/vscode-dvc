@@ -244,7 +244,14 @@ suite('Plots Test Suite', () => {
       )
       const plotsResentEvent = new Promise(resolve =>
         mockSendPlots.callsFake(() => {
-          if (isEqual(plotsModel.getMissingRevisions(), ['9235a02'])) {
+          if (
+            isEqual(
+              plotsModel.getMissingRevisions(
+                experiments.getSelectedRevisions()
+              ),
+              ['9235a02']
+            )
+          ) {
             resolve(undefined)
           }
         })
@@ -413,7 +420,7 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a comparison revisions reordered message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
+      const { experiments, plots, plotsModel, messageSpy } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
@@ -440,6 +447,7 @@ suite('Plots Test Suite', () => {
 
       expect(mockSetComparisonOrder).to.be.calledOnce
       expect(mockSetComparisonOrder).to.be.calledWithExactly(
+        experiments.getSelectedRevisions(),
         mockComparisonOrder
       )
       expect(messageSpy).to.be.calledOnce
