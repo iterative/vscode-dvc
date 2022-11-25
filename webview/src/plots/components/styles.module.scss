@@ -229,7 +229,7 @@ $resizer-border: 2px dashed $accent-color;
 }
 
 .plot.multiViewPlot {
-  aspect-ratio: calc(0.8 * var(--scale) + 0.2);
+  aspect-ratio: calc(0.6 * var(--scale) + 0.2);
   grid-column: span var(--scale);
   width: calc(300px * var(--scale));
   max-width: max-content;
