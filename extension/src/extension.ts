@@ -393,11 +393,14 @@ export class Extension extends Disposable implements IExtension {
         this.dvcRoots,
         this.updatesPaused,
         this.resourceLocator
-      ),
-      this.plots.create(this.dvcRoots, this.updatesPaused, this.resourceLocator)
+      )
     ])
-
-    this.experiments.linkRepositories(this.plots)
+    this.plots.create(
+      this.dvcRoots,
+      this.updatesPaused,
+      this.resourceLocator,
+      this.experiments
+    )
 
     return Promise.all([
       this.repositories.isReady(),

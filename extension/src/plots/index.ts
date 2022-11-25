@@ -28,55 +28,30 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
 
-  private experiments?: Experiments
-
-  private plots?: PlotsModel
-  private paths?: PathsModel
-
+  private readonly experiments: Experiments
+  private readonly plots: PlotsModel
+  private readonly paths: PathsModel
   private readonly data: PlotsData
-  private readonly workspaceState: Memento
 
-  private webviewMessages?: WebviewMessages
+  private webviewMessages: WebviewMessages
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
+    experiments: Experiments,
     updatesPaused: EventEmitter<boolean>,
     webviewIcon: Resource,
-    workspaceState: Memento,
-    data?: PlotsData
+    workspaceState: Memento
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.data = this.dispose.track(
-      data || new PlotsData(dvcRoot, internalCommands, updatesPaused)
-    )
-
-    this.dispose.track(
-      this.data.onDidUpdate(async ({ data, revs }) => {
-        await Promise.all([
-          this.plots?.transformAndSetPlots(data, revs),
-          this.paths?.transformAndSet(data)
-        ])
-        this.notifyChanged()
-      })
-    )
-
-    this.ensureTempDirRemoved()
-
-    this.workspaceState = workspaceState
-
-    this.onDidChangePaths = this.pathsChanged.event
-  }
-
-  public setExperiments(experiments: Experiments) {
     this.experiments = experiments
 
     this.plots = this.dispose.track(
-      new PlotsModel(this.dvcRoot, experiments, this.workspaceState)
+      new PlotsModel(this.dvcRoot, experiments, workspaceState)
     )
     this.paths = this.dispose.track(
-      new PathsModel(this.dvcRoot, this.workspaceState)
+      new PathsModel(this.dvcRoot, workspaceState)
     )
 
     this.webviewMessages = this.createWebviewMessageHandler(
@@ -85,13 +60,20 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.experiments
     )
 
-    this.data.setModel(this.plots)
+    this.data = this.dispose.track(
+      new PlotsData(dvcRoot, internalCommands, this.plots, updatesPaused)
+    )
 
+    this.onDidUpdateData()
     this.waitForInitialData(experiments)
 
     if (this.webview) {
       this.sendInitialWebviewData()
     }
+
+    this.ensureTempDirRemoved()
+
+    this.onDidChangePaths = this.pathsChanged.event
   }
 
   public sendInitialWebviewData() {
@@ -99,22 +81,22 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public togglePathStatus(path: string) {
-    const status = this.paths?.toggleStatus(path)
-    this.paths?.setTemplateOrder()
+    const status = this.paths.toggleStatus(path)
+    this.paths.setTemplateOrder()
     this.notifyChanged()
     return status
   }
 
   public async selectPlots() {
-    const paths = this.paths?.getTerminalNodes()
+    const paths = this.paths.getTerminalNodes()
 
     const selected = await pickPaths('plots', paths)
     if (!selected) {
       return
     }
 
-    this.paths?.setSelected(selected)
-    this.paths?.setTemplateOrder()
+    this.paths.setSelected(selected)
+    this.paths.setTemplateOrder()
     return this.notifyChanged()
   }
 
@@ -122,28 +104,28 @@ export class Plots extends BaseRepository<TPlotsData> {
     Toast.infoWithOptions(
       'Attempting to refresh plots for selected experiments.'
     )
-    for (const { revision } of this.plots?.getSelectedRevisionDetails() || []) {
-      this.plots?.setupManualRefresh(revision)
+    for (const { revision } of this.plots.getSelectedRevisionDetails()) {
+      this.plots.setupManualRefresh(revision)
     }
     this.data.managedUpdate()
   }
 
   public getChildPaths(path: string | undefined) {
-    const multiSourceEncoding = this.plots?.getMultiSourceData() || {}
+    const multiSourceEncoding = this.plots.getMultiSourceData()
 
     if (path && multiSourceEncoding[path]) {
       return collectEncodingElements(path, multiSourceEncoding)
     }
 
-    return this.paths?.getChildren(path, multiSourceEncoding) || []
+    return this.paths.getChildren(path, multiSourceEncoding)
   }
 
   public getPathStatuses() {
-    return this.paths?.getTerminalNodeStatuses() || []
+    return this.paths.getTerminalNodeStatuses()
   }
 
   public getScale() {
-    return collectScale(this.paths?.getTerminalNodes())
+    return collectScale(this.paths.getTerminalNodes())
   }
 
   private notifyChanged() {
@@ -155,14 +137,14 @@ export class Plots extends BaseRepository<TPlotsData> {
     await this.isReady()
 
     if (
-      this.paths?.hasPaths() &&
-      definedAndNonEmpty(this.plots?.getUnfetchedRevisions())
+      this.paths.hasPaths() &&
+      definedAndNonEmpty(this.plots.getUnfetchedRevisions())
     ) {
-      this.webviewMessages?.sendCheckpointPlotsMessage()
+      this.webviewMessages.sendCheckpointPlotsMessage()
       return this.data.managedUpdate()
     }
 
-    return this.webviewMessages?.sendWebviewMessage()
+    return this.webviewMessages.sendWebviewMessage()
   }
 
   private createWebviewMessageHandler(
@@ -203,10 +185,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       experiments.onDidChangeExperiments(async data => {
         if (data) {
-          await this.plots?.transformAndSetExperiments(data)
+          await this.plots.transformAndSetExperiments(data)
         }
 
-        this.plots?.setComparisonOrder()
+        this.plots.setComparisonOrder()
 
         this.fetchMissingOrSendPlots()
       })
@@ -214,14 +196,26 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private async initializeData(data: ExperimentsOutput) {
-    await this.plots?.transformAndSetExperiments(data)
+    await this.plots.transformAndSetExperiments(data)
     this.data.managedUpdate()
     await Promise.all([
       this.data.isReady(),
-      this.plots?.isReady(),
-      this.paths?.isReady()
+      this.plots.isReady(),
+      this.paths.isReady()
     ])
     this.deferred.resolve()
+  }
+
+  private onDidUpdateData() {
+    this.dispose.track(
+      this.data.onDidUpdate(async ({ data, revs }) => {
+        await Promise.all([
+          this.plots.transformAndSetPlots(data, revs),
+          this.paths.transformAndSet(data)
+        ])
+        this.notifyChanged()
+      })
+    )
   }
 
   private ensureTempDirRemoved() {

@@ -33,45 +33,44 @@ export const buildPlots = async (
     resourceLocator
   } = buildDependencies(disposer, expShow, plotsDiff)
 
-  const data = new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
-
   const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
   const mockGetModifiedTime = stub(FileSystem, 'getModifiedTime').returns(
     MOCK_IMAGE_MTIME
   )
 
-  const [experiments, plots] = await Promise.all([
-    disposer.track(
-      new Experiments(
-        dvcDemoPath,
-        internalCommands,
-        updatesPaused,
-        resourceLocator,
-        buildMockMemento(),
-        buildMockData<ExperimentsData>(),
-        buildMockData<FileSystemData>()
-      )
-    ),
-    disposer.track(
-      new Plots(
-        dvcDemoPath,
-        internalCommands,
-        updatesPaused,
-        resourceLocator.scatterGraph,
-        buildMockMemento(),
-        data
-      )
+  const experiments = disposer.track(
+    new Experiments(
+      dvcDemoPath,
+      internalCommands,
+      updatesPaused,
+      resourceLocator,
+      buildMockMemento(),
+      buildMockData<ExperimentsData>(),
+      buildMockData<FileSystemData>()
     )
-  ])
+  )
+  const plots = disposer.track(
+    new Plots(
+      dvcDemoPath,
+      internalCommands,
+      experiments,
+      updatesPaused,
+      resourceLocator.scatterGraph,
+      buildMockMemento()
+    )
+  )
+
   mockHasCheckpoints(expShow)
   experiments.setState(expShow)
-  plots.setExperiments(experiments)
 
   await plots.isReady()
 
   stub(BaseWorkspaceWebviews.prototype, 'getDvcRoots').returns([dvcDemoPath])
   stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: PlotsData = (plots as any).data
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const plotsModel: PlotsModel = (plots as any).plots
