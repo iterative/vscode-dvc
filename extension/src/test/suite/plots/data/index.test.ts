@@ -29,10 +29,6 @@ suite('Plots Data Test Suite', () => {
 
     stub(dvcRunner, 'isExperimentRunning').returns(experimentIsRunning)
 
-    const data = disposable.track(
-      new PlotsData(dvcDemoPath, internalCommands, updatesPaused)
-    )
-
     const mockGetMissingRevisions = stub().returns(missingRevisions)
     const mockGetMutableRevisions = stub().returns(mutableRevisions)
 
@@ -41,7 +37,14 @@ suite('Plots Data Test Suite', () => {
       getMutableRevisions: mockGetMutableRevisions
     } as unknown as PlotsModel
 
-    data.setModel(mockPlotsModel)
+    const data = disposable.track(
+      new PlotsData(
+        dvcDemoPath,
+        internalCommands,
+        mockPlotsModel,
+        updatesPaused
+      )
+    )
 
     return {
       data,

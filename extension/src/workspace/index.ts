@@ -1,13 +1,12 @@
 import { EventEmitter } from 'vscode'
 import { InternalCommands } from '../commands/internal'
-import { ResourceLocator } from '../resourceLocator'
 import { Disposables, reset } from '../util/disposable'
 import { quickPickOne } from '../vscode/quickPick'
 import { DeferredDisposable } from '../class/deferred'
 
 export abstract class BaseWorkspace<
   T extends DeferredDisposable,
-  U extends ResourceLocator | undefined = undefined
+  U = undefined
 > extends DeferredDisposable {
   protected repositories: Disposables<T> = {}
   protected readonly internalCommands: InternalCommands
@@ -21,10 +20,10 @@ export abstract class BaseWorkspace<
   public create(
     dvcRoots: string[],
     updatesPaused: EventEmitter<boolean>,
-    optional?: U
+    ...args: U[]
   ): T[] {
     const repositories = dvcRoots.map(dvcRoot =>
-      this.createRepository(dvcRoot, updatesPaused, optional)
+      this.createRepository(dvcRoot, updatesPaused, ...args)
     )
 
     Promise.all(repositories.map(repository => repository.isReady())).then(() =>
@@ -67,6 +66,6 @@ export abstract class BaseWorkspace<
   abstract createRepository(
     dvcRoot: string,
     updatesPaused: EventEmitter<boolean>,
-    arg?: U
+    ...args: U[]
   ): T
 }
