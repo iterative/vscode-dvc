@@ -27,6 +27,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public transformAndSet(data: PlotsOutput) {
+    if (data.error) {
+      return
+    }
+
     const paths = collectPaths(this.data, data)
 
     this.setNewStatuses(paths)

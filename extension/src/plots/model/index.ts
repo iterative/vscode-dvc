@@ -39,6 +39,7 @@ import {
   MultiSourceEncoding,
   MultiSourceVariations
 } from '../multiSource/collect'
+import { SelectedExperimentWithColor } from '../../experiments/model'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -105,6 +106,10 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public async transformAndSetPlots(data: PlotsOutput, revs: string[]) {
+    if (data.error) {
+      return
+    }
+
     const cliIdToLabel = this.getCLIIdToLabel()
 
     this.fetchedRevs = new Set([
@@ -147,15 +152,15 @@ export class PlotsModel extends ModelWithPersistence {
     this.deferred.resolve()
   }
 
-  public getCheckpointPlots() {
+  public getCheckpointPlots(overrideRevs?: SelectedExperimentWithColor[]) {
     if (!this.checkpointPlots) {
       return
     }
 
     const colors = getColorScale(
-      this.experiments
-        .getSelectedExperiments()
-        .map(({ displayColor, id: revision }) => ({ displayColor, revision }))
+      (overrideRevs || this.experiments.getSelectedExperiments()).map(
+        ({ displayColor, id: revision }) => ({ displayColor, revision })
+      )
     )
 
     if (!colors) {
@@ -176,19 +181,19 @@ export class PlotsModel extends ModelWithPersistence {
     this.deleteRevisionData(id)
   }
 
-  public getUnfetchedRevisions() {
-    return this.getSelectedRevisions().filter(
+  public getUnfetchedRevisions(overrideRevs?: SelectedExperimentWithColor[]) {
+    return this.getSelectedRevisions(overrideRevs).filter(
       revision => !this.fetchedRevs.has(revision)
     )
   }
 
-  public getMissingRevisions() {
+  public getMissingRevisions(overrideRevs?: SelectedExperimentWithColor[]) {
     const cachedRevisions = new Set([
       ...Object.keys(this.comparisonData),
       ...Object.keys(this.revisionData)
     ])
 
-    return this.getSelectedRevisions()
+    return this.getSelectedRevisions(overrideRevs)
       .filter(label => !cachedRevisions.has(label))
       .map(label => this.getCLIId(label))
   }
@@ -216,12 +221,15 @@ export class PlotsModel extends ModelWithPersistence {
     )
   }
 
-  public getTemplatePlots(order: TemplateOrder | undefined) {
+  public getTemplatePlots(
+    order: TemplateOrder | undefined,
+    overrideRevs?: SelectedExperimentWithColor[]
+  ) {
     if (!definedAndNonEmpty(order)) {
       return
     }
 
-    const selectedRevisions = this.getSelectedRevisions()
+    const selectedRevisions = this.getSelectedRevisions(overrideRevs)
 
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
@@ -230,12 +238,15 @@ export class PlotsModel extends ModelWithPersistence {
     return this.getSelectedTemplatePlots(order, selectedRevisions)
   }
 
-  public getComparisonPlots(paths: string[] | undefined) {
+  public getComparisonPlots(
+    paths: string[] | undefined,
+    overrideRevs?: SelectedExperimentWithColor[]
+  ) {
     if (!paths) {
       return
     }
 
-    const selectedRevisions = this.getSelectedRevisions()
+    const selectedRevisions = this.getSelectedRevisions(overrideRevs)
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
     }
@@ -317,6 +328,12 @@ export class PlotsModel extends ModelWithPersistence {
     return this.multiSourceEncoding
   }
 
+  public getSelectedRevisions(overrideRevs?: SelectedExperimentWithColor[]) {
+    return (overrideRevs || this.experiments.getSelectedRevisions()).map(
+      ({ label }) => label
+    )
+  }
+
   private removeStaleData() {
     return Promise.all([
       this.removeStaleBranches(),
@@ -377,10 +394,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   private getCLIId(label: string) {
     return this.branchRevisions[label] || label
-  }
-
-  private getSelectedRevisions() {
-    return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
   private getPlots(

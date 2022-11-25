@@ -89,11 +89,12 @@ suite('Plots Test Suite', () => {
 
     it('should call plots diff with new experiment revisions but not checkpoints', async () => {
       const mockNow = getMockNow()
-      const { mockPlotsDiff, data, experiments } = await buildPlots(
+      const { plots, mockPlotsDiff, experiments } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
       mockPlotsDiff.resetHistory()
+      await plots.showWebview()
 
       const updatedExpShowFixture = merge(
         cloneDeep(expShowFixtureWithoutErrors),
@@ -116,7 +117,9 @@ suite('Plots Test Suite', () => {
       )
 
       const dataUpdateEvent = new Promise(resolve =>
-        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+        disposable.track(
+          experiments.onDidChangeExperiments(() => resolve(undefined))
+        )
       )
 
       bypassProcessManagerDebounce(mockNow)
@@ -129,11 +132,21 @@ suite('Plots Test Suite', () => {
     })
 
     it('should call plots diff with the branch name whenever the current branch commit changes', async () => {
-      const mockNow = getMockNow()
-      const { data, experiments, mockPlotsDiff } = await buildPlots(
-        disposable,
-        plotsDiffFixture
+      const { plots, experiments, mockPlotsDiff, webviewMessages } =
+        await buildPlots(disposable, plotsDiffFixture)
+
+      const mockSendPlots = stub(webviewMessages, 'sendWebviewMessage')
+
+      const plotsSentEvent = new Promise(resolve =>
+        mockSendPlots.callsFake(() => {
+          resolve(undefined)
+        })
       )
+      await plots.showWebview()
+
+      await plotsSentEvent
+      mockSendPlots.resetBehavior()
+
       mockPlotsDiff.resetHistory()
 
       const committedExperiment = {
@@ -152,30 +165,38 @@ suite('Plots Test Suite', () => {
         workspace: committedExperiment
       }
 
-      const dataUpdateEvent = new Promise(resolve =>
-        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      const plotsResent = new Promise(resolve =>
+        mockSendPlots.callsFake(() => {
+          resolve(undefined)
+        })
       )
 
-      bypassProcessManagerDebounce(mockNow)
       experiments.setState(updatedExpShowFixture)
 
-      await dataUpdateEvent
+      await plotsResent
 
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        '9235a02',
-        'workspace'
+        'workspace',
+        '9235a02'
       )
     })
 
     it('should re-fetch data when moving between branches', async () => {
-      const mockNow = getMockNow()
-      const { data, experiments, mockPlotsDiff, plotsModel, webviewMessages } =
+      const { plots, experiments, mockPlotsDiff, plotsModel, webviewMessages } =
         await buildPlots(disposable, plotsDiffFixture)
-      mockPlotsDiff.resetHistory()
-
       const mockSendPlots = stub(webviewMessages, 'sendWebviewMessage')
+      const plotsSentEvent = new Promise(resolve =>
+        mockSendPlots.callsFake(() => {
+          resolve(undefined)
+        })
+      )
+      await plots.showWebview()
+      await plotsSentEvent
+      mockSendPlots.resetBehavior()
+
+      mockPlotsDiff.resetHistory()
 
       mockPlotsDiff
         .onFirstCall()
@@ -214,14 +235,14 @@ suite('Plots Test Suite', () => {
 
       const branchChangedEvent = new Promise(resolve =>
         disposable.track(
-          data.onDidUpdate(() => {
+          experiments.onDidChangeExperiments(() => {
             if (plotsModel) {
               resolve(undefined)
             }
           })
         )
       )
-      const plotsSentEvent = new Promise(resolve =>
+      const plotsResentEvent = new Promise(resolve =>
         mockSendPlots.callsFake(() => {
           if (isEqual(plotsModel.getMissingRevisions(), ['9235a02'])) {
             resolve(undefined)
@@ -229,35 +250,36 @@ suite('Plots Test Suite', () => {
         })
       )
 
-      bypassProcessManagerDebounce(mockNow)
       experiments.setState(updatedExpShowFixture)
 
       await branchChangedEvent
-      await plotsSentEvent
+      await plotsResentEvent
+      mockSendPlots.resetBehavior()
 
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        '9235a02',
-        'workspace'
+        'workspace',
+        '9235a02'
       )
 
-      bypassProcessManagerDebounce(mockNow, 2)
-      const dataUpdateEvent = new Promise(resolve =>
-        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      const originalPlotsSentEvent = new Promise(resolve =>
+        mockSendPlots.callsFake(() => {
+          resolve(undefined)
+        })
       )
 
       experiments.setState(expShowFixtureWithoutErrors)
-      await dataUpdateEvent
+      await originalPlotsSentEvent
 
       expect(mockPlotsDiff).to.be.calledTwice
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        '1ba7bcd',
-        '42b8736',
-        '4fb124a',
+        'workspace',
         '53c3851',
-        'workspace'
+        '4fb124a',
+        '42b8736',
+        '1ba7bcd'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -766,17 +788,28 @@ suite('Plots Test Suite', () => {
       const { experiments, plots, messageSpy, mockPlotsDiff } =
         await buildPlots(disposable, multiSourcePlotsDiffFixture)
 
+      messageSpy.restore()
+
       stub(experiments, 'getSelectedRevisions').returns([
         { label: 'workspace' },
         { label: 'main' }
       ] as SelectedExperimentWithColor[])
 
       const webview = await plots.showWebview()
+      const mockShow = stub(webview, 'show')
+      const messageReceived = new Promise(resolve =>
+        mockShow.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(true)
+        })
+      )
+
       await webview.isReady()
+      await messageReceived
 
       expect(mockPlotsDiff).to.be.called
 
-      const { template: templateData } = getFirstArgOfLastCall(messageSpy)
+      const { template: templateData } = getFirstArgOfLastCall(mockShow)
 
       const [singleViewSection, multiViewSection] = (
         templateData as TemplatePlotsData

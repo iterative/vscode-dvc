@@ -127,7 +127,7 @@ export class DvcReader extends DvcCli {
     } catch (error: unknown) {
       const msg =
         (error as MaybeConsoleError).stderr || (error as Error).message
-      Logger.error(`${args} failed with ${msg} retrying...`)
+      Logger.error(`${args} failed with ${msg}`)
       return { error: { msg, type: 'Caught error' } }
     }
   }

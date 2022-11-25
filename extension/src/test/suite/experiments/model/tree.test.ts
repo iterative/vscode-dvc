@@ -396,10 +396,10 @@ suite('Experiments Tree Test Suite', () => {
         'the missing revisions have been requested'
       ).to.be.calledWithExactly(
         dvcDemoPath,
-        '1ee5f2e',
-        '2173124',
         '23250b3',
-        'd1343a8'
+        'd1343a8',
+        '1ee5f2e',
+        '2173124'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

@@ -21,6 +21,7 @@ import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
 import { getModifiedTime } from '../../fileSystem'
 import { definedAndNonEmpty } from '../../util/array'
+import { SelectedExperimentWithColor } from '../../experiments/model'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -47,21 +48,18 @@ export class WebviewMessages {
     this.updateData = updateData
   }
 
-  public sendWebviewMessage() {
+  public sendWebviewMessage(
+    selectedRevs: SelectedExperimentWithColor[],
+    selectedExperiments: SelectedExperimentWithColor[]
+  ) {
     this.getWebview()?.show({
-      checkpoint: this.getCheckpointPlots(),
-      comparison: this.getComparisonPlots(),
+      checkpoint: this.getCheckpointPlots(selectedExperiments),
+      comparison: this.getComparisonPlots(selectedRevs),
       hasPlots: !!this.paths?.hasPaths(),
       hasSelectedPlots: definedAndNonEmpty(this.paths.getSelected()),
       sectionCollapsed: this.plots.getSectionCollapsed(),
       selectedRevisions: this.plots.getSelectedRevisionDetails(),
-      template: this.getTemplatePlots()
-    })
-  }
-
-  public sendCheckpointPlotsMessage() {
-    this.getWebview()?.show({
-      checkpoint: this.getCheckpointPlots()
+      template: this.getTemplatePlots(selectedRevs)
     })
   }
 
@@ -94,6 +92,12 @@ export class WebviewMessages {
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
+  }
+
+  private sendCheckpointPlotsMessage() {
+    this.getWebview()?.show({
+      checkpoint: this.getCheckpointPlots()
+    })
   }
 
   private setSelectedMetrics(metrics: string[]) {
@@ -230,9 +234,9 @@ export class WebviewMessages {
     })
   }
 
-  private getTemplatePlots() {
+  private getTemplatePlots(overrideRevs?: SelectedExperimentWithColor[]) {
     const paths = this.paths?.getTemplateOrder()
-    const plots = this.plots?.getTemplatePlots(paths)
+    const plots = this.plots?.getTemplatePlots(paths, overrideRevs)
 
     if (!this.plots || !plots || isEmpty(plots)) {
       return null
@@ -244,9 +248,9 @@ export class WebviewMessages {
     }
   }
 
-  private getComparisonPlots() {
+  private getComparisonPlots(overrideRevs?: SelectedExperimentWithColor[]) {
     const paths = this.paths.getComparisonPaths()
-    const comparison = this.plots.getComparisonPlots(paths)
+    const comparison = this.plots.getComparisonPlots(paths, overrideRevs)
     if (!this.plots || !comparison || isEmpty(comparison)) {
       return null
     }
@@ -284,7 +288,7 @@ export class WebviewMessages {
     }
   }
 
-  private getCheckpointPlots() {
-    return this.plots?.getCheckpointPlots() || null
+  private getCheckpointPlots(overrideRevs?: SelectedExperimentWithColor[]) {
+    return this.plots?.getCheckpointPlots(overrideRevs) || null
   }
 }

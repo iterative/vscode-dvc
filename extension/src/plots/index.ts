@@ -11,13 +11,14 @@ import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
-import { InternalCommands } from '../commands/internal'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { definedAndNonEmpty } from '../util/array'
-import { ExperimentsOutput } from '../cli/dvc/contract'
+import { ExperimentsOutput, PlotsOutput } from '../cli/dvc/contract'
 import { TEMP_PLOTS_DIR } from '../cli/dvc/constants'
 import { removeDir } from '../fileSystem'
 import { Toast } from '../vscode/toast'
 import { pickPaths } from '../path/selection/quickPick'
+import { SelectedExperimentWithColor } from '../experiments/model'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -28,6 +29,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
 
+  private readonly internalCommands: InternalCommands
   private readonly experiments: Experiments
   private readonly plots: PlotsModel
   private readonly paths: PathsModel
@@ -46,6 +48,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     super(dvcRoot, webviewIcon)
 
     this.experiments = experiments
+
+    this.internalCommands = internalCommands
 
     this.plots = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, workspaceState)
@@ -77,7 +81,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public sendInitialWebviewData() {
-    return this.fetchMissingOrSendPlots()
+    return this.fetchMissingAndSendPlots()
   }
 
   public togglePathStatus(path: string) {
@@ -130,21 +134,36 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private notifyChanged() {
     this.pathsChanged.fire()
-    this.fetchMissingOrSendPlots()
+    this.fetchMissingAndSendPlots()
   }
 
-  private async fetchMissingOrSendPlots() {
+  private async fetchMissingAndSendPlots(
+    overrideRevs?: SelectedExperimentWithColor[]
+  ) {
     await this.isReady()
 
-    if (
-      this.paths.hasPaths() &&
-      definedAndNonEmpty(this.plots.getUnfetchedRevisions())
-    ) {
-      this.webviewMessages.sendCheckpointPlotsMessage()
-      return this.data.managedUpdate()
+    const selectedRevs = overrideRevs || this.experiments.getSelectedRevisions()
+    const selectedExperiments = this.experiments.getSelectedExperiments()
+
+    const missingRevs = this.plots.getMissingRevisions(selectedRevs)
+
+    if (this.paths.hasPaths() && definedAndNonEmpty(missingRevs)) {
+      const data = await this.internalCommands.executeCommand<PlotsOutput>(
+        AvailableCommands.PLOTS_DIFF,
+        this.dvcRoot,
+        ...missingRevs
+      )
+
+      await Promise.all([
+        this.plots.transformAndSetPlots(data, missingRevs),
+        this.paths.transformAndSet(data)
+      ])
     }
 
-    return this.webviewMessages.sendWebviewMessage()
+    return this.webviewMessages.sendWebviewMessage(
+      selectedRevs,
+      selectedExperiments
+    )
   }
 
   private createWebviewMessageHandler(
@@ -184,13 +203,14 @@ export class Plots extends BaseRepository<TPlotsData> {
   private setupExperimentsListener(experiments: Experiments) {
     this.dispose.track(
       experiments.onDidChangeExperiments(async data => {
+        const selectedRevs = experiments.getSelectedRevisions()
         if (data) {
           await this.plots.transformAndSetExperiments(data)
         }
 
         this.plots.setComparisonOrder()
 
-        this.fetchMissingOrSendPlots()
+        this.fetchMissingAndSendPlots(selectedRevs)
       })
     )
   }
