@@ -10,11 +10,12 @@ import {
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
-  private model?: PlotsModel
+  private readonly model: PlotsModel
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
+    model: PlotsModel,
     updatesPaused: EventEmitter<boolean>
   ) {
     super(
@@ -29,12 +30,13 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
       ],
       ['dvc.yaml', 'dvc.lock']
     )
+    this.model = model
   }
 
   public async update(): Promise<void> {
     const revs = flattenUnique([
-      this.model?.getMissingRevisions() || [],
-      this.model?.getMutableRevisions() || []
+      this.model.getMissingRevisions(),
+      this.model.getMutableRevisions()
     ])
 
     if (
@@ -66,10 +68,6 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
 
   public collectFiles({ data }: { data: PlotsOutput }) {
     return Object.keys(data)
-  }
-
-  public setModel(model: PlotsModel) {
-    this.model = model
   }
 
   private getArgs(revs: string[]) {

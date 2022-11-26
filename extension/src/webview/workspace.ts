@@ -2,13 +2,12 @@ import { Memento, ViewColumn } from 'vscode'
 import { BaseRepository } from './repository'
 import { WebviewData } from './contract'
 import { InternalCommands } from '../commands/internal'
-import { ResourceLocator } from '../resourceLocator'
 import { BaseWorkspace } from '../workspace'
 
 export abstract class BaseWorkspaceWebviews<
   T extends BaseRepository<U>,
   U extends WebviewData
-> extends BaseWorkspace<T, ResourceLocator> {
+> extends BaseWorkspace<T, unknown> {
   protected readonly workspaceState: Memento
 
   protected focusedWebviewDvcRoot: string | undefined

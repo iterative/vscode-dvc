@@ -7,7 +7,6 @@ import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
-import { WorkspacePlots } from '../plots/workspace'
 import { Title } from '../vscode/title'
 import { setContextValue } from '../vscode/context'
 
@@ -58,12 +57,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         setContextValue('dvc.experiment.checkpoints', workspaceHasCheckpoints)
       })
     )
-  }
-
-  public linkRepositories(workspace: WorkspacePlots) {
-    for (const [dvcRoot, repository] of Object.entries(this.repositories)) {
-      workspace.getRepository(dvcRoot).setExperiments(repository)
-    }
   }
 
   public async addFilter(overrideRoot?: string) {
