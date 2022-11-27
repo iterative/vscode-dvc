@@ -157,11 +157,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       const data = await this.data.fetch(missingRevs)
 
       await Promise.all([
-        this.plots.transformAndSetPlots(
-          data,
-          missingRevs,
-          this.experiments.getSelectedRevisions()
-        ),
+        this.plots.transformAndSetPlots(data, missingRevs, selectedRevs),
         this.paths.transformAndSet(data)
       ])
     }
