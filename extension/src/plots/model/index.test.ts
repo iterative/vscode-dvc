@@ -7,6 +7,7 @@ import {
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { PersistenceKey } from '../../persistence/constants'
+import { SelectedExperimentWithColor } from '../../experiments/model'
 
 const mockedRevisions = [
   { displayColor: 'white', label: 'workspace' },
@@ -14,7 +15,7 @@ const mockedRevisions = [
   { displayColor: 'blue', label: '71f31cf' },
   { displayColor: 'black', label: 'e93c7e6' },
   { displayColor: 'brown', label: 'ffbe811' }
-]
+] as unknown as SelectedExperimentWithColor[]
 
 describe('plotsModel', () => {
   let model: PlotsModel
@@ -25,7 +26,6 @@ describe('plotsModel', () => {
       persistedSelectedMetrics,
     [PersistenceKey.PLOT_SIZES + exampleDvcRoot]: DEFAULT_SECTION_SIZES
   })
-  const mockedGetSelectedRevisions = jest.fn()
 
   beforeEach(() => {
     model = new PlotsModel(exampleDvcRoot, memento)
@@ -104,11 +104,9 @@ describe('plotsModel', () => {
   })
 
   it('should reorder comparison revisions after receiving a message to reorder', () => {
-    mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
-
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
     const newOrder = ['71f31cf', 'e93c7e6', 'ffbe811', 'workspace', 'main']
-    model.setComparisonOrder(mockedGetSelectedRevisions(), newOrder)
+    model.setComparisonOrder(mockedRevisions, newOrder)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
@@ -118,21 +116,19 @@ describe('plotsModel', () => {
 
     expect(
       model
-        .getSelectedRevisionDetails(mockedGetSelectedRevisions())
+        .getSelectedRevisionDetails(mockedRevisions)
         .map(({ revision }) => revision)
     ).toStrictEqual(newOrder)
   })
 
   it('should always send new revisions to the end of the list', () => {
-    mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
-
     const newOrder = ['71f31cf', 'e93c7e6']
 
-    model.setComparisonOrder(mockedGetSelectedRevisions(), newOrder)
+    model.setComparisonOrder(mockedRevisions, newOrder)
 
     expect(
       model
-        .getSelectedRevisionDetails(mockedGetSelectedRevisions())
+        .getSelectedRevisionDetails(mockedRevisions)
         .map(({ revision }) => revision)
     ).toStrictEqual([
       ...newOrder,
@@ -147,36 +143,28 @@ describe('plotsModel', () => {
     const revisionDropped = allRevisions.filter(({ label }) => label !== 'main')
     const revisionReAdded = allRevisions
 
-    mockedGetSelectedRevisions
-      .mockReturnValueOnce(allRevisions)
-      .mockReturnValueOnce(allRevisions)
-      .mockReturnValueOnce(revisionDropped)
-      .mockReturnValueOnce(revisionDropped)
-      .mockReturnValueOnce(revisionReAdded)
-      .mockReturnValueOnce(revisionReAdded)
-
     const initialOrder = ['workspace', 'main', '71f31cf']
-    model.setComparisonOrder(mockedGetSelectedRevisions(), initialOrder)
+    model.setComparisonOrder(allRevisions, initialOrder)
 
     expect(
       model
-        .getSelectedRevisionDetails(mockedGetSelectedRevisions())
+        .getSelectedRevisionDetails(allRevisions)
         .map(({ revision }) => revision)
     ).toStrictEqual(initialOrder)
 
-    model.setComparisonOrder(mockedGetSelectedRevisions())
+    model.setComparisonOrder(revisionDropped)
 
     expect(
       model
-        .getSelectedRevisionDetails(mockedGetSelectedRevisions())
+        .getSelectedRevisionDetails(revisionDropped)
         .map(({ revision }) => revision)
     ).toStrictEqual(initialOrder.filter(revision => revision !== 'main'))
 
-    model.setComparisonOrder(mockedGetSelectedRevisions())
+    model.setComparisonOrder(revisionReAdded)
 
     expect(
       model
-        .getSelectedRevisionDetails(mockedGetSelectedRevisions())
+        .getSelectedRevisionDetails(revisionReAdded)
         .map(({ revision }) => revision)
     ).toStrictEqual(['workspace', '71f31cf', 'main'])
   })
