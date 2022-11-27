@@ -11,8 +11,8 @@ import {
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
-  private plots: PlotsModel
-  private experiments: Experiments
+  private readonly plots: PlotsModel
+  private readonly experiments: Experiments
 
   constructor(
     dvcRoot: string,
@@ -54,17 +54,13 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
     }
 
     const args = this.getArgs(revs)
-    const data = await this.internalCommands.executeCommand<PlotsOutput>(
-      AvailableCommands.PLOTS_DIFF,
-      this.dvcRoot,
-      ...args
-    )
+    const data = await this.fetch(args)
 
     const files = this.collectFiles({ data })
 
     this.compareFiles(files)
 
-    return this.notifyChanged({ data, revs })
+    this.notifyChanged({ data, revs })
   }
 
   public managedUpdate() {
@@ -73,6 +69,14 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
 
   public collectFiles({ data }: { data: PlotsOutput }) {
     return Object.keys(data)
+  }
+
+  public fetch(revs: string[]) {
+    return this.internalCommands.executeCommand<PlotsOutput>(
+      AvailableCommands.PLOTS_DIFF,
+      this.dvcRoot,
+      ...revs
+    )
   }
 
   private getArgs(revs: string[]) {

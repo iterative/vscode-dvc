@@ -11,9 +11,9 @@ import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
+import { InternalCommands } from '../commands/internal'
 import { definedAndNonEmpty } from '../util/array'
-import { ExperimentsOutput, PlotsOutput } from '../cli/dvc/contract'
+import { ExperimentsOutput } from '../cli/dvc/contract'
 import { TEMP_PLOTS_DIR } from '../cli/dvc/constants'
 import { removeDir } from '../fileSystem'
 import { Toast } from '../vscode/toast'
@@ -29,7 +29,6 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
 
-  private readonly internalCommands: InternalCommands
   private readonly experiments: Experiments
   private readonly plots: PlotsModel
   private readonly paths: PathsModel
@@ -48,8 +47,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     super(dvcRoot, webviewIcon)
 
     this.experiments = experiments
-
-    this.internalCommands = internalCommands
 
     this.plots = this.dispose.track(
       new PlotsModel(this.dvcRoot, workspaceState)
@@ -157,11 +154,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     const missingRevs = this.plots.getMissingRevisions(selectedRevs)
 
     if (this.paths.hasPaths() && definedAndNonEmpty(missingRevs)) {
-      const data = await this.internalCommands.executeCommand<PlotsOutput>(
-        AvailableCommands.PLOTS_DIFF,
-        this.dvcRoot,
-        ...missingRevs
-      )
+      const data = await this.data.fetch(missingRevs)
 
       await Promise.all([
         this.plots.transformAndSetPlots(
