@@ -19,8 +19,8 @@ import {
   findByText,
   getAllByRole
 } from '@storybook/testing-library'
-import Experiments from '../experiments/components/Experiments'
 
+import Experiments from '../experiments/components/Experiments'
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
 import {
@@ -103,6 +103,7 @@ export default {
   },
   component: Experiments,
   parameters: {
+    chromatic: { viewPorts: [1600] },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/file/AuQXbrFj60xA2QXOjo9Z65/Experiments-Panel-%E2%80%A2-496'
