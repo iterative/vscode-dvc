@@ -12,7 +12,7 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import { definedAndNonEmpty } from '../util/array'
+import { definedAndNonEmpty, sameContents } from '../util/array'
 import { ExperimentsOutput } from '../cli/dvc/contract'
 import { TEMP_PLOTS_DIR } from '../cli/dvc/constants'
 import { removeDir } from '../fileSystem'
@@ -161,10 +161,20 @@ export class Plots extends BaseRepository<TPlotsData> {
       ])
     }
 
-    return this.webviewMessages.sendWebviewMessage(
-      selectedRevs,
-      selectedExperiments
-    )
+    this.webviewMessages.sendWebviewMessage(selectedRevs, selectedExperiments)
+    return this.syncWebview(selectedRevs)
+  }
+
+  private syncWebview(selectedRevs: SelectedExperimentWithColor[]) {
+    if (
+      sameContents(
+        this.experiments.getSelectedRevisions().map(({ label }) => label),
+        selectedRevs.map(({ label }) => label)
+      )
+    ) {
+      return
+    }
+    this.fetchMissingAndSendPlots()
   }
 
   private createWebviewMessageHandler(
