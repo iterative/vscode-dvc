@@ -39,7 +39,6 @@ import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { ExperimentStatus } from '../../../cli/dvc/contract'
 import { SelectedExperimentWithColor } from '../../../experiments/model'
-import { Experiments } from '../../../experiments'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -764,17 +763,13 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should send the correct data to the webview for flexible plots', async () => {
-      stub(Experiments.prototype, 'getSelectedRevisions').returns([
+      const { experiments, plots, messageSpy, mockPlotsDiff } =
+        await buildPlots(disposable, multiSourcePlotsDiffFixture)
+
+      stub(experiments, 'getSelectedRevisions').returns([
         { label: 'workspace' },
         { label: 'main' }
       ] as SelectedExperimentWithColor[])
-
-      stub(Experiments.prototype, 'getBranchRevisions').returns([])
-
-      const { plots, messageSpy, mockPlotsDiff } = await buildPlots(
-        disposable,
-        multiSourcePlotsDiffFixture
-      )
 
       const webview = await plots.showWebview()
       await webview.isReady()
