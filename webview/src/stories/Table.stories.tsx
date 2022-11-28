@@ -102,6 +102,13 @@ export default {
     tableData
   },
   component: Experiments,
+  decorators: [
+    Story => (
+      <div style={{ overflow: 'auto' }}>
+        <Story />
+      </div>
+    )
+  ],
   parameters: {
     design: {
       type: 'figma',
