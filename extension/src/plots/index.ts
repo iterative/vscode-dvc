@@ -142,7 +142,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.fetchMissingAndSendPlots()
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   private async fetchMissingAndSendPlots(
     overrideRevs?: SelectedExperimentWithColor[]
   ) {
