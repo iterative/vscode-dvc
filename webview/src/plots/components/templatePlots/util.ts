@@ -18,7 +18,7 @@ const add = (
 ) => {
   const entries = [...section.entries]
   entries.splice(
-    position !== undefined ? position : entries.length - 1,
+    position === undefined ? entries.length - 1 : position,
     0,
     entry
   )

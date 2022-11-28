@@ -763,7 +763,7 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should send the correct data to the webview for flexible plots', async () => {
-      const { plots, messageSpy, mockPlotsDiff, experiments } =
+      const { experiments, plots, messageSpy, mockPlotsDiff } =
         await buildPlots(disposable, multiSourcePlotsDiffFixture)
 
       stub(experiments, 'getSelectedRevisions').returns([

@@ -542,7 +542,9 @@ const transformRevisionData = (
 ): { revisions: string[]; datapoints: unknown[] } => {
   const field = multiSourceEncodingUpdate.strokeDash?.field
   const isMultiSource = !!field
-
+  const availableRevisions = selectedRevisions.filter(rev =>
+    Object.keys(revisionData).includes(rev)
+  )
   const transformNeeded =
     isMultiSource && (isMultiView || isConcatenatedField(field))
 
@@ -551,7 +553,7 @@ const transformRevisionData = (
       datapoints: selectedRevisions
         .flatMap(revision => revisionData?.[revision]?.[path])
         .filter(Boolean),
-      revisions: selectedRevisions
+      revisions: availableRevisions
     }
   }
 
@@ -562,12 +564,12 @@ const transformRevisionData = (
       datapoints: updateDatapoints(
         path,
         revisionData,
-        selectedRevisions,
+        availableRevisions,
         'rev',
         fields
       ),
       revisions: updateRevisions(
-        selectedRevisions,
+        availableRevisions,
         multiSourceEncodingUpdate.strokeDash.scale.domain
       )
     }
@@ -577,11 +579,11 @@ const transformRevisionData = (
     datapoints: updateDatapoints(
       path,
       revisionData,
-      selectedRevisions,
+      availableRevisions,
       field,
       fields
     ),
-    revisions: selectedRevisions
+    revisions: availableRevisions
   }
 }
 
