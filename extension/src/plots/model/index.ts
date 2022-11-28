@@ -213,6 +213,7 @@ export class PlotsModel extends ModelWithPersistence {
         .getSelectedRevisions()
         .map(({ label, displayColor, logicalGroupName, id }) => ({
           displayColor,
+          fetched: this.fetchedRevs.has(label),
           group: logicalGroupName,
           id,
           revision: label

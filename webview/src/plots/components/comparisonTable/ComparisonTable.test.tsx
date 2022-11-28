@@ -247,7 +247,7 @@ describe('ComparisonTable', () => {
     const newRevName = 'newRev'
     const newRevisions = [
       ...selectedRevisions,
-      { displayColor: '#000000', revision: newRevName }
+      { displayColor: '#000000', fetched: true, revision: newRevName }
     ] as Revision[]
 
     renderTable(comparisonTableFixture, newRevisions, rerender)
@@ -277,6 +277,7 @@ describe('ComparisonTable', () => {
         ...selectedRevisions,
         {
           displayColor: '#f56565',
+          fetched: true,
           group: undefined,
           id: 'noData',
           revision: revisionWithNoData

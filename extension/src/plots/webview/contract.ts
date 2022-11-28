@@ -40,6 +40,7 @@ export type Revision = {
   revision: string
   group?: string
   displayColor: Color
+  fetched: boolean
 }
 
 export interface PlotsComparisonData {

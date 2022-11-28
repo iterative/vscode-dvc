@@ -1836,6 +1836,7 @@ describe('App', () => {
         selectedRevisions: [
           {
             displayColor: '#f56565',
+            fetched: true,
             group: undefined,
             id: 'new-revision',
             revision: 'new-revision'
