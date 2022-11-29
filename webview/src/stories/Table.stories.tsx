@@ -120,7 +120,9 @@ const Template: Story<{ tableData: TableDataState }> = ({ tableData }) => {
         reducer: experimentsReducers
       })}
     >
-      <Experiments />
+      <div style={{ height: '900px', overflow: 'auto' }}>
+        <Experiments />
+      </div>
     </Provider>
   )
 }
@@ -243,7 +245,7 @@ export const Scrolled: Story<{ tableData: TableDataState }> = ({
         reducer: experimentsReducers
       })}
     >
-      <div style={{ height: 400, width: 600 }}>
+      <div style={{ height: '400px', overflow: 'auto', width: '600px' }}>
         <Experiments />
       </div>
     </Provider>
