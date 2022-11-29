@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, stub } from 'sinon'
@@ -5,7 +6,9 @@ import { Disposable } from '../../../../extension'
 import { PlotsData } from '../../../../plots/data'
 import { PlotsModel } from '../../../../plots/model'
 import { dvcDemoPath } from '../../../util'
-import { buildDependencies } from '../../util'
+import { buildDependencies, getFirstArgOfLastCall } from '../../util'
+import { getRelativePattern } from '../../../../fileSystem/watcher'
+import multiSourcePlotsDiffFixture from '../../../fixtures/plotsDiff/output/multiSource'
 
 suite('Plots Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -24,8 +27,13 @@ suite('Plots Data Test Suite', () => {
     missingRevisions: string[] = [],
     mutableRevisions: string[] = []
   ) => {
-    const { internalCommands, updatesPaused, mockPlotsDiff, dvcRunner } =
-      buildDependencies(disposable)
+    const {
+      internalCommands,
+      updatesPaused,
+      mockPlotsDiff,
+      dvcRunner,
+      mockCreateFileSystemWatcher
+    } = buildDependencies(disposable)
 
     stub(dvcRunner, 'isExperimentRunning').returns(experimentIsRunning)
 
@@ -48,6 +56,7 @@ suite('Plots Data Test Suite', () => {
 
     return {
       data,
+      mockCreateFileSystemWatcher,
       mockPlotsDiff
     }
   }
@@ -122,6 +131,42 @@ suite('Plots Data Test Suite', () => {
         '42b8736',
         '4fb124a',
         '53c3851'
+      )
+    })
+
+    it('should handle watching paths for top level plots', async () => {
+      const { data, mockPlotsDiff, mockCreateFileSystemWatcher } =
+        buildPlotsData(false)
+
+      const dataUpdatedEvent = new Promise(resolve =>
+        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      )
+
+      mockPlotsDiff.resolves(multiSourcePlotsDiffFixture)
+
+      data.update()
+
+      await dataUpdatedEvent
+
+      expect(getFirstArgOfLastCall(mockCreateFileSystemWatcher)).to.deep.equal(
+        getRelativePattern(
+          dvcDemoPath,
+          join(
+            '**',
+            '{' +
+              'dvc.yaml,' +
+              'dvc.lock,' +
+              [
+                join('evaluation', 'test', 'plots', 'confusion_matrix.json'),
+                join('evaluation', 'test', 'plots', 'precision_recall.json'),
+                join('evaluation', 'test', 'plots', 'roc.json'),
+                join('evaluation', 'train', 'plots', 'confusion_matrix.json'),
+                join('evaluation', 'train', 'plots', 'precision_recall.json'),
+                join('evaluation', 'train', 'plots', 'roc.json')
+              ].join(',') +
+              '}'
+          )
+        )
       )
     })
   })
