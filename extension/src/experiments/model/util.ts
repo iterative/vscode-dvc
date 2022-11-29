@@ -46,7 +46,7 @@ export const getDataFromColumnPath = (
   return {
     splitUpPath,
     value:
-      columnPath === 'Created' && typeof value === 'undefined'
+      columnPath === 'Created' && value === 'undefined'
         ? null
         : getStringifiedValue(value)
   }

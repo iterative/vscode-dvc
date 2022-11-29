@@ -33,7 +33,7 @@ const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
         15
       )
 
-      return value !== null ? `${truncatedKey}:${value}` : ''
+      return value === null ? '' : `${truncatedKey}:${value}`
     })
     .filter(Boolean)
     .join(', '),

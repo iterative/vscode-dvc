@@ -76,7 +76,9 @@ const mergeParentColumnByPath = (
   parentPath: string,
   label: string
 ) => {
-  if (!acc[path]) {
+  if (acc[path]) {
+    acc[path].hasChildren = true
+  } else {
     acc[path] = {
       hasChildren: true,
       label,
@@ -84,8 +86,6 @@ const mergeParentColumnByPath = (
       path,
       type
     }
-  } else {
-    acc[path].hasChildren = true
   }
 }
 

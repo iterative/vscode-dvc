@@ -29,7 +29,7 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
       )}
       {!hasSelectedRevisions && (
         <StartButton
-          appearance={!hasSelectedPlots ? 'secondary' : 'primary'}
+          appearance={hasSelectedPlots ? 'primary' : 'secondary'}
           isNested={!hasSelectedPlots}
           onClick={() =>
             sendMessage({

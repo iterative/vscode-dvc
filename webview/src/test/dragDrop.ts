@@ -60,7 +60,9 @@ export const dragEnter = (
   draggedOver = idToNode(draggedOverId)
 
   act(() => {
-    if (direction !== DragEnterDirection.AUTO) {
+    if (direction === DragEnterDirection.AUTO) {
+      draggedOver?.dispatchEvent(createBubbledEvent('dragover'))
+    } else {
       const left = 100
       const right = left + 100
       const top = 100
@@ -82,8 +84,6 @@ export const dragEnter = (
 
       draggedOver?.dispatchEvent(dragOverEvent)
       jest.advanceTimersByTime(1)
-    } else {
-      draggedOver?.dispatchEvent(createBubbledEvent('dragover'))
     }
   })
 

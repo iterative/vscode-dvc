@@ -355,7 +355,7 @@ export class ExperimentsTree
           path.slice(type.length + 1) || path,
           30
         )
-        return value !== null ? `| ${truncatedKey} | ${value} |\n` : ''
+        return value === null ? '' : `| ${truncatedKey} | ${value} |\n`
       })
       .join('')
 

@@ -241,12 +241,10 @@ SmoothTemplate.args = {
       ...templatePlotsFixture,
       plots: [
         {
-          entries: [
-            ...templatePlotsFixture.plots[0].entries.map(plot => ({
-              ...plot,
-              content: { ...smoothTemplatePlotContent }
-            }))
-          ],
+          entries: templatePlotsFixture.plots[0].entries.map(plot => ({
+            ...plot,
+            content: { ...smoothTemplatePlotContent }
+          })),
           group: TemplatePlotGroup.SINGLE_VIEW
         } as unknown as TemplatePlotSection
       ]
