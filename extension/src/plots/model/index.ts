@@ -25,7 +25,7 @@ import {
   SectionCollapsed,
   PlotSizeNumber
 } from '../webview/contract'
-import { ExperimentsOutput, PlotsOutput } from '../../cli/dvc/contract'
+import { ExperimentsOutput, PlotsOutputOrError } from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
 import { getColorScale, truncateVerticalTitle } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
@@ -39,6 +39,7 @@ import {
   MultiSourceEncoding,
   MultiSourceVariations
 } from '../multiSource/collect'
+import { isDvcError } from '../../cli/dvc/reader'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -104,7 +105,11 @@ export class PlotsModel extends ModelWithPersistence {
     return this.removeStaleData()
   }
 
-  public async transformAndSetPlots(data: PlotsOutput, revs: string[]) {
+  public async transformAndSetPlots(data: PlotsOutputOrError, revs: string[]) {
+    if (isDvcError(data)) {
+      return
+    }
+
     const cliIdToLabel = this.getCLIIdToLabel()
 
     this.fetchedRevs = new Set([

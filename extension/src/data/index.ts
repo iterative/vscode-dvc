@@ -7,12 +7,12 @@ import {
 } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, PlotsOutput } from '../cli/dvc/contract'
+import { ExperimentsOutput, PlotsOutputOrError } from '../cli/dvc/contract'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 
 export abstract class BaseData<
-  T extends { data: PlotsOutput; revs: string[] } | ExperimentsOutput
+  T extends { data: PlotsOutputOrError; revs: string[] } | ExperimentsOutput
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
 
