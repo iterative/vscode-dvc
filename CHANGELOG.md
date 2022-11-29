@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.20] - 2022-11-29
+
+### 🐛 Bug Fixes
+
+- Do not process CLI errors thrown by plots diff [#2852](https://github.com/iterative/vscode-dvc/pull/2852) by [@mattseddon](https://github.com/mattseddon)
+- Fix plots file watchers (diff output key is not always a file) [#2854](https://github.com/iterative/vscode-dvc/pull/2854) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.19] - 2022-11-29
 
 ### 🐛 Bug Fixes
