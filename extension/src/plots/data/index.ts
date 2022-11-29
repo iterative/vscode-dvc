@@ -59,6 +59,10 @@ export class PlotsData extends BaseData<{
       ...args
     )
 
+    if (args.length < 2) {
+      revs.push('workspace')
+    }
+
     this.notifyChanged({ data, revs })
 
     const files = this.collectFiles({ data })
