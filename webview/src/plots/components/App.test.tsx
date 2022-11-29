@@ -1818,38 +1818,6 @@ describe('App', () => {
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
     })
-
-    it('should not reorder the ribbon when comparison plots are reordered', () => {
-      renderAppWithOptionalData({
-        comparison: comparisonTableFixture,
-        selectedRevisions: plotsRevisionsFixture
-      })
-
-      const expectedRevisions = plotsRevisionsFixture.map(rev =>
-        rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
-      )
-
-      expect(getDisplayedRevisionOrder()).toStrictEqual(expectedRevisions)
-
-      sendSetDataMessage({
-        comparison: comparisonTableFixture,
-        selectedRevisions: [
-          {
-            displayColor: '#f56565',
-            fetched: true,
-            group: undefined,
-            id: 'new-revision',
-            revision: 'new-revision'
-          },
-          ...[...plotsRevisionsFixture].reverse()
-        ]
-      })
-
-      expect(getDisplayedRevisionOrder()).toStrictEqual([
-        ...expectedRevisions,
-        'new-revision'
-      ])
-    })
   })
 
   describe('Vega panels', () => {

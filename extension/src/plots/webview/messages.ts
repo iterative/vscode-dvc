@@ -3,6 +3,7 @@ import {
   ComparisonPlot,
   ComparisonRevisionData,
   PlotsData as TPlotsData,
+  Revision,
   Section,
   SectionCollapsed
 } from './contract'
@@ -48,14 +49,17 @@ export class WebviewMessages {
   }
 
   public sendWebviewMessage() {
+    const selectedRevisions = this.plots.getOverrideRevisionDetails()
+    const selectedLabels = selectedRevisions.map(({ revision }) => revision)
+
     this.getWebview()?.show({
       checkpoint: this.getCheckpointPlots(),
-      comparison: this.getComparisonPlots(),
+      comparison: this.getComparisonPlots(selectedLabels),
       hasPlots: !!this.paths?.hasPaths(),
       hasSelectedPlots: definedAndNonEmpty(this.paths.getSelected()),
       sectionCollapsed: this.plots.getSectionCollapsed(),
-      selectedRevisions: this.plots.getSelectedRevisionDetails(),
-      template: this.getTemplatePlots()
+      selectedRevisions,
+      template: this.getTemplatePlots(selectedRevisions)
     })
   }
 
@@ -213,14 +217,14 @@ export class WebviewMessages {
 
   private sendSectionCollapsed() {
     this.getWebview()?.show({
-      sectionCollapsed: this.plots?.getSectionCollapsed()
+      sectionCollapsed: this.plots.getSectionCollapsed()
     })
   }
 
   private sendComparisonPlots() {
     this.getWebview()?.show({
       comparison: this.getComparisonPlots(),
-      selectedRevisions: this.plots?.getSelectedRevisionDetails()
+      selectedRevisions: this.plots.getSelectedRevisionDetails()
     })
   }
 
@@ -230,11 +234,11 @@ export class WebviewMessages {
     })
   }
 
-  private getTemplatePlots() {
-    const paths = this.paths?.getTemplateOrder()
-    const plots = this.plots?.getTemplatePlots(paths)
+  private getTemplatePlots(overrideRevs?: Revision[]) {
+    const paths = this.paths.getTemplateOrder()
+    const plots = this.plots.getTemplatePlots(paths, overrideRevs)
 
-    if (!this.plots || !plots || isEmpty(plots)) {
+    if (!plots || isEmpty(plots)) {
       return null
     }
 
@@ -244,10 +248,10 @@ export class WebviewMessages {
     }
   }
 
-  private getComparisonPlots() {
+  private getComparisonPlots(overrideRevs?: string[]) {
     const paths = this.paths.getComparisonPaths()
-    const comparison = this.plots.getComparisonPlots(paths)
-    if (!this.plots || !comparison || isEmpty(comparison)) {
+    const comparison = this.plots.getComparisonPlots(paths, overrideRevs)
+    if (!comparison || isEmpty(comparison)) {
       return null
     }
 
@@ -285,6 +289,6 @@ export class WebviewMessages {
   }
 
   private getCheckpointPlots() {
-    return this.plots?.getCheckpointPlots() || null
+    return this.plots.getCheckpointPlots() || null
   }
 }

@@ -40,6 +40,8 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
+import { isRunning } from '../../experiments/webview/contract'
+import { SelectedExperimentWithColor } from '../../experiments/model'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -112,11 +114,6 @@ export class PlotsModel extends ModelWithPersistence {
 
     const cliIdToLabel = this.getCLIIdToLabel()
 
-    this.fetchedRevs = new Set([
-      ...this.fetchedRevs,
-      ...revs.map(rev => cliIdToLabel[rev])
-    ])
-
     const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
       await Promise.all([
         collectData(data, cliIdToLabel),
@@ -148,6 +145,11 @@ export class PlotsModel extends ModelWithPersistence {
     )
 
     this.setComparisonOrder()
+
+    this.fetchedRevs = new Set([
+      ...this.fetchedRevs,
+      ...revs.map(rev => cliIdToLabel[rev])
+    ])
 
     this.deferred.resolve()
   }
@@ -181,6 +183,34 @@ export class PlotsModel extends ModelWithPersistence {
     this.deleteRevisionData(id)
   }
 
+  public getOverrideRevisionDetails() {
+    const mapping: { [label: string]: string } = {}
+
+    const selectedWithFetchedRunningCheckpointRevs = this.experiments
+      .getSelectedRevisions()
+      .map(exp => {
+        const { label, status, displayColor, id } = exp
+        if (isRunning(status) && !this.fetchedRevs.has(label)) {
+          const mostRecent =
+            this.experiments
+              .getCheckpoints(id)
+              ?.find(({ label }) => this.fetchedRevs.has(label)) || exp
+          mapping[label] = mostRecent.label
+          return {
+            ...mostRecent,
+            displayColor
+          } as SelectedExperimentWithColor
+        }
+        mapping[label] = label
+        return exp
+      })
+
+    return this.getSelectedRevisionDetails(
+      this.comparisonOrder.map(label => mapping[label]).filter(Boolean),
+      selectedWithFetchedRunningCheckpointRevs
+    )
+  }
+
   public getUnfetchedRevisions() {
     return this.getSelectedRevisions().filter(
       revision => !this.fetchedRevs.has(revision)
@@ -193,41 +223,48 @@ export class PlotsModel extends ModelWithPersistence {
       ...Object.keys(this.revisionData)
     ])
 
-    return this.getSelectedRevisions()
-      .filter(label => !cachedRevisions.has(label))
-      .map(label => this.getCLIId(label))
+    return this.experiments
+      .getSelectedRevisions()
+      .filter(({ label }) => !cachedRevisions.has(label))
+      .map(({ label }) => this.getCLIId(label))
   }
 
   public getMutableRevisions() {
     return this.experiments.getMutableRevisions()
   }
 
-  public getRevisionColors() {
-    return getColorScale(this.getSelectedRevisionDetails())
+  public getRevisionColors(overrideRevs?: Revision[]) {
+    return getColorScale(overrideRevs || this.getSelectedRevisionDetails())
   }
 
-  public getSelectedRevisionDetails() {
+  public getSelectedRevisionDetails(
+    overrideOrder?: string[],
+    overrideRevs?: SelectedExperimentWithColor[]
+  ) {
     return reorderObjectList<Revision>(
-      this.comparisonOrder,
-      this.experiments
-        .getSelectedRevisions()
-        .map(({ label, displayColor, logicalGroupName, id }) => ({
+      overrideOrder || this.comparisonOrder,
+      (overrideRevs || this.experiments.getSelectedRevisions()).map(
+        ({ label, displayColor, logicalGroupName, id }) => ({
           displayColor,
           fetched: this.fetchedRevs.has(label),
           group: logicalGroupName,
           id,
           revision: label
-        })),
+        })
+      ),
       'revision'
     )
   }
 
-  public getTemplatePlots(order: TemplateOrder | undefined) {
+  public getTemplatePlots(
+    order: TemplateOrder | undefined,
+    overrideRevs?: Revision[]
+  ) {
     if (!definedAndNonEmpty(order)) {
       return
     }
 
-    const selectedRevisions = this.getSelectedRevisions()
+    const selectedRevisions = overrideRevs || this.getSelectedRevisionDetails()
 
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
@@ -236,12 +273,15 @@ export class PlotsModel extends ModelWithPersistence {
     return this.getSelectedTemplatePlots(order, selectedRevisions)
   }
 
-  public getComparisonPlots(paths: string[] | undefined) {
+  public getComparisonPlots(
+    paths: string[] | undefined,
+    overrideRevs?: string[]
+  ) {
     if (!paths) {
       return
     }
 
-    const selectedRevisions = this.getSelectedRevisions()
+    const selectedRevisions = overrideRevs || this.getSelectedRevisions()
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
     }
@@ -374,7 +414,7 @@ export class PlotsModel extends ModelWithPersistence {
   private getCLIIdToLabel() {
     const mapping: { [shortSha: string]: string } = {}
 
-    for (const rev of this.getSelectedRevisions()) {
+    for (const rev of this.experiments.getRevisions()) {
       mapping[this.getCLIId(rev)] = rev
     }
 
@@ -445,15 +485,15 @@ export class PlotsModel extends ModelWithPersistence {
 
   private getSelectedTemplatePlots(
     order: TemplateOrder,
-    selectedRevisions: string[]
+    selectedRevisions: Revision[]
   ) {
     return collectSelectedTemplatePlots(
       order,
-      selectedRevisions,
+      selectedRevisions.map(({ revision }) => revision),
       this.templates,
       this.revisionData,
       this.getPlotSize(Section.TEMPLATE_PLOTS),
-      this.getRevisionColors(),
+      this.getRevisionColors(selectedRevisions),
       this.multiSourceEncoding
     )
   }

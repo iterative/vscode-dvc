@@ -140,10 +140,8 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.paths.hasPaths() &&
       definedAndNonEmpty(this.plots.getUnfetchedRevisions())
     ) {
-      this.webviewMessages.sendCheckpointPlotsMessage()
       this.data.managedUpdate()
     }
-    // needs to wait for update if checkpoint experiment is running <= fix this in the way described in #2831
 
     return this.webviewMessages.sendWebviewMessage()
   }
