@@ -1,6 +1,6 @@
 import { EventEmitter } from 'vscode'
+import { collectFiles } from './collect'
 import { PlotsOutputOrError } from '../../cli/dvc/contract'
-import { isDvcError } from '../../cli/dvc/reader'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
 import {
@@ -59,22 +59,19 @@ export class PlotsData extends BaseData<{
       ...args
     )
 
+    this.notifyChanged({ data, revs })
+
     const files = this.collectFiles({ data })
 
     this.compareFiles(files)
-
-    return this.notifyChanged({ data, revs })
   }
 
   public managedUpdate() {
     return this.processManager.run('update')
   }
 
-  public collectFiles({ data }: { data: PlotsOutputOrError }) {
-    if (isDvcError(data)) {
-      return this.collectedFiles
-    }
-    return [...Object.keys(data), ...this.collectedFiles]
+  protected collectFiles({ data }: { data: PlotsOutputOrError }) {
+    return collectFiles(data, this.collectedFiles)
   }
 
   private getArgs(revs: string[]) {

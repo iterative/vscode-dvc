@@ -108,7 +108,7 @@ export abstract class BaseData<
     )
   }
 
-  abstract collectFiles(data: T): string[]
-
   abstract managedUpdate(path?: string): Promise<unknown>
+
+  protected abstract collectFiles(data: T): string[]
 }
