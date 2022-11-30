@@ -1307,11 +1307,6 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.webviews",
-          "name": "Views",
-          "when": "true"
-        },
-        {
           "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
@@ -1320,6 +1315,11 @@
           "id": "dvc.views.welcome",
           "name": "Welcome",
           "when": "!dvc.commands.available || dvc.cli.incompatible || !dvc.project.available"
+        },
+        {
+          "id": "dvc.views.webviews",
+          "name": "Views",
+          "when": "true"
         },
         {
           "id": "dvc.views.experimentsTree",
